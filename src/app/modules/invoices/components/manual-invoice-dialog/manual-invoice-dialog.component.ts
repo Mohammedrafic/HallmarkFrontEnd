@@ -43,7 +43,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     invoiceCandidates: [],
     invoiceAgencies: [],
     reasons: [],
-  }
+  };
 
   private filesForUpload: FileForUpload[];
 
@@ -58,7 +58,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   ngOnInit(): void {
     this.strategy = this.injector.get<ManualInvoiceStrategy>(
       ManualInvoiceStrategyMap.get(this.isAgency) as ProviderToken<ManualInvoiceStrategy>);
-      
+
     this.form = this.addService.createForm(this.isAgency) as CustomFormGroup<AddManInvoiceForm>;
 
     this.watchForSearch();
@@ -158,7 +158,6 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       });
       
       if (!item) {
-        this.postionSearch = null;
         this.postionSearch = null;
         const basedOnOrder = this.searchOptions.filter((item) => item.orderId.toString() === concatedValue) || [];
         this.strategy.populateOptions(basedOnOrder, this.dropDownOptions, this.form, this.dialogConfig, false);

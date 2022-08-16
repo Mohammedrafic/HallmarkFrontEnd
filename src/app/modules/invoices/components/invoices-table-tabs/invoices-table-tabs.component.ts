@@ -12,6 +12,9 @@ export class InvoicesTableTabsComponent {
   @Input()
   public tabConfig: TabsListConfig[];
 
+  @Input()
+  public agency: boolean = false;
+
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
 

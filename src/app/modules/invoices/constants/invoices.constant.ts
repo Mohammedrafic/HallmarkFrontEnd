@@ -9,12 +9,21 @@ import {
 import { FilteringOptionsFields, TableColumnAlign } from '../../timesheets/enums';
 import { InvoicesTableFiltersColumns } from '../enums/invoices.enum';
 
-export const INVOICES_TAB_CONFIG: TabsListConfig[] = [
+export const AGENCY_INVOICE_TABS: TabsListConfig[] = [
   {
-    title: 'Invoice Records',
+    title: 'Manual Invoice Pending'
   },
   {
-    title: 'All Invoices'
+    title: 'All Invoices',
+  }
+];
+
+export const ORGANIZATION_INVOICE_TABS: TabsListConfig[] = [
+  {
+    title: 'Manual Invoice Pending'
+  },
+  {
+    title: 'Pending Invoice Records'
   },
   {
     title: 'Pending Approval'
@@ -24,75 +33,11 @@ export const INVOICES_TAB_CONFIG: TabsListConfig[] = [
   },
   {
     title: 'Paid',
-  }
+  },
+  {
+    title: 'All Invoices'
+  },
 ];
-
-// export const MOK_CHILDREN_ITEMS: InvoiceItem[] = [
-//   {
-//     candidate: 'Sanders, Paul',
-//     amount: 1400,
-//     startDate: '2022-07-01T12:12:00',
-//     minRate: 50,
-//     maxRate: 50,
-//     timesheetId: '12345',
-//   },
-//   {
-//     candidate: 'Paul, Sanders',
-//     amount: 1600,
-//     startDate: '2022-07-01T12:12:00',
-//     minRate: 40,
-//     maxRate: 50,
-//     timesheetId: '12346',
-//   },
-//   {
-//     candidate: 'Sanders, Paul',
-//     amount: 1430,
-//     startDate: '2022-07-03T12:12:00',
-//     minRate: 20,
-//     maxRate: 50,
-//     timesheetId: '12347',
-//   }
-// ];
-
-// export const MOK_ALL_INVOICES_ITEMS = [
-//   {
-//     id: '20-30-01',
-//     statusText: INVOICES_STATUSES.SUBMITED_PEND_APPR,
-//     amount: 5000,
-//     type: 'Interface',
-//     organization: 'AB Staffing',
-//     location: 'Thone - Johnson Memorial Hospital',
-//     department: 'Emergency Department 1',
-//     candidate: 'Adkis, Adele Blue',
-//     issueDate: '2022-07-01T15:00:00',
-//     dueDate: '2022-07-20T12:00:00',
-//     invoices: MOK_CHILDREN_ITEMS,
-//   },
-//   {
-//     id: '20-30-01',
-//     statusText: INVOICES_STATUSES.PENDING_APPROVAL,
-//     amount: 5000,
-//     type: 'Interface',
-//     organization: 'AB Staffing',
-//     location: 'Thone - Johnson Memorial Hospital',
-//     department: 'Emergency Department 1',
-//     candidate: 'Adkis, Adele Blue',
-//     issueDate: '2022-07-01T15:00:00',
-//     dueDate: '2022-07-20T12:00:00'
-//   },
-//   {
-//     id: '20-30-01',
-//     statusText: INVOICES_STATUSES.PENDING_PAYMENT,
-//     amount: 5000,
-//     type: 'Interface',
-//     organization: 'AB Staffing',
-//     location: 'Thone - Johnson Memorial Hospital',
-//     department: 'Emergency Department 1',
-//     candidate: 'Adkis, Adele Blue',
-//     issueDate: '2022-07-01T15:00:00',
-//     dueDate: '2022-07-20T12:00:00'
-//   },
-// ];
 
 export const DEFAULT_ALL_INVOICES: InvoicePage = {
   items: [],

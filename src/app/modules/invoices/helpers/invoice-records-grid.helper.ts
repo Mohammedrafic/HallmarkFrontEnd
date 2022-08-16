@@ -9,7 +9,6 @@ import {
   TitleValueCellRendererComponent
 } from '@shared/components/grid/components/title-value-cell-renderer/title-value-cell-renderer.component';
 import { InvoiceRecord, InvoiceRecordTimesheetEntry } from '../interfaces';
-import { BillRateType } from '@shared/models';
 import {
   InvoiceRecordsTableRowDetailsComponent
 } from '../components/invoice-records-table-row-details/invoice-records-table-row-details.component';
@@ -18,6 +17,8 @@ import { GridValuesHelper } from '../../timesheets/helpers';
 import { GridCellLinkComponent } from '@shared/components/grid/components/grid-cell-link/grid-cell-link.component';
 import { GridCellLinkParams } from '@shared/components/grid/models';
 import { Attachment, AttachmentsListComponent, AttachmentsListParams } from '@shared/components/attachments';
+import { pendingInvoicesColDefsMap } from './pending-invoices-grid.helper';
+import { PendingInvoice, PendingInvoiceRecord } from '../interfaces/pending-invoice-record.interface';
 
 export class InvoiceRecordsGridHelper {
   public static getRowNestedGridOptions(): GridOptions {
@@ -27,8 +28,8 @@ export class InvoiceRecordsGridHelper {
       animateRows: true,
       getRowHeight: (params: RowHeightParams) => {
         if (params?.node?.detail) {
-          const data = params.data as InvoiceRecord;
-          return data.timesheetRecords.length * params.api.getSizesForCurrentTheme().rowHeight + 1;
+          const data = params.data as PendingInvoice;
+          return data.invoiceRecords.length * params.api.getSizesForCurrentTheme().rowHeight + 1;
         }
 
         return null;
@@ -39,7 +40,7 @@ export class InvoiceRecordsGridHelper {
         },
         getDetailRowData: (params: GetDetailRowDataParams) => {
           params.successCallback(
-            (params.data as InvoiceRecord).timesheetRecords
+            (params.data as PendingInvoice).invoiceRecords,
           );
         },
       } as IDetailCellRendererParams,
@@ -67,8 +68,8 @@ export class InvoiceRecordsGridHelper {
         cellRenderer: TitleValueCellRendererComponent,
         headerName: 'Bill Rate Type',
         valueGetter: (params: ValueGetterParams) => {
-          const data = params.data as InvoiceRecordTimesheetEntry;
-          return BillRateType[data.billRateType];
+          const data = params.data as PendingInvoiceRecord;
+          return data.billRateConfigTitle;
         },
       },
       {
@@ -88,18 +89,22 @@ export class InvoiceRecordsGridHelper {
         width: 80,
         cellRenderer: TitleValueCellRendererComponent,
         headerName: 'Rate',
+        valueGetter: (params: ValueGetterParams) => (params.data as PendingInvoiceRecord).rate || 0,
       },
       {
         field: 'value',
         width: 80,
         cellRenderer: TitleValueCellRendererComponent,
         headerName: 'Value',
+        valueGetter: (params: ValueGetterParams) => (params.data as PendingInvoiceRecord).value || 0,
       },
       {
         field: 'total',
         width: 80,
         cellRenderer: TitleValueCellRendererComponent,
         headerName: 'Total',
+        // Update after implemented on BE
+        valueGetter: () => 0,
       },
       {
         field: 'comment',
@@ -110,10 +115,17 @@ export class InvoiceRecordsGridHelper {
   }
 
   public static getInvoiceRecordsGridColumnDefinitions(): ColDef[] {
+    const {
+      timesheetType,
+      candidateName,
+      locationName,
+      departmentName,
+      skillName,
+      weekPeriod,
+    } = pendingInvoicesColDefsMap;
     return [
       {
-        field: 'type',
-        headerName: 'TYPE',
+        ...timesheetType,
         headerCheckboxSelection: true,
         headerCheckboxSelectionFilteredOnly: true,
         checkboxSelection: true,
@@ -122,17 +134,10 @@ export class InvoiceRecordsGridHelper {
         cellRenderer: 'agGroupCellRenderer',
       },
       {
-        field: 'agency',
+        field: 'agencyName',
         headerName: 'AGENCY',
       },
-      {
-        headerName: 'CANDIDATE NAME',
-        valueGetter: (params: ValueGetterParams) => {
-          const record = params.data as InvoiceRecord;
-
-          return `${record.candidateLastName}, ${record.candidateFirstName}`
-        }
-      },
+      candidateName,
       {
         field: 'orderId',
         headerName: 'ORDER ID',
@@ -150,10 +155,7 @@ export class InvoiceRecordsGridHelper {
           } as GridCellLinkParams;
         }
       },
-      {
-        field: 'location',
-        headerName: 'Location',
-      },
+      locationName,
       {
         field: 'attachments',
         cellRenderer: AttachmentsListComponent,
@@ -168,42 +170,16 @@ export class InvoiceRecordsGridHelper {
         },
         cellClass: 'invoice-records-attachments-list',
       },
-      {
-        field: 'department',
-        headerName: 'DEPARTMENT',
-      },
-      {
-        field: 'skill',
-        headerName: 'SKILL',
-      },
-      {
-        headerName: 'WEEK PERIOD',
-        valueGetter: (params: ValueGetterParams) => {
-          const record = params.data as InvoiceRecord;
-
-          return GridValuesHelper.formatDate(record.startDate, 'W - ccc M/d/yy');
-        },
-      },
+      departmentName,
+      skillName,
+      weekPeriod,
       {
         field: 'rate',
         headerName: 'RATE',
         width: 110,
         type: 'rightAligned',
         cellClass: 'color-black-bold align-right',
-      },
-      {
-        field: 'bonus',
-        headerName: 'BONUS',
-        width: 110,
-        type: 'rightAligned',
-        cellClass: 'color-black-bold align-right',
-      },
-      {
-        field: 'expenses',
-        headerName: 'EXPENSES',
-        width: 110,
-        type: 'rightAligned',
-        cellClass: 'color-black-bold align-right',
+        valueGetter: (params: ValueGetterParams) => (params.data as PendingInvoice).rate || 0
       },
       {
         field: 'hours',
@@ -211,6 +187,7 @@ export class InvoiceRecordsGridHelper {
         width: 110,
         type: 'rightAligned',
         cellClass: 'color-black-bold align-right',
+        valueGetter: (params: ValueGetterParams) => (params.data as PendingInvoice).miles || 0,
       },
       {
         field: 'miles',
@@ -218,6 +195,7 @@ export class InvoiceRecordsGridHelper {
         width: 110,
         type: 'rightAligned',
         cellClass: 'color-black-bold align-right',
+        valueGetter: (params: ValueGetterParams) => (params.data as PendingInvoice).miles || 0,
       },
       {
         field: 'amount',
@@ -225,13 +203,7 @@ export class InvoiceRecordsGridHelper {
         width: 110,
         type: 'rightAligned',
         cellClass: 'color-black-bold align-right',
-      },
-      {
-        field: 'amount',
-        headerName: 'AMOUNT',
-        width: 110,
-        type: 'rightAligned',
-        cellClass: 'color-black-bold align-right',
+        valueGetter: (params: ValueGetterParams) => (params.data as PendingInvoice).amount || 0,
       },
     ];
   }

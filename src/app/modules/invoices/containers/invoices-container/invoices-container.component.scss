@@ -4,6 +4,34 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+
+  ::ng-deep {
+    .color-supportive-green-10 {
+      color: $supportive-green-10;
+    }
+
+    .color-supportive-red {
+      color: $supportive-red;
+    }
+
+    .color-primary-active-blue-10 {
+      color: $primary-active-blue-10;
+    }
+
+    .color-black-bold {
+      font-weight: 700;
+    }
+
+    .align-right {
+      text-align: right;
+    }
+
+    .ag-cell {
+      .ag-cell-wrapper .ag-selection-checkbox {
+        margin-right: 20px;
+      }
+    }
+  }
 }
 
 .tab-navigation {

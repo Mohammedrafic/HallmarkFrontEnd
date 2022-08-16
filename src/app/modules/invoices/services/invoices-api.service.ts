@@ -1,14 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {ActivatedRoute} from "@angular/router";
 
 import { Observable, of } from 'rxjs';
-import {map} from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
-import {PageOfCollections} from '@shared/models/page.model';
+import { PageOfCollections } from '@shared/models/page.model';
 import { DataSourceItem, FileForUpload } from '@core/interface';
-import {InvoicesFilteringOptions, ManualInvoiceMeta, ManualInvoicePostDto, ManualInvoiceReason, ManualInvoiceTimesheetResponse} from '../interfaces';
+import {
+  InvoicesFilteringOptions,
+  InvoicesFilterState,
+  ManualInvoiceMeta,
+  ManualInvoicePostDto,
+  ManualInvoiceReason, ManualInvoiceTimesheetResponse
+} from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
+import { PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
+import { ChangeStatusData } from '../../timesheets/interface';
 
 @Injectable()
 export class InvoicesApiService {
@@ -73,5 +80,13 @@ export class InvoicesApiService {
     const endPoint = orgId ? `/api/Timesheets/${timesheetId}/organization/${orgId}/files`
     : `/api/Timesheets/${timesheetId}/files`
     return this.http.post<number[]>(endPoint, formData);
+  }
+
+  public getPendingInvoices(data: InvoicesFilterState): Observable<PendingInvoicesData> {
+    return this.http.post<PendingInvoicesData>('/api/PendingInvoices', data);
+  }
+
+  public changeInvoiceStatus(data: ChangeStatusData): Observable<void> {
+    return this.http.post<void>(`/api/TimesheetState/setstatus`, data);
   }
 }

@@ -123,6 +123,7 @@ import { OrderCloseReasonInfoComponent } from '@shared/components/order-close-re
 import { CommentComponent } from './components/comments/comment/comment.component';
 import { CommentsState } from './components/comments/store/comments.state';
 import { CandidateStatusName } from './pipes/candidate-status-name.pipe';
+import { RouterModule } from '@angular/router';
 
 const icons = {
   AlertCircle,
@@ -237,6 +238,7 @@ const COMPONENTS = [
     MultiSelectModule,
     NgxMaskModule.forChild(),
     SidebarModule,
+    RouterModule,
   ],
   exports: [
     ...COMPONENTS,
