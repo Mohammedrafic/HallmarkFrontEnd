@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
@@ -19,6 +19,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 import { AllOrganizationsSkill } from 'src/app/dashboard/models/all-organization-skill.model';
 import { DeleteEventArgs } from '@syncfusion/ej2-angular-buttons';
+import { isEqual } from 'lodash';
 
 
 @Component({
@@ -109,7 +110,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     changes['organizationStructure'] && this.onOrganizationStructureDataLoadHandler();
     changes['userIsAdmin'] && this.setupAdminFilter();
     changes['allOrganizations'] && this.onAllOrganizationsDataLoadHandler();
-    changes['orderedFilters'] && this.orderChipList();
+    changes['orderedFilters'] && this.orderChipList(changes['orderedFilters']);
   }
 
   private setupAdminFilter(): void {
@@ -335,7 +336,8 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     }
   }
 
-  private orderChipList(): void {
+  private orderChipList(change: SimpleChange): void {
+    if(isEqual(change.currentValue, change.previousValue)) return;
     this.orderedFilterChips = Object.entries(this.orderedFilters).map((item) => item.flat()); 
   }
 
