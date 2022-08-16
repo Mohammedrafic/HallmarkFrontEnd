@@ -431,7 +431,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     jobStartDateControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((jobStartDate: Date | null) => {
       const duration = durationControl.value;
 
-      if (isNaN(parseInt(duration)) || !(jobStartDate instanceof Date)) {
+      if (isNaN(parseInt(duration)) || !(jobStartDate instanceof Date) || orderTypeControl.value === OrderType.PermPlacement) {
         return;
       }
 
@@ -588,6 +588,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private populateHourlyRateField(orderType: OrderType, departmentId: number, skillId: number): void {
+    if (orderType === OrderType.PermPlacement) {
+      return;
+    }
     this.orderManagementService
       .getRegularLocalBillRate(orderType, departmentId, skillId)
       .pipe(
