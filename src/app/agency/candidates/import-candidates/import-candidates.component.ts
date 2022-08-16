@@ -81,7 +81,6 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
   ngOnInit(): void {
     this.subscribeOnOpenEvent();
     this.subscribeOnFileActions();
-    this.dropElement = document.getElementById('droparea') as HTMLElement;
   }
 
   public browse() : void {
@@ -157,8 +156,15 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
     }
   }
 
+  private setDropElement(): void {
+    this.dropElement = document.getElementById('droparea') as HTMLElement;
+  }
+
   private subscribeOnOpenEvent(): void {
-    this.openEvent.pipe(takeUntil(this.destroy$)).subscribe(() => this.sideDialog.show());
+    this.openEvent.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.sideDialog.show();
+      this.setDropElement();
+    });
   }
 
   private subscribeOnFileActions(): void {
@@ -182,11 +188,13 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
       });
 
     this.actions$.pipe(takeUntil(this.destroy$), ofActionSuccessful(SaveCandidateImportResultSucceeded))
-      .subscribe((result: { payload: CandidateImportResult }) => {
+      .subscribe(() => {
         this.store.dispatch(new ShowToast(MessageTypes.Success, 'Candidates were imported'));
         this.reloadCandidateList.next();
         if (this.candidateImportResult?.errorRecords.length) {
           this.tab.select(1); // errors tab
+        } else {
+          this.closeDialog();
         }
       });
   }
@@ -200,8 +208,15 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
 
   private getListBoxData(records: CandidateImportRecord[]): ListBoxItem[] {
     return records.map((item: CandidateImportRecord) => {
+      const firstName = item.candidateProfile?.firstName
+        || item.candidateExperiencesImportDtos[0]?.firstName
+        || item.candidatEducationImportDtos[0]?.firstName || '';
+      const lastName = item.candidateProfile?.lastName
+        || item.candidateExperiencesImportDtos[0]?.lastName
+        || item.candidatEducationImportDtos[0]?.lastName || '';
+
       return {
-        name: `${item.candidateProfile?.firstName} ${item.candidateProfile?.lastName}`,
+        name: firstName || lastName ? `${firstName} ${lastName}` : item.key,
         id: item.key
       }
     });
@@ -245,16 +260,20 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
   }
 
   private saveImportedCandidates(): void {
-    this.confirmService
-      .confirm(IMPORT_CONFIRM_TEXT, {
-        title: IMPORT_CONFIRM_TITLE,
-        okButtonLabel: 'Import',
-        okButtonClass: ''
-      })
-      .pipe(filter((confirm) => confirm))
-      .subscribe(() => {
-        this.store.dispatch(new SaveCandidateImportResult(this.candidateImportResult?.succesfullRecords || []));
-      });
+    if (this.candidateImportResult?.errorRecords.length) {
+      this.confirmService
+        .confirm(IMPORT_CONFIRM_TEXT, {
+          title: IMPORT_CONFIRM_TITLE,
+          okButtonLabel: 'Import',
+          okButtonClass: ''
+        })
+        .pipe(filter((confirm) => confirm))
+        .subscribe(() => {
+          this.store.dispatch(new SaveCandidateImportResult(this.candidateImportResult?.succesfullRecords || []));
+        });
+    } else {
+      this.store.dispatch(new SaveCandidateImportResult(this.candidateImportResult?.succesfullRecords || []));
+    }
   }
 
   private setCandidateImportResult(result: CandidateImportResult): void {
