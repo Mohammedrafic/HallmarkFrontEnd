@@ -267,6 +267,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     if (this.selectedLocation?.id) {
       this.getDepartments();
       this.clearSelection(this.grid);
+    } else {
+      this.grid.dataSource = [];
     }
   }
 

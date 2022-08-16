@@ -42,7 +42,7 @@
             <button
               ejs-button
               cssClass="e-outline edit-button"
-              [disabled]="!!(order?.orderClosureReasonId || order?.orderCloseDate)"
+              [disabled]="order?.status === orderStatus.Closed"
               (click)="editOrder(order)"
             >
               <i-feather name="edit" class="icon"></i-feather>
