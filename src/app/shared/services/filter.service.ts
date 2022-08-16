@@ -25,6 +25,8 @@ export class FilterService {
       form.controls[event.column].setValue(false);
     } else if (filterColumns[event.column].type === ControlTypes.Radio) {
       form.controls[event.column].setValue(filterColumns[event.column].default);
+    } else if (filterColumns[event.column].type === ControlTypes.Date) {
+      form.controls[event.column].setValue(null);
     } else {
       form.controls[event.column].setValue('');
     }
