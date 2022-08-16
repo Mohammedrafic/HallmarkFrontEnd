@@ -75,6 +75,10 @@
               .e-file-name, .e-file-type {
                 padding: unset;
               }
+
+              .e-file-name::before {
+                content: none;
+              }
             }
 
             .e-file-remove-btn {
