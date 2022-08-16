@@ -89,6 +89,4 @@ export class OrganizationStrategy implements ManualInvoiceStrategy {
       }
     });
   }
-
-
 }
