@@ -2,21 +2,19 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder } from '@angular/forms';
 
-import { Observable, of } from 'rxjs';
+import { filter, Observable, switchMap, take } from 'rxjs';
 import { Store } from '@ngxs/store';
 
 import { BaseObservable } from '@core/helpers';
 import { CustomFormGroup, DataSourceItem } from '@core/interface';
-import { PageOfCollections } from '@shared/models/page.model';
 import { OrganizationRegion } from '@shared/models/organization.model';
 
-import { GetInvoicesData, InvoiceRecord } from '../interfaces';
-import { generateInvoiceRecords } from '../helpers/generate-invoices-mock.helper';
 import { InvoiceFilterForm } from '../interfaces/form.interface';
 import { InvoicesTableFiltersColumns } from '../enums/invoices.enum';
 import { Invoices } from '../store/actions/invoices.actions';
-
-const mockedRecords: InvoiceRecord[] = generateInvoiceRecords(10);
+import { ConfirmService } from '@shared/services/confirm.service';
+import { rejectInvoiceConfirmDialogConfig } from '../constants/reject-invoice-confirm-dialog-config.const';
+import { approveInvoiceConfirmDialogConfig } from '../constants/approve-invoice-confirm-dialog-config.const';
 
 @Injectable()
 export class InvoicesService {
@@ -25,7 +23,8 @@ export class InvoicesService {
   constructor(
     private http: HttpClient,
     private fb: FormBuilder,
-    private store: Store
+    private confirmService: ConfirmService,
+    private store: Store,
   ) {
   }
 
@@ -47,20 +46,6 @@ export class InvoicesService {
     this.store.dispatch(new Invoices.SetFiltersDataSource(key, source));
   }
 
-  public getInvoices({pageSize, page}: GetInvoicesData): Observable<PageOfCollections<InvoiceRecord>> {
-    const totalPages = Math.ceil(100 / pageSize);
-    const currentPage = page;
-
-    return of({
-      items: mockedRecords,
-      totalCount: 100,
-      hasNextPage: currentPage < totalPages,
-      hasPreviousPage: currentPage > 1,
-      pageNumber: page,
-      totalPages: totalPages,
-    } as PageOfCollections<InvoiceRecord>);
-  }
-
   public getCurrentTableIdxStream(): Observable<number> {
     return this.currentSelectedTableRowIndex.getStream();
   }
@@ -77,5 +62,37 @@ export class InvoicesService {
 
   public getNextIndex(): number {
     return this.currentSelectedTableRowIndex.get();
+  }
+
+  public approveInvoice(invoiceId: number): Observable<void> {
+    const { title, submitButtonText, getMessage } = approveInvoiceConfirmDialogConfig;
+
+    return this.confirmService.confirm(getMessage(invoiceId), {
+      title,
+      okButtonLabel: submitButtonText,
+      okButtonClass: 'delete-button'
+    })
+      .pipe(
+        take(1),
+        filter((submitted: boolean) => submitted),
+        switchMap(() => this.store.dispatch(new Invoices.ApproveInvoice(invoiceId))),
+      );
+  }
+
+  public rejectInvoice(invoiceId: number): Observable<void> {
+    const {
+      title, okButtonLabel, okButtonClass
+    } = rejectInvoiceConfirmDialogConfig;
+
+    return this.confirmService.confirm(`Are you sure you want to reject invoice ${invoiceId}?`, {
+      title,
+      okButtonLabel,
+      okButtonClass,
+    })
+      .pipe(
+        take(1),
+        filter((submitted: boolean) => submitted),
+        switchMap(() => this.store.dispatch(new Invoices.RejectInvoice(invoiceId))),
+      );
   }
 }

@@ -1,7 +1,8 @@
 <app-page-toolbar>
   <ng-container left>
     <app-invoices-table-tabs
-      [tabConfig]="tabsConfig"
+      [agency]="!!organizationId"
+      [tabConfig]="(tabsConfig$ | async) || []"
       (changeTab)="handleChangeTab($event)">
     </app-invoices-table-tabs>
   </ng-container>
@@ -41,20 +42,25 @@
 </app-page-toolbar>
 
 <section class="invoices-table-container">
-  <ng-container [ngSwitch]="selectedTabIdx">
-    <ng-container *ngSwitchCase="0">
-      <app-invoice-records-table [tableData]="invoiceRecordsData$ | async"
-                                 #invoiceRecordsTable
-      ></app-invoice-records-table>
-    </ng-container>
-    <ng-container *ngSwitchDefault>
-      <app-all-invoices-table
-        #allInvoicesTable
-        [tableData]="allInvoices"
-        (rowSelectedData)="handleRowSelected($event)">
-      </app-all-invoices-table>
-    </ng-container>
-  </ng-container>
+  <app-grid
+          [class.inactive]="!(pendingInvoicesData$ | async)?.items?.length"
+          (gridReadyEmitter)="gridReady($event)"
+          (navigateToPageEmitter)="handlePageChange($event)"
+          (pageSizeChangeEmitter)="handlePageSizeChange($event)"
+          (approveEmitter)="bulkApprove($event)"
+          (exportEmitter)="bulkExport($event)"
+          (gridSelectedRow)="selectedRow($event)"
+          (sortChanged)="handleSortingChange($event)"
+          [suppressRowClickSelection]="false"
+          [columnDefinitions]="colDefs"
+          [isLoading]="isLoading"
+          [rowData]="(pendingInvoicesData$ | async)?.items"
+          [totalRecordsCount]="(pendingInvoicesData$ | async)?.items?.length || 0"
+          [changeTableSelectedIndex]="newSelectedIndex"
+          [allowBulkSelection]="false"
+          [rowSelection]="'multiple'"
+          [gridOptions]="gridOptions"
+  ></app-grid>
 </section>
 
 <app-invoice-record-dialog #invoiceRecordDialog></app-invoice-record-dialog>

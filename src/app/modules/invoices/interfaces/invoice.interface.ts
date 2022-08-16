@@ -55,6 +55,7 @@ export interface InvoicesFilterState {
   departmentIds?: string[];
   agencyIds?: string[];
   skillIds?: string[];
+  organizationId?: number | null;
 }
 
 export type InvoiceFilterColumns = {

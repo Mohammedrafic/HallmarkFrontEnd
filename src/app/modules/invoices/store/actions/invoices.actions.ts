@@ -12,6 +12,13 @@ export namespace Invoices {
     }
   }
 
+  export class GetPendingInvoices {
+    static readonly type = INVOICES_ACTIONS.GET_PENDING_INVOICES;
+
+    constructor(public readonly organizationId: number | null) {
+    }
+  }
+
   export class ToggleInvoiceDialog {
     static readonly type = INVOICES_ACTIONS.TOGGLE_INVOICE_DIALOG;
 
@@ -105,5 +112,33 @@ export namespace Invoices {
 
   export class ClearAttachments {
     static readonly type = INVOICES_ACTIONS.ClearManInvoiceAttachments;
+  }
+
+  export class SubmitInvoice {
+    static readonly type = INVOICES_ACTIONS.SubmitInvoice;
+
+    constructor(
+      public readonly invoiceId: number,
+      public readonly orgId: number | null,
+    ) {
+    }
+  }
+
+  export class ApproveInvoice {
+    static readonly type = INVOICES_ACTIONS.ApproveInvoice;
+
+    constructor(
+      public readonly invoiceId: number,
+    ) {
+    }
+  }
+
+  export class RejectInvoice {
+    static readonly type = INVOICES_ACTIONS.RejectInvoice;
+
+    constructor(
+      public readonly invoiceId: number,
+    ) {
+    }
   }
 }
