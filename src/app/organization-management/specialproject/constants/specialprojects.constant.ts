@@ -39,42 +39,42 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
         buttons: ['reset']
       }
     },
-    {
-      field: PurchaseOrderTableColumns.Region,
-      headerName: PurchaseOrderHeaderText.Region,
-      ...commonColumn,
-      filter: 'agSetColumnFilter',
-      filterParams: {
-        buttons: ['reset']
-      }
-    },
-    {
-      field: PurchaseOrderTableColumns.Location,
-      headerName: PurchaseOrderHeaderText.Location,
-      ...commonColumn,
-      filter: 'agSetColumnFilter',
-      filterParams: {
-        buttons: ['reset']
-      }
-    },
-    {
-      field: PurchaseOrderTableColumns.SkillName,
-      headerName: PurchaseOrderHeaderText.SkillName,
-      ...commonColumn,
-      filter: 'agSetColumnFilter',
-      filterParams: {
-        buttons: ['reset']
-      }
-    },
-    {
-      field: PurchaseOrderTableColumns.Department,
-      headerName: PurchaseOrderHeaderText.Department,
-      ...commonColumn,
-      filter: 'agSetColumnFilter',
-      filterParams: {
-        buttons: ['reset']
-      }
-    },
+    // {
+    //   field: PurchaseOrderTableColumns.Region,
+    //   headerName: PurchaseOrderHeaderText.Region,
+    //   ...commonColumn,
+    //   filter: 'agSetColumnFilter',
+    //   filterParams: {
+    //     buttons: ['reset']
+    //   }
+    // },
+    // {
+    //   field: PurchaseOrderTableColumns.Location,
+    //   headerName: PurchaseOrderHeaderText.Location,
+    //   ...commonColumn,
+    //   filter: 'agSetColumnFilter',
+    //   filterParams: {
+    //     buttons: ['reset']
+    //   }
+    // },
+    // {
+    //   field: PurchaseOrderTableColumns.SkillName,
+    //   headerName: PurchaseOrderHeaderText.SkillName,
+    //   ...commonColumn,
+    //   filter: 'agSetColumnFilter',
+    //   filterParams: {
+    //     buttons: ['reset']
+    //   }
+    // },
+    // {
+    //   field: PurchaseOrderTableColumns.Department,
+    //   headerName: PurchaseOrderHeaderText.Department,
+    //   ...commonColumn,
+    //   filter: 'agSetColumnFilter',
+    //   filterParams: {
+    //     buttons: ['reset']
+    //   }
+    // },
     {
       field: PurchaseOrderTableColumns.ProjectBudget,
       headerName: PurchaseOrderHeaderText.ProjectBudget,
@@ -182,42 +182,42 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
         buttons: ['reset']
       }
     },
-    {
-      field: "regionName",
-      headerName: SpecialProjectHeaderText.Region,
-      ...commonColumn,
-      filter: 'agSetColumnFilter',
-      filterParams: {
-        buttons: ['reset']
-      }
-    },
-    {
-      field: SpecialProjectTableColumns.Location,
-      headerName: SpecialProjectHeaderText.Location,
-      ...commonColumn,
-      filter: 'agSetColumnFilter',
-      filterParams: {
-        buttons: ['reset']
-      }
-    },
-    {
-      field: SpecialProjectTableColumns.SkillName,
-      headerName: SpecialProjectHeaderText.SkillName,
-      ...commonColumn,
-      filter: 'agSetColumnFilter',
-      filterParams: {
-        buttons: ['reset']
-      }
-    },
-    {
-      field: SpecialProjectTableColumns.Department,
-      headerName: SpecialProjectHeaderText.Department,
-      ...commonColumn,
-      filter: 'agSetColumnFilter',
-      filterParams: {
-        buttons: ['reset']
-      }
-    },
+    // {
+    //   field: "regionName",
+    //   headerName: SpecialProjectHeaderText.Region,
+    //   ...commonColumn,
+    //   filter: 'agSetColumnFilter',
+    //   filterParams: {
+    //     buttons: ['reset']
+    //   }
+    // },
+    // {
+    //   field: SpecialProjectTableColumns.Location,
+    //   headerName: SpecialProjectHeaderText.Location,
+    //   ...commonColumn,
+    //   filter: 'agSetColumnFilter',
+    //   filterParams: {
+    //     buttons: ['reset']
+    //   }
+    // },
+    // {
+    //   field: SpecialProjectTableColumns.SkillName,
+    //   headerName: SpecialProjectHeaderText.SkillName,
+    //   ...commonColumn,
+    //   filter: 'agSetColumnFilter',
+    //   filterParams: {
+    //     buttons: ['reset']
+    //   }
+    // },
+    // {
+    //   field: SpecialProjectTableColumns.Department,
+    //   headerName: SpecialProjectHeaderText.Department,
+    //   ...commonColumn,
+    //   filter: 'agSetColumnFilter',
+    //   filterParams: {
+    //     buttons: ['reset']
+    //   }
+    // },
     {
       field: SpecialProjectTableColumns.ProjectBudget,
       headerName: SpecialProjectHeaderText.ProjectBudget,

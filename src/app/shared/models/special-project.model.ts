@@ -5,18 +5,18 @@ export class SpecialProject {
     name: string;
     organizationId:number;
     projectTypeId? :number;
-    regionId:number;
-    regionName:String;
-    locationId:number;
-    locationName :string;
-    departmentId:number;
-    departmentName :string;
-    skillId:number;
+    // regionId:number;
+    // regionName:String;
+    // locationId:number;
+    // locationName :string;
+    // departmentId:number;
+    // departmentName :string;
+    // skillId:number;
     projectBudget : number;
     startDate :Date;
     endDate: Date;
     isDeleted :boolean;
-    specialProjectCategory? : string ;
+    // specialProjectCategory? : string ;
 }
 
 export type SpecialProjectPage = PageOfCollections<SpecialProject>;

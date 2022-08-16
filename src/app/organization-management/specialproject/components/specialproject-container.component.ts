@@ -148,10 +148,10 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         this.addButtonTitle = AddButtonText.AddSpecialProject;
         this.form.addControl(FormControlNames.ProjectCategory, new FormControl(null, [Validators.required]));
         this.form.addControl(FormControlNames.ProjectName, new FormControl(null, [Validators.required, Validators.maxLength(100), Validators.minLength(3)]));
-        this.form.addControl(FormControlNames.RegionIds, new FormControl(null, [Validators.required]));
-        this.form.addControl(FormControlNames.LocationIds, new FormControl(null, [Validators.required]));
-        this.form.addControl(FormControlNames.DepartmentsIds, new FormControl(null, [Validators.required]));
-        this.form.addControl(FormControlNames.SkillIds, new FormControl(null, [Validators.required]));
+        // this.form.addControl(FormControlNames.RegionIds, new FormControl(null, [Validators.required]));
+        // this.form.addControl(FormControlNames.LocationIds, new FormControl(null, [Validators.required]));
+        // this.form.addControl(FormControlNames.DepartmentsIds, new FormControl(null, [Validators.required]));
+        // this.form.addControl(FormControlNames.SkillIds, new FormControl(null, [Validators.required]));
         this.form.addControl(FormControlNames.AllowOnOrderCreation, new FormControl(null));
         this.form.addControl(FormControlNames.StartDate, new FormControl(null, [Validators.required]));
         this.form.addControl(FormControlNames.EndDate, new FormControl(null, [Validators.required]));
@@ -164,10 +164,10 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         this.addButtonTitle = AddButtonText.AddPurchaseOrder;
         this.form.addControl(FormControlNames.PoName, new FormControl(null, [Validators.required, Validators.maxLength(100), Validators.minLength(3)]));
         this.form.addControl(FormControlNames.PoDescription, new FormControl(null, [Validators.required, Validators.maxLength(100), Validators.minLength(3)]));
-        this.form.addControl(FormControlNames.RegionIds, new FormControl(null, [Validators.required]));
-        this.form.addControl(FormControlNames.LocationIds, new FormControl(null, [Validators.required]));
-        this.form.addControl(FormControlNames.DepartmentsIds, new FormControl(null, [Validators.required]));
-        this.form.addControl(FormControlNames.SkillIds, new FormControl(null, [Validators.required]));
+        // this.form.addControl(FormControlNames.RegionIds, new FormControl(null, [Validators.required]));
+        // this.form.addControl(FormControlNames.LocationIds, new FormControl(null, [Validators.required]));
+        // this.form.addControl(FormControlNames.DepartmentsIds, new FormControl(null, [Validators.required]));
+        // this.form.addControl(FormControlNames.SkillIds, new FormControl(null, [Validators.required]));
         this.form.addControl(FormControlNames.AllowOnOrderCreation, new FormControl(null));
         this.form.addControl(FormControlNames.StartDate, new FormControl(null, [Validators.required]));
         this.form.addControl(FormControlNames.EndDate, new FormControl(null, [Validators.required]));
@@ -358,13 +358,13 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
     {
       id: this.id,
       projectTypeId: this.form.value.projectCategory,
-      regionId: this.form.value.regionIds[0],
-      regionName: regionName,
-      locationId: this.form.value.locationIds[0],
-      locationName: locationName,
-      departmentId: this.form.value.departmentsIds[0],
-      departmentName: deptName,
-      skillId: this.form.value.skillIds[0],
+      // regionId: this.form.value.regionIds[0],
+      // regionName: regionName,
+      // locationId: this.form.value.locationIds[0],
+      // locationName: locationName,
+      // departmentId: this.form.value.departmentsIds[0],
+      // departmentName: deptName,
+      // skillId: this.form.value.skillIds[0],
       startDate: this.form.value.startDate,
       endDate: this.form.value.endDate,
       isDeleted: false,
@@ -385,13 +385,13 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
       id: this.id,
       poName: this.form.value.poName,
       poNumber: this.form.value.poDescription,
-      regionId: this.form.value.regionIds[0],
-      regionName: regionName,
-      locationId: this.form.value.locationIds[0],
-      locationName: locationName,
-      departmentId: this.form.value.departmentsIds[0],
-      departmentName: deptName,
-      skillId: this.form.value.skillIds[0],
+      // regionId: this.form.value.regionIds[0],
+      // regionName: regionName,
+      // locationId: this.form.value.locationIds[0],
+      // locationName: locationName,
+      // departmentId: this.form.value.departmentsIds[0],
+      // departmentName: deptName,
+      // skillId: this.form.value.skillIds[0],
       startDate: this.form.value.startDate,
       endDate: this.form.value.endDate,
       isDeleted: false,
@@ -410,8 +410,8 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
     {
       id: this.id,
       organizationId: this.organizationId,
-      specialProjectCategory: this.form.value.SpecialProjectCategoryName,
-      isDeleted: false
+      specialProjectCategory: this.form.value.SpecialProjectCategoryName
+      // isDeleted: false
     };
     this.store.dispatch(new SaveSpecialProjectCategory(specialProjectCategory)).subscribe(val => {
       this.form.reset();
@@ -457,10 +457,10 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         this.id = data?.id;
         this.form.setValue({
           projectCategory: data.projectTypeId || null,
-          regionIds: data.regionId ? [data.regionId] : null,
-          locationIds: data.locationId ? [data.locationId] : null,
-          departmentsIds: data.departmentId ? [data.departmentId] : null,
-          skillIds: data.skillId ? [data.skillId] : null,
+          // regionIds: data.regionId ? [data.regionId] : null,
+          // locationIds: data.locationId ? [data.locationId] : null,
+          // departmentsIds: data.departmentId ? [data.departmentId] : null,
+          // skillIds: data.skillId ? [data.skillId] : null,
           startDate: data.startDate,
           endDate: data.endDate,
           projectName: data.name,
@@ -478,10 +478,10 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
       if (data) {
         this.id = data?.id;
         this.form.setValue({
-          regionIds: data.regionId ? [data.regionId] : null,
-          locationIds: data.locationId ? [data.locationId] : null,
-          departmentsIds: data.departmentId ? [data.departmentId] : null,
-          skillIds: data.skillId ? [data.skillId] : null,
+          // regionIds: data.regionId ? [data.regionId] : null,
+          // locationIds: data.locationId ? [data.locationId] : null,
+          // departmentsIds: data.departmentId ? [data.departmentId] : null,
+          // skillIds: data.skillId ? [data.skillId] : null,
           startDate: data.startDate,
           endDate: data.endDate,
           poName: data.poName,
