@@ -134,7 +134,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.addMenuItem(SubmitButtonItem.SaveForLater, 'Save For Later');
           this.removeMenuItem(SubmitButtonItem.Save);
         } else {
-          if (order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement) {
+          if (order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement || order?.extensionFromId) {
             this.disableOrderType = true;
           }
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
