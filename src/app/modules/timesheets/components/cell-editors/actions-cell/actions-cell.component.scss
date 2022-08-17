@@ -1,3 +1,9 @@
 .remove-button {
   color: #FF5858
 }
+
+.actions-container {
+  &.disabled {
+    opacity: 0.5;
+  }
+}
