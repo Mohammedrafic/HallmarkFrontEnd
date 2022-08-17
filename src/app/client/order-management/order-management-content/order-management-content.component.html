@@ -216,7 +216,7 @@
       </e-column>
       <e-column field="billRate" headerText="BILL RATE" width="150">
         <ng-template #template let-data>
-          <div class="align-right">{{ data.billRate }}</div>
+          <div class="align-right">{{ data.orderType === orderTypes.PermPlacement ? '' : data.billRate }}</div>
         </ng-template>
       </e-column>
       <e-column field="candidates" headerText="CANDIDATES" width="150">
