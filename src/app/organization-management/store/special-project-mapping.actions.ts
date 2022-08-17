@@ -40,7 +40,7 @@ export class GetSpecialProjectMappingById {
   constructor(public id: number) { }
 }
 
-export class ShowConfirmationPopUp {
+export class SpecialProjectShowConfirmationPopUp {
   static readonly type = '[SpecialProjectMappings] Save/Update special project mapping Failed';
   constructor() { }
 }

@@ -33,7 +33,7 @@
         <e-tabitem>
           <ng-template #headerText><div>Purchase Order Mapping</div></ng-template>
           <ng-template #content>
-            <span>Purchase Orders Mappings</span>
+            <app-purchase-order-mapping [form]="form" (onEdit)="onEditClick($event)"></app-purchase-order-mapping>
           </ng-template>
         </e-tabitem>
       </e-tabitems>
@@ -113,7 +113,7 @@
     <section *ngIf="selectedTab!=SpecialProjectTabs.SpecialProjectCategories &&
               (selectedTab==SpecialProjectTabs.SpecialProjects || selectedTab==SpecialProjectTabs.PurchaseOrders)">
 
-     
+
       <div class="form-elemet">
         <div class="group">
           <div class="input-container calendar">
@@ -165,30 +165,47 @@
     </section>
     <section *ngIf="(selectedTab==SpecialProjectTabs.SpecialProjectsMapping || selectedTab==SpecialProjectTabs.PurchaseOrdersMapping)">
 
-      <div class="form-elemet">
-        <div class="input-container bootstrap">
-          <label>Project Category<span class="required">*</span></label>
-          <div class="input-group dropdown">
-            <ejs-dropdownlist formControlName="projectCategoryMapping"
-                              appValidateWithMessage
-                              [dataSource]="this.orgStructureData.projectTypeIds.dataSource"
-                              [fields]="projectTypeFields"
-                              (select)="onProjectTypeDropDownChanged($event)">
-            </ejs-dropdownlist>
+      <div *ngIf="selectedTab==SpecialProjectTabs.SpecialProjectsMapping">
+        <div class="form-elemet">
+          <div class="input-container bootstrap">
+            <label>Project Category<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist formControlName="projectCategoryMapping"
+                                appValidateWithMessage
+                                [dataSource]="this.orgStructureData.projectTypeIds.dataSource"
+                                [fields]="projectTypeFields"
+                                (select)="onProjectTypeDropDownChanged($event)">
+              </ejs-dropdownlist>
 
+            </div>
+          </div>
+        </div>
+        <div class="form-elemet">
+          <div class="input-container bootstrap">
+            <label>Project Name<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist formControlName="projectNameMapping"
+                                appValidateWithMessage
+                                [dataSource]="this.orgStructureData.projectNameIds.dataSource"
+                                [fields]="projectNameFields">
+              </ejs-dropdownlist>
+
+            </div>
           </div>
         </div>
       </div>
-      <div class="form-elemet">
-        <div class="input-container bootstrap">
-          <label>Project Name<span class="required">*</span></label>
-          <div class="input-group dropdown">
-            <ejs-dropdownlist formControlName="projectNameMapping"
-                              appValidateWithMessage
-                              [dataSource]="this.orgStructureData.projectNameIds.dataSource"
-                              [fields]="projectNameFields">
-            </ejs-dropdownlist>
+      <div *ngIf="selectedTab==SpecialProjectTabs.PurchaseOrdersMapping">
+        <div class="form-elemet">
+          <div class="input-container bootstrap">
+            <label>Po Name<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist formControlName="poNamesMapping"
+                                appValidateWithMessage
+                                [dataSource]="this.orgStructureData.poNameIds.dataSource"
+                                [fields]="poNameFields">
+              </ejs-dropdownlist>
 
+            </div>
           </div>
         </div>
       </div>

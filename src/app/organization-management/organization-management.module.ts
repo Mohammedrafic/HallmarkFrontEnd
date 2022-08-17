@@ -82,6 +82,8 @@ import { SpecialProjectCategoryComponent } from './specialproject/components/spe
 import { ProjectMappingComponent } from './specialproject/components/project-mapping/project-mapping.component';
 import { SpecialProjectTableComponent } from './specialproject/components/special-project-table/special-project-table.component';
 import { SpecialProjectMappingState } from './store/special-project-mapping.state';
+import { PurchaseOrderMappingComponent } from './specialproject/components/purchase-order-mapping/purchase-order-mapping.component';
+import { PurchaseOrderMappingState } from './store/purchase-order-mapping.state';
 
 const sidebarIcons = {
   Download,
@@ -135,7 +137,8 @@ const sidebarIcons = {
     SpecialProjectsComponent,
     SpecialProjectCategoryComponent,
     ProjectMappingComponent,
-    SpecialProjectTableComponent
+    SpecialProjectTableComponent,
+    PurchaseOrderMappingComponent
   ],
   imports: [
     CommonModule,
@@ -183,6 +186,7 @@ const sidebarIcons = {
       PurchaseOrderState,
       SpecialProjectCategoryState,
       SpecialProjectMappingState,
+      PurchaseOrderMappingState
     ]),
   ],
   providers: [

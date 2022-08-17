@@ -64,11 +64,10 @@ export class SpecialProjectCategoryState {
     { dispatch }: StateContext<SpecialProjectCategoryStateModel>,
     { specialProjectCategory }: SaveSpecialProjectCategory
   ): Observable<SpecialProjectCategory | void> {
-    var isEdit = specialProjectCategory.id > 0 ? true : false;
     return this.specialProjectCategoryService.saveSpecialProjectCategory(specialProjectCategory).pipe(
       tap((order) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, isEdit ? RECORD_MODIFIED : RECORD_ADDED),
+          new ShowToast(MessageTypes.Success, specialProjectCategory.id > 0 ? RECORD_MODIFIED : RECORD_ADDED),
           new SaveSpecialProjectCategorySucceeded(),
           new SetIsDirtySpecialProjectCategoryForm(false),
         ]);

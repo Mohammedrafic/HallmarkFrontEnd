@@ -75,12 +75,10 @@ export class SpecialProjectState {
     { dispatch }: StateContext<SpecialProjectStateModel>,
     { specialProject }: SaveSpecialProject
   ): Observable<SpecialProject | void> {
-    var isEdit = specialProject.id > 0 ? true : false;
-    console.log(isEdit);
     return this.specialProjectService.saveSpecialProject(specialProject).pipe(
       tap((order) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, isEdit ? RECORD_MODIFIED : RECORD_ADDED),
+          new ShowToast(MessageTypes.Success, specialProject.id > 0 ? RECORD_MODIFIED : RECORD_ADDED),
           new SaveSpecialProjectSucceeded(),
           new SetIsDirtySpecialProjectForm(false),
         ]);

@@ -5,13 +5,6 @@ export class PurchaseOrder {
   organizationId: number;
   poName?: string;
   poNumber?: string;
-  // regionId: number;
-  // regionName: string;
-  // locationId: number;
-  // locationName: string;
-  // departmentId: number;
-  // departmentName: string;
-  // skillId: number;
   projectBudget: number;
   startDate?: Date;
   endDate?: Date;
@@ -19,3 +12,5 @@ export class PurchaseOrder {
 }
 
 export type PurchaseOrderPage = PageOfCollections<PurchaseOrder>;
+
+

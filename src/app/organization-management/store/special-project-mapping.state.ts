@@ -8,7 +8,7 @@ import {
   DeletSpecialProjectMappingSucceeded,
   GetProjectNamesByTypeId,
   GetSpecialProjectMappingById,
-  ShowConfirmationPopUp
+  SpecialProjectShowConfirmationPopUp
 } from './special-project-mapping.actions';
 import { SpecialProjectMappingService } from '@shared/services/special-project-mapping.service';
 import { ShowToast } from 'src/app/store/app.actions';
@@ -59,8 +59,7 @@ export class SpecialProjectMappingState {
   }
 
 
-  constructor(private specialProjectMappingService: SpecialProjectMappingService,
-    private projectsService: ProjectsService) { }
+  constructor(private specialProjectMappingService: SpecialProjectMappingService) { }
 
   @Action(GetSpecialProjectMappings)
   GetSpecialProjectMappings({ patchState }: StateContext<SpecialProjectMappingStateModel>, { filter }: GetSpecialProjectMappings): Observable<SpecialProjectMappingPage> {
@@ -78,11 +77,10 @@ export class SpecialProjectMappingState {
     { dispatch }: StateContext<SpecialProjectMappingStateModel>,
     { specialProjectMapping }: SaveSpecialProjectMapping
   ): Observable<SaveSpecialProjectMappingDto | void> {
-    var isEdit = specialProjectMapping.Id > 0 ? true : false;
     return this.specialProjectMappingService.saveSpecialProjectMapping(specialProjectMapping).pipe(
       tap((payloadResponse) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, isEdit ? RECORD_MODIFIED : RECORD_ADDED),
+          new ShowToast(MessageTypes.Success, specialProjectMapping.Id > 0 ? RECORD_MODIFIED : RECORD_ADDED),
           new SaveSpecialProjectMappingSucceeded(),
           new SetIsDirtySpecialProjectMappingForm(false),
         ]);
@@ -91,13 +89,13 @@ export class SpecialProjectMappingState {
       catchError((error: any) => {
         if (specialProjectMapping.Id) {
           if (error.error && error.error.errors && error.error.errors.ForceUpsert) {
-            return dispatch(new ShowConfirmationPopUp());
+            return dispatch(new SpecialProjectShowConfirmationPopUp());
           } else {
             return dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_UPDATED));
           }
         } else {
           if (error.error && error.error.errors && error.error.errors.ForceUpsert) {
-            return dispatch(new ShowConfirmationPopUp());
+            return dispatch(new SpecialProjectShowConfirmationPopUp());
           } else {
             return dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_SAVED));
           }
@@ -116,7 +114,7 @@ export class SpecialProjectMappingState {
         const actions = [new DeletSpecialProjectMappingSucceeded(), new ShowToast(MessageTypes.Success, message)];
         dispatch([...actions, new DeletSpecialProjectMappingSucceeded()]);
       }),
-      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Special Project cannot be deleted'))))
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Special Project Mapping cannot be deleted'))))
     );
   }
 

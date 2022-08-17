@@ -61,11 +61,10 @@ export class PurchaseOrderState {
     { dispatch }: StateContext<PurchaseOrderStateModel>,
     { purchaseOrder }: SavePurchaseOrder
   ): Observable<PurchaseOrder | void> {
-    var isEdit = purchaseOrder.id > 0 ? true : false;
     return this.purchaseOrderService.savePurchaseOrder(purchaseOrder).pipe(
       tap((order) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, isEdit ? RECORD_MODIFIED : RECORD_ADDED),
+          new ShowToast(MessageTypes.Success, purchaseOrder.id > 0 ? RECORD_MODIFIED : RECORD_ADDED),
           new SavePurchaseOrderSucceeded(),
           new SetIsDirtyPurchaseOrderForm(false),
         ]);

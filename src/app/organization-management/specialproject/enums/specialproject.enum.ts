@@ -104,7 +104,8 @@ export enum FormControlNames {
   PoDescription = 'poDescription',
   SpecialProjectCategoryName = 'SpecialProjectCategoryName',
   projectNameMapping = "projectNameMapping",
-  projectCategoryMapping ="projectCategoryMapping"
+  projectCategoryMapping = "projectCategoryMapping",
+  PoNamesMapping ="poNamesMapping"
 }
 
 export enum SpecilaProjectMappingTableColumns {
@@ -127,6 +128,29 @@ export enum SpecilaProjectMappingHeaderText {
   OrganizationId = 'Organization Id',
   ProjectName = 'Project Name',
   CategoryName = "Category",
+  RegionName = 'Region',
+  LocationName = 'Location',
+  DepartmentName = 'Department',
+  SkillName = 'Skill',
+}
+
+export enum PurchaseOrderMappingTableColumns {
+  Id = 'id',
+  BusinessUnitId = "businessUnitId",
+  RegionId = 'regionId',
+  RegionName = 'regionName',
+  LocationId = 'locationId',
+  LocationName = 'locationName',
+  DepartmentId = 'departmentId',
+  DepartmentName = 'departmentName',
+  Skills = 'skills',
+  OrderPoName = "orderPoName",
+  OrderPoNumberId = "rderPoNumberId",
+}
+export enum PurchaseOrderMappingHeaderText {
+  Id = 'Id',
+  OrganizationId = 'Organization Id',
+  PoName = 'PO Name',
   RegionName = 'Region',
   LocationName = 'Location',
   DepartmentName = 'Department',

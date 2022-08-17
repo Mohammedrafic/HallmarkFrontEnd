@@ -1,7 +1,7 @@
 import { PageOfCollections } from '@shared/models/page.model';
 import { MasterSkillByOrganization } from './skill.model';
 
-export class SpecialProjectMapping {
+export class PurchaseOrderMapping {
   id: number;
   businessUnitId: number;
   regionId: number;
@@ -12,17 +12,16 @@ export class SpecialProjectMapping {
   departmentName: string;
   skills: MasterSkillByOrganization[];
   skillName: string;
-  orderProjectName: string;
-  orderSpecialProjectCategoryId: number;
-  orderSpecialProjectCategoryName: string;
-  orderSpecialProjectId: number;
+  orderPoNumberId: number;
+  orderPoNumber: string;
+  orderPoName:string
 }
 
-export type SpecialProjectMappingPage = PageOfCollections<SpecialProjectMapping>;
+export type PurchaseOrderMappingPage = PageOfCollections<PurchaseOrderMapping>;
 
-export class SaveSpecialProjectMappingDto {
+export class SavePurchaseOrderMappingDto {
   Id: number;
-  orderProjectNameId: number;
+  OrderPoNumberId: number;
   regionIds: number[];
   locationIds: number[];
   departmentIds: number[];
@@ -30,20 +29,19 @@ export class SaveSpecialProjectMappingDto {
   forceUpsert?: boolean;
 }
 
-export class ProjectNames {
+export class PurchaseOrderNames {
   id: number;
   name: string;
-  projectTypeId:number
 }
 
-export class SpecialProjectMappingFilters {
+export class PurchaseOrderMappingFilters {
   pageNumber?: number;
   pageSize?: number;
   regionIds?: number[];
   locationIds?: number[];
   departmentIds?: number[];
   skillIds?: number[];
-  getAll?:boolean
+  getAll?: boolean;
 }
 
 

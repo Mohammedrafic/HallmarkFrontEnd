@@ -3,7 +3,7 @@ import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
 import {
   PurchaseOrderTableColumns, PurchaseOrderHeaderText,
   SpecialProjectTableColumns, SpecialProjectHeaderText,
-  SpecilaProjectCategoryTableColumns, SpecilaProjectCategoryHeaderText, SpecilaProjectMappingTableColumns, SpecilaProjectMappingHeaderText
+  SpecilaProjectCategoryTableColumns, SpecilaProjectCategoryHeaderText, SpecilaProjectMappingTableColumns, SpecilaProjectMappingHeaderText, PurchaseOrderMappingTableColumns, PurchaseOrderMappingHeaderText
 } from '../enums/specialproject.enum';
 import { ActionCellRendererComponent } from '../../../shared/components/cell-renderer/action-cellrenderer.component';
 import { DatePipe } from '@angular/common';
@@ -325,7 +325,7 @@ export const SpecialProjectMappingColumnsDefinition = (actionCellParams: ICellRe
       cellRenderer: (params: ICellRendererParams) => {
         let returnString = '';
         if (params.value && params.value.length>0) {
-          var arrayValues:any[] = [];
+          let arrayValues:any[] = [];
           arrayValues = params.value;
           arrayValues.forEach((item: any, index: number) => {
             returnString += item.name;
@@ -353,5 +353,94 @@ export const SpecialProjectMappingColumnsDefinition = (actionCellParams: ICellRe
   ];
 }
 
+export const PurchaseOrderMappingColumnsDefinition = (actionCellParams: ICellRendererParams): ColumnDefinitionModel[] => {
+  return [
+    {
+      field: PurchaseOrderMappingTableColumns.Id,
+      headerName: PurchaseOrderMappingHeaderText.Id,
+      hide: true
+    },
+    {
+      field: PurchaseOrderMappingTableColumns.OrderPoName,
+      headerName: PurchaseOrderMappingHeaderText.PoName,
+      ...commonColumn,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset']
+      }
+    },
+    {
+      field: PurchaseOrderMappingTableColumns.RegionName,
+      headerName: PurchaseOrderMappingHeaderText.RegionName,
+      ...commonColumn,
+      cellRenderer: (params: ICellRendererParams) => {
+        const str = params.value == null ? 'All' : params.value;
+        return str;
+      },
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset']
+      }
+    },
+    {
+      field: PurchaseOrderMappingTableColumns.LocationName,
+      headerName: PurchaseOrderMappingHeaderText.LocationName,
+      ...commonColumn,
+      cellRenderer: (params: ICellRendererParams) => {
+        const str = params.value == null ? 'All' : params.value;
+        return str;
+      },
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset']
+      }
+    },
+    {
+      field: PurchaseOrderMappingTableColumns.DepartmentName,
+      headerName: PurchaseOrderMappingHeaderText.DepartmentName,
+      ...commonColumn,
+      cellRenderer: (params: ICellRendererParams) => {
+        const str = params.value == null ? 'All' : params.value;
+        return str;
+      },
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset']
+      }
+    },
+    {
+      field: PurchaseOrderMappingTableColumns.Skills,
+      headerName: PurchaseOrderMappingHeaderText.SkillName,
+      ...commonColumn,
+      cellRenderer: (params: ICellRendererParams) => {
+        let returnString = '';
+        if (params.value && params.value.length > 0) {
+          let arrayValues: any[] = [];
+          arrayValues = params.value;
+          arrayValues.forEach((item: any, index: number) => {
+            returnString += item.name;
+            if (index !== arrayValues.length - 1) {
+              returnString = returnString + ", ";
+            }
+          });
+        }
+        else
+          returnString = "All";
+
+        return returnString;
+      },
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset']
+      }
+    },
+    {
+      field: '',
+      headerName: 'Action',
+      cellRenderer: ActionCellRendererComponent,
+      cellRendererParams: actionCellParams
+    }
+  ];
+}
 
 

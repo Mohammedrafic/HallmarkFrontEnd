@@ -13,7 +13,7 @@ export class SpecialProjectService {
  * @return list of special projects
  */
   public getSpecialProjects(): Observable<SpecialProjectPage> {
-    return this.http.get<SpecialProjectPage>(`/api/SpecialProjects`);
+    return this.http.get<SpecialProjectPage>(`/api/SpecialProjects?GetAll=true`);
   }
 
   /**

@@ -13,7 +13,7 @@ export class PurchaseOrderService {
  * @return list of purchase orders
  */
   public getPurchaseOrders(): Observable<PurchaseOrderPage> {
-    return this.http.get<PurchaseOrderPage>(`/api/PurchaseOrders`);
+    return this.http.get<PurchaseOrderPage>(`/api/PurchaseOrders?GetAll=true`);
   }
 
   /**
