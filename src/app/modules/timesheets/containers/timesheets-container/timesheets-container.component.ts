@@ -145,7 +145,11 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public updateTableByFilters(filters: TimesheetsFilterState): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState({ ...filters }));
+    this.store.dispatch(new Timesheets.UpdateFiltersState({
+      ...filters
+    },
+      this.activeTabIdx !== 0
+    ));
     this.store.dispatch(new ShowFilterDialog(false));
   }
 

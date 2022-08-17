@@ -26,6 +26,7 @@
       >
         <i-feather name="plus" class="icon"></i-feather> Add Record
       </button>
+      
       <ng-container *ngIf="recordsToShow?.[currentTab]?.[modeValues.Edit]?.length || isEditOn">
         <button
           *ngIf="!isEditOn; else editHandlers"
@@ -40,13 +41,15 @@
       </ng-container>
 
       <ng-template #editHandlers>
-        <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
-        <button (click)="saveChanges()" ejs-button [isPrimary]="true" [disabled]="actionsDisabled" class="spinner-btn">
-          <div #spinner class="spinner-container" *ngIf="loading; else savetext"></div>
-          <ng-template #savetext>
-            <span>Save</span>
-          </ng-template>
-        </button>
+        <div class="controls-wrapper">
+          <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
+          <button (click)="saveChanges()" ejs-button [isPrimary]="true" [disabled]="actionsDisabled" class="spinner-btn">
+            <div #spinner class="spinner-container" *ngIf="loading; else savetext"></div>
+            <ng-template #savetext>
+              <span>Save</span>
+            </ng-template>
+          </button>
+        </div>
       </ng-template>
     </div>
 

@@ -146,14 +146,17 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       tap(() => this.clearDialog()),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe((value) => {
-      const concatedValue = value.replace(/\s/g, '').toLowerCase();
+    .subscribe((value: string) => {
+      const concatedValue = value.replace(/\s/g, '').toUpperCase();
+
       this.form.get('orderId')?.patchValue(concatedValue, { emitEvent: false, onlySelf: true });
+
       if (this.isAgency) {
         this.form.get('unitId')?.patchValue(this.store.snapshot().invoices.selectedOrganizationId);
       }
+      
       const item = this.searchOptions.find((item) => {
-        const concatedInputValue = item.formattedOrderId.replace(/\s/g, '').toLowerCase();
+        const concatedInputValue = item.formattedOrderId.replace(/\s/g, '').toUpperCase();
         return concatedInputValue === concatedValue;
       });
       
