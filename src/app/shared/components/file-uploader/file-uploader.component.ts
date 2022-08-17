@@ -46,7 +46,6 @@ export class FileUploaderComponent implements OnChanges {
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes)
     if (changes['clearAll'] && changes['clearAll'].currentValue === FilesClearEvent.ClearAll) {
       this.fileUploader.clearAll();
     }

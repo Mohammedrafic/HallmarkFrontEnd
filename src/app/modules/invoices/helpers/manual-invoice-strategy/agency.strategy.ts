@@ -41,6 +41,8 @@ export class AgencyStrategy implements ManualInvoiceStrategy {
       }
       this.connectConfigOptions(config, options);
       form.get('nameId')?.patchValue(meta[0].candidateId);
+      form.get('locationId')?.patchValue(meta[0].locationId);
+      form.get('departmentId')?.patchValue(meta[0].departmentId);
   }
 
   public getMeta(form: CustomFormGroup<AddManInvoiceForm>): Observable<null> {

@@ -31,11 +31,10 @@ export class TimesheetRecordsService {
     records: TimesheetRecordsDto,
     currentTab: RecordFields,
     colDefs: ColDef[],
-    currenMode: RecordsMode,
     ): Record<string, FormGroup> {
     const formGroups: Record<string, FormGroup> = {};
 
-    records[currentTab][currenMode].forEach((record) => {
+    records[currentTab][RecordsMode.Edit].forEach((record) => {
       const config = colDefs.filter((item) => item.cellRendererParams?.editMode);
       const controls: Record<string, string[] | number[] | Validators[]> = {};
 
