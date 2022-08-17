@@ -164,8 +164,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   public editTimesheets(): void {
     this.isEditOn = true;
     this.currentMode = RecordsMode.Edit;
-    this.gridApi.refreshCells()
     this.recordsToShow = JSON.parse(JSON.stringify(this.records));
+    this.gridApi.setRowData(this.recordsToShow[this.currentTab][this.currentMode]);
     this.createForm();
     this.setEditModeColDef();
   }
@@ -246,7 +246,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private createForm(): void {
     this.formControls = this.timesheetRecordsService.createEditForm(
-      this.records, this.currentTab, this.timesheetColDef, this.currentMode);
+      this.records, this.currentTab, this.timesheetColDef);
     this.watchFormChanges();
   }
 
@@ -295,7 +295,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private setEditModeColDef(): void {
     this.timesheetColDef = this.timesheetColDef.map((def) => {
-      if (this.isEditOn && def.field === 'billRateConfigName') {
+      if (this.isEditOn && def.field === 'billRateConfigName'
+      && this.currentTab === RecordFields.Time) {
         const editData = {
           cellRenderer: DropdownEditorComponent,
           cellRendererParams: {
@@ -310,10 +311,14 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
           ...def,
           ...editData,
         };
-      } else if (!this.isEditOn && def.field === 'billRateConfigId') {
+      } else if (!this.isEditOn && def.field === 'billRateConfigId' && this.currentTab === RecordFields.Time) {
         def.field = 'billRateConfigName';
         delete def.cellRenderer;
         delete def.cellRendererParams;
+      }
+
+      if ((def.field === 'billRate' || def.field === 'total') && this.currentTab !== RecordFields.Expenses) {
+        def.hide = this.isEditOn;
       }
 
       if (def.cellRendererParams && def.cellRendererParams.editMode) {
@@ -321,13 +326,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         def.cellRendererParams.formGroup = this.formControls;
       }
 
-      if (def.field === 'billRate' || def.field === 'total') {
-        def.hide = this.isEditOn;
-      }
-
       return def;
     });
-
     this.gridApi.setColumnDefs(this.timesheetColDef);
   }
 

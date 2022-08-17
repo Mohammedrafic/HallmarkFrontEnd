@@ -76,29 +76,26 @@
           </ng-template>
         </e-column>
         <e-column field="createUnder.name" headerText="Organization Name" textAlign="Left" width="320"></e-column>
-        <e-column field="generalInformation.status" headerText="Organization Status" textAlign="Left" width="120">
+        <e-column field="generalInformation.organizationType" headerText="Organization Type" textAlign="Left" width="150"></e-column>
+        <e-column field="generalInformation.status" headerText="Status" textAlign="Left" width="140">
           <ng-template #template let-data>
             <div class="status-cell">
               <ejs-chiplist>
                 <e-chips>
-                  <e-chip
-                    [text]="statusEnum[data.generalInformation.status]"
-                    [cssClass]="getChipCssClass(statusEnum[data.generalInformation.status])"
-                  ></e-chip>
+                  <e-chip [text]="statusEnum[data.generalInformation.status]"
+                          [cssClass]="getChipCssClass(statusEnum[data.generalInformation.status])"></e-chip>
                 </e-chips>
               </ejs-chiplist>
             </div>
           </ng-template>
         </e-column>
-        <e-column field="generalInformation.city" headerText="City" textAlign="Left" width="150"></e-column>
-        <e-column field="contactDetails.0.contactPerson" headerText="Contact" textAlign="Left" width="150"></e-column>
-        <e-column
-          field="contactDetails.0.phoneNumberExt"
-          headerText="Phone"
-          textAlign="Left"
-          width="130"
-          [allowSorting]="false"
-        >
+        <e-column field="contactDetails.0.contactPerson" headerText="Primary Contact" textAlign="Left" width="180"></e-column>
+        <e-column field="contactDetails.0.email" headerText="Email" textAlign="Left" width="200"></e-column>
+        <e-column field="contactDetails.0.phoneNumberExt"
+                  headerText="Phone"
+                  textAlign="Left"
+                  width="130"
+                  [allowSorting]="false">
           <ng-template #template let-data>
             <span>{{ data.contactDetails[0].phoneNumberExt | formatPhoneNumber }}</span>
           </ng-template>

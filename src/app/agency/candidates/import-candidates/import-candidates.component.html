@@ -72,13 +72,13 @@
                       </div>
                     </div>
                     <div class="right">
-                      <div class="profile-list-container">
+                      <div class="profile-list-container" *ngIf="selectedCandidate.candidateProfile">
                         <app-candidate-profile [candidateProfile]="selectedCandidate.candidateProfile"></app-candidate-profile>
                       </div>
-                      <div class="experience-list-container">
+                      <div class="experience-list-container" *ngIf="selectedCandidate.candidateExperiencesImportDtos.length">
                         <app-candidate-experience [candidateExperiencesImport]="selectedCandidate.candidateExperiencesImportDtos"></app-candidate-experience>
                       </div>
-                      <div class="education-list-container">
+                      <div class="education-list-container" *ngIf="selectedCandidate.candidatEducationImportDtos.length">
                         <app-candidate-education [candidateEducationImport]="selectedCandidate.candidatEducationImportDtos"></app-candidate-education>
                       </div>
                     </div>
@@ -102,13 +102,13 @@
                       </div>
                     </div>
                     <div class="right">
-                      <div class="profile-list-container">
+                      <div class="profile-list-container" *ngIf="selectedCandidate.candidateProfile">
                         <app-candidate-profile [candidateProfile]="selectedCandidate.candidateProfile"></app-candidate-profile>
                       </div>
-                      <div class="experience-list-container">
+                      <div class="experience-list-container" *ngIf="selectedCandidate.candidateExperiencesImportDtos.length">
                         <app-candidate-experience [candidateExperiencesImport]="selectedCandidate.candidateExperiencesImportDtos"></app-candidate-experience>
                       </div>
-                      <div class="education-list-container">
+                      <div class="education-list-container" *ngIf="selectedCandidate.candidatEducationImportDtos.length">
                         <app-candidate-education [candidateEducationImport]="selectedCandidate.candidatEducationImportDtos"></app-candidate-education>
                       </div>
                     </div>

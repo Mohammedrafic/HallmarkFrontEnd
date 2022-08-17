@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { Observable, Subject, takeWhile } from 'rxjs';
@@ -6,9 +6,7 @@ import { Observable, Subject, takeWhile } from 'rxjs';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import {
-  AccordionClickArgs,
   AccordionComponent,
-  ExpandEventArgs,
   SelectEventArgs,
   SelectingEventArgs,
   TabComponent,
@@ -67,6 +65,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild] | null>;
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
+  @Output() saveEmitter = new EventEmitter<void>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -255,6 +254,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public updateGrid(): void {
     this.closeExtensionSidebar();
     this.getExtensions();
+    this.saveEmitter.emit();
   }
 
   private setAddExtensionBtnState(candidate: OrderManagementChild): void {

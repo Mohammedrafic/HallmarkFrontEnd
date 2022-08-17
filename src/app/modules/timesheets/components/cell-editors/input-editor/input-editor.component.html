@@ -1,21 +1,14 @@
+<div class="init-value-wrapper" *ngIf="!editable; else editMode">
+  <span class="init-value">{{ type === 'currency' ? (value | currency)  : value }}</span>
+</div>
 
-<ng-container [ngSwitch]="editable">
-
-  <ng-template [ngSwitchCase]="false">
-    <div class="init-value-wrapper">
-      <span class="init-value">{{ type === 'currency' ? (value | currency)  : value }}</span>
-    </div>
-  </ng-template>
-
-  <ng-template [ngSwitchCase]="true">
-    <div *ngIf="group" [formGroup]="group">
-      <input
-      class="amount-input"
-      [formControl]="formControl"
-      [formControlName]="controlName"
-      type="text"
-      [value]="value"/>
-    </div>
-  </ng-template>
-
-</ng-container>
+<ng-template #editMode>
+  <div *ngIf="group" [formGroup]="group">
+    <input
+    class="amount-input"
+    [formControl]="formControl"
+    [formControlName]="controlName"
+    type="text"
+    [value]="value"/>
+  </div>
+</ng-template>

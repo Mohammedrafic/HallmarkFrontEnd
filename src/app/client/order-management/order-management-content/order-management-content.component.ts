@@ -204,6 +204,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public reOrderCount$ = new Subject<number>();
   public orderTypes = OrderType;
 
+  private selectedCandidateMeta: { order: number, positionId: number } | null;
   private selectedIndex: number | null;
   private ordersPage: OrderManagementPage;
 
@@ -553,6 +554,13 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       );
       const updatedCandidate = data?.children.find((child) => child.candidateId === this.selectedCandidate.candidateId);
       this.selectedCandidate = updatedCandidate;
+      if (this.selectedCandidateMeta) {
+        this.selectedCandidate.selected = this.selectedCandidateMeta;
+        const rowIndex = this.gridWithChildRow.getRowIndexByPrimaryKey(this.selectedCandidateMeta.order);
+        if (rowIndex) {
+          this.gridWithChildRow.detailRowModule.expand(rowIndex);
+        }
+      }
     }
 
     this.openPerDiemDetails();
@@ -630,7 +638,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
             this.orderManagementService.excludeDeployed
           )
         );
-        this.selectedCandidate = this.selectedReOrder = null;
+        this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
         this.openChildDialog.next(false);
         if (!isArray(event.data)) {
           this.openDetails.next(true);
@@ -650,7 +658,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private onChildDialogChange(): void {
     this.openChildDialog.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen) => {
       if (!isOpen) {
-        this.selectedCandidate = this.selectedReOrder = null;
+        this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
       } else {
         this.openDetails.next(false);
         this.gridWithChildRow?.clearRowSelection();
@@ -796,7 +804,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public onOpenCandidateDialog(candidate: OrderManagementChild, order: OrderManagement): void {
     this.selectedCandidate = candidate;
-    this.selectedCandidate.selected = {
+    this.selectedCandidateMeta = this.selectedCandidate.selected = {
       order: order.id,
       positionId: candidate.positionId,
     };

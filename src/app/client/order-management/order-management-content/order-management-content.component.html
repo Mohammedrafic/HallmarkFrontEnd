@@ -746,6 +746,7 @@
   [candidate]="selectedCandidate"
   [openEvent]="openChildDialog"
   [filters]="filters"
+  (saveEmitter)="updateGrid()"
 ></app-child-order-dialog>
 
 <app-close-order

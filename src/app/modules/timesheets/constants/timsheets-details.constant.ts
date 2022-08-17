@@ -143,13 +143,6 @@ export const TimesheetRecordsColdef: ColDef[] = [
   actionCol,
 ];
 
-export const submitTimesheetDialogData = {
-  title: 'Submit Timesheet',
-  submitButtonText: 'Submit',
-  confirmMessage: 'Are you sure you want to submit this timesheet?',
-  successMessage: 'Success. Timesheet Submitted',
-};
-
 export const MilesRecordsColDef: ColDef[] = [
   dayColDef,
   {
@@ -205,11 +198,15 @@ export const ExpensesRecordsColDef: ColDef[] = [
     }
   },
   {
-    ...amountColdef('Amount'),
+    field: 'total',
+    headerName: 'Amount',
+    type: 'rightAligned',
+    ...commonColumn,
+    cellClass: 'common-cell',
     width: 200,
     cellRenderer: InputEditorComponent,
     valueFormatter: (data) => {
-      if(!data.value) return 'ERROR'
+      if(!data.value) return '0'
       return GridValuesHelper.formatCurrency(data.value)
     },
     cellRendererParams: {
@@ -252,3 +249,10 @@ export const rejectTimesheetDialogData = {
 };
 
 export const rejectReasonMaxLength: number = 250;
+
+export const submitTimesheetDialogData = {
+  title: 'Submit Timesheet',
+  submitButtonText: 'Submit',
+  confirmMessage: 'Are you sure you want to submit this timesheet?',
+  successMessage: 'Success. Timesheet Submitted',
+};

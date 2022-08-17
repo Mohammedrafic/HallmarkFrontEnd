@@ -3,19 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import {
-  AlignJustify,
-  ChevronDown,
-  ChevronRight,
-  Lock,
-  Menu,
-  MessageSquare,
-  MoreVertical,
-  Package,
-  Percent,
-  Sliders,
-  Trash2,
-  X
-} from 'angular-feather/icons';
+  AlignJustify, ChevronDown, ChevronRight, Lock, Menu, MessageSquare, MoreVertical, Package,
+  Percent, Sliders, Trash2, X } from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { AutoCompleteAllModule, DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 import { NumericTextBoxModule, TextBoxAllModule, UploaderAllModule } from '@syncfusion/ej2-angular-inputs';
@@ -23,15 +12,22 @@ import { NgxsModule, Store } from '@ngxs/store';
 import { FeatherModule } from 'angular-feather';
 import { TabModule } from '@syncfusion/ej2-angular-navigations';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
-import { DialogModule } from '@syncfusion/ej2-angular-popups';
+import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { DatePickerAllModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { ButtonModule, ChipListModule, SwitchAllModule } from '@syncfusion/ej2-angular-buttons';
+import { map, of, switchMap } from 'rxjs';
 
 import { SharedModule } from '@shared/shared.module';
 import { DateWeekPickerModule } from '@shared/components/date-week-picker/date-week-picker.module';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { GridModule } from '@shared/components/grid/grid.module';
+import { FileUploaderModule } from '@shared/components/file-uploader/file-uploader.module';
+import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
+import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
+import { APP_FILTERS_CONFIG } from '@core/constants/filters-helper.constant';
+import { AddDialogHelperService } from '@core/services';
+import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { InvoicesContainerComponent } from './containers/invoices-container/invoices-container.component';
 import { InvoiceRecordsTableComponent } from './components/invoice-records-table/invoice-records-table.component';
 import { InvoicesRoutingModule } from './invoices-routing.module';
@@ -58,19 +54,12 @@ import { ManualInvoiceDialogComponent } from './components/manual-invoice-dialog
 import { InvoicesFiltersDialogComponent } from './components/invoices-filters-dialog/invoices-filters-dialog.component';
 import { InvoicesApiService } from './services/invoices-api.service';
 import { InvoicesTableTabsComponent } from './components/invoices-table-tabs/invoices-table-tabs.component';
-import { AddDialogHelperService } from '@core/services';
 import { GridActionsCellComponent } from './components/grid-actions-cell/grid-actions-cell.component';
-import { FileUploaderModule } from '@shared/components/file-uploader/file-uploader.module';
-import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
-import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
-import { APP_FILTERS_CONFIG } from '@core/constants/filters-helper.constant';
 import { InvoicesTableFiltersColumns } from './enums/invoices.enum';
 import { InvoiceTabs, OrganizationId } from './tokens';
 import { AGENCY_INVOICE_TABS, ORGANIZATION_INVOICE_TABS } from './constants';
-import { map, of, switchMap } from 'rxjs';
 import { AppState } from '../../store/app.state';
 import { UserState } from '../../store/user.state';
-import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 
 @NgModule({
   declarations: [
@@ -95,18 +84,8 @@ import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organizati
     SharedModule,
     DateWeekPickerModule,
     FeatherModule.pick({
-      AlignJustify,
-      Lock,
-      Menu,
-      MessageSquare,
-      MoreVertical,
-      Sliders,
-      ChevronRight,
-      ChevronDown,
-      X,
-      Percent,
-      Package,
-      Trash2,
+      AlignJustify, Lock, Menu, MessageSquare, MoreVertical, Sliders, ChevronRight,
+      ChevronDown, X, Percent, Package, Trash2,
     }),
     TabModule,
     DropDownButtonModule,
@@ -130,6 +109,7 @@ import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organizati
     DatePickerAllModule,
     MultiSelectModule,
     FileUploaderModule,
+    TooltipModule,
   ],
   providers: [
     InvoicesService,
