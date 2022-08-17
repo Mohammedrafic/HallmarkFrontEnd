@@ -103,4 +103,32 @@ export enum FormControlNames {
   PoName = 'poName',
   PoDescription = 'poDescription',
   SpecialProjectCategoryName = 'SpecialProjectCategoryName',
+  projectNameMapping = "projectNameMapping",
+  projectCategoryMapping ="projectCategoryMapping"
+}
+
+export enum SpecilaProjectMappingTableColumns {
+  Id = 'id',
+  BusinessUnitId = "businessUnitId",
+  RegionId = 'regionId',
+  RegionName = 'regionName',
+  LocationId = 'locationId',
+  LocationName = 'locationName',
+  DepartmentId = 'departmentId',
+  DepartmentName = 'departmentName',
+  Skills = 'skills',
+  OrderProjectName = "orderProjectName",
+  OrderSpecialProjectCategoryId = "orderSpecialProjectCategoryId",
+  OrderSpecialProjectCategoryName = "orderSpecialProjectCategoryName",
+  OrderSpecialProjectId ="orderSpecialProjectId",
+}
+export enum SpecilaProjectMappingHeaderText {
+  Id = 'Id',
+  OrganizationId = 'Organization Id',
+  ProjectName = 'Project Name',
+  CategoryName = "Category",
+  RegionName = 'Region',
+  LocationName = 'Location',
+  DepartmentName = 'Department',
+  SkillName = 'Skill',
 }

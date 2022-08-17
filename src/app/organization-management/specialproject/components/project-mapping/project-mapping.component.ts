@@ -1,63 +1,53 @@
 import { Component, OnDestroy, OnInit, Input, Output, ViewEncapsulation, EventEmitter } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { PurchaseOrder, PurchaseOrderPage } from "@shared/models/purchase-order.model";
-import { DatePipe } from '@angular/common';
-
+import { ConfirmService } from '@shared/services/confirm.service';
+import { SpecialProjectMapping, SpecialProjectMappingPage } from "@shared/models/special-project-mapping.model";
 import {
   GridApi,
   GridReadyEvent,
   GridOptions
 } from '@ag-grid-community/core';
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
-import { PurchaseOrdderColumnsDefinition } from '../../constants/specialprojects.constant';
-import { Select, Store } from '@ngxs/store';
+import { SpecialProjectMappingColumnsDefinition } from '../../constants/specialprojects.constant';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { PurchaseOrderState } from '../../../store/purchase-order.state';
-import { DeletPurchaseOrder, GetPurchaseOrders } from '../../../store/purchase-order.actions';
+import { FormGroup } from '@angular/forms';
+import { SpecialProjectMappingState } from '../../../store/special-project-mapping.state';
+import { DeletSpecialProjectMapping, GetSpecialProjectMappings } from '../../../store/special-project-mapping.actions';
 
 @Component({
-  selector: 'app-purchase-orders',
-  templateUrl: './purchase-orders.component.html',
-  styleUrls: ['./purchase-orders.component.scss'],
+  selector: 'app-project-mapping',
+  templateUrl: './project-mapping.component.html',
+  styleUrls: ['./project-mapping.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-
-export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class ProjectMappingComponent extends AbstractGridConfigurationComponent implements OnInit {
   @Input() form: FormGroup;
-  @Output() onEdit = new EventEmitter<PurchaseOrder>();
-
-  @Select(PurchaseOrderState.purchaseOrderPage)
-  purchaseOrderPage$: Observable<PurchaseOrderPage>;
-
+  @Output() onEdit = new EventEmitter<SpecialProjectMapping>();
+  @Select(SpecialProjectMappingState.specialProjectMappingPage)
+  specialProjectMappingPage$: Observable<SpecialProjectMappingPage>;
   private unsubscribe$: Subject<void> = new Subject();
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public gridApi!: GridApi;
-  public rowData : PurchaseOrder[]=[];
+  public rowData: SpecialProjectMapping[] = [];
   public rowSelection: 'single' | 'multiple' = 'single';
   public actionCellrenderParams: any = {
-    handleOnEdit: (params: any) => {
+    handleOnEdit: (params: SpecialProjectMapping) => {
       this.onEdit.next(params);
     },
     handleOnDelete: (params: any) => {
-      this.deletePurchaseOrder(params);
+      this.deleteSpecialProjectMapping(params);
     }
   }
-  constructor(private store: Store, private confirmService: ConfirmService, private datePipe: DatePipe) {
+
+  constructor(private store: Store, private confirmService: ConfirmService) {
     super();
   }
+  public readonly columnDefinitions: ColumnDefinitionModel[] = SpecialProjectMappingColumnsDefinition(this.actionCellrenderParams);
 
-  public readonly columnDefinitions: ColumnDefinitionModel[] = PurchaseOrdderColumnsDefinition(this.actionCellrenderParams,this.datePipe);
-  
   ngOnInit(): void {
-    this.getPurchaseOrders();
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.getSpecialProjectMappings();
   }
 
   onPageSizeChanged(event: any) {
@@ -112,7 +102,7 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
     paginationPageSize: this.pageSize,
     columnDefs: this.columnDefinitions,
     rowData: this.rowData,
-    sideBar:this.sideBar
+    sideBar: this.sideBar
   };
 
   onGridReady(params: GridReadyEvent) {
@@ -120,9 +110,12 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
     this.gridApi.setRowData(this.rowData);
   }
 
-  public getPurchaseOrders(): void {
-    this.store.dispatch(new GetPurchaseOrders());
-    this.purchaseOrderPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+  public getSpecialProjectMappings(): void {
+    this.store.dispatch(new GetSpecialProjectMappings({
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize
+    }));
+    this.specialProjectMappingPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (data?.items) {
         this.rowData = data.items;
         this.gridApi.setRowData(this.rowData);
@@ -130,7 +123,7 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
     });
   }
 
-  deletePurchaseOrder(params: any): void {
+  deleteSpecialProjectMapping(params: any): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
@@ -140,8 +133,8 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
       })
       .subscribe((confirm) => {
         if (confirm && params.id) {
-          this.store.dispatch(new DeletPurchaseOrder(params.id)).subscribe(val => {
-            this.getPurchaseOrders();
+          this.store.dispatch(new DeletSpecialProjectMapping(params.id)).subscribe(val => {
+            this.getSpecialProjectMappings();
           });
         }
         this.removeActiveCssClass();

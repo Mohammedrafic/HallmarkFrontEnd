@@ -1,6 +1,5 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { getAllErrors } from '@shared/utils/error.utils';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { SpecialProject, SpecialProjectPage } from 'src/app/shared/models/special-project.model';
 import {
@@ -13,12 +12,10 @@ import {
 import { SpecialProjectService } from '@shared/services/special-project.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
-import { SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { OrderManagementContentStateModel } from '@client/store/order-managment-content.state';
 import { ProjectType } from '@shared/models/project.model';
 import { ProjectsService } from '@shared/services/projects.service';
-import { any } from 'lodash/fp';
 
 export interface SpecialProjectStateModel {
   specialProjectPage: SpecialProjectPage | null;

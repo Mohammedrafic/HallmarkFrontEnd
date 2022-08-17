@@ -5,16 +5,14 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { SpecialProject, SpecialProjectPage } from "@shared/models/special-project.model";
 
 import {
-  CheckboxSelectionCallbackParams,
   GridApi,
   GridReadyEvent,
-  HeaderCheckboxSelectionCallbackParams,
   GridOptions
 } from '@ag-grid-community/core';
 import { ColumnDefinitionModel } from '../../../../shared/components/grid/models/column-definition.model';
 import { SpecialProjectColumnsDefinition } from '../../constants/specialprojects.constant';
 import { Select, Store } from '@ngxs/store';
-import { DeletSpecialProject, GetSpecialProjects, SaveSpecialProject } from '../../../store/special-project.actions';
+import { DeletSpecialProject, GetSpecialProjects } from '../../../store/special-project.actions';
 import { SpecialProjectState } from '../../../store/special-project.state';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '../../../../shared/constants';
@@ -59,6 +57,8 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
     this.getSpecialProjects();
   }
   ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   onPageSizeChanged(event: any) {

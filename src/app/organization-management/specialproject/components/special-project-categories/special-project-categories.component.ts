@@ -1,8 +1,6 @@
 import { Component, OnDestroy, OnInit, Input, Output, ViewEncapsulation, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { PurchaseOrder, PurchaseOrderPage } from "@shared/models/purchase-order.model";
-
 import {
   GridApi,
   GridReadyEvent,
@@ -56,6 +54,8 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
   }
 
   ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   onPageSizeChanged(event: any) {

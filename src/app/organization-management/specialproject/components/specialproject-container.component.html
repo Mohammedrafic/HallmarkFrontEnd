@@ -1,32 +1,44 @@
 <section class="flex-column">
-<section class="container">
-  <div class="toolbar-buttons">
-    <button ejs-button [isPrimary]="true" (click)="handleOnAdd()">{{addButtonTitle}}</button>
-  </div>
-  <ejs-tab (selected)="onTabSelected($event)">
-    <e-tabitems>
-      <e-tabitem>
-        <ng-template #headerText><div>Special Projects</div></ng-template>
-        <ng-template #content>
-          <app-special-projects [form]="form" (onEdit)="onEditClick($event)"></app-special-projects>
-        </ng-template>
-      </e-tabitem>
+  <section class="container">
+    <div class="toolbar-buttons">
+      <button ejs-button [isPrimary]="true" (click)="handleOnAdd()">{{addButtonTitle}}</button>
+    </div>
+    <ejs-tab (selected)="onTabSelected($event)">
+      <e-tabitems>
+        <e-tabitem>
+          <ng-template #headerText><div>Special Projects</div></ng-template>
+          <ng-template #content>
+            <app-special-projects [form]="form" (onEdit)="onEditClick($event)"></app-special-projects>
+          </ng-template>
+        </e-tabitem>
 
-      <e-tabitem>
-        <ng-template #headerText><div>Purchase Orders</div></ng-template>
-        <ng-template #content>
-          <app-purchase-orders [form]="form" (onEdit)="onEditClick($event)"></app-purchase-orders>
-        </ng-template>
-      </e-tabitem>
-      <e-tabitem>
-        <ng-template #headerText><div>Special Project Categories</div></ng-template>
-        <ng-template #content>
-          <app-special-project-category [form]="form" (onEdit)="onEditClick($event)"></app-special-project-category>
-        </ng-template>
-      </e-tabitem>
-    </e-tabitems>
-  </ejs-tab>
-</section>
+        <e-tabitem>
+          <ng-template #headerText><div>Purchase Orders</div></ng-template>
+          <ng-template #content>
+            <app-purchase-orders [form]="form" (onEdit)="onEditClick($event)"></app-purchase-orders>
+          </ng-template>
+        </e-tabitem>
+        <e-tabitem>
+          <ng-template #headerText><div>Special Project Categories</div></ng-template>
+          <ng-template #content>
+            <app-special-project-category [form]="form" (onEdit)="onEditClick($event)"></app-special-project-category>
+          </ng-template>
+        </e-tabitem>
+        <e-tabitem>
+          <ng-template #headerText><div>Special Project Mapping</div></ng-template>
+          <ng-template #content>
+            <app-project-mapping [form]="form" (onEdit)="onEditClick($event)"></app-project-mapping>
+          </ng-template>
+        </e-tabitem>
+        <e-tabitem>
+          <ng-template #headerText><div>Purchase Order Mapping</div></ng-template>
+          <ng-template #content>
+            <span>Purchase Orders Mappings</span>
+          </ng-template>
+        </e-tabitem>
+      </e-tabitems>
+    </ejs-tab>
+  </section>
 </section>
 
 <app-side-dialog header="{{ title }}" (formCancelClicked)="closeDialog()" (formSaveClicked)="handleOnSave()">
@@ -98,8 +110,89 @@
         </div>
       </div>
     </section>
-     <section *ngIf="selectedTab!=SpecialProjectTabs.SpecialProjectCategories">
-    <!--  <div class="form-elemet">
+    <section *ngIf="selectedTab!=SpecialProjectTabs.SpecialProjectCategories &&
+              (selectedTab==SpecialProjectTabs.SpecialProjects || selectedTab==SpecialProjectTabs.PurchaseOrders)">
+
+     
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container calendar">
+            <label for="startDate">Start Date <span class="required">*</span></label>
+            <div class="input-group datepicker">
+              <ejs-datepicker id="startDate"
+                              class="datepicker"
+                              format="MM/dd/yyyy"
+                              placeholder="MM/DD/YYYY"
+                              appValidateWithMessage
+                              formControlName="startDate">
+              </ejs-datepicker>
+            </div>
+          </div>
+          <div class="input-container calendar">
+            <label for="endDate">End Date <span class="required">*</span></label>
+            <div class="input-group datepicker">
+              <ejs-datepicker id="endDate"
+                              class="datepicker"
+                              format="MM/dd/yyyy"
+                              placeholder="MM/DD/YYYY"
+                              appValidateWithMessage
+                              formControlName="endDate">
+              </ejs-datepicker>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container bootstrap">
+            <label>Project Budget<span class="required">*</span></label>
+            <div class="input-group">
+              <ejs-numerictextbox id="projectBudget"
+                                  class="numeric-input"
+                                  appValidateWithMessage
+                                  min="0"
+                                  [maxlength]="10"
+                                  [validateDecimalOnType]="true"
+                                  [showSpinButton]="false"
+                                  decimals='2'
+                                  format="#.##"
+                                  formControlName="projectBudget">
+              </ejs-numerictextbox>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section *ngIf="(selectedTab==SpecialProjectTabs.SpecialProjectsMapping || selectedTab==SpecialProjectTabs.PurchaseOrdersMapping)">
+
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Project Category<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist formControlName="projectCategoryMapping"
+                              appValidateWithMessage
+                              [dataSource]="this.orgStructureData.projectTypeIds.dataSource"
+                              [fields]="projectTypeFields"
+                              (select)="onProjectTypeDropDownChanged($event)">
+            </ejs-dropdownlist>
+
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Project Name<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist formControlName="projectNameMapping"
+                              appValidateWithMessage
+                              [dataSource]="this.orgStructureData.projectNameIds.dataSource"
+                              [fields]="projectNameFields">
+            </ejs-dropdownlist>
+
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
         <div class="input-container bootstrap">
           <label>Region<span class="required">*</span></label>
           <div class="input-group multiselect">
@@ -170,58 +263,10 @@
             </ejs-multiselect>
           </div>
         </div>
-      </div> -->
+      </div>
       <div class="form-elemet">
         <div class="input-container bootstrap">
           <ejs-checkbox formControlName="allowOnOrderCreation" label="Prepopulate in all orders created with this combination  "></ejs-checkbox>
-        </div>
-      </div>
-      <div class="form-elemet">
-        <div class="group">
-          <div class="input-container calendar">
-            <label for="startDate">Start Date <span class="required">*</span></label>
-            <div class="input-group datepicker">
-              <ejs-datepicker id="startDate"
-                              class="datepicker"
-                              format="MM/dd/yyyy"
-                              placeholder="MM/DD/YYYY"
-                              appValidateWithMessage
-                              formControlName="startDate">
-              </ejs-datepicker>
-            </div>
-          </div>
-          <div class="input-container calendar">
-            <label for="endDate">End Date <span class="required">*</span></label>
-            <div class="input-group datepicker">
-              <ejs-datepicker id="endDate"
-                              class="datepicker"
-                              format="MM/dd/yyyy"
-                              placeholder="MM/DD/YYYY"
-                              appValidateWithMessage
-                              formControlName="endDate">
-              </ejs-datepicker>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="form-elemet">
-        <div class="group">
-          <div class="input-container bootstrap">
-            <label>Project Budget<span class="required">*</span></label>
-            <div class="input-group">
-              <ejs-numerictextbox id="projectBudget"
-                                  class="numeric-input"
-                                  appValidateWithMessage
-                                  min="0"
-                                  [maxlength]="10"
-                                  [validateDecimalOnType]="true"
-                                  [showSpinButton]="false"
-                                  decimals='2'
-                                  format="#.##"
-                                  formControlName="projectBudget">
-              </ejs-numerictextbox>
-            </div>
-          </div>
         </div>
       </div>
     </section>

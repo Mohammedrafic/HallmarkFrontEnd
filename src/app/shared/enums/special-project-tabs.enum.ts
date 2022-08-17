@@ -1,7 +1,9 @@
 export enum SpecialProjectTabs {
   SpecialProjects,
   PurchaseOrders,
-  SpecialProjectCategories
+  SpecialProjectCategories,
+  SpecialProjectsMapping,
+  PurchaseOrdersMapping
 }
 
 export enum AddButtonText {
@@ -11,4 +13,6 @@ export enum AddButtonText {
   EditSpecialProject = 'Edit Special Project',
   EditPurchaseOrder = 'Edit Purchase Order',
   EditSpecialProjectCategory = 'Edit Category',
+  AddMapping = 'Add Mapping',
+  EditMapping = 'Edit Mapping',
 }
