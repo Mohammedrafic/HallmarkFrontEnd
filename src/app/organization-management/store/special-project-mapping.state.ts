@@ -10,7 +10,7 @@ import {
   GetSpecialProjectMappingById,
   ShowConfirmationPopUp
 } from './special-project-mapping.actions';
-import { SpecialProjectMappingService } from '@shared/services/special-project.-mapping.service';
+import { SpecialProjectMappingService } from '@shared/services/special-project-mapping.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { RECORD_ADDED, RECORD_CANNOT_BE_SAVED, RECORD_CANNOT_BE_UPDATED, RECORD_MODIFIED } from '@shared/constants';
