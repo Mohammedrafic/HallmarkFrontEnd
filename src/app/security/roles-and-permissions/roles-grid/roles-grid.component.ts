@@ -19,7 +19,7 @@ import { rolesFilterColumns } from "src/app/security/roles-and-permissions/roles
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { GetRolesPage, RemoveRole } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
-import { RolesFilterService } from "./roles-filter.service";
+
 
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
@@ -39,7 +39,7 @@ enum Active {
   selector: 'app-roles-grid',
   templateUrl: './roles-grid.component.html',
   styleUrls: ['./roles-grid.component.scss'],
-  providers: [RolesFilterService]
+ 
 })
 export class RolesGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() filterForm: FormGroup;
@@ -68,7 +68,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   public selIndex: number[] = [];
   public sortOptions = { columns: [{ field: 'businessUnitName', direction: 'Descending' }] };
   public filterColumns = rolesFilterColumns;
-  public rolesFilterFormGroup: FormGroup = this.rolesFilterService.generateFiltersForm();
+
 
   private filters: RolesFilters = {};
   private isAlive = true;
@@ -106,8 +106,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
               private store: Store, 
               private confirmService: ConfirmService, 
               private datePipe: DatePipe,
-              private filterService: FilterService,
-              private rolesFilterService: RolesFilterService) {
+              private filterService: FilterService) {
     super();
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
@@ -347,38 +346,9 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     this.store.dispatch(new GetRolesPage(businessUnit, business || null, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
   }
 
-  public onFilterApply(): void {
-    this.filters = this.rolesFilterFormGroup.getRawValue();
-    this.filteredItems = this.filterService.generateChips(this.rolesFilterFormGroup, this.filterColumns);
-    this.dispatchNewPage();
-    this.store.dispatch(new ShowFilterDialog(false));
-    this.filteredItems$.next(this.filteredItems.length);
-  }
+  
 
-  public onFilterClose(): void {
-    this.rolesFilterFormGroup.setValue({
-      permissionsIds: this.filters.permissionsIds || [],
-    });
-    this.filteredItems = this.filterService.generateChips(this.rolesFilterFormGroup, this.filterColumns);
-    this.filteredItems$.next(this.filteredItems.length);
-  }
 
-  public onFilterDelete(event: FilteredItem): void {
-    this.filterService.removeValue(event, this.rolesFilterFormGroup, this.filterColumns);
-  }
-
-  public onFilterClearAll(): void {
-    this.clearFilters();
-    this.dispatchNewPage();
-  }
-
-  private clearFilters(): void {
-    this.rolesFilterFormGroup.reset();
-    this.filteredItems = [];
-    this.currentPage = 1;
-    this.filters = {};
-    this.filteredItems$.next(this.filteredItems.length);
-  }
 
   private onDialogClose(): void {
     this.actions$
