@@ -353,6 +353,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
       this.agencyCandidatesJob$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
         this.candidateJob = orderCandidateJob;
         if (orderCandidateJob) {
+          this.getExtensions();
           this.getComments();
           this.setAcceptForm(orderCandidateJob);
         }

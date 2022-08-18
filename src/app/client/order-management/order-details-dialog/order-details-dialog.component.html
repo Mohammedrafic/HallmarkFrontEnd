@@ -122,10 +122,14 @@
                 </app-order-reorders-container>
               </ng-template>
             </e-tabitem>
-            <e-tabitem *ngIf="order?.orderType !== orderType.OpenPerDiem && isReOrder">
+            <e-tabitem *ngIf="(order?.orderType !== orderType.OpenPerDiem && !isReOrder) || order?.extensionFromId">
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content>
-                <!--Extensions tab goes here-->
+                <section class="job-details">
+                  <app-general-order-info [orderInformation]="order"></app-general-order-info>
+                </section>
+                <hr />
+                <app-extension-grid [data]="extensions" class="extension-grid"></app-extension-grid>
               </ng-template>
             </e-tabitem>
           </e-tabitems>

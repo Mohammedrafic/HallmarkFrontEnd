@@ -26,7 +26,7 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ApproveOrder, DeleteOrder, SetLock } from '@client/store/order-managment-content.actions';
+import { ApproveOrder, DeleteOrder, GetExtensions, SetLock } from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
   CANCEL_CONFIRM_TEXT,
@@ -69,6 +69,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   @Select(OrderManagementContentState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
+
+  @Select(OrderManagementContentState.extensions) extensions$: Observable<any>;
+  public extensions: any[] = [];
 
   public readonly isReOrderDialogOpened$: Observable<boolean> = this.isDialogOpened();
 
@@ -294,6 +297,13 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         order.items?.filter(
           (candidate) => candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
         ).length;
+        this.extensions = [];
+        if (order?.items[0]?.deployedCandidateInfo?.jobId) {
+          this.store.dispatch(new GetExtensions(order.items[0].deployedCandidateInfo.jobId));
+        }
+    });
+    this.extensions$.pipe(takeUntil(this.unsubscribe$)).subscribe((extensions) => {
+      this.extensions = extensions?.filter((extension: any) => extension.id !== this.order.id);
     });
   }
 
