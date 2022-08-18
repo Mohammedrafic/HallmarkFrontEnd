@@ -76,7 +76,7 @@
             <button
               ejs-button
               cssClass="e-outline"
-              *ngIf="orderType.ReOrder !== order?.orderType"
+              *ngIf="orderType.ReOrder !== order?.orderType || !order?.extensionFromId"
               [isPrimary]="true"
               (click)="lockOrder()"
               [disabled]="disabledLock"
@@ -122,7 +122,7 @@
                 </app-order-reorders-container>
               </ng-template>
             </e-tabitem>
-            <e-tabitem *ngIf="(order?.orderType !== orderType.OpenPerDiem && !isReOrder) || order?.extensionFromId">
+            <e-tabitem *ngIf="(order?.orderType === orderType.Traveler || order?.orderType === orderType.ContractToPerm) && !isReOrder && order?.extensionFromId">
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content>
                 <section class="job-details">

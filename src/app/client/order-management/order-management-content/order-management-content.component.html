@@ -104,7 +104,7 @@
             <button
               ejs-button
               cssClass="e-flat secondary-icon-button"
-              [disabled]="disabledLock(data.status)"
+              [disabled]="disabledLock(data.status) || data?.extensionFromId"
               (click)="lockOrder(data)"
               *ngIf="isLockMenuButtonsShown"
             >

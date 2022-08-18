@@ -161,9 +161,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onChildDialogChange();
     const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
-    if (!this.previousSelectedOrderId) {
-      this.dispatchNewPage();
-    }
     this.onReloadOrderCandidatesLists();
     this.onExportSelectedSubscribe();
     this.idFieldName = 'orderId';
@@ -302,16 +299,18 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
+    if (event.currentPage && event.currentPage !== this.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
       this.isSubrowDisplay = false;
     }
   }
 
   public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
-    this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
-    this.dispatchNewPage();
+    if (this.pageSize !== parseInt(this.activeRowsPerPageDropDown)) {
+      this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+      this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
+      this.dispatchNewPage();
+    }
   }
 
   private onTabChange(): void {

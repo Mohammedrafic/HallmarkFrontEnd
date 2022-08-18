@@ -28,7 +28,7 @@
           </div>
           <div class="e-card-content dialog-controls">
             <app-button
-              *ngIf="isAddExtensionBtnAvailable && !order?.hasExtensions"
+              *ngIf="isAddExtensionBtnAvailable && !(extensions$ | async)?.length"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
               [disabled]="candidate?.orderStatus === orderStatus.InProgressOfferAccepted"
