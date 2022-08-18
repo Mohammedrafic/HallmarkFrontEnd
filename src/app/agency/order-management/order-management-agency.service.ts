@@ -8,17 +8,19 @@ import { OrderTab } from '@shared/components/candidate-details/models/candidate.
 })
 export class OrderManagementAgencyService extends DestroyableDirective {
   public orderPerDiemId$: Subject<number> = new Subject<number>();
+  public selectedOrderAfterRedirect$: Subject<OrderTab> = new Subject<OrderTab>();
   public orderId$: Subject<number> = new Subject<number>();
-  public orderMyAgencyId$: Subject<OrderTab> = new Subject<OrderTab>();
   public excludeDeployed: boolean;
 
   private _orderPerDiemId: number | null;
-  private _orderMyAgencyId: OrderTab | null;
+  private _selectedOrderAfterRedirect: OrderTab | null;
 
   constructor() {
     super();
     this.orderPerDiemId$.pipe(takeUntil(this.destroy$)).subscribe((id: number) => (this.orderPerDiemId = id));
-    this.orderMyAgencyId$.pipe(takeUntil(this.destroy$)).subscribe((order: OrderTab) => (this.orderMyAgencyId = order));
+    this.selectedOrderAfterRedirect$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((order: OrderTab) => (this.selectedOrderAfterRedirect = order));
   }
 
   set orderPerDiemId(value: number | null) {
@@ -29,11 +31,11 @@ export class OrderManagementAgencyService extends DestroyableDirective {
     return this._orderPerDiemId;
   }
 
-  set orderMyAgencyId(value: OrderTab | null) {
-    this._orderMyAgencyId = value;
+  set selectedOrderAfterRedirect(value: OrderTab | null) {
+    this._selectedOrderAfterRedirect = value;
   }
 
-  get orderMyAgencyId(): OrderTab | null {
-    return this._orderMyAgencyId;
+  get selectedOrderAfterRedirect(): OrderTab | null {
+    return this._selectedOrderAfterRedirect;
   }
 }
