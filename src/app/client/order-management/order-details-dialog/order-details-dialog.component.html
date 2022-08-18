@@ -76,7 +76,7 @@
             <button
               ejs-button
               cssClass="e-outline"
-              *ngIf="orderType.ReOrder !== order?.orderType"
+              *ngIf="orderType.ReOrder !== order?.orderType || !order?.extensionFromId"
               [isPrimary]="true"
               (click)="lockOrder()"
               [disabled]="disabledLock"
