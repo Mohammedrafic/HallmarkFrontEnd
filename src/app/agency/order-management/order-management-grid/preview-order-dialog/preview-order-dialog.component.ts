@@ -10,19 +10,20 @@ import {
   ViewChild,
 } from '@angular/core';
 import { Observable, Subject, takeWhile } from 'rxjs';
-import { Select } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
-import { AgencyOrderManagement, Order } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, Order, OrderCandidatesListPage } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import isNil from 'lodash/fp/isNil';
+import { GetAgencyExtensions } from '@agency/store/order-management.actions';
 
 @Component({
   selector: 'app-preview-order-dialog',
@@ -51,6 +52,12 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   @Select(OrderManagementState.selectedOrder)
   public selectedOrder$: Observable<Order>;
 
+  @Select(OrderManagementState.extensions) extensions$: Observable<any>;
+  public extensions: any[] = [];
+
+  @Select(OrderManagementState.orderCandidatePage)
+  public orderCandidatePage$: Observable<OrderCandidatesListPage>;
+
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
@@ -60,7 +67,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
 
   @Output() selectReOrder = new EventEmitter<any>();
 
-  constructor(private chipsCssClass: ChipsCssClass) {}
+  constructor(private chipsCssClass: ChipsCssClass, private store: Store) {}
 
   public get isReOrder(): boolean {
     return !isNil(this.order?.reOrderId || this.order?.id);
@@ -72,6 +79,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
 
   ngOnInit(): void {
     this.onOpenEvent();
+    this.subscribeOnOrderCandidatePage();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -82,6 +90,18 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
 
   ngOnDestroy(): void {
     this.isAlive = false;
+  }
+
+  private subscribeOnOrderCandidatePage(): void {
+    this.orderCandidatePage$.pipe(takeWhile(() => this.isAlive)).subscribe((order: OrderCandidatesListPage) => {
+      this.extensions = [];
+      if (order?.items[0]?.deployedCandidateInfo?.jobId) {
+        this.store.dispatch(new GetAgencyExtensions(order.items[0].deployedCandidateInfo.jobId, this.order.organizationId));
+      }
+    });
+    this.extensions$.pipe(takeWhile(() => this.isAlive)).subscribe((extensions) => {
+      this.extensions = extensions?.filter((extension: any) => extension.id !== this.order.id);
+    });
   }
 
   public onTabSelecting(event: SelectEventArgs): void {

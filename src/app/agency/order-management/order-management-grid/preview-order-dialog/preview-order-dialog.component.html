@@ -70,11 +70,19 @@
                 </ng-template>
               </e-tabitem>
 
-            <e-tabitem *ngIf="orderType.OpenPerDiem !== currentOrder.orderType && orderType.ReOrder !== currentOrder.orderType">
-              <ng-template #headerText>Extensions</ng-template>
-              <ng-template #content> </ng-template>
-            </e-tabitem>
-          </ng-container>
+              <e-tabitem *ngIf="orderType.OpenPerDiem !== currentOrder.orderType && orderType.ReOrder !== currentOrder.orderType">
+                <ng-template #headerText>Extensions</ng-template>
+                <ng-template #content>
+                  <section class="order-details">
+                    <section class="job-details">
+                      <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
+                    </section>
+                    <hr />
+                    <app-extension-grid [data]="extensions" class="extension-grid"></app-extension-grid>
+                  </section>
+                </ng-template>
+              </e-tabitem>
+            </ng-container>
           </e-tabitems>
         </ejs-tab>
       </div>

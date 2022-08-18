@@ -70,7 +70,7 @@
     <div class="column"></div>
     <div class="column last-column">
       <div *ngIf="orderInformation?.extensionInitialOrderId" class="accent link" (click)="moveToInitialOrder()">
-        Initial Order ID: {{ orderInformation?.extensionInitialOrderId }}
+        Initial Order ID: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionPublicId }}
       </div>
       <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
         Previous Extension: {{ orderInformation?.extensionFromId }}
