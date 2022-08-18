@@ -180,6 +180,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.subscribeOnPageChanges();
     this.onTabChange();
     this.onCommentRead();
+    this.listenRedirectFromExtension();
   }
 
   ngOnDestroy(): void {
@@ -615,6 +616,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.filteredItems$.next(this.filteredItems.length);
   }
   // End - Filter
+
+  private listenRedirectFromExtension(): void {
+    this.orderManagementAgencyService.orderId$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((id: number) => {
+      const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex((order: Order) => order.orderId === id);
+      this.gridWithChildRow.selectRow(index);
+    });
+  }
 
   private onOrderPreviewChange(): void {
     this.openPreview.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {

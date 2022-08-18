@@ -8,6 +8,7 @@ import { OrderTab } from '@shared/components/candidate-details/models/candidate.
 })
 export class OrderManagementAgencyService extends DestroyableDirective {
   public orderPerDiemId$: Subject<number> = new Subject<number>();
+  public orderId$: Subject<number> = new Subject<number>();
   public orderMyAgencyId$: Subject<OrderTab> = new Subject<OrderTab>();
   public excludeDeployed: boolean;
 

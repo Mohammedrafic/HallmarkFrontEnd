@@ -1270,7 +1270,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private listenRedirectFromExtension(): void {
-    this.orderManagementService.orderId$.pipe(filter(Boolean)).subscribe((id: number) => {
+    this.orderManagementService.orderId$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((id: number) => {
       const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex((order: Order) => order.id === id);
       this.gridWithChildRow.selectRow(index);
     });
