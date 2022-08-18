@@ -41,15 +41,17 @@ export class GridPositionRendererComponent implements ICellRendererAngularComp {
 
     if (isAgencyArea) {
       this.router.navigate(['/agency/order-management']);
-      this.orderManagementAgencyService.orderMyAgencyId$.next({
+      this.orderManagementAgencyService.selectedOrderAfterRedirect$.next({
         orderId: this.cellValue.orderId,
         candidateId: this.cellValue.candidateProfileId,
+        orderType: this.cellValue.orderType,
       });
     } else {
       this.router.navigate(['/client/order-management']);
-      this.orderManagementService.orderAllOrdersId$.next({
+      this.orderManagementService.selectedOrderAfterRedirect$.next({
         orderId: this.cellValue.orderId,
         candidateId: this.cellValue.candidateProfileId,
+        orderType: this.cellValue.orderType,
       });
     }
   }

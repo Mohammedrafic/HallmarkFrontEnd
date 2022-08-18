@@ -231,10 +231,16 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     rejectReason,
   }: OrderCandidateJob) {
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
-    const isBillRatePending =
-      this.orderCandidateJob.applicantStatus.applicantStatus === CandidatStatus.BillRatePending
-        ? candidateBillRate
-        : offeredBillRate;
+    let isBillRatePending: number;
+
+    if (this.orderCandidateJob.applicantStatus.applicantStatus === CandidatStatus.BillRatePending) {
+      isBillRatePending = candidateBillRate;
+    } else if (this.orderCandidateJob.applicantStatus.applicantStatus === CandidatStatus.Offered) {
+      isBillRatePending = candidateBillRateValue;
+    } else {
+      isBillRatePending = offeredBillRate;
+    }
+
     this.acceptForm.patchValue({
       reOrderFromId: `${reOrderFromId}-${orderId}-${positionId}`,
       offeredBillRate: PriceUtils.formatNumbers(hourlyRate),

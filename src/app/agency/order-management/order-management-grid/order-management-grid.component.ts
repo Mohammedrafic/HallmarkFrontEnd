@@ -180,10 +180,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.subscribeOnPageChanges();
     this.onTabChange();
     this.onCommentRead();
+    this.listenRedirectFromExtension();
   }
 
   ngOnDestroy(): void {
-    this.orderManagementAgencyService.orderMyAgencyId = null;
+    this.orderManagementAgencyService.selectedOrderAfterRedirect = null;
     this.isAlive = false;
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -264,17 +265,18 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private openMyAgencyTabWithCandidate(): void {
-    const { orderMyAgencyId } = this.orderManagementAgencyService;
-    if (orderMyAgencyId && this.ordersPage) {
+    const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
+    if (selectedOrderAfterRedirect && this.ordersPage) {
       const orderMyAgency = this.ordersPage.items.find(
-        (order: AgencyOrderManagement) => order.orderId === orderMyAgencyId.orderId
+        (order: AgencyOrderManagement) => order.orderId === selectedOrderAfterRedirect.orderId
       );
       if (orderMyAgency) {
         const candidate = orderMyAgency.children.find(
-          (candidate: OrderManagementChild) => candidate.candidateId === orderMyAgencyId.candidateId
+          (candidate: OrderManagementChild) => candidate.candidateId === selectedOrderAfterRedirect.candidateId
         );
         this.gridWithChildRow.detailRowModule.expand(0);
         this.onOpenCandidateDialog(candidate as OrderManagementChild, orderMyAgency);
+        this.orderManagementAgencyService.selectedOrderAfterRedirect = null;
       }
     }
   }
@@ -299,7 +301,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onGoToClick(event: any): void {
-    if (event.currentPage && event.currentPage !== this.currentPage || event.value) {
+    if ((event.currentPage && event.currentPage !== this.currentPage) || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
       this.isSubrowDisplay = false;
     }
@@ -318,8 +320,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       .pipe(
         takeUntil(this.unsubscribe$),
         tap((selected) => {
+          const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
           this.selectedTab = selected;
-          this.onGridCreated();
+          if (!selectedOrderAfterRedirect) {
+            this.onGridCreated();
+          }
           this.clearFilters();
           this.store.dispatch(new ClearOrders());
           this.selectedIndex = null;
@@ -330,11 +335,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private dispatchNewPage(): void {
+    const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
+
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
         this.filters.includeReOrders = true;
         this.hasOrderMyAgencyId();
-        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        selectedOrderAfterRedirect?.orderType !== OrderType.ReOrder &&
+          this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.PerDiem:
         this.filters.orderTypes = [OrderType.OpenPerDiem];
@@ -347,6 +355,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.ReOrders:
+        this.hasOrderMyAgencyId();
         this.filters.includeReOrders = false;
         this.filters.orderTypes = [OrderType.ReOrder];
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
@@ -358,7 +367,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         break;
     }
 
-    this.clearOrderMyAgencyId();
     this.checkSelectedChildrenItem();
   }
 
@@ -592,7 +600,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onFilterClearAll(): void {
-    this.orderManagementAgencyService.orderMyAgencyId = null;
+    this.orderManagementAgencyService.selectedOrderAfterRedirect = null;
     this.clearFilters();
     this.dispatchNewPage();
   }
@@ -615,6 +623,15 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.filteredItems$.next(this.filteredItems.length);
   }
   // End - Filter
+
+  private listenRedirectFromExtension(): void {
+    this.orderManagementAgencyService.orderId$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .subscribe((id: number) => {
+        const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex((order: Order) => order.orderId === id);
+        this.gridWithChildRow.selectRow(index);
+      });
+  }
 
   private onOrderPreviewChange(): void {
     this.openPreview.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
@@ -695,21 +712,18 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private hasOrderMyAgencyId(): void {
-    const { orderMyAgencyId } = this.orderManagementAgencyService;
-    if (orderMyAgencyId) {
-      this.OrderFilterFormGroup.patchValue({ orderId: orderMyAgencyId.orderId.toString() });
+    const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
+    if (selectedOrderAfterRedirect) {
+      this.OrderFilterFormGroup.patchValue({ orderId: selectedOrderAfterRedirect.orderId.toString() });
       this.filters = this.OrderFilterFormGroup.getRawValue();
-      this.filters.orderId = orderMyAgencyId.orderId;
+      this.filters.orderId = selectedOrderAfterRedirect.orderId;
       this.filters.includeReOrders = false;
       this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
       this.filteredItems$.next(this.filteredItems.length);
-    }
-  }
 
-  private clearOrderMyAgencyId(): void {
-    const { orderMyAgencyId } = this.orderManagementAgencyService;
-    if (orderMyAgencyId && this.selectedTab && this.selectedTab !== AgencyOrderManagementTabs.MyAgency) {
-      this.orderManagementAgencyService.orderMyAgencyId = null;
+      if (selectedOrderAfterRedirect.orderType === OrderType.ReOrder) {
+        this.filters.orderTypes = [10];
+      }
     }
   }
 

@@ -204,7 +204,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public reOrderCount$ = new Subject<number>();
   public orderTypes = OrderType;
 
-  private selectedCandidateMeta: { order: number, positionId: number } | null;
+  private selectedCandidateMeta: { order: number; positionId: number } | null;
   private selectedIndex: number | null;
   private ordersPage: OrderManagementPage;
 
@@ -295,7 +295,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   ngOnDestroy(): void {
-    this.orderManagementService.orderAllOrdersId = null;
+    this.orderManagementService.selectedOrderAfterRedirect = null;
     this.store.dispatch(new ClearSelectedOrder());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -403,6 +403,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.ReOrders:
+        this.hasOrderAllOrdersId();
         this.filters.orderTypes = [OrderType.ReOrder];
         this.filters.isTemplate = false;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
@@ -418,7 +419,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         break;
     }
 
-    this.clearOrderAllOrdersId();
     this.checkSelectedChildrenItem();
   }
 
@@ -507,7 +507,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onFilterClearAll(): void {
-    this.orderManagementService.orderAllOrdersId = null;
+    this.orderManagementService.selectedOrderAfterRedirect = null;
     this.clearFilters();
     this.getOrders();
   }
@@ -569,15 +569,18 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private openMyAllTabWithCandidate(): void {
-    const { orderAllOrdersId } = this.orderManagementService;
-    if (orderAllOrdersId && this.ordersPage?.items) {
-      const orderAllOrders = this.ordersPage.items.find((order: any) => order.id === orderAllOrdersId.orderId);
+    const { selectedOrderAfterRedirect } = this.orderManagementService;
+    if (selectedOrderAfterRedirect && this.ordersPage?.items) {
+      const orderAllOrders = this.ordersPage.items.find(
+        (order: any) => order.id === selectedOrderAfterRedirect.orderId
+      );
       if (orderAllOrders) {
         const candidate = orderAllOrders.children.find(
-          (candidate: OrderManagementChild) => candidate.candidateId === orderAllOrdersId.candidateId
+          (candidate: OrderManagementChild) => candidate.candidateId === selectedOrderAfterRedirect.candidateId
         );
         this.gridWithChildRow.detailRowModule.expand(0);
         this.onOpenCandidateDialog(candidate as OrderManagementChild, orderAllOrders);
+        this.orderManagementService.selectedOrderAfterRedirect = null;
       }
     }
   }
@@ -718,6 +721,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     // Don’t need reload orders if we go back from the candidate page
     if (!this.previousSelectedOrderId) {
+      const { selectedOrderAfterRedirect } = this.orderManagementService;
       this.openDetails.next(false);
       this.store.dispatch(new ClearOrders());
       this.selectedIndex = null;
@@ -738,7 +742,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           break;
         case OrganizationOrderManagementTabs.ReOrders:
           this.isLockMenuButtonsShown = false;
-          this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
+          !selectedOrderAfterRedirect && this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
           break;
         case OrganizationOrderManagementTabs.OrderTemplates:
           this.refreshGridColumns(orderTemplateColumnsConfig, this.gridWithChildRow);
@@ -907,7 +911,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.clearFilters();
       }
       if (!this.previousSelectedOrderId) {
-        this.pageSubject.next(1)
+        this.pageSubject.next(1);
       }
       this.store.dispatch(new GetAllOrganizationSkills());
     });
@@ -1212,13 +1216,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       });
   }
 
-  private clearOrderAllOrdersId(): void {
-    const { orderAllOrdersId } = this.orderManagementService;
-    if (orderAllOrdersId && this.activeTab && this.activeTab !== OrganizationOrderManagementTabs.AllOrders) {
-      this.orderManagementService.orderAllOrdersId = null;
-    }
-  }
-
   private handleDashboardFilters(): void {
     if (this.isRedirectedFromDashboard) {
       this.applyDashboardFilters();
@@ -1270,7 +1267,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private listenRedirectFromExtension(): void {
-    this.orderManagementService.orderId$.pipe(filter(Boolean)).subscribe((id: number) => {
+    this.orderManagementService.orderId$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((id: number) => {
       const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex((order: Order) => order.id === id);
       this.gridWithChildRow.selectRow(index);
     });
@@ -1283,11 +1280,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private hasOrderAllOrdersId(): void {
-    const { orderAllOrdersId } = this.orderManagementService;
-    if (orderAllOrdersId) {
-      this.OrderFilterFormGroup.patchValue({ orderId: orderAllOrdersId.orderId.toString() });
+    const { selectedOrderAfterRedirect } = this.orderManagementService;
+    if (selectedOrderAfterRedirect) {
+      this.OrderFilterFormGroup.patchValue({ orderId: selectedOrderAfterRedirect.orderId.toString() });
       this.filters = this.OrderFilterFormGroup.getRawValue();
-      this.filters.orderId = orderAllOrdersId.orderId;
+      this.filters.orderId = selectedOrderAfterRedirect.orderId;
       this.filters.agencyType = null;
       this.filters.includeReOrders = false;
       this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);

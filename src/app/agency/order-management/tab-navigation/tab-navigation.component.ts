@@ -10,6 +10,7 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 import { OrderManagementState } from '../../store/order-management.state';
 import { SetOrdersTab } from '../../store/order-management.actions';
 import { Location } from '@angular/common';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-tab-navigation',
@@ -38,6 +39,7 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
 
   public ngOnInit(): void {
     this.selectPerDiemTab();
+
     const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
   }
@@ -54,6 +56,8 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
       const storedTabIndex = this.tabsArray.indexOf(selected || AgencyOrderManagementTabs.MyAgency);
       this.tabNavigation.select(storedTabIndex);
     }
+
+    this.selectReOrderTab();
   }
 
   private selectPerDiemTab(): void {
@@ -62,5 +66,17 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
     this.orderManagementAgencyService.orderPerDiemId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.tabNavigation.select(perDiemTabIndex);
     });
+  }
+
+  private selectReOrderTab(): void {
+    const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
+    const reOrders = 3;
+
+    if (selectedOrderAfterRedirect?.orderType === OrderType.ReOrder) {
+      this.tabNavigation.select(reOrders);
+      this.selectedTab.emit(this.tabsArray[reOrders]);
+    } else if (selectedOrderAfterRedirect?.orderType !== OrderType.ReOrder) {
+      this.store.dispatch(new SetOrdersTab(this.tabsArray[0]));
+    }
   }
 }
