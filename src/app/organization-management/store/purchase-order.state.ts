@@ -12,6 +12,7 @@ import { PurchaseOrderService } from '@shared/services/purchase-order.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { getAllErrors } from '@shared/utils/error.utils';
 
 export interface PurchaseOrderStateModel {
   purchaseOrderPage: PurchaseOrderPage | null;
@@ -70,7 +71,7 @@ export class PurchaseOrderState {
         ]);
         return order;
       }),
-      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
     );
   }
 

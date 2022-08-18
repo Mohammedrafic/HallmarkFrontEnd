@@ -16,6 +16,7 @@ import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { OrderManagementContentStateModel } from '@client/store/order-managment-content.state';
 import { ProjectType } from '@shared/models/project.model';
 import { ProjectsService } from '@shared/services/projects.service';
+import { getAllErrors } from '@shared/utils/error.utils';
 
 export interface SpecialProjectStateModel {
   specialProjectPage: SpecialProjectPage | null;
@@ -84,7 +85,7 @@ export class SpecialProjectState {
         ]);
         return order;
       }),
-      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
     );
   }
 
