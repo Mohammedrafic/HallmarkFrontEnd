@@ -10,6 +10,7 @@ import { SharedModule } from '@shared/shared.module';
 import { FilterChipListModule } from './filter-chip-list/filter-chip-list.module';
 import { WidgetFilterModule } from './widget-filter/widget-filter.module';
 import { WidgetListModule } from './widget-list/widget-list.module';
+import { QuickOrderModule } from './quick-order/quick-order.module';
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import { WidgetListModule } from './widget-list/widget-list.module';
     FeatherModule.pick({ Sliders }),
     FilterChipListModule,
     WidgetFilterModule,
-    WidgetListModule
+    WidgetListModule,
+    QuickOrderModule
   ],
   exports: [DashboardControlComponent],
 })
