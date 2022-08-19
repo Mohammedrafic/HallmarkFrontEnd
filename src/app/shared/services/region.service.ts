@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { Region } from '@shared/models/region.model';
+import { Region, regionFilter } from '@shared/models/region.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
 export class RegionService {
@@ -14,8 +15,14 @@ export class RegionService {
    * Get the list of available regions by organizationId
    * @return Array of regions
    */
-  public getRegionsByOrganizationId(): Observable<Region[]> {
-    return this.http.get<Region[]>(`/api/Regions`);
+  public getRegionsByOrganizationId(filter:any): Observable<Region[]| regionFilter> {
+
+    if(filter){
+      return this.http.post<regionFilter>(`/api/Regions/filter`, filter);
+    }else{
+      return this.http.get<Region[]>(`/api/Regions`);
+    }
+   
   }
 
   /**
@@ -24,6 +31,15 @@ export class RegionService {
   public saveRegion(region: Region): Observable<Region> {
     return this.http.post<Region>(`/api/Regions/`, region);
   }
+
+    /**
+   * Export Regions
+   */
+     public exportRegion(payload: ExportPayload): Observable<any> {
+  
+
+      return this.http.post(`/api/Regions/export1`, payload, { responseType: 'blob' });
+    }
 
   /**
    * Update the region
@@ -37,5 +53,9 @@ export class RegionService {
    */
   public deleteRegionById(regionId: number): Observable<void> {
     return this.http.delete<void>(`/api/Regions/${regionId}`);
+  }
+  public getRegionFilterOptions(regionId: any): Observable<regionFilter> {
+    
+    return this.http.post<regionFilter>(`/api/Regions/filter`, regionId);
   }
 }
