@@ -182,7 +182,8 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   getProjectTypes(): void {
@@ -325,7 +326,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         this.form.addControl(FormControlNames.LocationIds, new FormControl(null, [Validators.required]));
         this.form.addControl(FormControlNames.DepartmentsIds, new FormControl(null, [Validators.required]));
         this.form.addControl(FormControlNames.SkillIds, new FormControl(null, [Validators.required]));
-        this.form.addControl(FormControlNames.PrePopulateInOrders, new FormControl(null));
+        this.form.addControl(FormControlNames.PrePopulateInOrders, new FormControl(false));
         if (this.form.contains(FormControlNames.ProjectCategory)) this.form.removeControl(FormControlNames.ProjectCategory);
         if (this.form.contains(FormControlNames.ProjectName)) this.form.removeControl(FormControlNames.ProjectName);
         if (this.form.contains(FormControlNames.PoName)) this.form.removeControl(FormControlNames.PoName);
@@ -342,7 +343,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         this.form.addControl(FormControlNames.LocationIds, new FormControl(null, [Validators.required]));
         this.form.addControl(FormControlNames.DepartmentsIds, new FormControl(null, [Validators.required]));
         this.form.addControl(FormControlNames.SkillIds, new FormControl(null, [Validators.required]));
-        this.form.addControl(FormControlNames.PrePopulateInOrders, new FormControl(null));
+        this.form.addControl(FormControlNames.PrePopulateInOrders, new FormControl(false));
         if (this.form.contains(FormControlNames.ProjectCategory)) this.form.removeControl(FormControlNames.ProjectCategory);
         if (this.form.contains(FormControlNames.ProjectName)) this.form.removeControl(FormControlNames.ProjectName);
         if (this.form.contains(FormControlNames.PoName)) this.form.removeControl(FormControlNames.PoName);
@@ -587,7 +588,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         locationIds: isAllRegions && isAllLocations ? [] : this.form.controls['locationIds'].value,
         departmentIds: isAllRegions && isAllDepartments ? [] : this.form.controls['departmentsIds'].value,
         skillIds: isAllSkills ? [] : this.form.controls['skillIds'].value,
-        prePopulateInOrders : this.form.controls['PrePopulateInOrders'].value
+        prePopulateInOrders: this.form.controls['PrePopulateInOrders'].value != null ? this.form.controls['PrePopulateInOrders'].value : false
       };
 
       this.specialProjectMappingToPost = specialProjectMapping;
@@ -606,7 +607,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         locationIds: isAllRegions && isAllLocations ? [] : this.form.controls['locationIds'].value,
         departmentIds: isAllRegions && isAllDepartments ? [] : this.form.controls['departmentsIds'].value,
         skillIds: isAllSkills ? [] : this.form.controls['skillIds'].value,
-        prePopulateInOrders : this.form.controls['PrePopulateInOrders'].value
+        prePopulateInOrders: this.form.controls['PrePopulateInOrders'].value != null ? this.form.controls['PrePopulateInOrders'].value : false
       };
 
       this.purchaseOrderMappingToPost = purchaseOrderMapping;

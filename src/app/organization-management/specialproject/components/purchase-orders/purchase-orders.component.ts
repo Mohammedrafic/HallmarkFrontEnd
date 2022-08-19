@@ -125,7 +125,7 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
     this.purchaseOrderPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (data?.items) {
         this.rowData = data.items;
-        this.gridApi.setRowData(this.rowData);
+        this.gridApi?.setRowData(this.rowData);
       }
     });
   }
