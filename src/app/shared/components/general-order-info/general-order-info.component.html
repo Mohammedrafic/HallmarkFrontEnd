@@ -55,10 +55,10 @@
       </div>
       <div>
         <div class="title">{{ orderInformation.jobStartDate | date: 'MM/dd/yyy' }}</div>
-        <div class="sup-title">Start Date</div>
+        <div class="sup-title">{{dateFieldName}}</div>
       </div>
     </div>
-    <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
+    <div *ngIf="!hideEndDate" class="column">
       <div class="icon">
         <i-feather name="calendar" class="icon"></i-feather>
       </div>

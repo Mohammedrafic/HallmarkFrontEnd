@@ -21,7 +21,18 @@ export class GeneralOrderInfoComponent {
 
   public orderType = OrderType;
 
-  constructor(private orderManagementService: OrderManagementService, private orderManagementAgencyService: OrderManagementAgencyService) {}
+  get hideEndDate(): boolean {
+    return [this.orderType.ReOrder, this.orderType.PermPlacement].includes(this.orderInformation.orderType);
+  }
+
+  get dateFieldName(): string {
+    return this.orderInformation.orderType === this.orderType.ReOrder ? 'Date' : 'Start Date';
+  }
+
+  constructor(
+    private orderManagementService: OrderManagementService,
+    private orderManagementAgencyService: OrderManagementAgencyService
+  ) {}
 
   public activeValue(value: boolean): string {
     return Active[Number(value)];
