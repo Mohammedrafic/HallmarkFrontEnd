@@ -125,6 +125,10 @@ import { CommentsState } from './components/comments/store/comments.state';
 import { AlwaysOpenFirstAccordition } from './directives/always-open-first-accordition.directive';
 import { CandidateStatusName } from './pipes/candidate-status-name.pipe';
 import { RouterModule } from '@angular/router';
+import { ToggleSwitchComponent } from './components/toggle-switch/toggle-switch.component';
+import { EmailSideDialogComponent } from './components/email-side-dialog/email-side-dialog.component';
+import { SmsSideDialogComponent } from './components/sms-side-dialog/sms-side-dialog.component';
+import { OnScreenSideDialogComponent } from './components/on-screen-side-dialog/on-screen-side-dialog.component';
 
 const icons = {
   AlertCircle,
@@ -200,7 +204,10 @@ const COMPONENTS = [
   OrderReOrdersListComponent,
   ReorderCandidatesListComponent,
   OrderReOrdersContainerComponent,
-  OrderCloseReasonInfoComponent,
+  OrderCloseReasonInfoComponent,  
+  EmailSideDialogComponent,  
+  SmsSideDialogComponent,
+  OnScreenSideDialogComponent,
 ];
 
 @NgModule({
@@ -264,6 +271,7 @@ const COMPONENTS = [
     CandidatesStatusModalComponent,
     ReorderStatusDialogComponent,
     AcceptFormComponent,
+    ToggleSwitchComponent,
   ],
   providers: [
     DatePipe,

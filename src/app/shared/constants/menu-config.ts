@@ -177,6 +177,21 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/page-report',
     },
+    60: {
+      // Alerts
+      icon: 'alert-circle',
+      route: '/alerts/user-subscription',
+    },
+    61: {
+      // User Subscription
+      icon: '',
+      route: '/alerts/user-subscription',
+    },
+    62: {
+      // Alerts Template
+      icon: '',
+      route: '/alerts/alerts-template',
+    },
   },
 
   [BusinessUnitType.MSP]: {

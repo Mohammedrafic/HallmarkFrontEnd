@@ -57,3 +57,18 @@ export class SetIsOrganizationAgencyArea {
   static readonly type = '[app] Set Is Organization/Agency Area';
   constructor(public payload: IsOrganizationAgencyAreaStateModel) { }
 }
+
+export class ShowEmailSideDialog {
+  static readonly type = '[app] Set Email Side Dialog Showing state';
+  constructor(public isDialogShown: boolean) { }
+}
+
+export class ShowSmsSideDialog {
+  static readonly type = '[app] Set Sms Side Dialog Showing state';
+  constructor(public isDialogShown: boolean) { }
+}
+
+export class ShowOnScreenSideDialog {
+  static readonly type = '[app] Set OnScreen Side Dialog Showing state';
+  constructor(public isDialogShown: boolean) { }
+}

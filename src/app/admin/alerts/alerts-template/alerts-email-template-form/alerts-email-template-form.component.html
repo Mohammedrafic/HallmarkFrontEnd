@@ -1,0 +1,38 @@
+<div [formGroup]="addEditEmailTemplateForm" id="addEditEmailTemplateForm" class="email-template-form">
+    <div class="section-container">
+        <div class="left-section">
+            <div class="input-container bootstrap top-container">
+                <label>Subject<span class="required">*</span></label>
+                <div class="input-group">
+                    <input appValidateWithMessage formControlName="subject" class="e-input" type="text" />
+                </div>
+            </div>
+            <div class="rich-text-container">
+                <label>Mail Body<span class="required">*</span></label>
+                <div>
+                    <ejs-richtexteditor #RTE id='defaultRTE' appValidateWithMessage formControlName="mailBody"
+                        [toolbarSettings]='tools'>
+                    </ejs-richtexteditor>
+                </div>
+            </div>
+        </div>
+        <div class="right-section">
+
+            <div class="input-container bootstrap top-container">
+                <div class="input-group">
+                </div>
+            </div>
+
+            <div class="input-container bootstrap">
+                <label>Attributes</label>
+                <div>
+                    <ejs-listview id="listbox" [dataSource]='data'>
+                    </ejs-listview>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
