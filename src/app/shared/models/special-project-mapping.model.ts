@@ -16,6 +16,7 @@ export class SpecialProjectMapping {
   orderSpecialProjectCategoryId: number;
   orderSpecialProjectCategoryName: string;
   orderSpecialProjectId: number;
+  prePopulateInOrders : boolean;
 }
 
 export type SpecialProjectMappingPage = PageOfCollections<SpecialProjectMapping>;
@@ -28,6 +29,7 @@ export class SaveSpecialProjectMappingDto {
   departmentIds: number[];
   skillIds: number[];
   forceUpsert?: boolean;
+  prePopulateInOrders : boolean;
 }
 
 export class ProjectNames {

@@ -96,7 +96,6 @@ export enum FormControlNames {
   LocationIds = 'locationIds',
   DepartmentsIds = 'departmentsIds',
   SkillIds = 'skillIds',
-  AllowOnOrderCreation = 'allowOnOrderCreation',
   StartDate = 'startDate',
   EndDate = 'endDate',
   ProjectBudget = 'projectBudget',
@@ -105,7 +104,8 @@ export enum FormControlNames {
   SpecialProjectCategoryName = 'SpecialProjectCategoryName',
   projectNameMapping = "projectNameMapping",
   projectCategoryMapping = "projectCategoryMapping",
-  PoNamesMapping ="poNamesMapping"
+  PoNamesMapping ="poNamesMapping",
+  PrePopulateInOrders ="PrePopulateInOrders"
 }
 
 export enum SpecilaProjectMappingTableColumns {
@@ -146,6 +146,7 @@ export enum PurchaseOrderMappingTableColumns {
   Skills = 'skills',
   OrderPoName = "orderPoName",
   OrderPoNumberId = "rderPoNumberId",
+  PrePopulateInOrders ="PrePopulateInOrders"
 }
 export enum PurchaseOrderMappingHeaderText {
   Id = 'Id',
