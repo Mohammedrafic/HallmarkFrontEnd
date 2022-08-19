@@ -210,6 +210,7 @@ public regionFilterFormGroup:FormGroup;
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.defaultFileName = 'Organization Regions ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportRegions(new ExportPayload(
+
       fileType,
       { ...this.filters },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
