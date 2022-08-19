@@ -15,13 +15,13 @@ import {
 } from '@angular/core';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { WidgetTypeEnum } from '../../../enums/widget-type.enum';
-import { WidgetOptionModel } from '../../../models/widget-option.model';
+import { WidgetTypeEnum } from '../../enums/widget-type.enum';
+import { WidgetOptionModel } from '../../models/widget-option.model';
 import lodashMap from 'lodash/fp/map';
 import findIndex from 'lodash/fp/findIndex';
 import { BehaviorSubject, Subject, takeUntil, filter, startWith, distinctUntilChanged, combineLatest } from 'rxjs';
 import isEqual from 'lodash/fp/isEqual';
-import { WidgetToggleModel } from '../../../models/widget-toggle.model';
+import { WidgetToggleModel } from '../../models/widget-toggle.model';
 import type { GridRowSelectEventModel, GridRowDeselectEventModel } from '@shared/models/grid-row-selection-event.model';
 
 @Component({

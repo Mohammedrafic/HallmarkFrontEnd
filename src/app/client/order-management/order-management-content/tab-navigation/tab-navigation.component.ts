@@ -7,6 +7,7 @@ import { filter, takeUntil } from 'rxjs';
 import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
 import { NavigationTabModel } from '@shared/models/navigation-tab.model';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-tab-navigation',
@@ -20,6 +21,7 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
   @Output() selectedTab = new EventEmitter<OrganizationOrderManagementTabs>();
 
   public tabTitle = OrganizationOrderManagementTabs;
+  private tabsArray = Object.values(OrganizationOrderManagementTabs);
 
   public constructor(
     private orderManagementService: OrderManagementService,
@@ -34,10 +36,13 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
     this.listenTabChanges();
   }
 
+  public onTabCreated(): void {
+    this.selectReOrderTab();
+  }
+
   public onSelect(event: SelectingEventArgs): void {
-    const tabsArray = Object.values(OrganizationOrderManagementTabs);
-    this.selectedTab.emit(tabsArray[event.selectingIndex]);
-    this.store.dispatch(new SelectNavigationTab(null, null, tabsArray[event.selectingIndex]));
+    this.selectedTab.emit(this.tabsArray[event.selectingIndex]);
+    this.store.dispatch(new SelectNavigationTab(null, null, this.tabsArray[event.selectingIndex]));
   }
 
   private selectPerDiemTab(): void {
@@ -45,6 +50,15 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
     this.orderManagementService.orderPerDiemId$
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.tabNavigation.select(perDiemTabIndex));
+  }
+
+  private selectReOrderTab(): void {
+    const { selectedOrderAfterRedirect } = this.orderManagementService;
+    const reOrders = 3;
+    if (selectedOrderAfterRedirect?.orderType === OrderType.ReOrder) {
+      this.tabNavigation.select(reOrders);
+      this.selectedTab.emit(this.tabsArray[reOrders]);
+    }
   }
 
   private listenTabChanges(): void {

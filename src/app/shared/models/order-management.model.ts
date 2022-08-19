@@ -297,6 +297,7 @@ export class Order {
   commentContainerId?: number;
   extensionFromId?: number | null;
   extensionInitialOrderId?: number | null;
+  extensionPublicId?: number | null;
   hasParentExtension?: boolean;
   hasExtensions?: boolean;
 }

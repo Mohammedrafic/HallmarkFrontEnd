@@ -9,23 +9,23 @@ import { OrderTab } from '@shared/components/candidate-details/models/candidate.
 export class OrderManagementService extends DestroyableDirective {
   public readonly orderPerDiemId$: Subject<number> = new Subject<number>();
   public readonly orderId$: Subject<number | null> = new Subject<number | null>();
-  public orderAllOrdersId$: Subject<OrderTab> = new Subject<OrderTab>();
+  public selectedOrderAfterRedirect$: Subject<OrderTab> = new Subject<OrderTab>();
   public excludeDeployed: boolean;
 
-  private _orderAllOrdersId: OrderTab | null;
+  private _selectedOrderAfterRedirect: OrderTab | null;
 
   constructor() {
     super();
-    this.orderAllOrdersId$
+    this.selectedOrderAfterRedirect$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((order: OrderTab) => (this.orderAllOrdersId = order));
+      .subscribe((order: OrderTab) => (this.selectedOrderAfterRedirect = order));
   }
 
-  set orderAllOrdersId(value: OrderTab | null) {
-    this._orderAllOrdersId = value;
+  set selectedOrderAfterRedirect(value: OrderTab | null) {
+    this._selectedOrderAfterRedirect = value;
   }
 
-  get orderAllOrdersId(): OrderTab | null {
-    return this._orderAllOrdersId;
+  get selectedOrderAfterRedirect(): OrderTab | null {
+    return this._selectedOrderAfterRedirect;
   }
 }

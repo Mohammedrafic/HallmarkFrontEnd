@@ -67,6 +67,8 @@ import { OrderManagementContentService } from '@shared/services/order-management
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
+import { SettingsHelper } from '@core/helpers/settings.helper';
+import { SettingsKeys } from '@shared/enums/settings';
 
 @Component({
   selector: 'app-order-details-form',
@@ -175,7 +177,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public reasonForRequisitionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public isSpecialProjectFieldsRequired: boolean;
-  private mandatorySpecialProjectDetailsKey: string = 'MandatorySpecialProjectDetails';
+  public settings: {[key in SettingsKeys]?: OrganizationSettingsGet};
+  public SettingsKeys = SettingsKeys;
 
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order | null>;
@@ -254,7 +257,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.orderTypeForm = this.formBuilder.group({
       orderType: [null, Validators.required],
     });
-    this.store.dispatch(new GetOrganizationSettings());
+    this.getSettings();
     this.generalInformationForm = this.formBuilder.group(
       {
         title: [null, [Validators.required, Validators.maxLength(50)]],
@@ -297,7 +300,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
       this.store.dispatch(new SetIsDirtyOrderForm(this.generalInformationForm.dirty));
     });
-    this.getOrganizationSettings();
+    this.subscribeForSettings();
     this.jobDistributionForm = this.formBuilder.group({
       jobDistribution: [[], Validators.required],
       agency: [null],
@@ -431,7 +434,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     jobStartDateControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((jobStartDate: Date | null) => {
       const duration = durationControl.value;
 
-      if (isNaN(parseInt(duration)) || !(jobStartDate instanceof Date)) {
+      if (isNaN(parseInt(duration)) || !(jobStartDate instanceof Date) || orderTypeControl.value === OrderType.PermPlacement) {
         return;
       }
 
@@ -573,6 +576,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.store.dispatch([new ClearSelectedOrder(), new ClearSuggestions()]);
   }
 
+  private getSettings(): void {
+    this.store.dispatch(new GetOrganizationSettings())
+  }
+
   private getComments(): void {
     this.commentsService.getComments(this.commentContainerId, null).subscribe((comments: Comment[]) => {
       this.comments = comments;
@@ -588,6 +595,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private populateHourlyRateField(orderType: OrderType, departmentId: number, skillId: number): void {
+    if (orderType === OrderType.PermPlacement) {
+      return;
+    }
     this.orderManagementService
       .getRegularLocalBillRate(orderType, departmentId, skillId)
       .pipe(
@@ -697,12 +707,12 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         .subscribe();
     }
   }
-  private getOrganizationSettings(): void {
+  private subscribeForSettings(): void {
     this.organizationSettings$.pipe(takeUntil(this.unsubscribe$)).subscribe((settings) => {
-      this.isSpecialProjectFieldsRequired =
-        settings.find((x) => x.settingKey === this.mandatorySpecialProjectDetailsKey)?.value === 'true';
+      this.settings = SettingsHelper.mapSettings(settings);
+      this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
       if (this.specialProject != null) {
-        if (this.isSpecialProjectFieldsRequired === true) {
+        if (this.isSpecialProjectFieldsRequired) {
           this.specialProject.controls['projectTypeId'].setValidators(Validators.required);
           this.specialProject.controls['projectNameId'].setValidators(Validators.required);
           this.specialProject.controls['poNumberId'].setValidators(Validators.required);

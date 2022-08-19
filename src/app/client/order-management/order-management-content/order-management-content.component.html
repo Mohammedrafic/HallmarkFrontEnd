@@ -104,7 +104,7 @@
             <button
               ejs-button
               cssClass="e-flat secondary-icon-button"
-              [disabled]="disabledLock(data.status)"
+              [disabled]="disabledLock(data.status) || data?.extensionFromId"
               (click)="lockOrder(data)"
               *ngIf="isLockMenuButtonsShown"
             >
@@ -216,7 +216,9 @@
       </e-column>
       <e-column field="billRate" headerText="BILL RATE" width="150">
         <ng-template #template let-data>
-          <div class="align-right">{{ data.billRate }}</div>
+          <ng-container *ngIf="data.orderType !== orderTypes.PermPlacement">
+            <div class="align-right">{{ data.billRate }}</div>
+          </ng-container>
         </ng-template>
       </e-column>
       <e-column field="candidates" headerText="CANDIDATES" width="150">
