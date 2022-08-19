@@ -782,6 +782,7 @@
   <div class="right-section">
     <app-document-uploader
       uploaderTitle="Documents"
+      [disabled]="!settings[SettingsKeys.AllowDocumentUpload]?.value"
       [documents]="order?.documents"
       (selectDocuments)="onDocumentsSelected($event)"
       (deleteDocument)="onDocumentDeleted($event)"
