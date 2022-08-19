@@ -24,7 +24,7 @@ export class GetRolesPage {
 
 export class GetRolePerUser {
   static readonly type = '[security] Get Roles Per User';
-  constructor(public businessUnitType: BusinessUnitType, public businessUnitId: number) {}
+  constructor(public businessUnitType: BusinessUnitType, public businessUnitIds: number[]) {}
 }
 
 export class GetUsersPage {
