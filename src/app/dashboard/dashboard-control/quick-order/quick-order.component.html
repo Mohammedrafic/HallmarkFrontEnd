@@ -1,0 +1,24 @@
+<ejs-dialog
+  #sideDialog
+  [animationSettings]="{ effect: 'SlideRight' }"
+  [isModal]="true"
+  [visible]="false"
+  [target]="targetElement"
+  cssClass="dialog"
+  id="dialog"
+  width="65%"
+>
+  <ng-template #header>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <h3 class="e-card-title">Create Quick Order</h3>
+          <div>
+            <button ejs-button cssClass="e-outline calcel" (click)="onCloseDialog()">Cancel</button>
+            <button ejs-button [isPrimary]="true">Submit</button>
+          </div>
+        </div>
+      </section>
+    </section>
+  </ng-template>
+</ejs-dialog>
