@@ -410,13 +410,7 @@ export class OrganizationManagementState {
       }));
   }
 
-  // @Action(GetLocationsByRegionId)
-  // GetLocationsByRegionId({ patchState }: StateContext<OrganizationManagementStateModel>, { regionId, filters }: GetLocationsByRegionId): Observable<Location[] | LocationsPage> {
-  //   return this.locationService.getLocationsByRegionId(regionId, filters).pipe(tap((payload) => {
-  //     patchState({ locations: payload});
-  //     return payload;
-  //   }));
-  // }
+
 
   @Action(GetRegions)
   GetRegions({ patchState }: StateContext<OrganizationManagementStateModel>, { filter }: any): Observable<Region[]> {

@@ -30,7 +30,7 @@
         (click)='onAddRegionClick()'>Add Region</button>
     </section>
   </section>
-<!-- {{regions$| async | json}} -->
+
 
   <ejs-grid class="grid grid-component"
     #grid
@@ -50,7 +50,7 @@
     [selectionSettings]="selectionSettings"
   >
     <e-columns>
-      <!-- <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column> -->
+    
       <e-column textAlign="Right" width="50">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
@@ -64,7 +64,7 @@
         </ng-template>
       </e-column>
 
-      <!-- <e-column field="id" headerText="ID" width=200 hidden></e-column> -->
+
       <e-column field="name" headerText="Region" width=200 ></e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>

@@ -100,9 +100,7 @@ public regionFilterFormGroup:FormGroup;
 
   public columnsToExport: ExportColumn[] = [
     { text:'Region', column: 'Name'},
-   // { text:'Id', column: 'Id'},
-    // { text:'Id', column: 'OrganizationId'},
-
+ 
   ];
   public fileName: string;
   public defaultFileName: string;
@@ -182,10 +180,7 @@ public regionFilterFormGroup:FormGroup;
     }
   }
 
-  // private getRegions() {
 
-  //   this.store.dispatch(new GetRegions())
-  // }
 
   public override updatePage(): void {
     this.getRegions();
@@ -298,7 +293,6 @@ public regionFilterFormGroup:FormGroup;
 
   onImportDataClick(): void {
     this.store.dispatch(new SetImportFileDialogState(true));
-    // TODO: implement data parse after BE implementation
   }
 
   onAddDepartmentClick(): void {
