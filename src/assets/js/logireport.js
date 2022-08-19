@@ -379,7 +379,6 @@
         }
         define("trace", curry(trace));
         function trace(tag, x) {
-            debugger;
             return x;
         }
         define("tco", tco);
@@ -1454,7 +1453,6 @@ J$VM = new function() {
     };
     self.$debug = function(target, fnName) {
         self.$inject(target, fnName, function() {
-            debugger;
         });
     };
     Boolean.prototype.boolValue = function() {
