@@ -83,6 +83,7 @@ import { ReasonsComponent } from './reasons/reasons.component';
 import { ClosureReasonComponent } from './reasons/closure-reason/closure-reason.component';
 import { RegionsComponent } from './regions/regions.component';
 import { ManualInvoiceRejectReasonComponent } from './reasons/manual-invoice-reject-reason/manual-invoice-reject-reason.component';
+import { OrderRequisitionComponent } from './reasons/order-requisition/order-requisition.component';
 import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
 import { PurchaseOrdersComponent } from './specialproject/components/purchase-orders/purchase-orders.component';
 import { SpecialProjectsComponent } from './specialproject/components/special-projects/special-projects.component';
@@ -143,6 +144,7 @@ const sidebarIcons = {
     ManualInvoiceRejectReasonComponent,
     ClosureReasonComponent,
     RegionsComponent,
+    OrderRequisitionComponent,
     SpecialProjectContainerComponent,
     PurchaseOrdersComponent,
     SpecialProjectsComponent,
