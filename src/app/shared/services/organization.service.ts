@@ -52,6 +52,7 @@ export class OrganizationService {
    * @return Created/Updated organization
    */
   public saveOrganization(organization: Organization): Observable<Organization> {
+    organization. organizationPrefix = organization.generalInformation.organizationPrefix;
     return organization.organizationId ?
       this.http.put<Organization>(`/api/Organizations`, organization) :
       this.http.post<Organization>(`/api/Organizations`, organization);
