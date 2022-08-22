@@ -38,7 +38,7 @@ export class RegionService {
      public exportRegion(payload: ExportPayload): Observable<any> {
   
 
-      return this.http.post(`/api/Regions/export1`, payload, { responseType: 'blob' });
+      return this.http.post(`/api/Regions/export`, payload, { responseType: 'blob' });
     }
 
   /**

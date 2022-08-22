@@ -142,7 +142,7 @@ public regionFilterFormGroup:FormGroup;
      
     }
     this.regionFilterOptions$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(options => {
-      this.filterColumns.id.dataSource = options.id;
+      this.filterColumns.id.dataSource = options.ids;
       this.filterColumns.name.dataSource = options.name;
   
     });
@@ -221,8 +221,8 @@ public regionFilterFormGroup:FormGroup;
 
   public onFilterClose() {
     this.regionFilterFormGroup.setValue({
-      name: this.filters?.name || [],
-      id: this.filters?.id || [],
+      
+      ids: this.filters?.ids || [],
 
     });
 
@@ -254,10 +254,7 @@ public regionFilterFormGroup:FormGroup;
 
     this.filters.pageNumber = this.currentPage,
     this.filters.pageSize = this.pageSizePager
- 
-  
 
-    
     this.getRegions();
     this.store.dispatch(new ShowFilterDialog(false));
   }
@@ -414,7 +411,7 @@ public regionFilterFormGroup:FormGroup;
 
 
     this.regionFilterFormGroup = this.formBuilder.group({
-     id:[[]]
+     ids:[[]]
     });
   }
 
