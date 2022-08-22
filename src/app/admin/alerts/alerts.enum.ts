@@ -2,9 +2,9 @@ export enum AlertEnum {
     No,
     Yes,
   }
-  export enum AlertTemplateType {
-    Email,
-    SMS,
-    OnScreen
+  export enum AlertChannel {
+    Email=1,
+    SMS=2,
+    OnScreen=3
   }
   

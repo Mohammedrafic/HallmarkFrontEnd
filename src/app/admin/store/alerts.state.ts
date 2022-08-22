@@ -1,15 +1,17 @@
 import { Injectable } from "@angular/core";
 import { UserSubscriptionPage } from "@shared/models/user-subscription.model";
 import { Action, Selector, StateContext} from '@ngxs/store';
-import { GetAlertsTemplatePage, GetUserSubscriptionPage } from "./alerts.actions";
+import { GetAlertsTemplatePage, GetTemplateByAlertId, GetUserSubscriptionPage } from "./alerts.actions";
 import { Observable ,tap} from "rxjs";
 import { AlertsService } from "@shared/services/alerts.service";
 import { BusinessUnitService } from "@shared/services/business-unit.service";
-import { AlertsTemplatePage } from "@shared/models/alerts-template.model";
+import { AlertsTemplate, AlertsTemplatePage, EditAlertsTemplate } from "@shared/models/alerts-template.model";
 
 interface AlertsStateModel {
     userSubscriptionPage: UserSubscriptionPage | null;
-    alertsTemplatePage:AlertsTemplatePage |null;
+    //alertsTemplatePage:AlertsTemplatePage |null;
+    alertsTemplates:AlertsTemplate[]| null;
+    editAlertsTemplate:EditAlertsTemplate|null;
 }
 
 @Injectable()
@@ -20,8 +22,14 @@ export class AlertsState {
     return state.userSubscriptionPage;
   }
   @Selector()
-  static AlertsTemplatePage(state: AlertsStateModel): AlertsTemplatePage | null {
-    return state.alertsTemplatePage;
+  static AlertsTemplatePage(state: AlertsStateModel): AlertsTemplate[] | null {
+    //return state.alertsTemplatePage;
+    return state.alertsTemplates;
+  }
+  @Selector()
+  static TemplateByAlertId(state: AlertsStateModel): EditAlertsTemplate | null {
+    //return state.alertsTemplatePage;
+    return state.editAlertsTemplate;
   }
   constructor(
     private businessUnitService: BusinessUnitService,
@@ -40,14 +48,28 @@ export class AlertsState {
       })
     );
   }
+  
   @Action(GetAlertsTemplatePage)
   GetAlertsTemplatePage(
     { patchState }: StateContext<AlertsStateModel>,
-    {  pageNumber, pageSize, sortModel, filterModel, filters }: GetAlertsTemplatePage
-  ): Observable<AlertsTemplatePage> {
-    return this.alertsService.getAlertsTemplatePage(pageNumber, pageSize, sortModel, filterModel, filters).pipe(
+    { bussinessUnitType,pageNumber, pageSize, sortModel, filterModel, filters }: GetAlertsTemplatePage
+  ): Observable<AlertsTemplate[]> {
+    return this.alertsService.getAlertsTemplatePage(bussinessUnitType,pageNumber, pageSize, sortModel, filterModel, filters).pipe(
       tap((payload) => {
-        patchState({ alertsTemplatePage: payload });
+        patchState({ alertsTemplates: payload });
+        return payload;
+      })
+    );
+  }
+
+  @Action(GetTemplateByAlertId)
+  GetTemplateByAlertId(
+    { patchState }: StateContext<AlertsStateModel>,
+    { alertId,alertChannelId}: GetTemplateByAlertId
+  ): Observable<EditAlertsTemplate> {
+    return this.alertsService.getTemplateByAlertId(alertId,alertChannelId).pipe(
+      tap((payload) => {
+        patchState({ editAlertsTemplate: payload });
         return payload;
       })
     );

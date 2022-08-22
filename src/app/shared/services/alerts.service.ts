@@ -1,9 +1,10 @@
 import { HttpClient } from "@angular/common/http"
 import { Injectable } from "@angular/core";
 import { UserSubscription, UserSubscriptionFilters, UserSubscriptionPage } from "@shared/models/user-subscription.model";
-import { Observable, of } from "rxjs";
+import { observable, Observable, of } from "rxjs";
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage } from "@shared/models/alerts-template.model";
+import { AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate } from "@shared/models/alerts-template.model";
+import { AlertChannel } from "@admin/alerts/alerts.enum";
 
 @Injectable({
   providedIn: 'root',
@@ -72,34 +73,44 @@ export class AlertsService {
    * @return UserSubscriptionPage
    */
    public getAlertsTemplatePage(
+    BusinessUnitType:BusinessUnitType,
     PageNumber: number,
     PageSize: number,
     SortModel: any,
     FilterModel: any,
     Filters: AlertsTemplateFilters
-  ): Observable<AlertsTemplatePage> {
-    this.alertsTemplates = [{
-      id: 1, alert: "CandStatus: Accepted",
-      status: "Active"
-    },
-    {
-      id: 2, alert: "CandStatus: Applied",
-      status: "InActive"
-    },
-    {
-      id: 3, alert: "Order Created",
-      status: "InActive"
-    }];
-    this.alertsTemplatePage = {
-      items: this.alertsTemplates,
-      pageNumber: 1,
-      totalPages: 2,
-      totalCount: this.alertsTemplates.length,
-      hasPreviousPage: false,
-      hasNextPage: false
-    }
-    //return this.http.post<UserSubscriptionPage>(`/api/usersubscription/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel, ...Filters });
-    return of(this.alertsTemplatePage);
+  ): Observable<AlertsTemplate[]> {
+    
+    //return this.http.get<AlertsTemplatePage>(`/api/Templates/GetAlertsForTemplate`, { BusinessUnitType, PageNumber, PageSize, SortModel, FilterModel, ...Filters });
+    return this.http.get<AlertsTemplate[]>(`/api/Templates/GetAlertsForTemplate/`+ BusinessUnitType);
+    // ObservableColl.subscribe((data)=>{
+    //   this.alertsTemplatePage = {
+    //     items: data,
+    //     pageNumber: 1,
+    //     totalPages: 2,
+    //     totalCount: data.length,
+    //     hasPreviousPage: false,
+    //     hasNextPage: false
+    //   }
+    // })
+    
+    //return of(this.alertsTemplatePage);
+  }
+  
+  /**
+   * Get Template By AlertId
+   * @param AlertId
+   * @param alertChannelId
+   *
+   * @return EditAlertsTemplate
+   */
+   public getTemplateByAlertId(
+    AlertId:number,
+    AlertChannelId:AlertChannel
+  ): Observable<EditAlertsTemplate> {
+  
+    return this.http.get<EditAlertsTemplate>(`/api/Templates/GetTemplateByAlertId/`+ AlertId+`?alertChannel=`+AlertChannelId);
+    
   }
   
 }

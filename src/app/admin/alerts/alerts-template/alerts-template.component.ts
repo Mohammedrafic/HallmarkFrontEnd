@@ -4,21 +4,22 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } 
 import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { GridReadyEvent } from '@ag-grid-community/core';
-import { GetAlertsTemplatePage } from '@admin/store/alerts.actions';
-import { AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage } from '@shared/models/alerts-template.model';
+import { GetAlertsTemplatePage, GetTemplateByAlertId } from '@admin/store/alerts.actions';
+import { AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate } from '@shared/models/alerts-template.model';
 import { AlertsState } from '@admin/store/alerts.state';
-import { SetHeaderState, ShowEmailSideDialog,ShowSmsSideDialog,ShowOnScreenSideDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowEmailSideDialog, ShowSmsSideDialog, ShowOnScreenSideDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
 import { FormGroup } from '@angular/forms';
 import { AlertsEmailTemplateFormComponent } from './alerts-email-template-form/alerts-email-template-form.component';
 import { toolsRichTextEditor } from '../alerts.constants';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { AlertTemplateType } from '../alerts.enum';
+import { AlertChannel } from '../alerts.enum';
 import { AlertsSmsTemplateFromComponent } from './alerts-sms-template-from/alerts-sms-template-from.component';
 import { AlertsOnScreenTemplateFormComponent } from './alerts-on-screen-template-form/alerts-on-screen-template-form.component';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 @Component({
   selector: 'app-template',
   templateUrl: './alerts-template.component.html',
@@ -27,40 +28,58 @@ import { AlertsOnScreenTemplateFormComponent } from './alerts-on-screen-template
 export class AlertsTemplateComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Output() editEmailTemplateEvent = new EventEmitter();
   @Output() editSmsTemplateEvent = new EventEmitter();
-  @Output() editOnScreenTemplateEvent = new EventEmitter(); 
-  public tools= toolsRichTextEditor;
+  @Output() editOnScreenTemplateEvent = new EventEmitter();
+  public tools = toolsRichTextEditor;
   targetElement: HTMLElement = document.body;
-  public alertTemplateType:string;
+  public alertTemplateType: string;
   @ViewChild('RTE')
   public rteEle: RichTextEditorComponent;
-  @ViewChild(AlertsEmailTemplateFormComponent, {static : true}) emailTemplateForm : AlertsEmailTemplateFormComponent;
-  @ViewChild(AlertsSmsTemplateFromComponent, {static : true}) smsTemplateForm : AlertsSmsTemplateFromComponent;
-  @ViewChild(AlertsOnScreenTemplateFormComponent, {static : true}) onScreenTemplateForm : AlertsOnScreenTemplateFormComponent;
-  private subTitle:string;  
+  @ViewChild(AlertsEmailTemplateFormComponent, { static: true }) emailTemplateForm: AlertsEmailTemplateFormComponent;
+  @ViewChild(AlertsSmsTemplateFromComponent, { static: true }) smsTemplateForm: AlertsSmsTemplateFromComponent;
+  @ViewChild(AlertsOnScreenTemplateFormComponent, { static: true }) onScreenTemplateForm: AlertsOnScreenTemplateFormComponent;
+  private subTitle: string;
   public emailTemplateFormGroup: FormGroup;
   public smsTemplateFormGroup: FormGroup;
   public onScreenTemplateFormGroup: FormGroup;
   @Select(AlertsState.AlertsTemplatePage)
   public alertsTemplatePage$: Observable<AlertsTemplatePage>;
+
+  @Select(AlertsState.TemplateByAlertId)
+  public editAlertsTemplate$: Observable<EditAlertsTemplate>;
+
+  public editAlertTemplateData: EditAlertsTemplate={
+    id: 0,
+    alertId: 0,
+    alertChannel: AlertChannel.Email,
+    businessUnitId: BusinessUnitType.Hallmark,
+    alertTitle: '',
+    alertBody: '',
+    toList: '',
+    cCList: '',
+    bCCList: '',
+    parameters: []
+  };
+  public templateParamsData: { [key: string]: Object }[]=[];
+  public unsubscribe$: Subject<void> = new Subject();
   get templateEmailTitle(): string {
-    return "Email Template for Alert : "+this.subTitle;
+    return "Email Template for Alert : " + this.subTitle;
   }
   get templateSmsTitle(): string {
-    return "SMS Template for Alert : "+this.subTitle;
+    return "SMS Template for Alert : " + this.subTitle;
   }
   get templateOnScreenTitle(): string {
-    return "OnScreen Template for Alert : "+this.subTitle;
+    return "OnScreen Template for Alert : " + this.subTitle;
   }
-  private gridApi : any;
-  private gridColumnApi: any;  
+  private gridApi: any;
+  private gridColumnApi: any;
   private filters: AlertsTemplateFilters = {};
   public title: string = "Alerts Template";
-  public export$ = new Subject<ExportedFileType>();  
-  public showParent:boolean=true;
-  public showEmailEdit:boolean=false;
+  public export$ = new Subject<ExportedFileType>();
+  public bussinessUnitType: BusinessUnitType = BusinessUnitType.MSP;
+ 
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
-  rowModelType:any;
-  serverSideInfiniteScroll:any;
+  rowModelType: any;
+  serverSideInfiniteScroll: any;
   cacheBlockSize: any;
   pagination: boolean;
   paginationPageSize: number;
@@ -70,31 +89,31 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   sideBar: any;
   serverSideStoreType: any;
   maxBlocksInCache: any;
-  defaultColDef:any;
-  autoGroupColumnDef:any;
+  defaultColDef: any;
+  autoGroupColumnDef: any;
   itemList: Array<AlertsTemplate> | undefined;
-  constructor(private actions$: Actions, 
+  constructor(private actions$: Actions,
     private store: Store) {
-    super();    
+    super();
     store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
     }
     this.rowModelType = 'serverSide';
     this.serverSideInfiniteScroll = true,
-    this.pagination = true;
+      this.pagination = true;
     this.paginationPageSize = this.pageSize,
-    this.cacheBlockSize = this.pageSize;
+      this.cacheBlockSize = this.pageSize;
     this.serverSideStoreType = 'partial';
     this.maxBlocksInCache = 2;
     this.columnDefs = [
-      { 
-        field: 'id',
-        hide: true 
-      },    
       {
-        header:'Alert',
-        field: 'alert',
+        field: 'alertId',
+        hide: true
+      },
+      {
+        header: 'Alert',
+        field: 'alertTitle',
         filter: 'agTextColumnFilter',
         filterParams: {
           buttons: ['reset'],
@@ -103,7 +122,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         }
       },
       {
-        header:'Status',
+        header: 'Status',
         field: 'status',
         filter: false
       },
@@ -155,7 +174,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         filter: false,
         sortable: false,
         menuTabs: []
-      }   
+      }
     ];
 
     this.defaultColDef = {
@@ -176,21 +195,21 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   ngOnDestroy(): void {
   }
 
-  ngOnInit(): void {    
+  ngOnInit(): void {
     this.emailTemplateFormGroup = AlertsEmailTemplateFormComponent.createForm();
     this.smsTemplateFormGroup = AlertsSmsTemplateFromComponent.createForm();
-    this.onScreenTemplateFormGroup =AlertsOnScreenTemplateFormComponent.createForm();
+    this.onScreenTemplateFormGroup = AlertsOnScreenTemplateFormComponent.createForm();
   }
   public onEmailTemplateEdit(data: any): void {
-    this.alertTemplateType=AlertTemplateType[AlertTemplateType.Email];
+    this.alertTemplateType = AlertChannel[AlertChannel.Email];    
     this.onEdit(data.rowData);
   }
-  public onSmsTemplateEdit(data: any): void {    
-    this.alertTemplateType=AlertTemplateType[AlertTemplateType.SMS];
+  public onSmsTemplateEdit(data: any): void {
+    this.alertTemplateType = AlertChannel[AlertChannel.SMS];    
     this.onEdit(data.rowData);
   }
-  public onScreenTemplateEdit(data: any): void {    
-    this.alertTemplateType=AlertTemplateType[AlertTemplateType.OnScreen];
+  public onScreenTemplateEdit(data: any): void {
+    this.alertTemplateType = AlertChannel[AlertChannel.OnScreen];
     this.onEdit(data.rowData);
   }
   public onRemove(data: AlertsTemplate): void {
@@ -209,16 +228,16 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   public onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
-    this.gridApi.showLoadingOverlay();     
+    this.gridApi.showLoadingOverlay();
     var datasource = this.createServerSideDatasource();
     console.log(datasource);
     params.api.setServerSideDatasource(datasource);
   }
   createServerSideDatasource() {
-    let self = this;    
+    let self = this;
     return {
       getRows: function (params: any) {
-        setTimeout(()=> {
+        setTimeout(() => {
           let postData = {
             pageNumber: params.request.endRow / self.paginationPageSize,
             pageSize: self.paginationPageSize,
@@ -227,56 +246,61 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           var filter: any;
           let jsonString = JSON.stringify(params.request.filterModel);
           if (jsonString != "{}") {
-         var updatedJson = jsonString.replace("operator", "logicalOperator");
-          filter = JSON.parse(updatedJson);
-           }
-           else filter = null;
+            var updatedJson = jsonString.replace("operator", "logicalOperator");
+            filter = JSON.parse(updatedJson);
+          }
+          else filter = null;
 
           var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
-          self.dispatchNewPage(sort,filter);
-          self.alertsTemplatePage$.pipe().subscribe((data: any) => {
-            self.itemList = data.items;            
-            params.successCallback(self.itemList, data.totalCount || 1);
+          self.dispatchNewPage(sort, filter);
+
+          self.alertsTemplatePage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
+            if (data != undefined) {
+              self.itemList = data;
+              params.successCallback(self.itemList, data.length || 1);
+            }
           });
         }, 500);
       }
     }
   }
   private dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
-    this.store.dispatch(new GetAlertsTemplatePage(this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+    this.store.dispatch(new GetAlertsTemplatePage(this.bussinessUnitType, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+  }
+  private dispatchEditAlertTemplate(alertId: number, alertChannelId: AlertChannel): void {
+    this.store.dispatch(new GetTemplateByAlertId(alertId, alertChannelId));
   }
   onPageSizeChanged(event: any) {
-    this.cacheBlockSize=Number(event.value.toLowerCase().replace("rows",""));
-    this.paginationPageSize=Number(event.value.toLowerCase().replace("rows",""));
-    if(this.gridApi!=null)
-    {
-      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows","")));
-      this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows","")));
+    this.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
+    this.paginationPageSize = Number(event.value.toLowerCase().replace("rows", ""));
+    if (this.gridApi != null) {
+      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows", "")));
+      this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows", "")));
       var datasource = this.createServerSideDatasource();
       this.gridApi.setServerSideDatasource(datasource);
     }
   }
-  public onEdit({ index, column, foreignKeyData, id, ...alertsTemplate }: AlertsTemplate & { index: string; column: unknown; foreignKeyData: unknown }): void {
-    this.subTitle=alertsTemplate.alert;
-    if(this.alertTemplateType===AlertTemplateType[AlertTemplateType.Email])  
-    {
-    this.emailTemplateForm.rteCreated();
-    this.store.dispatch(new ShowEmailSideDialog(true)); 
+  public onEdit({ index, column, foreignKeyData, alertId, ...alertsTemplate }: AlertsTemplate & { index: string; column: unknown; foreignKeyData: unknown }): void {
+    this.subTitle = alertsTemplate.alertTitle;
+    if (this.alertTemplateType === AlertChannel[AlertChannel.Email]) {
+      this.SetEditData(alertId, AlertChannel.Email);
+      this.emailTemplateForm.rteCreated();
+      this.store.dispatch(new ShowEmailSideDialog(true));
     }
-    else if(this.alertTemplateType===AlertTemplateType[AlertTemplateType.SMS])
-    {
-      this.smsTemplateForm.rteCreated();      
-    this.store.dispatch(new ShowSmsSideDialog(true));  
+    else if (this.alertTemplateType === AlertChannel[AlertChannel.SMS]) {
+      this.SetEditData(alertId, AlertChannel.SMS);
+      this.smsTemplateForm.rteCreated();
+      this.store.dispatch(new ShowSmsSideDialog(true));
     }
-    else if(this.alertTemplateType===AlertTemplateType[AlertTemplateType.OnScreen])
-    {
-      this.onScreenTemplateForm.rteCreated();      
-    this.store.dispatch(new ShowOnScreenSideDialog(true));
+    else if (this.alertTemplateType === AlertChannel[AlertChannel.OnScreen]) {
+      this.SetEditData(alertId, AlertChannel.OnScreen);
+      this.onScreenTemplateForm.rteCreated();
+      this.store.dispatch(new ShowOnScreenSideDialog(true));
     }
-       
+
   }
   public onEmailTemplateAddCancel(): void {
-   
+
     // if (this.roleFormGroup.dirty) {
     //   this.confirmService
     //     .confirm(DELETE_CONFIRM_TEXT, {
@@ -289,17 +313,17 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     //       this.closeDialog();
     //     });
     // } else {
-      this.emailTemplateCloseDialog();
+    this.emailTemplateCloseDialog();
     // }
   }
   public onSmsTemplateAddCancel(): void {
-         this.smsTemplateCloseDialog();
+    this.smsTemplateCloseDialog();
   }
   public onScreenTemplateAddCancel(): void {
     this.onScreenTemplateCloseDialog();
-}
+  }
 
-  public onEmailTemplateSave(): void { 
+  public onEmailTemplateSave(): void {
     // this.roleFormGroup.markAllAsTouched();
     // if (this.roleFormGroup.valid && !this.roleForm.showActiveError) {
     //   const value = this.roleFormGroup.getRawValue();
@@ -313,10 +337,10 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     // }
     this.emailTemplateCloseDialog();
   }
-  public onSmsTemplateSave(): void {     
+  public onSmsTemplateSave(): void {
     this.smsTemplateCloseDialog();
   }
-  public onScreenTemplateSave(): void {     
+  public onScreenTemplateSave(): void {
     this.onScreenTemplateCloseDialog();
   }
   private emailTemplateCloseDialog(): void {
@@ -328,5 +352,23 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   private onScreenTemplateCloseDialog(): void {
     this.store.dispatch(new ShowOnScreenSideDialog(false));
   }
+  private SetEditData(alertId: number, alertChannel: AlertChannel): void {
+    this.dispatchEditAlertTemplate(alertId, alertChannel);
+
+    this.editAlertsTemplate$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+      this.templateParamsData=[];
+      if (data != undefined) {
+        this.editAlertTemplateData = data;
+        data.parameters.forEach((paramter:string) =>{  
+          this.templateParamsData.push({
+            text: paramter,
+            id: paramter,
+            "htmlAttributes": { draggable: true }
+          })  
+        });         
+      }
+    });
+  }
+
 
 }

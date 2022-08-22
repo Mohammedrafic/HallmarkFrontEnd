@@ -207,7 +207,7 @@ const COMPONENTS = [
   ReorderCandidatesListComponent,
   OrderReOrdersContainerComponent,
   ExtensionCandidateComponent,
-  ActionCellRendererComponent
+  ActionCellRendererComponent,
   OrderCloseReasonInfoComponent,  
   EmailSideDialogComponent,  
   SmsSideDialogComponent,

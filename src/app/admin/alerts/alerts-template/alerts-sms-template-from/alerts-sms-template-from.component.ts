@@ -16,8 +16,10 @@ import { ScrollbarSettings } from '@syncfusion/ej2-angular-charts';
 export class AlertsSmsTemplateFromComponent implements OnInit, OnDestroy, OnChanges {
   public tools = toolsRichTextEditor;
   @Input() addEditSmsTemplateForm: FormGroup;
-  @Input() title: string;
-
+  @Input() title: string;  
+  @Input() alertTitle:string;
+  @Input() alertBody:string;
+  @Input() templateParamsData:{ [key: string]: Object }[];
   @Output() formCancelClicked = new EventEmitter();
   @Output() formSaveClicked = new EventEmitter();
   @ViewChild('SMSRTE') public rteObj: RichTextEditorComponent;
@@ -25,23 +27,7 @@ export class AlertsSmsTemplateFromComponent implements OnInit, OnDestroy, OnChan
   private editArea: HTMLElement;
   public range: Range = new Range();
   private dragEleContent: string;
-  public data: { [key: string]: Object }[] = [
-    {
-      text: 'Hennessey Venom',
-      id: 'list-01',
-      "htmlAttributes": { draggable: true }
-    },
-    {
-      text: 'Bugatti Chiron',
-      id: 'list-02',
-      "htmlAttributes": { draggable: true }
-    },
-    {
-      text: 'Bugatti Veyron Super Sport',
-      id: 'list-03',
-      "htmlAttributes": { draggable: true }
-    }
-  ];
+  
   constructor() { }
   ngOnChanges(changes: SimpleChanges): void {
   }
@@ -65,8 +51,7 @@ export class AlertsSmsTemplateFromComponent implements OnInit, OnDestroy, OnChan
         e.dataTransfer.setData("Text", (e.target as HTMLElement).innerText);
       });
     }
-    this.editArea.innerHTML="";
-    this.rteObj.toolbarSettings.type = ToolbarType.MultiRow;
+    this.rteObj.toolbarSettings.type = ToolbarType.Scrollable;
     this.rteObj.toolbarSettings.enableFloating = true;
     this.rteObj.height='400px';
   }

@@ -4,14 +4,14 @@
             <div class="input-container bootstrap top-container">
                 <label>Subject<span class="required">*</span></label>
                 <div class="input-group">
-                    <input appValidateWithMessage formControlName="subject" class="e-input" type="text" />
+                    <input appValidateWithMessage formControlName="subject" class="e-input" type="text" [(ngModel)]="alertTitle" />
                 </div>
             </div>
             <div class="rich-text-container">
                 <label>Mail Body<span class="required">*</span></label>
                 <div>
                     <ejs-richtexteditor #RTE id='defaultRTE' appValidateWithMessage formControlName="mailBody"
-                        [toolbarSettings]='tools'>
+                        [toolbarSettings]='tools' [(value)]='alertBody'>
                     </ejs-richtexteditor>
                 </div>
             </div>
@@ -26,13 +26,10 @@
             <div class="input-container bootstrap">
                 <label>Attributes</label>
                 <div>
-                    <ejs-listview id="listbox" [dataSource]='data'>
+                    <ejs-listview id="listbox" [dataSource]='templateParamsData'>
                     </ejs-listview>
                 </div>
             </div>
         </div>
     </div>
-
-
-
 </div>

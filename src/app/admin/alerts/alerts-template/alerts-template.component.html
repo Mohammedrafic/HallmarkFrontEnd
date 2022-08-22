@@ -1,48 +1,54 @@
 
 <section class="last-content-section-padding alerts-template-top-padding">  
-    <ag-grid-angular #agGridPagination
-                    class="ag-theme-alpine alerts-template-grid"
-                    [animateRows]="true"
-                    [columnDefs]="columnDefs"
-                    [defaultColDef]="defaultColDef"
-                    [suppressAggFuncInHeader]="true"
-                    [modules]="modules"                
-                    [cacheBlockSize]="cacheBlockSize"
-                    [rowModelType]="rowModelType"
-                    [frameworkComponents]="frameworkComponents"
-                    [pagination]="true"
-                    [paginationPageSize]="paginationPageSize"                    
-                    (gridReady)="onGridReady($event)"
-                    [sideBar]="sideBar"                                                
-                    toolPanel="columns"
-                    [serverSideStoreType]="serverSideStoreType"                
-                    [paginationAutoPageSize]="false"
-                    [maxBlocksInCache] ="maxBlocksInCache">
-    </ag-grid-angular>
+  <ag-grid-angular #agGridPagination
+                  class="ag-theme-alpine alerts-template-grid"
+                  [animateRows]="true"
+                  [columnDefs]="columnDefs"
+                  [defaultColDef]="defaultColDef"
+                  [suppressAggFuncInHeader]="true"
+                  [modules]="modules"                
+                  [cacheBlockSize]="cacheBlockSize"
+                  [rowModelType]="rowModelType"
+                  [frameworkComponents]="frameworkComponents"
+                  [pagination]="true"
+                  [paginationPageSize]="paginationPageSize"                    
+                  (gridReady)="onGridReady($event)"
+                  [sideBar]="sideBar"                                                
+                  toolPanel="columns"
+                  [serverSideStoreType]="serverSideStoreType"                
+                  [paginationAutoPageSize]="false"
+                  [maxBlocksInCache] ="maxBlocksInCache">
+  </ag-grid-angular>
 </section>
 <div class="row">
-  <div class="col-md-6"></div>
-  <div class="col-md-6 text-right">
-    <ejs-dropdownlist
-      id="rowsPerPage"
-      class="dropdown-no-border"
-      [dataSource]="rowsPerPageDropDown"
-      [(value)]="activeRowsPerPageDropDown"
-      (change)="onPageSizeChanged($event)">
-    </ejs-dropdownlist></div>
+<div class="col-md-6"></div>
+<div class="col-md-6 text-right">
+  <ejs-dropdownlist
+    id="rowsPerPage"
+    class="dropdown-no-border"
+    [dataSource]="rowsPerPageDropDown"
+    [(value)]="activeRowsPerPageDropDown"
+    (change)="onPageSizeChanged($event)">
+  </ejs-dropdownlist></div>
 </div>
 <app-email-side-dialog [header]="templateEmailTitle" (emailFormCancelClicked)="onEmailTemplateAddCancel()" (emailFormSaveClicked)="onEmailTemplateSave()" [width]="'1000px'">
-  <section>
-    <app-alerts-email-template-form #emailTemplateForm [addEditEmailTemplateForm]="$any(emailTemplateFormGroup)" [title]="templateEmailTitle"></app-alerts-email-template-form>
-  </section>
+<section>
+  <app-alerts-email-template-form #emailTemplateForm [addEditEmailTemplateForm]="$any(emailTemplateFormGroup)" [title]="templateEmailTitle" 
+  [alertTitle]="editAlertTemplateData.alertTitle" [alertBody]="editAlertTemplateData.alertBody" 
+  [templateParamsData]="templateParamsData"></app-alerts-email-template-form>
+</section>
 </app-email-side-dialog>
 <app-sms-side-dialog [header]="templateSmsTitle" (smsFormCancelClicked)="onSmsTemplateAddCancel()" (smsFormSaveClicked)="onEmailTemplateSave()" [width]="'1000px'">
-  <section>
-    <app-alerts-sms-template-from #smsTemplateForm [addEditSmsTemplateForm]="$any(smsTemplateFormGroup)" [title]="templateSmsTitle"></app-alerts-sms-template-from>
-  </section>
+<section>
+  <app-alerts-sms-template-from #smsTemplateForm [addEditSmsTemplateForm]="$any(smsTemplateFormGroup)" [title]="templateSmsTitle"
+  [alertTitle]="editAlertTemplateData.alertTitle" [alertBody]="editAlertTemplateData.alertBody" 
+  [templateParamsData]="templateParamsData"></app-alerts-sms-template-from>
+</section>
 </app-sms-side-dialog>
 <app-on-screen-side-dialog [header]="templateOnScreenTitle" (onScreenFormCancelClicked)="onScreenTemplateAddCancel()" (onScreenFormSaveClicked)="onScreenTemplateSave()" [width]="'1000px'">
-  <section>
-    <app-alerts-on-screen-template-form #onScreenTemplateForm [addEditOnScreenTemplateForm]="$any(onScreenTemplateFormGroup)" [title]="templateOnScreenTitle"></app-alerts-on-screen-template-form>
-  </section>
+<section>
+  <app-alerts-on-screen-template-form #onScreenTemplateForm [addEditOnScreenTemplateForm]="$any(onScreenTemplateFormGroup)" [title]="templateOnScreenTitle"
+  [alertTitle]="editAlertTemplateData.alertTitle" [alertBody]="editAlertTemplateData.alertBody" 
+  [templateParamsData]="templateParamsData"></app-alerts-on-screen-template-form>
+</section>
 </app-on-screen-side-dialog>
