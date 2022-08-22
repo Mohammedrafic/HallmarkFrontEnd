@@ -130,6 +130,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     { id: OrderType.PermPlacement, name: 'Perm. Placement' },
     { id: OrderType.Traveler, name: 'Traveler' },
   ];
+  public orderTypesDataSource: { id: number, name: string }[];
   public orderTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public durations = [
@@ -300,7 +301,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
       this.store.dispatch(new SetIsDirtyOrderForm(this.generalInformationForm.dirty));
     });
-    this.subscribeForSettings();
     this.jobDistributionForm = this.formBuilder.group({
       jobDistribution: [[], Validators.required],
       agency: [null],
@@ -542,12 +542,15 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
           this.commentContainerId = order.commentContainerId as number;
           this.getComments();
           this.populateForms(order);
+          this.subscribeForSettings();
         } else if (order?.isTemplate) {
           this.order = order;
           this.populateForms(order);
+          this.subscribeForSettings();
         }
       });
     } else {
+      this.subscribeForSettings();
       this.isEditMode = false;
       this.order = null;
       this.populateNewOrderForm();
@@ -577,7 +580,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private getSettings(): void {
-    this.store.dispatch(new GetOrganizationSettings())
+    this.store.dispatch(new GetOrganizationSettings());
   }
 
   private getComments(): void {
@@ -707,10 +710,31 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         .subscribe();
     }
   }
+
+  private orderTypeDataSourceHandler(): void {
+    if (this.orderId) {
+      if (
+          this.settings[SettingsKeys.IsReOrder]?.value || 
+          (!this.settings[SettingsKeys.IsReOrder]?.value && this.order?.orderType === OrderType.OpenPerDiem)
+        ) {
+            this.orderTypesDataSource = this.orderTypes;
+          } else {
+            this.orderTypesDataSource = this.orderTypes.filter((orderType) => orderType.id !== OrderType.OpenPerDiem);
+          }
+    } else {
+      if (this.settings[SettingsKeys.IsReOrder]?.value) {
+        this.orderTypesDataSource = this.orderTypes;
+      } else {
+        this.orderTypesDataSource = this.orderTypes.filter((orderType) => orderType.id !== OrderType.OpenPerDiem);
+      }
+    }
+  }
+
   private subscribeForSettings(): void {
     this.organizationSettings$.pipe(takeUntil(this.unsubscribe$)).subscribe((settings) => {
       this.settings = SettingsHelper.mapSettings(settings);
       this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
+      this.orderTypeDataSourceHandler();
       if (this.specialProject != null) {
         if (this.isSpecialProjectFieldsRequired) {
           this.specialProject.controls['projectTypeId'].setValidators(Validators.required);
@@ -727,6 +751,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       }
     });
   }
+
   private isFieldTouched(field: string): boolean {
     return this.touchedFields.has(field);
   }
@@ -969,7 +994,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.workflowForm.controls['workflowId'].patchValue(order.workflowId);
       this.disableFormControls(order);
       this.workflowForm.controls['workflowId'].updateValueAndValidity();
-      this.workflowDropdown.refresh();
+      this.workflowDropdown?.refresh();
     });
   }
 
