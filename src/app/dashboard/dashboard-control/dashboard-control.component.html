@@ -53,5 +53,11 @@
     [orderedFilters]="orderedFilters"
   ></app-widget-filter>
 
-  <app-quick-order [openEvent]="isOpenQuickOrderDialod$"></app-quick-order>
+  <app-quick-order
+    [openEvent]="isOpenQuickOrderDialod$"
+    [allOrganizations]="allOrganizations"
+    [userIsAdmin]="userIsAdmin"
+    [skills]="skills"
+    [organizationStructure]="organizationStructure"
+  ></app-quick-order>
 </ng-template>

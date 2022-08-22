@@ -21,4 +21,12 @@
       </section>
     </section>
   </ng-template>
+  <ng-template #content>
+    <app-quick-order-form
+      [allOrganizations]="allOrganizations"
+      [userIsAdmin]="userIsAdmin"
+      [skills]="skills"
+      [organizationStructure]="organizationStructure"
+    ></app-quick-order-form>
+  </ng-template>
 </ejs-dialog>

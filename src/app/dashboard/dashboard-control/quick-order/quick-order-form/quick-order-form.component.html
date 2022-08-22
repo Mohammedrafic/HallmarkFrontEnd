@@ -1,0 +1,197 @@
+<div class="quick-order-form-container">
+  <div class="row bootstrap">
+    <form *ngIf="userIsAdmin" [formGroup]="organizationForm" class="organization-form">
+      <div class="input-container order-type-container">
+        <label>Organization<span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            formControlName="organization"
+            appValidateWithMessage
+            [dataSource]="allOrganizations"
+            [fields]="organizationTypeFields"
+            (select)="onOrganizationDropDownSelected($event)"
+          >
+          </ejs-dropdownlist>
+        </div>
+      </div>
+    </form>
+    <form [formGroup]="orderTypeForm" class="order-type-status-form form-line-item-60">
+      <div class="input-container order-type-container ">
+        <label>Order Type<span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            formControlName="orderType"
+            appValidateWithMessage
+            [dataSource]="orderTypes"
+            [fields]="orderTypeFields"
+          >
+          </ejs-dropdownlist>
+        </div>
+      </div>
+
+      <div class="input-container form-line-item-30">
+        <label>Status</label>
+        <div class="input-group">
+          <input class="e-input" type="text" [value]="orderStatus" [disabled]="true" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <section class="quick-order-form">
+    <div class="general-information">
+      <h3 class="title">General Information</h3>
+      <div class="general-information-form-container">
+        <form [formGroup]="generalInformationForm">
+          <div class="row">
+            <!-- Job Title -->
+            <div class="input-container bootstrap form-line-item-20">
+              <label>Job Title<span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <div class="input-group">
+                  <input class="e-input" type="text" appValidateWithMessage formControlName="title" maxlength="50" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Region -->
+            <div class="input-container bootstrap form-line-item-20">
+              <label>Region<span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <ejs-dropdownlist
+                  formControlName="regionId"
+                  appValidateWithMessage
+                  [enabled]="isRegionsDropDownEnabled"
+                  [dataSource]="regionDataSource"
+                  [fields]="regionFields"
+                  (select)="onRegionDropDownSelected($event)"
+                >
+                </ejs-dropdownlist>
+              </div>
+            </div>
+
+            <!-- Location -->
+            <div class="input-container bootstrap form-line-item-20">
+              <label>Location<span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <ejs-dropdownlist
+                  formControlName="locationId"
+                  appValidateWithMessage
+                  [enabled]="isLocationsDropDownEnabled"
+                  [dataSource]="locationDataSource"
+                  [fields]="locationFields"
+                  (select)="onLocationDropDownSelected($event)"
+                >
+                </ejs-dropdownlist>
+              </div>
+            </div>
+
+            <!-- Department -->
+            <div class="input-container bootstrap form-line-item-20">
+              <label>Department<span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <ejs-dropdownlist
+                  formControlName="departmentId"
+                  appValidateWithMessage
+                  [enabled]="isDepartmentsDropDownEnabled"
+                  [dataSource]="departmentDataSource"
+                  [fields]="departmentFields"
+                >
+                </ejs-dropdownlist>
+              </div>
+            </div>
+
+            <!-- Skill -->
+            <div class="input-container bootstrap form-line-item-20">
+              <label>Skill<span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <ejs-dropdownlist
+                  formControlName="skillId"
+                  appValidateWithMessage
+                  [dataSource]="skillDataSource"
+                  [fields]="skillFields"
+                >
+                </ejs-dropdownlist>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <!-- Hourly Rate -->
+            <div *ngIf="isTravelerOrContactPermOrder"class="input-container bootstrap form-line-item-20">
+              <label>Hourly rate ($)<span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <div class="input-group">
+                  <input class="e-input" type="text" appValidateWithMessage formControlName="hourlyRate" maxlength="50" />
+                </div>
+              </div>
+            </div>
+
+            <!-- of Position -->
+            <div class="input-container bootstrap form-line-item-20">
+              <label># Open Positions<span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <div class="input-group">
+                  <input class="e-input" type="text" appValidateWithMessage formControlName="openPositions" maxlength="50" />
+                </div>
+              </div>
+            </div>
+
+            <div class="input-container bootstrap form-line-item-20">
+              <label>Duration<span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <ejs-dropdownlist
+                  formControlName="duration"
+                  appValidateWithMessage
+                  [dataSource]="durations"
+                  [fields]="durationFields"
+                >
+                </ejs-dropdownlist>
+              </div>
+            </div>  
+
+            <!-- Job Start Date -->
+            <div class="datepicker-container form-line-item-20">
+              <label>Job Start Date<span class="required">*</span></label>
+              <div class="input-group datepicker bootstrap">
+                <ejs-datepicker
+                  class="datepicker"
+                  format="MM/dd/yyyy"
+                  placeholder="MM/DD/YYYY"
+                  formControlName="jobStartDate"
+                  appValidateWithMessage
+                  [enableMask]="true"
+                  [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                  [min]="today"
+                >
+                </ejs-datepicker>
+              </div>
+            </div>
+
+            <!-- Job End Date -->
+            <div *ngIf="true" class="datepicker-container form-line-item-20">
+              <label>Job End Date<span class="required">*</span></label>
+              <div class="input-group datepicker bootstrap">
+                <ejs-datepicker
+                  class="datepicker"
+                  format="MM/dd/yyyy"
+                  placeholder="MM/DD/YYYY"
+                  formControlName="jobEndDate"
+                  appValidateWithMessage
+                  [enableMask]="true"
+                  [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                  [enabled]="isJobEndDateControlEnabled"
+                  [enableMask]="true"
+                  [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                  [min]="generalInformationForm.controls['jobStartDate'].value"
+                >
+                </ejs-datepicker>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+
