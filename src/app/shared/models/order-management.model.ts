@@ -151,7 +151,17 @@ export type OrderCandidatesList = {
   candidateStatus?: CandidateStatus;
   agencyName?: string;
   organizationId?: number;
+  workflowStepType: WorkflowStepType;
 };
+
+export interface WorkflowStepType {
+  closeDate: string;
+  rejectDate: string;
+  status: string;
+  type: number;
+  withdrawDate: string;
+  workflowStepId: number;
+}
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
 

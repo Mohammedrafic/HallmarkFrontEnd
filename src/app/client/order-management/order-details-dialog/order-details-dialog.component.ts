@@ -75,6 +75,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public readonly isReOrderDialogOpened$: Observable<boolean> = this.isDialogOpened();
 
+  candidateOrderPage: OrderCandidatesListPage;
   private unsubscribe$: Subject<void> = new Subject();
 
   public firstActive = true;
@@ -292,6 +293,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   private subscribeOnOrderCandidatePage(): void {
     this.orderCandidatePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: OrderCandidatesListPage) => {
+      this.candidateOrderPage = order;
       this.candidatesCounter =
         order &&
         order.items?.filter(
