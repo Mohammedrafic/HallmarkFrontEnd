@@ -65,7 +65,7 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Skill } from '@shared/models/skill.model';
-import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
+import { GetAllOrganizationSkills, GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { DatePipe, Location } from '@angular/common';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
@@ -101,6 +101,9 @@ import { OrderManagementContentService } from '@shared/services/order-management
 import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
+import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { SettingsKeys } from '@shared/enums/settings';
+import { SettingsHelper } from '@core/helpers/settings.helper';
 
 @Component({
   selector: 'app-order-management-content',
@@ -132,8 +135,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @Select(OrganizationManagementState.allOrganizationSkills)
   skills$: Observable<Skill[]>;
 
+  
+  @Select(OrganizationManagementState.organizationSettings)
+  organizationSettings$: Observable<OrganizationSettingsGet[]>;
+
   @Select(DashboardState.filteredItems) private readonly filteredItems$: Observable<FilteredItem[]>;
 
+  public settings: {[key in SettingsKeys]?: OrganizationSettingsGet};
+  public SettingsKeys = SettingsKeys;
   public activeTab: OrganizationOrderManagementTabs = OrganizationOrderManagementTabs.AllOrders;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
@@ -292,6 +301,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.listenRedirectFromReOrder();
     this.onCommentRead();
     this.listenRedirectFromExtension();
+    this.subscribeForSettings();
   }
 
   ngOnDestroy(): void {
@@ -905,8 +915,19 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       });
   }
 
+  private subscribeForSettings(): void {
+    this.organizationSettings$.pipe(takeUntil(this.unsubscribe$)).subscribe((settings) => {
+      this.settings = SettingsHelper.mapSettings(settings);
+    });
+  }
+
+  private getSettings(): void {
+    this.store.dispatch(new GetOrganizationSettings());
+  }
+
   private onOrganizationChangedHandler(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$), debounceTime(400)).subscribe(() => {
+      this.getSettings();
       if (!this.isRedirectedFromDashboard) {
         this.clearFilters();
       }

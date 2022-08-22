@@ -49,6 +49,7 @@ import { NgxsModule } from '@ngxs/store';
 import { OrganizationManagementState } from './store/organization-management.state';
 import { CredentialsState } from './store/credentials.state';
 import { SharedModule } from '@shared/shared.module';
+import { AgGridModule } from '@ag-grid-community/angular';
 import { ShiftsState } from './store/shifts.state';
 import { OrganizationManagementComponent } from './organization-management.component';
 import { OrganizationManagementRoutingModule } from './organization-management-routing.module';
@@ -82,6 +83,19 @@ import { ReasonsComponent } from './reasons/reasons.component';
 import { ClosureReasonComponent } from './reasons/closure-reason/closure-reason.component';
 import { RegionsComponent } from './regions/regions.component';
 import { ManualInvoiceRejectReasonComponent } from './reasons/manual-invoice-reject-reason/manual-invoice-reject-reason.component';
+import { OrderRequisitionComponent } from './reasons/order-requisition/order-requisition.component';
+import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
+import { PurchaseOrdersComponent } from './specialproject/components/purchase-orders/purchase-orders.component';
+import { SpecialProjectsComponent } from './specialproject/components/special-projects/special-projects.component';
+import { SpecialProjectState } from './store/special-project.state';
+import { PurchaseOrderState } from './store/purchase-order.state';
+import { SpecialProjectCategoryState } from './store/special-project-category.state';
+import { SpecialProjectCategoryComponent } from './specialproject/components/special-project-categories/special-project-categories.component';
+import { ProjectMappingComponent } from './specialproject/components/project-mapping/project-mapping.component';
+import { SpecialProjectTableComponent } from './specialproject/components/special-project-table/special-project-table.component';
+import { SpecialProjectMappingState } from './store/special-project-mapping.state';
+import { PurchaseOrderMappingComponent } from './specialproject/components/purchase-order-mapping/purchase-order-mapping.component';
+import { PurchaseOrderMappingState } from './store/purchase-order-mapping.state';
 
 const sidebarIcons = {
   Download,
@@ -127,10 +141,17 @@ const sidebarIcons = {
     FilteredCredentialsComponent,
     MapCredentialsFormComponent,
     ReasonsComponent,
-
     ManualInvoiceRejectReasonComponent,
     ClosureReasonComponent,
-    RegionsComponent
+    RegionsComponent,
+    OrderRequisitionComponent,
+    SpecialProjectContainerComponent,
+    PurchaseOrdersComponent,
+    SpecialProjectsComponent,
+    SpecialProjectCategoryComponent,
+    ProjectMappingComponent,
+    SpecialProjectTableComponent,
+    PurchaseOrderMappingComponent
   ],
   imports: [
     CommonModule,
@@ -162,6 +183,7 @@ const sidebarIcons = {
     AutoCompleteModule,
     DropDownButtonModule,
     MaskedTextBoxModule,
+    AgGridModule,
 
     FeatherModule.pick(sidebarIcons),
 
@@ -173,6 +195,11 @@ const sidebarIcons = {
       ShiftsState,
       HolidaysState,
       BillRatesState,
+      SpecialProjectState,
+      PurchaseOrderState,
+      SpecialProjectCategoryState,
+      SpecialProjectMappingState,
+      PurchaseOrderMappingState
     ]),
   ],
   exports: [BillRatesComponent],

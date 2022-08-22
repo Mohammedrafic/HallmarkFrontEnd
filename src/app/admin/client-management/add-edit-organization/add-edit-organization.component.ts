@@ -5,6 +5,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ONLY_LETTERS } from '@shared/constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Titles } from '@shared/enums/title';
+import { OrganizationTypes } from '@shared/enums/organization-type';
 import { User } from '@shared/models/user-managment-page.model';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
@@ -55,6 +56,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   public logo: Blob | null = null;
   public titles = Titles;
   public isMspUser = false;
+  public organizationTypes = OrganizationTypes;
 
   public createUnderFields = {
     text: 'name',
@@ -359,6 +361,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     this.GeneralInformationFormGroup = this.fb.group({
       id: new FormControl(organization ? organization.generalInformation.id : 0),
       name: new FormControl(organization ? organization.generalInformation.name : '', [Validators.required]),
+      organizationType: new FormControl(organization ? organization.generalInformation.organizationType : ''),
       externalId: new FormControl(organization ? organization.generalInformation.externalId : ''),
       taxId: new FormControl(organization ? organization.generalInformation.taxId : '', [
         Validators.required,
@@ -445,22 +448,10 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     });
     this.ContactFormArray = this.ContactFormGroup.get('contacts') as FormArray;
     this.PreferencesFormGroup = this.fb.group({
-      id: new FormControl(organization ? organization.preferences.id : 0),
-      purchaseOrderBy: new FormControl(organization ? organization.preferences.purchaseOrderBy.toString() : '0', [
-        Validators.required,
-      ]),
-      sendDocumentToAgency: new FormControl(organization ? organization.preferences.sendDocumentToAgency : null),
-      timesheetSubmittedBy: new FormControl(
-        organization ? organization.preferences.timesheetSubmittedBy.toString() : '0',
-        [Validators.required]
-      ),
+      id: new FormControl(organization ? organization.preferences.id : 0),     
       weekStartsOn: new FormControl(organization ? organization.preferences.weekStartsOn : '', [Validators.required]),
       paymentOptions: new FormControl(organization ? organization.preferences.paymentOptions.toString() : '0', [
         Validators.required,
-      ]),
-      timePeriodInMins: new FormControl(organization ? organization.preferences.timePeriodInMins : '', [
-        Validators.pattern(/^[0-9]+$/),
-        Validators.min(1),
       ]),
       paymentDescription: new FormControl(organization ? organization.preferences.paymentDescription : '', [
         Validators.required,

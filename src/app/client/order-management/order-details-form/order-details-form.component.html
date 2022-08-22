@@ -8,7 +8,7 @@
           <ejs-dropdownlist
             formControlName="orderType"
             appValidateWithMessage
-            [dataSource]="orderTypes"
+            [dataSource]="orderTypesDataSource"
             [fields]="orderTypeFields"
           >
           </ejs-dropdownlist>
@@ -28,7 +28,7 @@
   <div class="right-section"></div>
 </section>
 
-<section class="order-form-container">
+<section class="order-form-container" *ngIf="settings">
   <div class="left-section">
     <div tabindex="0" class="e-card">
       <div class="e-card-content">
@@ -782,6 +782,7 @@
   <div class="right-section">
     <app-document-uploader
       uploaderTitle="Documents"
+      [disabled]="!settings[SettingsKeys.AllowDocumentUpload]?.value"
       [documents]="order?.documents"
       (selectDocuments)="onDocumentsSelected($event)"
       (deleteDocument)="onDocumentDeleted($event)"

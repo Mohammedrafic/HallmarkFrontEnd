@@ -125,6 +125,8 @@ import { CommentsState } from './components/comments/store/comments.state';
 import { AlwaysOpenFirstAccordition } from './directives/always-open-first-accordition.directive';
 import { CandidateStatusName } from './pipes/candidate-status-name.pipe';
 import { RouterModule } from '@angular/router';
+import { ExtensionCandidateComponent } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
+import { ActionCellRendererComponent } from '@shared/components/cell-renderer/action-cellrenderer.component';
 import { ToggleSwitchComponent } from './components/toggle-switch/toggle-switch.component';
 import { EmailSideDialogComponent } from './components/email-side-dialog/email-side-dialog.component';
 import { SmsSideDialogComponent } from './components/sms-side-dialog/sms-side-dialog.component';
@@ -204,6 +206,8 @@ const COMPONENTS = [
   OrderReOrdersListComponent,
   ReorderCandidatesListComponent,
   OrderReOrdersContainerComponent,
+  ExtensionCandidateComponent,
+  ActionCellRendererComponent
   OrderCloseReasonInfoComponent,  
   EmailSideDialogComponent,  
   SmsSideDialogComponent,

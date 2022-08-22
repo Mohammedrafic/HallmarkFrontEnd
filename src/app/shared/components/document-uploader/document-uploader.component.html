@@ -5,8 +5,9 @@
     </div>
   </div>
   <div id="documents-uploader" class="e-card-content">
-    <div id="droparea" class="droparea" (click)="browse()">
-      <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
+    <div id="droparea" class="droparea" (click)="browse()" [class.disabled]="disabled">
+      <span *ngIf="!disabled">Drag & Drop or <span class="browse-link">browse</span> files here</span>
+      <span *ngIf="disabled">Uploads are not available for this organization</span>
     </div>
     <div *ngIf="documents?.length" class="e-upload uploaded-list">
       <ul class="e-upload-files">

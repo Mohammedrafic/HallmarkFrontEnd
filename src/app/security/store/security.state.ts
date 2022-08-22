@@ -227,9 +227,9 @@ export class SecurityState {
   @Action(GetRolePerUser)
   GetRolesPerPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitId, businessUnitType }: GetRolePerUser
+    { businessUnitType, businessUnitIds }: GetRolePerUser
   ): Observable<RolesPerUser[]> {
-    return this.userService.getRolesPerUser(businessUnitId, businessUnitType).pipe(
+    return this.userService.getRolesPerUser(businessUnitType, businessUnitIds).pipe(
       tap((payload) => {
         patchState({ rolesPerUsers: payload });
         return payload;
