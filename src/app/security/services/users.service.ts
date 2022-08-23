@@ -43,8 +43,8 @@ export class UsersService {
    *
    * @return RolesPerUser
    */
-  public getRolesPerUser(BusinessUnitType: BusinessUnitType, BusinessUnitId: number): Observable<RolesPerUser[]> {
-    return this.http.get<RolesPerUser[]>(`/api/Roles/basicinfo`, { params: { BusinessUnitType, BusinessUnitId } });
+  public getRolesPerUser(BusinessUnitType: BusinessUnitType, BusinessUnitIds: number[]): Observable<RolesPerUser[]> {
+    return this.http.post<RolesPerUser[]>(`/api/Roles/basicinfo`,  { BusinessUnitType, BusinessUnitIds } );
   }
 
   /**

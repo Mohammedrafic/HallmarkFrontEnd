@@ -490,6 +490,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/page-report',
     },
+    44: {
+      // Organization Profile
+      icon: 'user',
+      route: '/admin/profile',
+    },
   },
 
   [BusinessUnitType.Agency]: {
@@ -626,6 +631,11 @@ export const MENU_CONFIG: any = {
       // User List
       icon: '',
       route: 'security/user-list',
+    },
+    34: {
+      // Candidates
+      icon: 'file-text',
+      route: 'agency/candidates',
     },
     35: {
       // Candidate Details

@@ -1,0 +1,49 @@
+@import 'colors.scss';
+
+.container {
+  padding-top: 24px;
+
+  .toolbar-buttons {
+    float: right;
+    position: relative;
+    z-index: 99;
+    display: flex;
+  }
+
+  .button-filter {
+    margin-right: 12px;
+  }
+}
+.specialproject-form-dialog {
+  &.form-container {
+    margin-top: 20px;
+  }
+
+  .form-elemet {
+    margin-bottom: 15px;
+  }
+}
+.form-container {
+  padding-top: 24px;
+
+  .group {
+    display: flex;
+
+    .input-container:first-child {
+      padding-right: 13px;
+    }
+
+    .input-container {
+      width: 100%;
+
+      ejs-numerictextbox {
+        span.e-disabled {
+          border: 1px solid $grey;
+          background-color: $secondary-dark-blue-50;
+        }
+      }
+    }
+  }
+}
+
+

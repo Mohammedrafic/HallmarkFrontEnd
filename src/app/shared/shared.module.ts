@@ -122,8 +122,11 @@ import { CloseOrderSideDialogComponent } from '@shared/components/close-order-si
 import { OrderCloseReasonInfoComponent } from '@shared/components/order-close-reason-info/order-close-reason-info.component';
 import { CommentComponent } from './components/comments/comment/comment.component';
 import { CommentsState } from './components/comments/store/comments.state';
+import { AlwaysOpenFirstAccordition } from './directives/always-open-first-accordition.directive';
 import { CandidateStatusName } from './pipes/candidate-status-name.pipe';
 import { RouterModule } from '@angular/router';
+import { ExtensionCandidateComponent } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
+import { ActionCellRendererComponent } from '@shared/components/cell-renderer/action-cellrenderer.component';
 
 const icons = {
   AlertCircle,
@@ -158,6 +161,7 @@ const COMPONENTS = [
   BillRatePipe,
   ExBillRateNamesPipe,
   ValidateDirective,
+  AlwaysOpenFirstAccordition,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
   ClickOutsideDirective,
@@ -199,6 +203,8 @@ const COMPONENTS = [
   ReorderCandidatesListComponent,
   OrderReOrdersContainerComponent,
   OrderCloseReasonInfoComponent,
+  ExtensionCandidateComponent,
+  ActionCellRendererComponent
 ];
 
 @NgModule({

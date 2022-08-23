@@ -8,6 +8,7 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
+  GetCandidateJob,
   GetRejectReasonsForAgency,
   RejectCandidateForAgencySuccess,
   RejectCandidateJob,
@@ -17,11 +18,10 @@ import {
 import { DatePipe } from '@angular/common';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
-import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';
-import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
+import { GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -51,8 +51,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public rejectReasons: RejectReason[] = [];
   public isReadOnly = false;
   public openRejectDialog = new Subject<boolean>();
-  public accordionClickElement: HTMLElement | null;
-  public accordionOneField: AccordionOneField;
   public priceUtils = PriceUtils;
 
   get isRejected(): boolean {
@@ -94,7 +92,12 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   public comments: Comment[] = [];
 
-  constructor(private store: Store, private actions$: Actions, private datePipe: DatePipe, private commentsService: CommentsService) {}
+  constructor(
+    private store: Store,
+    private actions$: Actions,
+    private datePipe: DatePipe,
+    private commentsService: CommentsService
+  ) {}
 
   ngOnChanges(): void {
     this.checkReadOnlyStatuses();
@@ -152,16 +155,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
-  }
-
-  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
-  }
-
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
     this.store
@@ -215,9 +208,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private getComments(): void {
-    this.commentsService.getComments(this.candidateJob?.commentContainerId as number, null).subscribe((comments: Comment[]) => {
-      this.comments = comments;
-    });
+    this.commentsService
+      .getComments(this.candidateJob?.commentContainerId as number, null)
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+      });
   }
 
   private patchForm(): void {

@@ -6,9 +6,12 @@
           {{candidate?.lastName}}, {{candidate?.firstName}}
           <i-feather name="briefcase" class="icon deployed-icon" *ngIf="isDeployedCandidate"></i-feather>
         </h3>
-        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus && !isDeployedCandidate">
+        <ejs-chiplist *ngIf="isTab && candidateJob?.applicantStatus && !isDeployedCandidate">
           <e-chips>
-            <e-chip  [text]="candidatStatus[candidate.orderStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
+            <e-chip
+              [text]="statusText"
+              [cssClass]="candidatStatus[applicationStatus] | chipsCssClass">
+            </e-chip>
           </e-chips>
         </ejs-chiplist>
       </div>
@@ -33,7 +36,7 @@
   </section>
   <section class="content-container">
     <div class="job-details">
-      <ejs-accordion #accordionElement expandMode="Single" (expanding)="toForbidExpandSecondRow($event)" (clicked)="clickedOnAccordion($event)">
+      <ejs-accordion #accordionElement expandMode="Single" openFirstAccordion>
         <e-accordionitems>
           <e-accordionitem expanded="true">
             <ng-template #header>

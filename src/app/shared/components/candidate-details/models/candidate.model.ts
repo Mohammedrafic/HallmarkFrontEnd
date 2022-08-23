@@ -5,6 +5,7 @@ import { FilterColumn } from '@shared/models/filter.model';
 export type OrderTab = {
   orderId: number;
   candidateId: number;
+  orderType: number;
 };
 
 export interface CandidatesDetailsModel extends CandidatesBasicInfo {
@@ -21,6 +22,8 @@ export interface CandidatesDetailsModel extends CandidatesBasicInfo {
   lastName: string;
   jobTitle: string;
   status: number;
+  publicId: number;
+  orderType: number;
 }
 
 export type CandidateDetailsPage = PageOfCollections<CandidatesDetailsModel>;

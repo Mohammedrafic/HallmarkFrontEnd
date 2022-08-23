@@ -93,7 +93,7 @@
               (click)="createReorder(data)"
               ejs-button
               cssClass="e-flat default-icon-button"
-              [disabled]="data.status === orderStatus.PreOpen || data.status === orderStatus.Closed"
+              [disabled]="data.status === orderStatus.PreOpen || data.status === orderStatus.Closed || !settings[SettingsKeys.IsReOrder]?.value"
             >
               <span><i-feather name="calendar" class="icon"></i-feather></span>
             </button>
@@ -104,7 +104,7 @@
             <button
               ejs-button
               cssClass="e-flat secondary-icon-button"
-              [disabled]="disabledLock(data.status)"
+              [disabled]="disabledLock(data.status) || data?.extensionFromId"
               (click)="lockOrder(data)"
               *ngIf="isLockMenuButtonsShown"
             >
@@ -114,8 +114,8 @@
               (click)="$event.stopPropagation()"
               ejs-dropdownbutton
               [items]="
-                (data.orderCloseDate && closedOrderMenu) ||
-                (activeTab === OrganizationOrderManagementTabs.ReOrders && reOrdersMenu) ||
+                (data.status === orderStatus.Closed && closedOrderMenu) ||
+                (activeTab === OrganizationOrderManagementTabs.ReOrders && getMenuForReorders(data)) ||
                 (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : getMoreMenu(data))
               "
               (select)="menuOptionSelected($event, data)"
@@ -216,7 +216,9 @@
       </e-column>
       <e-column field="billRate" headerText="BILL RATE" width="150">
         <ng-template #template let-data>
-          <div class="align-right">{{ data.billRate }}</div>
+          <ng-container *ngIf="data.orderType !== orderTypes.PermPlacement">
+            <div class="align-right">{{ data.billRate }}</div>
+          </ng-container>
         </ng-template>
       </e-column>
       <e-column field="candidates" headerText="CANDIDATES" width="150">
@@ -733,6 +735,7 @@
   #detailsDialog
   [order]="selectedOrder"
   [children]="selectedDataRow?.children"
+  [settings]="settings"
   [openEvent]="openDetails"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid()"
@@ -746,6 +749,7 @@
   [candidate]="selectedCandidate"
   [openEvent]="openChildDialog"
   [filters]="filters"
+  (saveEmitter)="updateGrid()"
 ></app-child-order-dialog>
 
 <app-close-order
@@ -755,5 +759,3 @@
   (closePositionSuccess)="updatePositionDetails($event)"
 >
 </app-close-order>
-
-<!--<app-extension-grid class="extension-grid"></app-extension-grid>-->

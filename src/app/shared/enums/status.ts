@@ -75,6 +75,7 @@ export enum CredentialVerifiedStatus {
   Pending,
   Verified,
   Completed,
+  Rejected,
 }
 
 export enum CreateUserStatus {

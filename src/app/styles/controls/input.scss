@@ -24,6 +24,10 @@ body.light, body.dark {
 
       &[disabled] {
         background-color: $secondary-dark-blue-50;
+
+        &:hover {
+          border-color: $secondary-dark-blue-40 !important;
+        }
       }
 
       &.ng-touched.ng-invalid {
@@ -131,6 +135,10 @@ body.light, body.dark {
         &.e-disabled {
           background: $secondary-dark-blue-50 !important;
           border-color: $secondary-dark-blue-40 !important;
+
+          &:hover {
+            border-color: $secondary-dark-blue-40 !important;
+          }
         }
 
         &:hover {

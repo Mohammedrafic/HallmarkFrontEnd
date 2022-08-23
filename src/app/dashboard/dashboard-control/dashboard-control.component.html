@@ -16,6 +16,7 @@
       <app-filter-chip-list
         [items]="items"
         [allRegions]="organizationStructure?.regions"
+        [orderedFilters]="orderedFilters"
       ></app-filter-chip-list>
     </div>
     <div class="right-content">
@@ -29,7 +30,7 @@
         Manage Widgets <i-feather name="sliders" class="icon"></i-feather>
       </button>
       <button *ngIf="hasOrderManagePermission" ejs-button [isPrimary]="true" (click)="onCreateOrder()">
-        Create Order
+        Quick Order
       </button>
     </div>
   </div>
@@ -49,5 +50,8 @@
     [savedFilterItems]="items"
     [organizationStructure]="organizationStructure"
     [allSkills]="skills"
+    [orderedFilters]="orderedFilters"
   ></app-widget-filter>
+
+  <app-quick-order [openEvent]="isOpenQuickOrderDialod$"></app-quick-order>
 </ng-template>

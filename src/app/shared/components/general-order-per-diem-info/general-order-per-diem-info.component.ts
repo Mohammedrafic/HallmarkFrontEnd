@@ -1,8 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { OrderType } from '@shared/enums/order-type';
 import { Order } from "@shared/models/order-management.model";
-import { ReasonForRequisitionList } from "@shared/models/reason-for-requisition-list";
-import { ReasonForRequisition } from "@shared/enums/reason-for-requisition";
 
 enum Active {
   No,
@@ -21,9 +19,5 @@ export class GeneralOrderPerDiemInfoComponent {
 
   public activeValue(value: boolean): string {
     return value ? Active[Number(value)] : 'No';
-  }
-
-  public getReasonsForRequisition(reason: ReasonForRequisition): string {
-    return (reason !== null || true) ? ReasonForRequisitionList.find(item => item.id ===reason)?.name as string : 'No';
   }
 }

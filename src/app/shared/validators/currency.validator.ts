@@ -24,7 +24,7 @@ export function currencyValidator(min?: number, max?: number): ValidatorFn {
       return { currencyValidator: true };
     }
 
-    if (!isNaN(controlValue) && controlValue * 100 % 1 === 0) {
+    if (!isNaN(controlValue) && parseFloat((controlValue * 100).toFixed(2)) % 1 === 0) {
       return null;
     }
 

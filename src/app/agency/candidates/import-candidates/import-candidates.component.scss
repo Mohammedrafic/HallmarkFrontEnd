@@ -166,6 +166,10 @@
                 }
 
                 .e-list-item {
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                  overflow: hidden;
+
                   &.e-selected {
                     background-color: $primary-active-blue;
                     color: #FFF;

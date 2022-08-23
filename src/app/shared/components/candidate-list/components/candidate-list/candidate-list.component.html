@@ -65,7 +65,7 @@
         <div *ngFor="let skill of data.candidateProfileSkills">{{skill.skillDescription || skill}}</div>
       </ng-template>
     </e-column>
-    <e-column textAlign="Right" field="lastAssignmentEndDate" headerText="Current Assignment End Date">
+    <e-column textAlign="Left" field="lastAssignmentEndDate" headerText="Current Assignment End Date">
       <ng-template #template let-data>
         {{data.lastAssignmentEndDate | date: 'MM/dd/yyy'}}
       </ng-template>

@@ -28,7 +28,7 @@
           </div>
           <div class="e-card-content dialog-controls">
             <app-button
-              *ngIf="isAddExtensionBtnAvailable && !order?.hasExtensions"
+              *ngIf="isAddExtensionBtnAvailable && !(extensions$ | async)?.length"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
               [disabled]="candidate?.orderStatus === orderStatus.InProgressOfferAccepted"
@@ -104,8 +104,7 @@
                             <ejs-accordion
                               #accordionElement
                               expandMode="Single"
-                              (expanding)="toForbidExpandSecondRow($event)"
-                              (clicked)="clickedOnAccordion($event)"
+                              openFirstAccordion
                             >
                               <e-accordionitems>
                                 <e-accordionitem expanded="true">

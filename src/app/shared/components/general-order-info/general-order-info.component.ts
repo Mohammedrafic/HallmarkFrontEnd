@@ -2,8 +2,7 @@ import { Component, Input } from '@angular/core';
 import { OrderType } from '@shared/enums/order-type';
 import { Order } from '@shared/models/order-management.model';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
-import { ReasonForRequisition } from '@shared/enums/reason-for-requisition';
-import { ReasonForRequisitionList } from '@shared/models/reason-for-requisition-list';
+import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 
 enum Active {
   No,
@@ -20,7 +19,18 @@ export class GeneralOrderInfoComponent {
 
   public orderType = OrderType;
 
-  constructor(private orderManagementService: OrderManagementService) {}
+  get hideEndDate(): boolean {
+    return [this.orderType.ReOrder, this.orderType.PermPlacement].includes(this.orderInformation.orderType);
+  }
+
+  get dateFieldName(): string {
+    return this.orderInformation.orderType === this.orderType.ReOrder ? 'Date' : 'Start Date';
+  }
+
+  constructor(
+    private orderManagementService: OrderManagementService,
+    private orderManagementAgencyService: OrderManagementAgencyService
+  ) {}
 
   public activeValue(value: boolean): string {
     return Active[Number(value)];
@@ -28,15 +38,10 @@ export class GeneralOrderInfoComponent {
 
   public moveToInitialOrder(): void {
     this.orderManagementService.orderId$.next(this.orderInformation.extensionInitialOrderId!);
+    this.orderManagementAgencyService.orderId$.next(this.orderInformation.extensionInitialOrderId!);
   }
 
   public moveToPreviousExtension(): void {
     this.orderManagementService.orderId$.next(this.orderInformation.extensionFromId!);
-  }
-
-  public getReasonsForRequisition(reason: ReasonForRequisition): string {
-    return reason !== null || true
-      ? (ReasonForRequisitionList.find((item) => item.id === reason)?.name as string)
-      : 'No';
   }
 }

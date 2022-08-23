@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
@@ -9,7 +9,7 @@ import {
   SidebarComponent,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '../client/client.config';
@@ -20,8 +20,8 @@ import { GetUserMenuConfig, LogoutUser } from '../store/user.actions';
 import { UserState } from '../store/user.state';
 import { ItemModel } from '@syncfusion/ej2-angular-splitbuttons';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
-import { OrderManagementService } from "@client/order-management/order-management-content/order-management.service";
-import { OrderManagementAgencyService } from "@agency/order-management/order-management-agency.service";
+import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 enum THEME {
   light = 'light',
   dark = 'dark',
@@ -97,9 +97,18 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     private store: Store,
     private router: Router,
     private orderManagementService: OrderManagementService,
-    private orderManagementAgencyService: OrderManagementAgencyService,
+    private orderManagementAgencyService: OrderManagementAgencyService
   ) {
-
+    router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((data: any) => {
+      if (this.tree) {
+        const menuItem = this.tree.getTreeData().find((el => el['route'] === data['url']));
+        if (menuItem) {
+          this.tree.selectedNodes = [menuItem['title'] as string];
+        }
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -123,8 +132,12 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   }
 
   subsToOrderAgencyIds(): void {
-    this.orderManagementAgencyService.orderMyAgencyId$.subscribe(() => this.tree.selectedNodes = [this.routers[1]]);
-    this.orderManagementService.orderAllOrdersId$.subscribe(() => this.tree.selectedNodes = [this.routers[0]]);
+    this.orderManagementAgencyService.selectedOrderAfterRedirect$.subscribe(
+      () => (this.tree.selectedNodes = [this.routers[1]])
+    );
+    this.orderManagementService.selectedOrderAfterRedirect$.subscribe(
+      () => (this.tree.selectedNodes = [this.routers[0]])
+    );
   }
 
   onSelectProfileMenu(event: any) {
