@@ -89,3 +89,27 @@ export class GetManualInvoiceRejectReasonsByPage {
 export class SaveManualInvoiceRejectReasonError {
   static readonly type = '[reject reason] Save Manual Invoice Reason Error';
 }
+
+
+export class UpdateOrderRequisitionSuccess {
+  static readonly type = '[reject reason] Update Order Requisition Success';
+}
+
+export class RemoveOrderRequisition {
+  static readonly type = '[reject reason] Remove Order Requisition';
+  constructor(public id: number){}
+}
+
+export class GetOrderRequisitionByPage {
+  static readonly type = '[reject reason] Get Order Requisition by Page';
+  constructor(public pageNumber?: number, public pageSize?: number, public orderBy?: string) { }
+}
+
+export class SaveOrderRequisition {
+  static readonly type = '[reject reason] Save Order Requisition';
+  constructor(public payload: RejectReason){}
+}
+
+export class SaveOrderRequisitionError {
+  static readonly type = '[reject reason] Save Order Requisition Error';
+}

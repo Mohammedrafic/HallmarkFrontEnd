@@ -113,16 +113,15 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.search?.clear();
     this.store.dispatch(new Timesheets.UpdateFiltersState({
       statusIds: this.tabConfig[tabIndex].value,
-      searchTerm: ''
     }));
   }
 
   public handleChangePage(page: number): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState({ pageNumber: page }));
+    this.store.dispatch(new Timesheets.UpdateFiltersState({ pageNumber: page }, this.activeTabIdx !== 0));
   }
 
   public handleChangePerPage(pageSize: number): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState({ pageSize: pageSize }));
+    this.store.dispatch(new Timesheets.UpdateFiltersState({ pageSize: pageSize }, this.activeTabIdx !== 0));
   }
 
   public exportSelected(event: any): void {
@@ -138,7 +137,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public resetFilters(): void {
     this.store.dispatch(new Timesheets.UpdateFiltersState(
-      null,
+      {},
       this.activeTabIdx !== 0,
       this.isAgency,
     ));
@@ -165,7 +164,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public sortHandler(event: string): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState({ orderBy: event }));
+    this.store.dispatch(new Timesheets.UpdateFiltersState({ orderBy: event }, this.activeTabIdx !== 0));
   }
 
   public changeFiltersAmount(amount: number): void {
@@ -174,8 +173,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public setRange(range: string[]): void {
     this.store.dispatch(new Timesheets.UpdateFiltersState({
-      ...(range[0] && range[1] && { startDate: range[0], endDate: range[1] }),
-    }));
+      startDate: range[0],
+      endDate: range[1],
+    }, this.activeTabIdx !== 0));
   }
 
   public bulkApprove(data: RowNode[]): void {
@@ -217,7 +217,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       distinctUntilChanged(),
       switchMap((organizationId: number) => this.store.dispatch(
         [
-          new Timesheets.UpdateFiltersState({ organizationId }),
+          new Timesheets.UpdateFiltersState({ organizationId }, this.activeTabIdx !== 0),
           new Timesheets.SelectOrganization(organizationId),
         ]
       )),
@@ -230,7 +230,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       debounceTime(200),
       distinctUntilChanged(),
       switchMap((searchTerm) =>
-        this.store.dispatch(new Timesheets.UpdateFiltersState({ searchTerm }))
+        this.store.dispatch(new Timesheets.UpdateFiltersState({ searchTerm }, this.activeTabIdx !== 0))
       ),
       takeUntil(this.componentDestroy()),
     ).subscribe();
@@ -245,7 +245,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     ).subscribe(res => {
       this.organizationControl.setValue(res[0].id, { emitEvent: false });
       this.store.dispatch([
-        new Timesheets.UpdateFiltersState({ organizationId: res[0].id }),
+        new Timesheets.UpdateFiltersState({ organizationId: res[0].id }, this.activeTabIdx !== 0),
         new Timesheets.GetFiltersDataSource()
       ]);
     });

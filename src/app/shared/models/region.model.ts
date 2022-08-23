@@ -11,7 +11,7 @@ export class RegionMapping {
 }
 
 export class regionFilter {
-  id?: number;
+  ids?: number[];
 name?:string[];
 orderBy?: string;
 pageSize?: number;

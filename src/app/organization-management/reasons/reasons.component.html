@@ -21,7 +21,7 @@
       <e-tabitem>
         <ng-template #headerText><div>Order Requisition</div></ng-template>
         <ng-template #content>
-
+          <app-order-requisition (editReason)="onEdit($event)" [form]="form"></app-order-requisition>
         </ng-template>
       </e-tabitem>
 

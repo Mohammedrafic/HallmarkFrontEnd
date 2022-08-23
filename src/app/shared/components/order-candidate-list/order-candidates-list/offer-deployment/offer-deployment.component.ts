@@ -99,6 +99,14 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     return !!this.candidate.deployedCandidateInfo && this.candidate.status !== ApplicantStatusEnum.OnBoarded;
   }
 
+  get statusText(): string {
+    return this.candidateJob?.applicantStatus.statusText as string;
+  }
+
+  get applicationStatus(): ApplicantStatusEnum {
+    return this.candidateJob?.applicantStatus.applicantStatus as ApplicantStatusEnum;
+  }
+
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
   @Select(OrderManagementContentState.applicantStatuses)

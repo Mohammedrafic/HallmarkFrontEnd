@@ -11,6 +11,8 @@ export interface Timesheet {
   candidateMiddleName: string;
   candidateId: string;
   statusText: TIMETHEETS_STATUSES;
+  mileageStatus: number;
+  mileageTimesheetId: number;
   orderId: string;
   skill: string;
   location: string;
@@ -23,6 +25,7 @@ export interface Timesheet {
   billRate: number;
   totalDays: number;
   status: TIMETHEETS_STATUSES;
+  mileageStatusText: TIMETHEETS_STATUSES;
   workWeek: string;
 }
 

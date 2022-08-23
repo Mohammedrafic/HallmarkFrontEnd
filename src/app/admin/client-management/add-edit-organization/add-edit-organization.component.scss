@@ -18,8 +18,12 @@
   padding: 20px 0;
   display: flex;
 
-  h3 {
+  .form-title h3 {
     margin-left: 25px;
+  }
+
+  .profile h3 {
+    margin-left: 0;
   }
 
   .controls-form {

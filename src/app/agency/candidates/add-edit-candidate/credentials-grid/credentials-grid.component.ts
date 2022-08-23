@@ -2,6 +2,7 @@ import {
   GetCandidatesCredentialByPage,
   GetCredentialFiles,
   GetCredentialFilesSucceeded,
+  GetCredentialStatuses,
   GetCredentialTypes,
   GetGroupedCredentialsFiles,
   GetMasterCredentials,
@@ -28,8 +29,8 @@ import {
 import { CredentialVerifiedStatus, STATUS_COLOR_GROUP } from "@shared/enums/status";
 import { CandidateCredential, CandidateCredentialPage, CredentialFile } from "@shared/models/candidate-credential.model";
 import { CredentialType } from "@shared/models/credential-type.model";
+import { Credential } from "@shared/models/credential.model";
 import { ConfirmService } from "@shared/services/confirm.service";
-import { valuesOnly } from "@shared/utils/enum.utils";
 import { downloadBlobFile } from "@shared/utils/file.utils";
 import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { FieldSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
@@ -63,9 +64,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public today = new Date();
   public optionFields = { text: 'text', value: 'id' };
-  public verifiedStatuses = Object.values(CredentialVerifiedStatus)
-    .filter(valuesOnly)
-    .map((text, id) => ({ text, id }));
+  public showCertifiedFields: boolean;
+  public credentialStatuses: FieldSettingsModel[] = [];
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
@@ -81,6 +81,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   @Select(CandidateState.credentialTypes)
   credentialType$: Observable<CredentialType[]>;
+
+  @Select(CandidateState.credentialStatuses)
+  credentialStatuses$: Observable<CredentialVerifiedStatus[]>;
 
   @Select(CandidateState.masterCredentials)
   masterCredentials$: Observable<Credential[]>;
@@ -105,6 +108,14 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return !!this.credentialId;
   }
 
+  private get createdOnControl(): AbstractControl | null {
+    return this.addCredentialForm.get('createdOn');
+  }
+
+  private get createdUntilControl(): AbstractControl | null {
+    return this.addCredentialForm.get('createdUntil');
+  }
+
   constructor(private store: Store,
               private route: ActivatedRoute,
               private actions$: Actions,
@@ -116,6 +127,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   ngOnInit(): void {
     this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
+    this.store.dispatch(new GetCredentialTypes());
+    this.store.dispatch(new GetCredentialStatuses());
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
@@ -152,6 +165,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.createSearchCredentialForm();
     this.subscribeOnSearchUpdate();
     this.subscribeOnCandidateCredential();
+    this.subscribeOnCredentialStatuses();
   }
 
   ngOnDestroy(): void {
@@ -168,7 +182,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public addNew(): void {
     this.store.dispatch(new GetMasterCredentials('', ''));
-    this.store.dispatch(new GetCredentialTypes());
     this.store.dispatch(new ShowSideDialog(true)).subscribe(() => this.setDropElement());
   }
 
@@ -235,17 +248,17 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public onEdit(event: MouseEvent,
                 { status, insitute, createdOn, number, experience, createdUntil,
-                  completedDate, masterCredentialId, id, credentialFiles }: CandidateCredential) {
+                  masterCredentialId, id, credentialFiles, expireDateApplicable }: CandidateCredential) {
     event.stopPropagation();
+    this.checkCertifiedFields(expireDateApplicable as boolean);
     this.credentialId = id as number;
     this.masterCredentialId = masterCredentialId;
     this.hasFiles = !!credentialFiles?.length;
     this.store.dispatch(new GetMasterCredentials('', ''));
-    this.store.dispatch(new GetCredentialTypes());
     this.store.dispatch(new ShowSideDialog(true)).subscribe(() => this.setDropElement());
     this.addCredentialForm.patchValue({
       status, insitute, createdOn, number,
-      experience, createdUntil, completedDate
+      experience, createdUntil
     });
   }
 
@@ -290,8 +303,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       });
   }
 
-  public selectMasterCredentialId(event: any): void {
-    this.masterCredentialId = event.data.id;
+  public selectMasterCredentialId(event: { data: Credential }): void {
+    this.masterCredentialId = event.data.id as number;
+    this.checkCertifiedFields(event.data.expireDateApplicable);
   }
 
   public clearMasterCredentialId(): void {
@@ -319,12 +333,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private createAddCredentialForm(): void {
     this.addCredentialForm = this.fb.group({
       status: new FormControl(null, [Validators.required]),
-      insitute: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
-      createdOn: new FormControl(null, [Validators.required]),
-      number: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
-      experience: new FormControl(null, [Validators.required, Validators.maxLength(20)]),
-      createdUntil: new FormControl(null, [Validators.required]),
-      completedDate: new FormControl(null, [Validators.required])
+      insitute: new FormControl(null, [Validators.maxLength(100)]),
+      createdOn: new FormControl(null, []),
+      number: new FormControl(null, [Validators.maxLength(100)]),
+      experience: new FormControl(null, [Validators.maxLength(20)]),
+      createdUntil: new FormControl(null, []),
     });
   }
 
@@ -338,7 +351,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private saveCredential({ status, number, insitute, experience, createdOn, createdUntil, completedDate }: CandidateCredential): void {
     if (this.masterCredentialId) {
       this.store.dispatch(new SaveCandidatesCredential({
-        status, number, insitute, experience, createdOn, createdUntil, completedDate,
+        status, number, insitute, experience, createdOn, createdUntil,
+        completedDate: this.getCompleteDate(completedDate),
         masterCredentialId: this.masterCredentialId,
         id: this.credentialId as number
       }));
@@ -390,5 +404,43 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.candidateCredential$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((page: CandidateCredentialPage) => this.candidateCredentialPage = page);
+  }
+
+  private subscribeOnCredentialStatuses(): void {
+    this.credentialStatuses$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((statuses: CredentialVerifiedStatus[]) => {
+        this.credentialStatuses = statuses.map(item => {
+          return {
+            text: CredentialVerifiedStatus[item],
+            id: item
+          }
+        })
+      });
+  }
+
+  private checkCertifiedFields(expireDateApplicable: boolean): void {
+    this.showCertifiedFields = expireDateApplicable;
+
+    if (this.showCertifiedFields) {
+      this.createdOnControl?.setValidators([Validators.required]);
+      this.createdUntilControl?.setValidators([Validators.required]);
+    } else {
+      this.createdOnControl?.setValidators([]);
+      this.createdUntilControl?.setValidators([]);
+      this.createdOnControl?.setValue(null);
+      this.createdUntilControl?.setValue(null)
+    }
+
+    this.createdOnControl?.updateValueAndValidity();
+    this.createdUntilControl?.updateValueAndValidity()
+  }
+
+  private getCompleteDate(completeDate: string | null): string | null {
+    if (completeDate) {
+      return completeDate;
+    } else {
+      return this.uploadObj.filesData.some(file => file.statusCode === '1') ? new Date().toISOString() : null;
+    }
   }
 }
