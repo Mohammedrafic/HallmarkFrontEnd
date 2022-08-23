@@ -200,11 +200,10 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   ngOnDestroy(): void {
     this.isAlive = false;
   }
-
+ 
   ngOnInit(): void {
     this.businessForm = this.generateBusinessForm();
     this.onBusinessUnitValueChanged();
-
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
     if (user?.businessUnitType) {
@@ -421,7 +420,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
       if (!this.isBusinessFormDisabled) {
         this.businessControl.patchValue(0);
       }
+      this.dispatchNewPage();
     });
-  }
-
+  }  
+  
 }

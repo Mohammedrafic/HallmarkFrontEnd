@@ -12,16 +12,14 @@
           ></ejs-dropdownlist>
         </div>
       </div>
-      <div class="dropdown-container">
-        <app-multiselect-dropdown
-          [formGroupInstance]="businessForm"
-          [fields]="bussinesDataFields"
-          [dataSource]="bussinesData$ | async"
-          [showSelectAll]="true"
-          controlName="business"
-          placeholder="Business"
-          selectAllText="All"
-        ></app-multiselect-dropdown>
+      <div class="dropdown-container">       
+        <ejs-dropdownlist
+            appValidateWithMessage
+            formControlName="business"
+            [fields]="bussinesDataFields"
+            [dataSource]="bussinesData$ | async"
+            placeholder=Business
+          ></ejs-dropdownlist>
       </div>
     </div>
   </ng-container>
