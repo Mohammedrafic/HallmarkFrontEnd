@@ -479,30 +479,45 @@ export class OrganizationManagementState {
   }
 
   @Action(SaveLocation)
-  SaveLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { location, regionId, filters }: SaveLocation): Observable<Location> {
+  SaveLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, 
+    { location, regionId, filters }: SaveLocation):
+     Observable<Location|void> {
     patchState({ isLocationLoading: true });
     return this.locationService.saveLocation(location).pipe(tap((payload) => {
       patchState({ isLocationLoading: false});
-      dispatch(new GetLocationsByRegionId(regionId, filters));
+      dispatch(
+        [new ShowToast(MessageTypes.Success, RECORD_ADDED),
+        new GetLocationsByRegionId(regionId, filters)]);
       if (filters) {
         dispatch(new GetLocationFilterOptions(regionId));
       }
       return payload;
-    }));
-  }
+    }),
+    catchError((error) => 
+    dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
+    );
+}
 
   @Action(UpdateLocation)
-  UpdateLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { location, regionId, filters}: UpdateLocation): Observable<void> {
-    return this.locationService.updateLocation(location).pipe(tap((payload) => {
-      patchState({ isLocationLoading: false });
-      dispatch(new GetLocationsByRegionId(regionId, filters));
-      if (filters) {
-        dispatch(new GetLocationFilterOptions(regionId));
-      }
-      return payload;
-    }));
-  }
+  UpdateLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, 
+    { location, regionId, filters}: UpdateLocation): 
+      Observable<void> {
+          return this.locationService.updateLocation(location).pipe(tap((payload) => {
+            patchState({ isLocationLoading: false });
+            dispatch(
+              [new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
+              new GetLocationsByRegionId(regionId, filters)]);
+            if (filters) {
+              dispatch(new GetLocationFilterOptions(regionId));
+            }
+            return payload;
+          }),
+          catchError((error) => 
+          dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
+          );
+    }
 
+ 
   @Action(DeleteLocationById)
   DeleteLocationById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { locationId, regionId, filters }: DeleteLocationById): Observable<any> {
     return this.locationService.deleteLocationById(locationId).pipe(tap((payload) => {

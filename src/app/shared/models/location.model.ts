@@ -20,6 +20,7 @@ export class Location {
   inactiveDate?: string;
   timeZone : number;
   locationTypeId? :number;
+  organizationId :number;
 }
 
 export type LocationsPage = PageOfCollections<Location>;
