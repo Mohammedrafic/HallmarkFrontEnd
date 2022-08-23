@@ -491,8 +491,8 @@ export class OrderManagementContentState {
   }
 
   @Action(GetAssociateAgencies)
-  GetAssociateAgencies({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<AssociateAgency[]> {
-    return this.orderManagementService.getAssociateAgencies().pipe(
+  GetAssociateAgencies({ patchState }: StateContext<OrderManagementContentStateModel>, { lastSelectedBusinessUnitId }: GetAssociateAgencies): Observable<AssociateAgency[]> {
+    return this.orderManagementService.getAssociateAgencies(lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
         patchState({ associateAgencies: payload });
       })

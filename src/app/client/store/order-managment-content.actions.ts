@@ -109,7 +109,7 @@ export class GetProjectNames {
 
 export class GetAssociateAgencies {
   static readonly type = '[order management] Get Associate Agencies';
-  constructor() {}
+  constructor(public lastSelectedBusinessUnitId?: number) {}
 }
 
 export class SetPredefinedBillRatesData {

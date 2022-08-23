@@ -39,6 +39,10 @@ export class ApiInterceptor implements HttpInterceptor {
       };
 
       const { isOrganizationArea, isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+      
+      if(request.headers.has('selected-businessunit-id')) {
+        headers['selected-businessunit-id'] = request.headers.get('selected-businessunit-id') as string;
+      }
 
       if (isOrganizationArea && lastSelectedOrganizationId && isOrganization) {
         headers['selected-businessunit-id'] = lastSelectedOrganizationId.toString();
@@ -47,7 +51,6 @@ export class ApiInterceptor implements HttpInterceptor {
       if (isAgencyArea && lastSelectedAgencyId && isAgency) {
         headers['selected-businessunit-id'] = lastSelectedAgencyId.toString();
       }
-
       request = request.clone({ headers: new HttpHeaders(headers) });
     }
 

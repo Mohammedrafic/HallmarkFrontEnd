@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { map, Observable, switchMap, tap } from 'rxjs';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { map, Observable, switchMap } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+
 import {
   AcceptJobDTO,
   AgencyOrderFilters,
@@ -229,8 +230,14 @@ export class OrderManagementContentService {
    * Get the list of agencies for organization
    * @return Array of associate agencies
    */
-  public getAssociateAgencies(): Observable<AssociateAgency[]> {
-    return this.http.get<AssociateAgency[]>('/api/AssociateAgencies');
+  public getAssociateAgencies(lastSelectedBusinessUnitId?: number): Observable<AssociateAgency[]> {
+    let headers = {};
+
+    if (lastSelectedBusinessUnitId) {
+      headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
+    }
+
+    return this.http.get<AssociateAgency[]>('/api/AssociateAgencies', { headers });
   }
 
   /**
