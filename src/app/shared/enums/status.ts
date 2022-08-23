@@ -1,6 +1,5 @@
 import { TIMETHEETS_STATUSES } from '../../modules/timesheets/enums';
-import { INVOICES_STATUSES } from '../../modules/invoices/enums/invoices.enum';
-import { OrderType } from './order-type';
+import { INVOICES_STATUSES } from '../../modules/invoices/enums';
 
 export enum Status {
   'In Progress',
@@ -30,8 +29,17 @@ export const STATUS_COLOR_GROUP = {
     'in progress (pending)',
     'ex',
     INVOICES_STATUSES.PENDING_PAYMENT,
+    TIMETHEETS_STATUSES.NO_MILEAGES_EXIST,
   ], // yellow
-  'e-default': ['closed', 'Inactive', 'inactive', 'Closed', 'withdraw', TIMETHEETS_STATUSES.REJECTED], // hard gray
+  'e-default': [
+    'closed',
+    'Inactive',
+    'inactive',
+    'Closed',
+    'withdraw',
+    TIMETHEETS_STATUSES.REJECTED,
+    TIMETHEETS_STATUSES.ARCHIVED,
+  ], // hard gray
   'e-pending': ['pending', 'Pending', 'offered', TIMETHEETS_STATUSES.MISSING], // red
   'e-progress': ['in progress', 'In Progress', 'Verified', 'verified', INVOICES_STATUSES.SUBMITED_PEND_APPR], // blue
   'e-accepted': [

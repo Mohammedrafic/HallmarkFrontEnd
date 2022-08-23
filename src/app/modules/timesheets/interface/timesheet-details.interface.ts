@@ -55,8 +55,14 @@ export interface CostCenterOption {
 
 export interface TimesheetDetailsModel {
   id: number;
-  statusText: string
+  statusText: string;
   status: number;
+  mileageStatusText: string;
+  mileageStatus: number;
+  canApproveMileage: boolean;
+  canApproveTimesheet: boolean;
+  canEditMileage: boolean;
+  canEditTimesheet: boolean;
   rejectionReason?: string;
   organizationId: number;
   candidateId: number;

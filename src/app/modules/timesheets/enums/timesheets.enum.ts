@@ -48,6 +48,8 @@ export enum TIMETHEETS_STATUSES {
   MISSING = 'missing',
   REJECTED = 'rejected',
   APPROVED = 'approved',
+  NO_MILEAGES_EXIST = 'no mileages exist',
+  ARCHIVED = 'archived',
 }
 
 export enum ExportType {
@@ -68,6 +70,7 @@ export enum TimesheetsTableColumns {
   Approve = 'approve',
   Name = 'name',
   StatusText = 'statusText',
+  MileageStatusText = 'mileageStatusText',
   OrderId = 'orderId',
   Skill = 'skill',
   Location = 'location',
