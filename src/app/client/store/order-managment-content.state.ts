@@ -453,8 +453,8 @@ export class OrderManagementContentState {
   @Action(GetProjectSpecialData)
   GetProjectSpecialData({
     patchState,
-  }: StateContext<OrderManagementContentStateModel>): Observable<ProjectSpecialData> {
-    return this.projectsService.getProjectSpecialData().pipe(
+  }: StateContext<OrderManagementContentStateModel>, { lastSelectedBusinessUnitId }: GetProjectSpecialData): Observable<ProjectSpecialData> {
+    return this.projectsService.getProjectSpecialData(lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
         patchState({ projectSpecialData: payload });
       })

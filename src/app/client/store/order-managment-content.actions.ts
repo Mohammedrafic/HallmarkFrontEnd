@@ -94,7 +94,7 @@ export class GetAvailableSteps {
 
 export class GetProjectSpecialData {
   static readonly type = '[order management] Get Project Special Data';
-  constructor() {}
+  constructor(public lastSelectedBusinessUnitId?: number) {}
 }
 
 export class GetSuggestedDetails {
