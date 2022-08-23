@@ -9,7 +9,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { Observable, Subject, takeWhile } from 'rxjs';
+import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -52,6 +52,8 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   @Select(OrderManagementState.selectedOrder)
   public selectedOrder$: Observable<Order>;
 
+  public currentOrder: Order;
+
   @Select(OrderManagementState.extensions) extensions$: Observable<any>;
   public extensions: any[] = [];
 
@@ -64,6 +66,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
 
   private excludeDeployed: boolean;
   private isAlive = true;
+  private unsubscribe$: Subject<void> = new Subject();
 
   @Output() selectReOrder = new EventEmitter<any>();
 
@@ -79,6 +82,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
 
   ngOnInit(): void {
     this.onOpenEvent();
+    this.subsToSelectedOrder();
     this.subscribeOnOrderCandidatePage();
   }
 
@@ -90,6 +94,14 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
 
   ngOnDestroy(): void {
     this.isAlive = false;
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
+  private subsToSelectedOrder(): void {
+    this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+      this.currentOrder = order;
+    });
   }
 
   private subscribeOnOrderCandidatePage(): void {
@@ -151,7 +163,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
         } else {
           this.tab.select(1);
         }
-        
+
         windowScrollTop();
         this.sideDialog.show();
         disabledBodyOverflow(true);

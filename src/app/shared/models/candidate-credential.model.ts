@@ -13,6 +13,7 @@ export type CandidateCredential = {
   createdOn: string;
   createdUntil: string;
   credentialFiles?: CredentialFile[];
+  expireDateApplicable?: boolean;
 }
 
 export type CredentialFile = {

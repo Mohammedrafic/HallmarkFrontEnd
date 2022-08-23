@@ -75,10 +75,12 @@ import {
   GetMasterSkillsByOrganization,
   GetLocationFilterOptions,
   GetDepartmentFilterOptions,
-  GetOrganizationSettingsFilterOptions
+  GetOrganizationSettingsFilterOptions,
+  GetRegionFilterOptions,
+  ExportRegions
 } from './organization-management.actions';
 import { Department, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
-import { Region } from '@shared/models/region.model';
+import { Region, regionFilter } from '@shared/models/region.model';
 import { Location, LocationFilterOptions, LocationsPage } from '@shared/models/location.model';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
@@ -144,6 +146,7 @@ export interface OrganizationManagementStateModel {
   skillDataSource: SkillDataSource;
   allOrganizationSkills: Skill[] | null;
   locationFilterOptions: LocationFilterOptions | null;
+  regionFilterOptions: regionFilter | null;
   departmentFilterOptions: DepartmentFilterOptions | null;
   organizationSettingsFilterOptions: string[] | null;
 }
@@ -189,6 +192,7 @@ export interface OrganizationManagementStateModel {
     skillDataSource: { skillABBRs: [], skillDescriptions: [], glNumbers: [] },
     allOrganizationSkills: null,
     locationFilterOptions: null,
+    regionFilterOptions:null,
     departmentFilterOptions: null,
     organizationSettingsFilterOptions: null,
   },
@@ -227,6 +231,8 @@ export class OrganizationManagementState {
 
   @Selector()
   static regions(state: OrganizationManagementStateModel): Region[] { return state.regions; }
+  @Selector()
+  static GetRegionFilterOptions(state: OrganizationManagementStateModel): Region[] { return state.regions; }
 
   @Selector()
   static locationsByRegionId(state: OrganizationManagementStateModel): Location[] | LocationsPage { return state.locations; }
@@ -272,6 +278,8 @@ export class OrganizationManagementState {
 
   @Selector()
   static locationFilterOptions(state: OrganizationManagementStateModel): LocationFilterOptions | null { return state.locationFilterOptions; }
+  @Selector()
+  static regionFilterOptions(state: OrganizationManagementStateModel): regionFilter | null { return state.regionFilterOptions; }
 
   @Selector()
   static departmentFilterOptions(state: OrganizationManagementStateModel): DepartmentFilterOptions | null { return state.departmentFilterOptions; }
@@ -402,11 +410,23 @@ export class OrganizationManagementState {
       }));
   }
 
+
+
   @Action(GetRegions)
-  GetRegions({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetRegions): Observable<Region[]> {
-    return this.regionService.getRegionsByOrganizationId().pipe(tap((payload) => {
-      patchState({ regions: payload});
-      return payload;
+  GetRegions({ patchState }: StateContext<OrganizationManagementStateModel>, { filter }: any): Observable<Region[]> {
+
+    
+    return this.regionService.getRegionsByOrganizationId(filter).pipe(tap((payload:any) => {
+  
+      if("items" in payload){
+        patchState({ regions: payload.items});
+        return payload.items;
+      }else{
+        patchState({ regions: payload});
+        return payload
+      }
+   
+    
     }));
   }
 
@@ -778,7 +798,16 @@ export class OrganizationManagementState {
 
   @Action(ExportLocations)
   ExportLocations({ }: StateContext<OrganizationManagementStateModel>, { payload }: ExportLocations): Observable<any> {
+  
     return this.locationService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
+  @Action(ExportRegions)
+  ExportRegions({ }: StateContext<OrganizationManagementStateModel>, { payload }: ExportRegions): Observable<any> {
+
+    return this.regionService.exportRegion(payload).pipe(tap(file => {
       const url = window.URL.createObjectURL(file);
       saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
     }));
@@ -820,6 +849,13 @@ export class OrganizationManagementState {
   GetLocationFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetLocationFilterOptions): Observable<LocationFilterOptions> {
     return this.locationService.getLocationFilterOptions(payload).pipe(tap(options => {
       patchState({ locationFilterOptions: options });
+      return options;
+    }));
+  };
+  @Action(GetRegionFilterOptions)
+  GetRegionFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetRegionFilterOptions): Observable<regionFilter> {
+    return this.regionService.getRegionFilterOptions(payload).pipe(tap(options => {
+      patchState({ regionFilterOptions: options });
       return options;
     }));
   };

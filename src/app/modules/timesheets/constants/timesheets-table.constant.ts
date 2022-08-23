@@ -55,7 +55,15 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
     },
     {
       field: TimesheetsTableColumns.StatusText,
-      headerName: 'STATUS',
+      headerName: 'TIMESHEET STATUS',
+      minWidth: 170,
+      cellRenderer: TimesheetTableStatusCellComponent,
+      cellClass: 'status-cell',
+      ...commonColumn,
+    },
+    {
+      field: TimesheetsTableColumns.MileageStatusText,
+      headerName: 'MILES STATUS',
       minWidth: 170,
       cellRenderer: TimesheetTableStatusCellComponent,
       cellClass: 'status-cell',

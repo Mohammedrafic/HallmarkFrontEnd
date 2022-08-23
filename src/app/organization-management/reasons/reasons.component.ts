@@ -9,7 +9,10 @@ import {
   SaveRejectReasonsError,
   SaveRejectReasonsSuccess,
   UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReason, UpdateManualInvoiceRejectReasonSuccess,
-  UpdateRejectReasons
+  UpdateRejectReasons,
+  SaveOrderRequisition,
+  UpdateOrderRequisitionSuccess,
+  SaveOrderRequisitionError
 } from '@organization-management/store/reject-reason.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CANCEL_REJECTION_REASON, CHARS_HYPHEN_APOSTROPHE, DELETE_CONFIRM_TITLE } from '@shared/constants';
@@ -65,11 +68,11 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
 
   private subscribeOnSaveReasonSuccess(): void {
     this.actions$.pipe(
-      ofActionSuccessful(SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReasonSuccess),
+      ofActionSuccessful(SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReasonSuccess, UpdateOrderRequisitionSuccess),
       takeWhile(() => this.isAlive)
     ).subscribe(() =>this.closeSideDialog());
     this.actions$.pipe(
-      ofActionSuccessful(SaveRejectReasonsError, SaveClosureReasonsError, SaveManualInvoiceRejectReasonError),
+      ofActionSuccessful(SaveRejectReasonsError, SaveClosureReasonsError, SaveManualInvoiceRejectReasonError, SaveOrderRequisitionError),
       takeWhile(() => this.isAlive)
     ).subscribe(() => this.isSaving = false);
   }
@@ -96,7 +99,10 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
           }
           break;
         case ReasonsNavigationTabs.Requisition:
-          // TODO: pending US
+          this.store.dispatch(new SaveOrderRequisition({
+            id: this.form.value.id,
+            reason: this.form.value.reason
+          }));
           break;
         case ReasonsNavigationTabs.Closure:
           const payload = {

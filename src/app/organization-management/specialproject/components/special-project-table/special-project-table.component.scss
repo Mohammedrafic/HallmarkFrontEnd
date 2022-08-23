@@ -1,0 +1,63 @@
+@import '../../styles/variables/colors';
+@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
+@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
+
+.specialproject-grid {
+  margin-top: 20px;
+}
+
+app-grid {
+  flex: 1;
+}
+
+.app-grid {
+  display: flex;
+  flex-direction: column;
+
+  &__component {
+    width: 100%;
+  }
+
+  .ag-header {
+    background-color: var(--grid-background-color);
+  }
+
+  .ag-root-wrapper {
+    border-top-left-radius: var(--grid-border-radius);
+    border-top-right-radius: var(--grid-border-radius);
+  }
+
+  .ag-root-wrapper,
+  .ag-row,
+  .ag-header {
+    border-color: var(--grid-border-color);
+  }
+
+  .ag-cell {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .ag-row {
+    background-color: inherit;
+  }
+
+  .ag-row-hover {
+    background-color: var(--grid-row-background-color-hover);
+  }
+
+  .ag-header-cell-text {
+    text-transform: uppercase;
+    font-size: 12px;
+  }
+
+  .ag-root-wrapper {
+    border-bottom-right-radius: 15px !important;
+    border-bottom-left-radius: 15px !important;
+  }
+
+  .ag-header-cell-text {
+    font-weight: 600 !important;
+    color: $secondary-dark-blue-15 !important;
+  }
+}

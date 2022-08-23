@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Action, State, StateContext, Selector } from '@ngxs/store';
-import { CredentialType } from '@shared/models/credential-type.model';
-import { Credential } from '@shared/models/credential.model';
 import { catchError, Observable, of, tap } from 'rxjs';
 
 import { CandidateCredential, CandidateCredentialPage, CredentialGroupedFiles } from "@shared/models/candidate-credential.model";
+import { CredentialVerifiedStatus } from "@shared/enums/status";
+import { CredentialType } from '@shared/models/credential-type.model';
+import { Credential } from '@shared/models/credential.model';
 import { CandidateImportResult } from "@shared/models/candidate-profile-import.model";
 import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages";
 import { MessageTypes } from "src/app/shared/enums/message-types";
@@ -30,6 +31,7 @@ import {
   GetCredentialFilesSucceeded,
   GetCredentialPdfFiles,
   GetCredentialPdfFilesSucceeded,
+  GetCredentialStatuses,
   GetCredentialTypes,
   GetEducationByCandidateId,
   GetExperienceByCandidateId,
@@ -71,6 +73,7 @@ export interface CandidateStateModel {
   candidatePage: CandidatePage | null;
   candidateCredentialPage: CandidateCredentialPage | null;
   credentialTypes: CredentialType[];
+  credentialStatuses: CredentialVerifiedStatus[];
   masterCredentials: Credential[];
   groupedCandidateCredentialsFiles: CredentialGroupedFiles[];
 }
@@ -86,6 +89,7 @@ export interface CandidateStateModel {
     educations: [],
     candidateCredentialPage: null,
     credentialTypes: [],
+    credentialStatuses: [],
     masterCredentials: [],
     groupedCandidateCredentialsFiles: [],
   },
@@ -119,6 +123,11 @@ export class CandidateState {
   @Selector()
   static credentialTypes(state: CandidateStateModel): CredentialType[] {
     return state.credentialTypes;
+  }
+
+  @Selector()
+  static credentialStatuses(state: CandidateStateModel): CredentialVerifiedStatus[] {
+    return state.credentialStatuses;
   }
 
   @Selector()
@@ -364,6 +373,16 @@ export class CandidateState {
     return this.candidateService.getCredentialTypes().pipe(
       tap((payload) => {
         patchState({ credentialTypes: payload });
+        return payload;
+      })
+    );
+  }
+
+  @Action(GetCredentialStatuses)
+  GetCredentialStatuses({ patchState }: StateContext<CandidateStateModel>): Observable<CredentialVerifiedStatus[]> {
+    return this.candidateService.getCredentialStatuses().pipe(
+      tap((payload) => {
+        patchState({ credentialStatuses: payload });
         return payload;
       })
     );

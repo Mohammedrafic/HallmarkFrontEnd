@@ -93,7 +93,7 @@
               (click)="createReorder(data)"
               ejs-button
               cssClass="e-flat default-icon-button"
-              [disabled]="data.status === orderStatus.PreOpen || data.status === orderStatus.Closed"
+              [disabled]="data.status === orderStatus.PreOpen || data.status === orderStatus.Closed || !settings[SettingsKeys.IsReOrder]?.value"
             >
               <span><i-feather name="calendar" class="icon"></i-feather></span>
             </button>
@@ -735,6 +735,7 @@
   #detailsDialog
   [order]="selectedOrder"
   [children]="selectedDataRow?.children"
+  [settings]="settings"
   [openEvent]="openDetails"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid()"

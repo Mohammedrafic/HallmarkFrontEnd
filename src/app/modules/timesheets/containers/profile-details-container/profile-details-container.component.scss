@@ -55,6 +55,8 @@ $chip-margin: 8px;
   }
 
   .e-chip {
+    width: auto;
+
     &:first-child {
       margin-right: 20px;
     }
@@ -89,7 +91,7 @@ $chip-margin: 8px;
     font-weight: 700;
     font-size: 16px;
   }
-  
+
   .week-dates {
     margin-left: 20px;
   }
