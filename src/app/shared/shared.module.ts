@@ -18,10 +18,11 @@ import {
   Percent,
   Plus,
   Send,
+  Sliders,
   Trash2,
   User,
   Eye,
-  EyeOff
+  EyeOff,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
@@ -121,7 +122,15 @@ import { CloseOrderSideDialogComponent } from '@shared/components/close-order-si
 import { OrderCloseReasonInfoComponent } from '@shared/components/order-close-reason-info/order-close-reason-info.component';
 import { CommentComponent } from './components/comments/comment/comment.component';
 import { CommentsState } from './components/comments/store/comments.state';
+import { AlwaysOpenFirstAccordition } from './directives/always-open-first-accordition.directive';
+import { CandidateStatusName } from './pipes/candidate-status-name.pipe';
+import { RouterModule } from '@angular/router';
+import { ExtensionCandidateComponent } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
+import { ActionCellRendererComponent } from '@shared/components/cell-renderer/action-cellrenderer.component';
 import { ToggleSwitchComponent } from './components/toggle-switch/toggle-switch.component';
+import { EmailSideDialogComponent } from './components/email-side-dialog/email-side-dialog.component';
+import { SmsSideDialogComponent } from './components/sms-side-dialog/sms-side-dialog.component';
+import { OnScreenSideDialogComponent } from './components/on-screen-side-dialog/on-screen-side-dialog.component';
 
 const icons = {
   AlertCircle,
@@ -139,6 +148,7 @@ const icons = {
   Edit,
   Plus,
   Trash2,
+  Sliders,
   Eye,
   EyeOff,
   DollarSign,
@@ -149,11 +159,13 @@ const COMPONENTS = [
   ValidationErrorPipe,
   ChipsCssClass,
   OrderTypeName,
+  CandidateStatusName,
   FormatPhoneNumberPipe,
   RateHourPipe,
   BillRatePipe,
   ExBillRateNamesPipe,
   ValidateDirective,
+  AlwaysOpenFirstAccordition,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
   ClickOutsideDirective,
@@ -194,7 +206,12 @@ const COMPONENTS = [
   OrderReOrdersListComponent,
   ReorderCandidatesListComponent,
   OrderReOrdersContainerComponent,
-  OrderCloseReasonInfoComponent,
+  ExtensionCandidateComponent,
+  ActionCellRendererComponent,
+  OrderCloseReasonInfoComponent,  
+  EmailSideDialogComponent,  
+  SmsSideDialogComponent,
+  OnScreenSideDialogComponent,
 ];
 
 @NgModule({
@@ -234,6 +251,7 @@ const COMPONENTS = [
     MultiSelectModule,
     NgxMaskModule.forChild(),
     SidebarModule,
+    RouterModule,
   ],
   exports: [
     ...COMPONENTS,

@@ -8,7 +8,7 @@ import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DropdownOption } from '@core/interface';
 import { TimesheetRecordsDto, RecordValue } from './../interface';
 import { TimesheetsApiService } from './timesheets-api.service';
-import { RecordFields } from '../enums';
+import { RecordFields, RecordsMode, RecordStatus } from '../enums';
 
 @Injectable()
 export class TimesheetRecordsService {
@@ -34,7 +34,7 @@ export class TimesheetRecordsService {
     ): Record<string, FormGroup> {
     const formGroups: Record<string, FormGroup> = {};
 
-    records[currentTab].forEach((record) => {
+    records[currentTab][RecordsMode.Edit].forEach((record) => {
       const config = colDefs.filter((item) => item.cellRendererParams?.editMode);
       const controls: Record<string, string[] | number[] | Validators[]> = {};
 
@@ -45,8 +45,11 @@ export class TimesheetRecordsService {
         controls[field] = [value as string | number, Validators.required];
       });
 
+      controls['billRateConfigId'] = [record['billRateConfigId'], Validators.required]
+
       formGroups[record.id] = this.fb.group(controls);
     });
+
     return formGroups;
   }
 
@@ -112,5 +115,11 @@ export class TimesheetRecordsService {
 
     tabs.hideTab(1, !isMilageAvaliable);
     tabs.hideTab(2, !isExpensesAvaliable);
+  }
+
+  public checkForStatus(data: RecordValue[]): boolean {
+    return data.some((record) => {
+      return record.stateText === RecordStatus.Deleted || record.stateText === RecordStatus.New;
+    });
   }
 }

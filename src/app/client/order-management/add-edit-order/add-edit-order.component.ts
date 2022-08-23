@@ -104,7 +104,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
     if (this.orderId > 0) {
       this.title = 'Edit';
-      store.dispatch(new GetSelectedOrderById(this.orderId));
     } else {
       this.title = 'Create';
     }
@@ -116,6 +115,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public ngOnInit(): void {
     if (this.orderId > 0) {
+      this.store.dispatch(new GetSelectedOrderById(this.orderId));
       this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
         this.prefix = order?.organizationPrefix as string;
         this.publicId = order?.publicId as number;
@@ -134,7 +134,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.addMenuItem(SubmitButtonItem.SaveForLater, 'Save For Later');
           this.removeMenuItem(SubmitButtonItem.Save);
         } else {
-          if (order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement) {
+          if (order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement || order?.extensionFromId) {
             this.disableOrderType = true;
           }
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
@@ -353,7 +353,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       nO_OT,
       jobDescription,
       unitDescription,
-      reasonForRequisition,
+      orderRequisitionReasonId,
+      orderRequisitionReasonName,
       contactDetails,
       workLocations,
       workflowId,
@@ -397,7 +398,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       nO_OT,
       jobDescription,
       unitDescription,
-      reasonForRequisition,
+      orderRequisitionReasonId,
+      orderRequisitionReasonName,
       billRates,
       jobDistributions,
       contactDetails,
@@ -476,7 +478,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       );
     } else {
       this.store.dispatch(new SaveOrder(
-        order, documents
+        order, documents, this.orderDetailsFormComponent.comments
       ));
     }
   }

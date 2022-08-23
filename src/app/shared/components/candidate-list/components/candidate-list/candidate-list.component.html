@@ -23,7 +23,7 @@
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
             <span><i-feather name="edit" class="icon"></i-feather></span>
           </button>
-          <button ejs-button [disabled]="data.profileStatus === statusEnum.Inactive" cssClass="e-flat secondary-icon-button enabled-button">
+          <button ejs-button [disabled]="data.profileStatus === statusEnum.Inactive" cssClass="e-flat secondary-icon-button enabled-button"  (click)="onRemove(data.candidateProfileId)">
             <span><i-feather name="trash-2" class="icon"></i-feather></span>
           </button>
         </div>
@@ -65,17 +65,17 @@
         <div *ngFor="let skill of data.candidateProfileSkills">{{skill.skillDescription || skill}}</div>
       </ng-template>
     </e-column>
-    <e-column textAlign="Right" field="lastAssignmentEndDate" headerText="Current Assignment End Date">
+    <e-column textAlign="Left" field="lastAssignmentEndDate" headerText="Current Assignment End Date">
       <ng-template #template let-data>
         {{data.lastAssignmentEndDate | date: 'MM/dd/yyy'}}
       </ng-template>
     </e-column>
     <e-column field="candidateStatus" headerText="Candidate status" textAlign="Left" width="150">
       <ng-template #template let-data>
-        <div class="status-cell" *ngIf="getCandidateStatusName(data.candidateStatus)">
+        <div class="status-cell" *ngIf="showCandidateStatus(data.candidateStatus)">
           <ejs-chiplist>
             <e-chips>
-              <e-chip [text]="getCandidateStatusName(data.candidateStatus)" [cssClass]="getCandidateStatusName(data.candidateStatus) | chipsCssClass"></e-chip>
+              <e-chip [text]="data.candidateStatus | candidateStatusName" [cssClass]="data.candidateStatus | candidateStatusName | chipsCssClass"></e-chip>
             </e-chips>
           </ejs-chiplist>
         </div>
@@ -166,7 +166,7 @@
     </div>
     <div class="bootstrap">
       <div class="input-container">
-        <label>Position Status</label>
+        <label>Profile Status</label>
         <div class="input-group multiselect">
           <ejs-multiselect
             mode="CheckBox"

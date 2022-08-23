@@ -1,0 +1,57 @@
+@import '../../../styles/variables/colors';
+
+.dialog {
+  right: 0;
+  top: 60px !important;
+  left: auto !important;
+  height: calc(100% - 60px) !important;
+
+  .e-dlg-content {
+    padding: 0;
+  }
+
+  .container {
+    padding: 24px;
+
+    .header-container {
+
+      .e-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .e-card-title {
+          color: $black;
+          font-size: 23px;
+          font-weight: 600;
+        }
+
+        .e-card-content {
+          display: flex;
+          
+          .button-cancel {
+            margin-right: 7px;
+          }
+        }
+      }
+    }
+
+    .form-container {
+      .input-container {
+        padding-top: 20px;
+
+        label {
+          margin-bottom: 12px;
+        }
+
+        &.facility-phone {
+          width: 207px;
+        }
+
+        &.calendar {
+          width: 198px;
+        }
+      }
+    }
+  }
+}

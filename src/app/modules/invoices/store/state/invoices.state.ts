@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
-import { debounceTime, Observable, of, throttleTime, catchError } from 'rxjs';
+import { debounceTime, Observable, of, throttleTime, catchError, forkJoin, map, switchMap } from 'rxjs';
 import { tap } from 'rxjs/internal/operators/tap';
 
 import { PageOfCollections } from '@shared/models/page.model';
@@ -11,20 +11,34 @@ import { DataSourceItem } from '@core/interface';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
 import { Invoices } from '../actions/invoices.actions';
-import { InvoicesService } from '../../services';
+import { InvoicesApiService, InvoicesService } from '../../services';
 import {
-  InvoiceFilterColumns, InvoiceRecord, InvoicesFilteringOptions, InvoicesFilterState,
-  ManualInvoiceMeta, ManualInvoiceReason } from '../../interfaces';
+  InvoiceFilterColumns,
+  InvoiceRecord,
+  InvoicesFilteringOptions,
+  InvoicesFilterState,
+  ManualInvoiceMeta,
+  ManualInvoiceReason
+} from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
-import { FilteringOptionsFields } from '../../../timesheets/enums';
-import { DefaultInvoicesState, ManualInvoiceMessages } from '../../constants';
-import { DefaultFiltersState, SavedFiltersParams } from '../../../timesheets/constants';
+import { FilteringOptionsFields, TimesheetTargetStatus } from '../../../timesheets/enums';
+import { DefaultInvoicesState, InvoicesFilteringOptionsMapping, ManualInvoiceMessages } from '../../constants';
+import { SavedFiltersParams } from '../../../timesheets/constants';
 import { reduceFiltersState } from '../../../timesheets/helpers';
-import { InvoicesApiService } from '../../services';
 import { InvoicesTableFiltersColumns } from '../../enums/invoices.enum';
-import { InvoicesFilteringOptionsMapping } from '../../constants';
-import { InvoiceMetaAdapter } from '../../helpers/invoice-meta.adapter';
+import { InvoiceMetaAdapter } from '../../helpers';
 import { OrganizationStructure } from '@shared/models/organization.model';
+import { PendingInvoicesData } from '../../interfaces/pending-invoice-record.interface';
+import { getAllErrors } from '@shared/utils/error.utils';
+import { HttpErrorResponse } from '@angular/common/http';
+
+
+const DefaultFiltersState: InvoicesFilterState = {
+  pageNumber: 1,
+  pageSize: 30,
+  organizationId: null,
+};
+
 
 @State<InvoicesModel>({
   name: 'invoices',
@@ -35,12 +49,18 @@ export class InvoicesState {
   constructor(
     private invoicesService: InvoicesService,
     private invoicesAPIService: InvoicesApiService,
+    private store: Store,
   ) {
   }
 
   @Selector([InvoicesState])
   static invoicesData(state: InvoicesModel): PageOfCollections<InvoiceRecord> | null {
     return state?.invoicesData ?? null;
+  }
+
+  @Selector([InvoicesState])
+  static pendingInvoicesData(state: InvoicesModel): PendingInvoicesData | null {
+    return state?.pendingInvoicesData ?? null;
   }
 
   @Selector([InvoicesState])
@@ -78,16 +98,9 @@ export class InvoicesState {
     return state.invoiceReasons;
   }
 
-  @Action(Invoices.Get)
-  GetInvoices(
-    { patchState }: StateContext<InvoicesModel>,
-    { payload }: Invoices.Get
-  ): Observable<PageOfCollections<InvoiceRecord>> {
-    return this.invoicesService.getInvoices(payload).pipe(
-      tap((data: PageOfCollections<InvoiceRecord>) => patchState({
-        invoicesData: data,
-      }))
-    );
+  @Selector([InvoicesState])
+  static selectedOrgId(state: InvoicesModel): number {
+    return state.selectedOrganizationId;
   }
 
   @Action(Invoices.ToggleInvoiceDialog)
@@ -176,15 +189,15 @@ export class InvoicesState {
   }
 
   @Action(Invoices.ToggleManualInvoiceDialog)
-  ToggleManInvoiceDialog(
-    { action }: Invoices.ToggleManualInvoiceDialog
-  ): void {}
+  ToggleManInvoiceDialog(): void {}
 
   @Action(Invoices.GetInvoicesReasons)
   GetInvoicesReasons(
     { patchState }: StateContext<InvoicesModel>,
+    { orgId }: Invoices.GetInvoicesReasons,
   ): Observable<ManualInvoiceReason[]> {
-    return this.invoicesAPIService.getInvoiceReasons()
+
+    return this.invoicesAPIService.getInvoiceOrgReasons(orgId)
       .pipe(
         tap((res) => {
           patchState(
@@ -214,16 +227,19 @@ export class InvoicesState {
   @Action(Invoices.SaveManulaInvoice)
   SaveManualInvoice(
     ctx: StateContext<InvoicesModel>,
-    { payload }: Invoices.SaveManulaInvoice,
+    { payload, files, isAgency }: Invoices.SaveManulaInvoice,
     /**
      * TODO: change return type afte invoice get implementation
      */
-  ): Observable<ManualInvoiceMeta> {
+  ): Observable<number[]> {
     return this.invoicesAPIService.saveManualInvoice(payload)
     .pipe(
+      switchMap((res) => this.invoicesAPIService.saveManualInvoiceAttachments(
+        files, isAgency ? res.organizationId : null,  res.timesheetId,)),
       tap(() => {
         ctx.dispatch([
-          new ShowToast(MessageTypes.Success, ManualInvoiceMessages.successAdd)
+          new ShowToast(MessageTypes.Success, ManualInvoiceMessages.successAdd),
+          new Invoices.GetPendingInvoices(payload.organizationId),
         ]);
       }),
     );
@@ -269,6 +285,65 @@ export class InvoicesState {
       tap(() => patchState({
         selectedOrganizationId: id,
       }))
+    );
+  }
+
+  @Action(Invoices.GetPendingInvoices)
+  GetPendingInvoices(
+    { patchState, getState }: StateContext<InvoicesModel>,
+    { organizationId }: Invoices.GetPendingInvoices
+  ): Observable<PendingInvoicesData> {
+    const state = getState();
+
+    return this.invoicesAPIService.getPendingInvoices({
+      ...state.invoicesFilters,
+      organizationId,
+    }).pipe(
+      tap((data: PendingInvoicesData) => patchState({
+        pendingInvoicesData: data,
+      }))
+    );
+  }
+
+  @Action(Invoices.ApproveInvoice)
+  ApproveInvoices(
+    { patchState, getState }: StateContext<InvoicesModel>,
+    { invoiceId }: Invoices.ApproveInvoice
+  ): Observable<void> {
+    return this.invoicesAPIService.changeInvoiceStatus({
+      organizationId: null,
+      reason: null,
+      targetStatus: TimesheetTargetStatus.Approved,
+      timesheetId: invoiceId,
+    }).pipe(
+      tap(() => this.store.dispatch([
+        new Invoices.GetPendingInvoices(null),
+        new ShowToast(MessageTypes.Success, 'Record has been approved'),
+      ])),
+      catchError((error: HttpErrorResponse) => this.store.dispatch(
+        new ShowToast(MessageTypes.Error, getAllErrors(error.error))
+      ))
+    );
+  }
+
+  @Action(Invoices.RejectInvoice)
+  RejectInvoice(
+    { patchState, getState }: StateContext<InvoicesModel>,
+    { invoiceId }: Invoices.RejectInvoice
+  ): Observable<void> {
+    return this.invoicesAPIService.changeInvoiceStatus({
+      organizationId: null,
+      reason: null,
+      targetStatus: TimesheetTargetStatus.Rejected,
+      timesheetId: invoiceId,
+    }).pipe(
+      tap(() => this.store.dispatch([
+        new ShowToast(MessageTypes.Success, 'Record has been rejected'),
+        new Invoices.GetPendingInvoices(null),
+      ])),
+      catchError((error: HttpErrorResponse) => this.store.dispatch(
+        new ShowToast(MessageTypes.Error, getAllErrors(error.error))
+      )),
     );
   }
 }

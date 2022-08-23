@@ -5,6 +5,7 @@
     </div>
     <div class="dropdown-container bootstrap">
       <ejs-dropdownlist
+        *ngIf="!isAgencyUser"
         [dataSource]="commentsFilterItems"
         [(value)]="selectedFilter"
         (select)="onFilterChange($event)"
@@ -28,6 +29,7 @@
     <div class="input-group bootstrap">
       <ejs-textbox
         class="comment-text-box"
+        [class.readonly]="disabled"
         #textBox
         [multiline]="true"
         (created)="textBoxInit()"

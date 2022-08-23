@@ -16,6 +16,7 @@ export class Organization {
   preferences: Preferences;
   dbConnectionStringName: string;
   isOrganizationUsed?: boolean;
+  organizationPrefix: string;
 
   constructor(organizationId: number, businessUnitId: number, generalInformation: GeneralInformation, billingDetails: BillingDetails, contactDetails: ContactDetails[], preferences: Preferences, isSameAsOrg: boolean, dataBaseConnection: string) {
     if (organizationId) {
@@ -34,12 +35,7 @@ export class Organization {
     this.contactDetails = contactDetails;
     this.contactDetails.forEach((contact: ContactDetails) => contact.organizationId = organizationId || 0);
     this.preferences = preferences;
-    this.preferences.purchaseOrderBy = parseInt(this.preferences.purchaseOrderBy as string, 10);
-    this.preferences.timesheetSubmittedBy = parseInt(this.preferences.timesheetSubmittedBy as string, 10);
-    this.preferences.paymentOptions = parseInt(this.preferences.paymentOptions as string, 10);
-    if (this.preferences.timePeriodInMins === '') {
-      this.preferences.timePeriodInMins = null;
-    }
+    this.preferences.paymentOptions = parseInt(this.preferences.paymentOptions as string, 10);    
     this.preferences.organizationId = organizationId || 0;
     this.dbConnectionStringName = dataBaseConnection;
   }
@@ -51,6 +47,7 @@ export class GeneralInformation {
   externalId?: number | string | null;
   taxId: string;
   name: string;
+  organizationType: string;
   addressLine1: string;
   addressLine2: string;
   state: string;
@@ -96,12 +93,8 @@ export class Preferences {
   organizationId?: number;
   paymentOptions: number | string;
   paymentDescription: string;
-  timesheetSubmittedBy: number | string;
   weekStartsOn: number;
   considerLunch: boolean;
-  purchaseOrderBy: number | string;
-  sendDocumentToAgency: SendDocumentAgency;
-  timePeriodInMins: number | string | null;
 }
 
 export class OrganizationPage {

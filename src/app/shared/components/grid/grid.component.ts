@@ -27,7 +27,7 @@ import { GRID_CONFIG } from '@shared/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
-export class GridComponent<Data> extends DestroyableDirective implements OnChanges, OnInit {
+export class GridComponent<Data = unknown> extends DestroyableDirective implements OnChanges, OnInit {
   @Input() public columnDefinitions: ColumnDefinitionModel[] | null;
   @Input() public currentPage: number = 1;
   @Input() public isLoading: boolean | null = false;

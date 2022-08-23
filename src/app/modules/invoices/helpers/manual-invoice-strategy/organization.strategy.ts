@@ -46,14 +46,14 @@ export class OrganizationStrategy implements ManualInvoiceStrategy {
         this.connectConfigOptions(config, options);
         form.get('unitId')?.patchValue(meta[0].agencyId, { emitEvent: false, onlySelf: true });
         form.get('nameId')?.patchValue(meta[0].candidateId);
-
       } else {
-
         options.invoiceAgencies = InvoiceMetaAdapter.createAgencyOptions(meta);
         this.connectConfigOptions(config, options);
         form.get('unitId')?.patchValue(options.invoiceAgencies[0].value);
         form.get('nameId')?.patchValue(options.invoiceCandidates[0].value);
-      }      
+      }
+      form.get('locationId')?.patchValue(meta[0].locationId);
+      form.get('departmentId')?.patchValue(meta[0].departmentId);   
   }
 
   public populateCandidates(
@@ -89,6 +89,4 @@ export class OrganizationStrategy implements ManualInvoiceStrategy {
       }
     });
   }
-
-
 }

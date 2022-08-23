@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild,
-  OnChanges } from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, Input, OnInit, ViewChild,
+  OnChanges, ChangeDetectorRef, Renderer2
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import { debounceTime, distinctUntilChanged, of, takeUntil } from 'rxjs';
@@ -10,7 +12,8 @@ import { DatePickerComponent } from '@syncfusion/ej2-angular-calendars/src/datep
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DateWeekService } from '@core/services';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { ConfirmWeekChangeMessage } from './date-week.constant';
+import { ConfirmWeekChangeMessage, DatesMath } from './date-week.constant';
+import { WorkWeek } from '../../../modules/timesheets/interface';
 
 /**
  * DateWeekService has to provided in parent module.
@@ -28,15 +31,27 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
 
   @Input() initDates: [Date, Date];
 
+  @Input() availibleDates: WorkWeek<Date>[];
+
   @Input() isAbleToChange = true;
 
-  public readonly maxDate = new Date(new Date().setHours(23, 59, 59));
+  public maxDate: Date = new Date(new Date().setHours(23, 59, 59));
+
+  public minDate: Date;
+
+  public isPrevDisabled = false;
+
+  public isNextDisabled = false;
 
   private startDateValue: string;
+
+  private readonly datesMath = DatesMath;
 
   constructor(
     private weekService: DateWeekService,
     private confirmService: ConfirmService,
+    private cdr: ChangeDetectorRef,
+    private renderer2: Renderer2,
   ) {
     super();
   }
@@ -49,23 +64,20 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     this.setInitDate();
   }
 
-  /**
-   * TODO: try to use renderer2 here
-   */
   public renderCell(args: RenderDayCellEventArgs): void {
     if (this.dateControl.value && typeof this.dateControl.value === 'string') {
       const [from, to] = DateTimeHelper.getWeekStartEnd(this.dateControl.value);
 
       if (DateTimeHelper.isDateBetween(args.date, from, to)) {
-        args.element?.classList.add('e-highlightselectedrange');
+        this.renderer2.addClass(args.element, 'e-highlightselectedrange');
       }
     } else {
-      args.element?.classList.remove('e-highlightselectedrange');
+      this.renderer2.removeClass(args.element, 'e-highlightselectedrange');
     }
   }
 
   public prevWeek(): void {
-    const weekStart = new Date(new Date(this.startDateValue).getTime() - 7 * 24 * 60 * 60 * 1000);
+    const weekStart = new Date(new Date(this.startDateValue).getTime() - this.datesMath);
     const dateRange = DateTimeHelper.getRange(weekStart);
 
     // this.startDateValue = weekStart.toDateString();
@@ -73,7 +85,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
   }
 
   public nextWeek(): void {
-    const weekStart = new Date(new Date(this.startDateValue).getTime() + 7 * 24 * 60 * 60 * 1000);
+    const weekStart = new Date(new Date(this.startDateValue).getTime() + this.datesMath);
     const dateRange = DateTimeHelper.getRange(weekStart);
 
     // this.startDateValue = DateTimeHelper.getWeekStartEnd(dateRange)[0].toDateString();
@@ -113,12 +125,19 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
   }
 
   private setInitDate(): void {
+    if (this.availibleDates.length) {
+      this.minDate = this.availibleDates[0].weekStartDate;
+      const maxDateVal = this.availibleDates.slice(-1)[0].weekEndDate;
+      this.maxDate = maxDateVal > new Date() ? new Date() : this.maxDate;
+    }
+
     if (this.initDates) {
       this.startDateValue = this.initDates[0].toDateString();
       this.dateControl.patchValue(
         DateTimeHelper.getRange(this.initDates[0]),
         { emitEvent: false });
     }
+    this.compareDates();
   }
 
   private setControlValue(value: string): void {
@@ -131,6 +150,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
       DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(value, true)),
       DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(value))
     ]);
+    this.compareDates();
   }
 
   private changeRange(range: string, value: Date | string): void {
@@ -161,5 +181,16 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
       DateTimeHelper.toUtcFormat(new Date(this.startDateValue)),
       DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(this.startDateValue)),
     ]);
+    this.compareDates();
+  }
+
+  private compareDates(): void {
+    const compareDate = new Date(this.startDateValue || '');
+    const prevSuggestDate = new Date(compareDate.getTime() - this.datesMath);
+    const nextSuggestDate = new Date(compareDate.getTime() + this.datesMath);
+
+    this.isPrevDisabled = this.minDate > prevSuggestDate;
+    this.isNextDisabled = this.maxDate < nextSuggestDate;
+    this.cdr.detectChanges();
   }
 }

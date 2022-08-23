@@ -29,3 +29,10 @@ export const alertsFilterColumns: FilterColumnsModel = {
 //     valueId: 'id',
 //   },
 };
+export const toolsRichTextEditor: object = {
+  items: [
+      'Bold', 'Italic', 'Underline', '|',
+      'FontName', 'FontSize',  '|','LowerCase', 'UpperCase', '|', 'Undo', 'Redo', '|',
+      'Formats', 'Alignments', '|', 'CreateLink',
+      'Image', '|', 'SourceCode']
+};

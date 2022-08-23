@@ -37,7 +37,7 @@
             <div
               ejs-button
               cssClass="e-flat primary-icon-button custom-button"
-              [class.btn-icon__disabled]="order?.isClosed"
+              [class.btn-icon__disabled]="order?.isClosed || data.status === applicantStatus.Offboard"
               (click)="onEdit(data, $event)"
             >
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
@@ -51,7 +51,7 @@
             {{ data.lastName }}, {{ data.firstName }}
             <ng-container *ngIf="data.deployedCandidateInfo && data.statusName !== 'Onboard'">
               <ejs-tooltip content="Deployed Candidate" position="TopRight">
-                <i-feather name="§" class="icon"></i-feather>
+                <i-feather name="briefcase" class="icon" ></i-feather>
               </ejs-tooltip>
             </ng-container>
           </div>

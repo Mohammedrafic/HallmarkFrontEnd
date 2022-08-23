@@ -1,15 +1,20 @@
 <section class="controls-container">
-  <div>
-    <button ejs-button cssClass="e-outline" (click)="navigateBack()" id="backButton">Back</button>
-  </div>
-  <div class="form-title"><h3>{{ title }} Organization</h3></div>
+  <ng-container *ngIf="!profileMode">
+    <div>
+      <button ejs-button cssClass="e-outline" (click)="navigateBack()" id="backButton">Back</button>
+    </div>
+    <div class="form-title"><h3>{{ title }} Organization</h3></div>
+  </ng-container>
+  <ng-container *ngIf="profileMode">
+    <div class="profile"><h3>Edit Organization Profile</h3></div>
+  </ng-container>
   <div class="controls-form stick-right">
-    <button ejs-button cssClass="e-outline" (click)="clearForm()" id="clearButton">Clear</button>
+    <button *ngIf="!profileMode" ejs-button cssClass="e-outline" (click)="clearForm()" id="clearButton">Clear</button>
     <button ejs-button cssClass="e-outline" (click)="navigateBack()" id="cancelButton">Cancel</button>
     <button ejs-button [isPrimary]="true" (click)="save()" class="save-button" id="saveButton">Save</button>
   </div>
 </section>
-<section class="create-under-container bootstrap" *ngIf="!isMspUser">
+<section class="create-under-container bootstrap" *ngIf="!isMspUser && !profileMode">
   <div class="left-section">
     <form *ngIf="CreateUnderFormGroup && isAddMode" [formGroup]="CreateUnderFormGroup" id="createUnder">
       <label>Create Under<span class="required">*</span></label>
@@ -75,7 +80,14 @@
                   </div>
                 </div>
               </div>
-              <div class="right-column"></div>
+              <div class="right-column">
+                <div class="id-container">
+                  <div class="dropdown-container bootstrap">
+                    <label>Organization Type</label>
+                    <ejs-dropdownlist formControlName="organizationType" [dataSource]="organizationTypes"></ejs-dropdownlist>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="address-section bootstrap">
               <div class="left-column">
@@ -159,7 +171,7 @@
         <div class="billing-details bootstrap">
           <div class="title">Billing Details</div>
           <div class="org-address-checkbox">
-            <ejs-checkbox [checked]="isSameAsOrg" (change)="sameAsOrgChange($event)" label="Same As Organization"></ejs-checkbox>
+            <ejs-checkbox [checked]="isSameAsOrg" (change)="sameAsOrgChange($event)" label="Same As Organization" [disabled]="profileMode"></ejs-checkbox>
           </div>
           <div class="billing-details-section">
             <div class="left-column">
@@ -242,11 +254,11 @@
             <ng-container formArrayName="contacts">
               <div [formGroupName]="i" class="contact-item" *ngFor="let contact of ContactFormArray.controls; let i = index;">
                 <div *ngIf="!isEditTitle[i]" class="dropdown-container bootstrap">
-                  <label>Title</label>
+                  <label>Contact Type</label>
                   <ejs-dropdownlist formControlName="title" [dataSource]="titles"></ejs-dropdownlist>
                 </div>
                 <div *ngIf="isEditTitle[i]" class="input-container bootstrap">
-                  <label>Title</label>
+                  <label>Contact Type</label>
                   <div class="input-group">
                     <input formControlName="title" class="e-input" type="text"/>
                   </div>
@@ -289,10 +301,10 @@
   </div>
 
   <div class="right-section">
-    <app-image-uploader uploaderTitle="Logo" [logo]="logo" (selectImage)="onImageSelect($event)"></app-image-uploader>
+    <app-image-uploader uploaderTitle="Logo" [logo]="logo" (selectImage)="onImageSelect($event)" [disabled]="profileMode"></app-image-uploader>
 
     <!---Preferences section-->
-    <div tabindex="0" class="e-card">
+    <div *ngIf="!profileMode" tabindex="0" class="e-card">
       <div class="e-card-header">
         <div class="e-card-header-caption">
           <div class="e-card-title">Preferences</div>
@@ -300,24 +312,7 @@
       </div>
       <div class="e-card-content">
         <form *ngIf="PreferencesFormGroup" [formGroup]="PreferencesFormGroup" id="preferancesDetails">
-          <label class="radio-label">Select Purchase Order By</label>
-          <div class="inline-radio-container purchase-order-by">
-            <ejs-radiobutton formControlName="purchaseOrderBy" label="By Organization" name="purchaseOrderBy" value="0"></ejs-radiobutton>
-            <ejs-radiobutton formControlName="purchaseOrderBy" label="By Location" name="purchaseOrderBy" value="1"></ejs-radiobutton>
-          </div>
-          <div class="dropdown-container bootstrap">
-            <label>Send document to agency</label>
-            <div class="input-group dropdown">
-              <ejs-dropdownlist formControlName="sendDocumentToAgency" [fields]="optionFields" [dataSource]="sendDocumentAgencies$ | async"></ejs-dropdownlist>
-            </div>
-          </div>
-          <div class="column-radio-container submitted-by">
-            <label class="radio-label">Timesheet submitted By</label>
-            <ejs-radiobutton formControlName="timesheetSubmittedBy" label="Actual Time In/Time Out" name="timesheetSubmittedBy" value="0"></ejs-radiobutton>
-            <ejs-radiobutton formControlName="timesheetSubmittedBy" label="Total Hours by Week" name="timesheetSubmittedBy" value="1"></ejs-radiobutton>
-            <ejs-radiobutton formControlName="timesheetSubmittedBy" label="Total Hours by Day" name="timesheetSubmittedBy" value="2"></ejs-radiobutton>
-          </div>
-          <div class="dropdown-container bootstrap">
+           <div class="dropdown-container bootstrap">
             <label>Week Starts On<span class="required">*</span></label>
             <div class="input-group dropdown">
               <ejs-dropdownlist appValidateWithMessage formControlName="weekStartsOn" [fields]="optionFields" [dataSource]="days$ | async"></ejs-dropdownlist>
@@ -331,13 +326,7 @@
             <div class="input-group">
               <ejs-textbox appValidateWithMessage formControlName="paymentDescription" [multiline]="true"></ejs-textbox>
             </div>
-          </div>
-          <div class="input-container bootstrap">
-            <label>Consider Lunch</label>
-            <div class="input-group">
-              <input appValidateWithMessage formControlName="timePeriodInMins" class="e-input" type="text" placeholder="Time period in minutes"/>
-            </div>
-          </div>
+          </div>          
         </form>
       </div>
     </div>

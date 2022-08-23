@@ -33,9 +33,7 @@ import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/
 import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
-import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';
 import { ShowToast } from 'src/app/store/app.actions';
-import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { Comment } from '@shared/models/comment.model';
@@ -70,8 +68,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public candidatStatus = CandidatStatus;
   public candidateJob: OrderCandidateJob | null;
   public today = new Date();
-  public accordionClickElement: HTMLElement | null;
-  public accordionOneField: AccordionOneField;
   public priceUtils = PriceUtils;
 
   get showYearsOfExperience(): boolean {
@@ -101,6 +97,14 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   get isDeployedCandidate(): boolean {
     return !!this.candidate.deployedCandidateInfo && this.candidate.status !== ApplicantStatusEnum.OnBoarded;
+  }
+
+  get statusText(): string {
+    return this.candidateJob?.applicantStatus.statusText as string;
+  }
+
+  get applicationStatus(): ApplicantStatusEnum {
+    return this.candidateJob?.applicantStatus.applicantStatus as ApplicantStatusEnum;
   }
 
   @Select(OrderManagementContentState.candidatesJob)
@@ -214,16 +218,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.updateCandidateJob({ itemData: this.currentApplicantStatus }, true);
   }
 
-  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
-  }
-
-  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
-  }
-
   private createForm(): void {
     this.formGroup = new FormGroup({
       jobId: new FormControl(null),
@@ -261,9 +255,11 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private getComments(): void {
-    this.commentsService.getComments(this.candidateJob?.commentContainerId as number, null).subscribe((comments: Comment[]) => {
-      this.comments = comments;
-    });
+    this.commentsService
+      .getComments(this.candidateJob?.commentContainerId as number, null)
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+      });
   }
 
   private subscribeOnInitialData(): void {

@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { Observable, Subject, takeWhile } from 'rxjs';
@@ -6,9 +6,7 @@ import { Observable, Subject, takeWhile } from 'rxjs';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import {
-  AccordionClickArgs,
   AccordionComponent,
-  ExpandEventArgs,
   SelectEventArgs,
   SelectingEventArgs,
   TabComponent,
@@ -24,7 +22,6 @@ import {
   OrderManagementChild,
 } from '@shared/models/order-management.model';
 import { AcceptFormComponent } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
-import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
@@ -68,6 +65,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild] | null>;
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
+  @Output() saveEmitter = new EventEmitter<void>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -100,8 +98,6 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public selectedOrder$: Observable<Order>;
   public orderStatusText = OrderStatusText;
   public disabledCloseButton = true;
-  public accordionOneField: AccordionOneField;
-  public accordionClickElement: HTMLElement | null;
   public acceptForm = AcceptFormComponent.generateFormGroup();
   public candidateJob: OrderCandidateJob | null;
   public candidateStatus = CandidatStatus;
@@ -184,16 +180,6 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.selectedTemplate = null;
   }
 
-  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
-  }
-
-  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
-  }
-
   public onBillRatesChanged(bill: BillRate): void {
     if (!this.acceptForm.errors && this.candidateJob) {
       this.store
@@ -268,6 +254,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public updateGrid(): void {
     this.closeExtensionSidebar();
     this.getExtensions();
+    this.saveEmitter.emit();
   }
 
   private setAddExtensionBtnState(candidate: OrderManagementChild): void {
@@ -278,7 +265,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     const dateAvailable = candidate.closeDate
       ? addDays(candidate.closeDate, 14)?.getTime()! >= new Date().getTime()
       : true;
-    this.isAddExtensionBtnAvailable = this.isOrganization && isOrderFilledOrProgress && dateAvailable;
+    this.isAddExtensionBtnAvailable = this.isOrganization && isOrderFilledOrProgress && dateAvailable && isOrderTravelerOrContractToPerm;
   }
 
   private getTemplate(): void {
@@ -290,6 +277,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
           ApplicantStatus.Accepted,
           ApplicantStatus.Rejected,
           ApplicantStatus.OnBoarded,
+          ApplicantStatus.Offboard,
         ];
 
         if (allowedApplyStatuses.includes(this.candidate.candidateStatus)) {
@@ -307,6 +295,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
           ApplicantStatus.Shortlisted,
           ApplicantStatus.PreOfferCustom,
           ApplicantStatus.Offered,
+          ApplicantStatus.Offboard,
         ];
         const allowedOnboardedStatuses = [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded];
 
@@ -364,6 +353,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
       this.agencyCandidatesJob$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
         this.candidateJob = orderCandidateJob;
         if (orderCandidateJob) {
+          this.getExtensions();
           this.getComments();
           this.setAcceptForm(orderCandidateJob);
         }

@@ -25,3 +25,8 @@
 .switch-text {
   color: $secondary-dark-blue-30;
 }
+
+.button-export {
+  display: flex;
+  flex-wrap: nowrap;
+}

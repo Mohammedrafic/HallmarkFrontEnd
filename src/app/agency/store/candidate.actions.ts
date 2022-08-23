@@ -1,7 +1,13 @@
+import { CandidateImportRecord, CandidateImportResult } from "@shared/models/candidate-profile-import.model";
 import { CandidateCredential } from '@shared/models/candidate-credential.model';
 import { Candidate } from 'src/app/shared/models/candidate.model';
 import { Education } from 'src/app/shared/models/education.model';
 import { Experience } from 'src/app/shared/models/experience.model';
+
+export class GetCandidatesByPage {
+  static readonly type = '[candidate] Get Candidates by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
 
 export class GetCandidateById {
   static readonly type = '[candidate] Get Candidate by ID';
@@ -143,6 +149,11 @@ export class GetCredentialTypes {
   constructor() {}
 }
 
+export class GetCredentialStatuses {
+  static readonly type = '[candidate] Get Credential Statuses';
+  constructor() {}
+}
+
 export class UploadCredentialFiles {
   static readonly type = '[candidate] Upload Credential Files';
   constructor(public files: Blob[], public candidateCredentialId: number) {}
@@ -186,4 +197,34 @@ export class GetCandidateProfileTemplate {
 export class GetCandidateProfileTemplateSucceeded {
   static readonly type = '[candidate] Get Candidate Profile Template Succeeded';
   constructor(public payload: Blob) { }
+}
+
+export class GetCandidateProfileErrors {
+  static readonly type = '[candidate] Get Candidate Profile Errors';
+  constructor(public payload: CandidateImportRecord[]) { }
+}
+
+export class GetCandidateProfileErrorsSucceeded {
+  static readonly type = '[candidate] Get Candidate Profile Errors Succeeded';
+  constructor(public payload: Blob) { }
+}
+
+export class UploadCandidateProfileFile {
+  static readonly type = '[candidate] Upload Candidate Profile File';
+  constructor(public payload: Blob) { }
+}
+
+export class UploadCandidateProfileFileSucceeded {
+  static readonly type = '[candidate] Upload Candidate Profile File Succeeded';
+  constructor(public payload: CandidateImportResult) { }
+}
+
+export class SaveCandidateImportResult {
+  static readonly type = '[candidate] Save Candidate Import Result';
+  constructor(public payload: CandidateImportRecord[]) { }
+}
+
+export class SaveCandidateImportResultSucceeded {
+  static readonly type = '[candidate] Save Candidate Import Result Succeeded';
+  constructor(public payload: CandidateImportResult) { }
 }

@@ -28,7 +28,7 @@
           </div>
           <div class="e-card-content dialog-controls">
             <app-button
-              *ngIf="isAddExtensionBtnAvailable"
+              *ngIf="isAddExtensionBtnAvailable && !(extensions$ | async)?.length"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
               [disabled]="candidate?.orderStatus === orderStatus.InProgressOfferAccepted"
@@ -55,20 +55,19 @@
             <e-tabitem>
               <ng-template #headerText>Order Details</ng-template>
               <ng-template #content>
-                <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">
-                  <section class="job-details">
-                    <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
-                  </section>
-                  <hr />
-                  <ng-container *ngIf="currentOrder?.orderClosureReasonId">
-                    <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
+                  <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">
+                    <section class="job-details">
+                      <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
+                    </section>
                     <hr />
-                  </ng-container>
-                  <ng-container *ngIf="currentOrder?.orderClosureReason">
-                    <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
-                    <hr />
-                  </ng-container>
-                  <app-order-details [isPosition]="true" [currentOrder]="currentOrder"></app-order-details>
+                    <ng-container *ngIf="currentOrder?.orderClosureReasonId || candidate?.positionClosureReasonId">
+                      <app-order-close-reason-info
+                        [candidate]="candidate"
+                        [orderInformation]="currentOrder">
+                      </app-order-close-reason-info>
+                      <hr />
+                    </ng-container>
+                    <app-order-details [isPosition]="true" [currentOrder]="currentOrder"></app-order-details>
                 </section>
               </ng-template>
             </e-tabitem>
@@ -105,8 +104,7 @@
                             <ejs-accordion
                               #accordionElement
                               expandMode="Single"
-                              (expanding)="toForbidExpandSecondRow($event)"
-                              (clicked)="clickedOnAccordion($event)"
+                              openFirstAccordion
                             >
                               <e-accordionitems>
                                 <e-accordionitem expanded="true">

@@ -61,10 +61,10 @@ export class DateTimeHelper {
     return date.getTime() <= toDate.getTime();
   }
 
-  public static getWeekDate(date: string | Date, isStart = false, dayNum?: number): Date {
+  public static getWeekDate(date: string | Date, isStart = false): Date {
     const curr = new Date(date);
     const firstDay = curr.getTime() - curr.getDay() * 24 * 60 * 60 * 1000;
-    const lastDay = firstDay + (dayNum ? dayNum : 6) * 24 * 60 * 60 * 1000;
+    const lastDay = firstDay + 6 * 24 * 60 * 60 * 1000;
     let last = new Date(lastDay).getTime();
     let first = firstDay;
 
@@ -86,7 +86,6 @@ export class DateTimeHelper {
 
   public static getRange(date: string | Date): string {
     let startWeekDay, endWeekDay;
-
     startWeekDay = formatDate(DateTimeHelper.getWeekDate(date, true), 'MM/dd/YYYY', 'en-US');
     endWeekDay = formatDate(DateTimeHelper.getWeekDate(date), 'MM/dd/YYYY', 'en-US');
 

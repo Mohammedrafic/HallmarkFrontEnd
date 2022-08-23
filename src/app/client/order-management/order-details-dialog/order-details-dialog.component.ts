@@ -26,7 +26,7 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ApproveOrder, DeleteOrder, SetLock } from '@client/store/order-managment-content.actions';
+import { ApproveOrder, DeleteOrder, GetExtensions, SetLock } from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
   CANCEL_CONFIRM_TEXT,
@@ -42,6 +42,8 @@ import { ShowCloseOrderDialog, ShowSideDialog } from '../../../store/app.actions
 import { AddEditReorderComponent } from '@client/order-management/add-edit-reorder/add-edit-reorder.component';
 import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
+import { SettingsKeys } from '@shared/enums/settings';
+import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -52,6 +54,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() order: Order;
   @Input() openEvent: Subject<boolean>;
   @Input() children: OrderManagementChild[] | undefined;
+  @Input() settings: {[key in SettingsKeys]?: OrganizationSettingsGet};
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
@@ -70,10 +73,15 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Select(OrderManagementContentState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
 
+  @Select(OrderManagementContentState.extensions) extensions$: Observable<any>;
+  public extensions: any[] = [];
+
   public readonly isReOrderDialogOpened$: Observable<boolean> = this.isDialogOpened();
 
+  candidateOrderPage: OrderCandidatesListPage;
   private unsubscribe$: Subject<void> = new Subject();
 
+  public SettingsKeys = SettingsKeys;
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
@@ -289,11 +297,19 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   private subscribeOnOrderCandidatePage(): void {
     this.orderCandidatePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: OrderCandidatesListPage) => {
+      this.candidateOrderPage = order;
       this.candidatesCounter =
         order &&
         order.items?.filter(
           (candidate) => candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
         ).length;
+        this.extensions = [];
+        if (order?.items[0]?.deployedCandidateInfo?.jobId) {
+          this.store.dispatch(new GetExtensions(order.items[0].deployedCandidateInfo.jobId));
+        }
+    });
+    this.extensions$.pipe(takeUntil(this.unsubscribe$)).subscribe((extensions) => {
+      this.extensions = extensions?.filter((extension: any) => extension.id !== this.order.id);
     });
   }
 

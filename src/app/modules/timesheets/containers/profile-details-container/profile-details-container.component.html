@@ -19,14 +19,26 @@
             {{ timesheetDetails.candidateLastName }}, {{ timesheetDetails.candidateFirstName}}
           </h3>
 
-          <ejs-chiplist #chipList class="events-off">
-            <e-chips>
-              <e-chip
-                [text]="timesheetDetails.statusText"
-                [cssClass]="timesheetDetails.statusText || '' | chipsCssClass">
-              </e-chip>
-            </e-chips>
-          </ejs-chiplist>
+          <ejs-tooltip
+            id="tooltip"
+            #tooltip
+            target=".e-chip"
+            (beforeRender)="beforeRender($event)">
+            <ejs-chiplist #chipList>
+              <e-chips>
+                <e-chip
+                  [text]="timesheetDetails.statusText"
+                  [cssClass]="timesheetDetails.statusText || '' | chipsCssClass"
+                >
+                </e-chip>
+                <e-chip
+                  [text]="timesheetDetails.mileageStatusText"
+                  [cssClass]="timesheetDetails.mileageStatusText || '' | chipsCssClass"
+                >
+                </e-chip>
+              </e-chips>
+            </ejs-chiplist>
+          </ejs-tooltip>
         </div>
         <div class="spacer"></div>
 
@@ -36,47 +48,15 @@
           class="timesheet-details-upload-container"
           #uploadContainer>
 
-            <app-date-week-picker [initDates]="weekPeriod" [isAbleToChange]="isChangesSaved"></app-date-week-picker>
+            <app-date-week-picker
+              [initDates]="weekPeriod"
+              [availibleDates]="workWeeks"
+              [isAbleToChange]="isChangesSaved">
+            </app-date-week-picker>
 
-            <button
-             ejs-button
-             cssClass="e-outline"
-             class="upload-button"
-             #uploadBtn
-             (click)="uploadTooltip.open(uploadContainer)"
-             >Upload
-              <i-feather name="upload" class="icon"></i-feather>
-            </button>
-
-            <ejs-tooltip #uploadTooltip
-                         [container]="uploadContainer"
-                         [showTipPointer]="false"
-                         opensOn="Custom"
-                         position="TopLeft" width="100%">
-              <ng-template #content>
-                <div class="file-upload-area-container"
-                     appClickOutside
-                     (clickOutside)="uploadTooltip.close()"
-                     [exclude]="uploadBtn.element"
-                >
-                  <h2>Upload Documents</h2>
-                  <div class="upload-area" #uploadArea>
-                    <div class="droparea" #dropEl (click)="browse()">
-                      <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
-                    </div>
-                    <ejs-uploader #uploader
-                                  [dropArea]="dropEl"
-                                  [allowedExtensions]="allowedFileExtensions"
-                                  [maxFileSize]="maxFileSize"
-                                  [multiple]="true"
-                                  [autoUpload]="false"
-                                  [showFileList]="false"
-                                  (selected)="onFilesSelected($event, timesheetDetails.organizationId)">
-                    </ejs-uploader>
-                  </div>
-                </div>
-              </ng-template>
-            </ejs-tooltip>
+            <app-upload-button [container]="uploadContainer"
+                              (filesSelected)="onFilesSelected($event)"
+            ></app-upload-button>
 
             <app-export-button
                     (csvExport)="exportProfileDetails(exportedFileType.csv)"
@@ -106,19 +86,6 @@
             ></ejs-switch>
             <span>DNW</span>
           </div>
-
-          <button
-            *ngIf="!isAgency"
-            ejs-button cssClass="e-outline"
-            class="reject-button"
-            (click)="onRejectButtonClick()">Reject
-          </button>
-
-          <button ejs-button cssClass="e-primary"
-                  [disabled]="actionButtonDisabled"
-                  (click)="handleApprove()">
-            {{submitText}}
-          </button>
         </div>
       </div>
 
@@ -155,11 +122,13 @@
 
       <section class="profile-table-container">
         <app-profile-timesheet-table
-          [timesheetId]="timesheetId"
           [isAgency]="isAgency"
+          [timesheetDetails]="timesheetDetails"
           [actionsDisabled]="timesheetDetails.noWorkPerformed"
           (openAddSideDialog)="openAddDialog($event)"
           (changesSaved)="handleEditChanges($event)"
+          (rejectEvent)="onRejectButtonClick($event)"
+          (approveEvent)="handleApprove($event)"
         >
         </app-profile-timesheet-table>
       </section>

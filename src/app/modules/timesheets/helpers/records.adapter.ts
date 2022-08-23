@@ -1,7 +1,7 @@
 import { DateTimeHelper } from '@core/helpers';
-import { RecordFields } from './../enums';
+import { RecordFields, RecordsMode } from './../enums';
 import {
-  AddRecordDto, AddTimsheetForm, PutRecord, PutRecordDto, RecordValue, TimesheetRecordsDto,
+  AddRecordDto, AddTimsheetForm, PutRecord, PutRecordDto, RawTimsheetRecordsDto, RecordValue, TimesheetRecordsDto,
 } from '../interface';
 import { MapedRecordsType } from '../constants';
 
@@ -35,17 +35,52 @@ export class RecordsAdapter {
     }
   }
 
-  static adaptRecordsDto(data: TimesheetRecordsDto): TimesheetRecordsDto {
-    data.timesheets.forEach((item: RecordValue) => {
-      item.day = item['timeIn'] as string
-    });
-    data.miles.forEach((item: RecordValue) => {
-      item.day = item['timeIn'] as string;
-    });
-    data.expenses.forEach((item: RecordValue) => {
-      item.day = item['timeIn'] as string;
-    });
-    return data;
+  static adaptRecordsDto(data: RawTimsheetRecordsDto): TimesheetRecordsDto {
+    const records: TimesheetRecordsDto = {
+      [RecordFields.Time]: {
+        [RecordsMode.Edit]: data.timesheets.map((item: RecordValue) => {
+          const record = item;
+          record.day = item['timeIn'] as string;
+
+          return record;
+        }),
+        [RecordsMode.View]: data.timesheetsCalculated.map((item: RecordValue) => {
+          const record = item;
+          record.day = item['timeIn'] as string;
+
+          return record;
+        }),
+      },
+      [RecordFields.Miles]: {
+        [RecordsMode.Edit]: data.miles.map((item: RecordValue) => {
+          const record = item;
+          record.day = item['timeIn'] as string;
+
+          return record;
+        }),
+        [RecordsMode.View]: data.milesCalculated.map((item: RecordValue) => {
+          const record = item;
+          record.day = item['timeIn'] as string;
+
+          return record;
+        }),
+      },
+      [RecordFields.Expenses]: {
+        [RecordsMode.Edit]: data.expenses.map((item: RecordValue) => {
+          const record = item;
+          record.day = item['timeIn'] as string;
+
+          return record;
+        }),
+        [RecordsMode.View]: data.expensesCalculated.map((item: RecordValue) => {
+          const record = item;
+          record.day = item['timeIn'] as string;
+
+          return record;
+        }),
+      }
+    };
+    return records;
   }
 
   static adaptRecordsDiffs(records: RecordValue[], diffs: RecordValue[], deleteIds: number[]): RecordValue[] {

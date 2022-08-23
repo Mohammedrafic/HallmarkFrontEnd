@@ -1,4 +1,4 @@
-<div class="actions-container" *ngIf="editable">
+<div class="actions-container" *ngIf="editable" [ngClass]="{ 'disabled': isDeletable}">
   <button ejs-button [disabled]="isDeletable" cssClass="e-flat secondary-icon-button" (click)="deleteRecord()">
     <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
   </button>

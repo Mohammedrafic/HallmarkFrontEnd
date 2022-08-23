@@ -3,6 +3,8 @@ import { TimesheetStatistics } from './timesheet-statistics.interface';
 import { Attachment } from '@shared/components/attachments/models/attachment.interface';
 import { TimesheetInvoice } from './timesheet-invoice.interface';
 import { RecordValue } from './common.interface';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ExportColumn } from '@shared/models/export.model';
 
 export interface DetailsColumnConfig {
   align: TableColumnAlign;
@@ -53,8 +55,14 @@ export interface CostCenterOption {
 
 export interface TimesheetDetailsModel {
   id: number;
-  statusText: string
+  statusText: string;
   status: number;
+  mileageStatusText: string;
+  mileageStatus: number;
+  canApproveMileage: boolean;
+  canApproveTimesheet: boolean;
+  canEditMileage: boolean;
+  canEditTimesheet: boolean;
   rejectionReason?: string;
   organizationId: number;
   candidateId: number;
@@ -80,7 +88,19 @@ export interface TimesheetDetailsModel {
   invoices: TimesheetInvoice[];
   weekEndDate: string;
   weekStartDate: string;
-  isNotExist?: boolean;  
+  candidateWorkPeriods: WorkWeek<string>[];
+  isNotExist?: boolean;
+}
+
+export interface WorkWeek<T> {
+  weekStartDate: T;
+  weekEndDate: T;
+}
+
+export interface CustomExport {
+  columns: ExportColumn[];
+  fileName: string;
+  fileType: ExportedFileType;
 }
 
 export interface OpenAddDialogMeta {

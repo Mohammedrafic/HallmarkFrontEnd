@@ -16,6 +16,7 @@ import { ChartAccumulation, DonutChartData } from '../../models/chart-accumulati
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 import { DashboardService } from '../../services/dashboard.service';
 import { WidgetLegengDataModel } from '../../models/widget-legend-data.model';
+import { LegendPositionEnum } from '../../enums/legend-position.enum';
 
 @Component({
   selector: 'app-accumulation-chart',
@@ -33,6 +34,7 @@ export class AccumulationChartComponent
   public filteredChartData$: Observable<DonutChartData[]>;
   public legendData: WidgetLegengDataModel[] = [];
   public totalScore: number = 0;
+  public legendPosition: LegendPositionEnum = LegendPositionEnum.Right;
 
   public readonly tooltipSettings: TooltipSettingsModel = {
     enable: true,

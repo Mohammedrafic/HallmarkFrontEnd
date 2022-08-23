@@ -15,18 +15,24 @@ export class ExtensionGridComponent {
   @Input() public data: any = [];
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = [
-    { field: 'id', headerName: 'Extension ID', cellRenderer: ExtensionGridIdRendererComponent, maxWidth: 100 },
+    {  
+      headerName: 'Extension ID', 
+      cellRenderer: ExtensionGridIdRendererComponent, 
+      maxWidth: 140,
+      valueGetter: (params) => `${params.data.organizationPrefix}-${params.data.publicId}`,
+    },
     {
       field: 'statusText',
       headerName: 'Status',
       cellRenderer: ExtensionGridStatusRendererComponent,
       flex: 1,
+      minWidth: 185,
     },
     {
       field: 'billRate',
       headerName: 'Bill Rate $',
       valueFormatter: (params: ValueFormatterParams) => `$${params.data.billRate}`,
-      maxWidth: 100,
+      maxWidth: 130,
     },
     {
       field: 'actualStartDate',

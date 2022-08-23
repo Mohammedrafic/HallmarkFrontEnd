@@ -28,10 +28,9 @@
     
   </app-page-toolbar>
   
-  <section class="role-and-permissions last-content-section-padding">  
-      <ag-grid-angular #agGridPagination
-                      style="width: 100%; height: 550px;"
-                      class="ag-theme-alpine"
+  <section class="last-content-section-padding">  
+      <ag-grid-angular #agGridPagination                      
+                      class="ag-theme-alpine user-subscription-grid"
                       [animateRows]="true"
                       [columnDefs]="columnDefs"
                       [defaultColDef]="defaultColDef"

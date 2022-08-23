@@ -1,0 +1,36 @@
+<div [formGroup]="addEditOnScreenTemplateForm" id="addEditOnScreenTemplateForm" class="onScreen-template-form">
+    <div class="section-container">
+        <div class="left-section">
+            <div class="input-container bootstrap top-container">
+                <label>Title<span class="required">*</span></label>
+                <div class="input-group">
+                    <input appValidateWithMessage formControlName="alertTitle" class="e-input" type="text" [(ngModel)]="alertTitle"/>
+                </div>
+            </div>
+            <div class="rich-text-container">
+                <label>Text<span class="required">*</span></label>
+                <div class="input-group">
+                    <ejs-richtexteditor #OnScreenRTE id='onScreenDefaultRTE' appValidateWithMessage formControlName="alertBody"
+                        [toolbarSettings]='tools' [(ngModel)]='alertBody' [(value)]='alertBody' [showCharCount]='true' [maxLength]='200'>
+                    </ejs-richtexteditor>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="right-section">
+
+            <div class="input-container bootstrap top-container">
+                <div class="input-group">
+                </div>
+            </div>
+
+            <div class="input-container bootstrap">
+                <label>Attributes</label>
+                <div>
+                    <ejs-listview id="onScreenListbox" [dataSource]='templateParamsData'>
+                    </ejs-listview>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

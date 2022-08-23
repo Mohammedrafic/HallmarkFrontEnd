@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AlertsTemplateComponent } from './alerts-template/alerts-template.component';
 import { AlertsComponent } from './alerts.component';
 import { UserSubscriptionComponent } from './user-subscription/user-subscription.component';
 
@@ -12,6 +13,10 @@ const routes: Routes = [
       {
         path: 'user-subscription',
         component: UserSubscriptionComponent,
+      },
+      {
+        path: 'alerts-template',
+        component: AlertsTemplateComponent,
       }
      
     ],

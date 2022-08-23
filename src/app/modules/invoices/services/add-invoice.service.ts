@@ -7,7 +7,7 @@ export class AddInvoiceService {
     private fb: FormBuilder,
   ) {}
 
-  public createForm(): FormGroup {
+  public createForm(isAgency: boolean): FormGroup {
     return this.fb.group({
       orderId: [null, Validators.required],
       nameId: [null, Validators.required],
@@ -15,7 +15,8 @@ export class AddInvoiceService {
       locationId: [null, Validators.required],
       departmentId: [null, Validators.required],
       date: ['', Validators.required],
-      value: [null, [Validators.required, Validators.min(1), Validators.max(Number.MAX_SAFE_INTEGER)]],
+      value: [null, [Validators.required, Validators.min(-Number.MAX_SAFE_INTEGER),
+        Validators.max(Number.MAX_SAFE_INTEGER)]],
       reasonId: [null],
       link: [null],
       vendorFee: [true],

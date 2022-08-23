@@ -45,8 +45,7 @@
           <ejs-accordion
             #accordionElement
             expandMode="Single"
-            (expanding)="toForbidExpandSecondRow($event)"
-            (clicked)="clickedOnAccordion($event)"
+            openFirstAccordion
           >
             <e-accordionitems>
               <e-accordionitem expanded="true">
@@ -77,11 +76,18 @@
       </section>
 
       <section class="bill-rates">
-        <app-bill-rates #billRates
-                        [billRates]="orderCandidateJob?.billRates || []"
-                        [isActive]="isActiveCandidateDialog$ | async"
-                        (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)">
-        </app-bill-rates>
+        <app-bill-rates-view-grid
+          *ngIf="billRatesViewMode; else editBlock"
+          [billRatesData]="orderCandidateJob?.billRates || []"
+        ></app-bill-rates-view-grid>
+        <ng-template #editBlock>
+          <app-bill-rates
+            *ngIf="!isAgency"
+            [billRates]="orderCandidateJob?.billRates || []"
+            [isActive]="isActiveCandidateDialog$ | async"
+            (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)">
+          </app-bill-rates>
+        </ng-template>
       </section>
     </section>
   </ng-template>

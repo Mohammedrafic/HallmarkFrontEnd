@@ -15,6 +15,7 @@ import { JobOrderComponent } from './workflow/job-order/job-order.component';
 import { BillRatesComponent } from './bill-rates/bill-rates.component';
 import { ReasonsComponent } from './reasons/reasons.component';
 import { RegionsComponent } from './regions/regions.component';
+import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
 
 const routes: Routes = [
   {
@@ -113,6 +114,13 @@ const routes: Routes = [
       {
         path: 'reasons',
         component: ReasonsComponent,
+        data: {
+          isOrganizationArea: true
+        }
+      },
+      {
+        path: 'specialproject',
+        component: SpecialProjectContainerComponent,
         data: {
           isOrganizationArea: true
         }

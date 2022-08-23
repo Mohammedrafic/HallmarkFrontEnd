@@ -13,6 +13,11 @@
     display: none;
   }
 
+  &.disabled {
+    cursor: default;
+    pointer-events: none;
+  }
+
   .browse-link {
     text-decoration: underline;
     font-weight: 700;

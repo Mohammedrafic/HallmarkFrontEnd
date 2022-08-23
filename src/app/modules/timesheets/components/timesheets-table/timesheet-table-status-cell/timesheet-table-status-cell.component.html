@@ -1,4 +1,4 @@
-<div class="status-cell">
+<div *ngIf="cellValue" class="status-cell">
   <ejs-chiplist>
     <e-chips>
       <e-chip [text]="cellValue" [cssClass]="(cellValue | chipsCssClass)"></e-chip>

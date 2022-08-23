@@ -28,7 +28,7 @@
           </div>
         </div>
       </section>
-      <section class="form-container">
+      <section class="form-container" *ngIf="showForm">
         <form [formGroup]="form">
           <div class="dropdown-container bootstrap">
             <label>Organization<span class="required">*</span></label>

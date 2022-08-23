@@ -1,12 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {
-  CandidateCredential,
-  CandidateCredentialPage,
-  CredentialGroupedFiles,
-} from '@shared/models/candidate-credential.model';
-import { CredentialType } from '@shared/models/credential-type.model';
-import { Credential } from '@shared/models/credential.model';
+
+import { CredentialVerifiedStatus } from "@shared/enums/status";
+import { CandidateCredential, CandidateCredentialPage, CredentialGroupedFiles } from "@shared/models/candidate-credential.model";
+import { CandidateImportRecord, CandidateImportResult } from "@shared/models/candidate-profile-import.model";
+import { CredentialType } from "@shared/models/credential-type.model";
+import { Credential } from "@shared/models/credential.model";
 import { Observable } from 'rxjs';
 import { Candidate } from 'src/app/shared/models/candidate.model';
 import { Education } from 'src/app/shared/models/education.model';
@@ -177,6 +176,14 @@ export class CandidateService {
   }
 
   /**
+   * Get credential statuses
+   * @return list of credential statuses
+   */
+  public getCredentialStatuses(): Observable<CredentialVerifiedStatus[]> {
+    return this.http.get<CredentialVerifiedStatus[]>(`/api/CandidateCredentials/credentialStatuses`);
+  }
+
+  /**
    * Save credential files in blob storage
    * @return
    */
@@ -217,6 +224,28 @@ export class CandidateService {
    * @return blob
    */
   public getCandidateProfileTemplate(): Observable<any> {
-    return this.http.get('/api/CandidateProfile/template', { responseType: 'blob' });
+    return this.http.post('/api/CandidateProfile/template', [],{ responseType: 'blob' });
+  }
+
+  /**
+   * Get Candidate Profile Errors
+   * @return blob
+   */
+  public getCandidateProfileErrors(errorRecords: CandidateImportRecord[]): Observable<any> {
+    return this.http.post('/api/CandidateProfile/template', errorRecords, { responseType: 'blob' });
+  }
+
+  /**
+   * Upload Candidate Profile File
+   * @return CandidateImportResult
+   */
+  public uploadCandidateProfileFile(file: Blob): Observable<CandidateImportResult> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<CandidateImportResult>('/api/CandidateProfile/import', formData);
+  }
+
+  public saveCandidateImportResult(successfullRecords: CandidateImportRecord[]): Observable<CandidateImportResult> {
+    return this.http.post<CandidateImportResult>('/api/CandidateProfile/saveimport', successfullRecords);
   }
 }

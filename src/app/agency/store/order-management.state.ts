@@ -203,7 +203,7 @@ export class OrderManagementState {
     private extensionSidebarService: ExtensionSidebarService
   ) {}
 
-  @Action(GetAgencyOrdersPage)
+  @Action(GetAgencyOrdersPage, { cancelUncompleted: true })
   GetAgencyOrdersPage(
     { patchState }: StateContext<OrderManagementModel>,
     { pageNumber, pageSize, filters }: GetAgencyOrdersPage

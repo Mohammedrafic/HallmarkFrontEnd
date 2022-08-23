@@ -11,6 +11,8 @@ import { GridDayComponent } from '../components/cell-editors/grid-day/grid-day.c
 import { GridValuesHelper } from '../helpers/grid-values.helper';
 import { InputEditorComponent } from '../components/cell-editors/input-editor/input-editor.component';
 import { EditFieldTypes } from '@core/enums';
+import { RecordStatusCellComponent } from '../components/cell-editors/record-status-cell/record-status-cell.component';
+import { TimesheetDetailsModel } from '../interface';
 
 const commonColumn: ColDef = {
   filter: true,
@@ -58,6 +60,7 @@ const amountColdef = (headerText: string): ColDef => (
   {
     field: 'value',
     headerName: headerText,
+    resizable: true,
     type: 'rightAligned',
     ...commonColumn,
     cellClass: 'common-cell',
@@ -69,8 +72,8 @@ const actionCol: ColDef = {
   field: 'id',
   headerName: '',
   type: 'rightAligned',
-  resizable: false,
-  width: 60,
+  flex: 1,
+  resizable: true,
   cellRenderer: ActionsCellComponent,
   cellRendererParams: {
     editMode: true,
@@ -99,8 +102,17 @@ const billRateTypeStatic: ColDef = {
   type: 'rightAligned',
 };
 
-export const TimesheetRecordsColdef: ColDef[] = [
+const recordStatusCell: ColDef = {
+  field: 'stateText',
+  headerName: 'Status',
+  ...commonColumn,
+  width: 140,
+  cellRenderer: RecordStatusCellComponent,
+}
+
+export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  ([
   dayColDef,
+  ...(isStatusAvaliable ? [recordStatusCell] : []),
   {
     field: 'timeIn',
     headerName: 'Time in',
@@ -129,35 +141,22 @@ export const TimesheetRecordsColdef: ColDef[] = [
   },
   editableCostCenterDef,
   {
-    field: 'billRateConfigId',
+    field: 'billRateConfigName',
     headerName: 'Bill rate type',
     ...commonColumn,
     width: 180,
     filterValueGetter: (value) => { return value.data.billRateConfigName },
-    cellRenderer: DropdownEditorComponent,
     type: 'rightAligned',
-    cellRendererParams: {
-      editMode: true,
-      isEditable: false,
-      options: [],
-      storeField: 'billRateTypes',
-    }
   },
   amountColdef('Hours'),
   billRateColDef,
   totalCol,
   actionCol,
-];
+]);
 
-export const submitTimesheetDialogData = {
-  title: 'Submit Timesheet',
-  submitButtonText: 'Submit',
-  confirmMessage: 'Are you sure you want to submit this timesheet?',
-  successMessage: 'Success. Timesheet Submitted',
-};
-
-export const MilesRecordsColDef: ColDef[] = [
+export const MilesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
   dayColDef,
+  ...(isStatusAvaliable ? [recordStatusCell] : []),
   {
     ...editableCostCenterDef,
     width: 220,
@@ -186,10 +185,11 @@ export const MilesRecordsColDef: ColDef[] = [
     width: 200,
   },
   actionCol,
-];
+]);
 
-export const ExpensesRecordsColDef: ColDef[] = [
+export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
   dayColDef,
+  ...(isStatusAvaliable ? [recordStatusCell] : []),
   editableCostCenterDef,
   {
     ...billRateTypeStatic,
@@ -211,11 +211,15 @@ export const ExpensesRecordsColDef: ColDef[] = [
     }
   },
   {
-    ...amountColdef('Amount'),
+    field: 'total',
+    headerName: 'Amount',
+    type: 'rightAligned',
+    ...commonColumn,
+    cellClass: 'common-cell',
     width: 200,
     cellRenderer: InputEditorComponent,
     valueFormatter: (data) => {
-      if(!data.value) return 'ERROR'
+      if(!data.value) return '0'
       return GridValuesHelper.formatCurrency(data.value)
     },
     cellRendererParams: {
@@ -226,9 +230,9 @@ export const ExpensesRecordsColDef: ColDef[] = [
     }
   },
   actionCol,
-];
+]);
 
-export const TimesheetRecordsColConfig: Record<string, ColDef[]>  = {
+export const TimesheetRecordsColConfig: Record<string, ((isStatusAvaliable: boolean) => ColDef[])>  = {
   [RecordFields.Time]: TimesheetRecordsColdef,
   [RecordFields.Miles]: MilesRecordsColDef,
   [RecordFields.Expenses]: ExpensesRecordsColDef,
@@ -258,3 +262,10 @@ export const rejectTimesheetDialogData = {
 };
 
 export const rejectReasonMaxLength: number = 250;
+
+export const submitTimesheetDialogData = {
+  title: 'Submit Timesheet',
+  submitButtonText: 'Submit',
+  confirmMessage: 'Are you sure you want to submit this timesheet?',
+  successMessage: 'Success. Timesheet Submitted',
+};

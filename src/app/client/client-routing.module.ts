@@ -9,6 +9,7 @@ import { ReportsContentComponent } from './reports/reports-content/reports-conte
 import { ClientComponent } from './client.component';
 import { AddEditOrderComponent } from './order-management/add-edit-order/add-edit-order.component';
 import { UnsavedOrderChangesGuard } from './guards/unsaved-order-changes.guard';
+import { CandidateDetailsComponent } from '@shared/components/candidate-details/candidate-details.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -89,6 +90,13 @@ const routes: Routes = [
           ),
         //     canLoad: [ AdminGuard ],
         //     canActivate: [ AdminGuard ]
+      },
+      {
+        path: 'candidate-details',
+        component: CandidateDetailsComponent,
+        data: {
+          isOrganizationArea: true,
+        },
       },
     ],
   },

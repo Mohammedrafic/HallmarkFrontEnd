@@ -4,7 +4,7 @@ import { SkillCategory } from "src/app/shared/models/skill-category.model";
 import { Skill, SkillFilters } from "src/app/shared/models/skill.model";
 import { Department, DepartmentFilter } from '@shared/models/department.model';
 import { Location, LocationFilter } from '@shared/models/location.model';
-import { Region } from '@shared/models/region.model';
+import { Region, regionFilter } from '@shared/models/region.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialFilter } from '@shared/models/credential.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
@@ -78,7 +78,7 @@ export class DeleteDepartmentById {
 
 export class GetRegions {
   static readonly type = '[organizationManagement] Get The List Of Regions';
-  constructor() { }
+  constructor(public filter?: regionFilter) { }
 }
 
 export class SaveRegion {
@@ -320,6 +320,10 @@ export class ExportLocations {
   static readonly type = '[organizationManagement] Export Location list';
   constructor(public payload: ExportPayload) { }
 }
+export class ExportRegions {
+  static readonly type = '[organizationManagement] Export Region list';
+  constructor(public payload: ExportPayload) { }
+}
 
 export class ExportDepartments {
   static readonly type = '[organizationManagement] Export Department list';
@@ -344,6 +348,11 @@ export class GetAllOrganizationSkills {
 export class GetLocationFilterOptions {
   static readonly type = '[organizationManagement] Get Location Filter Options';
   constructor(public payload: number) { }
+}
+
+export class GetRegionFilterOptions {
+  static readonly type = '[organizationManagement] Get region Filter Options';
+  constructor(public payload: any) { }
 }
 
 export class GetDepartmentFilterOptions {

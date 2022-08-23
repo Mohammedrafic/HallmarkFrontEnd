@@ -19,6 +19,7 @@ import { AlertsState } from '@admin/store/alerts.state';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { SetHeaderState } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-user-subscription',
@@ -47,6 +48,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public defaultColDef:any;
   public autoGroupColumnDef:any;
   public userSubscriptionFilterFormGroup: FormGroup = this.userSubscriptionFilterService.generateFiltersForm();
+  public title: string = "User Subscription";
   itemList: Array<UserSubscription> | undefined;
   private gridApi : any;
   private gridColumnApi: any;
@@ -73,6 +75,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   constructor(private userSubscriptionFilterService: UserSubscriptionFilterService,private actions$: Actions, 
     private store: Store) {
     super();
+    store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
     this.rowModelType = 'serverSide';
     this.serverSideInfiniteScroll = true,
     this.pagination = true;

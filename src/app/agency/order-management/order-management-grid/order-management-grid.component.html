@@ -48,7 +48,7 @@
           <button *ngIf="isLockMenuButtonsShown" ejs-button cssClass="e-flat" [disabled]="true">
             <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
           </button>
-          <button ejs-button cssClass="e-flat default-icon-button with-badge">
+          <button ejs-button cssClass="e-flat default-icon-button with-badge" (click)="openDetailsTab = true">
             <span><i-feather name="message-square" class="icon"></i-feather></span>
             <span *ngIf="data.unreadComments" class="e-badge e-badge-success e-badge-pill right-overflow">{{ data.unreadComments }}</span>
           </button>
@@ -96,10 +96,11 @@
     </e-column>
     <e-column field="status" headerText="STATUS" width="152">
       <ng-template #template let-data>
-        <div class="status-cell">
+        <div class="status-cell" [class.ex-chip]="data?.extensionFromId">
           <ejs-chiplist>
             <e-chips>
               <e-chip [text]="data.statusText" [cssClass]="data.statusText | chipsCssClass"></e-chip>
+              <e-chip *ngIf="data?.extensionFromId" text="Ex" cssClass="e-warning ex"></e-chip>
             </e-chips>
           </ejs-chiplist>
         </div>
@@ -241,6 +242,7 @@
   #detailsDialog
   [order]="selectedOrder"
   [openEvent]="openPreview"
+  [openDetailsTab]="openDetailsTab"
   [openCandidateTab]="!!previousSelectedOrderId"
   (compareEvent)="onCompare()"
   (selectReOrder)="selectReOrder($event)"

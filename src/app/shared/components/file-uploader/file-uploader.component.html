@@ -1,0 +1,17 @@
+<div class="uploader-container" #uploadArea>
+  <div class="droparea" #droparea (click)="browseFiles()">
+    <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
+  </div>
+  <ejs-uploader
+    #fileUploader
+    [class.hide-selected-files]="!showSelectedFiles"
+    [dropArea]="droparea"
+    [allowedExtensions]="allowedFileExtensions"
+    [maxFileSize]="maxFileSize"
+    [multiple]="true"
+    [autoUpload]="false"
+    [showFileList]="true"
+    (selected)="filesSelected($event)"
+    (removing)="removeFile($event)"
+  ></ejs-uploader>
+</div>

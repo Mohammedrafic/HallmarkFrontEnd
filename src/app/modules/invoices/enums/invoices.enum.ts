@@ -7,6 +7,7 @@ export enum INVOICES_STATUSES {
 
 export enum INVOICES_ACTIONS {
   GET = '[invoices] GET',
+  GET_PENDING_INVOICES = '[invoices] GET PENDING INVOICES',
   TOGGLE_INVOICE_DIALOG = '[invoices] TOGGLE INVOICE DIALOG',
   ToggleManualInvoice = '[invoices] toggle manual invoice dialog',
   UPDATE_FILTERS_STATE = '[invoices] UPDATE FILTERS STATE',
@@ -19,6 +20,10 @@ export enum INVOICES_ACTIONS {
   GetOrganizations = '[invoices] Get organizations',
   GetOrganizationStructure = '[invoices] Get organization structure',
   SelectOrganization = '[invoices] Select another organization',
+  ClearManInvoiceAttachments = '[invoices] clear manual invoice attachments',
+  ApproveInvoice = '[invoices] Approve Invoice',
+  SubmitInvoice = '[invoices] Submit Invoice',
+  RejectInvoice = '[invoices] Reject Invoice',
 }
 
 export enum InvoicesTableFiltersColumns {

@@ -89,6 +89,13 @@ import { ImportCandidatesComponent } from './candidates/import-candidates/import
 import { MultiselectDropdownModule } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module';
 import { CandidateListModule } from '@shared/components/candidate-list/candidate-list.module';
 import { ChildOrderDialogModule } from '@shared/components/child-order-dialog/child-order-dialog.module';
+import { CandidateProfileComponent } from './candidates/import-candidates/candidate-profile/candidate-profile.component';
+import { GridModule } from '@shared/components/grid/grid.module';
+import { CandidateEducationComponent } from './candidates/import-candidates/candidate-education/candidate-education.component';
+import { CandidateExperienceComponent } from './candidates/import-candidates/candidate-experience/candidate-experience.component';
+import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
+import { GridErroredCellComponent } from './candidates/import-candidates/grid-errored-cell/grid-errored-cell.component';
+import { ExtensionModule } from '@shared/components/extension/extension.module';
 
 const sidebarIcons = {
   Sliders,
@@ -154,13 +161,19 @@ const sidebarIcons = {
     AgencyOrderFiltersComponent,
     AgencyListFiltersComponent,
     ImportCandidatesComponent,
+    CandidateProfileComponent,
+    CandidateEducationComponent,
+    CandidateExperienceComponent,
+    GridErroredCellComponent,
   ],
   imports: [
     CommonModule,
     AgencyRoutingModule,
     SharedModule,
     ReactiveFormsModule,
+
     SwitchModule,
+    GridModule,
     PdfViewerModule,
     ListBoxModule,
     ButtonModule,
@@ -182,6 +195,8 @@ const sidebarIcons = {
     MaskedTextBoxModule,
     DropDownButtonModule,
     AddEditReorderModule,
+    CandidateDetailsModule,
+    ExtensionModule,
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),
