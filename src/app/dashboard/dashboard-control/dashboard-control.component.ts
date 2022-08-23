@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter, OnInit
 import { Router } from '@angular/router';
 
 import { Store, Actions, ofActionDispatched, Select } from '@ngxs/store';
-import { Observable, map, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Observable, map, distinctUntilChanged, takeUntil, Subject } from 'rxjs';
 
 import { ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -41,6 +41,7 @@ export class DashboardControlComponent extends DestroyableDirective implements O
   @Select(UserState.organizationStructure) public readonly organizationStructure$: Observable<OrganizationStructure>;
 
   public readonly isDialogOpened$: Observable<boolean> = this.isDialogOpened();
+  public readonly isOpenQuickOrderDialod$: Subject<boolean> = new Subject<boolean>();
   public orderedFilters: Record<FilterName, FilteredItem[]>;
 
   constructor(
@@ -71,7 +72,7 @@ export class DashboardControlComponent extends DestroyableDirective implements O
   }
 
   public onCreateOrder(): void {
-    this.router.navigateByUrl('/client/order-management/add');
+    this.isOpenQuickOrderDialod$.next(true);
   }
 
   private toPutInOrderFilters(filters: FilteredItem[]): void {

@@ -114,4 +114,38 @@ export class RejectReasonService {
 
     return <HttpParams>params;
   }
+
+  /**
+   * Remove order requisition
+   * @param id
+   */
+  public removeOrderRequisition(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/OrderRequisition/${id}`);
+  }
+  
+  /**
+   * Get order requisitions by page number
+   * @param pageNumber
+   * @param pageSize
+   * @param orderBy
+   */
+  public getOrderRequisitionsByPage(pageNumber?: number, pageSize?: number, orderBy?: string): Observable<RejectReasonPage> {
+    const params = this.getCloseReasonsParams(pageNumber, pageSize, orderBy);
+
+    return this.http.post<RejectReasonPage>(`/api/OrderRequisition/all`,
+      { params }
+    );
+  }
+
+  /**
+   * Save order requisition
+   * @param payload
+   */
+  public saveOrderRequisitions(payload: RejectReason): Observable<RejectReason> {
+    payload.id = payload.id || 0;
+    if (payload.id) {
+      return this.http.put<RejectReason>('/api/OrderRequisition', payload);
+    }
+    return this.http.post<RejectReason>('/api/OrderRequisition', payload);
+  }
 }

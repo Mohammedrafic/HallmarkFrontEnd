@@ -9,7 +9,7 @@ import { Order } from '@shared/models/order-management.model';
 import { Observable, takeUntil } from 'rxjs';
 import { OrderType } from '@shared/enums/order-type';
 import { OrderManagementService } from '../order-management-content/order-management.service';
-import { OrderStatus } from "@shared/enums/order-management";
+import { OrderStatus } from '@shared/enums/order-management';
 
 @Component({
   selector: 'app-order-candidates-container',

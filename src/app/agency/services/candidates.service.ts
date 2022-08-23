@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { CredentialVerifiedStatus } from "@shared/enums/status";
 import { CandidateCredential, CandidateCredentialPage, CredentialGroupedFiles } from "@shared/models/candidate-credential.model";
 import { CandidateImportRecord, CandidateImportResult } from "@shared/models/candidate-profile-import.model";
 import { CredentialType } from "@shared/models/credential-type.model";
@@ -172,6 +173,14 @@ export class CandidateService {
    */
   public getCredentialTypes(): Observable<CredentialType[]> {
     return this.http.get<CredentialType[]>(`/api/CredentialTypes/all`);
+  }
+
+  /**
+   * Get credential statuses
+   * @return list of credential statuses
+   */
+  public getCredentialStatuses(): Observable<CredentialVerifiedStatus[]> {
+    return this.http.get<CredentialVerifiedStatus[]>(`/api/CandidateCredentials/credentialStatuses`);
   }
 
   /**

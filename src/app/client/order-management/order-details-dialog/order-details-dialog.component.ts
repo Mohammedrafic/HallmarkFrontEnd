@@ -42,6 +42,8 @@ import { ShowCloseOrderDialog, ShowSideDialog } from '../../../store/app.actions
 import { AddEditReorderComponent } from '@client/order-management/add-edit-reorder/add-edit-reorder.component';
 import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
+import { SettingsKeys } from '@shared/enums/settings';
+import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -52,6 +54,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() order: Order;
   @Input() openEvent: Subject<boolean>;
   @Input() children: OrderManagementChild[] | undefined;
+  @Input() settings: {[key in SettingsKeys]?: OrganizationSettingsGet};
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
@@ -75,8 +78,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public readonly isReOrderDialogOpened$: Observable<boolean> = this.isDialogOpened();
 
+  candidateOrderPage: OrderCandidatesListPage;
   private unsubscribe$: Subject<void> = new Subject();
 
+  public SettingsKeys = SettingsKeys;
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
@@ -292,6 +297,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   private subscribeOnOrderCandidatePage(): void {
     this.orderCandidatePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: OrderCandidatesListPage) => {
+      this.candidateOrderPage = order;
       this.candidatesCounter =
         order &&
         order.items?.filter(

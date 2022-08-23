@@ -61,7 +61,7 @@
               cssClass="e-outline"
               *ngIf="orderType.OpenPerDiem === order?.orderType"
               (click)="createReOrder()"
-              [disabled]="order?.status === orderStatus.PreOpen || order?.status === orderStatus.Closed"
+              [disabled]="order?.status === orderStatus.PreOpen || order?.status === orderStatus.Closed || !settings[SettingsKeys.IsReOrder]?.value"
             >
               Create Re-Order
             </button>
@@ -105,7 +105,14 @@
                 <span class="e-badge e-badge-success e-badge-circle">{{ candidatesCounter }}</span>
               </ng-template>
               <ng-template #content>
-                <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>
+                <app-extension-candidate
+                  [currentOrder]="order"
+                  [candidateOrder]="candidateOrderPage"
+                  *ngIf="order.extensionFromId; else candidateOrder">
+                </app-extension-candidate>
+                <ng-template #candidateOrder>
+                  <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>
+                </ng-template>
               </ng-template>
             </e-tabitem>
             <e-tabitem *ngIf="orderType.OpenPerDiem === order?.orderType">
