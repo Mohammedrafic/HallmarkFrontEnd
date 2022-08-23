@@ -1,19 +1,11 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewChild
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
+  Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { filter, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
@@ -23,28 +15,16 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
 import { AttachmentsListConfig } from '@shared/components/attachments';
-import { SubmitBtnText, TimesheetTargetStatus } from '../../enums';
+import { TimesheetTargetStatus } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import {
-  CandidateMilesData,
-  ChangeStatusData,
-  CustomExport,
-  DialogActionPayload,
-  OpenAddDialogMeta,
-  Timesheet,
-  TimesheetDetailsModel,
-  WorkWeek,
-} from '../../interface';
-import {
-  ConfirmDeleteTimesheetDialogContent,
-  rejectTimesheetDialogData,
-  TimesheetConfirmMessages,
-  TimesheetDetailsExportOptions
-} from '../../constants';
+import { CandidateMilesData, ChangeStatusData, CustomExport, DialogActionPayload, OpenAddDialogMeta,
+  Timesheet, TimesheetDetailsModel, WorkWeek, } from '../../interface';
+import { ConfirmDeleteTimesheetDialogContent, rejectTimesheetDialogData, TimesheetConfirmMessages,
+  TimesheetDetailsExportOptions } from '../../constants';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
-import { TimesheetDetailsService } from '../../services/timesheet-details.service';
+import { TimesheetDetailsService } from '../../services';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import { FileForUpload } from '@core/interface';
 
@@ -67,6 +47,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @ViewChild('dnwSwitch')
   public dnwSwitch: SwitchComponent;
 
+  @ViewChild('tooltip')
+  public tooltip: TooltipComponent;
+
   @Input() currentSelectedRowIndex: number | null = null;
 
   @Input() maxRowIndex: number = 30;
@@ -77,8 +60,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public isAgency: boolean;
 
-  public submitText: string;
-
   public fileName: string = '';
 
   public isChangesSaved = true;
@@ -87,6 +68,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public timesheetId: number;
 
+  public mileageTimesheetId: number;
+
   public organizationId: number | null = null;
 
   public weekPeriod: [Date, Date] = [new Date(), new Date()];
@@ -94,8 +77,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public workWeeks: WorkWeek<Date>[];
 
   public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
-
-  public actionButtonDisabled = false;
 
   private jobId: number;
 
@@ -117,6 +98,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public attachmentsListConfig$: Observable<AttachmentsListConfig>;
 
+  /**
+   * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
+   * */
+  private isTimesheetOrMileagesUpdate: boolean = true;
+
   constructor(
     private store: Store,
     private route: ActivatedRoute,
@@ -129,7 +115,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   ) {
     super();
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
-    this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
     this.attachmentsListConfig$ = this.timesheetDetails$.pipe(
       map(({id}) => this.timesheetDetailsService.getAttachmentsListConfig(id, this.organizationId, this.isAgency))
     )
@@ -188,8 +173,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     }
   }
 
-  public onRejectButtonClick(): void {
+  public onRejectButtonClick(isTimesheetOrMileagesUpdate: boolean): void {
     this.rejectReasonDialogVisible = true;
+    this.isTimesheetOrMileagesUpdate = isTimesheetOrMileagesUpdate;
+  }
+
+  public beforeRender(e: { target: HTMLElement }): void {
+    const parent = e.target.parentNode as ParentNode;
+    this.tooltip.content = Array.from(parent.children).indexOf(e.target)
+      ? 'Miles Status' : 'Timesheet Status';
   }
 
   public onDWNCheckboxSelectedChange({checked}: {checked: boolean}, switchComponent: SwitchComponent): void {
@@ -236,7 +228,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public updateTimesheetStatus(status: TimesheetTargetStatus, data?: Partial<ChangeStatusData>): Observable<void> {
     return this.store.dispatch(
       new TimesheetDetails.ChangeTimesheetStatus({
-        timesheetId: this.timesheetId,
+        timesheetId: this.isTimesheetOrMileagesUpdate ? this.timesheetId : this.mileageTimesheetId,
         organizationId: this.organizationId,
         targetStatus: status,
         reason: null,
@@ -245,11 +237,13 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     );
   }
 
-  public handleApprove(): void {
-    const { timesheetId, organizationId } = this;
+  public handleApprove(isTimesheetOrMileagesUpdate: boolean): void {
+    const { timesheetId, mileageTimesheetId, organizationId } = this;
 
     (organizationId ?
-      this.timesheetDetailsService.submitTimesheet(timesheetId, organizationId) :
+      this.timesheetDetailsService.submitTimesheet(
+        isTimesheetOrMileagesUpdate ? timesheetId : mileageTimesheetId,
+        organizationId) :
       this.timesheetDetailsService.approveTimesheet(timesheetId)
     )
       .pipe(
@@ -267,6 +261,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       filter(Boolean),
       switchMap((timesheet: Timesheet) => {
         this.timesheetId = timesheet.id;
+        this.mileageTimesheetId = timesheet.mileageTimesheetId;
 
         return this.store.dispatch(new Timesheets.GetTimesheetDetails(
           timesheet.id, timesheet.organizationId, this.isAgency));
@@ -369,7 +364,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.timesheetDetails$
     .pipe(
       filter(Boolean),
-      tap((details) => { this.setActionBtnState(details)}),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId, candidateWorkPeriods }) => {
@@ -385,15 +379,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       }));
       this.cd.markForCheck();
     });
-  }
-
-  private setActionBtnState(details: TimesheetDetailsModel): void {
-    if (this.isAgency) {
-      this.actionButtonDisabled = details.status === this.timesheetStatus.PendingApproval
-      || details.status === this.timesheetStatus.Approved;
-    } else {
-      this.actionButtonDisabled = details.status === this.timesheetStatus.Approved
-    }
   }
 
   private watchForRangeChange(): void {

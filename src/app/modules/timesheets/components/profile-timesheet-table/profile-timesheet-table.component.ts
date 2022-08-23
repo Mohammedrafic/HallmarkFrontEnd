@@ -1,24 +1,21 @@
-import {
-  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
-  ElementRef, EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef,
+  EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { combineLatest, Observable, takeUntil } from 'rxjs';
-import { filter, skip, take, tap, switchMap } from 'rxjs/operators';
+import { filter, skip, switchMap, take, tap } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { TabComponent, SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
 import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 
 import { Destroyable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
-import { RecordFields, RecordsMode } from '../../enums';
-import {
-  TimesheetRecordsColdef, TimesheetRecordsColConfig, RecordsTabConfig,
-  TimesheetConfirmMessages } from '../../constants';
+import { RecordFields, RecordsMode, SubmitBtnText, TIMETHEETS_STATUSES } from '../../enums';
+import { RecordsTabConfig, TimesheetConfirmMessages, TimesheetRecordsColConfig, TimesheetRecordsColdef } from '../../constants';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DialogActionPayload, OpenAddDialogMeta, TimesheetRecordsDto, TabConfig } from '../../interface';
+import { DialogActionPayload, OpenAddDialogMeta, TabConfig, TimesheetDetailsModel, TimesheetRecordsDto } from '../../interface';
 import { TimesheetRecordsService } from '../../services';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { RecordsAdapter } from '../../helpers';
@@ -41,7 +38,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @ViewChild('spinner') readonly spinner: ElementRef;
 
-  @Input() timesheetId: number;
+  @Input() timesheetDetails: TimesheetDetailsModel;
 
   @Input() isAgency: boolean;
 
@@ -50,6 +47,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
   @Output() readonly changesSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  @Output() readonly rejectEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  @Output() readonly approveEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @Select(TimesheetsState.tmesheetRecords)
   public readonly timesheetRecords$: Observable<TimesheetRecordsDto>;
@@ -87,6 +88,16 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public loading = false;
 
+  public isEditEnabled = false;
+
+  public isApproveBtnEnabled = false;
+
+  public isRejectBtnEnabled = false;
+
+  public actionButtonDisabled = false;
+
+  public submitText: string;
+
   private records: TimesheetRecordsDto;
 
   private isChangesSaved = true;
@@ -109,11 +120,19 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.context = {
       componentParent: this,
     };
+    this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
   }
 
   ngOnChanges(): void {
     if (this.gridApi) {
       this.gridApi.showLoadingOverlay();
+    }
+
+    if (this.timesheetDetails) {
+      this.initBtnsState();
+      this.setActionBtnState();
+      this.initEditBtnsState();
+      this.cd.detectChanges();
     }
   }
 
@@ -150,6 +169,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       }
       this.selectTab(selectEvent.selectedIndex);
     }
+    this.initBtnsState();
+    this.initEditBtnsState();
+    this.cd.detectChanges();
   }
 
   public openAddDialog(): void {
@@ -238,6 +260,14 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       .filter((record) => record.id !== id);
       this.cd.markForCheck();
     });
+  }
+
+  public onRejectButtonClick(): void {
+    this.rejectEvent.emit(this.currentTab === RecordFields.Time);
+  }
+
+  public handleApprove(): void {
+    this.approveEvent.emit(this.currentTab === RecordFields.Time);
   }
 
   private selectTab(index: number): void {
@@ -360,5 +390,33 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         this.changesSaved.emit(false);
       }
     })
+  }
+
+  private initBtnsState(): void {
+    const currentTabMapping: Map<RecordFields, boolean> = new Map<RecordFields, boolean>()
+      .set(RecordFields.Time, this.timesheetDetails.canApproveTimesheet)
+      .set(RecordFields.Miles, this.timesheetDetails.canApproveMileage);
+
+    this.isApproveBtnEnabled = !!currentTabMapping.get(this.currentTab);
+    this.isRejectBtnEnabled = !this.isAgency && !!currentTabMapping.get(this.currentTab);
+  }
+
+  private setActionBtnState(): void {
+    if (this.isAgency) {
+      this.actionButtonDisabled =
+        this.timesheetDetails.statusText === TIMETHEETS_STATUSES.PENDING_APPROVE
+        || this.timesheetDetails.statusText === TIMETHEETS_STATUSES.APPROVED;
+    } else {
+      this.actionButtonDisabled =
+        this.timesheetDetails.statusText === TIMETHEETS_STATUSES.APPROVED;
+    }
+  }
+
+  private initEditBtnsState(): void {
+    const currentTabMapping: Map<RecordFields, boolean> = new Map<RecordFields, boolean>()
+      .set(RecordFields.Time, this.timesheetDetails.canEditTimesheet)
+      .set(RecordFields.Miles, this.timesheetDetails.canEditMileage);
+
+    this.isEditEnabled = !!currentTabMapping.get(this.currentTab);
   }
 }

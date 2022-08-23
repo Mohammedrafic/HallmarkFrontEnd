@@ -19,14 +19,26 @@
             {{ timesheetDetails.candidateLastName }}, {{ timesheetDetails.candidateFirstName}}
           </h3>
 
-          <ejs-chiplist #chipList class="events-off">
-            <e-chips>
-              <e-chip
-                [text]="timesheetDetails.statusText"
-                [cssClass]="timesheetDetails.statusText || '' | chipsCssClass">
-              </e-chip>
-            </e-chips>
-          </ejs-chiplist>
+          <ejs-tooltip
+            id="tooltip"
+            #tooltip
+            target=".e-chip"
+            (beforeRender)="beforeRender($event)">
+            <ejs-chiplist #chipList>
+              <e-chips>
+                <e-chip
+                  [text]="timesheetDetails.statusText"
+                  [cssClass]="timesheetDetails.statusText || '' | chipsCssClass"
+                >
+                </e-chip>
+                <e-chip
+                  [text]="timesheetDetails.mileageStatusText"
+                  [cssClass]="timesheetDetails.mileageStatusText || '' | chipsCssClass"
+                >
+                </e-chip>
+              </e-chips>
+            </ejs-chiplist>
+          </ejs-tooltip>
         </div>
         <div class="spacer"></div>
 
@@ -74,19 +86,6 @@
             ></ejs-switch>
             <span>DNW</span>
           </div>
-
-          <button
-            *ngIf="!isAgency"
-            ejs-button cssClass="e-outline"
-            class="reject-button"
-            (click)="onRejectButtonClick()">Reject
-          </button>
-
-          <button ejs-button cssClass="e-primary"
-                  [disabled]="actionButtonDisabled"
-                  (click)="handleApprove()">
-            {{submitText}}
-          </button>
         </div>
       </div>
 
@@ -123,11 +122,13 @@
 
       <section class="profile-table-container">
         <app-profile-timesheet-table
-          [timesheetId]="timesheetId"
           [isAgency]="isAgency"
+          [timesheetDetails]="timesheetDetails"
           [actionsDisabled]="timesheetDetails.noWorkPerformed"
           (openAddSideDialog)="openAddDialog($event)"
           (changesSaved)="handleEditChanges($event)"
+          (rejectEvent)="onRejectButtonClick($event)"
+          (approveEvent)="handleApprove($event)"
         >
         </app-profile-timesheet-table>
       </section>
