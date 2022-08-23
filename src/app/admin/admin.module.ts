@@ -50,6 +50,7 @@ import { RejectReasonMasterComponent } from './master-data/reject-reason-master/
 import { RejectReasonMasterState } from "@admin/store/reject-reason-mater.state";
 import { ManualInvoiceReasonsComponent } from '@admin/master-data/manual-invoice-reasons/manual-invoice-reasons.component';
 import { ManualInvoiceReasonsState } from '@admin/store/manual-invoice-reasons.state';
+import { OrganizationProfileComponent } from './organization-profile/organization-profile.component';
 
 const sidebarIcons = {
   Download,
@@ -81,6 +82,7 @@ const sidebarIcons = {
     MasterHolidaysComponent,
     RejectReasonMasterComponent,
     ManualInvoiceReasonsComponent,
+    OrganizationProfileComponent
   ],
   imports: [
     CommonModule,

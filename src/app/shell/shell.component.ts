@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
@@ -9,7 +9,7 @@ import {
   SidebarComponent,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '../client/client.config';
@@ -98,7 +98,18 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     private router: Router,
     private orderManagementService: OrderManagementService,
     private orderManagementAgencyService: OrderManagementAgencyService
-  ) {}
+  ) {
+    router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((data: any) => {
+      if (this.tree) {
+        const menuItem = this.tree.getTreeData().find((el => el['route'] === data['url']));
+        if (menuItem) {
+          this.tree.selectedNodes = [menuItem['title'] as string];
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.subsToOrderAgencyIds();

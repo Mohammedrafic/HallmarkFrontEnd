@@ -539,28 +539,26 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetAssociateAgencies());
     this.store.dispatch(new GetOrganizationStatesWithKeyCode());
 
-    if (this.orderId) {
-      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-        const isEditMode = !!this.orderId;
-        if (order && isEditMode) {
-          this.isEditMode = true;
-          this.order = order;
-          this.commentContainerId = order.commentContainerId as number;
-          this.getComments();
-          this.populateForms(order);
-          this.subscribeForSettings();
-        } else if (order?.isTemplate) {
-          this.order = order;
-          this.populateForms(order);
-          this.subscribeForSettings();
-        }
-      });
-    } else {
-      this.subscribeForSettings();
-      this.isEditMode = false;
-      this.order = null;
-      this.populateNewOrderForm();
-    }
+    this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+      const isEditMode = !!this.orderId;
+      if (order && isEditMode) {
+        this.isEditMode = true;
+        this.order = order;
+        this.commentContainerId = order.commentContainerId as number;
+        this.getComments();
+        this.populateForms(order);
+        this.subscribeForSettings();
+      } else if (order?.isTemplate) {
+        this.order = order;
+        this.populateForms(order);
+        this.subscribeForSettings();
+      } else {
+        this.subscribeForSettings();
+        this.isEditMode = false;
+        this.order = null;
+        this.populateNewOrderForm();
+      }
+    });
 
     this.suggestedDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((suggestedDetails) => {
       if (!suggestedDetails) {

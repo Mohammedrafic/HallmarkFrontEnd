@@ -54,9 +54,9 @@
             <input #searchInput
                    id="sidebar-nav-search-input"
                    class="nav-search-input"
-                  [(ngModel)]="searchString"
+                   [(ngModel)]="searchString"
                    placeholder="Start typing"
-                  [value]="searchString"
+                   [value]="searchString"
                    (ngModelChange)="onSearchChange()"
                    (focus)="onSearchFocus()"
                    (focusout)="onSearchFocusOut()"
