@@ -7,6 +7,7 @@ import {
   GetAgencyOrderCandidatesList,
   GetOrderApplicantsData,
   ReloadOrderCandidatesLists,
+  GetOrderById,
 } from '@agency/store/order-management.actions';
 import { combineLatest, Observable, Subject, takeUntil } from 'rxjs';
 import { OrderManagementState } from '@agency/store/order-management.state';
@@ -14,6 +15,7 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import {
   ClearHistoricalData,
   GetHistoricalData,
+  GetOrderById as GetOrgOrderById,
   RejectCandidateJob,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
@@ -89,7 +91,9 @@ export class HistoricalEventsComponent implements OnInit, OnChanges, OnDestroy {
           UpdateOrganisationCandidateJob,
           RejectCandidateJob,
           GetAgencyOrderCandidatesList,
-          GetOrderApplicantsData
+          GetOrderApplicantsData,
+          GetOrderById,
+          GetOrgOrderById
         ),
         takeUntil(this.unsubscribe$)
       )
