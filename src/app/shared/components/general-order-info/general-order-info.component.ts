@@ -2,8 +2,6 @@ import { Component, Input } from '@angular/core';
 import { OrderType } from '@shared/enums/order-type';
 import { Order } from '@shared/models/order-management.model';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
-import { ReasonForRequisition } from '@shared/enums/reason-for-requisition';
-import { ReasonForRequisitionList } from '@shared/models/reason-for-requisition-list';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 
 enum Active {
@@ -45,11 +43,5 @@ export class GeneralOrderInfoComponent {
 
   public moveToPreviousExtension(): void {
     this.orderManagementService.orderId$.next(this.orderInformation.extensionFromId!);
-  }
-
-  public getReasonsForRequisition(reason: ReasonForRequisition): string {
-    return reason !== null || true
-      ? (ReasonForRequisitionList.find((item) => item.id === reason)?.name as string)
-      : 'No';
   }
 }
