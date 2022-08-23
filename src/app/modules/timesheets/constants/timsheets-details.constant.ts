@@ -11,6 +11,8 @@ import { GridDayComponent } from '../components/cell-editors/grid-day/grid-day.c
 import { GridValuesHelper } from '../helpers/grid-values.helper';
 import { InputEditorComponent } from '../components/cell-editors/input-editor/input-editor.component';
 import { EditFieldTypes } from '@core/enums';
+import { RecordStatusCellComponent } from '../components/cell-editors/record-status-cell/record-status-cell.component';
+import { TimesheetDetailsModel } from '../interface';
 
 const commonColumn: ColDef = {
   filter: true,
@@ -100,8 +102,17 @@ const billRateTypeStatic: ColDef = {
   type: 'rightAligned',
 };
 
-export const TimesheetRecordsColdef: ColDef[] = [
+const recordStatusCell: ColDef = {
+  field: 'stateText',
+  headerName: 'Status',
+  ...commonColumn,
+  width: 140,
+  cellRenderer: RecordStatusCellComponent,
+}
+
+export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  ([
   dayColDef,
+  ...(isStatusAvaliable ? [recordStatusCell] : []),
   {
     field: 'timeIn',
     headerName: 'Time in',
@@ -141,10 +152,11 @@ export const TimesheetRecordsColdef: ColDef[] = [
   billRateColDef,
   totalCol,
   actionCol,
-];
+]);
 
-export const MilesRecordsColDef: ColDef[] = [
+export const MilesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
   dayColDef,
+  ...(isStatusAvaliable ? [recordStatusCell] : []),
   {
     ...editableCostCenterDef,
     width: 220,
@@ -173,10 +185,11 @@ export const MilesRecordsColDef: ColDef[] = [
     width: 200,
   },
   actionCol,
-];
+]);
 
-export const ExpensesRecordsColDef: ColDef[] = [
+export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
   dayColDef,
+  ...(isStatusAvaliable ? [recordStatusCell] : []),
   editableCostCenterDef,
   {
     ...billRateTypeStatic,
@@ -217,9 +230,9 @@ export const ExpensesRecordsColDef: ColDef[] = [
     }
   },
   actionCol,
-];
+]);
 
-export const TimesheetRecordsColConfig: Record<string, ColDef[]>  = {
+export const TimesheetRecordsColConfig: Record<string, ((isStatusAvaliable: boolean) => ColDef[])>  = {
   [RecordFields.Time]: TimesheetRecordsColdef,
   [RecordFields.Miles]: MilesRecordsColDef,
   [RecordFields.Expenses]: ExpensesRecordsColDef,
