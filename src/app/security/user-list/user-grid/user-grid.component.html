@@ -1,109 +1,3 @@
-<!-- <ejs-grid
-  #usersGrid
-  id="users-grid"
-  class="users-grid"
-  [dataSource]="userGridData$ | async"
-  [allowSorting]="true"
-  [allowResizing]="true"
-  [resizeSettings]="resizeSettings"
-  [allowPaging]="allowPaging"
-  [enableVirtualization]="true"
-  [pageSettings]="pageSettings"
-  [height]="gridHeight"
-  (rowDataBound)='rowDataBound($event)'
-  (rowSelected)="rowSelected($event, grid)"
-  (rowDeselected)="rowDeselected($event, grid)"
-  [selectionSettings]="selectionSettings"
-  (actionBegin)="actionBegin($event)"
->
-  <e-columns>
-    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
-    <e-column textAlign="Right" width="60">
-      <ng-template #template let-data>
-        <div class="row-tool-buttons">
-          <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
-            <span><i-feather name="edit" class="icon"></i-feather></span>
-          </button>
-        </div>
-      </ng-template>
-    </e-column>
-    <e-column field="firstName" headerText="First Name" textAlign="Left" ></e-column>
-    <e-column field="lastName" headerText="Last Name" textAlign="Left" ></e-column>
-    <e-column field="isDeleted" headerText="Status" width=200>
-      <ng-template #template let-data>
-        <div>
-          <ejs-chiplist class="events-off">
-            <e-chips>
-              <e-chip [text]="statusEnum[+!data.isDeleted]"
-                      [cssClass]="getChipCssClass(statusEnum[+!data.isDeleted])">
-              </e-chip>
-            </e-chips>
-          </ejs-chiplist>
-        </div>
-      </ng-template>
-    </e-column>
-    <e-column field="email" headerText="Email" textAlign="Left" ></e-column>
-    <e-column field="roles" headerText="Role" textAlign="Left" >
-      <ng-template #template let-data>
-        <div *ngFor="let role of data.roles">
-          {{role.name}}
-        </div>
-      </ng-template>
-    </e-column>
-    <e-column field="organisation" headerText="Business" textAlign="Left" >
-      <ng-template #template let-data>
-        <span>{{data.businessUnitName}}</span>
-      </ng-template>
-    </e-column>
-    <e-column *ngIf="!isAgencyUser" field="hasVisibility" headerText="Visibility" textAlign="Left" [valueAccessor]='hasVisibility'></e-column>
-  </e-columns>
-
-  <ng-template #pagerTemplate let-data>
-    <div class="e-pagertemplate">
-      <div class="control-section">
-        <div class="content-wrapper">
-          <section class="left-side-pager-controls">
-            <ejs-dropdownlist
-              id="rowsPerPage"
-              class="dropdown-no-border"
-              [dataSource]="rowsPerPageDropDown"
-              [(value)]="activeRowsPerPageDropDown"
-              (change)="onRowsDropDownChanged()"
-            >
-            </ejs-dropdownlist>
-            <ejs-numerictextbox
-              id="goToPage"
-              class="numeric-input-no-border"
-              format="#"
-              placeholder="Go to:"
-              min="1"
-              [max]="(usersPage$ | async)?.totalCount"
-              [showSpinButton]="false"
-              (change)="onGoToClick($event)"
-            >
-            </ejs-numerictextbox>
-          </section>
-          <section class="right-side-pager-controls">
-            <ejs-pager
-              id="gridPager"
-              #gridPager
-              [pageSize]="pageSize"
-              [totalRecordsCount]="(usersPage$ | async)?.totalCount"
-              [enablePagerMessage]="false"
-              [currentPage]="currentPage"
-              (click)="onGoToClick($event)"
-            >
-            </ejs-pager>
-          </section>
-        </div>
-      </div>
-    </div>
-  </ng-template>
-</ejs-grid> -->
-
-<!-- [serverSideInfiniteScroll]="true"
-[serverSideFilterOnServer]="true"
-[serverSideSortOnServer]="true" -->
 <section>
   <ag-grid-angular #agGridPagination
                   style="width: 100%; height: 550px;"
@@ -123,7 +17,9 @@
                   toolPanel="columns"
                   [serverSideStoreType]="serverSideStoreType"                
                   [paginationAutoPageSize]="false"
-                  [maxBlocksInCache] ="maxBlocksInCache">
+                  [maxBlocksInCache] ="maxBlocksInCache"
+                  [noRowsOverlayComponent]="noRowsOverlayComponent"
+                  [noRowsOverlayComponentParams]="noRowsOverlayComponentParams">
   </ag-grid-angular>
 </section>
 <div class="row">

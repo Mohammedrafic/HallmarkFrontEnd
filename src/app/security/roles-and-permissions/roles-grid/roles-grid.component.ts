@@ -1,5 +1,5 @@
 import { GetBusinessByUnitType, ExportRoleList } from './../../store/security.actions';
-import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { filter, Observable, Subject, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -28,7 +28,7 @@ import { BusinessUnit } from '@shared/models/business-unit.model';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
-
+import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 
 enum Active {
   No,
@@ -39,7 +39,7 @@ enum Active {
   selector: 'app-roles-grid',
   templateUrl: './roles-grid.component.html',
   styleUrls: ['./roles-grid.component.scss'],
- 
+  encapsulation: ViewEncapsulation.None
 })
 export class RolesGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() filterForm: FormGroup;
@@ -236,6 +236,11 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
           };
   }
 
+  public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
+  public noRowsOverlayComponentParams: any = {
+    noRowsMessageFunc: () => 'No Rows To Show',
+  };
+
   ngOnInit(): void {
     this.onDialogClose();    
     this.filterForm.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => { 
@@ -280,8 +285,14 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
           var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
           self.dispatchNewPage(sort, filter);
           self.rolesPage$.pipe().subscribe((data: any) => {
-            self.itemList = data.items;            
-            params.successCallback(self.itemList, data.totalCount || 1);
+            self.itemList = data?.items;
+            if (!self.itemList || !self.itemList.length) {
+              self.gridApi.showNoRowsOverlay();
+            }
+            else {
+              self.gridApi.hideOverlay();
+            }
+            params.successCallback(self.itemList, data?.totalCount || 1);
           });
         }, 500);
       }
