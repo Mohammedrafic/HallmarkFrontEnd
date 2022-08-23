@@ -12,7 +12,7 @@ import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 
 import { Destroyable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
-import { RecordFields, RecordsMode, SubmitBtnText, TIMETHEETS_STATUSES } from '../../enums';
+import { RecordFields, RecordsMode, SubmitBtnText, TIMETHEETS_STATUSES, RecordStatus } from '../../enums';
 import { RecordsTabConfig, TimesheetConfirmMessages, TimesheetRecordsColConfig, TimesheetRecordsColdef } from '../../constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DialogActionPayload, OpenAddDialogMeta, TabConfig, TimesheetDetailsModel, TimesheetRecordsDto } from '../../interface';
@@ -66,7 +66,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public isEditOn = false;
 
-  public timesheetColDef = TimesheetRecordsColdef;
+  public timesheetColDef = TimesheetRecordsColdef(false);
 
   public readonly modules: Module[] = [ClientSideRowModelModule];
 
@@ -98,6 +98,16 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public submitText: string;
 
+  public readonly getRowStyle = (params: any) => {
+    if (params.data.stateText === RecordStatus.New) {
+      return { 'background-color': '#F2FAF2'}
+    }
+    if (params.data.stateText === RecordStatus.Deleted) {
+      return { 'background-color': '#FFDFDF'}
+    }
+    return { 'background-color': 'inherit'}
+  }
+
   private records: TimesheetRecordsDto;
 
   private isChangesSaved = true;
@@ -109,6 +119,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private slectingindex: number;
 
   private idsToDelete: number[] = [];
+
+  private isStatusColAvaliable = false;
 
   constructor(
     private store: Store,
@@ -324,6 +336,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   private setEditModeColDef(): void {
+    this.checkForStatusCol();
     this.timesheetColDef = this.timesheetColDef.map((def) => {
       if (this.isEditOn && def.field === 'billRateConfigName'
       && this.currentTab === RecordFields.Time) {
@@ -355,15 +368,16 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         def.cellRendererParams.isEditable = this.isEditOn;
         def.cellRendererParams.formGroup = this.formControls;
       }
-
       return def;
     });
+
     this.gridApi.setColumnDefs(this.timesheetColDef);
   }
 
   private changeColDefs(idx: number): void {
     this.currentTab = this.timesheetRecordsService.getCurrentTabName(idx);
-    this.timesheetColDef = TimesheetRecordsColConfig[this.currentTab];
+    this.checkForStatusCol();
+    this.timesheetColDef = TimesheetRecordsColConfig[this.currentTab](this.isStatusColAvaliable);
     this.cd.markForCheck();
   }
 
@@ -418,5 +432,16 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       .set(RecordFields.Miles, this.timesheetDetails.canEditMileage);
 
     this.isEditEnabled = !!currentTabMapping.get(this.currentTab);
+  }
+
+  private checkForStatusCol(): void {
+    this.isStatusColAvaliable =  this.timesheetRecordsService
+    .checkForStatus(this.recordsToShow[this.currentTab][this.currentMode]);
+
+    if (this.isEditOn) {
+      this.isStatusColAvaliable = false;
+    }
+
+    this.timesheetColDef  = TimesheetRecordsColConfig[this.currentTab](this.isStatusColAvaliable);
   }
 }

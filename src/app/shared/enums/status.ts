@@ -19,6 +19,7 @@ export const STATUS_COLOR_GROUP = {
     TIMETHEETS_STATUSES.PENDING_APPROVE,
     TIMETHEETS_STATUSES.PENDING_APPROVE_ASTERIX,
     INVOICES_STATUSES.PENDING_APPROVAL,
+    'new',
   ], // green
   'e-warning': [
     'incomplete',
@@ -40,7 +41,7 @@ export const STATUS_COLOR_GROUP = {
     TIMETHEETS_STATUSES.REJECTED,
     TIMETHEETS_STATUSES.ARCHIVED,
   ], // hard gray
-  'e-pending': ['pending', 'Pending', 'offered', TIMETHEETS_STATUSES.MISSING], // red
+  'e-pending': ['pending', 'Pending', 'offered', TIMETHEETS_STATUSES.MISSING, 'deleted'], // red
   'e-progress': ['in progress', 'In Progress', 'Verified', 'verified', INVOICES_STATUSES.SUBMITED_PEND_APPR], // blue
   'e-accepted': [
     'accepted',
