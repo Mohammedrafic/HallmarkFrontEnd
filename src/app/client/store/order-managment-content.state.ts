@@ -705,9 +705,9 @@ export class OrderManagementContentState {
   @Action(GetContactDetails)
   GetContactDetails(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { departmentId }: GetContactDetails
+    { departmentId, lastSelectedBusinessId }: GetContactDetails
   ): Observable<Department> {
-    return this.departmentService.getDepartmentData(departmentId).pipe(
+    return this.departmentService.getDepartmentData(departmentId, lastSelectedBusinessId).pipe(
       tap((contactDetails: Department) => {
         patchState({ contactDetails });
       })

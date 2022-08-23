@@ -232,7 +232,7 @@ export class SelectNavigationTab {
 
 export class GetContactDetails {
   static readonly type = '[order management] Get Contact Details';
-  constructor(public departmentId: number) {}
+  constructor(public departmentId: number, public lastSelectedBusinessId?: number) {}
 }
 
 export class GetExtensions {

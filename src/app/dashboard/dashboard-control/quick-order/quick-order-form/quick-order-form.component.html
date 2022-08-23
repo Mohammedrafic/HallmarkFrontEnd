@@ -96,6 +96,7 @@
                   [enabled]="isDepartmentsDropDownEnabled"
                   [dataSource]="departmentDataSource"
                   [fields]="departmentFields"
+                  (select)="onDepartmentDropDownSelected($event)"
                 >
                 </ejs-dropdownlist>
               </div>
