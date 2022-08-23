@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { UserSubscriptionPage } from "@shared/models/user-subscription.model";
 import { Action, Selector, StateContext} from '@ngxs/store';
-import { GetAlertsTemplatePage, GetTemplateByAlertId, GetUserSubscriptionPage } from "./alerts.actions";
+import { GetAlertsTemplatePage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId } from "./alerts.actions";
 import { Observable ,tap} from "rxjs";
 import { AlertsService } from "@shared/services/alerts.service";
 import { BusinessUnitService } from "@shared/services/business-unit.service";
@@ -28,6 +28,11 @@ export class AlertsState {
   }
   @Selector()
   static TemplateByAlertId(state: AlertsStateModel): EditAlertsTemplate | null {
+    //return state.alertsTemplatePage;
+    return state.editAlertsTemplate;
+  }
+  @Selector()
+  static SaveTemplateByAlertId(state: AlertsStateModel): EditAlertsTemplate | null {
     //return state.alertsTemplatePage;
     return state.editAlertsTemplate;
   }
@@ -68,6 +73,18 @@ export class AlertsState {
     { alertId,alertChannelId}: GetTemplateByAlertId
   ): Observable<EditAlertsTemplate> {
     return this.alertsService.getTemplateByAlertId(alertId,alertChannelId).pipe(
+      tap((payload) => {
+        patchState({ editAlertsTemplate: payload });
+        return payload;
+      })
+    );
+  }
+  @Action(SaveTemplateByAlertId)
+  SaveTemplateByAlertId(
+    { patchState }: StateContext<AlertsStateModel>,
+    { editAlertsTemplateRequest}: SaveTemplateByAlertId
+  ): Observable<EditAlertsTemplate> {
+    return this.alertsService.saveTemplateByAlertId(editAlertsTemplateRequest).pipe(
       tap((payload) => {
         patchState({ editAlertsTemplate: payload });
         return payload;

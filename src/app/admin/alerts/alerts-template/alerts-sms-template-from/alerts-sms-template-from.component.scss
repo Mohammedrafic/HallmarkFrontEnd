@@ -32,6 +32,7 @@
         .right-section {
           padding-left: 50px;
           flex: 1 0 30%;
+          padding-bottom: 30px;
         }
       }
     label {
@@ -44,7 +45,7 @@
     }
 
     .rich-text-container {
-        margin-bottom: 12px;
+        margin-bottom: 30px;
     }
 
     
@@ -59,6 +60,7 @@
     .button-cancel {
         margin-top: 10px;
     }
-    
-
+    .e-rte-content{
+      height: 258px !important;
+    }
 }

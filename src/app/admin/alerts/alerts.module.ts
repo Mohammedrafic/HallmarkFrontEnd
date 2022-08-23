@@ -20,6 +20,7 @@ import{ListViewAllModule} from '@syncfusion/ej2-angular-lists';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { AlertsSmsTemplateFromComponent } from './alerts-template/alerts-sms-template-from/alerts-sms-template-from.component';
 import { AlertsOnScreenTemplateFormComponent } from './alerts-template/alerts-on-screen-template-form/alerts-on-screen-template-form.component';
+import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { AlertsOnScreenTemplateFormComponent } from './alerts-template/alerts-on
     SwitchModule,
     SharedModule,
     DialogModule,
+    TextBoxModule,
     NgxsModule.forFeature([AlertsState]),
   ]
 })

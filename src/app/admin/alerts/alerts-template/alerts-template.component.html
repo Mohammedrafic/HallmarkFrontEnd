@@ -1,4 +1,32 @@
-
+<app-page-toolbar>
+  <ng-container left>
+    <div class="bootstrap business-dropdowns" [formGroup]="businessForm">
+      <div class="dropdown-container">
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            appValidateWithMessage
+            formControlName="businessUnit"
+            [fields]="optionFields"
+            [dataSource]="businessUnits"
+            placeholder="Business Unit"
+          ></ejs-dropdownlist>
+        </div>
+      </div>
+      <div class="dropdown-container">
+        <app-multiselect-dropdown
+          [formGroupInstance]="businessForm"
+          [fields]="bussinesDataFields"
+          [dataSource]="bussinesData$ | async"
+          [showSelectAll]="true"
+          controlName="business"
+          placeholder="Business"
+          selectAllText="All"
+        ></app-multiselect-dropdown>
+      </div>
+    </div>
+  </ng-container>
+  
+</app-page-toolbar>
 <section class="last-content-section-padding alerts-template-top-padding">  
   <ag-grid-angular #agGridPagination
                   class="ag-theme-alpine alerts-template-grid"
@@ -35,10 +63,10 @@
 <section>
   <app-alerts-email-template-form #emailTemplateForm [addEditEmailTemplateForm]="$any(emailTemplateFormGroup)" [title]="templateEmailTitle" 
   [alertTitle]="editAlertTemplateData.alertTitle" [alertBody]="editAlertTemplateData.alertBody" 
-  [templateParamsData]="templateParamsData"></app-alerts-email-template-form>
+  [templateParamsData]="templateParamsData" ></app-alerts-email-template-form>
 </section>
 </app-email-side-dialog>
-<app-sms-side-dialog [header]="templateSmsTitle" (smsFormCancelClicked)="onSmsTemplateAddCancel()" (smsFormSaveClicked)="onEmailTemplateSave()" [width]="'1000px'">
+<app-sms-side-dialog [header]="templateSmsTitle" (smsFormCancelClicked)="onSmsTemplateAddCancel()" (smsFormSaveClicked)="onSmsTemplateSave()" [width]="'1000px'">
 <section>
   <app-alerts-sms-template-from #smsTemplateForm [addEditSmsTemplateForm]="$any(smsTemplateFormGroup)" [title]="templateSmsTitle"
   [alertTitle]="editAlertTemplateData.alertTitle" [alertBody]="editAlertTemplateData.alertBody" 

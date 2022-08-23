@@ -1,10 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ToolbarService, LinkService, ImageService, HtmlEditorService, TableService, RichTextEditorComponent, ToolbarType } from '@syncfusion/ej2-angular-richtexteditor';
-import { toolsRichTextEditor } from '../../alerts.constants';
-import { DragEventArgs, ListBoxComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { ListViewComponent } from '@syncfusion/ej2-angular-lists';
-import { ScrollbarSettings } from '@syncfusion/ej2-angular-charts';
 
 @Component({
   selector: 'app-alerts-sms-template-from',
@@ -13,8 +9,7 @@ import { ScrollbarSettings } from '@syncfusion/ej2-angular-charts';
   providers: [ToolbarService, LinkService, ImageService, HtmlEditorService, TableService]
 })
 
-export class AlertsSmsTemplateFromComponent implements OnInit, OnDestroy, OnChanges {
-  public tools = toolsRichTextEditor;
+export class AlertsSmsTemplateFromComponent {
   @Input() addEditSmsTemplateForm: FormGroup;
   @Input() title: string;  
   @Input() alertTitle:string;
@@ -29,13 +24,7 @@ export class AlertsSmsTemplateFromComponent implements OnInit, OnDestroy, OnChan
   private dragEleContent: string;
   
   constructor() { }
-  ngOnChanges(changes: SimpleChanges): void {
-  }
-  ngOnDestroy(): void {
-  }
-
-  ngOnInit(): void {
-  }
+  
   rteCreated(): void {
     if (this.editArea == null) {
       this.editArea = document.querySelector("#smsDefaultRTE .e-content") as HTMLElement;
@@ -51,16 +40,15 @@ export class AlertsSmsTemplateFromComponent implements OnInit, OnDestroy, OnChan
         e.dataTransfer.setData("Text", (e.target as HTMLElement).innerText);
       });
     }
-    this.rteObj.toolbarSettings.type = ToolbarType.Scrollable;
+    this.rteObj.toolbarSettings.enable = false;
     this.rteObj.toolbarSettings.enableFloating = true;
-    this.rteObj.height='400px';
+    this.rteObj.height='300px';
   }
   ngAfterViewInit() {
     this.rteObj.refreshUI();
   }
   dropHandler(e: any): void {
     e.preventDefault();
-
     if (this.rteObj.inputElement.contains(e.target)) {
       let range: any;
       let getDocument = this.rteObj.contentModule.getDocument?.();
@@ -72,34 +60,22 @@ export class AlertsSmsTemplateFromComponent implements OnInit, OnDestroy, OnChan
         range.setStart(e.rangeParent, e.rangeOffset);
         this.rteObj.selectRange(range);
       }
-
-
-
       if (this.rteObj.formatter.getUndoRedoStack?.().length === 0) {
         this.rteObj.formatter.saveData?.();
       }
-
       var text = e.dataTransfer.getData('Text').replace(/\n/g, '').replace(/\r/g, '').replace(/\r\n/g, '');
-
       this.rteObj.executeCommand("insertHTML", text);
       this.rteObj.formatter.saveData?.();
       this.rteObj.formatter.enableUndo?.(this.rteObj);
     }
-
-
   }
-
 
   static createForm(): FormGroup {
     return new FormGroup({
-      id: new FormControl(),
-      mailBody: new FormControl('', [Validators.required]),
+      alertBody: new FormControl('', [Validators.required]),
     });
   }
-  removedropEvent(): void {
 
-    this.editArea.removeEventListener('drop', this.dropHandler.bind(this));
-  }
   onFormCancelClick(): void {
     this.formCancelClicked.emit();
   }

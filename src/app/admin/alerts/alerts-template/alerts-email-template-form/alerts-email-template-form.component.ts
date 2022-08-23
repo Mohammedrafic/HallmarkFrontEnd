@@ -12,7 +12,7 @@ import { toolsRichTextEditor } from '../../alerts.constants';
   styleUrls: ['./alerts-email-template-form.component.scss'],
   providers: [ToolbarService, LinkService, ImageService, HtmlEditorService, TableService]
 })
-export class AlertsEmailTemplateFormComponent implements OnInit, OnDestroy, OnChanges {
+export class AlertsEmailTemplateFormComponent  {
   public tools = toolsRichTextEditor;
   @Input() addEditEmailTemplateForm: FormGroup;
   @Input() title: string;
@@ -28,13 +28,7 @@ export class AlertsEmailTemplateFormComponent implements OnInit, OnDestroy, OnCh
   private dragEleContent: string;
   
   constructor() { }
-  ngOnChanges(changes: SimpleChanges): void {
-  }
-  ngOnDestroy(): void {
-  }
-
-  ngOnInit(): void {
-  }
+  
   rteCreated(): void {
     if (this.editArea == null) {
       this.editArea = document.querySelector("#defaultRTE .e-content") as HTMLElement;
@@ -52,7 +46,7 @@ export class AlertsEmailTemplateFormComponent implements OnInit, OnDestroy, OnCh
     }
     this.rteObj.toolbarSettings.type = ToolbarType.Scrollable;
     this.rteObj.toolbarSettings.enableFloating = true;
-    this.rteObj.height='400px';
+    this.rteObj.height='300px';
   }
   ngAfterViewInit() {
     this.rteObj.refreshUI();
@@ -71,35 +65,23 @@ export class AlertsEmailTemplateFormComponent implements OnInit, OnDestroy, OnCh
         range.setStart(e.rangeParent, e.rangeOffset);
         this.rteObj.selectRange(range);
       }
-
-
-
       if (this.rteObj.formatter.getUndoRedoStack?.().length === 0) {
         this.rteObj.formatter.saveData?.();
       }
-
       var text = e.dataTransfer.getData('Text').replace(/\n/g, '').replace(/\r/g, '').replace(/\r\n/g, '');
-
       this.rteObj.executeCommand("insertHTML", text);
       this.rteObj.formatter.saveData?.();
       this.rteObj.formatter.enableUndo?.(this.rteObj);
     }
-
-
   }
-
 
   static createForm(): FormGroup {
     return new FormGroup({
-      id: new FormControl(),
-      subject: new FormControl('', [Validators.required]),
-      mailBody: new FormControl('', [Validators.required]),
+      alertTitle: new FormControl('', [Validators.required]),
+      alertBody: new FormControl('', [Validators.required]),
     });
   }
-  removedropEvent(): void {
-
-    this.editArea.removeEventListener('drop', this.dropHandler.bind(this));
-  }
+ 
   onFormCancelClick(): void {
     this.formCancelClicked.emit();
   }

@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { UserSubscription, UserSubscriptionFilters, UserSubscriptionPage } from "@shared/models/user-subscription.model";
 import { observable, Observable, of } from "rxjs";
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate } from "@shared/models/alerts-template.model";
+import { AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
 import { AlertChannel } from "@admin/alerts/alerts.enum";
 
 @Injectable({
@@ -100,7 +100,7 @@ export class AlertsService {
   /**
    * Get Template By AlertId
    * @param AlertId
-   * @param alertChannelId
+   * @param AlertChannelId
    *
    * @return EditAlertsTemplate
    */
@@ -110,6 +110,20 @@ export class AlertsService {
   ): Observable<EditAlertsTemplate> {
   
     return this.http.get<EditAlertsTemplate>(`/api/Templates/GetTemplateByAlertId/`+ AlertId+`?alertChannel=`+AlertChannelId);
+    
+  }
+
+  /**
+   * Get Template By AlertId
+   * @param EditAlertsTemplateRequest
+   *
+   * @return EditAlertsTemplate
+   */
+   public saveTemplateByAlertId(
+    EditAlertsTemplateRequest:EditAlertsTemplateRequest
+  ): Observable<EditAlertsTemplate> {
+  
+    return this.http.put<EditAlertsTemplate>(`/api/Templates/`,EditAlertsTemplateRequest);
     
   }
   

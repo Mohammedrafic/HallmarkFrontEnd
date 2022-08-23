@@ -24,6 +24,15 @@ export type EditAlertsTemplate = {
   bCCList: string;
   parameters: string[];
 };
+export type EditAlertsTemplateRequest = {
+  id:number;
+  alertChannel:AlertChannel;      
+  alertTitle:string;
+  alertBody: string;
+  toList: string;
+  cCList: string;
+  bCCList: string;
+};
   
   export type AlertsTemplatePage = PageOfCollections<AlertsTemplate>;
   export type AlertsTemplateFilters = {

@@ -4,14 +4,14 @@
             <div class="input-container bootstrap top-container">
                 <label>Subject<span class="required">*</span></label>
                 <div class="input-group">
-                    <input appValidateWithMessage formControlName="subject" class="e-input" type="text" [(ngModel)]="alertTitle" />
+                    <input appValidateWithMessage formControlName="alertTitle" class="e-input" type="text" [(ngModel)]="alertTitle" />
                 </div>
             </div>
             <div class="rich-text-container">
                 <label>Mail Body<span class="required">*</span></label>
-                <div>
-                    <ejs-richtexteditor #RTE id='defaultRTE' appValidateWithMessage formControlName="mailBody"
-                        [toolbarSettings]='tools' [(value)]='alertBody'>
+                <div class="input-group">
+                    <ejs-richtexteditor #RTE id='defaultRTE' appValidateWithMessage formControlName="alertBody"
+                        [toolbarSettings]='tools' [(ngModel)]='alertBody' [(value)]='alertBody'>
                     </ejs-richtexteditor>
                 </div>
             </div>

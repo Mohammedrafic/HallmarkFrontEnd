@@ -2,9 +2,6 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, S
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ToolbarService, LinkService, ImageService, HtmlEditorService, TableService, RichTextEditorComponent, ToolbarType } from '@syncfusion/ej2-angular-richtexteditor';
 import { toolsRichTextEditor } from '../../alerts.constants';
-import { DragEventArgs, ListBoxComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { ListViewComponent } from '@syncfusion/ej2-angular-lists';
-import { ScrollbarSettings } from '@syncfusion/ej2-angular-charts';
 @Component({
   selector: 'app-alerts-on-screen-template-form',
   templateUrl: './alerts-on-screen-template-form.component.html',
@@ -12,7 +9,7 @@ import { ScrollbarSettings } from '@syncfusion/ej2-angular-charts';
   providers: [ToolbarService, LinkService, ImageService, HtmlEditorService, TableService]
 })
 
-export class AlertsOnScreenTemplateFormComponent implements OnInit, OnDestroy, OnChanges {
+export class AlertsOnScreenTemplateFormComponent {
   public tools = toolsRichTextEditor;
   @Input() addEditOnScreenTemplateForm: FormGroup;
   @Input() title: string;  
@@ -28,13 +25,7 @@ export class AlertsOnScreenTemplateFormComponent implements OnInit, OnDestroy, O
   private dragEleContent: string;
   
   constructor() { }
-  ngOnChanges(changes: SimpleChanges): void {
-  }
-  ngOnDestroy(): void {
-  }
-
-  ngOnInit(): void {
-  }
+  
   rteCreated(): void {
     if (this.editArea == null) {
       this.editArea = document.querySelector("#onScreenDefaultRTE .e-content") as HTMLElement;
@@ -52,14 +43,13 @@ export class AlertsOnScreenTemplateFormComponent implements OnInit, OnDestroy, O
     }
     this.rteObj.toolbarSettings.type = ToolbarType.Scrollable;
     this.rteObj.toolbarSettings.enableFloating = true;
-    this.rteObj.height='400px';
+    this.rteObj.height='300px';
   }
   ngAfterViewInit() {
     this.rteObj.refreshUI();
   }
   dropHandler(e: any): void {
     e.preventDefault();
-
     if (this.rteObj.inputElement.contains(e.target)) {
       let range: any;
       let getDocument = this.rteObj.contentModule.getDocument?.();
@@ -71,35 +61,23 @@ export class AlertsOnScreenTemplateFormComponent implements OnInit, OnDestroy, O
         range.setStart(e.rangeParent, e.rangeOffset);
         this.rteObj.selectRange(range);
       }
-
-
-
       if (this.rteObj.formatter.getUndoRedoStack?.().length === 0) {
         this.rteObj.formatter.saveData?.();
       }
-
       var text = e.dataTransfer.getData('Text').replace(/\n/g, '').replace(/\r/g, '').replace(/\r\n/g, '');
-
       this.rteObj.executeCommand("insertHTML", text);
       this.rteObj.formatter.saveData?.();
       this.rteObj.formatter.enableUndo?.(this.rteObj);
     }
-
-
   }
-
 
   static createForm(): FormGroup {
     return new FormGroup({
-      id: new FormControl(),
-      title: new FormControl('', [Validators.required]),
-      mailBody: new FormControl('', [Validators.required]),
+      alertTitle: new FormControl('', [Validators.required]),
+      alertBody: new FormControl('', [Validators.required]),
     });
   }
-  removedropEvent(): void {
-
-    this.editArea.removeEventListener('drop', this.dropHandler.bind(this));
-  }
+  
   onFormCancelClick(): void {
     this.formCancelClicked.emit();
   }

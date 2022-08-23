@@ -1,6 +1,6 @@
 import { AlertChannel } from "@admin/alerts/alerts.enum";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
-import { AlertsTemplateFilters } from "@shared/models/alerts-template.model";
+import { AlertsTemplateFilters, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
 import { UserSubscriptionFilters } from "@shared/models/user-subscription.model";
 
 export class GetUserSubscriptionPage {
@@ -32,5 +32,11 @@ export class GetUserSubscriptionPage {
     constructor(
       public alertId:number,
       public alertChannelId: AlertChannel
+    ) {}
+  }
+  export class SaveTemplateByAlertId {
+    static readonly type = '[alerts] Save Template By AlertId';
+    constructor(
+      public editAlertsTemplateRequest:EditAlertsTemplateRequest
     ) {}
   }
