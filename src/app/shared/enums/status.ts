@@ -31,7 +31,7 @@ export const STATUS_COLOR_GROUP = {
     'ex',
     INVOICES_STATUSES.PENDING_PAYMENT,
   ], // yellow
-  'e-default': ['closed', 'Inactive', 'inactive', 'Closed', 'withdraw', TIMETHEETS_STATUSES.REJECTED], // hard gray
+  'e-default': ['closed', 'Inactive', 'inactive', 'Closed', 'withdraw', 'Rejected', TIMETHEETS_STATUSES.REJECTED], // hard gray
   'e-pending': ['pending', 'Pending', 'offered', TIMETHEETS_STATUSES.MISSING], // red
   'e-progress': ['in progress', 'In Progress', 'Verified', 'verified', INVOICES_STATUSES.SUBMITED_PEND_APPR], // blue
   'e-accepted': [
@@ -67,6 +67,7 @@ export enum CredentialVerifiedStatus {
   Pending,
   Verified,
   Completed,
+  Rejected,
 }
 
 export enum CreateUserStatus {
