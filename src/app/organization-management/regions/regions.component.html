@@ -1,8 +1,28 @@
 <section class="flex-column">
   <section class="toolbar">
-
+  
     <section>
-
+      <button
+      ejs-button
+      id="importButton"
+      cssClass="e-outline button-import"
+      (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather></button>
+    <button
+      ejs-dropdownbutton
+      [items]="exportOptions"
+      (select)="exportSelected($event)"
+      id="importButton"
+      cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+      <button
+      ejs-button
+      id="filterButton"
+      cssClass="e-outline button-filter"
+      (click)="showFilters()">
+      <div class="filter-button-content">
+        <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+        Filters <i-feather name="sliders" class="icon"></i-feather>
+      </div>
+    </button>
       <button
         ejs-button
         id="addDepartmentButton"
@@ -10,6 +30,7 @@
         (click)='onAddRegionClick()'>Add Region</button>
     </section>
   </section>
+
 
   <ejs-grid class="grid grid-component"
     #grid
@@ -29,7 +50,7 @@
     [selectionSettings]="selectionSettings"
   >
     <e-columns>
-      <!-- <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column> -->
+    
       <e-column textAlign="Right" width="50">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
@@ -43,7 +64,7 @@
         </ng-template>
       </e-column>
 
-      <!-- <e-column field="id" headerText="ID" width=200 hidden></e-column> -->
+
       <e-column field="name" headerText="Region" width=200 ></e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
@@ -92,7 +113,24 @@
   </ejs-grid>
 </section>
 
-
+<app-filter-dialog [items]="filteredItems" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+  <form class="bootstrap" [formGroup]="regionFilterFormGroup">
+    <div class="input-container">
+      <label>Region</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+        formControlName="ids"
+        placeholder="All"
+        [allowFiltering]="true"
+        [fields]="optionFields"
+        [showDropDownIcon]="true"
+        [dataSource]="regions">
+</ejs-multiselect>
+      </div>
+    </div>
+  
+  </form>
+</app-filter-dialog>
 <app-side-dialog
   (formCancelClicked)="onFormCancelClick()"
   (formSaveClicked)="onFormSaveClick()"
@@ -117,8 +155,9 @@
           <input id="name"
                   class="e-input"
                   type="text"
-                  maxlength="50"
+                  maxlength="20"
                   appValidateWithMessage
+                  pattern="^[A-Za-z -]+$"
                   formControlName="region"/>
         </div>
       </div>
