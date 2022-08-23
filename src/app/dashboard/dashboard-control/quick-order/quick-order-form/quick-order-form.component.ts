@@ -1,7 +1,17 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnInit,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ChangeEventArgs, FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { combineLatest, debounceTime, filter, Observable, of, Subject, takeUntil } from 'rxjs';
+import { Select, Store } from '@ngxs/store';
 
 import { OrderType } from '@shared/enums/order-type';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
@@ -10,20 +20,24 @@ import { currencyValidator } from '@shared/validators/currency.validator';
 import { integerValidator } from '@shared/validators/integer.validator';
 import { AllOrganizationsSkill } from 'src/app/dashboard/models/all-organization-skill.model';
 import { Duration } from '@shared/enums/durations';
-import { combineLatest, debounceTime, filter, Observable, of, Subject, takeUntil } from 'rxjs';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { BillRate } from '@shared/models';
 import { JobDistribution } from '@shared/enums/job-distibution';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
-import { Select, Store } from '@ngxs/store';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
-import { GetAssociateAgencies } from '@client/store/order-managment-content.actions';
+import { GetAssociateAgencies, GetProjectSpecialData } from '@client/store/order-managment-content.actions';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import { ReasonForRequisitionList } from '@shared/models/reason-for-requisition-list';
 import PriceUtils from '@shared/utils/price.utils';
 import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
+import { ProjectSpecialData } from '@shared/models/project-special-data.model';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
+import { SettingsHelper } from '@core/helpers/settings.helper';
+import { SettingsKeys } from '@shared/enums/settings';
 
 @Component({
   selector: 'app-quick-order-form',
@@ -45,10 +59,13 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public generalInformationForm: FormGroup;
   public jobDistributionDescriptionForm: FormGroup;
   public contactDetailsForm: FormGroup;
+  public specialProjectForm: FormGroup;
   public orderStatus = 'Open';
   public isPermPlacementOrder = false;
   public priceUtils = PriceUtils;
   public isEditContactTitle = false;
+  public isSpecialProjectFieldsRequired = true;
+  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
 
   public readonly orderTypes = [
     { id: OrderType.ContractToPerm, name: 'Contract To Perm' },
@@ -93,7 +110,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public isContactToPermOrder = false;
   public isTravelerOrder = false;
   public isOpenPerDiem = false;
-  public isReOrder = false
+  public isReOrder = false;
 
   public readonly jobDistributions = [
     { id: JobDistribution.All, name: 'All' },
@@ -117,12 +134,21 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     { id: MasterShiftName.Rotating, name: 'Rotating' },
   ];
 
+  @Select(OrderManagementContentState.projectSpecialData)
+  public readonly projectSpecialData$: Observable<ProjectSpecialData>;
+  public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
+  public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
+  public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
+
   public readonly masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public readonly reasonsForRequisition = ReasonForRequisitionList;
   public readonly reasonForRequisitionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public readonly contactDetailTitles = ORDER_CONTACT_DETAIL_TITLES;
+
+  @Select(OrganizationManagementState.organizationSettings)
+  private readonly organizationSettings$: Observable<OrganizationSettingsGet[]>;
 
   get organizationControl() {
     return this.organizationForm.get('organization') as AbstractControl;
@@ -172,7 +198,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     private readonly fb: FormBuilder,
     private readonly cdr: ChangeDetectorRef,
     private readonly store: Store,
-    private readonly orderManagementService: OrderManagementContentService,
+    private readonly orderManagementService: OrderManagementContentService
   ) {
     super();
   }
@@ -192,13 +218,18 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.refreshMultiSelectAfterOpenDialog();
     this.initContactDetailsForm();
 
-    if(!this.userIsAdmin) {
+    this.subscribeForSettings();
+    this.initSpecialProjectForm();
+
+    if (!this.userIsAdmin) {
       this.store.dispatch(new GetAssociateAgencies());
+      this.store.dispatch(new GetProjectSpecialData());
+      this.store.dispatch(new GetOrganizationSettings());
     }
 
     this.associateAgencies$.subscribe((data) => {
       console.error(data);
-    })
+    });
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -211,6 +242,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       organization: [null, Validators.required],
     });
   }
+
   private initOrderTypeForm(): void {
     this.orderTypeForm = this.fb.group({
       orderType: [null, Validators.required],
@@ -252,8 +284,16 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.contactDetailsForm = this.fb.group({
       title: [[], Validators.required],
       name: ['', Validators.required],
-      email: ['', Validators.required, Validators.email]
-    })
+      email: ['', Validators.required, Validators.email],
+    });
+  }
+
+  private initSpecialProjectForm(): void {
+    this.specialProjectForm = this.fb.group({
+      projectTypeId: [null, Validators.required],
+      projectNameId: [null, Validators.required],
+      poNumberId: [null, Validators.required],
+    });
   }
 
   public onOrganizationDropDownSelected(event: ChangeEventArgs): void {
@@ -261,7 +301,9 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.regionDataSource = selectedOrganization.regions;
     this.isRegionsDropDownEnabled = true;
     this.handleAllOrganizationSkills(selectedOrganization.organizationId);
+    this.store.dispatch(new GetOrganizationSettings(undefined, selectedOrganization.organizationId));
     this.store.dispatch(new GetAssociateAgencies(selectedOrganization.organizationId));
+    this.store.dispatch(new GetProjectSpecialData(selectedOrganization.organizationId));
   }
 
   public onRegionDropDownSelected(event: ChangeEventArgs): void {
@@ -387,7 +429,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       });
   }
 
-  private populateHourlyRateField(orderType: OrderType, departmentId: number, skillId: number, organizationId?: number): void {
+  private populateHourlyRateField(orderType: OrderType,departmentId: number, skillId: number, organizationId?: number): void {
     if (this.isTravelerOrder || this.isContactToPermOrder) {
       this.orderManagementService
         .getRegularLocalBillRate(orderType, departmentId, skillId, organizationId)
@@ -424,17 +466,15 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     // });
   }
   private populateJobjobDistributionForm(): void {
-    this.jobDistributionControl.patchValue([
-      JobDistribution.All
-    ]);
+    this.jobDistributionControl.patchValue([JobDistribution.All]);
   }
 
   private refreshMultiSelectAfterOpenDialog(): void {
     this.openEvent.pipe(takeUntil(this.destroy$), debounceTime(300)).subscribe((isOpen) => {
-      if(isOpen) {
+      if (isOpen) {
         this.multiselect.refresh();
       }
-    })
+    });
   }
 
   private handleJobDistributionValueChanges(): void {
@@ -484,8 +524,32 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
             };
           });
 
-        this.jobDistributionsControl.patchValue([...jobDistributions, ...selectedJobDistributions], { emitEvent: false });
+        this.jobDistributionsControl.patchValue([...jobDistributions, ...selectedJobDistributions], {
+          emitEvent: false,
+        });
       });
+  }
+
+  private subscribeForSettings(): void {
+    this.organizationSettings$.pipe(takeUntil(this.destroy$)).subscribe((settings) => {
+      
+      this.settings = SettingsHelper.mapSettings(settings);
+      this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
+      if (this.specialProjectForm != null) {
+        if (this.isSpecialProjectFieldsRequired) {
+          this.specialProjectForm.controls['projectTypeId'].setValidators(Validators.required);
+          this.specialProjectForm.controls['projectNameId'].setValidators(Validators.required);
+          this.specialProjectForm.controls['poNumberId'].setValidators(Validators.required);
+        } else {
+          this.specialProjectForm.controls['projectTypeId'].clearValidators();
+          this.specialProjectForm.controls['projectNameId'].clearValidators();
+          this.specialProjectForm.controls['poNumberId'].clearValidators();
+        }
+        this.specialProjectForm.controls['projectTypeId'].updateValueAndValidity();
+        this.specialProjectForm.controls['projectNameId'].updateValueAndValidity();
+        this.specialProjectForm.controls['poNumberId'].updateValueAndValidity();
+      }
+    });
   }
 
   public onSubmitQuickOrderForm(): void {

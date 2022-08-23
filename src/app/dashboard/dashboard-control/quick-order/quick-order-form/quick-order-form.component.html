@@ -443,6 +443,53 @@
         </form>
       </div>
     </div>
+
+    <div class="special-project">
+      <div class="title">Special Project</div>
+      <form [formGroup]="specialProjectForm">
+        <div class="row">
+          <!-- Special Project Category -->
+          <div class="input-container bootstrap form-line-item-40">
+            <label>Special Project Category<span *ngIf="isSpecialProjectFieldsRequired" class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist
+                formControlName="projectTypeId"
+                appValidateWithMessage
+                [dataSource]="(projectSpecialData$ | async)?.specialProjectCategories"
+                [fields]="specialProjectCategoriesFields"
+              >
+              </ejs-dropdownlist>
+            </div>
+          </div>
+          <!-- Project Name -->
+          <div class="input-container bootstrap form-line-item-30">
+            <label>Project Name<span *ngIf="isSpecialProjectFieldsRequired" class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist
+                formControlName="projectNameId"
+                appValidateWithMessage
+                [dataSource]="(projectSpecialData$ | async)?.projectNames"
+                [fields]="projectNameFields"
+              >
+              </ejs-dropdownlist>
+            </div>
+          </div>
+          <!-- PO# -->
+          <div class="input-container bootstrap form-line-item-30">
+            <label>PO#<span *ngIf="isSpecialProjectFieldsRequired" class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist
+                formControlName="poNumberId"
+                appValidateWithMessage
+                [dataSource]="(projectSpecialData$ | async)?.poNumbers"
+                [fields]="poNumberFields"
+              >
+              </ejs-dropdownlist>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
   </section>
 </div>
 
