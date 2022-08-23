@@ -120,7 +120,7 @@ export class RejectReasonService {
    * @param id
    */
   public removeOrderRequisition(id: number): Observable<void> {
-    return this.http.delete<void>(`/api/OrderRequisition`, { body : { id: id }});
+    return this.http.delete<void>(`/api/OrderRequisition/${id}`);
   }
   
   /**

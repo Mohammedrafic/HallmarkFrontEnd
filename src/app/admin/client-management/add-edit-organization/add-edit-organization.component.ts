@@ -74,6 +74,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
   private user: User | null;
+  public profileMode: boolean = false;
 
   @Select(AdminState.countries)
   countries$: Observable<string[]>;
@@ -114,13 +115,6 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     private fb: FormBuilder
   ) {
     actions$
-      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveOrganizationSucceeded))
-      .subscribe((organization: { payload: Organization }) => {
-        this.currentBusinessUnitId = organization.payload.organizationId as number;
-        this.uploadImages(this.currentBusinessUnitId);
-        this.navigateBack();
-      });
-    actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetOrganizationByIdSucceeded))
       .subscribe((organization: { payload: Organization }) => {
         this.currentBusinessUnitId = organization.payload.organizationId as number;
@@ -128,6 +122,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
         this.isSameAsOrg = organization.payload.billingDetails.sameAsOrganization;
         if (this.isSameAsOrg) {
           this.disableBillingForm();
+          this.disableForms();
         }
       });
     actions$
@@ -135,16 +130,34 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
       .subscribe((logo: { payload: Blob }) => {
         this.logo = logo.payload;
       });
-    store.dispatch(new SetHeaderState({ iconName: 'file-text', title: 'Organization List' }));
-    store.dispatch(new GetBusinessUnitList());
-    store.dispatch(new GetDBConnections());
-    if (route.snapshot.paramMap.get('organizationId')) {
-      this.title = 'Edit';
-      const businessUnitId = parseInt(route.snapshot.paramMap.get('organizationId') as string);
-      store.dispatch(new GetOrganizationById(businessUnitId));
-      store.dispatch(new GetOrganizationLogo(businessUnitId));
+
+    if (route.snapshot.paramMap.get('profile')) {
+      this.profileMode = true;
+      store.dispatch(new SetHeaderState({ iconName: 'user', title: 'Organization Profile' }));
+      const user = this.store.selectSnapshot(UserState.user);
+      store.dispatch(new GetOrganizationById(user?.businessUnitId as number));
+      store.dispatch(new GetOrganizationLogo(user?.businessUnitId as number));
     } else {
-      this.initForms();
+      store.dispatch(new SetHeaderState({ iconName: 'file-text', title: 'Organization List' }));
+      store.dispatch(new GetBusinessUnitList());
+      store.dispatch(new GetDBConnections());
+      if (route.snapshot.paramMap.get('organizationId')) {
+        this.title = 'Edit';
+        const businessUnitId = parseInt(route.snapshot.paramMap.get('organizationId') as string);
+        store.dispatch(new GetOrganizationById(businessUnitId));
+        store.dispatch(new GetOrganizationLogo(businessUnitId));
+      } else {
+        this.initForms();
+      }
+    }
+    if (!this.profileMode) {
+      actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveOrganizationSucceeded))
+      .subscribe((organization: { payload: Organization }) => {
+        this.currentBusinessUnitId = organization.payload.organizationId as number;
+        this.uploadImages(this.currentBusinessUnitId);
+        this.navigateBack();
+      });
     }
   }
 
@@ -164,11 +177,18 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     this.user = null;
   }
 
+  private disableForms(): void {
+    if (this.profileMode) {
+      this.GeneralInformationFormGroup.disable();
+      this.BillingDetailsFormGroup.disable();
+    }
+  }
+
   public save(): void {
     if (
       this.CreateUnderFormGroup.valid &&
-      this.GeneralInformationFormGroup.valid &&
-      this.BillingDetailsFormGroup.valid &&
+      (this.GeneralInformationFormGroup.disabled || this.GeneralInformationFormGroup.valid) &&
+      (this.BillingDetailsFormGroup.disabled || this.BillingDetailsFormGroup.valid) &&
       this.ContactFormArray.valid &&
       this.PreferencesFormGroup.valid &&
       this.dataBaseConnectionsFormGroup.valid
@@ -300,7 +320,11 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   }
 
   public navigateBack(): void {
-    this.router.navigate(['/admin/client-management']);
+    if (this.profileMode) {
+      this.router.navigate(['/client/dashboard']);
+    } else {
+      this.router.navigate(['/admin/client-management']);
+    }
   }
 
   public clearForm(): void {

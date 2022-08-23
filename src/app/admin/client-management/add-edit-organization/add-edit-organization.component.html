@@ -1,15 +1,20 @@
 <section class="controls-container">
-  <div>
-    <button ejs-button cssClass="e-outline" (click)="navigateBack()" id="backButton">Back</button>
-  </div>
-  <div class="form-title"><h3>{{ title }} Organization</h3></div>
+  <ng-container *ngIf="!profileMode">
+    <div>
+      <button ejs-button cssClass="e-outline" (click)="navigateBack()" id="backButton">Back</button>
+    </div>
+    <div class="form-title"><h3>{{ title }} Organization</h3></div>
+  </ng-container>
+  <ng-container *ngIf="profileMode">
+    <div class="profile"><h3>Edit Organization Profile</h3></div>
+  </ng-container>
   <div class="controls-form stick-right">
-    <button ejs-button cssClass="e-outline" (click)="clearForm()" id="clearButton">Clear</button>
+    <button *ngIf="!profileMode" ejs-button cssClass="e-outline" (click)="clearForm()" id="clearButton">Clear</button>
     <button ejs-button cssClass="e-outline" (click)="navigateBack()" id="cancelButton">Cancel</button>
     <button ejs-button [isPrimary]="true" (click)="save()" class="save-button" id="saveButton">Save</button>
   </div>
 </section>
-<section class="create-under-container bootstrap" *ngIf="!isMspUser">
+<section class="create-under-container bootstrap" *ngIf="!isMspUser && !profileMode">
   <div class="left-section">
     <form *ngIf="CreateUnderFormGroup && isAddMode" [formGroup]="CreateUnderFormGroup" id="createUnder">
       <label>Create Under<span class="required">*</span></label>
@@ -166,7 +171,7 @@
         <div class="billing-details bootstrap">
           <div class="title">Billing Details</div>
           <div class="org-address-checkbox">
-            <ejs-checkbox [checked]="isSameAsOrg" (change)="sameAsOrgChange($event)" label="Same As Organization"></ejs-checkbox>
+            <ejs-checkbox [checked]="isSameAsOrg" (change)="sameAsOrgChange($event)" label="Same As Organization" [disabled]="profileMode"></ejs-checkbox>
           </div>
           <div class="billing-details-section">
             <div class="left-column">
@@ -296,10 +301,10 @@
   </div>
 
   <div class="right-section">
-    <app-image-uploader uploaderTitle="Logo" [logo]="logo" (selectImage)="onImageSelect($event)"></app-image-uploader>
+    <app-image-uploader uploaderTitle="Logo" [logo]="logo" (selectImage)="onImageSelect($event)" [disabled]="profileMode"></app-image-uploader>
 
     <!---Preferences section-->
-    <div tabindex="0" class="e-card">
+    <div *ngIf="!profileMode" tabindex="0" class="e-card">
       <div class="e-card-header">
         <div class="e-card-header-caption">
           <div class="e-card-title">Preferences</div>
