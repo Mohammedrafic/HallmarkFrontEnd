@@ -739,7 +739,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private subscribeForSettings(): void {
-    this.organizationSettings$.pipe(takeUntil(this.unsubscribe$)).subscribe((settings) => {
+    this.organizationSettings$.pipe(takeUntil(this.unsubscribe$), filter(settings => !!settings.length)).subscribe((settings) => {
       this.settings = SettingsHelper.mapSettings(settings);
       this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
       this.orderTypeDataSourceHandler();
