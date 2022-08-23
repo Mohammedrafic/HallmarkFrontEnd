@@ -100,6 +100,7 @@ import { SkillGroupService } from '@shared/services/skill-group.service';
 import { OrganizationSettingsService } from '@shared/services/organization-settings.service';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { GeneralTimeZones } from '@shared/constants/general-timezones';
 
 interface DropdownOption {
   id: number;
@@ -146,6 +147,7 @@ export interface OrganizationManagementStateModel {
   locationFilterOptions: LocationFilterOptions | null;
   departmentFilterOptions: DepartmentFilterOptions | null;
   organizationSettingsFilterOptions: string[] | null;
+  timeZones: string[] | null;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -191,6 +193,7 @@ export interface OrganizationManagementStateModel {
     locationFilterOptions: null,
     departmentFilterOptions: null,
     organizationSettingsFilterOptions: null,
+    timeZones :GeneralTimeZones
   },
 })
 @Injectable()
@@ -278,6 +281,10 @@ export class OrganizationManagementState {
 
   @Selector()
   static organizationSettingsFilterOptions(state: OrganizationManagementStateModel): string[] | null { return state.organizationSettingsFilterOptions; }
+
+  @Selector()
+  static timeZones(state: OrganizationManagementStateModel): string[] | null { return state.timeZones; }
+
 
   constructor(
     private organizationService: OrganizationService,

@@ -17,8 +17,9 @@ export class Location {
   phoneNumber: string;
   ext?: string;
   glNumber?: string;
-  invoiceNote?: string;
   inactiveDate?: string;
+  timeZone : number;
+  locationTypeId? :number;
 }
 
 export type LocationsPage = PageOfCollections<Location>;

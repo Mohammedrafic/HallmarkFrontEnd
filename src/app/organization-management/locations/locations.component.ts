@@ -45,6 +45,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { TimeZones} from '@shared/enums/timezones';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
 
@@ -86,6 +87,9 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   @Select(OrganizationManagementState.locationFilterOptions)
   locationFilterOptions$: Observable<LocationFilterOptions>;
+
+  @Select(OrganizationManagementState.timeZones)
+  timeZones$: Observable<FieldSettingsModel[]>;
 
   isEdit: boolean;
   editedLocationId?: number;
@@ -338,12 +342,13 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       state: location.state,
       glNumber: location.glNumber,
       ext: location.ext,
-      invoiceNote: location.invoiceNote,
       contactEmail: location.contactEmail,
       contactPerson: location.contactPerson,
       inactiveDate: location.inactiveDate,
       phoneNumber: location.phoneNumber,
-      phoneType: PhoneTypes[location.phoneType]
+      phoneType: PhoneTypes[location.phoneType],
+      timeZone :TimeZones[location.timeZone],
+      locationType :null
     });
     this.editedLocationId = location.id;
     this.isEdit = true;
@@ -405,12 +410,12 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         state: this.locationDetailsFormGroup.controls['state'].value,
         glNumber: this.locationDetailsFormGroup.controls['glNumber'].value,
         ext: this.locationDetailsFormGroup.controls['ext'].value,
-        invoiceNote: this.locationDetailsFormGroup.controls['invoiceNote'].value,
         contactEmail: this.locationDetailsFormGroup.controls['contactEmail'].value,
         contactPerson: this.locationDetailsFormGroup.controls['contactPerson'].value,
         inactiveDate: this.locationDetailsFormGroup.controls['inactiveDate'].value,
         phoneNumber: this.locationDetailsFormGroup.controls['phoneNumber'].value,
         phoneType: parseInt(PhoneTypes[this.locationDetailsFormGroup.controls['phoneType'].value]),
+        timeZone: parseInt(TimeZones[this.locationDetailsFormGroup.controls['timeZone'].value])
       }
 
       this.saveOrUpdateLocation(location);
@@ -437,13 +442,9 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     }
   }
 
-  onAllowDeployWOCreadentialsCheck(event: any): void {
-  //  TODO: add functionality after BE implementation
-  }
-
   private createLocationForm(): void {
     this.locationDetailsFormGroup = this.formBuilder.group({
-      invoiceId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+      invoiceId: [null],
       externalId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       address1: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(100)]],
@@ -452,13 +453,14 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       city: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(20)]],
       state: ['', [Validators.required]],
       glNumber: [null, Validators.maxLength(50)],
-      invoiceNote: [null, Validators.maxLength(50)],
       ext: [null, Validators.maxLength(50)],
       contactEmail: ['', [Validators.required, Validators.email]],
       contactPerson: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       inactiveDate: [null],
       phoneNumber: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10), Validators.pattern('^[0-9]*$')]],
       phoneType: ['', Validators.required],
+      timeZone: ['', Validators.required],
+      locationType: [null],
     });
 
     this.regionFormGroup = this.formBuilder.group({
