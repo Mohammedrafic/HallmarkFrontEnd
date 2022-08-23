@@ -1,7 +1,6 @@
 import { AlertChannel } from "@admin/alerts/alerts.enum";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
-import { PageOfCollections } from "./page.model";
-export type AlertsTemplate = {
+export class AlertsTemplate  {
   alertId: number;
   alertTitle:string;
   status: string;
@@ -12,7 +11,7 @@ export type AlertsTemplate = {
   onScreenTemplateExist: boolean;
   onScreenTemplateId: number
 };
-export type EditAlertsTemplate = {
+export class EditAlertsTemplate {
   id:number;
   alertId: number;
   alertChannel:AlertChannel;    
@@ -24,7 +23,7 @@ export type EditAlertsTemplate = {
   bCCList: string;
   parameters: string[];
 };
-export type EditAlertsTemplateRequest = {
+export class EditAlertsTemplateRequest  {
   id:number;
   alertChannel:AlertChannel;      
   alertTitle:string;
@@ -34,6 +33,14 @@ export type EditAlertsTemplateRequest = {
   bCCList: string;
 };
   
-  export type AlertsTemplatePage = PageOfCollections<AlertsTemplate>;
-  export type AlertsTemplateFilters = {
+  
+  export class AlertsTemplateFilters {
   };
+  export class AlertsTemplatePage {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    items: AlertsTemplate[];
+    pageNumber: number;
+    totalCount: number;
+    totalPages: number;
+  }

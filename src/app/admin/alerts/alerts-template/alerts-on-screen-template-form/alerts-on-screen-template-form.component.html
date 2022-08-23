@@ -11,7 +11,7 @@
                 <label>Text<span class="required">*</span></label>
                 <div class="input-group">
                     <ejs-richtexteditor #OnScreenRTE id='onScreenDefaultRTE' appValidateWithMessage formControlName="alertBody"
-                        [toolbarSettings]='tools' [(ngModel)]='alertBody' [(value)]='alertBody'>
+                        [toolbarSettings]='tools' [(ngModel)]='alertBody' [(value)]='alertBody' [showCharCount]='true' [maxLength]='200'>
                     </ejs-richtexteditor>
                     
                 </div>

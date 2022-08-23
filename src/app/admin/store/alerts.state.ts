@@ -9,8 +9,7 @@ import { AlertsTemplate, AlertsTemplatePage, EditAlertsTemplate } from "@shared/
 
 interface AlertsStateModel {
     userSubscriptionPage: UserSubscriptionPage | null;
-    //alertsTemplatePage:AlertsTemplatePage |null;
-    alertsTemplates:AlertsTemplate[]| null;
+    alertsTemplatePage:AlertsTemplatePage |null;
     editAlertsTemplate:EditAlertsTemplate|null;
 }
 
@@ -22,18 +21,16 @@ export class AlertsState {
     return state.userSubscriptionPage;
   }
   @Selector()
-  static AlertsTemplatePage(state: AlertsStateModel): AlertsTemplate[] | null {
-    //return state.alertsTemplatePage;
-    return state.alertsTemplates;
+  static AlertsTemplatePage(state: AlertsStateModel): AlertsTemplatePage | null {
+    return state.alertsTemplatePage;
+    
   }
   @Selector()
   static TemplateByAlertId(state: AlertsStateModel): EditAlertsTemplate | null {
-    //return state.alertsTemplatePage;
     return state.editAlertsTemplate;
   }
   @Selector()
   static SaveTemplateByAlertId(state: AlertsStateModel): EditAlertsTemplate | null {
-    //return state.alertsTemplatePage;
     return state.editAlertsTemplate;
   }
   constructor(
@@ -58,10 +55,10 @@ export class AlertsState {
   GetAlertsTemplatePage(
     { patchState }: StateContext<AlertsStateModel>,
     { bussinessUnitType,pageNumber, pageSize, sortModel, filterModel, filters }: GetAlertsTemplatePage
-  ): Observable<AlertsTemplate[]> {
+  ): Observable<AlertsTemplatePage> {
     return this.alertsService.getAlertsTemplatePage(bussinessUnitType,pageNumber, pageSize, sortModel, filterModel, filters).pipe(
       tap((payload) => {
-        patchState({ alertsTemplates: payload });
+        patchState({ alertsTemplatePage: payload });
         return payload;
       })
     );

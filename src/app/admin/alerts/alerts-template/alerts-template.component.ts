@@ -186,19 +186,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           menuTabs: []
         },
       },
-      {
-        headerName: 'Action',
-        cellRenderer: 'buttonRenderer',
-        cellRendererParams: {
-          onClick: this.onRemove.bind(this),
-          label: 'Delete'
-        },
-        pinned: 'right',
-        suppressMovable: true,
-        filter: false,
-        sortable: false,
-        menuTabs: []
-      }
+      
     ];
 
     this.defaultColDef = {
@@ -251,19 +239,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     this.alertTemplateType = AlertChannel[AlertChannel.OnScreen];
     this.onEdit(data.rowData);
   }
-  public onRemove(data: AlertsTemplate): void {
-    this.confirmService
-      .confirm(DELETE_RECORD_TEXT, {
-        title: DELETE_RECORD_TITLE,
-        okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button',
-      })
-      .subscribe((confirm) => {
-        if (confirm && data.alertId) {
-          // this.store.dispatch(new RemoveRole(data.id))
-        }
-      });
-  }
+  
   public onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
@@ -295,7 +271,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
 
           self.alertsTemplatePage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
             if (data != undefined) {
-              self.itemList = data;
+              self.itemList = data.items;
               params.successCallback(self.itemList, data.length || 1);
             }
           });

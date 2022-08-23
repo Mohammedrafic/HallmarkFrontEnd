@@ -5,7 +5,7 @@
                 <label>SMS Body<span class="required">*</span></label>
                 <div class="input-group">
                     <ejs-richtexteditor #SMSRTE id='smsDefaultRTE' appValidateWithMessage formControlName="alertBody"
-                        [(ngModel)]='alertBody' [(value)]='alertBody' maxlength="200">
+                        [(ngModel)]='alertBody' [(value)]='alertBody' [showCharCount]='true' [maxLength]='100'>
                     </ejs-richtexteditor>   
                                      
                 </div>

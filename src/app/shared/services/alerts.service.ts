@@ -79,23 +79,9 @@ export class AlertsService {
     SortModel: any,
     FilterModel: any,
     Filters: AlertsTemplateFilters
-  ): Observable<AlertsTemplate[]> {
-    
-    //return this.http.get<AlertsTemplatePage>(`/api/Templates/GetAlertsForTemplate`, { BusinessUnitType, PageNumber, PageSize, SortModel, FilterModel, ...Filters });
-    return this.http.get<AlertsTemplate[]>(`/api/Templates/GetAlertsForTemplate/`+ BusinessUnitType);
-    // ObservableColl.subscribe((data)=>{
-    //   this.alertsTemplatePage = {
-    //     items: data,
-    //     pageNumber: 1,
-    //     totalPages: 2,
-    //     totalCount: data.length,
-    //     hasPreviousPage: false,
-    //     hasNextPage: false
-    //   }
-    // })
-    
-    //return of(this.alertsTemplatePage);
-  }
+  ): Observable<AlertsTemplatePage> {    
+    return this.http.get<AlertsTemplatePage>(`/api/Templates/GetAlertsForTemplate/`+BusinessUnitType,{ params: { PageNumber: PageNumber, PageSize: PageSize }});
+      }
   
   /**
    * Get Template By AlertId
@@ -107,10 +93,8 @@ export class AlertsService {
    public getTemplateByAlertId(
     AlertId:number,
     AlertChannelId:AlertChannel
-  ): Observable<EditAlertsTemplate> {
-  
+  ): Observable<EditAlertsTemplate> {  
     return this.http.get<EditAlertsTemplate>(`/api/Templates/GetTemplateByAlertId/`+ AlertId+`?alertChannel=`+AlertChannelId);
-    
   }
 
   /**
@@ -121,11 +105,9 @@ export class AlertsService {
    */
    public saveTemplateByAlertId(
     EditAlertsTemplateRequest:EditAlertsTemplateRequest
-  ): Observable<EditAlertsTemplate> {
-  
+  ): Observable<EditAlertsTemplate> {  
     return this.http.put<EditAlertsTemplate>(`/api/Templates/`,EditAlertsTemplateRequest);
-    
-  }
+ }
   
 }
 
