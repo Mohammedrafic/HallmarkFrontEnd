@@ -1,4 +1,5 @@
-@import"colors";
+@import "colors";
+
 .quick-order-form-container {
   padding: 5px 24px;
 
@@ -6,17 +7,26 @@
     display: flex;
     width: 100%;
 
-    .organization-form {
-      flex: 1;
-      margin-right: 12px;
+    &:not(:last-child) {
+      margin-bottom: 15px;
+    }
+
+    > *:not(:first-child) {
+      box-sizing: border-box;
+      padding-left: 10px;
     }
 
     .order-type-status-form {
       display: flex;
+      flex: 1;
 
       .order-type-container {
         flex: 1;
-        margin-right: 12px;
+        padding-right: 12px;
+      }
+
+      .order-status {
+        width: 32%;
       }
     }
   }
@@ -26,6 +36,8 @@
     margin-bottom: 5px;
   }
 
+  .job-description,
+  .job-distibution,
   .general-information {
     margin: 24px auto;
 
@@ -35,13 +47,21 @@
       font-weight: 700;
       color: $black;
     }
+  }
+}
 
-    .general-information-form-container {
-      .datepicker-container,
-      .input-container {
-        margin-bottom: 15px;
-        margin-right: 10px;
-      }
+.job-description-form {
+  display: flex;
+  width: 100%;
+
+  .job-description {
+    margin: 0;
+    padding-left: 12px;
+  }
+
+  ejs-textbox.e-control {
+    .e-textbox {
+      height: 117px !important;
     }
   }
 }
@@ -52,6 +72,14 @@
 
 .form-line-item-30 {
   width: 30%;
+}
+
+.form-line-item-40 {
+  width: 40%;
+}
+
+.form-line-item-50 {
+  width: 50%;
 }
 
 .form-line-item-60 {
