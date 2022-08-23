@@ -8,6 +8,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import { FeatherModule } from 'angular-feather';
+import { Edit3 } from 'angular-feather/icons';
 
 @NgModule({
   imports: [
@@ -21,6 +23,7 @@ import { NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inp
     TimePickerModule,
     TextBoxModule,
     NumericTextBoxModule,
+    FeatherModule.pick({Edit3}),
   ],
   declarations: [QuickOrderComponent, QuickOrderFormComponent],
   exports: [QuickOrderComponent],

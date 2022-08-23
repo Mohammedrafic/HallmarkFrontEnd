@@ -389,6 +389,60 @@
         </div>
       </form>
     </div>
+
+    <div class="contact-details">
+      <div class="title">Contact Details</div>
+      <div class="contact-details-form-container">
+        <form [formGroup]="contactDetailsForm">
+          <div class="row">
+            <div class="contact-details-title-container form-line-item-35">
+              <div *ngIf="!isEditContactTitle" class="input-container bootstrap">
+                <label>Title<span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist [dataSource]="contactDetailTitles" appValidateWithMessage formControlName="title">
+                  </ejs-dropdownlist>
+                </div>
+              </div>
+
+              <div *ngIf="isEditContactTitle" class="input-container bootstrap">
+                <label>Title<span class="required">*</span></label>
+                <div class="input-group">
+                  <input class="e-input" type="text" appValidateWithMessage formControlName="title" />
+                </div>
+              </div>
+            </div>
+
+            <div class="input-container edit-button-container">
+              <button
+                ejs-button
+                type="button"
+                cssClass="e-outline"
+                class="icon-button"
+                (click)="isEditContactTitle = !isEditContactTitle"
+              >
+                <i-feather name="edit3" class="icon"></i-feather>
+              </button>
+            </div>
+
+            <!-- Contact Person -->
+            <div class="input-container bootstrap form-line-item-30">
+              <label>Contact Person<span class="required">*</span></label>
+              <div class="input-group">
+                <input class="e-input" type="text" appValidateWithMessage maxLength="50" formControlName="name" />
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="input-container bootstrap form-line-item-30">
+              <label>Email<span class="required">*</span></label>
+              <div class="input-group">
+                <input class="e-input" type="email" appValidateWithMessage formControlName="email" />
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   </section>
 </div>
 

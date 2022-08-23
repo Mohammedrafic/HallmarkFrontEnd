@@ -15,7 +15,7 @@
           <h3 class="e-card-title">Create Quick Order</h3>
           <div>
             <button ejs-button cssClass="e-outline calcel" (click)="onCloseDialog()">Cancel</button>
-            <button ejs-button [isPrimary]="true">Submit</button>
+            <button ejs-button [isPrimary]="true" (click)="onSubmitQuickOrder()">Submit</button>
           </div>
         </div>
       </section>
@@ -23,6 +23,7 @@
   </ng-template>
   <ng-template #content>
     <app-quick-order-form
+      #quickOrderForm
       [allOrganizations]="allOrganizations"
       [userIsAdmin]="userIsAdmin"
       [skills]="skills"
