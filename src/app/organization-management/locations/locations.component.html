@@ -298,7 +298,8 @@
               id="locationType"
               appValidateWithMessage
               formControlName="locationType"
-              [dataSource]="null"
+              [fields]="locationTypeOptionFields"
+              [dataSource]="locationTypes$ | async"
           >
             </ejs-dropdownlist>
           </div>
@@ -313,7 +314,7 @@
               id="timeZone"
               appValidateWithMessage
               formControlName="timeZone"
-              [dataSource]="timeZones$ | async"
+              [dataSource]="timeZones$ | async" 
             >
             </ejs-dropdownlist>
           </div>

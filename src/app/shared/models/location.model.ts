@@ -54,3 +54,8 @@ export class LocationFilterOptions {
   zipCodes: string[];
   contactPersons: string[];
 }
+
+export class LocationType{
+  LocationTypeId : number;
+  Name: string;
+}

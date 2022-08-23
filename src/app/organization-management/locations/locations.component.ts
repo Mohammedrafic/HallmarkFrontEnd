@@ -21,11 +21,12 @@ import {
   GetRegions,
   SaveLocation, SaveRegion, SetGeneralStatesByCountry,
   SetImportFileDialogState,
-  UpdateLocation
+  UpdateLocation,
+  GetLocationTypes
 } from '../store/organization-management.actions';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { Location, LocationFilter, LocationFilterOptions, LocationsPage } from '@shared/models/location.model';
+import { Location, LocationFilter, LocationFilterOptions, LocationsPage, LocationType } from '@shared/models/location.model';
 
 import { PhoneTypes } from '@shared/enums/phone-types';
 import {
@@ -91,6 +92,9 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   @Select(OrganizationManagementState.timeZones)
   timeZones$: Observable<FieldSettingsModel[]>;
 
+  @Select(OrganizationManagementState.locationTypes)
+  locationTypes$: Observable<GetLocationTypes>;
+
   isEdit: boolean;
   editedLocationId?: number;
 
@@ -133,6 +137,10 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.createLocationForm();
   }
 
+  public locationTypeOptionFields = {
+    text: 'name', value: 'locationTypeId'
+  };
+
   ngOnInit(): void {
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
       this.currentPage = page;
@@ -170,6 +178,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         this.defaultValue = data.organizationManagement.regions[0]?.id;
       });;
     });
+    this.store.dispatch(new GetLocationTypes());
   }
 
   ngOnDestroy(): void {
@@ -348,7 +357,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       phoneNumber: location.phoneNumber,
       phoneType: PhoneTypes[location.phoneType],
       timeZone :TimeZones[location.timeZone],
-      locationType :null
+      locationType :location.locationTypeId
     });
     this.editedLocationId = location.id;
     this.isEdit = true;
@@ -415,7 +424,8 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         inactiveDate: this.locationDetailsFormGroup.controls['inactiveDate'].value,
         phoneNumber: this.locationDetailsFormGroup.controls['phoneNumber'].value,
         phoneType: parseInt(PhoneTypes[this.locationDetailsFormGroup.controls['phoneType'].value]),
-        timeZone: parseInt(TimeZones[this.locationDetailsFormGroup.controls['timeZone'].value])
+        timeZone: parseInt(TimeZones[this.locationDetailsFormGroup.controls['timeZone'].value]),
+        locationTypeId : this.locationDetailsFormGroup.controls['locationType'].value
       }
 
       this.saveOrUpdateLocation(location);
@@ -491,4 +501,5 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   private getLastPage(data: object[]): number {
     return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
   }
+  
 }

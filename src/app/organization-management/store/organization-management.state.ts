@@ -75,11 +75,12 @@ import {
   GetMasterSkillsByOrganization,
   GetLocationFilterOptions,
   GetDepartmentFilterOptions,
-  GetOrganizationSettingsFilterOptions
+  GetOrganizationSettingsFilterOptions,
+  GetLocationTypes
 } from './organization-management.actions';
 import { Department, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
-import { Location, LocationFilterOptions, LocationsPage } from '@shared/models/location.model';
+import { Location, LocationFilterOptions, LocationsPage , LocationType} from '@shared/models/location.model';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
 import { MasterSkillByOrganization, Skill, SkillsPage, SkillDataSource } from 'src/app/shared/models/skill.model';
@@ -148,6 +149,8 @@ export interface OrganizationManagementStateModel {
   departmentFilterOptions: DepartmentFilterOptions | null;
   organizationSettingsFilterOptions: string[] | null;
   timeZones: string[] | null;
+  loctionTypes: LocationType[] |null;
+  isLocationTypesLoading : boolean;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -193,8 +196,10 @@ export interface OrganizationManagementStateModel {
     locationFilterOptions: null,
     departmentFilterOptions: null,
     organizationSettingsFilterOptions: null,
-    timeZones :GeneralTimeZones
-  },
+    timeZones :GeneralTimeZones,
+    loctionTypes :[],
+    isLocationTypesLoading: false
+   },
 })
 @Injectable()
 export class OrganizationManagementState {
@@ -284,6 +289,9 @@ export class OrganizationManagementState {
 
   @Selector()
   static timeZones(state: OrganizationManagementStateModel): string[] | null { return state.timeZones; }
+
+  @Selector()
+  static locationTypes(state: OrganizationManagementStateModel): LocationType[] | null { return state.loctionTypes; }
 
 
   constructor(
@@ -846,4 +854,15 @@ export class OrganizationManagementState {
       return options;
     }));
   };
+
+  @Action(GetLocationTypes)
+  GetLocationTypes({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetLocationTypes): Observable<LocationType[]> {
+    patchState({ isLocationTypesLoading: true });
+    return this.locationService.getLocationTypes().pipe(
+      tap((payload) => {
+        patchState({ isLocationTypesLoading: false, loctionTypes: payload });
+        return payload;
+      })
+    );
+  }
 }
