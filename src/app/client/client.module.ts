@@ -65,7 +65,7 @@ import { TimesheetsContentComponent } from './timesheets/timesheets-content/time
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { ClientComponent } from './client.component';
 import { TabNavigationComponent } from './order-management/order-management-content/tab-navigation/tab-navigation.component';
-import { SharedModule } from '../shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 import { AddEditOrderComponent } from './order-management/add-edit-order/add-edit-order.component';
 import { OrderDetailsFormComponent } from './order-management/order-details-form/order-details-form.component';
 

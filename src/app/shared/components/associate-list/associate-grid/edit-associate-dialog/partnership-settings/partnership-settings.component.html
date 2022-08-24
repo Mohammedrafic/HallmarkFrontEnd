@@ -43,6 +43,8 @@
                 mode="CheckBox"
                 appValidateWithMessage
                 formControlName="regionIds"
+                [allowFiltering]="true"
+                [showSelectAll]="true"
                 [fields]="optionFields"
                 [dataSource]="jobDistributionInitialData.regions"
               ></ejs-multiselect>
@@ -55,6 +57,8 @@
                 mode="CheckBox"
                 appValidateWithMessage
                 formControlName="orderTypes"
+                [allowFiltering]="true"
+                [showSelectAll]="true"
                 [fields]="optionFields"
                 [dataSource]="orderType"
               ></ejs-multiselect>
@@ -69,6 +73,8 @@
               <ejs-multiselect
                 mode="CheckBox"
                 appValidateWithMessage
+                [allowFiltering]="true"
+                [showSelectAll]="true"
                 formControlName="classifications"
                 [fields]="optionFields"
                 [dataSource]="classification"
@@ -81,6 +87,8 @@
               <ejs-multiselect
                 mode="CheckBox"
                 appValidateWithMessage
+                [allowFiltering]="true"
+                [showSelectAll]="true"
                 formControlName="skillCategoryIds"
                 [fields]="optionFields"
                 [dataSource]="jobDistributionInitialData.skillCategories"

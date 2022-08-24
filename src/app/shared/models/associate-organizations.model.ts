@@ -61,7 +61,6 @@ export enum FeeSettingsClassification {
 }
 
 export enum JobDistributionOrderType {
-  All = 0,
   'Contract to perm' = 1,
   'Open per diem' = 2,
   'Per diem' = 3,
