@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { Observable, takeWhile } from 'rxjs';
@@ -24,12 +24,14 @@ import { currencyValidator } from '@shared/validators/currency.validator';
   templateUrl: './bill-rate-form.component.html',
   styleUrls: ['./bill-rate-form.component.scss'],
 })
-export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
+export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
   @ViewChild('billRateOptions')
   public billRateOptionsDropdown: DropDownListComponent;
   @ViewChild('rateHours')
   public rateHoursInput: MaskedTextBoxComponent;
   @Input() billRateForm: FormGroup;
+  @Input() billRateOptions: BillRateOption[];
+  @Input() billRatesData: BillRate[];
   billRateTypes = BillRateTypes;
   public billRateConfig: BillRateOption;
   public optionFields = {
@@ -41,6 +43,8 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
     text: 'name',
     value: 'id',
   };
+
+  public billRateOptionsForSelect: BillRateOption[];
 
   public isIntervalMinControlRequired = true;
   public isIntervalMaxControlRequired = true;
@@ -84,6 +88,14 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
     intervalMaxControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
       this.isIntervalMaxControlRequired = intervalMaxControl.hasValidator(Validators.required);
     });
+  }
+
+  ngOnChanges(): void {
+    if (this.billRateOptions && this.billRatesData) {
+      this.billRateOptionsForSelect = this.billRateOptions.filter((rate) => {
+        return !!this.billRatesData.find((item) => item.billRateConfigId === rate.id)
+      });
+    }
   }
 
   ngAfterViewInit(): void {
