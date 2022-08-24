@@ -15,22 +15,16 @@ export const OPRION_FIELDS = {
 
 export const DISABLED_GROUP = [BusinessUnitType.Agency, BusinessUnitType.Organization];
 
-export const BUSSINES_DATA_FIELDS = {
+export const BUSINESS_DATA_FIELDS = {
   text: 'name',
   value: 'id',
 };
 export const User_DATA_FIELDS = {
-  text: 'name',
-  value: 'guid',
+  text: 'fullName',
+  value: 'id',
 };
 export const alertsFilterColumns: FilterColumnsModel = {
-//   permissionsIds: {
-//     type: ControlTypes.Multiselect,
-//     valueType: ValueType.Id,
-//     dataSource: [],
-//     valueField: 'name',
-//     valueId: 'id',
-//   },
+
 };
 export const toolsRichTextEditor: object = {
   items: [

@@ -6,7 +6,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { Observable, Subject, takeWhile } from 'rxjs';
 import { SecurityState } from 'src/app/security/store/security.state';
-import { alertsFilterColumns, BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS } from '../alerts.constants';
+import { alertsFilterColumns, BUSINESS_UNITS_VALUES, BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, User_DATA_FIELDS } from '../alerts.constants';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
 import { ToggleSwitchComponent } from '../toggle-switch/toggle-switch.component';
@@ -15,10 +15,14 @@ import { AlertChannel, AlertEnum } from 'src/app/admin/alerts/alerts.enum';
 import { GetUserSubscriptionPage, UpdateUserSubscription } from '@admin/store/alerts.actions';
 import { UserSubscription, UserSubscriptionFilters, UserSubscriptionPage, UserSubscriptionRequest } from '@shared/models/user-subscription.model';
 import { AlertsState } from '@admin/store/alerts.state';
-import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
+import { GetAllUsersPage, GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { SetHeaderState } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowToast } from 'src/app/store/app.actions';
+import { User, UsersPage } from '@shared/models/user.model';
+import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
+import { MessageTypes } from '@shared/enums/message-types';
+import { RECORD_MODIFIED } from '@shared/constants';
 
 @Component({
   selector: 'app-user-subscription',
@@ -27,7 +31,10 @@ import { SetHeaderState } from 'src/app/store/app.actions';
 })
 export class UserSubscriptionComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Select(SecurityState.bussinesData)
-  public bussinesData$: Observable<BusinessUnit[]>;
+  public businessData$: Observable<BusinessUnit[]>;
+  
+  @Select(SecurityState.allUsersPage)
+  public userData$: Observable<UsersPage>;
 
   @Select(AlertsState.UserSubscriptionPage)
   public userSubscriptionPage$: Observable<UserSubscriptionPage>;
@@ -41,7 +48,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public isBusinessFormDisabled = false;
   public businessUnits = BUSINESS_UNITS_VALUES;
   public optionFields = OPRION_FIELDS;
-  public bussinesDataFields = BUSSINES_DATA_FIELDS;
+  public businessDataFields = BUSINESS_DATA_FIELDS;  
+  public userDataFields = User_DATA_FIELDS;
   public roleId: number | null;
   public filterColumns = alertsFilterColumns;
   private filters: UserSubscriptionFilters = {};
@@ -49,7 +57,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public defaultColDef: any;
   public autoGroupColumnDef: any;
   public title: string = "User Subscription";
-  public userGuid: string = "BB401BC8-EA62-49B0-ABBD-9A32C3DA0853";
+  //public userGuid: string = "BB401BC8-EA62-49B0-ABBD-9A32C3DA0853";
+  public userGuid: string = "";
   itemList: Array<UserSubscription> | undefined;
   private gridApi: any;
   private gridColumnApi: any;
@@ -66,12 +75,17 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   sideBar: any;
   serverSideStoreType: any;
   maxBlocksInCache: any;
+  defaultValue:any;
+  userData:User[];
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
   }
 
   get businessControl(): AbstractControl {
     return this.businessForm.get('business') as AbstractControl;
+  }
+  get usersControl(): AbstractControl {
+    return this.businessForm.get('user') as AbstractControl;
   }
   constructor(private actions$: Actions,
     private store: Store) {
@@ -163,10 +177,15 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   ngOnDestroy(): void {
     this.isAlive = false;
   }
-
+  public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
+  public noRowsOverlayComponentParams: any = {
+    noRowsMessageFunc: () => 'No Rows To Show',
+  };
   ngOnInit(): void {
     this.businessForm = this.generateBusinessForm();
     this.onBusinessUnitValueChanged();
+    this.onBusinessValueChanged();
+    this.onUserValueChanged();
 
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
@@ -186,10 +205,18 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         takeWhile(() => this.isAlive)
       );
 
-
-    this.bussinesData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-
-    });
+      this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+        
+        if (!this.isBusinessFormDisabled) {
+          this.defaultValue = data[0]?.id;
+        }
+      });
+      this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => { 
+        if(data!=undefined)
+        {       
+        this.userData=data.items;
+        }
+      });
   }
   public onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;
@@ -203,18 +230,36 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     return new FormGroup({
       businessUnit: new FormControl(),
       business: new FormControl(0),
+      user:new FormControl(0)
     });
   }
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      this.userData=[];
+      this.itemList=[];
       this.store.dispatch(new GetBusinessByUnitType(value));
-
-      if (!this.isBusinessFormDisabled) {
-        this.businessControl.patchValue(0);
-      }
-      this.dispatchNewPage();
+      
     });
   }
+  private onBusinessValueChanged(): void {
+    this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      this.userData=[];
+      this.itemList=[];
+      let businessUnitIds=[];
+      if(value!=0 &&value!=null)
+      {
+      businessUnitIds.push(this.businessControl.value);
+      }
+      this.store.dispatch(new GetAllUsersPage(this.businessUnitControl.value,businessUnitIds,this.currentPage,this.pageSize,null,null, true));
+      
+    });
+  } 
+  private onUserValueChanged(): void {
+    this.usersControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      this.dispatchNewPage();
+      
+    });
+  }   
   createServerSideDatasource() {
     let self = this;
     return {
@@ -235,12 +280,17 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           else filter = null;
 
           var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
-          self.dispatchNewPage(sort, filter);
           self.userSubscriptionPage$.pipe().subscribe((data: any) => {
-            if (data != undefined) {
-              self.itemList = data.items;
-              params.successCallback(self.itemList, data.totalCount || 1);
-            }
+          
+              self.itemList = data?.items;
+              if (!self.itemList || !self.itemList.length) {
+                self.gridApi.showNoRowsOverlay();
+              }
+              else {
+                self.gridApi.hideOverlay();
+              }
+              params.successCallback(self.itemList, data?.totalCount || 1);
+            
           });
         }, 500);
       }
@@ -257,8 +307,12 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     }
   }
   private dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
-    const { businessUnit, business } = this.businessForm?.getRawValue();
-    this.store.dispatch(new GetUserSubscriptionPage(businessUnit || null, this.userGuid, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+    const { businessUnit, business ,user} = this.businessForm?.getRawValue();
+    if(this.usersControl.value!=0 &&this.usersControl.value!=undefined)
+    {
+      this.userGuid=user;
+      this.store.dispatch(new GetUserSubscriptionPage(businessUnit || null, user, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+    }
   }
   public onEmailChanged(data: any): void {
     this.SaveData(data,AlertChannel.Email);
@@ -274,14 +328,15 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     if (data != undefined) {
       let updateUserSubscription: UserSubscriptionRequest = {
         alertId: data.rowData?.alertId,
-        userId: data.rowData?.userId,
+        userId: this.userGuid,
         alertChannel: alertChannel,
         enabled: data.event?.checked
       }
       this.store.dispatch(new UpdateUserSubscription(updateUserSubscription));
       this.updateUserSubscription$.pipe().subscribe((updated: any) => {
         if (updated != undefined &&updated==true) {        
-          this.dispatchNewPage();        
+          this.dispatchNewPage();
+          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));     
         }
       });
       

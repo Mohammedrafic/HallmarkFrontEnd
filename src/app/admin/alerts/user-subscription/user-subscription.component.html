@@ -13,31 +13,33 @@
           </div>
         </div>
         <div class="dropdown-container">
-          <div class="dropdown-container">       
+          <div class="input-group dropdown">       
             <ejs-dropdownlist
                 appValidateWithMessage
                 formControlName="business"
-                [fields]="bussinesDataFields"
-                [dataSource]="bussinesData$ | async"
+                [fields]="businessDataFields"
+                [dataSource]="businessData$ | async"
                 placeholder=Business
               ></ejs-dropdownlist>
-          </div>
-          <div class="dropdown-container">       
-          <!--   <ejs-dropdownlist
-                appValidateWithMessage
-                formControlName="user"
-                [fields]="bussinesDataFields"
-                [dataSource]="bussinesData$ | async"
-                placeholder=Business
-              ></ejs-dropdownlist> -->
-          </div>
+          </div>         
         </div>
+        <div class="dropdown-container">
+        <div class="input-group dropdown">       
+          <ejs-dropdownlist
+              appValidateWithMessage
+              formControlName="user"
+              [fields]="userDataFields"
+              [dataSource]="userData"
+              placeholder=User
+            ></ejs-dropdownlist>
+        </div>
+      </div>
       </div>
     </ng-container>
     
   </app-page-toolbar>
   
-  <section class="last-content-section-padding">  
+  <section class="last-content-section-padding table-wrapper">  
       <ag-grid-angular #agGridPagination                      
                       class="ag-theme-alpine user-subscription-grid"
                       [animateRows]="true"
@@ -55,7 +57,9 @@
                       toolPanel="columns"
                       [serverSideStoreType]="serverSideStoreType"                
                       [paginationAutoPageSize]="false"
-                      [maxBlocksInCache] ="maxBlocksInCache">
+                      [maxBlocksInCache] ="maxBlocksInCache"
+                      [noRowsOverlayComponent]="noRowsOverlayComponent"
+                      [noRowsOverlayComponentParams]="noRowsOverlayComponentParams">
       </ag-grid-angular>
   </section>
   <div class="row">

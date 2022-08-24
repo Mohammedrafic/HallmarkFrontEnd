@@ -17,7 +17,7 @@
             appValidateWithMessage
             formControlName="business"
             [fields]="bussinesDataFields"
-            [dataSource]="bussinesData$ | async"
+            [dataSource]="businessData$ | async"
             placeholder=Business
             [value]="defaultValue"
           ></ejs-dropdownlist>
@@ -44,7 +44,9 @@
                   toolPanel="columns"
                   [serverSideStoreType]="serverSideStoreType"                
                   [paginationAutoPageSize]="false"
-                  [maxBlocksInCache] ="maxBlocksInCache"
+                  [maxBlocksInCache] ="maxBlocksInCache"                  
+                  [noRowsOverlayComponent]="noRowsOverlayComponent"
+                  [noRowsOverlayComponentParams]="noRowsOverlayComponentParams"
                   >
   </ag-grid-angular>
 </section>

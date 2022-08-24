@@ -13,7 +13,7 @@ import { SetHeaderState, ShowEmailSideDialog, ShowSmsSideDialog, ShowOnScreenSid
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { AlertsEmailTemplateFormComponent } from './alerts-email-template-form/alerts-email-template-form.component';
-import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor } from '../alerts.constants';
+import { BUSINESS_UNITS_VALUES, BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor } from '../alerts.constants';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { AlertChannel } from '../alerts.enum';
@@ -26,6 +26,7 @@ import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_MODIFIED } from '@shared/constants';
+import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
 @Component({
   selector: 'app-template',
@@ -40,14 +41,14 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   targetElement: HTMLElement = document.body;
   public alertTemplateType: string;
   @Select(SecurityState.bussinesData)
-  public bussinesData$: Observable<BusinessUnit[]>;
+  public businessData$: Observable<BusinessUnit[]>;
 
   @Input() filterForm: FormGroup;
   public businessForm: FormGroup;
   public isBusinessFormDisabled = false;
   public businessUnits = BUSINESS_UNITS_VALUES;
   public optionFields = OPRION_FIELDS;
-  public bussinesDataFields = BUSSINES_DATA_FIELDS;
+  public bussinesDataFields = BUSINESS_DATA_FIELDS;
   @ViewChild('RTE')
   public rteEle: RichTextEditorComponent;
   @ViewChild(AlertsEmailTemplateFormComponent, { static: true }) emailTemplateForm: AlertsEmailTemplateFormComponent;
@@ -93,7 +94,6 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   public title: string = "Alerts Template";
   public export$ = new Subject<ExportedFileType>();
   defaultValue:any;
-  bussinessData:BusinessUnit[]
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   rowModelType: any;
   serverSideInfiniteScroll: any;
@@ -201,7 +201,10 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   ngOnDestroy(): void {
     this.isAlive = false;
   }
- 
+  public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
+  public noRowsOverlayComponentParams: any = {
+    noRowsMessageFunc: () => 'No Rows To Show',
+  };
   ngOnInit(): void {
     this.businessForm = this.generateBusinessForm();
     this.onBusinessUnitValueChanged();
@@ -221,8 +224,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
       .pipe(
         takeWhile(() => this.isAlive)
       );
-    this.bussinesData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-      this.bussinessData=data;
+    this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       if (!this.isBusinessFormDisabled) {
         this.defaultValue = data[0]?.id;
       }
@@ -273,11 +275,16 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
           self.dispatchNewPage(sort, filter);
 
-          self.alertsTemplatePage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
-            if (data != undefined) {
-              self.itemList = data.items;
-              params.successCallback(self.itemList, data.items.length || 1);
-            }
+          self.alertsTemplatePage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {           
+              self.itemList = data?.items;
+              if (!self.itemList || !self.itemList.length) {
+                self.gridApi.showNoRowsOverlay();
+              }
+              else {
+                self.gridApi.hideOverlay();
+              }
+              params.successCallback(self.itemList, data.totalCount || 1);
+            
           });
         }, 500);
       }
@@ -420,8 +427,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   }
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      this.store.dispatch(new GetBusinessByUnitType(value));
-      
+      this.store.dispatch(new GetBusinessByUnitType(value));      
       this.dispatchNewPage();
     });
   }  
