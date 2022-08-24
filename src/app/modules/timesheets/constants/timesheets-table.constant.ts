@@ -100,7 +100,10 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       minWidth: 240,
       cellClass: 'bold',
       ...commonColumn,
-      valueFormatter: (params: ValueFormatterParams) => GridValuesHelper.formatDate(params.value, 'W - ccc M/d/yy'),
+      valueFormatter: (params: ValueFormatterParams) => {
+        const weekNum = params.data.workWeek;
+        return `${weekNum} - ${GridValuesHelper.formatDate(params.value, 'ccc M/d/yy')}`
+      },
     },
     {
       field: TimesheetsTableColumns.Department,
