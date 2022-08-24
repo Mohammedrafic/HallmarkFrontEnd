@@ -5,7 +5,11 @@ import { filter, Observable, Subject, takeWhile } from 'rxjs';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
-import { GetOrganizationsByPage, InvateOrganizations, InvateOrganizationsSucceeded } from 'src/app/agency/store/agency.actions';
+import {
+  GetOrganizationsByPage,
+  InvateOrganizations,
+  InvateOrganizationsSucceeded,
+} from 'src/app/agency/store/agency.actions';
 import { AgencyState } from 'src/app/agency/store/agency.state';
 import { Organization } from 'src/app/shared/models/organization.model';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -56,23 +60,23 @@ export class InviteDialogComponent implements OnInit {
     if (this.control.dirty) {
       this.store.dispatch(new InvateOrganizations(this.control.value));
     } else {
-      this.control.markAsTouched()
+      this.control.markAsTouched();
     }
   }
 
   public onCancel(): void {
     if (this.control.dirty) {
       this.confirmService
-      .confirm(DELETE_CONFIRM_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
-        okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button',
-      })
-      .pipe(filter((confirm) => !!confirm))
-      .subscribe(() => {
-        this.control.reset();
-        this.sideDialog.hide();
-      });
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => !!confirm))
+        .subscribe(() => {
+          this.control.reset();
+          this.sideDialog.hide();
+        });
     } else {
       this.sideDialog.hide();
     }

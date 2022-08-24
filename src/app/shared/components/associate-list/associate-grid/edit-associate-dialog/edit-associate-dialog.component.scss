@@ -1,0 +1,14 @@
+.edit-org {
+  padding-top: 24px;
+
+  .e-content.e-lib.e-touch {
+    padding-top: 24px;
+  }
+
+  &.first-active {
+    .e-tab .e-tab-header:not(.e-vertical) .e-indicator {
+      left: 0px !important;
+      right: 182px !important;
+    }
+  }
+}

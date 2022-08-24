@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import {
-  AssociateOrganizations,
-  AssociateOrganizationsPage,
+  AssociateOrganizationsAgency,
+  AssociateOrganizationsAgencyPage,
   FeeSettings,
   JobDistributionInitialData,
   PartnershipSettings,
@@ -21,8 +21,14 @@ export class AssociateOrganizationsService {
    * @param organizationIds
    * @return Created Organization
    */
-  public invateOrganizations(businessUnitId: number, organizationIds: number[]): Observable<AssociateOrganizations[]> {
-    return this.http.post<AssociateOrganizations[]>(`/api/AssociateOrganizations`, { businessUnitId, organizationIds });
+  public invateOrganizations(
+    businessUnitId: number,
+    organizationIds: number[]
+  ): Observable<AssociateOrganizationsAgency[]> {
+    return this.http.post<AssociateOrganizationsAgency[]>(`/api/AssociateOrganizations`, {
+      businessUnitId,
+      organizationIds,
+    });
   }
 
   /**
@@ -32,8 +38,12 @@ export class AssociateOrganizationsService {
    * @param pageSize
    * @return list of Associate Organizations
    */
-  public getOrganizationsById(agencyId: number, pageNumber: number, pageSize: number): Observable<AssociateOrganizationsPage> {
-    return this.http.get<AssociateOrganizationsPage>(`/api/AssociateOrganizations/${agencyId}`, {
+  public getOrganizationsById(
+    agencyId: number,
+    pageNumber: number,
+    pageSize: number
+  ): Observable<AssociateOrganizationsAgencyPage> {
+    return this.http.get<AssociateOrganizationsAgencyPage>(`/api/AssociateOrganizations/${agencyId}`, {
       params: { PageNumber: pageNumber, PageSize: pageSize },
     });
   }
@@ -43,7 +53,11 @@ export class AssociateOrganizationsService {
    * @param agencyId
    * @return Base fee with fee exceptions
    */
-  public getFeeSettingByOrganizationId(associateOrganizationId: number, PageNumber: number, PageSize: number): Observable<FeeSettings> {
+  public getFeeSettingByOrganizationId(
+    associateOrganizationId: number,
+    PageNumber: number,
+    PageSize: number
+  ): Observable<FeeSettings> {
     return this.http.get<FeeSettings>(`/api/AssociateOrganizations/${associateOrganizationId}/feeSettings`, {
       params: { PageNumber, PageSize },
     });
@@ -83,7 +97,9 @@ export class AssociateOrganizationsService {
    * @return Partnership Settings
    */
   public getPartnershipSettingsById(associateOrganizationId: number): Observable<PartnershipSettings> {
-    return this.http.get<PartnershipSettings>(`/api/AssociateOrganizations/${associateOrganizationId}/partnershipSettings`);
+    return this.http.get<PartnershipSettings>(
+      `/api/AssociateOrganizations/${associateOrganizationId}/partnershipSettings`
+    );
   }
 
   /**

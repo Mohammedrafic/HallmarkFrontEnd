@@ -8,13 +8,13 @@ import { MessageTypes } from 'src/app/shared/enums/message-types';
 
 import { Agency, AgencyFilteringOptions, AgencyPage } from 'src/app/shared/models/agency.model';
 import {
-  AssociateOrganizations,
-  AssociateOrganizationsPage,
   FeeExceptionsInitialData,
   FeeExceptionsPage,
   FeeSettings,
   PartnershipSettings,
   JobDistributionInitialData,
+  AssociateOrganizationsAgencyPage,
+  AssociateOrganizationsAgency,
 } from 'src/app/shared/models/associate-organizations.model';
 import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
@@ -63,7 +63,7 @@ export interface AgencyStateModel {
   agency: Agency | null;
   isOrganizationLoading: boolean;
   organizations: OrganizationPage | null;
-  associateOrganizationsPages: AssociateOrganizationsPage | { items: AssociateOrganizationsPage['items'] };
+  associateOrganizationsPages: AssociateOrganizationsAgencyPage | { items: AssociateOrganizationsAgencyPage['items'] };
   agencyPage: AgencyPage | null;
   feeSettings: FeeSettings | null;
   feeExceptionsInitialData: FeeExceptionsInitialData | null;
@@ -89,7 +89,7 @@ export interface AgencyStateModel {
     feeExceptionsInitialData: null,
     jobDistributionInitialData: null,
     partnershipSettings: null,
-    agencyFilteringOptions: null
+    agencyFilteringOptions: null,
   },
 })
 @Injectable()
@@ -118,14 +118,14 @@ export class AgencyState {
   }
 
   @Selector()
-  static associateOrganizationsItems(state: AgencyStateModel): AssociateOrganizations[] {
+  static associateOrganizationsItems(state: AgencyStateModel): AssociateOrganizationsAgency[] {
     return state.associateOrganizationsPages.items;
   }
 
   @Selector()
   static associateOrganizationsPages(
     state: AgencyStateModel
-  ): AssociateOrganizationsPage | { items: AssociateOrganizationsPage['items'] } {
+  ): AssociateOrganizationsAgencyPage | { items: AssociateOrganizationsAgencyPage['items'] } {
     return state.associateOrganizationsPages;
   }
 
@@ -163,7 +163,6 @@ export class AgencyState {
   static agencyFilteringOptions(state: AgencyStateModel): AgencyFilteringOptions | null {
     return state.agencyFilteringOptions;
   }
-
 
   constructor(
     private agencyService: AgencyService,
@@ -207,7 +206,7 @@ export class AgencyState {
   InvateOrganizations(
     { patchState, dispatch, getState }: StateContext<AgencyStateModel>,
     { organizationIds }: InvateOrganizations
-  ): Observable<AssociateOrganizations[]> {
+  ): Observable<AssociateOrganizationsAgency[]> {
     const state = getState();
     const businessUnitId = state.agency?.createUnder?.id;
     return businessUnitId
@@ -229,7 +228,7 @@ export class AgencyState {
   GetAssociateOrganizationsById(
     { patchState, getState }: StateContext<AgencyStateModel>,
     { pageNumber, pageSize }: GetAssociateOrganizationsById
-  ): Observable<AssociateOrganizationsPage> {
+  ): Observable<AssociateOrganizationsAgencyPage> {
     const state = getState();
     const businessUnitId = state.agency?.createUnder?.id;
     return businessUnitId
@@ -488,8 +487,10 @@ export class AgencyState {
 
   @Action(GetAgencyFilteringOptions)
   GetAgencyFilteringOptions({ patchState }: StateContext<AgencyStateModel>): Observable<AgencyFilteringOptions> {
-    return this.agencyService.getAgencyFilteringOptions().pipe(tap(data => {
-      patchState({ agencyFilteringOptions: data });
-    }));
-  };
+    return this.agencyService.getAgencyFilteringOptions().pipe(
+      tap((data) => {
+        patchState({ agencyFilteringOptions: data });
+      })
+    );
+  }
 }

@@ -1,25 +1,23 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { FormArray, FormGroup } from '@angular/forms';
 import { filter, Observable, Subject, takeWhile } from 'rxjs';
-import { Actions, Select, Store } from '@ngxs/store';
-
+import { AssociateOrganizationsAgency, FeeExceptionsPage } from '@shared/models/associate-organizations.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
-
-import { AssociateOrganizationsAgency, FeeExceptionsPage } from 'src/app/shared/models/associate-organizations.model';
-import { FeeSettingsComponent } from './fee-settings/fee-settings.component';
+import { Actions, Select, Store } from '@ngxs/store';
+import { FormArray, FormGroup } from '@angular/forms';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import PriceUtils from '@shared/utils/price.utils';
+import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
+import { FeeSettingsComponent } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/fee-settings.component';
+import { PartnershipSettingsComponent } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/partnership-settings/partnership-settings.component';
 import {
   GetFeeExceptionsInitialData,
   GetJobDistributionInitialData,
   GetPartnershipSettings,
   SaveBaseFee,
   SavePartnershipSettings,
-} from 'src/app/agency/store/agency.actions';
-import { AgencyState } from 'src/app/agency/store/agency.state';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
-import { PartnershipSettingsComponent } from './partnership-settings/partnership-settings.component';
-import PriceUtils from '@shared/utils/price.utils';
+} from '@shared/components/associate-list/store/associate.actions';
 
 enum Tabs {
   FeeSettings,
@@ -27,29 +25,27 @@ enum Tabs {
 }
 
 @Component({
-  selector: 'app-edit-associated-dialog',
-  templateUrl: './edit-associated-dialog.component.html',
-  styleUrls: ['./edit-associated-dialog.component.scss'],
+  selector: 'app-edit-associate-dialog',
+  templateUrl: './edit-associate-dialog.component.html',
+  styleUrls: ['./edit-associate-dialog.component.scss'],
 })
-export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
+export class EditAssociateDialogComponent implements OnInit, OnDestroy {
   @Input() openEvent: Subject<AssociateOrganizationsAgency>;
   @Output() editEndEvent = new EventEmitter<never>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('editOrgTab') editOrgTab: TabComponent;
 
-  @Select(AgencyState.feeExceptionsPage)
+  @Select(AssociateListState.feeExceptionsPage)
   public feeExceptionsPage$: Observable<FeeExceptionsPage>;
-
-  @Select(AgencyState.baseFee)
+  @Select(AssociateListState.baseFee)
   public baseFee$: Observable<number>;
 
   public targetElement: HTMLElement = document.body;
-  public editOrg: AssociateOrganizationsAgency;
+  public editAgencyOrg: AssociateOrganizationsAgency;
   public width: string;
   public feeSettingsForm: FormGroup;
   public partnershipForm: FormGroup;
-
   public firstActive = true;
 
   private isAlive = true;
@@ -99,16 +95,16 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
         if (this.partnershipForm.valid) {
           const jobDistributionFormValue = this.partnershipForm.getRawValue();
           this.store.dispatch(
-            new SavePartnershipSettings({ ...jobDistributionFormValue, associateOrganizationId: this.editOrg.id })
+            new SavePartnershipSettings({ ...jobDistributionFormValue, associateOrganizationId: this.editAgencyOrg.id })
           );
           this.partnershipForm.markAsUntouched();
         }
         break;
       case Tabs.FeeSettings:
         this.feeSettingsForm.markAllAsTouched();
-        if (this.feeSettingsForm.valid && this.editOrg.id) {
+        if (this.feeSettingsForm.valid && this.editAgencyOrg.id) {
           const { baseFee } = this.feeSettingsForm.getRawValue();
-          this.store.dispatch(new SaveBaseFee(this.editOrg.id, baseFee));
+          this.store.dispatch(new SaveBaseFee(this.editAgencyOrg.id, baseFee));
           this.feeSettingsForm.markAsUntouched();
         }
         break;
@@ -122,29 +118,34 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
   }
 
   private onOpenEvent(): void {
-    this.openEvent.pipe(takeWhile(() => this.isAlive)).subscribe((org) => {
-      if (org) {
-        this.editOrg = org;
-        this.sideDialog.show();
+    this.openEvent
+      .pipe(takeWhile(() => this.isAlive))
+      .subscribe((associateOrganizationsAgency: AssociateOrganizationsAgency) => {
+        if (associateOrganizationsAgency) {
+          this.editAgencyOrg = associateOrganizationsAgency;
+          this.sideDialog.show();
 
-        if (org.id && org.organizationId) {
-          this.feeSettingsForm.patchValue({ id: org.id, baseFee: PriceUtils.formatNumbers(org.baseFee) });
-          this.store.dispatch(new GetFeeExceptionsInitialData(org.organizationId));
-          this.store.dispatch(new GetJobDistributionInitialData(org.organizationId));
-          this.store.dispatch(new GetPartnershipSettings(org.id));
+          if (associateOrganizationsAgency.id && associateOrganizationsAgency.organizationId) {
+            this.feeSettingsForm.patchValue({
+              id: associateOrganizationsAgency.id,
+              baseFee: PriceUtils.formatNumbers(associateOrganizationsAgency.baseFee),
+            });
+            this.store.dispatch(new GetFeeExceptionsInitialData(associateOrganizationsAgency.organizationId));
+            this.store.dispatch(new GetJobDistributionInitialData(associateOrganizationsAgency.organizationId));
+            this.store.dispatch(new GetPartnershipSettings(associateOrganizationsAgency.id));
+          }
         }
-      }
-    });
+      });
   }
 
   private onBaseFeeChanged(): void {
-    this.baseFee$.pipe(takeWhile(() => this.isAlive)).subscribe((baseFee) => {
+    this.baseFee$.pipe(takeWhile(() => this.isAlive)).subscribe((baseFee: number) => {
       this.feeSettingsForm.patchValue({ baseFee: PriceUtils.formatNumbers(baseFee) });
     });
   }
 
   private onFeeExceptionsPageChanged(): void {
-    this.feeExceptionsPage$.pipe(takeWhile(() => this.isAlive)).subscribe((feeExceptions) => {
+    this.feeExceptionsPage$.pipe(takeWhile(() => this.isAlive)).subscribe((feeExceptions: FeeExceptionsPage) => {
       this.updateFeeExceptions(feeExceptions);
     });
   }

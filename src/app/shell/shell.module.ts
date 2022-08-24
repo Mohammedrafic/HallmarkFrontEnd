@@ -27,7 +27,7 @@ import {
   Bell,
   Search,
   HelpCircle,
-  PieChart
+  PieChart,
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -36,7 +36,7 @@ import { SharedModule } from '../shared/shared.module';
 
 import { OrganizationAgencySelectorComponent } from './components/organization-agency-selector/organization-agency-selector.component';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
-import { SearchMenuComponent } from './components/search-menu/search-menu.component'; 
+import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 
 const sidebarIcons = {
   Sidebar,
@@ -57,15 +57,11 @@ const sidebarIcons = {
   Bell,
   Search,
   HelpCircle,
-  PieChart
+  PieChart,
 };
 
 @NgModule({
-  declarations: [
-    OrganizationAgencySelectorComponent,
-    ShellPageComponent,
-    SearchMenuComponent
-  ],
+  declarations: [OrganizationAgencySelectorComponent, ShellPageComponent, SearchMenuComponent],
   imports: [
     CommonModule,
     ShellRoutingModule,
@@ -81,7 +77,7 @@ const sidebarIcons = {
     DropDownListModule,
     ReactiveFormsModule,
     DropDownButtonModule,
-    FormsModule
+    FormsModule,
   ],
   providers: [],
 })

@@ -14,8 +14,8 @@ import { AbstractGridConfigurationComponent } from 'src/app/shared/components/ab
 import { GRID_CONFIG } from 'src/app/shared/constants/grid-config';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import {
-  AssociateOrganizations,
-  AssociateOrganizationsPage,
+  AssociateOrganizationsAgency,
+  AssociateOrganizationsAgencyPage,
 } from 'src/app/shared/models/associate-organizations.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { JOB_DISTRIBUTION_COLUMNS } from './associated-org-grid.constant';
@@ -33,19 +33,19 @@ export class AssociatedOrgGridComponent
   @ViewChild('grid') grid: GridComponent;
 
   @Select(AgencyState.associateOrganizationsItems)
-  public associateOrganizations$: Observable<AssociateOrganizations[]>;
+  public associateOrganizations$: Observable<AssociateOrganizationsAgency[]>;
 
   @Select(AgencyState.associateOrganizationsPages)
-  public associateOrganizationsPages$: Observable<AssociateOrganizationsPage>;
+  public associateOrganizationsPages$: Observable<AssociateOrganizationsAgencyPage>;
 
   public openAssosiateOrgDialog = new EventEmitter<boolean>();
   public priceUtils = PriceUtils;
-  public openEditDialog = new EventEmitter<AssociateOrganizations>();
+  public openEditDialog = new EventEmitter<AssociateOrganizationsAgency>();
   public jobDistributionColumns = JOB_DISTRIBUTION_COLUMNS;
-  public tierValueAccess = (_: string, { tier }: AssociateOrganizations) => {
+  public tierValueAccess = (_: string, { tier }: AssociateOrganizationsAgency) => {
     return DistributionLevels[tier];
   };
-  public partnershipStatusValueAccess = (_: string, { partnershipStatus }: AssociateOrganizations) => {
+  public partnershipStatusValueAccess = (_: string, { partnershipStatus }: AssociateOrganizationsAgency) => {
     return PartnershipStatus[partnershipStatus];
   };
 
@@ -83,7 +83,7 @@ export class AssociatedOrgGridComponent
     this.openAssosiateOrgDialog.emit(true);
   }
 
-  public onEdit({ index, ...org }: { index: string } & AssociateOrganizations): void {
+  public onEdit({ index, ...org }: { index: string } & AssociateOrganizationsAgency): void {
     this.grid.selectRow(Number(index) + 1);
     this.openEditDialog.emit(org);
   }
@@ -92,7 +92,7 @@ export class AssociatedOrgGridComponent
     this.grid.clearRowSelection();
   }
 
-  public onRemove({ index, ...org }: { index: string } & AssociateOrganizations): void {
+  public onRemove({ index, ...org }: { index: string } & AssociateOrganizationsAgency): void {
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,

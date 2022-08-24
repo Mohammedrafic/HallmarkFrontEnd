@@ -1,0 +1,132 @@
+<section [formGroup]="partnershipForm" id="partnershipForm" class="partnership-settings">
+  <div class="dropdown-container bootstrap">
+    <label>Partnership Status</label>
+    <div class="input-group dropdown">
+      <ejs-dropdownlist
+        appValidateWithMessage
+        [fields]="optionFields"
+        formControlName="status"
+        [dataSource]="partnershipStatus"
+      ></ejs-dropdownlist>
+    </div>
+  </div>
+
+  <section class="main-content">
+    <section>
+      <h3 class="title">{{title}}</h3>
+      <div class="flex-wrapper">
+        <div class="flex-50">
+          <div class="dropdown-container bootstrap">
+            <label>{{title}}</label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist
+                appValidateWithMessage
+                [fields]="optionFields"
+                formControlName="agencyCategory"
+                [dataSource]="agencyCategoryTier"
+              ></ejs-dropdownlist>
+            </div>
+          </div>
+        </div>
+        <div class="flex-50"></div>
+      </div>
+    </section>
+
+    <section class="job-distribution bootstrap" *ngIf="jobDistributionInitialData$ | async as jobDistributionInitialData">
+      <h3 class="title">Job Distribution</h3>
+      <div class="flex-wrapper">
+        <div class="flex-50">
+          <div class="dropdown-container">
+            <label>Region<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-multiselect
+                mode="CheckBox"
+                appValidateWithMessage
+                formControlName="regionIds"
+                [fields]="optionFields"
+                [dataSource]="jobDistributionInitialData.regions"
+              ></ejs-multiselect>
+            </div>
+          </div>
+          <div class="dropdown-container">
+            <label>Order Type<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-multiselect
+                mode="CheckBox"
+                appValidateWithMessage
+                formControlName="orderTypes"
+                [fields]="optionFields"
+                [dataSource]="orderType"
+              ></ejs-multiselect>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-50">
+          <div class="dropdown-container">
+            <label>Classification<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-multiselect
+                mode="CheckBox"
+                appValidateWithMessage
+                formControlName="classifications"
+                [fields]="optionFields"
+                [dataSource]="classification"
+              ></ejs-multiselect>
+            </div>
+          </div>
+          <div class="dropdown-container">
+            <label>Skill Category<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-multiselect
+                mode="CheckBox"
+                appValidateWithMessage
+                formControlName="skillCategoryIds"
+                [fields]="optionFields"
+                [dataSource]="jobDistributionInitialData.skillCategories"
+              ></ejs-multiselect>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h3 class="title">VMS Settings</h3>
+      <div class="flex-wrapper checkbox-section bootstrap">
+        <div class="flex-30">
+          <ejs-checkbox label="Allow On board" formControlName="allowOnBoard"></ejs-checkbox>
+          <ejs-checkbox label="Exclude Min years of experience to Apply" formControlName="excludeExperience"></ejs-checkbox>
+          <ejs-checkbox label="Update by self" formControlName="updateBySelf"></ejs-checkbox>
+          <ejs-checkbox label="Do not allow to apply" formControlName="applyProhibited"></ejs-checkbox>
+        </div>
+        <div class="flex-30">
+          <ejs-checkbox label="Allow deploy w/o credentials" formControlName="allowDeployCredentials"></ejs-checkbox>
+          <ejs-checkbox label="Send email to candidate for distribution" formControlName="sendCandidateDistributionEmail"></ejs-checkbox>
+          <ejs-checkbox label="Load other agency candidate details" formControlName="loadAgencyCandidateDetails"></ejs-checkbox>
+        </div>
+        <div class="flex-30"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="flex-wrapper">
+        <div class="flex-50">
+          <div class="dropdown-container bootstrap submission">
+            <label>Submission % override when applying</label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist
+                appValidateWithMessage
+                [fields]="optionFields"
+                formControlName="submissionPercentageOverrideRestriction"
+                [dataSource]="submission"
+                placeholder="Submission"
+              ></ejs-dropdownlist>
+            </div>
+          </div>
+        </div>
+        <div class="flex-50"></div>
+      </div>
+    </section>
+  </section>
+</section>

@@ -1,0 +1,85 @@
+<div class="associated-grid">
+  <ejs-grid
+    #grid
+    [dataSource]="(associateListPage$ | async)?.items"
+    [allowSorting]="true"
+    [allowResizing]="true"
+    [allowSelection]="false"
+    [resizeSettings]="resizeSettings"
+    [allowPaging]="allowPaging"
+    [enableVirtualization]="true"
+    [pageSettings]="pageSettings"
+    [height]="gridHeight"
+    class="e-gridwithheader e-gridsubheader"
+  >
+    <e-columns>
+      <e-column textAlign="Right" width="100">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data); (false)">
+              <span><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
+              <span><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column field="businessUnitName" headerText="{{headerText}}" textAlign="Left"></e-column>
+      <e-column field="baseFee" headerText="Base Fee %" width="130" textAlign="left">
+        <ng-template #template let-data>
+          {{ priceUtils.formatNumbers(data.baseFee) }}
+        </ng-template>
+      </e-column>
+      <e-column field="tier" headerText="Tier" width="150" textAlign="left" [valueAccessor]="tierValueAccess"></e-column>
+      <e-column field="exeptionFee" headerText="Exception Fee" width="150" textAlign="left"></e-column>
+      <e-column headerText="Job Distribution" [columns]="jobDistributionColumns" textAlign="left"></e-column>
+      <e-column field="partnershipStatus" headerText="Partnership Status" textAlign="left" [valueAccessor]="partnershipStatusValueAccess"></e-column>
+    </e-columns>
+
+    <ng-template #pagerTemplate let-data>
+      <div class="e-pagertemplate">
+        <div class="control-section">
+          <div class="content-wrapper">
+            <section class="left-side-pager-controls">
+              <ejs-dropdownlist
+                id="rowsPerPage"
+                class="dropdown-no-border"
+                [dataSource]="rowsPerPageDropDown"
+                [(value)]="activeRowsPerPageDropDown"
+                (change)="onRowsDropDownChanged()"
+              >
+              </ejs-dropdownlist>
+              <ejs-numerictextbox
+                id="goToPage"
+                class="numeric-input-no-border"
+                format="#"
+                placeholder="Go to:"
+                min="1"
+                [max]="(associateListPage$ | async)?.totalCount"
+                [showSpinButton]="false"
+                (change)="onGoToClick($event)"
+              >
+              </ejs-numerictextbox>
+            </section>
+            <section class="right-side-pager-controls">
+              <ejs-pager
+                id="gridPager"
+                #gridPager
+                [pageSize]="pageSize"
+                [totalRecordsCount]="(associateListPage$ | async)?.totalPages"
+                [enablePagerMessage]="false"
+                [currentPage]="currentPage"
+                (click)="onGoToClick($event)"
+              >
+              </ejs-pager>
+            </section>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ejs-grid>
+</div>
+
+<app-invite-dialog [openEvent]="openAssociateOrgAgencyDialog"></app-invite-dialog>
+<app-edit-associate-dialog [openEvent]="openEditDialog" (editEndEvent)="onEditEnd()"></app-edit-associate-dialog>
