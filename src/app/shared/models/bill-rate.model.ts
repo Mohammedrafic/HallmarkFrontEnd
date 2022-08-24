@@ -50,6 +50,7 @@ export interface BillRate {
   effectiveDate: string;
   editAllowed: boolean;
   billType: boolean;
+  IsPredefined?: boolean;
 }
 
 export interface OrderBillRateDto extends Omit<BillRate, 'billRateConfig' | 'billRateGroupId'> { }

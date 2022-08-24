@@ -11,6 +11,7 @@ import { ProfileComponent } from '@agency/profile/profile.component';
 import { OrderManagementComponent } from './order-management/order-management.component';
 import { PendingChangesGuard } from '@shared/guards/pending-changes.guard';
 import { CandidateDetailsComponent } from '@shared/components/candidate-details/candidate-details.component';
+import { AssociateListComponent } from '@shared/components/associate-list/associate-list.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -62,8 +63,8 @@ const routes: Routes = [
         path: 'candidates',
         component: CandidatesComponent,
         data: {
-          isAgencyArea: true
-        }
+          isAgencyArea: true,
+        },
       },
       {
         path: 'candidates/add',
@@ -77,6 +78,13 @@ const routes: Routes = [
         path: 'candidates/edit/:id',
         component: AddEditCandidateComponent,
         canDeactivate: [PendingChangesGuard],
+        data: {
+          isAgencyArea: true,
+        },
+      },
+      {
+        path: 'associate-list',
+        component: AssociateListComponent,
         data: {
           isAgencyArea: true,
         },

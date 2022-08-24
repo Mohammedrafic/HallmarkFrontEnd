@@ -1,82 +1,66 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { filter, Observable, Subject, takeWhile } from 'rxjs';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-
-import { AgencyState } from 'src/app/agency/store/agency.state';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import {
   FeeExceptions,
   FeeExceptionsInitialData,
   FeeSettingsClassification,
-} from 'src/app/shared/models/associate-organizations.model';
-import { valuesOnly } from 'src/app/shared/utils/enum.utils';
-import { SaveFeeExceptions, SaveFeeExceptionsSucceeded } from '@agency/store/agency.actions';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
+} from '@shared/models/associate-organizations.model';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import PriceUtils from '@shared/utils/price.utils';
-
-type AddNewFeeExceptionFormValue = {
-  region: number[];
-  classification: number[];
-  skill: number[];
-  fee: number;
-};
+import { valuesOnly } from '@shared/utils/enum.utils';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import {
+  SaveFeeExceptions,
+  SaveFeeExceptionsSucceeded,
+} from '@shared/components/associate-list/store/associate.actions';
+import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
+import {
+  MASTER_SKILLS_FIELDS,
+  OPTION_FIELDS,
+} from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({
   selector: 'app-add-new-fee-dialog',
   templateUrl: './add-new-fee-dialog.component.html',
   styleUrls: ['./add-new-fee-dialog.component.scss'],
 })
-export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
+export class AddNewFeeDialogComponent extends DestroyableDirective implements OnInit {
   @Input() openEvent: Subject<number>;
   @Input() openEditEvent: Subject<FeeExceptions>;
 
   @ViewChild('addFeeSideDialog') sideDialog: DialogComponent;
 
-  @Select(AgencyState.feeExceptionsInitialData)
+  @Select(AssociateListState.feeExceptionsInitialData)
   public feeExceptionsInitialData$: Observable<FeeExceptionsInitialData>;
 
   public targetElement: HTMLElement = document.body;
   public editMode = false;
   public feeFormGroup: FormGroup = this.generateNewForm();
-  public optionFields = {
-    text: 'name',
-    value: 'id',
-  };
-  public masterSkillsFields = {
-    text: 'skillDescription',
-    value: 'id',
-  };
+  public optionFields = OPTION_FIELDS;
+  public masterSkillsFields = MASTER_SKILLS_FIELDS;
   public priceUtils = PriceUtils;
   public classification = Object.values(FeeSettingsClassification)
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));
 
   get title(): string {
-    return this.editMode ? 'Edit Fee Exception' : 'Add Fee Exception';
+    return `${this.editMode ? 'Edit' : 'Add'} Fee Exception`;
   }
 
   private organizationId: number;
-  private isAlive = true;
 
-  constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {}
+  constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {
+    super();
+  }
 
   ngOnInit(): void {
     this.onOpenEvent();
     this.onOpenEditEvent();
-
-    this.actions$
-      .pipe(ofActionSuccessful(SaveFeeExceptionsSucceeded))
-      .pipe(takeWhile(() => this.isAlive))
-      .subscribe(() => {
-        this.sideDialog.hide();
-      });
-  }
-
-  ngOnDestroy(): void {
-    this.isAlive = false;
+    this.subscribeOnSaveFeeExceptions();
   }
 
   public onCancel(): void {
@@ -107,7 +91,7 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
   }
 
   private onOpenEvent(): void {
-    this.openEvent.subscribe((id) => {
+    this.openEvent.subscribe((id: number) => {
       if (id) {
         this.organizationId = id;
         this.feeFormGroup.reset();
@@ -117,7 +101,7 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
   }
 
   private onOpenEditEvent(): void {
-    this.openEditEvent.subscribe((feeData) => {
+    this.openEditEvent.subscribe((feeData: FeeExceptions) => {
       if (feeData) {
         this.editMode = true;
         this.feeFormGroup.patchValue({
@@ -137,5 +121,14 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
       masterSkillIds: new FormControl([], [Validators.required]),
       fee: new FormControl(null),
     });
+  }
+
+  private subscribeOnSaveFeeExceptions(): void {
+    this.actions$
+      .pipe(ofActionSuccessful(SaveFeeExceptionsSucceeded))
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.sideDialog.hide();
+      });
   }
 }

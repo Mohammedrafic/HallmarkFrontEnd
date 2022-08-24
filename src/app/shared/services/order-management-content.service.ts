@@ -246,7 +246,15 @@ export class OrderManagementContentService {
       .append('departmentId', departmentId)
       .append('skillId', skillId);
 
-    return this.http.get<BillRate[]>('/api/BillRates/predefined/forOrder', { params });
+    return this.http.get<BillRate[]>('/api/BillRates/predefined/forOrder', { params })
+    .pipe(
+      map((items) => items.map((rate) => {
+        return ({
+          ...rate,
+          IsPredefined: true,
+        })
+      } ))
+    )
   }
 
   /**

@@ -54,7 +54,7 @@ export const MENU_CONFIG: any = {
     12: {
       // Associated Agencies
       icon: 'clock',
-      route: '',
+      route: '/client/associate-list',
     },
     13: {
       // Order Management
@@ -117,6 +117,11 @@ export const MENU_CONFIG: any = {
       route: 'agency/invoices',
     },
     26: reportsMenuItemConfiguration,
+    28: {
+      // Associated Organizations
+      icon: 'clock',
+      route: 'agency/associate-list',
+    },
     27: {
       // Settings
       icon: '',
@@ -240,7 +245,7 @@ export const MENU_CONFIG: any = {
     12: {
       // Associated Agencies
       icon: 'clock',
-      route: '',
+      route: '/client/associate-list',
     },
     13: {
       // Order Management
@@ -297,6 +302,11 @@ export const MENU_CONFIG: any = {
       // Settings
       icon: '',
       route: '',
+    },
+    28: {
+      // Associated Organizations
+      icon: 'clock',
+      route: 'agency/associate-list',
     },
     29: {
       // MSP List
@@ -391,7 +401,7 @@ export const MENU_CONFIG: any = {
     12: {
       // Associated Agencies
       icon: 'clock',
-      route: '',
+      route: '/client/associate-list',
     },
     13: {
       // Order Management
@@ -628,9 +638,9 @@ export const MENU_CONFIG: any = {
       route: '',
     },
     28: {
-      // User Management
-      icon: 'lock',
-      route: '',
+      // Associated Organizations
+      icon: 'clock',
+      route: 'agency/associate-list',
     },
     29: {
       // MSP List

@@ -130,6 +130,7 @@ import { ActionCellRendererComponent } from '@shared/components/cell-renderer/ac
 import { EmailSideDialogComponent } from './components/email-side-dialog/email-side-dialog.component';
 import { SmsSideDialogComponent } from './components/sms-side-dialog/sms-side-dialog.component';
 import { OnScreenSideDialogComponent } from './components/on-screen-side-dialog/on-screen-side-dialog.component';
+import { CustomNoRowsOverlayComponent } from './components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 
 const icons = {
   AlertCircle,
@@ -274,6 +275,7 @@ const COMPONENTS = [
     CandidatesStatusModalComponent,
     ReorderStatusDialogComponent,
     AcceptFormComponent,
+    CustomNoRowsOverlayComponent,
   ],
   providers: [
     DatePipe,

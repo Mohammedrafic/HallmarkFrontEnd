@@ -59,17 +59,11 @@ import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { NgxsModule } from '@ngxs/store';
 import { AgencyState } from './store/agency.state';
 import { CandidateState } from './store/candidate.state';
-import { AssociatedOrgGridComponent } from './agency-list/add-edit-agency/associated-org-grid/associated-org-grid.component';
-import { InviteDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/invite-dialog/invite-dialog.component';
 import { DialogAllModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ExperienceGridComponent } from './candidates/add-edit-candidate/experience-grid/experience-grid.component';
 import { EducationGridComponent } from './candidates/add-edit-candidate/education-grid/education-grid.component';
-import { EditAssociatedDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/edit-associated-dialog.component';
-import { FeeSettingsComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/fee-settings/fee-settings.component';
-import { AddNewFeeDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/fee-settings/add-new-fee-dialog/add-new-fee-dialog.component';
 import { CredentialsGridComponent } from './candidates/add-edit-candidate/credentials-grid/credentials-grid.component';
 import { CandidateAgencyComponent } from './candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
-import { PartnershipSettingsComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/partnership-settings/partnership-settings.component';
 import { OrderManagementComponent } from './order-management/order-management.component';
 import { TabNavigationComponent } from './order-management/tab-navigation/tab-navigation.component';
 import { OrderManagementGridComponent } from './order-management/order-management-grid/order-management-grid.component';
@@ -96,6 +90,7 @@ import { CandidateExperienceComponent } from './candidates/import-candidates/can
 import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
 import { GridErroredCellComponent } from './candidates/import-candidates/grid-errored-cell/grid-errored-cell.component';
 import { ExtensionModule } from '@shared/components/extension/extension.module';
+import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
 
 const sidebarIcons = {
   Sliders,
@@ -139,17 +134,11 @@ const sidebarIcons = {
     CandidateGeneralInfoComponent,
     CandidateContactDetailsComponent,
     CandidateProfessionalSummaryComponent,
-    AssociatedOrgGridComponent,
-    InviteDialogComponent,
-    EditAssociatedDialogComponent,
-    FeeSettingsComponent,
     ExperienceGridComponent,
     EducationGridComponent,
-    AddNewFeeDialogComponent,
     CredentialsGridComponent,
     CandidateAgencyComponent,
     FileViewerComponent,
-    PartnershipSettingsComponent,
     OrderManagementComponent,
     TabNavigationComponent,
     OrderManagementGridComponent,
@@ -197,6 +186,7 @@ const sidebarIcons = {
     AddEditReorderModule,
     CandidateDetailsModule,
     ExtensionModule,
+    AssociateListModule,
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),
