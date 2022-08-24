@@ -4,11 +4,11 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { OrderType } from '@shared/enums/order-type';
 import { Duration } from '@shared/enums/durations';
 import { JobClassification } from '@shared/enums/job-classification';
-import { ReasonForRequisition } from '@shared/enums/reason-for-requisition';
 import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
 import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
 import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
+import { RejectReason } from './reject-reason.model';
 
 export class OrderManagement {
   id: number;
@@ -271,7 +271,8 @@ export class Order {
   nO_OT: boolean;
   jobDescription: string;
   unitDescription: string;
-  reasonForRequisition: ReasonForRequisition;
+  orderRequisitionReasonId: number;
+  orderRequisitionReasonName: string;
   billRates: BillRate[];
   jobDistributions: JobDistributionModel[];
   contactDetails: OrderContactDetails[];

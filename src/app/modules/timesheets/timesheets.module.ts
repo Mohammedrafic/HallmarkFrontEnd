@@ -67,6 +67,7 @@ import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
 import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
 import { TimesheetsTableFiltersColumns } from './enums';
 import { APP_FILTERS_CONFIG } from '@core/constants/filters-helper.constant';
+import { RecordStatusCellComponent } from './components/cell-editors/record-status-cell/record-status-cell.component';
 
 const gridIcons = {
   MessageSquare,
@@ -119,6 +120,7 @@ const gridIcons = {
     InputEditorComponent,
     TimesheetsTabsComponent,
     UploadButtonComponent,
+    RecordStatusCellComponent,
   ],
   imports: [
     CommonModule,

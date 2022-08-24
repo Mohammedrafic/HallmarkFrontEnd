@@ -5,7 +5,7 @@ import { FieldType, FieldWidthStyle } from '@core/enums';
 import { DropdownOption } from '@core/interface';
 import { Attachment } from '@shared/components/attachments/models/attachment.interface';
 import { TimesheetsModel } from './../store/model/timesheets.model';
-import { RecordFields, RecordsMode } from './../enums';
+import { RecordFields, RecordsMode, RecordStatus } from './../enums';
 
 export interface DialogConfigField {
   title: string;
@@ -66,6 +66,8 @@ export interface RecordValue {
   extDepartmentId: string;
   total:  number;
   value: 10;
+  state: number;
+  stateText: RecordStatus;
 }
 
 export interface TimesheetAttachments {

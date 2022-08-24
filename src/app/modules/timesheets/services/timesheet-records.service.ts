@@ -8,7 +8,7 @@ import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DropdownOption } from '@core/interface';
 import { TimesheetRecordsDto, RecordValue } from './../interface';
 import { TimesheetsApiService } from './timesheets-api.service';
-import { RecordFields, RecordsMode } from '../enums';
+import { RecordFields, RecordsMode, RecordStatus } from '../enums';
 
 @Injectable()
 export class TimesheetRecordsService {
@@ -115,5 +115,11 @@ export class TimesheetRecordsService {
 
     tabs.hideTab(1, !isMilageAvaliable);
     tabs.hideTab(2, !isExpensesAvaliable);
+  }
+
+  public checkForStatus(data: RecordValue[]): boolean {
+    return data.some((record) => {
+      return record.stateText === RecordStatus.Deleted || record.stateText === RecordStatus.New;
+    });
   }
 }

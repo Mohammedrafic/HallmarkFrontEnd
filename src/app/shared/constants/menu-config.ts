@@ -490,6 +490,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/page-report',
     },
+    44: {
+      // Organization Profile
+      icon: 'user',
+      route: '/admin/profile',
+    },
   },
 
   [BusinessUnitType.Agency]: {
