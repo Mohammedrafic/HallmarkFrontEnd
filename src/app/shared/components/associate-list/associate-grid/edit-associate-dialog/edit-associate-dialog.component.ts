@@ -18,6 +18,7 @@ import {
   SaveBaseFee,
   SavePartnershipSettings,
 } from '@shared/components/associate-list/store/associate.actions';
+import { Router } from '@angular/router';
 
 enum Tabs {
   FeeSettings,
@@ -50,7 +51,12 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
 
   private isAlive = true;
 
-  constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {}
+  constructor(
+    private store: Store,
+    private actions$: Actions,
+    private confirmService: ConfirmService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.onOpenEvent();
@@ -122,6 +128,7 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.isAlive))
       .subscribe((associateOrganizationsAgency: AssociateOrganizationsAgency) => {
         if (associateOrganizationsAgency) {
+          const isAgency = this.router.url.includes('agency');
           this.editAgencyOrg = associateOrganizationsAgency;
           this.sideDialog.show();
 
@@ -131,7 +138,9 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
               baseFee: PriceUtils.formatNumbers(associateOrganizationsAgency.baseFee),
             });
             this.store.dispatch(new GetFeeExceptionsInitialData(associateOrganizationsAgency.organizationId));
-            this.store.dispatch(new GetJobDistributionInitialData(associateOrganizationsAgency.organizationId));
+            this.store.dispatch(
+              new GetJobDistributionInitialData(isAgency ? associateOrganizationsAgency.organizationId : null)
+            );
             this.store.dispatch(new GetPartnershipSettings(associateOrganizationsAgency.id));
           }
         }

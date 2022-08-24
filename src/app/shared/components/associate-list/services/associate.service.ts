@@ -52,7 +52,7 @@ export class AssociateService {
    */
   public saveBaseFee(associateOrganizationAgencyId: number, baseFee: number): Observable<FeeSettings> {
     return this.http.put<FeeSettings>(`/api/AssociateOrganizations/baseFee`, {
-      associateOrganizationAgencyId,
+      associateOrganizationId: associateOrganizationAgencyId,
       baseFee,
     });
   }
@@ -62,10 +62,15 @@ export class AssociateService {
    * @param organizationAgencyId
    * @return Initial Data for Job Distribution
    */
-  public getJobDistributionInitialData(organizationAgencyId: number): Observable<JobDistributionInitialData> {
-    return this.http.get<JobDistributionInitialData>(`/api/AssociateOrganizations/jobDistributionInitialData`, {
-      params: { organizationAgencyId },
-    });
+  public getJobDistributionInitialData(organizationAgencyId: number | null): Observable<JobDistributionInitialData> {
+    return this.http.get<JobDistributionInitialData>(
+      `/api/AssociateOrganizations/jobDistributionInitialData`,
+      organizationAgencyId
+        ? {
+            params: { OrganizationId: organizationAgencyId },
+          }
+        : {}
+    );
   }
 
   /**
@@ -138,7 +143,7 @@ export class AssociateService {
    */
   public getFeeExceptionsInitialData(organizationAgencyId: number): Observable<FeeExceptionsInitialData> {
     return this.http.get<FeeExceptionsInitialData>(`/api/FeeExceptions/initialData`, {
-      params: { organizationAgencyId },
+      params: { OrganizationId: organizationAgencyId },
     });
   }
 }
