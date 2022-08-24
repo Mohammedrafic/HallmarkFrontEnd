@@ -31,7 +31,6 @@ import {
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_DELETE, RECORD_SAVED } from '@shared/constants';
-import { FeeExceptionsService } from '@agency/services/fee-exceptions.service';
 
 export interface AssociateStateModel {
   associateListPage: AssociateOrganizationsAgencyPage | { items: AssociateOrganizationsAgencyPage['items'] };
@@ -93,7 +92,7 @@ export class AssociateListState {
     return state.feeSettings?.baseFee;
   }
 
-  constructor(private associateService: AssociateService, private feeExceptionsService: FeeExceptionsService) {}
+  constructor(private associateService: AssociateService) {}
 
   @Action(GetAssociateListPage)
   GetAssociateListPage(
@@ -134,7 +133,7 @@ export class AssociateListState {
   ): Observable<FeeExceptionsPage> {
     const state = getState();
     const baseFee = state.feeSettings?.baseFee;
-    return this.feeExceptionsService.saveFeeExceptions(feeExceptionsDTO).pipe(
+    return this.associateService.saveFeeExceptions(feeExceptionsDTO).pipe(
       tap((payload) => {
         const feeSettings: FeeSettings = {
           baseFee,
@@ -155,7 +154,7 @@ export class AssociateListState {
     { id }: RemoveFeeExceptionsById
   ): Observable<never> {
     const state = getState();
-    return this.feeExceptionsService.removeFeeExceptionsById(id).pipe(
+    return this.associateService.removeFeeExceptionsById(id).pipe(
       tap(() => {
         const feeSettings = {
           feeExceptions: {
@@ -209,7 +208,7 @@ export class AssociateListState {
     { patchState }: StateContext<AssociateStateModel>,
     { organizationId }: GetFeeExceptionsInitialData
   ): Observable<FeeExceptionsInitialData> {
-    return this.feeExceptionsService.getFeeExceptionsInitialData(organizationId).pipe(
+    return this.associateService.getFeeExceptionsInitialData(organizationId).pipe(
       tap((payload) => {
         patchState({ feeExceptionsInitialData: payload });
       })

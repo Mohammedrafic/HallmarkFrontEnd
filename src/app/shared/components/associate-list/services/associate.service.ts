@@ -4,6 +4,9 @@ import { Observable } from 'rxjs';
 import {
   AssociateOrganizationsAgency,
   AssociateOrganizationsAgencyPage,
+  FeeExceptionsDTO,
+  FeeExceptionsInitialData,
+  FeeExceptionsPage,
   FeeSettings,
   JobDistributionInitialData,
   PartnershipSettings,
@@ -108,6 +111,34 @@ export class AssociateService {
   public inviteOrganizationsAgency(organizationAgencyIds: number[]): Observable<AssociateOrganizationsAgency[]> {
     return this.http.post<AssociateOrganizationsAgency[]>(`/api/AssociateOrganizations`, {
       businessUnitIds: organizationAgencyIds,
+    });
+  }
+
+  /**
+   * Save FeeExceptions
+   * @param feeExceptions
+   * @return UpdatedFeeExceptionsPage
+   */
+  public saveFeeExceptions(feeExceptions: FeeExceptionsDTO): Observable<FeeExceptionsPage> {
+    return this.http.put<FeeExceptionsPage>(`/api/FeeExceptions`, feeExceptions);
+  }
+
+  /**
+   * Remove FeeExceptions
+   * @param id
+   */
+  public removeFeeExceptionsById(id: number): Observable<never> {
+    return this.http.delete<never>(`/api/FeeExceptions/${id}`);
+  }
+
+  /**
+   * Get Fee Exceptions Initial Data By Organization Id
+   * @param organizationAgencyId
+   * @return Initial Data for Fee Exceptions
+   */
+  public getFeeExceptionsInitialData(organizationAgencyId: number): Observable<FeeExceptionsInitialData> {
+    return this.http.get<FeeExceptionsInitialData>(`/api/FeeExceptions/initialData`, {
+      params: { organizationAgencyId },
     });
   }
 }
