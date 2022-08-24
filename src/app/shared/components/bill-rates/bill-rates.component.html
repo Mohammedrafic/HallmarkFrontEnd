@@ -13,5 +13,10 @@
   [width]="'436px'"
   (formCancelClicked)="onDialogCancel()"
   (formSaveClicked)="onDialogOk()">
-  <app-bill-rate-form [billRateForm]="billRateForm" [selectedBillRateUnit]="selectedBillRateUnit"></app-bill-rate-form>
+  <app-bill-rate-form
+  [billRateForm]="billRateForm"
+  [billRateOptions]="billRatesOptions"
+  [selectedBillRateUnit]="selectedBillRateUnit"
+  [billRatesData]="billRatesControl.value"
+  ></app-bill-rate-form>
 </app-side-dialog>
