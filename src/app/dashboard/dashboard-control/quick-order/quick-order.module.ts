@@ -10,6 +10,7 @@ import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-cale
 import { NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { FeatherModule } from 'angular-feather';
 import { Edit3 } from 'angular-feather/icons';
+import { SharedModule } from '@shared/shared.module';
 
 @NgModule({
   imports: [
@@ -24,6 +25,7 @@ import { Edit3 } from 'angular-feather/icons';
     TextBoxModule,
     NumericTextBoxModule,
     FeatherModule.pick({Edit3}),
+    SharedModule,
   ],
   declarations: [QuickOrderComponent, QuickOrderFormComponent],
   exports: [QuickOrderComponent],

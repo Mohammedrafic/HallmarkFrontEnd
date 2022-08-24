@@ -139,13 +139,15 @@
               <label># Open Positions<span class="required">*</span></label>
               <div class="input-group dropdown">
                 <div class="input-group">
-                  <input
-                    class="e-input"
-                    type="text"
+                  <ejs-numerictextbox
+                    class="numeric-input"
+                    min="0"
+                    maxlength="3"
                     appValidateWithMessage
+                    format="0"
                     formControlName="openPositions"
-                    maxlength="50"
-                  />
+                    [showSpinButton]="false"
+                  ></ejs-numerictextbox>
                 </div>
               </div>
             </div>
@@ -451,7 +453,9 @@
         <div class="row">
           <!-- Special Project Category -->
           <div class="input-container bootstrap form-line-item-40">
-            <label>Special Project Category<span *ngIf="isSpecialProjectFieldsRequired" class="required">*</span></label>
+            <label
+              >Special Project Category<span *ngIf="isSpecialProjectFieldsRequired" class="required">*</span></label
+            >
             <div class="input-group dropdown">
               <ejs-dropdownlist
                 formControlName="projectTypeId"
