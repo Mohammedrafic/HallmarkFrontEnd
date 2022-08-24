@@ -21,6 +21,7 @@ import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { AlertsSmsTemplateFromComponent } from './alerts-template/alerts-sms-template-from/alerts-sms-template-from.component';
 import { AlertsOnScreenTemplateFormComponent } from './alerts-template/alerts-on-screen-template-form/alerts-on-screen-template-form.component';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import { ToggleSwitchComponent } from './toggle-switch/toggle-switch.component';
 
 
 @NgModule({
@@ -31,6 +32,7 @@ import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
     AlertsEmailTemplateFormComponent,
     AlertsSmsTemplateFromComponent,
     AlertsOnScreenTemplateFormComponent, 
+    ToggleSwitchComponent
   ],
   imports: [
     CommonModule,

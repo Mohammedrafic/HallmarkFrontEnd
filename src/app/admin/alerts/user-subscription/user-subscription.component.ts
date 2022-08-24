@@ -4,17 +4,16 @@ import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { Observable, Subject,takeWhile } from 'rxjs';
+import { Observable, Subject, takeWhile } from 'rxjs';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { alertsFilterColumns, BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS } from '../alerts.constants';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
-import { ToggleSwitchComponent } from '@shared/components/toggle-switch/toggle-switch.component';
+import { ToggleSwitchComponent } from '../toggle-switch/toggle-switch.component';
 import { GridReadyEvent } from '@ag-grid-community/core';
-import {AlertEnum} from 'src/app/admin/alerts/alerts.enum';
-import { UserSubscriptionFilterService } from './user-subscription.service';
-import { GetUserSubscriptionPage } from '@admin/store/alerts.actions';
-import { UserSubscription, UserSubscriptionFilters, UserSubscriptionPage } from '@shared/models/user-subscription.model';
+import { AlertChannel, AlertEnum } from 'src/app/admin/alerts/alerts.enum';
+import { GetUserSubscriptionPage, UpdateUserSubscription } from '@admin/store/alerts.actions';
+import { UserSubscription, UserSubscriptionFilters, UserSubscriptionPage, UserSubscriptionRequest } from '@shared/models/user-subscription.model';
 import { AlertsState } from '@admin/store/alerts.state';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -25,7 +24,6 @@ import { SetHeaderState } from 'src/app/store/app.actions';
   selector: 'app-user-subscription',
   templateUrl: './user-subscription.component.html',
   styleUrls: ['./user-subscription.component.scss'],
-  providers: [UserSubscriptionFilterService]
 })
 export class UserSubscriptionComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Select(SecurityState.bussinesData)
@@ -33,6 +31,9 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
 
   @Select(AlertsState.UserSubscriptionPage)
   public userSubscriptionPage$: Observable<UserSubscriptionPage>;
+
+  @Select(AlertsState.UpdateUserSubscription)
+  public updateUserSubscription$: Observable<boolean>;
 
   @Input() filterForm: FormGroup;
   public businessForm: FormGroup;
@@ -45,17 +46,17 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public filterColumns = alertsFilterColumns;
   private filters: UserSubscriptionFilters = {};
   public export$ = new Subject<ExportedFileType>();
-  public defaultColDef:any;
-  public autoGroupColumnDef:any;
-  public userSubscriptionFilterFormGroup: FormGroup = this.userSubscriptionFilterService.generateFiltersForm();
+  public defaultColDef: any;
+  public autoGroupColumnDef: any;
   public title: string = "User Subscription";
+  public userGuid: string = "BB401BC8-EA62-49B0-ABBD-9A32C3DA0853";
   itemList: Array<UserSubscription> | undefined;
-  private gridApi : any;
+  private gridApi: any;
   private gridColumnApi: any;
   private isAlive = true;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
-  rowModelType:any;
-  serverSideInfiniteScroll:any;
+  rowModelType: any;
+  serverSideInfiniteScroll: any;
   cacheBlockSize: any;
   pagination: boolean;
   paginationPageSize: number;
@@ -72,25 +73,25 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   get businessControl(): AbstractControl {
     return this.businessForm.get('business') as AbstractControl;
   }
-  constructor(private userSubscriptionFilterService: UserSubscriptionFilterService,private actions$: Actions, 
+  constructor(private actions$: Actions,
     private store: Store) {
     super();
     store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
     this.rowModelType = 'serverSide';
     this.serverSideInfiniteScroll = true,
-    this.pagination = true;
+      this.pagination = true;
     this.paginationPageSize = this.pageSize,
-    this.cacheBlockSize = this.pageSize;
+      this.cacheBlockSize = this.pageSize;
     this.serverSideStoreType = 'partial';
     this.maxBlocksInCache = 2;
     this.columnDefs = [
-      { 
-        field: 'id',
-        hide: true 
-      },    
       {
-        header:'Alert',
-        field: 'alert',
+        field: 'id',
+        hide: true
+      },
+      {
+        headerName: 'Alert Description',
+        field: 'alert.alertTitle',
         filter: 'agTextColumnFilter',
         filterParams: {
           buttons: ['reset'],
@@ -99,46 +100,49 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         }
       },
       {
-        header: 'Email',
-        field: 'email',
+        headerName: 'Email',
+        field: 'isEmailEnabled',
         cellRenderer: ToggleSwitchComponent,
         cellRendererParams: {
-          
+          onChange: this.onEmailChanged.bind(this),
+          label: 'email'
         },
-        valueGetter : (params: { data: { email: boolean}}) => { return AlertEnum[Number(params.data.email)] },
+        valueGetter: (params: { data: { isEmailEnabled: boolean } }) => { return AlertEnum[Number(params.data.isEmailEnabled)] },
         suppressMovable: true,
         filter: false,
         sortable: false,
         menuTabs: []
       },
       {
-        header: 'Text',
-        field: 'text',
+        headerName: 'SMS',
+        field: 'isSMSEnabled',
         cellRenderer: ToggleSwitchComponent,
         cellRendererParams: {
-          
+          onChange: this.onSmsChanged.bind(this),
+          label: 'sms'
         },
-        valueGetter : (params: { data: { text: boolean}}) => { return AlertEnum[Number(params.data.text)] },
+        valueGetter: (params: { data: { isSMSEnabled: boolean } }) => { return AlertEnum[Number(params.data.isSMSEnabled)] },
         suppressMovable: true,
         filter: false,
         sortable: false,
         menuTabs: []
       },
       {
-        header: 'OnScreen',
-        field: 'onScreen',
+        headerName: 'OnScreen',
+        field: 'isOnScreenEnabled',
         cellRenderer: ToggleSwitchComponent,
         cellRendererParams: {
-          
+          onChange: this.onScreenChanged.bind(this),
+          label: 'onScreen'
         },
-        valueGetter : (params: { data: { onScreen: boolean}}) => { return AlertEnum[Number(params.data.onScreen)] },
+        valueGetter: (params: { data: { isOnScreenEnabled: boolean } }) => { return AlertEnum[Number(params.data.isOnScreenEnabled)] },
         suppressMovable: true,
         filter: false,
         sortable: false,
         menuTabs: []
       },
-      
-      
+
+
     ];
 
     this.defaultColDef = {
@@ -157,7 +161,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
 
   }
   ngOnDestroy(): void {
-    this.isAlive=false;
+    this.isAlive = false;
   }
 
   ngOnInit(): void {
@@ -181,16 +185,16 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       .pipe(
         takeWhile(() => this.isAlive)
       );
-      
+
 
     this.bussinesData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-      
+
     });
   }
   public onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
-    this.gridApi.showLoadingOverlay();     
+    this.gridApi.showLoadingOverlay();
     var datasource = this.createServerSideDatasource();
     console.log(datasource);
     params.api.setServerSideDatasource(datasource);
@@ -208,13 +212,14 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       if (!this.isBusinessFormDisabled) {
         this.businessControl.patchValue(0);
       }
+      this.dispatchNewPage();
     });
   }
   createServerSideDatasource() {
-    let self = this;    
+    let self = this;
     return {
       getRows: function (params: any) {
-        setTimeout(()=> {
+        setTimeout(() => {
           let postData = {
             pageNumber: params.request.endRow / self.paginationPageSize,
             pageSize: self.paginationPageSize,
@@ -232,28 +237,55 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
           self.dispatchNewPage(sort, filter);
           self.userSubscriptionPage$.pipe().subscribe((data: any) => {
-            self.itemList = data.items;            
-            params.successCallback(self.itemList, data.totalCount || 1);
+            if (data != undefined) {
+              self.itemList = data.items;
+              params.successCallback(self.itemList, data.totalCount || 1);
+            }
           });
         }, 500);
       }
     }
   }
   onPageSizeChanged(event: any) {
-    this.cacheBlockSize=Number(event.value.toLowerCase().replace("rows",""));
-    this.paginationPageSize=Number(event.value.toLowerCase().replace("rows",""));
-    if(this.gridApi!=null)
-    {
-      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows","")));
-      this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows","")));
+    this.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
+    this.paginationPageSize = Number(event.value.toLowerCase().replace("rows", ""));
+    if (this.gridApi != null) {
+      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows", "")));
+      this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows", "")));
       var datasource = this.createServerSideDatasource();
       this.gridApi.setServerSideDatasource(datasource);
     }
   }
   private dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
     const { businessUnit, business } = this.businessForm?.getRawValue();
-    this.store.dispatch(new GetUserSubscriptionPage(businessUnit||null, business || null, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+    this.store.dispatch(new GetUserSubscriptionPage(businessUnit || null, this.userGuid, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
   }
-
+  public onEmailChanged(data: any): void {
+    this.SaveData(data,AlertChannel.Email);
+  }
+  public onSmsChanged(data: any): void {
+    this.SaveData(data,AlertChannel.SMS);
+  }
+  public onScreenChanged(data: any): void {
+    this.SaveData(data,AlertChannel.OnScreen);
+  }
+  private SaveData(data:any,alertChannel:AlertChannel)
+  {
+    if (data != undefined) {
+      let updateUserSubscription: UserSubscriptionRequest = {
+        alertId: data.rowData?.alertId,
+        userId: data.rowData?.userId,
+        alertChannel: alertChannel,
+        enabled: data.event?.checked
+      }
+      this.store.dispatch(new UpdateUserSubscription(updateUserSubscription));
+      this.updateUserSubscription$.pipe().subscribe((updated: any) => {
+        if (updated != undefined &&updated==true) {        
+          this.dispatchNewPage();        
+        }
+      });
+      
+    }
+  }
 
 }

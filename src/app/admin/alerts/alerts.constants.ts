@@ -19,7 +19,10 @@ export const BUSSINES_DATA_FIELDS = {
   text: 'name',
   value: 'id',
 };
-
+export const User_DATA_FIELDS = {
+  text: 'name',
+  value: 'guid',
+};
 export const alertsFilterColumns: FilterColumnsModel = {
 //   permissionsIds: {
 //     type: ControlTypes.Multiselect,

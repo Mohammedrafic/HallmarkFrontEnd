@@ -44,3 +44,14 @@ export class EditAlertsTemplateRequest  {
     totalCount: number;
     totalPages: number;
   }
+
+export class Alert{
+    id :number;
+    alertTitle:string;
+    alertTypeId:number;
+    hallmark:boolean;
+    mSP:boolean;
+    organization:boolean;
+    agency:boolean;
+    isDeleted:boolean;
+}

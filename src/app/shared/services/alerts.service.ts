@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http"
 import { Injectable } from "@angular/core";
-import { UserSubscription, UserSubscriptionFilters, UserSubscriptionPage } from "@shared/models/user-subscription.model";
+import { UserSubscription, UserSubscriptionFilters, UserSubscriptionPage ,UserSubscriptionRequest} from "@shared/models/user-subscription.model";
 import { observable, Observable, of } from "rxjs";
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
@@ -28,41 +28,25 @@ export class AlertsService {
    */
   public getUserSubscriptionPage(
     BusinessUnitType: BusinessUnitType,
-    BusinessUnitIds: number[],
+    UserId: string,
     PageNumber: number,
     PageSize: number,
     SortModel: any,
     FilterModel: any,
     Filters: UserSubscriptionFilters
-  ): Observable<UserSubscriptionPage> {
-    this.userSubscriptions = [{
-      id: 1, alert: "CandStatus: Accepted",
-      isEmail: true,
-      isText: true,
-      isOnScreen: false
-    },
-    {
-      id: 2, alert: "CandStatus: Applied",
-      isEmail: false,
-      isText: true,
-      isOnScreen: true
-    },
-    {
-      id: 3, alert: "CandStatus: Rejected",
-      isEmail: false,
-      isText: true,
-      isOnScreen: true
-    }];
-    this.userSubscriptionPage = {
-      items: this.userSubscriptions,
-      pageNumber: 1,
-      totalPages: 2,
-      totalCount: this.userSubscriptions.length,
-      hasPreviousPage: false,
-      hasNextPage: false
-    }
-    //return this.http.post<UserSubscriptionPage>(`/api/usersubscription/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel, ...Filters });
-    return of(this.userSubscriptionPage);
+  ): Observable<UserSubscriptionPage> {  
+    return this.http.get<UserSubscriptionPage>(`/api/UserSubscription/GetPagedUserSubscriptions/`+BusinessUnitType+`/`+ UserId,{params: {  pageNumber:PageNumber,pageSize: PageSize }});
+  }
+  /**
+   * Update UserSubscription 
+   * @param UserSubscriptionRequest   
+   *
+   * @return void
+   */
+   public updateUserSubscription(
+    UserSubscriptionRequest:UserSubscriptionRequest    
+  ): Observable<void> {  
+    return this.http.post<void>(`/api/UserSubscription/`,UserSubscriptionRequest);
   }
   /**
    * Get the list of AlertsTemplate
@@ -74,13 +58,14 @@ export class AlertsService {
    */
    public getAlertsTemplatePage(
     BusinessUnitType:BusinessUnitType,
+    BusinessUnitId:number,
     PageNumber: number,
     PageSize: number,
     SortModel: any,
     FilterModel: any,
     Filters: AlertsTemplateFilters
   ): Observable<AlertsTemplatePage> {    
-    return this.http.get<AlertsTemplatePage>(`/api/Templates/GetAlertsForTemplate/`+BusinessUnitType,{ params: { PageNumber: PageNumber, PageSize: PageSize }});
+    return this.http.get<AlertsTemplatePage>(`/api/Templates/GetAlertsForTemplate/`+BusinessUnitType,{ params: {BusinessUnitId :BusinessUnitId, PageNumber: PageNumber, PageSize: PageSize }});
       }
   
   /**

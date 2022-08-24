@@ -92,7 +92,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   private filters: AlertsTemplateFilters = {};
   public title: string = "Alerts Template";
   public export$ = new Subject<ExportedFileType>();
-
+  defaultValue:any;
+  bussinessData:BusinessUnit[]
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   rowModelType: any;
   serverSideInfiniteScroll: any;
@@ -136,7 +137,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         hide: true
       },
       {
-        header: 'Alert',
+        headerName: 'Alert Description',
         field: 'alertTitle',
         filter: 'agTextColumnFilter',
         filterParams: {
@@ -146,7 +147,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         }
       },
       {
-        header: 'Status',
+        headerName: 'Status',
         field: 'status',
         filter: false
       },
@@ -175,7 +176,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         },
       },
       {
-        headerName: 'OnScreen Template',
+        headerName: 'Onscreen Template',
         cellRenderer: 'buttonRenderer',
         cellRendererParams: {
           onClick: this.onScreenTemplateEdit.bind(this),
@@ -204,6 +205,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   ngOnInit(): void {
     this.businessForm = this.generateBusinessForm();
     this.onBusinessUnitValueChanged();
+    this.onBusinessValueChanged();
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
     if (user?.businessUnitType) {
@@ -220,7 +222,10 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         takeWhile(() => this.isAlive)
       );
     this.bussinesData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-
+      this.bussinessData=data;
+      if (!this.isBusinessFormDisabled) {
+        this.defaultValue = data[0]?.id;
+      }
     });
     this.emailTemplateFormGroup = AlertsEmailTemplateFormComponent.createForm();
     this.smsTemplateFormGroup = AlertsSmsTemplateFromComponent.createForm();
@@ -271,7 +276,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           self.alertsTemplatePage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
             if (data != undefined) {
               self.itemList = data.items;
-              params.successCallback(self.itemList, data.length || 1);
+              params.successCallback(self.itemList, data.items.length || 1);
             }
           });
         }, 500);
@@ -279,7 +284,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     }
   }
   private dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
-    this.store.dispatch(new GetAlertsTemplatePage(this.businessUnitControl.value, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+    this.store.dispatch(new GetAlertsTemplatePage(this.businessUnitControl.value,this.businessControl.value, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
   }
   private dispatchEditAlertTemplate(alertId: number, alertChannelId: AlertChannel): void {
     this.store.dispatch(new GetTemplateByAlertId(alertId, alertChannelId));
@@ -416,11 +421,16 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       this.store.dispatch(new GetBusinessByUnitType(value));
-
-      if (!this.isBusinessFormDisabled) {
-        this.businessControl.patchValue(0);
-      }
+      
       this.dispatchNewPage();
+    });
+  }  
+  private onBusinessValueChanged(): void {
+    this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      if(value!=0)
+      {
+      this.dispatchNewPage();
+      }
     });
   }  
   
