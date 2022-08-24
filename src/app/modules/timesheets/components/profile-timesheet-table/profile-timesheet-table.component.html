@@ -54,7 +54,7 @@
         </div>
       </ng-template>
 
-      <div *ngIf="currentTab !== tableTypes.Expenses" class="btn-group">
+      <div *ngIf="currentTab !== tableTypes.Expenses && !isEditOn" class="btn-group">
         <button
           *ngIf="isRejectBtnEnabled"
           ejs-button

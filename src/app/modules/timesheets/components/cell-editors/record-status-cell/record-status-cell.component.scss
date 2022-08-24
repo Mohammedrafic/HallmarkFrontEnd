@@ -1,4 +1,9 @@
 .status-cell {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  
   & .e-chip {
     width: 70%;
     height: 20px;

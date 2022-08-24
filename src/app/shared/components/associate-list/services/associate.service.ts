@@ -4,6 +4,9 @@ import { Observable } from 'rxjs';
 import {
   AssociateOrganizationsAgency,
   AssociateOrganizationsAgencyPage,
+  FeeExceptionsDTO,
+  FeeExceptionsInitialData,
+  FeeExceptionsPage,
   FeeSettings,
   JobDistributionInitialData,
   PartnershipSettings,
@@ -49,7 +52,7 @@ export class AssociateService {
    */
   public saveBaseFee(associateOrganizationAgencyId: number, baseFee: number): Observable<FeeSettings> {
     return this.http.put<FeeSettings>(`/api/AssociateOrganizations/baseFee`, {
-      associateOrganizationAgencyId,
+      associateOrganizationId: associateOrganizationAgencyId,
       baseFee,
     });
   }
@@ -59,10 +62,15 @@ export class AssociateService {
    * @param organizationAgencyId
    * @return Initial Data for Job Distribution
    */
-  public getJobDistributionInitialData(organizationAgencyId: number): Observable<JobDistributionInitialData> {
-    return this.http.get<JobDistributionInitialData>(`/api/AssociateOrganizations/jobDistributionInitialData`, {
-      params: { organizationAgencyId },
-    });
+  public getJobDistributionInitialData(organizationAgencyId: number | null): Observable<JobDistributionInitialData> {
+    return this.http.get<JobDistributionInitialData>(
+      `/api/AssociateOrganizations/jobDistributionInitialData`,
+      organizationAgencyId
+        ? {
+            params: { OrganizationId: organizationAgencyId },
+          }
+        : {}
+    );
   }
 
   /**
@@ -108,6 +116,34 @@ export class AssociateService {
   public inviteOrganizationsAgency(organizationAgencyIds: number[]): Observable<AssociateOrganizationsAgency[]> {
     return this.http.post<AssociateOrganizationsAgency[]>(`/api/AssociateOrganizations`, {
       businessUnitIds: organizationAgencyIds,
+    });
+  }
+
+  /**
+   * Save FeeExceptions
+   * @param feeExceptions
+   * @return UpdatedFeeExceptionsPage
+   */
+  public saveFeeExceptions(feeExceptions: FeeExceptionsDTO): Observable<FeeExceptionsPage> {
+    return this.http.put<FeeExceptionsPage>(`/api/FeeExceptions`, feeExceptions);
+  }
+
+  /**
+   * Remove FeeExceptions
+   * @param id
+   */
+  public removeFeeExceptionsById(id: number): Observable<never> {
+    return this.http.delete<never>(`/api/FeeExceptions/${id}`);
+  }
+
+  /**
+   * Get Fee Exceptions Initial Data By Organization Id
+   * @param organizationAgencyId
+   * @return Initial Data for Fee Exceptions
+   */
+  public getFeeExceptionsInitialData(organizationAgencyId: number): Observable<FeeExceptionsInitialData> {
+    return this.http.get<FeeExceptionsInitialData>(`/api/FeeExceptions/initialData`, {
+      params: { OrganizationId: organizationAgencyId },
     });
   }
 }

@@ -5,9 +5,11 @@ import { Observable, of } from 'rxjs';
 
 import { ExportPayload } from '@shared/models/export.model';
 import {
+  AddMileageDto,
   ChangeStatusData,
   DeleteAttachmentData,
   DownloadAttachmentRequestData,
+  MileageCreateResponse,
   TimesheetDetailsModel,
   TimesheetFileData
 } from '../interface';
@@ -92,6 +94,10 @@ export class TimesheetDetailsApiService {
     });
   }
 
+  public createMilesEntity(body: AddMileageDto): Observable<MileageCreateResponse> {
+    return this.http.post<MileageCreateResponse>('/api/Timesheets/createmileage', body);
+  }
+
   private organizationDownloadAttachment(fileId: number): Observable<Blob> {
     return this.http.get(`/api/Timesheets/files/${fileId}`, {
       responseType: 'blob',
@@ -122,5 +128,5 @@ export class TimesheetDetailsApiService {
 
   private agencyDeleteAttachment(fileId: number, timesheetId: number, organizationId: number): Observable<void> {
     return this.http.delete<void>(`/api/Timesheets/${timesheetId}/organization/${organizationId}/files/${fileId}`);
-  }
+  }  
 }
