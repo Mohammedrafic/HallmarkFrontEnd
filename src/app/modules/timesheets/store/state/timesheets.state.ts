@@ -1,8 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { catchError, debounceTime, forkJoin, mergeMap, Observable, of,
-  switchMap, tap, throttleTime, throwError } from 'rxjs';
+import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap, throttleTime, throwError } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -13,21 +12,42 @@ import { DialogAction } from '@core/enums';
 import { DataSourceItem, DropdownOption } from '@core/interface';
 
 import { TimesheetsModel, TimeSheetsPage } from '../model/timesheets.model';
-import { TimesheetsApiService } from '../../services/timesheets-api.service';
+import { TimesheetsApiService } from '../../services';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import {
-  RecordFields, TimesheetTargetStatus, TimesheetsTableFiltersColumns, FilteringOptionsFields
+  FilteringOptionsFields,
+  RecordFields,
+  TimesheetsTableFiltersColumns,
+  TimesheetTargetStatus,
 } from '../../enums';
 import {
-  AddSuccessMessage, DefaultFiltersState, DefaultTimesheetCollection, DefaultTimesheetState,
-  filteringOptionsMapping, GetBydateErrMessage, PutSuccess, SavedFiltersParams } from '../../constants';
+  AddSuccessMessage,
+  DefaultFiltersState,
+  DefaultTimesheetCollection,
+  DefaultTimesheetState,
+  filteringOptionsMapping,
+  GetBydateErrMessage,
+  PutSuccess,
+  SavedFiltersParams
+} from '../../constants';
 import {
-  Attachment, CandidateHoursAndMilesData, CandidateInfo, CandidateMilesData, FilterColumns, TabCountConfig,
-  Timesheet, TimesheetDetailsModel, TimesheetInvoice, TimesheetRecordsDto, TimesheetsFilterState, TimesheetStatistics,
-  TimesheetsFilteringOptions } from '../../interface';
+  Attachment,
+  CandidateHoursAndMilesData,
+  CandidateInfo,
+  CandidateMilesData,
+  FilterColumns,
+  TabCountConfig,
+  Timesheet,
+  TimesheetDetailsModel,
+  TimesheetInvoice,
+  TimesheetRecordsDto,
+  TimesheetsFilteringOptions,
+  TimesheetsFilterState,
+  TimesheetStatistics
+} from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
-import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
+import { TimesheetDetailsApiService } from '../../services';
 import { reduceFiltersState } from '../../helpers';
 
 @State<TimesheetsModel>({

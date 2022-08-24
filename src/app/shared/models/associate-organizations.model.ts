@@ -1,9 +1,13 @@
-import { DistributionLevels, PartnershipStatus, SubmissionPercentageOverrideRestriction } from '@shared/enums/partnership-settings';
+import {
+  DistributionLevels,
+  PartnershipStatus,
+  SubmissionPercentageOverrideRestriction,
+} from '@shared/enums/partnership-settings';
 import { PageOfCollections } from './page.model';
 import { Region } from './region.model';
 import { SkillCategory } from './skill-category.model';
 
-export type AssociateOrganizations = {
+export type AssociateOrganizationsAgency = {
   id?: number;
   organizationId?: number;
   organizationName: string;
@@ -17,9 +21,10 @@ export type AssociateOrganizations = {
   skillCategory: string;
   partnershipStatus: number;
   partnershipStatusTitle: string;
+  businessUnitName: string;
 };
 
-export type AssociateOrganizationsPage = PageOfCollections<AssociateOrganizations>;
+export type AssociateOrganizationsAgencyPage = PageOfCollections<AssociateOrganizationsAgency>;
 
 export type FeeExceptions = {
   id: number;
@@ -57,11 +62,11 @@ export enum FeeSettingsClassification {
 
 export enum JobDistributionOrderType {
   All = 0,
-  "Contract to perm" = 1,
-  "Open per diem" = 2,
-  "Per diem" = 3,
-  "Perm placement" = 4,
-  "Traveler" = 5,
+  'Contract to perm' = 1,
+  'Open per diem' = 2,
+  'Per diem' = 3,
+  'Perm placement' = 4,
+  'Traveler' = 5,
 }
 
 export type FeeExceptionsInitialData = {

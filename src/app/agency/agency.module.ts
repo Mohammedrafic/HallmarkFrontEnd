@@ -96,6 +96,7 @@ import { CandidateExperienceComponent } from './candidates/import-candidates/can
 import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
 import { GridErroredCellComponent } from './candidates/import-candidates/grid-errored-cell/grid-errored-cell.component';
 import { ExtensionModule } from '@shared/components/extension/extension.module';
+import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
 
 const sidebarIcons = {
   Sliders,
@@ -197,6 +198,7 @@ const sidebarIcons = {
     AddEditReorderModule,
     CandidateDetailsModule,
     ExtensionModule,
+    AssociateListModule,
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),

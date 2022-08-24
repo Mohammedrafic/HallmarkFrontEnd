@@ -86,6 +86,7 @@ import { CandidateListModule } from '@shared/components/candidate-list/candidate
 import { ChildOrderDialogModule } from '@shared/components/child-order-dialog/child-order-dialog.module';
 import { ExtensionModule } from '@shared/components/extension/extension.module';
 import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
+import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
 
 const gridIcons = {
   MessageSquare,
@@ -166,6 +167,7 @@ const gridIcons = {
     SwitchModule,
     CandidateDetailsModule,
     ChildOrderDialogModule,
+    AssociateListModule,
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
     ExtensionModule,

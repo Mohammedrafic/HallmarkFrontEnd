@@ -1,6 +1,6 @@
 import { Agency, AgencyListFilters } from 'src/app/shared/models/agency.model';
 import {
-  AssociateOrganizations,
+  AssociateOrganizationsAgency,
   FeeExceptionsDTO,
   FeeExceptionsPage,
   FeeSettings,
@@ -30,7 +30,7 @@ export class InvateOrganizations {
 
 export class InvateOrganizationsSucceeded {
   static readonly type = '[agency] Invate Organizations Succeeded';
-  constructor(public payload: AssociateOrganizations[]) {}
+  constructor(public payload: AssociateOrganizationsAgency[]) {}
 }
 
 export class GetAssociateOrganizationsById {
@@ -159,5 +159,5 @@ export class ExportAgencyList {
 
 export class GetAgencyFilteringOptions {
   static readonly type = '[agency] Get Agency Filtering Options';
-  constructor() { }
+  constructor() {}
 }

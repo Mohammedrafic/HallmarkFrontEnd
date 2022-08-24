@@ -6,7 +6,7 @@ import { Actions, Select, Store } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
-import { AssociateOrganizations, FeeExceptionsPage } from 'src/app/shared/models/associate-organizations.model';
+import { AssociateOrganizationsAgency, FeeExceptionsPage } from 'src/app/shared/models/associate-organizations.model';
 import { FeeSettingsComponent } from './fee-settings/fee-settings.component';
 import {
   GetFeeExceptionsInitialData,
@@ -32,7 +32,7 @@ enum Tabs {
   styleUrls: ['./edit-associated-dialog.component.scss'],
 })
 export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
-  @Input() openEvent: Subject<AssociateOrganizations>;
+  @Input() openEvent: Subject<AssociateOrganizationsAgency>;
   @Output() editEndEvent = new EventEmitter<never>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
@@ -45,7 +45,7 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
   public baseFee$: Observable<number>;
 
   public targetElement: HTMLElement = document.body;
-  public editOrg: AssociateOrganizations;
+  public editOrg: AssociateOrganizationsAgency;
   public width: string;
   public feeSettingsForm: FormGroup;
   public partnershipForm: FormGroup;

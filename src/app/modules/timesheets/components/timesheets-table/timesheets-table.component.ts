@@ -29,6 +29,7 @@ export class TimesheetsTableComponent implements OnChanges {
   @Input() tableData: TimeSheetsPage;
 
   @Input() newSelectedIndex: null | number;
+
   @Input() activeTabIdx: number;
 
   @Output() readonly changePage: EventEmitter<number> = new EventEmitter<number>();
