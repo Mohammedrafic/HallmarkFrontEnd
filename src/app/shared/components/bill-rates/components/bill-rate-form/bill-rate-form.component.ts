@@ -1,12 +1,11 @@
-import { AfterViewInit, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Select, Store } from '@ngxs/store';
-import { Observable, takeWhile } from 'rxjs';
+import { Store } from '@ngxs/store';
+import { takeWhile } from 'rxjs';
 
 import { DropDownListComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { MaskedTextBoxComponent } from "@syncfusion/ej2-angular-inputs";
 
-import { BillRateState } from '@shared/components/bill-rates/store/bill-rate.state';
 import {
   BillRate,
   BillRateCategory,
@@ -51,9 +50,6 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy, 
   @Input() selectedBillRateUnit: BillRateUnit;
   public BillRateUnitList = BillRateUnit;
   public priceUtils = PriceUtils;
-
-  @Select(BillRateState.billRateOptions)
-  public billRateOptions$: Observable<BillRateOption[]>;
 
   get billRateConfigControl(): AbstractControl | null {
     return this.billRateForm.get('billRateConfig');
