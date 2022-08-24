@@ -65,7 +65,7 @@ import { TimesheetsContentComponent } from './timesheets/timesheets-content/time
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { ClientComponent } from './client.component';
 import { TabNavigationComponent } from './order-management/order-management-content/tab-navigation/tab-navigation.component';
-import { SharedModule } from '../shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 import { AddEditOrderComponent } from './order-management/add-edit-order/add-edit-order.component';
 import { OrderDetailsFormComponent } from './order-management/order-details-form/order-details-form.component';
 
@@ -86,6 +86,7 @@ import { CandidateListModule } from '@shared/components/candidate-list/candidate
 import { ChildOrderDialogModule } from '@shared/components/child-order-dialog/child-order-dialog.module';
 import { ExtensionModule } from '@shared/components/extension/extension.module';
 import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
+import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
 
 const gridIcons = {
   MessageSquare,
@@ -166,6 +167,7 @@ const gridIcons = {
     SwitchModule,
     CandidateDetailsModule,
     ChildOrderDialogModule,
+    AssociateListModule,
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
     ExtensionModule,

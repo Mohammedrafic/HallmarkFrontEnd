@@ -1,22 +1,22 @@
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
-import { Select, Store } from '@ngxs/store';
-import { filter, Observable, Subject } from 'rxjs';
-
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-
-import { GetFeeSettingByOrganizationId, RemoveFeeExceptionsById } from 'src/app/agency/store/agency.actions';
-import { AgencyState } from 'src/app/agency/store/agency.state';
-import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { filter, Observable, Subject } from 'rxjs';
 import {
   FeeExceptions,
   FeeExceptionsPage,
   FeeSettingsClassification,
-} from 'src/app/shared/models/associate-organizations.model';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { DELETE_RECORD_TITLE, DELETE_RECORD_TEXT } from '@shared/constants/messages';
-import { GRID_CONFIG } from '@shared/constants/grid-config';
+} from '@shared/models/associate-organizations.model';
+import { Select, Store } from '@ngxs/store';
 import PriceUtils from '@shared/utils/price.utils';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
+import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
+import {
+  GetFeeSettingByOrganizationId,
+  RemoveFeeExceptionsById,
+} from '@shared/components/associate-list/store/associate.actions';
 
 @Component({
   selector: 'app-fee-settings',
@@ -25,7 +25,6 @@ import PriceUtils from '@shared/utils/price.utils';
 })
 export class FeeSettingsComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit {
   @Input() form: FormGroup;
-
   @ViewChild('grid') grid: GridComponent;
 
   public openAddNewFeeDialog = new Subject<number>();
@@ -38,22 +37,18 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
     return this.form.get('feeExceptions')?.value || [];
   }
 
-  @Select(AgencyState.feeExceptionsPage)
+  @Select(AssociateListState.feeExceptionsPage)
   public feeExceptionsPage$: Observable<FeeExceptionsPage>;
-
   public priceUtils = PriceUtils;
 
-  private organizationId: number;
+  private organizationAgencyId: number;
 
   constructor(private store: Store, private confirmService: ConfirmService) {
     super();
   }
 
   ngOnInit(): void {
-    this.form.get('id')?.valueChanges.subscribe((organizationId) => {
-      this.organizationId = organizationId;
-      this.store.dispatch(new GetFeeSettingByOrganizationId(organizationId, this.currentPage, this.pageSize));
-    });
+    this.subscribeOnIdChanges();
   }
 
   ngAfterViewInit(): void {
@@ -61,11 +56,11 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
   }
 
   public addNew(): void {
-    this.openAddNewFeeDialog.next(this.organizationId);
+    this.openAddNewFeeDialog.next(this.organizationAgencyId);
   }
 
   public onEdit(data: { index: string } & FeeExceptions): void {
-    this.openAddNewFeeDialog.next(this.organizationId);
+    this.openAddNewFeeDialog.next(this.organizationAgencyId);
     this.editFeeData.next(data);
   }
 
@@ -82,7 +77,9 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
 
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.store.dispatch(new GetFeeSettingByOrganizationId(this.organizationId, this.currentPage, this.pageSize));
+      this.store.dispatch(
+        new GetFeeSettingByOrganizationId(this.organizationAgencyId, this.currentPage, this.pageSize)
+      );
     }
   }
 
@@ -108,6 +105,13 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
       skillName: new FormControl(''),
       skillId: new FormControl(''),
       fee: new FormControl(''),
+    });
+  }
+
+  private subscribeOnIdChanges(): void {
+    this.form.get('id')?.valueChanges.subscribe((organizationAgencyId) => {
+      this.organizationAgencyId = organizationAgencyId;
+      this.store.dispatch(new GetFeeSettingByOrganizationId(organizationAgencyId, this.currentPage, this.pageSize));
     });
   }
 }

@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AssociatedOrgGridComponent } from './associated-org-grid.component';
+import { AssociateGridComponent } from './associate-grid.component';
 
-describe('AssociatedOrgGridComponent', () => {
-  let component: AssociatedOrgGridComponent;
-  let fixture: ComponentFixture<AssociatedOrgGridComponent>;
+describe('AssociateGridComponent', () => {
+  let component: AssociateGridComponent;
+  let fixture: ComponentFixture<AssociateGridComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AssociatedOrgGridComponent ]
+      declarations: [ AssociateGridComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AssociatedOrgGridComponent);
+    fixture = TestBed.createComponent(AssociateGridComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
