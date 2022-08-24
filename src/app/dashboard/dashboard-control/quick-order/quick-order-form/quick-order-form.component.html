@@ -254,7 +254,7 @@
             </div>
           </div>
 
-          <div class="row" *ngIf="true">
+          <div class="row" *ngIf="this.isTravelerOrder || this.isContactToPermOrder || this.isPermPlacementOrder">
             <!-- Shift Requirements -->
             <div class="input-container bootstrap form-line-item-20">
               <label>Shift Name<span class="required">*</span></label>
@@ -362,7 +362,7 @@
                   <ejs-dropdownlist
                     formControlName="reasonForRequisition"
                     appValidateWithMessage
-                    [dataSource]="reasonsForRequisition"
+                    [dataSource]="(reasons$ | async)?.items"
                     [fields]="reasonForRequisitionFields"
                   >
                   </ejs-dropdownlist>
@@ -493,4 +493,3 @@
     </div>
   </section>
 </div>
-
