@@ -90,6 +90,7 @@ export interface TimesheetDetailsModel {
   weekStartDate: string;
   candidateWorkPeriods: WorkWeek<string>[];
   isNotExist?: boolean;
+  mileageTimesheetId: number;
 }
 
 export interface WorkWeek<T> {
@@ -144,4 +145,19 @@ export interface PutRecordDto {
   type: number;
   deleteIds?: number[];
   records?: PutRecord[];
+}
+
+export interface AddMileageDto {
+  organizationId: number;
+  jobId: number;
+  weekStartDate: string;
+}
+
+export interface MileageCreateResponse {
+  timesheetId: number;
+  type: number;
+  jobId: number;
+  organizationId: number;
+  weekStart: string;
+  status: number;
 }

@@ -61,7 +61,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
         this.setDateBounds(value.initDate, 7);
         this.populateOptions();
         this.sideAddDialog.show();
-        this.cd.markForCheck();
+        this.cd.detectChanges();
       }),
       filter((value) => value.type === RecordFields.Time),
       switchMap(() => this.watchForDayChange()),
