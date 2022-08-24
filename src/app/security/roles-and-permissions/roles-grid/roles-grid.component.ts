@@ -38,8 +38,7 @@ enum Active {
 @Component({
   selector: 'app-roles-grid',
   templateUrl: './roles-grid.component.html',
-  styleUrls: ['./roles-grid.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./roles-grid.component.scss']
 })
 export class RolesGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() filterForm: FormGroup;

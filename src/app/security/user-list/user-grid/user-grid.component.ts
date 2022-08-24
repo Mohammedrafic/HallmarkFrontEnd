@@ -36,8 +36,7 @@ enum Visibility {
 @Component({
   selector: 'app-user-grid',
   templateUrl: './user-grid.component.html',
-  styleUrls: ['./user-grid.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./user-grid.component.scss']
 })
 export class UserGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() filterForm: FormGroup;
