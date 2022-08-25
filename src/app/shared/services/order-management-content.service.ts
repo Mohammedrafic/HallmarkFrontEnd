@@ -251,9 +251,9 @@ export class OrderManagementContentService {
       map((items) => items.map((rate) => {
         return ({
           ...rate,
-          IsPredefined: true,
+          isPredefined: true,
         })
-      } ))
+      }))
     )
   }
 

@@ -156,6 +156,7 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy, 
       editAllowed: new FormControl(false),
       billType: new FormControl(false, [Validators.required]),
       effectiveDate: new FormControl('', [Validators.required]),
+      isPredefined: new FormControl(false),
       billRateConfig: new FormGroup({
         id: new FormControl(),
         category: new FormControl(),

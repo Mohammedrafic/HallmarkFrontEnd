@@ -80,7 +80,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     this.editBillRateIndex = null;
     this.billRateForm.reset();
     this.billRateFormHeader = 'Add Bill Rate';
-    this.billRateForm.patchValue({ id: 0, editAllowed: false});
+    this.billRateForm.patchValue({ id: 0, editAllowed: false, isPredefined: false });
     this.selectedBillRateUnit = BillRateUnit.Multiplier;
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -186,6 +186,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       } else {
         this.billRatesControl.push(this.fromValueToBillRate(value));
       }
+
       this.billRatesChanged.emit(this.billRateForm.value);
       this.billRateForm.reset();
       this.store.dispatch(new ShowSideDialog(false));
