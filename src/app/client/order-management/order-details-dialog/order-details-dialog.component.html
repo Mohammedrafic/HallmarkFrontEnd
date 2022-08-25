@@ -82,7 +82,8 @@
               [disabled]="disabledLock"
             >
               {{ order?.isLocked ? 'Unlock' : 'Lock' }}
-              <i-feather [name]="order?.isLocked ? 'unlock' : 'lock'" class="icon"></i-feather>
+              <i-feather *ngIf="!order?.isLocked" name="lock" class="icon"></i-feather>
+              <app-custom-icon *ngIf="order?.isLocked" name="unlock" class="icon"></app-custom-icon>
             </button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>

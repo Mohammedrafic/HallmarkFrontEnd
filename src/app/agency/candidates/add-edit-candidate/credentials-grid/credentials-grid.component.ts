@@ -233,7 +233,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     event.stopPropagation();
     this.disabledCopy = true;
     this.masterCredentialId = data.masterCredentialId;
-    this.saveCredential(data);
+    this.saveCredential({ ...data, status: CredentialVerifiedStatus.Pending });
   }
 
   public onViewFiles(id: number) {
@@ -247,7 +247,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   public onEdit(event: MouseEvent,
-                { status, insitute, createdOn, number, experience, createdUntil,
+                { status, insitute, createdOn, number, experience, createdUntil, completedDate,
                   masterCredentialId, id, credentialFiles, expireDateApplicable }: CandidateCredential) {
     event.stopPropagation();
     this.checkCertifiedFields(expireDateApplicable as boolean);
@@ -258,7 +258,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new ShowSideDialog(true)).subscribe(() => this.setDropElement());
     this.addCredentialForm.patchValue({
       status, insitute, createdOn, number,
-      experience, createdUntil
+      experience, createdUntil, completedDate
     });
   }
 
@@ -269,24 +269,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.uploadObj.clearAll();
   }
 
-
-  public onFileSelected(args : SelectedEventArgs) : void {
-    // Filter the 3 files only to showcase
-    args.filesData.splice(3);
-    let filesData : FileInfo[] = this.uploadObj.getFilesData();
-    let allFiles : FileInfo[] = filesData.concat(args.filesData);
-    if (allFiles.length > 3) {
-      for (let i : number = 0; i < allFiles.length; i++) {
-        if (allFiles.length > 3) {
-          allFiles.shift();
-        }
-      }
-      args.filesData = allFiles;
-      // set the modified custom data
-      args.modifiedFilesData = args.filesData;
+  public onFileSelected(event : SelectedEventArgs) : void {
+    if (event.filesData[0].statusCode !== '1') {
+      this.addFilesValidationMessage(event.filesData[0]);
     }
-    args.isModified = true;
-    allFiles.filter((file) => file.statusCode === '0').forEach((file, index) => this.addFilesValidationMessage(file, index));
   }
 
   public onRemove(event: MouseEvent, data: any) {
@@ -334,10 +320,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.addCredentialForm = this.fb.group({
       status: new FormControl(null, [Validators.required]),
       insitute: new FormControl(null, [Validators.maxLength(100)]),
-      createdOn: new FormControl(null, []),
+      createdOn: new FormControl(null),
       number: new FormControl(null, [Validators.maxLength(100)]),
       experience: new FormControl(null, [Validators.maxLength(20)]),
-      createdUntil: new FormControl(null, []),
+      createdUntil: new FormControl(null),
+      completedDate: new FormControl(null),
     });
   }
 
@@ -351,8 +338,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private saveCredential({ status, number, insitute, experience, createdOn, createdUntil, completedDate }: CandidateCredential): void {
     if (this.masterCredentialId) {
       this.store.dispatch(new SaveCandidatesCredential({
-        status, number, insitute, experience, createdOn, createdUntil,
-        completedDate: this.getCompleteDate(completedDate),
+        status, number, insitute, experience, createdOn, createdUntil, completedDate,
         masterCredentialId: this.masterCredentialId,
         id: this.credentialId as number
       }));
@@ -374,11 +360,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   private uploadFiles(credentialId: number): void {
-    this.uploadObj.filesData.forEach((item, index) => {
-      if (this.uploadObj.filesData[index].statusCode === '1' && this.filesDetails.length < 3) {
-        this.filesDetails.push(this.uploadObj.filesData[index].rawFile as Blob);
-      }
-    });
+    if (this.uploadObj.filesData[0]?.statusCode === '1') {
+      this.filesDetails.push(this.uploadObj.filesData[0].rawFile as Blob);
+    }
 
     if (this.filesDetails.length || this.removeFiles) {
       this.store.dispatch(new UploadCredentialFiles(this.filesDetails, credentialId));
@@ -389,9 +373,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.dropElement = document.getElementById('files-droparea') as HTMLElement;
   }
 
-  private addFilesValidationMessage(file: FileInfo, fileIndex: number) {
+  private addFilesValidationMessage(file: FileInfo) {
     requestAnimationFrame(() => {
-      this.uploaderErrorMessageElement = document.getElementsByClassName('e-validation-fails')[fileIndex] as HTMLElement;
+      this.uploaderErrorMessageElement = document.getElementsByClassName('e-validation-fails')[0] as HTMLElement;
       if (this.uploaderErrorMessageElement) {
         this.uploaderErrorMessageElement.innerText = file.size > this.maxFileSize
           ? 'The file exceeds the limitation, max allowed 10 MB.'
@@ -434,13 +418,5 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
     this.createdOnControl?.updateValueAndValidity();
     this.createdUntilControl?.updateValueAndValidity()
-  }
-
-  private getCompleteDate(completeDate: string | null): string | null {
-    if (completeDate) {
-      return completeDate;
-    } else {
-      return this.uploadObj.filesData.some(file => file.statusCode === '1') ? new Date().toISOString() : null;
-    }
   }
 }

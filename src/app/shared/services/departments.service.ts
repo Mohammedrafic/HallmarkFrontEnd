@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
@@ -35,8 +35,13 @@ export class DepartmentsService {
   /**
    * Get department data
    */
-   public getDepartmentData(departmentId: number): Observable<Department> {
-    return this.http.get<Department>(`/api/Departments/${departmentId}`);
+   public getDepartmentData(departmentId: number, lastSelectedBusinessId?: number): Observable<Department> {
+    let headers = {};
+
+    if (lastSelectedBusinessId) {
+      headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessId}` });
+    }
+    return this.http.get<Department>(`/api/Departments/${departmentId}`, { headers });
   }
 
   /**

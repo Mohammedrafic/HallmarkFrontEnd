@@ -329,11 +329,11 @@ export class OrderManagementContentState {
   @Action(SetLock)
   SetLock(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { id, lockStatus, filters, updateOpened }: SetLock
+    { id, lockStatus, filters, prefixId, updateOpened }: SetLock
   ): Observable<boolean | void> {
     return this.orderManagementService.setLock(id, lockStatus).pipe(
       tap(() => {
-        const message = lockStatus ? `The Order ${id} is locked` : `The Order ${id} is unlocked`;
+        const message = lockStatus ? `The Order ${prefixId} is locked` : `The Order ${prefixId} is unlocked`;
         const actions = [new LockUpdatedSuccessfully(), new ShowToast(MessageTypes.Success, message)];
         dispatch(updateOpened ? [...actions, new GetSelectedOrderById(id)] : actions);
       }),
@@ -453,8 +453,8 @@ export class OrderManagementContentState {
   @Action(GetProjectSpecialData)
   GetProjectSpecialData({
     patchState,
-  }: StateContext<OrderManagementContentStateModel>): Observable<ProjectSpecialData> {
-    return this.projectsService.getProjectSpecialData().pipe(
+  }: StateContext<OrderManagementContentStateModel>, { lastSelectedBusinessUnitId }: GetProjectSpecialData): Observable<ProjectSpecialData> {
+    return this.projectsService.getProjectSpecialData(lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
         patchState({ projectSpecialData: payload });
       })
@@ -491,8 +491,8 @@ export class OrderManagementContentState {
   }
 
   @Action(GetAssociateAgencies)
-  GetAssociateAgencies({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<AssociateAgency[]> {
-    return this.orderManagementService.getAssociateAgencies().pipe(
+  GetAssociateAgencies({ patchState }: StateContext<OrderManagementContentStateModel>, { lastSelectedBusinessUnitId }: GetAssociateAgencies): Observable<AssociateAgency[]> {
+    return this.orderManagementService.getAssociateAgencies(lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
         patchState({ associateAgencies: payload });
       })
@@ -548,16 +548,19 @@ export class OrderManagementContentState {
   @Action(SaveOrder)
   SaveOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents, comments }: SaveOrder
+    { order, documents, comments, lastSelectedBusinessUnitId }: SaveOrder
   ): Observable<Order | void> {
-    return this.orderManagementService.saveOrder(order, documents, comments).pipe(
-      tap((order) => {
+
+    return this.orderManagementService.saveOrder(order, documents, comments, lastSelectedBusinessUnitId).pipe(
+      tap((payload) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          order?.isQuickOrder
+            ? new ShowToast(MessageTypes.Success, RECORD_ADDED, order.isQuickOrder, payload.id)
+            : new ShowToast(MessageTypes.Success, RECORD_ADDED),
           new SaveOrderSucceeded(),
           new SetIsDirtyOrderForm(false),
         ]);
-        return order;
+        return payload;
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
     );
@@ -705,9 +708,9 @@ export class OrderManagementContentState {
   @Action(GetContactDetails)
   GetContactDetails(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { departmentId }: GetContactDetails
+    { departmentId, lastSelectedBusinessId }: GetContactDetails
   ): Observable<Department> {
-    return this.departmentService.getDepartmentData(departmentId).pipe(
+    return this.departmentService.getDepartmentData(departmentId, lastSelectedBusinessId).pipe(
       tap((contactDetails: Department) => {
         patchState({ contactDetails });
       })

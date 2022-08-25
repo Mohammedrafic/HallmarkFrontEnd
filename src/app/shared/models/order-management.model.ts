@@ -301,6 +301,7 @@ export class Order {
   orderClosureReason?: string;
   orderClosureReasonId?: string;
   isTemplate?: boolean;
+  isQuickOrder?: boolean;
   organizationPrefix?: string;
   orderPlacementFee?: number;
   annualSalaryRangeFrom?: number;
@@ -431,6 +432,7 @@ export type OrderCandidateJob = {
   positionClosureReason?: string;
   positionClosureReasonId?: number;
   commentContainerId?: number;
+  reOrderDate?: string;
 };
 
 export type CandidatesBasicInfo = {

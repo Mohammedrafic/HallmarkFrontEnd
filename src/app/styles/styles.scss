@@ -134,7 +134,7 @@ body {
   }
 
   // Default icon size
-  i-feather.icon {
+  i-feather.icon, app-custom-icon.icon {
     width: 16px;
     height: 16px;
     &.fill-red {

@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
 
@@ -129,11 +129,15 @@ export class RejectReasonService {
    * @param pageSize
    * @param orderBy
    */
-  public getOrderRequisitionsByPage(pageNumber?: number, pageSize?: number, orderBy?: string): Observable<RejectReasonPage> {
+  public getOrderRequisitionsByPage(pageNumber?: number, pageSize?: number, orderBy?: string, lastSelectedBusinessUnitId?: number): Observable<RejectReasonPage> {
     const params = this.getCloseReasonsParams(pageNumber, pageSize, orderBy);
+    let headers = {};
+    if (lastSelectedBusinessUnitId) {
+      headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
+    }
 
     return this.http.post<RejectReasonPage>(`/api/OrderRequisition/all`,
-      { params }
+      { params }, { headers }
     );
   }
 

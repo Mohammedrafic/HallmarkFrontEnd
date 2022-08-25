@@ -11,6 +11,7 @@ import { DashboardService } from './services/dashboard.service';
 import { DashboardState } from './store/dashboard.state';
 import { DashboardWidgetsModule } from './dashboard-widgets/dashboard-widgets.module';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
 @NgModule({
   declarations: [DashboardComponent],
@@ -18,7 +19,7 @@ import { OrganizationManagementState } from '@organization-management/store/orga
     CommonModule,
     DashboardControlModule,
     RouterModule.forChild([{ path: '', component: DashboardComponent }]),
-      NgxsModule.forFeature([DashboardState, OrganizationManagementState]),
+      NgxsModule.forFeature([DashboardState, OrganizationManagementState, OrderManagementContentState]),
     ReactiveFormsModule,
     DashboardWidgetsModule,
   ],

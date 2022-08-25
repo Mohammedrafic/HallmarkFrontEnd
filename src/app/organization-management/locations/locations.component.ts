@@ -21,11 +21,12 @@ import {
   GetRegions,
   SaveLocation, SaveRegion, SetGeneralStatesByCountry,
   SetImportFileDialogState,
-  UpdateLocation
+  UpdateLocation,
+  GetLocationTypes
 } from '../store/organization-management.actions';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { Location, LocationFilter, LocationFilterOptions, LocationsPage } from '@shared/models/location.model';
+import { Location, LocationFilter, LocationFilterOptions, LocationsPage, LocationType } from '@shared/models/location.model';
 
 import { PhoneTypes } from '@shared/enums/phone-types';
 import {
@@ -45,6 +46,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { TimeZones} from '@shared/enums/timezones';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
 
@@ -69,7 +71,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedRegion: Region;
-  defaultValue:any;
+  defaultValue: any;
 
   @Select(OrganizationManagementState.locationsByRegionId)
   locations$: Observable<LocationsPage>;
@@ -87,6 +89,12 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   @Select(OrganizationManagementState.locationFilterOptions)
   locationFilterOptions$: Observable<LocationFilterOptions>;
 
+  @Select(OrganizationManagementState.timeZones)
+  timeZones$: Observable<FieldSettingsModel[]>;
+
+  @Select(OrganizationManagementState.locationTypes)
+  locationTypes$: Observable<GetLocationTypes>;
+
   isEdit: boolean;
   editedLocationId?: number;
 
@@ -98,15 +106,15 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   public columnsToExport: ExportColumn[] = [
-    { text:'Ext Location ID', column: 'ExternalId'},
-    { text:'Invoice Location ID', column: 'InvoiceId'},
-    { text:'Location Name', column: 'Name'},
-    { text:'Address 1', column: 'Address1'},
-    { text:'Address 2', column: 'Address2'},
-    { text:'City', column: 'City'},
-    { text:'State', column: 'State'},
-    { text:'Zip', column: 'Zip'},
-    { text:'Contact Person', column: 'ContactPerson'}
+    { text: 'Ext Location ID', column: 'ExternalId' },
+    { text: 'Invoice Location ID', column: 'InvoiceId' },
+    { text: 'Location Name', column: 'Name' },
+    { text: 'Address 1', column: 'Address1' },
+    { text: 'Address 2', column: 'Address2' },
+    { text: 'City', column: 'City' },
+    { text: 'State', column: 'State' },
+    { text: 'Zip', column: 'Zip' },
+    { text: 'Contact Person', column: 'ContactPerson' }
   ];
   public fileName: string;
   public defaultFileName: string;
@@ -119,15 +127,19 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   public filterColumns: any;
 
   constructor(private store: Store,
-              @Inject(FormBuilder) private builder: FormBuilder,
-              private confirmService: ConfirmService,
-              private datePipe: DatePipe,
-              private filterService: FilterService) {
+    @Inject(FormBuilder) private builder: FormBuilder,
+    private confirmService: ConfirmService,
+    private datePipe: DatePipe,
+    private filterService: FilterService) {
     super();
 
     this.formBuilder = builder;
     this.createLocationForm();
   }
+
+  public locationTypeOptionFields = {
+    text: 'name', value: 'locationTypeId'
+  };
 
   ngOnInit(): void {
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
@@ -162,10 +174,11 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
       this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data) => {
-        this.defaultValue = data.organizationManagement.regions[0]?.id;
-      });;
+        .subscribe((data) => {
+          this.defaultValue = data.organizationManagement.regions[0]?.id;
+        });;
     });
+    this.store.dispatch(new GetLocationTypes());
   }
 
   ngOnDestroy(): void {
@@ -261,12 +274,12 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.clearFilters();
     this.getLocations();
   }
-  
+
   public onFilterApply(): void {
     this.filters = this.LocationFilterFormGroup.getRawValue();
     this.filters.regionId = this.selectedRegion.id,
-    this.filters.pageNumber = this.currentPage,
-    this.filters.pageSize = this.pageSizePager
+      this.filters.pageNumber = this.currentPage,
+      this.filters.pageSize = this.pageSizePager
     this.filteredItems = this.filterService.generateChips(this.LocationFilterFormGroup, this.filterColumns);
     this.getLocations();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -338,12 +351,14 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       state: location.state,
       glNumber: location.glNumber,
       ext: location.ext,
-      invoiceNote: location.invoiceNote,
       contactEmail: location.contactEmail,
       contactPerson: location.contactPerson,
       inactiveDate: location.inactiveDate,
       phoneNumber: location.phoneNumber,
-      phoneType: PhoneTypes[location.phoneType]
+      phoneType: PhoneTypes[location.phoneType],
+      timeZone: TimeZones[location.timeZone],
+      locationType: location.locationTypeId,
+      organizationId :this.businessUnitId
     });
     this.editedLocationId = location.id;
     this.isEdit = true;
@@ -405,12 +420,14 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         state: this.locationDetailsFormGroup.controls['state'].value,
         glNumber: this.locationDetailsFormGroup.controls['glNumber'].value,
         ext: this.locationDetailsFormGroup.controls['ext'].value,
-        invoiceNote: this.locationDetailsFormGroup.controls['invoiceNote'].value,
         contactEmail: this.locationDetailsFormGroup.controls['contactEmail'].value,
         contactPerson: this.locationDetailsFormGroup.controls['contactPerson'].value,
         inactiveDate: this.locationDetailsFormGroup.controls['inactiveDate'].value,
         phoneNumber: this.locationDetailsFormGroup.controls['phoneNumber'].value,
         phoneType: parseInt(PhoneTypes[this.locationDetailsFormGroup.controls['phoneType'].value]),
+        timeZone: parseInt(TimeZones[this.locationDetailsFormGroup.controls['timeZone'].value]),
+        locationTypeId: this.locationDetailsFormGroup.controls['locationType'].value,
+        organizationId : this.businessUnitId
       }
 
       this.saveOrUpdateLocation(location);
@@ -426,25 +443,19 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   private saveOrUpdateLocation(location: Location): void {
     if (this.selectedRegion.id) {
       if (this.isEdit) {
-        this.store.dispatch(new UpdateLocation(location, this.selectedRegion.id, this.filters));
-        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      this.store.dispatch(new UpdateLocation(location, this.selectedRegion.id, this.filters));
         this.isEdit = false;
         this.editedLocationId = undefined;
         return;
       }
       this.store.dispatch(new SaveLocation(location, this.selectedRegion.id, this.filters));
-      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
     }
-  }
-
-  onAllowDeployWOCreadentialsCheck(event: any): void {
-  //  TODO: add functionality after BE implementation
   }
 
   private createLocationForm(): void {
     this.locationDetailsFormGroup = this.formBuilder.group({
-      invoiceId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      externalId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+      invoiceId: [null],
+      externalId: ['', [Validators.maxLength(50)]],
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       address1: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(100)]],
       address2: [null, [Validators.maxLength(50)]],
@@ -452,17 +463,19 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       city: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(20)]],
       state: ['', [Validators.required]],
       glNumber: [null, Validators.maxLength(50)],
-      invoiceNote: [null, Validators.maxLength(50)],
       ext: [null, Validators.maxLength(50)],
       contactEmail: ['', [Validators.required, Validators.email]],
       contactPerson: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       inactiveDate: [null],
       phoneNumber: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10), Validators.pattern('^[0-9]*$')]],
       phoneType: ['', Validators.required],
+      timeZone: [''],
+      locationType: [null],
+      organizationId:0
     });
 
     this.regionFormGroup = this.formBuilder.group({
-      newRegionName: ['', [Validators.required,  Validators.minLength(1),  Validators.maxLength(50)]]
+      newRegionName: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]]
     });
 
     this.LocationFilterFormGroup = this.formBuilder.group({

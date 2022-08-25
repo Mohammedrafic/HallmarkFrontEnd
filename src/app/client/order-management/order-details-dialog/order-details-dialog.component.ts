@@ -165,7 +165,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public lockOrder(): void {
-    this.store.dispatch(new SetLock(this.order.id, !this.order.isLocked, {}, true));
+    this.store.dispatch(new SetLock(this.order.id, !this.order.isLocked, {}, `${this.order.organizationPrefix || ''}-${this.order.publicId}`, true));
   }
 
   public onTabSelecting(event: SelectEventArgs): void {

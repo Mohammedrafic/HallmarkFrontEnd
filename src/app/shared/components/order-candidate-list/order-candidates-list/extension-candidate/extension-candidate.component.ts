@@ -27,6 +27,7 @@ import { map } from 'rxjs/operators';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { Router } from '@angular/router';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
+import { UpdateOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-extension-candidate',
@@ -92,6 +93,46 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public updateOrganizationCandidateJobWithBillRate(bill: BillRate): void {
+    this.form.markAllAsTouched();
+    if (!this.form.errors && this.candidateJob) {
+      const value = this.form.getRawValue();
+      this.store.dispatch(
+        new UpdateOrganisationCandidateJob({
+          organizationId: this.candidateJob.organizationId,
+          orderId: this.candidateJob.orderId,
+          jobId: this.candidateJob.jobId,
+          skillName: value.skillName,
+          offeredBillRate: this.candidateJob?.offeredBillRate,
+          candidateBillRate: this.candidateJob.candidateBillRate,
+          nextApplicantStatus: {
+            applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
+            statusText: this.candidateJob.applicantStatus.statusText,
+          },
+          billRates: this.getBillRateForUpdate(bill),
+        })
+      );
+    }
+  }
+
+  private getBillRateForUpdate(value: BillRate): BillRate[] {
+    let billRates;
+    const existingBillRateIndex = this.candidateJob.billRates.findIndex((billRate) => billRate.id === value.id);
+    if (existingBillRateIndex > -1) {
+      this.candidateJob.billRates.splice(existingBillRateIndex, 1, value);
+      billRates = this.candidateJob?.billRates;
+    } else {
+      if (typeof value === 'number') {
+        this.candidateJob?.billRates.splice(value, 1);
+        billRates = this.candidateJob?.billRates;
+      } else {
+        billRates = [...(this.candidateJob?.billRates as BillRate[]), value];
+      }
+    }
+
+    return billRates;
   }
 
   public onReject(): void {

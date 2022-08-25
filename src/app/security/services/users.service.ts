@@ -27,13 +27,13 @@ export class UsersService {
    */
   public getUsersPage(
     BusinessUnitType: BusinessUnitType,
-    BusinessUnitId: number,
+    BusinessUnitIds: number[] | null,
     PageNumber: number,
     PageSize: number,
     SortModel: any,
     FilterModel: any
   ): Observable<UsersPage> {
-    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitId, PageNumber, PageSize, SortModel, FilterModel });
+    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel });
   }
 
   /**
