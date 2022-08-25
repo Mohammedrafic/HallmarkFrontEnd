@@ -70,6 +70,11 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
+  static loading(state: TimesheetsModel): boolean {
+    return state.loading;
+  }
+
+  @Selector([TimesheetsState])
   static timesheetsFilters(state: TimesheetsModel): TimesheetsFilterState | null {
     return state.timesheetsFilters;
   }
@@ -172,6 +177,7 @@ export class TimesheetsState {
   ): Observable<TimeSheetsPage | void> {
     patchState({
       timesheets: DefaultTimesheetCollection,
+      loading: true,
     });
 
     const filters = getState().timesheetsFilters || {};
@@ -181,6 +187,7 @@ export class TimesheetsState {
         tap((res: TimeSheetsPage) => {
           patchState({
             timesheets: res,
+            loading: false,
           });
 
           dispatch(new Timesheets.GetTabsCounts());
@@ -296,7 +303,7 @@ export class TimesheetsState {
   ): Observable<null | void> {
     return this.timesheetsApiService.deleteProfileTimesheets(profileId, profileTimesheetId)
     .pipe(
-      catchError((err: HttpErrorResponse) => { 
+      catchError((err: HttpErrorResponse) => {
         return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
       }),
     )
@@ -338,7 +345,7 @@ export class TimesheetsState {
           ctx.dispatch(new TimesheetDetails.GetBillRates(res.jobId, orgId, isAgency)),
           ctx.dispatch(new TimesheetDetails.GetCostCenters(res.jobId, orgId, isAgency)),
         ])),
-        catchError((err: HttpErrorResponse) => { 
+        catchError((err: HttpErrorResponse) => {
           return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
         }),
       )
@@ -587,8 +594,8 @@ export class TimesheetsState {
     if (body.type === 2 && selectedTimesheet.mileageTimesheetId) {
       body.timesheetId = selectedTimesheet.mileageTimesheetId;
     }
-    
-    return (body.type === 2 && !selectedTimesheet.mileageTimesheetId ?  
+
+    return (body.type === 2 && !selectedTimesheet.mileageTimesheetId ?
       this.timesheetDetailsApiService.createMilesEntity(creatBody)
       .pipe(
         switchMap((data) => {
