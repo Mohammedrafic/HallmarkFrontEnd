@@ -21,6 +21,7 @@ export class MessageToastComponent implements OnInit, OnDestroy {
   messageType = MessageTypes;
   isQuickOrder: boolean | undefined;
   orderId: number | undefined;
+  organizationPrefix: string | undefined
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -30,11 +31,12 @@ export class MessageToastComponent implements OnInit, OnDestroy {
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowToast))
       .pipe(tap(() => this.toast.hide()), delay(500))
-      .subscribe((payload: { type: MessageTypes; messageContent: string; isQuickOrder?: boolean; orderId?: number }) => {
+      .subscribe((payload: { type: MessageTypes; messageContent: string; isQuickOrder?: boolean; organizationPrefix?: string; orderId?: number }) => {
         this.type = payload.type;
         this.messageContent = payload.messageContent;
         this.isQuickOrder = payload.isQuickOrder;
         this.orderId = payload.orderId;
+        this.organizationPrefix = payload.organizationPrefix;
         this.cssClass = this.getCssClass(this.type);
         this.toast.show();
       });

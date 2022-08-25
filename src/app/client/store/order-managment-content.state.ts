@@ -555,7 +555,7 @@ export class OrderManagementContentState {
       tap((payload) => {
         dispatch([
           order?.isQuickOrder
-            ? new ShowToast(MessageTypes.Success, RECORD_ADDED, order.isQuickOrder, payload.id)
+            ? new ShowToast(MessageTypes.Success, RECORD_ADDED, order.isQuickOrder, payload.organizationPrefix, payload.publicId)
             : new ShowToast(MessageTypes.Success, RECORD_ADDED),
           new SaveOrderSucceeded(),
           new SetIsDirtyOrderForm(false),
