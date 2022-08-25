@@ -54,8 +54,7 @@ export class MessageToastComponent implements OnInit, OnDestroy {
       case MessageTypes.Success:
         return 'success-toast';
       case MessageTypes.Warning:
-        return 'warning-toast'
-        
+        return 'warning-toast';
     }
   }
 

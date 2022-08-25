@@ -67,7 +67,7 @@ import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectsService } from '@shared/services/projects.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { ORDER_WITHOUT_BILLRATES, ORDER_WITHOUT_CREDENTIALS, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { OrderManagementModel } from '@agency/store/order-management.state';
@@ -82,6 +82,7 @@ import { DepartmentsService } from '@shared/services/departments.service';
 import { Department } from '@shared/models/department.model';
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
 import { ExtensionGridModel } from '@shared/components/extension/extension-sidebar/models/extension.model';
+import { OrderType } from '@shared/enums/order-type';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -553,9 +554,24 @@ export class OrderManagementContentState {
 
     return this.orderManagementService.saveOrder(order, documents, comments, lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
+        let TOAST_MESSAGE = RECORD_ADDED;
+        let MESSAGE_TYPE = MessageTypes.Success;
+        const hasntOrderCredentials = (order?.isQuickOrder && payload.credentials.length === 0);
+        const hasntOrderBillRates = ((order?.isQuickOrder && payload.orderType === OrderType.Traveler || payload.orderType === OrderType.ContractToPerm) && payload.billRates.length === 0);
+
+        if (!hasntOrderCredentials) {
+          TOAST_MESSAGE = `${ORDER_WITHOUT_CREDENTIALS}`;
+          MESSAGE_TYPE = MessageTypes.Warning;
+        } else if (!hasntOrderBillRates) {
+          TOAST_MESSAGE = `${ORDER_WITHOUT_BILLRATES}`;
+          MESSAGE_TYPE = MessageTypes.Warning;
+        } else if (!hasntOrderCredentials && !hasntOrderBillRates) {
+          TOAST_MESSAGE = `${ORDER_WITHOUT_CREDENTIALS} && ${ORDER_WITHOUT_BILLRATES}`;
+        }
+
         dispatch([
           order?.isQuickOrder
-            ? new ShowToast(MessageTypes.Success, RECORD_ADDED, order.isQuickOrder, payload.organizationPrefix, payload.publicId)
+            ? new ShowToast(MESSAGE_TYPE, TOAST_MESSAGE, order.isQuickOrder, payload.organizationPrefix, payload.publicId)
             : new ShowToast(MessageTypes.Success, RECORD_ADDED),
           new SaveOrderSucceeded(),
           new SetIsDirtyOrderForm(false),
