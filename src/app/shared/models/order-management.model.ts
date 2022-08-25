@@ -431,6 +431,7 @@ export type OrderCandidateJob = {
   positionClosureReason?: string;
   positionClosureReasonId?: number;
   commentContainerId?: number;
+  reOrderDate?: string;
 };
 
 export type CandidatesBasicInfo = {

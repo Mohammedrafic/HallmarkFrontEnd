@@ -219,7 +219,6 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       locationName,
       departmentName,
       skillName,
-      orderOpenDate,
       shiftStartTime,
       shiftEndTime,
       openPositions,
@@ -229,6 +228,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     orderId,
     positionId,
     rejectReason,
+    reOrderDate,
   }: OrderCandidateJob) {
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     let isBillRatePending: number;
@@ -248,7 +248,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       locationName,
       departmentName,
       skillName,
-      orderOpenDate,
+      orderOpenDate: reOrderDate,
       shiftStartTime,
       shiftEndTime,
       openPositions,
