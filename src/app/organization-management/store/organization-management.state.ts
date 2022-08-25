@@ -78,11 +78,12 @@ import {
   GetRegionFilterOptions,
   ExportRegions,
   GetOrganizationSettingsFilterOptions,
-  GetLocationTypes
+  GetLocationTypes,
+  GetUSCanadaTimeZoneIds
 } from './organization-management.actions';
 import { Department, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
 import { Region, regionFilter } from '@shared/models/region.model';
-import { Location, LocationFilterOptions, LocationsPage , LocationType} from '@shared/models/location.model';
+import { Location, LocationFilterOptions, LocationsPage, LocationType, TimeZoneModel } from '@shared/models/location.model';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
 import { MasterSkillByOrganization, Skill, SkillsPage, SkillDataSource } from 'src/app/shared/models/skill.model';
@@ -103,7 +104,6 @@ import { SkillGroupService } from '@shared/services/skill-group.service';
 import { OrganizationSettingsService } from '@shared/services/organization-settings.service';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { GeneralTimeZones } from '@shared/constants/general-timezones';
 
 interface DropdownOption {
   id: number;
@@ -151,7 +151,7 @@ export interface OrganizationManagementStateModel {
   regionFilterOptions: regionFilter | null;
   departmentFilterOptions: DepartmentFilterOptions | null;
   organizationSettingsFilterOptions: string[] | null;
-  timeZones: string[] | null;
+  timeZones: TimeZoneModel[] | null;
   loctionTypes: LocationType[] |null;
   isLocationTypesLoading : boolean;
 }
@@ -200,7 +200,7 @@ export interface OrganizationManagementStateModel {
     regionFilterOptions:null,
     departmentFilterOptions: null,
     organizationSettingsFilterOptions: null,
-    timeZones :GeneralTimeZones,
+    timeZones :[],
     loctionTypes :[],
     isLocationTypesLoading: false
    },
@@ -296,7 +296,7 @@ export class OrganizationManagementState {
   static organizationSettingsFilterOptions(state: OrganizationManagementStateModel): string[] | null { return state.organizationSettingsFilterOptions; }
 
   @Selector()
-  static timeZones(state: OrganizationManagementStateModel): string[] | null { return state.timeZones; }
+  static timeZones(state: OrganizationManagementStateModel): TimeZoneModel[] | null { return state.timeZones; }
 
   @Selector()
   static locationTypes(state: OrganizationManagementStateModel): LocationType[] | null { return state.loctionTypes; }
@@ -912,6 +912,17 @@ export class OrganizationManagementState {
     return this.locationService.getLocationTypes().pipe(
       tap((payload) => {
         patchState({ isLocationTypesLoading: false, loctionTypes: payload });
+        return payload;
+      })
+    );
+  }
+  
+  @Action(GetUSCanadaTimeZoneIds)
+  GetUSCanadaTimeZoneIds({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetUSCanadaTimeZoneIds): Observable<TimeZoneModel[]> {
+    patchState({ isLocationTypesLoading: true });
+    return this.locationService.getUSCanadaTimeZoneIds().pipe(
+      tap((payload) => {
+        patchState({ isLocationTypesLoading: false, timeZones: payload });
         return payload;
       })
     );
