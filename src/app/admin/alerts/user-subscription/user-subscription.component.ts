@@ -236,27 +236,30 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       this.userData=[];
-      this.itemList=[];
+      this.dispatchNewPage(null);     
       this.store.dispatch(new GetBusinessByUnitType(value));
-      
+      if(value==1)
+      {
+        this.dispatchUserPage([]);
+      }
     });
   }
   private onBusinessValueChanged(): void {
     this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       this.userData=[];
-      this.itemList=[];
+      this.dispatchNewPage(null);      
       let businessUnitIds=[];
       if(value!=0 &&value!=null)
       {
       businessUnitIds.push(this.businessControl.value);
       }
-      this.store.dispatch(new GetAllUsersPage(this.businessUnitControl.value,businessUnitIds,this.currentPage,this.pageSize,null,null, true));
+      this.dispatchUserPage(businessUnitIds);
       
     });
   } 
   private onUserValueChanged(): void {
     this.usersControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      this.dispatchNewPage();
+      this.dispatchNewPage(value);
       
     });
   }   
@@ -306,13 +309,17 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       this.gridApi.setServerSideDatasource(datasource);
     }
   }
-  private dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
-    const { businessUnit, business ,user} = this.businessForm?.getRawValue();
-    if(this.usersControl.value!=0 &&this.usersControl.value!=undefined)
-    {
+  private dispatchNewPage(user:any,sortModel: any = null, filterModel: any = null): void {
+    const { businessUnit} = this.businessForm?.getRawValue(); 
+    if(user!=0)
+    {   
       this.userGuid=user;
       this.store.dispatch(new GetUserSubscriptionPage(businessUnit || null, user, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
     }
+  }
+  private dispatchUserPage(businessUnitIds:number[])
+  {
+    this.store.dispatch(new GetAllUsersPage(this.businessUnitControl.value,businessUnitIds,this.currentPage,this.pageSize,null,null, true));
   }
   public onEmailChanged(data: any): void {
     this.SaveData(data,AlertChannel.Email);
@@ -335,7 +342,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       this.store.dispatch(new UpdateUserSubscription(updateUserSubscription));
       this.updateUserSubscription$.pipe().subscribe((updated: any) => {
         if (updated != undefined &&updated==true) {        
-          this.dispatchNewPage();
+          this.dispatchNewPage(this.userGuid);
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));     
         }
       });

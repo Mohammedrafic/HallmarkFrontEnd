@@ -10,10 +10,7 @@ import { AlertChannel } from "@admin/alerts/alerts.enum";
   providedIn: 'root',
 })
 export class AlertsService {
-  private userSubscriptions: UserSubscription[];
-  private userSubscriptionPage: UserSubscriptionPage;
-  private alertsTemplates: AlertsTemplate[];
-  private alertsTemplatePage: AlertsTemplatePage;
+   private  userSubscriptionPage:UserSubscriptionPage; 
   constructor(private http: HttpClient) { }
 
   /**
@@ -34,8 +31,12 @@ export class AlertsService {
     SortModel: any,
     FilterModel: any,
     Filters: UserSubscriptionFilters
-  ): Observable<UserSubscriptionPage> {  
-    return this.http.get<UserSubscriptionPage>(`/api/UserSubscription/GetPagedUserSubscriptions/`+BusinessUnitType+`/`+ UserId,{params: {  pageNumber:PageNumber,pageSize: PageSize }});
+  ): Observable<UserSubscriptionPage> {
+    if(UserId==null)
+    {
+      return of(this.userSubscriptionPage);
+    }
+    return this.http.get<UserSubscriptionPage>(`/api/UserSubscription/GetPagedUserSubscriptions/`+BusinessUnitType+`/`+UserId,{params: { pageNumber:PageNumber,pageSize: PageSize }});
   }
   /**
    * Update UserSubscription 
