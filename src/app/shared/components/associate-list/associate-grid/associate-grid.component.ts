@@ -33,7 +33,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
   @ViewChild('grid') grid: GridComponent;
 
   @Select(AssociateListState.associateListPage)
-  public readonly associateListPage$: Observable<AssociateOrganizationsAgencyPage>;
+  public associateListPage$: Observable<AssociateOrganizationsAgencyPage>;
   @Select(UserState.lastSelectedAgencyId)
   private lastSelectedAgencyId$: Observable<number>;
   @Select(UserState.lastSelectedOrganizationId)
