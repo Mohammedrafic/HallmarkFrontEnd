@@ -548,16 +548,19 @@ export class OrderManagementContentState {
   @Action(SaveOrder)
   SaveOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents, comments }: SaveOrder
+    { order, documents, comments, lastSelectedBusinessUnitId }: SaveOrder
   ): Observable<Order | void> {
-    return this.orderManagementService.saveOrder(order, documents, comments).pipe(
-      tap((order) => {
+
+    return this.orderManagementService.saveOrder(order, documents, comments, lastSelectedBusinessUnitId).pipe(
+      tap((payload) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          order?.isQuickOrder
+            ? new ShowToast(MessageTypes.Success, RECORD_ADDED, order.isQuickOrder, payload.id)
+            : new ShowToast(MessageTypes.Success, RECORD_ADDED),
           new SaveOrderSucceeded(),
           new SetIsDirtyOrderForm(false),
         ]);
-        return order;
+        return payload;
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
     );

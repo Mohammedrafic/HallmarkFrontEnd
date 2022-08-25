@@ -301,6 +301,7 @@ export class Order {
   orderClosureReason?: string;
   orderClosureReasonId?: string;
   isTemplate?: boolean;
+  isQuickOrder?: boolean;
   organizationPrefix?: string;
   orderPlacementFee?: number;
   annualSalaryRangeFrom?: number;

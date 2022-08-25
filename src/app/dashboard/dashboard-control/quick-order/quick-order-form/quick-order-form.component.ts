@@ -11,7 +11,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 
 import { ChangeEventArgs, FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { combineLatest, debounceTime, filter, Observable, of, Subject, takeUntil } from 'rxjs';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { OrderType } from '@shared/enums/order-type';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
@@ -28,7 +28,7 @@ import { JobDistribution } from '@shared/enums/job-distibution';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
-import { GetAssociateAgencies, GetContactDetails, GetProjectSpecialData
+import { GetAssociateAgencies, GetContactDetails, GetProjectSpecialData, SaveOrder
 } from '@client/store/order-managment-content.actions';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import PriceUtils from '@shared/utils/price.utils';
@@ -165,7 +165,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     private readonly fb: FormBuilder,
     private readonly cdr: ChangeDetectorRef,
     private readonly store: Store,
-    private readonly orderManagementService: OrderManagementContentService
+    private readonly orderManagementService: OrderManagementContentService,
+    private readonly actions$: Actions
   ) {
     super();
     this.initOrganizationForm();
@@ -626,21 +627,18 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   private subscribeForSettings(): void {
     this.organizationSettings$.pipe(takeUntil(this.destroy$)).subscribe((settings) => {
+      const projectFields = ['projectTypeId', 'projectNameId', 'poNumberId'];
       this.settings = SettingsHelper.mapSettings(settings);
       this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
       if (this.specialProjectForm != null) {
         if (this.isSpecialProjectFieldsRequired) {
-          this.specialProjectForm.controls['projectTypeId'].setValidators(Validators.required);
-          this.specialProjectForm.controls['projectNameId'].setValidators(Validators.required);
-          this.specialProjectForm.controls['poNumberId'].setValidators(Validators.required);
+          projectFields.forEach((control) =>
+            this.specialProjectForm.controls[control].setValidators(Validators.required)
+          );
         } else {
-          this.specialProjectForm.controls['projectTypeId'].clearValidators();
-          this.specialProjectForm.controls['projectNameId'].clearValidators();
-          this.specialProjectForm.controls['poNumberId'].clearValidators();
+          projectFields.forEach((control) => this.specialProjectForm.controls[control].clearValidators());
         }
-        this.specialProjectForm.controls['projectTypeId'].updateValueAndValidity();
-        this.specialProjectForm.controls['projectNameId'].updateValueAndValidity();
-        this.specialProjectForm.controls['poNumberId'].updateValueAndValidity();
+        projectFields.forEach((control) => this.specialProjectForm.controls[control].updateValueAndValidity());
       }
     });
   }
@@ -655,17 +653,19 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.specialProjectForm.valid
     ) {
       const order = {
-        ...this.organizationForm.getRawValue(),
+        isSubmit: true,
+        isQuickOrder: true,
+        jobDistributions: this.jobDistributionDescriptionForm.getRawValue().jobDistributions,
+        contactDetails: [this.contactDetailsForm.getRawValue()],
         ...this.orderTypeForm.getRawValue(),
         ...this.generalInformationForm.getRawValue(),
-        ...this.jobDistributionDescriptionForm.getRawValue(),
-        ...this.contactDetailsForm.getRawValue(),
         ...this.specialProjectForm.getRawValue(),
-        isQuickOrder: true,
       };
-
-      //save order() TODO implement in scope EIN-3580
-
+      const selectedBusinessUnitId = this.organizationForm.value.organization;
+      this.store.dispatch(new SaveOrder(order, [], undefined, selectedBusinessUnitId));
+      this.actions$.pipe(takeUntil(this.destroy$), ofActionSuccessful(SaveOrder)).subscribe(() => {
+        this.openEvent.next(false);
+      });
     } else {
       this.cdr.markForCheck();
       this.organizationForm.markAllAsTouched();

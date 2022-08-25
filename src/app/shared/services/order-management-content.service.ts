@@ -279,8 +279,14 @@ export class OrderManagementContentService {
    * @param documents array of attached documents
    * @return saved order
    */
-  public saveOrder(order: CreateOrderDto, documents: Blob[], comments: Comment[] | undefined): Observable<Order> {
-    return this.http.post<Order>('/api/Orders', order).pipe(
+  public saveOrder(order: CreateOrderDto, documents: Blob[], comments: Comment[] | undefined, lastSelectedBusinessUnitId?: number): Observable<Order> {
+    let headers = {}
+
+    if (lastSelectedBusinessUnitId) {
+      headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
+    }
+    
+    return this.http.post<Order>('/api/Orders', order, { headers }).pipe(
       switchMap((createdOrder) => {
         const formData = new FormData();
         if (comments?.length) {
