@@ -122,6 +122,8 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
         this.isSameAsOrg = organization.payload.billingDetails.sameAsOrganization;
         if (this.isSameAsOrg) {
           this.disableBillingForm();
+        }
+        if (this.profileMode) {
           this.disableForms();
         }
       });

@@ -271,7 +271,7 @@
                 <div class="input-container bootstrap">
                   <label>Contact Person<span class="required">*</span></label>
                   <div class="input-group">
-                    <input appValidateWithMessage formControlName="contactPerson" class="e-input" type="text"/>
+                    <input appValidateWithMessage formControlName="contactPerson" class="e-input" type="text" maxlength="100"/>
                     <span class="error" *ngIf="!contact.get('contactPerson')?.untouched">{{ contact.get('contactPerson')?.errors | validationError }}</span>
                   </div>
                 </div>
