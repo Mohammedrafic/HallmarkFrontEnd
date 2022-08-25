@@ -282,7 +282,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   ngOnInit(): void {
-    this.handleRedirectFromQuickOrderToast();
     this.handleDashboardFilters();
     this.orderFilterColumnsSetup();
     this.onOrderFilterDataSourcesLoadHandler();
@@ -298,6 +297,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.previousSelectedOrderId = locationState.orderId;
 
     this.onGridPageChangedHandler();
+    this.handleRedirectFromQuickOrderToast();
     this.onOrganizationChangedHandler();
     this.onOrdersDataLoadHandler();
 
@@ -940,7 +940,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       if (!this.isRedirectedFromDashboard) {
         this.clearFilters();
       }
-      if (!this.previousSelectedOrderId) {
+      if (!this.previousSelectedOrderId && !this.isRedirectedFromToast) {
         this.pageSubject.next(1);
       }
       this.store.dispatch(new GetAllOrganizationSkills());
@@ -962,7 +962,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private onGridPageChangedHandler(): void {
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => { 
       this.currentPage = page;
       this.getOrders();
     });
@@ -1349,16 +1349,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private handleRedirectFromQuickOrderToast(): void {
     if (this.isRedirectedFromToast) {
-      this.ordersPage$.pipe(filter(Boolean), take(1)).subscribe((data) => {
+    this.ordersPage$.pipe(filter((data) => !!data ), take(2), debounceTime(400)).subscribe((data) => {
         this.pageSubject.next(data.totalPages);
         this.isSubrowDisplay = false;
-        this.actions$.pipe(ofActionSuccessful(GetOrders)).subscribe(() => {
+        this.actions$.pipe(ofActionSuccessful(GetOrders), take(1)).subscribe(() => {
           this.ordersPage$.pipe(take(1)).subscribe((data) => {
-            data.items.find((item, i) => {
-              if (item.publicId === this.publicId && item.organizationPrefix === this.organizationPrefix) {
-                this.gridWithChildRow.selectRow(i);
-              }
-            });
+            
+            const index = data.items.findIndex((item) => item.publicId === this.publicId && item.organizationPrefix === this.organizationPrefix);
+            (index > -1) && this.gridWithChildRow.selectRow(index);
+            this.isRedirectedFromToast = false;
           });
         });
       });
