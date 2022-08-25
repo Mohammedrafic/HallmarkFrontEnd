@@ -1,6 +1,6 @@
 <a [routerLink]="params?.link"
    [state]="params?.navigationExtras?.state"
    [queryParams]="params?.navigationExtras?.queryParams"
-   (click)="$event.stopImmediatePropagation();">
+   (click)="$event.preventDefault();">
     <span [innerHTML]="value"></span>
 </a>
