@@ -33,7 +33,8 @@ export class SetLock {
     public id: number,
     public lockStatus: boolean,
     public filters: OrderFilter = {},
-    public updateOpened = false
+    public prefixId: string,
+    public updateOpened = false,
   ) {}
 }
 

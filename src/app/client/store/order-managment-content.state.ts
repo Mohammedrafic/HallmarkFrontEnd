@@ -329,11 +329,11 @@ export class OrderManagementContentState {
   @Action(SetLock)
   SetLock(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { id, lockStatus, filters, updateOpened }: SetLock
+    { id, lockStatus, filters, prefixId, updateOpened }: SetLock
   ): Observable<boolean | void> {
     return this.orderManagementService.setLock(id, lockStatus).pipe(
       tap(() => {
-        const message = lockStatus ? `The Order ${id} is locked` : `The Order ${id} is unlocked`;
+        const message = lockStatus ? `The Order ${prefixId} is locked` : `The Order ${prefixId} is unlocked`;
         const actions = [new LockUpdatedSuccessfully(), new ShowToast(MessageTypes.Success, message)];
         dispatch(updateOpened ? [...actions, new GetSelectedOrderById(id)] : actions);
       }),

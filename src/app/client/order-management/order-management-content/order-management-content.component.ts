@@ -1191,7 +1191,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public lockOrder(order: Order): void {
-    this.store.dispatch(new SetLock(order.id, !order.isLocked, this.filters));
+    this.store.dispatch(new SetLock(order.id, !order.isLocked, this.filters, `${order.organizationPrefix || ''}-${order.publicId}`));
   }
 
   public disabledLock(status: OrderStatus): boolean {

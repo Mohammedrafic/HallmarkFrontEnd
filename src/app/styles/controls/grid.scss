@@ -231,6 +231,10 @@ ejs-grid.e-control.e-grid {
 
         &:hover {
           background-color: $supportive-red-40;
+
+          &.green-background {
+            background-color: $supportive-green-40;
+          }
         }
 
         &[disabled] {

@@ -104,6 +104,7 @@
             <button
               ejs-button
               cssClass="e-flat secondary-icon-button"
+              [class.green-background]="!data.isLocked"
               [disabled]="disabledLock(data.status) || data?.extensionFromId"
               (click)="lockOrder(data); $event.stopPropagation();"
               *ngIf="isLockMenuButtonsShown"
