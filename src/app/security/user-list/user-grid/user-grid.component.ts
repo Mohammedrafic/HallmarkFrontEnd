@@ -379,7 +379,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
   private dispatchNewPage(): void {
     const { businessUnit, business } = this.filterForm.getRawValue();
-    this.store.dispatch(new GetUsersPage(businessUnit, business || null, this.currentPage, this.pageSize, null, null));
+    this.store.dispatch(new GetUsersPage(businessUnit, business != 0 ? [business] : null, this.currentPage, this.pageSize, null, null));
   }
 
   private checkAgencyUser(): void {
@@ -415,7 +415,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
           var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
           const { businessUnit, business } = self.filterForm.getRawValue();
-          self.store.dispatch(new GetUsersPage(businessUnit, business || null, isNaN(postData.pageNumber) ? self.currentPage : postData.pageNumber, postData.pageSize, sort, filter));
+          self.store.dispatch(new GetUsersPage(businessUnit, business != 0 ? [business] : null, isNaN(postData.pageNumber) ? self.currentPage : postData.pageNumber, postData.pageSize, sort, filter));
           self.usersPage$.pipe().subscribe((data: any) => {
             self.itemList = data?.items;
             if (!self.itemList || !self.itemList.length) {

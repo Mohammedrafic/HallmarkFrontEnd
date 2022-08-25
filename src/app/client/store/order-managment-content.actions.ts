@@ -33,7 +33,8 @@ export class SetLock {
     public id: number,
     public lockStatus: boolean,
     public filters: OrderFilter = {},
-    public updateOpened = false
+    public prefixId: string,
+    public updateOpened = false,
   ) {}
 }
 
@@ -134,7 +135,7 @@ export class SetIsDirtyOrderForm {
 
 export class SaveOrder {
   static readonly type = '[order management] Save Order';
-  constructor(public order: CreateOrderDto, public documents: Blob[], public comments?: Comment[] | undefined) {}
+  constructor(public order: CreateOrderDto, public documents: Blob[], public comments?: Comment[] | undefined, public lastSelectedBusinessUnitId?: number) {}
 }
 
 export class SaveOrderSucceeded {

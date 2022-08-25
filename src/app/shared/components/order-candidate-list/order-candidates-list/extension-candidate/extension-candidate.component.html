@@ -108,6 +108,16 @@
     </div>
   </section>
   <section class="bill-rates">
-    <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
+    <ng-container [ngTemplateOutlet]="isAgency ? billRates : editBillRates"></ng-container>
+    <ng-template #billRates>
+      <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
+    </ng-template>
+    <ng-template #editBillRates>
+      <app-bill-rates
+        [billRates]="billRatesData"
+        (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)"
+        [isActive]="true">
+      </app-bill-rates>
+    </ng-template>
   </section>
 </section>
