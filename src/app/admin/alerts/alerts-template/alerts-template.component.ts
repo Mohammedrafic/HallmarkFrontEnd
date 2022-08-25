@@ -15,7 +15,6 @@ import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { AlertsEmailTemplateFormComponent } from './alerts-email-template-form/alerts-email-template-form.component';
 import { BUSINESS_UNITS_VALUES, BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor } from '../alerts.constants';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { AlertChannel } from '../alerts.enum';
 import { AlertsSmsTemplateFromComponent } from './alerts-sms-template-from/alerts-sms-template-from.component';
 import { AlertsOnScreenTemplateFormComponent } from './alerts-on-screen-template-form/alerts-on-screen-template-form.component';
@@ -25,7 +24,7 @@ import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_MODIFIED } from '@shared/constants';
+import { RECORD_MODIFIED } from '@shared/constants';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
 @Component({
@@ -338,16 +337,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   public onEmailTemplateSave(): void {
     this.emailTemplateFormGroup.markAllAsTouched();
     if (this.emailTemplateFormGroup.valid && this.emailTemplateFormGroup.errors == null) {
-      const formValues = this.emailTemplateFormGroup.getRawValue();
-      const emailTemplateDto: EditAlertsTemplateRequest = {
-        id: this.editAlertTemplateData.id,
-        alertBody: formValues.alertBody,
-        alertChannel: this.editAlertTemplateData.alertChannel,
-        alertTitle: formValues.alertTitle,
-        toList: this.editAlertTemplateData.toList == undefined ? '' : this.editAlertTemplateData.toList,
-        cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
-        bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
-      };
+      const emailTemplateDto = this.populateEditData(this.editAlertTemplateData.alertChannel);
       this.store.dispatch(new SaveTemplateByAlertId(emailTemplateDto));
       this.emailTemplateCloseDialog();
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
@@ -356,16 +346,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   public onSmsTemplateSave(): void {
     this.smsTemplateFormGroup.markAllAsTouched();
     if (this.smsTemplateFormGroup.valid && this.smsTemplateFormGroup.errors == null) {
-      const formValues = this.smsTemplateFormGroup.getRawValue();
-      const smsTemplateDto: EditAlertsTemplateRequest = {
-        id: this.editAlertTemplateData.id,
-        alertBody: formValues.alertBody,
-        alertChannel: this.editAlertTemplateData.alertChannel,
-        alertTitle: this.editAlertTemplateData.alertTitle,
-        toList: this.editAlertTemplateData.toList == undefined ? '' : this.editAlertTemplateData.toList,
-        cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
-        bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
-      };
+      const smsTemplateDto=this.populateEditData(this.editAlertTemplateData.alertChannel);;
       this.store.dispatch(new SaveTemplateByAlertId(smsTemplateDto));
       this.smsTemplateCloseDialog();
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
@@ -375,21 +356,25 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   public onScreenTemplateSave(): void {
     this.onScreenTemplateFormGroup.markAllAsTouched();
     if (this.onScreenTemplateFormGroup.valid && this.onScreenTemplateFormGroup.errors == null) {
-      const formValues = this.onScreenTemplateFormGroup.getRawValue();
-      const onSCreenTemplateDto: EditAlertsTemplateRequest = {
-        id: this.editAlertTemplateData.id,
-        alertBody: formValues.alertBody,
-        alertChannel: this.editAlertTemplateData.alertChannel,
-        alertTitle: formValues.alertTitle,
-        toList: this.editAlertTemplateData.toList == undefined ? '' : this.editAlertTemplateData.toList,
-        cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
-        bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
-      };
+      const onSCreenTemplateDto= this.populateEditData(this.editAlertTemplateData.alertChannel);      
       this.store.dispatch(new SaveTemplateByAlertId(onSCreenTemplateDto));
       this.onScreenTemplateCloseDialog();
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
     }
 
+  }
+  private populateEditData(alertChannel: AlertChannel): EditAlertsTemplateRequest {
+    const formValues = this.onScreenTemplateFormGroup.getRawValue();
+    const editAlertsTemplateDto: EditAlertsTemplateRequest = {
+      id: this.editAlertTemplateData.id,
+      alertBody: alertChannel == AlertChannel.SMS ? formValues.alertBody?.replace(/<[^>]*>/g, ''): formValues.alertBody,
+      alertChannel: this.editAlertTemplateData.alertChannel,
+      alertTitle: alertChannel == AlertChannel.SMS ?this.editAlertTemplateData.alertTitle:formValues.alertTitle,
+      toList: this.editAlertTemplateData.toList == undefined ? '' : this.editAlertTemplateData.toList,
+      cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
+      bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
+    };
+    return editAlertsTemplateDto;
   }
   private emailTemplateCloseDialog(): void {
     this.store.dispatch(new ShowEmailSideDialog(false));
@@ -405,7 +390,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
 
     this.editAlertsTemplate$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
       this.templateParamsData = [];
-      if (data != undefined) {
+      if (data != undefined) {        
         this.editAlertTemplateData = data;
         if (data.parameters != undefined) {
           data.parameters.forEach((paramter: string) => {
