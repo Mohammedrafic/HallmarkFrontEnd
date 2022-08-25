@@ -59,6 +59,6 @@ export class MessageToastComponent implements OnInit, OnDestroy {
   }
 
   navigateToAllOrders(): void {
-    this.router.navigateByUrl('/client/order-management').then(() => this.toast.hide());
+    this.router.navigate(['/client/order-management'], { state: { redirectedFromToast: true, organizationPrefix: this.organizationPrefix, publicId: this.orderId } }).then(() => this.toast.hide());
   }
 }
