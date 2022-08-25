@@ -1,5 +1,5 @@
 import unionBy from 'lodash/fp/unionBy';
-import { filter, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { filter, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
@@ -306,7 +306,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private collectOrderData(isSubmit: boolean): CreateOrderDto {
-
     let orderBillRates: BillRate[] | null;
     if (this.isPerDiem || this.isPermPlacementOrder) {
       orderBillRates = null;
@@ -440,6 +439,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (!order.compBonus) {
       order.compBonus = null;
     }
+    
     return order;
   }
 
