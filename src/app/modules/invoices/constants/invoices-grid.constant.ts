@@ -1,4 +1,10 @@
-import { CellRendererSelectorFunc, ColDef, ICellRendererParams, ValueFormatterFunc } from '@ag-grid-community/core';
+import {
+  CellRendererSelectorFunc,
+  ColDef,
+  ICellRendererParams,
+  ValueFormatterFunc, ValueGetterFunc,
+  ValueGetterParams
+} from '@ag-grid-community/core';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 import { GridValuesHelper } from '../../timesheets/helpers';
 import {
@@ -6,6 +12,7 @@ import {
 } from '@shared/components/grid/components/title-value-cell-renderer/title-value-cell-renderer.component';
 import { TypedColDef, TypedValueGetterParams } from '../interfaces/typed-col-def.interface';
 import { ManualInvoice } from '../interfaces';
+import { PendingInvoice } from '../interfaces/pending-invoice-record.interface';
 
 export const amountValueFormatter: (params: ValueFormatterParams) => string =
   ({ value }: ValueFormatterParams) => GridValuesHelper.formatNumber(value, '1.2-2');
@@ -21,6 +28,12 @@ export const titleValueCellRendererSelector: CellRendererSelectorFunc = (params:
     component: TitleValueCellRendererComponent,
   } : undefined;
 }
+
+export const weekPeriodValueGetter: ValueGetterFunc = (params: ValueGetterParams) => {
+  const { weekNumber, weekStartDate: date } = params.data as PendingInvoice;
+
+  return `${weekNumber} - ${GridValuesHelper.formatDate(date, 'cccccc M/d/yy')}`;
+};
 
 export const invoicesRowDetailsOffsetColDef: ColDef = {
   width: 140,

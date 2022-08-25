@@ -3,7 +3,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  Inject, NgZone,
+  Inject,
   OnInit,
   ViewChild
 } from '@angular/core';
@@ -145,7 +145,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     private invoicesService: InvoicesService,
     private actions$: Actions,
     private invoicesContainerService: InvoicesContainerService,
-    private ngZone: NgZone,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
     @Inject(OrganizationId) public organizationId$: OrganizationIdProvider,
   ) {
@@ -204,6 +203,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
   public handleChangeTab(tabIdx: number): void {
     this.selectedTabIdx = tabIdx;
+    this.clearTab();
 
     this.organizationId$.pipe(
       takeUntil(this.componentDestroy())
@@ -332,14 +332,19 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   }
 
   public showGroupingOverlay(): void {
-    this.ngZone.runOutsideAngular(() => setTimeout(() => {
+    setTimeout(() => {
       this.groupInvoicesOverlayVisible = true;
       this.cdr.markForCheck();
-    }));
+    });
   }
 
   public hideGroupingOverlay(): void {
     this.groupInvoicesOverlayVisible = false;
+  }
+
+
+  private clearTab(): void {
+    this.groupingInvoiceRecordsIds = [];
   }
 
   private getInvoicesByTab(): void {

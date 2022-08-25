@@ -3,7 +3,7 @@ import {
   PendingApprovalInvoice,
   PendingApprovalInvoiceRecord
 } from '../../interfaces/pending-approval-invoice.interface';
-import { GridActionsCellComponent } from '../../../../shared/components/grid/cell-renderers/grid-actions-cell/grid-actions-cell.component';
+import { GridActionsCellComponent } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import {
   GetDetailRowDataParams,
   GridOptions,
@@ -23,7 +23,7 @@ import {
   ToggleRowExpansionHeaderCellComponent
 } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
 import {
-  amountValueFormatter,
+  amountValueFormatter, weekPeriodValueGetter,
   invoicesRowDetailsOffsetColDef,
   monthDayYearDateFormatter,
   titleValueCellRendererSelector
@@ -169,6 +169,7 @@ export class PendingApprovalGridHelper {
               },
               {
                 ...weekPeriod,
+                valueGetter: weekPeriodValueGetter,
                 headerName: 'Week Period',
                 cellRendererSelector: titleValueCellRendererSelector,
               },
