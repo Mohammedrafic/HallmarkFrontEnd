@@ -38,6 +38,7 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
         this.sideDialog.show();
       } else {
         this.sideDialog.hide();
+        setTimeout(() => this.sideDialog.refresh(), 300);
       }
     });
   }
