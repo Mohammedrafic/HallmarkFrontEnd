@@ -8,7 +8,7 @@ export const ORG_SETTINGS: { [key: string]: Object }[] = [
   { text: 'Holidays', id: 7, route: './holidays' },
   { text: 'Workflow', id: 8, route: './workflow' },
   { text: 'Bill Rates', id: 9, route: './bill-rates' },
-  { text: 'Settings', id: 6, route: './settings' },
+  { text: 'Configurations', id: 6, route: './settings' },
   { text: 'Reasons', id: 10, route: './reasons' },
-  { text: 'Special Project', id: 10, route: './specialproject' },
+  { text: 'Special Project', id: 12, route: './specialproject' },
 ];

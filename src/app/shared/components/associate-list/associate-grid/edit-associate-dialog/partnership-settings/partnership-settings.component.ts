@@ -1,9 +1,7 @@
-import { AgencyState } from '@agency/store/agency.state';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select } from '@ngxs/store';
-import { Observable, takeWhile } from 'rxjs';
-
+import { Observable, takeUntil } from 'rxjs';
 import {
   FeeSettingsClassification,
   JobDistributionInitialData,
@@ -11,26 +9,35 @@ import {
   PartnershipSettings,
 } from '@shared/models/associate-organizations.model';
 import { valuesOnly } from '@shared/utils/enum.utils';
-import { DistributionLevels, PartnershipStatus, SubmissionPercentageOverrideRestriction } from '@shared/enums/partnership-settings';
+import {
+  DistributionLevels,
+  PartnershipStatus,
+  SubmissionPercentageOverrideRestriction,
+} from '@shared/enums/partnership-settings';
+import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
+import { OPTION_FIELDS } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-partnership-settings',
   templateUrl: './partnership-settings.component.html',
   styleUrls: ['./partnership-settings.component.scss'],
 })
-export class PartnershipSettingsComponent implements OnInit, OnDestroy {
+export class PartnershipSettingsComponent extends DestroyableDirective implements OnInit {
   @Input() partnershipForm: FormGroup;
+  @Input() set activeTab(tab: number) {
+    if (tab === 1) {
+      this.partnershipForm.reset();
+      this.partnershipForm.patchValue({ ...this.partnershipSettings });
+    }
+  }
 
-  @Select(AgencyState.partnershipSettings)
+  @Select(AssociateListState.partnershipSettings)
   public partnershipSettings$: Observable<PartnershipSettings>;
-
-  @Select(AgencyState.jobDistributionInitialData)
+  @Select(AssociateListState.jobDistributionInitialData)
   public jobDistributionInitialData$: Observable<JobDistributionInitialData>;
-
-  public optionFields = {
-    text: 'name',
-    value: 'id',
-  };
+  public optionFields = OPTION_FIELDS;
   public classification = Object.values(FeeSettingsClassification)
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));
@@ -47,17 +54,19 @@ export class PartnershipSettingsComponent implements OnInit, OnDestroy {
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));
 
-  private isAlive = true;
-
-  ngOnInit(): void {
-    this.partnershipSettings$.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      this.partnershipForm.reset();
-      this.partnershipForm.patchValue({ ...value });
-    });
+  get title(): string {
+    const isAgency = this.router.url.includes('agency');
+    return `${isAgency ? 'Organization' : 'Agency'} Category`;
   }
 
-  ngOnDestroy(): void {
-    this.isAlive = false;
+  private partnershipSettings: PartnershipSettings;
+
+  constructor(private router: Router) {
+    super();
+  }
+
+  ngOnInit(): void {
+    this.subscribeOnPartnershipSettings();
   }
 
   static createForm(): FormGroup {
@@ -80,6 +89,14 @@ export class PartnershipSettingsComponent implements OnInit, OnDestroy {
       applyProhibited: new FormControl(false),
 
       submissionPercentageOverrideRestriction: new FormControl(),
+    });
+  }
+
+  private subscribeOnPartnershipSettings(): void {
+    this.partnershipSettings$.pipe(takeUntil(this.destroy$)).subscribe((settings: PartnershipSettings) => {
+      this.partnershipSettings = settings;
+      this.partnershipForm.reset();
+      this.partnershipForm.patchValue({ ...settings });
     });
   }
 }

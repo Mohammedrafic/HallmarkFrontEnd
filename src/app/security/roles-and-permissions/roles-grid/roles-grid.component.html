@@ -1,4 +1,4 @@
-<section>
+<section class="table-wrapper">
   <ag-grid-angular #agGridPagination
                   style="width: 100%; height: 550px;"
                   class="ag-theme-alpine"
@@ -17,7 +17,9 @@
                   toolPanel="columns"
                   [serverSideStoreType]="serverSideStoreType"                
                   [paginationAutoPageSize]="false"
-                  [maxBlocksInCache] ="maxBlocksInCache">
+                  [maxBlocksInCache] ="maxBlocksInCache"
+                  [noRowsOverlayComponent]="noRowsOverlayComponent"
+                  [noRowsOverlayComponentParams]="noRowsOverlayComponentParams">
   </ag-grid-angular>
 </section>
 <div class="row">

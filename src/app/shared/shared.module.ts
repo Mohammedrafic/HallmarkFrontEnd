@@ -127,6 +127,7 @@ import { CandidateStatusName } from './pipes/candidate-status-name.pipe';
 import { RouterModule } from '@angular/router';
 import { ExtensionCandidateComponent } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
 import { ActionCellRendererComponent } from '@shared/components/cell-renderer/action-cellrenderer.component';
+import { CustomNoRowsOverlayComponent } from './components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 
 const icons = {
   AlertCircle,
@@ -268,6 +269,7 @@ const COMPONENTS = [
     CandidatesStatusModalComponent,
     ReorderStatusDialogComponent,
     AcceptFormComponent,
+    CustomNoRowsOverlayComponent,
   ],
   providers: [
     DatePipe,

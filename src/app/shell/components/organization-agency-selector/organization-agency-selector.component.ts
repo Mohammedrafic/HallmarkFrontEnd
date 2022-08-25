@@ -4,7 +4,20 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { OrganizationService } from '@shared/services/organization.service';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
-import { BehaviorSubject, catchError, combineLatest, debounceTime, distinctUntilChanged, mergeMap, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  mergeMap,
+  Observable,
+  of,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
 
 import {
   GetUserAgencies,
@@ -36,7 +49,7 @@ interface IOrganizationAgency {
   selector: 'app-organization-agency-selector',
   templateUrl: './organization-agency-selector.component.html',
   styleUrls: ['./organization-agency-selector.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   public organizationAgencyControl: FormControl = new FormControl();
@@ -44,10 +57,12 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
   public optionFields = {
     text: 'name',
-    value: 'id'
+    value: 'id',
   };
 
-  public organizationsAgencies$: BehaviorSubject<IOrganizationAgency[]> = new BehaviorSubject<IOrganizationAgency[]>([]);
+  public organizationsAgencies$: BehaviorSubject<IOrganizationAgency[]> = new BehaviorSubject<IOrganizationAgency[]>(
+    []
+  );
 
   public organizationAgency: IOrganizationAgency;
   public isAgencyOrOrganization = true;
@@ -72,25 +87,29 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store, 
-              private cd: ChangeDetectorRef, 
-              private domSanitizer: DomSanitizer, 
-              private organizationService: OrganizationService,
-              private actions$: Actions) {}
+  constructor(
+    private store: Store,
+    private cd: ChangeDetectorRef,
+    private domSanitizer: DomSanitizer,
+    private organizationService: OrganizationService,
+    private actions$: Actions
+  ) {}
 
   ngOnInit(): void {
     this.subscribeUserChange();
     this.isOrganizationAgencyAreaChange();
     this.subscribeOrganizationAgencies();
 
-    this.organizationAgencyControl.valueChanges.pipe(
-      takeUntil(this.unsubscribe$),
-      debounceTime(300),
-      distinctUntilChanged(),
-      mergeMap((id) => this.getLogo(id)),
-      switchMap(() => this.user$)
-    ).subscribe(user => {
-      const agencyOrganizations = [BusinessUnitType.Agency, BusinessUnitType.Organization];
+    this.organizationAgencyControl.valueChanges
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        debounceTime(300),
+        distinctUntilChanged(),
+        mergeMap((id) => this.getLogo(id)),
+        switchMap(() => this.user$)
+      )
+      .subscribe((user) => {
+        const agencyOrganizations = [BusinessUnitType.Agency, BusinessUnitType.Organization];
         if (!user) {
           return;
         }
@@ -99,37 +118,52 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
           this.store.dispatch(new LastSelectedOrganisationAgency(user.businessUnitName));
           const isAgency = user.businessUnitType === BusinessUnitType.Agency;
           this.store.dispatch(
-            new SaveLastSelectedOrganizationAgencyId({
-              lastSelectedOrganizationId: !isAgency ? user.businessUnitId : null,
-              lastSelectedAgencyId: isAgency ? user.businessUnitId : null,
-            }, !isAgency)
+            new SaveLastSelectedOrganizationAgencyId(
+              {
+                lastSelectedOrganizationId: !isAgency ? user.businessUnitId : null,
+                lastSelectedAgencyId: isAgency ? user.businessUnitId : null,
+              },
+              !isAgency
+            )
           );
         }
 
-      const selectedOrganizationAgencyId: number = this.organizationAgencyControl.value;
-      const selectedOrganizationAgency = this.organizationsAgencies$.getValue().find(i => i.id === selectedOrganizationAgencyId);
+        const selectedOrganizationAgencyId: number = this.organizationAgencyControl.value;
+        const selectedOrganizationAgency = this.organizationsAgencies$
+          .getValue()
+          .find((i) => i.id === selectedOrganizationAgencyId);
 
-      if (!selectedOrganizationAgency) {
-        return;
-      }
+        if (!selectedOrganizationAgency) {
+          return;
+        }
 
-      const selectedType = selectedOrganizationAgency.type;
+        const selectedType = selectedOrganizationAgency.type;
 
-      if (selectedType === 'Organization') {
-        this.store.dispatch(new LastSelectedOrganisationAgency(selectedType));
-        this.store.dispatch(new SaveLastSelectedOrganizationAgencyId({
-          lastSelectedOrganizationId: selectedOrganizationAgencyId,
-          lastSelectedAgencyId: this.store.selectSnapshot(UserState.lastSelectedAgencyId),
-        }, true));
-      }
-      if (selectedType === 'Agency') {
-        this.store.dispatch(new LastSelectedOrganisationAgency(selectedType));
-        this.store.dispatch(new SaveLastSelectedOrganizationAgencyId({
-          lastSelectedOrganizationId: this.store.selectSnapshot(UserState.lastSelectedOrganizationId),
-          lastSelectedAgencyId: selectedOrganizationAgencyId
-        }, false));
-      }
-    });
+        if (selectedType === 'Organization') {
+          this.store.dispatch(new LastSelectedOrganisationAgency(selectedType));
+          this.store.dispatch(
+            new SaveLastSelectedOrganizationAgencyId(
+              {
+                lastSelectedOrganizationId: selectedOrganizationAgencyId,
+                lastSelectedAgencyId: this.store.selectSnapshot(UserState.lastSelectedAgencyId),
+              },
+              true
+            )
+          );
+        }
+        if (selectedType === 'Agency') {
+          this.store.dispatch(new LastSelectedOrganisationAgency(selectedType));
+          this.store.dispatch(
+            new SaveLastSelectedOrganizationAgencyId(
+              {
+                lastSelectedOrganizationId: this.store.selectSnapshot(UserState.lastSelectedOrganizationId),
+                lastSelectedAgencyId: selectedOrganizationAgencyId,
+              },
+              false
+            )
+          );
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -139,12 +173,15 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
   public getLogo(id: number): Observable<Blob | boolean> {
     return this.organizationService.getOrganizationLogo(id).pipe(
-        tap(blob => {
-          const url = window.URL.createObjectURL(blob);
-          this.selectedLogo$.next(this.domSanitizer.bypassSecurityTrustUrl(url));
-        }), catchError(() => {
-          this.selectedLogo$.next(null);
-          return of(false)}));
+      tap((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        this.selectedLogo$.next(this.domSanitizer.bypassSecurityTrustUrl(url));
+      }),
+      catchError(() => {
+        this.selectedLogo$.next(null);
+        return of(false);
+      })
+    );
   }
 
   private subscribeUserChange(): void {
@@ -152,7 +189,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
       this.store.dispatch(new GetUserOrganizations());
       this.store.dispatch(new GetUserAgencies());
     });
-    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe(user => {
+    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
       if (!user) {
         return;
       }
@@ -166,7 +203,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   }
 
   private isOrganizationAgencyAreaChange(): void {
-    this.isOrganizationAgencyArea$.pipe(takeUntil(this.unsubscribe$)).subscribe(area => {
+    this.isOrganizationAgencyArea$.pipe(takeUntil(this.unsubscribe$)).subscribe((area) => {
       const isOrganizationArea = area.isOrganizationArea;
       const isAgencyArea = area.isAgencyArea;
       if (isOrganizationArea && isAgencyArea) {
@@ -183,46 +220,49 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   }
 
   private subscribeOrganizationAgencies(): void {
-    combineLatest([
-      this.agencies$,
-      this.organizations$
-    ]).pipe(takeUntil(this.unsubscribe$)).subscribe(userAgenciesAndOrganizations => {
-      if (!Array.isArray(userAgenciesAndOrganizations) || !userAgenciesAndOrganizations[0] || !userAgenciesAndOrganizations[1]) {
-        return;
-      }
-
-      this.userAgencies = userAgenciesAndOrganizations[0];
-      this.userOrganizations = userAgenciesAndOrganizations[1];
-
-      const agencies = this.userAgencies.businessUnits;
-      const organizations = this.userOrganizations.businessUnits;
-
-      this.agencies = agencies.map((a: UserAgencyOrganizationBusinessUnit) => {
-        const { id, name, logo } = a;
-        const agency: IOrganizationAgency = { id, name, type: 'Agency' };
-
-        if (logo) {
-          agency.logo = logo;
+    combineLatest([this.agencies$, this.organizations$])
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((userAgenciesAndOrganizations) => {
+        if (
+          !Array.isArray(userAgenciesAndOrganizations) ||
+          !userAgenciesAndOrganizations[0] ||
+          !userAgenciesAndOrganizations[1]
+        ) {
+          return;
         }
 
-        return agency;
+        this.userAgencies = userAgenciesAndOrganizations[0];
+        this.userOrganizations = userAgenciesAndOrganizations[1];
+
+        const agencies = this.userAgencies.businessUnits;
+        const organizations = this.userOrganizations.businessUnits;
+
+        this.agencies = agencies.map((a: UserAgencyOrganizationBusinessUnit) => {
+          const { id, name, logo } = a;
+          const agency: IOrganizationAgency = { id, name, type: 'Agency' };
+
+          if (logo) {
+            agency.logo = logo;
+          }
+
+          return agency;
+        });
+
+        this.organizations = organizations.map((o: UserAgencyOrganizationBusinessUnit) => {
+          const { id, name, logo } = o;
+          const organization: IOrganizationAgency = { id, name, type: 'Organization' };
+
+          if (logo) {
+            organization.logo = logo;
+          }
+
+          return organization;
+        });
+
+        const area = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+
+        this.applyOrganizationsAgencies(area.isOrganizationArea, area.isAgencyArea);
       });
-
-      this.organizations = organizations.map((o: UserAgencyOrganizationBusinessUnit) => {
-        const { id, name, logo } = o;
-        const organization: IOrganizationAgency = { id, name, type: 'Organization' };
-
-        if (logo) {
-          organization.logo = logo;
-        }
-
-        return organization;
-      });
-
-      const area = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-
-      this.applyOrganizationsAgencies(area.isOrganizationArea, area.isAgencyArea);
-    });
   }
 
   private applyOrganizationsAgencies(isOrganizationArea: boolean, isAgencyArea: boolean): void {
@@ -242,7 +282,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
     if (this.isAgencyOrOrganization) {
       this.organizationAgency = this.organizations[0] || this.agencies[0];
-
     } else {
       this.organizationsAgencies$.next(organizationsAgencies);
     }
@@ -254,11 +293,11 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     let newOrganizationAgencyControlValue: number | null;
 
     if (isAgencyArea && isAgency) {
-      newOrganizationAgencyControlValue = organizationsAgencies.find(i => i.id === lastSelectedAgencyId)
+      newOrganizationAgencyControlValue = organizationsAgencies.find((i) => i.id === lastSelectedAgencyId)
         ? lastSelectedAgencyId
         : organizationsAgencies[0]?.id || null;
     } else {
-      newOrganizationAgencyControlValue = organizationsAgencies.find(i => i.id === lastSelectedOrganizationId)
+      newOrganizationAgencyControlValue = organizationsAgencies.find((i) => i.id === lastSelectedOrganizationId)
         ? lastSelectedOrganizationId
         : organizationsAgencies[0]?.id || null;
     }

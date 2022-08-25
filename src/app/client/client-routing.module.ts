@@ -10,6 +10,7 @@ import { ClientComponent } from './client.component';
 import { AddEditOrderComponent } from './order-management/add-edit-order/add-edit-order.component';
 import { UnsavedOrderChangesGuard } from './guards/unsaved-order-changes.guard';
 import { CandidateDetailsComponent } from '@shared/components/candidate-details/candidate-details.component';
+import { AssociateListComponent } from '@shared/components/associate-list/associate-list.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -28,6 +29,13 @@ const routes: Routes = [
       {
         path: 'order-management',
         component: OrderManagementContentComponent,
+        data: {
+          isOrganizationArea: true,
+        },
+      },
+      {
+        path: 'associate-list',
+        component: AssociateListComponent,
         data: {
           isOrganizationArea: true,
         },

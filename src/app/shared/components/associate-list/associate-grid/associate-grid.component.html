@@ -1,16 +1,7 @@
-<section class="last-content-section-padding">
-  <div class="e-gridcustomheader">
-    <div class="title">
-      <h3>Associate Organizations</h3>
-    </div>
-    <div class="actions">
-      <span class="action-link" (click)="onFilter()"><i-feather name="sliders" class="icon"></i-feather> Filters</span>
-      <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Associate New Organization</span>
-    </div>
-  </div>
+<div class="associated-grid">
   <ejs-grid
     #grid
-    [dataSource]="associateOrganizations$ | async"
+    [dataSource]="(associateListPage$ | async)?.items"
     [allowSorting]="true"
     [allowResizing]="true"
     [allowSelection]="false"
@@ -34,7 +25,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="organizationName" headerText="Organization" textAlign="Left"></e-column>
+      <e-column field="businessUnitName" headerText="{{headerText}}" textAlign="Left"></e-column>
       <e-column field="baseFee" headerText="Base Fee %" width="130" textAlign="left">
         <ng-template #template let-data>
           {{ priceUtils.formatNumbers(data.baseFee) }}
@@ -65,7 +56,7 @@
                 format="#"
                 placeholder="Go to:"
                 min="1"
-                [max]="(associateOrganizationsPages$ | async)?.totalCount"
+                [max]="(associateListPage$ | async)?.totalPages"
                 [showSpinButton]="false"
                 (change)="onGoToClick($event)"
               >
@@ -76,7 +67,7 @@
                 id="gridPager"
                 #gridPager
                 [pageSize]="pageSize"
-                [totalRecordsCount]="(associateOrganizationsPages$ | async)?.totalPages"
+                [totalRecordsCount]="(associateListPage$ | async)?.totalCount"
                 [enablePagerMessage]="false"
                 [currentPage]="currentPage"
                 (click)="onGoToClick($event)"
@@ -88,7 +79,7 @@
       </div>
     </ng-template>
   </ejs-grid>
-</section>
+</div>
 
-<app-invite-dialog [openEvent]="openAssosiateOrgDialog"></app-invite-dialog>
-<app-edit-associated-dialog [openEvent]="openEditDialog" (editEndEvent)="onEditEnd()"></app-edit-associated-dialog>
+<app-invite-dialog [openEvent]="openAssociateOrgAgencyDialog"></app-invite-dialog>
+<app-edit-associate-dialog [openEvent]="openEditDialog" (editEndEvent)="onEditEnd()"></app-edit-associate-dialog>

@@ -1,4 +1,4 @@
-@import "../../../../../../styles/variables/colors.scss";
+@import "colors";
 
 .partnership-settings {
   .main-content {
@@ -8,10 +8,10 @@
   }
 
   .title {
-      font-weight: 700;
-      color: $title-black;
-      margin: 0 0 16px;
-      font-size: 16px;
+    font-weight: 700;
+    color: $title-black;
+    margin: 0 0 16px;
+    font-size: 16px;
   }
 
   .flex-wrapper {
@@ -29,7 +29,7 @@
     .flex-30 {
       width: calc(100% / 3);
 
-   
+
 
       &:not(:last-child) {
         margin-right: 16px;

@@ -7,6 +7,10 @@
     color: $secondary-dark-blue-15;
   }
 
+  & .ag-overlay {
+    background-color: $grid-overlay;
+  }
+
   & .ag-theme-alpine .ag-ltr .ag-cell {
     &.status-cell {
       display: flex;

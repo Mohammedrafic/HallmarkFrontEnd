@@ -14,7 +14,7 @@ export class OrganizationManagementComponent implements OnInit {
 
 
   constructor(private store: Store) {
-    store.dispatch(new SetHeaderState({ title: 'Organization Management', iconName: 'file-text' }));
+    store.dispatch(new SetHeaderState({ title: 'Settings', iconName: '' }));
   }
 
   ngOnInit(): void {
