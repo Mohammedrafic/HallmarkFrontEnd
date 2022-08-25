@@ -1,33 +1,16 @@
 import { Attachment } from '@shared/components/attachments';
 import { PageOfCollections } from '@shared/models/page.model';
-import { TimesheetType } from '../enums/timesheet-type.enum';
-import { PendingInvoiceStatus } from '../enums/pending-invoice-status.enum';
+import { InvoiceType } from '../enums/invoice-type.enum';
+import { BaseInvoice } from './base-invoice.interface';
+import { InvoiceRecordType } from '../enums';
+import { InvoiceAttachment } from './invoice-attachment.interface';
 
 export type PendingInvoicesData = PageOfCollections<PendingInvoice>;
 
-export interface PendingInvoice {
-  id: number;
-  agencyName: string;
-  agencyId: number;
-  timesheetType: TimesheetType;
-  pendingInvoiceStatus: PendingInvoiceStatus;
-  pendingInvoiceStatusText: string;
-  organizationId: number;
-  organizationName: string;
-  candidateId: number;
-  candidateFirstName: string;
-  candidateMiddleName: string | null;
-  candidateLastName: string;
-  orderId: number;
-  departmentId: number;
-  departmentName: string;
-  locationId: number;
-  locationName: string;
-  regionId: number;
-  regionName: string;
-  skillId: number;
-  skillName: string;
-  skillAbbr: string;
+export interface PendingInvoice extends BaseInvoice {
+  timesheetType: InvoiceType;
+  timesheetTypeText: string;
+
   weekStartDate: string;
   weekEndDate: string;
   weekNumber: number;
@@ -44,14 +27,23 @@ export interface PendingInvoice {
 
 export interface PendingInvoiceRecord {
   id: number;
+  invoiceRecordType: InvoiceRecordType;
+  invoiceRecordTypeText: string;
   dateTime: string;
   billRateConfigId: number;
   billRateConfigTitle: string;
   timeIn: TimeSpan;
   timeOut: TimeSpan;
+  vendorFeeApplicable: boolean;
   comment: string;
+  reasonId: number;
+  reasonCode: string;
+  linkedInvoiceId: number;
   rate: number;
   value: number;
+  total: number;
+  timesheetId: number;
+  attachments: InvoiceAttachment[];
 }
 
 export interface TimeSpan {
