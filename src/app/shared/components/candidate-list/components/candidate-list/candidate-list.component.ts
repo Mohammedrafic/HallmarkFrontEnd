@@ -319,15 +319,25 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private subscribeOnInitialData(): void {
     this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
     if (this.isAgency) {
-      this.lastSelectedAgencyId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-        this.dispatchNewPage();
-        this.clearFilters();
-      });
+      this.lastSelectedAgencyId$
+        .pipe(
+          takeUntil(this.unsubscribe$),
+          filter((value) => !!value)
+        )
+        .subscribe(() => {
+          this.dispatchNewPage();
+          this.clearFilters();
+        });
     } else {
-      this.lastSelectedOrgId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-        this.dispatchNewPage();
-        this.clearFilters();
-      });
+      this.lastSelectedOrgId$
+        .pipe(
+          takeUntil(this.unsubscribe$),
+          filter((value) => !!value)
+        )
+        .subscribe(() => {
+          this.dispatchNewPage();
+          this.clearFilters();
+        });
     }
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
