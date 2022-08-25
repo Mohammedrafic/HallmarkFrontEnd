@@ -16,10 +16,6 @@ export class AssociateListComponent {
     return this.isAgency ? 'Organizations' : 'Agencies';
   }
 
-  get buttonText(): string {
-    return `Associate New ${this.isAgency ? 'Agency' : 'Organization'}`;
-  }
-
   constructor(private store: Store, private router: Router) {
     this.setHeaderName();
   }

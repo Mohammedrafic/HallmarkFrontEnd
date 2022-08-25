@@ -32,7 +32,7 @@ export class InviteDialogComponent extends DestroyableDirective implements OnIni
   public businessUnitName$: Observable<string>;
 
   get title(): string {
-    return this.isAgency ? 'Agency' : 'Organization';
+    return this.isAgency ? 'Organization' : 'Agency';
   }
 
   public targetElement: HTMLElement = document.body;

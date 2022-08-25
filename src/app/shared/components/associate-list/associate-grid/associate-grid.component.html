@@ -56,7 +56,7 @@
                 format="#"
                 placeholder="Go to:"
                 min="1"
-                [max]="(associateListPage$ | async)?.totalCount"
+                [max]="(associateListPage$ | async)?.totalPages"
                 [showSpinButton]="false"
                 (change)="onGoToClick($event)"
               >
@@ -67,7 +67,7 @@
                 id="gridPager"
                 #gridPager
                 [pageSize]="pageSize"
-                [totalRecordsCount]="(associateListPage$ | async)?.totalPages"
+                [totalRecordsCount]="(associateListPage$ | async)?.totalCount"
                 [enablePagerMessage]="false"
                 [currentPage]="currentPage"
                 (click)="onGoToClick($event)"
