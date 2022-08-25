@@ -1,5 +1,5 @@
 import unionBy from 'lodash/fp/unionBy';
-import { filter, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { filter, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
@@ -116,7 +116,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     if (this.orderId > 0) {
       this.store.dispatch(new GetSelectedOrderById(this.orderId));
-      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
+      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe((order: Order) => {
         this.prefix = order?.organizationPrefix as string;
         this.publicId = order?.publicId as number;
         this.isPermPlacementOrder = order?.orderType === OrderType.PermPlacement;
@@ -148,14 +149,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
     this.getPredefinedBillRatesData$
       .pipe(
-        takeUntil(this.unsubscribe$),
         switchMap((getPredefinedBillRatesData) => {
           if (getPredefinedBillRatesData && !this.orderBillRates.length) {
             return this.store.dispatch(new GetPredefinedBillRates());
           } else {
             return of(null);
           }
-        })
+        }),
+        takeUntil(this.unsubscribe$),
       )
       .subscribe();
 
@@ -305,6 +306,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private collectOrderData(isSubmit: boolean): CreateOrderDto {
+
     let orderBillRates: BillRate[] | null;
     if (this.isPerDiem || this.isPermPlacementOrder) {
       orderBillRates = null;
@@ -364,10 +366,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       annualSalaryRangeTo,
       orderPlacementFee,
     } = allValues;
-
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
-      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed } = billRate;
-      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed };
+      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed, isPredefined } = billRate;
+      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed, isPredefined };
     });
 
     const order: CreateOrderDto | EditOrderDto = {
@@ -439,7 +440,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (!order.compBonus) {
       order.compBonus = null;
     }
-
     return order;
   }
 
