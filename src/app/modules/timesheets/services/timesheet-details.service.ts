@@ -25,8 +25,8 @@ export class TimesheetDetailsService {
   ) {
   }
 
-  public approveTimesheet(timesheetId: number): Observable<void> {
-    const { title, submitButtonText, confirmMessage, successMessage } = approveTimesheetDialogData;
+  public approveTimesheet(timesheetId: number, isTimesheetOrMileagesUpdate: boolean): Observable<void> {
+    const { title, submitButtonText, confirmMessage, successMessage } = approveTimesheetDialogData(isTimesheetOrMileagesUpdate);
 
     return this.confirmService.confirm(confirmMessage, {
       title,
@@ -47,8 +47,8 @@ export class TimesheetDetailsService {
       );
   }
 
-  public submitTimesheet(timesheetId: number, orgId: number): Observable<void> {
-    const { title, submitButtonText, confirmMessage, successMessage } = submitTimesheetDialogData;
+  public submitTimesheet(timesheetId: number, orgId: number, isTimesheetOrMileagesUpdate: boolean): Observable<void> {
+    const { title, submitButtonText, confirmMessage, successMessage } = submitTimesheetDialogData(isTimesheetOrMileagesUpdate);
 
     return this.confirmService.confirm(confirmMessage, {
       title,
