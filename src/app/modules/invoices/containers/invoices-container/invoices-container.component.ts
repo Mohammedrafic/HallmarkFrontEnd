@@ -15,6 +15,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
+  map,
   Observable,
   switchMap,
   takeUntil
@@ -30,10 +31,11 @@ import {
   InvoicesFilterState,
   ManualInvoice,
   ManualInvoicesData,
+  PrintingPostDto,
 } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { InvoicesService } from '../../services';
+import { InvoicePrintingService, InvoicesService } from '../../services';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { UNIT_ORGANIZATIONS_FIELDS } from 'src/app/modules/timesheets/constants';
 import { DataSourceItem } from '@core/interface';
@@ -137,6 +139,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   public rejectInvoiceId: number;
   public tabConfig: GridContainerTabConfig = {};
   public groupInvoicesOverlayVisible: boolean = false;
+  public selectedInvoiceIds: number[];
 
   constructor(
     private store: Store,
@@ -145,6 +148,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     private invoicesService: InvoicesService,
     private actions$: Actions,
     private invoicesContainerService: InvoicesContainerService,
+    private printingService: InvoicePrintingService,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
     @Inject(OrganizationId) public organizationId$: OrganizationIdProvider,
   ) {
@@ -203,12 +207,14 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
   public handleChangeTab(tabIdx: number): void {
     this.selectedTabIdx = tabIdx;
+    this.clearSelections();
     this.clearTab();
 
     this.organizationId$.pipe(
       takeUntil(this.componentDestroy())
     )
       .subscribe((orgId: number | null) => {
+        this.organizationId = orgId;
         this.gridOptions = {
           ...this.defaultGridOptions,
           ...this.invoicesContainerService.getGridOptions(tabIdx),
@@ -342,6 +348,31 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     this.groupInvoicesOverlayVisible = false;
   }
 
+  public handleMultiSelectionChanged(nodes: RowNode[]): void {
+    console.log(nodes)
+    if (nodes.length) {
+      this.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);
+    } else {
+      this.selectedInvoiceIds = [];
+    }
+  }
+
+  public printInvoices(): void {
+    const dto: PrintingPostDto = {
+      organizationId: this.organizationId as number,
+      invoiceIds: this.selectedInvoiceIds,
+    }
+    this.store.dispatch(new Invoices.GetPrintData(dto))
+    .pipe(
+      filter((state) => !!state.invoices.printData),
+      map((state) => state.invoices.printData),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((data) => {
+      this.printingService.printInvoice(data)
+    });
+  }
+
 
   private clearTab(): void {
     this.groupingInvoiceRecordsIds = [];
@@ -375,5 +406,9 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
       this.store.dispatch(new Invoices.SelectOrganization(res[0].id),
       )
     });
+  }
+
+  private clearSelections(): void {
+    this.selectedInvoiceIds = [];
   }
 }

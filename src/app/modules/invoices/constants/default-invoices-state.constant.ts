@@ -20,4 +20,5 @@ export const DefaultInvoicesState: InvoicesModel = {
   organizationLocations: [],
   selectedOrganizationId: 0,
   regions: [],
+  printData: [],
 };

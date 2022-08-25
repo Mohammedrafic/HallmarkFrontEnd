@@ -30,12 +30,26 @@
     </button>
     <app-export-button (optionSelected)="onExportOptionSelect($event)"></app-export-button>
 
+    <button
+      ejs-button
+      *ngIf="selectedTabIdx === 2"
+      [disabled]="!selectedInvoiceIds || !selectedInvoiceIds.length"
+      cssClass="e-outline button-filter button--no-wrap"
+      (click)="printInvoices()">
+      <span>Print</span>
+      <i-feather name="printer" class="icon"></i-feather>
+    </button>
 
     <div class="invoices-actions-container">
-      <button ejs-button class="e-primary"
-              (click)="openAddDialog()">
+      <button
+        ejs-button
+        class="e-primary"
+        (click)="openAddDialog()"
+        *ngIf="selectedTabIdx === 0"
+        >
         Add Manual Invoice
       </button>
+
 
 <!--      TODO: Move to component-->
       <div class="group-invoices-overlay"
@@ -110,6 +124,7 @@
           (approveEmitter)="bulkApprove($event)"
           (exportEmitter)="bulkExport($event)"
           (sortChanged)="handleSortingChange($event)"
+          (multiSelectionChanged)="handleMultiSelectionChanged($event)"
           [suppressRowClickSelection]="false"
           [columnDefinitions]="colDefs"
           [isLoading]="isLoading"
