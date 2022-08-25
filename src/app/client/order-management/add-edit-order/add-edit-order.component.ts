@@ -247,7 +247,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.jobDescriptionForm.valid &&
       this.orderDetailsFormComponent.contactDetailsForm.valid &&
       this.orderDetailsFormComponent.workLocationForm.valid &&
-      (this.orderDetailsFormComponent.workflowForm.disabled || this.orderDetailsFormComponent.workflowForm.valid) &&
       this.orderDetailsFormComponent.specialProject.valid &&
       (this.billRatesComponent?.billRatesControl.valid ||
         this.orderBillRates.length ||
@@ -278,7 +277,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.jobDescriptionForm.markAllAsTouched();
       this.orderDetailsFormComponent.contactDetailsForm.markAllAsTouched();
       this.orderDetailsFormComponent.workLocationForm.markAllAsTouched();
-      this.orderDetailsFormComponent.workflowForm.markAllAsTouched();
       this.orderDetailsFormComponent.specialProject.markAllAsTouched();
     }
   }
@@ -319,7 +317,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       ...this.orderDetailsFormComponent.jobDescriptionForm.getRawValue(),
       ...this.orderDetailsFormComponent.contactDetailsForm.getRawValue(),
       ...this.orderDetailsFormComponent.workLocationForm.getRawValue(),
-      ...this.orderDetailsFormComponent.workflowForm.getRawValue(),
       ...this.orderDetailsFormComponent.specialProject.getRawValue(),
       ...{ credentials: this.orderCredentials },
       ...{ billRates: orderBillRates },
@@ -358,7 +355,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       orderRequisitionReasonName,
       contactDetails,
       workLocations,
-      workflowId,
       credentials,
       canApprove,
       annualSalaryRangeFrom,
@@ -405,7 +401,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       contactDetails,
       workLocations,
       credentials,
-      workflowId,
       isSubmit,
       canApprove,
       annualSalaryRangeFrom,
