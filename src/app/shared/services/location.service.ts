@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Location, LocationFilter, LocationFilterOptions, LocationsPage } from '../../shared/models/location.model';
+import { Location, LocationFilter, LocationFilterOptions, LocationsPage, LocationType } from '../../shared/models/location.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
@@ -72,5 +72,13 @@ export class LocationService {
    */
   public getLocationFilterOptions(regionId: number): Observable<LocationFilterOptions> {
     return this.http.get<LocationFilterOptions>(`/api/Locations/filteringoptions`, { params: { RegionId: regionId }});
+  }
+
+  /**
+   * Get all locationTypes
+   * @return Array of locationTypes
+   */
+   public getLocationTypes(): Observable<LocationType[]> {
+    return this.http.get<LocationType[]>(`/api/Locations/locationtypes`);
   }
 }

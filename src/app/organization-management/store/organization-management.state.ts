@@ -75,13 +75,14 @@ import {
   GetMasterSkillsByOrganization,
   GetLocationFilterOptions,
   GetDepartmentFilterOptions,
-  GetOrganizationSettingsFilterOptions,
   GetRegionFilterOptions,
-  ExportRegions
+  ExportRegions,
+  GetOrganizationSettingsFilterOptions,
+  GetLocationTypes
 } from './organization-management.actions';
 import { Department, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
 import { Region, regionFilter } from '@shared/models/region.model';
-import { Location, LocationFilterOptions, LocationsPage } from '@shared/models/location.model';
+import { Location, LocationFilterOptions, LocationsPage , LocationType} from '@shared/models/location.model';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
 import { MasterSkillByOrganization, Skill, SkillsPage, SkillDataSource } from 'src/app/shared/models/skill.model';
@@ -102,6 +103,7 @@ import { SkillGroupService } from '@shared/services/skill-group.service';
 import { OrganizationSettingsService } from '@shared/services/organization-settings.service';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { GeneralTimeZones } from '@shared/constants/general-timezones';
 
 interface DropdownOption {
   id: number;
@@ -149,6 +151,9 @@ export interface OrganizationManagementStateModel {
   regionFilterOptions: regionFilter | null;
   departmentFilterOptions: DepartmentFilterOptions | null;
   organizationSettingsFilterOptions: string[] | null;
+  timeZones: string[] | null;
+  loctionTypes: LocationType[] |null;
+  isLocationTypesLoading : boolean;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -195,7 +200,10 @@ export interface OrganizationManagementStateModel {
     regionFilterOptions:null,
     departmentFilterOptions: null,
     organizationSettingsFilterOptions: null,
-  },
+    timeZones :GeneralTimeZones,
+    loctionTypes :[],
+    isLocationTypesLoading: false
+   },
 })
 @Injectable()
 export class OrganizationManagementState {
@@ -286,6 +294,13 @@ export class OrganizationManagementState {
 
   @Selector()
   static organizationSettingsFilterOptions(state: OrganizationManagementStateModel): string[] | null { return state.organizationSettingsFilterOptions; }
+
+  @Selector()
+  static timeZones(state: OrganizationManagementStateModel): string[] | null { return state.timeZones; }
+
+  @Selector()
+  static locationTypes(state: OrganizationManagementStateModel): LocationType[] | null { return state.loctionTypes; }
+
 
   constructor(
     private organizationService: OrganizationService,
@@ -484,30 +499,45 @@ export class OrganizationManagementState {
   }
 
   @Action(SaveLocation)
-  SaveLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { location, regionId, filters }: SaveLocation): Observable<Location> {
+  SaveLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, 
+    { location, regionId, filters }: SaveLocation):
+     Observable<Location|void> {
     patchState({ isLocationLoading: true });
     return this.locationService.saveLocation(location).pipe(tap((payload) => {
       patchState({ isLocationLoading: false});
-      dispatch(new GetLocationsByRegionId(regionId, filters));
+      dispatch(
+        [new ShowToast(MessageTypes.Success, RECORD_ADDED),
+        new GetLocationsByRegionId(regionId, filters)]);
       if (filters) {
         dispatch(new GetLocationFilterOptions(regionId));
       }
       return payload;
-    }));
-  }
+    }),
+    catchError((error) => 
+    dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
+    );
+}
 
   @Action(UpdateLocation)
-  UpdateLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { location, regionId, filters}: UpdateLocation): Observable<void> {
-    return this.locationService.updateLocation(location).pipe(tap((payload) => {
-      patchState({ isLocationLoading: false });
-      dispatch(new GetLocationsByRegionId(regionId, filters));
-      if (filters) {
-        dispatch(new GetLocationFilterOptions(regionId));
-      }
-      return payload;
-    }));
-  }
+  UpdateLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, 
+    { location, regionId, filters}: UpdateLocation): 
+      Observable<void> {
+          return this.locationService.updateLocation(location).pipe(tap((payload) => {
+            patchState({ isLocationLoading: false });
+            dispatch(
+              [new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
+              new GetLocationsByRegionId(regionId, filters)]);
+            if (filters) {
+              dispatch(new GetLocationFilterOptions(regionId));
+            }
+            return payload;
+          }),
+          catchError((error) => 
+          dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
+          );
+    }
 
+ 
   @Action(DeleteLocationById)
   DeleteLocationById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { locationId, regionId, filters }: DeleteLocationById): Observable<any> {
     return this.locationService.deleteLocationById(locationId).pipe(tap((payload) => {
@@ -875,4 +905,15 @@ export class OrganizationManagementState {
       return options;
     }));
   };
+
+  @Action(GetLocationTypes)
+  GetLocationTypes({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetLocationTypes): Observable<LocationType[]> {
+    patchState({ isLocationTypesLoading: true });
+    return this.locationService.getLocationTypes().pipe(
+      tap((payload) => {
+        patchState({ isLocationTypesLoading: false, loctionTypes: payload });
+        return payload;
+      })
+    );
+  }
 }
