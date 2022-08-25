@@ -27,6 +27,19 @@ body.light, body.dark {
     }
   }
 
+  .warning-toast {
+    .e-toast {
+      background-color: #FFF4E1 !important;
+      border-left: 6px solid $supportive-orange;
+
+      .e-toast-message {
+        .e-toast-title {
+          color: $supportive-orange !important;
+        }
+      }
+    }
+  }
+
   .e-toast {
     top: 8% !important;
 

@@ -10,6 +10,7 @@ import {
   Observable,
   Subject,
   Subscription,
+  take,
   takeUntil,
   throttleTime,
 } from 'rxjs';
@@ -65,7 +66,8 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Skill } from '@shared/models/skill.model';
-import { GetAllOrganizationSkills, GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
+import { GetAllOrganizationSkills, GetOrganizationSettings
+} from '@organization-management/store/organization-management.actions';
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { DatePipe, Location } from '@angular/common';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
@@ -141,7 +143,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   @Select(DashboardState.filteredItems) private readonly filteredItems$: Observable<FilteredItem[]>;
 
-  public settings: {[key in SettingsKeys]?: OrganizationSettingsGet};
+  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   public SettingsKeys = SettingsKeys;
   public activeTab: OrganizationOrderManagementTabs = OrganizationOrderManagementTabs.AllOrders;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
@@ -224,6 +226,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public selectedRowRef: any;
 
   private isRedirectedFromDashboard: boolean;
+  private isRedirectedFromToast: boolean;
+  private organizationPrefix: string;
+  private publicId: number;
   private dashboardFilterSubscription: Subscription;
   private orderPerDiemId: number | null;
   private creatingReorder = false;
@@ -246,6 +251,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     super();
     this.isRedirectedFromDashboard =
       this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromDashboard'] || false;
+    this.isRedirectedFromToast = this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromToast'] || false;
+    this.organizationPrefix = this.router.getCurrentNavigation()?.extras?.state?.['organizationPrefix'];
+    this.publicId = this.router.getCurrentNavigation()?.extras?.state?.['publicId'];
 
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.fb.group({
@@ -274,6 +282,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   ngOnInit(): void {
+    this.handleRedirectFromQuickOrderToast();
     this.handleDashboardFilters();
     this.orderFilterColumnsSetup();
     this.onOrderFilterDataSourcesLoadHandler();
@@ -1336,5 +1345,23 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         positionClosureReasonId: res.positionClosureReasonId,
       };
     });
+  }
+
+  private handleRedirectFromQuickOrderToast(): void {
+    if (this.isRedirectedFromToast) {
+      this.ordersPage$.pipe(filter(Boolean), take(1)).subscribe((data) => {
+        this.pageSubject.next(data.totalPages);
+        this.isSubrowDisplay = false;
+        this.actions$.pipe(ofActionSuccessful(GetOrders)).subscribe(() => {
+          this.ordersPage$.pipe(take(1)).subscribe((data) => {
+            data.items.find((item, i) => {
+              if (item.publicId === this.publicId && item.organizationPrefix === this.organizationPrefix) {
+                this.gridWithChildRow.selectRow(i);
+              }
+            });
+          });
+        });
+      });
+    }
   }
 }
