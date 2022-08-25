@@ -14,7 +14,7 @@ export abstract class GridCellRenderer<P extends ICellRendererParams = ICellRend
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
 
-    this.value = params.getValue?.();
+    this.value = params.valueFormatted || params.getValue?.();
   }
 
   public refresh(params: P): boolean {
