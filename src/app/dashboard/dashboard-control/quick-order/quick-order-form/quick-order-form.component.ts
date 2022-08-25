@@ -28,7 +28,7 @@ import { JobDistribution } from '@shared/enums/job-distibution';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
-import { GetAssociateAgencies, GetContactDetails, GetProjectSpecialData
+import { GetAssociateAgencies, GetContactDetails, GetProjectSpecialData, SaveOrder
 } from '@client/store/order-managment-content.actions';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import PriceUtils from '@shared/utils/price.utils';
@@ -626,21 +626,16 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   private subscribeForSettings(): void {
     this.organizationSettings$.pipe(takeUntil(this.destroy$)).subscribe((settings) => {
+      const projectFields = ['projectTypeId', 'projectNameId', 'poNumberId']
       this.settings = SettingsHelper.mapSettings(settings);
       this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
       if (this.specialProjectForm != null) {
         if (this.isSpecialProjectFieldsRequired) {
-          this.specialProjectForm.controls['projectTypeId'].setValidators(Validators.required);
-          this.specialProjectForm.controls['projectNameId'].setValidators(Validators.required);
-          this.specialProjectForm.controls['poNumberId'].setValidators(Validators.required);
+          projectFields.forEach((control) => this.specialProjectForm.controls[control].setValidators(Validators.required))
         } else {
-          this.specialProjectForm.controls['projectTypeId'].clearValidators();
-          this.specialProjectForm.controls['projectNameId'].clearValidators();
-          this.specialProjectForm.controls['poNumberId'].clearValidators();
+          projectFields.forEach((control) => this.specialProjectForm.controls[control].clearValidators());
         }
-        this.specialProjectForm.controls['projectTypeId'].updateValueAndValidity();
-        this.specialProjectForm.controls['projectNameId'].updateValueAndValidity();
-        this.specialProjectForm.controls['poNumberId'].updateValueAndValidity();
+        projectFields.forEach((control) => this.specialProjectForm.controls[control].updateValueAndValidity());
       }
     });
   }
@@ -655,16 +650,16 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.specialProjectForm.valid
     ) {
       const order = {
-        ...this.organizationForm.getRawValue(),
+        isSubmit: true,
+        isQuickOrder: true,
+        jobDistributions: this.jobDistributionDescriptionForm.getRawValue().jobDistributions,
+        contactDetails: [this.contactDetailsForm.getRawValue()],
         ...this.orderTypeForm.getRawValue(),
         ...this.generalInformationForm.getRawValue(),
-        ...this.jobDistributionDescriptionForm.getRawValue(),
-        ...this.contactDetailsForm.getRawValue(),
         ...this.specialProjectForm.getRawValue(),
-        isQuickOrder: true,
       };
-
-      //save order() TODO implement in scope EIN-3580
+      const selectedBusinessUnitId = this.organizationForm.value.organization
+      this.store.dispatch(new SaveOrder(order, [], undefined, selectedBusinessUnitId ));
 
     } else {
       this.cdr.markForCheck();
