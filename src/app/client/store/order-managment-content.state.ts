@@ -453,8 +453,8 @@ export class OrderManagementContentState {
   @Action(GetProjectSpecialData)
   GetProjectSpecialData({
     patchState,
-  }: StateContext<OrderManagementContentStateModel>): Observable<ProjectSpecialData> {
-    return this.projectsService.getProjectSpecialData().pipe(
+  }: StateContext<OrderManagementContentStateModel>, { lastSelectedBusinessUnitId }: GetProjectSpecialData): Observable<ProjectSpecialData> {
+    return this.projectsService.getProjectSpecialData(lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
         patchState({ projectSpecialData: payload });
       })
@@ -491,8 +491,8 @@ export class OrderManagementContentState {
   }
 
   @Action(GetAssociateAgencies)
-  GetAssociateAgencies({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<AssociateAgency[]> {
-    return this.orderManagementService.getAssociateAgencies().pipe(
+  GetAssociateAgencies({ patchState }: StateContext<OrderManagementContentStateModel>, { lastSelectedBusinessUnitId }: GetAssociateAgencies): Observable<AssociateAgency[]> {
+    return this.orderManagementService.getAssociateAgencies(lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
         patchState({ associateAgencies: payload });
       })
@@ -705,9 +705,9 @@ export class OrderManagementContentState {
   @Action(GetContactDetails)
   GetContactDetails(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { departmentId }: GetContactDetails
+    { departmentId, lastSelectedBusinessId }: GetContactDetails
   ): Observable<Department> {
-    return this.departmentService.getDepartmentData(departmentId).pipe(
+    return this.departmentService.getDepartmentData(departmentId, lastSelectedBusinessId).pipe(
       tap((contactDetails: Department) => {
         patchState({ contactDetails });
       })

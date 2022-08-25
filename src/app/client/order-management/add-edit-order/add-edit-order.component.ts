@@ -116,7 +116,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     if (this.orderId > 0) {
       this.store.dispatch(new GetSelectedOrderById(this.orderId));
-      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
+      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe((order: Order) => {
         this.prefix = order?.organizationPrefix as string;
         this.publicId = order?.publicId as number;
         this.isPermPlacementOrder = order?.orderType === OrderType.PermPlacement;
@@ -148,14 +149,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
     this.getPredefinedBillRatesData$
       .pipe(
-        takeUntil(this.unsubscribe$),
         switchMap((getPredefinedBillRatesData) => {
           if (getPredefinedBillRatesData && !this.orderBillRates.length) {
             return this.store.dispatch(new GetPredefinedBillRates());
           } else {
             return of(null);
           }
-        })
+        }),
+        takeUntil(this.unsubscribe$),
       )
       .subscribe();
 
@@ -246,7 +247,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.jobDescriptionForm.valid &&
       this.orderDetailsFormComponent.contactDetailsForm.valid &&
       this.orderDetailsFormComponent.workLocationForm.valid &&
-      (this.orderDetailsFormComponent.workflowForm.disabled || this.orderDetailsFormComponent.workflowForm.valid) &&
       this.orderDetailsFormComponent.specialProject.valid &&
       (this.billRatesComponent?.billRatesControl.valid ||
         this.orderBillRates.length ||
@@ -277,7 +277,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.jobDescriptionForm.markAllAsTouched();
       this.orderDetailsFormComponent.contactDetailsForm.markAllAsTouched();
       this.orderDetailsFormComponent.workLocationForm.markAllAsTouched();
-      this.orderDetailsFormComponent.workflowForm.markAllAsTouched();
       this.orderDetailsFormComponent.specialProject.markAllAsTouched();
     }
   }
@@ -318,7 +317,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       ...this.orderDetailsFormComponent.jobDescriptionForm.getRawValue(),
       ...this.orderDetailsFormComponent.contactDetailsForm.getRawValue(),
       ...this.orderDetailsFormComponent.workLocationForm.getRawValue(),
-      ...this.orderDetailsFormComponent.workflowForm.getRawValue(),
       ...this.orderDetailsFormComponent.specialProject.getRawValue(),
       ...{ credentials: this.orderCredentials },
       ...{ billRates: orderBillRates },
@@ -357,17 +355,15 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       orderRequisitionReasonName,
       contactDetails,
       workLocations,
-      workflowId,
       credentials,
       canApprove,
       annualSalaryRangeFrom,
       annualSalaryRangeTo,
       orderPlacementFee,
     } = allValues;
-
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
-      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed } = billRate;
-      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed };
+      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed, isPredefined } = billRate;
+      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed, isPredefined };
     });
 
     const order: CreateOrderDto | EditOrderDto = {
@@ -405,7 +401,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       contactDetails,
       workLocations,
       credentials,
-      workflowId,
       isSubmit,
       canApprove,
       annualSalaryRangeFrom,
@@ -439,7 +434,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (!order.compBonus) {
       order.compBonus = null;
     }
-
+    
     return order;
   }
 

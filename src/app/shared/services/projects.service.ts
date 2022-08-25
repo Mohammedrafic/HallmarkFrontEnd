@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
@@ -31,7 +31,12 @@ export class ProjectsService {
    * Get project special data
    * @return list of project types
    */
-  public getProjectSpecialData(): Observable<ProjectSpecialData> {
-    return this.http.get<ProjectSpecialData>(`/api/orders/specialProjectData`);
+  public getProjectSpecialData(lastSelectedBusinessUnitId?: number): Observable<ProjectSpecialData> {
+    let headers = {};
+
+    if (lastSelectedBusinessUnitId) {
+      headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
+    }
+    return this.http.get<ProjectSpecialData>(`/api/orders/specialProjectData`, { headers });
   }
 }

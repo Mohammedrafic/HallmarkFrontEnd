@@ -94,7 +94,7 @@ export class GetAvailableSteps {
 
 export class GetProjectSpecialData {
   static readonly type = '[order management] Get Project Special Data';
-  constructor() {}
+  constructor(public lastSelectedBusinessUnitId?: number) {}
 }
 
 export class GetSuggestedDetails {
@@ -109,7 +109,7 @@ export class GetProjectNames {
 
 export class GetAssociateAgencies {
   static readonly type = '[order management] Get Associate Agencies';
-  constructor() {}
+  constructor(public lastSelectedBusinessUnitId?: number) {}
 }
 
 export class SetPredefinedBillRatesData {
@@ -232,7 +232,7 @@ export class SelectNavigationTab {
 
 export class GetContactDetails {
   static readonly type = '[order management] Get Contact Details';
-  constructor(public departmentId: number) {}
+  constructor(public departmentId: number, public lastSelectedBusinessId?: number) {}
 }
 
 export class GetExtensions {

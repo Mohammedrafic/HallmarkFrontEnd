@@ -767,8 +767,8 @@ export class OrganizationManagementState {
   }
 
   @Action(GetOrganizationSettings)
-  GetOrganizationSettingsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { filters }: GetOrganizationSettings): Observable<OrganizationSettingsGet[]> {
-    return this.organizationSettingsService.getOrganizationSettings(filters).pipe(tap((payload) => {
+  GetOrganizationSettingsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { filters, lastSelectedBusinessUnitId }: GetOrganizationSettings): Observable<OrganizationSettingsGet[]> {
+    return this.organizationSettingsService.getOrganizationSettings(filters, lastSelectedBusinessUnitId).pipe(tap((payload) => {
       patchState({ organizationSettings: payload });
       return payload;
     }));
