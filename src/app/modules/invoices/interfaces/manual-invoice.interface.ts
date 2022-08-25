@@ -1,20 +1,27 @@
-import { Attachment } from '@shared/components/attachments';
-import { TimesheetStatus } from '../../timesheets/enums/timesheet-status.enum';
+import { InvoiceAttachment } from './invoice-attachment.interface';
+import { InvoiceRecordType } from '../enums';
+import { PageOfCollections } from '@shared/models/page.model';
+import { BaseInvoice } from './base-invoice.interface';
 
-// TODO: Create basic interface for invoices
-export interface ManualInvoice {
-  type: 'Manual';
-  status: TimesheetStatus;
-  statusText: string;
-  unitName: string;
-  candidateFirstName: string;
-  candidateLastName: string;
-  orderId: number;
-  location: string;
-  department: string;
-  skill: string;
-  startDate: string;
-  rejectReason: string | null;
-  attachments: Attachment[];
+export type ManualInvoicesData = PageOfCollections<ManualInvoice>;
+
+export interface ManualInvoice extends BaseInvoice {
   amount: number;
+  attachments: InvoiceAttachment[];
+  comment: string | null;
+
+  formattedOrderId: number;
+  positionId: number;
+
+  invoiceRecordType: InvoiceRecordType;
+  invoiceRecordTypeText: string;
+  jobId: number;
+
+  reasonCode: string;
+  reasonId: number;
+  rejectionReason: string | null;
+  vendorFeeApplicable: boolean;
+  weekEndDate: string;
+  weekNumber: number;
+  weekStartDate: string;
 }

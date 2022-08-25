@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder } from '@angular/forms';
 
-import { filter, Observable, switchMap, take } from 'rxjs';
+import { catchError, filter, Observable, take } from 'rxjs';
 import { Store } from '@ngxs/store';
 
 import { BaseObservable } from '@core/helpers';
@@ -13,18 +13,23 @@ import { InvoiceFilterForm } from '../interfaces/form.interface';
 import { InvoicesTableFiltersColumns } from '../enums/invoices.enum';
 import { Invoices } from '../store/actions/invoices.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { rejectInvoiceConfirmDialogConfig } from '../constants/reject-invoice-confirm-dialog-config.const';
 import { approveInvoiceConfirmDialogConfig } from '../constants/approve-invoice-confirm-dialog-config.const';
+import { TimesheetTargetStatus } from '../../timesheets/enums';
+import { tap } from 'rxjs/internal/operators/tap';
+import { ShowToast } from '../../../store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { getAllErrors } from '@shared/utils/error.utils';
+import { InvoicesApiService } from './invoices-api.service';
 
 @Injectable()
 export class InvoicesService {
   private currentSelectedTableRowIndex: BaseObservable<number> = new BaseObservable<number>(null as any);
 
   constructor(
-    private http: HttpClient,
     private fb: FormBuilder,
     private confirmService: ConfirmService,
     private store: Store,
+    private invoicesApiService: InvoicesApiService,
   ) {
   }
 
@@ -64,7 +69,7 @@ export class InvoicesService {
     return this.currentSelectedTableRowIndex.get();
   }
 
-  public approveInvoice(invoiceId: number): Observable<void> {
+  public confirmInvoiceApprove(invoiceId: number): Observable<boolean> {
     const { title, submitButtonText, getMessage } = approveInvoiceConfirmDialogConfig;
 
     return this.confirmService.confirm(getMessage(invoiceId), {
@@ -75,24 +80,41 @@ export class InvoicesService {
       .pipe(
         take(1),
         filter((submitted: boolean) => submitted),
-        switchMap(() => this.store.dispatch(new Invoices.ApproveInvoice(invoiceId))),
       );
   }
 
-  public rejectInvoice(invoiceId: number): Observable<void> {
-    const {
-      title, okButtonLabel, okButtonClass
-    } = rejectInvoiceConfirmDialogConfig;
-
-    return this.confirmService.confirm(`Are you sure you want to reject invoice ${invoiceId}?`, {
-      title,
-      okButtonLabel,
-      okButtonClass,
+  public approveInvoice(id: number) {
+    return this.invoicesApiService.changeInvoiceStatus({
+      organizationId: null,
+      reason: null,
+      targetStatus: TimesheetTargetStatus.Approved,
+      timesheetId: id,
     })
       .pipe(
-        take(1),
-        filter((submitted: boolean) => submitted),
-        switchMap(() => this.store.dispatch(new Invoices.RejectInvoice(invoiceId))),
+        tap(() => this.store.dispatch([
+          new ShowToast(MessageTypes.Success, 'Record has been approved'),
+          new Invoices.GetManualInvoices(null),
+        ])),
+        catchError((error: HttpErrorResponse) => this.store.dispatch(
+          new ShowToast(MessageTypes.Error, getAllErrors(error.error))
+        ))
       );
+  }
+
+  public rejectInvoice(invoiceId: number, rejectionReason: string): Observable<void> {
+    return this.invoicesApiService.changeInvoiceStatus({
+      organizationId: null,
+      reason: rejectionReason,
+      targetStatus: TimesheetTargetStatus.Rejected,
+      timesheetId: invoiceId,
+    }).pipe(
+      tap(() => this.store.dispatch([
+        new ShowToast(MessageTypes.Success, 'Record has been rejected'),
+        new Invoices.GetManualInvoices(null),
+      ])),
+      catchError((error: HttpErrorResponse) => this.store.dispatch(
+        new ShowToast(MessageTypes.Error, getAllErrors(error.error))
+      )),
+    );
   }
 }

@@ -250,22 +250,22 @@ export const RecordsTabConfig: TabConfig[] = [
   },
 ];
 
-export const approveTimesheetDialogData = {
-  title: 'Approve Timesheet',
+export const approveTimesheetDialogData = (timesheetOrMiles: boolean = true) => ({
+  title: `Approve ${timesheetOrMiles ? 'Timesheet' : 'Mileages'}`,
   submitButtonText: 'Approve',
-  confirmMessage: 'Are you sure you want to approve this timesheet?',
-  successMessage: 'Success. Timesheet Approved',
-};
+  confirmMessage: `Are you sure you want to approve this ${timesheetOrMiles ? 'timesheet' : 'mileages'}?`,
+  successMessage: `Success. ${timesheetOrMiles ? 'Timesheet' : 'Mileages'} Approved`,
+});
 
-export const rejectTimesheetDialogData = {
-  successMessage: 'Success. Timesheet Rejected',
-};
+export const rejectTimesheetDialogData = (timesheetOrMiles: boolean = true) => ({
+  successMessage: `Success. ${timesheetOrMiles ? 'Timesheet' : 'Mileages'} Rejected`,
+});
 
 export const rejectReasonMaxLength: number = 250;
 
-export const submitTimesheetDialogData = {
-  title: 'Submit Timesheet',
+export const submitTimesheetDialogData = (timesheetOrMiles: boolean = true) => ({
+  title: `Submit ${timesheetOrMiles ? 'Timesheet' : 'Mileages'}`,
   submitButtonText: 'Submit',
-  confirmMessage: 'Are you sure you want to submit this timesheet?',
-  successMessage: 'Success. Timesheet Submitted',
-};
+  confirmMessage: `Are you sure you want to submit this ${timesheetOrMiles ? 'timesheet' : 'mileages'}?`,
+  successMessage: `Success. ${timesheetOrMiles ? 'Timesheet' : 'Mileages'} Submitted`,
+});

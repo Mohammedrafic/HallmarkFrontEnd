@@ -31,8 +31,10 @@ export class AttachmentsListComponent implements AttachmentsListParams {
   }
 
   public preview(attachment: Attachment): void {
-    if (this.attachmentsListConfig?.preview) {
-      this.attachmentsListConfig.preview(attachment);
-    }
+    this.attachmentsListConfig?.preview?.(attachment);
+  }
+
+  public download(attachment: Attachment): void {
+    this.attachmentsListConfig?.download?.(attachment);
   }
 }

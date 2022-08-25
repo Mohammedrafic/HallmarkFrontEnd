@@ -49,6 +49,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   @Select(TimesheetsState.timesheets)
   readonly timesheets$: Observable<TimeSheetsPage>;
 
+  @Select(TimesheetsState.loading)
+  readonly loading$: Observable<boolean>;
+
   @Select(TimesheetsState.tabCounts)
   readonly tabCounts$: Observable<TabCountConfig>;
 

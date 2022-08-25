@@ -1,4 +1,4 @@
-import { formatCurrency, formatDate } from '@angular/common';
+import { DecimalPipe, formatCurrency, formatNumber, formatDate } from '@angular/common';
 
 export class GridValuesHelper {
   public static formatDate(value: string, pattern: string): string {
@@ -13,5 +13,13 @@ export class GridValuesHelper {
       return '';
     }
     return formatCurrency(Number(value), 'en', '$');
+  }
+
+  public static formatNumber(value: string | number, format?: string): string {
+    if (!Number(value)) {
+      return '';
+    }
+
+    return formatNumber(+value, 'en', format)?.toString()?.replace(',', '') || '';
   }
 }

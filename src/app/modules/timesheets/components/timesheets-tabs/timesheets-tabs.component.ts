@@ -13,6 +13,9 @@ export class TimesheetsTabsComponent {
   @Input()
   public tabConfig: TabsListConfig[];
 
+  @Input()
+  public isDisabled: boolean = false;
+
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
 

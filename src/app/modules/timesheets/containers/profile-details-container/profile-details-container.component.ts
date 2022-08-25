@@ -217,7 +217,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       )
       .subscribe(() => {
         this.store.dispatch([
-          new ShowToast(MessageTypes.Success, rejectTimesheetDialogData.successMessage),
+          new ShowToast(MessageTypes.Success, rejectTimesheetDialogData(this.isTimesheetOrMileagesUpdate).successMessage),
           new Timesheets.GetAll(),
         ]);
 
@@ -243,8 +243,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     (organizationId ?
       this.timesheetDetailsService.submitTimesheet(
         isTimesheetOrMileagesUpdate ? timesheetId : mileageTimesheetId,
-        organizationId) :
-      this.timesheetDetailsService.approveTimesheet(timesheetId)
+        organizationId, isTimesheetOrMileagesUpdate) :
+      this.timesheetDetailsService.approveTimesheet(timesheetId, isTimesheetOrMileagesUpdate)
     )
       .pipe(
         takeUntil(this.componentDestroy())

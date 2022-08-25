@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ICellRendererAngularComp } from '@ag-grid-community/angular';
-import { GridApi, ICellRendererParams, RowNode } from '@ag-grid-community/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { GridApi, IHeaderParams, RowNode } from '@ag-grid-community/core';
+import { IHeaderAngularComp } from '@ag-grid-community/angular';
 
 @Component({
   selector: 'app-toggle-row-expansion-header-cell',
@@ -8,19 +8,25 @@ import { GridApi, ICellRendererParams, RowNode } from '@ag-grid-community/core';
   styleUrls: ['./toggle-row-expansion-header-cell.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ToggleRowExpansionHeaderCellComponent implements ICellRendererAngularComp {
-  public params: ICellRendererParams | null = null;
+export class ToggleRowExpansionHeaderCellComponent implements IHeaderAngularComp {
+  public params: IHeaderParams | null = null;
   public expanded: boolean = false;
 
   private gridApi: GridApi;
 
-  public agInit(params: ICellRendererParams): void {
-    this.params = params;
-    this.expanded = this.checkIfAnyRowExpanded();
-    this.gridApi = params.api;
+  constructor(
+    private readonly cdr: ChangeDetectorRef,
+  ) {
   }
 
-  public refresh(params: ICellRendererParams): boolean {
+  public agInit(params: IHeaderParams): void {
+    this.params = params;
+    this.gridApi = params.api;
+
+    this.expanded = this.checkIfAnyRowExpanded();
+  }
+
+  public refresh(params: IHeaderParams): boolean {
     this.agInit(params);
 
     return true;
@@ -29,6 +35,7 @@ export class ToggleRowExpansionHeaderCellComponent implements ICellRendererAngul
   public toggleRowExpansion(): void {
     this.gridApi?.forEachNode( (node: RowNode) => node.expanded = !this.expanded);
     this.gridApi?.onGroupExpandedOrCollapsed();
+    this.cdr.markForCheck();
     this.expanded = this.checkIfAnyRowExpanded();
   }
 

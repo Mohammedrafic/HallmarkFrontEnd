@@ -4,14 +4,19 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import {
   AlignJustify, ChevronDown, ChevronRight, Lock, Menu, MessageSquare, MoreVertical, Package,
-  Percent, Sliders, Trash2, X } from 'angular-feather/icons';
+  Percent, Sliders, Trash2, X, AlertCircle, ChevronsDown } from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
-import { AutoCompleteAllModule, DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
+import {
+  AutoCompleteAllModule,
+  DropDownListModule,
+  ListBoxModule,
+  MultiSelectModule
+} from '@syncfusion/ej2-angular-dropdowns';
 import { NumericTextBoxModule, TextBoxAllModule, UploaderAllModule } from '@syncfusion/ej2-angular-inputs';
 import { NgxsModule, Store } from '@ngxs/store';
 import { FeatherModule } from 'angular-feather';
 import { TabModule } from '@syncfusion/ej2-angular-navigations';
-import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { DatePickerAllModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { AgGridModule } from '@ag-grid-community/angular';
@@ -29,14 +34,10 @@ import { APP_FILTERS_CONFIG } from '@core/constants/filters-helper.constant';
 import { AddDialogHelperService } from '@core/services';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { InvoicesContainerComponent } from './containers/invoices-container/invoices-container.component';
-import { InvoiceRecordsTableComponent } from './components/invoice-records-table/invoice-records-table.component';
 import { InvoicesRoutingModule } from './invoices-routing.module';
 import { InvoicesState } from './store/state/invoices.state';
 import { AddInvoiceService, InvoicesService } from './services';
-import { InvoicesTableComponent } from './components/invoices-table/invoices-table.component';
 import { InvoiceRecordDialogComponent } from './components/invoice-record-dialog/invoice-record-dialog.component';
-import { AllInvoicesTableComponent } from './components/all-invoices-table/all-invoices-table.component';
-import { AllInvoicesSubrowComponent } from './components/all-invoices-subrow/all-invoices-subrow.component';
 import {
   InvoiceDetailContainerComponent
 } from './containers/invoice-details-container/invoice-detail-container.component';
@@ -54,20 +55,27 @@ import { ManualInvoiceDialogComponent } from './components/manual-invoice-dialog
 import { InvoicesFiltersDialogComponent } from './components/invoices-filters-dialog/invoices-filters-dialog.component';
 import { InvoicesApiService } from './services/invoices-api.service';
 import { InvoicesTableTabsComponent } from './components/invoices-table-tabs/invoices-table-tabs.component';
-import { GridActionsCellComponent } from './components/grid-actions-cell/grid-actions-cell.component';
 import { InvoicesTableFiltersColumns } from './enums/invoices.enum';
 import { InvoiceTabs, OrganizationId } from './tokens';
 import { AGENCY_INVOICE_TABS, ORGANIZATION_INVOICE_TABS } from './constants';
 import { AppState } from '../../store/app.state';
 import { UserState } from '../../store/user.state';
+import {
+  RejectReasonInputDialogModule
+} from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.module';
+import { ManualInvoiceAttachmentsApiService } from './services/manual-invoice-attachments-api.service';
+import { FileViewerModule } from '@shared/modules/file-viewer/file-viewer.module';
+import { InvoicesContainerService } from './services/invoices-container/invoices-container.service';
+import { Router } from '@angular/router';
+import { AgencyInvoicesContainerService } from './services/invoices-container/agency-invoices-container.service';
+import {
+  OrganizationInvoicesContainerService
+} from './services/invoices-container/organization-invoices-container.service';
+import { A11yModule } from '@angular/cdk/a11y';
 
 @NgModule({
   declarations: [
     InvoicesContainerComponent,
-    InvoiceRecordsTableComponent,
-    InvoicesTableComponent,
-    AllInvoicesTableComponent,
-    AllInvoicesSubrowComponent,
     InvoiceRecordDialogComponent,
     InvoiceDetailContainerComponent,
     InvoiceDetailInvoiceInfoComponent,
@@ -77,7 +85,6 @@ import { UserState } from '../../store/user.state';
     ManualInvoiceDialogComponent,
     InvoicesFiltersDialogComponent,
     InvoicesTableTabsComponent,
-    GridActionsCellComponent,
   ],
   imports: [
     CommonModule,
@@ -85,7 +92,7 @@ import { UserState } from '../../store/user.state';
     DateWeekPickerModule,
     FeatherModule.pick({
       AlignJustify, Lock, Menu, MessageSquare, MoreVertical, Sliders, ChevronRight,
-      ChevronDown, X, Percent, Package, Trash2,
+      ChevronDown, X, Percent, Package, Trash2, AlertCircle, ChevronsDown,
     }),
     TabModule,
     DropDownButtonModule,
@@ -110,6 +117,11 @@ import { UserState } from '../../store/user.state';
     MultiSelectModule,
     FileUploaderModule,
     TooltipModule,
+    RejectReasonInputDialogModule,
+    FileViewerModule,
+    SplitButtonModule,
+    ListBoxModule,
+    A11yModule,
   ],
   providers: [
     InvoicesService,
@@ -117,6 +129,7 @@ import { UserState } from '../../store/user.state';
     ChipsCssClass,
     AddInvoiceService,
     FiltersDialogHelper,
+    ManualInvoiceAttachmentsApiService,
     {
       provide: AddDialogHelperService,
       useClass: AddInvoiceService,
@@ -145,6 +158,12 @@ import { UserState } from '../../store/user.state';
       ),
       deps: [Store]
     },
+    {
+      provide: InvoicesContainerService,
+      useFactory: (router: Router, store: Store) =>
+        router.url.includes('agency') ? new AgencyInvoicesContainerService(store) : new OrganizationInvoicesContainerService(store),
+      deps: [Router, Store],
+    }
   ]
 })
 export class InvoicesModule { }
