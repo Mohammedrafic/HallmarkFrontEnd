@@ -237,6 +237,10 @@ ejs-grid.e-control.e-grid {
           pointer-events: none;
           background-color: transparent;
           color: $supportive-red-40;
+
+          app-custom-icon.icon.supportive-green-10 {
+            color: $supportive-green-40;
+          }
         }
       }
 

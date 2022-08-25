@@ -105,10 +105,11 @@
               ejs-button
               cssClass="e-flat secondary-icon-button"
               [disabled]="disabledLock(data.status) || data?.extensionFromId"
-              (click)="lockOrder(data)"
+              (click)="lockOrder(data); $event.stopPropagation();"
               *ngIf="isLockMenuButtonsShown"
             >
-              <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
+              <span *ngIf="data.isLocked"><i-feather name="lock" class="icon"></i-feather></span>
+              <span *ngIf="!data.isLocked"><app-custom-icon name="unlock" class="icon supportive-green-10"></app-custom-icon></span>
             </button>
             <button
               (click)="$event.stopPropagation()"
