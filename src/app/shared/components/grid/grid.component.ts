@@ -62,6 +62,8 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Output() public approveEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
   @Output() public exportEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
   @Output() public sortChanged: EventEmitter<string> = new EventEmitter<string>();
+  @Output() public multiSelectionChanged: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
+
 
   public readonly defaultColumnDefinition: ColumnDefinitionModel = { minWidth: 100, resizable: true };
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
@@ -92,6 +94,7 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
 
   public handleMultiSelectionChanged(event: SelectionChangedEvent): void {
     this.selectedTableRows = event.api.getSelectedNodes();
+    this.multiSelectionChanged.emit(this.selectedTableRows);
   }
 
   public handleSortChanged(event: SortChangedEvent): void {

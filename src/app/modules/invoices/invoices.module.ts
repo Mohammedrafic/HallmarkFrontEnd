@@ -4,7 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import {
   AlignJustify, ChevronDown, ChevronRight, Lock, Menu, MessageSquare, MoreVertical, Package,
-  Percent, Sliders, Trash2, X, AlertCircle, ChevronsDown } from 'angular-feather/icons';
+  Percent, Sliders, Trash2, X, AlertCircle, ChevronsDown, Printer } from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import {
   AutoCompleteAllModule,
@@ -36,7 +36,7 @@ import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organizati
 import { InvoicesContainerComponent } from './containers/invoices-container/invoices-container.component';
 import { InvoicesRoutingModule } from './invoices-routing.module';
 import { InvoicesState } from './store/state/invoices.state';
-import { AddInvoiceService, InvoicesService } from './services';
+import { AddInvoiceService, InvoicePrintingService, InvoicesService } from './services';
 import { InvoiceRecordDialogComponent } from './components/invoice-record-dialog/invoice-record-dialog.component';
 import {
   InvoiceDetailContainerComponent
@@ -92,7 +92,7 @@ import { A11yModule } from '@angular/cdk/a11y';
     DateWeekPickerModule,
     FeatherModule.pick({
       AlignJustify, Lock, Menu, MessageSquare, MoreVertical, Sliders, ChevronRight,
-      ChevronDown, X, Percent, Package, Trash2, AlertCircle, ChevronsDown,
+      ChevronDown, X, Percent, Package, Trash2, AlertCircle, ChevronsDown, Printer,
     }),
     TabModule,
     DropDownButtonModule,
@@ -130,6 +130,7 @@ import { A11yModule } from '@angular/cdk/a11y';
     AddInvoiceService,
     FiltersDialogHelper,
     ManualInvoiceAttachmentsApiService,
+    InvoicePrintingService,
     {
       provide: AddDialogHelperService,
       useClass: AddInvoiceService,

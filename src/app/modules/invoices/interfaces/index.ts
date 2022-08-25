@@ -8,3 +8,4 @@ export * from './base-invoice.interface';
 export * from './group-invoices-params.interface';
 export * from './dropdown-select-event-args.interface';
 export * from './get-pending-approval-params.interface';
+export * from './printing.interface';

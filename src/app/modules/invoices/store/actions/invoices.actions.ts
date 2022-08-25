@@ -3,7 +3,8 @@ import {
   GroupInvoicesParams,
   InvoicesFilterState,
   ManualInvoice,
-  ManualInvoicePostDto
+  ManualInvoicePostDto,
+  PrintingPostDto
 } from '../../interfaces';
 import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums/invoices.enum';
 import { DialogAction } from '@core/enums';
@@ -226,5 +227,11 @@ export namespace Invoices {
       public readonly payload: PendingApprovalInvoice,
     ) {
     }
+  }
+
+  export class GetPrintData {
+    static readonly type = INVOICES_ACTIONS.GetPrintingData;
+
+    constructor (public readonly body: PrintingPostDto) {}
   }
 }

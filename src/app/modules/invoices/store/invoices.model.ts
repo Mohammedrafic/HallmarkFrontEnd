@@ -7,7 +7,8 @@ import {
   InvoicesFilterState,
   ManualInvoiceMeta,
   ManualInvoiceReason,
-  ManualInvoicesData
+  ManualInvoicesData,
+  PrintInvoiceData
 } from '../interfaces';
 import { OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
@@ -32,4 +33,5 @@ export interface InvoicesModel {
   organizationLocations: OrganizationLocation[];
   selectedOrganizationId: number;
   regions: OrganizationRegion[];
+  printData: PrintInvoiceData[];
 }

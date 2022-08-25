@@ -13,7 +13,7 @@ import {
   InvoicesFilterState,
   ManualInvoiceMeta,
   ManualInvoicePostDto,
-  ManualInvoiceReason, ManualInvoicesData, ManualInvoiceTimesheetResponse
+  ManualInvoiceReason, ManualInvoicesData, ManualInvoiceTimesheetResponse, PrintingPostDto, PrintInvoiceData
 } from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
@@ -116,6 +116,10 @@ export class InvoicesApiService {
   public approvePendingApproveInvoice(data: PendingApprovalInvoice): Observable<null> {
     // TODO: Change to API when its ready
     return of(null);
+  }
+
+  public getPrintData(body: PrintingPostDto): Observable<PrintInvoiceData[]> {
+    return this.http.post<PrintInvoiceData[]>('/api/Invoices/printing', body);
   }
 
   private organizationDeleteManualInvoice(id: number): Observable<void> {

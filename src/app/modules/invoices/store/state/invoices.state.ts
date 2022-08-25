@@ -19,7 +19,7 @@ import {
   InvoicesFilteringOptions,
   InvoicesFilterState,
   ManualInvoiceMeta,
-  ManualInvoiceReason, ManualInvoicesData
+  ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData
 } from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
 import { FilteringOptionsFields } from '../../../timesheets/enums';
@@ -471,5 +471,20 @@ export class InvoicesState {
           new ShowToast(MessageTypes.Error, getAllErrors(error))
         ))
       );
+  }
+
+  @Action(Invoices.GetPrintData)
+  GetPrintingData(
+    { patchState } : StateContext<InvoicesModel>,
+    { body }: Invoices.GetPrintData,
+  ): Observable<PrintInvoiceData[] | void> {
+    return this.invoicesAPIService.getPrintData(body)
+    .pipe(
+      tap((res) => {
+        patchState({
+          printData: res,
+        });
+      })
+    )
   }
 }
