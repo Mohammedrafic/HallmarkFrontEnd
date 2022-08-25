@@ -71,6 +71,9 @@ import { SettingsKeys } from '@shared/enums/settings';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { GetOrderRequisitionByPage } from '@organization-management/store/reject-reason.actions';
+import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
+import { ORDER_JOB_DISTRIBUTION_LIST } from '@shared/constants/order-job-distribution-list';
+import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 
 @Component({
   selector: 'app-order-details-form',
@@ -135,25 +138,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public orderTypesDataSource: { id: number, name: string }[];
   public orderTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public durations = [
-    { id: Duration.TwelveWeeks, name: '12 Weeks' },
-    { id: Duration.ThirteenWeeks, name: '13 Weeks' },
-    { id: Duration.TwentySixWeeks, name: '26 Weeks' },
-    { id: Duration.Month, name: 'Month' },
-    { id: Duration.Year, name: 'Year' },
-    { id: Duration.NinetyDays, name: '90 Days' },
-    { id: Duration.Other, name: 'Other' },
-  ];
+  public durations = ORDER_DURATION_LIST;
   public durationFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public jobDistributions = [
-    { id: JobDistribution.All, name: 'All' },
-    { id: JobDistribution.Internal, name: 'Internal' },
-    { id: JobDistribution.ExternalTier1, name: 'External Tier 1' },
-    { id: JobDistribution.ExternalTier2, name: 'External Tier 2' },
-    { id: JobDistribution.ExternalTier3, name: 'External Tier 3' },
-    { id: JobDistribution.Selected, name: 'Selected' },
-  ];
+  public jobDistributions = ORDER_JOB_DISTRIBUTION_LIST;
   public jobDistributionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public jobClassifications = [
@@ -165,12 +153,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     { id: JobClassification.Volunteers, name: 'Volunteers' },
   ];
 
-  public masterShiftNames = [
-    { id: MasterShiftName.Day, name: 'Day' },
-    { id: MasterShiftName.Evening, name: 'Evening' },
-    { id: MasterShiftName.Night, name: 'Night' },
-    { id: MasterShiftName.Rotating, name: 'Rotating' },
-  ];
+  public masterShiftNames = ORDER_MASTER_SHIFT_NAME_LIST;
 
   public masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
 

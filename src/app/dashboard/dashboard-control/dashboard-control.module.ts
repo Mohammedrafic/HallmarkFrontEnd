@@ -9,8 +9,8 @@ import { DashboardControlComponent } from './dashboard-control.component';
 import { SharedModule } from '@shared/shared.module';
 import { FilterChipListModule } from './filter-chip-list/filter-chip-list.module';
 import { WidgetFilterModule } from './widget-filter/widget-filter.module';
-import { WidgetListModule } from './widget-list/widget-list.module';
 import { QuickOrderModule } from './quick-order/quick-order.module';
+import { WidgetListModule } from './widget-list/widget-list.module';
 
 
 @NgModule({

@@ -298,7 +298,7 @@ export class RemoveCredentialSkillGroup {
 
 export class GetOrganizationSettings {
   static readonly type = '[organizationManagement] Get Organization Settings';
-  constructor(public filters?: OrganizationSettingFilter) {}
+  constructor(public filters?: OrganizationSettingFilter, public lastSelectedBusinessUnitId?: number) {}
 }
 
 export class SaveOrganizationSettings {

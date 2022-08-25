@@ -102,7 +102,7 @@ export class RemoveOrderRequisition {
 
 export class GetOrderRequisitionByPage {
   static readonly type = '[reject reason] Get Order Requisition by Page';
-  constructor(public pageNumber?: number, public pageSize?: number, public orderBy?: string) { }
+  constructor(public pageNumber?: number, public pageSize?: number, public orderBy?: string, public lastSelectedBusinessUnitId?: number) { }
 }
 
 export class SaveOrderRequisition {
