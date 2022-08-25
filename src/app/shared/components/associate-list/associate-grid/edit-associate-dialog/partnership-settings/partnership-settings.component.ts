@@ -26,6 +26,12 @@ import { Router } from '@angular/router';
 })
 export class PartnershipSettingsComponent extends DestroyableDirective implements OnInit {
   @Input() partnershipForm: FormGroup;
+  @Input() set activeTab(tab: number) {
+    if (tab === 1) {
+      this.partnershipForm.reset();
+      this.partnershipForm.patchValue({ ...this.partnershipSettings });
+    }
+  }
 
   @Select(AssociateListState.partnershipSettings)
   public partnershipSettings$: Observable<PartnershipSettings>;
@@ -52,6 +58,8 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
     const isAgency = this.router.url.includes('agency');
     return `${isAgency ? 'Organization' : 'Agency'} Category`;
   }
+
+  private partnershipSettings: PartnershipSettings;
 
   constructor(private router: Router) {
     super();
@@ -85,9 +93,10 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
   }
 
   private subscribeOnPartnershipSettings(): void {
-    this.partnershipSettings$.pipe(takeUntil(this.destroy$)).subscribe((value: PartnershipSettings) => {
+    this.partnershipSettings$.pipe(takeUntil(this.destroy$)).subscribe((settings: PartnershipSettings) => {
+      this.partnershipSettings = settings;
       this.partnershipForm.reset();
-      this.partnershipForm.patchValue({ ...value });
+      this.partnershipForm.patchValue({ ...settings });
     });
   }
 }

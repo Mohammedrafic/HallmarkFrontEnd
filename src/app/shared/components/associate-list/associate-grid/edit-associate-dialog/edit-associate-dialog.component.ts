@@ -48,6 +48,7 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
   public feeSettingsForm: FormGroup;
   public partnershipForm: FormGroup;
   public firstActive = true;
+  public activeTab: number = 0;
 
   private isAlive = true;
 
@@ -119,7 +120,8 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  public onTabSelecting(): void {
+  public onTabSelecting(tab: { selectingIndex: number }): void {
+    this.activeTab = tab.selectingIndex;
     this.firstActive = false;
   }
 
