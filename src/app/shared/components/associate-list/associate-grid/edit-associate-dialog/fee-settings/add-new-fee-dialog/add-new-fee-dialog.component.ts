@@ -119,7 +119,7 @@ export class AddNewFeeDialogComponent extends DestroyableDirective implements On
       regionIds: new FormControl([], [Validators.required]),
       classifications: new FormControl([], [Validators.required]),
       masterSkillIds: new FormControl([], [Validators.required]),
-      fee: new FormControl(null),
+      fee: new FormControl(null, [Validators.required]),
     });
   }
 
