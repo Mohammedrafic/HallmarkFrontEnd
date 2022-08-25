@@ -11,7 +11,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 
 import { ChangeEventArgs, FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { combineLatest, debounceTime, filter, Observable, of, Subject, takeUntil } from 'rxjs';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { OrderType } from '@shared/enums/order-type';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
@@ -165,7 +165,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     private readonly fb: FormBuilder,
     private readonly cdr: ChangeDetectorRef,
     private readonly store: Store,
-    private readonly orderManagementService: OrderManagementContentService
+    private readonly orderManagementService: OrderManagementContentService,
+    private readonly actions$: Actions
   ) {
     super();
     this.initOrganizationForm();
@@ -626,12 +627,14 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   private subscribeForSettings(): void {
     this.organizationSettings$.pipe(takeUntil(this.destroy$)).subscribe((settings) => {
-      const projectFields = ['projectTypeId', 'projectNameId', 'poNumberId']
+      const projectFields = ['projectTypeId', 'projectNameId', 'poNumberId'];
       this.settings = SettingsHelper.mapSettings(settings);
       this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
       if (this.specialProjectForm != null) {
         if (this.isSpecialProjectFieldsRequired) {
-          projectFields.forEach((control) => this.specialProjectForm.controls[control].setValidators(Validators.required))
+          projectFields.forEach((control) =>
+            this.specialProjectForm.controls[control].setValidators(Validators.required)
+          );
         } else {
           projectFields.forEach((control) => this.specialProjectForm.controls[control].clearValidators());
         }
@@ -658,9 +661,11 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         ...this.generalInformationForm.getRawValue(),
         ...this.specialProjectForm.getRawValue(),
       };
-      const selectedBusinessUnitId = this.organizationForm.value.organization
-      this.store.dispatch(new SaveOrder(order, [], undefined, selectedBusinessUnitId ));
-
+      const selectedBusinessUnitId = this.organizationForm.value.organization;
+      this.store.dispatch(new SaveOrder(order, [], undefined, selectedBusinessUnitId));
+      this.actions$.pipe(takeUntil(this.destroy$), ofActionSuccessful(SaveOrder)).subscribe(() => {
+        this.openEvent.next(false);
+      });
     } else {
       this.cdr.markForCheck();
       this.organizationForm.markAllAsTouched();
