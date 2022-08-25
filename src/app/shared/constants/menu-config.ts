@@ -182,17 +182,17 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/page-report',
     },
-    60: {
+    45: {
       // Alerts
       icon: 'alert-circle',
       route: '/alerts/user-subscription',
     },
-    61: {
+    46: {
       // User Subscription
       icon: '',
       route: '/alerts/user-subscription',
     },
-    62: {
+    47: {
       // Alerts Template
       icon: '',
       route: '/alerts/alerts-template',
@@ -352,6 +352,21 @@ export const MENU_CONFIG: any = {
       // Page Report
       icon: '',
       route: '/analytics/page-report',
+    },
+    45: {
+      // Alerts
+      icon: 'alert-circle',
+      route: '/alerts/user-subscription',
+    },
+    46: {
+      // User Subscription
+      icon: '',
+      route: '/alerts/user-subscription',
+    },
+    47: {
+      // Alerts Template
+      icon: '',
+      route: '/alerts/alerts-template',
     },
   },
 
@@ -520,6 +535,21 @@ export const MENU_CONFIG: any = {
       icon: 'user',
       route: '/admin/profile',
     },
+    45: {
+      // Alerts
+      icon: 'alert-circle',
+      route: '/alerts/user-subscription',
+    },
+    46: {
+      // User Subscription
+      icon: '',
+      route: '/alerts/user-subscription',
+    },
+    47: {
+      // Alerts Template
+      icon: '',
+      route: '/alerts/alerts-template',
+    },
   },
 
   [BusinessUnitType.Agency]: {
@@ -686,6 +716,21 @@ export const MENU_CONFIG: any = {
       // Page Report
       icon: '',
       route: '/analytics/page-report',
+    },
+    45: {
+      // Alerts
+      icon: 'alert-circle',
+      route: '/alerts/user-subscription',
+    },
+    46: {
+      // User Subscription
+      icon: '',
+      route: '/alerts/user-subscription',
+    },
+    47: {
+      // Alerts Template
+      icon: '',
+      route: '/alerts/alerts-template',
     },
   },
 };
