@@ -935,12 +935,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private onOrganizationChangedHandler(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$), debounceTime(400)).subscribe(() => {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.getSettings();
       if (!this.isRedirectedFromDashboard) {
         this.clearFilters();
       }
-      if (!this.previousSelectedOrderId && !this.isRedirectedFromToast) {
+      if (!this.previousSelectedOrderId) {
         this.pageSubject.next(1);
       }
       this.store.dispatch(new GetAllOrganizationSkills());
