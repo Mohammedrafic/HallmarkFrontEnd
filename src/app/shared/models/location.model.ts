@@ -62,7 +62,6 @@ export class LocationType{
 }
 
 export class TimeZoneModel {
-  SystemTimeZoneId: string;
   SystemTimeZoneName: string;
   TimeZoneId: string;
 }
