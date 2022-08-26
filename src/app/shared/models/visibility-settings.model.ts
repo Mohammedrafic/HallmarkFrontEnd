@@ -32,7 +32,8 @@ export type Organisation = {
 export type Department = {
   id: number;
   name: string;
-  locationName?: string
+  locationName?: string;
+  organizationId: number;
 }
 
 export type Location = {

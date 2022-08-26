@@ -9,7 +9,7 @@ import {
 import { DistributionLevels, PartnershipStatus } from '@shared/enums/partnership-settings';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
-import { combineLatest, filter, Observable, Subject, takeWhile } from 'rxjs';
+import { combineLatest, debounceTime, filter, Observable, Subject, takeWhile } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import {
@@ -33,7 +33,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
   @ViewChild('grid') grid: GridComponent;
 
   @Select(AssociateListState.associateListPage)
-  public readonly associateListPage$: Observable<AssociateOrganizationsAgencyPage>;
+  public associateListPage$: Observable<AssociateOrganizationsAgencyPage>;
   @Select(UserState.lastSelectedAgencyId)
   private lastSelectedAgencyId$: Observable<number>;
   @Select(UserState.lastSelectedOrganizationId)
@@ -55,6 +55,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
   public openEditDialog = new EventEmitter<AssociateOrganizationsAgency>();
 
   private isAlive = true;
+  private pageSubject = new Subject<number>();
 
   constructor(private confirmService: ConfirmService, private store: Store, private actions$: Actions) {
     super();
@@ -64,6 +65,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
     this.subscribeOnAssociateOrgAgencyDialogEvent();
     this.subscribeOnUpdatePage();
     this.subscribeOnBusinessUnitChange();
+    this.subscribeOnPageChanges();
   }
 
   ngOnDestroy(): void {
@@ -95,14 +97,16 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
   }
 
   public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
-    this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
-    this.dispatchNewPage();
+    if (this.pageSize !== parseInt(this.activeRowsPerPageDropDown)) {
+      this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+      this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
+      this.dispatchNewPage();
+    }
   }
 
   public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.dispatchNewPage();
+    if ((event.currentPage && event.currentPage !== this.currentPage) || event.value) {
+      this.pageSubject.next(event.currentPage || event.value);
     }
   }
 
@@ -134,5 +138,12 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
         this.store.dispatch(new GetAssociateAgencyOrg());
         this.dispatchNewPage();
       });
+  }
+
+  private subscribeOnPageChanges(): void {
+    this.pageSubject.pipe(debounceTime(1)).subscribe((page: number) => {
+      this.currentPage = page;
+      this.dispatchNewPage();
+    });
   }
 }

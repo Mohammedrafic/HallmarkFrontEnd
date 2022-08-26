@@ -307,8 +307,8 @@ export class OrderManagementState {
     { payload }: UpdateAgencyCandidateJob
   ): Observable<any> {
     return this.orderManagementContentService.updateCandidateJob(payload).pipe(
-      tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
+      tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'))),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Candidate cannot be updated'))))
     );
   }
 

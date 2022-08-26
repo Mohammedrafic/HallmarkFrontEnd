@@ -301,6 +301,7 @@ export class Order {
   orderClosureReason?: string;
   orderClosureReasonId?: string;
   isTemplate?: boolean;
+  isQuickOrder?: boolean;
   organizationPrefix?: string;
   orderPlacementFee?: number;
   annualSalaryRangeFrom?: number;
@@ -372,6 +373,8 @@ export type AcceptJobDTO = {
   billRates?: BillRate[];
   offeredStartDate?: string;
   skillName?: string;
+  expAsTravelers?: number;
+  availableStartDate?: string;
 };
 
 export type CandidateProfile = {
@@ -431,6 +434,7 @@ export type OrderCandidateJob = {
   positionClosureReason?: string;
   positionClosureReasonId?: number;
   commentContainerId?: number;
+  reOrderDate?: string;
 };
 
 export type CandidatesBasicInfo = {

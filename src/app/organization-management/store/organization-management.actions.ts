@@ -3,8 +3,8 @@ import { Organization } from "src/app/shared/models/organization.model";
 import { SkillCategory } from "src/app/shared/models/skill-category.model";
 import { Skill, SkillFilters } from "src/app/shared/models/skill.model";
 import { Department, DepartmentFilter } from '@shared/models/department.model';
-import { Location, LocationFilter } from '@shared/models/location.model';
 import { Region, regionFilter } from '@shared/models/region.model';
+import { Location, LocationFilter, LocationType } from '@shared/models/location.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialFilter } from '@shared/models/credential.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
@@ -298,7 +298,7 @@ export class RemoveCredentialSkillGroup {
 
 export class GetOrganizationSettings {
   static readonly type = '[organizationManagement] Get Organization Settings';
-  constructor(public filters?: OrganizationSettingFilter) {}
+  constructor(public filters?: OrganizationSettingFilter, public lastSelectedBusinessUnitId?: number) {}
 }
 
 export class SaveOrganizationSettings {
@@ -363,4 +363,15 @@ export class GetDepartmentFilterOptions {
 export class GetOrganizationSettingsFilterOptions {
   static readonly type = '[organizationManagement] Get Organization Settings Filter Options';
   constructor() { }
+}
+
+export class GetLocationTypes
+{
+  static readonly type ='[organizationManagement] Get Location Types'
+  constructor() {}
+}
+export class GetUSCanadaTimeZoneIds
+{
+  static readonly type ='[organizationManagement] Get US Canada TimeZoneIds'
+  constructor() {}
 }

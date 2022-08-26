@@ -247,9 +247,9 @@ export class SecurityState {
   @Action(GetUsersPage)
   GetUsersPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitId, businessUnitType, pageNumber, pageSize, sortModel, filterModel }: GetUsersPage
+    { businessUnitIds, businessUnitType, pageNumber, pageSize, sortModel, filterModel }: GetUsersPage
   ): Observable<UsersPage> {
-    return this.userService.getUsersPage(businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel).pipe(
+    return this.userService.getUsersPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel).pipe(
       tap((payload) => {
         patchState({ usersPage: payload });
         return payload;

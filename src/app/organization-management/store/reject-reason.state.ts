@@ -271,11 +271,11 @@ export class RejectReasonState {
   @Action(GetOrderRequisitionByPage)
   GetOrderRequisitionByPage(
     { patchState }: StateContext<RejectReasonStateModel>,
-    { pageNumber, pageSize, orderBy }: GetOrderRequisitionByPage
+    { pageNumber, pageSize, orderBy, lastSelectedBusinessUnitId }: GetOrderRequisitionByPage
   ): Observable<RejectReasonPage> {
     patchState({ isReasonLoading: true });
 
-    return this.rejectReasonService.getOrderRequisitionsByPage(pageNumber, pageSize, orderBy).pipe(
+    return this.rejectReasonService.getOrderRequisitionsByPage(pageNumber, pageSize, orderBy, lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
         patchState({orderRequisition: payload});
         return payload;

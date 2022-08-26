@@ -323,10 +323,20 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: 'security/user-list',
     },
+    34: {
+      // Candidates
+      icon: 'file-text',
+      route: 'agency/candidates',
+    },
     35: {
       // Candidate Details
       icon: 'users',
       route: 'agency/candidate-details',
+    },
+    36: {
+      // Candidates
+      icon: 'file-text',
+      route: 'client/candidates',
     },
     37: {
       // Candidate Details

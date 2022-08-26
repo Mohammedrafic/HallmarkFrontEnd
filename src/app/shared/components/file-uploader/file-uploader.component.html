@@ -4,13 +4,13 @@
   </div>
   <ejs-uploader
     #fileUploader
-    [class.hide-selected-files]="!showSelectedFiles"
     [dropArea]="droparea"
     [allowedExtensions]="allowedFileExtensions"
     [maxFileSize]="maxFileSize"
     [multiple]="true"
     [autoUpload]="false"
-    [showFileList]="true"
+    [files]="existingFiles"
+    [showFileList]="showSelectedFiles"
     (selected)="filesSelected($event)"
     (removing)="removeFile($event)"
   ></ejs-uploader>

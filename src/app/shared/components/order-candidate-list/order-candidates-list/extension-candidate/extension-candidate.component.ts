@@ -5,6 +5,7 @@ import { EMPTY, Observable, Subject } from 'rxjs';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Actions, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
   ApplicantStatus,
   Order,
@@ -27,6 +28,10 @@ import { map } from 'rxjs/operators';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { Router } from '@angular/router';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
+import {
+  ReloadOrganisationOrderCandidatesLists,
+  UpdateOrganisationCandidateJob,
+} from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-extension-candidate',
@@ -41,11 +46,14 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   @Select(OrderManagementState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
 
+  @Select(OrderManagementContentState.orderCandidatePage)
+  public clientOrderCandidatePage$: Observable<OrderCandidatesListPage>;
+
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
 
-  form: FormGroup;
-
+  public form: FormGroup;
+  public statusesFormControl = new FormControl();
   public candidateJob: OrderCandidateJob;
   public candidatStatus = CandidatStatus;
   public workflowStepType = WorkflowStepType;
@@ -58,18 +66,22 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   public applicantStatuses: ApplicantStatus[] = [
     { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
   ];
+  public isAgency: boolean = false;
 
   private unsubscribe$: Subject<void> = new Subject();
 
   public comments: Comment[] = [];
-  isAgency: boolean = false;
 
   get isAccepted(): boolean {
     return this.candidateJob?.applicantStatus?.applicantStatus === this.candidatStatus.Accepted;
   }
 
+  get isOnBoard(): boolean {
+    return this.candidateJob?.applicantStatus?.applicantStatus === this.candidatStatus.OnBoard;
+  }
+
   get canAccept(): boolean {
-    return this.candidateJob && this.isAgency && !this.isAccepted;
+    return this.candidateJob && this.isAgency && !this.isAccepted && !this.isOnBoard;
   }
 
   constructor(
@@ -86,12 +98,57 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subsToCandidate();
     this.createForm();
-    this.form.disable();
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public updateOrganizationCandidateJobWithBillRate(bill: BillRate): void {
+    this.form.markAllAsTouched();
+    if (!this.form.errors && this.candidateJob) {
+      const value = this.form.getRawValue();
+      this.store.dispatch(
+        new UpdateOrganisationCandidateJob({
+          organizationId: this.candidateJob.organizationId,
+          orderId: this.candidateJob.orderId,
+          jobId: this.candidateJob.jobId,
+          skillName: value.skillName,
+          offeredBillRate: this.candidateJob?.offeredBillRate,
+          candidateBillRate: this.candidateJob.candidateBillRate,
+          nextApplicantStatus: {
+            applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
+            statusText: this.candidateJob.applicantStatus.statusText,
+          },
+          billRates: this.getBillRateForUpdate(bill),
+        })
+      );
+    }
+  }
+
+  private getBillRateForUpdate(value: BillRate): BillRate[] {
+    let billRates;
+    const existingBillRateIndex = this.candidateJob.billRates.findIndex((billRate) => billRate.id === value.id);
+    if (existingBillRateIndex > -1) {
+      this.candidateJob.billRates.splice(existingBillRateIndex, 1, value);
+      billRates = this.candidateJob?.billRates;
+    } else {
+      if (typeof value === 'number') {
+        this.candidateJob?.billRates.splice(value, 1);
+        billRates = this.candidateJob?.billRates;
+      } else {
+        billRates = [...(this.candidateJob?.billRates as BillRate[]), value];
+      }
+    }
+
+    return billRates;
+  }
+
+  public updatedUnsavedOnboarded(): void {
+    if (this.isOnBoard) {
+      this.updateAgencyCandidateJob(this.candidateJob.applicantStatus);
+    }
   }
 
   public onReject(): void {
@@ -103,19 +160,46 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
   }
 
-  public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatusEnum; statusText: string } }): void {
-    if (event.itemData?.applicantStatus === ApplicantStatusEnum.Accepted) {
-      this.onAccept();
+  public onDropDownChanged(event: { itemData: ApplicantStatus }): void {
+    switch (event.itemData.applicantStatus) {
+      case ApplicantStatusEnum.Accepted:
+        this.onAccept()
+        break;
+      case ApplicantStatusEnum.Rejected:
+        this.onReject();
+        break;
+      case ApplicantStatusEnum.OnBoarded:
+        this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' });
+        break;
+
+      default:
+        break;
     }
   }
 
+  private setAllowedStatuses(candidate: OrderCandidatesList): void {
+    this.applicantStatuses =
+      candidate.status === ApplicantStatusEnum.Accepted
+        ? [
+            { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
+            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
+          ]
+        : [{ applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' }];
+  }
+
   private subsToCandidate(): void {
-    this.candidate$ = this.orderCandidatePage$.pipe(
+    const state$ = this.isAgency ? this.orderCandidatePage$ : this.clientOrderCandidatePage$;
+    this.candidate$ = state$.pipe(
       map((res) => {
         const items = res?.items || this.candidateOrder?.items;
-        const candidate = items?.find((candidate) => candidate.candidateJobId) as OrderCandidatesList;
+        const candidate = items?.find((candidate) => candidate.candidateJobId);
         if (candidate) {
+          this.statusesFormControl.reset();
+          this.createForm();
           this.patchForm(candidate.candidateJobId);
+          if (!this.isAgency) {
+            this.setAllowedStatuses(candidate);
+          }
           this.store.dispatch(
             new GetCandidateJob(this.currentOrder.organizationId as number, candidate?.candidateJobId as number)
           );
@@ -129,36 +213,45 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
 
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
+    const updatedValue = {
+      organizationId: this.candidateJob.organizationId,
+      jobId: this.candidateJob.jobId,
+      orderId: this.candidateJob.orderId,
+      nextApplicantStatus: applicantStatus,
+      candidateBillRate: this.candidateJob.candidateBillRate,
+      offeredBillRate: value.offeredBillRate,
+      requestComment: value.comments,
+      actualStartDate: new Date(value.actualStartDate).toISOString(),
+      actualEndDate: new Date(value.actualEndDate).toISOString(),
+      allowDeployWoCredentials: value.allowDeployCredentials,
+      billRates: this.billRatesData,
+      guaranteedWorkWeek: value.guaranteedWorkWeek,
+      clockId: value.clockId,
+    };
     this.store
       .dispatch(
-        new UpdateAgencyCandidateJob({
-          organizationId: this.candidateJob.organizationId,
-          jobId: this.candidateJob.jobId,
-          orderId: this.candidateJob.orderId,
-          nextApplicantStatus: applicantStatus,
-          candidateBillRate: this.candidateJob.candidateBillRate,
-          offeredBillRate: value.offeredBillRate,
-          requestComment: value.comments,
-          actualStartDate: '2022-08-23T16:05:23+00:00',
-          actualEndDate: this.candidateJob.actualEndDate,
-          allowDeployWoCredentials: false,
-          billRates: this.billRatesData,
-        })
+        this.isAgency ? new UpdateAgencyCandidateJob(updatedValue) : new UpdateOrganisationCandidateJob(updatedValue)
       )
       .subscribe(() => {
-        this.store.dispatch(new ReloadOrderCandidatesLists());
+        this.store.dispatch(this.isAgency ? new ReloadOrderCandidatesLists() : new ReloadOrganisationOrderCandidatesLists());
       });
   }
 
   private createForm(): void {
     this.form = new FormGroup({
-      jobId: new FormControl(''),
-      locationName: new FormControl(''),
+      jobId: new FormControl({ value: '', disabled: true }),
+      locationName: new FormControl({ value: '', disabled: true }),
       offeredBillRate: new FormControl(''),
       comments: new FormControl(''),
       actualStartDate: new FormControl(''),
       actualEndDate: new FormControl(''),
+      extensionStartDate: new FormControl({ value: '', disabled: true }),
+      extensionEndDate: new FormControl({ value: '', disabled: true }),
+      guaranteedWorkWeek: new FormControl(''),
+      clockId: new FormControl(''),
+      allowDeployCredentials: new FormControl(false),
     });
+    this.form.disable();
   }
 
   private getDateString(date: string): string | null {
@@ -187,14 +280,28 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
             locationName: this.candidateJob.order?.locationName,
             actualStartDate: this.getDateString(this.candidateJob.actualStartDate),
             actualEndDate: this.getDateString(this.candidateJob.actualEndDate),
+            extensionStartDate: this.getDateString(this.candidateJob.actualStartDate),
+            extensionEndDate: this.getDateString(this.candidateJob.actualEndDate),
             offeredBillRate: PriceUtils.formatNumbers(this.candidateJob.offeredBillRate),
             comments: this.candidateJob.requestComment,
+            guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
+            clockId: this.candidateJob.clockId,
+            allowDeployCredentials: this.candidateJob.allowDeployCredentials,
           });
           this.isAgency ? this.form.get('comments')?.enable() : this.form.get('offeredBillRate')?.enable();
-          if (this.isAccepted) {
-            this.form.get('comments')?.disable();
+          if (this.isAccepted && !this.isAgency) {
+            this.form.get('guaranteedWorkWeek')?.enable();
+            this.form.get('clockId')?.enable();
+            this.form.get('actualStartDate')?.enable();
+            this.form.get('actualEndDate')?.enable();
+          }
+          if (this.isOnBoard && !this.isAgency) {
+            this.form.get('clockId')?.enable();
+            this.form.get('actualStartDate')?.enable();
+            this.form.get('actualEndDate')?.enable();
           }
         }
       });
   }
 }
+

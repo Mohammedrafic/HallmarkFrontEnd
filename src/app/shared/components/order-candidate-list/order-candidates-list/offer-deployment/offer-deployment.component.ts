@@ -12,10 +12,11 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { SET_READONLY_STATUS } from '@shared/constants';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SET_READONLY_STATUS } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
+import { ConfirmService } from "@shared/services/confirm.service";
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 
 import { BillRate } from '@shared/models/bill-rate.model';
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
@@ -118,7 +119,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   public comments: Comment[] = [];
 
-  constructor(private store: Store, private actions$: Actions, private commentsService: CommentsService) {}
+  constructor(private store: Store,
+              private actions$: Actions,
+              private confirmService: ConfirmService,
+              private commentsService: CommentsService) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
     this.readOnlyMode =
@@ -126,6 +130,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       changes['candidate']?.currentValue.status === ApplicantStatusEnum.Rejected;
 
     this.checkRejectReason();
+    this.switchFormState();
   }
 
   public ngOnInit(): void {
@@ -134,6 +139,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.subscribeOnInitialData();
     this.subscribeOnSuccessRejection();
     this.subscribeOnReasonsList();
+    this.switchFormState();
   }
 
   public ngOnDestroy(): void {
@@ -141,12 +147,20 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.unsubscribe$.complete();
   }
 
-  public closeDialog(): void {
-    this.closeDialogEmitter.next();
-    this.nextApplicantStatuses = [];
-    this.billRatesData = [];
-    this.candidateJob = null;
-    this.isRejected = false;
+  public onClose(): void {
+    if (this.formGroup.dirty) {
+      this.confirmService
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => confirm))
+        .subscribe(() => {
+          this.closeDialog();
+        });
+    } else {
+      this.closeDialog();
+    }
   }
 
   public onRejectCandidate(event: { rejectReason: number }): void {
@@ -276,10 +290,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.applicantStatuses$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: ApplicantStatus[]) => (this.nextApplicantStatuses = data));
-
-    if (this.isDeployedCandidate) {
-      this.formGroup.disable();
-    }
   }
 
   private subscribeOnSuccessRejection(): void {
@@ -300,6 +310,23 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private checkRejectReason(): void {
     if (this.candidate.status === ApplicantStatusEnum.Rejected) {
       this.isRejected = true;
+    }
+  }
+
+  private closeDialog(): void {
+    this.closeDialogEmitter.next();
+    this.nextApplicantStatuses = [];
+    this.billRatesData = [];
+    this.candidateJob = null;
+    this.isRejected = false;
+    this.formGroup.markAsPristine();
+  }
+
+  private switchFormState(): void {
+    if (this.isDeployedCandidate) {
+      this.formGroup?.disable();
+    } else {
+      this.formGroup?.enable();
     }
   }
 }

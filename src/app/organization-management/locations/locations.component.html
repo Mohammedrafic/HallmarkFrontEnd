@@ -77,7 +77,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="externalId" headerText="EXT LOCATION ID" width=200></e-column>
+      <e-column field="externalId" headerText="LOCATION Id" width=200></e-column>
       <e-column field="invoiceId" headerText="INVOICE LOCATION ID" width=200></e-column>
       <e-column field="name" headerText="LOCATION NAME" width=200></e-column>
       <e-column field="address1" headerText="ADDRESS 1" width=200></e-column>
@@ -86,6 +86,7 @@
       <e-column field="state" headerText="STATE" width=200></e-column>
       <e-column field="zip" headerText="ZIP" width=200></e-column>
       <e-column field="contactPerson" headerText="CONTACT PERSON" width=200></e-column>
+      <e-column field="timeZone" headerText="Timezone" width=200></e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
@@ -138,7 +139,7 @@
 <app-filter-dialog [items]="filteredItems" [count]="(locations$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
   <form class="bootstrap" [formGroup]="LocationFilterFormGroup">
     <div class="input-container">
-      <label>Ext Location ID</label>
+      <label>Location Id</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
                          formControlName="externalIds"
@@ -173,7 +174,7 @@
         </ejs-multiselect>
       </div>
     </div>
-    <div class="input-container">
+     <div class="input-container">
       <label>Address 1</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
@@ -249,7 +250,7 @@
   >
     <div>
       <div class="input-container">
-        <label for="externalId">Ext Location ID <span class="required">*</span></label>
+        <label for="externalId">Location Id</label>
         <div class="input-group">
           <input id="externalId"
                   class="e-input"
@@ -261,9 +262,9 @@
       </div>
     </div>
 
-    <div class="group">
+    <div class="large-group">
       <div class="input-container">
-        <label for="invoiceId">Invoice Location ID <span class="required">*</span></label>
+        <label for="invoiceId">Invoice Location ID </label>
         <div class="input-group">
           <input id="invoiceId"
                   class="e-input"
@@ -283,6 +284,39 @@
                   maxlength="50"
                   appValidateWithMessage
                   formControlName="name"/>
+        </div>
+      </div>
+    </div>
+    <div class="large-group">
+      <div class="input-container">
+        <label for="locationType">Location Type </label>
+        <div class="input-group">
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              id="locationType"
+              appValidateWithMessage
+              formControlName="locationType"
+              [fields]="locationTypeOptionFields"
+              [dataSource]="locationTypes$ | async"
+          >
+            </ejs-dropdownlist>
+          </div>
+   </div>
+      </div>
+
+      <div class="input-container">
+        <label for="timeZone">Time Zone</label>
+        <div class="input-group">
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              id="timeZone"
+              appValidateWithMessage
+              formControlName="timeZone"
+              [fields]="timeZoneOptionFields"
+              [dataSource]="timeZoneIds$ | async" 
+            >
+            </ejs-dropdownlist>
+          </div>
         </div>
       </div>
     </div>
@@ -432,17 +466,7 @@
       </div>
 
       <div class="group">
-        <div class="input-container">
-          <label for="invoiceNote">Invoice Note</label>
-          <div class="input-group">
-            <input id="invoiceNote"
-                    class="e-input"
-                    type="text"
-                    maxlength="50"
-                    formControlName="invoiceNote"/>
-          </div>
-        </div>
-
+       
         <div>
           <div class="input-container calendar">
             <label for="inactiveDate">Inactive Date</label>
@@ -458,13 +482,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="bootstrap">
-        <ejs-checkbox
-          label="Allow deploy w/o credentials"
-          (change)="onAllowDeployWOCreadentialsCheck($event)"
-        ></ejs-checkbox>
       </div>
     </div>
   </form>

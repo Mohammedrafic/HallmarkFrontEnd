@@ -1,3 +1,4 @@
+import { TimesheetStatus } from './../../enums/timesheet-status.enum';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef,
   EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
@@ -132,7 +133,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.context = {
       componentParent: this,
     };
-    this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
   }
 
   ngOnChanges(): void {
@@ -141,6 +141,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     }
 
     if (this.timesheetDetails) {
+      this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
+
       this.initBtnsState();
       this.setActionBtnState();
       this.initEditBtnsState();
@@ -219,36 +221,20 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public saveChanges(): void {
-    const diffs = this.timesheetRecordsService.findDiffs(
-      this.records[this.currentTab][this,this.currentMode], this.formControls, this.timesheetColDef);
-
-    const recordsToUpdate = RecordsAdapter.adaptRecordsDiffs(
-      this.records[this.currentTab][this,this.currentMode], diffs, this.idsToDelete);
-
-    if (diffs.length || this.idsToDelete.length) {
-      this.loading = true;
-      this.cd.detectChanges();
-      createSpinner({
-        target: this.spinner.nativeElement,
-      });
-      showSpinner(this.spinner.nativeElement);
-
-      const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
-      const dto = RecordsAdapter.adaptRecordPutDto(
-        recordsToUpdate, organizationId, id, this.currentTab, this.idsToDelete);
-
-      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
+    if (this.checkTabStatusApproved()) {
+      this.confirmService.confirm(TimesheetConfirmMessages.confirmEdit, {
+        title: 'Edit Timesheet',
+        okButtonLabel: 'Yes',
+        okButtonClass: 'delete-button',
+      })
       .pipe(
+        filter(Boolean),
         takeUntil(this.componentDestroy()),
-      )
-      .subscribe(() => {
-        this.loading = false;
-        this.changesSaved.emit(true);
-        this.isChangesSaved = true;
-        this.idsToDelete = [];
-        this.setInitialTableState();
-        this.cd.detectChanges();
-      });
+      ).subscribe(() => {
+        this.saveRecords();
+      })
+    } else {
+      this.saveRecords();
     }
   }
 
@@ -432,6 +418,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       .set(RecordFields.Miles, this.timesheetDetails.canEditMileage);
 
     this.isEditEnabled = !!currentTabMapping.get(this.currentTab);
+
+    if (this.isAgency) {
+      this.isApproveBtnEnabled = !!currentTabMapping.get(this.currentTab);
+    }
   }
 
   private checkForStatusCol(): void {
@@ -443,5 +433,48 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     }
 
     this.timesheetColDef  = TimesheetRecordsColConfig[this.currentTab](this.isStatusColAvaliable);
+  }
+
+  private saveRecords(): void {
+    const diffs = this.timesheetRecordsService.findDiffs(
+      this.records[this.currentTab][this,this.currentMode], this.formControls, this.timesheetColDef);
+
+    const recordsToUpdate = RecordsAdapter.adaptRecordsDiffs(
+      this.records[this.currentTab][this,this.currentMode], diffs, this.idsToDelete);
+
+    if (diffs.length || this.idsToDelete.length) {
+      this.loading = true;
+      this.cd.detectChanges();
+      createSpinner({
+        target: this.spinner.nativeElement,
+      });
+      showSpinner(this.spinner.nativeElement);
+
+      const { organizationId, id, mileageTimesheetId } = this.store.snapshot().timesheets.selectedTimeSheet;
+      const dto = RecordsAdapter.adaptRecordPutDto(
+        recordsToUpdate,
+        organizationId,
+        this.currentTab === RecordFields.Time ? id : mileageTimesheetId,
+        this.currentTab,
+        this.idsToDelete,
+      );
+
+      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
+      .pipe(
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(() => {
+        this.loading = false;
+        this.changesSaved.emit(true);
+        this.isChangesSaved = true;
+        this.idsToDelete = [];
+        this.setInitialTableState();
+        this.cd.detectChanges();
+      });
+    }
+  }
+
+  private checkTabStatusApproved(): boolean {
+    return (this.currentTab === RecordFields.Time && this.timesheetDetails.status === TimesheetStatus.Approved);
   }
 }

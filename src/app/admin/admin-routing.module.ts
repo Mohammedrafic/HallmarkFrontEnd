@@ -94,6 +94,7 @@ const routes: Routes = [
         data: {
           isOrganizationArea: true,
         },
+        canDeactivate: [UnsavedChangesGuard]
       },
       {
         path: 'alerts',

@@ -709,27 +709,6 @@
             </ng-container>
           </form>
         </div>
-        <div class="workflow">
-          <div class="title">Workflow</div>
-          <form [formGroup]="workflowForm">
-            <div class="form-line">
-              <!-- Workflow -->
-              <div class="input-container bootstrap form-line-item-40">
-                <label>Workflow<span class="required">*</span></label>
-                <div class="input-group dropdown">
-                  <ejs-dropdownlist
-                    #workflowDropdown
-                    formControlName="workflowId"
-                    appValidateWithMessage
-                    [dataSource]="workflows$ | async"
-                    [fields]="workflowFields"
-                  >
-                  </ejs-dropdownlist>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
         <div class="special-project">
           <div class="title">Special Project</div>
           <form [formGroup]="specialProject">

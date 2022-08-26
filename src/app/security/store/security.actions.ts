@@ -31,7 +31,7 @@ export class GetUsersPage {
   static readonly type = '[security] Get Users Page';
   constructor(
     public businessUnitType: BusinessUnitType,
-    public businessUnitId: number,
+    public businessUnitIds: number[] | null,
     public pageNumber: number,
     public pageSize: number,
     public sortModel: any,

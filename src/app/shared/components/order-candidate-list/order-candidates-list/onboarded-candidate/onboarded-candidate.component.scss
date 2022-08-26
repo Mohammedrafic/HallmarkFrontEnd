@@ -26,20 +26,13 @@
     margin-top: 24px;
 
     .input-group.input-readonly {
-      .e-input[readonly] {
+      .e-input[readonly], ejs-daterangepicker .e-input-group, ejs-datepicker .e-input-group {
         background-color: $secondary-dark-blue-50;
         color: $secondary-dark-blue-30;
         border: 1px solid $secondary-dark-blue-40 !important;
       }
-
-      ejs-daterangepicker {
-        .e-input-group {
-          background-color: $secondary-dark-blue-50;
-          color: $secondary-dark-blue-30;
-          border: 1px solid $secondary-dark-blue-40 !important;
-        }
-      }
     }
+
     .candidate-info {
       width: 55%;
       margin-right: 12px;
@@ -88,7 +81,7 @@
 
     .comments {
       width: 45%;
-      height: 710px;
+      height: auto;
       background-color: $secondary-dark-blue-50;
       border-radius: 8px;
     }

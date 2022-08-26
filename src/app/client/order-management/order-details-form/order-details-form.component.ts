@@ -22,7 +22,6 @@ import {
   GetOrganizationStatesWithKeyCode,
   GetProjectSpecialData,
   GetSuggestedDetails,
-  GetWorkflows,
   SetIsDirtyOrderForm,
   SetPredefinedBillRatesData,
 } from '@client/store/order-managment-content.actions';
@@ -36,7 +35,6 @@ import { Department } from '@shared/models/department.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
-import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from '@shared/models/order-management.model';
 import { Document } from '@shared/models/document.model';
 
@@ -71,6 +69,9 @@ import { SettingsKeys } from '@shared/enums/settings';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { GetOrderRequisitionByPage } from '@organization-management/store/reject-reason.actions';
+import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
+import { ORDER_JOB_DISTRIBUTION_LIST } from '@shared/constants/order-job-distribution-list';
+import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 
 @Component({
   selector: 'app-order-details-form',
@@ -88,16 +89,12 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   @Output() orderTypeChanged = new EventEmitter<OrderType>();
 
-  @ViewChild('workflowDropdown')
-  public workflowDropdown: DropDownListComponent;
-
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
   public jobDistributionForm: FormGroup;
   public jobDescriptionForm: FormGroup;
   public contactDetailsForm: FormGroup;
   public workLocationForm: FormGroup;
-  public workflowForm: FormGroup;
   public specialProject: FormGroup;
 
   public contactDetailsFormArray: FormArray;
@@ -135,25 +132,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public orderTypesDataSource: { id: number, name: string }[];
   public orderTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public durations = [
-    { id: Duration.TwelveWeeks, name: '12 Weeks' },
-    { id: Duration.ThirteenWeeks, name: '13 Weeks' },
-    { id: Duration.TwentySixWeeks, name: '26 Weeks' },
-    { id: Duration.Month, name: 'Month' },
-    { id: Duration.Year, name: 'Year' },
-    { id: Duration.NinetyDays, name: '90 Days' },
-    { id: Duration.Other, name: 'Other' },
-  ];
+  public durations = ORDER_DURATION_LIST;
   public durationFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public jobDistributions = [
-    { id: JobDistribution.All, name: 'All' },
-    { id: JobDistribution.Internal, name: 'Internal' },
-    { id: JobDistribution.ExternalTier1, name: 'External Tier 1' },
-    { id: JobDistribution.ExternalTier2, name: 'External Tier 2' },
-    { id: JobDistribution.ExternalTier3, name: 'External Tier 3' },
-    { id: JobDistribution.Selected, name: 'Selected' },
-  ];
+  public jobDistributions = ORDER_JOB_DISTRIBUTION_LIST;
   public jobDistributionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public jobClassifications = [
@@ -165,12 +147,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     { id: JobClassification.Volunteers, name: 'Volunteers' },
   ];
 
-  public masterShiftNames = [
-    { id: MasterShiftName.Day, name: 'Day' },
-    { id: MasterShiftName.Evening, name: 'Evening' },
-    { id: MasterShiftName.Night, name: 'Night' },
-    { id: MasterShiftName.Rotating, name: 'Rotating' },
-  ];
+  public masterShiftNames = ORDER_MASTER_SHIFT_NAME_LIST;
 
   public masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
@@ -223,10 +200,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   @Select(OrderManagementContentState.suggestedDetails)
   suggestedDetails$: Observable<SuggestedDetails | null>;
-
-  @Select(OrderManagementContentState.workflows)
-  workflows$: Observable<WorkflowByDepartmentAndSkill[]>;
-  workflowFields: FieldSettingsModel = { text: 'workflowGroupName', value: 'workflowGroupId' };
 
   @Select(OrderManagementContentState.contactDetails)
   contactDetails$: Observable<Department>;
@@ -360,14 +333,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.store.dispatch(new SetIsDirtyOrderForm(this.workLocationsFormArray.dirty));
     });
 
-    this.workflowForm = this.formBuilder.group({
-      workflowId: [null, Validators.required],
-    });
-
-    this.workflowForm.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
-      this.store.dispatch(new SetIsDirtyOrderForm(this.workflowForm.dirty));
-    });
-
     this.specialProject = this.formBuilder.group({
       projectTypeId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
       projectNameId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
@@ -409,8 +374,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         if (isNaN(parseInt(orderType)) || !departmentId || !skillId) {
           return;
         }
-
-        this.populateHourlyRateField(orderType, departmentId, skillId);
+        if (!this.isEditMode) {
+          this.populateHourlyRateField(orderType, departmentId, skillId);
+        }
         this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
       });
 
@@ -421,7 +387,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.store.dispatch(new GetWorkflows(departmentId, skillId));
         this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId));
       });
 
@@ -867,6 +832,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       if (this.generalInformationForm.contains(controlName)) {
         const control = this.generalInformationForm.get(controlName);
         control?.clearValidators();
+        control?.updateValueAndValidity();
       }
     });
   }
@@ -998,13 +964,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     } else {
       this.workLocationsFormArray.push(this.newWorkLocationFormGroup());
     }
-
-    this.workflows$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.workflowForm.controls['workflowId'].patchValue(order.workflowId);
-      this.disableFormControls(order);
-      this.workflowForm.controls['workflowId'].updateValueAndValidity();
-      this.workflowDropdown?.refresh();
-    });
+    this.disableFormControls(order);
   }
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
@@ -1084,7 +1044,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private disableFormControls(order: Order): void {
     if (order.status === OrderStatus.InProgress || order.status === OrderStatus.Filled) {
       this.generalInformationForm = disableControls(this.generalInformationForm, ['regionId', 'skillId'], false);
-      this.workflowForm.get('workflowId')?.disable({ onlySelf: true });
     }
     if (order.orderType === OrderType.OpenPerDiem && order.status === OrderStatus.Open) {
       this.generalInformationForm = disableControls(
@@ -1092,7 +1051,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         ['title', 'regionId', 'locationId', 'departmentId', 'skillId'],
         false
       );
-      this.workflowForm.get('workflowId')?.disable({ onlySelf: true });
     }
   }
 

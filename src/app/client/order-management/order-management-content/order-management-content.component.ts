@@ -10,6 +10,7 @@ import {
   Observable,
   Subject,
   Subscription,
+  take,
   takeUntil,
   throttleTime,
 } from 'rxjs';
@@ -65,7 +66,10 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Skill } from '@shared/models/skill.model';
-import { GetAllOrganizationSkills, GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
+import {
+  GetAllOrganizationSkills,
+  GetOrganizationSettings,
+} from '@organization-management/store/organization-management.actions';
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { DatePipe, Location } from '@angular/common';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
@@ -135,13 +139,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @Select(OrganizationManagementState.allOrganizationSkills)
   skills$: Observable<Skill[]>;
 
-  
   @Select(OrganizationManagementState.organizationSettings)
   organizationSettings$: Observable<OrganizationSettingsGet[]>;
 
   @Select(DashboardState.filteredItems) private readonly filteredItems$: Observable<FilteredItem[]>;
 
-  public settings: {[key in SettingsKeys]?: OrganizationSettingsGet};
+  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   public SettingsKeys = SettingsKeys;
   public activeTab: OrganizationOrderManagementTabs = OrganizationOrderManagementTabs.AllOrders;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
@@ -224,6 +227,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public selectedRowRef: any;
 
   private isRedirectedFromDashboard: boolean;
+  private isRedirectedFromToast: boolean;
+  private quickOrderId: number;
   private dashboardFilterSubscription: Subscription;
   private orderPerDiemId: number | null;
   private creatingReorder = false;
@@ -246,6 +251,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     super();
     this.isRedirectedFromDashboard =
       this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromDashboard'] || false;
+    this.isRedirectedFromToast = this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromToast'] || false;
+    this.quickOrderId = this.router.getCurrentNavigation()?.extras?.state?.['publicId'];
 
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.fb.group({
@@ -274,6 +281,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   ngOnInit(): void {
+    this.handleRedirectFromQuickOrderToast();
     this.handleDashboardFilters();
     this.orderFilterColumnsSetup();
     this.onOrderFilterDataSourcesLoadHandler();
@@ -822,6 +830,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       order: order.id,
       positionId: candidate.positionId,
     };
+    this.store.dispatch(
+      new GetAgencyOrderCandidatesList(
+        order.id,
+        order.organizationId,
+        1,
+        30,
+        this.orderManagementService.excludeDeployed
+      )
+    );
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
     this.selectedDataRow = order as any;
@@ -897,8 +914,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       .subscribe(() => {
         this.store.dispatch(
           new GetAgencyOrderCandidatesList(
-            this.selectedDataRow.id,
-            this.selectedDataRow.organizationId as number,
+            this.selectedOrder.id,
+            this.selectedOrder.organizationId as number,
             1,
             30,
             this.orderManagementService.excludeDeployed
@@ -907,8 +924,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.getOrders();
         this.store.dispatch(
           new GetOrderById(
-            this.selectedDataRow.id,
-            this.selectedDataRow.organizationId as number,
+            this.selectedOrder.id,
+            this.selectedOrder.organizationId as number,
             this.getDialogNextPreviousOption(this.selectedDataRow as any)
           )
         );
@@ -926,9 +943,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private onOrganizationChangedHandler(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$), debounceTime(400)).subscribe(() => {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.getSettings();
-      if (!this.isRedirectedFromDashboard) {
+      if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
         this.clearFilters();
       }
       if (!this.previousSelectedOrderId) {
@@ -1191,7 +1208,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public lockOrder(order: Order): void {
-    this.store.dispatch(new SetLock(order.id, !order.isLocked, this.filters));
+    this.store.dispatch(new SetLock(order.id, !order.isLocked, this.filters, `${order.organizationPrefix || ''}-${order.publicId}`));
   }
 
   public disabledLock(status: OrderStatus): boolean {
@@ -1336,5 +1353,25 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         positionClosureReasonId: res.positionClosureReasonId,
       };
     });
+  }
+
+  private handleRedirectFromQuickOrderToast(): void {
+    if (this.isRedirectedFromToast) {
+      this.organizationId$.pipe(takeUntil(this.unsubscribe$), debounceTime(50)).subscribe(() => {
+        this.filteredItems = [{text: this.quickOrderId.toString(), column: 'orderId', value: this.quickOrderId}];
+        this.filters['orderId'] = this.quickOrderId;
+        this.OrderFilterFormGroup.controls['orderId'].patchValue(this.quickOrderId);
+        this.getOrders();
+
+        this.ordersPage$.pipe(take(2)).subscribe((data) => {
+          if (data.items[0].publicId === this.quickOrderId) {
+            setTimeout(() => {
+              this.gridWithChildRow.selectRow(0);
+              this.isRedirectedFromToast = false;
+            }, 100);
+          }
+        });
+      });
+    }
   }
 }

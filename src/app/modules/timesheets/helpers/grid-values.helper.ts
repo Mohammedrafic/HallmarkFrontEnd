@@ -1,5 +1,8 @@
-import { formatCurrency, formatDate } from '@angular/common';
+import { formatCurrency, formatNumber, formatDate } from '@angular/common';
 
+/**
+ * TODO: Move to core helpers
+ */
 export class GridValuesHelper {
   public static formatDate(value: string, pattern: string): string {
     if (!value) {
@@ -13,5 +16,35 @@ export class GridValuesHelper {
       return '';
     }
     return formatCurrency(Number(value), 'en', '$');
+  }
+
+  public static formatNumber(value: string | number, format?: string): string {
+    if (!Number(value)) {
+      return '';
+    }
+
+    return formatNumber(+value, 'en', format)?.toString()?.replace(',', '') || '';
+  }
+
+  public static formatAbsCurrency(value: number): string {
+    if (isNaN(value)) {
+      return '';
+    }
+    const formated = value < 0 ? `(${GridValuesHelper.formatCurrency(Math.abs(value).toString())})`
+    : GridValuesHelper.formatCurrency(value.toString());
+
+    return formated;
+  }
+
+  public static formatAbsNumber(value: number, format: string): string {
+    if (!Number(value)) {
+      return '';
+    }
+
+    if (value < 0) {
+      return `(${formatNumber(Math.abs(value), 'en', format) || ''})`
+    }
+
+    return formatNumber(value, 'en', format) || '';
   }
 }

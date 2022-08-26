@@ -14,6 +14,11 @@ import { addDays } from '@shared/utils/date-time.utils';
 import { OrderCandidateJob, OrderManagementChild } from '@shared/models/order-management.model';
 import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
 import { Comment } from '@shared/models/comment.model';
+import { Store } from '@ngxs/store';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { RECORD_ADDED } from '@shared/constants';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 @Component({
   selector: 'app-extension-sidebar',
@@ -37,7 +42,7 @@ export class ExtensionSidebarComponent implements OnInit {
   public extensionForm: FormGroup;
   public comments: Comment[] = [];
 
-  public constructor(public formBuilder: FormBuilder, private extensionSidebarService: ExtensionSidebarService) {}
+  public constructor(public formBuilder: FormBuilder, private extensionSidebarService: ExtensionSidebarService, private store: Store) {}
 
   public ngOnInit(): void {
     this.minDate = addDays(this.candidateJob?.actualEndDate, 1)!;
@@ -46,7 +51,7 @@ export class ExtensionSidebarComponent implements OnInit {
     this.listenDurationChanges();
   }
 
-  public saveExtension(): void {
+  public saveExtension(positionDialog: DialogComponent): void {
     if (this.extensionForm.invalid) {
       this.extensionForm.markAllAsTouched();
       return;
@@ -62,7 +67,11 @@ export class ExtensionSidebarComponent implements OnInit {
         comments: this.comments
       })
       .subscribe({
-        next: () => this.saveEmitter.emit(),
+        next: () => {
+          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+          positionDialog.hide();
+          return this.saveEmitter.emit()
+        },
       });
   }
 

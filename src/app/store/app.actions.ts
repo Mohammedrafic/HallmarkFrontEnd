@@ -29,7 +29,13 @@ export class SetIsFirstLoadState {
 
 export class ShowToast {
   static readonly type = '[app] Set Toast Showing state';
-  constructor(public type: MessageTypes, public messageContent: string) { }
+  constructor(
+    public type: MessageTypes,
+    public messageContent: string,
+    public isQuickOrder?: boolean,
+    public organizationPrefix?: string,
+    public publicId?: number,
+  ) { }
 }
 
 export class ShowSideDialog {

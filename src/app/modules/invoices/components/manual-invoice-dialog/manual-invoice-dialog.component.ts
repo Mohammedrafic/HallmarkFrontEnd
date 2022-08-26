@@ -12,7 +12,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ManualInvoiceDialogConfig } from '../../constants';
 import {
-  AddManInvoiceDialogConfig,   AddManInvoiceForm, ManualInvoiceInputOptions,  ManualInvoiceMeta,
+  AddManInvoiceDialogConfig, AddManInvoiceForm, ManualInvoice, ManualInvoiceInputOptions, ManualInvoiceMeta,
   ManualInvoiceReason } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoiceConfirmMessages } from '../../constants/messages.constant';
@@ -32,6 +32,8 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   public readonly today = new Date();
 
   public clearFiles: FilesClearEvent | null;
+
+  public invoiceToEdit: ManualInvoice | null = null;
 
   private searchOptions: ManualInvoiceMeta[];
 
@@ -62,9 +64,6 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     this.form = this.addService.createForm(this.isAgency) as CustomFormGroup<AddManInvoiceForm>;
 
     this.watchForSearch();
-    this.watchForCandidate();
-    this.watchForLocation();
-    this.watchForAgency();
     this.watchForCandidate();
     this.watchForLocation();
     this.watchForAgency();

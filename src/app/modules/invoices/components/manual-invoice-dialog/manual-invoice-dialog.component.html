@@ -123,8 +123,10 @@
 
         </form>
         <app-file-uploader [maxFiles]="5"
-          [clearAll]="clearFiles"
-          (uploadFilesChanged)="setFilesForUpload($event)">
+                           *ngIf="invoiceToEdit?.attachments?.length"
+                           [clearAll]="clearFiles"
+                           [attachments]="invoiceToEdit?.attachments || []"
+                           (uploadFilesChanged)="setFilesForUpload($event)">
         </app-file-uploader>
       </div>
     </div>

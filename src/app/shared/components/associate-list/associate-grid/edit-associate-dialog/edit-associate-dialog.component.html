@@ -25,7 +25,7 @@
       </section>
 
       <section class="edit-org" [ngClass]="{ 'first-active': firstActive }">
-        <ejs-tab #editOrgTab (selecting)="onTabSelecting()">
+        <ejs-tab #editOrgTab (selecting)="onTabSelecting($event)">
           <e-tabitems>
             <e-tabitem>
               <ng-template #headerText> Fee Settings </ng-template>
@@ -37,7 +37,7 @@
             <e-tabitem>
               <ng-template #headerText> Partnership Settings </ng-template>
               <ng-template #content>
-                <app-partnership-settings [partnershipForm]="$any(partnershipForm)"></app-partnership-settings>
+                <app-partnership-settings [partnershipForm]="$any(partnershipForm)" [activeTab]="activeTab"></app-partnership-settings>
               </ng-template>
             </e-tabitem>
           </e-tabitems>

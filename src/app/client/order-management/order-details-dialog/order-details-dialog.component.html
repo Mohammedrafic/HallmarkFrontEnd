@@ -76,13 +76,14 @@
             <button
               ejs-button
               cssClass="e-outline"
-              *ngIf="orderType.ReOrder !== order?.orderType || !order?.extensionFromId"
+              *ngIf="orderType.ReOrder !== order?.orderType && !this.order?.extensionFromId"
               [isPrimary]="true"
               (click)="lockOrder()"
               [disabled]="disabledLock"
             >
               {{ order?.isLocked ? 'Unlock' : 'Lock' }}
-              <i-feather [name]="order?.isLocked ? 'unlock' : 'lock'" class="icon"></i-feather>
+              <i-feather *ngIf="!order?.isLocked" name="lock" class="icon"></i-feather>
+              <app-custom-icon *ngIf="order?.isLocked" name="unlock" class="icon"></app-custom-icon>
             </button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>
@@ -108,7 +109,7 @@
                 <app-extension-candidate
                   [currentOrder]="order"
                   [candidateOrder]="candidateOrderPage"
-                  *ngIf="order.extensionFromId; else candidateOrder">
+                  *ngIf="order?.extensionFromId; else candidateOrder">
                 </app-extension-candidate>
                 <ng-template #candidateOrder>
                   <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>

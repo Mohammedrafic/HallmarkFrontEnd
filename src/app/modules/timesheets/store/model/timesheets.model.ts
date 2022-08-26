@@ -10,6 +10,7 @@ import {
 export type TimeSheetsPage = PageOfCollections<Timesheet>;
 
 export interface TimesheetsModel {
+  loading: boolean;
   timesheets: TimeSheetsPage | null;
   timesheetsFilters: TimesheetsFilterState | null;
   candidateInfo: CandidateInfo | null;

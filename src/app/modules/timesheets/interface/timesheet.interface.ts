@@ -17,6 +17,7 @@ export interface Timesheet {
   skill: string;
   location: string;
   startDate: string;
+  formattedId: string;
   department: string;
   agencyName: string;
   organizationId: number;
