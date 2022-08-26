@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
 
 import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { filter, merge, Observable, takeUntil, tap } from 'rxjs';
-import { GetCandidateJob } from '@agency/store/order-management.actions';
+import { GetCandidateJob, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
-import { OrderCandidateListViewService } from "@shared/components/order-candidate-list/order-candidate-list-view.service";
+import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 
 enum ReorderCandidateStutuses {
   BillRatePending = 44,
@@ -35,6 +35,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     protected override store: Store,
     protected override router: Router,
     private orderCandidateListViewService: OrderCandidateListViewService,
+    private actions$: Actions
   ) {
     super(store, router);
   }
@@ -42,6 +43,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   override ngOnInit(): void {
     super.ngOnInit();
     this.onChangeCandidateJob().pipe(takeUntil(this.unsubscribe$)).subscribe();
+    this.subscribeOnReloadAction();
   }
 
   public onEdit(data: OrderCandidatesList & { index: string }, event: MouseEvent): void {
@@ -99,5 +101,11 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
       filter((candidateJob) => !!candidateJob),
       tap((candidateJob: OrderCandidateJob) => (this.candidateJob = candidateJob))
     );
+  }
+
+  private subscribeOnReloadAction(): void {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ReloadOrderCandidatesLists)).subscribe(() => {
+      this.emitGetCandidatesList();
+    });
   }
 }
