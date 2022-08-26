@@ -22,6 +22,10 @@ export class BusinessLineService {
     return this.httpClient.delete<void>(`/api/businesslines/${id}`);
   }
 
+  public getAllBusinessLines(): Observable<BusinessLines[]> {
+    return this.httpClient.get<BusinessLines[]>('/api/businesslines/all');
+  }
+
   private getCloseReasonsParams(pageNumber?: number, pageSize?: number, orderBy?: string): HttpParams {
     let params = {};
     if (pageNumber) params = { ...params, pageNumber };

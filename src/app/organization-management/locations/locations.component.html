@@ -262,7 +262,7 @@
       </div>
     </div>
 
-    <div class="large-group">
+    <div class="group">
       <div class="input-container">
         <label for="invoiceId">Invoice Location ID </label>
         <div class="input-group">
@@ -284,6 +284,21 @@
                   maxlength="50"
                   appValidateWithMessage
                   formControlName="name"/>
+        </div>
+      </div>
+      <div class="input-container">
+        <label for="businessLine">Business Line</label>
+        <div class="input-group">
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              id="businessLine"
+              appValidateWithMessage
+              formControlName="businessLineId"
+              [fields]="businessLineFields"
+              [dataSource]="businessLines$ | async"
+            >
+            </ejs-dropdownlist>
+          </div>
         </div>
       </div>
     </div>

@@ -4,6 +4,10 @@ export class GetBusinessLines {
   static readonly type = '[Business lines] Get Business Lines';
 }
 
+export class GetAllBusinessLines {
+  static readonly type = '[Business lines] Get All Business Lines';
+}
+
 export class DeleteBusinessLine {
   static readonly type = '[Business lines] Delete Business Line';
   constructor(public id: number) {}
