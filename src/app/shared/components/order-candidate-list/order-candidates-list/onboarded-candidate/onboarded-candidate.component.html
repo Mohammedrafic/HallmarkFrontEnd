@@ -15,7 +15,6 @@
       <div class="e-card-content button-container">
         <div class="input-group dropdown bootstrap input-readonly" *ngIf="!isRejected && !isDeployedCandidate">
           <ejs-dropdownlist
-            *ngIf="isOnboarded"
             [fields]="optionFields"
             [formControl]="jobStatusControl"
             [dataSource]="nextApplicantStatuses"
@@ -28,7 +27,7 @@
             </ng-template>
           </ejs-dropdownlist>
         </div>
-        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
@@ -67,8 +66,8 @@
                     </div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Guaranteed Work Week</label>
-                      <div class="input-group">
-                        <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" maxlength="50"/>
+                      <div class="input-group" [ngClass]="{'input-readonly': isOnBoarded}">
+                        <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" maxlength="50" [readOnly]="isOnBoarded"/>
                       </div>
                     </div>
                   </div>
@@ -177,13 +176,14 @@
                   </div>
                   <div class="input-container bootstrap">
                     <label class="input-group">Actual End Date</label>
-                    <div class="input-group datepicker">
+                    <div class="input-group datepicker" [ngClass]="{'input-readonly': isOnBoarded}">
                       <ejs-datepicker
                         id="endDate"
                         class="datepicker"
                         format="MM/dd/yyyy"
                         appValidateWithMessage
                         placeholder="MM/DD/YYYY"
+                        [readonly]="isOnBoarded"
                         [min]="today"
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
