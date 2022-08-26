@@ -373,6 +373,8 @@ export type AcceptJobDTO = {
   billRates?: BillRate[];
   offeredStartDate?: string;
   skillName?: string;
+  expAsTravelers?: number;
+  availableStartDate?: string;
 };
 
 export type CandidateProfile = {

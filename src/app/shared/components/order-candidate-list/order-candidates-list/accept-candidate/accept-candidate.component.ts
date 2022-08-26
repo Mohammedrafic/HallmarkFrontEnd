@@ -1,14 +1,16 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
 import { RejectReason } from '@shared/models/reject-reason.model';
-import { Observable, Subject, takeUntil } from 'rxjs';
-import { FormControl, FormGroup } from '@angular/forms';
+import { ConfirmService } from "@shared/services/confirm.service";
+import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
-  GetCandidateJob,
   GetRejectReasonsForAgency,
   RejectCandidateForAgencySuccess,
   RejectCandidateJob,
@@ -21,12 +23,12 @@ import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
-import { GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-accept-candidate',
   templateUrl: './accept-candidate.component.html',
   styleUrls: ['./accept-candidate.component.scss'],
+  providers: [MaskedDateTimeService],
 })
 export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
@@ -55,6 +57,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
+  }
+
+  get isApplied(): boolean {
+    return this.candidateStatus === ApplicantStatusEnum.Applied;
   }
 
   get isOnboard(): boolean {
@@ -96,16 +102,18 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     private store: Store,
     private actions$: Actions,
     private datePipe: DatePipe,
+    private confirmService: ConfirmService,
     private commentsService: CommentsService
   ) {}
 
   ngOnChanges(): void {
+    this.switchFormState();
     this.checkReadOnlyStatuses();
   }
 
   ngOnInit(): void {
     this.createForm();
-    this.form.disable();
+    this.switchFormState();
     this.patchForm();
     this.subscribeOnReasonsList();
     this.subscribeOnSuccessRejection();
@@ -116,15 +124,30 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.unsubscribe$.complete();
   }
 
-  public closeDialog(): void {
-    this.closeModalEvent.emit();
-    this.billRatesData = [];
-    this.isReadOnly = false;
-    this.isWithdraw = false;
+  public onClose(): void {
+    if (this.form.dirty) {
+      this.confirmService
+        .confirm(CANCEL_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => confirm))
+        .subscribe(() => {
+          this.closeDialog();
+        });
+    } else {
+      this.closeDialog();
+    }
   }
 
   public onAccept(): void {
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
+  }
+
+  public onApply(): void {
+    if (this.form.valid) {
+      this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Applied, statusText: 'Applied' });
+    }
   }
 
   public onWithdraw(): void {
@@ -165,8 +188,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           orderId: this.candidateJob.orderId,
           nextApplicantStatus: applicantStatus,
           candidateBillRate: value.candidateBillRate,
-          offeredBillRate: value.offeredBillRate,
+          offeredBillRate: value.offeredBillRate || null,
           requestComment: value.comments,
+          expAsTravelers: value.expAsTravelers,
+          availableStartDate: value.availableStartDate,
           actualStartDate: this.candidateJob.actualStartDate,
           actualEndDate: this.candidateJob.actualEndDate,
           clockId: this.candidateJob.clockId,
@@ -187,11 +212,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       jobId: new FormControl(''),
       date: new FormControl(''),
       billRates: new FormControl(''),
-      avStartDate: new FormControl(''),
-      candidateBillRate: new FormControl(''),
+      availableStartDate: new FormControl('', [Validators.required]),
+      candidateBillRate: new FormControl('', [Validators.required]),
       locationName: new FormControl(''),
       yearExp: new FormControl(''),
-      travelExp: new FormControl(''),
+      expAsTravelers: new FormControl(''),
       offeredBillRate: new FormControl(''),
       comments: new FormControl(''),
       rejectReason: new FormControl(''),
@@ -225,11 +250,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           jobId: value.orderId,
           date: [value.order.jobStartDate, value.order.jobEndDate],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
-          avStartDate: this.getDateString(value.availableStartDate),
+          availableStartDate: value.availableStartDate,
           candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
           locationName: value.order.locationName,
           yearExp: value.yearsOfExperience,
-          travelExp: value.expAsTravelers,
+          expAsTravelers: value.expAsTravelers,
           offeredBillRate: PriceUtils.formatNumbers(value.offeredBillRate),
           comments: value.requestComment,
           rejectReason: value.rejectReason,
@@ -269,5 +294,21 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     if (readOnlyStatuses.includes(this.candidateStatus) || this.isDeployedCandidate) {
       this.isReadOnly = true;
     }
+  }
+
+  private switchFormState(): void {
+    if (this.isApplied && !this.candidate.deployedCandidateInfo) {
+      this.form?.enable();
+    } else {
+      this.form?.disable();
+    }
+  }
+
+  private closeDialog(): void {
+    this.closeModalEvent.emit();
+    this.billRatesData = [];
+    this.isReadOnly = false;
+    this.isWithdraw = false;
+    this.form.markAsPristine();
   }
 }
