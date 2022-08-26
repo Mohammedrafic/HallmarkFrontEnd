@@ -196,6 +196,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
 
     data.summary.forEach((summary) => {
       summary.items.forEach((detail, idx: number) => {
+        
         const sum: CellDef[] = [
           idx === 0 ? {
             content: summary.locationName, 
@@ -241,7 +242,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
             },
           },
           {
-            content: detail.details,
+            content: detail.details || '',
             colSpan: 3,
             styles: {
               halign: 'left',
@@ -484,7 +485,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
           },
           formatDate(record.timeOut, 'MM/dd/YYYY HH:mm', 'en-US'),
           record.billRateConfigName,
-          record.costCenterName,
+          record.departmentName,
           record.jobId,
           `${record.candidateFirstName}, ${record.candidateLastName}`,
           record.agencyName,

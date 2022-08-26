@@ -132,7 +132,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.context = {
       componentParent: this,
     };
-    this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
   }
 
   ngOnChanges(): void {
@@ -141,6 +140,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     }
 
     if (this.timesheetDetails) {
+      this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
+
       this.initBtnsState();
       this.setActionBtnState();
       this.initEditBtnsState();
@@ -233,9 +234,14 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       });
       showSpinner(this.spinner.nativeElement);
 
-      const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
+      const { organizationId, id, mileageTimesheetId } = this.store.snapshot().timesheets.selectedTimeSheet;
       const dto = RecordsAdapter.adaptRecordPutDto(
-        recordsToUpdate, organizationId, id, this.currentTab, this.idsToDelete);
+        recordsToUpdate,
+        organizationId,
+        this.currentTab === RecordFields.Time ? id : mileageTimesheetId,
+        this.currentTab,
+        this.idsToDelete,
+      );
 
       this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
       .pipe(
@@ -432,6 +438,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       .set(RecordFields.Miles, this.timesheetDetails.canEditMileage);
 
     this.isEditEnabled = !!currentTabMapping.get(this.currentTab);
+
+    if (this.isAgency) {
+      this.isApproveBtnEnabled = !!currentTabMapping.get(this.currentTab);
+    }
   }
 
   private checkForStatusCol(): void {
