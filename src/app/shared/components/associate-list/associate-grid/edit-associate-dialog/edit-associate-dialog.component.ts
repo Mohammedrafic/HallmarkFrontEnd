@@ -111,7 +111,7 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
         this.feeSettingsForm.markAllAsTouched();
         if (this.feeSettingsForm.valid && this.editAgencyOrg.id) {
           const { baseFee } = this.feeSettingsForm.getRawValue();
-          this.store.dispatch(new SaveBaseFee(this.editAgencyOrg.id, baseFee));
+          this.store.dispatch(new SaveBaseFee(this.editAgencyOrg.id, baseFee ? baseFee : null));
           this.feeSettingsForm.markAsPristine();
         }
         break;
