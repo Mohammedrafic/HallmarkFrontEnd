@@ -577,8 +577,6 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         this.generalInformationForm.get(name)?.patchValue(value);
       });
     } else {
-      console.error('remove');
-
       Object.keys(shiftControls).forEach((name) => {
         this.generalInformationForm.contains(name) && this.generalInformationForm.setValidators(null);
       });

@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BusinessLines, BusinessLinesDtoModel } from '@shared/models/business-line.model';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,9 +9,9 @@ import { map, Observable } from 'rxjs';
 export class BusinessLineService {
   constructor(private readonly httpClient: HttpClient) {}
 
-  public getBusinessLines(pageNumber?: number, pageSize?: number, orderBy?: string): Observable<BusinessLines[]> {
+  public getBusinessLines(pageNumber?: number, pageSize?: number, orderBy?: string): Observable<BusinessLinesDtoModel> {
     const params = this.getCloseReasonsParams(pageNumber, pageSize, orderBy);
-    return this.httpClient.get<BusinessLinesDtoModel>('/api/businesslines', { params }).pipe(map((data) => data.items));
+    return this.httpClient.get<BusinessLinesDtoModel>('/api/businesslines', { params });
   }
 
   public saveBusinessLine(businessLine: { line: string; id: number }): Observable<BusinessLines> {
@@ -20,6 +20,10 @@ export class BusinessLineService {
 
   public deleteBusinessLine(id: number): Observable<void> {
     return this.httpClient.delete<void>(`/api/businesslines/${id}`);
+  }
+
+  public getAllBusinessLines(): Observable<BusinessLines[]> {
+    return this.httpClient.get<BusinessLines[]>('/api/businesslines/all');
   }
 
   private getCloseReasonsParams(pageNumber?: number, pageSize?: number, orderBy?: string): HttpParams {
