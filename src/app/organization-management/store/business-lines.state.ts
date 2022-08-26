@@ -3,7 +3,7 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { BusinessLines } from '@shared/models/business-line.model';
 import { BusinessLineService } from '@shared/services/business-line.service';
 import { Observable, tap } from 'rxjs';
-import { AddBusinessLine, DeleteBusinessLine, GetBusinessLines } from './business-lines.action';
+import { SaveBusinessLine, DeleteBusinessLine, GetBusinessLines } from './business-lines.action';
 
 interface BusinessLinesStateModel {
   businessLines: BusinessLines[];
@@ -34,15 +34,24 @@ export class BusinessLinesState {
     );
   }
 
-  @Action(AddBusinessLine)
-  private addBusinessLine({ patchState, getState }: StateContext<BusinessLinesStateModel>, { businessLine }: AddBusinessLine) {
-    this.businessLineService.addBusinessLine(businessLine).pipe(tap((payload) => {
-      patchState({businessLines: getState().businessLines.concat(payload)})
-    }))
+  @Action(SaveBusinessLine)
+  private saveBusinessLine({ dispatch }: StateContext<BusinessLinesStateModel>, { businessLine }: SaveBusinessLine) {
+    return this.businessLineService.saveBusinessLine(businessLine).pipe(
+      tap((payload) => {
+        console.error('hhhh');
+
+        dispatch(new GetBusinessLines());
+        return payload;
+      })
+    );
   }
 
   @Action(DeleteBusinessLine)
-  private deleteBusinessLine( { dispatch }: StateContext<BusinessLinesStateModel>, { id }: DeleteBusinessLine) {
-    return this.businessLineService.deleteBusinessLine(id).pipe(tap(() => dispatch(new GetBusinessLines())))
+  private deleteBusinessLine({ dispatch }: StateContext<BusinessLinesStateModel>, { id }: DeleteBusinessLine) {
+    return this.businessLineService.deleteBusinessLine(id).pipe(
+      tap(() => {
+        dispatch(new GetBusinessLines());
+      })
+    );
   }
 }

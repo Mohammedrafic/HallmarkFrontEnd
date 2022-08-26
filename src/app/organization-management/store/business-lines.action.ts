@@ -9,7 +9,7 @@ export class DeleteBusinessLine {
   constructor(public id: number) {}
 }
 
-export class AddBusinessLine {
+export class SaveBusinessLine {
   static readonly type = '[Business lines] Add Business Line';
   constructor(public businessLine: BusinessLines) {}
 }

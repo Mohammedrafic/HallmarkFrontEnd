@@ -1,7 +1,7 @@
 <section class="flex-column">
   <section class="toolbar">
     <section>
-      <h3>Business Lines </h3>
+      <h3>Business Lines</h3>
     </section>
     <section>
       <button ejs-button [isPrimary]="true" (click)="addBusinessLine()">Add Business Lines</button>
@@ -26,16 +26,16 @@
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data, $event)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove(data.id)">
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove(data.id, $event)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
         </ng-template>
       </e-column>
-      <e-column field="name" headerText="Business Lines" textAlign="Left" width="100%"></e-column>
+      <e-column field="line" headerText="Business Lines" textAlign="Left" width="100%"></e-column>
     </e-columns>
 
     <ng-template #pagerTemplate let-data>
@@ -78,3 +78,29 @@
     </ng-template>
   </ejs-grid>
 </section>
+
+<app-side-dialog
+  (formCancelClicked)="onFormCancelClick()"
+  (formSaveClicked)="onFormSaveClick()"
+  [header]="'Add Business Line'"
+  [width]="'400px'"
+>
+  <form class="form-container bootstrap" id="addEditRecordForm" [formGroup]="businessLineFormGroup">
+    <div class="group">
+      <div class="input-container">
+        <label for="name">Business Line<span class="required">*</span></label>
+        <div class="input-group">
+          <input
+            id="name"
+            class="e-input"
+            type="text"
+            maxlength="20"
+            appValidateWithMessage
+            pattern="^[A-Za-z -]+$"
+            formControlName="line"
+          />
+        </div>
+      </div>
+    </div>
+  </form>
+</app-side-dialog>
