@@ -81,7 +81,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   }
 
   get canAccept(): boolean {
-    return this.candidateJob && this.isAgency && !this.isAccepted;
+    return this.candidateJob && this.isAgency && !this.isAccepted && !this.isOnBoard;
   }
 
   constructor(
@@ -145,6 +145,12 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     return billRates;
   }
 
+  public updatedUnsavedOnboarded(): void {
+    if (this.isOnBoard) {
+      this.updateAgencyCandidateJob(this.candidateJob.applicantStatus);
+    }
+  }
+
   public onReject(): void {
     // TODO
     console.error('has not been implemented yet');
@@ -186,9 +192,10 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     this.candidate$ = state$.pipe(
       map((res) => {
         const items = res?.items || this.candidateOrder?.items;
-        const candidate = items?.find((candidate) => candidate.candidateJobId) as OrderCandidatesList;
+        const candidate = items?.find((candidate) => candidate.candidateJobId);
         if (candidate) {
           this.statusesFormControl.reset();
+          this.createForm();
           this.patchForm(candidate.candidateJobId);
           if (!this.isAgency) {
             this.setAllowedStatuses(candidate);
@@ -244,6 +251,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
       clockId: new FormControl(''),
       allowDeployCredentials: new FormControl(false),
     });
+    this.form.disable();
   }
 
   private getDateString(date: string): string | null {
@@ -281,15 +289,16 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
             allowDeployCredentials: this.candidateJob.allowDeployCredentials,
           });
           this.isAgency ? this.form.get('comments')?.enable() : this.form.get('offeredBillRate')?.enable();
-          if (this.isAccepted) {
-            this.form.get('comments')?.disable();
+          if (this.isAccepted && !this.isAgency) {
             this.form.get('guaranteedWorkWeek')?.enable();
-            this.form.get('allowDeployCredentials')?.enable();
+            this.form.get('clockId')?.enable();
+            this.form.get('actualStartDate')?.enable();
+            this.form.get('actualEndDate')?.enable();
           }
-          if (this.isOnBoard) {
-            this.form.get('guaranteedWorkWeek')?.disable();
-            this.form.get('comments')?.disable();
-            this.form.get('allowDeployCredentials')?.disable();
+          if (this.isOnBoard && !this.isAgency) {
+            this.form.get('clockId')?.enable();
+            this.form.get('actualStartDate')?.enable();
+            this.form.get('actualEndDate')?.enable();
           }
         }
       });

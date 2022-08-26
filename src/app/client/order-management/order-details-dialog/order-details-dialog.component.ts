@@ -11,7 +11,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { distinctUntilChanged, filter, map, Observable, Subject, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, map, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -35,6 +35,7 @@ import {
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
+  UNSAVE_CHANGES_TEXT,
 } from '@shared/constants';
 import { Location } from '@angular/common';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
@@ -44,6 +45,7 @@ import { AddEditReorderService } from '@client/order-management/add-edit-reorder
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 import { SettingsKeys } from '@shared/enums/settings';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { ExtensionCandidateComponent } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -66,6 +68,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @ViewChild('chipList') chipList: ChipListComponent;
   @ViewChild('tab') tab: TabComponent;
   @ViewChild(AddEditReorderComponent) addEditReOrder: AddEditReorderComponent;
+  @ViewChild(ExtensionCandidateComponent) extensionCandidateComponent: ExtensionCandidateComponent;
 
   @Select(OrderManagementContentState.orderDialogOptions)
   public orderDialogOptions$: Observable<DialogNextPreviousOption>;
@@ -265,12 +268,33 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public onClose(): void {
-    this.sideDialog.hide();
-    this.openEvent.next(false);
+    if (this.extensionCandidateComponent?.form.dirty) {
+      this.saveExtensionChanges().subscribe(() => this.closeSideDialog());
+    } else {
+      this.closeSideDialog();
+    }
   }
 
   public onNextPreviousOrder(next: boolean): void {
     this.nextPreviousOrderEvent.emit(next);
+  }
+
+  private closeSideDialog(): void {
+    this.sideDialog.hide();
+    this.openEvent.next(false);
+  }
+
+  private saveExtensionChanges(): Observable<boolean> {
+    const options = {
+      title: 'Save Changes',
+      okButtonLabel: 'Save',
+      okButtonClass: 'delete-button',
+      cancelButtonLabel: 'Cancel',
+    };
+
+    return this.confirmService
+    .confirm(UNSAVE_CHANGES_TEXT, options)
+    .pipe(tap((confirm) =>  confirm && this.extensionCandidateComponent.updatedUnsavedOnboarded()));
   }
 
   private selectCandidateOnOrderId(): void {
