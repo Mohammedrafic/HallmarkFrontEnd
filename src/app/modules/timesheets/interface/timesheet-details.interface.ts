@@ -71,6 +71,7 @@ export interface TimesheetDetailsModel {
   candidateMiddleName: string;
   noWorkPerformed: boolean;
   departmentId: number;
+  formattedId: string;
   skillId: number;
   orderType: number;
   jobId: number;

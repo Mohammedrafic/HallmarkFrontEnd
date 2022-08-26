@@ -41,8 +41,6 @@ export interface PrintInvoiceData {
   meta: PrintInvoiceMeta,
   totals: {
     total: number;
-    totalValue: number;
-    adjustments: number;
     amount: number;
   };
   invoiceRecords: InvoicePrintRecord[];

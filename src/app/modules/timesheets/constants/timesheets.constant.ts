@@ -42,11 +42,6 @@ export const UNIT_ORGANIZATIONS_FIELDS = {
   value: 'id',
 };
 
-export const profileDetailsHoursChartColorsMap: Record<HourOccupationType, string> = {
-  [HourOccupationType.OnCall]: '#3E7FFF',
-  [HourOccupationType.Callback]: '#518CFF',
-  [HourOccupationType.Regular]: '#6499FF',
-  [HourOccupationType.Holiday]: '#9EBFFF',
-  [HourOccupationType.Preceptor]: '#D8E5FF',
-  [HourOccupationType.Orientation]: '#FFFFFF',
-};
+export const ColorsWidgetMap: string[] = [
+  '#3E7FFF', '#518CFF', '#6499FF', '#9EBFFF', '#D8E5FF', '#FFFFFF'
+];

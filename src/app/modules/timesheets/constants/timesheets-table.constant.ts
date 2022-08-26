@@ -77,6 +77,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       cellClass: 'name',
       ...commonColumn,
       cellRenderer: TimesheetTableLinkComponent,
+      valueFormatter: (params: ValueFormatterParams) => params.data.formattedId,
     },
     {
       field: TimesheetsTableColumns.Skill,
