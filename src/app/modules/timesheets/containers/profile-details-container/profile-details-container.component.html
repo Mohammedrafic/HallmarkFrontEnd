@@ -71,7 +71,7 @@
 
       <div class="order-header">
         <div class="order-meta">
-          <h2 class="order-id">Order ID {{ timesheetDetails?.orderId}}</h2>
+          <h2 class="order-id">Order ID {{ timesheetDetails?.formattedId}}</h2>
         </div>
         <div class="bootstrap reject-reason-input" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
           <div class="e-input input">{{rejectReason}}</div>

@@ -52,7 +52,7 @@ export class DropdownEditorComponent implements ICellRendererAngularComp {
     this.options = this.store.snapshot().timesheets[storeField];
     
     if (storeField === 'billRateTypes') {
-      const ratesNotForSelect = ['Daily OT', 'Daily Premium OT', 'Charge', 'Mileage'];
+      const ratesNotForSelect = ['Daily OT', 'Daily Premium OT', 'Mileage', 'OT'];
 
       this.options = this.options.filter((option) => {
         return !ratesNotForSelect.includes(option.text);

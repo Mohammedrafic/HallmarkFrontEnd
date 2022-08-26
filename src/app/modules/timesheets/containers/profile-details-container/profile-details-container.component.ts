@@ -90,7 +90,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public readonly timesheetDetails$: Observable<TimesheetDetailsModel>;
 
   @Select(TimesheetsState.timesheetDetailsMilesStatistics)
-  public readonly milesData$: Observable<CandidateMilesData>
+  public readonly milesData$: Observable<CandidateMilesData>;
 
   public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
 
