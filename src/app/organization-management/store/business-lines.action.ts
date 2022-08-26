@@ -2,6 +2,7 @@ import { BusinessLines } from "@shared/models/business-line.model";
 
 export class GetBusinessLines {
   static readonly type = '[Business lines] Get Business Lines';
+  constructor(public currentPage?: number, public pageSize?: number) {}
 }
 
 export class GetAllBusinessLines {

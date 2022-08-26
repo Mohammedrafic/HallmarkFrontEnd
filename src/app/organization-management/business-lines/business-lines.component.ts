@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import {
@@ -20,8 +20,9 @@ import {
 import { MessageTypes } from '@shared/enums/message-types';
 import { BusinessLines } from '@shared/models/business-line.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { filter, Observable } from 'rxjs';
+import { filter, Observable, Subject, takeWhile, throttleTime } from 'rxjs';
 import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-business-lines',
@@ -29,12 +30,16 @@ import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
   styleUrls: ['./business-lines.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BusinessLinesComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class BusinessLinesComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Select(BusinessLinesState.businessLines) public readonly businessLines$: Observable<BusinessLines[]>;
+  @Select(BusinessLinesState.totalCount) public readonly totalCount$: Observable<number>;
+  @Select(UserState.lastSelectedOrganizationId) public readonly organizationId$: Observable<number>;
 
   public businessLineFormGroup: FormGroup;
   private isEdit = false;
   private editedBusinessLineId: number | null;
+  private readonly pageSubject = new Subject<number>();
+  private isAlive = true;
 
   constructor(private readonly store: Store, private readonly confirmService: ConfirmService) {
     super();
@@ -43,8 +48,13 @@ export class BusinessLinesComponent extends AbstractGridConfigurationComponent i
     });
   }
 
+  public ngOnDestroy(): void {
+    this.isAlive = false;
+  }
+
   public ngOnInit(): void {
-    this.store.dispatch(new GetBusinessLines());
+    this.getData();
+    this.subscribeOnOrganization();
   }
 
   public onEdit(businessLine: BusinessLines, event: MouseEvent): void {
@@ -130,5 +140,38 @@ export class BusinessLinesComponent extends AbstractGridConfigurationComponent i
     }
     this.store.dispatch(new SaveBusinessLine(businessLine));
     this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+  }
+
+  public onGoToClick(event: any): void {
+    if (event.currentPage || event.value) {
+      this.pageSubject.next(event.currentPage || event.value);
+    }
+  }
+
+  private getData(): void {
+    this.store.dispatch(new GetBusinessLines(this.currentPage, this.pageSize));
+  }
+
+  private subscribeOnOrganization(): void {
+    this.organizationId$.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
+      this.currentPage = 1;
+      this.getData();
+    });
+
+    this.pageSubject
+      .pipe(
+        takeWhile(() => this.isAlive),
+        throttleTime(100)
+      )
+      .subscribe((page) => {
+        this.currentPage = page;
+        this.getData();
+      });
+  }
+
+  public onRowsDropDownChanged(): void {
+    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+    this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
+    this.getData();
   }
 }
