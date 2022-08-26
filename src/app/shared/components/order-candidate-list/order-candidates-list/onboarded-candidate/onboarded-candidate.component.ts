@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ConfirmService } from "@shared/services/confirm.service";
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, merge, Observable, Subject, takeUntil } from 'rxjs';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
@@ -10,7 +11,6 @@ import { DatePipe } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
-  GetOrganisationCandidateJob,
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
@@ -23,14 +23,12 @@ import { RejectReason } from '@shared/models/reject-reason.model';
 import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
-import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';
 import PriceUtils from '@shared/utils/price.utils';
-import { SET_READONLY_STATUS } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SET_READONLY_STATUS } from '@shared/constants';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
-import { GetCandidateJob } from '@agency/store/order-management.actions';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -60,7 +58,6 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public jobStatusControl: FormControl;
   public optionFields = OPTION_FIELDS;
   public candidateJob: OrderCandidateJob | null;
-  public isOnboarded = true;
   public today = new Date();
   public candidatStatus = CandidatStatus;
   public billRatesData: BillRate[] = [];
@@ -100,6 +97,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     private store: Store,
     private actions$: Actions,
     private orderCandidateListViewService: OrderCandidateListViewService,
+    private confirmService: ConfirmService,
     private commentsService: CommentsService
   ) {}
 
@@ -153,14 +151,20 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     }
   }
 
-  public closeDialog() {
-    this.closeModalEvent.emit();
-    this.candidateJob = null;
-    this.jobStatusControl.reset();
-    this.billRatesData = [];
-    this.isRejected = false;
-    this.nextApplicantStatuses = [];
-    this.orderCandidateListViewService.setIsCandidateOpened(false);
+  public onClose(): void {
+    if (this.form.dirty) {
+      this.confirmService
+        .confirm(CANCEL_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => confirm))
+        .subscribe(() => {
+          this.closeDialog();
+        });
+    } else {
+      this.closeDialog();
+    }
   }
 
   public onBillRatesChanged(bill: BillRate): void {
@@ -274,7 +278,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
           offeredStartDate: this.getDateString(value.offeredStartDate),
         });
 
-        this.isFormDisabled(value.applicantStatus.applicantStatus);
+        this.switchFormState();
       }
     });
   }
@@ -296,19 +300,6 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
         const value = this.form.getRawValue();
         this.form.patchValue({ date: [value.startDate, value.endDate] });
       });
-  }
-
-  private isFormDisabled(status: number): void {
-    if (status === ApplicantStatus.OnBoarded) {
-      this.form.disable();
-      this.isOnboarded = false;
-    } else {
-      this.form.enable();
-      this.isOnboarded = true;
-    }
-    if (this.isDeployedCandidate && !this.isAgency) {
-      this.form.disable();
-    }
   }
 
   private subscribeOnReasonsList(): void {
@@ -380,5 +371,24 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     });
 
     this.jobStatusControl = new FormControl('');
+  }
+
+  private closeDialog() {
+    this.closeModalEvent.emit();
+    this.candidateJob = null;
+    this.jobStatusControl.reset();
+    this.billRatesData = [];
+    this.isRejected = false;
+    this.nextApplicantStatuses = [];
+    this.orderCandidateListViewService.setIsCandidateOpened(false);
+    this.form.markAsPristine();
+  }
+
+  private switchFormState(): void {
+    if (this.isDeployedCandidate && !this.isAgency) {
+      this.form?.disable();
+    } else {
+      this.form?.enable();
+    }
   }
 }

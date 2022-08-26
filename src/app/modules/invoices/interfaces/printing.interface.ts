@@ -3,7 +3,7 @@ export interface InvoicePrintRecord {
   timeIn: string;
   timeOut: string;
   billRateConfigName: string;
-  costCenterName: string;
+  departmentName: string;
   jobId: string;
   candidateFirstName: string;
   candidateLastName: string;

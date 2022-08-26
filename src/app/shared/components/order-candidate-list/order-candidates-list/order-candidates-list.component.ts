@@ -102,12 +102,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           }
           this.openDialog(this.offerDeployment);
         } else if (allowedOnboardedStatuses.includes(this.candidate.status)) {
-          this.store.dispatch(
-            new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId)
-          );
-          if (!this.isShowDropdown && !this.candidate.deployedCandidateInfo) {
-            this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
-          }
+          this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
+          this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
           this.openDialog(this.onboarded);
         }
       }

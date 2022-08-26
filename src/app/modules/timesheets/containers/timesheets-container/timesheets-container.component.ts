@@ -4,7 +4,7 @@ import {
   OnInit,
   ChangeDetectorRef, ViewChild,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormControl } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
@@ -90,7 +90,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     private store: Store,
     private timesheetsService: TimesheetsService,
     private cd: ChangeDetectorRef,
-    private router: Router,
+    private route: ActivatedRoute,
   ) {
     super();
     store.dispatch([
@@ -99,7 +99,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       new Timesheets.SelectOrganization(0),
     ]);
 
-    this.isAgency = this.router.url.includes('agency');
+    this.isAgency = this.route.snapshot.data['isAgencyArea'];
   }
 
   ngOnInit(): void {

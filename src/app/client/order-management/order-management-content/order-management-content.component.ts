@@ -66,7 +66,9 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Skill } from '@shared/models/skill.model';
-import { GetAllOrganizationSkills, GetOrganizationSettings
+import {
+  GetAllOrganizationSkills,
+  GetOrganizationSettings,
 } from '@organization-management/store/organization-management.actions';
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { DatePipe, Location } from '@angular/common';
@@ -136,7 +138,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   @Select(OrganizationManagementState.allOrganizationSkills)
   skills$: Observable<Skill[]>;
-
 
   @Select(OrganizationManagementState.organizationSettings)
   organizationSettings$: Observable<OrganizationSettingsGet[]>;
@@ -904,8 +905,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       .subscribe(() => {
         this.store.dispatch(
           new GetAgencyOrderCandidatesList(
-            this.selectedDataRow.id,
-            this.selectedDataRow.organizationId as number,
+            this.selectedOrder.id,
+            this.selectedOrder.organizationId as number,
             1,
             30,
             this.orderManagementService.excludeDeployed
@@ -914,8 +915,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.getOrders();
         this.store.dispatch(
           new GetOrderById(
-            this.selectedDataRow.id,
-            this.selectedDataRow.organizationId as number,
+            this.selectedOrder.id,
+            this.selectedOrder.organizationId as number,
             this.getDialogNextPreviousOption(this.selectedDataRow as any)
           )
         );

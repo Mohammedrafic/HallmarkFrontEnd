@@ -1,13 +1,15 @@
 import { Component, OnDestroy, OnInit, Input, Output, ViewEncapsulation, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import {
   GridApi,
   GridReadyEvent,
-  GridOptions
+  GridOptions,
+  FilterChangedEvent
 } from '@ag-grid-community/core';
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
-import { SpecialProjectCategoryColumnsDefinition } from '../../constants/specialprojects.constant';
+import { SpecialProjectCategoryColumnsDefinition, SpecialProjectMessages } from '../../constants/specialprojects.constant';
 import { Select, Store } from '@ngxs/store';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
@@ -104,13 +106,27 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
     ],
   };
 
+  public noRowsOverlayComponentParams: any = {
+    noRowsMessageFunc: () => SpecialProjectMessages.NoRowsMessage,
+  };
+
   gridOptions: GridOptions = {
     pagination: true,
     cacheBlockSize: this.pageSize,
     paginationPageSize: this.pageSize,
     columnDefs: this.columnDefinitions,
     rowData: this.rowData,
-    sideBar:this.sideBar
+    sideBar: this.sideBar,
+    noRowsOverlayComponent: CustomNoRowsOverlayComponent,
+    noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
+    onFilterChanged: (event: FilterChangedEvent) => {
+      if (!event.api.getDisplayedRowCount()) {
+        this.gridApi.showNoRowsOverlay();
+      }
+      else {
+        this.gridApi.hideOverlay();
+      }
+    }
   };
 
   onGridReady(params: GridReadyEvent) {
@@ -121,10 +137,14 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
   public getSpecialProjectCategories(): void {
     this.store.dispatch(new GetSpecialProjectCategories());
     this.specialProjectCategoryPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (data?.items) {
-        this.rowData = data.items;
-        this.gridApi?.setRowData(this.rowData);
-      }
+        if (!data?.items.length) {
+          this.gridApi.showNoRowsOverlay();
+        }
+        else {
+          this.gridApi.hideOverlay();
+          this.rowData = data.items;
+          this.gridApi?.setRowData(this.rowData);
+        }
     });
   }
 

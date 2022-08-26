@@ -244,7 +244,10 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       this.timesheetDetailsService.submitTimesheet(
         isTimesheetOrMileagesUpdate ? timesheetId : mileageTimesheetId,
         organizationId, isTimesheetOrMileagesUpdate) :
-      this.timesheetDetailsService.approveTimesheet(timesheetId, isTimesheetOrMileagesUpdate)
+      this.timesheetDetailsService.approveTimesheet(
+        isTimesheetOrMileagesUpdate ? timesheetId : mileageTimesheetId,
+        isTimesheetOrMileagesUpdate
+      )
     )
       .pipe(
         takeUntil(this.componentDestroy())

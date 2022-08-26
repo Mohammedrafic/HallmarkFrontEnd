@@ -50,6 +50,14 @@ export class DropdownEditorComponent implements ICellRendererAngularComp {
     this.editable = colDef.cellRendererParams.isEditable;
     
     this.options = this.store.snapshot().timesheets[storeField];
+    
+    if (storeField === 'billRateTypes') {
+      const ratesNotForSelect = ['Daily OT', 'Daily Premium OT', 'Charge', 'Mileage'];
+
+      this.options = this.options.filter((option) => {
+        return !ratesNotForSelect.includes(option.text);
+      })
+    }
 
     if (this.options && this.options.length) {
       this.value = this.options.find((item) => item.value === params.value) as DropdownOption || { text: 'N/A', value: 0 };

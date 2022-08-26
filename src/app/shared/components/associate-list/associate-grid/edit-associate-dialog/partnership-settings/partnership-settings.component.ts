@@ -17,7 +17,6 @@ import {
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
 import { OPTION_FIELDS } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-partnership-settings',
@@ -54,14 +53,9 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));
 
-  get title(): string {
-    const isAgency = this.router.url.includes('agency');
-    return `${isAgency ? 'Organization' : 'Agency'} Category`;
-  }
-
   private partnershipSettings: PartnershipSettings;
 
-  constructor(private router: Router) {
+  constructor() {
     super();
   }
 

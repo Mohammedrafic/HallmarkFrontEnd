@@ -831,6 +831,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       if (this.generalInformationForm.contains(controlName)) {
         const control = this.generalInformationForm.get(controlName);
         control?.clearValidators();
+        control?.updateValueAndValidity();
       }
     });
   }

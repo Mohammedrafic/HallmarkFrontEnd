@@ -22,11 +22,12 @@ import {
   SaveLocation, SaveRegion, SetGeneralStatesByCountry,
   SetImportFileDialogState,
   UpdateLocation,
-  GetLocationTypes
+  GetLocationTypes,
+  GetUSCanadaTimeZoneIds
 } from '../store/organization-management.actions';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { Location, LocationFilter, LocationFilterOptions, LocationsPage, LocationType } from '@shared/models/location.model';
+import { Location, LocationFilter, LocationFilterOptions, LocationsPage } from '@shared/models/location.model';
 
 import { PhoneTypes } from '@shared/enums/phone-types';
 import {
@@ -46,7 +47,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import { TimeZones} from '@shared/enums/timezones';
+
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
 
@@ -69,7 +70,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   @Select(OrganizationManagementState.regions)
   regions$: Observable<Region[]>;
-  regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  regionFields: FieldSettingsModel = { text: 'name', value: 'id'};
   selectedRegion: Region;
   defaultValue: any;
 
@@ -89,11 +90,14 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   @Select(OrganizationManagementState.locationFilterOptions)
   locationFilterOptions$: Observable<LocationFilterOptions>;
 
-  @Select(OrganizationManagementState.timeZones)
-  timeZones$: Observable<FieldSettingsModel[]>;
-
+  
   @Select(OrganizationManagementState.locationTypes)
   locationTypes$: Observable<GetLocationTypes>;
+  locationTypeOptionFields:FieldSettingsModel ={    text: 'name', value: 'locationTypeId'  };
+
+  @Select(OrganizationManagementState.timeZones)
+  timeZoneIds$: Observable<GetUSCanadaTimeZoneIds>;
+  timeZoneOptionFields: FieldSettingsModel = { text: 'systemTimeZoneName', value: 'timeZoneId'};
 
   isEdit: boolean;
   editedLocationId?: number;
@@ -137,9 +141,6 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.createLocationForm();
   }
 
-  public locationTypeOptionFields = {
-    text: 'name', value: 'locationTypeId'
-  };
 
   ngOnInit(): void {
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
@@ -179,6 +180,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         });;
     });
     this.store.dispatch(new GetLocationTypes());
+    this.store.dispatch(new GetUSCanadaTimeZoneIds());
   }
 
   ngOnDestroy(): void {
@@ -356,7 +358,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       inactiveDate: location.inactiveDate,
       phoneNumber: location.phoneNumber,
       phoneType: PhoneTypes[location.phoneType],
-      timeZone: TimeZones[location.timeZone],
+      timeZone: location.timeZone,
       locationType: location.locationTypeId,
       organizationId :this.businessUnitId
     });
@@ -425,7 +427,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         inactiveDate: this.locationDetailsFormGroup.controls['inactiveDate'].value,
         phoneNumber: this.locationDetailsFormGroup.controls['phoneNumber'].value,
         phoneType: parseInt(PhoneTypes[this.locationDetailsFormGroup.controls['phoneType'].value]),
-        timeZone: parseInt(TimeZones[this.locationDetailsFormGroup.controls['timeZone'].value]),
+        timeZone: this.locationDetailsFormGroup.controls['timeZone'].value,
         locationTypeId: this.locationDetailsFormGroup.controls['locationType'].value,
         organizationId : this.businessUnitId
       }
@@ -469,7 +471,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       inactiveDate: [null],
       phoneNumber: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10), Validators.pattern('^[0-9]*$')]],
       phoneType: ['', Validators.required],
-      timeZone: [''],
+      timeZone: [null],
       locationType: [null],
       organizationId:0
     });

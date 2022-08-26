@@ -86,6 +86,7 @@
       <e-column field="state" headerText="STATE" width=200></e-column>
       <e-column field="zip" headerText="ZIP" width=200></e-column>
       <e-column field="contactPerson" headerText="CONTACT PERSON" width=200></e-column>
+      <e-column field="timeZone" headerText="Timezone" width=200></e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
@@ -261,7 +262,7 @@
       </div>
     </div>
 
-    <div class="group">
+    <div class="large-group">
       <div class="input-container">
         <label for="invoiceId">Invoice Location ID </label>
         <div class="input-group">
@@ -286,10 +287,7 @@
         </div>
       </div>
     </div>
- <!-- ToDo
-      Binding location types is pending
- -->
-    <div class="group">
+    <div class="large-group">
       <div class="input-container">
         <label for="locationType">Location Type </label>
         <div class="input-group">
@@ -314,7 +312,8 @@
               id="timeZone"
               appValidateWithMessage
               formControlName="timeZone"
-              [dataSource]="timeZones$ | async" 
+              [fields]="timeZoneOptionFields"
+              [dataSource]="timeZoneIds$ | async" 
             >
             </ejs-dropdownlist>
           </div>
