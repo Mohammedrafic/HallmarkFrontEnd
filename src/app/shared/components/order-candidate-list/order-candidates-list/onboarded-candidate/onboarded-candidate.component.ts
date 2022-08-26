@@ -24,7 +24,7 @@ import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SET_READONLY_STATUS } from '@shared/constants';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SET_READONLY_STATUS } from '@shared/constants';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
@@ -154,7 +154,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public onClose(): void {
     if (this.form.dirty) {
       this.confirmService
-        .confirm(CANCEL_CONFIRM_TEXT, {
+        .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'

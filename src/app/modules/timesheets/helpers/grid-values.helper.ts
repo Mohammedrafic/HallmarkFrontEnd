@@ -30,9 +30,21 @@ export class GridValuesHelper {
     if (isNaN(value)) {
       return '';
     }
-    const formated = value < 0 ? `(${GridValuesHelper.formatCurrency(value.toString())})`
+    const formated = value < 0 ? `(${GridValuesHelper.formatCurrency(Math.abs(value).toString())})`
     : GridValuesHelper.formatCurrency(value.toString());
 
     return formated;
+  }
+
+  public static formatAbsNumber(value: number, format: string): string {
+    if (!Number(value)) {
+      return '';
+    }
+
+    if (value < 0) {
+      return `(${formatNumber(Math.abs(value), 'en', format) || ''})`
+    }
+
+    return formatNumber(value, 'en', format) || '';
   }
 }

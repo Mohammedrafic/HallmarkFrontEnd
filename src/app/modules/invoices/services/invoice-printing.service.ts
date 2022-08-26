@@ -112,19 +112,13 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
         }
       ],
       [
-        { content: '', colSpan: 10 },
-        { content: 'Total:', styles: { fontStyle: 'bold', halign: 'right' } },
-        { content: `${GridValuesHelper.formatCurrency(data.totals.total.toString())}`,
-        styles: { halign: 'right', fontStyle: 'normal' } },
-      ],
-      [
         {
           content: 'Invoice Amount:',
           colSpan: 11,
           styles: { halign: 'right' },
         },
         {
-          content: GridValuesHelper.formatCurrency(data.totals.amount.toString()),
+          content: GridValuesHelper.formatAbsCurrency(data.totals.amount),
           styles: { halign: 'right', fontStyle: 'normal' },
         }
       ],
@@ -226,7 +220,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
             },
           },
           {
-            content: GridValuesHelper.formatAbsCurrency(detail.value),
+            content: GridValuesHelper.formatAbsNumber(detail.value, '1.2-2'),
             styles: {
               halign: 'right',
               fontStyle: 'normal',
@@ -234,7 +228,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
             },
           },
           {
-            content: GridValuesHelper.formatCurrency(detail.total.toString()),
+            content: GridValuesHelper.formatAbsCurrency(detail.total),
             styles: {
               halign: 'right',
               fontStyle: 'normal',
@@ -284,7 +278,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
         },
       },
       {
-        content: GridValuesHelper.formatAbsCurrency(data.totals.totalValue),
+        content: GridValuesHelper.formatAbsNumber(data.totals.total, '1.2-2'),
         styles: {
           fontStyle: 'bold',
           halign: 'right',
@@ -292,7 +286,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
         }
       },
       {
-        content: GridValuesHelper.formatCurrency(data.totals.amount.toString()),
+        content: GridValuesHelper.formatAbsCurrency(data.totals.amount),
         styles: {
           fontStyle: 'bold',
           halign: 'right',
@@ -491,19 +485,19 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
           record.agencyName,
           record.skillName,
           {
-            content:  GridValuesHelper.formatAbsCurrency(record.value),
+            content:  GridValuesHelper.formatAbsNumber(record.value, '1.2-2'),
             styles: {
               halign: 'right',
             },
           },
           {
-            content: GridValuesHelper.formatCurrency(record.rate.toString()),
+            content: GridValuesHelper.formatAbsCurrency(record.rate),
             styles: {
               halign: 'right',
             },
           },
           {
-            content: GridValuesHelper.formatCurrency(record.total.toString()),
+            content: GridValuesHelper.formatAbsCurrency(record.total),
             styles: {
               halign: 'right',
             },

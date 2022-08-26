@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subject, takeWhile } from 'rxjs';
+import { Observable, Subject, takeWhile, tap } from 'rxjs';
 
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -45,6 +45,9 @@ import { addDays, toCorrectTimezoneFormat } from '@shared/utils/date-time.utils'
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 import { ExtensionSidebarComponent } from '@shared/components/extension/extension-sidebar/extension-sidebar.component';
 import { AppState } from '../../../store/app.state';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { UNSAVE_CHANGES_TEXT } from '@shared/constants';
+import { ExtensionCandidateComponent } from '../order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
 
 enum Template {
   accept,
@@ -72,6 +75,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('tab') tab: TabComponent;
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
   @ViewChild(ExtensionSidebarComponent) extensionSidebarComponent: ExtensionSidebarComponent;
+  @ViewChild(ExtensionCandidateComponent) extensionCandidateComponent: ExtensionCandidateComponent;
 
   @Select(OrderManagementState.selectedOrder)
   public agencySelectedOrder$: Observable<Order>;
@@ -115,7 +119,8 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     private chipsCssClass: ChipsCssClass,
     private router: Router,
     private store: Store,
-    private commentsService: CommentsService
+    private commentsService: CommentsService,
+    private confirmService: ConfirmService,
   ) {}
 
   ngOnInit(): void {
@@ -174,10 +179,11 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public onClose(): void {
-    this.tab.select(0);
-    this.sideDialog.hide();
-    this.openEvent.next(null);
-    this.selectedTemplate = null;
+    if (this.extensionCandidateComponent?.form.dirty) {
+      this.saveExtensionChanges().subscribe(() => this.closeSideDialog());
+    } else {
+      this.closeSideDialog();
+    }
   }
 
   public onBillRatesChanged(bill: BillRate): void {
@@ -255,6 +261,26 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.closeExtensionSidebar();
     this.getExtensions();
     this.saveEmitter.emit();
+  }
+
+  private closeSideDialog(): void {
+    this.tab.select(0);
+    this.sideDialog.hide();
+    this.openEvent.next(null);
+    this.selectedTemplate = null;
+  }
+
+  private saveExtensionChanges(): Observable<boolean> {
+    const options = {
+      title: 'Save Changes',
+      okButtonLabel: 'Save',
+      okButtonClass: 'delete-button',
+      cancelButtonLabel: 'Cancel',
+    };
+
+    return this.confirmService
+    .confirm(UNSAVE_CHANGES_TEXT, options)
+    .pipe(tap((confirm) =>  confirm && this.extensionCandidateComponent.updatedUnsavedOnboarded()));
   }
 
   private setAddExtensionBtnState(candidate: OrderManagementChild): void {

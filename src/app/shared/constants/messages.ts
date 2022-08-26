@@ -28,6 +28,7 @@ export const IMPORT_CONFIRM_TEXT = 'Only those data that do not contain errors w
 export const IMPORT_CONFIRM_TITLE = 'Import';
 export const ORDER_WITHOUT_CREDENTIALS = "Added order doesn’t contain the Credentials. Please edit the order to onboard candidates successfully";
 export const ORDER_WITHOUT_BILLRATES = "Added order doesn’t contain the Bill Rates. Please edit the order to onboard candidates successfully";
+export const UNSAVE_CHANGES_TEXT= "Do you want to save changes?";
 
 export const usedByOrderErrorMessage = (val: string, entities: string) => `${val} cannot be deleted. This ${val} was used in ${entities}.`;
 export const usedInMappingMessage = ( mappingName: string ) => `This change has been affected ${mappingName} Mapping, please update it on the ${mappingName} Mapping tab`

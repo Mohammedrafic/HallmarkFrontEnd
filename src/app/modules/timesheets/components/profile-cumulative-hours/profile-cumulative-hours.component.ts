@@ -7,9 +7,10 @@ import {
   DonutChartData,
   TimesheetStatisticsDetails
 } from '../../interface';
-import { profileDetailsHoursChartColorsMap, profileDetailsHoursChartSettings } from '../../constants';
+import { ColorsWidgetMap, profileDetailsHoursChartSettings } from '../../constants';
 import { HourOccupationType } from '../../enums';
 import { CandidateBarChartHelper } from '../../helpers';
+import { TimesheetDetailsService } from '../../services';
 
 @Component({
   selector: 'app-profile-cumulative-hours',
@@ -25,25 +26,18 @@ export class ProfileCumulativeHoursComponent {
   public totalWeekHours: number = 0;
   public totalCumulativeHours: number = 0;
   public legendItems: TimesheetStatisticsDetails[] = [];
-
+  public readonly chartColorsMap = ColorsWidgetMap;
   public readonly chartSettings = profileDetailsHoursChartSettings;
-  public readonly chartColorsMap: Record<HourOccupationType, string> = profileDetailsHoursChartColorsMap;
 
   @Input()
   public set statisticsData(statistics: TimesheetStatisticsDetails[] | null) {
     this._statisticsData = statistics;
 
-    const chartItems: TimesheetStatisticsDetails[] = Object.keys(HourOccupationType).map((occupationTypeName: string) => {
-      const existing = (statistics || []).find((item: TimesheetStatisticsDetails) => item.billRateConfigName === occupationTypeName);
-
-      return existing || getEmptyHoursOccupationData(occupationTypeName);
-    }) || [];
-
+    const chartItems: TimesheetStatisticsDetails[] = this.timesheetDetailsService.createChartItems(statistics);
     this.legendItems = chartItems;
-    const reversedItems: TimesheetStatisticsDetails[] = chartItems.slice().reverse();
-
-    this.weekHoursChartData = reversedItems.map(CandidateBarChartHelper.toWeekHoursChartData);
-    this.cumulativeHoursChartData = reversedItems.map(CandidateBarChartHelper.toCumulativeHoursChartData);
+    
+    this.weekHoursChartData = chartItems.map(CandidateBarChartHelper.toWeekHoursChartData);
+    this.cumulativeHoursChartData = chartItems.map(CandidateBarChartHelper.toCumulativeHoursChartData);
 
     this.updateTotalHoursData();
   }
@@ -52,12 +46,16 @@ export class ProfileCumulativeHoursComponent {
     return this._statisticsData;
   }
 
+  constructor(
+    private timesheetDetailsService: TimesheetDetailsService,
+  ) {}
+
   public trackByName(_: number, item: TimesheetStatisticsDetails): string {
     return item.billRateConfigName;
   }
 
   public onPointRender(event: ChartPointRenderEvent<HourOccupationType>): void {
-    event.fill = profileDetailsHoursChartColorsMap[event.point.x];
+    event.fill = ColorsWidgetMap[event.point.index];
   }
 
   public toggleChartCategoryVisibility({checked}: CheckBoxChangeEventArgs, legendItem: TimesheetStatisticsDetails): void {
@@ -90,13 +88,4 @@ export class ProfileCumulativeHoursComponent {
   private getTotalCumulativeHours(): number {
     return this.cumulativeHoursChartData.reduce((acc, value) => acc + value.y, 0);
   }
-}
-
-function getEmptyHoursOccupationData(name: string): TimesheetStatisticsDetails {
-  return {
-    billRateConfigName: name as HourOccupationType,
-    cumulativeHours: 0,
-    weekHours: 0,
-    billRateConfigId: Math.random(),
-  };
 }

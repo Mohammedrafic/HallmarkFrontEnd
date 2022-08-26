@@ -76,7 +76,7 @@
             <button
               ejs-button
               cssClass="e-outline"
-              *ngIf="orderType.ReOrder !== order?.orderType"
+              *ngIf="orderType.ReOrder !== order?.orderType && !this.order?.extensionFromId"
               [isPrimary]="true"
               (click)="lockOrder()"
               [disabled]="disabledLock"
@@ -109,7 +109,7 @@
                 <app-extension-candidate
                   [currentOrder]="order"
                   [candidateOrder]="candidateOrderPage"
-                  *ngIf="order.extensionFromId; else candidateOrder">
+                  *ngIf="order?.extensionFromId; else candidateOrder">
                 </app-extension-candidate>
                 <ng-template #candidateOrder>
                   <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>

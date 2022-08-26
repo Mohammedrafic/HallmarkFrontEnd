@@ -28,7 +28,11 @@ import { JobDistribution } from '@shared/enums/job-distibution';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
-import { GetAssociateAgencies, GetContactDetails, GetProjectSpecialData, SaveOrder
+import {
+  GetAssociateAgencies,
+  GetContactDetails,
+  GetProjectSpecialData,
+  SaveOrder,
 } from '@client/store/order-managment-content.actions';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import PriceUtils from '@shared/utils/price.utils';
@@ -245,6 +249,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       title: [[], Validators.required],
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
+      isPrimaryContact: true,
     });
   }
 
@@ -426,7 +431,14 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   private handlePerDiemOrder(): void {
     const listOfCommonControls = [
-      'hourlyRate', 'openPositions', 'jobStartDate', 'jobEndDate', 'shift', 'shiftStartTime', 'shiftEndTime'];
+      'hourlyRate',
+      'openPositions',
+      'jobStartDate',
+      'jobEndDate',
+      'shift',
+      'shiftStartTime',
+      'shiftEndTime',
+    ];
     if (this.isOpenPerDiem) {
       listOfCommonControls.forEach((control) => {
         this.generalInformationForm.controls[control].setValidators(null);
@@ -618,9 +630,12 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
             };
           });
 
-          this.jobDistributionDescriptionForm.controls['jobDistributions'].patchValue([...jobDistributions, ...selectedJobDistributions], {
-          emitEvent: false,
-        });
+        this.jobDistributionDescriptionForm.controls['jobDistributions'].patchValue(
+          [...jobDistributions, ...selectedJobDistributions],
+          {
+            emitEvent: false,
+          }
+        );
       });
   }
 

@@ -75,7 +75,7 @@
         </tr>
         <tr *ngFor="let legendItem of legendItems; let i = index; trackBy: trackByName">
           <td>
-            <div class="marker" [style.backgroundColor]="chartColorsMap[legendItem.billRateConfigName]"></div>
+            <div class="marker" [style.backgroundColor]="chartColorsMap[i]"></div>
           </td>
           <td class="name">{{legendItem.billRateConfigName}}</td>
           <td class="week-hours-value">

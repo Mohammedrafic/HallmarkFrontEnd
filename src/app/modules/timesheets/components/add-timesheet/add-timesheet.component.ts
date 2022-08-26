@@ -86,7 +86,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
       }
 
       if (item.optionsStateKey === 'billRateTypes') {
-        const ratesNotForSelect = ['Daily OT', 'Daily Premium OT', 'Charge', 'Mileage'];
+        const ratesNotForSelect = ['Daily OT', 'Daily Premium OT', 'OT', 'Mileage'];
 
         item.options = item.options?.filter((option) => {
           return !ratesNotForSelect.includes(option.text);
