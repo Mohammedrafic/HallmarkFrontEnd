@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Location, LocationFilter, LocationFilterOptions, LocationsPage, LocationType } from '../../shared/models/location.model';
+import { Location, LocationFilter, LocationFilterOptions, LocationsPage, LocationType, TimeZoneModel } from '../../shared/models/location.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
@@ -80,5 +80,13 @@ export class LocationService {
    */
    public getLocationTypes(): Observable<LocationType[]> {
     return this.http.get<LocationType[]>(`/api/Locations/locationtypes`);
+  }
+
+  /**
+   * Get usa canada timezoneids from noda
+   * @return Array of timezoneIds
+   */
+  public getUSCanadaTimeZoneIds(): Observable<TimeZoneModel[]> {
+    return this.http.get<TimeZoneModel[]>(`/api/NodaTime/uscanadatimezones`);
   }
 }
