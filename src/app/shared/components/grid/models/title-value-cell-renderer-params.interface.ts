@@ -4,5 +4,6 @@ export interface TitleValueCellRendererParams extends ICellRendererParams {
   titleValueParams?: {
     value?: string;
     title?: string;
+    valueClass?: string;
   }
 }

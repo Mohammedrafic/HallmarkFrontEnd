@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, ViewChild, ElementRef, Input, Output,
-  EventEmitter, ChangeDetectorRef, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+  EventEmitter, ChangeDetectorRef, OnChanges, SimpleChanges } from '@angular/core';
 
-import { RemovingEventArgs, SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
+import { FilesPropModel, RemovingEventArgs, SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
 import { UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { Actions, Store } from '@ngxs/store';
 
@@ -11,6 +11,7 @@ import { AllowedFileExtensions } from './file-uploader.constant';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { FilesClearEvent } from '@core/enums';
+import { Attachment } from '@shared/components/attachments';
 
 @Component({
   selector: 'app-file-uploader',
@@ -36,6 +37,21 @@ export class FileUploaderComponent implements OnChanges {
   @Input() clearAll: FilesClearEvent | null;
 
   @Output() uploadFilesChanged: EventEmitter<FileForUpload[]> = new EventEmitter();
+
+  public existingFiles: FilesPropModel[] = [];
+
+  @Input()
+  public set attachments(value: Attachment[]) {
+    if (value && value.length) {
+      this.existingFiles = value.map<FilesPropModel>(({ fileName}) => {
+        return {
+          name: fileName,
+          type: '',
+          size: 0,
+        }
+      });
+    }
+  }
 
   public files: FileForUpload[] = [];
 

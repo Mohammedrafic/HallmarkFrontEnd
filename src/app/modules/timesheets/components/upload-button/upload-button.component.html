@@ -25,6 +25,7 @@
             <h2>Upload Documents</h2>
             <app-file-uploader [allowedFileExtensions]="allowedFileExtensions"
                                [maxFileSize]="maxFileSize"
+                               [maxFiles]="5"
                                [showSelectedFiles]="false"
                                (uploadFilesChanged)="emitSelectedFiles($event)"
             ></app-file-uploader>

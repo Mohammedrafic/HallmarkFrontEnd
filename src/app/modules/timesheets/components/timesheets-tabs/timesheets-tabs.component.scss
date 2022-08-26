@@ -3,6 +3,18 @@
     padding: 0 !important;
   }
 
+  .e-control.e-tab.e-lib.disabled {
+    & .e-toolbar-item.e-icon.e-template {
+      background: inherit;
+      opacity: 1;
+      pointer-events: none;
+
+      & .e-tab-text {
+        color: #9e9e9e;
+      }
+    }
+  }
+
   .e-tab_default_tab_header_items_nav.e-scroll-nav.e-scroll-left-nav.e-lib.e-touch,
   .e-tab_default_tab_header_items_nav.e-scroll-nav.e-scroll-right-nav.e-lib.e-touch {
     display: none;

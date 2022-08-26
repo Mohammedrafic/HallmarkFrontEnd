@@ -1,14 +1,25 @@
-import { GetInvoicesData, InvoicesFilterState, ManualInvoicePostDto } from '../../interfaces';
+import {
+  GetPendingApprovalParams,
+  GroupInvoicesParams,
+  InvoicesFilterState,
+  ManualInvoice,
+  ManualInvoicePostDto,
+  PrintingPostDto
+} from '../../interfaces';
 import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums/invoices.enum';
 import { DialogAction } from '@core/enums';
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { DataSourceItem, FileForUpload } from '@core/interface';
+import { Attachment } from '@shared/components/attachments';
+import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
 
 export namespace Invoices {
-  export class Get {
-    static readonly type = INVOICES_ACTIONS.GET;
+  export class GetManualInvoices {
+    static readonly type = INVOICES_ACTIONS.GET_MANUAL_INVOICES;
 
-    constructor(public readonly payload: GetInvoicesData) {
+    constructor(
+      public readonly organizationId: number | null
+    ) {
     }
   }
 
@@ -16,6 +27,15 @@ export namespace Invoices {
     static readonly type = INVOICES_ACTIONS.GET_PENDING_INVOICES;
 
     constructor(public readonly organizationId: number | null) {
+    }
+  }
+
+  export class GetPendingApproval {
+    static readonly type = INVOICES_ACTIONS.GET_PENDING_APPROVAL;
+
+    constructor(
+      public readonly payload: GetPendingApprovalParams,
+    ) {
     }
   }
 
@@ -35,6 +55,7 @@ export namespace Invoices {
 
     constructor(
       public readonly action: DialogAction,
+      public readonly invoice?: ManualInvoice,
     ) {}
   }
 
@@ -90,6 +111,15 @@ export namespace Invoices {
     ) {}
   }
 
+  export class DeleteManualInvoice {
+    static readonly type = INVOICES_ACTIONS.DeleteManualInvoice;
+
+    constructor(
+      public readonly id: number,
+      public readonly organizationId: number | null,
+    ) {}
+  }
+
   export class GetOrganizations {
     static readonly type = INVOICES_ACTIONS.GetOrganizations;
   }
@@ -133,12 +163,75 @@ export namespace Invoices {
     }
   }
 
+  export class ApproveInvoices {
+    static readonly type = INVOICES_ACTIONS.ApproveInvoices;
+
+    constructor(
+      public readonly invoiceIds: number[],
+    ) {
+    }
+  }
+
   export class RejectInvoice {
     static readonly type = INVOICES_ACTIONS.RejectInvoice;
 
     constructor(
       public readonly invoiceId: number,
+      public readonly rejectionReason: string,
     ) {
     }
+  }
+
+  export class PreviewAttachment {
+    static readonly type = INVOICES_ACTIONS.PreviewAttachment;
+
+    constructor(
+      public readonly organizationId: number | null,
+      public readonly payload: Attachment,
+    ) {
+    }
+  }
+
+  export class DownloadAttachment {
+    static readonly type = INVOICES_ACTIONS.DownloadAttachment;
+
+    constructor(
+      public readonly organizationId: number | null,
+      public readonly payload: Attachment,
+    ) {
+    }
+  }
+
+  export class ShowRejectInvoiceDialog {
+    static readonly type = INVOICES_ACTIONS.OpenRejectReasonDialog;
+
+    constructor(
+      public readonly invoiceId: number,
+    ) {
+    }
+  }
+
+  export class GroupInvoices {
+    static readonly type = INVOICES_ACTIONS.GroupInvoices;
+
+    constructor(
+      public readonly payload: GroupInvoicesParams,
+    ) {
+    }
+  }
+
+  export class ApprovePendingApproveInvoice {
+    static readonly type = INVOICES_ACTIONS.ApprovePendingApprovalInvoice;
+
+    constructor(
+      public readonly payload: PendingApprovalInvoice,
+    ) {
+    }
+  }
+
+  export class GetPrintData {
+    static readonly type = INVOICES_ACTIONS.GetPrintingData;
+
+    constructor (public readonly body: PrintingPostDto) {}
   }
 }

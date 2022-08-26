@@ -318,6 +318,11 @@ export const MENU_CONFIG: any = {
       icon: 'users',
       route: 'agency/candidate-details',
     },
+    36: {
+      // Candidates
+      icon: 'file-text',
+      route: 'client/candidates',
+    },
     37: {
       // Candidate Details
       icon: 'users',

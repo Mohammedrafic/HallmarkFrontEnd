@@ -17,7 +17,7 @@ export class ManualInvoiceAdapter {
         jobId: jobPosition.jobId,
         amount: Number(formData.value),
         serviceDate: DateTimeHelper.toUtcFormat(formData.date),
-        linkedInvoiceId: Number(formData.link),
+        linkedInvoiceId: formData.link,
         vendorFeeApplicable: !!formData.vendorFee,
         manualInvoiceReasonId: formData.reasonId,
         comment: formData.description,

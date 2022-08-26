@@ -6,22 +6,6 @@
   flex-direction: column;
 
   ::ng-deep {
-    .color-supportive-green-10 {
-      color: $supportive-green-10;
-    }
-
-    .color-supportive-red {
-      color: $supportive-red;
-    }
-
-    .color-primary-active-blue-10 {
-      color: $primary-active-blue-10;
-    }
-
-    .color-black-bold {
-      font-weight: 700;
-    }
-
     .align-right {
       text-align: right;
     }
@@ -29,6 +13,24 @@
     .ag-cell {
       .ag-cell-wrapper .ag-selection-checkbox {
         margin-right: 20px;
+      }
+
+      &.expansion-toggle-icons-order-1 {
+        .ag-group-contracted, .ag-group-expanded {
+          order: 1;
+          margin-left: 25px;
+
+          .ag-icon {
+            color: $primary-active-blue-10;
+            font-weight: 700;
+          }
+        }
+      }
+    }
+
+    .multi-line-header {
+      .ag-header-cell-text {
+        white-space: normal;
       }
     }
   }
@@ -42,6 +44,7 @@
 
 .invoices-table-container {
   flex-grow: 1;
+  padding-bottom: 25px;
 }
 
 .create-invoice-dialog-content {
@@ -62,5 +65,74 @@
 
   button[type="submit"] {
     margin-left: 8px;
+  }
+}
+
+.invoices-actions-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .group-invoices-overlay {
+    position: absolute;
+    left: 50px;
+    z-index: 10;
+
+    top: 45px;
+    right: 0;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 3px 28px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    padding-top: 7px;
+    padding-bottom: 7px;
+
+    &.hidden {
+      width: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    .e-list-template {
+      border: none;
+    }
+
+    .e-list-item {
+      padding: 14px;
+      display: flex;
+      align-items: center;
+
+      .group-option-name {
+        padding-right: 25px;
+        flex-grow: 1;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 22px;
+        letter-spacing: 0.015em;
+        color: $black;
+      }
+    }
+  }
+}
+
+.invoices-split-button {
+  margin-left: 12px;
+
+  .main-button {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-right: 1px;
+    min-width: 225px;
+  }
+
+  .dropdown-button {
+    padding: 8px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+
+    i-feather {
+      margin-left: 0;
+      font-weight: 700;
+    }
   }
 }

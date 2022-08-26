@@ -7,7 +7,9 @@ export enum INVOICES_STATUSES {
 
 export enum INVOICES_ACTIONS {
   GET = '[invoices] GET',
+  GET_MANUAL_INVOICES = '[invoices] GET MANUAL INVOICES',
   GET_PENDING_INVOICES = '[invoices] GET PENDING INVOICES',
+  GET_PENDING_APPROVAL = '[invoices] GET PENDING APPROVAL',
   TOGGLE_INVOICE_DIALOG = '[invoices] TOGGLE INVOICE DIALOG',
   ToggleManualInvoice = '[invoices] toggle manual invoice dialog',
   UPDATE_FILTERS_STATE = '[invoices] UPDATE FILTERS STATE',
@@ -17,13 +19,21 @@ export enum INVOICES_ACTIONS {
   GetReasons = '[invoices] Get reasons for manual invoices',
   GetMeta = '[invoices] Get manual invoice metadata',
   SaveManualinvoice = '[invoices] Save manual invoice',
+  DeleteManualInvoice = '[invoices] Delete manual invoice',
   GetOrganizations = '[invoices] Get organizations',
   GetOrganizationStructure = '[invoices] Get organization structure',
   SelectOrganization = '[invoices] Select another organization',
   ClearManInvoiceAttachments = '[invoices] clear manual invoice attachments',
   ApproveInvoice = '[invoices] Approve Invoice',
+  ApproveInvoices = '[invoices] Approve Invoices',
   SubmitInvoice = '[invoices] Submit Invoice',
   RejectInvoice = '[invoices] Reject Invoice',
+  DownloadAttachment = '[invoices] Download Attachment',
+  OpenRejectReasonDialog = '[invoices] Open Reject Reason Dialog',
+  PreviewAttachment = '[invoices] Preview Attachment',
+  GroupInvoices = '[invoices] Group Invoices',
+  ApprovePendingApprovalInvoice = '[invoices] Approve Pending Payment Invoice',
+  GetPrintingData = '[invoices] Get printing data',
 }
 
 export enum InvoicesTableFiltersColumns {

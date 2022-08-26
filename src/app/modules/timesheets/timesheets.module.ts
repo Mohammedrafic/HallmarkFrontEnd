@@ -39,7 +39,6 @@ import { ProfileDetailsJobInfoComponent } from './components/profile-details-job
 import { ProfileCumulativeHoursComponent } from './components/profile-cumulative-hours/profile-cumulative-hours.component';
 import { ProfileInvoicesComponent } from './components/profile-invoices/profile-invoices.component';
 import { TimesheetsService } from './services/timesheets.service';
-import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
 import { TimesheetDetailsApiService } from './services/timesheet-details-api.service';
 import { TimesheetRecordsService } from './services/timesheet-records.service';
 import { DropdownEditorComponent } from './components/cell-editors/dropdown-editor/dropdown-editor.component';
@@ -67,6 +66,9 @@ import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
 import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
 import { TimesheetsTableFiltersColumns } from './enums';
 import { APP_FILTERS_CONFIG } from '@core/constants/filters-helper.constant';
+import {
+  RejectReasonInputDialogModule
+} from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.module';
 import { RecordStatusCellComponent } from './components/cell-editors/record-status-cell/record-status-cell.component';
 
 const gridIcons = {
@@ -108,7 +110,6 @@ const gridIcons = {
     ProfileDetailsJobInfoComponent,
     ProfileCumulativeHoursComponent,
     ProfileInvoicesComponent,
-    TimesheetRejectReasonDialogComponent,
     GridDateEditorComponent,
     DropdownEditorComponent,
     ActionsCellComponent,
@@ -159,6 +160,7 @@ const gridIcons = {
     FileViewerModule,
     AttachmentsModule,
     FileUploaderModule,
+    RejectReasonInputDialogModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [

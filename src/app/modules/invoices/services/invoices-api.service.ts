@@ -7,15 +7,18 @@ import { map } from 'rxjs/operators';
 import { PageOfCollections } from '@shared/models/page.model';
 import { DataSourceItem, FileForUpload } from '@core/interface';
 import {
+  GetPendingApprovalParams,
+  GroupInvoicesParams,
   InvoicesFilteringOptions,
   InvoicesFilterState,
   ManualInvoiceMeta,
   ManualInvoicePostDto,
-  ManualInvoiceReason, ManualInvoiceTimesheetResponse
+  ManualInvoiceReason, ManualInvoicesData, ManualInvoiceTimesheetResponse, PrintingPostDto, PrintInvoiceData
 } from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
 import { ChangeStatusData } from '../../timesheets/interface';
+import { PendingApprovalInvoice, PendingApprovalInvoicesData } from '../interfaces/pending-approval-invoice.interface';
 
 @Injectable()
 export class InvoicesApiService {
@@ -53,6 +56,10 @@ export class InvoicesApiService {
     return this.http.post<ManualInvoiceTimesheetResponse>('/api/ManualInvoiceRecords', payload);
   }
 
+  public deleteManualInvoice(id: number, organizationId: number | null): Observable<void> {
+    return organizationId ? this.agencyDeleteManualInvoice(id, organizationId) : this.organizationDeleteManualInvoice(id);
+  }
+
     /**
    * TODO: remove this with shared service
    */
@@ -82,11 +89,44 @@ export class InvoicesApiService {
     return this.http.post<number[]>(endPoint, formData);
   }
 
+  public getManualInvoices(data: InvoicesFilterState): Observable<ManualInvoicesData> {
+    return this.http.post<ManualInvoicesData>('/api/ManualInvoiceRecords/filtered', data);
+  }
+
   public getPendingInvoices(data: InvoicesFilterState): Observable<PendingInvoicesData> {
     return this.http.post<PendingInvoicesData>('/api/PendingInvoices', data);
   }
 
+  public getPendingApproval(data: GetPendingApprovalParams): Observable<PendingApprovalInvoicesData> {
+    return this.http.post<PendingApprovalInvoicesData>('/api/Invoices/filtered', data);
+  }
+
   public changeInvoiceStatus(data: ChangeStatusData): Observable<void> {
     return this.http.post<void>(`/api/TimesheetState/setstatus`, data);
+  }
+
+  public bulkApprove(timesheetIds: number[]): Observable<void> {
+    return this.http.post<void>('/api/TimesheetState/bulkapprove', { timesheetIds });
+  }
+
+  public groupInvoices(data: GroupInvoicesParams): Observable<void> {
+    return this.http.post<void>('/api/Invoices', data);
+  }
+
+  public approvePendingApproveInvoice(data: PendingApprovalInvoice): Observable<null> {
+    // TODO: Change to API when its ready
+    return of(null);
+  }
+
+  public getPrintData(body: PrintingPostDto): Observable<PrintInvoiceData[]> {
+    return this.http.post<PrintInvoiceData[]>('/api/Invoices/printing', body);
+  }
+
+  private organizationDeleteManualInvoice(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/ManualInvoiceRecords/${id}`);
+  }
+
+  private agencyDeleteManualInvoice(id: number, organizationId: number | null): Observable<void> {
+    return this.http.delete<void>(`/api/ManualInvoiceRecords/${id}/organizations/${organizationId}`);
   }
 }

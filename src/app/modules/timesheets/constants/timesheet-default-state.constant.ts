@@ -3,6 +3,7 @@ import { TimesheetsModel } from '../store/model/timesheets.model';
 import { DefaultFilterColumns, DefaultFiltersState } from './timesheets-table.constant';
 
 export const DefaultTimesheetState: TimesheetsModel = {
+  loading: false,
   timesheets: null,
   timesheetsFilters: null,
   tabCounts: null,

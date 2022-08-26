@@ -1,7 +1,8 @@
 <ejs-tab
   id="tab_default"
   heightAdjustMode="Auto"
-  (selecting)="onSelect($event)">
+  (selecting)="onSelect($event)"
+  cssClass="{{ isDisabled && 'disabled' }}">
   <e-tabitems>
     <e-tabitem>
       <ng-template #headerText>
