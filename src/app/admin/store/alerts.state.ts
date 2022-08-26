@@ -1,17 +1,19 @@
 import { Injectable } from "@angular/core";
 import { UserSubscriptionPage, UserSubscriptionRequest } from "@shared/models/user-subscription.model";
 import { Action, Selector, StateContext} from '@ngxs/store';
-import { GetAlertsTemplatePage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
+import { GetAlertsTemplatePage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
 import { Observable ,tap} from "rxjs";
 import { AlertsService } from "@shared/services/alerts.service";
 import { BusinessUnitService } from "@shared/services/business-unit.service";
 import { AlertsTemplate, AlertsTemplatePage, EditAlertsTemplate } from "@shared/models/alerts-template.model";
 
 interface AlertsStateModel {
-    userSubscriptionPage: UserSubscriptionPage | null;
-    userSubscriptionSaved:boolean|false;
+  userSubscriptionPage: UserSubscriptionPage | null;
+  userSubscriptionSaved: boolean;
     alertsTemplatePage:AlertsTemplatePage |null;
-    editAlertsTemplate:EditAlertsTemplate|null;
+    editAlertsTemplate: EditAlertsTemplate | null;
+    saveAlertsTemplate: EditAlertsTemplate | null;
+    updateAlertsTemplate: EditAlertsTemplate | null;
 }
 
 @Injectable()
@@ -36,7 +38,11 @@ export class AlertsState {
   }
   @Selector()
   static SaveTemplateByAlertId(state: AlertsStateModel): EditAlertsTemplate | null {
-    return state.editAlertsTemplate;
+    return state.saveAlertsTemplate;
+  }
+  @Selector()
+  static UpdateTemplateByAlertId(state: AlertsStateModel): EditAlertsTemplate | null {
+    return state.updateAlertsTemplate;
   }
   constructor(
     private businessUnitService: BusinessUnitService,
@@ -58,7 +64,7 @@ export class AlertsState {
   @Action(UpdateUserSubscription)
   UpdateUserSubscription(
     { patchState }: StateContext<AlertsStateModel>,
-    { userSubscriptionRequest}: UpdateUserSubscription
+    { userSubscriptionRequest }: UpdateUserSubscription
   ): Observable<void> {
     return this.alertsService.updateUserSubscription(userSubscriptionRequest).pipe(
       tap((payload) => {
@@ -66,6 +72,7 @@ export class AlertsState {
         return payload;
       })
     );
+   
   }
   
   @Action(GetAlertsTemplatePage)
@@ -84,11 +91,23 @@ export class AlertsState {
   @Action(GetTemplateByAlertId)
   GetTemplateByAlertId(
     { patchState }: StateContext<AlertsStateModel>,
-    { alertId,alertChannelId}: GetTemplateByAlertId
+    { alertId,alertChannel,businessUnitId}: GetTemplateByAlertId
   ): Observable<EditAlertsTemplate> {
-    return this.alertsService.getTemplateByAlertId(alertId,alertChannelId).pipe(
+    return this.alertsService.getTemplateByAlertId(alertId,alertChannel,businessUnitId).pipe(
       tap((payload) => {
         patchState({ editAlertsTemplate: payload });
+        return payload;
+      })
+    );
+  }
+  @Action(UpdateTemplateByAlertId)
+  UpdateTemplateByAlertId(
+    { patchState }: StateContext<AlertsStateModel>,
+    { editAlertsTemplateRequest }: UpdateTemplateByAlertId
+  ): Observable<EditAlertsTemplate> {
+    return this.alertsService.updateTemplateByAlertId(editAlertsTemplateRequest).pipe(
+      tap((payload) => {
+        patchState({ updateAlertsTemplate: payload });
         return payload;
       })
     );
@@ -96,11 +115,11 @@ export class AlertsState {
   @Action(SaveTemplateByAlertId)
   SaveTemplateByAlertId(
     { patchState }: StateContext<AlertsStateModel>,
-    { editAlertsTemplateRequest}: SaveTemplateByAlertId
+    { addAlertsTemplateRequest }: SaveTemplateByAlertId
   ): Observable<EditAlertsTemplate> {
-    return this.alertsService.saveTemplateByAlertId(editAlertsTemplateRequest).pipe(
+    return this.alertsService.saveTemplateByAlertId(addAlertsTemplateRequest).pipe(
       tap((payload) => {
-        patchState({ editAlertsTemplate: payload });
+        patchState({ saveAlertsTemplate: payload });
         return payload;
       })
     );

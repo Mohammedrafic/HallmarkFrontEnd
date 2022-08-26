@@ -4,7 +4,7 @@ import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { Observable, Subject, takeWhile } from 'rxjs';
+import { Observable, Subject, takeWhile, takeUntil } from 'rxjs';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { alertsFilterColumns, BUSINESS_UNITS_VALUES, BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, User_DATA_FIELDS } from '../alerts.constants';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
@@ -57,12 +57,13 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public defaultColDef: any;
   public autoGroupColumnDef: any;
   public title: string = "User Subscription";
-  //public userGuid: string = "BB401BC8-EA62-49B0-ABBD-9A32C3DA0853";
   public userGuid: string = "";
+  public unsubscribe$: Subject<void> = new Subject();
   itemList: Array<UserSubscription> | undefined;
   private gridApi: any;
   private gridColumnApi: any;
-  private isAlive = true;
+  private isAlive: boolean = true;
+  private isSavedData: boolean = false;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   rowModelType: any;
   serverSideInfiniteScroll: any;
@@ -283,7 +284,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           else filter = null;
 
           var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
-          self.userSubscriptionPage$.pipe().subscribe((data: any) => {
+          self.userSubscriptionPage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
           
               self.itemList = data?.items;
               if (!self.itemList || !self.itemList.length) {
@@ -291,7 +292,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
               }
               else {
                 self.gridApi.hideOverlay();
-              }
+            }
+            
               params.successCallback(self.itemList, data?.totalCount || 1);
             
           });
@@ -340,10 +342,9 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         enabled: data.event?.checked
       }
       this.store.dispatch(new UpdateUserSubscription(updateUserSubscription));
-      this.updateUserSubscription$.pipe().subscribe((updated: any) => {
-        if (updated != undefined &&updated==true) {        
-          this.dispatchNewPage(this.userGuid);
-          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));     
+      this.updateUserSubscription$.pipe(takeUntil(this.unsubscribe$)).subscribe((updated: boolean) => {
+        if (updated != undefined &&updated==true) {  
+            this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         }
       });
       

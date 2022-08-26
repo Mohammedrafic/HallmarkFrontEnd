@@ -15,7 +15,7 @@ export class EditAlertsTemplate {
   id:number;
   alertId: number;
   alertChannel:AlertChannel;    
-  businessUnitId:BusinessUnitType;    
+  businessUnitId:number |null;    
   alertTitle:string;
   alertBody: string;
   toList: string;
@@ -32,7 +32,16 @@ export class EditAlertsTemplateRequest  {
   cCList: string;
   bCCList: string;
 };
-  
+export class AddAlertsTemplateRequest {  
+  businessUnitId: number |null;
+  alertId: number;
+  alertChannel: AlertChannel;
+  alertTitle: string;
+  alertBody: string;
+  toList: string;
+  cCList: string;
+  bCCList: string;  
+};
   
   export class AlertsTemplateFilters {
   };

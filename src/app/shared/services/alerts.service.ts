@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { UserSubscription, UserSubscriptionFilters, UserSubscriptionPage ,UserSubscriptionRequest} from "@shared/models/user-subscription.model";
 import { observable, Observable, of } from "rxjs";
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
+import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
 import { AlertChannel } from "@admin/alerts/alerts.enum";
 
 @Injectable({
@@ -47,7 +47,7 @@ export class AlertsService {
    public updateUserSubscription(
     UserSubscriptionRequest:UserSubscriptionRequest    
   ): Observable<void> {  
-    return this.http.post<void>(`/api/UserSubscription/`,UserSubscriptionRequest);
+     return this.http.post<void>(`/api/UserSubscription/`,UserSubscriptionRequest);
   }
   /**
    * Get the list of AlertsTemplate
@@ -78,23 +78,39 @@ export class AlertsService {
    */
    public getTemplateByAlertId(
     AlertId:number,
-    AlertChannelId:AlertChannel
-  ): Observable<EditAlertsTemplate> {  
-    return this.http.get<EditAlertsTemplate>(`/api/Templates/GetTemplateByAlertId/`+ AlertId+`?alertChannel=`+AlertChannelId);
+    AlertChannel:AlertChannel,
+    BusinessUnitId:any
+  ): Observable<EditAlertsTemplate> {     
+     if(BusinessUnitId==null)
+     {
+      return this.http.get<EditAlertsTemplate>(`/api/Templates/GetTemplateByAlertId/`+ AlertId,{params:{AlertChannel: AlertChannel}});
+     }
+    return this.http.get<EditAlertsTemplate>(`/api/Templates/GetTemplateByAlertId/`+ AlertId,{params:{AlertChannel: AlertChannel, BusinessUnitId: BusinessUnitId}});
   }
 
   /**
-   * Get Template By AlertId
+   * Save Template By AlertId
+   * @param AddAlertsTemplateRequest
+   *
+   * @return EditAlertsTemplate
+   */
+  public saveTemplateByAlertId(
+    AddAlertsTemplateRequest: AddAlertsTemplateRequest
+   ): Observable<EditAlertsTemplate> {     
+    return this.http.post<EditAlertsTemplate>(`/api/Templates/`, AddAlertsTemplateRequest);
+     
+  }
+  /**
+   * Update Template By AlertId
    * @param EditAlertsTemplateRequest
    *
    * @return EditAlertsTemplate
    */
-   public saveTemplateByAlertId(
-    EditAlertsTemplateRequest:EditAlertsTemplateRequest
-  ): Observable<EditAlertsTemplate> {  
-    return this.http.put<EditAlertsTemplate>(`/api/Templates/`,EditAlertsTemplateRequest);
- }
+  public updateTemplateByAlertId(
+    EditAlertsTemplateRequest: EditAlertsTemplateRequest
+  ): Observable<EditAlertsTemplate> {    
+    return this.http.put<EditAlertsTemplate>(`/api/Templates/`, EditAlertsTemplateRequest);
+  }
   
 }
 
-  

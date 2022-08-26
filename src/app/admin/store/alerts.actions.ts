@@ -1,6 +1,6 @@
 import { AlertChannel } from "@admin/alerts/alerts.enum";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
-import { AlertsTemplateFilters, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
+import { AddAlertsTemplateRequest, AlertsTemplateFilters, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
 import { UserSubscriptionFilters, UserSubscriptionRequest } from "@shared/models/user-subscription.model";
 
 export class GetUserSubscriptionPage {
@@ -38,12 +38,19 @@ export class GetUserSubscriptionPage {
     static readonly type = '[alerts] Get Template By AlertId';
     constructor(
       public alertId:number,
-      public alertChannelId: AlertChannel
+      public alertChannel: AlertChannel,
+      public businessUnitId:number |null
     ) {}
   }
-  export class SaveTemplateByAlertId {
-    static readonly type = '[alerts] Save Template By AlertId';
+  export class UpdateTemplateByAlertId {
+    static readonly type = '[alerts] Update Template By AlertId';
     constructor(
       public editAlertsTemplateRequest:EditAlertsTemplateRequest
     ) {}
-  }
+}
+export class SaveTemplateByAlertId {
+  static readonly type = '[alerts] Save Template By AlertId';
+  constructor(
+    public addAlertsTemplateRequest: AddAlertsTemplateRequest
+  ) { }
+}
