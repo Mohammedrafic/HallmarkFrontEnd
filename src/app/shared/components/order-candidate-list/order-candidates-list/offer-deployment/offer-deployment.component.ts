@@ -12,7 +12,7 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SET_READONLY_STATUS } from '@shared/constants';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SET_READONLY_STATUS } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ConfirmService } from "@shared/services/confirm.service";
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -150,7 +150,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public onClose(): void {
     if (this.formGroup.dirty) {
       this.confirmService
-        .confirm(CANCEL_CONFIRM_TEXT, {
+        .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ConfirmService } from "@shared/services/confirm.service";
 import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
@@ -127,7 +127,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public onClose(): void {
     if (this.form.dirty) {
       this.confirmService
-        .confirm(CANCEL_CONFIRM_TEXT, {
+        .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'
