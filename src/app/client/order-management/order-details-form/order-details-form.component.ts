@@ -374,8 +374,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         if (isNaN(parseInt(orderType)) || !departmentId || !skillId) {
           return;
         }
-
-        this.populateHourlyRateField(orderType, departmentId, skillId);
+        if (!this.isEditMode) {
+          this.populateHourlyRateField(orderType, departmentId, skillId);
+        }
         this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
       });
 

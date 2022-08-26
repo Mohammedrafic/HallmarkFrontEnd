@@ -104,7 +104,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   get disabledLock(): boolean {
     const statuses = [this.orderStatus.Open, this.orderStatus.InProgress, this.orderStatus.Filled];
-    return !statuses.includes(this.order?.status) || !!this.order?.extensionFromId;
+    return !statuses.includes(this.order?.status);
   }
   get canCloseOrder(): boolean {
     const canNotClose = [this.orderStatus.PreOpen, this.orderStatus.Incomplete];
