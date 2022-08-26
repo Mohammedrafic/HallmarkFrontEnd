@@ -112,6 +112,10 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
+  get switcherValue(): string {
+    return this.organizationSettingsFormGroup.controls['value'].value ? 'on' : 'off';
+  }
+
   private unsubscribe$: Subject<void> = new Subject();
 
   public SettingsFilterFormGroup: FormGroup;
