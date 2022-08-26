@@ -3,9 +3,11 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { Subject, takeUntil } from 'rxjs';
+import { filter, Subject, takeUntil } from 'rxjs';
 import { AllOrganizationsSkill } from '../../models/all-organization-skill.model';
 import { QuickOrderFormComponent } from './quick-order-form/quick-order-form.component';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 @Component({
   selector: 'app-quick-order',
@@ -24,7 +26,7 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
 
   public readonly targetElement: HTMLElement = document.body;
 
-  constructor() {
+  constructor(private confirmService: ConfirmService) {
     super();
   }
 
@@ -43,11 +45,28 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
     });
   }
 
-  public onCloseDialog(): void {
-    this.openEvent.next(false);
+  public onClose(): void {
+    if (this.quickOrderForm.isFormDirty) {
+      this.confirmService
+        .confirm(CANCEL_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => confirm))
+        .subscribe(() => {
+          this.closeDialog();
+        });
+    } else {
+      this.closeDialog();
+    }
   }
 
   public onSubmitQuickOrder(): void {
     this.quickOrderForm.onSubmitQuickOrderForm();
+  }
+
+  private closeDialog(): void {
+    this.openEvent.next(false);
   }
 }
