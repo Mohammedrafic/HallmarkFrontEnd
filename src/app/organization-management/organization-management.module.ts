@@ -97,6 +97,7 @@ import { SpecialProjectMappingState } from './store/special-project-mapping.stat
 import { PurchaseOrderMappingComponent } from './specialproject/components/purchase-order-mapping/purchase-order-mapping.component';
 import { PurchaseOrderMappingState } from './store/purchase-order-mapping.state';
 import { BusinessLinesComponent } from './business-lines/business-lines.component';
+import { BusinessLinesState } from './store/business-lines.state';
 
 const sidebarIcons = {
   Download,
@@ -201,7 +202,8 @@ const sidebarIcons = {
       PurchaseOrderState,
       SpecialProjectCategoryState,
       SpecialProjectMappingState,
-      PurchaseOrderMappingState
+      PurchaseOrderMappingState,
+      BusinessLinesState,
     ]),
   ],
   exports: [BillRatesComponent],
