@@ -109,7 +109,7 @@
                 <app-extension-candidate
                   [currentOrder]="order"
                   [candidateOrder]="candidateOrderPage"
-                  *ngIf="order.extensionFromId; else candidateOrder">
+                  *ngIf="order?.extensionFromId; else candidateOrder">
                 </app-extension-candidate>
                 <ng-template #candidateOrder>
                   <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>

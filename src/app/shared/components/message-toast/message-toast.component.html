@@ -23,7 +23,7 @@
     <ng-template #content>
       <div>
         <span *ngIf="isQuickOrder" class="order-id" (click)="navigateToAllOrders()">
-          {{ organizationPrefix }}-{{ orderId }}
+          {{ organizationPrefix }}-{{ publicId }}
         </span>
         {{ messageContent }}
       </div>
