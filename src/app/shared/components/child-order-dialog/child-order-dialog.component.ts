@@ -238,7 +238,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public saveExtension(): void {
-    this.extensionSidebarComponent.saveExtension();
+    this.extensionSidebarComponent.saveExtension(this.sideDialog);
   }
 
   public getExtensions(): void {

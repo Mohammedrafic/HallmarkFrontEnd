@@ -220,11 +220,12 @@ export namespace Invoices {
     }
   }
 
-  export class ApprovePendingApproveInvoice {
+  export class ChangeInvoiceState {
     static readonly type = INVOICES_ACTIONS.ApprovePendingApprovalInvoice;
 
     constructor(
       public readonly payload: PendingApprovalInvoice,
+      public readonly stateId: number,
     ) {
     }
   }

@@ -86,7 +86,11 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
       }
 
       if (item.optionsStateKey === 'billRateTypes') {
-        item.options = item.options?.filter((rate) => rate.text !== 'Mileage' && rate.text !== 'Charge');
+        const ratesNotForSelect = ['Daily OT', 'Daily Premium OT', 'Charge', 'Mileage'];
+
+        item.options = item.options?.filter((option) => {
+          return !ratesNotForSelect.includes(option.text);
+        })
       }
     });
   }

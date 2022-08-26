@@ -13,12 +13,13 @@
   <ejs-grid #grid class="e-gridwithheader"
             [dataSource]="billRatesData"
             [allowSelection]="false"
-            [height]="billRatesData.length? billRatesData.length * rowHeight : rowHeight"
+            [height]="billRatesData.length ? billRatesData.length * rowHeight : rowHeight"
             [rowHeight]="rowHeight"
             [enableVirtualization]="true"
             [resizeSettings]="resizeSettings"
             [allowSorting]="allowSorting"
             [allowResizing]="allowResizing"
+            [pageSettings]="pageSettings"
             (dataBound)="dataBound()">
     <e-columns>
       <e-column [visible]="!readOnlyMode" textAlign="Right" width="120">

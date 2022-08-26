@@ -370,3 +370,8 @@ export class GetLocationTypes
   static readonly type ='[organizationManagement] Get Location Types'
   constructor() {}
 }
+export class GetUSCanadaTimeZoneIds
+{
+  static readonly type ='[organizationManagement] Get US Canada TimeZoneIds'
+  constructor() {}
+}

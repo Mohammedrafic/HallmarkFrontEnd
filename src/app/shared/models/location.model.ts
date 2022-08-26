@@ -18,7 +18,7 @@ export class Location {
   ext?: string;
   glNumber?: string;
   inactiveDate?: string;
-  timeZone : number;
+  timeZone? : string;
   locationTypeId? :number;
   organizationId :number;
 }
@@ -59,4 +59,10 @@ export class LocationFilterOptions {
 export class LocationType{
   LocationTypeId : number;
   Name: string;
+}
+
+export class TimeZoneModel {
+  SystemTimeZoneId: string;
+  SystemTimeZoneName: string;
+  TimeZoneId: string;
 }
