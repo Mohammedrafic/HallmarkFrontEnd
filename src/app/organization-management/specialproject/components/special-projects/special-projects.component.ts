@@ -3,14 +3,15 @@ import { FormGroup } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { SpecialProject, SpecialProjectPage } from "@shared/models/special-project.model";
-
+import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import {
   GridApi,
   GridReadyEvent,
-  GridOptions
+  GridOptions,
+  FilterChangedEvent
 } from '@ag-grid-community/core';
 import { ColumnDefinitionModel } from '../../../../shared/components/grid/models/column-definition.model';
-import { SpecialProjectColumnsDefinition } from '../../constants/specialprojects.constant';
+import { SpecialProjectColumnsDefinition, SpecialProjectMessages } from '../../constants/specialprojects.constant';
 import { Select, Store } from '@ngxs/store';
 import { DeletSpecialProject, GetSpecialProjects } from '../../../store/special-project.actions';
 import { SpecialProjectState } from '../../../store/special-project.state';
@@ -69,6 +70,11 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
       this.gridApi.setRowData(this.rowData);
     }
   }
+
+  public noRowsOverlayComponentParams: any = {
+    noRowsMessageFunc: () => SpecialProjectMessages.NoRowsMessage,
+  };
+
   public sideBar = {
     toolPanels: [
       {
@@ -112,7 +118,17 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
     paginationPageSize: this.pageSize,
     columnDefs: this.columnDefinitions,
     rowData: this.rowData,
-    sideBar: this.sideBar
+    sideBar: this.sideBar,
+    noRowsOverlayComponent: CustomNoRowsOverlayComponent,
+    noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
+    onFilterChanged: (event: FilterChangedEvent) => {
+      if (!event.api.getDisplayedRowCount()) {
+        this.gridApi.showNoRowsOverlay();
+      }
+      else {
+        this.gridApi.hideOverlay();
+      }
+    }
   };
 
   onGridReady(params: GridReadyEvent) {
@@ -124,7 +140,11 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
   public getSpecialProjects(): void {
     this.store.dispatch(new GetSpecialProjects());
     this.specialProjectPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (data?.items) {
+      if (!data || !data?.items.length) {
+        this.gridApi.showNoRowsOverlay();
+      }
+      else {
+        this.gridApi.hideOverlay();
         this.rowData = data.items;
         this.gridApi?.setRowData(this.rowData);
       }

@@ -443,4 +443,8 @@ export const PurchaseOrderMappingColumnsDefinition = (actionCellParams: ICellRen
   ];
 }
 
+export const SpecialProjectMessages = {
+  NoRowsMessage:'No Rows To Show'
+}
+
 
