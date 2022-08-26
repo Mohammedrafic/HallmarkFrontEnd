@@ -27,7 +27,6 @@ export class BusinessLineService {
     if (pageNumber) params = { ...params, pageNumber };
     if (pageSize) params = { ...params, pageSize };
     if (orderBy) params = { ...params, orderBy };
-
     return <HttpParams>params;
   }
 }
