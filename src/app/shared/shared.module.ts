@@ -127,7 +127,6 @@ import { CandidateStatusName } from './pipes/candidate-status-name.pipe';
 import { RouterModule } from '@angular/router';
 import { ExtensionCandidateComponent } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
 import { ActionCellRendererComponent } from '@shared/components/cell-renderer/action-cellrenderer.component';
-import { CustomNoRowsOverlayComponent } from './components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { CustomIconComponent } from './components/custom-icon/custom-icon.component';
 import { EmailSideDialogComponent } from '@shared/components/email-side-dialog/email-side-dialog.component';
 import { SmsSideDialogComponent } from '@shared/components/sms-side-dialog/sms-side-dialog.component';
