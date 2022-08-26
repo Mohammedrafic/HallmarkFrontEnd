@@ -31,15 +31,16 @@ import {
 import { GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 
 interface PendingApprovalColDefsConfig {
-  approve: (invoice: PendingApprovalInvoice) => void;
+  approve?: (invoice: PendingApprovalInvoice) => void;
+  actionTitle?: string,
 }
 
 export class PendingApprovalGridHelper {
   public static getOrganizationColDefs(
-    { approve }: PendingApprovalColDefsConfig
+    { approve, actionTitle }: PendingApprovalColDefsConfig
   ): TypedColDef<PendingApprovalInvoice>[] {
-    return [
-      {
+    const colDef = [
+      approve ? {
         headerName: '',
         headerCheckboxSelection: true,
         headerCheckboxSelectionFilteredOnly: true,
@@ -54,7 +55,7 @@ export class PendingApprovalGridHelper {
             actionsConfig: [
               {
                 action: approve,
-                title: 'Approve',
+                title: actionTitle || 'Approve',
                 titleClass: 'color-supportive-green-10',
                 disabled: [
                   PendingInvoiceStatus.Approved,
@@ -67,7 +68,7 @@ export class PendingApprovalGridHelper {
         suppressMenu: true,
         filter: false,
         resizable: false,
-      },
+      } : {},
       {
         field: 'formattedInvoiceId',
         minWidth: 160,
@@ -113,6 +114,12 @@ export class PendingApprovalGridHelper {
         valueFormatter: monthDayYearDateFormatter,
       },
     ];
+
+    if (!colDef[0].headerComponent) {
+      colDef.splice(0, 1);
+    } 
+
+    return colDef;
   }
 
   public static getGridOptions(agency: boolean): GridOptions {

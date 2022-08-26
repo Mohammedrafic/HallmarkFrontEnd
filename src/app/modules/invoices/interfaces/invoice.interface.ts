@@ -85,3 +85,8 @@ export interface ManualInvoiceTimesheetResponse {
   timesheetId: number;
   invoiceId: number;
 }
+
+export interface InvoiceStateDto {
+  invoiceId: number;
+  targetState: number;
+}

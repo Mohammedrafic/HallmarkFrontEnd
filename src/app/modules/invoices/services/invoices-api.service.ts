@@ -11,6 +11,7 @@ import {
   GroupInvoicesParams,
   InvoicesFilteringOptions,
   InvoicesFilterState,
+  InvoiceStateDto,
   ManualInvoiceMeta,
   ManualInvoicePostDto,
   ManualInvoiceReason, ManualInvoicesData, ManualInvoiceTimesheetResponse, PrintingPostDto, PrintInvoiceData
@@ -113,9 +114,8 @@ export class InvoicesApiService {
     return this.http.post<void>('/api/Invoices', data);
   }
 
-  public approvePendingApproveInvoice(data: PendingApprovalInvoice): Observable<null> {
-    // TODO: Change to API when its ready
-    return of(null);
+  public approvePendingApproveInvoice(data: InvoiceStateDto): Observable<void> {
+    return this.http.post<void>(`/api/Invoices/setstatus`, data);
   }
 
   public getPrintData(body: PrintingPostDto): Observable<PrintInvoiceData[]> {
