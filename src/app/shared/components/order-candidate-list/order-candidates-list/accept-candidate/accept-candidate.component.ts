@@ -145,7 +145,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public onApply(): void {
-    this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Applied, statusText: 'Applied' });
+    if (this.form.valid) {
+      this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Applied, statusText: 'Applied' });
+    }
   }
 
   public onWithdraw(): void {
