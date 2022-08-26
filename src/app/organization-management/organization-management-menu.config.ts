@@ -11,4 +11,5 @@ export const ORG_SETTINGS: { [key: string]: Object }[] = [
   { text: 'Configurations', id: 6, route: './settings' },
   { text: 'Reasons', id: 10, route: './reasons' },
   { text: 'Special Project', id: 12, route: './specialproject' },
+  { text: 'Business Lines', id: 13, route: './businesslines' },
 ];
