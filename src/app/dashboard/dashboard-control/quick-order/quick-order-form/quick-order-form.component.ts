@@ -165,6 +165,17 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     return this.jobDistributionDescriptionForm.get('agency') as AbstractControl;
   }
 
+  get isFormDirty(): boolean {
+    return [
+      this.organizationForm,
+      this.orderTypeForm,
+      this.generalInformationForm,
+      this.jobDistributionDescriptionForm,
+      this.contactDetailsForm,
+      this.specialProjectForm,
+    ].some((formGr) => formGr.dirty);
+  }
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly cdr: ChangeDetectorRef,
@@ -566,8 +577,6 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         this.generalInformationForm.get(name)?.patchValue(value);
       });
     } else {
-      console.error('remove');
-
       Object.keys(shiftControls).forEach((name) => {
         this.generalInformationForm.contains(name) && this.generalInformationForm.setValidators(null);
       });

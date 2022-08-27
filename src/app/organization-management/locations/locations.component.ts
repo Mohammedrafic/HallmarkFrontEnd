@@ -35,8 +35,6 @@ import {
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
-  RECORD_ADDED,
-  RECORD_MODIFIED
 } from '@shared/constants';
 import { Organization } from '@shared/models/organization.model';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -47,6 +45,9 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { BusinessLinesState } from '@organization-management/store/business-lines.state';
+import { BusinessLines } from '@shared/models/business-line.model';
+import { GetAllBusinessLines } from '@organization-management/store/business-lines.action';
 
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
@@ -98,6 +99,9 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   @Select(OrganizationManagementState.timeZones)
   timeZoneIds$: Observable<GetUSCanadaTimeZoneIds>;
   timeZoneOptionFields: FieldSettingsModel = { text: 'systemTimeZoneName', value: 'timeZoneId'};
+
+  @Select(BusinessLinesState.allBusinessLines) public readonly businessLines$: Observable<BusinessLines[]>;
+  public readonly businessLineFields = { text: 'line', value: 'id' };
 
   isEdit: boolean;
   editedLocationId?: number;
@@ -181,6 +185,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     });
     this.store.dispatch(new GetLocationTypes());
     this.store.dispatch(new GetUSCanadaTimeZoneIds());
+    this.store.dispatch(new GetAllBusinessLines());
   }
 
   ngOnDestroy(): void {
@@ -346,6 +351,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       invoiceId: location.invoiceId,
       externalId: location.externalId,
       name: location.name,
+      businessLineId: location.businessLineId,
       address1: location.address1,
       address2: location.address2,
       zip: location.zip,
@@ -415,6 +421,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         invoiceId: this.locationDetailsFormGroup.controls['invoiceId'].value,
         externalId: this.locationDetailsFormGroup.controls['externalId'].value,
         name: this.locationDetailsFormGroup.controls['name'].value,
+        businessLineId: this.locationDetailsFormGroup.controls['businessLineId'].value,
         address1: this.locationDetailsFormGroup.controls['address1'].value,
         address2: this.locationDetailsFormGroup.controls['address2'].value,
         zip: this.locationDetailsFormGroup.controls['zip'].value,
@@ -459,6 +466,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       invoiceId: [null],
       externalId: ['', [Validators.maxLength(50)]],
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+      businessLineId: [null],
       address1: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(100)]],
       address2: [null, [Validators.maxLength(50)]],
       zip: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(6), Validators.pattern('^[0-9]*$')]],

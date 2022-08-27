@@ -16,6 +16,7 @@ import { BillRatesComponent } from './bill-rates/bill-rates.component';
 import { ReasonsComponent } from './reasons/reasons.component';
 import { RegionsComponent } from './regions/regions.component';
 import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
+import { BusinessLinesComponent } from './business-lines/business-lines.component';
 
 const routes: Routes = [
   {
@@ -121,6 +122,13 @@ const routes: Routes = [
       {
         path: 'specialproject',
         component: SpecialProjectContainerComponent,
+        data: {
+          isOrganizationArea: true
+        }
+      },
+      {
+        path: 'businesslines',
+        component: BusinessLinesComponent,
         data: {
           isOrganizationArea: true
         }
