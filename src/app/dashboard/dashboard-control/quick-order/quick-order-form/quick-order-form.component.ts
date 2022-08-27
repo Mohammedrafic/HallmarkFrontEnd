@@ -199,7 +199,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.handleJobDistributionValueChanges();
     this.handleDurationControlValueChanges();
     this.populateQuickOrderFormValues();
-    this.populateJobjobDistributionForm();
+    this.populateJobDistributionForm();
     this.populateShiftTimes();
     this.refreshMultiSelectAfterOpenDialog();
     this.subscribeForSettings();
@@ -437,6 +437,10 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.isOpenPerDiem = value === OrderType.OpenPerDiem;
       this.handlePerDiemOrder();
       this.handlePermPlacementOrder();
+
+      Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
+        this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
+      });
     });
   }
 
@@ -561,7 +565,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     });
   }
 
-  private populateJobjobDistributionForm(): void {
+  private populateJobDistributionForm(): void {
     this.jobDistributionControl.patchValue([JobDistribution.All]);
   }
 
