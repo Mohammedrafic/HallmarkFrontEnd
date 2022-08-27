@@ -362,7 +362,7 @@
                 <label>Reason for Requisition<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
-                    formControlName="reasonForRequisition"
+                    formControlName="orderRequisitionReasonId"
                     appValidateWithMessage
                     [dataSource]="(reasons$ | async)?.items"
                     [fields]="reasonForRequisitionFields"

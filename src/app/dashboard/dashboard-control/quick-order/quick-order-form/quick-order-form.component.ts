@@ -251,7 +251,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       agency: [null],
       jobDistributions: [[]],
       jobDescription: ['', Validators.maxLength(500)],
-      reasonForRequisition: [null, Validators.required],
+      orderRequisitionReasonId: [null, Validators.required],
     });
   }
 
@@ -678,11 +678,11 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       const order = {
         isSubmit: true,
         isQuickOrder: true,
-        jobDistributions: this.jobDistributionDescriptionForm.getRawValue().jobDistributions,
         contactDetails: [this.contactDetailsForm.getRawValue()],
         ...this.orderTypeForm.getRawValue(),
         ...this.generalInformationForm.getRawValue(),
         ...this.specialProjectForm.getRawValue(),
+        ...this.jobDistributionDescriptionForm.getRawValue(),
       };
       const selectedBusinessUnitId = this.organizationForm.value.organization;
       this.store.dispatch(new SaveOrder(order, [], undefined, selectedBusinessUnitId));
