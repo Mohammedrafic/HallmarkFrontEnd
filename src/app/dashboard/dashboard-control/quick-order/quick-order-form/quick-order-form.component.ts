@@ -199,7 +199,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.handleJobDistributionValueChanges();
     this.handleDurationControlValueChanges();
     this.populateQuickOrderFormValues();
-    this.populateJobjobDistributionForm();
+    this.populateJobDistributionForm();
     this.populateShiftTimes();
     this.refreshMultiSelectAfterOpenDialog();
     this.subscribeForSettings();
@@ -251,7 +251,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       agency: [null],
       jobDistributions: [[]],
       jobDescription: ['', Validators.maxLength(500)],
-      reasonForRequisition: [null, Validators.required],
+      orderRequisitionReasonId: [null, Validators.required],
     });
   }
 
@@ -437,6 +437,10 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.isOpenPerDiem = value === OrderType.OpenPerDiem;
       this.handlePerDiemOrder();
       this.handlePermPlacementOrder();
+
+      Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
+        this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
+      });
     });
   }
 
@@ -561,7 +565,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     });
   }
 
-  private populateJobjobDistributionForm(): void {
+  private populateJobDistributionForm(): void {
     this.jobDistributionControl.patchValue([JobDistribution.All]);
   }
 
@@ -678,11 +682,11 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       const order = {
         isSubmit: true,
         isQuickOrder: true,
-        jobDistributions: this.jobDistributionDescriptionForm.getRawValue().jobDistributions,
         contactDetails: [this.contactDetailsForm.getRawValue()],
         ...this.orderTypeForm.getRawValue(),
         ...this.generalInformationForm.getRawValue(),
         ...this.specialProjectForm.getRawValue(),
+        ...this.jobDistributionDescriptionForm.getRawValue(),
       };
       const selectedBusinessUnitId = this.organizationForm.value.organization;
       this.store.dispatch(new SaveOrder(order, [], undefined, selectedBusinessUnitId));
