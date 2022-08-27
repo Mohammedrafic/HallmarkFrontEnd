@@ -41,6 +41,10 @@ export class BusinessLinesComponent extends AbstractGridConfigurationComponent i
   private readonly pageSubject = new Subject<number>();
   private isAlive = true;
 
+  get dialogHeader(): string {
+    return this.isEdit ? 'Edit' : 'Add';
+  }
+
   constructor(private readonly store: Store, private readonly confirmService: ConfirmService) {
     super();
     this.businessLineFormGroup = new FormGroup({

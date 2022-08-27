@@ -1,4 +1,4 @@
-@import"colors";
+@import "colors";
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -14,4 +14,12 @@
 .grid-component {
   margin-top: 25px;
   overflow-y: auto;
+}
+
+form {
+  margin-top: 24px;
+
+  .input-group {
+    margin: 5px auto;
+  }
 }
