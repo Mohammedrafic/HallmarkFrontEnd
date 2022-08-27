@@ -126,16 +126,21 @@
                   <input
                     class="e-input"
                     type="text"
-                    appValidateWithMessage
                     formControlName="hourlyRate"
-                    maxlength="50"
+                    appValidateWithMessage
+                    maxlength="10"
+                    (focus)="priceUtils.setPriceMask(generalInformationForm, 'hourlyRate', $event)"
+                    (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'hourlyRate', $event)"
                   />
                 </div>
               </div>
             </div>
 
             <!-- of Position -->
-            <div class="input-container bootstrap form-line-item-20">
+            <div
+              *ngIf="this.isTravelerOrder || this.isContactToPermOrder || this.isPermPlacementOrder"
+              class="input-container bootstrap form-line-item-20"
+            >
               <label># Open Positions<span class="required">*</span></label>
               <div class="input-group dropdown">
                 <div class="input-group">
@@ -166,7 +171,10 @@
             </div>
 
             <!-- Job Start Date -->
-            <div class="datepicker-container form-line-item-20">
+            <div
+              *ngIf="this.isTravelerOrder || this.isContactToPermOrder"
+              class="datepicker-container form-line-item-20"
+            >
               <label>Job Start Date<span class="required">*</span></label>
               <div class="input-group datepicker bootstrap">
                 <ejs-datepicker
@@ -257,6 +265,28 @@
           </div>
 
           <div class="row" *ngIf="this.isTravelerOrder || this.isContactToPermOrder || this.isPermPlacementOrder">
+
+            <!-- Job Start Date -->
+            <div
+              *ngIf="this.isPermPlacementOrder"
+              class="datepicker-container form-line-item-20"
+            >
+              <label>Job Start Date<span class="required">*</span></label>
+              <div class="input-group datepicker bootstrap">
+                <ejs-datepicker
+                  class="datepicker"
+                  format="MM/dd/yyyy"
+                  placeholder="MM/DD/YYYY"
+                  formControlName="jobStartDate"
+                  appValidateWithMessage
+                  [enableMask]="true"
+                  [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                  [min]="today"
+                >
+                </ejs-datepicker>
+              </div>
+            </div>
+
             <!-- Shift Requirements -->
             <div class="input-container bootstrap form-line-item-20">
               <label>Shift Name<span class="required">*</span></label>
