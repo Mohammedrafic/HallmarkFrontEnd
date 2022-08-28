@@ -1363,7 +1363,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.OrderFilterFormGroup.controls['orderId'].patchValue(this.quickOrderId);
         this.getOrders();
 
-        this.ordersPage$.pipe(take(2)).subscribe((data) => {
+        this.ordersPage$.pipe(take(2), filter(Boolean)).subscribe((data) => {
           if (data.items[0].publicId === this.quickOrderId) {
             setTimeout(() => {
               this.gridWithChildRow.selectRow(0);

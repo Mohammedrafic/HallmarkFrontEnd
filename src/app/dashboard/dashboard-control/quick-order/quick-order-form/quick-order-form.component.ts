@@ -205,6 +205,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.subscribeForSettings();
     this.getContactDetails();
     this.getDataForOrganizationUser();
+    this.cleanUpValidatorsForOrganizationUser();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -397,6 +398,15 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.store.dispatch(new GetAssociateAgencies());
       this.store.dispatch(new GetProjectSpecialData());
       this.store.dispatch(new GetOrganizationSettings());
+      this.store.dispatch(new GetOrderRequisitionByPage());
+    }
+  }
+
+  private cleanUpValidatorsForOrganizationUser(): void {
+    if (!this.userIsAdmin) {
+      const organizationControl = this.organizationForm.controls['organization'];
+      organizationControl.clearValidators();
+      organizationControl.updateValueAndValidity({ onlySelf: false, emitEvent: false });
     }
   }
 
