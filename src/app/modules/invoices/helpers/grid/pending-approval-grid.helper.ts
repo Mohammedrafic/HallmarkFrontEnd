@@ -29,9 +29,16 @@ import {
   titleValueCellRendererSelector
 } from '../../constants';
 import { GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
+import { AllInvoicesActionCellComponent } from '../../components/all-invoices-action-cell/all-invoices-action-cell.component';
 
 interface PendingApprovalColDefsConfig {
   approve?: (invoice: PendingApprovalInvoice) => void;
+  actionTitle?: string,
+}
+
+interface AllColDefsConfig {
+  approve?: (invoice: PendingApprovalInvoice) => void;
+  pay?: (invoice: PendingApprovalInvoice) => void;
   actionTitle?: string,
 }
 
@@ -212,5 +219,79 @@ export class PendingApprovalGridHelper {
         };
       }
     }
+  }
+
+  public static getOrganizationAllColDefs(
+    { approve, pay }: AllColDefsConfig
+  ): TypedColDef<PendingApprovalInvoice>[] {
+    const colDef = [
+      {
+        headerName: '',
+        headerCheckboxSelection: true,
+        headerCheckboxSelectionFilteredOnly: true,
+        checkboxSelection: true,
+        minWidth: 240,
+        headerComponent: ToggleRowExpansionHeaderCellComponent,
+        cellRenderer: AllInvoicesActionCellComponent,
+        cellRendererParams: {
+          approve: approve,
+          pay: pay,
+        },
+        sortable: false,
+        suppressMenu: true,
+        filter: false,
+        resizable: false,
+      },
+      {
+        field: 'formattedInvoiceId',
+        minWidth: 160,
+        headerName: 'Invoice Id',
+        cellRenderer: 'agGroupCellRenderer',
+        cellClass: 'expansion-toggle-icons-order-1 color-primary-active-blue-10 font-weight-bold',
+        flex: 1,
+      },
+      {
+        field: 'invoiceStateText',
+        headerName: 'Status',
+        minWidth: 190,
+        flex: 1,
+      },
+      {
+        field: 'amount',
+        minWidth: 280,
+        headerName: 'Amount',
+        cellClass: 'font-weight-bold',
+        valueFormatter: amountValueFormatter,
+      },
+      {
+        field: 'apDeliveryText',
+        headerName: 'Ap Delivery',
+        minWidth: 270,
+      },
+      {
+        field: 'aggregateByTypeText',
+        headerName: 'Group By Type',
+        minWidth: 360,
+      },
+      {
+        field: 'issuedDate',
+        minWidth: 230,
+        headerName: 'Issued Date',
+        valueFormatter: monthDayYearDateFormatter,
+      },
+      {
+        field: 'dueDate',
+        minWidth: 200,
+        headerName: 'Due Date',
+        type: 'rightAligned',
+        valueFormatter: monthDayYearDateFormatter,
+      },
+    ];
+
+    if (!colDef[0].headerComponent) {
+      colDef.splice(0, 1);
+    } 
+
+    return colDef;
   }
 }

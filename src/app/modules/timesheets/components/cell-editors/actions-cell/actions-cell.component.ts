@@ -14,11 +14,11 @@ import { RecordValue } from '../../../interface';
 export class ActionsCellComponent implements ICellRendererAngularComp {
   public editable = false;
 
-  private recordId: number;
-
   public isDeletable = true;
 
-  componentParent: ProfileTimesheetTableComponent;
+  private recordId: number;
+
+  private componentParent: ProfileTimesheetTableComponent;
 
   constructor(
     private cd: ChangeDetectorRef,

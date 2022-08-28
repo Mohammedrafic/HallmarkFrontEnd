@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { A11yModule } from '@angular/cdk/a11y';
 
 import {
   AlignJustify, ChevronDown, ChevronRight, Lock, Menu, MessageSquare, MoreVertical, Package,
@@ -71,7 +72,7 @@ import { AgencyInvoicesContainerService } from './services/invoices-container/ag
 import {
   OrganizationInvoicesContainerService
 } from './services/invoices-container/organization-invoices-container.service';
-import { A11yModule } from '@angular/cdk/a11y';
+import { AllInvoicesActionCellComponent } from './components/all-invoices-action-cell/all-invoices-action-cell.component';
 
 @NgModule({
   declarations: [
@@ -85,6 +86,7 @@ import { A11yModule } from '@angular/cdk/a11y';
     ManualInvoiceDialogComponent,
     InvoicesFiltersDialogComponent,
     InvoicesTableTabsComponent,
+    AllInvoicesActionCellComponent,
   ],
   imports: [
     CommonModule,
