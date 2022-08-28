@@ -290,7 +290,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     this.jobDescriptionForm = this.formBuilder.group({
-      classification: [null, Validators.required],
+      classification: [null],
       onCallRequired: [false],
       asapStart: [false],
       criticalOrder: [false],
