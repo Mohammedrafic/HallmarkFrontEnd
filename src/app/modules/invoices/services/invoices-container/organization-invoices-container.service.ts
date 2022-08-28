@@ -50,6 +50,13 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
         });
       case OrganizationInvoicesGridTab.Paid:
         return  PendingApprovalGridHelper.getOrganizationColDefs({});
+      case OrganizationInvoicesGridTab.All:
+        return PendingApprovalGridHelper.getOrganizationAllColDefs({
+          approve: (invoice: PendingApprovalInvoice) => 
+          this.store.dispatch(new Invoices.ChangeInvoiceState(invoice, InvoiceState.PendingPayment)),
+          pay: (invoice: PendingApprovalInvoice) =>
+          this.store.dispatch(new Invoices.ChangeInvoiceState(invoice, InvoiceState.Paid)),
+        })
       default:
         return [];
     }
@@ -83,6 +90,12 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
           invoiceState: InvoiceState.Paid,
         });
         break;
+      case OrganizationInvoicesGridTab.All:
+        action = new Invoices.GetPendingApproval({
+          organizationId,
+          invoiceState: InvoiceState.PendingPayment,
+        });
+        break;
     }
 
     return this.store.dispatch(action);
@@ -96,6 +109,8 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
       case OrganizationInvoicesGridTab.PendingPayment:
         return PendingApprovalGridHelper.getGridOptions(false);
       case OrganizationInvoicesGridTab.Paid:
+        return PendingApprovalGridHelper.getGridOptions(false);
+      case OrganizationInvoicesGridTab.All:
         return PendingApprovalGridHelper.getGridOptions(false);
       default:
         return super.getGridOptions(tabIndex);

@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
-import { GridCellRenderer } from '@shared/components/grid/models';
+
 import { ICellRendererParams } from '@ag-grid-community/core';
+
+import { GridCellRenderer } from '@shared/components/grid/models';
 import { GridActionsCellConfig, GridActionsCellItem } from './grid-actions-cell-config.interface';
 
 @Component({

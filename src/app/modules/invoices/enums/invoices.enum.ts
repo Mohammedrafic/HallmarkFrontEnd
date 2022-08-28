@@ -34,6 +34,7 @@ export enum INVOICES_ACTIONS {
   GroupInvoices = '[invoices] Group Invoices',
   ApprovePendingApprovalInvoice = '[invoices] Approve Pending Payment Invoice',
   GetPrintingData = '[invoices] Get printing data',
+  GetAllInvoices ='[invoices] Get invoices with all statuses',
 }
 
 export enum InvoicesTableFiltersColumns {
