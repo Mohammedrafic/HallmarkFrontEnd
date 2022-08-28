@@ -24,6 +24,8 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
   @ViewChild('sideDialog', { static: true }) public sideDialog: DialogComponent;
   @ViewChild('quickOrderForm') public quickOrderForm: QuickOrderFormComponent;
 
+  public submitQuickOrder$ = new Subject<boolean>();
+
   public readonly targetElement: HTMLElement = document.body;
 
   constructor(private confirmService: ConfirmService) {
@@ -63,7 +65,7 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
   }
 
   public onSubmitQuickOrder(): void {
-    this.quickOrderForm.onSubmitQuickOrderForm();
+    this.submitQuickOrder$.next(true);
   }
 
   private closeDialog(): void {

@@ -62,6 +62,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   @Input() public skills: AllOrganizationsSkill[];
   @Input() public organizationStructure: OrganizationStructure;
   @Input() public openEvent: Subject<boolean>;
+  @Input() public submitQuickOrder$: Subject<boolean>;
 
   @ViewChild('multiselect') public readonly multiselect: MultiSelectComponent;
 
@@ -206,6 +207,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.getContactDetails();
     this.getDataForOrganizationUser();
     this.cleanUpValidatorsForOrganizationUser();
+    this.submitQuickOrder();
+    this.detectFormValueChanges();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -712,5 +715,19 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.contactDetailsForm.markAllAsTouched();
       this.specialProjectForm.markAllAsTouched();
     }
+  }
+
+  private submitQuickOrder(): void {
+    this.submitQuickOrder$.pipe(takeUntil(this.destroy$)).subscribe((isSubmit) => {
+      if (isSubmit) {
+        this.onSubmitQuickOrderForm();
+      }
+    });
+  }
+
+  private detectFormValueChanges(): void {
+    this.contactDetailsForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
+    this.jobDistributionDescriptionForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
+    this.generalInformationForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
   }
 }
