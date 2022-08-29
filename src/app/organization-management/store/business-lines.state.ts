@@ -1,8 +1,15 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+
 import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { catchError, Observable, tap } from 'rxjs';
+
+import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { MessageTypes } from '@shared/enums/message-types';
 import { BusinessLines, BusinessLinesDtoModel } from '@shared/models/business-line.model';
 import { BusinessLineService } from '@shared/services/business-line.service';
-import { Observable, tap } from 'rxjs';
+import { getAllErrors } from '@shared/utils/error.utils';
+import { ShowToast } from 'src/app/store/app.actions';
 import { SaveBusinessLine, DeleteBusinessLine, GetBusinessLines, GetAllBusinessLines } from './business-lines.action';
 
 interface BusinessLinesStateModel {
@@ -47,12 +54,16 @@ export class BusinessLinesState {
   }
 
   @Action(SaveBusinessLine)
-  private saveBusinessLine({ dispatch }: StateContext<BusinessLinesStateModel>, { businessLine }: SaveBusinessLine) {
+  private saveBusinessLine({ dispatch }: StateContext<BusinessLinesStateModel>, { businessLine, isEdit }: SaveBusinessLine) {
+    const TOAST_MESSAGE = isEdit ? RECORD_MODIFIED : RECORD_ADDED;
     return this.businessLineService.saveBusinessLine(businessLine).pipe(
       tap((payload) => {
 
-        dispatch(new GetBusinessLines());
+        dispatch([new ShowToast(MessageTypes.Success, TOAST_MESSAGE), new GetBusinessLines()]);
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))
       })
     );
   }
