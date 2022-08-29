@@ -24,6 +24,7 @@
   <ng-template #content>
     <app-quick-order-form
       #quickOrderForm
+      [submitQuickOrder$]="submitQuickOrder$"
       [allOrganizations]="allOrganizations"
       [userIsAdmin]="userIsAdmin"
       [skills]="skills"
