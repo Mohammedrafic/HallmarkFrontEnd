@@ -25,7 +25,7 @@ export class GetUserSubscriptionPage {
     static readonly type = '[alerts] Get Templates Page';
     constructor(
       public businessUnitType:BusinessUnitType,
-      public businessUnitId:number,
+      public businessUnitId:number |null,
       public pageNumber: number,
       public pageSize: number,
       public sortModel: any,

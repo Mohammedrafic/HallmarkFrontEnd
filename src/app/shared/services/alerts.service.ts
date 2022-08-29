@@ -5,6 +5,7 @@ import { observable, Observable, of } from "rxjs";
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
 import { AlertChannel } from "@admin/alerts/alerts.enum";
+import { BusinessUnit } from "../models/business-unit.model";
 
 @Injectable({
   providedIn: 'root',
@@ -59,13 +60,16 @@ export class AlertsService {
    */
    public getAlertsTemplatePage(
     BusinessUnitType:BusinessUnitType,
-    BusinessUnitId:number,
+    BusinessUnitId:number |null,
     PageNumber: number,
     PageSize: number,
     SortModel: any,
     FilterModel: any,
     Filters: AlertsTemplateFilters
-  ): Observable<AlertsTemplatePage> {    
+   ): Observable<AlertsTemplatePage> {
+     if (BusinessUnitId == null) {
+       return this.http.get<AlertsTemplatePage>(`/api/Templates/GetAlertsForTemplate/` + BusinessUnitType, { params: { PageNumber: PageNumber, PageSize: PageSize } });
+     }
     return this.http.get<AlertsTemplatePage>(`/api/Templates/GetAlertsForTemplate/`+BusinessUnitType,{ params: {BusinessUnitId :BusinessUnitId, PageNumber: PageNumber, PageSize: PageSize }});
       }
   

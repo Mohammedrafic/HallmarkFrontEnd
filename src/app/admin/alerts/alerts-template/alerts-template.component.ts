@@ -299,7 +299,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     }
   }
   private dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
-    this.store.dispatch(new GetAlertsTemplatePage(this.businessUnitControl.value, this.businessControl.value == null ? 0 : this.businessControl.value, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+    this.store.dispatch(new GetAlertsTemplatePage(this.businessUnitControl.value, this.businessControl.value == 0 ? null : this.businessControl.value, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
   }
   private dispatchEditAlertTemplate(alertId: number, alertChannel: AlertChannel,businessUnitId:number|null): void {
     this.store.dispatch(new GetTemplateByAlertId(alertId, alertChannel,businessUnitId));
@@ -485,14 +485,14 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       this.store.dispatch(new GetBusinessByUnitType(value));
-      this.dispatchNewPage();
+      if (value == 1) {
+        this.dispatchNewPage();
+      }
     });
   }
   private onBusinessValueChanged(): void {
-    this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      if (value != 0) {
+    this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {     
         this.dispatchNewPage();
-      }
     });
   }
   private closeDialog(): void {
