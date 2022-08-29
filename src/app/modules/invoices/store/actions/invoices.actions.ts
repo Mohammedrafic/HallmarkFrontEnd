@@ -1,3 +1,9 @@
+import { DialogAction } from '@core/enums';
+import { DataSourceItem, FileForUpload } from '@core/interface';
+import { OrganizationRegion } from '@shared/models/organization.model';
+import { Attachment } from '@shared/components/attachments';
+import { ExportPayload } from '@shared/models/export.model';
+
 import {
   GetPendingApprovalParams,
   GroupInvoicesParams,
@@ -6,11 +12,7 @@ import {
   ManualInvoicePostDto,
   PrintingPostDto
 } from '../../interfaces';
-import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums/invoices.enum';
-import { DialogAction } from '@core/enums';
-import { OrganizationRegion } from '@shared/models/organization.model';
-import { DataSourceItem, FileForUpload } from '@core/interface';
-import { Attachment } from '@shared/components/attachments';
+import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums';
 import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
 
 export namespace Invoices {
@@ -21,6 +23,12 @@ export namespace Invoices {
       public readonly organizationId: number | null
     ) {
     }
+  }
+
+  export class DetailExport {
+    static readonly type = INVOICES_ACTIONS.DETAIL_EXPORT;
+
+    constructor(public readonly payload: ExportPayload) { }
   }
 
   export class GetPendingInvoices {
@@ -44,9 +52,10 @@ export namespace Invoices {
 
     constructor(
       public readonly action: DialogAction,
-      public readonly id?: number,
-      public readonly prevId?: string,
-      public readonly nextId?: string) {
+      public readonly payload?: { organizationIds?: number[]; invoiceIds: number[] },
+      public readonly prevId?: number | null,
+      public readonly nextId?: number | null
+    ) {
     }
   }
 
@@ -224,7 +233,7 @@ export namespace Invoices {
     static readonly type = INVOICES_ACTIONS.ApprovePendingApprovalInvoice;
 
     constructor(
-      public readonly payload: PendingApprovalInvoice,
+      public readonly invoiceId: number,
       public readonly stateId: number,
     ) {
     }
@@ -233,6 +242,9 @@ export namespace Invoices {
   export class GetPrintData {
     static readonly type = INVOICES_ACTIONS.GetPrintingData;
 
-    constructor (public readonly body: PrintingPostDto) {}
+    constructor (
+      public readonly body: PrintingPostDto,
+      public readonly isAgency: boolean,
+      ) {}
   }
 }

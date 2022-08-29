@@ -5,10 +5,8 @@ import { GridCellLinkComponent } from '@shared/components/grid/components/grid-c
 import { ColDef, ICellRendererParams, ValueGetterParams } from '@ag-grid-community/core';
 import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
 import { GridValuesHelper } from '../../../timesheets/helpers';
-import {
-  TimesheetTableStatusCellComponent
-} from '../../../timesheets/components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
 import { GridCellLinkParams } from '@shared/components/grid/models';
+import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
 
 type BaseInvoiceColDefsKeys = keyof Pick<BaseInvoice, 'locationName' | 'departmentName' | 'skillName' | 'statusText'>
 type CustomColDefsKeys = 'weekPeriod' | 'attachments' | 'candidateName' | 'orderId' | 'unitName';
@@ -33,7 +31,7 @@ export class InvoicesContainerGridHelper {
       statusText: {
         headerName: 'STATUS',
         minWidth: 170,
-        cellRenderer: TimesheetTableStatusCellComponent,
+        cellRenderer: TableStatusCellComponent,
         cellClass: 'status-cell',
         field: 'statusText',
       },

@@ -4,64 +4,115 @@
   cssClass="dialog invoice-details-container-dialog"
   [width]="'1180px'"
   [visible]="false"
+  [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
-    <section class="container">
+    <section *ngIf="invoiceDetail" class="container">
       <div class="profile-details-header">
         <div class="flex flex-column">
-          <h3 class="username">Invoice ID {{ invoiceData?.id }}</h3>
-          <ejs-chiplist #chipList class="events-off">
-            <e-chips>
-              <e-chip
-                *ngIf="invoiceData"
-                [text]="invoiceData?.statusText"
-                [cssClass]="invoiceData?.statusText || '' | chipsCssClass">
-              </e-chip>
-            </e-chips>
-          </ejs-chiplist>
+          <h3 class="username">Invoice ID {{ invoiceDetail.meta.formattedInvoiceNumber }}</h3>
+          <div class="wrapper">
+            <ejs-chiplist *ngIf="!isAgency" #chipList class="events-off">
+              <e-chips>
+                <e-chip
+                  [text]="invoiceDetail.meta.invoiceStateText"
+                  [cssClass]="invoiceDetail.meta.invoiceStateText || '' | chipsCssClass">
+                </e-chip>
+              </e-chips>
+            </ejs-chiplist>
+            <div [class.spaced]="isAgency" class="grouped">
+              By {{ invoiceDetail.meta.aggregateByTypeText }}
+            </div>
+          </div>
         </div>
 
         <div class="spacer"></div>
 
         <div class="header-controls">
+          <app-export-button (optionSelected)="export($event)"></app-export-button>
           <button
+            ejs-button
+            [disabled]="isApproveDisable"
+            cssClass="e-outline print-btn"
+            (click)="handlePrint()">
+            Print
+            <i-feather name="printer" class="icon"></i-feather>
+          </button>
+          <div class="separator"></div>
+          <button
+            *ngIf="!isAgency"
             ejs-button
             [disabled]="isApproveDisable"
             cssClass="e-primary"
             (click)="handleApprove()">
             Approve
           </button>
-          <div class="separator"></div>
-          <app-export-button (optionSelected)="export($event)"></app-export-button>
         </div>
 
         <i-feather name="x" class="icon close-button" (click)="handleProfileClose()"></i-feather>
       </div>
 
       <div class="job-general-info tile-dark-blue">
-        <app-invoice-detail-invoice-info [invoiceInfo]="invoiceData"></app-invoice-detail-invoice-info>
+        <app-invoice-detail-invoice-info [invoiceInfo]="invoiceDetail"></app-invoice-detail-invoice-info>
       </div>
 
       <div class="profile-table-block">
-        <ng-container *ngIf="invoiceData">
-          <section
-            *ngFor="let invoice of invoiceData.invoices"
-            class="profile-table-container">
-              <app-invoice-detail-table
-                [invoice]="invoice">
-              </app-invoice-detail-table>
-          </section>
+        <ng-container *ngIf="invoiceDetail">
+          <app-grid
+            [class.inactive]="!invoiceDetail.invoiceRecords.length"
+            [columnDefinitions]="columnDefinitions"
+            [isLoading]="isLoading"
+            [rowData]="invoiceDetail.invoiceRecords"
+            [totalRecordsCount]="invoiceDetail.invoiceRecords.length"
+            [gridOptions]="gridOptions"
+            [paginationPanel]="false"
+          ></app-grid>
+          <ng-container *ngTemplateOutlet="tableFooter"></ng-container>
+
+          <h3 class="profile-table-block__title">Summary</h3>
+          <ng-container *ngIf="invoiceDetail.summary[0] as summaryObj">
+            <app-grid
+              [class.inactive]="!summaryObj.items.length"
+              [columnDefinitions]="columnSummaryDefinitions"
+              [isLoading]="isLoading"
+              [rowData]="summaryObj.items"
+              [totalRecordsCount]="summaryObj.items.length"
+              [gridOptions]="gridSummaryOptions"
+              [paginationPanel]="false"
+            ></app-grid>
+          </ng-container>
+          <ng-container *ngTemplateOutlet="tableFooter; context: { $implicit: true }"></ng-container>
         </ng-container>
       </div>
     </section>
-      <app-navigation-panel
-              prevLabel="Previous Order"
-              nextLabel="Next Order"
-              [prevDisabled]="(prevId$ | async) === null"
-              [nextDisabled]="(nextId$ | async) === null"
-              (prevClick)="onNextPreviousOrder(false)"
-              (nextClick)="onNextPreviousOrder(true)"
-      ></app-navigation-panel>
+    <app-navigation-panel
+            prevLabel="Previous Order"
+            nextLabel="Next Order"
+            [prevDisabled]="(prevId$ | async) === null"
+            [nextDisabled]="(nextId$ | async) === null"
+            (prevClick)="onNextPreviousOrder(false)"
+            (nextClick)="onNextPreviousOrder(true)"
+    ></app-navigation-panel>
   </ng-template>
 </ejs-dialog>
+<ng-template #tableFooter let-showHours>
+  <div class="table-footer">
+    <div *ngIf="showHours" class="total">
+      <h5 class="total__value">{{ invoiceDetail.totals.total }}</h5>
+      <p class="total__text">Hours/Miles</p>
+    </div>
+    <div *ngIf="isAgency" class="total">
+      <h5 class="total__value">$ {{ invoiceDetail.totals.feeTotal }}</h5>
+      <p class="total__text">Total Fee Amount</p>
+    </div>
+    <div class="total">
+      <h5 class="total__value">$ {{ invoiceDetail.totals.calculatedTotal }}</h5>
+      <p class="total__text">Amount to be Paid</p>
+    </div>
+    <div *ngIf="isAgency" class="total">
+      <h5 class="total__value">$ {{ invoiceDetail.totals.amount }}</h5>
+      <p class="total__text">Total Amount</p>
+    </div>
+  </div>
+</ng-template>
