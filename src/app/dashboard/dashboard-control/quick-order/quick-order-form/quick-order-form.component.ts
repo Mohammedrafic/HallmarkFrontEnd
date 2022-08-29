@@ -10,7 +10,7 @@ import {
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ChangeEventArgs, FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { combineLatest, debounceTime, filter, merge, Observable, of, Subject, takeUntil } from 'rxjs';
+import { combineLatest, debounceTime, filter, merge, Observable, of, Subject, take, takeUntil } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { OrderType } from '@shared/enums/order-type';
@@ -285,15 +285,15 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.resetLocation();
     this.resetDepartment();
     const selectedOrganization = event.itemData as Organisation;
+    const organizationId = selectedOrganization.organizationId;
     this.regionDataSource = selectedOrganization.regions;
     this.isRegionsDropDownEnabled = true;
-    this.handleAllOrganizationSkills(selectedOrganization.organizationId);
-    this.store.dispatch(new GetOrganizationSettings(undefined, selectedOrganization.organizationId));
-    this.store.dispatch(new GetAssociateAgencies(selectedOrganization.organizationId));
-    this.store.dispatch(new GetProjectSpecialData(selectedOrganization.organizationId));
-    this.store.dispatch(
-      new GetOrderRequisitionByPage(undefined, undefined, undefined, selectedOrganization.organizationId)
-    );
+    this.handleAllOrganizationSkills(organizationId);
+    this.populateRegLocDepSkillFields(selectedOrganization.regions[0]);
+    this.store.dispatch(new GetOrganizationSettings(undefined, organizationId));
+    this.store.dispatch(new GetAssociateAgencies(organizationId));
+    this.store.dispatch(new GetProjectSpecialData(organizationId));
+    this.store.dispatch(new GetOrderRequisitionByPage(undefined, undefined, undefined, organizationId));
   }
 
   public onRegionDropDownSelected(event: ChangeEventArgs): void {
@@ -319,7 +319,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   private resetRegion(): void {
     this.cdr.markForCheck();
     const regionControl = this.generalInformationForm.get('regionId') as AbstractControl;
-    if (regionControl.touched) {
+    if (regionControl.value) {
       regionControl.reset(null, { emitValue: false });
       regionControl.markAsUntouched();
       this.regionDataSource = [];
@@ -330,7 +330,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   private resetLocation(): void {
     this.cdr.markForCheck();
     const locationControl = this.generalInformationForm.get('locationId') as AbstractControl;
-    if (locationControl.touched) {
+    if (locationControl.value) {
       locationControl.reset(null, { emitValue: false });
       locationControl.markAsUntouched();
       this.locationDataSource = [];
@@ -341,7 +341,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   private resetDepartment(): void {
     this.cdr.markForCheck();
     const departmentControl = this.generalInformationForm.get('departmentId') as AbstractControl;
-    if (departmentControl.touched) {
+    if (departmentControl.value) {
       departmentControl.reset(null, { emitValue: false });
       departmentControl.markAsUntouched();
       this.departmentDataSource = [];
@@ -360,8 +360,31 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   private handleOrganizationUserDataStructure(): void {
     if (!this.userIsAdmin && this.organizationStructure) {
       this.regionDataSource = this.organizationStructure.regions;
-      this.isRegionsDropDownEnabled = true;
+      this.populateRegLocDepSkillFields(this.regionDataSource[0]);
     }
+  }
+
+  private populateRegLocDepSkillFields(region: Region | OrganizationRegion): void {
+    if (region) {
+      this.generalInformationForm.controls['regionId'].patchValue(region.id);
+      this.isRegionsDropDownEnabled = true;
+      this.locationDataSource = region.locations as Location[];
+    }
+    if (this.locationDataSource.length > 0) {
+      this.generalInformationForm.controls['locationId'].patchValue(this.locationDataSource[0].id);
+      this.isLocationsDropDownEnabled = true;
+      this.departmentDataSource = this.locationDataSource[0].departments;
+    }
+
+    if (this.departmentDataSource.length > 0) {
+      this.generalInformationForm.controls['departmentId'].patchValue(this.departmentDataSource[0].id);
+      this.store.dispatch(
+        new GetContactDetails(this.departmentDataSource[0].id, this.departmentDataSource[0].organizationId)
+      );
+      this.isDepartmentsDropDownEnabled = true;
+    }
+
+    this.generalInformationForm.controls['skillId'].patchValue(this.skillDataSource[0].id);
   }
 
   private handleDurationControlValueChanges(): void {
@@ -552,10 +575,9 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         .getRegularLocalBillRate(orderType, departmentId, skillId, organizationId)
         .pipe(
           takeUntil(this.destroy$),
-          filter((billRate) => !!billRate.length)
         )
         .subscribe((billRates: BillRate[]) =>
-          this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour)
+          this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0]?.rateHour || null)
         );
     }
   }
@@ -576,7 +598,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private getContactDetails(): void {
-    this.contactDetails$.pipe(takeUntil(this.destroy$), filter(Boolean)).subscribe((contactDetails) => {
+    this.contactDetails$.pipe(filter(Boolean), take(1)).subscribe((contactDetails) => {
       const { facilityContact, facilityEmail } = contactDetails;
       this.populateContactDetailsForm(facilityContact, facilityEmail);
     });
