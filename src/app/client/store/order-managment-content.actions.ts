@@ -34,7 +34,7 @@ export class SetLock {
     public lockStatus: boolean,
     public filters: OrderFilter = {},
     public prefixId: string,
-    public updateOpened = false,
+    public updateOpened = false
   ) {}
 }
 
@@ -135,7 +135,12 @@ export class SetIsDirtyOrderForm {
 
 export class SaveOrder {
   static readonly type = '[order management] Save Order';
-  constructor(public order: CreateOrderDto, public documents: Blob[], public comments?: Comment[] | undefined, public lastSelectedBusinessUnitId?: number) {}
+  constructor(
+    public order: CreateOrderDto,
+    public documents: Blob[],
+    public comments?: Comment[] | undefined,
+    public lastSelectedBusinessUnitId?: number
+  ) {}
 }
 
 export class SaveOrderSucceeded {
@@ -239,4 +244,9 @@ export class GetContactDetails {
 export class GetExtensions {
   static readonly type = '[order management] Get Extensions';
   constructor(public id: number) {}
+}
+
+export class SetIsDirtyQuickOrderForm {
+  static readonly type = '[order management] Set Quick Order Dirty';
+  constructor(public isDirtyQuickOrderForm: boolean) {}
 }

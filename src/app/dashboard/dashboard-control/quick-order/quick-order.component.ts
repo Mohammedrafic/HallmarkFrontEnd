@@ -3,11 +3,14 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { filter, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { AllOrganizationsSkill } from '../../models/all-organization-skill.model';
 import { QuickOrderFormComponent } from './quick-order-form/quick-order-form.component';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { Select, Store } from '@ngxs/store';
+import { SetIsDirtyQuickOrderForm } from '@client/store/order-managment-content.actions';
 
 @Component({
   selector: 'app-quick-order',
@@ -24,14 +27,22 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
   @ViewChild('sideDialog', { static: true }) public sideDialog: DialogComponent;
   @ViewChild('quickOrderForm') public quickOrderForm: QuickOrderFormComponent;
 
+  @Select(OrderManagementContentState.isDirtyQuickOrderForm)
+  private isFormDirty$: Observable<boolean>;
+
+  public submitQuickOrder$ = new Subject<boolean>();
+
   public readonly targetElement: HTMLElement = document.body;
 
-  constructor(private confirmService: ConfirmService) {
+  private isFormDirty: boolean;
+
+  constructor(private confirmService: ConfirmService, private store: Store) {
     super();
   }
 
   public ngOnInit(): void {
     this.onOpenEvent();
+    this.subscribeOnFormDirty();
   }
 
   private onOpenEvent(): void {
@@ -46,7 +57,7 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
   }
 
   public onClose(): void {
-    if (this.quickOrderForm.isFormDirty) {
+    if (this.isFormDirty) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
@@ -63,10 +74,17 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
   }
 
   public onSubmitQuickOrder(): void {
-    this.quickOrderForm.onSubmitQuickOrderForm();
+    this.submitQuickOrder$.next(true);
   }
 
   private closeDialog(): void {
     this.openEvent.next(false);
+    this.store.dispatch(new SetIsDirtyQuickOrderForm(false));
+  }
+
+  private subscribeOnFormDirty(): void {
+    this.isFormDirty$.pipe(takeUntil(this.destroy$)).subscribe((value) => {
+      this.isFormDirty = value;
+    });
   }
 }

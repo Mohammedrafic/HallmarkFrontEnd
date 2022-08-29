@@ -10,7 +10,7 @@ import {
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ChangeEventArgs, FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { combineLatest, debounceTime, filter, Observable, of, Subject, takeUntil } from 'rxjs';
+import { combineLatest, debounceTime, filter, merge, Observable, of, Subject, takeUntil } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { OrderType } from '@shared/enums/order-type';
@@ -33,6 +33,7 @@ import {
   GetContactDetails,
   GetProjectSpecialData,
   SaveOrder,
+  SetIsDirtyQuickOrderForm,
 } from '@client/store/order-managment-content.actions';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import PriceUtils from '@shared/utils/price.utils';
@@ -62,6 +63,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   @Input() public skills: AllOrganizationsSkill[];
   @Input() public organizationStructure: OrganizationStructure;
   @Input() public openEvent: Subject<boolean>;
+  @Input() public submitQuickOrder$: Subject<boolean>;
 
   @ViewChild('multiselect') public readonly multiselect: MultiSelectComponent;
 
@@ -145,6 +147,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   @Select(OrderManagementContentState.contactDetails)
   private readonly contactDetails$: Observable<ContactDetails>;
 
+  private isFormDirty: boolean = false;
+
   get orderTypeControl() {
     return this.orderTypeForm.get('orderType') as AbstractControl;
   }
@@ -165,7 +169,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     return this.jobDistributionDescriptionForm.get('agency') as AbstractControl;
   }
 
-  get isFormDirty(): boolean {
+  get isAnyFormsDirty(): boolean {
     return [
       this.organizationForm,
       this.orderTypeForm,
@@ -199,12 +203,16 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.handleJobDistributionValueChanges();
     this.handleDurationControlValueChanges();
     this.populateQuickOrderFormValues();
-    this.populateJobjobDistributionForm();
+    this.populateJobDistributionForm();
     this.populateShiftTimes();
     this.refreshMultiSelectAfterOpenDialog();
     this.subscribeForSettings();
     this.getContactDetails();
     this.getDataForOrganizationUser();
+    this.cleanUpValidatorsForOrganizationUser();
+    this.submitQuickOrder();
+    this.detectFormValueChanges();
+    this.setIsFormDirty();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -251,7 +259,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       agency: [null],
       jobDistributions: [[]],
       jobDescription: ['', Validators.maxLength(500)],
-      reasonForRequisition: [null, Validators.required],
+      orderRequisitionReasonId: [null, Validators.required],
     });
   }
 
@@ -397,6 +405,15 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.store.dispatch(new GetAssociateAgencies());
       this.store.dispatch(new GetProjectSpecialData());
       this.store.dispatch(new GetOrganizationSettings());
+      this.store.dispatch(new GetOrderRequisitionByPage());
+    }
+  }
+
+  private cleanUpValidatorsForOrganizationUser(): void {
+    if (!this.userIsAdmin) {
+      const organizationControl = this.organizationForm.controls['organization'];
+      organizationControl.clearValidators();
+      organizationControl.updateValueAndValidity({ onlySelf: false, emitEvent: false });
     }
   }
 
@@ -437,6 +454,10 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.isOpenPerDiem = value === OrderType.OpenPerDiem;
       this.handlePerDiemOrder();
       this.handlePermPlacementOrder();
+
+      Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
+        this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
+      });
     });
   }
 
@@ -561,7 +582,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     });
   }
 
-  private populateJobjobDistributionForm(): void {
+  private populateJobDistributionForm(): void {
     this.jobDistributionControl.patchValue([JobDistribution.All]);
   }
 
@@ -678,11 +699,11 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       const order = {
         isSubmit: true,
         isQuickOrder: true,
-        jobDistributions: this.jobDistributionDescriptionForm.getRawValue().jobDistributions,
         contactDetails: [this.contactDetailsForm.getRawValue()],
         ...this.orderTypeForm.getRawValue(),
         ...this.generalInformationForm.getRawValue(),
         ...this.specialProjectForm.getRawValue(),
+        ...this.jobDistributionDescriptionForm.getRawValue(),
       };
       const selectedBusinessUnitId = this.organizationForm.value.organization;
       this.store.dispatch(new SaveOrder(order, [], undefined, selectedBusinessUnitId));
@@ -698,5 +719,40 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.contactDetailsForm.markAllAsTouched();
       this.specialProjectForm.markAllAsTouched();
     }
+  }
+
+  private submitQuickOrder(): void {
+    this.submitQuickOrder$.pipe(takeUntil(this.destroy$)).subscribe((isSubmit) => {
+      if (isSubmit) {
+        this.onSubmitQuickOrderForm();
+      }
+    });
+  }
+
+  private detectFormValueChanges(): void {
+    this.contactDetailsForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
+    this.jobDistributionDescriptionForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.cdr.markForCheck());
+    this.generalInformationForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
+  }
+
+  private setIsFormDirty(): void {
+    merge(
+      this.organizationForm.valueChanges,
+      this.orderTypeForm.valueChanges,
+      this.generalInformationForm.valueChanges,
+      this.jobDistributionDescriptionForm.valueChanges,
+      this.contactDetailsForm.valueChanges,
+      this.specialProjectForm.valueChanges
+    )
+      .pipe(
+        takeUntil(this.destroy$),
+        filter(() => this.isFormDirty !== this.isAnyFormsDirty)
+      )
+      .subscribe(() => {
+        this.isFormDirty = this.isAnyFormsDirty;
+        this.store.dispatch(new SetIsDirtyQuickOrderForm(this.isAnyFormsDirty));
+      });
   }
 }

@@ -41,6 +41,7 @@ import {
   SaveOrderSucceeded,
   SelectNavigationTab,
   SetIsDirtyOrderForm,
+  SetIsDirtyQuickOrderForm,
   SetLock,
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob,
@@ -105,6 +106,7 @@ export interface OrderManagementContentStateModel {
   associateAgencies: AssociateAgency[];
   predefinedBillRates: BillRate[];
   isDirtyOrderForm: boolean;
+  isDirtyQuickOrderForm: boolean;
   rejectionReasonsList: RejectReason[] | null;
   orderFilterDataSources: OrderFilterDataSource | null;
   historicalEvents: HistoricalEvent[] | null;
@@ -136,6 +138,7 @@ export interface OrderManagementContentStateModel {
     associateAgencies: [],
     predefinedBillRates: [],
     isDirtyOrderForm: false,
+    isDirtyQuickOrderForm: false,
     rejectionReasonsList: null,
     orderFilterDataSources: null,
     historicalEvents: null,
@@ -277,6 +280,11 @@ export class OrderManagementContentState {
     return state.extensions;
   }
 
+  @Selector()
+  static isDirtyQuickOrderForm(state: OrderManagementContentStateModel): boolean {
+    return state.isDirtyQuickOrderForm;
+  }
+
   constructor(
     private orderManagementService: OrderManagementContentService,
     private projectsService: ProjectsService,
@@ -290,17 +298,19 @@ export class OrderManagementContentState {
     { patchState }: StateContext<OrderManagementContentStateModel>,
     { payload, isIncomplete }: GetOrders
   ): Observable<OrderManagementPage> {
-    return !isIncomplete ? this.orderManagementService.getOrders(payload).pipe(
-      tap((payload) => {
-        this.orderManagementService.countShiftsWithinPeriod(payload);
-        patchState({ ordersPage: payload });
-        return payload;
-      })
-    ) : this.orderManagementService.getIncompleteOrders(payload).pipe(
-      tap((payload) => {
-        patchState({ ordersPage: payload });
-      })
-    );
+    return !isIncomplete
+      ? this.orderManagementService.getOrders(payload).pipe(
+          tap((payload) => {
+            this.orderManagementService.countShiftsWithinPeriod(payload);
+            patchState({ ordersPage: payload });
+            return payload;
+          })
+        )
+      : this.orderManagementService.getIncompleteOrders(payload).pipe(
+          tap((payload) => {
+            patchState({ ordersPage: payload });
+          })
+        );
   }
 
   @Action(ClearOrders)
@@ -452,9 +462,10 @@ export class OrderManagementContentState {
   }
 
   @Action(GetProjectSpecialData)
-  GetProjectSpecialData({
-    patchState,
-  }: StateContext<OrderManagementContentStateModel>, { lastSelectedBusinessUnitId }: GetProjectSpecialData): Observable<ProjectSpecialData> {
+  GetProjectSpecialData(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { lastSelectedBusinessUnitId }: GetProjectSpecialData
+  ): Observable<ProjectSpecialData> {
     return this.projectsService.getProjectSpecialData(lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
         patchState({ projectSpecialData: payload });
@@ -492,7 +503,10 @@ export class OrderManagementContentState {
   }
 
   @Action(GetAssociateAgencies)
-  GetAssociateAgencies({ patchState }: StateContext<OrderManagementContentStateModel>, { lastSelectedBusinessUnitId }: GetAssociateAgencies): Observable<AssociateAgency[]> {
+  GetAssociateAgencies(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { lastSelectedBusinessUnitId }: GetAssociateAgencies
+  ): Observable<AssociateAgency[]> {
     return this.orderManagementService.getAssociateAgencies(lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
         patchState({ associateAgencies: payload });
@@ -551,13 +565,15 @@ export class OrderManagementContentState {
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents, comments, lastSelectedBusinessUnitId }: SaveOrder
   ): Observable<Order | void> {
-
     return this.orderManagementService.saveOrder(order, documents, comments, lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
         let TOAST_MESSAGE = RECORD_ADDED;
         let MESSAGE_TYPE = MessageTypes.Success;
-        const hasntOrderCredentials = (order?.isQuickOrder && payload.credentials.length === 0);
-        const hasntOrderBillRates = ((order?.isQuickOrder && payload.orderType === OrderType.Traveler || payload.orderType === OrderType.ContractToPerm) && payload.billRates.length === 0);
+        const hasntOrderCredentials = order?.isQuickOrder && payload.credentials.length === 0;
+        const hasntOrderBillRates =
+          ((order?.isQuickOrder && payload.orderType === OrderType.Traveler) ||
+            payload.orderType === OrderType.ContractToPerm) &&
+          payload.billRates.length === 0;
 
         if (!hasntOrderCredentials) {
           TOAST_MESSAGE = `${ORDER_WITHOUT_CREDENTIALS}`;
@@ -571,7 +587,13 @@ export class OrderManagementContentState {
 
         dispatch([
           order?.isQuickOrder
-            ? new ShowToast(MESSAGE_TYPE, TOAST_MESSAGE, order.isQuickOrder, payload.organizationPrefix, payload.publicId)
+            ? new ShowToast(
+                MESSAGE_TYPE,
+                TOAST_MESSAGE,
+                order.isQuickOrder,
+                payload.organizationPrefix,
+                payload.publicId
+              )
             : new ShowToast(MessageTypes.Success, RECORD_ADDED),
           new SaveOrderSucceeded(),
           new SetIsDirtyOrderForm(false),
@@ -739,5 +761,13 @@ export class OrderManagementContentState {
     { id }: GetExtensions
   ): Observable<ExtensionGridModel[]> {
     return this.extensionSidebarService.getExtensions(id).pipe(tap((extensions) => patchState({ extensions })));
+  }
+
+  @Action(SetIsDirtyQuickOrderForm)
+  SetIsDirtyQuickOrderForm(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { isDirtyQuickOrderForm }: SetIsDirtyQuickOrderForm
+  ): void {
+    patchState({ isDirtyQuickOrderForm });
   }
 }

@@ -118,6 +118,11 @@
                   [ngTemplateOutlet]="invoicesTable"
                   [ngTemplateOutletContext]="{ itemsData: pendingApprovalInvoicesData$ | async }"
     ></ng-container>
+
+    <ng-container *ngSwitchCase="5"
+                  [ngTemplateOutlet]="invoicesTable"
+                  [ngTemplateOutletContext]="{ itemsData: pendingApprovalInvoicesData$ | async }"
+    ></ng-container>
   </ng-container>
 </section>
 

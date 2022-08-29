@@ -51,6 +51,9 @@ export interface BillRate {
   editAllowed: boolean;
   billType: boolean;
   isPredefined: boolean;
+  seventhDayOtEnabled?: boolean;
+  weeklyOtEnabled?: boolean;
+  dailyOtEnabled?: boolean;
 }
 
 export interface OrderBillRateDto extends Omit<BillRate, 'billRateConfig' | 'billRateGroupId'> { }
