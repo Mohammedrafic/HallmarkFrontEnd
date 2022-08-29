@@ -470,6 +470,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     if (this.isOpenPerDiem) {
       listOfCommonControls.forEach((control) => {
         this.generalInformationForm.controls[control].setValidators(null);
+        this.generalInformationForm.controls[control].patchValue(null, { emitEvent: false });
       });
     } else {
       listOfCommonControls.forEach((control) => {
@@ -550,9 +551,9 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
           takeUntil(this.destroy$),
           filter((billRate) => !!billRate.length)
         )
-        .subscribe((billRates: BillRate[]) =>
-          this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour)
-        );
+        .subscribe((billRates: BillRate[]) => {
+          this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour);
+        });
     }
   }
 
@@ -727,7 +728,9 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   private detectFormValueChanges(): void {
     this.contactDetailsForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
-    this.jobDistributionDescriptionForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
+    this.jobDistributionDescriptionForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.cdr.markForCheck());
     this.generalInformationForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
   }
 }
