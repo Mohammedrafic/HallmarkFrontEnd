@@ -16,5 +16,5 @@ export class DeleteBusinessLine {
 
 export class SaveBusinessLine {
   static readonly type = '[Business lines] Add Business Line';
-  constructor(public businessLine: BusinessLines) {}
+  constructor(public businessLine: BusinessLines, public isEdit: boolean) {}
 }

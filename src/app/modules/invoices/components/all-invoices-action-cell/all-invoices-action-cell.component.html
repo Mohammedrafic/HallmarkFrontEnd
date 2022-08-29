@@ -1,6 +1,6 @@
 <button ejs-button class="grid-actions-cell-item" cssClass="e-flat e-success"
   *ngIf="action"
-        (click)="handleAction()">
+        (click)="handleAction($event)">
     <span *ngIf="actionName"
           class="grid-actions-cell-item-title">
         {{actionName}}

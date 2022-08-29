@@ -4,17 +4,9 @@ import {
   Input,
   OnChanges,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { Router } from '@angular/router';
-import { Invoice } from '../../interfaces';
 
-interface InvoiceInfoUIItem {
-  icon: string;
-  value: unknown;
-  title: string;
-  isHide?: boolean;
-  isAmount?: boolean;
-}
+import { InvoiceDetail, InvoiceInfoUIItem } from '../../interfaces';
+import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 
 @Component({
   selector: 'app-invoice-detail-invoice-info',
@@ -23,67 +15,22 @@ interface InvoiceInfoUIItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoiceDetailInvoiceInfoComponent implements OnChanges {
-  @Input() invoiceInfo: Invoice;
+  @Input() invoiceInfo: InvoiceDetail;
 
   public items: InvoiceInfoUIItem[] = [];
 
-  private isAgency: boolean;
-
   constructor(
-    private datePipe: DatePipe,
-    private router: Router,
-    ) {
-    this.isAgency = this.router.url.includes('agency');
+    private invoicesContainerService: InvoicesContainerService
+  ) {
   }
 
   ngOnChanges(): void {
     if (this.invoiceInfo) {
-      this.items = this.getUIItems(this.invoiceInfo);
+      this.items = this.invoicesContainerService.getDetailsUIItems(this.invoiceInfo);
     }
   }
 
   public trackByTitle(_: number, item: InvoiceInfoUIItem): string {
     return item.title;
-  }
-
-  private getUIItems(data: Invoice): InvoiceInfoUIItem[] {
-    return [
-      {
-        title: 'Invoice to',
-        icon: 'user',
-        value: data.location,
-      },
-      {
-        title: 'Net Payment Terms',
-        icon: 'package',
-        value: 45,
-      },
-      {
-        title: 'Department',
-        icon: 'folder',
-        value: data.department,
-      },
-      {
-        title: 'Invoice Amount',
-        icon: '',
-        value: `$${this.isAgency ? Number((data.amount * 1.05).toFixed(2)) : data.amount}`,
-        isAmount: true,
-      },
-      {
-        title: 'Location',
-        icon: 'map-pin',
-        value: data.location,
-      },
-      {
-        title: 'Invoice Date',
-        icon: 'calendar',
-        value: `${this.datePipe.transform(data.issuedDate, 'MM/d/y')}`,
-      },
-      {
-        title: 'Due Date',
-        icon: 'calendar',
-        value: `${this.datePipe.transform(data.dueDate, 'MM/d/y')}`,
-      },
-    ];
   }
 }

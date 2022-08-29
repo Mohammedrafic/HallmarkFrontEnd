@@ -208,6 +208,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public createReOrder(): void {
+    this.addEditReorderService.setReOrderDialogTitle(SidebarDialogTitlesEnum.AddReOrder);
     this.store.dispatch(new ShowSideDialog(true));
   }
 

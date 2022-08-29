@@ -4,8 +4,10 @@ import { DataSourceItem } from '@core/interface';
 
 import { DetailsColumnConfig } from '../../timesheets/interface';
 import { InvoiceRecord } from './invoice-record.model';
-import { INVOICES_STATUSES, InvoicesTableFiltersColumns } from '../enums/invoices.enum';
+import { INVOICES_STATUSES, InvoicesTableFiltersColumns } from '../enums';
 import { FilteringOptionsFields } from '../../timesheets/enums';
+import { InvoiceDetail } from './invoice-detail.interface';
+import { PendingApprovalInvoice } from './pending-approval-invoice.interface';
 
 export interface Invoice extends InvoiceRecord {
   groupBy: string;
@@ -89,4 +91,14 @@ export interface ManualInvoiceTimesheetResponse {
 export interface InvoiceStateDto {
   invoiceId: number;
   targetState: number;
+}
+
+export interface SelectedInvoiceRow {
+  rowIndex: number;
+  data?: PendingApprovalInvoice;
+}
+
+export interface InvoiceDialogActionPayload {
+  dialogState: boolean;
+  invoiceDetail: InvoiceDetail | null;
 }

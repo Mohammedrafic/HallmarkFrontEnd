@@ -5,7 +5,7 @@ import { A11yModule } from '@angular/cdk/a11y';
 
 import {
   AlignJustify, ChevronDown, ChevronRight, Lock, Menu, MessageSquare, MoreVertical, Package,
-  Percent, Sliders, Trash2, X, AlertCircle, ChevronsDown, Printer } from 'angular-feather/icons';
+  Percent, Sliders, Trash2, X, AlertCircle, ChevronsDown, Search, Printer } from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import {
   AutoCompleteAllModule,
@@ -72,6 +72,7 @@ import { AgencyInvoicesContainerService } from './services/invoices-container/ag
 import {
   OrganizationInvoicesContainerService
 } from './services/invoices-container/organization-invoices-container.service';
+import { TableStatusCellModule } from '@shared/components/table-status-cell/table-status-cell.module';
 import { AllInvoicesActionCellComponent } from './components/all-invoices-action-cell/all-invoices-action-cell.component';
 
 @NgModule({
@@ -94,7 +95,8 @@ import { AllInvoicesActionCellComponent } from './components/all-invoices-action
     DateWeekPickerModule,
     FeatherModule.pick({
       AlignJustify, Lock, Menu, MessageSquare, MoreVertical, Sliders, ChevronRight,
-      ChevronDown, X, Percent, Package, Trash2, AlertCircle, ChevronsDown, Printer,
+      ChevronDown, X, Percent, Package, Trash2, AlertCircle, ChevronsDown, Search,
+      Printer,
     }),
     TabModule,
     DropDownButtonModule,
@@ -124,6 +126,7 @@ import { AllInvoicesActionCellComponent } from './components/all-invoices-action
     SplitButtonModule,
     ListBoxModule,
     A11yModule,
+    TableStatusCellModule,
   ],
   providers: [
     InvoicesService,

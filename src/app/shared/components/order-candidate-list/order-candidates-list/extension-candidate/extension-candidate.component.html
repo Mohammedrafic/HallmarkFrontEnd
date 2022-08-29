@@ -3,11 +3,13 @@
     <div class="e-card-header">
       <div class="e-card-header-caption candidat-status">
         <h3 class="e-card-title candidate-title">{{ candidate?.lastName }}, {{ candidate?.firstName }}</h3>
-        <ejs-chiplist [text]="candidate.workflowStepType.status">
-          <e-chips>
-            <e-chip [cssClass]="workflowStepType[candidate.workflowStepType.type] | chipsCssClass"></e-chip>
-          </e-chips>
-        </ejs-chiplist>
+        <ng-container *ngIf="candidate.workflowStepType">
+          <ejs-chiplist [text]="candidate.workflowStepType.status">
+            <e-chips>
+              <e-chip [cssClass]="workflowStepType[candidate.workflowStepType.type] | chipsCssClass"></e-chip>
+            </e-chips>
+          </ejs-chiplist>
+        </ng-container>
       </div>
       <div class="e-card-content button-container">
         <div class="input-group dropdown bootstrap">
@@ -19,8 +21,9 @@
             placeholder="Select Status"
             (select)="onDropDownChanged($event)"
           ></ejs-dropdownlist>
-          <button ejs-button cssClass="e-primary" (click)="onAccept()" *ngIf="canAccept">Accept</button>
         </div>
+        <button ejs-button cssClass="e-outline" [isPrimary]="true" *ngIf="!isAccepted && canAccept" (click)="onReject()">Reject</button>
+        <button ejs-button [isPrimary]="true" *ngIf="canAccept" (click)="onAccept()">Accept</button>
       </div>
     </div>
   </section>
@@ -100,12 +103,17 @@
                     </div>
                   </div>
                 </div>
-                <div class="d-flex" *ngIf="isAccepted || isOnBoard">
+                <div class="d-flex" *ngIf="!isAgency && (isAccepted || isOnBoard)">
                   <div class="f-grow-2">
                     <div class="input-container bootstrap">
                       <label class="input-group">Guaranted Work Week</label>
                       <div>
-                        <input appValidateWithMessage formControlName="guaranteedWorkWeek" class="e-input" type="text" />
+                        <input
+                          appValidateWithMessage
+                          formControlName="guaranteedWorkWeek"
+                          class="e-input"
+                          type="text"
+                        />
                       </div>
                     </div>
                     <div class="d-flex">
@@ -117,7 +125,6 @@
                             formControlName="actualStartDate"
                             class="e-input"
                             type="text"
-                            readonly
                           />
                         </div>
                       </div>
@@ -129,7 +136,6 @@
                             formControlName="actualEndDate"
                             class="e-input"
                             type="text"
-                            readonly
                           />
                         </div>
                       </div>
@@ -187,7 +193,8 @@
       <app-bill-rates
         [billRates]="billRatesData"
         (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)"
-        [isActive]="true">
+        [isActive]="true"
+      >
       </app-bill-rates>
     </ng-template>
   </section>

@@ -362,8 +362,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       orderPlacementFee,
     } = allValues;
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
-      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed, isPredefined } = billRate;
-      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed, isPredefined };
+      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed, isPredefined, seventhDayOtEnabled, weeklyOtEnabled, dailyOtEnabled } = billRate;
+      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed, isPredefined, seventhDayOtEnabled, weeklyOtEnabled, dailyOtEnabled };
     });
 
     const order: CreateOrderDto | EditOrderDto = {
@@ -440,8 +440,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private saveForLater(): void {
     const titleControl = this.orderDetailsFormComponent.generalInformationForm.controls['title'];
-
-    const contactDetailsForm = this.orderDetailsFormComponent.contactDetailsForm;
     const workLocationForm = this.orderDetailsFormComponent.workLocationForm;
 
     if (titleControl.invalid) {
@@ -451,10 +449,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
     const order = this.collectOrderData(false);
     const documents = this.orderDetailsFormComponent.documents;
-
-    if (contactDetailsForm.invalid) {
-      order.contactDetails = [];
-    }
 
     if (workLocationForm.invalid) {
       order.workLocations = [];

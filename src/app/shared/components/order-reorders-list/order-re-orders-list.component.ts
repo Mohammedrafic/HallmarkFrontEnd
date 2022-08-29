@@ -4,6 +4,8 @@ import { Store } from "@ngxs/store";
 import { debounceTime, Subject } from "rxjs";
 import { AgencyOrderManagement, Order, OrderManagement, ReOrder } from '@shared/models/order-management.model';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
+import { AddEditReorderService } from "@client/order-management/add-edit-reorder/add-edit-reorder.service";
+import { SidebarDialogTitlesEnum } from "@shared/enums/sidebar-dialog-titles.enum";
 
 @Component({
   selector: 'app-order-reorders-list',
@@ -22,7 +24,7 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
   @Output() selectReOrder = new EventEmitter<{ reOrder: OrderManagement | AgencyOrderManagement, order: Order | OrderManagement | AgencyOrderManagement }>()
   @Output() editReorder = new EventEmitter();
 
-  constructor(private store: Store, private orderManagementService: OrderManagementContentService) {
+  constructor(private store: Store, private orderManagementService: OrderManagementContentService, private addEditReOrderService: AddEditReorderService) {
     super();
   }
 
@@ -52,6 +54,7 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
   }
 
   edit(order: OrderManagement): void {
+    this.addEditReOrderService.setReOrderDialogTitle(SidebarDialogTitlesEnum.EditReOrder);
     this.orderManagementService.getOrderById(order.id).subscribe(order => this.editReorder.emit(order));
   }
 }

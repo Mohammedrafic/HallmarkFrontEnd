@@ -4,7 +4,7 @@
       <h3>Business Lines</h3>
     </section>
     <section>
-      <button ejs-button [isPrimary]="true" (click)="addBusinessLine()">Add Business Lines</button>
+      <button ejs-button [isPrimary]="true" (click)="addBusinessLine()">Add Business Line</button>
     </section>
   </section>
 
@@ -35,7 +35,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="line" headerText="Business Lines" textAlign="Left" width="100%"></e-column>
+      <e-column field="line" headerText="Business Line" textAlign="Left" width="100%"></e-column>
     </e-columns>
 
     <ng-template #pagerTemplate let-data>
@@ -85,8 +85,8 @@
 <app-side-dialog
   (formCancelClicked)="onFormCancelClick()"
   (formSaveClicked)="onFormSaveClick()"
-  [header]="'Add Business Line'"
-  [width]="'400px'"
+  [header]="dialogHeader + ' Business Line'"
+  [width]="'436px'"
 >
   <form class="form-container bootstrap" id="addEditRecordForm" [formGroup]="businessLineFormGroup">
     <div class="group">
@@ -97,10 +97,11 @@
             id="name"
             class="e-input"
             type="text"
-            maxlength="20"
+            minlength="3"
+            maxlength="100"
             appValidateWithMessage
-            pattern="^[A-Za-z -]+$"
             formControlName="line"
+            pattern="^[A-Za-z -]+$"
           />
         </div>
       </div>

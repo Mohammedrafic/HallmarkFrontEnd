@@ -41,6 +41,10 @@ export class BusinessLinesComponent extends AbstractGridConfigurationComponent i
   private readonly pageSubject = new Subject<number>();
   private isAlive = true;
 
+  get dialogHeader(): string {
+    return this.isEdit ? 'Edit' : 'Add';
+  }
+
   constructor(private readonly store: Store, private readonly confirmService: ConfirmService) {
     super();
     this.businessLineFormGroup = new FormGroup({
@@ -132,14 +136,12 @@ export class BusinessLinesComponent extends AbstractGridConfigurationComponent i
 
   private saveOrUpdateRegion(businessLine: BusinessLines): void {
     if (this.isEdit) {
-      this.store.dispatch(new SaveBusinessLine(businessLine));
-      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      this.store.dispatch(new SaveBusinessLine(businessLine, true));
       this.isEdit = false;
       this.editedBusinessLineId = null;
       return;
     }
-    this.store.dispatch(new SaveBusinessLine(businessLine));
-    this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+    this.store.dispatch(new SaveBusinessLine(businessLine, false));
   }
 
   public onGoToClick(event: any): void {

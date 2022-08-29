@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
 import { combineLatest, debounceTime, filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
 
-import { ChangeEventArgs, DropDownListComponent, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 import {
   GetDepartmentsByLocationId,
@@ -57,7 +57,6 @@ import { disableControls } from '@shared/utils/form.utils';
 import { AlertService } from '@shared/services/alert.service';
 import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
 import { Comment } from '@shared/models/comment.model';
-import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 import { BillRate } from '@shared/models';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
@@ -290,7 +289,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     this.jobDescriptionForm = this.formBuilder.group({
-      classification: [null, Validators.required],
+      classification: [null],
       onCallRequired: [false],
       asapStart: [false],
       criticalOrder: [false],
@@ -507,6 +506,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
       const isEditMode = !!this.orderId;
       if (order && isEditMode) {
+        this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
         this.isEditMode = true;
         this.order = order;
         this.commentContainerId = order.commentContainerId as number;
@@ -849,7 +849,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private populateForms(order: Order): void {
-    const isStatusEditOrProgress = order.status === OrderStatus.Filled || order.status === OrderStatus.InProgress;
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
     this.orderTypeChanged.emit(order.orderType);
 
@@ -894,7 +893,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         .pipe(take(1))
         .subscribe(() => {
           this.generalInformationForm.controls['locationId'].patchValue(order.locationId);
-          this.isLocationsDropDownEnabled = !isStatusEditOrProgress;
         });
     }
 
@@ -904,7 +902,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         .pipe(take(1))
         .subscribe(() => {
           this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
-          this.isDepartmentsDropDownEnabled = !isStatusEditOrProgress;
         });
     }
 

@@ -81,7 +81,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   }
 
   get canAccept(): boolean {
-    return this.candidateJob && this.isAgency && !this.isAccepted && !this.isOnBoard;
+    return this.candidateJob && this.isAgency && !this.isOnBoard;
   }
 
   constructor(
@@ -163,7 +163,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   public onDropDownChanged(event: { itemData: ApplicantStatus }): void {
     switch (event.itemData.applicantStatus) {
       case ApplicantStatusEnum.Accepted:
-        this.onAccept()
+        this.onAccept();
         break;
       case ApplicantStatusEnum.Rejected:
         this.onReject();
@@ -181,10 +181,14 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     this.applicantStatuses =
       candidate.status === ApplicantStatusEnum.Accepted
         ? [
+            { applicantStatus: candidate.status, statusText: CandidatStatus[candidate.status] },
             { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
             { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
           ]
-        : [{ applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' }];
+        : [
+            { applicantStatus: candidate.status, statusText: CandidatStatus[candidate.status] },
+            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
+          ];
   }
 
   private subsToCandidate(): void {
@@ -233,7 +237,9 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
         this.isAgency ? new UpdateAgencyCandidateJob(updatedValue) : new UpdateOrganisationCandidateJob(updatedValue)
       )
       .subscribe(() => {
-        this.store.dispatch(this.isAgency ? new ReloadOrderCandidatesLists() : new ReloadOrganisationOrderCandidatesLists());
+        this.store.dispatch(
+          this.isAgency ? new ReloadOrderCandidatesLists() : new ReloadOrganisationOrderCandidatesLists()
+        );
       });
   }
 
@@ -275,7 +281,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
           this.getComments();
           this.billRatesData = this.candidateJob?.billRates ? [...this.candidateJob.billRates] : [];
           this.form.patchValue({
-            jobId: this.candidateJob.orderId,
+            jobId: `${this.currentOrder.organizationPrefix}-${this.currentOrder.publicId}`,
             avStartDate: this.getDateString(this.candidateJob.availableStartDate),
             locationName: this.candidateJob.order?.locationName,
             actualStartDate: this.getDateString(this.candidateJob.actualStartDate),
@@ -294,6 +300,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
             this.form.get('clockId')?.enable();
             this.form.get('actualStartDate')?.enable();
             this.form.get('actualEndDate')?.enable();
+            this.form.get('allowDeployCredentials')?.enable();
           }
           if (this.isOnBoard && !this.isAgency) {
             this.form.get('clockId')?.enable();

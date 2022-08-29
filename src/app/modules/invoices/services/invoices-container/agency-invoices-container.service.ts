@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { InvoicesContainerService } from './invoices-container.service';
 import { ManualInvoicesGridHelper } from '../../helpers';
-import { ColDef } from '@ag-grid-community/core';
+import { ColDef, GridOptions } from '@ag-grid-community/core';
 import { Observable } from 'rxjs';
-import { ManualInvoice } from '../../interfaces';
+import { InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
-import { AgencyInvoicesGridTab } from '../../enums';
+import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
 import { DialogAction } from '@core/enums';
+import { invoiceDetailsColumnDefs, invoiceInfoItems, invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
+import { AllInvoicesGridHelper } from '../../helpers/grid/all-invoices-grid.helper';
 
 @Injectable()
 export class AgencyInvoicesContainerService extends InvoicesContainerService {
@@ -27,8 +29,19 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
             new Invoices.DownloadAttachment(organizationId, attachment),
           ),
         });
+      case 1:
+        return AllInvoicesGridHelper.getColDefs();
       default:
         return [];
+    }
+  }
+
+  public override getGridOptions(tabIndex: OrganizationInvoicesGridTab): GridOptions {
+    switch (tabIndex) {
+      case 1:
+        return AllInvoicesGridHelper.getGridOptions(true);
+      default:
+        return super.getGridOptions(tabIndex);
     }
   }
 
@@ -40,10 +53,26 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
         action = new Invoices.GetManualInvoices(organizationId);
         break;
       case AgencyInvoicesGridTab.All:
-        action = new Invoices.GetPendingInvoices(organizationId);
+        action = new Invoices.GetPendingApproval({ organizationId });
         break;
     }
 
     return this.store.dispatch(action);
+  }
+
+  public getDetailColDef(): ColDef[] {
+    return invoiceDetailsColumnDefs(true);
+  }
+
+  public getDetailSummaryColDef(location: string): ColDef[] {
+    return invoiceSummaryColumnDefs(location);
+  }
+
+  public isAgency(): boolean {
+    return true;
+  }
+
+  public getDetailsUIItems(data: InvoiceDetail): InvoiceInfoUIItem[] {
+    return invoiceInfoItems(data, true);
   }
 }

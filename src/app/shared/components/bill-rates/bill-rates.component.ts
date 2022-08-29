@@ -80,7 +80,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     this.editBillRateIndex = null;
     this.billRateForm.reset();
     this.billRateFormHeader = 'Add Bill Rate';
-    this.billRateForm.patchValue({ id: 0, editAllowed: false, isPredefined: false });
+    this.billRateForm.patchValue({ id: 0, editAllowed: false, isPredefined: false, seventhDayOtEnabled: false, weeklyOtEnabled: false, dailyOtEnabled: false });
     this.selectedBillRateUnit = BillRateUnit.Multiplier;
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -101,6 +101,10 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       rateHour: rateHour,
       billType: value.billType,
       editAllowed: value.editAllowed || false,
+      isPredefined: value.isPredefined || false,
+      seventhDayOtEnabled: value.seventhDayOtEnabled || false,
+      weeklyOtEnabled: value.weeklyOtEnabled || false,
+      dailyOtEnabled: value.dailyOtEnabled || false
      }, { emitEvent: false });
 
     if (!value.billRateConfig.intervalMin) {

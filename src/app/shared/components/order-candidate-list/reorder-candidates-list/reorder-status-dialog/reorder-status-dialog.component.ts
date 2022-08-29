@@ -111,6 +111,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     );
   }
 
+  get isRejectCandidate(): boolean {
+    return this.currentCandidateApplicantStatus === ApplicantStatusEnum.Rejected;
+  }
+
   public jobStatusControl: FormControl;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public acceptForm = AcceptFormComponent.generateFormGroup();

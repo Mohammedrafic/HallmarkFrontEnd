@@ -1,0 +1,35 @@
+<div [formGroup]="addEditEmailTemplateForm" id="addEditEmailTemplateForm" class="email-template-form">
+    <div class="section-container">
+        <div class="left-section">
+            <div class="input-container bootstrap top-container">
+                <label>Subject<span class="required">*</span></label>
+                <div class="input-group">
+                    <input appValidateWithMessage formControlName="alertTitle" class="e-input" type="text" [(ngModel)]="alertTitle" />
+                </div>
+            </div>
+            <div class="rich-text-container">
+                <label>Mail Body<span class="required">*</span></label>
+                <div class="input-group">
+                    <ejs-richtexteditor #RTE id='defaultRTE' appValidateWithMessage formControlName="alertBody"
+                        [toolbarSettings]='tools' [(ngModel)]='alertBody' [(value)]='alertBody'>
+                    </ejs-richtexteditor>
+                </div>
+            </div>
+        </div>
+        <div class="right-section">
+
+            <div class="input-container bootstrap top-container">
+                <div class="input-group">
+                </div>
+            </div>
+
+            <div class="input-container bootstrap">
+                <label>Attributes</label>
+                <div>
+                    <ejs-listview id="listbox" [dataSource]='templateParamsData'>
+                    </ejs-listview>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

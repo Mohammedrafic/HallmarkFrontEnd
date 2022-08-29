@@ -33,6 +33,19 @@
         white-space: normal;
       }
     }
+
+    .app-grid {
+      .ag-header-cell-text {
+        font-weight: 600 !important;
+        color: $secondary-dark-blue-15 !important;
+      }
+    }
+
+    .inactive {
+      .ag-center-cols-viewport {
+        background: $secondary-dark-blue-45;
+      }
+    }
   }
 }
 

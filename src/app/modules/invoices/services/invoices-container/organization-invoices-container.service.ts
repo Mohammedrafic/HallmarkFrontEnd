@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { GridContainerTabConfig, InvoicesContainerService } from './invoices-container.service';
 import { ColDef, GridOptions } from '@ag-grid-community/core';
 import { Observable } from 'rxjs';
-import { ManualInvoice } from '../../interfaces';
+import { InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
 import { ManualInvoicesGridHelper, PendingInvoiceRowDetailsGridHelper, PendingInvoicesGridHelper } from '../../helpers';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
 import { Attachment } from '@shared/components/attachments';
 import { PendingApprovalGridHelper } from '../../helpers/grid/pending-approval-grid.helper';
 import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
+import { invoiceDetailsColumnDefs, invoiceInfoItems, invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
 
 @Injectable()
 export class OrganizationInvoicesContainerService extends InvoicesContainerService {
@@ -40,22 +41,22 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
       case OrganizationInvoicesGridTab.PendingApproval:
         return PendingApprovalGridHelper.getOrganizationColDefs({
           approve: (invoice: PendingApprovalInvoice) =>
-            this.store.dispatch(new Invoices.ChangeInvoiceState(invoice, InvoiceState.PendingPayment)),
+            this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.PendingPayment)),
         });
       case OrganizationInvoicesGridTab.PendingPayment:
         return PendingApprovalGridHelper.getOrganizationColDefs({
           approve: (invoice: PendingApprovalInvoice) =>
-            this.store.dispatch(new Invoices.ChangeInvoiceState(invoice, InvoiceState.Paid)),
+            this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.Paid)),
           actionTitle: 'Pay'
         });
       case OrganizationInvoicesGridTab.Paid:
         return  PendingApprovalGridHelper.getOrganizationColDefs({});
       case OrganizationInvoicesGridTab.All:
         return PendingApprovalGridHelper.getOrganizationAllColDefs({
-          approve: (invoice: PendingApprovalInvoice) => 
-          this.store.dispatch(new Invoices.ChangeInvoiceState(invoice, InvoiceState.PendingPayment)),
+          approve: (invoice: PendingApprovalInvoice) =>
+          this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.PendingPayment)),
           pay: (invoice: PendingApprovalInvoice) =>
-          this.store.dispatch(new Invoices.ChangeInvoiceState(invoice, InvoiceState.Paid)),
+          this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.Paid)),
         })
       default:
         return [];
@@ -93,7 +94,7 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
       case OrganizationInvoicesGridTab.All:
         action = new Invoices.GetPendingApproval({
           organizationId,
-          invoiceState: InvoiceState.PendingPayment,
+          invoiceState: undefined,
         });
         break;
     }
@@ -128,5 +129,21 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
       default:
         return defaultConfig;
     }
+  }
+
+  public getDetailColDef(): ColDef[] {
+    return invoiceDetailsColumnDefs(false);
+  }
+
+  public getDetailSummaryColDef(location: string): ColDef[] {
+    return invoiceSummaryColumnDefs(location);
+  }
+
+  public isAgency(): boolean {
+    return false;
+  }
+
+  public getDetailsUIItems(data: InvoiceDetail): InvoiceInfoUIItem[] {
+    return invoiceInfoItems(data, false);
   }
 }

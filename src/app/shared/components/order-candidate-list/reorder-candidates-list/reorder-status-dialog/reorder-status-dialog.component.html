@@ -85,6 +85,7 @@
             *ngIf="!isAgency"
             [billRates]="orderCandidateJob?.billRates || []"
             [isActive]="isActiveCandidateDialog$ | async"
+            [readOnlyMode]="isRejectCandidate"
             (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)">
           </app-bill-rates>
         </ng-template>
