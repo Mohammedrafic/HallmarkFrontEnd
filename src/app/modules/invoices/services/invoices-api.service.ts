@@ -128,8 +128,9 @@ export class InvoicesApiService {
     );
   }
 
-  public getPrintData(body: PrintingPostDto): Observable<PrintInvoiceData[]> {
-    return this.http.post<PrintInvoiceData[]>('/api/Invoices/printing', body);
+  public getPrintData(body: PrintingPostDto, isAgency: boolean): Observable<PrintInvoiceData[]> {
+    const endpoint = isAgency ? '/api/Invoices/agency/printing' : '/api/Invoices/printing';
+    return this.http.post<PrintInvoiceData[]>(endpoint, body);
   }
 
   private organizationDeleteManualInvoice(id: number): Observable<void> {

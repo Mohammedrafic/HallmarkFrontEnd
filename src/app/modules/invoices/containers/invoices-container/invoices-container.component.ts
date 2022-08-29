@@ -127,6 +127,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   public tabConfig: GridContainerTabConfig = {};
   public groupInvoicesOverlayVisible: boolean = false;
   public selectedInvoiceIds: number[];
+  public selectedOrgIds: number[];
 
   public isAgency: boolean;
 
@@ -357,24 +358,33 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   public handleMultiSelectionChanged(nodes: RowNode[]): void {
     if (nodes.length) {
       this.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);
+      this.selectedOrgIds = nodes.map((node) => node.data.organizationId);
     } else {
       this.selectedInvoiceIds = [];
     }
   }
 
   public printInvoices(): void {
-    const dto: PrintingPostDto = {
+    const dto: PrintingPostDto = this.isAgency ? {
+      invoiceIds: this.selectedInvoiceIds,
+      organizationIds: this.selectedOrgIds,
+    } : {
       organizationId: this.organizationId as number,
       invoiceIds: this.selectedInvoiceIds,
-    }
-    this.store.dispatch(new Invoices.GetPrintData(dto))
+    };
+
+    this.store.dispatch(new Invoices.GetPrintData(dto, this.isAgency))
     .pipe(
       filter((state) => !!state.invoices.printData),
       map((state) => state.invoices.printData),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((data) => {
-      this.printingService.printInvoice(data)
+      if (this.isAgency) {
+        this.printingService.printAgencyInvoice(data);
+      } else {
+        this.printingService.printInvoice(data);
+      }
     });
   }
 

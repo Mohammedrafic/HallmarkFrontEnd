@@ -548,13 +548,13 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
       [
         {
           content: '',
-          colSpan: 12,
+          colSpan: 13,
         }
       ],
       [
         {
           content: 'Invoice Amount:',
-          colSpan: 11,
+          colSpan: 12,
           styles: { halign: 'right' },
         },
         {
@@ -564,8 +564,19 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
       ],
       [
         {
-          content: 'Summary',
+          content: 'Fee:',
           colSpan: 12,
+          styles: { halign: 'right' },
+        },
+        {
+          content: GridValuesHelper.formatAbsCurrency(data.totals.feeTotal),
+          styles: { halign: 'right', fontStyle: 'normal' },
+        }
+      ],
+      [
+        {
+          content: 'Summary',
+          colSpan: 13,
           styles: {
             fillColor: '#CFCFCF',
             fontStyle: 'bold',
@@ -585,7 +596,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
         },
         {
           content: 'Department',
-          colSpan: 3,
+          colSpan: 2,
           styles: {
             fillColor: '#CFCFCF',
             lineColor: '#181919',
@@ -608,6 +619,14 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
             halign: 'left',
           },
         },
+        {
+          content: 'Fee',
+          styles: {
+            fillColor: '#CFCFCF',
+            lineColor: '#181919',
+            halign: 'right',
+          },
+        },
         { 
           content: 'Total Amount',
           styles: {
@@ -618,7 +637,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
         },
         {
           content: 'Addl. Details',
-          colSpan: 3,
+          colSpan: 4,
           styles: {
             fillColor: '#CFCFCF',
             lineColor: '#181919',
@@ -643,8 +662,8 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
             },
           } :  {},
           {
-            content: detail.departmentName,
-            colSpan: 3,
+            content: detail.costCenterFormattedName,
+            colSpan: 2,
             styles: {
               halign: 'left',
               fontStyle: 'normal',
@@ -668,7 +687,15 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
             },
           },
           {
-            content: GridValuesHelper.formatAbsCurrency(detail.total),
+            content: GridValuesHelper.formatAbsCurrency(detail.feeTotal),
+            styles: {
+              halign: 'right',
+              fontStyle: 'normal',
+              lineColor: '#181919',
+            },
+          },
+          {
+            content: GridValuesHelper.formatAbsCurrency(detail.calculatedTotal),
             styles: {
               halign: 'right',
               fontStyle: 'normal',
@@ -677,7 +704,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
           },
           {
             content: detail.details || '',
-            colSpan: 3,
+            colSpan: 4,
             styles: {
               halign: 'left',
               fontStyle: 'normal',
@@ -706,7 +733,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
       },
       {
         content: '',
-        colSpan: 3,
+        colSpan: 2,
         styles: {
           lineColor: '#181919',
         },
@@ -726,7 +753,15 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
         }
       },
       {
-        content: GridValuesHelper.formatAbsCurrency(data.totals.amount),
+        content: GridValuesHelper.formatAbsCurrency(data.totals.feeTotal),
+        styles: {
+          fontStyle: 'bold',
+          halign: 'right',
+          lineColor: '#181919',
+        }
+      },
+      {
+        content: GridValuesHelper.formatAbsCurrency(data.totals.calculatedTotal),
         styles: {
           fontStyle: 'bold',
           halign: 'right',
@@ -735,7 +770,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
       },
       {
         content: '',
-        colSpan: 4,
+        colSpan: 5,
         styles: {
           lineColor: '#181919',
         },
@@ -743,6 +778,12 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
     ])
 
     footer.push([
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
       {
         content: '',
         styles: {
@@ -883,6 +924,12 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
           fillColor: '#F5F5F5',
         },
       },
+      {
+        content: '',
+        styles: {
+          fillColor: '#F5F5F5',
+        },
+      },
     ]);
 
     autoTable(doc, {
@@ -891,7 +938,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
       tableLineWidth: 1,
       showFoot: 'lastPage',
       head: [['Week', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
-      'Agency', 'Skill', 'Hours/Miles', 'Bill Rate', 'Total']],
+      'Organization', 'Skill', 'Hours/Miles', 'Bill Rate', 'Fee', 'Total']],
       headStyles: {
         fillColor: '#CFCFCF',
         fontStyle: 'bold',
@@ -919,10 +966,10 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
           },
           formatDate(record.timeOut, 'MM/dd/YYYY HH:mm', 'en-US'),
           record.billRateConfigName,
-          record.departmentName,
-          record.jobId,
+          record.costCenterFormattedName,
+          record.formattedJobId,
           `${record.candidateFirstName}, ${record.candidateLastName}`,
-          record.agencyName,
+          record.organizationName,
           record.skillName,
           {
             content:  GridValuesHelper.formatAbsNumber(record.value, '1.2-2'),
@@ -932,6 +979,12 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
           },
           {
             content: GridValuesHelper.formatAbsCurrency(record.rate),
+            styles: {
+              halign: 'right',
+            },
+          },
+          {
+            content: `${GridValuesHelper.formatPercentage(record.fee)}`,
             styles: {
               halign: 'right',
             },

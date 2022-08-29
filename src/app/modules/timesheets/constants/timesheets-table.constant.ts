@@ -69,7 +69,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
     },
     {
       field: TimesheetsTableColumns.OrderId,
-      headerName: 'ORDER ID',
+      headerName: 'JOB ID',
       width: 140,
       minWidth: 140,
       cellClass: 'name',

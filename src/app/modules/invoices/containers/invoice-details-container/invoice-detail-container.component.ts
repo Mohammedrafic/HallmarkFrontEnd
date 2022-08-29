@@ -95,21 +95,22 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   }
 
   public handlePrint(): void {
-    const dto: PrintingPostDto = {
-      ...(this.invoiceDetail.meta.organizationIds && {
-        organizationId: this.invoiceDetail.meta.organizationIds[0],
-      }),
+    const dto: PrintingPostDto = this.isAgency ? {
+      invoiceIds: [this.invoiceDetail.meta.invoiceId],
+      organizationIds: [this.invoiceDetail.meta.organizationIds[0]],
+    } : {
+      organizationId: this.invoiceDetail.meta.organizationIds[0],
       invoiceIds: [this.invoiceDetail.meta.invoiceId],
     };
 
-    this.store.dispatch(new Invoices.GetPrintData(dto))
+    this.store.dispatch(new Invoices.GetPrintData(dto, this.isAgency))
       .pipe(
         filter((state) => !!state.invoices.printData),
         map((state) => state.invoices.printData),
         takeUntil(this.componentDestroy()),
       )
       .subscribe((data) => {
-        if (this.invoiceDetail.meta.organizationIds) {
+        if (this.isAgency) {
           this.printingService.printAgencyInvoice(data);
         } else {
           this.printingService.printInvoice(data);

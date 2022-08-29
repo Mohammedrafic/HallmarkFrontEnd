@@ -242,6 +242,9 @@ export namespace Invoices {
   export class GetPrintData {
     static readonly type = INVOICES_ACTIONS.GetPrintingData;
 
-    constructor (public readonly body: PrintingPostDto) {}
+    constructor (
+      public readonly body: PrintingPostDto,
+      public readonly isAgency: boolean,
+      ) {}
   }
 }

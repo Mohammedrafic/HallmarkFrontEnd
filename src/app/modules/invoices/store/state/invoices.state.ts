@@ -560,9 +560,9 @@ export class InvoicesState {
   @Action(Invoices.GetPrintData)
   GetPrintingData(
     { patchState, dispatch } : StateContext<InvoicesModel>,
-    { body }: Invoices.GetPrintData,
+    { body, isAgency }: Invoices.GetPrintData,
   ): Observable<PrintInvoiceData[] | void> {
-    return this.invoicesAPIService.getPrintData(body)
+    return this.invoicesAPIService.getPrintData(body, isAgency)
     .pipe(
       tap((res) => {
         patchState({

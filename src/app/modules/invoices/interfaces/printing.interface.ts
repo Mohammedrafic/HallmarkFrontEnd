@@ -13,19 +13,23 @@ export interface InvoicePrintRecord {
   skillName: string;
   value: number;
   formattedJobId: string;
-  calculatedTotal?: number;
-  feeTotal?: number;
-  fee?: number;
+  calculatedTotal: number;
+  feeTotal: number;
+  fee: number;
   rate: number;
   total: number;
 };
 
 export interface InvoicePrintSummaryRecord {
   departmentName: string;
+  costCenterFormattedName: string;
   skillName: string;
   value: number;
   total: number;
   details: string;
+  calculatedTotal: number;
+  fee: number;
+  feeTotal: number;
 }
 
 export interface PrintInvoiceMeta {
@@ -49,6 +53,8 @@ export interface PrintInvoiceData {
   totals: {
     total: number;
     amount: number;
+    feeTotal: number;
+    calculatedTotal: number;
   };
   invoiceRecords: InvoicePrintRecord[];
   summary: GroupedPrintSummary[];
@@ -56,5 +62,6 @@ export interface PrintInvoiceData {
 
 export interface PrintingPostDto {
   organizationId?: number;
+  organizationIds?: number[]; 
   invoiceIds: number[];
 }
