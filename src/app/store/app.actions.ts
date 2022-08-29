@@ -57,3 +57,8 @@ export class SetIsOrganizationAgencyArea {
   static readonly type = '[app] Set Is Organization/Agency Area';
   constructor(public payload: IsOrganizationAgencyAreaStateModel) { }
 }
+
+export class GetAlertsForCurrentUser {
+  static readonly type = '[app] Get Alerts For Current User';
+  constructor(public payload: any) { }
+}
