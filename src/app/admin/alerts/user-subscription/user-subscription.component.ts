@@ -223,8 +223,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
     this.gridApi.showLoadingOverlay();
-    var datasource = this.createServerSideDatasource();
-    console.log(datasource);
+    let datasource = this.createServerSideDatasource();
     params.api.setServerSideDatasource(datasource);
   }
   private generateBusinessForm(): FormGroup {
@@ -275,15 +274,15 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
             sortFields: params.request.sortModel,
             filterModels: params.request.filterModel
           };
-          var filter: any;
+          let filter: any;
           let jsonString = JSON.stringify(params.request.filterModel);
           if (jsonString != "{}") {
-            var updatedJson = jsonString.replace("operator", "logicalOperator");
+            let updatedJson = jsonString.replace("operator", "logicalOperator");
             filter = JSON.parse(updatedJson);
           }
           else filter = null;
 
-          var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
+          let sort = postData.sortFields.length > 0 ? postData.sortFields : null;
           self.userSubscriptionPage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
           
               self.itemList = data?.items;
@@ -307,7 +306,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     if (this.gridApi != null) {
       this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows", "")));
       this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows", "")));
-      var datasource = this.createServerSideDatasource();
+      let datasource = this.createServerSideDatasource();
       this.gridApi.setServerSideDatasource(datasource);
     }
   }

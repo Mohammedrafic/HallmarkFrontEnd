@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ToolbarService, LinkService, ImageService, HtmlEditorService, TableService, RichTextEditorComponent, ToolbarType } from '@syncfusion/ej2-angular-richtexteditor';
 import { toolsRichTextEditor } from '../../alerts.constants';
@@ -22,7 +22,6 @@ export class AlertsOnScreenTemplateFormComponent {
   private listboxEle: HTMLElement;
   private editArea: HTMLElement;
   public range: Range = new Range();
-  private dragEleContent: string;
   
   constructor() { }
   
@@ -64,7 +63,7 @@ export class AlertsOnScreenTemplateFormComponent {
       if (this.rteObj.formatter.getUndoRedoStack?.().length === 0) {
         this.rteObj.formatter.saveData?.();
       }
-      var text = e.dataTransfer.getData('Text').replace(/\n/g, '').replace(/\r/g, '').replace(/\r\n/g, '');
+      let text = e.dataTransfer.getData('Text').replace(/\n/g, '').replace(/\r/g, '').replace(/\r\n/g, '');
       this.rteObj.executeCommand("insertHTML", text);
       this.rteObj.formatter.saveData?.();
       this.rteObj.formatter.enableUndo?.(this.rteObj);

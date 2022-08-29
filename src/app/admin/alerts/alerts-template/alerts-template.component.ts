@@ -9,7 +9,7 @@ import { GridReadyEvent } from '@ag-grid-community/core';
 import { GetAlertsTemplatePage, GetTemplateByAlertId, SaveTemplateByAlertId, UpdateTemplateByAlertId } from '@admin/store/alerts.actions';
 import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from '@shared/models/alerts-template.model';
 import { AlertsState } from '@admin/store/alerts.state';
-import { SetHeaderState, ShowEmailSideDialog, ShowSmsSideDialog, ShowOnScreenSideDialog, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowEmailSideDialog, ShowSmsSideDialog, ShowOnScreenSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { AlertsEmailTemplateFormComponent } from './alerts-email-template-form/alerts-email-template-form.component';
@@ -259,8 +259,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
     this.gridApi.showLoadingOverlay();
-    var datasource = this.createServerSideDatasource();
-    console.log(datasource);
+    let datasource = this.createServerSideDatasource();
     params.api.setServerSideDatasource(datasource);
   }
   createServerSideDatasource() {
@@ -273,15 +272,15 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
             pageSize: self.paginationPageSize,
             sortFields: params.request.sortModel
           };
-          var filter: any;
+          let filter: any;
           let jsonString = JSON.stringify(params.request.filterModel);
           if (jsonString != "{}") {
-            var updatedJson = jsonString.replace("operator", "logicalOperator");
+            let updatedJson = jsonString.replace("operator", "logicalOperator");
             filter = JSON.parse(updatedJson);
           }
           else filter = null;
 
-          var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
+          let sort = postData.sortFields.length > 0 ? postData.sortFields : null;
           self.dispatchNewPage(sort, filter);
 
           self.alertsTemplatePage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
@@ -311,7 +310,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     if (this.gridApi != null) {
       this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows", "")));
       this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows", "")));
-      var datasource = this.createServerSideDatasource();
+      let datasource = this.createServerSideDatasource();
       this.gridApi.setServerSideDatasource(datasource);
     }
   }
