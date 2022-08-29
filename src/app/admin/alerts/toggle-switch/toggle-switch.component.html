@@ -1,0 +1,10 @@
+<div class="input-group switch">
+    <ejs-switch
+      id="switcher"
+      class="switch"
+      onLabel="ON" offLabel="OFF"
+      [(checked)]="toggleYesOrNo"
+      (change)="onChange($event)"
+    ></ejs-switch>
+    <label class="switch-label">{{toggleYesOrNo==true?"Yes":"No"}}</label>
+  </div>

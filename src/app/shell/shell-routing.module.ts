@@ -44,6 +44,12 @@ const shellRoutes: Routes = [
         //     canLoad: [ AdminGuard ],
         //     canActivate: [ AdminGuard ]
       },
+      {
+        path: 'alerts',
+        loadChildren: () => import('../admin/alerts/alerts.module').then((m) => m.AlertsModule),
+        //     canLoad: [ AdminGuard ],
+        //     canActivate: [ AdminGuard ]
+      },
     ],
   },
 ];
