@@ -1,8 +1,11 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
 import { RejectReason } from '@shared/models/reject-reason.model';
-import { Observable, Subject, takeUntil } from 'rxjs';
-import { FormControl, FormGroup } from '@angular/forms';
+import { ConfirmService } from "@shared/services/confirm.service";
+import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
@@ -17,14 +20,15 @@ import {
 import { DatePipe } from '@angular/common';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
-import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';
-import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
+import { CommentsService } from '@shared/services/comments.service';
+import { Comment } from '@shared/models/comment.model';
 
 @Component({
   selector: 'app-accept-candidate',
   templateUrl: './accept-candidate.component.html',
   styleUrls: ['./accept-candidate.component.scss'],
+  providers: [MaskedDateTimeService],
 })
 export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
@@ -49,12 +53,14 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public rejectReasons: RejectReason[] = [];
   public isReadOnly = false;
   public openRejectDialog = new Subject<boolean>();
-  public accordionClickElement: HTMLElement | null;
-  public accordionOneField: AccordionOneField;
   public priceUtils = PriceUtils;
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
+  }
+
+  get isApplied(): boolean {
+    return this.candidateStatus === ApplicantStatusEnum.Applied;
   }
 
   get isOnboard(): boolean {
@@ -90,15 +96,24 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private unsubscribe$: Subject<void> = new Subject();
   private isWithdraw: boolean;
 
-  constructor(private store: Store, private actions$: Actions, private datePipe: DatePipe) {}
+  public comments: Comment[] = [];
+
+  constructor(
+    private store: Store,
+    private actions$: Actions,
+    private datePipe: DatePipe,
+    private confirmService: ConfirmService,
+    private commentsService: CommentsService
+  ) {}
 
   ngOnChanges(): void {
+    this.switchFormState();
     this.checkReadOnlyStatuses();
   }
 
   ngOnInit(): void {
     this.createForm();
-    this.form.disable();
+    this.switchFormState();
     this.patchForm();
     this.subscribeOnReasonsList();
     this.subscribeOnSuccessRejection();
@@ -109,15 +124,30 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.unsubscribe$.complete();
   }
 
-  public closeDialog(): void {
-    this.closeModalEvent.emit();
-    this.billRatesData = [];
-    this.isReadOnly = false;
-    this.isWithdraw = false;
+  public onClose(): void {
+    if (this.form.dirty) {
+      this.confirmService
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => confirm))
+        .subscribe(() => {
+          this.closeDialog();
+        });
+    } else {
+      this.closeDialog();
+    }
   }
 
   public onAccept(): void {
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
+  }
+
+  public onApply(): void {
+    if (this.form.valid) {
+      this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Applied, statusText: 'Applied' });
+    }
   }
 
   public onWithdraw(): void {
@@ -148,16 +178,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
-  }
-
-  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
-  }
-
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
     this.store
@@ -168,8 +188,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           orderId: this.candidateJob.orderId,
           nextApplicantStatus: applicantStatus,
           candidateBillRate: value.candidateBillRate,
-          offeredBillRate: value.offeredBillRate,
+          offeredBillRate: value.offeredBillRate || null,
           requestComment: value.comments,
+          expAsTravelers: value.expAsTravelers,
+          availableStartDate: value.availableStartDate,
           actualStartDate: this.candidateJob.actualStartDate,
           actualEndDate: this.candidateJob.actualEndDate,
           clockId: this.candidateJob.clockId,
@@ -190,11 +212,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       jobId: new FormControl(''),
       date: new FormControl(''),
       billRates: new FormControl(''),
-      avStartDate: new FormControl(''),
-      candidateBillRate: new FormControl(''),
+      availableStartDate: new FormControl('', [Validators.required]),
+      candidateBillRate: new FormControl('', [Validators.required]),
       locationName: new FormControl(''),
       yearExp: new FormControl(''),
-      travelExp: new FormControl(''),
+      expAsTravelers: new FormControl(''),
       offeredBillRate: new FormControl(''),
       comments: new FormControl(''),
       rejectReason: new FormControl(''),
@@ -210,20 +232,29 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     return this.datePipe.transform(date, 'MM/dd/yyyy');
   }
 
+  private getComments(): void {
+    this.commentsService
+      .getComments(this.candidateJob?.commentContainerId as number, null)
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+      });
+  }
+
   private patchForm(): void {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
       this.candidateJob = value;
       if (value) {
+        this.getComments();
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: value.orderId,
           date: [value.order.jobStartDate, value.order.jobEndDate],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
-          avStartDate: this.getDateString(value.availableStartDate),
+          availableStartDate: value.availableStartDate,
           candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
           locationName: value.order.locationName,
           yearExp: value.yearsOfExperience,
-          travelExp: value.expAsTravelers,
+          expAsTravelers: value.expAsTravelers,
           offeredBillRate: PriceUtils.formatNumbers(value.offeredBillRate),
           comments: value.requestComment,
           rejectReason: value.rejectReason,
@@ -263,5 +294,21 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     if (readOnlyStatuses.includes(this.candidateStatus) || this.isDeployedCandidate) {
       this.isReadOnly = true;
     }
+  }
+
+  private switchFormState(): void {
+    if (this.isApplied && !this.candidate.deployedCandidateInfo) {
+      this.form?.enable();
+    } else {
+      this.form?.disable();
+    }
+  }
+
+  private closeDialog(): void {
+    this.closeModalEvent.emit();
+    this.billRatesData = [];
+    this.isReadOnly = false;
+    this.isWithdraw = false;
+    this.form.markAsPristine();
   }
 }

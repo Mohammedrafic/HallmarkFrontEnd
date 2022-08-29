@@ -33,6 +33,7 @@ export class InputEditorComponent implements ICellRendererAngularComp {
 
   public agInit(params: ICellRendererParams): void {
     this.setData(params);
+    this.setFormControl(params);
   }
 
   public refresh(params: ICellRendererParams): boolean {
@@ -49,7 +50,7 @@ export class InputEditorComponent implements ICellRendererAngularComp {
     this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
     this.type = (params.colDef as ColDef).cellRendererParams.type;
     this.value = params.value;
-    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 
   private setFormControl(params: ICellRendererParams): void {

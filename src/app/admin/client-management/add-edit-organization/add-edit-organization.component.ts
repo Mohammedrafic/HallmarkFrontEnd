@@ -5,6 +5,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ONLY_LETTERS } from '@shared/constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Titles } from '@shared/enums/title';
+import { OrganizationTypes } from '@shared/enums/organization-type';
 import { User } from '@shared/models/user-managment-page.model';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
@@ -55,6 +56,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   public logo: Blob | null = null;
   public titles = Titles;
   public isMspUser = false;
+  public organizationTypes = OrganizationTypes;
 
   public createUnderFields = {
     text: 'name',
@@ -72,6 +74,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
   private user: User | null;
+  public profileMode: boolean = false;
 
   @Select(AdminState.countries)
   countries$: Observable<string[]>;
@@ -112,13 +115,6 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     private fb: FormBuilder
   ) {
     actions$
-      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveOrganizationSucceeded))
-      .subscribe((organization: { payload: Organization }) => {
-        this.currentBusinessUnitId = organization.payload.organizationId as number;
-        this.uploadImages(this.currentBusinessUnitId);
-        this.navigateBack();
-      });
-    actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetOrganizationByIdSucceeded))
       .subscribe((organization: { payload: Organization }) => {
         this.currentBusinessUnitId = organization.payload.organizationId as number;
@@ -127,22 +123,43 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
         if (this.isSameAsOrg) {
           this.disableBillingForm();
         }
+        if (this.profileMode) {
+          this.disableForms();
+        }
       });
     actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetOrganizationLogoSucceeded))
       .subscribe((logo: { payload: Blob }) => {
         this.logo = logo.payload;
       });
-    store.dispatch(new SetHeaderState({ iconName: 'file-text', title: 'Organization List' }));
-    store.dispatch(new GetBusinessUnitList());
-    store.dispatch(new GetDBConnections());
-    if (route.snapshot.paramMap.get('organizationId')) {
-      this.title = 'Edit';
-      const businessUnitId = parseInt(route.snapshot.paramMap.get('organizationId') as string);
-      store.dispatch(new GetOrganizationById(businessUnitId));
-      store.dispatch(new GetOrganizationLogo(businessUnitId));
+
+    if (route.snapshot.paramMap.get('profile')) {
+      this.profileMode = true;
+      store.dispatch(new SetHeaderState({ iconName: 'user', title: 'Organization Profile' }));
+      const user = this.store.selectSnapshot(UserState.user);
+      store.dispatch(new GetOrganizationById(user?.businessUnitId as number));
+      store.dispatch(new GetOrganizationLogo(user?.businessUnitId as number));
     } else {
-      this.initForms();
+      store.dispatch(new SetHeaderState({ iconName: 'file-text', title: 'Organization List' }));
+      store.dispatch(new GetBusinessUnitList());
+      store.dispatch(new GetDBConnections());
+      if (route.snapshot.paramMap.get('organizationId')) {
+        this.title = 'Edit';
+        const businessUnitId = parseInt(route.snapshot.paramMap.get('organizationId') as string);
+        store.dispatch(new GetOrganizationById(businessUnitId));
+        store.dispatch(new GetOrganizationLogo(businessUnitId));
+      } else {
+        this.initForms();
+      }
+    }
+    if (!this.profileMode) {
+      actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveOrganizationSucceeded))
+      .subscribe((organization: { payload: Organization }) => {
+        this.currentBusinessUnitId = organization.payload.organizationId as number;
+        this.uploadImages(this.currentBusinessUnitId);
+        this.navigateBack();
+      });
     }
   }
 
@@ -162,11 +179,18 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     this.user = null;
   }
 
+  private disableForms(): void {
+    if (this.profileMode) {
+      this.GeneralInformationFormGroup.disable();
+      this.BillingDetailsFormGroup.disable();
+    }
+  }
+
   public save(): void {
     if (
       this.CreateUnderFormGroup.valid &&
-      this.GeneralInformationFormGroup.valid &&
-      this.BillingDetailsFormGroup.valid &&
+      (this.GeneralInformationFormGroup.disabled || this.GeneralInformationFormGroup.valid) &&
+      (this.BillingDetailsFormGroup.disabled || this.BillingDetailsFormGroup.valid) &&
       this.ContactFormArray.valid &&
       this.PreferencesFormGroup.valid &&
       this.dataBaseConnectionsFormGroup.valid
@@ -298,7 +322,11 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   }
 
   public navigateBack(): void {
-    this.router.navigate(['/admin/client-management']);
+    if (this.profileMode) {
+      this.router.navigate(['/client/dashboard']);
+    } else {
+      this.router.navigate(['/admin/client-management']);
+    }
   }
 
   public clearForm(): void {
@@ -359,6 +387,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     this.GeneralInformationFormGroup = this.fb.group({
       id: new FormControl(organization ? organization.generalInformation.id : 0),
       name: new FormControl(organization ? organization.generalInformation.name : '', [Validators.required]),
+      organizationType: new FormControl(organization ? organization.generalInformation.organizationType : ''),
       externalId: new FormControl(organization ? organization.generalInformation.externalId : ''),
       taxId: new FormControl(organization ? organization.generalInformation.taxId : '', [
         Validators.required,
@@ -445,22 +474,10 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     });
     this.ContactFormArray = this.ContactFormGroup.get('contacts') as FormArray;
     this.PreferencesFormGroup = this.fb.group({
-      id: new FormControl(organization ? organization.preferences.id : 0),
-      purchaseOrderBy: new FormControl(organization ? organization.preferences.purchaseOrderBy.toString() : '0', [
-        Validators.required,
-      ]),
-      sendDocumentToAgency: new FormControl(organization ? organization.preferences.sendDocumentToAgency : null),
-      timesheetSubmittedBy: new FormControl(
-        organization ? organization.preferences.timesheetSubmittedBy.toString() : '0',
-        [Validators.required]
-      ),
+      id: new FormControl(organization ? organization.preferences.id : 0),     
       weekStartsOn: new FormControl(organization ? organization.preferences.weekStartsOn : '', [Validators.required]),
       paymentOptions: new FormControl(organization ? organization.preferences.paymentOptions.toString() : '0', [
         Validators.required,
-      ]),
-      timePeriodInMins: new FormControl(organization ? organization.preferences.timePeriodInMins : '', [
-        Validators.pattern(/^[0-9]+$/),
-        Validators.min(1),
       ]),
       paymentDescription: new FormControl(organization ? organization.preferences.paymentDescription : '', [
         Validators.required,

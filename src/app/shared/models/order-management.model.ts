@@ -4,14 +4,15 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { OrderType } from '@shared/enums/order-type';
 import { Duration } from '@shared/enums/durations';
 import { JobClassification } from '@shared/enums/job-classification';
-import { ReasonForRequisition } from '@shared/enums/reason-for-requisition';
 import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
 import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
 import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
+import { RejectReason } from './reject-reason.model';
 
 export class OrderManagement {
   id: number;
+  publicId?: number;
   reOrderFromId?: number;
   organizationId: number;
   status: number;
@@ -48,6 +49,8 @@ export class OrderManagement {
   orderClosureReason?: string;
   orderClosureReasonId?: string;
   organizationPrefix: string;
+  commentContainerId?: number;
+  extensionFromId?: number | null;
 }
 
 export class OrderManagementFilter {
@@ -67,6 +70,7 @@ export type OrderManagementPage = PageOfCollections<OrderManagement>;
 export type AgencyOrderManagement = {
   orderId: number;
   id?: number;
+  publicId?: number;
   reOrderId?: number;
   reOrderFromId?: number;
   statusText: string;
@@ -100,6 +104,7 @@ export type AgencyOrderManagement = {
 };
 
 export type OrderManagementChild = {
+  orderPublicId?: number;
   candidateBillRate: number;
   candidateId: number;
   candidateMasterCredentialIds: number[];
@@ -123,6 +128,7 @@ export type OrderManagementChild = {
   closeDate?: string;
   positionClosureReason?: string;
   positionClosureReasonId?: number;
+  commentContainerId?: number;
 };
 
 export type OrderCandidatesList = {
@@ -145,7 +151,17 @@ export type OrderCandidatesList = {
   candidateStatus?: CandidateStatus;
   agencyName?: string;
   organizationId?: number;
+  workflowStepType: WorkflowStepType;
 };
+
+export interface WorkflowStepType {
+  closeDate: string;
+  rejectDate: string;
+  status: string;
+  type: number;
+  withdrawDate: string;
+  workflowStepId: number;
+}
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
 
@@ -225,6 +241,7 @@ export class GetPredefinedBillRatesData {
 
 export class Order {
   id: number;
+  publicId?: number;
   reOrderFromId?: number;
   title: string;
   regionId: number;
@@ -254,7 +271,8 @@ export class Order {
   nO_OT: boolean;
   jobDescription: string;
   unitDescription: string;
-  reasonForRequisition: ReasonForRequisition;
+  orderRequisitionReasonId: number;
+  orderRequisitionReasonName: string;
   billRates: BillRate[];
   jobDistributions: JobDistributionModel[];
   contactDetails: OrderContactDetails[];
@@ -283,11 +301,17 @@ export class Order {
   orderClosureReason?: string;
   orderClosureReasonId?: string;
   isTemplate?: boolean;
+  isQuickOrder?: boolean;
   organizationPrefix?: string;
   orderPlacementFee?: number;
   annualSalaryRangeFrom?: number;
   annualSalaryRangeTo?: number;
   commentContainerId?: number;
+  extensionFromId?: number | null;
+  extensionInitialOrderId?: number | null;
+  extensionPublicId?: number | null;
+  hasParentExtension?: boolean;
+  hasExtensions?: boolean;
 }
 
 export class ReOrder {
@@ -349,6 +373,8 @@ export type AcceptJobDTO = {
   billRates?: BillRate[];
   offeredStartDate?: string;
   skillName?: string;
+  expAsTravelers?: number;
+  availableStartDate?: string;
 };
 
 export type CandidateProfile = {
@@ -407,6 +433,8 @@ export type OrderCandidateJob = {
   closeDate?: string;
   positionClosureReason?: string;
   positionClosureReasonId?: number;
+  commentContainerId?: number;
+  reOrderDate?: string;
 };
 
 export type CandidatesBasicInfo = {

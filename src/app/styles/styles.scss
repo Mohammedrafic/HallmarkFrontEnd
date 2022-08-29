@@ -134,7 +134,7 @@ body {
   }
 
   // Default icon size
-  i-feather.icon {
+  i-feather.icon, app-custom-icon.icon {
     width: 16px;
     height: 16px;
     &.fill-red {
@@ -248,7 +248,8 @@ hr {
 @import './controls/numeric-textbox';
 @import './controls/pdf-viewer';
 @import './controls/tooltip';
-@import "controls/custom-buttons";
+@import './controls/custom-buttons';
+@import 'text';
 
 a, a:hover, a:focus, a:active {
   text-decoration: none;
@@ -308,7 +309,14 @@ a, a:hover, a:focus, a:active {
 html, body {
    height: 100%;
    width: 100%;
-   padding: 5px;
    box-sizing: border-box;
    -webkit-overflow-scrolling: touch;
+}
+
+#chart_57723_1_tooltip {
+  top: 10px !important;
+
+  @media screen and (max-width: 1700px) {
+    top: 0 !important;
+  }
 }

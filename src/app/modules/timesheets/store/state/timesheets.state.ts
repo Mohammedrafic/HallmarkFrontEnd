@@ -1,8 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { catchError, debounceTime, forkJoin, mergeMap, Observable, of,
-  switchMap, tap, throttleTime, throwError } from 'rxjs';
+import { catchError, debounceTime, EMPTY, empty, forkJoin, mergeMap, Observable, of, switchMap, tap, throttleTime, throwError } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -13,22 +12,45 @@ import { DialogAction } from '@core/enums';
 import { DataSourceItem, DropdownOption } from '@core/interface';
 
 import { TimesheetsModel, TimeSheetsPage } from '../model/timesheets.model';
-import { TimesheetsApiService } from '../../services/timesheets-api.service';
+import { TimesheetsApiService } from '../../services';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import {
-  RecordFields, TimesheetTargetStatus, TimesheetsTableFiltersColumns, FilteringOptionsFields
+  FilteringOptionsFields,
+  RecordFields,
+  TimesheetsTableFiltersColumns,
+  TimesheetTargetStatus,
 } from '../../enums';
 import {
-  AddSuccessMessage, DefaultFiltersState, DefaultTimesheetCollection, DefaultTimesheetState,
-  filteringOptionsMapping, GetBydateErrMessage, PutSuccess, SavedFiltersParams } from '../../constants';
+  AddSuccessMessage,
+  DefaultFiltersState,
+  DefaultTimesheetCollection,
+  DefaultTimesheetState,
+  filteringOptionsMapping,
+  GetBydateErrMessage,
+  PutSuccess,
+  SavedFiltersParams
+} from '../../constants';
 import {
-  Attachment, CandidateHoursAndMilesData, CandidateInfo, CandidateMilesData, FilterColumns, TabCountConfig,
-  Timesheet, TimesheetDetailsModel, TimesheetInvoice, TimesheetRecordsDto, TimesheetsFilterState, TimesheetStatistics,
-  TimesheetsFilteringOptions } from '../../interface';
+  AddMileageDto,
+  Attachment,
+  CandidateHoursAndMilesData,
+  CandidateInfo,
+  CandidateMilesData,
+  FilterColumns,
+  TabCountConfig,
+  Timesheet,
+  TimesheetDetailsModel,
+  TimesheetInvoice,
+  TimesheetRecordsDto,
+  TimesheetsFilteringOptions,
+  TimesheetsFilterState,
+  TimesheetStatistics
+} from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
-import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
+import { TimesheetDetailsApiService } from '../../services';
 import { reduceFiltersState } from '../../helpers';
+import { getAllErrors } from '@shared/utils/error.utils';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -45,6 +67,11 @@ export class TimesheetsState {
   @Selector([TimesheetsState])
   static timesheets(state: TimesheetsModel): TimeSheetsPage | null {
     return state.timesheets;
+  }
+
+  @Selector([TimesheetsState])
+  static loading(state: TimesheetsModel): boolean {
+    return state.loading;
   }
 
   @Selector([TimesheetsState])
@@ -147,9 +174,10 @@ export class TimesheetsState {
   @Action(Timesheets.GetAll)
   GetTimesheets(
     { patchState, getState, dispatch }: StateContext<TimesheetsModel>,
-  ): Observable<TimeSheetsPage> {
+  ): Observable<TimeSheetsPage | void> {
     patchState({
       timesheets: DefaultTimesheetCollection,
+      loading: true,
     });
 
     const filters = getState().timesheetsFilters || {};
@@ -159,17 +187,21 @@ export class TimesheetsState {
         tap((res: TimeSheetsPage) => {
           patchState({
             timesheets: res,
+            loading: false,
           });
 
           dispatch(new Timesheets.GetTabsCounts());
-        })
+        }),
+        catchError((err: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        }),
       );
   }
 
   @Action(Timesheets.GetTabsCounts)
   GetTabsCounts(
-    { patchState, getState }: StateContext<TimesheetsModel>,
-  ): Observable<TabCountConfig> {
+    { patchState, getState, dispatch }: StateContext<TimesheetsModel>,
+  ): Observable<TabCountConfig | void> {
     const filters = getState().timesheetsFilters || {};
 
     return this.timesheetsApiService.getTabsCounts(filters)
@@ -178,7 +210,11 @@ export class TimesheetsState {
           patchState({
             tabCounts: res,
           });
-        }));
+        }),
+        catchError((err: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        }),
+      );
   }
 
   @Action(Timesheets.UpdateFiltersState)
@@ -187,14 +223,17 @@ export class TimesheetsState {
     { payload, saveStatuses, saveOrganizationId }: Timesheets.UpdateFiltersState,
   ): Observable<null> {
     const oldFilters: TimesheetsFilterState = getState().timesheetsFilters || DefaultFiltersState;
-    let filters: TimesheetsFilterState = reduceFiltersState(oldFilters, SavedFiltersParams);
+    const savedFiltersKeys = SavedFiltersParams.filter((key: TimesheetsTableFiltersColumns) =>
+      saveStatuses || key !== TimesheetsTableFiltersColumns.StatusIds
+    );
+    let filters: TimesheetsFilterState = reduceFiltersState(oldFilters, savedFiltersKeys);
     filters = Object.assign({}, filters, payload);
 
     return of(null).pipe(
       throttleTime(100),
       tap(() =>
         setState(patch<TimesheetsModel>({
-          timesheetsFilters: payload || saveStatuses ?
+          timesheetsFilters: payload ?
             filters :
             Object.assign({}, DefaultFiltersState, saveOrganizationId && {
               organizationId: oldFilters.organizationId,
@@ -218,15 +257,18 @@ export class TimesheetsState {
 
   @Action(TimesheetDetails.GetTimesheetRecords)
   GetTimesheetRecords(
-    { patchState }: StateContext<TimesheetsModel>,
+    { patchState, dispatch }: StateContext<TimesheetsModel>,
     { id, orgId, isAgency }: TimesheetDetails.GetTimesheetRecords
-  ): Observable<TimesheetRecordsDto> {
+  ): Observable<TimesheetRecordsDto | void> {
     return this.timesheetsApiService.getTimesheetRecords(id, orgId, isAgency)
     .pipe(
       tap((res) => {
         patchState({
           timeSheetRecords: res,
         });
+      }),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
       }),
     )
   }
@@ -244,13 +286,13 @@ export class TimesheetsState {
         /**
          * TODO: make all messages for toast in one constant.
          */
-        this.store.dispatch(new ShowToast(MessageTypes.Success, PutSuccess.successMessage));
-        this.store.dispatch(new Timesheets.GetTimesheetDetails(body.timesheetId, body.organizationId, isAgency));
-        return this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
+        ctx.dispatch(new ShowToast(MessageTypes.Success, PutSuccess.successMessage));
+        ctx.dispatch(new Timesheets.GetTimesheetDetails(body.timesheetId, body.organizationId, isAgency));
+        return ctx.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
       }),
       catchError((err: HttpErrorResponse) => {
-        return ctx.dispatch(new ShowToast(MessageTypes.Error, err.error.errors[''][0]))
-      })
+        return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
     )
   }
 
@@ -258,8 +300,13 @@ export class TimesheetsState {
   DeleteProfileTimesheet(
     ctx: StateContext<TimesheetsModel>,
     { profileId, profileTimesheetId }: Timesheets.DeleteProfileTimesheet
-  ): Observable<null> {
-    return this.timesheetsApiService.deleteProfileTimesheets(profileId, profileTimesheetId);
+  ): Observable<null | void> {
+    return this.timesheetsApiService.deleteProfileTimesheets(profileId, profileTimesheetId)
+    .pipe(
+      catchError((err: HttpErrorResponse) => {
+        return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
+    )
   }
 
   @Action(Timesheets.ToggleCandidateDialog)
@@ -287,7 +334,7 @@ export class TimesheetsState {
   GetTimesheetDetails(
     ctx: StateContext<TimesheetsModel>,
     { timesheetId, orgId, isAgency }: Timesheets.GetTimesheetDetails
-  ): Observable<[void, void]> {
+  ): Observable<[void, void] | void> {
     return this.timesheetDetailsApiService.getTimesheetDetails(timesheetId, orgId, isAgency)
       .pipe(
         tap((res: TimesheetDetailsModel) => ctx.patchState({
@@ -298,12 +345,15 @@ export class TimesheetsState {
           ctx.dispatch(new TimesheetDetails.GetBillRates(res.jobId, orgId, isAgency)),
           ctx.dispatch(new TimesheetDetails.GetCostCenters(res.jobId, orgId, isAgency)),
         ])),
-      );
+        catchError((err: HttpErrorResponse) => {
+          return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        }),
+      )
   }
 
   @Action(TimesheetDetails.AgencySubmitTimesheet)
   SubmitTimesheet(
-    { getState, patchState }: StateContext<TimesheetsModel>,
+    {  dispatch }: StateContext<TimesheetsModel>,
     { id, orgId }: TimesheetDetails.AgencySubmitTimesheet
   ): Observable<void> {
     return this.timesheetDetailsApiService.changeTimesheetStatus({
@@ -311,12 +361,17 @@ export class TimesheetsState {
       organizationId: orgId,
       targetStatus: TimesheetTargetStatus.Submitted,
       reason: null,
-    });
+    })
+    .pipe(
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
+    );
   }
 
   @Action(TimesheetDetails.OrganizationApproveTimesheet)
   ApproveTimesheet(
-    { getState, patchState }: StateContext<TimesheetsModel>,
+    { dispatch }: StateContext<TimesheetsModel>,
     { id, orgId }: TimesheetDetails.OrganizationApproveTimesheet
   ): Observable<void> {
     return this.timesheetDetailsApiService.changeTimesheetStatus({
@@ -324,51 +379,71 @@ export class TimesheetsState {
       organizationId: orgId,
       targetStatus: TimesheetTargetStatus.Approved,
       reason: null,
-    });
+    })
+    .pipe(
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
+    );
   }
 
   @Action(TimesheetDetails.ChangeTimesheetStatus)
   ChangeTimesheetStatus(
-    {}: StateContext<TimesheetsModel>,
+    { dispatch }: StateContext<TimesheetsModel>,
     { payload }: TimesheetDetails.ChangeTimesheetStatus
   ): Observable<void> {
-    return this.timesheetDetailsApiService.changeTimesheetStatus(payload);
+    return this.timesheetDetailsApiService.changeTimesheetStatus(payload)
+    .pipe(
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
+    );
   }
 
   @Action(TimesheetDetails.Export)
-  ExportTimesheetDetails({}: StateContext<TimesheetsModel>, { payload }: TimesheetDetails.Export): Observable<Blob> {
+  ExportTimesheetDetails({ dispatch }: StateContext<TimesheetsModel>,
+    { payload }: TimesheetDetails.Export): Observable<Blob | void> {
     return this.timesheetDetailsApiService.export(payload)
       .pipe(
         tap((file: Blob) => {
           downloadBlobFile(file, `empty.${payload.exportFileType === ExportedFileType.csv ? 'csv' : 'xlsx'}`);
-        })
+        }),
+        catchError((err: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        }),
       );
   }
 
   @Action(TimesheetDetails.UploadFiles)
   TimesheetUploadAttachments(
-    { getState, patchState }: StateContext<TimesheetsModel>,
+    { dispatch }: StateContext<TimesheetsModel>,
     { payload: { timesheetId, files, organizationId } }: TimesheetDetails.UploadFiles
   ): Observable<void> {
     return (organizationId ? this.timesheetDetailsApiService.agencyUploadFiles(timesheetId, organizationId, files)
-      : this.timesheetDetailsApiService.organizationUploadFiles(timesheetId, files));
+      : this.timesheetDetailsApiService.organizationUploadFiles(timesheetId, files))
+      .pipe(
+        catchError((err: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
+        }),
+      );
   }
 
   @Action(TimesheetDetails.DeleteAttachment)
   DeleteTimesheetAttachment(
-    { getState, patchState }: StateContext<TimesheetsModel>,
+    { dispatch }: StateContext<TimesheetsModel>,
     { payload }: TimesheetDetails.DeleteAttachment
   ): Observable<void> {
     return this.timesheetDetailsApiService.deleteAttachment(payload)
       .pipe(
-        catchError(() => this.store.dispatch(
+        catchError(() => dispatch(
           new ShowToast(MessageTypes.Error, 'File not found')
-        ))
+        )),
       );
   }
 
   @Action(Timesheets.GetFiltersDataSource)
-  GetFiltersDataSource({ setState, getState }: StateContext<TimesheetsModel>): Observable<TimesheetsFilteringOptions> {
+  GetFiltersDataSource(
+    { setState, getState, dispatch }: StateContext<TimesheetsModel>): Observable<TimesheetsFilteringOptions | void> {
     const selectedOrganizationId = getState().selectedOrganizationId;
 
     return this.timesheetsApiService.getFiltersDataSource(selectedOrganizationId).pipe(
@@ -381,7 +456,10 @@ export class TimesheetsState {
             return acc;
           }, {})),
         }));
-      })
+      }),
+      catchError((err: HttpErrorResponse) => dispatch(
+        new ShowToast(MessageTypes.Error, getAllErrors(err.error)),
+      )),
     );
   }
 
@@ -406,58 +484,72 @@ export class TimesheetsState {
   }
 
   @Action(TimesheetDetails.GetBillRates)
-  GetBillRates({ patchState }: StateContext<TimesheetsModel>,
-      { jobId, orgId, isAgency }: TimesheetDetails.GetBillRates): Observable<DropdownOption[]> {
+  GetBillRates({ patchState, dispatch }: StateContext<TimesheetsModel>,
+      { jobId, orgId, isAgency }: TimesheetDetails.GetBillRates): Observable<DropdownOption[] | void> {
       return this.timesheetsApiService.getCandidateBillRates(jobId, orgId, isAgency)
       .pipe(
         tap((res) => patchState({
           billRateTypes: res,
         })),
+        catchError((err: HttpErrorResponse) => dispatch(
+          new ShowToast(MessageTypes.Error, getAllErrors(err.error)),
+        )),
       );
     }
 
   @Action(TimesheetDetails.GetCostCenters)
-  GetCostCenters({ patchState }: StateContext<TimesheetsModel>,
+  GetCostCenters({ patchState, dispatch }: StateContext<TimesheetsModel>,
     { jobId, orgId, isAgency}: TimesheetDetails.GetCostCenters,
-  ) {
+  ): Observable<DropdownOption[] | void> {
     return this.timesheetsApiService.getCandidateCostCenters(jobId, orgId, isAgency)
     .pipe(
       tap((res) => patchState({
         costCenterOptions: res,
       })),
+      catchError((err: HttpErrorResponse) => dispatch(
+        new ShowToast(MessageTypes.Error, getAllErrors(err.error)),
+      )),
     );
   }
 
   @Action(TimesheetDetails.DownloadAttachment)
   DownloadAttachment(
-    { }: StateContext<TimesheetsModel>,
+    { dispatch }: StateContext<TimesheetsModel>,
     { payload }: TimesheetDetails.DownloadAttachment
-  ): Observable<Blob> {
+  ): Observable<Blob | void> {
     return this.timesheetDetailsApiService.downloadAttachment(payload)
       .pipe(
         tap((file: Blob) => downloadBlobFile(file, payload.fileName)),
-        catchError(() => this.store.dispatch(
-          new ShowToast(MessageTypes.Error, 'File not found')
-        ))
+        catchError((err: HttpErrorResponse) => dispatch(
+          new ShowToast(MessageTypes.Error, getAllErrors(err.error))
+        )),
       )
   }
 
   @Action(TimesheetDetails.NoWorkPerformed)
   NoWorkPerformed(
-    { }: StateContext<TimesheetsModel>,
+    { dispatch }: StateContext<TimesheetsModel>,
     { noWorkPerformed, timesheetId, organizationId }: TimesheetDetails.NoWorkPerformed
   ): Observable<void> {
-    return this.timesheetDetailsApiService.noWorkPerformed(noWorkPerformed, timesheetId, organizationId);
+    return this.timesheetDetailsApiService.noWorkPerformed(noWorkPerformed, timesheetId, organizationId)
+    .pipe(
+      catchError((err: HttpErrorResponse) => dispatch(
+        new ShowToast(MessageTypes.Error, getAllErrors(err.error))
+      )),
+    )
   }
 
   @Action(Timesheets.GetOrganizations)
-  GetOrganizations({ patchState }: StateContext<TimesheetsModel>): Observable<DataSourceItem[]> {
+  GetOrganizations({ patchState, dispatch }: StateContext<TimesheetsModel>): Observable<DataSourceItem[] | void> {
     return this.timesheetsApiService.getOrganizations()
     .pipe(
       tap((organizations: DataSourceItem[]) => patchState({
         organizations,
         selectedOrganizationId: organizations[0]?.id,
       })),
+      catchError((err: HttpErrorResponse) => dispatch(
+        new ShowToast(MessageTypes.Error, getAllErrors(err.error))
+      )),
     );
   }
 
@@ -476,29 +568,58 @@ export class TimesheetsState {
 
   @Action(Timesheets.BulkApprove)
   BulkApprove(
-    { patchState }: StateContext<TimesheetsModel>,
+    { dispatch }: StateContext<TimesheetsModel>,
     { timesheetIds }: Timesheets.BulkApprove
-  ): Observable<void> | any {
-    return this.timesheetsApiService.postBulkApprove(timesheetIds);
+  ): Observable<void> {
+    return this.timesheetsApiService.postBulkApprove(timesheetIds)
+    .pipe(
+      catchError((err: HttpErrorResponse) => dispatch(
+        new ShowToast(MessageTypes.Error, getAllErrors(err.error))
+      )),
+    );
   }
 
   @Action(TimesheetDetails.AddTimesheetRecord)
   AddTimesheetRecord(ctx: StateContext<TimesheetsModel>,
     { body, isAgency }: TimesheetDetails.AddTimesheetRecord): Observable<void> {
-    return this.timesheetsApiService.addTimesheetRecord(body)
-    .pipe(
-      tap(() => {
-        const state = ctx.getState();
-        const { id, organizationId } = state.selectedTimeSheet as Timesheet;
+      const selectedTimesheet = ctx.getState().timesheetDetails as TimesheetDetailsModel;
 
-        ctx.dispatch([
-          new ShowToast(MessageTypes.Success, AddSuccessMessage.successMessage),
-          new Timesheets.GetTimesheetDetails(body.timesheetId, body.organizationId, isAgency),
-          new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency)
-        ]);
-      }),
+    const { organizationId, jobId, weekStartDate } = selectedTimesheet;
+    const creatBody: AddMileageDto = {
+      organizationId: organizationId,
+      jobId: jobId,
+      weekStartDate: weekStartDate,
+    };
+
+    if (body.type === 2 && selectedTimesheet.mileageTimesheetId) {
+      body.timesheetId = selectedTimesheet.mileageTimesheetId;
+    }
+
+    return (body.type === 2 && !selectedTimesheet.mileageTimesheetId ?
+      this.timesheetDetailsApiService.createMilesEntity(creatBody)
+      .pipe(
+        switchMap((data) => {
+          body.timesheetId = data.timesheetId;
+          return this.timesheetsApiService.addTimesheetRecord(body);
+        })
+      ) : this.timesheetsApiService.addTimesheetRecord(body))
+      .pipe(
+        tap(() => {
+          const state = ctx.getState();
+          const { id, organizationId } = state.selectedTimeSheet as Timesheet;
+
+          if (body.type === 2 && !selectedTimesheet.mileageTimesheetId) {
+            ctx.dispatch(new Timesheets.GetAll())
+          }
+
+          ctx.dispatch([
+            new ShowToast(MessageTypes.Success, AddSuccessMessage.successMessage),
+            new Timesheets.GetTimesheetDetails(body.timesheetId, body.organizationId, isAgency),
+            new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency),
+          ]);
+        }),
       catchError((err: HttpErrorResponse) => {
-        return ctx.dispatch(new ShowToast(MessageTypes.Error, err.error.errors[''][0]))
+        return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       })
     )
   }
@@ -507,7 +628,7 @@ export class TimesheetsState {
   GetDetailsByDate(
     ctx: StateContext<TimesheetsModel>,
     { orgId, startdate, jobId, isAgency }: TimesheetDetails.GetDetailsByDate,
-  ): Observable<[void, void]> {
+  ): Observable<[void, void] | void> {
     return this.timesheetDetailsApiService.getDetailsByDate(orgId, startdate, jobId)
       .pipe(
         tap((res: TimesheetDetailsModel) => ctx.patchState({
@@ -520,8 +641,6 @@ export class TimesheetsState {
         ])),
         catchError((err: HttpErrorResponse) => {
           if (err.status === 400) {
-            ctx.dispatch(new ShowToast(MessageTypes.Error, GetBydateErrMessage));
-
             ctx.patchState({
               timesheetDetails: {
                 ...ctx.getState().timesheetDetails as TimesheetDetailsModel,
@@ -541,13 +660,22 @@ export class TimesheetsState {
                 }
               },
               timeSheetRecords: {
-                [RecordFields.Time]: [],
-                [RecordFields.Miles]: [],
-                [RecordFields.Expenses]: [],
+                timesheets: {
+                  editMode: [],
+                  viewMode: [],
+                },
+                miles: {
+                  editMode: [],
+                  viewMode: [],
+                },
+                expenses: {
+                  editMode: [],
+                  viewMode: [],
+                },
               }
             })
           }
-          return throwError(() => err);
+          return ctx.dispatch(new ShowToast(MessageTypes.Error, GetBydateErrMessage));
         })
       );
   }

@@ -18,10 +18,11 @@ import {
   Percent,
   Plus,
   Send,
+  Sliders,
   Trash2,
   User,
   Eye,
-  EyeOff
+  EyeOff,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
@@ -30,7 +31,7 @@ import {
   TextBoxModule,
   UploaderModule,
 } from '@syncfusion/ej2-angular-inputs';
-import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 
 import { ValidateDirective } from './directives/validate.directive';
 import { ErrorMessageComponent } from './components/error-message/error-message.component';
@@ -57,7 +58,7 @@ import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousComponent } from './components/dialog-next-previous/dialog-next-previous.component';
 import { OrderDetailsComponent } from './components/order-details/order-details.component';
-import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
+import { AccordionModule, SidebarModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { OrderTypeName } from '@shared/pipes/order-type-name.pipe';
 import { GeneralOrderInfoComponent } from './components/general-order-info/general-order-info.component';
 import {
@@ -95,7 +96,6 @@ import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.com
 import { BillRateFormComponent } from '@shared/components/bill-rates/components/bill-rate-form/bill-rate-form.component';
 import { BillRatesGridComponent } from '@shared/components/bill-rates/components/bill-rates-grid/bill-rates-grid.component';
 import { BillRateState } from '@shared/components/bill-rates/store/bill-rate.state';
-import { ChildOrderDialogComponent } from '@shared/components/child-order-dialog/child-order-dialog.component';
 import { RejectReasonDialogComponent } from './components/reject-reason-dialog/reject-reason-dialog.component';
 import { ClickOutsideDirective } from './directives/click-outside.directive';
 import { ExportButtonComponent } from './components/export-button/export-button.component';
@@ -122,6 +122,16 @@ import { CloseOrderSideDialogComponent } from '@shared/components/close-order-si
 import { OrderCloseReasonInfoComponent } from '@shared/components/order-close-reason-info/order-close-reason-info.component';
 import { CommentComponent } from './components/comments/comment/comment.component';
 import { CommentsState } from './components/comments/store/comments.state';
+import { AlwaysOpenFirstAccordition } from './directives/always-open-first-accordition.directive';
+import { CandidateStatusName } from './pipes/candidate-status-name.pipe';
+import { RouterModule } from '@angular/router';
+import { ExtensionCandidateComponent } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
+import { ActionCellRendererComponent } from '@shared/components/cell-renderer/action-cellrenderer.component';
+import { CustomIconComponent } from './components/custom-icon/custom-icon.component';
+import { EmailSideDialogComponent } from '@shared/components/email-side-dialog/email-side-dialog.component';
+import { SmsSideDialogComponent } from '@shared/components/sms-side-dialog/sms-side-dialog.component';
+import { OnScreenSideDialogComponent } from '@shared/components/on-screen-side-dialog/on-screen-side-dialog.component';
+import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 
 const icons = {
   AlertCircle,
@@ -139,6 +149,7 @@ const icons = {
   Edit,
   Plus,
   Trash2,
+  Sliders,
   Eye,
   EyeOff,
   DollarSign,
@@ -149,11 +160,13 @@ const COMPONENTS = [
   ValidationErrorPipe,
   ChipsCssClass,
   OrderTypeName,
+  CandidateStatusName,
   FormatPhoneNumberPipe,
   RateHourPipe,
   BillRatePipe,
   ExBillRateNamesPipe,
   ValidateDirective,
+  AlwaysOpenFirstAccordition,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
   ClickOutsideDirective,
@@ -187,7 +200,6 @@ const COMPONENTS = [
   BillRatesComponent,
   RejectReasonDialogComponent,
   GridSubrowCandidateComponent,
-  ChildOrderDialogComponent,
   ExportButtonComponent,
   DeployCandidateMessageComponent,
   GeneralReorderInfoComponent,
@@ -195,7 +207,14 @@ const COMPONENTS = [
   OrderReOrdersListComponent,
   ReorderCandidatesListComponent,
   OrderReOrdersContainerComponent,
-  OrderCloseReasonInfoComponent,
+  ExtensionCandidateComponent,
+  ActionCellRendererComponent,
+  CustomIconComponent,
+  ActionCellRendererComponent, 
+  EmailSideDialogComponent,  
+  SmsSideDialogComponent,
+  OnScreenSideDialogComponent,  
+  OrderCloseReasonInfoComponent
 ];
 
 @NgModule({
@@ -232,7 +251,10 @@ const COMPONENTS = [
     FilterDialogModule,
     SideMenuModule,
     SwitchModule,
+    MultiSelectModule,
     NgxMaskModule.forChild(),
+    SidebarModule,
+    RouterModule,
   ],
   exports: [
     ...COMPONENTS,
@@ -243,6 +265,7 @@ const COMPONENTS = [
     NavigationPanelComponent,
     ErrorMessageComponent,
     CandidateAvatarPipe,
+    AcceptFormComponent,
   ],
   declarations: [
     ...COMPONENTS,
@@ -255,6 +278,7 @@ const COMPONENTS = [
     CandidatesStatusModalComponent,
     ReorderStatusDialogComponent,
     AcceptFormComponent,
+    CustomNoRowsOverlayComponent,
   ],
   providers: [
     DatePipe,

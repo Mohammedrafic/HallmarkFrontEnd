@@ -34,6 +34,7 @@
   <ng-template #legend>
     <app-widget-legend
       [legendData]="legendData"
+      [legendPosition]="legendPosition"
       (changeCheckbox)="onClickLegend($event)"
       (onClickLegend)="redirectToSourceContent()"
     ></app-widget-legend>

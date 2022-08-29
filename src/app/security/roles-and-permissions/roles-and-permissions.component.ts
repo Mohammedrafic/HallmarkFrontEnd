@@ -59,7 +59,7 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
 
   constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {
     super();
-    this.store.dispatch(new SetHeaderState({ title: 'Security', iconName: 'lock' }));    
+    this.store.dispatch(new SetHeaderState({ title: 'Roles and Permissions', iconName: 'lock' }));    
   }
 
   ngOnInit(): void {

@@ -1,36 +1,32 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
-import {
-  ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter,
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
   Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { filter, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
-import { SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
-import { DialogAction, FileSize } from '@core/enums';
-import { FileExtensionsString } from '@core/constants';
+import { DialogAction } from '@core/enums';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
-import { SubmitBtnText, TimesheetTargetStatus } from '../../enums';
+import { AttachmentsListConfig } from '@shared/components/attachments';
+import { TimesheetTargetStatus } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import {
-  CandidateMilesData, ChangeStatusData, DialogActionPayload, OpenAddDialogMeta,
-  Timesheet, TimesheetDetailsModel } from '../../interface';
-import {
-  ConfirmDeleteTimesheetDialogContent, rejectTimesheetDialogData,
-  TimesheetConfirmMessages, TimesheetDetailsExportOptions } from '../../constants';
+import { CandidateMilesData, ChangeStatusData, CustomExport, DialogActionPayload, OpenAddDialogMeta,
+  Timesheet, TimesheetDetailsModel, WorkWeek, } from '../../interface';
+import { ConfirmDeleteTimesheetDialogContent, rejectTimesheetDialogData, TimesheetConfirmMessages,
+  TimesheetDetailsExportOptions } from '../../constants';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
-import { TimesheetDetailsService } from '../../services/timesheet-details.service';
+import { TimesheetDetailsService } from '../../services';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
-import { AttachmentsListConfig } from '@shared/components/attachments';
+import { FileForUpload } from '@core/interface';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -48,20 +44,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @ViewChild('chipList')
   public chipList: ChipListComponent;
 
-  /**
-   * TODO: try to use file-uploader component from invoices with tooltip as separate shared component.
-   */
-  @ViewChild('dropEl')
-  public dropEl: HTMLDivElement;
-
-  @ViewChild('uploadTooltip')
-  public uploadTooltip: TooltipComponent;
-
-  @ViewChild('uploadArea')
-  public uploadArea: ElementRef<HTMLDivElement>;
-
   @ViewChild('dnwSwitch')
   public dnwSwitch: SwitchComponent;
+
+  @ViewChild('tooltip')
+  public tooltip: TooltipComponent;
 
   @Input() currentSelectedRowIndex: number | null = null;
 
@@ -73,8 +60,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public isAgency: boolean;
 
-  public submitText: string;
-
   public fileName: string = '';
 
   public isChangesSaved = true;
@@ -83,13 +68,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public timesheetId: number;
 
+  public mileageTimesheetId: number;
+
   public organizationId: number | null = null;
 
   public weekPeriod: [Date, Date] = [new Date(), new Date()];
 
-  public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
+  public workWeeks: WorkWeek<Date>[];
 
-  public actionButtonDisabled = false;
+  public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
 
   private jobId: number;
 
@@ -103,14 +90,18 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public readonly timesheetDetails$: Observable<TimesheetDetailsModel>;
 
   @Select(TimesheetsState.timesheetDetailsMilesStatistics)
-  public readonly milesData$: Observable<CandidateMilesData>
+  public readonly milesData$: Observable<CandidateMilesData>;
 
   public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
-  public readonly allowedFileExtensions: string = FileExtensionsString;
-  public readonly maxFileSize: number = FileSize.MB_10;
+
   public readonly timesheetStatus: typeof TimesheetStatus = TimesheetStatus;
 
   public attachmentsListConfig$: Observable<AttachmentsListConfig>;
+
+  /**
+   * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
+   * */
+  private isTimesheetOrMileagesUpdate: boolean = true;
 
   constructor(
     private store: Store,
@@ -124,9 +115,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   ) {
     super();
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
-    this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
     this.attachmentsListConfig$ = this.timesheetDetails$.pipe(
-      tap(({id}) => console.log(id, this.organizationId, this.isAgency)),
       map(({id}) => this.timesheetDetailsService.getAttachmentsListConfig(id, this.organizationId, this.isAgency))
     )
   }
@@ -184,8 +173,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     }
   }
 
-  public onRejectButtonClick(): void {
+  public onRejectButtonClick(isTimesheetOrMileagesUpdate: boolean): void {
     this.rejectReasonDialogVisible = true;
+    this.isTimesheetOrMileagesUpdate = isTimesheetOrMileagesUpdate;
+  }
+
+  public beforeRender(e: { target: HTMLElement }): void {
+    const parent = e.target.parentNode as ParentNode;
+    this.tooltip.content = Array.from(parent.children).indexOf(e.target)
+      ? 'Miles Status' : 'Timesheet Status';
   }
 
   public onDWNCheckboxSelectedChange({checked}: {checked: boolean}, switchComponent: SwitchComponent): void {
@@ -221,7 +217,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       )
       .subscribe(() => {
         this.store.dispatch([
-          new ShowToast(MessageTypes.Success, rejectTimesheetDialogData.successMessage),
+          new ShowToast(MessageTypes.Success, rejectTimesheetDialogData(this.isTimesheetOrMileagesUpdate).successMessage),
           new Timesheets.GetAll(),
         ]);
 
@@ -232,7 +228,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public updateTimesheetStatus(status: TimesheetTargetStatus, data?: Partial<ChangeStatusData>): Observable<void> {
     return this.store.dispatch(
       new TimesheetDetails.ChangeTimesheetStatus({
-        timesheetId: this.timesheetId,
+        timesheetId: this.isTimesheetOrMileagesUpdate ? this.timesheetId : this.mileageTimesheetId,
         organizationId: this.organizationId,
         targetStatus: status,
         reason: null,
@@ -241,12 +237,17 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     );
   }
 
-  public handleApprove(): void {
-    const { timesheetId, organizationId } = this;
+  public handleApprove(isTimesheetOrMileagesUpdate: boolean): void {
+    const { timesheetId, mileageTimesheetId, organizationId } = this;
 
     (organizationId ?
-      this.timesheetDetailsService.submitTimesheet(timesheetId, organizationId) :
-      this.timesheetDetailsService.approveTimesheet(timesheetId)
+      this.timesheetDetailsService.submitTimesheet(
+        isTimesheetOrMileagesUpdate ? timesheetId : mileageTimesheetId,
+        organizationId, isTimesheetOrMileagesUpdate) :
+      this.timesheetDetailsService.approveTimesheet(
+        isTimesheetOrMileagesUpdate ? timesheetId : mileageTimesheetId,
+        isTimesheetOrMileagesUpdate
+      )
     )
       .pipe(
         takeUntil(this.componentDestroy())
@@ -263,6 +264,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       filter(Boolean),
       switchMap((timesheet: Timesheet) => {
         this.timesheetId = timesheet.id;
+        this.mileageTimesheetId = timesheet.mileageTimesheetId;
 
         return this.store.dispatch(new Timesheets.GetTimesheetDetails(
           timesheet.id, timesheet.organizationId, this.isAgency));
@@ -312,10 +314,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     )
   }
 
-  /**
-   * TODO: move event interface to interface folder and get rid of any
-   */
-  public customExport(event: {columns: any[]; fileName: string; fileType: ExportedFileType }): void {
+  public customExport(event: CustomExport): void {
     this.closeExport();
     this.exportProfileDetails(event.fileType);
   }
@@ -328,16 +327,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     );
   }
 
-  public onFilesSelected(event: SelectedEventArgs, orgId: number): void {
+  public onFilesSelected(files: FileForUpload[]): void {
     this.store.dispatch(new TimesheetDetails.UploadFiles({
       timesheetId: this.timesheetId,
-      organizationId: this.isAgency ? orgId : null,
-      files: event.filesData.map((fileData) => {
-        return {
-          blob: fileData.rawFile as Blob,
-          fileName: fileData.name,
-        }
-      }),
+      organizationId: this.organizationId,
+      files,
     }))
       .pipe(
         takeUntil(this.componentDestroy())
@@ -347,14 +341,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
           new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
         );
       });
-
-    this.uploadTooltip?.close();
-  }
-
-  public browse() : void {
-    this.uploadArea.nativeElement
-      ?.getElementsByClassName('e-file-select-wrap')[0]
-      ?.querySelector('button')?.click();
   }
 
   private refreshData(): Observable<TimesheetDetailsModel> {
@@ -381,27 +367,21 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.timesheetDetails$
     .pipe(
       filter(Boolean),
-      tap((details) => { this.setActionBtnState(details)}),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId }) => {
+    .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId, candidateWorkPeriods }) => {
       this.organizationId = this.isAgency ? organizationId : null;
       this.jobId = jobId;
       this.weekPeriod = [
         new Date(DateTimeHelper.convertDateToUtc(weekStartDate)),
         new Date(DateTimeHelper.convertDateToUtc(weekEndDate)),
       ];
+      this.workWeeks = candidateWorkPeriods.map((el: WorkWeek<string>): WorkWeek<Date> => ({
+        weekStartDate: new Date(DateTimeHelper.convertDateToUtc(el.weekStartDate)),
+        weekEndDate: new Date(DateTimeHelper.convertDateToUtc(el.weekEndDate)),
+      }));
       this.cd.markForCheck();
     });
-  }
-
-  private setActionBtnState(details: TimesheetDetailsModel): void {
-    if (this.isAgency) {
-      this.actionButtonDisabled = details.status === this.timesheetStatus.PendingApproval
-      || details.status === this.timesheetStatus.Approved;
-    } else {
-      this.actionButtonDisabled = details.status === this.timesheetStatus.Approved
-    }
   }
 
   private watchForRangeChange(): void {
@@ -411,8 +391,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     )
     .subscribe((range) => {
       this.store.dispatch(new TimesheetDetails.GetDetailsByDate(
-        this.organizationId as number, range[0], this.jobId, this.isAgency));
+        this.organizationId as number, range[0], this.jobId, this.isAgency)
+      );
     });
   }
 }
-

@@ -12,14 +12,9 @@ import { ExportPayload } from '@shared/models/export.model';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 
-export class GetIncompleteOrders {
-  static readonly type = '[order management] Get Incomplete Orders';
-  constructor(public payload: OrderManagementFilter | object) {}
-}
-
 export class GetOrders {
   static readonly type = '[order management] Get Orders';
-  constructor(public payload: OrderManagementFilter | object) {}
+  constructor(public payload: OrderManagementFilter | object, public isIncomplete?: boolean | undefined) {}
 }
 
 export class ClearOrders {
@@ -38,6 +33,7 @@ export class SetLock {
     public id: number,
     public lockStatus: boolean,
     public filters: OrderFilter = {},
+    public prefixId: string,
     public updateOpened = false
   ) {}
 }
@@ -99,7 +95,7 @@ export class GetAvailableSteps {
 
 export class GetProjectSpecialData {
   static readonly type = '[order management] Get Project Special Data';
-  constructor() {}
+  constructor(public lastSelectedBusinessUnitId?: number) {}
 }
 
 export class GetSuggestedDetails {
@@ -114,7 +110,7 @@ export class GetProjectNames {
 
 export class GetAssociateAgencies {
   static readonly type = '[order management] Get Associate Agencies';
-  constructor() {}
+  constructor(public lastSelectedBusinessUnitId?: number) {}
 }
 
 export class SetPredefinedBillRatesData {
@@ -139,7 +135,12 @@ export class SetIsDirtyOrderForm {
 
 export class SaveOrder {
   static readonly type = '[order management] Save Order';
-  constructor(public order: CreateOrderDto, public documents: Blob[], public comments?: Comment[] | undefined) {}
+  constructor(
+    public order: CreateOrderDto,
+    public documents: Blob[],
+    public comments?: Comment[] | undefined,
+    public lastSelectedBusinessUnitId?: number
+  ) {}
 }
 
 export class SaveOrderSucceeded {
@@ -237,5 +238,15 @@ export class SelectNavigationTab {
 
 export class GetContactDetails {
   static readonly type = '[order management] Get Contact Details';
-  constructor(public departmentId: number) {}
+  constructor(public departmentId: number, public lastSelectedBusinessId?: number) {}
+}
+
+export class GetExtensions {
+  static readonly type = '[order management] Get Extensions';
+  constructor(public id: number) {}
+}
+
+export class SetIsDirtyQuickOrderForm {
+  static readonly type = '[order management] Set Quick Order Dirty';
+  constructor(public isDirtyQuickOrderForm: boolean) {}
 }

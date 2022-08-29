@@ -5,5 +5,8 @@ export enum Duration {
   Month,
   Year,
   NinetyDays,
-  Other
+  Other,
+  Weeks,
+  Days,
+  Months,
 }

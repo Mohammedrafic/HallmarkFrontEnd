@@ -1,34 +1,29 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-import { Sliders } from 'angular-feather/icons';
-import { DashboardControlComponent } from './dashboard-control.component';
 import { FeatherModule } from 'angular-feather';
+import { Sliders } from 'angular-feather/icons';
+
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
-import { GridModule } from '@syncfusion/ej2-angular-grids';
-import { WidgetListComponent } from './components/widget-list/widget-list.component';
-import { DialogModule } from '@syncfusion/ej2-angular-popups';
+
+import { DashboardControlComponent } from './dashboard-control.component';
 import { SharedModule } from '@shared/shared.module';
-import { InlineLoaderModule } from '@shared/components/inline-loader/inline-loader.module';
-import { WidgetFilterComponent } from './components/widget-filter/widget-filter.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
-import { FilterChipListModule } from './components/filter-chip-list/filter-chip-list.module';
+import { FilterChipListModule } from './filter-chip-list/filter-chip-list.module';
+import { WidgetFilterModule } from './widget-filter/widget-filter.module';
+import { QuickOrderModule } from './quick-order/quick-order.module';
+import { WidgetListModule } from './widget-list/widget-list.module';
 
 
 @NgModule({
-  declarations: [DashboardControlComponent, WidgetListComponent, WidgetFilterComponent],
+  declarations: [DashboardControlComponent],
   imports: [
     CommonModule,
     ButtonModule,
-    GridModule,
-    DialogModule,
     SharedModule,
     FeatherModule.pick({ Sliders }),
-    InlineLoaderModule,
-    ReactiveFormsModule,
-    MultiSelectAllModule,
-    FilterChipListModule
+    FilterChipListModule,
+    WidgetFilterModule,
+    WidgetListModule,
+    QuickOrderModule
   ],
   exports: [DashboardControlComponent],
 })

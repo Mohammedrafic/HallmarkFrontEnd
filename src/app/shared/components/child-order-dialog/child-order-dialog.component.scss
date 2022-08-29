@@ -15,6 +15,10 @@
   }
 }
 
+.order-tabs span {
+  margin-left: 0 !important;
+}
+
 .preview-dialog {
   .preview-header {
     align-items: start !important;
@@ -73,7 +77,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 }
 
 .dialog-controls {
-  button {
+  button, app-button {
     margin-left: 12px;
   }
 }
@@ -113,6 +117,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
     .comments {
       width: 45%;
       background-color: $secondary-dark-blue-50;
+      height: 580px;
     }
   }
 
@@ -124,4 +129,13 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 .candidate-status {
   display: flex;
   align-items: center;
+}
+
+.extension-sidebar {
+  padding: 0 20px;
+}
+
+.extension-grid {
+  height: 500px;
+  display: block;
 }

@@ -1,0 +1,9 @@
+@import '../../../styles/variables/colors';
+
+:host {
+  display: inline-block;
+
+  &.supportive-green-10 {
+    color: $supportive-green-10;
+  }
+}

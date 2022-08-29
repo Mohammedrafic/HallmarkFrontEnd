@@ -2,6 +2,7 @@
   <ng-container left>
     <app-timesheets-tabs
       [tabConfig]="tabConfig"
+      [isDisabled]="!!(loading$ | async)"
       (changeTab)="handleChangeTab($event)">
     </app-timesheets-tabs>
   </ng-container>

@@ -1,6 +1,6 @@
 import { takeUntil } from 'rxjs';
 
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ContentChild, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Actions, ofActionDispatched } from '@ngxs/store';
 import { ShowFilterDialog } from '../../../store/app.actions';
@@ -15,12 +15,12 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 })
 export class FilterDialogComponent extends DestroyableDirective implements OnInit {
   @ViewChild('filterDialog') filterDialog: DialogComponent;
+  @ContentChild('groupedChips') public groupedChips:TemplateRef<HTMLElement>;
   targetElement: HTMLElement = document.body;
 
   @Input() width: string = '532px';
   @Input() items: FilteredItem[] | null = [];
   @Input() count: number | undefined | null = 0;
-  @Input() showResultsCounter: boolean = true;
   @Output() clearAllFiltersClicked: EventEmitter<void> = new EventEmitter();
   @Output() applyFilterClicked: EventEmitter<void> = new EventEmitter();
   @Output() deleteFilter: EventEmitter<FilteredItem> = new EventEmitter();

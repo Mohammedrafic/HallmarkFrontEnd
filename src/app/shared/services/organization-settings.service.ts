@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { OrganizationSettingFilter, OrganizationSettingsGet, OrganizationSettingsPost } from '@shared/models/organization-settings.model';
 
@@ -12,11 +12,16 @@ export class OrganizationSettingsService {
    * @param organizationId organization id to search by
    * @return Array of organization settings
    */
-  public getOrganizationSettings(filters?: OrganizationSettingFilter): Observable<OrganizationSettingsGet[]> {
+  public getOrganizationSettings(filters?: OrganizationSettingFilter, lastSelectedBusinessUnitId?: number): Observable<OrganizationSettingsGet[]> {
+    let headers = {};
+    if (lastSelectedBusinessUnitId) {
+      headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
+    }
+
     if (filters) {
       return this.http.post<OrganizationSettingsGet[]>(`/api/OrganizationSettings/filter`, filters);
     }
-    return this.http.get<OrganizationSettingsGet[]>(`/api/OrganizationSettings/`);
+    return this.http.get<OrganizationSettingsGet[]>(`/api/OrganizationSettings/`, { headers });
   }
 
   /**

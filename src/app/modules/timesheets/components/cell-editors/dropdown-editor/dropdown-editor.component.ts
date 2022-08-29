@@ -30,6 +30,7 @@ export class DropdownEditorComponent implements ICellRendererAngularComp {
 
   public agInit(params: ICellRendererParams): void {
     this.setData(params);
+    this.setFormControl(params);
   }
 
   public refresh(params: ICellRendererParams): boolean {
@@ -49,15 +50,24 @@ export class DropdownEditorComponent implements ICellRendererAngularComp {
     this.editable = colDef.cellRendererParams.isEditable;
     
     this.options = this.store.snapshot().timesheets[storeField];
+    
+    if (storeField === 'billRateTypes') {
+      const ratesNotForSelect = ['Daily OT', 'Daily Premium OT', 'Mileage', 'OT'];
+
+      this.options = this.options.filter((option) => {
+        return !ratesNotForSelect.includes(option.text);
+      })
+    }
 
     if (this.options && this.options.length) {
-      this.value = this.options.find((item) => item.value === params.value) as DropdownOption;
+      this.value = this.options.find((item) => item.value === params.value) as DropdownOption || { text: 'N/A', value: 0 };
     }
     this.cd.markForCheck();
   }
 
   private setFormControl(params: ICellRendererParams): void {
     if (params.colDef?.cellRendererParams.formGroup?.[params.data.id]) {
+
       const group = params.colDef?.cellRendererParams.formGroup[params.data.id] as FormGroup;
       this.control = group.get((params.colDef as ColDef).field as string) as AbstractControl;
     }

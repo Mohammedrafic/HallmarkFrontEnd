@@ -46,6 +46,7 @@ export class AddEditVisibilityComponent implements OnInit, OnDestroy {
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
+  public showForm: boolean;
 
   private unsubscribe$: Subject<void> = new Subject();
   private editVisibility: UserVisibilitySetting | null;
@@ -128,6 +129,7 @@ export class AddEditVisibilityComponent implements OnInit, OnDestroy {
 
   private subscribeOnOpenEvent(): void {
     this.openEvent.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.showForm = true;
       this.store.dispatch(new GetOrganizationsStructureAll(this.createdUser?.id as string)).subscribe(() => {
         if (data) {
           this.title = 'Edit';
@@ -245,5 +247,6 @@ export class AddEditVisibilityComponent implements OnInit, OnDestroy {
     this.sideDialog.hide();
     this.editVisibility = null;
     this.form.reset();
+    this.showForm = false;
   }
 }

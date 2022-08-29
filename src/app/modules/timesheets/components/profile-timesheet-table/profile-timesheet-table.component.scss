@@ -72,3 +72,35 @@
     right: 151px !important;
   }
 }
+
+button.privilege {
+  margin-left: 12px;
+}
+
+::ng-deep {
+  .spinner-btn {
+    width: 81px!important;
+    height: 40px!important;
+    display: block;
+    padding: 0!important;
+
+    .spinner-container {
+      height: 40px;
+    }
+
+    .e-spinner-pane.e-spin-show {
+      position: static!important;
+      align-items: center;
+    }
+    .e-spinner-inner {
+      position: static!important;
+      left: 0!important;
+      transform: none!important;
+      top: 0!important;
+
+      svg {
+        stroke: #fff!important;
+      }
+    }
+  }
+}

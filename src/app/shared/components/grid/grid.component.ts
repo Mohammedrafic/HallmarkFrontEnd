@@ -1,20 +1,16 @@
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import type {
-  GridOptions,
-  Module,
-  SelectionChangedEvent,
-  SortChangedEvent
-} from '@ag-grid-community/core';
-import { BehaviorSubject, combineLatest, filter, takeUntil, delay } from 'rxjs';
+import type { GridOptions, Module, SelectionChangedEvent, SortChangedEvent } from '@ag-grid-community/core';
+import { RowNode } from '@ag-grid-community/core';
+import { BehaviorSubject, combineLatest, delay, filter, takeUntil } from 'rxjs';
 
 import {
-  Component,
-  OnInit,
   ChangeDetectionStrategy,
-  Input,
-  Output,
+  Component,
   EventEmitter,
+  Input,
   OnChanges,
+  OnInit,
+  Output,
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
@@ -23,7 +19,6 @@ import { ColumnDefinitionModel } from '@shared/components/grid/models/column-def
 import { GridReadyEventModel } from '@shared/components/grid/models/grid-ready-event.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { GRID_CONFIG } from '@shared/constants';
-import { RowNode } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-grid',
@@ -32,7 +27,7 @@ import { RowNode } from '@ag-grid-community/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
-export class GridComponent<Data> extends DestroyableDirective implements OnChanges, OnInit {
+export class GridComponent<Data = unknown> extends DestroyableDirective implements OnChanges, OnInit {
   @Input() public columnDefinitions: ColumnDefinitionModel[] | null;
   @Input() public currentPage: number = 1;
   @Input() public isLoading: boolean | null = false;
@@ -45,6 +40,7 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
   @Input() public totalRecordsCount: number = 1;
   @Input() public gridOptions: GridOptions;
   @Input() public paginationPanel = true;
+  @Input() public title: string;
 
   @Input() set changeTableSelectedIndex(next: number | null) {
     if (next !== null) {
@@ -57,7 +53,7 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
         }
       });
     }
-  };
+  }
 
   @Output() public gridReadyEmitter: EventEmitter<GridReadyEventModel> = new EventEmitter();
   @Output() public navigateToPageEmitter: EventEmitter<number> = new EventEmitter<number>();
@@ -66,6 +62,8 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
   @Output() public approveEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
   @Output() public exportEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
   @Output() public sortChanged: EventEmitter<string> = new EventEmitter<string>();
+  @Output() public multiSelectionChanged: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
+
 
   public readonly defaultColumnDefinition: ColumnDefinitionModel = { minWidth: 100, resizable: true };
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
@@ -96,10 +94,11 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
 
   public handleMultiSelectionChanged(event: SelectionChangedEvent): void {
     this.selectedTableRows = event.api.getSelectedNodes();
+    this.multiSelectionChanged.emit(this.selectedTableRows);
   }
 
   public handleSortChanged(event: SortChangedEvent): void {
-    const columnWithSort = event.columnApi.getColumnState().find(col => col.sort !== null);
+    const columnWithSort = event.columnApi.getColumnState().find((col) => col.sort !== null);
     this.sortChanged.emit(columnWithSort ? `${columnWithSort.colId} ${columnWithSort.sort}` : undefined);
   }
 

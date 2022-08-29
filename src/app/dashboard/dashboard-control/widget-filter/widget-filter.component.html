@@ -1,0 +1,112 @@
+<app-filter-dialog
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+>
+  <form [formGroup]="widgetFilterFormGroup">
+    <div class="bootstrap">
+      <div *ngIf="userIsAdmin" class="input-container">
+        <label>Organization</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="organizationIds"
+            placeholder="All"
+            [fields]="orgsFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.organizationIds?.dataSource"
+            [showSelectAll]="true"
+          >
+          </ejs-multiselect>
+          <span *ngIf="selectedOrganizations" class="e-badge e-badge-success e-badge-circle">{{ selectedOrganizations }}</span>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label>Region</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="regionIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.regionIds.dataSource"
+            [showSelectAll]="true"
+          >
+          </ejs-multiselect>
+          <span *ngIf="selectedRegions" class="e-badge e-badge-success e-badge-circle">{{ selectedRegions }}</span>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label>Location</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="locationIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.locationIds.dataSource"
+            [showSelectAll]="true"
+          >
+          </ejs-multiselect>
+          <span *ngIf="selectedLocations" class="e-badge e-badge-success e-badge-circle">{{ selectedLocations }}</span>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label>Department</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="departmentsIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.departmentsIds.dataSource"
+            [showSelectAll]="true"
+          >
+          </ejs-multiselect>
+          <span *ngIf="selectedDepartments" class="e-badge e-badge-success e-badge-circle">{{ selectedDepartments }}</span>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label>Skill</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="skillIds"
+            placeholder="All"
+            [fields]="skillsFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.skillIds.dataSource"
+            [showSelectAll]="true"
+          >
+          </ejs-multiselect>
+          <span *ngIf="selectedSkills" class="e-badge e-badge-success e-badge-circle">{{ selectedSkills }}</span>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <ng-template #groupedChips>
+    <div class="ordered-chips">
+      <div class="ordered-chips__section" *ngFor="let filters of orderedFilterChips">
+        <ng-container *ngFor="let chip of filters">
+          <div class="ordered-chips__value" *ngIf="chip.hasOwnProperty('value'); else filterName">
+            <ejs-chiplist [chips]="[chip]" enableDelete="true" (delete)="deleteChip($event)"></ejs-chiplist>
+          </div>
+          <ng-template #filterName><span class="ordered-chips__title">{{ chip }}</span></ng-template>
+        </ng-container>
+      </div>
+    </div>
+  </ng-template>
+</app-filter-dialog>

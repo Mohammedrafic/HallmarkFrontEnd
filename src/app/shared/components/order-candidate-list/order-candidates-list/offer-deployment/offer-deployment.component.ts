@@ -12,10 +12,11 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { SET_READONLY_STATUS } from '@shared/constants';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SET_READONLY_STATUS } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
+import { ConfirmService } from "@shared/services/confirm.service";
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 
 import { BillRate } from '@shared/models/bill-rate.model';
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
@@ -33,11 +34,11 @@ import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/
 import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
-import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';
 import { ShowToast } from 'src/app/store/app.actions';
-import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
+import { Comment } from '@shared/models/comment.model';
+import { CommentsService } from '@shared/services/comments.service';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -68,8 +69,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public candidatStatus = CandidatStatus;
   public candidateJob: OrderCandidateJob | null;
   public today = new Date();
-  public accordionClickElement: HTMLElement | null;
-  public accordionOneField: AccordionOneField;
   public priceUtils = PriceUtils;
 
   get showYearsOfExperience(): boolean {
@@ -101,6 +100,14 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     return !!this.candidate.deployedCandidateInfo && this.candidate.status !== ApplicantStatusEnum.OnBoarded;
   }
 
+  get statusText(): string {
+    return this.candidateJob?.applicantStatus.statusText as string;
+  }
+
+  get applicationStatus(): ApplicantStatusEnum {
+    return this.candidateJob?.applicantStatus.applicantStatus as ApplicantStatusEnum;
+  }
+
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
   @Select(OrderManagementContentState.applicantStatuses)
@@ -110,7 +117,12 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private currentApplicantStatus: ApplicantStatus;
   private readOnlyMode: boolean;
 
-  constructor(private store: Store, private actions$: Actions) {}
+  public comments: Comment[] = [];
+
+  constructor(private store: Store,
+              private actions$: Actions,
+              private confirmService: ConfirmService,
+              private commentsService: CommentsService) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
     this.readOnlyMode =
@@ -118,6 +130,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       changes['candidate']?.currentValue.status === ApplicantStatusEnum.Rejected;
 
     this.checkRejectReason();
+    this.switchFormState();
   }
 
   public ngOnInit(): void {
@@ -126,6 +139,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.subscribeOnInitialData();
     this.subscribeOnSuccessRejection();
     this.subscribeOnReasonsList();
+    this.switchFormState();
   }
 
   public ngOnDestroy(): void {
@@ -133,12 +147,20 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.unsubscribe$.complete();
   }
 
-  public closeDialog(): void {
-    this.closeDialogEmitter.next();
-    this.nextApplicantStatuses = [];
-    this.billRatesData = [];
-    this.candidateJob = null;
-    this.isRejected = false;
+  public onClose(): void {
+    if (this.formGroup.dirty) {
+      this.confirmService
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => confirm))
+        .subscribe(() => {
+          this.closeDialog();
+        });
+    } else {
+      this.closeDialog();
+    }
   }
 
   public onRejectCandidate(event: { rejectReason: number }): void {
@@ -210,16 +232,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.updateCandidateJob({ itemData: this.currentApplicantStatus }, true);
   }
 
-  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
-  }
-
-  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
-  }
-
   private createForm(): void {
     this.formGroup = new FormGroup({
       jobId: new FormControl(null),
@@ -256,11 +268,20 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     });
   }
 
+  private getComments(): void {
+    this.commentsService
+      .getComments(this.candidateJob?.commentContainerId as number, null)
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+      });
+  }
+
   private subscribeOnInitialData(): void {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrderCandidateJob) => {
       this.candidateJob = data;
 
       if (data) {
+        this.getComments();
         this.currentApplicantStatus = data.applicantStatus;
         this.billRatesData = [...data.billRates];
         this.setFormValue(data);
@@ -269,10 +290,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.applicantStatuses$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: ApplicantStatus[]) => (this.nextApplicantStatuses = data));
-
-    if (this.isDeployedCandidate) {
-      this.formGroup.disable();
-    }
   }
 
   private subscribeOnSuccessRejection(): void {
@@ -293,6 +310,23 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private checkRejectReason(): void {
     if (this.candidate.status === ApplicantStatusEnum.Rejected) {
       this.isRejected = true;
+    }
+  }
+
+  private closeDialog(): void {
+    this.closeDialogEmitter.next();
+    this.nextApplicantStatuses = [];
+    this.billRatesData = [];
+    this.candidateJob = null;
+    this.isRejected = false;
+    this.formGroup.markAsPristine();
+  }
+
+  private switchFormState(): void {
+    if (this.isDeployedCandidate) {
+      this.formGroup?.disable();
+    } else {
+      this.formGroup?.enable();
     }
   }
 }

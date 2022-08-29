@@ -15,6 +15,7 @@ export class DocumentUploaderComponent implements OnInit {
   @Input() allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
   @Input() maxFileSize: number = 5242880; // 5 mb
   @Input() documents:  Document[] | undefined | null;
+  @Input() disabled: boolean = false;
 
   @Output() selectDocuments = new EventEmitter<Blob[]>();
   @Output() deleteDocument = new EventEmitter<Document>();

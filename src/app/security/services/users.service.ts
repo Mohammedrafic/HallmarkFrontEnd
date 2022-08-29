@@ -27,13 +27,34 @@ export class UsersService {
    */
   public getUsersPage(
     BusinessUnitType: BusinessUnitType,
-    BusinessUnitId: number,
+    BusinessUnitIds: number[] | null,
     PageNumber: number,
     PageSize: number,
     SortModel: any,
     FilterModel: any
   ): Observable<UsersPage> {
-    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitId, PageNumber, PageSize, SortModel, FilterModel });
+    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel });
+  }
+
+  /**
+   * Get the list of users by BusinessUnitType and BusinessUnitId
+   * @param BusinessUnitType
+   * @param BusinessUnitId
+   * @param PageNumber
+   * @param PageSize
+   *
+   * @return UsersPage
+   */
+   public getAllUsersPage(
+    BusinessUnitType: BusinessUnitType,
+    BusinessUnitIds: number[],
+    PageNumber: number,
+    PageSize: number,
+    SortModel: any,
+    FilterModel: any,
+    GetAll:boolean
+  ): Observable<UsersPage> {
+    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel ,GetAll});
   }
 
   /**
@@ -43,8 +64,8 @@ export class UsersService {
    *
    * @return RolesPerUser
    */
-  public getRolesPerUser(BusinessUnitType: BusinessUnitType, BusinessUnitId: number): Observable<RolesPerUser[]> {
-    return this.http.get<RolesPerUser[]>(`/api/Roles/basicinfo`, { params: { BusinessUnitType, BusinessUnitId } });
+  public getRolesPerUser(BusinessUnitType: BusinessUnitType, BusinessUnitIds: number[]): Observable<RolesPerUser[]> {
+    return this.http.post<RolesPerUser[]>(`/api/Roles/basicinfo`,  { BusinessUnitType, BusinessUnitIds } );
   }
 
   /**

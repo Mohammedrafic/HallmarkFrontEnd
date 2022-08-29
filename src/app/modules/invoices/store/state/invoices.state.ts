@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
-import { debounceTime, Observable, of, throttleTime, catchError } from 'rxjs';
+import { debounceTime, Observable, of, throttleTime, catchError, switchMap } from 'rxjs';
 import { tap } from 'rxjs/internal/operators/tap';
 
 import { PageOfCollections } from '@shared/models/page.model';
@@ -11,20 +11,40 @@ import { DataSourceItem } from '@core/interface';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ShowToast } from 'src/app/store/app.actions';
 import { Invoices } from '../actions/invoices.actions';
-import { InvoicesService } from '../../services';
+import { InvoicesApiService, InvoicesService, ManualInvoiceAttachmentsApiService } from '../../services';
 import {
-  InvoiceFilterColumns, InvoiceRecord, InvoicesFilteringOptions, InvoicesFilterState,
-  ManualInvoiceMeta, ManualInvoiceReason } from '../../interfaces';
+  BaseInvoice,
+  InvoiceDetail, InvoiceDialogActionPayload,
+  InvoiceFilterColumns,
+  InvoiceRecord,
+  InvoicesFilteringOptions,
+  InvoicesFilterState,
+  InvoiceStateDto,
+  ManualInvoiceMeta,
+  ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData
+} from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
 import { FilteringOptionsFields } from '../../../timesheets/enums';
-import { DefaultInvoicesState, ManualInvoiceMessages } from '../../constants';
-import { DefaultFiltersState, SavedFiltersParams } from '../../../timesheets/constants';
+import { DefaultInvoicesState, InvoicesFilteringOptionsMapping, ManualInvoiceMessages } from '../../constants';
+import { SavedFiltersParams } from '../../../timesheets/constants';
 import { reduceFiltersState } from '../../../timesheets/helpers';
-import { InvoicesApiService } from '../../services';
-import { InvoicesTableFiltersColumns } from '../../enums/invoices.enum';
-import { InvoicesFilteringOptionsMapping } from '../../constants';
-import { InvoiceMetaAdapter } from '../../helpers/invoice-meta.adapter';
+import { InvoicesTableFiltersColumns } from '../../enums';
+import { InvoiceMetaAdapter } from '../../helpers';
 import { OrganizationStructure } from '@shared/models/organization.model';
+import { PendingInvoicesData } from '../../interfaces/pending-invoice-record.interface';
+import { getAllErrors } from '@shared/utils/error.utils';
+import { HttpErrorResponse } from '@angular/common/http';
+import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
+import { downloadBlobFile } from '@shared/utils/file.utils';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
+
+const DefaultFiltersState: InvoicesFilterState = {
+  pageNumber: 1,
+  pageSize: 30,
+  organizationId: null,
+};
+
 
 @State<InvoicesModel>({
   name: 'invoices',
@@ -35,12 +55,38 @@ export class InvoicesState {
   constructor(
     private invoicesService: InvoicesService,
     private invoicesAPIService: InvoicesApiService,
+    private manualInvoiceAttachmentsApiService: ManualInvoiceAttachmentsApiService,
   ) {
   }
 
   @Selector([InvoicesState])
   static invoicesData(state: InvoicesModel): PageOfCollections<InvoiceRecord> | null {
     return state?.invoicesData ?? null;
+  }
+
+  @Selector([InvoicesState])
+  static manualInvoicesData(state: InvoicesModel): ManualInvoicesData | null {
+    return state?.manualInvoicesData ?? null;
+  }
+
+  @Selector([InvoicesState])
+  static pendingInvoicesData(state: InvoicesModel): PendingInvoicesData | null {
+    return state?.pendingInvoicesData ?? null;
+  }
+
+  @Selector([InvoicesState])
+  static invoicesContainerData(state: InvoicesModel): PageOfCollections<BaseInvoice> | null {
+    return state?.invoicesContainerData ?? null;
+  }
+
+  @Selector([InvoicesState])
+  static pendingApprovalInvoicesData(state: InvoicesModel): PendingApprovalInvoicesData | null {
+    return state?.pendingApprovalInvoicesData ?? null;
+  }
+
+  @Selector([InvoicesState])
+  static pendingPaymentInvoicesData(state: InvoicesModel): PendingApprovalInvoicesData | null {
+    return state?.pendingPaymentInvoicesData ?? null;
   }
 
   @Selector([InvoicesState])
@@ -58,19 +104,22 @@ export class InvoicesState {
     return state.organizations;
   }
 
-  // @Selector([InvoicesState])
-  // static isInvoiceDetailDialogOpen(state: InvoicesModel): DialogActionPayload {
-  //   return { dialogState: state.isInvoiceDetailDialogOpen, rowId: state.selectedInvoiceId };
-  // }
-
   @Selector([InvoicesState])
-  static nextInvoiceId(state: InvoicesModel): string | null {
-    return state?.nextInvoiceId ?? null;
+  static isInvoiceDetailDialogOpen(state: InvoicesModel): InvoiceDialogActionPayload {
+    return {
+      dialogState: state.isInvoiceDetailDialogOpen,
+      invoiceDetail: state.invoiceDetail,
+    };
   }
 
   @Selector([InvoicesState])
-  static prevInvoiceId(state: InvoicesModel): string | null {
-    return state?.prevInvoiceId ?? null;
+  static nextInvoiceId(state: InvoicesModel): number | null {
+    return state.nextInvoiceId;
+  }
+
+  @Selector([InvoicesState])
+  static prevInvoiceId(state: InvoicesModel): number | null {
+    return state.prevInvoiceId;
   }
 
   @Selector([InvoicesState])
@@ -78,30 +127,53 @@ export class InvoicesState {
     return state.invoiceReasons;
   }
 
-  @Action(Invoices.Get)
-  GetInvoices(
-    { patchState }: StateContext<InvoicesModel>,
-    { payload }: Invoices.Get
-  ): Observable<PageOfCollections<InvoiceRecord>> {
-    return this.invoicesService.getInvoices(payload).pipe(
-      tap((data: PageOfCollections<InvoiceRecord>) => patchState({
-        invoicesData: data,
-      }))
-    );
+  @Selector([InvoicesState])
+  static selectedOrgId(state: InvoicesModel): number {
+    return state.selectedOrganizationId;
   }
 
   @Action(Invoices.ToggleInvoiceDialog)
   ToggleInvoiceDialog(
-    { patchState }: StateContext<InvoicesModel>,
-    { action, id, prevId, nextId }: Invoices.ToggleInvoiceDialog
-  ): void {
+    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { action, payload, prevId, nextId }: Invoices.ToggleInvoiceDialog
+  ): Observable<InvoiceDetail[] | void> | void {
     const isOpen: boolean = action === DialogAction.Open;
 
-    patchState({
-      isInvoiceDetailDialogOpen: isOpen,
-      selectedInvoiceId: id,
-      ...(isOpen ? {prevInvoiceId: prevId, nextInvoiceId: nextId} : {}),
-    });
+    if (!isOpen) {
+      patchState({
+        isInvoiceDetailDialogOpen: isOpen,
+      });
+
+      return;
+    }
+
+    return this.invoicesAPIService.getInvoicesForPrinting(payload!, !!payload?.organizationIds?.length).pipe(
+      tap((res: InvoiceDetail[]) => patchState({
+        invoiceDetail: res[0],
+        isInvoiceDetailDialogOpen: isOpen,
+          ...(isOpen ? { prevInvoiceId: prevId, nextInvoiceId: nextId } : {}),
+        })
+      ),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
+    );
+  }
+
+  @Action(Invoices.DetailExport)
+  DetailExport(
+    { dispatch }: StateContext<InvoicesModel>,
+    { payload }: Invoices.DetailExport
+  ): Observable<Blob | void> {
+    return this.invoicesAPIService.export(payload)
+      .pipe(
+        tap((file: Blob) => {
+          downloadBlobFile(file, `empty.${payload.exportFileType === ExportedFileType.csv ? 'csv' : 'xlsx'}`);
+        }),
+        catchError((err: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        }),
+      );
   }
 
   @Action(Invoices.UpdateFiltersState)
@@ -135,8 +207,8 @@ export class InvoicesState {
 
   @Action(Invoices.GetFiltersDataSource)
   GetFiltersDataSource(
-    { setState }: StateContext<InvoicesModel>,
-  ): Observable<InvoicesFilteringOptions> {
+    { setState, dispatch }: StateContext<InvoicesModel>,
+  ): Observable<InvoicesFilteringOptions | void> {
     return this.invoicesAPIService.getFiltersDataSource().pipe(
       tap((res) => {
         setState(patch({
@@ -151,7 +223,10 @@ export class InvoicesState {
             return acc;
           }, {})),
         }));
-      })
+      }),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
     );
   }
 
@@ -176,15 +251,15 @@ export class InvoicesState {
   }
 
   @Action(Invoices.ToggleManualInvoiceDialog)
-  ToggleManInvoiceDialog(
-    { action }: Invoices.ToggleManualInvoiceDialog
-  ): void {}
+  ToggleManInvoiceDialog(): void {}
 
   @Action(Invoices.GetInvoicesReasons)
   GetInvoicesReasons(
-    { patchState }: StateContext<InvoicesModel>,
-  ): Observable<ManualInvoiceReason[]> {
-    return this.invoicesAPIService.getInvoiceReasons()
+    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { orgId }: Invoices.GetInvoicesReasons,
+  ): Observable<ManualInvoiceReason[] | void> {
+
+    return this.invoicesAPIService.getInvoiceOrgReasons(orgId)
       .pipe(
         tap((res) => {
           patchState(
@@ -193,14 +268,17 @@ export class InvoicesState {
             }
           );
         }),
+        catchError((err: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        }),
       )
   }
 
   @Action(Invoices.GetManInvoiceMeta)
   GetInvoiceMeta(
-    { patchState }: StateContext<InvoicesModel>,
+    { patchState, dispatch }: StateContext<InvoicesModel>,
     { orgId }: Invoices.GetManInvoiceMeta,
-  ): Observable<ManualInvoiceMeta[]> {
+  ): Observable<ManualInvoiceMeta[] | void> {
     return this.invoicesAPIService.getManInvoiceMeta(orgId)
       .pipe(
         tap((res) => {
@@ -208,46 +286,80 @@ export class InvoicesState {
             invoiceMeta: res,
           });
         }),
+        catchError((err: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        }),
       );
   }
 
   @Action(Invoices.SaveManulaInvoice)
   SaveManualInvoice(
     ctx: StateContext<InvoicesModel>,
-    { payload }: Invoices.SaveManulaInvoice,
+    { payload, files, isAgency }: Invoices.SaveManulaInvoice,
     /**
      * TODO: change return type afte invoice get implementation
      */
-  ): Observable<ManualInvoiceMeta> {
+  ): Observable<number[] | void> {
     return this.invoicesAPIService.saveManualInvoice(payload)
     .pipe(
+      switchMap((res) => this.invoicesAPIService.saveManualInvoiceAttachments(
+        files, isAgency ? res.organizationId : null,  res.timesheetId,)),
       tap(() => {
         ctx.dispatch([
-          new ShowToast(MessageTypes.Success, ManualInvoiceMessages.successAdd)
+          new ShowToast(MessageTypes.Success, ManualInvoiceMessages.successAdd),
+          new Invoices.GetManualInvoices(payload.organizationId),
         ]);
+      }),
+      catchError((err: HttpErrorResponse) => {
+        return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
       }),
     );
   }
 
+  @Action(Invoices.DeleteManualInvoice)
+  DeleteManualInvoice(
+    ctx: StateContext<InvoicesModel | void>,
+    { id, organizationId }: Invoices.DeleteManualInvoice,
+    /**
+     * TODO: change return type afte invoice get implementation
+     */
+  ): Observable<void> {
+    return this.invoicesAPIService.deleteManualInvoice(id, organizationId)
+      .pipe(
+        tap(() => {
+          ctx.dispatch([
+            new ShowToast(MessageTypes.Success, ManualInvoiceMessages.successDelete),
+            new Invoices.GetManualInvoices(organizationId),
+          ]);
+        }),
+        catchError((err: HttpErrorResponse) => {
+          return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        }),
+      );
+  }
+
   @Action(Invoices.GetOrganizations)
   GetOrganizations(
-    { patchState }: StateContext<InvoicesModel>,
-  ): Observable<DataSourceItem[]> {
+    { patchState, dispatch }: StateContext<InvoicesModel>,
+  ): Observable<DataSourceItem[] | void> {
     return this.invoicesAPIService.getOrganizations()
     .pipe(
       tap((res) => {
         patchState({
           organizations: res,
         });
-      })
+      }),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
     )
   }
 
   @Action(Invoices.GetOrganizationStructure)
   GetStructure(
-    { patchState }: StateContext<InvoicesModel>,
+    { patchState, dispatch }: StateContext<InvoicesModel>,
     { orgId, isAgency }: Invoices.GetOrganizationStructure,
-  ): Observable<OrganizationStructure> {
+  ): Observable<OrganizationStructure | void> {
     return this.invoicesAPIService.getOrgStructure(orgId, isAgency)
     .pipe(
       tap((res) => {
@@ -255,6 +367,9 @@ export class InvoicesState {
           organizationLocations: InvoiceMetaAdapter.createLocationsStructure(res.regions),
           regions: res.regions,
         });
+      }),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
       }),
     )
   }
@@ -270,5 +385,193 @@ export class InvoicesState {
         selectedOrganizationId: id,
       }))
     );
+  }
+
+  @Action(Invoices.GetManualInvoices)
+  GetManualInvoices(
+    { patchState, getState, dispatch }: StateContext<InvoicesModel>,
+    { organizationId }: Invoices.GetManualInvoices
+  ): Observable<ManualInvoicesData | void> {
+    const state = getState();
+
+    return this.invoicesAPIService.getManualInvoices({
+      ...state.invoicesFilters,
+      organizationId,
+    }).pipe(
+      tap((data: ManualInvoicesData) => patchState({
+        manualInvoicesData: data,
+      })),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
+    );
+  }
+
+  @Action(Invoices.GetPendingInvoices)
+  GetPendingInvoices(
+    { patchState, getState, dispatch }: StateContext<InvoicesModel>,
+    { organizationId }: Invoices.GetPendingInvoices
+  ): Observable<PendingInvoicesData | void> {
+    const state = getState();
+
+    return this.invoicesAPIService.getPendingInvoices({
+      ...state.invoicesFilters,
+      organizationId,
+    }).pipe(
+      tap((data: PendingInvoicesData) => patchState({
+        pendingInvoicesData: data,
+      })),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
+    );
+  }
+
+  @Action(Invoices.GetPendingApproval)
+  GetPendingApproval(
+    { patchState, getState, dispatch }: StateContext<InvoicesModel>,
+    { payload }: Invoices.GetPendingApproval
+  ): Observable<PendingApprovalInvoicesData | void> {
+    const state = getState();
+
+    return this.invoicesAPIService.getPendingApproval({
+      ...state.invoicesFilters,
+      ...payload,
+    },
+      !!payload?.organizationId
+    ).pipe(
+      tap((data: PendingApprovalInvoicesData) => patchState({
+        pendingApprovalInvoicesData: data,
+      })),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
+    );
+  }
+
+  @Action(Invoices.ApproveInvoice)
+  ApproveInvoice(
+    { dispatch }: StateContext<InvoicesModel>,
+    { invoiceId }: Invoices.ApproveInvoice
+  ): Observable<void> {
+    return this.invoicesService.confirmInvoiceApprove(invoiceId)
+      .pipe(
+        switchMap(() => this.invoicesService.approveInvoice(invoiceId)),
+        catchError((err: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        }),
+      );
+  }
+
+  @Action(Invoices.ApproveInvoices)
+  ApproveInvoices(
+    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { invoiceIds }: Invoices.ApproveInvoices
+  ): Observable<void> {
+    return this.invoicesAPIService.bulkApprove(invoiceIds)
+      .pipe(
+        tap(() => dispatch([
+          new ShowToast(MessageTypes.Success, 'Records has been approved'),
+          new Invoices.GetManualInvoices(null),
+        ])),
+        catchError((error: HttpErrorResponse) => dispatch(
+          new ShowToast(MessageTypes.Error, getAllErrors(error.error))
+        ))
+      );
+  }
+
+  @Action(Invoices.RejectInvoice)
+  RejectInvoice(
+    { dispatch }: StateContext<InvoicesModel>,
+    { invoiceId, rejectionReason }: Invoices.RejectInvoice
+  ): Observable<void> {
+    return this.invoicesService.rejectInvoice(invoiceId, rejectionReason)
+    .pipe(
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
+    )
+  }
+
+  @Action(Invoices.PreviewAttachment)
+  PreviewAttachment(
+    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { organizationId, payload: { id, fileName } }: Invoices.PreviewAttachment
+  ): Observable<void> {
+    return dispatch(
+      new FileViewer.Open({
+        fileName,
+        getPDF: () => this.manualInvoiceAttachmentsApiService.downloadPDFAttachment(id, organizationId),
+        getOriginal: () => this.manualInvoiceAttachmentsApiService.downloadAttachment(id, organizationId)
+      })
+    );
+  }
+
+  @Action(Invoices.DownloadAttachment)
+  DownloadAttachment(
+    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { organizationId, payload: { id, fileName } }: Invoices.DownloadAttachment
+  ): Observable<Blob | void> {
+    return this.manualInvoiceAttachmentsApiService.downloadAttachment(id, organizationId)
+      .pipe(
+        tap((file: Blob) => downloadBlobFile(file, fileName)),
+        catchError(() => dispatch(
+          new ShowToast(MessageTypes.Error, 'File not found')
+        ))
+      );
+  }
+
+  @Action(Invoices.GroupInvoices)
+  GroupInvoices(
+    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { payload  }: Invoices.GroupInvoices
+  ): Observable<void> {
+    return this.invoicesAPIService.groupInvoices(payload)
+      .pipe(
+        tap(() => {
+          dispatch(new ShowToast(MessageTypes.Success, 'Invoice was created successfully'));
+        }),
+        catchError(({ error }: HttpErrorResponse) => dispatch(
+          new ShowToast(MessageTypes.Error, getAllErrors(error))
+        ))
+      );
+  }
+
+  @Action(Invoices.ChangeInvoiceState)
+  ChangeInvoiceState(
+    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { invoiceId, stateId }: Invoices.ChangeInvoiceState,
+  ): Observable<void> {
+    const body: InvoiceStateDto = {
+      invoiceId,
+      targetState: stateId,
+    }
+    return this.invoicesAPIService.changeInvoiceStatus(body)
+      .pipe(
+        tap(() => {
+          dispatch(new ShowToast(MessageTypes.Success, 'Invoice status was changed successfully'));
+        }),
+        catchError(({ error }: HttpErrorResponse) => dispatch(
+          new ShowToast(MessageTypes.Error, getAllErrors(error)),
+        )),
+      );
+  }
+
+  @Action(Invoices.GetPrintData)
+  GetPrintingData(
+    { patchState, dispatch } : StateContext<InvoicesModel>,
+    { body, isAgency }: Invoices.GetPrintData,
+  ): Observable<PrintInvoiceData[] | void> {
+    return this.invoicesAPIService.getPrintData(body, isAgency)
+    .pipe(
+      tap((res) => {
+        patchState({
+          printData: res,
+        });
+      }),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
+    )
   }
 }

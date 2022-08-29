@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
 import { FormGroup } from '@angular/forms';
 import { Role, RolesFilters, RolesPage } from '@shared/models/roles.model';
@@ -26,6 +26,7 @@ import {
   IServerSideGetRowsRequest,
   PaginationChangedEvent,
 } from '@ag-grid-enterprise/all-modules';
+import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 
 enum Visibility {
   Unassigned,
@@ -35,9 +36,9 @@ enum Visibility {
 @Component({
   selector: 'app-user-grid',
   templateUrl: './user-grid.component.html',
-  styleUrls: ['./user-grid.component.scss'],
+  styleUrls: ['./user-grid.component.scss']
 })
-export class UserGridComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
+export class UserGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() filterForm: FormGroup;
   @Input() export$: Subject<ExportedFileType>;
   @Output() editUserEvent = new EventEmitter();
@@ -107,8 +108,22 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
       this.pagination = true;
     this.paginationPageSize = this.pageSize,
       this.cacheBlockSize = this.pageSize;
-    this.maxBlocksInCache = 2;
+    this.maxBlocksInCache = 1;
     this.columnDefs = [
+      {
+        headerName: 'Action',
+        cellRenderer: 'buttonRenderer',
+        cellRendererParams: {
+          onClick: this.onEdit.bind(this),
+          label: 'Edit'
+        },
+        width: 50,
+        pinned: 'left',
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      },
       {
         field: 'id',
         hide: true,
@@ -139,6 +154,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
       {
         headerName: 'Status',
         field: 'isDeleted',
+        width: 50,
         valueGetter: function (params: { data: { isDeleted: boolean } }) {
           return self.statusEnum[+!params.data.isDeleted];
         },
@@ -159,13 +175,6 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
       {
         headerName: 'Roles',
         field: 'roleNames',
-        // cellRenderer: function (params: { data: { roles: any } }) {
-        //   var roleNames = '';
-        //   params.data.roles.forEach((item: any) => {
-        //     roleNames += item.name + ',';
-        //   });
-        //   return roleNames.substring(0, roleNames.length - 1);
-        // },
         sortable: false,
         filter: 'agSetColumnFilter',
         filterParams: {
@@ -181,7 +190,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         }
       },
       {
-        field: 'organisation',
+        field: 'organization',
         valueGetter: function (params: { data: { businessUnitName: string }; }) {
           return params.data.businessUnitName || "All";
         },
@@ -196,20 +205,6 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         },
         filter: false,
         sortable: false
-      },
-      {
-        headerName: 'Action',
-        cellRenderer: 'buttonRenderer',
-        cellRendererParams: {
-          onClick: this.onEdit.bind(this),
-          label: 'Edit'
-        },
-        width: 50,
-        pinned: 'right',
-        suppressMovable: true,
-        filter: false,
-        sortable: false,
-        menuTabs: []
       }
     ];
 
@@ -262,9 +257,14 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
           },
         },
       ],
-      //defaultToolPanel: 'columns',
+      
     };
   }
+
+  public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
+  public noRowsOverlayComponentParams: any = {
+    noRowsMessageFunc: () => 'No Rows To Show',
+  };
 
   ngOnInit(): void {
     this.checkAgencyUser();
@@ -273,10 +273,6 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.subscribeOnExportAction();
     this.updateUsers();
     this.loadRoles();
-  }
-
-  ngAfterViewInit(): void {
-    // this.grid.rowHeight = GRID_CONFIG.initialRowHeight;
   }
 
   ngOnDestroy(): void {
@@ -384,7 +380,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
   private dispatchNewPage(): void {
     const { businessUnit, business } = this.filterForm.getRawValue();
-    this.store.dispatch(new GetUsersPage(businessUnit, business || null, this.currentPage, this.pageSize, null, null));
+    this.store.dispatch(new GetUsersPage(businessUnit, business != 0 ? [business] : null, this.currentPage, this.pageSize, null, null));
   }
 
   private checkAgencyUser(): void {
@@ -396,7 +392,6 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
     var datasource = this.createServerSideDatasource();
-    console.log(datasource);
     params.api.setServerSideDatasource(datasource);
   }
 
@@ -420,12 +415,17 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
           else filter = null;
 
           var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
-          console.log(postData)
           const { businessUnit, business } = self.filterForm.getRawValue();
-          self.store.dispatch(new GetUsersPage(businessUnit, business || null, isNaN(postData.pageNumber) ? self.currentPage : postData.pageNumber, postData.pageSize, sort, filter));
+          self.store.dispatch(new GetUsersPage(businessUnit, business != 0 ? [business] : null, isNaN(postData.pageNumber) ? self.currentPage : postData.pageNumber, postData.pageSize, sort, filter));
           self.usersPage$.pipe().subscribe((data: any) => {
-            self.itemList = data.items;
-            params.successCallback(self.itemList, data.totalCount || 1);
+            self.itemList = data?.items;
+            if (!self.itemList || !self.itemList.length) {
+              self.gridApi.showNoRowsOverlay();
+            }
+            else {
+              self.gridApi.hideOverlay();
+            }
+            params.successCallback(self.itemList, data?.totalCount || 1);
           });
         }, 500);
       }

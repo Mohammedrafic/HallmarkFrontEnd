@@ -4,13 +4,15 @@ import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Actions, ofActionDispatched } from '@ngxs/store';
 
 import { ShowSideDialog } from '../../../store/app.actions';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-side-dialog',
   templateUrl: './side-dialog.component.html',
   styleUrls: ['./side-dialog.component.scss'],
 })
-export class SideDialogComponent implements OnInit {
+export class SideDialogComponent extends DestroyableDirective implements OnInit {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   targetElement: HTMLElement = document.body;
 
@@ -20,10 +22,12 @@ export class SideDialogComponent implements OnInit {
   @Output() formCancelClicked = new EventEmitter();
   @Output() formSaveClicked = new EventEmitter();
 
-  constructor(private action$: Actions) {}
+  constructor(private action$: Actions) {
+    super();
+  }
 
   ngOnInit(): void {
-    this.action$.pipe(ofActionDispatched(ShowSideDialog)).subscribe((payload) => {
+    this.action$.pipe(ofActionDispatched(ShowSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
         this.sideDialog.show();
       } else {

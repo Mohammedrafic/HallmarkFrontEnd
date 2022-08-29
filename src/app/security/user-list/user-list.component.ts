@@ -14,7 +14,7 @@ import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { UserSettingsComponent } from './add-edit-user/user-settings/user-settings.component';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { UserDTO, User } from '@shared/models/user-managment-page.model';
-import { take } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 
@@ -61,7 +61,7 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
 
   constructor(private store: Store, private confirmService: ConfirmService, private actions$: Actions) {
     super();
-    this.store.dispatch(new SetHeaderState({ title: 'Security', iconName: 'lock' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Users', iconName: 'lock' }));
   }
 
   ngOnInit(): void {
@@ -222,11 +222,11 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
         this.userSettingForm.get('businessUnitId')?.setValue(user.businessUnitId);
       });
     }
-
+      
     this.store
       .dispatch(
-        new GetRolePerUser((user.businessUnitId as BusinessUnitType) || 0, user.businessUnitType as BusinessUnitType)
-      )
+        new GetRolePerUser(user.businessUnitType ? user.businessUnitType:0 , user.businessUnitId ? [user.businessUnitId] : [])
+    )
       .subscribe(() => {
         this.userSettingForm.get('roles')?.setValue(user.roles?.map((role: any) => role.id));
       });

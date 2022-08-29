@@ -31,7 +31,7 @@
   </section>
   <section class="content-container">
     <div class="job-details">
-      <ejs-accordion #accordionElement expandMode="Single" (expanding)="toForbidExpandSecondRow($event)" (clicked)="clickedOnAccordion($event)">
+      <ejs-accordion #accordionElement expandMode="Single" openFirstAccordions>
         <e-accordionitems>
           <e-accordionitem expanded="true">
             <ng-template #header>
@@ -141,7 +141,7 @@
       </ejs-accordion>
     </div>
     <div class="comments">
-      <app-comments></app-comments>
+      <app-comments [disabled]="!showComments"  [comments]="comments" [commentContainerId]="candidateJob?.commentContainerId || 0"></app-comments>
     </div>
   </section>
   <section class="bill-rates">

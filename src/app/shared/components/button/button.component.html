@@ -1,4 +1,10 @@
-<button ejs-button [cssClass]="type | buttonClass" (click)="clickEmitter.emit()" [tabindex]="tabindex">
+<button
+  ejs-button
+  [cssClass]="type | buttonClass"
+  (click)="clickEmitter.emit()"
+  [tabindex]="tabindex"
+  [disabled]="disabled"
+>
   <div class="filter-button-content">
     <span *ngIf="badgeText" class="e-badge e-badge-success e-badge-circle">{{ badgeText }}</span>
     <span>{{ text }}</span>

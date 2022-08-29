@@ -71,6 +71,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public SelectedTab = SelectedTab;
   public orderId: number;
+  public publicId: number;
   public prefix: string;
 
   public title: string;
@@ -103,7 +104,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
     if (this.orderId > 0) {
       this.title = 'Edit';
-      store.dispatch(new GetSelectedOrderById(this.orderId));
     } else {
       this.title = 'Create';
     }
@@ -115,8 +115,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public ngOnInit(): void {
     if (this.orderId > 0) {
-      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
+      this.store.dispatch(new GetSelectedOrderById(this.orderId));
+      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe((order: Order) => {
         this.prefix = order?.organizationPrefix as string;
+        this.publicId = order?.publicId as number;
         this.isPermPlacementOrder = order?.orderType === OrderType.PermPlacement;
         if (order?.credentials) {
           this.orderCredentials = [...order.credentials];
@@ -132,7 +135,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.addMenuItem(SubmitButtonItem.SaveForLater, 'Save For Later');
           this.removeMenuItem(SubmitButtonItem.Save);
         } else {
-          if (order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement) {
+          if (order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement || order?.extensionFromId) {
             this.disableOrderType = true;
           }
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
@@ -146,14 +149,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
     this.getPredefinedBillRatesData$
       .pipe(
-        takeUntil(this.unsubscribe$),
         switchMap((getPredefinedBillRatesData) => {
           if (getPredefinedBillRatesData && !this.orderBillRates.length) {
             return this.store.dispatch(new GetPredefinedBillRates());
           } else {
             return of(null);
           }
-        })
+        }),
+        takeUntil(this.unsubscribe$),
       )
       .subscribe();
 
@@ -244,7 +247,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.jobDescriptionForm.valid &&
       this.orderDetailsFormComponent.contactDetailsForm.valid &&
       this.orderDetailsFormComponent.workLocationForm.valid &&
-      (this.orderDetailsFormComponent.workflowForm.disabled || this.orderDetailsFormComponent.workflowForm.valid) &&
       this.orderDetailsFormComponent.specialProject.valid &&
       (this.billRatesComponent?.billRatesControl.valid ||
         this.orderBillRates.length ||
@@ -275,7 +277,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.jobDescriptionForm.markAllAsTouched();
       this.orderDetailsFormComponent.contactDetailsForm.markAllAsTouched();
       this.orderDetailsFormComponent.workLocationForm.markAllAsTouched();
-      this.orderDetailsFormComponent.workflowForm.markAllAsTouched();
       this.orderDetailsFormComponent.specialProject.markAllAsTouched();
     }
   }
@@ -316,7 +317,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       ...this.orderDetailsFormComponent.jobDescriptionForm.getRawValue(),
       ...this.orderDetailsFormComponent.contactDetailsForm.getRawValue(),
       ...this.orderDetailsFormComponent.workLocationForm.getRawValue(),
-      ...this.orderDetailsFormComponent.workflowForm.getRawValue(),
       ...this.orderDetailsFormComponent.specialProject.getRawValue(),
       ...{ credentials: this.orderCredentials },
       ...{ billRates: orderBillRates },
@@ -351,20 +351,19 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       nO_OT,
       jobDescription,
       unitDescription,
-      reasonForRequisition,
+      orderRequisitionReasonId,
+      orderRequisitionReasonName,
       contactDetails,
       workLocations,
-      workflowId,
       credentials,
       canApprove,
       annualSalaryRangeFrom,
       annualSalaryRangeTo,
       orderPlacementFee,
     } = allValues;
-
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
-      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed } = billRate;
-      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed };
+      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed, isPredefined, seventhDayOtEnabled, weeklyOtEnabled, dailyOtEnabled } = billRate;
+      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed, isPredefined, seventhDayOtEnabled, weeklyOtEnabled, dailyOtEnabled };
     });
 
     const order: CreateOrderDto | EditOrderDto = {
@@ -395,13 +394,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       nO_OT,
       jobDescription,
       unitDescription,
-      reasonForRequisition,
+      orderRequisitionReasonId,
+      orderRequisitionReasonName,
       billRates,
       jobDistributions,
       contactDetails,
       workLocations,
       credentials,
-      workflowId,
       isSubmit,
       canApprove,
       annualSalaryRangeFrom,
@@ -435,14 +434,12 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (!order.compBonus) {
       order.compBonus = null;
     }
-
+    
     return order;
   }
 
   private saveForLater(): void {
     const titleControl = this.orderDetailsFormComponent.generalInformationForm.controls['title'];
-
-    const contactDetailsForm = this.orderDetailsFormComponent.contactDetailsForm;
     const workLocationForm = this.orderDetailsFormComponent.workLocationForm;
 
     if (titleControl.invalid) {
@@ -452,10 +449,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
     const order = this.collectOrderData(false);
     const documents = this.orderDetailsFormComponent.documents;
-
-    if (contactDetailsForm.invalid) {
-      order.contactDetails = [];
-    }
 
     if (workLocationForm.invalid) {
       order.workLocations = [];
@@ -474,7 +467,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       );
     } else {
       this.store.dispatch(new SaveOrder(
-        order, documents
+        order, documents, this.orderDetailsFormComponent.comments
       ));
     }
   }

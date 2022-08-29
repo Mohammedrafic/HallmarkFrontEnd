@@ -5,7 +5,7 @@
       <div class="widget-legend__row-container" (click)="onClickLegendRow($event)" (mousedown)="defineMousePosition($event)">
         <div class="widget-legend__row">
           <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"></div>
-          <div class="widget-legend__legend-text">{{ legend.label }}</div>
+          <div [ngClass]="['widget-legend__legend-text', legendPosition]">{{ legend.label }}</div>
         </div>
         <div *ngIf="!showPercentRatio" class="widget-legend__score">{{ legend.value }}</div>
         <app-percentage-ratio-indicator

@@ -4,8 +4,10 @@ import { AddManInvoiceForm, ManualInvoiceMeta, ManualInvoicePostDto } from '../i
 export class ManualInvoiceAdapter {
   static adapPostDto(formData: AddManInvoiceForm,
     rawData: ManualInvoiceMeta[], orgId: number): ManualInvoicePostDto | null {
+    const order = formData.orderId.split('-')[0];
+
     const jobPosition = rawData.find((item) => {
-        return (item.orderId === Number(formData.orderId)
+        return (item.orderId === Number(order)
         && item.candidateId === Number(formData.nameId));
     });
 
@@ -15,7 +17,7 @@ export class ManualInvoiceAdapter {
         jobId: jobPosition.jobId,
         amount: Number(formData.value),
         serviceDate: DateTimeHelper.toUtcFormat(formData.date),
-        linkedInvoiceId: Number(formData.link),
+        linkedInvoiceId: formData.link,
         vendorFeeApplicable: !!formData.vendorFee,
         manualInvoiceReasonId: formData.reasonId,
         comment: formData.description,

@@ -1,28 +1,27 @@
-import {
-  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
+import { TimesheetStatus } from './../../enums/timesheet-status.enum';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef,
   EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { combineLatest, Observable, takeUntil } from 'rxjs';
-import { filter, skip, take, tap, switchMap } from 'rxjs/operators';
+import { filter, skip, switchMap, take, tap } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { TabComponent, SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
+import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 
 import { Destroyable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
-import { RecordFields } from '../../enums';
-import {
-  TimesheetRecordsColdef, TimesheetRecordsColConfig, RecordsTabConfig,
-  TimesheetConfirmMessages,
-} from '../../constants';
+import { RecordFields, RecordsMode, SubmitBtnText, TIMETHEETS_STATUSES, RecordStatus } from '../../enums';
+import { RecordsTabConfig, TimesheetConfirmMessages, TimesheetRecordsColConfig, TimesheetRecordsColdef } from '../../constants';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DialogActionPayload, OpenAddDialogMeta, TimesheetRecordsDto, TabConfig } from '../../interface';
-import { TimesheetRecordsService } from '../../services/timesheet-records.service';
+import { DialogActionPayload, OpenAddDialogMeta, TabConfig, TimesheetDetailsModel, TimesheetRecordsDto } from '../../interface';
+import { TimesheetRecordsService } from '../../services';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { RecordsAdapter } from '../../helpers';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
+import { DropdownEditorComponent } from '../cell-editors/dropdown-editor/dropdown-editor.component';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -38,16 +37,21 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @ViewChild('grid') readonly grid: IClientSideRowModel;
 
-  @Input() timesheetId: number;
+  @ViewChild('spinner') readonly spinner: ElementRef;
+
+  @Input() timesheetDetails: TimesheetDetailsModel;
 
   @Input() isAgency: boolean;
 
-  @Input()
-  public actionsDisabled: boolean = false;
+  @Input() actionsDisabled: boolean = false;
 
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
   @Output() readonly changesSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  @Output() readonly rejectEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  @Output() readonly approveEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @Select(TimesheetsState.tmesheetRecords)
   public readonly timesheetRecords$: Observable<TimesheetRecordsDto>;
@@ -63,7 +67,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public isEditOn = false;
 
-  public timesheetColDef = TimesheetRecordsColdef;
+  public timesheetColDef = TimesheetRecordsColdef(false);
 
   public readonly modules: Module[] = [ClientSideRowModelModule];
 
@@ -75,7 +79,35 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public isFirstSelected = true;
 
+  public readonly modeValues = RecordsMode;
+
   public recordsToShow: TimesheetRecordsDto;
+
+  public currentMode: RecordsMode = RecordsMode.View;
+
+  public context: { componentParent: ProfileTimesheetTableComponent };
+
+  public loading = false;
+
+  public isEditEnabled = false;
+
+  public isApproveBtnEnabled = false;
+
+  public isRejectBtnEnabled = false;
+
+  public actionButtonDisabled = false;
+
+  public submitText: string;
+
+  public readonly getRowStyle = (params: any) => {
+    if (params.data.stateText === RecordStatus.New) {
+      return { 'background-color': '#F2FAF2'}
+    }
+    if (params.data.stateText === RecordStatus.Deleted) {
+      return { 'background-color': '#FFDFDF'}
+    }
+    return { 'background-color': 'inherit'}
+  }
 
   private records: TimesheetRecordsDto;
 
@@ -89,7 +121,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private idsToDelete: number[] = [];
 
-  public context: { componentParent: ProfileTimesheetTableComponent };
+  private isStatusColAvaliable = false;
 
   constructor(
     private store: Store,
@@ -106,6 +138,15 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   ngOnChanges(): void {
     if (this.gridApi) {
       this.gridApi.showLoadingOverlay();
+    }
+
+    if (this.timesheetDetails) {
+      this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
+
+      this.initBtnsState();
+      this.setActionBtnState();
+      this.initEditBtnsState();
+      this.cd.detectChanges();
     }
   }
 
@@ -142,6 +183,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       }
       this.selectTab(selectEvent.selectedIndex);
     }
+    this.initBtnsState();
+    this.initEditBtnsState();
+    this.cd.detectChanges();
   }
 
   public openAddDialog(): void {
@@ -155,6 +199,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public editTimesheets(): void {
     this.isEditOn = true;
+    this.currentMode = RecordsMode.Edit;
+    this.recordsToShow = JSON.parse(JSON.stringify(this.records));
+    this.gridApi.setRowData(this.recordsToShow[this.currentTab][this.currentMode]);
     this.createForm();
     this.setEditModeColDef();
   }
@@ -166,6 +213,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public cancelChanges(): void {
     this.changesSaved.emit(true);
+    this.loading = false;
     this.isChangesSaved = true;
     this.recordsToShow = JSON.parse(JSON.stringify(this.records));
     this.idsToDelete = [];
@@ -173,27 +221,20 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public saveChanges(): void {
-    const diffs = this.timesheetRecordsService.findDiffs(
-      this.records[this.currentTab], this.formControls, this.timesheetColDef);
-
-    const recordsToUpdate = RecordsAdapter.adaptRecordsDiffs(
-      this.records[this.currentTab], diffs, this.idsToDelete);
-
-    if (diffs.length || this.idsToDelete.length) {
-      const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
-      const dto = RecordsAdapter.adaptRecordPutDto(
-        recordsToUpdate, organizationId, id, this.currentTab, this.idsToDelete);
-
-      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
+    if (this.checkTabStatusApproved()) {
+      this.confirmService.confirm(TimesheetConfirmMessages.confirmEdit, {
+        title: 'Edit Timesheet',
+        okButtonLabel: 'Yes',
+        okButtonClass: 'delete-button',
+      })
       .pipe(
+        filter(Boolean),
         takeUntil(this.componentDestroy()),
-      )
-      .subscribe(() => {
-        this.changesSaved.emit(true);
-        this.isChangesSaved = true;
-        this.idsToDelete = [];
-        this.setInitialTableState();
-      });
+      ).subscribe(() => {
+        this.saveRecords();
+      })
+    } else {
+      this.saveRecords();
     }
   }
 
@@ -213,9 +254,18 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     )
     .subscribe(() => {
       this.idsToDelete.push(id);
-      this.recordsToShow[this.currentTab] = this.recordsToShow[this.currentTab].filter((record) => record.id !== id);
+      this.recordsToShow[this.currentTab][this.currentMode] = this.recordsToShow[this.currentTab][this.currentMode]
+      .filter((record) => record.id !== id);
       this.cd.markForCheck();
     });
+  }
+
+  public onRejectButtonClick(): void {
+    this.rejectEvent.emit(this.currentTab === RecordFields.Time);
+  }
+
+  public handleApprove(): void {
+    this.approveEvent.emit(this.currentTab === RecordFields.Time);
   }
 
   private selectTab(index: number): void {
@@ -234,6 +284,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       tap((res) => {
         if (this.isEditOn) {
           this.isEditOn = false;
+          this.currentMode = RecordsMode.View;
           this.cancelChanges();
         }
         this.records = res;
@@ -253,7 +304,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
-      if (!this.records[this.currentTab].length) {
+      if (!this.records[this.currentTab][this.currentMode].length) {
         this.gridApi.showNoRowsOverlay();
       }
       this.setEditModeColDef();
@@ -264,12 +315,41 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private setInitialTableState(): void {
     this.isEditOn = false;
+    this.currentMode = RecordsMode.View;
     this.formControls = {};
     this.setEditModeColDef();
+    this.cd.markForCheck();
   }
 
   private setEditModeColDef(): void {
+    this.checkForStatusCol();
     this.timesheetColDef = this.timesheetColDef.map((def) => {
+      if (this.isEditOn && def.field === 'billRateConfigName'
+      && this.currentTab === RecordFields.Time) {
+        const editData = {
+          cellRenderer: DropdownEditorComponent,
+          cellRendererParams: {
+            editMode: true,
+            isEditable: true,
+            options: [],
+            storeField: 'billRateTypes',
+          }
+        }
+        def.field = 'billRateConfigId';
+        def = {
+          ...def,
+          ...editData,
+        };
+      } else if (!this.isEditOn && def.field === 'billRateConfigId' && this.currentTab === RecordFields.Time) {
+        def.field = 'billRateConfigName';
+        delete def.cellRenderer;
+        delete def.cellRendererParams;
+      }
+
+      if ((def.field === 'billRate' || def.field === 'total') && this.currentTab !== RecordFields.Expenses) {
+        def.hide = this.isEditOn;
+      }
+
       if (def.cellRendererParams && def.cellRendererParams.editMode) {
         def.cellRendererParams.isEditable = this.isEditOn;
         def.cellRendererParams.formGroup = this.formControls;
@@ -282,7 +362,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private changeColDefs(idx: number): void {
     this.currentTab = this.timesheetRecordsService.getCurrentTabName(idx);
-    this.timesheetColDef = TimesheetRecordsColConfig[this.currentTab];
+    this.checkForStatusCol();
+    this.timesheetColDef = TimesheetRecordsColConfig[this.currentTab](this.isStatusColAvaliable);
     this.cd.markForCheck();
   }
 
@@ -309,5 +390,91 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         this.changesSaved.emit(false);
       }
     })
+  }
+
+  private initBtnsState(): void {
+    const currentTabMapping: Map<RecordFields, boolean> = new Map<RecordFields, boolean>()
+      .set(RecordFields.Time, this.timesheetDetails.canApproveTimesheet)
+      .set(RecordFields.Miles, this.timesheetDetails.canApproveMileage);
+
+    this.isApproveBtnEnabled = !!currentTabMapping.get(this.currentTab);
+    this.isRejectBtnEnabled = !this.isAgency && !!currentTabMapping.get(this.currentTab);
+  }
+
+  private setActionBtnState(): void {
+    if (this.isAgency) {
+      this.actionButtonDisabled =
+        this.timesheetDetails.statusText === TIMETHEETS_STATUSES.PENDING_APPROVE
+        || this.timesheetDetails.statusText === TIMETHEETS_STATUSES.APPROVED;
+    } else {
+      this.actionButtonDisabled =
+        this.timesheetDetails.statusText === TIMETHEETS_STATUSES.APPROVED;
+    }
+  }
+
+  private initEditBtnsState(): void {
+    const currentTabMapping: Map<RecordFields, boolean> = new Map<RecordFields, boolean>()
+      .set(RecordFields.Time, this.timesheetDetails.canEditTimesheet)
+      .set(RecordFields.Miles, this.timesheetDetails.canEditMileage);
+
+    this.isEditEnabled = !!currentTabMapping.get(this.currentTab);
+
+    if (this.isAgency) {
+      this.isApproveBtnEnabled = !!currentTabMapping.get(this.currentTab);
+    }
+  }
+
+  private checkForStatusCol(): void {
+    this.isStatusColAvaliable =  this.timesheetRecordsService
+    .checkForStatus(this.recordsToShow[this.currentTab][this.currentMode]);
+
+    if (this.isEditOn) {
+      this.isStatusColAvaliable = false;
+    }
+
+    this.timesheetColDef  = TimesheetRecordsColConfig[this.currentTab](this.isStatusColAvaliable);
+  }
+
+  private saveRecords(): void {
+    const diffs = this.timesheetRecordsService.findDiffs(
+      this.records[this.currentTab][this,this.currentMode], this.formControls, this.timesheetColDef);
+
+    const recordsToUpdate = RecordsAdapter.adaptRecordsDiffs(
+      this.records[this.currentTab][this,this.currentMode], diffs, this.idsToDelete);
+
+    if (diffs.length || this.idsToDelete.length) {
+      this.loading = true;
+      this.cd.detectChanges();
+      createSpinner({
+        target: this.spinner.nativeElement,
+      });
+      showSpinner(this.spinner.nativeElement);
+
+      const { organizationId, id, mileageTimesheetId } = this.store.snapshot().timesheets.selectedTimeSheet;
+      const dto = RecordsAdapter.adaptRecordPutDto(
+        recordsToUpdate,
+        organizationId,
+        this.currentTab === RecordFields.Time ? id : mileageTimesheetId,
+        this.currentTab,
+        this.idsToDelete,
+      );
+
+      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
+      .pipe(
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(() => {
+        this.loading = false;
+        this.changesSaved.emit(true);
+        this.isChangesSaved = true;
+        this.idsToDelete = [];
+        this.setInitialTableState();
+        this.cd.detectChanges();
+      });
+    }
+  }
+
+  private checkTabStatusApproved(): boolean {
+    return (this.currentTab === RecordFields.Time && this.timesheetDetails.status === TimesheetStatus.Approved);
   }
 }

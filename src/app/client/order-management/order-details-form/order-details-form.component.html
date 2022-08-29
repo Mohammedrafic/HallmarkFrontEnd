@@ -8,7 +8,7 @@
           <ejs-dropdownlist
             formControlName="orderType"
             appValidateWithMessage
-            [dataSource]="orderTypes"
+            [dataSource]="orderTypesDataSource"
             [fields]="orderTypeFields"
           >
           </ejs-dropdownlist>
@@ -28,7 +28,7 @@
   <div class="right-section"></div>
 </section>
 
-<section class="order-form-container">
+<section class="order-form-container" *ngIf="settings">
   <div class="left-section">
     <div tabindex="0" class="e-card">
       <div class="e-card-content">
@@ -448,7 +448,7 @@
               <div class="form-line">
                 <!-- Classification -->
                 <div class="input-container bootstrap form-line-item-20">
-                  <label>Classification<span class="required">*</span></label>
+                  <label>Classification</label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
                       formControlName="classification"
@@ -508,9 +508,10 @@
                   <label>Reason for Requisition<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      formControlName="reasonForRequisition"
+                      formControlName="orderRequisitionReasonId"
                       appValidateWithMessage
-                      [dataSource]="reasonsForRequisition"
+                      (change)='onRequisitionChange($event)'
+                      [dataSource]="(reasons$ | async)?.items"
                       [fields]="reasonForRequisitionFields"
                     >
                     </ejs-dropdownlist>
@@ -708,34 +709,14 @@
             </ng-container>
           </form>
         </div>
-        <div class="workflow">
-          <div class="title">Workflow</div>
-          <form [formGroup]="workflowForm">
-            <div class="form-line">
-              <!-- Workflow -->
-              <div class="input-container bootstrap form-line-item-40">
-                <label>Workflow<span class="required">*</span></label>
-                <div class="input-group dropdown">
-                  <ejs-dropdownlist
-                    #workflowDropdown
-                    formControlName="workflowId"
-                    appValidateWithMessage
-                    [dataSource]="workflows$ | async"
-                    [fields]="workflowFields"
-                  >
-                  </ejs-dropdownlist>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
         <div class="special-project">
           <div class="title">Special Project</div>
           <form [formGroup]="specialProject">
             <div class="form-line">
               <!-- Special Project Category -->
               <div class="input-container bootstrap form-line-item-30">
-                <label>Special Project Category<span class="required">*</span></label>
+       
+                <label>Special Project Category<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
                     formControlName="projectTypeId"
@@ -748,7 +729,7 @@
               </div>
               <!-- Project Name -->
               <div class="input-container bootstrap form-line-item-30">
-                <label>Project Name<span class="required">*</span></label>
+                <label>Project Name<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
                     formControlName="projectNameId"
@@ -761,7 +742,7 @@
               </div>
               <!-- PO# -->
               <div class="input-container bootstrap form-line-item-30">
-                <label>PO#<span class="required">*</span></label>
+                <label>PO#<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
                     formControlName="poNumberId"
@@ -782,6 +763,7 @@
   <div class="right-section">
     <app-document-uploader
       uploaderTitle="Documents"
+      [disabled]="!settings[SettingsKeys.AllowDocumentUpload]?.value"
       [documents]="order?.documents"
       (selectDocuments)="onDocumentsSelected($event)"
       (deleteDocument)="onDocumentDeleted($event)"

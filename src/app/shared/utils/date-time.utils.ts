@@ -34,3 +34,12 @@ export const setTimeToDate = (time: string | null): Date | null => {
   const todayDate = new Date().toLocaleDateString('en-US');
   return new Date(`${todayDate} ${time}`);
 };
+
+export const addDays = (date: string | Date, days: number): Date | null => {
+  if (isNaN(new Date(date).valueOf())) {
+    return null;
+  }
+
+  const newDate = new Date(date);
+  return new Date(newDate.setDate(newDate.getDate() + days));
+};

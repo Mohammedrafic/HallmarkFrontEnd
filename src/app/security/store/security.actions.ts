@@ -24,18 +24,30 @@ export class GetRolesPage {
 
 export class GetRolePerUser {
   static readonly type = '[security] Get Roles Per User';
-  constructor(public businessUnitType: BusinessUnitType, public businessUnitId: number) {}
+  constructor(public businessUnitType: BusinessUnitType, public businessUnitIds: number[]) {}
 }
 
 export class GetUsersPage {
   static readonly type = '[security] Get Users Page';
   constructor(
     public businessUnitType: BusinessUnitType,
-    public businessUnitId: number,
+    public businessUnitIds: number[] | null,
     public pageNumber: number,
     public pageSize: number,
     public sortModel: any,
     public filterModel: any
+  ) {}
+}
+export class GetAllUsersPage {
+  static readonly type = '[security] Get All Users Page';
+  constructor(
+    public businessUnitType: BusinessUnitType,
+    public businessUnitIds: number[],
+    public pageNumber: number,
+    public pageSize: number,
+    public sortModel: any,
+    public filterModel: any,
+    public getAll:boolean
   ) {}
 }
 

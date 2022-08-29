@@ -2,42 +2,54 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { GridModule, ResizeService, PagerModule, PageService } from '@syncfusion/ej2-angular-grids';
-import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
-import { DropDownListModule, ListBoxModule, MultiSelectAllModule, AutoCompleteModule } from '@syncfusion/ej2-angular-dropdowns';
+import { GridModule, PagerModule, PageService, ResizeService } from '@syncfusion/ej2-angular-grids';
 import {
-  UploaderModule,
-  TextBoxModule,
+  ButtonModule,
+  CheckBoxModule,
+  ChipListModule,
+  RadioButtonModule,
+  SwitchModule,
+} from '@syncfusion/ej2-angular-buttons';
+import {
+  AutoCompleteModule,
+  DropDownListModule,
+  ListBoxModule,
+  MultiSelectAllModule,
+} from '@syncfusion/ej2-angular-dropdowns';
+import {
+  MaskedTextBoxModule,
   NumericTextBoxModule,
-  MaskedTextBoxModule
+  TextBoxModule,
+  UploaderModule,
 } from '@syncfusion/ej2-angular-inputs';
-import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import { DatePickerModule, TimePickerModule, DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
+import { SidebarModule, TabAllModule, TabModule } from '@syncfusion/ej2-angular-navigations';
+import { DatePickerModule, DateTimePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
 import {
-  Download,
-  Upload,
-  Sliders,
-  Edit,
-  Trash2,
-  AlignJustify,
-  Menu,
-  FileText,
-  MapPin,
-  Plus,
   AlertCircle,
-  Edit3,
+  AlignJustify,
   ChevronDown,
   ChevronRight,
   Copy,
-  Search
+  Download,
+  Edit,
+  Edit3,
+  FileText,
+  MapPin,
+  Menu,
+  Plus,
+  Search,
+  Sliders,
+  Trash2,
+  Upload,
 } from 'angular-feather/icons';
 
 import { NgxsModule } from '@ngxs/store';
 import { OrganizationManagementState } from './store/organization-management.state';
 import { CredentialsState } from './store/credentials.state';
 import { SharedModule } from '@shared/shared.module';
+import { AgGridModule } from '@ag-grid-community/angular';
 import { ShiftsState } from './store/shifts.state';
 import { OrganizationManagementComponent } from './organization-management.component';
 import { OrganizationManagementRoutingModule } from './organization-management-routing.module';
@@ -71,6 +83,21 @@ import { ReasonsComponent } from './reasons/reasons.component';
 import { ClosureReasonComponent } from './reasons/closure-reason/closure-reason.component';
 import { RegionsComponent } from './regions/regions.component';
 import { ManualInvoiceRejectReasonComponent } from './reasons/manual-invoice-reject-reason/manual-invoice-reject-reason.component';
+import { OrderRequisitionComponent } from './reasons/order-requisition/order-requisition.component';
+import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
+import { PurchaseOrdersComponent } from './specialproject/components/purchase-orders/purchase-orders.component';
+import { SpecialProjectsComponent } from './specialproject/components/special-projects/special-projects.component';
+import { SpecialProjectState } from './store/special-project.state';
+import { PurchaseOrderState } from './store/purchase-order.state';
+import { SpecialProjectCategoryState } from './store/special-project-category.state';
+import { SpecialProjectCategoryComponent } from './specialproject/components/special-project-categories/special-project-categories.component';
+import { ProjectMappingComponent } from './specialproject/components/project-mapping/project-mapping.component';
+import { SpecialProjectTableComponent } from './specialproject/components/special-project-table/special-project-table.component';
+import { SpecialProjectMappingState } from './store/special-project-mapping.state';
+import { PurchaseOrderMappingComponent } from './specialproject/components/purchase-order-mapping/purchase-order-mapping.component';
+import { PurchaseOrderMappingState } from './store/purchase-order-mapping.state';
+import { BusinessLinesComponent } from './business-lines/business-lines.component';
+import { BusinessLinesState } from './store/business-lines.state';
 
 const sidebarIcons = {
   Download,
@@ -88,7 +115,7 @@ const sidebarIcons = {
   ChevronDown,
   ChevronRight,
   Copy,
-  Search
+  Search,
 };
 @NgModule({
   declarations: [
@@ -116,10 +143,18 @@ const sidebarIcons = {
     FilteredCredentialsComponent,
     MapCredentialsFormComponent,
     ReasonsComponent,
-
     ManualInvoiceRejectReasonComponent,
     ClosureReasonComponent,
-    RegionsComponent
+    RegionsComponent,
+    OrderRequisitionComponent,
+    SpecialProjectContainerComponent,
+    PurchaseOrdersComponent,
+    SpecialProjectsComponent,
+    SpecialProjectCategoryComponent,
+    ProjectMappingComponent,
+    SpecialProjectTableComponent,
+    PurchaseOrderMappingComponent,
+    BusinessLinesComponent
   ],
   imports: [
     CommonModule,
@@ -151,6 +186,7 @@ const sidebarIcons = {
     AutoCompleteModule,
     DropDownButtonModule,
     MaskedTextBoxModule,
+    AgGridModule,
 
     FeatherModule.pick(sidebarIcons),
 
@@ -162,11 +198,15 @@ const sidebarIcons = {
       ShiftsState,
       HolidaysState,
       BillRatesState,
+      SpecialProjectState,
+      PurchaseOrderState,
+      SpecialProjectCategoryState,
+      SpecialProjectMappingState,
+      PurchaseOrderMappingState,
+      BusinessLinesState,
     ]),
   ],
-  providers: [
-    ResizeService,
-    PageService
-  ]
+  exports: [BillRatesComponent],
+  providers: [ResizeService, PageService],
 })
-export class OrganizationManagementModule { }
+export class OrganizationManagementModule {}

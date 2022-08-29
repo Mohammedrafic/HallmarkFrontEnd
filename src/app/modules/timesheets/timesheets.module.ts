@@ -24,8 +24,6 @@ import { DatePickerModule, MaskedDateTimeService } from '@syncfusion/ej2-angular
 import { AccumulationChartAllModule, ChartAllModule } from '@syncfusion/ej2-angular-charts';
 
 import { ControlConverterModule } from '@shared/pipes/control-converter/control-converter.module';
-import { CapitalizeFirstModule } from '@shared/pipes/capitalize-first/capitalize-first.module';
-import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
 import { SharedModule } from '@shared/shared.module';
 import { DateWeekPickerModule } from '@shared/components/date-week-picker/date-week-picker.module';
 import { TimesheetsRoutingModule } from './timesheets-routing.module';
@@ -41,14 +39,12 @@ import { ProfileDetailsJobInfoComponent } from './components/profile-details-job
 import { ProfileCumulativeHoursComponent } from './components/profile-cumulative-hours/profile-cumulative-hours.component';
 import { ProfileInvoicesComponent } from './components/profile-invoices/profile-invoices.component';
 import { TimesheetsService } from './services/timesheets.service';
-import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
 import { TimesheetDetailsApiService } from './services/timesheet-details-api.service';
 import { TimesheetRecordsService } from './services/timesheet-records.service';
 import { DropdownEditorComponent } from './components/cell-editors/dropdown-editor/dropdown-editor.component';
 import { ActionsCellComponent } from './components/cell-editors/actions-cell/actions-cell.component';
 import { TimesheetsFilterDialogComponent } from './components/timesheets-filter-dialog/timesheets-filter-dialog.component';
 import { GridModule } from '@shared/components/grid/grid.module';
-import { TimesheetTableStatusCellComponent } from './components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
 import { ProfileMilesComponent } from './components/profile-cumulative-hours/profile-miles/profile-miles.component';
 import { InputEditorComponent } from './components/cell-editors/input-editor/input-editor.component';
 import { GridDateEditorComponent } from './components/cell-editors/grid-date-editor/grid-date-editor.component';
@@ -57,12 +53,23 @@ import {
 } from './components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 import { TimesheetTableLinkComponent } from './components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 import { TimesheetDetailsService } from './services/timesheet-details.service';
-import { FileViewerModule } from '../../shared/modules/file-viewer/file-viewer.module';
+import { FileViewerModule } from '@shared/modules/file-viewer/file-viewer.module';
 import { DateRangeWeekPickerModule } from '@shared/components/date-range-week-picker/date-range-week-picker.module';
 import { TimesheetsTabsComponent } from './components/timesheets-tabs/timesheets-tabs.component';
 import { AddDialogHelperService, DateWeekService } from '@core/services';
 import { AttachmentsModule } from '@shared/components/attachments';
 import { AddDialogHelper } from '@core/helpers';
+import { UploadButtonComponent } from './components/upload-button/upload-button.component';
+import { FileUploaderModule } from '@shared/components/file-uploader/file-uploader.module';
+import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
+import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
+import { TimesheetsTableFiltersColumns } from './enums';
+import { APP_FILTERS_CONFIG } from '@core/constants/filters-helper.constant';
+import {
+  RejectReasonInputDialogModule
+} from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.module';
+import { RecordStatusCellComponent } from './components/cell-editors/record-status-cell/record-status-cell.component';
+import { TableStatusCellModule } from '@shared/components/table-status-cell/table-status-cell.module';
 
 const gridIcons = {
   MessageSquare,
@@ -103,17 +110,17 @@ const gridIcons = {
     ProfileDetailsJobInfoComponent,
     ProfileCumulativeHoursComponent,
     ProfileInvoicesComponent,
-    TimesheetRejectReasonDialogComponent,
     GridDateEditorComponent,
     DropdownEditorComponent,
     ActionsCellComponent,
     TimesheetsFilterDialogComponent,
-    TimesheetTableStatusCellComponent,
     TimesheetTableApproveCellComponent,
     TimesheetTableLinkComponent,
     ProfileMilesComponent,
     InputEditorComponent,
     TimesheetsTabsComponent,
+    UploadButtonComponent,
+    RecordStatusCellComponent,
   ],
   imports: [
     CommonModule,
@@ -140,7 +147,6 @@ const gridIcons = {
     FormsModule,
     CheckBoxModule,
     ControlConverterModule,
-    CapitalizeFirstModule,
     DateWeekPickerModule,
     DateRangeWeekPickerModule,
     UploaderModule,
@@ -152,6 +158,9 @@ const gridIcons = {
     PdfViewerModule,
     FileViewerModule,
     AttachmentsModule,
+    FileUploaderModule,
+    RejectReasonInputDialogModule,
+    TableStatusCellModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [
@@ -159,16 +168,24 @@ const gridIcons = {
     AddRecordService,
     MaskedDateTimeService,
     TimesheetsService,
-    CapitalizeFirstPipe,
     TimesheetDetailsApiService,
     ChipsCssClass,
     TimesheetRecordsService,
     TimesheetDetailsService,
     DateWeekService,
     AddDialogHelper,
+    FiltersDialogHelper,
     {
       provide: AddDialogHelperService,
       useClass: AddRecordService,
+    },
+    {
+      provide: APP_FILTERS_CONFIG,
+      useValue: TimesheetsTableFiltersColumns,
+    },
+    {
+      provide: FiltersDialogHelperService,
+      useClass: TimesheetsService,
     },
   ]
 })

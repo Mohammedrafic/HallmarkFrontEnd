@@ -1,0 +1,32 @@
+<div class="common-info">
+  <div class="section">
+    <div class="title">
+      <i-feather name="user" class="icon"></i-feather>
+      <span class="title-text">
+        {{ candidateJob?.candidateProfile?.firstName }}, {{ candidateJob?.candidateProfile?.lastName }}
+      </span>
+    </div>
+    <div class="sub-title">Candidate Name</div>
+  </div>
+  <div class="section">
+    <div class="title">
+      <i-feather name="briefcase" class="icon"></i-feather>
+      <span class="title-text">{{ orderPosition?.agencyName }}</span>
+    </div>
+    <div class="sub-title">Agency Name</div>
+  </div>
+  <div class="section">
+    <div class="title">
+      <i-feather name="calendar" class="icon"></i-feather>
+      <span class="title-text">{{ candidateJob?.actualStartDate | date: 'MM/dd/yyyy' }}</span>
+    </div>
+    <div class="sub-title">Initial Start Date</div>
+  </div>
+  <div class="section">
+    <div class="title">
+      <i-feather name="calendar" class="icon"></i-feather>
+      <span class="title-text">{{ candidateJob?.actualEndDate | date: 'MM/dd/yyyy' }}</span>
+    </div>
+    <div class="sub-title">Initial End Date</div>
+  </div>
+</div>

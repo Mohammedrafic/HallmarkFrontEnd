@@ -3,6 +3,10 @@ import { TimesheetStatistics } from './timesheet-statistics.interface';
 import { Attachment } from '@shared/components/attachments/models/attachment.interface';
 import { TimesheetInvoice } from './timesheet-invoice.interface';
 import { RecordValue } from './common.interface';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ExportColumn } from '@shared/models/export.model';
+import { Invoice, InvoiceDetail } from '../../invoices/interfaces';
+import { PendingApprovalInvoice } from '../../invoices/interfaces/pending-approval-invoice.interface';
 
 export interface DetailsColumnConfig {
   align: TableColumnAlign;
@@ -20,7 +24,6 @@ export interface DetailsTableConfig {
   hours: DetailsColumnConfig;
   rate: DetailsColumnConfig;
   total: DetailsColumnConfig;
-  actions: DetailsColumnConfig;
 }
 
 export interface DialogActionPayload {
@@ -53,8 +56,14 @@ export interface CostCenterOption {
 
 export interface TimesheetDetailsModel {
   id: number;
-  statusText: string
+  statusText: string;
   status: number;
+  mileageStatusText: string;
+  mileageStatus: number;
+  canApproveMileage: boolean;
+  canApproveTimesheet: boolean;
+  canEditMileage: boolean;
+  canEditTimesheet: boolean;
   rejectionReason?: string;
   organizationId: number;
   candidateId: number;
@@ -63,6 +72,7 @@ export interface TimesheetDetailsModel {
   candidateMiddleName: string;
   noWorkPerformed: boolean;
   departmentId: number;
+  formattedId: string;
   skillId: number;
   orderType: number;
   jobId: number;
@@ -80,7 +90,20 @@ export interface TimesheetDetailsModel {
   invoices: TimesheetInvoice[];
   weekEndDate: string;
   weekStartDate: string;
-  isNotExist?: boolean;  
+  candidateWorkPeriods: WorkWeek<string>[];
+  isNotExist?: boolean;
+  mileageTimesheetId: number;
+}
+
+export interface WorkWeek<T> {
+  weekStartDate: T;
+  weekEndDate: T;
+}
+
+export interface CustomExport {
+  columns: ExportColumn[];
+  fileName: string;
+  fileType: ExportedFileType;
 }
 
 export interface OpenAddDialogMeta {
@@ -124,4 +147,19 @@ export interface PutRecordDto {
   type: number;
   deleteIds?: number[];
   records?: PutRecord[];
+}
+
+export interface AddMileageDto {
+  organizationId: number;
+  jobId: number;
+  weekStartDate: string;
+}
+
+export interface MileageCreateResponse {
+  timesheetId: number;
+  type: number;
+  jobId: number;
+  organizationId: number;
+  weekStart: string;
+  status: number;
 }

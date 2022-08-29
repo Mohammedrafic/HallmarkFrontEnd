@@ -185,11 +185,6 @@ export const ProfileTimesheetTableConfig: DetailsTableConfig = {
     width: 100,
     header: 'Total',
   },
-  actions: {
-    align: TableColumnAlign.Center,
-    width: 88,
-    header: '',
-  }
 }
 
 export const MapedRecordsType = {

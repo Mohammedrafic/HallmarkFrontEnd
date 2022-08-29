@@ -4,17 +4,15 @@ import { ColumnDefinitionModel } from '@shared/components/grid/models/column-def
 import { ColDef } from '@ag-grid-community/core';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
-import { FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
-import { FilterColumns, FilterDataSource, TimesheetsFilterState } from '../interface';
-import {
-  TimesheetTableStatusCellComponent
-} from '../components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
+import { FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns } from '../enums';
+import { FilterColumns, TimesheetsFilterState } from '../interface';
 import {
   TimesheetTableApproveCellComponent
 } from '../components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
 import { TimesheetTableLinkComponent } from '../components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 import { GridValuesHelper } from '../helpers';
+import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
 
 const commonColumn: ColDef = {
   sortable: true,
@@ -55,20 +53,29 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
     },
     {
       field: TimesheetsTableColumns.StatusText,
-      headerName: 'STATUS',
+      headerName: 'TIMESHEET STATUS',
       minWidth: 170,
-      cellRenderer: TimesheetTableStatusCellComponent,
+      cellRenderer: TableStatusCellComponent,
+      cellClass: 'status-cell',
+      ...commonColumn,
+    },
+    {
+      field: TimesheetsTableColumns.MileageStatusText,
+      headerName: 'MILES STATUS',
+      minWidth: 170,
+      cellRenderer: TableStatusCellComponent,
       cellClass: 'status-cell',
       ...commonColumn,
     },
     {
       field: TimesheetsTableColumns.OrderId,
-      headerName: 'ORDER ID',
+      headerName: 'JOB ID',
       width: 140,
       minWidth: 140,
       cellClass: 'name',
       ...commonColumn,
       cellRenderer: TimesheetTableLinkComponent,
+      valueFormatter: (params: ValueFormatterParams) => params.data.formattedId,
     },
     {
       field: TimesheetsTableColumns.Skill,
@@ -92,7 +99,10 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       minWidth: 240,
       cellClass: 'bold',
       ...commonColumn,
-      valueFormatter: (params: ValueFormatterParams) => GridValuesHelper.formatDate(params.value, 'W - ccc M/d/yy'),
+      valueFormatter: (params: ValueFormatterParams) => {
+        const weekNum = params.data.workWeek;
+        return `${weekNum} - ${GridValuesHelper.formatDate(params.value, 'ccc M/d/yy')}`
+      },
     },
     {
       field: TimesheetsTableColumns.Department,
@@ -142,19 +152,20 @@ export const DefaultFilterColumns: FilterColumns = {
   locationIds: defaultColumnMapping,
 } as FilterColumns;
 
-export const SavedFiltersParams: string[] = [
-  'pageNumber',
-  'pageSize',
-  'organizationId',
-  'orderBy',
-  'dateTimeOffset',
-  'searchTerm',
-  'statusIds',
+export const SavedFiltersParams: TimesheetsTableFiltersColumns[] = [
+  TimesheetsTableFiltersColumns.PageNumber,
+  TimesheetsTableFiltersColumns.PageSize,
+  TimesheetsTableFiltersColumns.OrganizationId,
+  TimesheetsTableFiltersColumns.OrderBy,
+  TimesheetsTableFiltersColumns.StartDate,
+  TimesheetsTableFiltersColumns.EndDate,
+  TimesheetsTableFiltersColumns.SearchTerm,
+  TimesheetsTableFiltersColumns.StatusIds,
 ];
 
 export const DefaultFiltersState: TimesheetsFilterState = {
   pageNumber: 1,
-  pageSize: 30
+  pageSize: 30,
 };
 
 export const DefaultTimesheetCollection: TimeSheetsPage = {
@@ -164,11 +175,6 @@ export const DefaultTimesheetCollection: TimeSheetsPage = {
   totalCount: 0,
   hasNextPage: false,
   hasPreviousPage: false,
-};
-
-export const filterOptionFields = {
-  text: 'name',
-  value: 'id'
 };
 
 export const filteringOptionsMapping: Map<FilteringOptionsFields, TimesheetsTableFiltersColumns> = new Map()

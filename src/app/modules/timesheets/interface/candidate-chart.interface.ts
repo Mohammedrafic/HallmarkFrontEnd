@@ -23,6 +23,7 @@ export interface ChartPointRenderEvent<T = string> {
   point: {
     x: T,
     y: number;
+    index: number;
   };
   fill: string;
 }

@@ -14,3 +14,13 @@ export enum RecordFields {
   Miles = 'miles',
   Expenses = 'expenses',
 }
+
+export enum RecordsMode {
+  View = 'viewMode',
+  Edit = 'editMode',
+}
+
+export enum RecordStatus {
+  New = 'New',
+  Deleted = 'Deleted',
+}

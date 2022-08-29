@@ -13,6 +13,9 @@ import { Timesheets } from '../store/actions/timesheets.actions';
 import { Attachment, AttachmentsListConfig } from '@shared/components/attachments';
 import { TimesheetDetailsApiService } from './timesheet-details-api.service';
 import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
+import { TimesheetStatisticsDetails } from '../interface';
+import { HourOccupationType } from '../enums';
+import { getEmptyHoursOccupationData } from '../helpers';
 
 
 @Injectable()
@@ -25,8 +28,8 @@ export class TimesheetDetailsService {
   ) {
   }
 
-  public approveTimesheet(timesheetId: number): Observable<void> {
-    const { title, submitButtonText, confirmMessage, successMessage } = approveTimesheetDialogData;
+  public approveTimesheet(timesheetId: number, isTimesheetOrMileagesUpdate: boolean): Observable<void> {
+    const { title, submitButtonText, confirmMessage, successMessage } = approveTimesheetDialogData(isTimesheetOrMileagesUpdate);
 
     return this.confirmService.confirm(confirmMessage, {
       title,
@@ -47,8 +50,8 @@ export class TimesheetDetailsService {
       );
   }
 
-  public submitTimesheet(timesheetId: number, orgId: number): Observable<void> {
-    const { title, submitButtonText, confirmMessage, successMessage } = submitTimesheetDialogData;
+  public submitTimesheet(timesheetId: number, orgId: number, isTimesheetOrMileagesUpdate: boolean): Observable<void> {
+    const { title, submitButtonText, confirmMessage, successMessage } = submitTimesheetDialogData(isTimesheetOrMileagesUpdate);
 
     return this.confirmService.confirm(confirmMessage, {
       title,
@@ -136,5 +139,32 @@ export class TimesheetDetailsService {
       take(1),
       filter((submitted) => submitted)
     )
+  }
+
+  public createChartItems(statistic: TimesheetStatisticsDetails[] | null): TimesheetStatisticsDetails[] {
+    let chartItems: TimesheetStatisticsDetails[] = [];
+
+    if (statistic && statistic.length) {
+      chartItems = statistic.sort((a, b) => {
+        if (a.cumulativeHours < b.cumulativeHours) {
+          return 1;
+        }
+        if (a.cumulativeHours > b.cumulativeHours) {
+          return -1;
+        }
+        return 0;
+      }).filter((item) => {
+        return item.cumulativeHours || item.weekHours;
+      });
+    } else if (!statistic || !statistic.length || !chartItems || !chartItems.length) {
+      chartItems = Object.keys(HourOccupationType).map((rate) => {
+        return getEmptyHoursOccupationData(rate);
+      })
+
+      const ItemsNumToshow = 6;
+      chartItems.splice(ItemsNumToshow, chartItems.length);
+    }
+
+    return chartItems;
   }
 }

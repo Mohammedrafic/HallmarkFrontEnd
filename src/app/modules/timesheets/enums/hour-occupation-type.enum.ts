@@ -5,4 +5,8 @@ export enum HourOccupationType {
   Holiday = 'Holiday',
   Preceptor = 'Preceptor',
   Orientation = 'Orientation',
+  DailyOT = 'Daily OT',
+  DailyPremiumOT = 'Daily Premium OT',
+  Charge = 'Charge',
+  OT = 'OT',
 }

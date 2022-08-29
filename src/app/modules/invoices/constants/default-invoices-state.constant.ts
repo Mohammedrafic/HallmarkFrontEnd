@@ -3,16 +3,22 @@ import { InvoiceDefaultFilterColumns } from './invoices.constant';
 
 export const DefaultInvoicesState: InvoicesModel = {
   invoicesData: null,
+  manualInvoicesData: null,
+  pendingInvoicesData: null,
+  pendingApprovalInvoicesData: null,
+  pendingPaymentInvoicesData: null,
+  invoicesContainerData: null,
   invoicesFilters: null,
   invoiceFiltersColumns: InvoiceDefaultFilterColumns,
   isInvoiceDetailDialogOpen: false,
   nextInvoiceId: null,
   prevInvoiceId: null,
-  selectedInvoiceId: null,
+  invoiceDetail: null,
   invoiceReasons: [],
   invoiceMeta: [],
   organizations: [],
   organizationLocations: [],
   selectedOrganizationId: 0,
   regions: [],
+  printData: [],
 };

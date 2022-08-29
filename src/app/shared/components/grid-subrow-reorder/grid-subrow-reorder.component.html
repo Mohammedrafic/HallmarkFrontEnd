@@ -1,6 +1,6 @@
 <div class="reorder-row"  [ngClass]="{'selected': selected}" (click)="clickEvent.emit(reOrder)">
   <div class="info">
-    <div class="data">{{ reOrder.organizationPrefix }}-{{ reOrder.id || reOrder.orderId}}</div>
+    <div class="data">{{ reOrder.organizationPrefix }}-{{ reOrder.publicId }}</div>
     <div class="title">Re-Order ID</div>
   </div>
   <div class="info status">

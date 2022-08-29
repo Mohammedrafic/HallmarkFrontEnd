@@ -1,4 +1,4 @@
-<section>
+<section class="table-wrapper">
   <ag-grid-angular #agGridPagination
                   style="width: 100%; height: 550px;"
                   class="ag-theme-alpine"
@@ -17,7 +17,9 @@
                   toolPanel="columns"
                   [serverSideStoreType]="serverSideStoreType"                
                   [paginationAutoPageSize]="false"
-                  [maxBlocksInCache] ="maxBlocksInCache">
+                  [maxBlocksInCache] ="maxBlocksInCache"
+                  [noRowsOverlayComponent]="noRowsOverlayComponent"
+                  [noRowsOverlayComponentParams]="noRowsOverlayComponentParams">
   </ag-grid-angular>
 </section>
 <div class="row">
@@ -32,91 +34,6 @@
     </ejs-dropdownlist></div>
 </div>
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
-<!-- <ejs-grid
-  #rolesGrid
-  id="roles-grid"
-  class="roles-grid"
-  [dataSource]="roleGirdData$ | async"
-  [allowSorting]="true"
-  [sortSettings]="sortOptions"
-  [allowResizing]="true"
-  [allowSelection]="true"
-  [resizeSettings]="resizeSettings"
-  [allowPaging]="allowPaging"
-  [pageSettings]="pageSettings"
-  [height]="gridHeight"
-  [enableVirtualization]="true"
-  (rowDataBound)='rowDataBound($event)'
-  (dataBound)="dataBound()"
->
-  <e-columns>
-    <e-column textAlign="Right" width="100">
-      <ng-template #template let-data>
-        <div class="row-tool-buttons">
-          <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
-            <span><i-feather name="edit" class="icon"></i-feather></span>
-          </button>
-          <button ejs-button [disabled]="data.isDefault" cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
-            <span><i-feather name="trash-2" class="icon"></i-feather></span>
-          </button>
-        </div>
-      </ng-template>
-    </e-column>
-    <e-column field="businessUnitName" headerText="Business" textAlign="Left" [valueAccessor]="businessValueAccess" width="100%"></e-column>
-    <e-column field="name" headerText="Role Name" textAlign="Left" width="100%"></e-column>
-    <e-column field="isActive" headerText="Active" textAlign="Left" maxWidth=500 [valueAccessor]="activeValueAccess" width="100%"></e-column>
-  </e-columns>
 
-  <ng-template #pagerTemplate let-data>
-    <div class="e-pagertemplate">
-      <div class="control-section">
-        <div class="content-wrapper">
-          <section class="left-side-pager-controls">
-            <ejs-dropdownlist
-              id="rowsPerPage"
-              class="dropdown-no-border"
-              [dataSource]="rowsPerPageDropDown"
-              [(value)]="activeRowsPerPageDropDown"
-              (change)="onRowsDropDownChanged()"
-            >
-            </ejs-dropdownlist>
-            <ejs-numerictextbox
-              id="goToPage"
-              class="numeric-input-no-border"
-              format="#"
-              placeholder="Go to:"
-              min="1"
-              [max]="(rolesPage$ | async)?.totalCount"
-              [showSpinButton]="false"
-              (change)="onGoToClick($event)"
-            >
-            </ejs-numerictextbox>
-          </section>
-          <section class="right-side-pager-controls">
-            <ejs-pager
-              id="gridPager"
-              #gridPager
-              [pageSize]="pageSize"
-              [totalRecordsCount]="(rolesPage$ | async)?.totalPages"
-              [enablePagerMessage]="false"
-              [currentPage]="currentPage"
-              (click)="onGoToClick($event)"
-            >
-            </ejs-pager>
-          </section>
-        </div>
-      </div>
-    </div>
-  </ng-template>
-</ejs-grid>-->
 
-<app-filter-dialog
-  [items]="filteredItems"
-  [count]="(rolesPage$ | async)?.totalCount"
-  (deleteFilter)="onFilterDelete($event)"
-  (clearAllFiltersClicked)="onFilterClearAll()"
-  (applyFilterClicked)="onFilterApply()"
-  (closeDialogClicked)="onFilterClose()"
->
-  <app-roles-filters [form]="rolesFilterFormGroup" [filterColumns]="filterColumns"></app-roles-filters>
-</app-filter-dialog>
+

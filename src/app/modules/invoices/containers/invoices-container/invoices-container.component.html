@@ -1,13 +1,13 @@
 <app-page-toolbar>
   <ng-container left>
     <app-invoices-table-tabs
-      [tabConfig]="tabsConfig"
+      [tabConfig]="(tabsConfig$ | async) || []"
       (changeTab)="handleChangeTab($event)">
     </app-invoices-table-tabs>
   </ng-container>
 
   <ng-container right>
-    <div *ngIf="isAgency" class="bootstrap">
+    <div *ngIf="!!organizationId" class="bootstrap">
       <div class="input-container">
         <ejs-dropdownlist
           *ngIf="organizations$ | async as organizations"
@@ -18,7 +18,7 @@
         </ejs-dropdownlist>
       </div>
     </div>
-    <app-search class="search" *ngIf="false"></app-search>
+    <app-search class="search" *ngIf="selectedTabIdx >= 2"></app-search>
     <button
       ejs-button
       cssClass="e-outline button-filter button--no-wrap"
@@ -29,33 +29,133 @@
       </div>
     </button>
     <app-export-button (optionSelected)="onExportOptionSelect($event)"></app-export-button>
-    <button ejs-button class="e-primary"
-      (click)="openAddDialog()">
-      Add Manual Invoice
+
+    <button
+      ejs-button
+      *ngIf="(!isAgency && (selectedTabIdx !== 0 && selectedTabIdx !== 1)
+      || (isAgency && selectedTabIdx !==0))"
+      [disabled]="!selectedInvoiceIds || !selectedInvoiceIds.length"
+      cssClass="e-outline button-filter button--no-wrap"
+      (click)="printInvoices()">
+      <span>Print</span>
+      <i-feather name="printer" class="icon"></i-feather>
     </button>
-    <button ejs-button class="e-primary"
-            (click)="createInvoiceDialog.show()">
-      Create Invoice
-    </button>
+
+    <div class="invoices-actions-container">
+      <button
+        ejs-button
+        class="e-primary"
+        (click)="openAddDialog()"
+        *ngIf="selectedTabIdx === 0"
+        >
+        Add Manual Invoice
+      </button>
+
+
+<!--      TODO: Move to component-->
+      <div class="group-invoices-overlay"
+           [class.hidden]="!groupInvoicesOverlayVisible"
+           appClickOutside (clickOutside)="hideGroupingOverlay()">
+        <ejs-listbox [dataSource]="groupInvoicesOptions" [itemTemplate]="itemTemplate" (change)="onInvoiceGrouping($event)"></ejs-listbox>
+
+        <ng-template #itemTemplate let-data>
+          <div class="group-option-name" cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
+            By {{data.text}}
+          </div>
+
+          <ejs-tooltip [content]="data.tooltip" position="BottomCenter">
+            <i-feather name="alert-circle" class="icon"></i-feather>
+          </ejs-tooltip>
+        </ng-template>
+      </div>
+
+<!--      TODO: Move to component-->
+      <ejs-tooltip content="Select record in the table"
+                   position="BottomCenter"
+                   [opensOn]="!groupingInvoiceRecordsIds.length ? 'Auto' : 'Custom'">
+        <div class="invoices-split-button" *ngIf="tabConfig.groupingEnabled">
+          <button ejs-button cssClass="e-primary"
+                  class="main-button"
+                  [disabled]="!groupingInvoiceRecordsIds.length"
+                  (click)="groupInvoices()">
+            Create Invoice By {{groupInvoicesBy.text}}
+          </button>
+
+          <button ejs-button cssClass="e-primary"
+                  class="dropdown-button"
+                  [disabled]="!groupingInvoiceRecordsIds.length"
+                  (click)="showGroupingOverlay()">
+            <i-feather name="chevron-down" class="icon"></i-feather>
+          </button>
+        </div>
+      </ejs-tooltip>
+    </div>
   </ng-container>
 </app-page-toolbar>
 
 <section class="invoices-table-container">
   <ng-container [ngSwitch]="selectedTabIdx">
-    <ng-container *ngSwitchCase="0">
-      <app-invoice-records-table [tableData]="invoiceRecordsData$ | async"
-                                 #invoiceRecordsTable
-      ></app-invoice-records-table>
+    <ng-container *ngSwitchCase="0"
+                  [ngTemplateOutlet]="invoicesTable"
+                  [ngTemplateOutletContext]="{ itemsData: manualInvoicesData$ | async }"
+    ></ng-container>
+
+    <ng-container *ngSwitchCase="1">
+      <ng-container *ngIf="isAgency; else pendingInvoice"
+                    [ngTemplateOutlet]="invoicesTable"
+                    [ngTemplateOutletContext]="{ itemsData: pendingApprovalInvoicesData$ | async }"
+      ></ng-container>
+      <ng-template #pendingInvoice>
+        <ng-container [ngTemplateOutlet]="invoicesTable"
+                      [ngTemplateOutletContext]="{ itemsData: pendingInvoicesData$ | async}"
+        ></ng-container>
+      </ng-template>
     </ng-container>
-    <ng-container *ngSwitchDefault>
-      <app-all-invoices-table
-        #allInvoicesTable
-        [tableData]="allInvoices"
-        (rowSelectedData)="handleRowSelected($event)">
-      </app-all-invoices-table>
-    </ng-container>
+
+    <ng-container *ngSwitchCase="2"
+                  [ngTemplateOutlet]="invoicesTable"
+                  [ngTemplateOutletContext]="{ itemsData: pendingApprovalInvoicesData$ | async }"
+    ></ng-container>
+
+    <ng-container *ngSwitchCase="3"
+                  [ngTemplateOutlet]="invoicesTable"
+                  [ngTemplateOutletContext]="{ itemsData: pendingApprovalInvoicesData$ | async }"
+    ></ng-container>
+
+    <ng-container *ngSwitchCase="4"
+                  [ngTemplateOutlet]="invoicesTable"
+                  [ngTemplateOutletContext]="{ itemsData: pendingApprovalInvoicesData$ | async }"
+    ></ng-container>
+
+    <ng-container *ngSwitchCase="5"
+                  [ngTemplateOutlet]="invoicesTable"
+                  [ngTemplateOutletContext]="{ itemsData: pendingApprovalInvoicesData$ | async }"
+    ></ng-container>
   </ng-container>
 </section>
+
+<ng-template #invoicesTable let-itemsData="itemsData">
+  <app-grid
+          [class.inactive]="!itemsData?.items?.length"
+          (navigateToPageEmitter)="handlePageChange($event)"
+          (pageSizeChangeEmitter)="handlePageSizeChange($event)"
+          (approveEmitter)="bulkApprove($event)"
+          (exportEmitter)="bulkExport($event)"
+          (sortChanged)="handleSortingChange($event)"
+          (multiSelectionChanged)="handleMultiSelectionChanged($event)"
+          (gridSelectedRow)="handleRowSelected($event)"
+          [suppressRowClickSelection]="false"
+          [columnDefinitions]="colDefs"
+          [isLoading]="isLoading"
+          [rowData]="itemsData?.items"
+          [totalRecordsCount]="itemsData?.totalCount || 0"
+          [changeTableSelectedIndex]="currentSelectedTableRowIndex | async"
+          [allowBulkSelection]="false"
+          [allowBulkButton]="true"
+          [rowSelection]="'multiple'"
+          [gridOptions]="gridOptions"
+  ></app-grid>
+</ng-template>
 
 <app-invoice-record-dialog #invoiceRecordDialog></app-invoice-record-dialog>
 
@@ -74,10 +174,17 @@
 
         <div class="spacer"></div>
 
-        <button ejs-button class="e-outline" (click)="createInvoiceDialog.hide()" type="button">Cancel</button>
-        <button ejs-button class="e-primary"
+        <button ejs-button
+                class="e-outline"
+                type="button"
+                (click)="createInvoiceDialog.hide()"
+        >
+          Cancel
+        </button>
+        <button ejs-button
+                class="e-primary"
                 type="submit"
-                (click)="$event.preventDefault();"
+                (click)="$event.preventDefault(); groupInvoices();"
         >
           Create
         </button>
@@ -85,9 +192,10 @@
 
       <div class="dropdown-container bootstrap">
         <label>Group Invoice by</label>
-        <ejs-dropdownlist [dataSource]="invoicesGroupByOptions"
-                          [value]="invoicesGroupByOptions[0].text"
-                          [fields]="fieldValues" (select)="onInvoiceGrouping($event)" #groupBy></ejs-dropdownlist>
+        <ejs-dropdownlist [dataSource]="groupInvoicesOptions"
+                          [value]="groupInvoicesBy.text"
+                          (select)="onInvoiceGrouping($event)"
+        ></ejs-dropdownlist>
       </div>
     </form>
   </ng-template>
@@ -95,9 +203,9 @@
 
 <app-invoice-detail-container
   [currentSelectedRowIndex]="currentSelectedTableRowIndex | async"
-  [maxRowIndex]="allInvoices?.items?.length || 0"
+  [maxRowIndex]="0"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
-  (updateTable)="handleUpdateTable()"
+  (updateTable)="handleUpdateTable($event)"
 ></app-invoice-detail-container>
 
 <app-manual-invoice-dialog></app-manual-invoice-dialog>
@@ -108,3 +216,7 @@
   (resetFilters)="resetFilters()"
   (updateTableByFilters)="updateTableByFilters($event)">
 </app-invoices-filters-dialog>
+
+<app-reject-reason-input-dialog (rejectReasonChange)="handleInvoiceRejection($event)"></app-reject-reason-input-dialog>
+
+<app-file-viewer></app-file-viewer>

@@ -1,0 +1,35 @@
+<ejs-dialog
+  #sideDialog
+  [animationSettings]="{ effect: 'SlideRight' }"
+  [isModal]="true"
+  [visible]="false"
+  [target]="targetElement"
+  cssClass="dialog"
+  id="dialog"
+  width="65%"
+>
+  <ng-template #header>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <h3 class="e-card-title">Quick Order</h3>
+          <div>
+            <button ejs-button cssClass="e-outline calcel" (click)="onClose()">Cancel</button>
+            <button ejs-button [isPrimary]="true" (click)="onSubmitQuickOrder()">Submit</button>
+          </div>
+        </div>
+      </section>
+    </section>
+  </ng-template>
+  <ng-template #content>
+    <app-quick-order-form
+      #quickOrderForm
+      [submitQuickOrder$]="submitQuickOrder$"
+      [allOrganizations]="allOrganizations"
+      [userIsAdmin]="userIsAdmin"
+      [skills]="skills"
+      [organizationStructure]="organizationStructure"
+      [openEvent]="openEvent"
+    ></app-quick-order-form>
+  </ng-template>
+</ejs-dialog>

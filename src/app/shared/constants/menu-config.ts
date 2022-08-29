@@ -54,7 +54,7 @@ export const MENU_CONFIG: any = {
     12: {
       // Associated Agencies
       icon: 'clock',
-      route: '',
+      route: '/client/associate-list',
     },
     13: {
       // Order Management
@@ -117,6 +117,11 @@ export const MENU_CONFIG: any = {
       route: 'agency/invoices',
     },
     26: reportsMenuItemConfiguration,
+    28: {
+      // Associated Organizations
+      icon: 'clock',
+      route: 'agency/associate-list',
+    },
     27: {
       // Settings
       icon: '',
@@ -142,6 +147,21 @@ export const MENU_CONFIG: any = {
       icon: 'file-text',
       route: 'agency/candidates',
     },
+    36: {
+      // Candidates
+      icon: 'file-text',
+      route: 'client/candidates',
+    },
+    35: {
+      // Candidate Details
+      icon: '',
+      route: 'agency/candidate-details',
+    },
+    37: {
+      // Candidate Details
+      icon: 'users',
+      route: 'client/candidate-details',
+    },
     40: {
       // Custom Reports
       icon: 'pie-chart',
@@ -161,6 +181,21 @@ export const MENU_CONFIG: any = {
       // Page Report
       icon: '',
       route: '/analytics/page-report',
+    },
+    45: {
+      // Alerts
+      icon: 'alert-circle',
+      route: '/alerts/user-subscription',
+    },
+    46: {
+      // User Subscription
+      icon: '',
+      route: '/alerts/user-subscription',
+    },
+    47: {
+      // Alerts Template
+      icon: '',
+      route: '/alerts/alerts-template',
     },
   },
 
@@ -210,17 +245,12 @@ export const MENU_CONFIG: any = {
     12: {
       // Associated Agencies
       icon: 'clock',
-      route: '',
+      route: '/client/associate-list',
     },
     13: {
       // Order Management
       icon: 'file-text',
       route: '/client/order-management',
-    },
-    14: {
-      // Candidates
-      icon: 'file-text',
-      route: 'agency/candidates',
     },
     15: {
       // Timesheets
@@ -257,11 +287,6 @@ export const MENU_CONFIG: any = {
       icon: 'file-text',
       route: 'agency/order-management',
     },
-    23: {
-      // Candidates
-      icon: 'file-text',
-      route: 'agency/candidates',
-    },
     24: {
       // Timesheets
       icon: 'clock',
@@ -278,6 +303,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '',
     },
+    28: {
+      // Associated Organizations
+      icon: 'clock',
+      route: 'agency/associate-list',
+    },
     29: {
       // MSP List
       icon: '',
@@ -292,6 +322,26 @@ export const MENU_CONFIG: any = {
       // User List
       icon: '',
       route: 'security/user-list',
+    },
+    34: {
+      // Candidates
+      icon: 'file-text',
+      route: 'agency/candidates',
+    },
+    35: {
+      // Candidate Details
+      icon: 'users',
+      route: 'agency/candidate-details',
+    },
+    36: {
+      // Candidates
+      icon: 'file-text',
+      route: 'client/candidates',
+    },
+    37: {
+      // Candidate Details
+      icon: 'users',
+      route: 'agency/candidate-details',
     },
     40: {
       // Custom Reports
@@ -312,6 +362,21 @@ export const MENU_CONFIG: any = {
       // Page Report
       icon: '',
       route: '/analytics/page-report',
+    },
+    45: {
+      // Alerts
+      icon: 'alert-circle',
+      route: '/alerts/user-subscription',
+    },
+    46: {
+      // User Subscription
+      icon: '',
+      route: '/alerts/user-subscription',
+    },
+    47: {
+      // Alerts Template
+      icon: '',
+      route: '/alerts/alerts-template',
     },
   },
 
@@ -361,7 +426,7 @@ export const MENU_CONFIG: any = {
     12: {
       // Associated Agencies
       icon: 'clock',
-      route: '',
+      route: '/client/associate-list',
     },
     13: {
       // Order Management
@@ -376,7 +441,7 @@ export const MENU_CONFIG: any = {
     15: {
       // Timesheets
       icon: 'clock',
-      route: 'client/timesheets'
+      route: 'client/timesheets',
     },
     16: {
       // Invoices
@@ -445,6 +510,16 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: 'security/user-list',
     },
+    36: {
+      // Candidates
+      icon: 'file-text',
+      route: 'client/candidates',
+    },
+    37: {
+      // Candidate Details
+      icon: 'users',
+      route: 'client/candidate-details',
+    },
     40: {
       // Custom Reports
       icon: 'pie-chart',
@@ -464,6 +539,26 @@ export const MENU_CONFIG: any = {
       // Page Report
       icon: '',
       route: '/analytics/page-report',
+    },
+    44: {
+      // Organization Profile
+      icon: 'user',
+      route: '/admin/profile',
+    },
+    45: {
+      // Alerts
+      icon: 'alert-circle',
+      route: '/alerts/user-subscription',
+    },
+    46: {
+      // User Subscription
+      icon: '',
+      route: '/alerts/user-subscription',
+    },
+    47: {
+      // Alerts Template
+      icon: '',
+      route: '/alerts/alerts-template',
     },
   },
 
@@ -528,7 +623,7 @@ export const MENU_CONFIG: any = {
     15: {
       // Timesheets
       icon: 'clock',
-      route: 'agency/timesheets'
+      route: 'agency/timesheets',
     },
     16: {
       // Invoices
@@ -569,7 +664,7 @@ export const MENU_CONFIG: any = {
     24: {
       // Timesheets
       icon: 'clock',
-      route: 'agency/timesheets'
+      route: 'agency/timesheets',
     },
     25: {
       // Invoices
@@ -583,9 +678,9 @@ export const MENU_CONFIG: any = {
       route: '',
     },
     28: {
-      // User Management
-      icon: 'lock',
-      route: '',
+      // Associated Organizations
+      icon: 'clock',
+      route: 'agency/associate-list',
     },
     29: {
       // MSP List
@@ -601,6 +696,16 @@ export const MENU_CONFIG: any = {
       // User List
       icon: '',
       route: 'security/user-list',
+    },
+    34: {
+      // Candidates
+      icon: 'file-text',
+      route: 'agency/candidates',
+    },
+    35: {
+      // Candidate Details
+      icon: 'users',
+      route: 'agency/candidate-details',
     },
     40: {
       // Custom Reports
@@ -621,6 +726,21 @@ export const MENU_CONFIG: any = {
       // Page Report
       icon: '',
       route: '/analytics/page-report',
+    },
+    45: {
+      // Alerts
+      icon: 'alert-circle',
+      route: '/alerts/user-subscription',
+    },
+    46: {
+      // User Subscription
+      icon: '',
+      route: '/alerts/user-subscription',
+    },
+    47: {
+      // Alerts Template
+      icon: '',
+      route: '/alerts/alerts-template',
     },
   },
 };

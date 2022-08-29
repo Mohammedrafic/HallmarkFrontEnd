@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule, ChipListModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import {
   AlertCircle,
@@ -24,11 +24,13 @@ import {
   MoreVertical,
   Plus,
   Search,
+  Slash,
   Sliders,
   Trash2,
   Unlock,
   Upload,
   X,
+  XCircle,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxModule,
@@ -57,17 +59,11 @@ import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { NgxsModule } from '@ngxs/store';
 import { AgencyState } from './store/agency.state';
 import { CandidateState } from './store/candidate.state';
-import { AssociatedOrgGridComponent } from './agency-list/add-edit-agency/associated-org-grid/associated-org-grid.component';
-import { InviteDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/invite-dialog/invite-dialog.component';
 import { DialogAllModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ExperienceGridComponent } from './candidates/add-edit-candidate/experience-grid/experience-grid.component';
 import { EducationGridComponent } from './candidates/add-edit-candidate/education-grid/education-grid.component';
-import { EditAssociatedDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/edit-associated-dialog.component';
-import { FeeSettingsComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/fee-settings/fee-settings.component';
-import { AddNewFeeDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/fee-settings/add-new-fee-dialog/add-new-fee-dialog.component';
 import { CredentialsGridComponent } from './candidates/add-edit-candidate/credentials-grid/credentials-grid.component';
 import { CandidateAgencyComponent } from './candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
-import { PartnershipSettingsComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/partnership-settings/partnership-settings.component';
 import { OrderManagementComponent } from './order-management/order-management.component';
 import { TabNavigationComponent } from './order-management/tab-navigation/tab-navigation.component';
 import { OrderManagementGridComponent } from './order-management/order-management-grid/order-management-grid.component';
@@ -83,8 +79,18 @@ import { AgencyOrderFiltersComponent } from './order-management/order-management
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
 import { AgencyListFiltersComponent } from './agency-list/agency-list-filters/agency-list-filters.component';
-import { MultiselectDropdownModule } from "@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module";
 import { ImportCandidatesComponent } from './candidates/import-candidates/import-candidates.component';
+import { MultiselectDropdownModule } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module';
+import { CandidateListModule } from '@shared/components/candidate-list/candidate-list.module';
+import { ChildOrderDialogModule } from '@shared/components/child-order-dialog/child-order-dialog.module';
+import { CandidateProfileComponent } from './candidates/import-candidates/candidate-profile/candidate-profile.component';
+import { GridModule } from '@shared/components/grid/grid.module';
+import { CandidateEducationComponent } from './candidates/import-candidates/candidate-education/candidate-education.component';
+import { CandidateExperienceComponent } from './candidates/import-candidates/candidate-experience/candidate-experience.component';
+import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
+import { GridErroredCellComponent } from './candidates/import-candidates/grid-errored-cell/grid-errored-cell.component';
+import { ExtensionModule } from '@shared/components/extension/extension.module';
+import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
 
 const sidebarIcons = {
   Sliders,
@@ -110,6 +116,8 @@ const sidebarIcons = {
   ChevronDown,
   ChevronRight,
   Upload,
+  XCircle,
+  Slash,
 };
 
 @NgModule({
@@ -126,17 +134,11 @@ const sidebarIcons = {
     CandidateGeneralInfoComponent,
     CandidateContactDetailsComponent,
     CandidateProfessionalSummaryComponent,
-    AssociatedOrgGridComponent,
-    InviteDialogComponent,
-    EditAssociatedDialogComponent,
-    FeeSettingsComponent,
     ExperienceGridComponent,
     EducationGridComponent,
-    AddNewFeeDialogComponent,
     CredentialsGridComponent,
     CandidateAgencyComponent,
     FileViewerComponent,
-    PartnershipSettingsComponent,
     OrderManagementComponent,
     TabNavigationComponent,
     OrderManagementGridComponent,
@@ -148,6 +150,10 @@ const sidebarIcons = {
     AgencyOrderFiltersComponent,
     AgencyListFiltersComponent,
     ImportCandidatesComponent,
+    CandidateProfileComponent,
+    CandidateEducationComponent,
+    CandidateExperienceComponent,
+    GridErroredCellComponent,
   ],
   imports: [
     CommonModule,
@@ -155,6 +161,8 @@ const sidebarIcons = {
     SharedModule,
     ReactiveFormsModule,
 
+    SwitchModule,
+    GridModule,
     PdfViewerModule,
     ListBoxModule,
     ButtonModule,
@@ -176,12 +184,15 @@ const sidebarIcons = {
     MaskedTextBoxModule,
     DropDownButtonModule,
     AddEditReorderModule,
+    CandidateDetailsModule,
+    ExtensionModule,
+    AssociateListModule,
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),
+    CandidateListModule,
+    ChildOrderDialogModule,
   ],
-  exports: [
-    FileViewerComponent
-  ]
+  exports: [FileViewerComponent],
 })
 export class AgencyModule {}

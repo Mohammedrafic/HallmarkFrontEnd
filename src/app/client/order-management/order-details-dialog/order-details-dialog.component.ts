@@ -11,7 +11,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { distinctUntilChanged, filter, map, Observable, Subject, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, map, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -26,7 +26,7 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ApproveOrder, DeleteOrder, SetLock } from '@client/store/order-managment-content.actions';
+import { ApproveOrder, DeleteOrder, GetExtensions, SetLock } from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
   CANCEL_CONFIRM_TEXT,
@@ -35,6 +35,7 @@ import {
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
+  UNSAVE_CHANGES_TEXT,
 } from '@shared/constants';
 import { Location } from '@angular/common';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
@@ -42,6 +43,9 @@ import { ShowCloseOrderDialog, ShowSideDialog } from '../../../store/app.actions
 import { AddEditReorderComponent } from '@client/order-management/add-edit-reorder/add-edit-reorder.component';
 import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
+import { SettingsKeys } from '@shared/enums/settings';
+import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { ExtensionCandidateComponent } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -52,6 +56,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() order: Order;
   @Input() openEvent: Subject<boolean>;
   @Input() children: OrderManagementChild[] | undefined;
+  @Input() settings: {[key in SettingsKeys]?: OrganizationSettingsGet};
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
@@ -63,6 +68,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @ViewChild('chipList') chipList: ChipListComponent;
   @ViewChild('tab') tab: TabComponent;
   @ViewChild(AddEditReorderComponent) addEditReOrder: AddEditReorderComponent;
+  @ViewChild(ExtensionCandidateComponent) extensionCandidateComponent: ExtensionCandidateComponent;
 
   @Select(OrderManagementContentState.orderDialogOptions)
   public orderDialogOptions$: Observable<DialogNextPreviousOption>;
@@ -70,10 +76,15 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Select(OrderManagementContentState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
 
+  @Select(OrderManagementContentState.extensions) extensions$: Observable<any>;
+  public extensions: any[] = [];
+
   public readonly isReOrderDialogOpened$: Observable<boolean> = this.isDialogOpened();
 
+  candidateOrderPage: OrderCandidatesListPage;
   private unsubscribe$: Subject<void> = new Subject();
 
+  public SettingsKeys = SettingsKeys;
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
@@ -157,7 +168,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public lockOrder(): void {
-    this.store.dispatch(new SetLock(this.order.id, !this.order.isLocked, {}, true));
+    this.store.dispatch(new SetLock(this.order.id, !this.order.isLocked, {}, `${this.order.organizationPrefix || ''}-${this.order.publicId}`, true));
   }
 
   public onTabSelecting(event: SelectEventArgs): void {
@@ -196,7 +207,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     });
   }
 
-  createReOrder(): void {
+  public createReOrder(): void {
+    this.addEditReorderService.setReOrderDialogTitle(SidebarDialogTitlesEnum.AddReOrder);
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -257,12 +269,33 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public onClose(): void {
-    this.sideDialog.hide();
-    this.openEvent.next(false);
+    if (this.extensionCandidateComponent?.form.dirty) {
+      this.saveExtensionChanges().subscribe(() => this.closeSideDialog());
+    } else {
+      this.closeSideDialog();
+    }
   }
 
   public onNextPreviousOrder(next: boolean): void {
     this.nextPreviousOrderEvent.emit(next);
+  }
+
+  private closeSideDialog(): void {
+    this.sideDialog.hide();
+    this.openEvent.next(false);
+  }
+
+  private saveExtensionChanges(): Observable<boolean> {
+    const options = {
+      title: 'Save Changes',
+      okButtonLabel: 'Save',
+      okButtonClass: 'delete-button',
+      cancelButtonLabel: 'Cancel',
+    };
+
+    return this.confirmService
+    .confirm(UNSAVE_CHANGES_TEXT, options)
+    .pipe(tap((confirm) =>  confirm && this.extensionCandidateComponent.updatedUnsavedOnboarded()));
   }
 
   private selectCandidateOnOrderId(): void {
@@ -289,11 +322,19 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   private subscribeOnOrderCandidatePage(): void {
     this.orderCandidatePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: OrderCandidatesListPage) => {
+      this.candidateOrderPage = order;
       this.candidatesCounter =
         order &&
         order.items?.filter(
           (candidate) => candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
         ).length;
+        this.extensions = [];
+        if (order?.items[0]?.deployedCandidateInfo?.jobId) {
+          this.store.dispatch(new GetExtensions(order.items[0].deployedCandidateInfo.jobId));
+        }
+    });
+    this.extensions$.pipe(takeUntil(this.unsubscribe$)).subscribe((extensions) => {
+      this.extensions = extensions?.filter((extension: any) => extension.id !== this.order.id);
     });
   }
 

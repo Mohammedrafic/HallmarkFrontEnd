@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { Actions, Select, Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -10,12 +10,12 @@ import { ApplyOrderApplicants, ReloadOrderCandidatesLists } from '@agency/store/
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { OrderApplicantsInitialData } from '@shared/models/order-applicants.model';
-import { OrderCandidatesList } from '@shared/models/order-management.model';
+import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
-import { ExpandEventArgs, AccordionClickArgs } from '@syncfusion/ej2-navigations';
-import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
+import { Comment } from '@shared/models/comment.model';
+import { CommentsService } from '@shared/services/comments.service';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -40,11 +40,16 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public today = new Date();
   public organizationId: number;
   public priceUtils = PriceUtils;
-  public accordionClickElement: HTMLElement | null;
-  public accordionOneField: AccordionOneField;
 
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
+
+  @Select(OrderManagementState.candidatesJob)
+  candidateJobState$: Observable<OrderCandidateJob>;
+  public candidateJob: OrderCandidateJob;
+
+  public comments: Comment[] = [];
+  public showComments: boolean = true;
 
   private unsubscribe$: Subject<void> = new Subject();
   private candidateId: number;
@@ -53,10 +58,11 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     return !!this.candidate.deployedCandidateInfo && this.candidate.candidateStatus !== ApplicantStatus.OnBoarded;
   }
 
-  constructor(private store: Store, private actions$: Actions) {}
+  constructor(private store: Store, private commentsService: CommentsService) {}
 
   ngOnChanges(): void {
     this.readOnlyMode = !!this.isDeployedCandidate && this.isAgency;
+    this.showComments = this.candidate.status !== ApplicantStatus.NotApplied;
   }
 
   ngOnInit(): void {
@@ -97,16 +103,6 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
-  }
-
-  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
-  }
-
   private createForm(): void {
     this.formGroup = new FormGroup({
       orderId: new FormControl(null),
@@ -135,7 +131,22 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     });
   }
 
+  private getComments(): void {
+    this.commentsService
+      .getComments(this.candidateJob?.commentContainerId as number, null)
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+      });
+  }
+
   private subscribeOnInitialData(): void {
+    this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrderCandidateJob) => {
+      this.candidateJob = data;
+
+      if (data?.candidateProfile.id === this.candidate.candidateId) {
+        this.getComments();
+      }
+    });
     this.orderApplicantsInitialData$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: OrderApplicantsInitialData) => {

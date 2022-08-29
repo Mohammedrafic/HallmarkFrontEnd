@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Comment } from '@shared/models/comment.model';
 import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { TextBoxComponent } from '@syncfusion/ej2-angular-inputs';
-import { debounceTime, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { debounceTime, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { UserState } from 'src/app/store/user.state';
-import { ClearComments, GetComments, MarkCommentAsRead, SaveComment } from './store/comments.actions';
+import { MarkCommentAsRead, SaveComment, UpdateGridCommentsCounter } from './store/comments.actions';
 import { CommentsState } from './store/comments.state';
 
 enum CommentsFilter {
@@ -23,7 +23,19 @@ enum CommentsFilter {
 })
 export class CommentsComponent {
   @Input() useBackground: boolean = true;
-  @Input() comments: Comment[] = [];
+  @Input() disabled: boolean = false;
+  @Input() orderId: number;
+  @Input() set comments(value: Comment[]) {
+    this.commentsList = value;
+    if (value.length) {
+      this.hasUnreadMessages = this.hasUnread();
+      this.initView$.next();
+    }
+  }
+  get comments(): Comment[] {
+    return this.commentsList;
+  }
+  public commentsList: Comment[] = [];
   @Input() commentContainerId: number;
   @Input() isCreating: boolean = false;
 
@@ -48,6 +60,7 @@ export class CommentsComponent {
   public scroll$ = new Subject<HTMLElement | null>();
   public scrolledToMessage$ = new Subject<void>();
   public markAsRead$ = new Subject<number[]>();
+  public initView$ = new Subject<void>();
 
   public readMessagesIds: number[] = []; 
 
@@ -64,79 +77,42 @@ export class CommentsComponent {
     this.markAsRead$.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((ids: number[]) => {
       if (ids.length) {
         this.store.dispatch(new MarkCommentAsRead(this.readMessagesIds));
+        if (this.orderId) {
+          this.store.dispatch(new UpdateGridCommentsCounter(this.readMessagesIds.length, this.orderId));
+        }
         this.readMessagesIds = [];
       }
     });
-  }
-
-  ngAfterViewInit (): void {
-    if (!this.isCreating) {
-      this.comments$.pipe(
-        takeUntil(this.unsubscribe$), 
-        filter((comments: Comment[]) => !!comments.length),
-        tap((comments: Comment[]) => {
-          this.comments = comments; /*[ // TODO: Mocked data, remove after BE
-            {
-              id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet', isExternal: true, creationDate: new Date(), isRead: true,
-            },
-            {
-              id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date(), isRead: true,
-            },
-            {
-              id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date(), isRead: true,
-            },
-            {
-              id: 0, text: 'Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date(), isRead: true,
-            },
-            {
-              id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment', isExternal: true, creationDate: new Date(), isRead: false,
-            },
-            {
-              id: 0, text: '500 chars comment Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second linecomment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date(), isRead: false
-            },
-            {
-              id: 0, text: 'short', isExternal: false, creationDate: new Date(), isRead: false,
-            },
-            {
-              id: 0, text: 'Some Text', isExternal: true, creationDate: new Date(), isRead: true,
-            },
-            {
-              id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date(), isRead: true,
-            },
-            {
-              id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date(), isRead: false
-            },
-          ]; */
-          this.cd.detectChanges();
-          return comments;
-        })).subscribe((comments: Comment[]) => {
-          this.hasUnreadMessages = this.hasUnread();
-          const unreadMessages = this.body?.nativeElement.getElementsByClassName('new');
-          if (unreadMessages.length) {
-            this.scroll$.next(unreadMessages[0]);
-          } else {
-            this.scroll$.next(null);
-          }
-      });
+    this.initView$.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
+      const unreadMessages = this.body?.nativeElement.getElementsByClassName('new');
+      if (unreadMessages?.length) {
+        this.scroll$.next(unreadMessages[0]);
+      } else {
+        this.scroll$.next(null);
+      }
+    });
+    const user = this.store.selectSnapshot(UserState).user;
+    this.isAgencyUser = user.businessUnitType === BusinessUnitType.Agency;
+    if (this.isAgencyUser) {
+      this.isExternal = true;
     }
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-    this.store.dispatch(new ClearComments());
   }
 
   private scrollToLastMessage(): void {
-    this.body?.nativeElement.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest'});
+    this.body?.nativeElement.lastElementChild?.scrollIntoView({ block: 'nearest'});
   }
 
   private scrollToSpecificMessage(messageEl: HTMLElement): void {
-    messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest'});
+    messageEl.scrollIntoView({ block: 'nearest'});
   }
 
   private hasUnread(): boolean {
-    return !!this.comments.find((message: Comment) => !message.isRead);
+    return !!this.commentsList.find((message: Comment) => !message.isRead);
   }
 
   public onRead(comment: Comment): void {
@@ -156,18 +132,32 @@ export class CommentsComponent {
   }
 
   public visibilityHandler(): void {
-    this.isExternal = !this.isExternal;
+    if (this.isAgencyUser) {
+      this.isExternal = true;
+    } else {
+      this.isExternal = !this.isExternal;
+    }
   }
 
   public send(): void {
-    const comment = {
-      id: 0, text: this.message, creationDate: new Date(), isExternal: this.isExternal, new: true, commentContainerId: this.commentContainerId, isRead: true
-    };
-    if (this.message) {
-      this.comments.push(comment);
-      this.message = '';
-      this.scroll$.next(null);
+    if (!this.message) {
+      return;
     }
+    const user = this.store.selectSnapshot(UserState).user;
+    const comment = {
+      id: 0, 
+      text: this.message, 
+      createdAt: new Date(),
+      firstName: user.firstName,
+      lastName: user.lastName,
+      isExternal: this.isExternal, 
+      new: true, 
+      commentContainerId: this.commentContainerId,
+      isRead: true
+    };
+    this.comments.push(comment);
+    this.message = '';
+    this.scroll$.next(null);
     if (!this.isCreating) {
       this.store.dispatch(new SaveComment(comment))
     } 

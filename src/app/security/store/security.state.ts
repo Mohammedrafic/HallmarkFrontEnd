@@ -29,6 +29,7 @@ import {
   GetNewRoleBusinessByUnitTypeSucceeded,
   ExportUserList,
   ExportRoleList,
+  GetAllUsersPage,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -51,6 +52,7 @@ const BUSINNESS_DATA_HALLMARK_VALUE = { id: 0, name: 'Hallmark' };
 interface SecurityStateModel {
   bussinesData: BusinessUnit[];
   usersPage: UsersPage | null;
+  allUsersPage: UsersPage | null;
   rolesPage: RolesPage | null;
   rolesPerUsers: RolesPerUser[] | null;
   permissionsTree: PermissionsTree;
@@ -67,6 +69,7 @@ interface SecurityStateModel {
     bussinesData: [],
     rolesPage: null,
     usersPage: null,
+    allUsersPage:null,
     rolesPerUsers: [],
     permissionsTree: [],
     isNewRoleDataLoading: false,
@@ -106,6 +109,10 @@ export class SecurityState {
   @Selector()
   static usersPage(state: SecurityStateModel): UsersPage | null {
     return state.usersPage;
+  }
+  @Selector()
+  static allUsersPage(state: SecurityStateModel): UsersPage | null {
+    return state.allUsersPage;
   }
 
   @Selector()
@@ -227,9 +234,9 @@ export class SecurityState {
   @Action(GetRolePerUser)
   GetRolesPerPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitId, businessUnitType }: GetRolePerUser
+    { businessUnitType, businessUnitIds }: GetRolePerUser
   ): Observable<RolesPerUser[]> {
-    return this.userService.getRolesPerUser(businessUnitId, businessUnitType).pipe(
+    return this.userService.getRolesPerUser(businessUnitType, businessUnitIds).pipe(
       tap((payload) => {
         patchState({ rolesPerUsers: payload });
         return payload;
@@ -240,11 +247,23 @@ export class SecurityState {
   @Action(GetUsersPage)
   GetUsersPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitId, businessUnitType, pageNumber, pageSize, sortModel, filterModel }: GetUsersPage
+    { businessUnitIds, businessUnitType, pageNumber, pageSize, sortModel, filterModel }: GetUsersPage
   ): Observable<UsersPage> {
-    return this.userService.getUsersPage(businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel).pipe(
+    return this.userService.getUsersPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel).pipe(
       tap((payload) => {
         patchState({ usersPage: payload });
+        return payload;
+      })
+    );
+  }
+  @Action(GetAllUsersPage)
+  GetAllUsersPage(
+    { patchState }: StateContext<SecurityStateModel>,
+    { businessUnitType,businessUnitIds, pageNumber, pageSize, sortModel, filterModel,getAll }: GetAllUsersPage
+  ): Observable<UsersPage> {
+    return this.userService.getAllUsersPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel,getAll).pipe(
+      tap((payload) => {
+        patchState({ allUsersPage: payload });
         return payload;
       })
     );

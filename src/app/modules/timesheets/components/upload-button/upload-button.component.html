@@ -1,0 +1,34 @@
+<button
+        ejs-button
+        cssClass="e-outline"
+        class="upload-button"
+        #uploadBtn
+        (click)="uploadTooltip.open(container)"
+>Upload
+    <i-feather name="upload" class="icon"></i-feather>
+</button>
+
+<ejs-tooltip #uploadTooltip
+             [container]="container"
+             [showTipPointer]="false"
+             opensOn="Custom"
+             position="TopLeft"
+             width="100%"
+             cssClass="custom-tooltip"
+>
+    <ng-template #content>
+        <div class="file-upload-area-container"
+             appClickOutside
+             (clickOutside)="uploadTooltip.close()"
+             [exclude]="uploadBtn.element"
+        >
+            <h2>Upload Documents</h2>
+            <app-file-uploader [allowedFileExtensions]="allowedFileExtensions"
+                               [maxFileSize]="maxFileSize"
+                               [maxFiles]="5"
+                               [showSelectedFiles]="false"
+                               (uploadFilesChanged)="emitSelectedFiles($event)"
+            ></app-file-uploader>
+        </div>
+    </ng-template>
+</ejs-tooltip>

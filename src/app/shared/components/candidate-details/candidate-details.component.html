@@ -1,0 +1,44 @@
+<app-page-toolbar>
+  <ng-container left>
+    <app-tab-navigation></app-tab-navigation>
+  </ng-container>
+  <ng-container right>
+    <button ejs-button cssClass="e-outline" (click)="showFilters()">
+      <div class="filter-button-content">
+        <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+        Filters <i-feather name="sliders" class="icon"></i-feather>
+      </div>
+    </button>
+  </ng-container>
+</app-page-toolbar>
+<section class="tab-legend">
+  <div class="tab-legend__item">
+    <span>All:</span> Confirmed, Active, Past job Candidates.
+  </div>
+  <div class="tab-legend__item">
+    <span>Confirmed:</span> Offer accepted and ready to Onboard.
+  </div>
+  <div class="tab-legend__item">
+    <span>Active:</span> On assignment candidates.
+  </div>
+  <div class="tab-legend__item">
+    <span>Past:</span> Jobs completed Candidates.
+  </div>
+</section>
+<section class="candidates-grid">
+  <app-candidate-grid [candidatesPage]="candidatesPage" [pageNumber]="pageNumber" [pageSize]="pageSize"></app-candidate-grid>
+</section>
+
+<app-filter-dialog
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (closeDialogClicked)="onFilterClose()"
+  (applyFilterClicked)="onFilterApply()"
+  (deleteFilter)="onFilterDelete($event)"
+  [items]="filteredItems"
+  [count]="(candidates$ | async)?.totalCount"
+>
+  <app-filters
+    [filtersForm]="filtersForm"
+    [filterColumns]="filterColumns"
+  ></app-filters>
+</app-filter-dialog>

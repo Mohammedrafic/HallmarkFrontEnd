@@ -15,8 +15,9 @@
       <div class="e-card-content">
         <button *ngIf="!isReadOnly" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
         <button *ngIf="showWithdrawAction" ejs-button cssClass="e-outline" (click)="onWithdraw()">Withdraw</button>
+        <button ejs-button [isPrimary]="true" *ngIf="isApplied && !candidate.deployedCandidateInfo" class="apply-button" (click)="onApply()">Apply</button>
         <button ejs-button [isPrimary]="true" *ngIf="candidate?.statusName !== 'Accepted' && !isReadOnly && !candidate.deployedCandidateInfo" class="apply-button" (click)="onAccept()">Accept</button>
-        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
@@ -25,7 +26,7 @@
   </section>
   <section class="content-container">
     <div class="candidate-info">
-      <ejs-accordion #accordionElement expandMode="Single" (expanding)="toForbidExpandSecondRow($event)" (clicked)="clickedOnAccordion($event)">
+      <ejs-accordion #accordionElement expandMode="Single" openFirstAccordion>
         <e-accordionitems>
           <e-accordionitem expanded="true">
             <ng-template #header>
@@ -35,19 +36,20 @@
               <form [formGroup]="form">
                 <div class="d-flex">
                   <div class="input-container bootstrap f-grow-2">
-                    <label class="input-group">Job ID</label>
-                    <div>
-                      <input appValidateWithMessage formControlName="jobId" class="e-input" type="text"/>
+                    <label>Job ID</label>
+                    <div class="input-group" [ngClass]="{'input-readonly': isApplied}">
+                      <input appValidateWithMessage formControlName="jobId" class="e-input" type="text" [readOnly]="isApplied"/>
                     </div>
                   </div>
                   <div class="input-container bootstrap">
-                    <label class="input-group">Bill Rate ($)</label>
-                    <div>
+                    <label>Bill Rate ($)</label>
+                    <div class="input-group" [ngClass]="{'input-readonly': isApplied}">
                       <input
                         appValidateWithMessage
                         formControlName="billRates"
                         class="e-input"
                         type="text"
+                        [readOnly]="isApplied"
                         (focus)="priceUtils.setPriceMask(form, 'billRates', $event)"
                         (blur)="priceUtils.setTwoDecimals(form, 'billRates', $event)"
                       />
@@ -56,17 +58,18 @@
                 </div>
                 <div class="d-flex">
                   <div class="input-container bootstrap f-grow-2">
-                    <label class="input-group">Job Date</label>
-                    <div>
+                    <label>Job Date</label>
+                    <div class="input-group" [ngClass]="{'input-readonly': isApplied}">
                       <ejs-daterangepicker
                         formControlName="date"
+                        [readonly]="isApplied"
                         placeholder="DD/MM/YYYY - DD/MM/YYYY">
                       </ejs-daterangepicker>
                     </div>
                   </div>
                   <div class="input-container bootstrap">
-                    <label class="input-group">Candidate Bill Rate ($)</label>
-                    <div>
+                    <label>Candidate Bill Rate ($) <span *ngIf="isApplied" class="required">*</span></label>
+                    <div class="input-group">
                       <input
                         appValidateWithMessage
                         formControlName="candidateBillRate"
@@ -80,32 +83,33 @@
                 </div>
                 <div class="d-flex">
                   <div class="input-container bootstrap">
-                    <label class="input-group">Location</label>
-                    <div>
-                      <input appValidateWithMessage formControlName="locationName" class="e-input" type="text"/>
+                    <label>Location</label>
+                    <div class="input-group" [ngClass]="{'input-readonly': isApplied}">
+                      <input appValidateWithMessage formControlName="locationName" class="e-input" type="text" [readOnly]="isApplied"/>
                     </div>
                   </div>
                 </div>
                 <div class="d-flex">
                   <div class="input-container bootstrap">
-                    <label class="input-group">Yrs. of Exp.</label>
-                    <div>
-                      <input appValidateWithMessage formControlName="yearExp" class="e-input" type="text"/>
+                    <label>Yrs. of Exp.</label>
+                    <div class="input-group" [ngClass]="{'input-readonly': isApplied}">
+                      <input appValidateWithMessage formControlName="yearExp" class="e-input" type="text" [readOnly]="isApplied"/>
                     </div>
                   </div>
                   <div class="input-container bootstrap">
-                    <label class="input-group">Exp. as Travelers</label>
-                    <div>
-                      <input appValidateWithMessage formControlName="travelExp" class="e-input" type="text"/>
+                    <label>Exp. as Travelers</label>
+                    <div class="input-group">
+                      <input appValidateWithMessage formControlName="expAsTravelers" class="e-input" type="text"/>
                     </div>
                   </div>
                   <div class="input-container bootstrap">
-                    <label class="input-group">Offered Bill Rate ($)</label>
-                    <div>
+                    <label>Offered Bill Rate ($)</label>
+                    <div class="input-group" [ngClass]="{'input-readonly': isApplied}">
                       <input
                         appValidateWithMessage
                         formControlName="offeredBillRate"
                         class="e-input"
+                        [readOnly]="isApplied"
                         (focus)="priceUtils.setPriceMask(form, 'offeredBillRate', $event)"
                         (blur)="priceUtils.setTwoDecimals(form, 'offeredBillRate', $event)"
                         type="text"/>
@@ -114,29 +118,36 @@
                 </div>
                 <div class="d-flex">
                   <div class="input-container bootstrap">
-                    <label class="input-group">Available Start Date</label>
-                    <div class="input-group input-readonly">
-                      <input appValidateWithMessage formControlName="avStartDate" class="e-input" type="text" readonly/>
+                    <label>Available Start Date <span *ngIf="isApplied" class="required">*</span></label>
+                    <div class="input-group datepicker">
+                      <ejs-datepicker appValidateWithMessage
+                                      class="datepicker"
+                                      format="MM/dd/yyyy"
+                                      placeholder="MM/DD/YYYY"
+                                      [enableMask]="true"
+                                      [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                                      formControlName="availableStartDate">
+                      </ejs-datepicker>
                     </div>
                   </div>
                 </div>
                 <div class="d-flex">
                   <div class="input-container bootstrap">
-                    <label class="input-group">Leave request comments</label>
-                    <div>
+                    <label>Leave request comments</label>
+                    <div class="input-group">
                       <input appValidateWithMessage formControlName="comments" class="e-input" type="text" />
                     </div>
                   </div>
                 </div>
                 <div *ngIf="showGuaranteedWorkWeek" class="d-flex">
                   <div class="input-container bootstrap f-grow-2">
-                    <label class="input-group">Guaranteed Work Week</label>
+                    <label>Guaranteed Work Week</label>
                     <div class="input-group input-readonly">
                       <input appValidateWithMessage formControlName="guaranteedWorkWeek" class="e-input" type="text" readonly/>
                     </div>
                   </div>
                   <div class="input-container bootstrap">
-                    <label class="input-group">Offered Start Date</label>
+                    <label>Offered Start Date</label>
                     <div class="input-group input-readonly">
                       <input appValidateWithMessage formControlName="offeredStartDate" class="e-input" type="text" readonly/>
                     </div>
@@ -144,19 +155,19 @@
                 </div>
                 <div *ngIf="isOnboard" class="d-flex">
                   <div class="input-container bootstrap">
-                    <label class="input-group">Clock ID</label>
+                    <label>Clock ID</label>
                     <div class="input-group input-readonly">
                       <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" readonly/>
                     </div>
                   </div>
                   <div class="input-container bootstrap">
-                    <label class="input-group">Actual Start Date</label>
+                    <label>Actual Start Date</label>
                     <div class="input-group input-readonly">
                       <input appValidateWithMessage formControlName="actualStartDate" class="e-input" type="text" readonly/>
                     </div>
                   </div>
                   <div class="input-container bootstrap">
-                    <label class="input-group">Actual End Date</label>
+                    <label>Actual End Date</label>
                     <div class="input-group input-readonly">
                       <input appValidateWithMessage formControlName="actualEndDate" class="e-input" type="text" readonly/>
                     </div>
@@ -164,8 +175,8 @@
                 </div>
                 <div class="d-flex">
                   <div class="input-container bootstrap" *ngIf="isRejected">
-                    <label class="input-group">Rejection Reason</label>
-                    <div>
+                    <label>Rejection Reason</label>
+                    <div class="input-group">
                       <input appValidateWithMessage formControlName="rejectReason" class="e-input" type="text" />
                     </div>
                   </div>
@@ -185,7 +196,7 @@
       </ejs-accordion>
     </div>
     <div class="comments">
-      <app-comments></app-comments>
+      <app-comments *ngIf="candidateJob" [comments]="comments" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
     </div>
   </section>
   <section class="bill-rates">

@@ -20,7 +20,7 @@ import { BillRateState } from '@shared/components/bill-rates/store/bill-rate.sta
   styleUrls: ['./bill-rates.component.scss'],
 })
 export class BillRatesComponent implements OnInit, OnDestroy {
-  @Input() isActive = false;
+  @Input() isActive: boolean | null = false;
   @Input() readOnlyMode = false;
   @Input() set billRates(values: BillRate[]) {
     if (values) {
@@ -45,7 +45,10 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   private editBillRateIndex: string | null;
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private confirmService: ConfirmService, private store: Store) {
+  constructor(
+    private confirmService: ConfirmService,
+    private store: Store,
+  ) {
     this.billRatesControl = new FormArray([]);
   }
 
@@ -77,7 +80,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     this.editBillRateIndex = null;
     this.billRateForm.reset();
     this.billRateFormHeader = 'Add Bill Rate';
-    this.billRateForm.patchValue({ id: 0, editAllowed: false});
+    this.billRateForm.patchValue({ id: 0, editAllowed: false, isPredefined: false, seventhDayOtEnabled: false, weeklyOtEnabled: false, dailyOtEnabled: false });
     this.selectedBillRateUnit = BillRateUnit.Multiplier;
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -88,7 +91,6 @@ export class BillRatesComponent implements OnInit, OnDestroy {
 
     const foundBillRateOption = this.billRatesOptions.find(option => option.id === value.billRateConfigId);
     const rateHour = foundBillRateOption?.unit === BillRateUnit.Hours ? String(value.rateHour) : parseFloat(value.rateHour.toString()).toFixed(2);
-    console.log(rateHour)
     this.billRateForm.patchValue({
       billRateConfig: value.billRateConfig,
       billRateConfigId: value.billRateConfigId,
@@ -99,6 +101,10 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       rateHour: rateHour,
       billType: value.billType,
       editAllowed: value.editAllowed || false,
+      isPredefined: value.isPredefined || false,
+      seventhDayOtEnabled: value.seventhDayOtEnabled || false,
+      weeklyOtEnabled: value.weeklyOtEnabled || false,
+      dailyOtEnabled: value.dailyOtEnabled || false
      }, { emitEvent: false });
 
     if (!value.billRateConfig.intervalMin) {
@@ -184,6 +190,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       } else {
         this.billRatesControl.push(this.fromValueToBillRate(value));
       }
+
       this.billRatesChanged.emit(this.billRateForm.value);
       this.billRateForm.reset();
       this.store.dispatch(new ShowSideDialog(false));

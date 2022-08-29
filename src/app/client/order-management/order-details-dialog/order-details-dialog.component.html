@@ -12,11 +12,12 @@
       <section class="header-container">
         <div class="e-card-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title">{{ isReOrder ? 'Re-Order' : 'Order' }} ID {{ order?.organizationPrefix }}-{{ order?.id }}</h3>
+            <h3 class="e-card-title">{{ isReOrder ? 'Re-Order' : 'Order' }} ID {{ order?.organizationPrefix }}-{{ order?.publicId }}</h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList>
                 <e-chips>
                   <e-chip [text]="order?.statusText"></e-chip>
+                  <e-chip *ngIf="order?.extensionFromId" text="Ex" cssClass="e-warning ex-chip"></e-chip>
                 </e-chips>
               </ejs-chiplist>
               <div class="vertical-divider"></div>
@@ -41,7 +42,7 @@
             <button
               ejs-button
               cssClass="e-outline edit-button"
-              [disabled]="!!(order?.orderClosureReasonId || order?.orderCloseDate)"
+              [disabled]="order?.status === orderStatus.Closed"
               (click)="editOrder(order)"
             >
               <i-feather name="edit" class="icon"></i-feather>
@@ -60,7 +61,7 @@
               cssClass="e-outline"
               *ngIf="orderType.OpenPerDiem === order?.orderType"
               (click)="createReOrder()"
-              [disabled]="order?.status === orderStatus.PreOpen || order?.status === orderStatus.Closed"
+              [disabled]="order?.status === orderStatus.PreOpen || order?.status === orderStatus.Closed || !settings[SettingsKeys.IsReOrder]?.value"
             >
               Create Re-Order
             </button>
@@ -75,13 +76,14 @@
             <button
               ejs-button
               cssClass="e-outline"
-              *ngIf="orderType.ReOrder !== order?.orderType"
+              *ngIf="orderType.ReOrder !== order?.orderType && !this.order?.extensionFromId"
               [isPrimary]="true"
               (click)="lockOrder()"
               [disabled]="disabledLock"
             >
               {{ order?.isLocked ? 'Unlock' : 'Lock' }}
-              <i-feather [name]="order?.isLocked ? 'unlock' : 'lock'" class="icon"></i-feather>
+              <i-feather *ngIf="!order?.isLocked" name="lock" class="icon"></i-feather>
+              <app-custom-icon *ngIf="order?.isLocked" name="unlock" class="icon"></app-custom-icon>
             </button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>
@@ -104,7 +106,14 @@
                 <span class="e-badge e-badge-success e-badge-circle">{{ candidatesCounter }}</span>
               </ng-template>
               <ng-template #content>
-                <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>
+                <app-extension-candidate
+                  [currentOrder]="order"
+                  [candidateOrder]="candidateOrderPage"
+                  *ngIf="order?.extensionFromId; else candidateOrder">
+                </app-extension-candidate>
+                <ng-template #candidateOrder>
+                  <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>
+                </ng-template>
               </ng-template>
             </e-tabitem>
             <e-tabitem *ngIf="orderType.OpenPerDiem === order?.orderType">
@@ -121,10 +130,14 @@
                 </app-order-reorders-container>
               </ng-template>
             </e-tabitem>
-            <e-tabitem *ngIf="order?.orderType !== orderType.OpenPerDiem && isReOrder">
+            <e-tabitem *ngIf="(order?.orderType === orderType.Traveler || order?.orderType === orderType.ContractToPerm) && !isReOrder && order?.extensionFromId">
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content>
-                <!--Extensions tab goes here-->
+                <section class="job-details">
+                  <app-general-order-info [orderInformation]="order"></app-general-order-info>
+                </section>
+                <hr />
+                <app-extension-grid [data]="extensions" class="extension-grid"></app-extension-grid>
               </ng-template>
             </e-tabitem>
           </e-tabitems>
@@ -135,12 +148,6 @@
               <ng-template #headerText>Order Details</ng-template>
               <ng-template #content>
                 <app-order-details-container [currentOrder]="order"></app-order-details-container>
-              </ng-template>
-            </e-tabitem>
-            <e-tabitem>
-              <ng-template #headerText>Extensions</ng-template>
-              <ng-template #content>
-                <!--Extensions tab goes here-->
               </ng-template>
             </e-tabitem>
           </e-tabitems>

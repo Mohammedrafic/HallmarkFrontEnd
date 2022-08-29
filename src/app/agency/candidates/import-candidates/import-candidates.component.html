@@ -15,7 +15,10 @@
           </div>
           <div class="e-card-content">
             <button ejs-button cssClass="e-outline" (click)="onCancel()">Cancel</button>
-            <button ejs-button cssClass="e-primary" [disabled]="!selectedFile">Import</button>
+            <ng-container *ngIf="!activeErrorTab"><ng-container *ngTemplateOutlet="importBtn"></ng-container></ng-container>
+            <ejs-tooltip *ngIf="activeErrorTab" id="tooltip" content="Invalid data cannot be imported" [showTipPointer]="false" position="BottomCenter">
+              <div><ng-container *ngTemplateOutlet="importBtn"></ng-container></div>
+            </ejs-tooltip>
           </div>
         </div>
       </section>
@@ -45,7 +48,81 @@
             </div>
           </div>
         </section>
+        <section *ngIf="candidateImportResult && selectedCandidate" class="candidates" [ngClass]="{'first-active': firstActive}">
+          <span *ngIf="activeErrorTab" class="action-link-btn error-template-button" (click)="downloadErrors()">
+            Download file with Errors
+            <i-feather name="download" class="icon"></i-feather>
+          </span>
+          <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
+            <e-tabitems>
+              <e-tabitem [disabled]="!candidateImportResult.succesfullRecords.length">
+                <ng-template #headerText> Successful <span class="tab-badge">{{candidateImportResult?.succesfullRecords?.length}}</span></ng-template>
+                <ng-template #content>
+                  <section class="candidates-selector">
+                    <div class="left">
+                      <div class="side-menu">
+                        <ejs-listbox class="list-box"
+                                     id="successfulCandidates"
+                                     [dataSource]="successfulListBoxData"
+                                     [fields]="fields"
+                                     [selectionSettings]="selectionSettings"
+                                     (created)="onListBoxCreated()"
+                                     (change)="selectCandidate($event)">
+                        </ejs-listbox>
+                      </div>
+                    </div>
+                    <div class="right">
+                      <div class="profile-list-container" *ngIf="selectedCandidate.candidateProfile">
+                        <app-candidate-profile [candidateProfile]="selectedCandidate.candidateProfile"></app-candidate-profile>
+                      </div>
+                      <div class="experience-list-container" *ngIf="selectedCandidate.candidateExperiencesImportDtos.length">
+                        <app-candidate-experience [candidateExperiencesImport]="selectedCandidate.candidateExperiencesImportDtos"></app-candidate-experience>
+                      </div>
+                      <div class="education-list-container" *ngIf="selectedCandidate.candidatEducationImportDtos.length">
+                        <app-candidate-education [candidateEducationImport]="selectedCandidate.candidatEducationImportDtos"></app-candidate-education>
+                      </div>
+                    </div>
+                  </section>
+                </ng-template>
+              </e-tabitem>
+              <e-tabitem [disabled]="!candidateImportResult.errorRecords.length">
+                <ng-template #headerText> Error <span class="tab-badge">{{candidateImportResult?.errorRecords?.length}}</span></ng-template>
+                <ng-template #content>
+                  <section class="candidates-selector">
+                    <div class="left">
+                      <div class="side-menu">
+                        <ejs-listbox class="list-box"
+                                     id="errorsCandidates"
+                                     [dataSource]="errorListBoxData"
+                                     [fields]="fields"
+                                     [selectionSettings]="selectionSettings"
+                                     (created)="onListBoxCreated()"
+                                     (change)="selectCandidate($event)">
+                        </ejs-listbox>
+                      </div>
+                    </div>
+                    <div class="right">
+                      <div class="profile-list-container" *ngIf="selectedCandidate.candidateProfile">
+                        <app-candidate-profile [candidateProfile]="selectedCandidate.candidateProfile"></app-candidate-profile>
+                      </div>
+                      <div class="experience-list-container" *ngIf="selectedCandidate.candidateExperiencesImportDtos.length">
+                        <app-candidate-experience [candidateExperiencesImport]="selectedCandidate.candidateExperiencesImportDtos"></app-candidate-experience>
+                      </div>
+                      <div class="education-list-container" *ngIf="selectedCandidate.candidatEducationImportDtos.length">
+                        <app-candidate-education [candidateEducationImport]="selectedCandidate.candidatEducationImportDtos"></app-candidate-education>
+                      </div>
+                    </div>
+                  </section>
+                </ng-template>
+              </e-tabitem>
+            </e-tabitems>
+          </ejs-tab>
+        </section>
       </section>
     </section>
   </ng-template>
 </ejs-dialog>
+
+<ng-template #importBtn>
+  <button ejs-button cssClass="e-primary" [disabled]="!enabledImportButton" (click)="onImport()">Import</button>
+</ng-template>

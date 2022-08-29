@@ -1,22 +1,29 @@
 import { GetAlertsForCurrentUser } from './../store/app.actions';
 import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
-import { ContextMenuComponent, NodeSelectEventArgs, SidebarComponent, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import {
+  ContextMenuComponent,
+  NodeSelectEventArgs,
+  SidebarComponent,
+  TreeViewComponent,
+} from '@syncfusion/ej2-angular-navigations';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '../client/client.config';
 import { Menu, MenuItem } from '../shared/models/menu.model';
 import { User } from '../shared/models/user.model';
-import { SetHeaderState, SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
+import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
 import { GetUserMenuConfig, LogoutUser } from '../store/user.actions';
 import { UserState } from '../store/user.state';
-import { ItemModel, MenuEventArgs, BeforeOpenCloseMenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
+import { ItemModel } from '@syncfusion/ej2-angular-splitbuttons';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
+import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 enum THEME {
   light = 'light',
@@ -43,13 +50,13 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   sideBarMenu: MenuItem[];
   sideBarMenuField: Object;
   activeMenuItemData: MenuItem;
-  public userLogin:{firstName:string, lastName:string};
+  public userLogin: { firstName: string; lastName: string };
 
   private unsubscribe$: Subject<void> = new Subject();
 
   @ViewChild('sidebar') sidebar: SidebarComponent;
   @ViewChild('alertSidebar') alertSidebar: SidebarComponent;
-  @ViewChild ('treevalidate') tree: TreeViewComponent;
+  @ViewChild('treevalidate') tree: TreeViewComponent;
   @ViewChild('contextmenu') contextmenu: ContextMenuComponent;
   @ViewChild('searchInputContainer')
   public searchInputContainer: ElementRef;
@@ -91,27 +98,42 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
   profileDatasource: ItemModel[] = [
+    { text: 'Edit Profile', id: '0', iconCss: 'e-ddb-icons e-settings' },
 
-    { text: "Edit Profile", id: '0', iconCss: 'e-ddb-icons e-settings' },
-
-    { text: "LogOut", id: '1', iconCss: 'e-ddb-icons e-logout' }
-
+    { text: 'LogOut', id: '1', iconCss: 'e-ddb-icons e-logout' },
   ];
+  private routers: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
 
   faTimes = faTimes;
   alerts: any;
-  constructor(private store: Store,
-              private router: Router) { }
-  
+  constructor(
+    private store: Store,
+    private router: Router,
+    private orderManagementService: OrderManagementService,
+    private orderManagementAgencyService: OrderManagementAgencyService
+  ) {
+    router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((data: any) => {
+      if (this.tree) {
+        const menuItem = this.tree.getTreeData().find((el => el['route'] === data['url']));
+        if (menuItem) {
+          this.tree.selectedNodes = [menuItem['title'] as string];
+        }
+      }
+    });
+  }
+
   ngOnInit(): void {
-    this.isDarkTheme$.pipe(takeUntil(this.unsubscribe$)).subscribe(isDark => {
+    this.subsToOrderAgencyIds();
+    this.isDarkTheme$.pipe(takeUntil(this.unsubscribe$)).subscribe((isDark) => {
       this.isDarkTheme = isDark;
       this.setTheme(isDark);
     });
     this.initSidebarFields();
     this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
       if (user) {
-        this.userLogin = user; 
+        this.userLogin = user;
         this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
         this.store.dispatch(new GetAlertsForCurrentUser({}))
         this.alertStateModel$.subscribe((x)=>{
@@ -126,10 +148,17 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
+  subsToOrderAgencyIds(): void {
+    this.orderManagementAgencyService.selectedOrderAfterRedirect$.subscribe(
+      () => (this.tree.selectedNodes = [this.routers[1]])
+    );
+    this.orderManagementService.selectedOrderAfterRedirect$.subscribe(
+      () => (this.tree.selectedNodes = [this.routers[0]])
+    );
+  }
+
   onSelectProfileMenu(event: any) {
-
     switch (Number(event.item.properties.id)) {
-
       case 0:
         break;
 
@@ -137,15 +166,12 @@ export class ShellPageComponent implements OnInit, OnDestroy {
         this.logout();
         break;
     }
-
   }
-
-  
 
   onSideBarCreated(): void {
     // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
-    this.isSideBarDocked$.pipe(takeUntil(this.unsubscribe$)).subscribe(isDocked => this.sidebar.isOpen = isDocked);
-    this.isFirstLoad$.pipe(takeUntil(this.unsubscribe$)).subscribe(isFirstLoad => {
+    this.isSideBarDocked$.pipe(takeUntil(this.unsubscribe$)).subscribe((isDocked) => (this.sidebar.isOpen = isDocked));
+    this.isFirstLoad$.pipe(takeUntil(this.unsubscribe$)).subscribe((isFirstLoad) => {
       this.isFirstLoad = isFirstLoad;
       if (isFirstLoad) {
         // TODO: Should be decided after Login: CLIENT_SIDEBAR_MENU, ADMIN_SIDEBAR_MENU etc.
@@ -180,7 +206,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
         if (this.router.url === '/') {
           this.router.navigate([this.sideBarMenu[0].route]);
         }
-        this.sideBarMenuField = { dataSource: this.sideBarMenu, id: 'title', text: 'title', child: 'children' };
+        this.sideBarMenuField = { dataSource: this.sideBarMenu, id: 'anch', text: 'title', child: 'children' };
       }
     });
   }
@@ -189,7 +215,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     if (args.node.classList.contains('e-level-1') && this.sidebar.isOpen) {
       this.tree.collapseAll();
       this.tree.expandAll([args.node]);
-      this.tree.expandOn = 'None'
+      this.tree.expandOn = 'None';
     }
   }
 
@@ -199,7 +225,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   }
 
   onSubMenuItemClick(event: any): void {
-    this.tree.selectedNodes = [this.activeMenuItemData.title];
+    this.tree.selectedNodes = [this.activeMenuItemData.anch];
     this.setSideBarForFirstLoad(event.item.route);
     this.router.navigate([event.item.route]);
   }
@@ -209,10 +235,11 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     if (data.children && data.children.length > 0 && !this.sidebar.isOpen) {
       this.activeMenuItemData = data;
       const boundingRectangle = event.target.getBoundingClientRect();
-      this.contextmenu.items = data.children.map((child: any) => {
-        child.text = child.title;
-        return child;
-      }) || [];
+      this.contextmenu.items =
+        data.children.map((child: any) => {
+          child.text = child.title;
+          return child;
+        }) || [];
 
       // workaround to eliminate UI glitch with context menu resizing
       setTimeout(() => this.contextmenu.open(boundingRectangle.top, parseInt(this.dockSize)));
@@ -223,7 +250,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     if (!this.sidebar.isOpen) {
       event.items.forEach((item: any) => {
         if (item.route === this.router.url && item.id) {
-          const contextMenuItem = document.getElementById(item.id)
+          const contextMenuItem = document.getElementById(item.id);
           if (contextMenuItem) {
             // added left colored border
             contextMenuItem.classList.add('e-selected');
@@ -245,9 +272,8 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   }
 
   public onGetHelp(): void {
-    window.open('https://helpdocumentation.azurewebsites.net/', "_blank");
+    window.open('https://helpdocumentation.azurewebsites.net/', '_blank');
   }
-
 
   private setSideBarForFirstLoad(route: string): void {
     if (this.isFirstLoad && route !== this.router.url) {
@@ -264,50 +290,38 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   public onSearchFocus(): void {
     this.searchHeight = 100;
     this.isSearching = true;
-   
+
     if (this.isMaximized) {
       this.searchInput?.nativeElement?.focus();
     } else {
-        this.searchMenuInstance.setFocus();
+      this.searchMenuInstance.setFocus();
     }
   }
 
   public onSearchChange(): void {
-
-    this.searchResult = this.getData(this.searchString.toLowerCase())  
- 
+    this.searchResult = this.getData(this.searchString.toLowerCase());
   }
 
   getData(searchText: string) {
-
     const menuItems = [...this.sideBarMenu];
 
-    return this.getValueLogic(menuItems, searchText)
-
+    return this.getValueLogic(menuItems, searchText);
   }
 
   getValueLogic(data: any, filterText: string) {
-
     const arr: any = [];
 
     if (data && Array.isArray(data)) {
-
       for (let i = 0; i < data.length; i++) {
-
         const ele = data[i];
 
         ele && ele.title.toLowerCase().includes(filterText.toLocaleLowerCase())
-
           ? arr.push(ele)
-
           : arr.push(...this.getValueLogic(ele.children, filterText));
-
       }
-
     }
 
     return arr;
-
   }
 
   public onSearchFocusOut(): void {

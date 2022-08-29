@@ -1,0 +1,36 @@
+@import "colors";
+.e-dlg-header-content {
+  padding: 24px !important;
+
+  .e-dlg-header {
+    width: 100%;
+  }
+
+  .container {
+    padding: 0 !important;
+
+    .header-container {
+      .e-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .e-card-title {
+          color: $black;
+          font-size: 24px;
+          font-weight: 700;
+          margin: 0;
+        }
+
+        .calcel {
+          margin-right: 8px;
+        }
+
+        button {
+          font-size: 14px;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}

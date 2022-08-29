@@ -10,4 +10,5 @@ export const TimesheetConfirmMessages: CommonDialogConformMessages = {
   confirmAddFormCancel: 'Are you sure you want to exit without saving changes?',
   confirmRecordDelete: 'Are you sure you want to delete this record?',
   confirmOrderChange: 'Are you sure you want to change timesheet without saving changes?',
+  confirmEdit: 'Are you sure you want to change the timesheet? This will lead to recalculating values and generating new invoice records.'
 }

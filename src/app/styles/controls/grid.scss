@@ -231,12 +231,20 @@ ejs-grid.e-control.e-grid {
 
         &:hover {
           background-color: $supportive-red-40;
+
+          &.green-background {
+            background-color: $supportive-green-40;
+          }
         }
 
         &[disabled] {
           pointer-events: none;
           background-color: transparent;
           color: $supportive-red-40;
+
+          app-custom-icon.icon.supportive-green-10 {
+            color: $supportive-green-40;
+          }
         }
       }
 

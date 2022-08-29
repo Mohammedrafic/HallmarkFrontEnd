@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ConfirmService } from "@shared/services/confirm.service";
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, merge, Observable, Subject, takeUntil } from 'rxjs';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
@@ -13,7 +14,8 @@ import {
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
-  ReloadOrganisationOrderCandidatesLists, SetIsDirtyOrderForm,
+  ReloadOrganisationOrderCandidatesLists,
+  SetIsDirtyOrderForm,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
@@ -21,11 +23,12 @@ import { RejectReason } from '@shared/models/reject-reason.model';
 import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
-import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';
-import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
-import { SET_READONLY_STATUS } from '@shared/constants';
-import { toCorrectTimezoneFormat } from "@shared/utils/date-time.utils";
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SET_READONLY_STATUS } from '@shared/constants';
+import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
+import { CommentsService } from '@shared/services/comments.service';
+import { Comment } from '@shared/models/comment.model';
+import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -55,7 +58,6 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public jobStatusControl: FormControl;
   public optionFields = OPTION_FIELDS;
   public candidateJob: OrderCandidateJob | null;
-  public isOnboarded = true;
   public today = new Date();
   public candidatStatus = CandidatStatus;
   public billRatesData: BillRate[] = [];
@@ -63,9 +65,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public openRejectDialog = new Subject<boolean>();
   public isRejected = false;
   public priceUtils = PriceUtils;
-  public accordionClickElement: HTMLElement | null;
-  public accordionOneField: AccordionOneField;
   public nextApplicantStatuses: ApplicantStatus[];
+  public isActiveCandidateDialog$: Observable<boolean>;
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
@@ -89,9 +90,19 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private datePipe: DatePipe, private store: Store, private actions$: Actions) {}
+  public comments: Comment[] = [];
+
+  constructor(
+    private datePipe: DatePipe,
+    private store: Store,
+    private actions$: Actions,
+    private orderCandidateListViewService: OrderCandidateListViewService,
+    private confirmService: ConfirmService,
+    private commentsService: CommentsService
+  ) {}
 
   ngOnInit(): void {
+    this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
     this.createForm();
     this.patchForm();
     this.subscribeOnDate();
@@ -105,6 +116,14 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private getComments(): void {
+    this.commentsService
+      .getComments(this.candidateJob?.commentContainerId as number, null)
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+      });
   }
 
   public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatus; isEnabled: boolean } }): void {
@@ -132,23 +151,20 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     }
   }
 
-  public closeDialog() {
-    this.closeModalEvent.emit();
-    this.candidateJob = null;
-    this.jobStatusControl.reset();
-    this.billRatesData = [];
-    this.isRejected = false;
-    this.nextApplicantStatuses = [];
-  }
-
-  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
-  }
-
-  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
+  public onClose(): void {
+    if (this.form.dirty) {
+      this.confirmService
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => confirm))
+        .subscribe(() => {
+          this.closeDialog();
+        });
+    } else {
+      this.closeDialog();
+    }
   }
 
   public onBillRatesChanged(bill: BillRate): void {
@@ -173,7 +189,6 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
             clockId: this.candidateJob?.clockId,
             guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
             billRates: this.getBillRateForUpdate(bill),
-
           })
         )
         .subscribe(() => {
@@ -186,7 +201,9 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   getBillRateForUpdate(value: BillRate): BillRate[] {
     let billRates;
-    const existingBillRateIndex = this.candidateJob?.billRates.findIndex(billRate => billRate.id === value.id) as number;
+    const existingBillRateIndex = this.candidateJob?.billRates.findIndex(
+      (billRate) => billRate.id === value.id
+    ) as number;
     if (existingBillRateIndex > -1) {
       this.candidateJob?.billRates.splice(existingBillRateIndex, 1, value);
       billRates = this.candidateJob?.billRates;
@@ -195,7 +212,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
         this.candidateJob?.billRates.splice(value, 1);
         billRates = this.candidateJob?.billRates;
       } else {
-        billRates = [...this.candidateJob?.billRates as BillRate[], value];
+        billRates = [...(this.candidateJob?.billRates as BillRate[]), value];
       }
     }
 
@@ -238,6 +255,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
       this.candidateJob = value;
       if (value) {
+        this.getComments();
         this.billRatesData = [...value?.billRates];
         this.form.patchValue({
           jobId: value.orderId,
@@ -260,7 +278,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
           offeredStartDate: this.getDateString(value.offeredStartDate),
         });
 
-        this.isFormDisabled(value.applicantStatus.applicantStatus);
+        this.switchFormState();
       }
     });
   }
@@ -282,19 +300,6 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
         const value = this.form.getRawValue();
         this.form.patchValue({ date: [value.startDate, value.endDate] });
       });
-  }
-
-  private isFormDisabled(status: number): void {
-    if (status === ApplicantStatus.OnBoarded) {
-      this.form.disable();
-      this.isOnboarded = false;
-    } else {
-      this.form.enable();
-      this.isOnboarded = true;
-    }
-    if (this.isDeployedCandidate && !this.isAgency) {
-      this.form.disable();
-    }
   }
 
   private subscribeOnReasonsList(): void {
@@ -366,5 +371,24 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     });
 
     this.jobStatusControl = new FormControl('');
+  }
+
+  private closeDialog() {
+    this.closeModalEvent.emit();
+    this.candidateJob = null;
+    this.jobStatusControl.reset();
+    this.billRatesData = [];
+    this.isRejected = false;
+    this.nextApplicantStatuses = [];
+    this.orderCandidateListViewService.setIsCandidateOpened(false);
+    this.form.markAsPristine();
+  }
+
+  private switchFormState(): void {
+    if (this.isDeployedCandidate && !this.isAgency) {
+      this.form?.disable();
+    } else {
+      this.form?.enable();
+    }
   }
 }

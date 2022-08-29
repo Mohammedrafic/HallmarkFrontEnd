@@ -39,7 +39,7 @@ export class TimesheetTableApproveCellComponent implements ICellRendererAngularC
   }
 
   public approveItem(): void {
-    const { successMessage } = approveTimesheetDialogData;
+    const { successMessage } = approveTimesheetDialogData();
     const timesheetId = this.params.data.id;
 
     this.store.dispatch(

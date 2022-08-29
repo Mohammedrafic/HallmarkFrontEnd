@@ -1,18 +1,20 @@
 import { Injectable } from '@angular/core';
-import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { CredentialType } from "@shared/models/credential-type.model";
-import { Credential } from "@shared/models/credential.model";
-import { catchError, Observable, of, tap } from "rxjs";
+import { Action, State, StateContext, Selector } from '@ngxs/store';
+import { catchError, Observable, of, tap } from 'rxjs';
 
 import { CandidateCredential, CandidateCredentialPage, CredentialGroupedFiles } from "@shared/models/candidate-credential.model";
+import { CredentialVerifiedStatus } from "@shared/enums/status";
+import { CredentialType } from '@shared/models/credential-type.model';
+import { Credential } from '@shared/models/credential.model';
+import { CandidateImportResult } from "@shared/models/candidate-profile-import.model";
 import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages";
 import { MessageTypes } from "src/app/shared/enums/message-types";
 import { Candidate, CandidatePage } from 'src/app/shared/models/candidate.model';
-import { Education } from "src/app/shared/models/education.model";
-import { Experience } from "src/app/shared/models/experience.model";
+import { Education } from 'src/app/shared/models/education.model';
+import { Experience } from 'src/app/shared/models/experience.model';
 import { Skill } from 'src/app/shared/models/skill.model';
 import { SkillsService } from 'src/app/shared/services/skills.service';
-import { ShowToast } from "src/app/store/app.actions";
+import { ShowToast } from 'src/app/store/app.actions';
 import { CandidateService } from '../services/candidates.service';
 import {
   GetAllSkills,
@@ -20,14 +22,16 @@ import {
   GetCandidateByIdSucceeded,
   GetCandidatePhoto,
   GetCandidatePhotoSucceeded,
+  GetCandidateProfileErrors,
+  GetCandidateProfileErrorsSucceeded,
   GetCandidateProfileTemplate,
   GetCandidateProfileTemplateSucceeded,
-  GetCandidatesByPage,
   GetCandidatesCredentialByPage,
   GetCredentialFiles,
   GetCredentialFilesSucceeded,
   GetCredentialPdfFiles,
   GetCredentialPdfFilesSucceeded,
+  GetCredentialStatuses,
   GetCredentialTypes,
   GetEducationByCandidateId,
   GetExperienceByCandidateId,
@@ -42,6 +46,8 @@ import {
   RemoveExperience,
   RemoveExperienceSucceeded,
   SaveCandidate,
+  SaveCandidateImportResult,
+  SaveCandidateImportResultSucceeded,
   SaveCandidatesCredential,
   SaveCandidatesCredentialFailed,
   SaveCandidatesCredentialSucceeded,
@@ -51,10 +57,11 @@ import {
   SaveExperience,
   SaveExperienceSucceeded,
   UploadCandidatePhoto,
+  UploadCandidateProfileFile,
+  UploadCandidateProfileFileSucceeded,
   UploadCredentialFiles,
-  UploadCredentialFilesSucceeded
+  UploadCredentialFilesSucceeded,
 } from './candidate.actions';
-import { HttpErrorResponse } from '@angular/common/http';
 import { getAllErrors } from '@shared/utils/error.utils';
 
 export interface CandidateStateModel {
@@ -66,6 +73,7 @@ export interface CandidateStateModel {
   candidatePage: CandidatePage | null;
   candidateCredentialPage: CandidateCredentialPage | null;
   credentialTypes: CredentialType[];
+  credentialStatuses: CredentialVerifiedStatus[];
   masterCredentials: Credential[];
   groupedCandidateCredentialsFiles: CredentialGroupedFiles[];
 }
@@ -81,8 +89,9 @@ export interface CandidateStateModel {
     educations: [],
     candidateCredentialPage: null,
     credentialTypes: [],
+    credentialStatuses: [],
     masterCredentials: [],
-    groupedCandidateCredentialsFiles: []
+    groupedCandidateCredentialsFiles: [],
   },
 })
 @Injectable()
@@ -117,6 +126,11 @@ export class CandidateState {
   }
 
   @Selector()
+  static credentialStatuses(state: CandidateStateModel): CredentialVerifiedStatus[] {
+    return state.credentialStatuses;
+  }
+
+  @Selector()
   static masterCredentials(state: CandidateStateModel): Credential[] {
     return state.masterCredentials;
   }
@@ -127,21 +141,6 @@ export class CandidateState {
   }
 
   constructor(private candidateService: CandidateService, private skillsService: SkillsService) {}
-
-  @Action(GetCandidatesByPage)
-  GetCandidatesByPage({ patchState, dispatch }: StateContext<CandidateStateModel>, { pageNumber, pageSize }: GetCandidatesByPage): Observable<CandidatePage | unknown> {
-    patchState({ isCandidateLoading: true });
-    return this.candidateService.getCandidates(pageNumber, pageSize).pipe(
-      tap((payload) => {
-        patchState({ isCandidateLoading: false, candidatePage: payload });
-        return payload;
-      }),
-      catchError((error: HttpErrorResponse) => {
-        patchState({isCandidateLoading: false, candidatePage: null });
-        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
-      })
-    );
-  }
 
   @Action(GetCandidateById)
   GetCandidateById({ patchState, dispatch }: StateContext<CandidateStateModel>, { payload }: GetCandidateById): Observable<Candidate> {
@@ -284,18 +283,26 @@ export class CandidateState {
   }
 
   @Action(RemoveEducation)
-  RemoveEducation({ patchState, dispatch }: StateContext<CandidateStateModel>, { payload }: RemoveEducation): Observable<any> {
+  RemoveEducation(
+    { patchState, dispatch }: StateContext<CandidateStateModel>,
+    { payload }: RemoveEducation
+  ): Observable<any> {
     patchState({ isCandidateLoading: true });
-    return this.candidateService.removeEducation(payload).pipe(tap((payload) => {
+    return this.candidateService.removeEducation(payload).pipe(
+      tap((payload) => {
         patchState({ isCandidateLoading: false });
         dispatch(new RemoveEducationSucceeded());
         return payload;
       }),
-      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Education cannot be deleted')))));
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Education cannot be deleted'))))
+    );
   }
 
   @Action(GetCandidatesCredentialByPage)
-  GetCandidatesCredentialByPage({ patchState, dispatch, getState  }: StateContext<CandidateStateModel>, { pageNumber, pageSize }: GetCandidatesCredentialByPage): Observable<CandidateCredentialPage> {
+  GetCandidatesCredentialByPage(
+    { patchState, dispatch, getState }: StateContext<CandidateStateModel>,
+    { pageNumber, pageSize }: GetCandidatesCredentialByPage
+  ): Observable<CandidateCredentialPage> {
     patchState({ isCandidateLoading: true });
     const id = getState().candidate?.id as number;
     return this.candidateService.getCredentialByCandidateId(pageNumber, pageSize, id).pipe(
@@ -307,7 +314,10 @@ export class CandidateState {
   }
 
   @Action(GetMasterCredentials)
-  GetMasterCredentials({ patchState }: StateContext<CandidateStateModel>, { searchTerm, credentialTypeId }: GetMasterCredentials): Observable<Credential[]> {
+  GetMasterCredentials(
+    { patchState }: StateContext<CandidateStateModel>,
+    { searchTerm, credentialTypeId }: GetMasterCredentials
+  ): Observable<Credential[]> {
     patchState({ isCandidateLoading: true });
     return this.candidateService.getMasterCredentials(searchTerm, credentialTypeId).pipe(
       tap((payload) => {
@@ -318,11 +328,15 @@ export class CandidateState {
   }
 
   @Action(SaveCandidatesCredential)
-  SaveCandidatesCredential({ patchState, dispatch, getState }: StateContext<CandidateStateModel>, { payload }: SaveCandidatesCredential): Observable<CandidateCredential | void> {
+  SaveCandidatesCredential(
+    { patchState, dispatch, getState }: StateContext<CandidateStateModel>,
+    { payload }: SaveCandidatesCredential
+  ): Observable<CandidateCredential | void> {
     const isCreating = !payload.id;
     payload.candidateProfileId = getState().candidate?.id as number;
     patchState({ isCandidateLoading: true });
-    return this.candidateService.saveCredential(payload).pipe(tap((payload) => {
+    return this.candidateService.saveCredential(payload).pipe(
+      tap((payload) => {
         patchState({ isCandidateLoading: false });
         dispatch(new SaveCandidatesCredentialSucceeded(payload));
         dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
@@ -336,36 +350,64 @@ export class CandidateState {
   }
 
   @Action(RemoveCandidatesCredential)
-  RemoveCandidatesCredential({ patchState, dispatch }: StateContext<CandidateStateModel>, { payload }: RemoveCandidatesCredential): Observable<any> {
+  RemoveCandidatesCredential(
+    { patchState, dispatch }: StateContext<CandidateStateModel>,
+    { payload }: RemoveCandidatesCredential
+  ): Observable<any> {
     patchState({ isCandidateLoading: true });
-    return this.candidateService.removeCredential(payload).pipe(tap((payload) => {
+    return this.candidateService.removeCredential(payload).pipe(
+      tap((payload) => {
         patchState({ isCandidateLoading: false });
         dispatch(new RemoveCandidatesCredentialSucceeded());
         return payload;
       }),
-      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Credential cannot be deleted')))));
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Credential cannot be deleted'))))
+    );
   }
 
   @Action(GetCredentialTypes)
-  GetCredentialTypes({ patchState }: StateContext<CandidateStateModel>, { }: GetCredentialTypes): Observable<CredentialType[]> {
-    return this.candidateService.getCredentialTypes().pipe(tap((payload) => {
-      patchState({ credentialTypes: payload });
-      return payload;
-    }));
+  GetCredentialTypes(
+    { patchState }: StateContext<CandidateStateModel>,
+    {}: GetCredentialTypes
+  ): Observable<CredentialType[]> {
+    return this.candidateService.getCredentialTypes().pipe(
+      tap((payload) => {
+        patchState({ credentialTypes: payload });
+        return payload;
+      })
+    );
+  }
+
+  @Action(GetCredentialStatuses)
+  GetCredentialStatuses({ patchState }: StateContext<CandidateStateModel>): Observable<CredentialVerifiedStatus[]> {
+    return this.candidateService.getCredentialStatuses().pipe(
+      tap((payload) => {
+        patchState({ credentialStatuses: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(UploadCredentialFiles)
-  UploadCredentialFiles({ patchState, dispatch }: StateContext<CandidateStateModel>, { files, candidateCredentialId }: UploadCredentialFiles): Observable<any> {
+  UploadCredentialFiles(
+    { patchState, dispatch }: StateContext<CandidateStateModel>,
+    { files, candidateCredentialId }: UploadCredentialFiles
+  ): Observable<any> {
     patchState({ isCandidateLoading: true });
-    return this.candidateService.saveCredentialFiles(files, candidateCredentialId).pipe(tap((payload) => {
-      patchState({ isCandidateLoading: false });
-      dispatch(new UploadCredentialFilesSucceeded());
-      return payload;
-    }));
+    return this.candidateService.saveCredentialFiles(files, candidateCredentialId).pipe(
+      tap((payload) => {
+        patchState({ isCandidateLoading: false });
+        dispatch(new UploadCredentialFilesSucceeded());
+        return payload;
+      })
+    );
   }
 
   @Action(GetCredentialFiles)
-  GetCredentialFiles({ dispatch }: StateContext<CandidateStateModel>, { payload }: GetCredentialFiles): Observable<any> {
+  GetCredentialFiles(
+    { dispatch }: StateContext<CandidateStateModel>,
+    { payload }: GetCredentialFiles
+  ): Observable<any> {
     return this.candidateService.getCredentialFile(payload).pipe(
       tap((payload) => {
         dispatch(new GetCredentialFilesSucceeded(payload));
@@ -376,7 +418,10 @@ export class CandidateState {
   }
 
   @Action(GetCredentialPdfFiles)
-  GetCredentialPdfFiles({ dispatch }: StateContext<CandidateStateModel>, { payload }: GetCredentialPdfFiles): Observable<any> {
+  GetCredentialPdfFiles(
+    { dispatch }: StateContext<CandidateStateModel>,
+    { payload }: GetCredentialPdfFiles
+  ): Observable<any> {
     return this.candidateService.getCredentialPdfFile(payload).pipe(
       tap((payload) => {
         dispatch(new GetCredentialPdfFilesSucceeded(payload));
@@ -387,7 +432,10 @@ export class CandidateState {
   }
 
   @Action(GetGroupedCredentialsFiles)
-  GetGroupedCredentialsFiles({ patchState, getState }: StateContext<CandidateStateModel>, { }: GetGroupedCredentialsFiles): Observable<CredentialGroupedFiles[]> {
+  GetGroupedCredentialsFiles(
+    { patchState, getState }: StateContext<CandidateStateModel>,
+    {}: GetGroupedCredentialsFiles
+  ): Observable<CredentialGroupedFiles[]> {
     const id = getState().candidate?.id as number;
     return this.candidateService.getCredentialGroupedFiles(id).pipe(
       tap((payload) => {
@@ -404,7 +452,40 @@ export class CandidateState {
         dispatch(new GetCandidateProfileTemplateSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Template was not found'))))
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the template'))))
+    );
+  }
+
+  @Action(GetCandidateProfileErrors)
+  GetCandidateProfileErrors({ dispatch }: StateContext<CandidateStateModel>, { payload }: GetCandidateProfileErrors): Observable<any> {
+    return this.candidateService.getCandidateProfileErrors(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetCandidateProfileErrorsSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(UploadCandidateProfileFile)
+  UploadCandidateProfileFile({ dispatch }: StateContext<CandidateStateModel>, { payload }: UploadCandidateProfileFile): Observable<CandidateImportResult | Observable<void>> {
+    return this.candidateService.uploadCandidateProfileFile(payload).pipe(
+      tap((payload) => {
+        dispatch(new UploadCandidateProfileFileSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : 'File was not uploaded'))))
+    );
+  }
+
+  @Action(SaveCandidateImportResult)
+  SaveCandidateImportResult({ dispatch }: StateContext<CandidateStateModel>, { payload }: SaveCandidateImportResult): Observable<CandidateImportResult | Observable<void>> {
+    return this.candidateService.saveCandidateImportResult(payload).pipe(
+      tap((payload) => {
+        dispatch(new SaveCandidateImportResultSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Candidates were not imported'))))
     );
   }
 }

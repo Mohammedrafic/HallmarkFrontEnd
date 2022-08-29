@@ -5,9 +5,11 @@
     </div>
     <div class="dropdown-container bootstrap">
       <ejs-dropdownlist
+        *ngIf="!isAgencyUser"
         [dataSource]="commentsFilterItems"
         [(value)]="selectedFilter"
         (select)="onFilterChange($event)"
+        [readonly]="disabled"
       ></ejs-dropdownlist>
     </div>
   </div>
@@ -27,14 +29,16 @@
     <div class="input-group bootstrap">
       <ejs-textbox
         class="comment-text-box"
+        [class.readonly]="disabled"
         #textBox
         [multiline]="true"
         (created)="textBoxInit()"
         maxlength="500"
         [(value)]="message"
+        [readonly]="disabled"
         placeholder="Enter your comment here..."></ejs-textbox>
     </div>
-    <div class="actions">
+    <div class="actions" [class.readonly]="disabled">
       <ejs-tooltip
         [content]="isExternal ? 'External' : 'Internal'">
         <span class="control-wrapper visibility" (click)="visibilityHandler()">
@@ -42,9 +46,12 @@
           <i-feather *ngIf="isExternal" name="eye" class="icon"></i-feather>
         </span>
       </ejs-tooltip>
-      <span class="control-wrapper send" (click)="send()">
-        <i-feather name="send" class="icon"></i-feather>
-      </span>
+      <ejs-tooltip
+        [content]="'Send'">
+        <span class="control-wrapper send" (click)="send()">
+          <i-feather name="send" class="icon"></i-feather>
+        </span>
+      </ejs-tooltip>
     </div>
   </div>
 </section>

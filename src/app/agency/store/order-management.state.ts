@@ -31,6 +31,7 @@ import {
   ClearAgencyHistoricalData,
   ClearOrders,
   ExportAgencyOrders,
+  GetAgencyExtensions,
   GetAgencyFilterOptions,
   GetAgencyHistoricalData,
   GetAgencyOrderCandidatesList,
@@ -56,6 +57,9 @@ import { OrganizationService } from '@shared/services/organization.service';
 import { getRegionsFromOrganizationStructure } from '@agency/order-management/order-management-grid/agency-order-filters/agency-order-filters.utils';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { ExtensionGridModel } from '@shared/components/extension/extension-sidebar/models/extension.model';
+import { OrderManagementContentStateModel } from '@client/store/order-managment-content.state';
+import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
 
 export interface OrderManagementModel {
   ordersPage: AgencyOrderManagementPage | null;
@@ -185,15 +189,21 @@ export class OrderManagementState {
     return state.ordersTab;
   }
 
+  @Selector()
+  static extensions(state: OrderManagementContentStateModel): any | null {
+    return state.extensions;
+  }
+
   constructor(
     private orderManagementContentService: OrderManagementContentService,
     private rejectReasonService: RejectReasonService,
     private orderApplicantsService: OrderApplicantsService,
     private orderFilteringOptionsService: OrderFilteringOptionsService,
-    private organizationService: OrganizationService
+    private organizationService: OrganizationService,
+    private extensionSidebarService: ExtensionSidebarService
   ) {}
 
-  @Action(GetAgencyOrdersPage)
+  @Action(GetAgencyOrdersPage, { cancelUncompleted: true })
   GetAgencyOrdersPage(
     { patchState }: StateContext<OrderManagementModel>,
     { pageNumber, pageSize, filters }: GetAgencyOrdersPage
@@ -297,8 +307,8 @@ export class OrderManagementState {
     { payload }: UpdateAgencyCandidateJob
   ): Observable<any> {
     return this.orderManagementContentService.updateCandidateJob(payload).pipe(
-      tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
+      tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'))),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Candidate cannot be updated'))))
     );
   }
 
@@ -396,5 +406,15 @@ export class OrderManagementState {
   @Action(ClearOrders)
   ClearOrders({ patchState }: StateContext<OrderManagementModel>, {}: ClearOrders): OrderManagementModel {
     return patchState({ ordersPage: null });
+  }
+
+  @Action(GetAgencyExtensions)
+  GetAgencyExtensions(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { id, organizationId }: GetAgencyExtensions
+  ): Observable<ExtensionGridModel[]> {
+    return this.extensionSidebarService
+      .getExtensions(id, organizationId)
+      .pipe(tap((extensions) => patchState({ extensions })));
   }
 }

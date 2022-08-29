@@ -42,6 +42,10 @@ section {
     background-color: $secondary-dark-blue-50;
     gap: 25px 38px;
 
+    &.extension {
+      grid-template-columns: repeat(5, 1fr);
+    }
+
     &.reorders {
       grid-template-columns: repeat(5, 1fr);
     }

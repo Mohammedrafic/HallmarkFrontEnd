@@ -8,7 +8,7 @@ import { DataSourceItem, DropdownOption } from '@core/interface';
 
 import {
   TimesheetsFilterState, TimesheetRecordsDto, CostCentersDto,
-  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, TabCountConfig
+  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, TabCountConfig, RawTimsheetRecordsDto
 } from '../interface';
 import { CostCenterAdapter } from '../helpers';
 import { RecordsAdapter } from '../helpers';
@@ -40,13 +40,22 @@ export class TimesheetsApiService {
     ): Observable<TimesheetRecordsDto> {
     const endpoint = !isAgency
     ? `/api/Timesheets/${id}/records` : `/api/Timesheets/${id}/records/organization/${orgId}`;
-    return this.http.get<TimesheetRecordsDto>(endpoint)
+    return this.http.get<RawTimsheetRecordsDto>(endpoint)
     .pipe(
       map((data) => RecordsAdapter.adaptRecordsDto(data)),
       catchError(() => of({
-        timesheets: [],
-        miles: [],
-        expenses: [],
+        timesheets: {
+          editMode: [],
+          viewMode: [],
+        },
+        miles: {
+          editMode: [],
+          viewMode: [],
+        },
+        expenses: {
+          editMode: [],
+          viewMode: [],
+        },
       }))
     );
   }

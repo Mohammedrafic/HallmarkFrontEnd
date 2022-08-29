@@ -66,6 +66,14 @@
       color: $secondary-dark-blue-20;
       display: flex;
 
+      &.readonly {
+        pointer-events: none;
+
+        .send {
+          color: $secondary-dark-blue-20;
+        }
+      }
+
       .control-wrapper {
         display: flex;
         align-items: center;

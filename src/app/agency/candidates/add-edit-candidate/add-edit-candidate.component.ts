@@ -10,7 +10,6 @@ import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { CandidateGeneralInfoComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
 import { CandidateProfessionalSummaryComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { CandidateContactDetailsComponent } from './candidate-contact-details/candidate-contact-details.component';
 import { SetHeaderState } from 'src/app/store/app.actions';
@@ -26,13 +25,15 @@ import {
   UploadCandidatePhoto,
 } from '../../store/candidate.actions';
 import { Candidate } from 'src/app/shared/models/candidate.model';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UserState } from 'src/app/store/user.state';
 import { Location } from '@angular/common';
 import { ComponentCanDeactivate } from '@shared/guards/pending-changes.guard';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
-import { NavigationTabModel } from '@shared/models/navigation-tab.model';
+import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
+import { SelectNavigation, SetCandidateMessage } from '@shared/components/candidate-details/store/candidate.actions';
+import { CandidateMessage } from '@shared/components/candidate-details/models/candidate.model';
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -40,6 +41,9 @@ import { NavigationTabModel } from '@shared/models/navigation-tab.model';
   styleUrls: ['./add-edit-candidate.component.scss'],
 })
 export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCanDeactivate {
+  @Select(CandidateDetailsState.candidateMessage)
+  public candidateMessage$: Observable<CandidateMessage>;
+
   @ViewChild('stepper') tab: TabComponent;
 
   public showSaveProfileButtons = true;
@@ -48,6 +52,8 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
   public photo: Blob | null = null;
   // Used for disabling form and remove creation actions
   public readonlyMode = false;
+  public isCredentialStep = false;
+  public candidateMessage: CandidateMessage | null = null;
 
   private filesDetails: Blob[] = [];
   private unsubscribe$: Subject<void> = new Subject();
@@ -96,9 +102,11 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
       this.store.dispatch(new GetCandidatePhoto(parseInt(this.route.snapshot.paramMap.get('id') as string)));
     }
     this.pagePermissions();
+    this.subscribeOnCandidateMessage();
   }
 
   ngOnDestroy(): void {
+    this.store.dispatch(new SetCandidateMessage(null, null));
     this.store.dispatch(new RemoveCandidateFromStore());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -271,23 +279,53 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
   }
 
   private pagePermissions(): void {
+    const location = this.location.getState() as { readonly: boolean };
+
     this.route.data.subscribe((data) => {
       if (data['readonly']) {
         this.readonlyMode = true;
+        this.isCredentialStep = true;
         this.candidateForm.disable();
       }
     });
+
+    if (location.readonly) {
+      this.candidateForm.disable();
+      this.readonlyMode = true;
+      this.isCredentialStep = false;
+    }
   }
 
   private navigateToCandidates(): void {
-    const location = this.location.getState() as { orderId: number; pageToBack: string };
-    if (location.orderId) {
-      this.router.navigate([location.pageToBack], { state: { orderId: location.orderId } });
-      const selectedTab = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
-      this.store.dispatch(new SelectNavigationTab(selectedTab.current));
-    } else {
-      this.router.navigate(['/agency/candidates']);
+    const location = this.location.getState() as {
+      orderId: number;
+      pageToBack: string;
+      isNavigateFromCandidateDetails: boolean;
+    };
+
+    switch (true) {
+      case location.orderId && !location.isNavigateFromCandidateDetails:
+        this.router.navigate([location.pageToBack], { state: { orderId: location.orderId } });
+        const selectedNavigation = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
+        this.store.dispatch(new SelectNavigationTab(selectedNavigation.current));
+        break;
+      case location.orderId && location.isNavigateFromCandidateDetails:
+        this.router.navigate([location.pageToBack]);
+        const selectedTab = this.store.selectSnapshot(CandidateDetailsState.navigationTab);
+        this.store.dispatch(new SelectNavigation(selectedTab.active, null, true));
+        break;
+      default:
+        this.router.navigate(['/agency/candidates']);
     }
+  }
+
+  private subscribeOnCandidateMessage(): void {
+    this.candidateMessage$
+      .pipe(
+        filter((message: CandidateMessage) => !!message),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((message: CandidateMessage) => (this.candidateMessage = message));
   }
 
   private getStringSsn(ssn: any): string {

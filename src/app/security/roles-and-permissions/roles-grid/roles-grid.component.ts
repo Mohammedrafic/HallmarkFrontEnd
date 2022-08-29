@@ -1,5 +1,5 @@
 import { GetBusinessByUnitType, ExportRoleList } from './../../store/security.actions';
-import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { filter, Observable, Subject, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -19,7 +19,7 @@ import { rolesFilterColumns } from "src/app/security/roles-and-permissions/roles
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { GetRolesPage, RemoveRole } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
-import { RolesFilterService } from "./roles-filter.service";
+
 
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
@@ -28,7 +28,7 @@ import { BusinessUnit } from '@shared/models/business-unit.model';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
-
+import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 
 enum Active {
   No,
@@ -38,8 +38,7 @@ enum Active {
 @Component({
   selector: 'app-roles-grid',
   templateUrl: './roles-grid.component.html',
-  styleUrls: ['./roles-grid.component.scss'],
-  providers: [RolesFilterService]
+  styleUrls: ['./roles-grid.component.scss']
 })
 export class RolesGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() filterForm: FormGroup;
@@ -68,7 +67,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   public selIndex: number[] = [];
   public sortOptions = { columns: [{ field: 'businessUnitName', direction: 'Descending' }] };
   public filterColumns = rolesFilterColumns;
-  public rolesFilterFormGroup: FormGroup = this.rolesFilterService.generateFiltersForm();
+
 
   private filters: RolesFilters = {};
   private isAlive = true;
@@ -106,8 +105,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
               private store: Store, 
               private confirmService: ConfirmService, 
               private datePipe: DatePipe,
-              private filterService: FilterService,
-              private rolesFilterService: RolesFilterService) {
+              private filterService: FilterService) {
     super();
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
@@ -118,8 +116,34 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     this.paginationPageSize = this.pageSize,
     this.cacheBlockSize = this.pageSize;
     this.serverSideStoreType = 'partial';
-    this.maxBlocksInCache = 2;
+    this.maxBlocksInCache = 1;
     this.columnDefs = [
+      {
+        headerName: 'Action',
+        cellRenderer: 'buttonRenderer',
+        cellRendererParams: {
+          onClick: this.onEdit.bind(this),
+          label: 'Edit'
+        },
+        pinned: 'left',
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      },
+      {
+        headerName: '',
+        cellRenderer: 'buttonRenderer',
+        cellRendererParams: {
+          onClick: this.onRemove.bind(this),
+          label: 'Delete'
+        },
+        pinned: 'left',
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      },
       { 
         field: 'id',
         hide: true 
@@ -152,32 +176,6 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
         header: 'Active',
         field: 'isActive',
         valueGetter : (params: { data: { isActive: boolean}}) => { return Active[Number(params.data.isActive)] },
-        suppressMovable: true,
-        filter: false,
-        sortable: false,
-        menuTabs: []
-      },
-      {
-        headerName: 'Action',
-        cellRenderer: 'buttonRenderer',
-        cellRendererParams: {
-          onClick: this.onEdit.bind(this),
-          label: 'Edit'
-        },        
-        pinned: 'right',
-        suppressMovable: true,
-        filter: false,
-        sortable: false,
-        menuTabs: []
-      },
-      {
-        headerName: '',
-        cellRenderer: 'buttonRenderer',
-        cellRendererParams: {
-          onClick: this.onRemove.bind(this),
-          label: 'Delete'
-        },
-        pinned: 'right',
         suppressMovable: true,
         filter: false,
         sortable: false,
@@ -237,6 +235,11 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
           };
   }
 
+  public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
+  public noRowsOverlayComponentParams: any = {
+    noRowsMessageFunc: () => 'No Rows To Show',
+  };
+
   ngOnInit(): void {
     this.onDialogClose();    
     this.filterForm.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => { 
@@ -256,7 +259,6 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
     var datasource = this.createServerSideDatasource();
-    console.log(datasource);
     params.api.setServerSideDatasource(datasource);
   }
 
@@ -282,8 +284,14 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
           var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
           self.dispatchNewPage(sort, filter);
           self.rolesPage$.pipe().subscribe((data: any) => {
-            self.itemList = data.items;            
-            params.successCallback(self.itemList, data.totalCount || 1);
+            self.itemList = data?.items;
+            if (!self.itemList || !self.itemList.length) {
+              self.gridApi.showNoRowsOverlay();
+            }
+            else {
+              self.gridApi.hideOverlay();
+            }
+            params.successCallback(self.itemList, data?.totalCount || 1);
           });
         }, 500);
       }
@@ -348,38 +356,9 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     this.store.dispatch(new GetRolesPage(businessUnit, business || null, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
   }
 
-  public onFilterApply(): void {
-    this.filters = this.rolesFilterFormGroup.getRawValue();
-    this.filteredItems = this.filterService.generateChips(this.rolesFilterFormGroup, this.filterColumns);
-    this.dispatchNewPage();
-    this.store.dispatch(new ShowFilterDialog(false));
-    this.filteredItems$.next(this.filteredItems.length);
-  }
+  
 
-  public onFilterClose(): void {
-    this.rolesFilterFormGroup.setValue({
-      permissionsIds: this.filters.permissionsIds || [],
-    });
-    this.filteredItems = this.filterService.generateChips(this.rolesFilterFormGroup, this.filterColumns);
-    this.filteredItems$.next(this.filteredItems.length);
-  }
 
-  public onFilterDelete(event: FilteredItem): void {
-    this.filterService.removeValue(event, this.rolesFilterFormGroup, this.filterColumns);
-  }
-
-  public onFilterClearAll(): void {
-    this.clearFilters();
-    this.dispatchNewPage();
-  }
-
-  private clearFilters(): void {
-    this.rolesFilterFormGroup.reset();
-    this.filteredItems = [];
-    this.currentPage = 1;
-    this.filters = {};
-    this.filteredItems$.next(this.filteredItems.length);
-  }
 
   private onDialogClose(): void {
     this.actions$

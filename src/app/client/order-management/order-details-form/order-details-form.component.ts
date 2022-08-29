@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
 import { combineLatest, debounceTime, filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
 
-import { ChangeEventArgs, DropDownListComponent, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 import {
   GetDepartmentsByLocationId,
@@ -22,7 +22,6 @@ import {
   GetOrganizationStatesWithKeyCode,
   GetProjectSpecialData,
   GetSuggestedDetails,
-  GetWorkflows,
   SetIsDirtyOrderForm,
   SetPredefinedBillRatesData,
 } from '@client/store/order-managment-content.actions';
@@ -36,7 +35,6 @@ import { Department } from '@shared/models/department.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
-import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from '@shared/models/order-management.model';
 import { Document } from '@shared/models/document.model';
 
@@ -58,17 +56,21 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { disableControls } from '@shared/utils/form.utils';
 import { AlertService } from '@shared/services/alert.service';
 import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
-import { ReasonForRequisitionList } from '@shared/models/reason-for-requisition-list';
 import { Comment } from '@shared/models/comment.model';
-import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 import { BillRate } from '@shared/models';
-import { GetComments } from '@shared/components/comments/store/comments.actions';
-import { UserState } from 'src/app/store/user.state';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { CommentsService } from '@shared/services/comments.service';
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
+import { SettingsHelper } from '@core/helpers/settings.helper';
+import { SettingsKeys } from '@shared/enums/settings';
+import { RejectReasonState } from '@organization-management/store/reject-reason.state';
+import { RejectReasonPage } from '@shared/models/reject-reason.model';
+import { GetOrderRequisitionByPage } from '@organization-management/store/reject-reason.actions';
+import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
+import { ORDER_JOB_DISTRIBUTION_LIST } from '@shared/constants/order-job-distribution-list';
+import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 
 @Component({
   selector: 'app-order-details-form',
@@ -86,16 +88,12 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   @Output() orderTypeChanged = new EventEmitter<OrderType>();
 
-  @ViewChild('workflowDropdown')
-  public workflowDropdown: DropDownListComponent;
-
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
   public jobDistributionForm: FormGroup;
   public jobDescriptionForm: FormGroup;
   public contactDetailsForm: FormGroup;
   public workLocationForm: FormGroup;
-  public workflowForm: FormGroup;
   public specialProject: FormGroup;
 
   public contactDetailsFormArray: FormArray;
@@ -130,27 +128,13 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     { id: OrderType.PermPlacement, name: 'Perm. Placement' },
     { id: OrderType.Traveler, name: 'Traveler' },
   ];
+  public orderTypesDataSource: { id: number, name: string }[];
   public orderTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public durations = [
-    { id: Duration.TwelveWeeks, name: '12 Weeks' },
-    { id: Duration.ThirteenWeeks, name: '13 Weeks' },
-    { id: Duration.TwentySixWeeks, name: '26 Weeks' },
-    { id: Duration.Month, name: 'Month' },
-    { id: Duration.Year, name: 'Year' },
-    { id: Duration.NinetyDays, name: '90 Days' },
-    { id: Duration.Other, name: 'Other' },
-  ];
+  public durations = ORDER_DURATION_LIST;
   public durationFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public jobDistributions = [
-    { id: JobDistribution.All, name: 'All' },
-    { id: JobDistribution.Internal, name: 'Internal' },
-    { id: JobDistribution.ExternalTier1, name: 'External Tier 1' },
-    { id: JobDistribution.ExternalTier2, name: 'External Tier 2' },
-    { id: JobDistribution.ExternalTier3, name: 'External Tier 3' },
-    { id: JobDistribution.Selected, name: 'Selected' },
-  ];
+  public jobDistributions = ORDER_JOB_DISTRIBUTION_LIST;
   public jobDistributionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public jobClassifications = [
@@ -162,22 +146,17 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     { id: JobClassification.Volunteers, name: 'Volunteers' },
   ];
 
-  public masterShiftNames = [
-    { id: MasterShiftName.Day, name: 'Day' },
-    { id: MasterShiftName.Evening, name: 'Evening' },
-    { id: MasterShiftName.Night, name: 'Night' },
-    { id: MasterShiftName.Rotating, name: 'Rotating' },
-  ];
+  public masterShiftNames = ORDER_MASTER_SHIFT_NAME_LIST;
 
   public masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public jobClassificationFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public reasonsForRequisition = ReasonForRequisitionList;
-  public reasonForRequisitionFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  public reasonForRequisitionFields: FieldSettingsModel = { text: 'reason', value: 'id' };
 
   public isSpecialProjectFieldsRequired: boolean;
-  private mandatorySpecialProjectDetailsKey: string = 'MandatorySpecialProjectDetails';
+  public settings: {[key in SettingsKeys]?: OrganizationSettingsGet};
+  public SettingsKeys = SettingsKeys;
 
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order | null>;
@@ -221,15 +200,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.suggestedDetails)
   suggestedDetails$: Observable<SuggestedDetails | null>;
 
-  @Select(OrderManagementContentState.workflows)
-  workflows$: Observable<WorkflowByDepartmentAndSkill[]>;
-  workflowFields: FieldSettingsModel = { text: 'workflowGroupName', value: 'workflowGroupId' };
-
   @Select(OrderManagementContentState.contactDetails)
   contactDetails$: Observable<Department>;
 
   @Select(OrganizationManagementState.organizationSettings)
   organizationSettings$: Observable<OrganizationSettingsGet[]>;
+
+  @Select(RejectReasonState.orderRequisition)
+  public reasons$: Observable<RejectReasonPage>;
 
   public isEditMode: boolean;
 
@@ -250,12 +228,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private alertService: AlertService,
-    private orderManagementService: OrderManagementContentService
+    private orderManagementService: OrderManagementContentService,
+    private commentsService: CommentsService
   ) {
     this.orderTypeForm = this.formBuilder.group({
       orderType: [null, Validators.required],
     });
-    this.store.dispatch(new GetOrganizationSettings());
+    this.store.dispatch(new GetOrderRequisitionByPage());
+    this.getSettings();
     this.generalInformationForm = this.formBuilder.group(
       {
         title: [null, [Validators.required, Validators.maxLength(50)]],
@@ -298,7 +278,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
       this.store.dispatch(new SetIsDirtyOrderForm(this.generalInformationForm.dirty));
     });
-    this.getOrganizationSettings();
     this.jobDistributionForm = this.formBuilder.group({
       jobDistribution: [[], Validators.required],
       agency: [null],
@@ -310,14 +289,15 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     this.jobDescriptionForm = this.formBuilder.group({
-      classification: [null, Validators.required],
+      classification: [null],
       onCallRequired: [false],
       asapStart: [false],
       criticalOrder: [false],
       nO_OT: [false],
       jobDescription: ['', Validators.maxLength(500)],
       unitDescription: ['', Validators.maxLength(500)],
-      reasonForRequisition: [null, Validators.required],
+      orderRequisitionReasonId: [null, Validators.required],
+      orderRequisitionReasonName: [null],
     });
 
     this.jobDescriptionForm.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
@@ -350,14 +330,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
     this.workLocationsFormArray.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
       this.store.dispatch(new SetIsDirtyOrderForm(this.workLocationsFormArray.dirty));
-    });
-
-    this.workflowForm = this.formBuilder.group({
-      workflowId: [null, Validators.required],
-    });
-
-    this.workflowForm.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
-      this.store.dispatch(new SetIsDirtyOrderForm(this.workflowForm.dirty));
     });
 
     this.specialProject = this.formBuilder.group({
@@ -401,8 +373,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         if (isNaN(parseInt(orderType)) || !departmentId || !skillId) {
           return;
         }
-
-        this.populateHourlyRateField(orderType, departmentId, skillId);
+        if (!this.isEditMode) {
+          this.populateHourlyRateField(orderType, departmentId, skillId);
+        }
         this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
       });
 
@@ -413,7 +386,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.store.dispatch(new GetWorkflows(departmentId, skillId));
         this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId));
       });
 
@@ -432,7 +404,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     jobStartDateControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((jobStartDate: Date | null) => {
       const duration = durationControl.value;
 
-      if (isNaN(parseInt(duration)) || !(jobStartDate instanceof Date)) {
+      if (isNaN(parseInt(duration)) || !(jobStartDate instanceof Date) || orderTypeControl.value === OrderType.PermPlacement) {
         return;
       }
 
@@ -534,18 +506,19 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
       const isEditMode = !!this.orderId;
       if (order && isEditMode) {
-        const user = this.store.selectSnapshot(UserState.user);
+        this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
         this.isEditMode = true;
         this.order = order;
         this.commentContainerId = order.commentContainerId as number;
-        this.store.dispatch(
-          new GetComments(this.commentContainerId, null, user?.businessUnitType === BusinessUnitType.Agency)
-        );
+        this.getComments();
         this.populateForms(order);
+        this.subscribeForSettings();
       } else if (order?.isTemplate) {
         this.order = order;
         this.populateForms(order);
+        this.subscribeForSettings();
       } else {
+        this.subscribeForSettings();
         this.isEditMode = false;
         this.order = null;
         this.populateNewOrderForm();
@@ -557,10 +530,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         return;
       }
 
-      const { name, email, mobilePhone } = suggestedDetails.contactDetails;
       const { address, state, city, zipCode } = suggestedDetails.workLocation;
-
-      this.populateContactDetailsForm(name, email, mobilePhone);
 
       const workLocationsFormArray = this.workLocationForm.controls['workLocations'] as FormArray;
       const firstWorlLocationsControl = workLocationsFormArray.at(0) as FormGroup;
@@ -578,6 +548,20 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.store.dispatch([new ClearSelectedOrder(), new ClearSuggestions()]);
   }
 
+  public onRequisitionChange(event: any): void {
+    this.jobDescriptionForm.controls['orderRequisitionReasonName'].patchValue(event.itemData.reason);
+  }
+
+  private getSettings(): void {
+    this.store.dispatch(new GetOrganizationSettings());
+  }
+
+  private getComments(): void {
+    this.commentsService.getComments(this.commentContainerId, null).subscribe((comments: Comment[]) => {
+      this.comments = comments;
+    });
+  }
+
   private populateContactDetailsForm(name: string, email: string, mobilePhone: string): void {
     const contactDetailsFormArray = this.contactDetailsForm.controls['contactDetails'] as FormArray;
     const firstContactDetailsControl = contactDetailsFormArray.at(0) as FormGroup;
@@ -587,6 +571,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private populateHourlyRateField(orderType: OrderType, departmentId: number, skillId: number): void {
+    if (orderType === OrderType.PermPlacement) {
+      return;
+    }
     this.orderManagementService
       .getRegularLocalBillRate(orderType, departmentId, skillId)
       .pipe(
@@ -696,12 +683,33 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         .subscribe();
     }
   }
-  private getOrganizationSettings(): void {
-    this.organizationSettings$.pipe(takeUntil(this.unsubscribe$)).subscribe((settings) => {
-      this.isSpecialProjectFieldsRequired =
-        settings.find((x) => x.settingKey === this.mandatorySpecialProjectDetailsKey)?.value === 'true';
+
+  private orderTypeDataSourceHandler(): void {
+    if (this.orderId) {
+      if (
+          this.settings[SettingsKeys.IsReOrder]?.value || 
+          (!this.settings[SettingsKeys.IsReOrder]?.value && this.order?.orderType === OrderType.OpenPerDiem)
+        ) {
+            this.orderTypesDataSource = this.orderTypes;
+          } else {
+            this.orderTypesDataSource = this.orderTypes.filter((orderType) => orderType.id !== OrderType.OpenPerDiem);
+          }
+    } else {
+      if (this.settings[SettingsKeys.IsReOrder]?.value) {
+        this.orderTypesDataSource = this.orderTypes;
+      } else {
+        this.orderTypesDataSource = this.orderTypes.filter((orderType) => orderType.id !== OrderType.OpenPerDiem);
+      }
+    }
+  }
+
+  private subscribeForSettings(): void {
+    this.organizationSettings$.pipe(takeUntil(this.unsubscribe$), filter(settings => !!settings.length)).subscribe((settings) => {
+      this.settings = SettingsHelper.mapSettings(settings);
+      this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
+      this.orderTypeDataSourceHandler();
       if (this.specialProject != null) {
-        if (this.isSpecialProjectFieldsRequired === true) {
+        if (this.isSpecialProjectFieldsRequired) {
           this.specialProject.controls['projectTypeId'].setValidators(Validators.required);
           this.specialProject.controls['projectNameId'].setValidators(Validators.required);
           this.specialProject.controls['poNumberId'].setValidators(Validators.required);
@@ -716,6 +724,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       }
     });
   }
+
   private isFieldTouched(field: string): boolean {
     return this.touchedFields.has(field);
   }
@@ -823,6 +832,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       if (this.generalInformationForm.contains(controlName)) {
         const control = this.generalInformationForm.get(controlName);
         control?.clearValidators();
+        control?.updateValueAndValidity();
       }
     });
   }
@@ -839,7 +849,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private populateForms(order: Order): void {
-    const isStatusEditOrProgress = order.status === OrderStatus.Filled || order.status === OrderStatus.InProgress;
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
     this.orderTypeChanged.emit(order.orderType);
 
@@ -884,7 +893,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         .pipe(take(1))
         .subscribe(() => {
           this.generalInformationForm.controls['locationId'].patchValue(order.locationId);
-          this.isLocationsDropDownEnabled = !isStatusEditOrProgress;
         });
     }
 
@@ -894,7 +902,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         .pipe(take(1))
         .subscribe(() => {
           this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
-          this.isDepartmentsDropDownEnabled = !isStatusEditOrProgress;
         });
     }
 
@@ -931,7 +938,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.jobDescriptionForm.controls['nO_OT'].patchValue(order.nO_OT);
     this.jobDescriptionForm.controls['jobDescription'].patchValue(order.jobDescription);
     this.jobDescriptionForm.controls['unitDescription'].patchValue(order.unitDescription);
-    this.jobDescriptionForm.controls['reasonForRequisition'].patchValue(order.reasonForRequisition);
+    this.jobDescriptionForm.controls['orderRequisitionReasonId'].patchValue(order.orderRequisitionReasonId);
+    this.jobDescriptionForm.controls['orderRequisitionReasonName'].patchValue(order.orderRequisitionReasonName);
 
     this.contactDetailsFormArray.clear();
     this.workLocationsFormArray.clear();
@@ -953,13 +961,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     } else {
       this.workLocationsFormArray.push(this.newWorkLocationFormGroup());
     }
-
-    this.workflows$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.workflowForm.controls['workflowId'].patchValue(order.workflowId);
-      this.disableFormControls(order);
-      this.workflowForm.controls['workflowId'].updateValueAndValidity();
-      this.workflowDropdown.refresh();
-    });
+    this.disableFormControls(order);
   }
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
@@ -1039,7 +1041,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private disableFormControls(order: Order): void {
     if (order.status === OrderStatus.InProgress || order.status === OrderStatus.Filled) {
       this.generalInformationForm = disableControls(this.generalInformationForm, ['regionId', 'skillId'], false);
-      this.workflowForm.get('workflowId')?.disable({ onlySelf: true });
     }
     if (order.orderType === OrderType.OpenPerDiem && order.status === OrderStatus.Open) {
       this.generalInformationForm = disableControls(
@@ -1047,7 +1048,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         ['title', 'regionId', 'locationId', 'departmentId', 'skillId'],
         false
       );
-      this.workflowForm.get('workflowId')?.disable({ onlySelf: true });
     }
   }
 

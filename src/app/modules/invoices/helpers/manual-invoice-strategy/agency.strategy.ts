@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { switchMap } from 'rxjs/operators';
-import { map, Observable, distinctUntilChanged, debounceTime, zip } from 'rxjs';
+import { map, Observable, zip } from 'rxjs';
 import { Actions, ofActionCompleted, Store } from '@ngxs/store';
 
 import { CustomFormGroup, DropdownOption } from '@core/interface';
@@ -42,6 +41,8 @@ export class AgencyStrategy implements ManualInvoiceStrategy {
       }
       this.connectConfigOptions(config, options);
       form.get('nameId')?.patchValue(meta[0].candidateId);
+      form.get('locationId')?.patchValue(meta[0].locationId);
+      form.get('departmentId')?.patchValue(meta[0].departmentId);
   }
 
   public getMeta(form: CustomFormGroup<AddManInvoiceForm>): Observable<null> {

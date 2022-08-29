@@ -29,8 +29,6 @@ import {
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AccordionOneField } from '../../../../models/accordion-one-field.model';
-import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -121,8 +119,6 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   public optionFields = { text: 'statusText', value: 'applicantStatus' };
   public nextApplicantStatuses: ApplicantStatus[];
   public orderCandidateJob: OrderCandidateJob | null;
-  public accordionClickElement: HTMLElement | null;
-  public accordionOneField: AccordionOneField;
 
   private unsubscribe$: Subject<void> = new Subject();
   private orderApplicantsInitialData: OrderApplicantsInitialData | null;
@@ -198,16 +194,6 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
 
   public onAccept(): void {
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
-  }
-
-  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
-  }
-
-  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
   }
 
   public onWithdraw(): void {

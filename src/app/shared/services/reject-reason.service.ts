@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
 
@@ -113,5 +113,43 @@ export class RejectReasonService {
     if (getAll) params = {...params, getAll};
 
     return <HttpParams>params;
+  }
+
+  /**
+   * Remove order requisition
+   * @param id
+   */
+  public removeOrderRequisition(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/OrderRequisition/${id}`);
+  }
+  
+  /**
+   * Get order requisitions by page number
+   * @param pageNumber
+   * @param pageSize
+   * @param orderBy
+   */
+  public getOrderRequisitionsByPage(pageNumber?: number, pageSize?: number, orderBy?: string, lastSelectedBusinessUnitId?: number): Observable<RejectReasonPage> {
+    const params = this.getCloseReasonsParams(pageNumber, pageSize, orderBy);
+    let headers = {};
+    if (lastSelectedBusinessUnitId) {
+      headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
+    }
+
+    return this.http.post<RejectReasonPage>(`/api/OrderRequisition/all`,
+      { params }, { headers }
+    );
+  }
+
+  /**
+   * Save order requisition
+   * @param payload
+   */
+  public saveOrderRequisitions(payload: RejectReason): Observable<RejectReason> {
+    payload.id = payload.id || 0;
+    if (payload.id) {
+      return this.http.put<RejectReason>('/api/OrderRequisition', payload);
+    }
+    return this.http.post<RejectReason>('/api/OrderRequisition', payload);
   }
 }

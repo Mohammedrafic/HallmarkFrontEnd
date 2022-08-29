@@ -1,0 +1,48 @@
+<ejs-dialog
+  id="edit-dialog"
+  #sideDialog
+  cssClass="dialog"
+  [width]="width"
+  [target]="targetElement"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">{{ editAgencyOrg?.businessUnitName}}</h3>
+          </div>
+          <div class="e-card-content">
+            <button ejs-button cssClass="e-outline button-cancel" id="cancelFormButton" (click)="onCancel()">Cancel</button>
+            <button ejs-button id="addFormButton" type="submit" [isPrimary]="true" (click)="onSave()">
+              Save
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="edit-org" [ngClass]="{ 'first-active': firstActive }">
+        <ejs-tab #editOrgTab (selecting)="onTabSelecting($event)">
+          <e-tabitems>
+            <e-tabitem>
+              <ng-template #headerText> Fee Settings </ng-template>
+              <ng-template #content>
+                <app-fee-settings [form]="$any(feeSettingsForm)"></app-fee-settings>
+              </ng-template>
+            </e-tabitem>
+
+            <e-tabitem>
+              <ng-template #headerText> Partnership Settings </ng-template>
+              <ng-template #content>
+                <app-partnership-settings [partnershipForm]="$any(partnershipForm)" [activeTab]="activeTab"></app-partnership-settings>
+              </ng-template>
+            </e-tabitem>
+          </e-tabitems>
+        </ejs-tab>
+      </section>
+    </section>
+  </ng-template>
+</ejs-dialog>
