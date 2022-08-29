@@ -93,8 +93,8 @@ export class InvoicesApiService {
     return this.http.post<PendingInvoicesData>('/api/PendingInvoices', data);
   }
 
-  public getPendingApproval(data: GetPendingApprovalParams): Observable<PendingApprovalInvoicesData> {
-    return this.http.post<PendingApprovalInvoicesData>('/api/Invoices/filtered', data);
+  public getPendingApproval(data: GetPendingApprovalParams, isAgency = false): Observable<PendingApprovalInvoicesData> {
+    return this.http.post<PendingApprovalInvoicesData>(`/api/Invoices${isAgency ? '/agency' : ''}/filtered`, data);
   }
 
   public changeManualInvoiceStatus(data: ChangeStatusData): Observable<void> {
@@ -113,8 +113,11 @@ export class InvoicesApiService {
     return this.http.post<void>('/api/Invoices', data);
   }
 
-  public getInvoicesForPrinting(payload: { organizationId?: number; invoiceIds: number[] }): Observable<InvoiceDetail[]> {
-    return this.http.post<InvoiceDetail[]>('/api/Invoices/printing', payload);
+  public getInvoicesForPrinting(
+    payload: { organizationIds?: number[]; invoiceIds: number[] },
+    isAgency = false
+  ): Observable<InvoiceDetail[]> {
+    return this.http.post<InvoiceDetail[]>(`/api/Invoices${isAgency ? '/agency' : ''}/printing`, payload);
   }
 
   public export(data: ExportPayload): Observable<Blob>  {

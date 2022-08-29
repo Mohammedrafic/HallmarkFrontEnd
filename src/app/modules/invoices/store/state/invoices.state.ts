@@ -147,7 +147,7 @@ export class InvoicesState {
       return;
     }
 
-    return this.invoicesAPIService.getInvoicesForPrinting(payload!).pipe(
+    return this.invoicesAPIService.getInvoicesForPrinting(payload!, !!payload?.organizationIds?.length).pipe(
       tap((res: InvoiceDetail[]) => patchState({
         invoiceDetail: res[0],
         isInvoiceDetailDialogOpen: isOpen,
@@ -437,7 +437,9 @@ export class InvoicesState {
     return this.invoicesAPIService.getPendingApproval({
       ...state.invoicesFilters,
       ...payload,
-    }).pipe(
+    },
+      !!payload?.organizationId
+    ).pipe(
       tap((data: PendingApprovalInvoicesData) => patchState({
         pendingApprovalInvoicesData: data,
       })),

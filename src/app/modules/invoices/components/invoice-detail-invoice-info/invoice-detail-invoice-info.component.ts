@@ -4,7 +4,7 @@ import {
   Input,
   OnChanges,
 } from '@angular/core';
-import { Router } from '@angular/router';
+
 import { InvoiceDetail, InvoiceInfoUIItem } from '../../interfaces';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 
@@ -20,7 +20,6 @@ export class InvoiceDetailInvoiceInfoComponent implements OnChanges {
   public items: InvoiceInfoUIItem[] = [];
 
   constructor(
-    private router: Router,
     private invoicesContainerService: InvoicesContainerService
   ) {
   }

@@ -100,10 +100,17 @@
                   [ngTemplateOutletContext]="{ itemsData: manualInvoicesData$ | async }"
     ></ng-container>
 
-    <ng-container *ngSwitchCase="1"
-                  [ngTemplateOutlet]="invoicesTable"
-                  [ngTemplateOutletContext]="{ itemsData: pendingInvoicesData$ | async }"
-    ></ng-container>
+    <ng-container *ngSwitchCase="1">
+      <ng-container *ngIf="isAgency; else pendingInvoice"
+                    [ngTemplateOutlet]="invoicesTable"
+                    [ngTemplateOutletContext]="{ itemsData: pendingApprovalInvoicesData$ | async }"
+      ></ng-container>
+      <ng-template #pendingInvoice>
+        <ng-container [ngTemplateOutlet]="invoicesTable"
+                      [ngTemplateOutletContext]="{ itemsData: pendingInvoicesData$ | async}"
+        ></ng-container>
+      </ng-template>
+    </ng-container>
 
     <ng-container *ngSwitchCase="2"
                   [ngTemplateOutlet]="invoicesTable"

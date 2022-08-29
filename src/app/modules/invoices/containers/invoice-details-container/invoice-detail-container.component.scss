@@ -37,6 +37,11 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   font-weight: 400;
   line-height: 16px;
   background: $secondary-dark-blue-50;
+
+  &.spaced {
+    margin-left: 0;
+    margin-top: 10px;
+  }
 }
 
 .print-btn {

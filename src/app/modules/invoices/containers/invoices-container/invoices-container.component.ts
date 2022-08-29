@@ -39,6 +39,7 @@ import { AgencyInvoicesGridTab, InvoiceState, OrganizationInvoicesGridTab } from
 import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions } from '../../constants';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { UserState } from 'src/app/store/user.state';
+import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
 
 @Component({
   selector: 'app-invoices-container',
@@ -78,7 +79,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   public readonly manualInvoicesData$: Observable<ManualInvoicesData>;
 
   @Select(InvoicesState.pendingApprovalInvoicesData)
-  public readonly pendingApprovalInvoicesData$: Observable<ManualInvoicesData>;
+  public readonly pendingApprovalInvoicesData$: Observable<PendingApprovalInvoicesData>;
 
   @Select(InvoicesState.invoicesFilters)
   public readonly invoicesFilters$: Observable<PendingInvoicesData>;
@@ -246,7 +247,9 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   }
 
   public handleRowSelected(selectedRowData: SelectedInvoiceRow): void {
-    if (this.selectedTabIdx >= 2) {
+    const enableSelectionIndex = this.isAgency ? 1 : 2;
+
+    if (this.selectedTabIdx >= enableSelectionIndex) {
       this.invoicesService.setCurrentSelectedIndexValue(selectedRowData.rowIndex);
       const invoices = this.store.selectSnapshot(InvoicesState.pendingApprovalInvoicesData);
       const prevId: number | null = invoices?.items[selectedRowData.rowIndex - 1]?.invoiceId || null;
@@ -258,7 +261,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
           {
             invoiceIds: [selectedRowData.data!.invoiceId],
             ...(this.organizationId && {
-              organizationId: this.organizationId,
+              organizationIds: [this.organizationId],
             })
           },
           prevId,

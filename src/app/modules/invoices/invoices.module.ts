@@ -72,8 +72,8 @@ import { AgencyInvoicesContainerService } from './services/invoices-container/ag
 import {
   OrganizationInvoicesContainerService
 } from './services/invoices-container/organization-invoices-container.service';
-import { AllInvoicesActionCellComponent } from './components/all-invoices-action-cell/all-invoices-action-cell.component';
 import { TableStatusCellModule } from '@shared/components/table-status-cell/table-status-cell.module';
+import { AllInvoicesActionCellComponent } from './components/all-invoices-action-cell/all-invoices-action-cell.component';
 
 @NgModule({
   declarations: [

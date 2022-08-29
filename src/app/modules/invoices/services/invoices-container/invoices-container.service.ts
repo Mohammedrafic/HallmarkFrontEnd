@@ -20,7 +20,7 @@ export abstract class InvoicesContainerService {
 
   public abstract getDetailSummaryColDef(summaryLocation: string): ColDef[];
 
-  public abstract showFee(): boolean;
+  public abstract isAgency(): boolean;
 
   public abstract getDetailsUIItems(data: InvoiceDetail): InvoiceInfoUIItem[];
 

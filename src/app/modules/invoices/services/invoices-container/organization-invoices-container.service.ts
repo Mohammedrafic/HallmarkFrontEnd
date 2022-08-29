@@ -139,7 +139,7 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
     return invoiceSummaryColumnDefs(location);
   }
 
-  public showFee(): boolean {
+  public isAgency(): boolean {
     return false;
   }
 

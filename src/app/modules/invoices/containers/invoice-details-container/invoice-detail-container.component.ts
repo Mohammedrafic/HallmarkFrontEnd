@@ -3,7 +3,7 @@ import {
   OnInit, Output, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 
-import { Observable, takeUntil, throttleTime } from 'rxjs';
+import { map, Observable, takeUntil, throttleTime } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { Destroyable } from '@core/helpers';
@@ -17,10 +17,11 @@ import { ExportPayload } from '@shared/models/export.model';
 import { ColDef, GridOptions } from '@ag-grid-community/core';
 
 import { InvoicesState } from '../../store/state/invoices.state';
-import { InvoiceDetail, InvoiceDialogActionPayload } from '../../interfaces';
+import { InvoiceDetail, InvoiceDialogActionPayload, PrintingPostDto } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { INVOICES_STATUSES } from '../../enums';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
+import { InvoicePrintingService } from '../../services';
 
 interface ExportOption extends ItemModel {
   ext: string | null;
@@ -57,13 +58,14 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   public columnSummaryDefinitions: ColDef[] = [];
   public gridOptions: GridOptions = {};
   public gridSummaryOptions: GridOptions = {};
-  public showFee: boolean;
+  public isAgency: boolean;
 
   constructor(
     private cdr: ChangeDetectorRef,
     private chipPipe: ChipsCssClass,
     private store: Store,
-    private invoicesContainerService: InvoicesContainerService
+    private invoicesContainerService: InvoicesContainerService,
+    private printingService: InvoicePrintingService,
   ) {
     super();
   }
@@ -93,7 +95,26 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   }
 
   public handlePrint(): void {
+    const dto: PrintingPostDto = {
+      ...(this.invoiceDetail.meta.organizationIds && {
+        organizationId: this.invoiceDetail.meta.organizationIds[0],
+      }),
+      invoiceIds: [this.invoiceDetail.meta.invoiceId],
+    };
 
+    this.store.dispatch(new Invoices.GetPrintData(dto))
+      .pipe(
+        filter((state) => !!state.invoices.printData),
+        map((state) => state.invoices.printData),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe((data) => {
+        if (this.invoiceDetail.meta.organizationIds) {
+          this.printingService.printAgencyInvoice(data);
+        } else {
+          this.printingService.printInvoice(data);
+        }
+      });
   }
 
   public handleApprove(): void {
@@ -129,6 +150,6 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   private initTableColumns(summaryLocation: string): void {
     this.columnDefinitions = this.invoicesContainerService.getDetailColDef();
     this.columnSummaryDefinitions = this.invoicesContainerService.getDetailSummaryColDef(summaryLocation);
-    this.showFee = this.invoicesContainerService.showFee();
+    this.isAgency = this.invoicesContainerService.isAgency();
   }
 }

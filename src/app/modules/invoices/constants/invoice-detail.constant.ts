@@ -24,7 +24,7 @@ export const invoiceInfoItems = (data: InvoiceDetail, isAgency: boolean): Invoic
   {
     title: 'Invoice Amount',
     icon: '',
-    value: `$${isAgency ? Number((data.totals.amount * 1.05).toFixed(2)) : data.totals.amount}`,
+    value: `$${data.totals.calculatedTotal}`,
     isAmount: true,
   },
   {
@@ -45,10 +45,13 @@ export const invoiceInfoItems = (data: InvoiceDetail, isAgency: boolean): Invoic
 ];
 
 const agencyCol: ColDef = {
-  field: '',
+  field: 'fee',
   headerName: 'Agency fee',
-  width: 103,
-  flex: 1,
+  width: 120,
+  type: 'rightAligned',
+  headerClass: 'custom-wrap align-right',
+  cellClass: 'font-weight-bold align-right',
+  valueFormatter: (params: ValueFormatterParams) => `% ${params.value}`,
 };
 
 export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
@@ -229,7 +232,7 @@ export const invoiceSummaryColumnDefs = (location: string): ColDef[] => [
     headerClass: 'custom-wrap align-right',
   },
   {
-    field: 'total',
+    field: 'calculatedTotal',
     headerName: 'Amount to be Paid',
     width: 150,
     type: 'rightAligned',

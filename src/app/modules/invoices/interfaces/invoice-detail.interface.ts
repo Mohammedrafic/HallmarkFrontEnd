@@ -4,7 +4,8 @@ export interface InvoiceDetail {
   totals: {
     total: number;
     amount: number;
-    totalFee: number;
+    feeTotal: number;
+    calculatedTotal: number;
   };
   summary: InvoiceDetailSummary[];
 }
@@ -24,6 +25,7 @@ export interface InvoiceDetailMeta {
   invoiceState: number;
   invoiceStateText: string;
   organizationPrefix: string;
+  organizationIds: number[];
 }
 
 export interface InvoiceDetailRecord {
@@ -50,6 +52,7 @@ export interface InvoiceDetailRecord {
   organizationPrefix: string;
   positionId: number;
   weekNumber: number;
+  fee: number;
 }
 
 export interface InvoiceDetailSummary {

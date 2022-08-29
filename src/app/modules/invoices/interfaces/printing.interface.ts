@@ -55,6 +55,6 @@ export interface PrintInvoiceData {
 }
 
 export interface PrintingPostDto {
-  organizationId: number;
+  organizationId?: number;
   invoiceIds: number[];
 }
