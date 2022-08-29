@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
+import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 import { debounceTime, Observable, of, throttleTime, catchError, switchMap } from 'rxjs';
 import { tap } from 'rxjs/internal/operators/tap';
@@ -14,6 +14,7 @@ import { Invoices } from '../actions/invoices.actions';
 import { InvoicesApiService, InvoicesService, ManualInvoiceAttachmentsApiService } from '../../services';
 import {
   BaseInvoice,
+  InvoiceDetail, InvoiceDialogActionPayload,
   InvoiceFilterColumns,
   InvoiceRecord,
   InvoicesFilteringOptions,
@@ -27,7 +28,7 @@ import { FilteringOptionsFields } from '../../../timesheets/enums';
 import { DefaultInvoicesState, InvoicesFilteringOptionsMapping, ManualInvoiceMessages } from '../../constants';
 import { SavedFiltersParams } from '../../../timesheets/constants';
 import { reduceFiltersState } from '../../../timesheets/helpers';
-import { InvoicesTableFiltersColumns } from '../../enums/invoices.enum';
+import { InvoicesTableFiltersColumns } from '../../enums';
 import { InvoiceMetaAdapter } from '../../helpers';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { PendingInvoicesData } from '../../interfaces/pending-invoice-record.interface';
@@ -35,8 +36,8 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
 import { downloadBlobFile } from '@shared/utils/file.utils';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
-
 
 const DefaultFiltersState: InvoicesFilterState = {
   pageNumber: 1,
@@ -103,19 +104,22 @@ export class InvoicesState {
     return state.organizations;
   }
 
-  // @Selector([InvoicesState])
-  // static isInvoiceDetailDialogOpen(state: InvoicesModel): DialogActionPayload {
-  //   return { dialogState: state.isInvoiceDetailDialogOpen, rowId: state.selectedInvoiceId };
-  // }
-
   @Selector([InvoicesState])
-  static nextInvoiceId(state: InvoicesModel): string | null {
-    return state?.nextInvoiceId ?? null;
+  static isInvoiceDetailDialogOpen(state: InvoicesModel): InvoiceDialogActionPayload {
+    return {
+      dialogState: state.isInvoiceDetailDialogOpen,
+      invoiceDetail: state.invoiceDetail,
+    };
   }
 
   @Selector([InvoicesState])
-  static prevInvoiceId(state: InvoicesModel): string | null {
-    return state?.prevInvoiceId ?? null;
+  static nextInvoiceId(state: InvoicesModel): number | null {
+    return state.nextInvoiceId;
+  }
+
+  @Selector([InvoicesState])
+  static prevInvoiceId(state: InvoicesModel): number | null {
+    return state.prevInvoiceId;
   }
 
   @Selector([InvoicesState])
@@ -130,16 +134,46 @@ export class InvoicesState {
 
   @Action(Invoices.ToggleInvoiceDialog)
   ToggleInvoiceDialog(
-    { patchState }: StateContext<InvoicesModel>,
-    { action, id, prevId, nextId }: Invoices.ToggleInvoiceDialog
-  ): void {
+    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { action, payload, prevId, nextId }: Invoices.ToggleInvoiceDialog
+  ): Observable<InvoiceDetail[] | void> | void {
     const isOpen: boolean = action === DialogAction.Open;
 
-    patchState({
-      isInvoiceDetailDialogOpen: isOpen,
-      selectedInvoiceId: id,
-      ...(isOpen ? {prevInvoiceId: prevId, nextInvoiceId: nextId} : {}),
-    });
+    if (!isOpen) {
+      patchState({
+        isInvoiceDetailDialogOpen: isOpen,
+      });
+
+      return;
+    }
+
+    return this.invoicesAPIService.getInvoicesForPrinting(payload!, !!payload?.organizationIds?.length).pipe(
+      tap((res: InvoiceDetail[]) => patchState({
+        invoiceDetail: res[0],
+        isInvoiceDetailDialogOpen: isOpen,
+          ...(isOpen ? { prevInvoiceId: prevId, nextInvoiceId: nextId } : {}),
+        })
+      ),
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+      }),
+    );
+  }
+
+  @Action(Invoices.DetailExport)
+  DetailExport(
+    { dispatch }: StateContext<InvoicesModel>,
+    { payload }: Invoices.DetailExport
+  ): Observable<Blob | void> {
+    return this.invoicesAPIService.export(payload)
+      .pipe(
+        tap((file: Blob) => {
+          downloadBlobFile(file, `empty.${payload.exportFileType === ExportedFileType.csv ? 'csv' : 'xlsx'}`);
+        }),
+        catchError((err: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        }),
+      );
   }
 
   @Action(Invoices.UpdateFiltersState)
@@ -403,7 +437,9 @@ export class InvoicesState {
     return this.invoicesAPIService.getPendingApproval({
       ...state.invoicesFilters,
       ...payload,
-    }).pipe(
+    },
+      !!payload?.organizationId
+    ).pipe(
       tap((data: PendingApprovalInvoicesData) => patchState({
         pendingApprovalInvoicesData: data,
       })),
@@ -504,13 +540,13 @@ export class InvoicesState {
   @Action(Invoices.ChangeInvoiceState)
   ChangeInvoiceState(
     { patchState, dispatch }: StateContext<InvoicesModel>,
-    { payload, stateId  }: Invoices.ChangeInvoiceState,
+    { invoiceId, stateId }: Invoices.ChangeInvoiceState,
   ): Observable<void> {
     const body: InvoiceStateDto = {
-      invoiceId: payload.invoiceId,
+      invoiceId,
       targetState: stateId,
     }
-    return this.invoicesAPIService.approvePendingApproveInvoice(body)
+    return this.invoicesAPIService.changeInvoiceStatus(body)
       .pipe(
         tap(() => {
           dispatch(new ShowToast(MessageTypes.Success, 'Invoice status was changed successfully'));
@@ -524,9 +560,9 @@ export class InvoicesState {
   @Action(Invoices.GetPrintData)
   GetPrintingData(
     { patchState, dispatch } : StateContext<InvoicesModel>,
-    { body }: Invoices.GetPrintData,
+    { body, isAgency }: Invoices.GetPrintData,
   ): Observable<PrintInvoiceData[] | void> {
-    return this.invoicesAPIService.getPrintData(body)
+    return this.invoicesAPIService.getPrintData(body, isAgency)
     .pipe(
       tap((res) => {
         patchState({

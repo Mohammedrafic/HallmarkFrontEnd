@@ -4,3 +4,9 @@
     padding: 24px 0;
   }
 }
+
+.button-container {
+  button:not(:last-child) {
+    margin-right: 12px;
+  }
+}

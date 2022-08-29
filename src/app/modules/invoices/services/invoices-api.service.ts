@@ -6,17 +6,12 @@ import { map } from 'rxjs/operators';
 
 import { PageOfCollections } from '@shared/models/page.model';
 import { DataSourceItem, FileForUpload } from '@core/interface';
-import {
-  GetPendingApprovalParams,
-  GroupInvoicesParams,
-  InvoicesFilteringOptions,
-  InvoicesFilterState,
-  InvoiceStateDto,
-  ManualInvoiceMeta,
-  ManualInvoicePostDto,
-  ManualInvoiceReason, ManualInvoicesData, ManualInvoiceTimesheetResponse, PrintingPostDto, PrintInvoiceData
-} from '../interfaces';
+import { GetPendingApprovalParams, GroupInvoicesParams, InvoicesFilteringOptions, InvoicesFilterState, InvoiceStateDto, ManualInvoiceMeta,
+  ManualInvoicePostDto, ManualInvoiceReason, ManualInvoicesData, ManualInvoiceTimesheetResponse, InvoiceDetail, PrintingPostDto,
+  PrintInvoiceData, } from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
+import { ExportPayload } from '@shared/models/export.model';
+
 import { PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
 import { ChangeStatusData } from '../../timesheets/interface';
 import { PendingApprovalInvoice, PendingApprovalInvoicesData } from '../interfaces/pending-approval-invoice.interface';
@@ -98,12 +93,16 @@ export class InvoicesApiService {
     return this.http.post<PendingInvoicesData>('/api/PendingInvoices', data);
   }
 
-  public getPendingApproval(data: GetPendingApprovalParams): Observable<PendingApprovalInvoicesData> {
-    return this.http.post<PendingApprovalInvoicesData>('/api/Invoices/filtered', data);
+  public getPendingApproval(data: GetPendingApprovalParams, isAgency = false): Observable<PendingApprovalInvoicesData> {
+    return this.http.post<PendingApprovalInvoicesData>(`/api/Invoices${isAgency ? '/agency' : ''}/filtered`, data);
   }
 
-  public changeInvoiceStatus(data: ChangeStatusData): Observable<void> {
+  public changeManualInvoiceStatus(data: ChangeStatusData): Observable<void> {
     return this.http.post<void>(`/api/TimesheetState/setstatus`, data);
+  }
+
+  public changeInvoiceStatus(data: InvoiceStateDto): Observable<void> {
+    return this.http.post<void>(`/api/Invoices/setstatus`, data);
   }
 
   public bulkApprove(timesheetIds: number[]): Observable<void> {
@@ -114,12 +113,24 @@ export class InvoicesApiService {
     return this.http.post<void>('/api/Invoices', data);
   }
 
-  public approvePendingApproveInvoice(data: InvoiceStateDto): Observable<void> {
-    return this.http.post<void>(`/api/Invoices/setstatus`, data);
+  public getInvoicesForPrinting(
+    payload: { organizationIds?: number[]; invoiceIds: number[] },
+    isAgency = false
+  ): Observable<InvoiceDetail[]> {
+    return this.http.post<InvoiceDetail[]>(`/api/Invoices${isAgency ? '/agency' : ''}/printing`, payload);
   }
 
-  public getPrintData(body: PrintingPostDto): Observable<PrintInvoiceData[]> {
-    return this.http.post<PrintInvoiceData[]>('/api/Invoices/printing', body);
+  public export(data: ExportPayload): Observable<Blob>  {
+    const testData = { field1: 'Field1Value', field2: 'Field2Value' };
+
+    return of(
+      new Blob([JSON.stringify(testData, null, 2)], {type: 'application/text'})
+    );
+  }
+
+  public getPrintData(body: PrintingPostDto, isAgency: boolean): Observable<PrintInvoiceData[]> {
+    const endpoint = isAgency ? '/api/Invoices/agency/printing' : '/api/Invoices/printing';
+    return this.http.post<PrintInvoiceData[]>(endpoint, body);
   }
 
   private organizationDeleteManualInvoice(id: number): Observable<void> {

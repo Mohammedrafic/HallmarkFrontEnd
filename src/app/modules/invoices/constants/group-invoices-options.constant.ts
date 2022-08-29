@@ -17,11 +17,11 @@ export interface GroupInvoicesOption {
 }
 
 export const groupInvoicesOptions: GroupInvoicesOption[] = [
-  {
-    id: InvoicesAggregationType.Region,
-    text:  'Region',
-    tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.Region],
-  },
+  // {
+  //   id: InvoicesAggregationType.Region,
+  //   text:  'Region',
+  //   tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.Region],
+  // },
   {
     id: InvoicesAggregationType.Location,
     text:  'Location',

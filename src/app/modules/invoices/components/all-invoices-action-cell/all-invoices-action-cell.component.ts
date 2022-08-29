@@ -26,7 +26,8 @@ export class AllInvoicesActionCellComponent implements ICellRendererAngularComp 
     return true;
   }
 
-  public handleAction(): void {
+  public handleAction(event: Event): void {
+    event.stopImmediatePropagation();
     this.action(this.invoice);
   }
 

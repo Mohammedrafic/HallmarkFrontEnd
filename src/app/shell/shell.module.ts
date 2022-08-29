@@ -28,6 +28,7 @@ import {
   Search,
   HelpCircle,
   PieChart,
+  AlertCircle
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -58,6 +59,7 @@ const sidebarIcons = {
   Search,
   HelpCircle,
   PieChart,
+  AlertCircle
 };
 
 @NgModule({

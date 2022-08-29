@@ -29,6 +29,7 @@ import {
   titleValueCellRendererSelector
 } from '../../constants';
 import { GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
+import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
 import { AllInvoicesActionCellComponent } from '../../components/all-invoices-action-cell/all-invoices-action-cell.component';
 
 interface PendingApprovalColDefsConfig {
@@ -89,6 +90,8 @@ export class PendingApprovalGridHelper {
         headerName: 'Status',
         minWidth: 190,
         flex: 1,
+        cellRenderer: TableStatusCellComponent,
+        cellClass: 'status-cell',
       },
       {
         field: 'amount',
@@ -124,7 +127,7 @@ export class PendingApprovalGridHelper {
 
     if (!colDef[0].headerComponent) {
       colDef.splice(0, 1);
-    } 
+    }
 
     return colDef;
   }
@@ -230,7 +233,7 @@ export class PendingApprovalGridHelper {
         headerCheckboxSelection: true,
         headerCheckboxSelectionFilteredOnly: true,
         checkboxSelection: true,
-        minWidth: 240,
+        width: 160,
         headerComponent: ToggleRowExpansionHeaderCellComponent,
         cellRenderer: AllInvoicesActionCellComponent,
         cellRendererParams: {
@@ -255,6 +258,8 @@ export class PendingApprovalGridHelper {
         headerName: 'Status',
         minWidth: 190,
         flex: 1,
+        cellRenderer: TableStatusCellComponent,
+        cellClass: 'status-cell',
       },
       {
         field: 'amount',
@@ -290,7 +295,7 @@ export class PendingApprovalGridHelper {
 
     if (!colDef[0].headerComponent) {
       colDef.splice(0, 1);
-    } 
+    }
 
     return colDef;
   }

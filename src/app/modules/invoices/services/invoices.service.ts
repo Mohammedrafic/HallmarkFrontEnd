@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder } from '@angular/forms';
 
 import { catchError, filter, Observable, take } from 'rxjs';
@@ -10,7 +10,7 @@ import { CustomFormGroup, DataSourceItem } from '@core/interface';
 import { OrganizationRegion } from '@shared/models/organization.model';
 
 import { InvoiceFilterForm } from '../interfaces/form.interface';
-import { InvoicesTableFiltersColumns } from '../enums/invoices.enum';
+import { InvoicesTableFiltersColumns } from '../enums';
 import { Invoices } from '../store/actions/invoices.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { approveInvoiceConfirmDialogConfig } from '../constants/approve-invoice-confirm-dialog-config.const';
@@ -84,7 +84,7 @@ export class InvoicesService {
   }
 
   public approveInvoice(id: number) {
-    return this.invoicesApiService.changeInvoiceStatus({
+    return this.invoicesApiService.changeManualInvoiceStatus({
       organizationId: null,
       reason: null,
       targetStatus: TimesheetTargetStatus.Approved,
@@ -102,7 +102,7 @@ export class InvoicesService {
   }
 
   public rejectInvoice(invoiceId: number, rejectionReason: string): Observable<void> {
-    return this.invoicesApiService.changeInvoiceStatus({
+    return this.invoicesApiService.changeManualInvoiceStatus({
       organizationId: null,
       reason: rejectionReason,
       targetStatus: TimesheetTargetStatus.Rejected,

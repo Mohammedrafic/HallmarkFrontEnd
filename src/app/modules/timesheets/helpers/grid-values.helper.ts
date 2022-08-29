@@ -38,7 +38,7 @@ export class GridValuesHelper {
 
   public static formatAbsNumber(value: number, format: string): string {
     if (!Number(value)) {
-      return '';
+      return '0.00';
     }
 
     if (value < 0) {
@@ -46,5 +46,13 @@ export class GridValuesHelper {
     }
 
     return formatNumber(value, 'en', format) || '';
+  }
+
+  public static formatPercentage(value: number): string {
+    if (!Number(value)) {
+      return '0.00';
+    }
+
+    return `%${formatNumber(value, 'en', '1.2-2')}` || '';
   }
 }

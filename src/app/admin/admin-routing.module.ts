@@ -16,6 +16,7 @@ import { AnalyticsComponent } from './analytics/analytics.component';
 import { ManualInvoiceReasonsComponent } from '@admin/master-data/manual-invoice-reasons/manual-invoice-reasons.component';
 import { OrganizationProfileComponent } from './organization-profile/organization-profile.component';
 
+import { AlertsComponent } from './alerts/alerts.component';
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
@@ -95,6 +96,10 @@ const routes: Routes = [
         },
         canDeactivate: [UnsavedChangesGuard]
       },
+      {
+        path: 'alerts',
+        component: AlertsComponent
+      }
     ],
   },
 ];
