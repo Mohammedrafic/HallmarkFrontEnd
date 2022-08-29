@@ -116,8 +116,34 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     this.paginationPageSize = this.pageSize,
     this.cacheBlockSize = this.pageSize;
     this.serverSideStoreType = 'partial';
-    this.maxBlocksInCache = 2;
+    this.maxBlocksInCache = 1;
     this.columnDefs = [
+      {
+        headerName: 'Action',
+        cellRenderer: 'buttonRenderer',
+        cellRendererParams: {
+          onClick: this.onEdit.bind(this),
+          label: 'Edit'
+        },
+        pinned: 'left',
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      },
+      {
+        headerName: '',
+        cellRenderer: 'buttonRenderer',
+        cellRendererParams: {
+          onClick: this.onRemove.bind(this),
+          label: 'Delete'
+        },
+        pinned: 'left',
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      },
       { 
         field: 'id',
         hide: true 
@@ -150,32 +176,6 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
         header: 'Active',
         field: 'isActive',
         valueGetter : (params: { data: { isActive: boolean}}) => { return Active[Number(params.data.isActive)] },
-        suppressMovable: true,
-        filter: false,
-        sortable: false,
-        menuTabs: []
-      },
-      {
-        headerName: 'Action',
-        cellRenderer: 'buttonRenderer',
-        cellRendererParams: {
-          onClick: this.onEdit.bind(this),
-          label: 'Edit'
-        },        
-        pinned: 'right',
-        suppressMovable: true,
-        filter: false,
-        sortable: false,
-        menuTabs: []
-      },
-      {
-        headerName: '',
-        cellRenderer: 'buttonRenderer',
-        cellRendererParams: {
-          onClick: this.onRemove.bind(this),
-          label: 'Delete'
-        },
-        pinned: 'right',
         suppressMovable: true,
         filter: false,
         sortable: false,
