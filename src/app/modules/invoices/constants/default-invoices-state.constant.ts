@@ -13,7 +13,7 @@ export const DefaultInvoicesState: InvoicesModel = {
   isInvoiceDetailDialogOpen: false,
   nextInvoiceId: null,
   prevInvoiceId: null,
-  selectedInvoiceId: null,
+  invoiceDetail: null,
   invoiceReasons: [],
   invoiceMeta: [],
   organizations: [],

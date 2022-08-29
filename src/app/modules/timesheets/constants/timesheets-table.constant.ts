@@ -7,14 +7,12 @@ import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entit
 import { FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns } from '../enums';
 import { FilterColumns, TimesheetsFilterState } from '../interface';
 import {
-  TimesheetTableStatusCellComponent
-} from '../components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
-import {
   TimesheetTableApproveCellComponent
 } from '../components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
 import { TimesheetTableLinkComponent } from '../components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 import { GridValuesHelper } from '../helpers';
+import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
 
 const commonColumn: ColDef = {
   sortable: true,
@@ -57,7 +55,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       field: TimesheetsTableColumns.StatusText,
       headerName: 'TIMESHEET STATUS',
       minWidth: 170,
-      cellRenderer: TimesheetTableStatusCellComponent,
+      cellRenderer: TableStatusCellComponent,
       cellClass: 'status-cell',
       ...commonColumn,
     },
@@ -65,7 +63,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       field: TimesheetsTableColumns.MileageStatusText,
       headerName: 'MILES STATUS',
       minWidth: 170,
-      cellRenderer: TimesheetTableStatusCellComponent,
+      cellRenderer: TableStatusCellComponent,
       cellClass: 'status-cell',
       ...commonColumn,
     },

@@ -1,21 +1,20 @@
 import { ActivatedRoute } from '@angular/router';
-import {
-  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit,
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit,
   ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import {
-  combineLatestWith, debounceTime, distinctUntilChanged, filter, map, merge, Observable,
-  switchMap, takeUntil, tap } from 'rxjs';
+import { combineLatestWith, debounceTime, distinctUntilChanged, filter, map, Observable,
+  switchMap, takeUntil, tap, } from 'rxjs';
 
 import { PageOfCollections } from '@shared/models/page.model';
 import { Destroyable } from '@core/helpers';
 import { DialogAction } from '@core/enums';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import {
-  BaseInvoice,  Invoice,  InvoicesFilterState,  ManualInvoice,  ManualInvoicesData,
-  PrintingPostDto, } from '../../interfaces';
+  BaseInvoice, InvoicesFilterState, ManualInvoice, ManualInvoicesData,
+  PrintingPostDto, SelectedInvoiceRow
+} from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { InvoicePrintingService, InvoicesService } from '../../services';
@@ -36,7 +35,7 @@ import { GridContainerTabConfig, InvoicesContainerService } from '../../services
 import {
   RejectReasonInputDialogComponent
 } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
-import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
+import { AgencyInvoicesGridTab, InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
 import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions } from '../../constants';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { UserState } from 'src/app/store/user.state';
@@ -214,7 +213,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
           ...this.defaultGridOptions,
           ...this.invoicesContainerService.getGridOptions(tabIdx),
         };
-        
+
         this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx, { organizationId: orgId });
         this.tabConfig = this.invoicesContainerService.getTabConfig(tabIdx);
 
@@ -246,31 +245,41 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  public handleRowSelected(selectedRowData: { rowIndex: number; data: Invoice }): void {
-    this.invoicesService.setCurrentSelectedIndexValue(selectedRowData.rowIndex);
-    // TODO: Implement
-    // const prevId: string = this.allInvoices.items[selectedRowData.rowIndex - 1]?.id;
-    // const nextId: string = this.allInvoices.items[selectedRowData.rowIndex + 1]?.id;
+  public handleRowSelected(selectedRowData: SelectedInvoiceRow): void {
+    if (this.selectedTabIdx >= 2) {
+      this.invoicesService.setCurrentSelectedIndexValue(selectedRowData.rowIndex);
+      const invoices = this.store.selectSnapshot(InvoicesState.pendingApprovalInvoicesData);
+      const prevId: number | null = invoices?.items[selectedRowData.rowIndex - 1]?.invoiceId || null;
+      const nextId: number | null = invoices?.items[selectedRowData.rowIndex + 1]?.invoiceId || null;
 
-    // this.store.dispatch(
-    //   new Invoices.ToggleInvoiceDialog(
-    //     DialogAction.Open,
-    //     selectedRowData.rowIndex,
-    //     prevId,
-    //     nextId
-    //   ));
-    // this.cdr.markForCheck();
+      this.store.dispatch(
+        new Invoices.ToggleInvoiceDialog(
+          DialogAction.Open,
+          {
+            invoiceIds: [selectedRowData.data!.invoiceId],
+            ...(this.organizationId && {
+              organizationId: this.organizationId,
+            })
+          },
+          prevId,
+          nextId
+        ));
+      this.cdr.markForCheck();
+    }
   }
 
   public onNextPreviousOrderEvent(next: boolean): void {
     this.invoicesService.setNextValue(next);
-    const index = this.invoicesService.getNextIndex();
-
     this.cdr.markForCheck();
   }
 
-  public handleUpdateTable(): void {
-    this.getInvoicesByTab();
+  public handleUpdateTable(invoiceId: number): void {
+    this.store.dispatch(new Invoices.ChangeInvoiceState(invoiceId, InvoiceState.PendingPayment))
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
+        this.store.dispatch(new Invoices.ToggleInvoiceDialog(DialogAction.Close))
+        this.getInvoicesByTab();
+      });
   }
 
   public handlePageChange(page: number): void {
@@ -388,8 +397,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     ).subscribe((orgId) => {
       this.setOrgId(orgId);
     });
-
-
   }
 
   private initOrganizationsList(): void {

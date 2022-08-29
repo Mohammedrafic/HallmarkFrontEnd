@@ -23,6 +23,26 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   width: initial;
 }
 
+.wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.grouped {
+  margin-left: 14px;
+  padding: 3px 12px;
+  border: 1px solid $secondary-dark-blue-40;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  background: $secondary-dark-blue-50;
+}
+
+.print-btn {
+  margin-left: 12px;
+}
+
 .profile-table-container {
   padding-top: 12px;
   padding-bottom: 16px;
@@ -30,7 +50,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 }
 
 .container {
-  padding: 12px 24px;
+  padding: 0 24px 12px !important;
 }
 
 .d-flex {
@@ -59,9 +79,13 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 }
 
 .profile-details-header {
+  position: sticky;
+  top: 0;
+  padding: 24px 0;
+  z-index: 100;
   display: flex;
   align-items: center;
-  padding-bottom: 24px;
+  background: white;
 
   .e-avatar {
     margin-right: 16px;
@@ -160,7 +184,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 
 .job-general-info {
   margin-bottom: 16px;
-  padding: 25px;
+  padding: 17px 23px 17px 17px;
 }
 
 .profile-hours-statistics {
@@ -234,7 +258,90 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 }
 
 .profile-table-block {
-  overflow: auto;
+  padding-bottom: 40px;
+
+  ::ng-deep {
+    .align-right {
+      text-align: right;
+
+      .ag-header-cell-label {
+        justify-content: flex-end;
+      }
+    }
+
+    .custom-wrap {
+      .ag-header-cell-text {
+        text-overflow: initial !important;
+        white-space: normal !important;
+      }
+    }
+
+    .custom-line-height {
+      line-height: initial !important;
+    }
+
+    .app-grid {
+      .ag-root-wrapper {
+        height: auto !important;
+      }
+
+      .ag-root-wrapper-body {
+        height: auto !important;
+      }
+
+      .ag-header-cell-text {
+        font-weight: 600 !important;
+        color: $secondary-dark-blue-15 !important;
+      }
+
+      .inactive {
+        .ag-center-cols-viewport {
+          background: $secondary-dark-blue-45;
+        }
+      }
+    }
+  }
+
+  &__title {
+    margin: 24px 0 12px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 0.015em;
+    color: $black;
+  }
+
+  .table-footer {
+    width: 100%;
+    padding: 12px 0;
+    border-bottom: 1px solid $secondary-dark-blue-45;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .total {
+    margin-left: 30px;
+
+    &__value {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 16px;
+      text-align: right;
+      color: $black;
+    }
+
+    &__text {
+      margin-top: 1px;
+      margin-bottom: 0;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 16px;
+      text-align: right;
+      color: $secondary-dark-blue-30;
+    }
+  }
 }
 
 .invoice-details-container-dialog {

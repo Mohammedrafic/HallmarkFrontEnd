@@ -1,6 +1,6 @@
 <button ejs-button class="grid-actions-cell-item" cssClass="e-flat e-success"
         [disabled]="!!actionData.disabled"
-        (click)="actionData.action?.(data)"
+        (click)="$event.stopImmediatePropagation(); actionData.action?.(data)"
         *ngFor="let actionData of actionsConfig; trackBy: trackBy">
     <i-feather *ngIf="actionData.iconName"
                [name]="actionData.iconName"

@@ -3,10 +3,11 @@ import { InvoicesContainerService } from './invoices-container.service';
 import { ManualInvoicesGridHelper } from '../../helpers';
 import { ColDef } from '@ag-grid-community/core';
 import { Observable } from 'rxjs';
-import { ManualInvoice } from '../../interfaces';
+import { InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { AgencyInvoicesGridTab } from '../../enums';
 import { DialogAction } from '@core/enums';
+import { invoiceDetailsColumnDefs, invoiceInfoItems, invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
 
 @Injectable()
 export class AgencyInvoicesContainerService extends InvoicesContainerService {
@@ -45,5 +46,21 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
     }
 
     return this.store.dispatch(action);
+  }
+
+  public getDetailColDef(): ColDef[] {
+    return invoiceDetailsColumnDefs(true);
+  }
+
+  public getDetailSummaryColDef(location: string): ColDef[] {
+    return invoiceSummaryColumnDefs(location);
+  }
+
+  public showFee(): boolean {
+    return true;
+  }
+
+  public getDetailsUIItems(data: InvoiceDetail): InvoiceInfoUIItem[] {
+    return invoiceInfoItems(data, true);
   }
 }

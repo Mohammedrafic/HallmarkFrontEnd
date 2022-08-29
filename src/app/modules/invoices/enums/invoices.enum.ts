@@ -1,5 +1,5 @@
 export enum INVOICES_STATUSES {
-  SUBMITED_PEND_APPR = 'submited pend appr',
+  SUBMITED_PEND_APPR = 'submitted pend appr',
   PENDING_APPROVAL = 'pending approval',
   PENDING_PAYMENT = 'pending payment',
   PAID = 'paid',
@@ -8,6 +8,7 @@ export enum INVOICES_STATUSES {
 export enum INVOICES_ACTIONS {
   GET = '[invoices] GET',
   GET_MANUAL_INVOICES = '[invoices] GET MANUAL INVOICES',
+  DETAIL_EXPORT = '[invoices] DETAIL EXPORT',
   GET_PENDING_INVOICES = '[invoices] GET PENDING INVOICES',
   GET_PENDING_APPROVAL = '[invoices] GET PENDING APPROVAL',
   TOGGLE_INVOICE_DIALOG = '[invoices] TOGGLE INVOICE DIALOG',
