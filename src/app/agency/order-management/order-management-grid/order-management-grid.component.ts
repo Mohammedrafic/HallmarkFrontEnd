@@ -500,6 +500,15 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       positionId: candidate.positionId,
     };
     this.selectedOrder = order;
+    this.store.dispatch(
+      new GetAgencyOrderCandidatesList(
+        order.orderId || (order.id as number),
+        order.organizationId,
+        this.currentPage,
+        this.pageSize,
+        this.orderManagementAgencyService.excludeDeployed
+      )
+    );
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));
     this.openChildDialog.next([order, candidate]);

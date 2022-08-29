@@ -77,9 +77,9 @@
               <ng-template #content>
                 <hr />
                 <section class="candidate">
-                  <ng-container [ngSwitch]="selectedTemplate">
+                  <ng-container [ngSwitch]="selectedTemplate" *ngIf="!order.extensionFromId; else extensionCandidate">
                     <ng-container *ngSwitchCase="template.onboarded">
-                      <section *ngIf="!order.extensionFromId; else extensionCandidate" class="container onboarded-candidate-container">
+                      <section  class="container onboarded-candidate-container">
                         <section class="header-container">
                           <div class="e-card-header">
                             <div class="e-card-header-caption candidate-status">
@@ -152,14 +152,6 @@
                           </app-bill-rates>
                         </section>
                       </section>
-
-                      <ng-template #extensionCandidate>
-                        <section class="container onboarded-candidate-container">
-                          <app-extension-candidate
-                            [currentOrder]="order">
-                          </app-extension-candidate>
-                        </section>
-                      </ng-template>
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.accept">
@@ -185,6 +177,14 @@
 
                     <div *ngSwitchDefault></div>
                   </ng-container>
+
+                  <ng-template #extensionCandidate>
+                    <section class="container onboarded-candidate-container">
+                      <app-extension-candidate
+                        [currentOrder]="order">
+                      </app-extension-candidate>
+                    </section>
+                  </ng-template>
                 </section>
               </ng-template>
             </e-tabitem>

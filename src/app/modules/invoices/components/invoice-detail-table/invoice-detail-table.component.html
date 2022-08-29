@@ -97,27 +97,6 @@
             <b>{{ data.total | currency:'USD':'symbol':'1.0-2' }}</b>
           </ng-template>
         </e-column>
-        <e-column
-          field=""
-          [headerText]="tableConfig.actions.header"
-          [textAlign]="tableConfig.actions.align"
-          [width]="tableConfig.actions.width">
-          <ng-template #template let-data>
-            <div class="row-tool-buttons">
-              <button
-                ejs-button
-                cssClass="e-flat default-icon-button">
-                <span><i-feather name="message-square" class="icon"></i-feather></span>
-              </button>
-              <button
-                ejs-button
-                cssClass="e-flat default-icon-button"
-                (click)="deleteTableItem(data)">
-                <span><i-feather name="trash2" class="icon fill-red"></i-feather></span>
-              </button>
-            </div>
-          </ng-template>
-        </e-column>
       </e-columns>
     </ejs-grid>
   </div>

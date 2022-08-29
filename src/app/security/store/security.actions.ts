@@ -38,6 +38,18 @@ export class GetUsersPage {
     public filterModel: any
   ) {}
 }
+export class GetAllUsersPage {
+  static readonly type = '[security] Get All Users Page';
+  constructor(
+    public businessUnitType: BusinessUnitType,
+    public businessUnitIds: number[],
+    public pageNumber: number,
+    public pageSize: number,
+    public sortModel: any,
+    public filterModel: any,
+    public getAll:boolean
+  ) {}
+}
 
 export class GetPermissionsTree {
   static readonly type = '[security] Get Permissions Tree';

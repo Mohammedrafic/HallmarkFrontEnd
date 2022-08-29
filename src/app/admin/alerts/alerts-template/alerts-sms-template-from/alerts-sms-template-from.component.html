@@ -1,0 +1,32 @@
+<div [formGroup]="addEditSmsTemplateForm" id="addEditSmsTemplateForm" class="sms-template-form">
+    <div class="section-container">
+        <div class="left-section">            
+            <div class="rich-text-container">
+                <label>SMS Body<span class="required">*</span></label>
+                <div class="input-group">
+                    <ejs-richtexteditor #SMSRTE id='smsDefaultRTE' appValidateWithMessage formControlName="alertBody"
+                        [(ngModel)]='alertBody' [(value)]='alertBody' [showCharCount]='true' [maxLength]='200'>
+                    </ejs-richtexteditor>   
+                                     
+                </div>
+            </div>
+            <div class="input-container bootstrap top-container">
+                <div class="input-group">
+                </div>
+            </div>
+        </div>
+        <div class="right-section">
+            <div class="input-container bootstrap">
+                <label>Attributes</label>
+                <div>
+                    <ejs-listview id="smsListbox" [dataSource]='templateParamsData'>
+                    </ejs-listview>
+                </div>
+            </div>
+            <div class="input-container bootstrap top-container">
+                <div class="input-group">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

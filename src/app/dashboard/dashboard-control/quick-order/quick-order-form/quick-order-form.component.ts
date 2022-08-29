@@ -10,7 +10,7 @@ import {
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ChangeEventArgs, FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { combineLatest, debounceTime, filter, merge, Observable, of, Subject, take, takeUntil } from 'rxjs';
+import { combineLatest, debounceTime, filter, merge, Observable, of, Subject, take, takeUntil, throttleTime } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { OrderType } from '@shared/enums/order-type';
@@ -497,6 +497,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     if (this.isOpenPerDiem) {
       listOfCommonControls.forEach((control) => {
         this.generalInformationForm.controls[control].setValidators(null);
+        this.generalInformationForm.controls[control].patchValue(null, { emitEvent: false });
       });
     } else {
       listOfCommonControls.forEach((control) => {
@@ -554,12 +555,12 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.generalInformationForm.controls['skillId'].valueChanges,
       this.userIsAdmin ? this.organizationForm.controls['organization'].valueChanges : of(null),
     ])
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$), debounceTime(300))
       .subscribe(([orderType, departmentId, skillId, organizationId]) => {
         if (isNaN(parseInt(orderType)) || !departmentId || !skillId) {
           return;
         }
-
+       
         this.populateHourlyRateField(orderType, departmentId, skillId, organizationId);
       });
   }
@@ -569,16 +570,12 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     departmentId: number,
     skillId: number,
     organizationId?: number
-  ): void {
+  ): void {;
     if (this.isTravelerOrder || this.isContactToPermOrder) {
       this.orderManagementService
         .getRegularLocalBillRate(orderType, departmentId, skillId, organizationId)
-        .pipe(
-          takeUntil(this.destroy$),
-        )
-        .subscribe((billRates: BillRate[]) =>
-          this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0]?.rateHour || null)
-        );
+        .pipe(take(1))
+        .subscribe((billRates: BillRate[]) => this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0]?.rateHour || null));
     }
   }
 

@@ -45,7 +45,6 @@ import { DropdownEditorComponent } from './components/cell-editors/dropdown-edit
 import { ActionsCellComponent } from './components/cell-editors/actions-cell/actions-cell.component';
 import { TimesheetsFilterDialogComponent } from './components/timesheets-filter-dialog/timesheets-filter-dialog.component';
 import { GridModule } from '@shared/components/grid/grid.module';
-import { TimesheetTableStatusCellComponent } from './components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
 import { ProfileMilesComponent } from './components/profile-cumulative-hours/profile-miles/profile-miles.component';
 import { InputEditorComponent } from './components/cell-editors/input-editor/input-editor.component';
 import { GridDateEditorComponent } from './components/cell-editors/grid-date-editor/grid-date-editor.component';
@@ -70,6 +69,7 @@ import {
   RejectReasonInputDialogModule
 } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.module';
 import { RecordStatusCellComponent } from './components/cell-editors/record-status-cell/record-status-cell.component';
+import { TableStatusCellModule } from '@shared/components/table-status-cell/table-status-cell.module';
 
 const gridIcons = {
   MessageSquare,
@@ -114,7 +114,6 @@ const gridIcons = {
     DropdownEditorComponent,
     ActionsCellComponent,
     TimesheetsFilterDialogComponent,
-    TimesheetTableStatusCellComponent,
     TimesheetTableApproveCellComponent,
     TimesheetTableLinkComponent,
     ProfileMilesComponent,
@@ -161,6 +160,7 @@ const gridIcons = {
     AttachmentsModule,
     FileUploaderModule,
     RejectReasonInputDialogModule,
+    TableStatusCellModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [

@@ -37,6 +37,27 @@ export class UsersService {
   }
 
   /**
+   * Get the list of users by BusinessUnitType and BusinessUnitId
+   * @param BusinessUnitType
+   * @param BusinessUnitId
+   * @param PageNumber
+   * @param PageSize
+   *
+   * @return UsersPage
+   */
+   public getAllUsersPage(
+    BusinessUnitType: BusinessUnitType,
+    BusinessUnitIds: number[],
+    PageNumber: number,
+    PageSize: number,
+    SortModel: any,
+    FilterModel: any,
+    GetAll:boolean
+  ): Observable<UsersPage> {
+    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel ,GetAll});
+  }
+
+  /**
    * Get the list of roles for user by BusinessUnitType and BusinessUnitId
    * @param BusinessUnitType
    * @param BusinessUnitId

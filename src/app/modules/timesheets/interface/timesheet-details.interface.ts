@@ -5,6 +5,8 @@ import { TimesheetInvoice } from './timesheet-invoice.interface';
 import { RecordValue } from './common.interface';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn } from '@shared/models/export.model';
+import { Invoice, InvoiceDetail } from '../../invoices/interfaces';
+import { PendingApprovalInvoice } from '../../invoices/interfaces/pending-approval-invoice.interface';
 
 export interface DetailsColumnConfig {
   align: TableColumnAlign;
@@ -22,7 +24,6 @@ export interface DetailsTableConfig {
   hours: DetailsColumnConfig;
   rate: DetailsColumnConfig;
   total: DetailsColumnConfig;
-  actions: DetailsColumnConfig;
 }
 
 export interface DialogActionPayload {

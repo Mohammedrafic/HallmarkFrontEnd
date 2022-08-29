@@ -1,0 +1,63 @@
+@import "../../../../styles/variables/colors.scss";
+
+.onScreen-template-form {
+    padding-top: 24px;
+    .section-container{
+        display: flex;
+    
+        label {
+          display: block;
+          margin-bottom: 5px;
+          color: $secondary-dark-blue-15;
+        }
+    
+        .input-container {
+          margin-bottom: 15px;
+          margin-right: 10px;
+          flex: 1 1 0;
+        }
+    
+        .active-toggle {
+          margin-top: 24px;
+    
+          span{
+            font-size: 14px;
+          }
+        }
+    
+        .left-section
+        {
+            flex: 1 0 65%;
+          }
+        .right-section {
+          padding-left: 50px;
+          flex: 1 0 30%;
+        }
+      }
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .input-container {
+        margin-bottom: 12px;
+    }
+
+    .rich-text-container {
+        margin-bottom: 12px;
+    }
+
+    
+    .top-container{
+        height:70px;
+    }
+    
+    #defaultRTE_toolbar_wrapper  {
+        height:43px !important;
+    }
+    
+
+    .button-cancel {
+        margin-top: 10px;
+    }
+}
