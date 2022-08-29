@@ -127,7 +127,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   public groupInvoicesOverlayVisible: boolean = false;
   public selectedInvoiceIds: number[];
 
-  private isAgency: boolean;
+  public isAgency: boolean;
 
   constructor(
     private store: Store,

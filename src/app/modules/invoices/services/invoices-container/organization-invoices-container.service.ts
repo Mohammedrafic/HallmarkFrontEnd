@@ -94,7 +94,7 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
       case OrganizationInvoicesGridTab.All:
         action = new Invoices.GetPendingApproval({
           organizationId,
-          invoiceState: InvoiceState.PendingPayment,
+          invoiceState: undefined,
         });
         break;
     }

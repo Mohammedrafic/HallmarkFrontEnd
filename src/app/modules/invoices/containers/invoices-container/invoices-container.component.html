@@ -32,7 +32,8 @@
 
     <button
       ejs-button
-      *ngIf="selectedTabIdx === 2"
+      *ngIf="(!isAgency && (selectedTabIdx !== 0 && selectedTabIdx !== 1)
+      || (isAgency && selectedTabIdx !==0))"
       [disabled]="!selectedInvoiceIds || !selectedInvoiceIds.length"
       cssClass="e-outline button-filter button--no-wrap"
       (click)="printInvoices()">

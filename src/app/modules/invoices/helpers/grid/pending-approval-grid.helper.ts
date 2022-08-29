@@ -76,7 +76,14 @@ export class PendingApprovalGridHelper {
         suppressMenu: true,
         filter: false,
         resizable: false,
-      } : {},
+      } : {
+        headerComponent: ToggleRowExpansionHeaderCellComponent,
+        headerName: '',
+        headerCheckboxSelection: true,
+        headerCheckboxSelectionFilteredOnly: true,
+        checkboxSelection: true,
+        width: 120,
+      },
       {
         field: 'formattedInvoiceId',
         minWidth: 160,
@@ -233,7 +240,7 @@ export class PendingApprovalGridHelper {
         headerCheckboxSelection: true,
         headerCheckboxSelectionFilteredOnly: true,
         checkboxSelection: true,
-        minWidth: 240,
+        minWidth: 140,
         headerComponent: ToggleRowExpansionHeaderCellComponent,
         cellRenderer: AllInvoicesActionCellComponent,
         cellRendererParams: {
@@ -258,6 +265,8 @@ export class PendingApprovalGridHelper {
         headerName: 'Status',
         minWidth: 190,
         flex: 1,
+        cellRenderer: TableStatusCellComponent,
+        cellClass: 'status-cell',
       },
       {
         field: 'amount',

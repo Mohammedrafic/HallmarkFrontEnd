@@ -8,8 +8,14 @@ export interface InvoicePrintRecord {
   candidateFirstName: string;
   candidateLastName: string;
   agencyName: string;
+  organizationName: string;
+  costCenterFormattedName: string;
   skillName: string;
   value: number;
+  formattedJobId: string;
+  calculatedTotal?: number;
+  feeTotal?: number;
+  fee?: number;
   rate: number;
   total: number;
 };
@@ -25,6 +31,7 @@ export interface InvoicePrintSummaryRecord {
 export interface PrintInvoiceMeta {
   invoiceNum: string;
   invoiceDate: string;
+  formattedInvoiceNumber: string;
   paymentTerms: number;
   dueDate: string;
   unitName: string;
