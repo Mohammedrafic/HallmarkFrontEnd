@@ -1,4 +1,3 @@
-import { BusinessLines } from "./business-line.model";
 import { PageOfCollections } from "./page.model";
 
 export class Location {
@@ -8,7 +7,8 @@ export class Location {
   externalId: string;
   invoiceId: string;
   name: string;
-  businessLineId?: BusinessLines;
+  businessLineId: number | null;
+  businessLine?: string | null;
   address1: string;
   address2?: string;
   city: string;
