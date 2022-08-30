@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 
 import { RejectReason } from '@shared/models/reject-reason.model';
+import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { EMPTY, Observable, Subject } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, Select, Store } from '@ngxs/store';
@@ -38,6 +39,7 @@ import { capitalize } from 'lodash';
   selector: 'app-extension-candidate',
   templateUrl: './extension-candidate.component.html',
   styleUrls: ['../accept-candidate/accept-candidate.component.scss', './extension-candidate.component.scss'],
+  providers: [MaskedDateTimeService],
 })
 export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   @Input() currentOrder: Order;

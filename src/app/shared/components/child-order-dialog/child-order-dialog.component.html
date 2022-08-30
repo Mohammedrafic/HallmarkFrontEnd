@@ -79,7 +79,13 @@
                 <section class="candidate">
                   <ng-container [ngSwitch]="selectedTemplate" *ngIf="!order.extensionFromId; else extensionCandidate">
                     <ng-container *ngSwitchCase="template.onboarded">
-                      <section  class="container onboarded-candidate-container">
+                      <app-onboarded-candidate
+                        *ngIf="!isReorderType"
+                        [candidate]="$any(candidate)"
+                        [isTab]="true"
+                        (closeModalEvent)="onClose()"
+                      ></app-onboarded-candidate>
+                      <section *ngIf="isReorderType" class="container onboarded-candidate-container">
                         <section class="header-container">
                           <div class="e-card-header">
                             <div class="e-card-header-caption candidate-status">
