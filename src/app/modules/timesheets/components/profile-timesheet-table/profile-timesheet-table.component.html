@@ -90,6 +90,7 @@
         [modules]="modules"
         [pagination]="false"
         [getRowStyle]="getRowStyle"
+        [class.empty-table]="!recordsToShow[currentTab][currentMode].length"
         (gridReady)="onGridReady($event)"
         class="ag-theme-alpine app-grid__component"
         >

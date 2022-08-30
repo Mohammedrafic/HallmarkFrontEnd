@@ -5,6 +5,20 @@ $chip-margin: 8px;
 
 .profile-table-container {
   padding-bottom: 0;
+
+  ::ng-deep {
+    ag-grid-angular {
+      height: auto !important;
+
+      .ag-root-wrapper {
+        height: auto !important;
+      }
+
+      .ag-root-wrapper-body {
+        height: auto !important;
+      }
+    }
+  }
 }
 
 .container {
@@ -181,4 +195,8 @@ $chip-margin: 8px;
 
 app-date-week-picker {
   margin-top: 5px;
+}
+
+app-navigation-panel {
+  margin-top: auto;
 }
