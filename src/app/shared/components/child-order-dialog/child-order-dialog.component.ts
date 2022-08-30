@@ -126,6 +126,10 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
   private isAlive = true;
 
+  get isReorderType(): boolean {
+    return this.candidateJob?.order.orderType === OrderType.ReOrder;
+  }
+
   constructor(
     private chipsCssClass: ChipsCssClass,
     private router: Router,
