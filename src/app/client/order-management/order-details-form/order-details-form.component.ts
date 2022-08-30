@@ -128,7 +128,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     { id: OrderType.PermPlacement, name: 'Perm. Placement' },
     { id: OrderType.Traveler, name: 'Traveler' },
   ];
-  public orderTypesDataSource: { id: number, name: string }[];
+  public orderTypesDataSource: { id: number; name: string }[];
   public orderTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public durations = ORDER_DURATION_LIST;
@@ -155,7 +155,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public reasonForRequisitionFields: FieldSettingsModel = { text: 'reason', value: 'id' };
 
   public isSpecialProjectFieldsRequired: boolean;
-  public settings: {[key in SettingsKeys]?: OrganizationSettingsGet};
+  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   public SettingsKeys = SettingsKeys;
 
   @Select(OrderManagementContentState.selectedOrder)
@@ -687,13 +687,15 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private orderTypeDataSourceHandler(): void {
     if (this.orderId) {
       if (
+        this.settings[SettingsKeys.IsReOrder]?.value ||
           this.settings[SettingsKeys.IsReOrder]?.value || 
-          (!this.settings[SettingsKeys.IsReOrder]?.value && this.order?.orderType === OrderType.OpenPerDiem)
-        ) {
-            this.orderTypesDataSource = this.orderTypes;
-          } else {
-            this.orderTypesDataSource = this.orderTypes.filter((orderType) => orderType.id !== OrderType.OpenPerDiem);
-          }
+        this.settings[SettingsKeys.IsReOrder]?.value ||
+        (!this.settings[SettingsKeys.IsReOrder]?.value && this.order?.orderType === OrderType.OpenPerDiem)
+      ) {
+        this.orderTypesDataSource = this.orderTypes;
+      } else {
+        this.orderTypesDataSource = this.orderTypes.filter((orderType) => orderType.id !== OrderType.OpenPerDiem);
+      }
     } else {
       if (this.settings[SettingsKeys.IsReOrder]?.value) {
         this.orderTypesDataSource = this.orderTypes;
@@ -1039,15 +1041,16 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   /** During editing order (in progress or filled), some fields have to be disabled */
   private disableFormControls(order: Order): void {
+    const controlNames = ['regionId', 'locationId', 'departmentId', 'skillId'];
+
+    if (order.status === OrderStatus.Incomplete || order.status === OrderStatus.Open) {
+      controlNames.forEach((control) => this.generalInformationForm.controls[control].enable());
+    }
     if (order.status === OrderStatus.InProgress || order.status === OrderStatus.Filled) {
-      this.generalInformationForm = disableControls(this.generalInformationForm, ['regionId', 'skillId'], false);
+      this.generalInformationForm = disableControls(this.generalInformationForm, controlNames, false);
     }
     if (order.orderType === OrderType.OpenPerDiem && order.status === OrderStatus.Open) {
-      this.generalInformationForm = disableControls(
-        this.generalInformationForm,
-        ['title', 'regionId', 'locationId', 'departmentId', 'skillId'],
-        false
-      );
+      this.generalInformationForm = disableControls(this.generalInformationForm, controlNames, false);
     }
   }
 
