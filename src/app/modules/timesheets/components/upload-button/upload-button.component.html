@@ -27,7 +27,7 @@
                                [maxFileSize]="maxFileSize"
                                [maxFiles]="5"
                                [showSelectedFiles]="false"
-                               (uploadFilesChanged)="emitSelectedFiles($event)"
+                               (selectedFilesChanged)="emitSelectedFiles($event)"
             ></app-file-uploader>
         </div>
     </ng-template>

@@ -19,6 +19,8 @@ import { InvoiceConfirmMessages } from '../../constants/messages.constant';
 import { InvoicesState } from "../../store/state/invoices.state";
 import { InvoiceMetaAdapter, InvoicesAdapter, ManualInvoiceAdapter } from '../../helpers';
 import { ManualInvoiceStrategy, ManualInvoiceStrategyMap } from '../../helpers/manual-invoice-strategy';
+import { Attachment } from '@shared/components/attachments';
+import { CustomFilesPropModel } from '@shared/components/file-uploader/custom-files-prop-model.interface';
 
 @Component({
   selector: 'app-manual-invoice-dialog',
@@ -34,6 +36,12 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   public clearFiles: FilesClearEvent | null;
 
   public invoiceToEdit: ManualInvoice | null = null;
+
+  public filesForDelete: Attachment[] = [];
+
+  public dialogShown: boolean = false;
+
+  public title: string = '';
 
   private searchOptions: ManualInvoiceMeta[];
 
@@ -96,7 +104,15 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       return;
     }
 
-    this.store.dispatch(new Invoices.SaveManulaInvoice(dto, this.filesForUpload, this.isAgency));
+    if (this.invoiceToEdit) {
+      this.store.dispatch(new Invoices.UpdateManualInvoice({
+        ...dto,
+        timesheetId: this.invoiceToEdit.id,
+      }, this.filesForUpload, this.filesForDelete, this.isAgency));
+    } else {
+      this.store.dispatch(new Invoices.SaveManulaInvoice(dto, this.filesForUpload, this.isAgency));
+    }
+
     this.closeDialog();
   }
 
@@ -109,8 +125,12 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     .pipe(
       ofActionDispatched(Invoices.ToggleManualInvoiceDialog),
       filter((payload: Invoices.ToggleManualInvoiceDialog) => payload.action === DialogAction.Open),
-      tap(() => {
+      tap(({ invoice }) => {
+        this.invoiceToEdit = invoice || null;
+        this.title = invoice ? this.dialogConfig.editTitle : this.dialogConfig.title;
         this.clearFiles = null;
+        this.dialogShown = true;
+
         this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
         this.sideAddDialog.show();
         this.cd.markForCheck();
@@ -120,6 +140,8 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     )
     .subscribe(() => {
       this.searchOptions = this.store.snapshot().invoices.invoiceMeta;
+
+      this.setOrderIdOnEdit();
       this.cd.markForCheck();
     });
   }
@@ -132,6 +154,8 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       )
       .subscribe((data) => {
         this.dropDownOptions.reasons = data;
+
+        this.setOrderIdOnEdit();
         this.cd.markForCheck();
       });
   }
@@ -145,30 +169,65 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       tap(() => this.clearDialog()),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe((value: string) => {
-      const concatedValue = value.replace(/\s/g, '').toUpperCase();
+    .subscribe((value: string) => this.handleOrderIdChange(value));
+  }
 
-      this.form.get('orderId')?.patchValue(concatedValue, { emitEvent: false, onlySelf: true });
+  private handleOrderIdChange(value: string): void {
+    const concatedValue = value.replace(/\s/g, '').toUpperCase();
 
-      if (this.isAgency) {
-        this.form.get('unitId')?.patchValue(this.store.snapshot().invoices.selectedOrganizationId);
-      }
-      
-      const item = this.searchOptions.find((item) => {
-        const concatedInputValue = item.formattedOrderId.replace(/\s/g, '').toUpperCase();
-        return concatedInputValue === concatedValue;
-      });
-      
-      if (!item) {
-        this.postionSearch = null;
-        const basedOnOrder = this.searchOptions.filter((item) => item.orderId.toString() === concatedValue) || [];
-        this.strategy.populateOptions(basedOnOrder, this.dropDownOptions, this.form, this.dialogConfig, false);
-      } else {
-        this.postionSearch = item;
-        this.strategy.populateOptions([item], this.dropDownOptions, this.form, this.dialogConfig, true);
-      }
-      this.cd.markForCheck();
+    this.form.get('orderId')?.patchValue(concatedValue, { emitEvent: false, onlySelf: true });
+
+    if (this.isAgency) {
+      this.form.get('unitId')?.patchValue(this.store.snapshot().invoices.selectedOrganizationId);
+    }
+
+    const item = this.searchOptions.find((item) => {
+      const concatedInputValue = item.formattedOrderId.replace(/\s/g, '').toUpperCase();
+      return concatedInputValue === concatedValue;
     });
+
+    if (!item) {
+      this.postionSearch = null;
+      const basedOnOrder = this.searchOptions.filter((item) => item.orderId.toString() === concatedValue) || [];
+      this.strategy.populateOptions(basedOnOrder, this.dropDownOptions, this.form, this.dialogConfig, false);
+    } else {
+      this.postionSearch = item;
+      this.strategy.populateOptions([item], this.dropDownOptions, this.form, this.dialogConfig, true);
+    }
+
+    this.setFormValuesOnEdit();
+    this.cd.markForCheck();
+  }
+
+  private setFormValuesOnEdit(): void {
+    if (this.invoiceToEdit) {
+      const {
+        amount: value,
+        serviceDate: date,
+        linkedInvoiceId: link,
+        vendorFeeApplicable: vendorFee,
+        reasonId,
+        comment
+      } = this.invoiceToEdit;
+
+      this.form.patchValue({
+        value,
+        link,
+        date,
+        vendorFee,
+        reasonId,
+        description: comment,
+      }, { emitEvent: false });
+    }
+  }
+
+  public setOrderIdOnEdit(): void {
+    if (this.invoiceToEdit) {
+      const { formattedOrderId } = this.invoiceToEdit;
+
+      const [orderId, position] = formattedOrderId.replace(/\s/g, '').split('-');
+      this.handleOrderIdChange(Number(position) ? formattedOrderId : orderId);
+    }
   }
 
   private watchForCandidate(): void {
@@ -258,5 +317,20 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       this.form.get('departmentId')?.patchValue(this.dropDownOptions.invoiceDepartments[0].value);
     }
     this.cd.markForCheck();
+  }
+
+  public deleteFile({ id }: CustomFilesPropModel): void {
+    const file = this.invoiceToEdit?.attachments.find((attachment: Attachment) => attachment.id === id);
+
+    if (file) {
+      this.filesForDelete = [...this.filesForDelete, file];
+    }
+  }
+
+  public clearDialogData(): void {
+    this.invoiceToEdit = null;
+    this.filesForDelete = [];
+    this.filesForUpload = [];
+    this.dialogShown = false;
   }
 }

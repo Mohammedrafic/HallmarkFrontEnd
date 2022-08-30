@@ -5,11 +5,12 @@
   [visible]="false"
   [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
+  (beforeClose)="clearDialogData()"
 >
   <ng-template #content>
     <div class="dialog-container">
       <div class="dialog-header">
-        <h3 class="title">{{ dialogConfig.title | titlecase }}</h3>
+        <h3 class="title">{{ title | titlecase }}</h3>
         <div class="controls">
           <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
           <button ejs-button [isPrimary]="true" (click)="saveManualInvoice()">Save</button>
@@ -122,11 +123,12 @@
           </ng-container>
 
         </form>
-        <app-file-uploader [maxFiles]="5"
-                           *ngIf="invoiceToEdit?.attachments?.length"
+        <app-file-uploader *ngIf="dialogShown"
+                           [maxFiles]="5"
                            [clearAll]="clearFiles"
                            [attachments]="invoiceToEdit?.attachments || []"
-                           (uploadFilesChanged)="setFilesForUpload($event)">
+                           (existingFileDelete)="deleteFile($event)"
+                           (selectedFilesChanged)="setFilesForUpload($event)">
         </app-file-uploader>
       </div>
     </div>

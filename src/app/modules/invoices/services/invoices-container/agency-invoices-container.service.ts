@@ -16,9 +16,10 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
     switch (tab) {
       case 0:
         return ManualInvoicesGridHelper.getAgencyColDefs({
-          edit: (invoice: ManualInvoice) => this.store.dispatch(
-            new Invoices.ToggleManualInvoiceDialog(DialogAction.Open, invoice)
-          ),
+          edit: (invoice: ManualInvoice) => this.store.dispatch([
+            new Invoices.ToggleManualInvoiceDialog(DialogAction.Open, invoice),
+            new Invoices.GetInvoicesReasons(organizationId),
+          ]),
           delete: ({ id, organizationId }: ManualInvoice) => this.store.dispatch(
             new Invoices.DeleteManualInvoice(id, organizationId)
           ),

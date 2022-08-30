@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
-import { debounceTime, Observable, of, throttleTime, catchError, switchMap } from 'rxjs';
+import { catchError, debounceTime, forkJoin, map, Observable, of, switchMap, throttleTime } from 'rxjs';
 import { tap } from 'rxjs/internal/operators/tap';
 
 import { PageOfCollections } from '@shared/models/page.model';
@@ -21,7 +21,7 @@ import {
   InvoicesFilterState,
   InvoiceStateDto,
   ManualInvoiceMeta,
-  ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData
+  ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData, ManualInvoiceTimesheetResponse
 } from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
 import { FilteringOptionsFields } from '../../../timesheets/enums';
@@ -38,6 +38,7 @@ import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
 import { downloadBlobFile } from '@shared/utils/file.utils';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
+import { Attachment } from '@shared/components/attachments';
 
 const DefaultFiltersState: InvoicesFilterState = {
   pageNumber: 1,
@@ -316,6 +317,40 @@ export class InvoicesState {
     );
   }
 
+  @Action(Invoices.UpdateManualInvoice)
+  UpdateManualInvoice(
+    ctx: StateContext<InvoicesModel>,
+    { payload, files, filesToDelete, isAgency }: Invoices.UpdateManualInvoice,
+  ): Observable<number[]> {
+    const organizationId = isAgency ? payload.organizationId : null;
+
+    return this.invoicesAPIService.updateManualInvoice(payload)
+      .pipe(
+        switchMap(() => forkJoin([
+          this.manualInvoiceAttachmentsApiService.deleteAttachments(
+            filesToDelete.map((file: Attachment) => file.id),
+            payload.timesheetId,
+            organizationId
+          ),
+          this.invoicesAPIService.saveManualInvoiceAttachments(
+            files, organizationId, payload.timesheetId
+          )
+        ])),
+        map((ids: [number[], number[]]) => ids.flat()),
+        tap(() => ctx.dispatch([
+          new ShowToast(MessageTypes.Success, ManualInvoiceMessages.successEdit),
+          new Invoices.GetManualInvoices(payload.organizationId),
+        ])),
+        catchError((err: HttpErrorResponse) => {
+          ctx.dispatch(
+            new ShowToast(MessageTypes.Error, getAllErrors(err.error))
+          );
+
+          return of([]);
+        }),
+      );
+  }
+
   @Action(Invoices.DeleteManualInvoice)
   DeleteManualInvoice(
     ctx: StateContext<InvoicesModel | void>,
@@ -515,6 +550,22 @@ export class InvoicesState {
     return this.manualInvoiceAttachmentsApiService.downloadAttachment(id, organizationId)
       .pipe(
         tap((file: Blob) => downloadBlobFile(file, fileName)),
+        catchError(() => dispatch(
+          new ShowToast(MessageTypes.Error, 'File not found')
+        ))
+      );
+  }
+
+  @Action(Invoices.DeleteAttachment)
+  DeleteAttachment(
+    { patchState, getState, dispatch }: StateContext<InvoicesModel>,
+    { invoiceId, fileId, organizationId }: Invoices.DeleteAttachment
+  ): Observable<number | void> {
+    return this.manualInvoiceAttachmentsApiService.deleteAttachment(fileId, invoiceId, organizationId)
+      .pipe(
+        tap(() => dispatch(
+          new ShowToast(MessageTypes.Success, 'File successfully deleted')
+        )),
         catchError(() => dispatch(
           new ShowToast(MessageTypes.Error, 'File not found')
         ))
