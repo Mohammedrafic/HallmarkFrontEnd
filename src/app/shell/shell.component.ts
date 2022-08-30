@@ -251,7 +251,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   }
 
   public onGetHelp(): void {
-    window.open('https://helpdocumentation.azurewebsites.net/', '_blank');
+    window.open('https://lemon-sea-05b5a7c0f.1.azurestaticapps.net/', '_blank');
   }
 
   private setSideBarForFirstLoad(route: string): void {
