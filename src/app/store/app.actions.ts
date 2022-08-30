@@ -78,3 +78,8 @@ export class ShowOnScreenSideDialog {
   static readonly type = '[app] Set OnScreen Side Dialog Showing state';
   constructor(public isDialogShown: boolean) { }
 }
+
+export class GetAlertsForCurrentUser {
+  static readonly type = '[app] Get Alerts For Current User';
+  constructor(public payload: any) { }
+}

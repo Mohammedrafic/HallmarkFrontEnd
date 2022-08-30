@@ -56,7 +56,7 @@ import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum
 import { ExtensionSidebarComponent } from '@shared/components/extension/extension-sidebar/extension-sidebar.component';
 import { AppState } from '../../../store/app.state';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ExtensionCandidateComponent } from '../order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
 import { filter } from 'rxjs/operators';
 
@@ -255,7 +255,19 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public closeExtensionSidebar(): void {
-    this.isExtensionSidebarShown = false;
+    if (this.extensionSidebarComponent.extensionForm.dirty) {
+      this.confirmService
+      .confirm(CANCEL_CONFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button'
+      }).pipe(filter(confirm => !!confirm))
+      .subscribe(() => {
+        this.isExtensionSidebarShown = false;
+      });
+    } else {
+      this.isExtensionSidebarShown = false;
+    }
   }
 
   public saveExtension(): void {
