@@ -119,7 +119,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   private setFormValue(data: OrderApplicantsInitialData): void {
     this.formGroup.setValue({
-      orderId: data.orderId,
+      orderId: `${this.candidateJob.organizationPrefix}-${this.candidateJob.orderPublicId}`,
       jobDate: [data.jobStartDate, data.jobEndDate],
       orderBillRate: PriceUtils.formatNumbers(data.orderBillRate),
       locationName: data.locationName,

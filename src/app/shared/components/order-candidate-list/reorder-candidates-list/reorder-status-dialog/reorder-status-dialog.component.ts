@@ -217,22 +217,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   private setValueForm({
-    order: {
-      reOrderFromId,
-      hourlyRate,
-      locationName,
-      departmentName,
-      skillName,
-      shiftStartTime,
-      shiftEndTime,
-      openPositions,
-    },
+    order: { hourlyRate, locationName, departmentName, skillName, shiftStartTime, shiftEndTime, openPositions },
     candidateBillRate,
     offeredBillRate,
-    orderId,
-    positionId,
     rejectReason,
     reOrderDate,
+    organizationPrefix,
+    orderPublicId,
   }: OrderCandidateJob) {
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     let isBillRatePending: number;
@@ -246,7 +237,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     }
 
     this.acceptForm.patchValue({
-      reOrderFromId: `${reOrderFromId}-${orderId}-${positionId}`,
+      reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
       offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
       candidateBillRate: PriceUtils.formatNumbers(candidateBillRateValue),
       locationName,

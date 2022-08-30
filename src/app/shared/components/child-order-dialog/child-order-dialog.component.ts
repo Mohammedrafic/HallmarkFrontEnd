@@ -1,4 +1,14 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { Observable, Subject, takeWhile, tap } from 'rxjs';
@@ -120,7 +130,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     private router: Router,
     private store: Store,
     private commentsService: CommentsService,
-    private confirmService: ConfirmService,
+    private confirmService: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -279,8 +289,8 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     };
 
     return this.confirmService
-    .confirm(UNSAVE_CHANGES_TEXT, options)
-    .pipe(tap((confirm) =>  confirm && this.extensionCandidateComponent.updatedUnsavedOnboarded()));
+      .confirm(UNSAVE_CHANGES_TEXT, options)
+      .pipe(tap((confirm) => confirm && this.extensionCandidateComponent.updatedUnsavedOnboarded()));
   }
 
   private setAddExtensionBtnState(candidate: OrderManagementChild): void {
@@ -291,7 +301,8 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     const dateAvailable = candidate.closeDate
       ? addDays(candidate.closeDate, 14)?.getTime()! >= new Date().getTime()
       : true;
-    this.isAddExtensionBtnAvailable = this.isOrganization && isOrderFilledOrProgress && dateAvailable && isOrderTravelerOrContractToPerm;
+    this.isAddExtensionBtnAvailable =
+      this.isOrganization && isOrderFilledOrProgress && dateAvailable && isOrderTravelerOrContractToPerm;
   }
 
   private getTemplate(): void {
@@ -389,7 +400,6 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
   private setAcceptForm({
     order: {
-      reOrderFromId,
       hourlyRate,
       locationName,
       departmentName,
@@ -401,8 +411,8 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     },
     candidateBillRate,
     offeredBillRate,
-    orderId,
-    positionId,
+    organizationPrefix,
+    orderPublicId,
   }: OrderCandidateJob) {
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     const isBillRatePending =
@@ -410,7 +420,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
         ? candidateBillRate
         : offeredBillRate;
     this.acceptForm.patchValue({
-      reOrderFromId: `${reOrderFromId}-${orderId}-${positionId}`,
+      reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
       offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
       candidateBillRate: PriceUtils.formatNumbers(candidateBillRateValue),
       locationName,

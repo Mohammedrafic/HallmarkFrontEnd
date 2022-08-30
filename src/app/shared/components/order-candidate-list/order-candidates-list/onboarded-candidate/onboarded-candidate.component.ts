@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { ConfirmService } from "@shared/services/confirm.service";
+import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, merge, Observable, Subject, takeUntil } from 'rxjs';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
@@ -157,8 +157,9 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
         .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => confirm))
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => confirm))
         .subscribe(() => {
           this.closeDialog();
         });
@@ -258,7 +259,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
         this.getComments();
         this.billRatesData = [...value?.billRates];
         this.form.patchValue({
-          jobId: value.orderId,
+          jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
           date: [value.order.jobStartDate, value.order.jobEndDate],
           billRates: PriceUtils.formatNumbers(value.order.hourlyRate),
           candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,

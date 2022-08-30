@@ -290,7 +290,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
 
   private setValueForm(orderCandidateJob: OrderCandidateJob): void {
     this.form?.patchValue({
-      jobId: orderCandidateJob.jobId,
+      jobId: `${orderCandidateJob.organizationPrefix}-${orderCandidateJob.orderPublicId}`,
       locationName: orderCandidateJob.order.locationName,
       department: orderCandidateJob.order.departmentName,
       skill: orderCandidateJob.order.skillName,
