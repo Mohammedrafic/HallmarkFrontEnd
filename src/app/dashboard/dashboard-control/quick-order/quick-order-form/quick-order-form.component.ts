@@ -383,8 +383,6 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       );
       this.isDepartmentsDropDownEnabled = true;
     }
-
-    this.generalInformationForm.controls['skillId'].patchValue(this.skillDataSource[0].id);
   }
 
   private handleDurationControlValueChanges(): void {
