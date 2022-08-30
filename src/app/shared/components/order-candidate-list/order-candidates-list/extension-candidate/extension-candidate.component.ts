@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { EMPTY, Observable, Subject } from 'rxjs';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
@@ -67,6 +67,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
   ];
   public isAgency: boolean = false;
+  public today = new Date();
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -252,10 +253,10 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     this.form = new FormGroup({
       jobId: new FormControl({ value: '', disabled: true }),
       locationName: new FormControl({ value: '', disabled: true }),
-      offeredBillRate: new FormControl(''),
+      offeredBillRate: new FormControl('', Validators.required),
       comments: new FormControl(''),
-      actualStartDate: new FormControl(''),
-      actualEndDate: new FormControl(''),
+      actualStartDate: new FormControl('', Validators.required),
+      actualEndDate: new FormControl('', Validators.required),
       extensionStartDate: new FormControl({ value: '', disabled: true }),
       extensionEndDate: new FormControl({ value: '', disabled: true }),
       guaranteedWorkWeek: new FormControl(''),
@@ -316,4 +317,3 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
       });
   }
 }
-

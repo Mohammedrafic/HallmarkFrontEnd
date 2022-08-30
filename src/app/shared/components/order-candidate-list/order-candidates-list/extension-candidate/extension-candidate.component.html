@@ -82,7 +82,7 @@
                   <div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Offered Bill Rate</label>
-                      <div>
+                      <div class="input-group">
                         <input
                           appValidateWithMessage
                           formControlName="offeredBillRate"
@@ -119,24 +119,34 @@
                     <div class="d-flex">
                       <div class="input-container bootstrap">
                         <label class="input-group">Actual Start Date</label>
-                        <div class="input-group input-readonly">
-                          <input
-                            appValidateWithMessage
+                        <div class="input-group">
+                          <ejs-datepicker
                             formControlName="actualStartDate"
-                            class="e-input"
-                            type="text"
-                          />
+                            appValidateWithMessage
+                            format="MM/dd/yyyy"
+                            placeholder="MM/DD/YYYY"
+                            [enableMask]="true"
+                            [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                            class="datepicker"
+                            [min]="today"
+                          >
+                          </ejs-datepicker>
                         </div>
                       </div>
                       <div class="input-container bootstrap">
                         <label class="input-group">Actual End Date</label>
-                        <div class="input-group input-readonly">
-                          <input
+                        <div class="input-group">
+                          <ejs-datepicker
                             appValidateWithMessage
+                            format="MM/dd/yyyy"
+                            placeholder="MM/DD/YYYY"
                             formControlName="actualEndDate"
-                            class="e-input"
-                            type="text"
-                          />
+                            [enableMask]="true"
+                            [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                            class="datepicker"
+                            [min]="today"
+                          >
+                          </ejs-datepicker>
                         </div>
                       </div>
                     </div>
