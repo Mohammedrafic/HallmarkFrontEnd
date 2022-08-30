@@ -90,8 +90,8 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   }
 
   public saveManualInvoice(): void {
-    if (!this.form.valid) {
-      this.form.updateValueAndValidity();
+    if (!this.form?.valid) {
+      this.form?.updateValueAndValidity();
       this.cd.markForCheck();
       return;
     }
@@ -135,7 +135,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
         this.sideAddDialog.show();
         this.cd.markForCheck();
       }),
-      switchMap(() => this.strategy.getMeta(this.form)),
+      switchMap(() => this.strategy.getMeta(this.form as CustomFormGroup<AddManInvoiceForm>)),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
@@ -161,7 +161,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   }
 
   private watchForSearch(): void {
-    this.form.get('orderId')?.valueChanges
+    this.form?.get('orderId')?.valueChanges
     .pipe(
       filter((value) => !!value),
       distinctUntilChanged(),
@@ -175,10 +175,10 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   private handleOrderIdChange(value: string): void {
     const concatedValue = value.replace(/\s/g, '').toUpperCase();
 
-    this.form.get('orderId')?.patchValue(concatedValue, { emitEvent: false, onlySelf: true });
+    this.form?.get('orderId')?.patchValue(concatedValue, { emitEvent: false, onlySelf: true });
 
     if (this.isAgency) {
-      this.form.get('unitId')?.patchValue(this.store.snapshot().invoices.selectedOrganizationId);
+      this.form?.get('unitId')?.patchValue(this.store.snapshot().invoices.selectedOrganizationId);
     }
 
     const item = this.searchOptions.find((item) => {
@@ -189,10 +189,12 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     if (!item) {
       this.postionSearch = null;
       const basedOnOrder = this.searchOptions.filter((item) => item.orderId.toString() === concatedValue) || [];
-      this.strategy.populateOptions(basedOnOrder, this.dropDownOptions, this.form, this.dialogConfig, false);
+      this.strategy.populateOptions(basedOnOrder, this.dropDownOptions,
+        this.form as CustomFormGroup<AddManInvoiceForm>, this.dialogConfig, false);
     } else {
       this.postionSearch = item;
-      this.strategy.populateOptions([item], this.dropDownOptions, this.form, this.dialogConfig, true);
+      this.strategy.populateOptions([item], this.dropDownOptions,
+        this.form as CustomFormGroup<AddManInvoiceForm>, this.dialogConfig, true);
     }
 
     this.setFormValuesOnEdit();
@@ -210,7 +212,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
         comment
       } = this.invoiceToEdit;
 
-      this.form.patchValue({
+      this.form?.patchValue({
         value,
         link,
         date,
@@ -231,7 +233,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   }
 
   private watchForCandidate(): void {
-    this.form.get('nameId')?.valueChanges
+    this.form?.get('nameId')?.valueChanges
     .pipe(
       filter((value) => !!value),
       takeUntil(this.componentDestroy()),
@@ -243,7 +245,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
 
   public populateLocations(id: number): void {
     const regions = this.store.snapshot().invoices.regions as OrganizationRegion[];
-    const orderId = this.form.get('orderId')?.value.split('-')[0];
+    const orderId = this.form?.get('orderId')?.value.split('-')[0];
 
     const candidateLocationId = this.searchOptions.find((item) => {
       return (item.orderId === Number(orderId)
@@ -258,15 +260,15 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     this.dropDownOptions.invoiceLocations = locations;
     this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
     if (this.postionSearch) {
-      this.form.get('locationId')?.patchValue(this.postionSearch.locationId);
+      this.form?.get('locationId')?.patchValue(this.postionSearch.locationId);
     } else {
-      this.form.get('locationId')?.patchValue(this.dropDownOptions.invoiceLocations[0].value);
+      this.form?.get('locationId')?.patchValue(this.dropDownOptions.invoiceLocations[0].value);
     }
     this.cd.markForCheck();
   }
 
   private watchForLocation(): void {
-    this.form.controls['locationId'].valueChanges
+    this.form?.controls['locationId'].valueChanges
     .pipe(
       filter((value) => !!value),
       takeUntil(this.componentDestroy())
@@ -277,13 +279,13 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   }
 
   private watchForAgency(): void {
-    this.form.controls['unitId'].valueChanges
+    this.form?.controls['unitId'].valueChanges
     .pipe(
       filter((value) => !!value),
       takeUntil(this.componentDestroy())
     )
     .subscribe((id) => {
-      const orderId = this.form.get('orderId')?.value;
+      const orderId = this.form?.get('orderId')?.value;
 
       this.strategy.populateCandidates(id, this.searchOptions, this.dropDownOptions, this.dialogConfig, orderId);
       this.cd.markForCheck();
@@ -291,7 +293,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   }
 
   private clearDialog(): void {
-    this.form.reset({
+    this.form?.reset({
       vendorFee: true,
     });
     this.dropDownOptions.invoiceLocations = [];
@@ -312,9 +314,9 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   private updateOptions(): void {
     this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
     if (this.postionSearch) {
-      this.form.get('departmentId')?.patchValue(this.postionSearch.departmentId);
+      this.form?.get('departmentId')?.patchValue(this.postionSearch.departmentId);
     } else {
-      this.form.get('departmentId')?.patchValue(this.dropDownOptions.invoiceDepartments[0].value);
+      this.form?.get('departmentId')?.patchValue(this.dropDownOptions.invoiceDepartments[0].value);
     }
     this.cd.markForCheck();
   }

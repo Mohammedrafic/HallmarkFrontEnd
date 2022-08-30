@@ -64,7 +64,6 @@ cssClass="dialog short"
                   </label>
                   <div class="input-group">
                     <ejs-datetimepicker
-                      name="startDateTime"
                       [formControlName]="field.field"
                       appValidateWithMessage
                       [step]="15"
@@ -100,11 +99,11 @@ cssClass="dialog short"
                   <div class="input-group">
                     <ejs-datepicker
                     class="datepicker"
-                    appValidateWithMessage
+                      appValidateWithMessage
                       format="MM/dd/yyyy"
                       [min]="dateSettings.timeIn.min"
                       [max]="dateSettings.timeIn.max"
-                    [formControlName]="field.field"
+                      [formControlName]="field.field"
                     >
                     </ejs-datepicker>
                   </div>
