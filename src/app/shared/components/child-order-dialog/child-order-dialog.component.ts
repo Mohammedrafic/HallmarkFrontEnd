@@ -56,8 +56,9 @@ import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum
 import { ExtensionSidebarComponent } from '@shared/components/extension/extension-sidebar/extension-sidebar.component';
 import { AppState } from '../../../store/app.state';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { UNSAVE_CHANGES_TEXT } from '@shared/constants';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ExtensionCandidateComponent } from '../order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
+import { filter } from 'rxjs/operators';
 
 enum Template {
   accept,
@@ -282,15 +283,13 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
   private saveExtensionChanges(): Observable<boolean> {
     const options = {
-      title: 'Save Changes',
-      okButtonLabel: 'Save',
+      title: DELETE_CONFIRM_TITLE,
+      okButtonLabel: 'Leave',
       okButtonClass: 'delete-button',
       cancelButtonLabel: 'Cancel',
     };
 
-    return this.confirmService
-      .confirm(UNSAVE_CHANGES_TEXT, options)
-      .pipe(tap((confirm) => confirm && this.extensionCandidateComponent.updatedUnsavedOnboarded()));
+    return this.confirmService.confirm(DELETE_CONFIRM_TEXT, options).pipe(filter((confirm) => confirm));
   }
 
   private setAddExtensionBtnState(candidate: OrderManagementChild): void {
