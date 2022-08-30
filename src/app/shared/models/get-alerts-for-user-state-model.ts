@@ -1,4 +1,4 @@
 export class GetAlertsForUserStateModel {
-    content: string;
-    createdAt: Date;
+  content: string;
+  createdAt: Date;
 }

@@ -392,7 +392,7 @@
 
 #alert-sidebar{
   .sidebar-header{
-    background-color:#0378d5;
+    background-color: $alert-side-bar-bgcolor;
     i-feather{
       position: absolute;
       top: 0px;
@@ -431,7 +431,7 @@
     padding: 10px;
 
     .card {
-      background-color: #E6E6E3;
+      background-color: $alert-side-bar-cardcolor;
       border-radius: 4px;
       padding: 10px;
       font-size:0.85rem !important;
@@ -439,7 +439,7 @@
       .card-footer {
         text-align: right;
         padding-top:4px;
-        border-top:1px solid #ddd;
+        border-top:1px solid $alert-side-bar-footerborder;
         margin-top:6px; 
       }
     }

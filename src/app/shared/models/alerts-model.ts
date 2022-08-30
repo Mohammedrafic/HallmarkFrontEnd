@@ -1,4 +1,4 @@
 export class AlertsModel {
-    content: string;
-    createdAt: Date;
+  content: string;
+  createdAt: Date;
 }
