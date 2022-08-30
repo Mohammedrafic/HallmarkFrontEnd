@@ -2,7 +2,7 @@ import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { filter, Observable, Subject, takeUntil, throttleTime ,take} from 'rxjs';
+import { filter, Observable, Subject, takeUntil, throttleTime ,take, map} from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -101,6 +101,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   timeZoneOptionFields: FieldSettingsModel = { text: 'systemTimeZoneName', value: 'timeZoneId'};
 
   @Select(BusinessLinesState.allBusinessLines) public readonly businessLines$: Observable<BusinessLines[]>;
+  public businessLineDataSource: BusinessLines[];
   public readonly businessLineFields = { text: 'line', value: 'id' };
 
   isEdit: boolean;
@@ -330,6 +331,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   onAddDepartmentClick(): void {
     if (this.selectedRegion) {
       this.store.dispatch(new ShowSideDialog(true));
+      this.getBusinessLineDataSource(null, null);
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_REGIONS_NOT_SELECTED));
     }
@@ -369,6 +371,8 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       locationType: location.locationTypeId,
       organizationId :this.businessUnitId
     });
+
+    this.getBusinessLineDataSource(location.businessLineId, location.businessLine); 
     this.editedLocationId = location.id;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
@@ -512,5 +516,20 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   private getLastPage(data: object[]): number {
     return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
+  }
+
+  private getBusinessLineDataSource(id: number | null, line: string | null | undefined) {
+    this.businessLines$
+      .pipe(
+        take(1),
+        map((businessLines) => {
+          if (id && businessLines.find((item) => item.id === id)) {
+            return businessLines;
+          } else {
+            return id && line ? [{ id, line }, ...businessLines] : businessLines
+          }
+        })
+      )
+      .subscribe((data) => this.businessLineDataSource = data);
   }
 }
