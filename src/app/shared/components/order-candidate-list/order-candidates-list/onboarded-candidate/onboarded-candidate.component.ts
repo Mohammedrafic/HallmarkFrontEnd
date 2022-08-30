@@ -150,7 +150,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch(new RejectCandidateJob(payload));
+      this.store.dispatch([new RejectCandidateJob(payload), new ReloadOrganisationOrderCandidatesLists()]);
       this.closeDialog();
     }
   }
