@@ -118,7 +118,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     { text: 'Ext Location ID', column: 'ExternalId' },
     { text: 'Invoice Location ID', column: 'InvoiceId' },
     { text: 'Location Name', column: 'Name' },
-    { text: 'Business Line', column: 'businessLine' },
+    { text: 'Business Line', column: 'BusinessLine' },
     { text: 'Address 1', column: 'Address1' },
     { text: 'Address 2', column: 'Address2' },
     { text: 'City', column: 'City' },
