@@ -52,7 +52,7 @@ export class InvoicesContainerGridHelper {
         }
       },
       orderId: {
-        field: 'orderId',
+        field: 'formattedOrderIdFull',
         headerName: 'ORDER ID',
         width: 120,
         cellRenderer: GridCellLinkComponent,
