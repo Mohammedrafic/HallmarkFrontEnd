@@ -389,3 +389,59 @@
     cursor: pointer;
   }
 }
+
+#alert-sidebar{
+  .sidebar-header{
+    background-color: $alert-side-bar-bgcolor;
+    i-feather{
+      position: absolute;
+      top: 0px;
+      padding: 0.5rem;
+      color: white;
+      width: 20px;
+      height: 20px;
+    }
+    h5 {
+      color: white; 
+      padding: 0.5rem 1.5rem;
+      font-size: 1.17em !important;
+      margin: auto;
+      span{
+        padding: 0 0.8rem !important;
+      }
+    }
+    .closebtn {
+      top: 2px;
+      line-height: 26px;
+      height: 42px;
+      color: black;
+      position: absolute;
+      right: 4px;
+      background-color: transparent !important;
+
+      button {
+        padding: 0.3rem 0.5rem !important;
+        border-radius:4px !important;  
+        height: auto !important;
+      }
+    }
+  } 
+  
+  #listcontainer {
+    padding: 10px;
+
+    .card {
+      background-color: $alert-side-bar-cardcolor;
+      border-radius: 4px;
+      padding: 10px;
+      font-size:0.85rem !important;
+
+      .card-footer {
+        text-align: right;
+        padding-top:4px;
+        border-top:1px solid $alert-side-bar-footerborder;
+        margin-top:6px; 
+      }
+    }
+  }
+}

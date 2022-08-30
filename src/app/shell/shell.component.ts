@@ -1,3 +1,5 @@
+import { GetAlertsForCurrentUser } from './../store/app.actions';
+import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 
@@ -22,6 +24,7 @@ import { ItemModel } from '@syncfusion/ej2-angular-splitbuttons';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 enum THEME {
   light = 'light',
   dark = 'dark',
@@ -37,6 +40,10 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   width = SIDEBAR_CONFIG.width;
   dockSize = SIDEBAR_CONFIG.dockSize;
   sideBarType = SIDEBAR_CONFIG.type;
+  alertSidebarWidth = "360px";
+  alertSidebarType = "auto";
+  alertSidebarPosition = "Right";
+  showAlertSidebar = false;
 
   isDarkTheme: boolean;
   isFirstLoad: boolean;
@@ -48,6 +55,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<void> = new Subject();
 
   @ViewChild('sidebar') sidebar: SidebarComponent;
+  @ViewChild('alertSidebar') alertSidebar: SidebarComponent;
   @ViewChild('treevalidate') tree: TreeViewComponent;
   @ViewChild('contextmenu') contextmenu: ContextMenuComponent;
   @ViewChild('searchInputContainer')
@@ -77,6 +85,9 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   @Select(UserState.menu)
   menu$: Observable<Menu>;
 
+  @Select(AppState.getAlertsForCurrentUser)
+  alertStateModel$: Observable<GetAlertsForUserStateModel[]>
+
   public searchString: string = '';
   public isClosingSearch: boolean = false;
   public searchResult: MenuItem[] = [];
@@ -93,6 +104,8 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   ];
   private routers: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
 
+  faTimes = faTimes;
+  alerts: any;
   constructor(
     private store: Store,
     private router: Router,
@@ -122,6 +135,10 @@ export class ShellPageComponent implements OnInit, OnDestroy {
       if (user) {
         this.userLogin = user;
         this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
+        this.store.dispatch(new GetAlertsForCurrentUser({}))
+        this.alertStateModel$.subscribe((x)=>{
+          this.alerts = x;          
+        });
       }
     });
   }
@@ -167,6 +184,10 @@ export class ShellPageComponent implements OnInit, OnDestroy {
         // }
       }
     });
+  }
+
+  onAlertSidebarCreated(): void{
+    this.sidebar.element.classList.add("e-hidden");
   }
 
   toggleClick(): void {
@@ -313,5 +334,14 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.isClosingSearch = false;
     }, 500);
+  }
+
+  bellIconClicked(){
+    this.showAlertSidebar = true;
+    this.alertSidebar.show();    
+  }
+
+  alertSideBarCloseClick(){
+    this.alertSidebar.hide();    
   }
 }

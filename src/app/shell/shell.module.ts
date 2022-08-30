@@ -1,3 +1,4 @@
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
@@ -80,6 +81,7 @@ const sidebarIcons = {
     ReactiveFormsModule,
     DropDownButtonModule,
     FormsModule,
+    FontAwesomeModule
   ],
   providers: [],
 })

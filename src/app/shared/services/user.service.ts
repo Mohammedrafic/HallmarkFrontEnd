@@ -6,6 +6,7 @@ import { User, UsersAssignedToRole, UsersPage } from 'src/app/shared/models/user
 import { BusinessUnitType } from '../enums/business-unit-type';
 import { Menu } from '../models/menu.model';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
+import { AlertsModel } from '@shared/models/alerts-model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -76,5 +77,13 @@ export class UserService {
    */
   public getCurrentUserPermissions(): Observable<CurrentUserPermission[]> {
     return this.http.get<CurrentUserPermission[]>('/api/Permissions/currentUser');
+  }
+
+  /**
+   * Get Alerts for Current User
+   * @returns list of alerts
+   */
+   public getAlertsForUser(): Observable<AlertsModel[]> {
+    return this.http.get<AlertsModel[]>('/api/Alerts/GetAlertsForUser');
   }
 }
