@@ -25,6 +25,7 @@ import { SearchMenuComponent } from './components/search-menu/search-menu.compon
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 enum THEME {
   light = 'light',
   dark = 'dark',
@@ -104,7 +105,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   ];
   private routers: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
 
-  faTimes = faTimes;
+  faTimes = faTimes as IconDefinition;
   alerts: any;
   constructor(
     private store: Store,
