@@ -51,7 +51,7 @@
   >
     <e-columns>
     
-      <e-column textAlign="Right" width="50">
+      <e-column textAlign="Right" width="25">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, $event)">
@@ -156,6 +156,7 @@
                   class="e-input"
                   type="text"
                   maxlength="20"
+                  minlength="3"
                   appValidateWithMessage
                   pattern="^[A-Za-z -]+$"
                   formControlName="region"/>

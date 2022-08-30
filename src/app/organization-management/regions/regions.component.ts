@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
@@ -93,7 +93,7 @@ public regionFilterFormGroup:FormGroup;
   private pageSubject = new Subject<number>();
 
   selectedRegion: any;
-
+  submited: boolean=false;
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
@@ -363,8 +363,14 @@ public regionFilterFormGroup:FormGroup;
       this.removeActiveCssClass();
     }
   }
-
+  public noWhitespaceValidator(control: FormControl) {
+    const isWhitespace = (control.value || '').trim().length === 0;
+    const isValid = !isWhitespace;
+    var s=isValid ? null : { 'whitespace': true };
+    return isValid ? null : { 'whitespace': true };
+}
   onFormSaveClick(): void {
+    this.submited=true;
          const Region: Region = {
      id: this.editedRegionId,
 
@@ -388,13 +394,11 @@ public regionFilterFormGroup:FormGroup;
 
       if (this.isEdit) {
         this.store.dispatch(new UpdateRegion(Region));
-        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         this.isEdit = false;
         this.editedRegionId = undefined;
         return;
       }
       this.store.dispatch(new SaveRegion(Region));
-      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
 
   }
 
@@ -405,7 +409,7 @@ public regionFilterFormGroup:FormGroup;
   private createLocationForm(): void {
     this.regionFormGroup = this.formBuilder.group({
       id: [''],
-      region: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(20)]],
+      region: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20),this.noWhitespaceValidator]],
 
     });
 
