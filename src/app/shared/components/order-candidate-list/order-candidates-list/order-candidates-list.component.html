@@ -179,6 +179,7 @@
       [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
       [candidate]="candidate"
       [isAgency]="isAgency"
+      [order]="$any((selectedOrder$ | async))"
       [isLocked]="(selectedOrder$ | async)?.isLocked"
     >
     </app-apply-candidate>

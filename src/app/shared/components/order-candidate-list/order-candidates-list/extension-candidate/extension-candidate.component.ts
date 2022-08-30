@@ -173,6 +173,12 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
         break;
 
       default:
+        if (this.form.dirty) {
+          this.updateAgencyCandidateJob({
+            applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
+            statusText: this.candidateJob.applicantStatus.statusText,
+          });
+        }
         break;
     }
   }
@@ -181,7 +187,6 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     this.applicantStatuses =
       candidate.status === ApplicantStatusEnum.Accepted
         ? [
-            { applicantStatus: candidate.status, statusText: CandidatStatus[candidate.status] },
             { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
             { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
           ]
@@ -281,7 +286,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
           this.getComments();
           this.billRatesData = this.candidateJob?.billRates ? [...this.candidateJob.billRates] : [];
           this.form.patchValue({
-            jobId: `${this.currentOrder.organizationPrefix}-${this.currentOrder.publicId}`,
+            jobId: `${this.currentOrder?.organizationPrefix ?? ''}-${this.currentOrder?.publicId}`,
             avStartDate: this.getDateString(this.candidateJob.availableStartDate),
             locationName: this.candidateJob.order?.locationName,
             actualStartDate: this.getDateString(this.candidateJob.actualStartDate),

@@ -166,6 +166,7 @@
                       <app-apply-candidate
                         [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
                         [candidate]="$any(candidate)"
+                        [order]="$any((selectedOrder$ | async))"
                         [isTab]="true"
                       >
                       </app-apply-candidate>

@@ -30,6 +30,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() candidate: OrderCandidatesList;
   @Input() billRatesData: BillRate[] = [];
+  @Input() order: any;
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
   @Input() isLocked: boolean | undefined = false;
@@ -119,7 +120,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   private setFormValue(data: OrderApplicantsInitialData): void {
     this.formGroup.setValue({
-      orderId: `${this.candidateJob.organizationPrefix}-${this.candidateJob.orderPublicId}`,
+      orderId: `${this.order?.organizationPrefix ?? ''}-${this.order?.publicId}`,
       jobDate: [data.jobStartDate, data.jobEndDate],
       orderBillRate: PriceUtils.formatNumbers(data.orderBillRate),
       locationName: data.locationName,
