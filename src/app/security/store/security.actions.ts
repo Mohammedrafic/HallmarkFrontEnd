@@ -135,3 +135,8 @@ export class ExportRoleList {
   static readonly type = '[security] Export Role List';
   constructor(public payload: ExportPayload) {}
 }
+export class GetUSCanadaTimeZoneIds
+{
+  static readonly type ='[security] Get US Canada TimeZoneIds'
+  constructor() {}
+}

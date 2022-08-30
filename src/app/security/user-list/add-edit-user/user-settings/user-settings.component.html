@@ -10,13 +10,14 @@
               formControlName="businessUnitType"
               [fields]="unitFields"
               [dataSource]="businessUnits"
+              tabindex="1"
             ></ejs-dropdownlist>
           </div>
         </div>
         <div class="input-container bootstrap">
           <label>First Name<span class="required">*</span></label>
           <div class="input-group">
-            <input appValidateWithMessage formControlName="firstName" class="e-input" type="text" maxlength="50"/>
+            <input appValidateWithMessage formControlName="firstName" class="e-input" type="text" maxlength="50" tabindex="3"/>
           </div>
         </div>
         <div class="dropdown-container bootstrap">
@@ -27,12 +28,28 @@
                              [allowFiltering]="false"
                              formControlName="roles"
                              [fields]="roleFields"
+                             tabindex="5"
                              [dataSource]="rolesPerUsers$ | async">
             </ejs-multiselect>
           </div>
         </div>
+        <div class="dropdown-container bootstrap">
+          <label>Timezone</label>
+          <div class="input-group">
+            <ejs-dropdownlist
+            id="timeZone"
+            appValidateWithMessage
+            formControlName="timeZone"
+            [fields]="timeZoneOptionFields"
+            [dataSource]="timeZoneIds$ | async" 
+            tabindex="6"
+          >
+          </ejs-dropdownlist>
+          </div>
+        </div>
+
         <div class="active-toggle">
-          <ejs-switch #swithActive formControlName="isDeleted" class="switch" [disabled]="form.disabled" [checked]="form.get('isDeleted')?.value" (click)="toggleActive()"></ejs-switch>
+          <ejs-switch #swithActive formControlName="isDeleted" class="switch" [disabled]="form.disabled" [checked]="form.get('isDeleted')?.value" (click)="toggleActive()" tabindex="7"></ejs-switch>
           <span class="e-text">Active</span>
         </div>
       </div>
@@ -45,13 +62,14 @@
               formControlName="businessUnitId"
               [fields]="bussinesDataFields"
               [dataSource]="businessValue"
+              tabindex="2"
             ></ejs-dropdownlist>
           </div>
         </div>
         <div class="input-container bootstrap">
           <label>Last Name<span class="required">*</span></label>
           <div class="input-group">
-            <input appValidateWithMessage formControlName="lastName" class="e-input" type="text" maxlength="50"/>
+            <input appValidateWithMessage formControlName="lastName" class="e-input" type="text" maxlength="50" tabindex="4"/>
           </div>
         </div>
       </div>
@@ -63,13 +81,13 @@
       <div class="left-section">
         <div class="input-container bootstrap">
           <label>Address 1</label>
-          <input formControlName="address1" class="e-input" type="text" maxlength="100"/>
+          <input formControlName="address1" class="e-input" type="text" maxlength="100" tabindex="8"/>
         </div>
       </div>
       <div class="right-section">
         <div class="input-container bootstrap">
           <label>Address 2</label>
-          <input formControlName="address2" class="e-input" type="text" maxlength="100"/>
+          <input formControlName="address2" class="e-input" type="text" maxlength="100" tabindex="9"/>
         </div>
       </div>
     </div>
@@ -81,7 +99,9 @@
             appValidateWithMessage
             [fields]="unitFields"
             formControlName="country"
+            tabindex="10"
             [dataSource]="countries">
+
           </ejs-dropdownlist>
         </div>
       </div>
@@ -90,6 +110,7 @@
         <div class="input-group dropdown bootstrap">
           <ejs-dropdownlist appValidateWithMessage
                             formControlName="state"
+                            tabindex="11"
                             [dataSource]="countryState$ | async">
           </ejs-dropdownlist>
         </div>
@@ -97,13 +118,13 @@
       <div class="input-container bootstrap">
         <label>City</label>
         <div class="input-group">
-          <input appValidateWithMessage formControlName="city" class="e-input" type="text" maxlength="20"/>
+          <input appValidateWithMessage formControlName="city" class="e-input" type="text" maxlength="20" tabindex="12"/>
         </div>
       </div>
       <div class="input-container bootstrap">
         <label>Zipcode</label>
         <div class="input-group">
-          <ejs-maskedtextbox class="organization-input" promptChar="_" mask='00000' appValidateWithMessage formControlName="zip" placeholder=" " maxlength="6"></ejs-maskedtextbox>
+          <ejs-maskedtextbox class="organization-input" promptChar="_" mask='00000' appValidateWithMessage formControlName="zip" placeholder=" " maxlength="6" tabindex="13"></ejs-maskedtextbox>
         </div>
       </div>
     </div>
@@ -114,25 +135,25 @@
       <div class="input-container bootstrap">
         <label>Email<span class="required">*</span></label>
         <div class="input-group">
-          <input appValidateWithMessage formControlName="email" class="e-input" type="text" maxlength="100"/>
+          <input appValidateWithMessage formControlName="email" class="e-input" type="text" maxlength="100" tabindex="14"/>
         </div>
       </div>
       <div class="input-container bootstrap">
         <label>Confirm Email<span class="required">*</span></label>
         <div class="input-group">
-          <input appValidateWithMessage formControlName="emailConfirmation" class="e-input" type="text" maxlength="100"/>
+          <input appValidateWithMessage formControlName="emailConfirmation" class="e-input" type="text" maxlength="100" tabindex="15"/>
         </div>
       </div>
       <div class="input-container bootstrap">
         <label>Phone Number</label>
         <div class="input-group">
-          <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="phoneNumber" placeholder=" " maxlength="10"></ejs-maskedtextbox>
+          <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="phoneNumber" placeholder=" " maxlength="10" tabindex="16"></ejs-maskedtextbox>
         </div>
       </div>
       <div class="input-container bootstrap">
         <label>Fax</label>
         <div class="input-group">
-          <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="fax" placeholder=" " maxlength="10"></ejs-maskedtextbox>
+          <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="fax" placeholder=" " maxlength="10" tabindex="17"></ejs-maskedtextbox>
         </div>
       </div>
     </div>
