@@ -10,3 +10,4 @@ export * from './dropdown-select-event-args.interface';
 export * from './get-pending-approval-params.interface';
 export * from './invoice-detail.interface';
 export * from './printing.interface';
+export * from './pending-invoice-row-details-config.interface';

@@ -12,11 +12,13 @@ import {
   InvoiceRecordsTableRowDetailsComponent
 } from '../../components/invoice-records-table-row-details/invoice-records-table-row-details.component';
 import { GridValuesHelper } from '../../../timesheets/helpers';
-import { Attachment, AttachmentsListComponent, AttachmentsListParams } from '@shared/components/attachments';
+import { AttachmentsListComponent, AttachmentsListParams } from '@shared/components/attachments';
 import { PendingInvoice, PendingInvoiceRecord } from '../../interfaces/pending-invoice-record.interface';
 import { TypedColDef, TypedValueGetterParams } from '../../interfaces/typed-col-def.interface';
 import { InvoiceType } from '../../enums/invoice-type.enum';
 import { currencyFormatter, invoicesRowDetailsOffsetColDef, titleValueCellRendererSelector } from '../../constants';
+import { GetPendingInvoiceDetailsColDefsFn, InvoiceAttachment, PendingInvoiceRowDetailsConfig } from '../../interfaces';
+
 
 const dayColDef: TypedColDef<PendingInvoiceRecord> = {
   width: 130,
@@ -79,57 +81,57 @@ const timesheetTypeColDefs: TypedColDef<PendingInvoiceRecord>[] = [
   },
 ];
 
-const manualTypeColDefs: TypedColDef<PendingInvoiceRecord>[] = [
-  invoicesRowDetailsOffsetColDef,
-  dayColDef,
-  {
-    field: 'invoiceRecordTypeText',
-    headerName: 'Type',
-    width: 300,
-    cellRendererSelector: titleValueCellRendererSelector,
-  },
-  totalColDef,
-  {
-    field: 'linkedInvoiceId',
-    headerName: 'Linked Invoice',
-    cellRendererSelector: titleValueCellRendererSelector,
-  },
-  {
-    field: 'vendorFeeApplicable',
-    headerName: 'Vendor Fee Applicable',
-    cellRendererSelector: titleValueCellRendererSelector,
-    valueGetter: (params: TypedValueGetterParams<PendingInvoiceRecord>) =>
-      params.data.vendorFeeApplicable ? 'Yes' : 'No',
-  },
-  {
-    field: 'reasonCode',
-    headerName: 'Reason Code',
-    cellRendererSelector: titleValueCellRendererSelector,
-  },
-  {
-    field: 'comment',
-    headerName: 'Comment',
-    cellRendererSelector: titleValueCellRendererSelector,
-  },
-  {
-    field: 'attachments',
-    cellRenderer: AttachmentsListComponent,
-    cellRendererParams: (params: ICellRendererParams): AttachmentsListParams => {
-      const { attachments } = params.data as PendingInvoiceRecord;
+const getManualTypeColDefs: GetPendingInvoiceDetailsColDefsFn =
+  ({ previewExpensesAttachment, downloadExpensesAttachment }: PendingInvoiceRowDetailsConfig) => [
+    invoicesRowDetailsOffsetColDef,
+    dayColDef,
+    {
+      field: 'invoiceRecordTypeText',
+      headerName: 'Type',
+      width: 300,
+      cellRendererSelector: titleValueCellRendererSelector,
+    },
+    totalColDef,
+    {
+      field: 'linkedInvoiceId',
+      headerName: 'Linked Invoice',
+      cellRendererSelector: titleValueCellRendererSelector,
+    },
+    {
+      field: 'vendorFeeApplicable',
+      headerName: 'Vendor Fee Applicable',
+      cellRendererSelector: titleValueCellRendererSelector,
+      valueGetter: (params: TypedValueGetterParams<PendingInvoiceRecord>) =>
+        params.data.vendorFeeApplicable ? 'Yes' : 'No',
+    },
+    {
+      field: 'reasonCode',
+      headerName: 'Reason Code',
+      cellRendererSelector: titleValueCellRendererSelector,
+    },
+    {
+      field: 'comment',
+      headerName: 'Comment',
+      cellRendererSelector: titleValueCellRendererSelector,
+    },
+    {
+      field: 'attachments',
+      cellRenderer: AttachmentsListComponent,
+      cellRendererParams: (params: ICellRendererParams): AttachmentsListParams<InvoiceAttachment> => {
+        const { attachments } = params.data as PendingInvoiceRecord;
 
-      return {
-        attachments,
-        attachmentsListConfig: {
-          // TODO: Implement
-          preview: (item: Attachment) => {},
-          download: (item: Attachment) => {},
-        },
+        return {
+          attachments,
+          attachmentsListConfig: {
+            preview: previewExpensesAttachment,
+            download: downloadExpensesAttachment,
+          },
+        }
       }
     }
-  }
-];
+  ];
 
-const milesInvoiceTypeColDefs: TypedColDef<PendingInvoiceRecord>[] = [
+const milesInvoiceTypeColDefs: GetPendingInvoiceDetailsColDefsFn = ({ downloadMilesAttachments, previewMilesAttachments }) => [
   invoicesRowDetailsOffsetColDef,
   dayColDef,
   {
@@ -156,15 +158,15 @@ const milesInvoiceTypeColDefs: TypedColDef<PendingInvoiceRecord>[] = [
   {
     field: 'attachments',
     cellRenderer: AttachmentsListComponent,
-    cellRendererParams: (params: ICellRendererParams): AttachmentsListParams => {
+    cellRendererParams: (params: ICellRendererParams): AttachmentsListParams<InvoiceAttachment> => {
       const { attachments } = params.data as PendingInvoiceRecord;
 
       return {
         attachments,
         attachmentsListConfig: {
-          // TODO: Implement
-          preview: (item: Attachment) => {},
-          download: (item: Attachment) => {},
+          // TODO: Uncomment after BE for miles attachments implemented, implement endpoints
+          // preview: previewMilesAttachments,
+          // download: downloadMilesAttachments,
         },
       }
     }
@@ -172,7 +174,7 @@ const milesInvoiceTypeColDefs: TypedColDef<PendingInvoiceRecord>[] = [
 ];
 
 export class PendingInvoiceRowDetailsGridHelper {
-  public static getNestedRowsGridOptions(): GridOptions {
+  public static getRowDetailsGridOptions(config: PendingInvoiceRowDetailsConfig): GridOptions {
     return {
       masterDetail: true,
       detailCellRenderer: InvoiceRecordsTableRowDetailsComponent,
@@ -193,7 +195,7 @@ export class PendingInvoiceRowDetailsGridHelper {
         return {
           ...params,
           detailGridOptions: {
-            columnDefs: PendingInvoiceRowDetailsGridHelper.getRowDetailsColumnDefinitions(timesheetType),
+            columnDefs: PendingInvoiceRowDetailsGridHelper.getRowDetailsColumnDefinitions(timesheetType, config),
           },
           getDetailRowData: (params: GetDetailRowDataParams) => params.successCallback(
             (params.data as PendingInvoice).invoiceRecords,
@@ -203,14 +205,17 @@ export class PendingInvoiceRowDetailsGridHelper {
     }
   }
 
-  public static getRowDetailsColumnDefinitions(invoiceType: InvoiceType): TypedColDef<PendingInvoiceRecord>[] {
+  public static getRowDetailsColumnDefinitions(
+    invoiceType: InvoiceType,
+    config: PendingInvoiceRowDetailsConfig
+  ): TypedColDef<PendingInvoiceRecord>[] {
     switch (invoiceType) {
       case InvoiceType.Timesheet:
         return timesheetTypeColDefs;
       case InvoiceType.Manual:
-        return manualTypeColDefs;
+        return getManualTypeColDefs(config);
       case InvoiceType.Mileage:
-        return milesInvoiceTypeColDefs;
+        return milesInvoiceTypeColDefs(config);
       default:
         throw new Error(`Invoice record type "${invoiceType}" is not supported`);
     }

@@ -49,6 +49,10 @@
 
     app-attachments-list {
       height: 100%;
+
+      .attachment {
+        padding-bottom: 4px;
+      }
     }
   }
 }

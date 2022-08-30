@@ -212,8 +212,28 @@ export namespace Invoices {
     }
   }
 
+  export class PreviewMilesAttachment {
+    static readonly type = INVOICES_ACTIONS.PreviewMilesAttachment;
+
+    constructor(
+      public readonly organizationId: number | null,
+      public readonly payload: Attachment,
+    ) {
+    }
+  }
+
   export class DownloadAttachment {
     static readonly type = INVOICES_ACTIONS.DownloadAttachment;
+
+    constructor(
+      public readonly organizationId: number | null,
+      public readonly payload: Attachment,
+    ) {
+    }
+  }
+
+  export class DownloadMilesAttachment {
+    static readonly type = INVOICES_ACTIONS.DownloadMilesAttachment;
 
     constructor(
       public readonly organizationId: number | null,

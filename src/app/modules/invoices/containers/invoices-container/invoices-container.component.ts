@@ -212,7 +212,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
         this.organizationId = orgId;
         this.gridOptions = {
           ...this.defaultGridOptions,
-          ...this.invoicesContainerService.getGridOptions(tabIdx),
+          ...this.invoicesContainerService.getGridOptions(tabIdx, orgId),
         };
 
         this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx, { organizationId: orgId });

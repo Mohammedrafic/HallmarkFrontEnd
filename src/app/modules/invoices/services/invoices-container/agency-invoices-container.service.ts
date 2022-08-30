@@ -37,12 +37,12 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
     }
   }
 
-  public override getGridOptions(tabIndex: OrganizationInvoicesGridTab): GridOptions {
+  public override getGridOptions(tabIndex: OrganizationInvoicesGridTab, orgId: number | null): GridOptions {
     switch (tabIndex) {
       case 1:
         return AllInvoicesGridHelper.getGridOptions(true);
       default:
-        return super.getGridOptions(tabIndex);
+        return super.getGridOptions(tabIndex, orgId);
     }
   }
 

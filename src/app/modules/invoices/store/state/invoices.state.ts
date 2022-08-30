@@ -572,6 +572,34 @@ export class InvoicesState {
       );
   }
 
+  @Action(Invoices.PreviewMilesAttachment)
+  PreviewMilesAttachment(
+    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { organizationId, payload: { id, fileName } }: Invoices.PreviewMilesAttachment
+  ): Observable<Blob | void> {
+    return dispatch(
+      new FileViewer.Open({
+        fileName,
+        getPDF: () => this.manualInvoiceAttachmentsApiService.downloadMilesPDFAttachment(id, organizationId),
+        getOriginal: () => this.manualInvoiceAttachmentsApiService.downloadMilesAttachment(id, organizationId)
+      })
+    );
+  }
+
+  @Action(Invoices.DownloadMilesAttachment)
+  DownloadMilesAttachment(
+    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { organizationId, payload: { id, fileName } }: Invoices.DownloadMilesAttachment
+  ): Observable<Blob | void> {
+    return this.manualInvoiceAttachmentsApiService.downloadMilesAttachment(id, organizationId)
+      .pipe(
+        tap((file: Blob) => downloadBlobFile(file, fileName)),
+        catchError(() => dispatch(
+          new ShowToast(MessageTypes.Error, 'File not found')
+        ))
+      );
+  }
+
   @Action(Invoices.GroupInvoices)
   GroupInvoices(
     { patchState, dispatch }: StateContext<InvoicesModel>,
