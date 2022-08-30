@@ -404,7 +404,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     jobStartDateControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((jobStartDate: Date | null) => {
       const duration = durationControl.value;
 
-      if (isNaN(parseInt(duration)) || !(jobStartDate instanceof Date) || orderTypeControl.value === OrderType.PermPlacement) {
+      if (
+        isNaN(parseInt(duration)) ||
+        !(jobStartDate instanceof Date) ||
+        orderTypeControl.value === OrderType.PermPlacement
+      ) {
         return;
       }
 
@@ -687,8 +691,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private orderTypeDataSourceHandler(): void {
     if (this.orderId) {
       if (
-        this.settings[SettingsKeys.IsReOrder]?.value ||
-          this.settings[SettingsKeys.IsReOrder]?.value || 
         this.settings[SettingsKeys.IsReOrder]?.value ||
         (!this.settings[SettingsKeys.IsReOrder]?.value && this.order?.orderType === OrderType.OpenPerDiem)
       ) {
