@@ -98,6 +98,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public attachmentsListConfig$: Observable<AttachmentsListConfig>;
 
+  public isDNWEnabled: boolean = false;
+
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
    * */
@@ -369,7 +371,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       filter(Boolean),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId, candidateWorkPeriods }) => {
+    .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId, candidateWorkPeriods, canEditTimesheet }) => {
       this.organizationId = this.isAgency ? organizationId : null;
       this.jobId = jobId;
       this.weekPeriod = [
@@ -380,6 +382,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
         weekStartDate: new Date(DateTimeHelper.convertDateToUtc(el.weekStartDate)),
         weekEndDate: new Date(DateTimeHelper.convertDateToUtc(el.weekEndDate)),
       }));
+      this.setDNWBtnState(canEditTimesheet);
       this.cd.markForCheck();
     });
   }
@@ -394,5 +397,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
         this.organizationId as number, range[0], this.jobId, this.isAgency)
       );
     });
+  }
+
+  private setDNWBtnState(canEditTimesheet: boolean): void {
+    this.isDNWEnabled = this.isAgency || canEditTimesheet;
   }
 }

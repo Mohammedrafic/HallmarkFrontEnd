@@ -16,67 +16,68 @@
         </ejs-tab>
       </div>
 
-      <ng-container *ngIf="isEditEnabled">
-        <button
-          *ngIf="currentTab !== tableTypes.Expenses"
-          class="add-action spaced"
-          cssClass="e-action-button"
-          ejs-button
-          (click)="openAddDialog()"
-          [disabled]="actionsDisabled"
-        >
-          <i-feather name="plus" class="icon"></i-feather> Add Record
-        </button>
-
-        <ng-container *ngIf="recordsToShow?.[currentTab]?.[modeValues.Edit]?.length || isEditOn">
+      <ng-container *ngIf="!actionsDisabled">
+        <ng-container *ngIf="isEditEnabled">
           <button
-            *ngIf="!isEditOn; else editHandlers"
-            [disabled]="actionsDisabled"
-            (click)="editTimesheets()"
-            ejs-button
+            *ngIf="currentTab !== tableTypes.Expenses"
+            class="add-action spaced"
             cssClass="e-action-button"
-            class="add-action">
-            <i-feather name="edit" class="icon"></i-feather>
-            Edit
+            ejs-button
+            (click)="openAddDialog()"
+          >
+            <i-feather name="plus" class="icon"></i-feather> Add Record
           </button>
-        </ng-container>
-      </ng-container>
 
-      <ng-template #editHandlers>
-        <div class="controls-wrapper">
-          <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
-          <button (click)="saveChanges()" ejs-button [isPrimary]="true" [disabled]="actionsDisabled" class="spinner-btn">
-            <div #spinner class="spinner-container" *ngIf="loading; else savetext"></div>
-            <ng-template #savetext>
-              <span>Save</span>
+          <ng-container *ngIf="recordsToShow?.[currentTab]?.[modeValues.Edit]?.length || isEditOn">
+            <button
+              *ngIf="!isEditOn; else editHandlers"
+              (click)="editTimesheets()"
+              ejs-button
+              cssClass="e-action-button"
+              class="add-action">
+              <i-feather name="edit" class="icon"></i-feather>
+              Edit
+            </button>
+          </ng-container>
+        </ng-container>
+
+        <ng-template #editHandlers>
+          <div class="controls-wrapper">
+            <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
+            <button (click)="saveChanges()" ejs-button [isPrimary]="true" class="spinner-btn">
+              <div #spinner class="spinner-container" *ngIf="loading; else savetext"></div>
+              <ng-template #savetext>
+                <span>Save</span>
+              </ng-template>
+            </button>
+          </div>
+        </ng-template>
+
+        <div *ngIf="currentTab !== tableTypes.Expenses && !isEditOn" class="btn-group">
+          <button
+            *ngIf="isRejectBtnEnabled"
+            ejs-button
+            [disabled]="actionButtonDisabled"
+            cssClass="e-outline privilege"
+            (click)="onRejectButtonClick()"
+          >
+            Reject
+          </button>
+          <button
+            *ngIf="isApproveBtnEnabled"
+            ejs-button
+            [isPrimary]="true"
+            [disabled]="actionButtonDisabled"
+            class="spinner-btn privilege"
+            (click)="handleApprove()"
+          >
+            <div #spinner class="spinner-container" *ngIf="loading; else approvetext"></div>
+            <ng-template #approvetext>
+              <span>{{ submitText }}</span>
             </ng-template>
           </button>
         </div>
-      </ng-template>
-
-      <div *ngIf="currentTab !== tableTypes.Expenses && !isEditOn" class="btn-group">
-        <button
-          *ngIf="isRejectBtnEnabled"
-          ejs-button
-          cssClass="e-outline privilege"
-          (click)="onRejectButtonClick()"
-        >
-          Reject
-        </button>
-        <button
-          *ngIf="isApproveBtnEnabled"
-          ejs-button
-          [isPrimary]="true"
-          [disabled]="actionButtonDisabled"
-          class="spinner-btn privilege"
-          (click)="handleApprove()"
-        >
-          <div #spinner class="spinner-container" *ngIf="loading; else approvetext"></div>
-          <ng-template #approvetext>
-            <span>{{ submitText }}</span>
-          </ng-template>
-        </button>
-      </div>
+      </ng-container>
     </div>
 
     <div class="timesheet-table-container">

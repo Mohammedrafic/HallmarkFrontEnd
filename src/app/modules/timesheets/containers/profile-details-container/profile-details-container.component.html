@@ -78,7 +78,7 @@
         </div>
 
         <div class="controls-block">
-          <div class="checkbox-block" *ngIf="isAgency">
+          <div class="checkbox-block" *ngIf="isDNWEnabled">
             <ejs-switch #dnwSwitch
               class="toggle"
               [checked]="timesheetDetails.noWorkPerformed"
