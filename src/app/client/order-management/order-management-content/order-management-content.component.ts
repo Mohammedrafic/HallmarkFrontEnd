@@ -590,7 +590,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     const { selectedOrderAfterRedirect } = this.orderManagementService;
     if (selectedOrderAfterRedirect && this.ordersPage?.items) {
       const orderAllOrders = this.ordersPage.items.find(
-        (order: any) => order.id === selectedOrderAfterRedirect.orderId
+        (order: any) => order.publicId === selectedOrderAfterRedirect.orderId
       );
       if (orderAllOrders) {
         const candidate = orderAllOrders.children.find(
@@ -1326,6 +1326,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.filters.agencyType = null;
       this.filters.includeReOrders = false;
       this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
+
+      if (selectedOrderAfterRedirect.orderType === OrderType.ReOrder) {
+        this.filters.orderTypes = [OrderType.ReOrder];
+      }
     }
   }
 
