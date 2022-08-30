@@ -62,7 +62,7 @@ import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { DatePipe, Location } from '@angular/common';
 import { UserState } from 'src/app/store/user.state';
-import { isUndefined } from 'lodash';
+import { isArray, isUndefined } from 'lodash';
 import { FilterService } from '@shared/services/filter.service';
 import { ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -425,6 +425,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
 
     this.checkSelectedChildrenItem();
+    if (!isArray(event.data)) {
+      this.selectedRowRef = event;
+    }
   }
 
   public onRowDeselect(event: any, grid: any) {

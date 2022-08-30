@@ -18,7 +18,7 @@ import { CommonDialogConformMessages } from './../interface/common.interface';
 export class AddDialogHelper<T> extends TimesheetDateHelper {
   @ViewChild('sideAddDialog') protected sideAddDialog: DialogComponent;
 
-  public form: CustomFormGroup<T>;
+  public form: CustomFormGroup<T> | null;
 
   public targetElement: HTMLBodyElement;
 
@@ -53,11 +53,11 @@ export class AddDialogHelper<T> extends TimesheetDateHelper {
   }
 
   public updateValidity(): void {
-    this.form.updateValueAndValidity();
+    this.form?.updateValueAndValidity();
   }
 
   public cancelChanges(): void {
-    if (this.form.touched) {
+    if (this.form?.touched) {
       this.confirmService.confirm(this.confirmMessages.confirmAddFormCancel, {
         title: 'Unsaved Progress',
         okButtonLabel: 'Proceed',
@@ -76,7 +76,7 @@ export class AddDialogHelper<T> extends TimesheetDateHelper {
   }
 
   protected closeDialog(): void {
-    this.form.reset();
+    this.form?.reset();
     this.sideAddDialog.hide();
   }
 }

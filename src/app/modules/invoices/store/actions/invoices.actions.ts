@@ -9,7 +9,7 @@ import {
   GroupInvoicesParams,
   InvoicesFilterState,
   ManualInvoice,
-  ManualInvoicePostDto,
+  ManualInvoicePostDto,ManualInvoicePutDto,
   PrintingPostDto
 } from '../../interfaces';
 import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums';
@@ -120,6 +120,17 @@ export namespace Invoices {
     ) {}
   }
 
+  export class UpdateManualInvoice {
+    static readonly type = INVOICES_ACTIONS.UpdateManualInvoice;
+
+    constructor(
+      public readonly payload: ManualInvoicePutDto,
+      public readonly files: FileForUpload[],
+      public readonly filesToDelete: Attachment[],
+      public readonly isAgency: boolean,
+    ) {}
+  }
+
   export class DeleteManualInvoice {
     static readonly type = INVOICES_ACTIONS.DeleteManualInvoice;
 
@@ -201,12 +212,43 @@ export namespace Invoices {
     }
   }
 
+  export class PreviewMilesAttachment {
+    static readonly type = INVOICES_ACTIONS.PreviewMilesAttachment;
+
+    constructor(
+      public readonly organizationId: number | null,
+      public readonly payload: Attachment,
+    ) {
+    }
+  }
+
   export class DownloadAttachment {
     static readonly type = INVOICES_ACTIONS.DownloadAttachment;
 
     constructor(
       public readonly organizationId: number | null,
       public readonly payload: Attachment,
+    ) {
+    }
+  }
+
+  export class DownloadMilesAttachment {
+    static readonly type = INVOICES_ACTIONS.DownloadMilesAttachment;
+
+    constructor(
+      public readonly organizationId: number | null,
+      public readonly payload: Attachment,
+    ) {
+    }
+  }
+
+  export class DeleteAttachment {
+    static readonly type = INVOICES_ACTIONS.DeleteAttachment;
+
+    constructor(
+      public readonly fileId: number,
+      public readonly invoiceId: number,
+      public readonly organizationId: number | null,
     ) {
     }
   }

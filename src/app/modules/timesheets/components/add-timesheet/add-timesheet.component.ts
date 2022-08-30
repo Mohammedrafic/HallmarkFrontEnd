@@ -8,7 +8,6 @@ import { DialogAction } from '@core/enums';
 import { AddDialogHelper } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
 import { TimesheetsState } from './../../store/state/timesheets.state';
-import { AddRecordService } from '../../services/add-record.service';
 import { AddTimsheetForm } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { RecordAddDialogConfig, TimesheetConfirmMessages } from '../../constants';
@@ -39,14 +38,14 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
   }
 
   public saveRecord(): void {
-    if (this.form.valid) {
+    if (this.form?.valid) {
       const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
       const body = RecordsAdapter.adaptRecordAddDto(this.form.value, organizationId, id, this.formType);
 
       this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
       this.closeDialog();
     } else {
-      this.form.updateValueAndValidity();
+      this.form?.updateValueAndValidity();
       this.cd.detectChanges();
     }
   }
@@ -56,6 +55,10 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
     .pipe(
       filter((value) => value.state),
       tap((value) => {
+        if (this.form) {
+          this.form = null;
+          this.cd.detectChanges();
+        }
         this.form = this.addService.createForm(value.type) as CustomFormGroup<AddTimsheetForm>;
         this.formType = value.type;
         this.setDateBounds(value.initDate, 7);
@@ -69,8 +72,8 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
       takeUntil(this.componentDestroy()),
     )
     .subscribe((day) => {
-      this.form.controls['timeIn'].patchValue(new Date(day.setHours(0, 0, 0)));
-      this.form.controls['timeOut'].patchValue(new Date(day.setHours(0, 0, 0)));
+      this.form?.controls['timeIn'].patchValue(new Date(day.setHours(0, 0, 0)));
+      this.form?.controls['timeOut'].patchValue(new Date(day.setHours(0, 0, 0)));
     });
   }
 
@@ -96,6 +99,6 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
   }
 
   private watchForDayChange(): Observable<Date> {
-    return this.form.controls['day'].valueChanges
+    return this.form?.controls['day']?.valueChanges as Observable<Date>;
   }
 }

@@ -61,7 +61,7 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
 
   constructor(private store: Store, private confirmService: ConfirmService, private actions$: Actions) {
     super();
-    this.store.dispatch(new SetHeaderState({ title: 'Security', iconName: 'lock' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Users', iconName: 'lock' }));
   }
 
   ngOnInit(): void {

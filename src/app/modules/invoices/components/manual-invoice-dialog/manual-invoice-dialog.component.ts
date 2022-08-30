@@ -19,6 +19,8 @@ import { InvoiceConfirmMessages } from '../../constants/messages.constant';
 import { InvoicesState } from "../../store/state/invoices.state";
 import { InvoiceMetaAdapter, InvoicesAdapter, ManualInvoiceAdapter } from '../../helpers';
 import { ManualInvoiceStrategy, ManualInvoiceStrategyMap } from '../../helpers/manual-invoice-strategy';
+import { Attachment } from '@shared/components/attachments';
+import { CustomFilesPropModel } from '@shared/components/file-uploader/custom-files-prop-model.interface';
 
 @Component({
   selector: 'app-manual-invoice-dialog',
@@ -34,6 +36,12 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   public clearFiles: FilesClearEvent | null;
 
   public invoiceToEdit: ManualInvoice | null = null;
+
+  public filesForDelete: Attachment[] = [];
+
+  public dialogShown: boolean = false;
+
+  public title: string = '';
 
   private searchOptions: ManualInvoiceMeta[];
 
@@ -82,8 +90,8 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   }
 
   public saveManualInvoice(): void {
-    if (!this.form.valid) {
-      this.form.updateValueAndValidity();
+    if (!this.form?.valid) {
+      this.form?.updateValueAndValidity();
       this.cd.markForCheck();
       return;
     }
@@ -96,7 +104,15 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       return;
     }
 
-    this.store.dispatch(new Invoices.SaveManulaInvoice(dto, this.filesForUpload, this.isAgency));
+    if (this.invoiceToEdit) {
+      this.store.dispatch(new Invoices.UpdateManualInvoice({
+        ...dto,
+        timesheetId: this.invoiceToEdit.id,
+      }, this.filesForUpload, this.filesForDelete, this.isAgency));
+    } else {
+      this.store.dispatch(new Invoices.SaveManulaInvoice(dto, this.filesForUpload, this.isAgency));
+    }
+
     this.closeDialog();
   }
 
@@ -109,17 +125,23 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     .pipe(
       ofActionDispatched(Invoices.ToggleManualInvoiceDialog),
       filter((payload: Invoices.ToggleManualInvoiceDialog) => payload.action === DialogAction.Open),
-      tap(() => {
+      tap(({ invoice }) => {
+        this.invoiceToEdit = invoice || null;
+        this.title = invoice ? this.dialogConfig.editTitle : this.dialogConfig.title;
         this.clearFiles = null;
+        this.dialogShown = true;
+
         this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
         this.sideAddDialog.show();
         this.cd.markForCheck();
       }),
-      switchMap(() => this.strategy.getMeta(this.form)),
+      switchMap(() => this.strategy.getMeta(this.form as CustomFormGroup<AddManInvoiceForm>)),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
       this.searchOptions = this.store.snapshot().invoices.invoiceMeta;
+
+      this.setOrderIdOnEdit();
       this.cd.markForCheck();
     });
   }
@@ -132,12 +154,14 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       )
       .subscribe((data) => {
         this.dropDownOptions.reasons = data;
+
+        this.setOrderIdOnEdit();
         this.cd.markForCheck();
       });
   }
 
   private watchForSearch(): void {
-    this.form.get('orderId')?.valueChanges
+    this.form?.get('orderId')?.valueChanges
     .pipe(
       filter((value) => !!value),
       distinctUntilChanged(),
@@ -145,34 +169,71 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       tap(() => this.clearDialog()),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe((value: string) => {
-      const concatedValue = value.replace(/\s/g, '').toUpperCase();
+    .subscribe((value: string) => this.handleOrderIdChange(value));
+  }
 
-      this.form.get('orderId')?.patchValue(concatedValue, { emitEvent: false, onlySelf: true });
+  private handleOrderIdChange(value: string): void {
+    const concatedValue = value.replace(/\s/g, '').toUpperCase();
 
-      if (this.isAgency) {
-        this.form.get('unitId')?.patchValue(this.store.snapshot().invoices.selectedOrganizationId);
-      }
-      
-      const item = this.searchOptions.find((item) => {
-        const concatedInputValue = item.formattedOrderId.replace(/\s/g, '').toUpperCase();
-        return concatedInputValue === concatedValue;
-      });
-      
-      if (!item) {
-        this.postionSearch = null;
-        const basedOnOrder = this.searchOptions.filter((item) => item.orderId.toString() === concatedValue) || [];
-        this.strategy.populateOptions(basedOnOrder, this.dropDownOptions, this.form, this.dialogConfig, false);
-      } else {
-        this.postionSearch = item;
-        this.strategy.populateOptions([item], this.dropDownOptions, this.form, this.dialogConfig, true);
-      }
-      this.cd.markForCheck();
+    this.form?.get('orderId')?.patchValue(concatedValue, { emitEvent: false, onlySelf: true });
+
+    if (this.isAgency) {
+      this.form?.get('unitId')?.patchValue(this.store.snapshot().invoices.selectedOrganizationId);
+    }
+
+    const item = this.searchOptions.find((item) => {
+      const concatedInputValue = item.formattedOrderId.replace(/\s/g, '').toUpperCase();
+      return concatedInputValue === concatedValue;
     });
+
+    if (!item) {
+      this.postionSearch = null;
+      const basedOnOrder = this.searchOptions.filter((item) => item.orderId.toString() === concatedValue) || [];
+      this.strategy.populateOptions(basedOnOrder, this.dropDownOptions,
+        this.form as CustomFormGroup<AddManInvoiceForm>, this.dialogConfig, false);
+    } else {
+      this.postionSearch = item;
+      this.strategy.populateOptions([item], this.dropDownOptions,
+        this.form as CustomFormGroup<AddManInvoiceForm>, this.dialogConfig, true);
+    }
+
+    this.setFormValuesOnEdit();
+    this.cd.markForCheck();
+  }
+
+  private setFormValuesOnEdit(): void {
+    if (this.invoiceToEdit) {
+      const {
+        amount: value,
+        serviceDate: date,
+        linkedInvoiceId: link,
+        vendorFeeApplicable: vendorFee,
+        reasonId,
+        comment
+      } = this.invoiceToEdit;
+
+      this.form?.patchValue({
+        value,
+        link,
+        date,
+        vendorFee,
+        reasonId,
+        description: comment,
+      }, { emitEvent: false });
+    }
+  }
+
+  public setOrderIdOnEdit(): void {
+    if (this.invoiceToEdit) {
+      const { formattedOrderId } = this.invoiceToEdit;
+
+      const [orderId, position] = formattedOrderId.replace(/\s/g, '').split('-');
+      this.handleOrderIdChange(Number(position) ? formattedOrderId : orderId);
+    }
   }
 
   private watchForCandidate(): void {
-    this.form.get('nameId')?.valueChanges
+    this.form?.get('nameId')?.valueChanges
     .pipe(
       filter((value) => !!value),
       takeUntil(this.componentDestroy()),
@@ -184,7 +245,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
 
   public populateLocations(id: number): void {
     const regions = this.store.snapshot().invoices.regions as OrganizationRegion[];
-    const orderId = this.form.get('orderId')?.value.split('-')[0];
+    const orderId = this.form?.get('orderId')?.value.split('-')[0];
 
     const candidateLocationId = this.searchOptions.find((item) => {
       return (item.orderId === Number(orderId)
@@ -199,15 +260,15 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     this.dropDownOptions.invoiceLocations = locations;
     this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
     if (this.postionSearch) {
-      this.form.get('locationId')?.patchValue(this.postionSearch.locationId);
+      this.form?.get('locationId')?.patchValue(this.postionSearch.locationId);
     } else {
-      this.form.get('locationId')?.patchValue(this.dropDownOptions.invoiceLocations[0].value);
+      this.form?.get('locationId')?.patchValue(this.dropDownOptions.invoiceLocations[0].value);
     }
     this.cd.markForCheck();
   }
 
   private watchForLocation(): void {
-    this.form.controls['locationId'].valueChanges
+    this.form?.controls['locationId'].valueChanges
     .pipe(
       filter((value) => !!value),
       takeUntil(this.componentDestroy())
@@ -218,13 +279,13 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   }
 
   private watchForAgency(): void {
-    this.form.controls['unitId'].valueChanges
+    this.form?.controls['unitId'].valueChanges
     .pipe(
       filter((value) => !!value),
       takeUntil(this.componentDestroy())
     )
     .subscribe((id) => {
-      const orderId = this.form.get('orderId')?.value;
+      const orderId = this.form?.get('orderId')?.value;
 
       this.strategy.populateCandidates(id, this.searchOptions, this.dropDownOptions, this.dialogConfig, orderId);
       this.cd.markForCheck();
@@ -232,7 +293,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   }
 
   private clearDialog(): void {
-    this.form.reset({
+    this.form?.reset({
       vendorFee: true,
     });
     this.dropDownOptions.invoiceLocations = [];
@@ -253,10 +314,25 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   private updateOptions(): void {
     this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
     if (this.postionSearch) {
-      this.form.get('departmentId')?.patchValue(this.postionSearch.departmentId);
+      this.form?.get('departmentId')?.patchValue(this.postionSearch.departmentId);
     } else {
-      this.form.get('departmentId')?.patchValue(this.dropDownOptions.invoiceDepartments[0].value);
+      this.form?.get('departmentId')?.patchValue(this.dropDownOptions.invoiceDepartments[0].value);
     }
     this.cd.markForCheck();
+  }
+
+  public deleteFile({ id }: CustomFilesPropModel): void {
+    const file = this.invoiceToEdit?.attachments.find((attachment: Attachment) => attachment.id === id);
+
+    if (file) {
+      this.filesForDelete = [...this.filesForDelete, file];
+    }
+  }
+
+  public clearDialogData(): void {
+    this.invoiceToEdit = null;
+    this.filesForDelete = [];
+    this.filesForUpload = [];
+    this.dialogShown = false;
   }
 }

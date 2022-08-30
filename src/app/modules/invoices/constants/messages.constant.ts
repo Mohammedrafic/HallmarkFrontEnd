@@ -11,5 +11,6 @@ export const InvoiceConfirmMessages: CommonDialogConformMessages = {
 
 export const ManualInvoiceMessages = {
   successAdd: 'Manual invoice was created successfully',
+  successEdit: 'Manual invoice was edited successfully',
   successDelete: 'Manual invoice was deleted successfully',
 }

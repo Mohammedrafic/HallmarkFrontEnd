@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { GridContainerTabConfig, InvoicesContainerService } from './invoices-container.service';
 import { ColDef, GridOptions } from '@ag-grid-community/core';
 import { Observable } from 'rxjs';
-import { InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
+import { InvoiceAttachment, InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
 import { ManualInvoicesGridHelper, PendingInvoiceRowDetailsGridHelper, PendingInvoicesGridHelper } from '../../helpers';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
@@ -102,10 +102,23 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
     return this.store.dispatch(action);
   }
 
-  public override getGridOptions(tabIndex: OrganizationInvoicesGridTab): GridOptions {
+  public override getGridOptions(tabIndex: OrganizationInvoicesGridTab, organizationId: number | null): GridOptions {
     switch (tabIndex) {
       case OrganizationInvoicesGridTab.PendingRecords:
-        return PendingInvoiceRowDetailsGridHelper.getNestedRowsGridOptions();
+        return PendingInvoiceRowDetailsGridHelper.getRowDetailsGridOptions({
+          previewExpensesAttachment: (attachment: InvoiceAttachment) => this.store.dispatch(
+            new Invoices.PreviewAttachment(organizationId, attachment)
+          ),
+          downloadExpensesAttachment: (attachment: InvoiceAttachment) => this.store.dispatch(
+            new Invoices.DownloadAttachment(organizationId, attachment),
+          ),
+          previewMilesAttachments: (attachment: InvoiceAttachment) => this.store.dispatch(
+            new Invoices.PreviewMilesAttachment(organizationId, attachment)
+          ),
+          downloadMilesAttachments: (attachment: InvoiceAttachment) => this.store.dispatch(
+            new Invoices.DownloadMilesAttachment(organizationId, attachment)
+          ),
+        });
       case OrganizationInvoicesGridTab.PendingApproval:
       case OrganizationInvoicesGridTab.PendingPayment:
         return PendingApprovalGridHelper.getGridOptions(false);
@@ -114,7 +127,7 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
       case OrganizationInvoicesGridTab.All:
         return PendingApprovalGridHelper.getGridOptions(false);
       default:
-        return super.getGridOptions(tabIndex);
+        return super.getGridOptions(tabIndex, organizationId);
     }
   }
 

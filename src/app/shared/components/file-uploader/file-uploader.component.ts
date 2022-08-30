@@ -1,17 +1,26 @@
-import { Component, ChangeDetectionStrategy, ViewChild, ElementRef, Input, Output,
-  EventEmitter, ChangeDetectorRef, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 
-import { FilesPropModel, RemovingEventArgs, SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
-import { UploaderComponent } from '@syncfusion/ej2-angular-inputs';
-import { Actions, Store } from '@ngxs/store';
+import { FileInfo, RemovingEventArgs, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
+import { Store } from '@ngxs/store';
 
 import { FileAdapter } from '@core/helpers/adapters';
 import { FileForUpload } from '@core/interface';
 import { AllowedFileExtensions } from './file-uploader.constant';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { FilesClearEvent } from '@core/enums';
+import { FilesClearEvent, UploaderFileStatus } from '@core/enums';
 import { Attachment } from '@shared/components/attachments';
+import { CustomFilesPropModel } from '@shared/components/file-uploader/custom-files-prop-model.interface';
 
 @Component({
   selector: 'app-file-uploader',
@@ -36,17 +45,23 @@ export class FileUploaderComponent implements OnChanges {
 
   @Input() clearAll: FilesClearEvent | null;
 
-  @Output() uploadFilesChanged: EventEmitter<FileForUpload[]> = new EventEmitter();
+  @Output() selectedFilesChanged: EventEmitter<FileForUpload[]> = new EventEmitter();
 
-  public existingFiles: FilesPropModel[] = [];
+  @Output()
+  public readonly existingFileDelete: EventEmitter<CustomFilesPropModel> = new EventEmitter<CustomFilesPropModel>();
+
+  public existingFiles: CustomFilesPropModel[] = [];
 
   @Input()
   public set attachments(value: Attachment[]) {
     if (value && value.length) {
-      this.existingFiles = value.map<FilesPropModel>(({ fileName}) => {
+      this.existingFiles = value.map<CustomFilesPropModel>(({ id, fileName }: Attachment) => {
+        const [name, type] = fileName.split(/\./);
+
         return {
-          name: fileName,
-          type: '',
+          id,
+          name,
+          type,
           size: 0,
         }
       });
@@ -57,8 +72,6 @@ export class FileUploaderComponent implements OnChanges {
 
   constructor(
     private store: Store,
-    private actions$: Actions,
-    private cd: ChangeDetectorRef,
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -74,7 +87,7 @@ export class FileUploaderComponent implements OnChanges {
   }
 
   public filesSelected(event: SelectedEventArgs): void {
-    if (this.files.length + event.filesData.length < this.maxFiles) {
+    if (this.files.length + event.filesData.length <= this.maxFiles) {
       this.setFiles(event);
     } else {
       event.filesData.splice(this.maxFiles, event.filesData.length);
@@ -83,9 +96,15 @@ export class FileUploaderComponent implements OnChanges {
     }
   }
 
-  public removeFile(event: RemovingEventArgs): void {
-    this.files = this.files.filter((file) => file.fileName !== event.filesData[0].name);
-    this.uploadFilesChanged.emit(this.files);
+  public removeFile(removingEventArgs: RemovingEventArgs): void {
+    const [ removedFile ] = removingEventArgs.filesData;
+
+    if (removedFile.statusCode === UploaderFileStatus.UploadedSuccessfully) {
+      this.handleExistingFileRemove(removedFile);
+    } else {
+      this.files = this.files.filter((file: FileForUpload) => file.fileName !== removedFile.name);
+      this.selectedFilesChanged.emit(this.files);
+    }
   }
 
   private showFileNumberExceed(): void {
@@ -94,6 +113,15 @@ export class FileUploaderComponent implements OnChanges {
 
   private setFiles(event: SelectedEventArgs): void {
     this.files = [...this.files, ...FileAdapter.adaptRawEventFiles(event.filesData)];
-    this.uploadFilesChanged.emit(this.files);
+    this.selectedFilesChanged.emit(this.files);
+  }
+
+  private handleExistingFileRemove(file: FileInfo) {
+    const existingFile = this.existingFiles.find(({ name, type }: CustomFilesPropModel) =>
+      [name, type].join('.') === file.name);
+
+    if (existingFile) {
+      this.existingFileDelete.emit(existingFile);
+    }
   }
 }

@@ -68,7 +68,7 @@ import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectsService } from '@shared/services/projects.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { ORDER_WITHOUT_BILLRATES, ORDER_WITHOUT_CREDENTIALS, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { ORDER_WITHOUT_BILLRATES, ORDER_WITHOUT_CREDENTIALS, ORDER_WITHOUT_CRED_BILLRATES, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { OrderManagementModel } from '@agency/store/order-management.state';
@@ -567,7 +567,7 @@ export class OrderManagementContentState {
   ): Observable<Order | void> {
     return this.orderManagementService.saveOrder(order, documents, comments, lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
-        let TOAST_MESSAGE = RECORD_ADDED;
+        let TOAST_MESSAGE = 'Record has been created';
         let MESSAGE_TYPE = MessageTypes.Success;
         const hasntOrderCredentials = order?.isQuickOrder && payload.credentials.length === 0;
         const hasntOrderBillRates =
@@ -575,14 +575,14 @@ export class OrderManagementContentState {
             payload.orderType === OrderType.ContractToPerm) &&
           payload.billRates.length === 0;
 
-        if (!hasntOrderCredentials) {
-          TOAST_MESSAGE = `${ORDER_WITHOUT_CREDENTIALS}`;
+        if (hasntOrderCredentials) {
+          TOAST_MESSAGE += `. ${ORDER_WITHOUT_CREDENTIALS}`;
           MESSAGE_TYPE = MessageTypes.Warning;
-        } else if (!hasntOrderBillRates) {
-          TOAST_MESSAGE = `${ORDER_WITHOUT_BILLRATES}`;
+        } else if (hasntOrderBillRates) {
+          TOAST_MESSAGE += `. ${ORDER_WITHOUT_BILLRATES}`;
           MESSAGE_TYPE = MessageTypes.Warning;
-        } else if (!hasntOrderCredentials && !hasntOrderBillRates) {
-          TOAST_MESSAGE = `${ORDER_WITHOUT_CREDENTIALS} && ${ORDER_WITHOUT_BILLRATES}`;
+        } else if (hasntOrderCredentials && hasntOrderBillRates) {
+          TOAST_MESSAGE += `. ${ORDER_WITHOUT_CRED_BILLRATES}`;
         }
 
         dispatch([

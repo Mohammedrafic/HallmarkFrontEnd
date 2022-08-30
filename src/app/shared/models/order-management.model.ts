@@ -430,6 +430,8 @@ export type OrderCandidateJob = {
   allowDeployCredentials: boolean;
   hasAllRequiredOnboardedCredentials: boolean;
   offeredStartDate: string;
+  organizationPrefix: string;
+  orderPublicId: number;
   closeDate?: string;
   positionClosureReason?: string;
   positionClosureReasonId?: number;

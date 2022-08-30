@@ -32,10 +32,10 @@ import {
   CANCEL_CONFIRM_TEXT,
   CANCEL_ORDER_CONFIRM_TEXT,
   CANCEL_ORDER_CONFIRM_TITLE,
+  DELETE_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
-  UNSAVE_CHANGES_TEXT,
 } from '@shared/constants';
 import { Location } from '@angular/common';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
@@ -56,7 +56,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() order: Order;
   @Input() openEvent: Subject<boolean>;
   @Input() children: OrderManagementChild[] | undefined;
-  @Input() settings: {[key in SettingsKeys]?: OrganizationSettingsGet};
+  @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
@@ -168,7 +168,15 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public lockOrder(): void {
-    this.store.dispatch(new SetLock(this.order.id, !this.order.isLocked, {}, `${this.order.organizationPrefix || ''}-${this.order.publicId}`, true));
+    this.store.dispatch(
+      new SetLock(
+        this.order.id,
+        !this.order.isLocked,
+        {},
+        `${this.order.organizationPrefix || ''}-${this.order.publicId}`,
+        true
+      )
+    );
   }
 
   public onTabSelecting(event: SelectEventArgs): void {
@@ -270,7 +278,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public onClose(): void {
     if (this.extensionCandidateComponent?.form.dirty) {
-      this.saveExtensionChanges().subscribe(() => this.closeSideDialog());
+      this.saveExtensionChanges().subscribe(() => {
+        this.closeSideDialog();
+      });
     } else {
       this.closeSideDialog();
     }
@@ -287,15 +297,13 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   private saveExtensionChanges(): Observable<boolean> {
     const options = {
-      title: 'Save Changes',
-      okButtonLabel: 'Save',
+      title: DELETE_CONFIRM_TITLE,
+      okButtonLabel: 'Leave',
       okButtonClass: 'delete-button',
       cancelButtonLabel: 'Cancel',
     };
 
-    return this.confirmService
-    .confirm(UNSAVE_CHANGES_TEXT, options)
-    .pipe(tap((confirm) =>  confirm && this.extensionCandidateComponent.updatedUnsavedOnboarded()));
+    return this.confirmService.confirm(DELETE_CONFIRM_TEXT, options).pipe(filter((confirm) => confirm));
   }
 
   private selectCandidateOnOrderId(): void {
@@ -328,10 +336,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         order.items?.filter(
           (candidate) => candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
         ).length;
-        this.extensions = [];
-        if (order?.items[0]?.deployedCandidateInfo?.jobId) {
-          this.store.dispatch(new GetExtensions(order.items[0].deployedCandidateInfo.jobId));
-        }
+      this.extensions = [];
+      if (order?.items[0]?.deployedCandidateInfo?.jobId) {
+        this.store.dispatch(new GetExtensions(order.items[0].deployedCandidateInfo.jobId));
+      }
     });
     this.extensions$.pipe(takeUntil(this.unsubscribe$)).subscribe((extensions) => {
       this.extensions = extensions?.filter((extension: any) => extension.id !== this.order.id);

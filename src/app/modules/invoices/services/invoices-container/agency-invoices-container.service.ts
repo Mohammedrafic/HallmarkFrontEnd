@@ -16,9 +16,10 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
     switch (tab) {
       case 0:
         return ManualInvoicesGridHelper.getAgencyColDefs({
-          edit: (invoice: ManualInvoice) => this.store.dispatch(
-            new Invoices.ToggleManualInvoiceDialog(DialogAction.Open, invoice)
-          ),
+          edit: (invoice: ManualInvoice) => this.store.dispatch([
+            new Invoices.ToggleManualInvoiceDialog(DialogAction.Open, invoice),
+            new Invoices.GetInvoicesReasons(organizationId),
+          ]),
           delete: ({ id, organizationId }: ManualInvoice) => this.store.dispatch(
             new Invoices.DeleteManualInvoice(id, organizationId)
           ),
@@ -36,12 +37,12 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
     }
   }
 
-  public override getGridOptions(tabIndex: OrganizationInvoicesGridTab): GridOptions {
+  public override getGridOptions(tabIndex: OrganizationInvoicesGridTab, orgId: number | null): GridOptions {
     switch (tabIndex) {
       case 1:
         return AllInvoicesGridHelper.getGridOptions(true);
       default:
-        return super.getGridOptions(tabIndex);
+        return super.getGridOptions(tabIndex, orgId);
     }
   }
 

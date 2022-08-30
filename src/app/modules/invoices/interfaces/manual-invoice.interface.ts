@@ -10,7 +10,7 @@ export interface ManualInvoice extends BaseInvoice {
   attachments: InvoiceAttachment[];
   comment: string | null;
 
-  formattedOrderId: number;
+  formattedOrderId: string;
   positionId: number;
 
   invoiceRecordType: InvoiceRecordType;
@@ -24,4 +24,6 @@ export interface ManualInvoice extends BaseInvoice {
   weekEndDate: string;
   weekNumber: number;
   weekStartDate: string;
+  serviceDate: string;
+  linkedInvoiceId: string | null;
 }

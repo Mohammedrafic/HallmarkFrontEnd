@@ -108,8 +108,22 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
       this.pagination = true;
     this.paginationPageSize = this.pageSize,
       this.cacheBlockSize = this.pageSize;
-    this.maxBlocksInCache = 2;
+    this.maxBlocksInCache = 1;
     this.columnDefs = [
+      {
+        headerName: 'Action',
+        cellRenderer: 'buttonRenderer',
+        cellRendererParams: {
+          onClick: this.onEdit.bind(this),
+          label: 'Edit'
+        },
+        width: 50,
+        pinned: 'left',
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      },
       {
         field: 'id',
         hide: true,
@@ -140,6 +154,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
       {
         headerName: 'Status',
         field: 'isDeleted',
+        width: 50,
         valueGetter: function (params: { data: { isDeleted: boolean } }) {
           return self.statusEnum[+!params.data.isDeleted];
         },
@@ -175,7 +190,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         }
       },
       {
-        field: 'organisation',
+        field: 'organization',
         valueGetter: function (params: { data: { businessUnitName: string }; }) {
           return params.data.businessUnitName || "All";
         },
@@ -190,20 +205,6 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         },
         filter: false,
         sortable: false
-      },
-      {
-        headerName: 'Action',
-        cellRenderer: 'buttonRenderer',
-        cellRendererParams: {
-          onClick: this.onEdit.bind(this),
-          label: 'Edit'
-        },
-        width: 50,
-        pinned: 'right',
-        suppressMovable: true,
-        filter: false,
-        sortable: false,
-        menuTabs: []
       }
     ];
 

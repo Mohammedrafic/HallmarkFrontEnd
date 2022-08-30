@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { RejectReason } from '@shared/models/reject-reason.model';
-import { ConfirmService } from "@shared/services/confirm.service";
-import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
+import { ConfirmService } from '@shared/services/confirm.service';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -130,8 +130,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => confirm))
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => confirm))
         .subscribe(() => {
           this.closeDialog();
         });
@@ -247,7 +248,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         this.getComments();
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
-          jobId: value.orderId,
+          jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
           date: [value.order.jobStartDate, value.order.jobEndDate],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
           availableStartDate: value.availableStartDate,

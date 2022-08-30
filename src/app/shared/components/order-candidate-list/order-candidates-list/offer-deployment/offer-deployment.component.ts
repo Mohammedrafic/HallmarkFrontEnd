@@ -14,7 +14,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SET_READONLY_STATUS } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
-import { ConfirmService } from "@shared/services/confirm.service";
+import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 
@@ -119,10 +119,12 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   public comments: Comment[] = [];
 
-  constructor(private store: Store,
-              private actions$: Actions,
-              private confirmService: ConfirmService,
-              private commentsService: CommentsService) {}
+  constructor(
+    private store: Store,
+    private actions$: Actions,
+    private confirmService: ConfirmService,
+    private commentsService: CommentsService
+  ) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
     this.readOnlyMode =
@@ -153,8 +155,9 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
         .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => confirm))
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => confirm))
         .subscribe(() => {
           this.closeDialog();
         });
@@ -252,7 +255,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   private setFormValue(data: OrderCandidateJob): void {
     this.formGroup.setValue({
-      jobId: data.jobId,
+      jobId: `${data.organizationPrefix}-${data.orderPublicId}`,
       jobDate: [data.order.jobStartDate, data.order.jobEndDate],
       offeredBillRate: PriceUtils.formatNumbers(data.offeredBillRate || data.order.hourlyRate),
       orderBillRate: data.order.hourlyRate && PriceUtils.formatNumbers(data.order.hourlyRate),

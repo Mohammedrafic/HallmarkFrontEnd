@@ -17,7 +17,7 @@
       display: inline-flex;
     }
 
-    .file-icon, .file-name {
+    .file-icon, .file-name.preview-enabled {
       color: $primary-active-blue-10;
       cursor: pointer;
     }
