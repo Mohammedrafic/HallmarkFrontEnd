@@ -28,7 +28,7 @@ export class AllInvoicesGridHelper {
         headerCheckboxSelection: true,
         headerCheckboxSelectionFilteredOnly: true,
         checkboxSelection: true,
-        minWidth: 240,
+        width: 80,
         headerComponent: ToggleRowExpansionHeaderCellComponent,
         cellRenderer: 'agGroupCellRenderer',
       },
