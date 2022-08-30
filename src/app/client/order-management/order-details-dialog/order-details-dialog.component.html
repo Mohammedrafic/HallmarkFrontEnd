@@ -109,6 +109,7 @@
                 <app-extension-candidate
                   [currentOrder]="order"
                   [candidateOrder]="candidateOrderPage"
+                  [dialogEvent]="openEvent"
                   *ngIf="order?.extensionFromId; else candidateOrder">
                 </app-extension-candidate>
                 <ng-template #candidateOrder>

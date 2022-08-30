@@ -41,13 +41,13 @@
                   <div class="f-grow-2">
                     <div class="input-container bootstrap">
                       <label class="input-group">Job ID</label>
-                      <div>
+                      <div class="input-group">
                         <input appValidateWithMessage formControlName="jobId" class="e-input" type="text" />
                       </div>
                     </div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Location</label>
-                      <div>
+                      <div class="input-group">
                         <input appValidateWithMessage formControlName="locationName" class="e-input" type="text" />
                       </div>
                     </div>
@@ -56,25 +56,33 @@
                       <div class="input-container bootstrap">
                         <label class="input-group">Extension Start Date</label>
                         <div class="input-group input-readonly">
-                          <input
-                            appValidateWithMessage
-                            formControlName="extensionStartDate"
-                            class="e-input"
-                            type="text"
-                            readonly
-                          />
+                          <ejs-datepicker
+                          class="datepicker"
+                          format="MM/dd/yyyy"
+                          appValidateWithMessage
+                          placeholder="MM/DD/YYYY"
+                          [enableMask]="true"
+                          readonly
+                          [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                          formControlName="extensionStartDate"
+                        >
+                        </ejs-datepicker>
                         </div>
                       </div>
                       <div class="input-container bootstrap">
                         <label class="input-group">Extension End Date</label>
                         <div class="input-group input-readonly">
-                          <input
-                            appValidateWithMessage
-                            formControlName="extensionEndDate"
-                            class="e-input"
-                            type="text"
-                            readonly
-                          />
+                          <ejs-datepicker
+                          class="datepicker"
+                          format="MM/dd/yyyy"
+                          appValidateWithMessage
+                          placeholder="MM/DD/YYYY"
+                          [enableMask]="true"
+                          readonly
+                          [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                          formControlName="extensionEndDate"
+                        >
+                        </ejs-datepicker>
                         </div>
                       </div>
                     </div>
@@ -98,21 +106,22 @@
                 <div class="d-flex" *ngIf="isAgency || isAccepted || isOnBoard">
                   <div class="input-container bootstrap">
                     <label class="input-group">Leave request comments</label>
-                    <div>
+                    <div class="input-group">
                       <input appValidateWithMessage formControlName="comments" class="e-input" type="text" />
                     </div>
                   </div>
                 </div>
-                <div class="d-flex" *ngIf="!isAgency && (isAccepted || isOnBoard)">
+                <div class="d-flex" *ngIf="(isAccepted && !isAgency) || isOnBoard">
                   <div class="f-grow-2">
                     <div class="input-container bootstrap">
                       <label class="input-group">Guaranted Work Week</label>
-                      <div>
+                      <div class="input-group">
                         <input
                           appValidateWithMessage
                           formControlName="guaranteedWorkWeek"
                           class="e-input"
                           type="text"
+                          maxlength="50"
                         />
                       </div>
                     </div>
@@ -121,32 +130,34 @@
                         <label class="input-group">Actual Start Date</label>
                         <div class="input-group">
                           <ejs-datepicker
-                            formControlName="actualStartDate"
-                            appValidateWithMessage
-                            format="MM/dd/yyyy"
-                            placeholder="MM/DD/YYYY"
-                            [enableMask]="true"
-                            [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                            class="datepicker"
-                            [min]="today"
-                          >
-                          </ejs-datepicker>
+                          id="startDate"
+                          #startDate
+                          class="datepicker"
+                          format="MM/dd/yyyy"
+                          appValidateWithMessage
+                          placeholder="MM/DD/YYYY"
+                          [enableMask]="true"
+                          [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                          formControlName="actualStartDate"
+                        >
+                        </ejs-datepicker>
                         </div>
                       </div>
                       <div class="input-container bootstrap">
                         <label class="input-group">Actual End Date</label>
                         <div class="input-group">
                           <ejs-datepicker
-                            appValidateWithMessage
-                            format="MM/dd/yyyy"
-                            placeholder="MM/DD/YYYY"
-                            formControlName="actualEndDate"
-                            [enableMask]="true"
-                            [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                            class="datepicker"
-                            [min]="today"
-                          >
-                          </ejs-datepicker>
+                          id="endDate"
+                          class="datepicker"
+                          format="MM/dd/yyyy"
+                          appValidateWithMessage
+                          placeholder="MM/DD/YYYY"
+                          [enableMask]="true"
+                          [min]="startDate.value"
+                          [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                          formControlName="actualEndDate"
+                        >
+                        </ejs-datepicker>
                         </div>
                       </div>
                     </div>
@@ -160,9 +171,9 @@
                   </div>
                   <div>
                     <div class="input-container bootstrap">
-                      <label class="input-group">Clock ID</label>
-                      <div>
-                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" />
+                      <label>Clock ID</label>
+                      <div class="input-group">
+                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text"  maxlength="50"/>
                       </div>
                     </div>
                   </div>

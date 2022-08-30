@@ -32,6 +32,7 @@ import {
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
+import { capitalize } from 'lodash';
 
 @Component({
   selector: 'app-extension-candidate',
@@ -41,6 +42,7 @@ import {
 export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   @Input() currentOrder: Order;
   @Input() candidateOrder: OrderCandidatesListPage;
+  @Input() dialogEvent: Subject<boolean>;
   candidate$: Observable<OrderCandidatesList>;
 
   @Select(OrderManagementState.orderCandidatePage)
@@ -67,7 +69,6 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
   ];
   public isAgency: boolean = false;
-  public today = new Date();
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -192,7 +193,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
             { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
           ]
         : [
-            { applicantStatus: candidate.status, statusText: CandidatStatus[candidate.status] },
+            { applicantStatus: candidate.status, statusText:  capitalize(CandidatStatus[candidate.status]) },
             { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
           ];
   }
@@ -238,6 +239,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
       guaranteedWorkWeek: value.guaranteedWorkWeek,
       clockId: value.clockId,
     };
+    const statusChanged = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
     this.store
       .dispatch(
         this.isAgency ? new UpdateAgencyCandidateJob(updatedValue) : new UpdateOrganisationCandidateJob(updatedValue)
@@ -246,6 +248,9 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
         this.store.dispatch(
           this.isAgency ? new ReloadOrderCandidatesLists() : new ReloadOrganisationOrderCandidatesLists()
         );
+        if (statusChanged) {
+          this.dialogEvent.next(false);
+        }
       });
   }
 
@@ -259,8 +264,8 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
       actualEndDate: new FormControl('', Validators.required),
       extensionStartDate: new FormControl({ value: '', disabled: true }),
       extensionEndDate: new FormControl({ value: '', disabled: true }),
-      guaranteedWorkWeek: new FormControl(''),
-      clockId: new FormControl(''),
+      guaranteedWorkWeek: new FormControl('', [Validators.maxLength(50)]),
+      clockId: new FormControl('', [Validators.maxLength(50)]),
       allowDeployCredentials: new FormControl(false),
     });
     this.form.disable();
@@ -300,7 +305,9 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
             clockId: this.candidateJob.clockId,
             allowDeployCredentials: this.candidateJob.allowDeployCredentials,
           });
-          this.isAgency ? this.form.get('comments')?.enable() : this.form.get('offeredBillRate')?.enable();
+          if (this.isAgency && !this.isOnBoard) {
+            this.isAgency ? this.form.get('comments')?.enable() : this.form.get('offeredBillRate')?.enable();
+          }
           if (this.isAccepted && !this.isAgency) {
             this.form.get('guaranteedWorkWeek')?.enable();
             this.form.get('clockId')?.enable();

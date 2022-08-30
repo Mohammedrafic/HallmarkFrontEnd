@@ -182,6 +182,7 @@
                   <ng-template #extensionCandidate>
                     <section class="container onboarded-candidate-container">
                       <app-extension-candidate
+                        [dialogEvent]="$any(openEvent)"
                         [currentOrder]="order">
                       </app-extension-candidate>
                     </section>
