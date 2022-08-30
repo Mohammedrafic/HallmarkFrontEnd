@@ -6,12 +6,13 @@ import { Select, Store } from "@ngxs/store";
 import { SecurityState } from "../../../store/security.state";
 import { filter, map, merge, Observable, Subject, takeWhile } from "rxjs";
 import { BusinessUnit } from "@shared/models/business-unit.model";
-import { GetNewRoleBusinessByUnitType, GetRolePerUser } from "../../../store/security.actions";
+import { GetNewRoleBusinessByUnitType, GetRolePerUser,GetUSCanadaTimeZoneIds } from "../../../store/security.actions";
 import { AdminState } from "@admin/store/admin.state";
 import { CanadaStates, Country, UsaStates } from "@shared/enums/states";
 import { mustMatch } from "@shared/validators/must-match.validators";
 import { RolesPerUser } from "@shared/models/user-managment-page.model";
 import { SwitchComponent } from "@syncfusion/ej2-angular-buttons";
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 @Component({
   selector: 'app-user-settings',
@@ -35,6 +36,10 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
 
   @Select(SecurityState.newBusinessDataPerUser)
   public newBusinessDataPerUser$:Observable<(type: number) => BusinessUnit[]>
+
+  @Select(SecurityState.timeZones)
+  timeZoneIds$: Observable<GetUSCanadaTimeZoneIds>;
+  timeZoneOptionFields: FieldSettingsModel = { text: 'systemTimeZoneName', value: 'timeZoneId'};
 
   public businessValue: BusinessUnit[];
   public unitFields = UNIT_FIELDS;
@@ -67,6 +72,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
     this.onBusinessUnitControlChanged();
     this.subscribeOnBusinessUnits();
     this.updateBusinessDataPerUser();
+    this.store.dispatch(new GetUSCanadaTimeZoneIds());
   }
 
   ngOnDestroy(): void {
@@ -136,6 +142,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
         emailConfirmation: new FormControl('', [Validators.required, Validators.maxLength(100)]),
       phoneNumber: new FormControl('', [Validators.maxLength(10), Validators.minLength(10)]),
       fax: new FormControl('', [Validators.maxLength(10), Validators.minLength(10)]),
+      timeZone : new FormControl('')
     },
       mustMatch('email', 'emailConfirmation')
     );

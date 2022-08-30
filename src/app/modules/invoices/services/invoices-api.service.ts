@@ -8,7 +8,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { DataSourceItem, FileForUpload } from '@core/interface';
 import { GetPendingApprovalParams, GroupInvoicesParams, InvoicesFilteringOptions, InvoicesFilterState, InvoiceStateDto, ManualInvoiceMeta,
   ManualInvoicePostDto, ManualInvoiceReason, ManualInvoicesData, ManualInvoiceTimesheetResponse, InvoiceDetail, PrintingPostDto,
-  PrintInvoiceData, } from '../interfaces';
+  PrintInvoiceData, ManualInvoicePutDto } from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ExportPayload } from '@shared/models/export.model';
 
@@ -52,6 +52,10 @@ export class InvoicesApiService {
     return this.http.post<ManualInvoiceTimesheetResponse>('/api/ManualInvoiceRecords', payload);
   }
 
+  public updateManualInvoice(payload: ManualInvoicePutDto): Observable<ManualInvoiceTimesheetResponse> {
+    return this.http.put<ManualInvoiceTimesheetResponse>('/api/ManualInvoiceRecords', payload);
+  }
+
   public deleteManualInvoice(id: number, organizationId: number | null): Observable<void> {
     return organizationId ? this.agencyDeleteManualInvoice(id, organizationId) : this.organizationDeleteManualInvoice(id);
   }
@@ -74,7 +78,7 @@ export class InvoicesApiService {
 
   public saveManualInvoiceAttachments(
     files: FileForUpload[], orgId: number | null, timesheetId: number): Observable<number[]> {
-    if (!files.length) {
+    if (!files?.length) {
       return of([0]);
     }
     const formData = new FormData();

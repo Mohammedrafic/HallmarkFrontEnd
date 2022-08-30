@@ -20,6 +20,7 @@ export type User = {
   businessUnitName?: string;
   assigned: boolean;
   roles: Array<number> | [];
+  timeZone?: string; 
 };
 
 export type UserDTO = {

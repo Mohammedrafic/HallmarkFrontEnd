@@ -1,9 +1,9 @@
 import { Attachment } from '@shared/components/attachments';
 
-type AttachmentAction = (item: Attachment) => void;
+export type AttachmentAction<T extends Attachment = Attachment> = (item: T) => void;
 
-export interface AttachmentsListConfig {
-  preview?: AttachmentAction;
-  download?: AttachmentAction;
-  delete?: AttachmentAction;
+export interface AttachmentsListConfig<T extends Attachment = Attachment> {
+  preview?: AttachmentAction<T>;
+  download?: AttachmentAction<T>;
+  delete?: AttachmentAction<T>;
 }

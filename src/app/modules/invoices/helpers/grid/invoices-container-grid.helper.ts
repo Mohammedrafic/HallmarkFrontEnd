@@ -52,7 +52,7 @@ export class InvoicesContainerGridHelper {
         }
       },
       orderId: {
-        field: 'orderId',
+        field: 'formattedOrderIdFull',
         headerName: 'ORDER ID',
         width: 120,
         cellRenderer: GridCellLinkComponent,
@@ -81,6 +81,17 @@ export class InvoicesContainerGridHelper {
           const { weekNumber, weekStartDate: date } = params.data as PendingInvoice;
 
           return `${weekNumber} - ${GridValuesHelper.formatDate(date, 'cccccc')}<br>${GridValuesHelper.formatDate(date, 'M/d/yy')}`;
+        },
+        cellRendererParams: (params: ICellRendererParams): GridCellLinkParams => {
+          const { id, organizationId } = params.data as BaseInvoice;
+
+          return {
+            ...params,
+            link: agency ? `/agency/timesheets` : `/client/timesheets`,
+            navigationExtras: {
+              state: { timesheetId: id, organizationId },
+            }
+          };
         }
       },
     };

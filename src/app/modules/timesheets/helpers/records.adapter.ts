@@ -27,6 +27,11 @@ export class RecordsAdapter {
     if (data.timeOut) {
       data.timeOut = RecordsAdapter.checkTimeOutDate(data.timeIn, data.timeOut);
     }
+
+    if (type === RecordFields.Miles) {
+      data.timeIn = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(data.timeIn));
+    }
+
     return {
       timesheetId: sheetId,
       organizationId: orgId,

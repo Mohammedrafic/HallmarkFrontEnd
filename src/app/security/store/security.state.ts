@@ -45,6 +45,9 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import { TimeZoneModel } from '@shared/models/location.model';
+import { GetUSCanadaTimeZoneIds } from './security.actions';
+import { NodatimeService } from '@shared/services/nodatime.service';
 
 const BUSINNESS_DATA_DEFAULT_VALUE = { id: 0, name: 'All' };
 const BUSINNESS_DATA_HALLMARK_VALUE = { id: 0, name: 'Hallmark' };
@@ -61,6 +64,7 @@ interface SecurityStateModel {
   userVisibilitySettingsPage: UserVisibilitySettingsPage | null;
   copyRoleData: Role[];
   organizations: Organisation[];
+  timeZones: TimeZoneModel[] | null;
 }
 
 @State<SecurityStateModel>({
@@ -69,7 +73,7 @@ interface SecurityStateModel {
     bussinesData: [],
     rolesPage: null,
     usersPage: null,
-    allUsersPage:null,
+    allUsersPage: null,
     rolesPerUsers: [],
     permissionsTree: [],
     isNewRoleDataLoading: false,
@@ -77,6 +81,7 @@ interface SecurityStateModel {
     userVisibilitySettingsPage: null,
     copyRoleData: [],
     organizations: [],
+    timeZones: [],
   },
 })
 @Injectable()
@@ -182,11 +187,15 @@ export class SecurityState {
         : ([BUSINNESS_DATA_DEFAULT_VALUE, ...state.newRoleBussinesData] as BusinessUnit[]);
   }
 
+  @Selector()
+  static timeZones(state: SecurityStateModel): TimeZoneModel[] | null { return state.timeZones; }
+
   constructor(
     private businessUnitService: BusinessUnitService,
     private roleService: RolesService,
-    private userService: UsersService
-  ) {}
+    private userService: UsersService,
+    private nodatimeService: NodatimeService
+  ) { }
 
   @Action(GetBusinessByUnitType)
   GetBusinessByUnitType(
@@ -259,9 +268,9 @@ export class SecurityState {
   @Action(GetAllUsersPage)
   GetAllUsersPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitType,businessUnitIds, pageNumber, pageSize, sortModel, filterModel,getAll }: GetAllUsersPage
+    { businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel, getAll }: GetAllUsersPage
   ): Observable<UsersPage> {
-    return this.userService.getAllUsersPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel,getAll).pipe(
+    return this.userService.getAllUsersPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel, getAll).pipe(
       tap((payload) => {
         patchState({ allUsersPage: payload });
         return payload;
@@ -442,7 +451,7 @@ export class SecurityState {
   }
 
   @Action(ExportUserList)
-  ExportUserList({}: StateContext<SecurityStateModel>, { payload }: ExportUserList): Observable<Blob> {
+  ExportUserList({ }: StateContext<SecurityStateModel>, { payload }: ExportUserList): Observable<Blob> {
     return this.userService.export(payload).pipe(
       tap((file: Blob) => {
         const url = window.URL.createObjectURL(file);
@@ -452,7 +461,7 @@ export class SecurityState {
   }
 
   @Action(ExportRoleList)
-  ExportRoleList({}: StateContext<SecurityStateModel>, { payload }: ExportRoleList): Observable<Blob> {
+  ExportRoleList({ }: StateContext<SecurityStateModel>, { payload }: ExportRoleList): Observable<Blob> {
     return this.roleService.export(payload).pipe(
       tap((file: Blob) => {
         const url = window.URL.createObjectURL(file);
@@ -460,4 +469,14 @@ export class SecurityState {
       })
     );
   }
+  @Action(GetUSCanadaTimeZoneIds)
+  GetUSCanadaTimeZoneIds({ patchState }: StateContext<SecurityStateModel>, { }: GetUSCanadaTimeZoneIds): Observable<TimeZoneModel[]> {
+    return this.nodatimeService.getUSCanadaTimeZoneIds().pipe(
+      tap((payload) => {
+        patchState({ timeZones: payload });
+        return payload;
+      })
+    );
+  }
 }
+

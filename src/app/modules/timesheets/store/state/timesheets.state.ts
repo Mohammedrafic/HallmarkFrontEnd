@@ -287,7 +287,7 @@ export class TimesheetsState {
          * TODO: make all messages for toast in one constant.
          */
         ctx.dispatch(new ShowToast(MessageTypes.Success, PutSuccess.successMessage));
-        ctx.dispatch(new Timesheets.GetTimesheetDetails(body.timesheetId, body.organizationId, isAgency));
+        ctx.dispatch(new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency));
         return ctx.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
       }),
       catchError((err: HttpErrorResponse) => {
@@ -614,7 +614,7 @@ export class TimesheetsState {
 
           ctx.dispatch([
             new ShowToast(MessageTypes.Success, AddSuccessMessage.successMessage),
-            new Timesheets.GetTimesheetDetails(body.timesheetId, body.organizationId, isAgency),
+            new Timesheets.GetTimesheetDetails(id, body.organizationId, isAgency),
             new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency),
           ]);
         }),

@@ -46,7 +46,15 @@
 }
 
 .timesheet-table-container {
-  height: 255px;
+  height: auto;
+
+  &::ng-deep {
+    .empty-table {
+      .ag-body-viewport {
+        height: 100px;
+      }
+    }
+  }
 }
 
 ::ng-deep {

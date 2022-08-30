@@ -104,6 +104,7 @@ import { SkillGroupService } from '@shared/services/skill-group.service';
 import { OrganizationSettingsService } from '@shared/services/organization-settings.service';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { NodatimeService } from '@shared/services/nodatime.service';
 
 interface DropdownOption {
   id: number;
@@ -311,7 +312,8 @@ export class OrganizationManagementState {
     private locationService: LocationService,
     private credentialsService: CredentialsService,
     private skillGroupService: SkillGroupService,
-    private organizationSettingsService: OrganizationSettingsService
+    private organizationSettingsService: OrganizationSettingsService,
+    private nodatimeService: NodatimeService
   ) { }
 
   @Action(SetGeneralStatesByCountry)
@@ -917,12 +919,11 @@ export class OrganizationManagementState {
     );
   }
   
-  @Action(GetUSCanadaTimeZoneIds)
+ @Action(GetUSCanadaTimeZoneIds)
   GetUSCanadaTimeZoneIds({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetUSCanadaTimeZoneIds): Observable<TimeZoneModel[]> {
-    patchState({ isLocationTypesLoading: true });
-    return this.locationService.getUSCanadaTimeZoneIds().pipe(
+    return this.nodatimeService.getUSCanadaTimeZoneIds().pipe(
       tap((payload) => {
-        patchState({ isLocationTypesLoading: false, timeZones: payload });
+        patchState({ timeZones: payload });
         return payload;
       })
     );

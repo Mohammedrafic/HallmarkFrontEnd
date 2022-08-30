@@ -4,6 +4,7 @@ import { AddManInvoiceDialogConfig } from '../interfaces';
 
 export const ManualInvoiceDialogConfig = (isAgency: boolean): AddManInvoiceDialogConfig => ({
   title: 'Add Manual Invoice',
+  editTitle: 'Edit Manual Invoice',
   fields: [
     {
       field: 'orderId',

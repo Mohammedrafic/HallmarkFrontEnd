@@ -46,6 +46,14 @@
         background: $secondary-dark-blue-45;
       }
     }
+
+    app-attachments-list {
+      height: 100%;
+
+      .attachment {
+        padding-bottom: 4px;
+      }
+    }
   }
 }
 

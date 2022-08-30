@@ -6,6 +6,7 @@
     ></i-feather>
 
     <ejs-tooltip [content]="attachment.fileName"
+                 [class.preview-enabled]="!!attachmentsListConfig?.preview"
                  (click)="preview(attachment)"
                  position="BottomCenter"
                  class="file-name"

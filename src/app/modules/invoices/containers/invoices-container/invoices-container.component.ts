@@ -100,7 +100,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   public readonly defaultGridOptions: GridOptions = {
     onRowSelected: (event: RowSelectedEvent): void => {
       this.groupingInvoiceRecordsIds = event.api.getSelectedRows()
-        .map(({ invoiceRecords }: PendingInvoice) => invoiceRecords.map((record: PendingInvoiceRecord) => record.id))
+        .map(({ invoiceRecords }: PendingInvoice) => invoiceRecords?.map((record: PendingInvoiceRecord) => record.id))
         .flat();
     }
   };
@@ -127,7 +127,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   public tabConfig: GridContainerTabConfig = {};
   public groupInvoicesOverlayVisible: boolean = false;
   public selectedInvoiceIds: number[];
-  public selectedOrgIds: number[];
 
   public isAgency: boolean;
 
@@ -213,7 +212,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
         this.organizationId = orgId;
         this.gridOptions = {
           ...this.defaultGridOptions,
-          ...this.invoicesContainerService.getGridOptions(tabIdx),
+          ...this.invoicesContainerService.getGridOptions(tabIdx, orgId),
         };
 
         this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx, { organizationId: orgId });
@@ -358,19 +357,19 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   public handleMultiSelectionChanged(nodes: RowNode[]): void {
     if (nodes.length) {
       this.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);
-      this.selectedOrgIds = nodes.map((node) => node.data.organizationId);
     } else {
       this.selectedInvoiceIds = [];
     }
   }
 
   public printInvoices(): void {
-    const dto: PrintingPostDto = this.isAgency ? {
+    const dto: PrintingPostDto = {
       invoiceIds: this.selectedInvoiceIds,
-      organizationIds: this.selectedOrgIds,
-    } : {
-      organizationId: this.organizationId as number,
-      invoiceIds: this.selectedInvoiceIds,
+      ...(this.isAgency ? {
+        organizationIds: [this.organizationId] as number[],
+      } : {
+        organizationId: this.organizationId as number,
+      })
     };
 
     this.store.dispatch(new Invoices.GetPrintData(dto, this.isAgency))
