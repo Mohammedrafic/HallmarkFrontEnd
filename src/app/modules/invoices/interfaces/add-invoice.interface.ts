@@ -15,6 +15,7 @@ export interface ManInvoiceInputConfig {
 
 export interface AddManInvoiceDialogConfig {
   title: string;
+  editTitle: string;
   fields: ManInvoiceInputConfig[];
 }
 
@@ -75,4 +76,8 @@ export interface ManualInvoicePostDto {
   manualInvoiceReasonId: number;
   comment: string;
   departmentId: number;
+}
+
+export interface ManualInvoicePutDto extends ManualInvoicePostDto {
+  timesheetId: number;
 }

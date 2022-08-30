@@ -40,6 +40,13 @@ export class DateTimeHelper {
     date.getMonth(), date.getDate(), date.getHours(), date.getMinutes())).toISOString();
   }
 
+  public static setInitHours(data: string): string {
+    const date = new Date(this.convertDateToUtc(data));
+    date.setHours(0, 0, 0);
+    
+    return this.toUtcFormat(date);
+  }
+
   public static geFirstDayofWeek(date: Date): Date {
     return new Date(date.setDate(date.getDate() - date.getDay()));
   }
