@@ -36,7 +36,6 @@
   </div>
 
   <app-widget-list
-    *ngIf="isDialogOpened$ | async"
     (closeDialogEmitter)="toggleDialog(false)"
     (widgetToggleEmitter)="widgetToggleEmitter.emit($event)"
     [selectedWidgets]="selectedWidgets"
