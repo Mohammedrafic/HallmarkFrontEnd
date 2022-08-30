@@ -285,7 +285,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public updateGrid(): void {
-    this.closeExtensionSidebar();
+    this.isExtensionSidebarShown = false;
     this.getExtensions();
     this.saveEmitter.emit();
   }
