@@ -1,5 +1,6 @@
 import { formatDate } from '@angular/common';
 import { Injectable } from '@angular/core';
+import { DateTimeHelper } from '@core/helpers';
 
 import jsPDF from 'jspdf';
 import autoTable, { CellDef, RowInput } from 'jspdf-autotable';
@@ -468,7 +469,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
       tableLineColor: '#181919',
       tableLineWidth: 1,
       showFoot: 'lastPage',
-      head: [['Week', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
+      head: [['Week End', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
       'Agency', 'Skill', 'Hours/Miles', 'Bill Rate', 'Total']],
       headStyles: {
         fillColor: '#CFCFCF',
@@ -484,18 +485,18 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
       body: data.invoiceRecords.map((record) => {
         return [
           {
-            content: formatDate(record.weekDate, 'MM/dd/YYYY', 'en-US'),
+            content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
             styles: {
               halign: 'left',
             }
           },
           {
-            content: formatDate(record.timeIn, 'MM/dd/YYYY HH:mm', 'en-US'),
+            content: formatDate(DateTimeHelper.toUtcFormat(record.timeIn), 'MM/dd/YYYY HH:mm', 'en-US', 'utc'),
             styles: {
               halign: 'left',
             }
           },
-          formatDate(record.timeOut, 'MM/dd/YYYY HH:mm', 'en-US'),
+          formatDate(DateTimeHelper.toUtcFormat(record.timeOut), 'MM/dd/YYYY HH:mm', 'en-US', 'utc'),
           record.billRateConfigName,
           record.costCenterFormattedName,
           record.formattedJobId,
@@ -503,7 +504,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
           record.agencyName,
           record.skillName,
           {
-            content:  GridValuesHelper.formatAbsNumber(record.value, '1.2-2'),
+            content: GridValuesHelper.formatAbsNumber(record.value, '1.2-2'),
             styles: {
               halign: 'right',
             },
@@ -937,7 +938,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
       tableLineColor: '#181919',
       tableLineWidth: 1,
       showFoot: 'lastPage',
-      head: [['Week', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
+      head: [['Week End', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
       'Organization', 'Skill', 'Hours/Miles', 'Bill Rate', 'Fee', 'Total']],
       headStyles: {
         fillColor: '#CFCFCF',
@@ -953,18 +954,18 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
       body: data.invoiceRecords.map((record) => {
         return [
           {
-            content: formatDate(record.weekDate, 'MM/dd/YYYY', 'en-US'),
+            content: formatDate(DateTimeHelper.toUtcFormat(record.weekDate), 'MM/dd/YYYY', 'en-US', 'utc'),
             styles: {
               halign: 'left',
             }
           },
           {
-            content: formatDate(record.timeIn, 'MM/dd/YYYY HH:mm', 'en-US'),
+            content: formatDate(DateTimeHelper.toUtcFormat(record.timeIn), 'MM/dd/YYYY HH:mm', 'en-US', 'utc'),
             styles: {
               halign: 'left',
             }
           },
-          formatDate(record.timeOut, 'MM/dd/YYYY HH:mm', 'en-US'),
+          formatDate(DateTimeHelper.toUtcFormat(record.timeOut), 'MM/dd/YYYY HH:mm', 'en-US', 'utc'),
           record.billRateConfigName,
           record.costCenterFormattedName,
           record.formattedJobId,

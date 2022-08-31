@@ -11,6 +11,7 @@ export interface ManualInvoice extends BaseInvoice {
   comment: string | null;
 
   formattedOrderId: string;
+  formattedOrderIdFull: string;
   positionId: number;
 
   invoiceRecordType: InvoiceRecordType;
@@ -26,4 +27,5 @@ export interface ManualInvoice extends BaseInvoice {
   weekStartDate: string;
   serviceDate: string;
   linkedInvoiceId: string | null;
+  orderPublicId: number;
 }
