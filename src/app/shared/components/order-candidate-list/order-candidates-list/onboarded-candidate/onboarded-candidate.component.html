@@ -176,14 +176,13 @@
                   </div>
                   <div class="input-container bootstrap">
                     <label class="input-group">Actual End Date</label>
-                    <div class="input-group datepicker" [ngClass]="{'input-readonly': isOnBoarded}">
+                    <div class="input-group datepicker">
                       <ejs-datepicker
                         id="endDate"
                         class="datepicker"
                         format="MM/dd/yyyy"
                         appValidateWithMessage
                         placeholder="MM/DD/YYYY"
-                        [readonly]="isOnBoarded"
                         [min]="today"
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"

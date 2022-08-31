@@ -97,9 +97,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   public handlePrint(): void {
     const dto: PrintingPostDto = this.isAgency ? {
       invoiceIds: [this.invoiceDetail.meta.invoiceId],
-      organizationIds: [this.store.snapshot().invoices.selectedOrganizationId as number],
+      organizationIds: [this.invoiceDetail.meta.organizationIds[0]],
     } : {
-      organizationId: this.store.snapshot().invoices.selectedOrganizationId,
       invoiceIds: [this.invoiceDetail.meta.invoiceId],
     };
 

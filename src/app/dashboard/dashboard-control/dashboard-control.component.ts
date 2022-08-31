@@ -1,8 +1,7 @@
 import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 
-import { Store, Actions, ofActionDispatched, Select } from '@ngxs/store';
-import { Observable, map, distinctUntilChanged, takeUntil, Subject } from 'rxjs';
+import { Store, Select } from '@ngxs/store';
+import { Observable, takeUntil, Subject } from 'rxjs';
 
 import { ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -28,7 +27,7 @@ import { FilterColumnTypeEnum } from '../enums/dashboard-filter-fields.enum';
 export class DashboardControlComponent extends DestroyableDirective implements OnInit{
   @Input() public isLoading: boolean | null;
   @Input() public selectedWidgets: WidgetTypeEnum[] | null;
-  @Input() public widgets: WidgetOptionModel[] | null;
+  @Input() public widgets: WidgetOptionModel[];
   @Input() public hasOrderManagePermission: boolean;
   @Input() public hasWidgetPermission: boolean;
   @Input() public allOrganizations: Organisation[];
@@ -40,14 +39,11 @@ export class DashboardControlComponent extends DestroyableDirective implements O
   @Select(DashboardState.filteredItems) public readonly filteredItems$: Observable<FilteredItem[]>;
   @Select(UserState.organizationStructure) public readonly organizationStructure$: Observable<OrganizationStructure>;
 
-  public readonly isDialogOpened$: Observable<boolean> = this.isDialogOpened();
   public readonly isOpenQuickOrderDialod$: Subject<boolean> = new Subject<boolean>();
   public orderedFilters: Record<FilterName, FilteredItem[]>;
 
   constructor(
-    private readonly actions: Actions,
     private readonly store: Store,
-    private readonly router: Router
     ) {
     super();
   }
@@ -56,12 +52,6 @@ export class DashboardControlComponent extends DestroyableDirective implements O
     this.filteredItems$.pipe(takeUntil(this.destroy$)).subscribe((filters) => this.toPutInOrderFilters(filters));
   }
 
-  private isDialogOpened(): Observable<boolean> {
-    return this.actions.pipe(ofActionDispatched(ShowSideDialog)).pipe(
-      map((payload: ShowSideDialog) => payload.isDialogShown),
-      distinctUntilChanged()
-    );
-  }
 
   public toggleDialog(isDialogShown: boolean): void {
     this.store.dispatch(new ShowSideDialog(isDialogShown));
