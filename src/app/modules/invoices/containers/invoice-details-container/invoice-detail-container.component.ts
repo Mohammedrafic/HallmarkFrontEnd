@@ -99,7 +99,6 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
       invoiceIds: [this.invoiceDetail.meta.invoiceId],
       organizationIds: [this.invoiceDetail.meta.organizationIds[0]],
     } : {
-      organizationId: this.invoiceDetail.meta.organizationIds[0],
       invoiceIds: [this.invoiceDetail.meta.invoiceId],
     };
 
