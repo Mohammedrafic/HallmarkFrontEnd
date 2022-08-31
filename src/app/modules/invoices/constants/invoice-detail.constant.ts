@@ -2,6 +2,8 @@ import { InvoiceDetail, InvoiceInfoUIItem } from '../interfaces';
 import { GridValuesHelper } from '../../timesheets/helpers';
 import { ColDef } from '@ag-grid-enterprise/all-modules';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
+import { formatDate } from '@angular/common';
+import { DateTimeHelper } from '@core/helpers';
 
 const hallmarkName = 'Hallmark';
 
@@ -80,7 +82,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
       cellClass: 'align-right custom-line-height',
       headerClass: 'custom-wrap align-right',
       valueFormatter: (params: ValueFormatterParams) => {
-        return `${GridValuesHelper.formatDate(params.value, 'MM/dd/YYYY HH:mm')}`
+        return formatDate(DateTimeHelper.toUtcFormat(params.value), 'MM/dd/YYYY HH:mm', 'en-US', 'utc');
       },
     },
     {
@@ -94,7 +96,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
       cellClass: 'align-right custom-line-height',
       headerClass: 'custom-wrap align-right',
       valueFormatter: (params: ValueFormatterParams) => {
-        return `${GridValuesHelper.formatDate(params.value, 'MM/dd/YYYY HH:mm')}`
+        return formatDate(DateTimeHelper.toUtcFormat(params.value), 'MM/dd/YYYY HH:mm', 'en-US', 'utc');
       },
     },
     {
