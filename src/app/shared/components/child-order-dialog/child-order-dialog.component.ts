@@ -120,6 +120,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public isExtensionSidebarShown: boolean;
   public isAddExtensionBtnAvailable: boolean;
   public extensions$: Observable<any>;
+  public extensions: Order[];
 
   public readonly buttonTypeEnum = ButtonTypeEnum;
   public readonly orderStatus = OrderStatus;
@@ -143,6 +144,9 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.isOrganization = this.router.url.includes('client');
     this.selectedOrder$ = this.isAgency ? this.agencySelectedOrder$ : this.orgSelectedOrder$;
     this.extensions$ = this.isAgency ? this.agencyExtensions$ : this.organizationExtensions$;
+    this.extensions$.pipe(takeWhile(() => this.isAlive)).subscribe(extensions => {
+      this.extensions = extensions.filter((extension: Order) => extension.id !== this.order.id);
+    });
     this.subscribeOnCandidateJob();
     this.onOpenEvent();
   }
@@ -285,7 +289,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public updateGrid(): void {
-    this.closeExtensionSidebar();
+    this.isExtensionSidebarShown = false;
     this.getExtensions();
     this.saveEmitter.emit();
   }

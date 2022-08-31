@@ -66,6 +66,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     private store: Store,
     private invoicesContainerService: InvoicesContainerService,
     private printingService: InvoicePrintingService,
+    private chipsCssClass: ChipsCssClass,
   ) {
     super();
   }
@@ -99,7 +100,6 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
       invoiceIds: [this.invoiceDetail.meta.invoiceId],
       organizationIds: [this.invoiceDetail.meta.organizationIds[0]],
     } : {
-      organizationId: this.invoiceDetail.meta.organizationIds[0],
       invoiceIds: [this.invoiceDetail.meta.invoiceId],
     };
 
@@ -140,6 +140,10 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
           this.invoiceDetail = payload.invoiceDetail as InvoiceDetail;
           if (payload.invoiceDetail) {
             this.initTableColumns(this.invoiceDetail.summary[0]?.locationName || '');
+            if (this.chipList) {
+              this.chipList.cssClass = this.chipsCssClass.transform(this.invoiceDetail.meta.invoiceStateText);
+              this.chipList.text = this.invoiceDetail.meta.invoiceStateText.toUpperCase();
+            }
           }
         } else {
           this.sideDialog.hide();

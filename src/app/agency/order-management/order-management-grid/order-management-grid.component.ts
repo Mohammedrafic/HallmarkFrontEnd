@@ -268,7 +268,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     if (selectedOrderAfterRedirect && this.ordersPage) {
       const orderMyAgency = this.ordersPage.items.find(
-        (order: AgencyOrderManagement) => order.orderId === selectedOrderAfterRedirect.orderId
+        (order: AgencyOrderManagement) => order.publicId === selectedOrderAfterRedirect.orderId
       );
       if (orderMyAgency) {
         const candidate = orderMyAgency.children.find(
@@ -734,7 +734,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.filteredItems$.next(this.filteredItems.length);
 
       if (selectedOrderAfterRedirect.orderType === OrderType.ReOrder) {
-        this.filters.orderTypes = [10];
+        this.filters.orderTypes = [OrderType.ReOrder];
       }
     }
   }

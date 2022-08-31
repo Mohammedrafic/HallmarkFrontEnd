@@ -189,6 +189,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     ).subscribe(([orgId]) => {
       this.organizationId = orgId;
       this.invoicesContainerService.getRowData(this.selectedTabIdx, orgId);
+      this.cdr.markForCheck();
     });
   }
 
@@ -208,7 +209,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
       takeUntil(this.componentDestroy())
     )
       .subscribe((orgId: number | null) => {
-
         this.organizationId = orgId;
         this.gridOptions = {
           ...this.defaultGridOptions,

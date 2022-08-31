@@ -11,7 +11,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { distinctUntilChanged, filter, map, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { distinctUntilChanged, filter, map, Observable, Subject, takeUntil, zip } from 'rxjs';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -75,6 +75,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   @Select(OrderManagementContentState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
+
+  @Select(OrderManagementContentState.selectedOrder) selectedOrder: Observable<Order>;
 
   @Select(OrderManagementContentState.extensions) extensions$: Observable<any>;
   public extensions: any[] = [];
@@ -329,18 +331,25 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private subscribeOnOrderCandidatePage(): void {
-    this.orderCandidatePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: OrderCandidatesListPage) => {
-      this.candidateOrderPage = order;
-      this.candidatesCounter =
-        order &&
-        order.items?.filter(
-          (candidate) => candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
-        ).length;
-      this.extensions = [];
-      if (order?.items[0]?.deployedCandidateInfo?.jobId) {
-        this.store.dispatch(new GetExtensions(order.items[0].deployedCandidateInfo.jobId));
-      }
-    });
+    zip([this.orderCandidatePage$, this.selectedOrder])
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(([order, selectedOrder]: [OrderCandidatesListPage, Order]) => {
+        this.candidateOrderPage = order;
+        this.candidatesCounter =
+          order &&
+          order.items?.filter(
+            (candidate) =>
+              candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
+          ).length;
+        this.extensions = [];
+        if (
+          order?.items[0]?.deployedCandidateInfo?.jobId &&
+          (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
+        ) {
+          this.store.dispatch(new GetExtensions(order.items[0].deployedCandidateInfo.jobId));
+        }
+      });
+
     this.extensions$.pipe(takeUntil(this.unsubscribe$)).subscribe((extensions) => {
       this.extensions = extensions?.filter((extension: any) => extension.id !== this.order.id);
     });
