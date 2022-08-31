@@ -34,6 +34,13 @@ import isNil from 'lodash/fp/isNil';
 import { AbstractControl } from '@angular/forms';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { SaveTemplateDialogService } from '@client/order-management/save-template-dialog/save-template-dialog.service';
+import { AlertTrigger } from '@admin/store/alerts.actions';
+import { AlertTriggerDto } from '@shared/models/alerts-template.model';
+import { UserState } from 'src/app/store/user.state';
+import { User } from '@shared/models/user.model';
+import { AgencyState } from '@agency/store/agency.state';
+import { Agency } from '@shared/models/agency.model';
+import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
 
 enum SelectedTab {
   OrderDetails,
@@ -69,11 +76,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   @Select(OrderCandidatesCredentialsState.predefinedCredentials)
   predefinedCredentials$: Observable<IOrderCredentialItem[]>;
 
+  @Select(OrderManagementContentState.saveOrder)
+  savedOrder$: Observable<Order>;
+
   public SelectedTab = SelectedTab;
   public orderId: number;
   public publicId: number;
   public prefix: string;
-
+  
   public title: string;
   public submitMenuItems: ItemModel[] = [
     { id: SubmitButtonItem.SaveForLater, text: 'Save For Later' },
@@ -83,9 +93,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   // todo: update/set credentials list in edit mode for order
   public orderCredentials: IOrderCredentialItem[] = [];
   public orderBillRates: BillRate[] = [];
-
+  private savedOrder:Order;
   private unsubscribe$: Subject<void> = new Subject();
-
+  
   public isPerDiem = false;
   public isPermPlacementOrder = false;
   public disableOrderType = false;
@@ -116,6 +126,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     if (this.orderId > 0) {
       this.store.dispatch(new GetSelectedOrderById(this.orderId));
+      this.store.dispatch(new Agency)
       this.selectedOrder$.pipe(takeUntil(this.unsubscribe$))
       .subscribe((order: Order) => {
         this.prefix = order?.organizationPrefix as string;
@@ -143,7 +154,22 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         }
       });
     }
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe(() => {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe((data) => {
+            const user = this.store.selectSnapshot(UserState.user) as User;
+      const agency = this.store.selectSnapshot(AgencyState.agency) as Agency;      
+      let params:any={};
+      params['@'+AlertParameterEnum[AlertParameterEnum.MyOrganization]]=user?.businessUnitName;
+      params['@'+AlertParameterEnum[AlertParameterEnum.Agency]]=agency?.agencyDetails?.name;
+      params['@'+AlertParameterEnum[AlertParameterEnum.OrderId]]=this.savedOrder?.organizationPrefix +'-'+ this.savedOrder?.publicId;
+      params['@'+AlertParameterEnum[AlertParameterEnum.JobTitle]]=this.savedOrder?.title;
+      params['@'+AlertParameterEnum[AlertParameterEnum.ClickbackURL]]='';
+      
+      let alertTriggerDto:AlertTriggerDto={
+        BusinessUnitId: user?.businessUnitId,
+        AlertId: this.orderId>0?AlertIdEnum.OrderUpdated:AlertIdEnum.OrderCreated,
+        Parameters: params
+      }
+      this.store.dispatch(new AlertTrigger(alertTriggerDto));
       this.router.navigate(['/client/order-management']);
     });
 
@@ -270,6 +296,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       } else {
         this.store.dispatch(new SaveOrder(order, documents, this.orderDetailsFormComponent.isEditMode ? undefined : this.orderDetailsFormComponent.comments));
       }
+      this.savedOrder$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe((order: Order) => {
+        this.savedOrder=order;
+      });
     } else {
       this.orderDetailsFormComponent.orderTypeForm.markAllAsTouched();
       this.orderDetailsFormComponent.generalInformationForm.markAllAsTouched();
@@ -277,7 +307,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.jobDescriptionForm.markAllAsTouched();
       this.orderDetailsFormComponent.contactDetailsForm.markAllAsTouched();
       this.orderDetailsFormComponent.workLocationForm.markAllAsTouched();
-      this.orderDetailsFormComponent.specialProject.markAllAsTouched();
+      this.orderDetailsFormComponent.specialProject.markAllAsTouched();      
     }
   }
 
@@ -470,6 +500,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         order, documents, this.orderDetailsFormComponent.comments
       ));
     }
+    
   }
 
   private subscribeOnPredefinedCredentials(): void {

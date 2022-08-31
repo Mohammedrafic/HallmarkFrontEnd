@@ -71,7 +71,7 @@ export class AlertsSmsTemplateFromComponent {
 
   static createForm(): FormGroup {
     return new FormGroup({
-      alertBody: new FormControl('', [Validators.required,Validators.maxLength(200)]),
+      alertBody: new FormControl('', [Validators.required]),
     });
   }
 

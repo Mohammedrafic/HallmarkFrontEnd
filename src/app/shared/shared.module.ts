@@ -132,6 +132,7 @@ import { EmailSideDialogComponent } from '@shared/components/email-side-dialog/e
 import { SmsSideDialogComponent } from '@shared/components/sms-side-dialog/sms-side-dialog.component';
 import { OnScreenSideDialogComponent } from '@shared/components/on-screen-side-dialog/on-screen-side-dialog.component';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
+import { AlertsState } from '@admin/store/alerts.state';
 
 const icons = {
   AlertCircle,
@@ -246,7 +247,7 @@ const COMPONENTS = [
     TextBoxModule,
     MaskedTextBoxAllModule,
     TabAllModule,
-    NgxsModule.forFeature([BillRateState, SecurityState, CommentsState]),
+    NgxsModule.forFeature([BillRateState, SecurityState, CommentsState,AlertsState]),
     PageToolbarModule,
     FilterDialogModule,
     SideMenuModule,
