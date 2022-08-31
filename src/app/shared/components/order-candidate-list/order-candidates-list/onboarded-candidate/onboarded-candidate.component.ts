@@ -77,15 +77,19 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   }
 
   get isAccepted(): boolean {
-    return this.candidate.status === ApplicantStatusEnum.Accepted;
+    return this.candidateStatus === ApplicantStatusEnum.Accepted;
   }
 
   get isOnBoarded(): boolean {
-    return this.candidate.status === ApplicantStatusEnum.OnBoarded;
+    return this.candidateStatus === ApplicantStatusEnum.OnBoarded;
   }
 
   get isDeployedCandidate(): boolean {
-    return !!this.candidate.deployedCandidateInfo && this.candidate.status !== ApplicantStatus.OnBoarded;
+    return !!this.candidate?.deployedCandidateInfo && !this.isOnBoarded;
+  }
+
+  get candidateStatus(): ApplicantStatusEnum {
+    return this.candidate.status || (this.candidate.candidateStatus as any);
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -146,7 +150,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch(new RejectCandidateJob(payload));
+      this.store.dispatch([new RejectCandidateJob(payload), new ReloadOrganisationOrderCandidatesLists()]);
       this.closeDialog();
     }
   }
@@ -310,7 +314,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   }
 
   private checkRejectReason(): void {
-    if (this.candidate.status === ApplicantStatusEnum.Rejected) {
+    if (this.candidateStatus === ApplicantStatusEnum.Rejected) {
       this.isRejected = true;
       this.form.disable();
     }

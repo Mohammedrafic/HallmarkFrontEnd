@@ -575,14 +575,15 @@ export class OrderManagementContentState {
             payload.orderType === OrderType.ContractToPerm) &&
           payload.billRates.length === 0;
 
-        if (hasntOrderCredentials) {
+        if (hasntOrderCredentials && hasntOrderBillRates) {
+          TOAST_MESSAGE += `. ${ORDER_WITHOUT_CRED_BILLRATES}`;
+          MESSAGE_TYPE = MessageTypes.Warning;
+        } else if (hasntOrderCredentials) {
           TOAST_MESSAGE += `. ${ORDER_WITHOUT_CREDENTIALS}`;
           MESSAGE_TYPE = MessageTypes.Warning;
         } else if (hasntOrderBillRates) {
           TOAST_MESSAGE += `. ${ORDER_WITHOUT_BILLRATES}`;
           MESSAGE_TYPE = MessageTypes.Warning;
-        } else if (hasntOrderCredentials && hasntOrderBillRates) {
-          TOAST_MESSAGE += `. ${ORDER_WITHOUT_CRED_BILLRATES}`;
         }
 
         dispatch([

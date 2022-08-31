@@ -28,7 +28,7 @@
           </div>
           <div class="e-card-content dialog-controls">
             <app-button
-              *ngIf="isAddExtensionBtnAvailable && !(extensions$ | async)?.length"
+              *ngIf="isAddExtensionBtnAvailable && !extensions?.length"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
               [disabled]="candidate?.orderStatus === orderStatus.InProgressOfferAccepted"
@@ -79,7 +79,13 @@
                 <section class="candidate">
                   <ng-container [ngSwitch]="selectedTemplate" *ngIf="!order.extensionFromId; else extensionCandidate">
                     <ng-container *ngSwitchCase="template.onboarded">
-                      <section  class="container onboarded-candidate-container">
+                      <app-onboarded-candidate
+                        *ngIf="!isReorderType"
+                        [candidate]="$any(candidate)"
+                        [isTab]="true"
+                        (closeModalEvent)="onClose()"
+                      ></app-onboarded-candidate>
+                      <section *ngIf="isReorderType" class="container onboarded-candidate-container">
                         <section class="header-container">
                           <div class="e-card-header">
                             <div class="e-card-header-caption candidate-status">
@@ -199,7 +205,7 @@
                     <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
                   </section>
                   <hr />
-                  <app-extension-grid [data]="extensions$ | async" class="extension-grid"></app-extension-grid>
+                  <app-extension-grid [data]="extensions" class="extension-grid"></app-extension-grid>
                 </section>
               </ng-template>
             </e-tabitem>

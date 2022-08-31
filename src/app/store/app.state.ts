@@ -1,3 +1,6 @@
+import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
+import { UserService } from './../shared/services/user.service';
+import { AlertsModel } from './../shared/models/alerts-model';
 import { Injectable } from '@angular/core';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 
@@ -7,10 +10,12 @@ import {
   SetHeaderState,
   ToggleSidebarState,
   SetIsFirstLoadState,
-  SetIsOrganizationAgencyArea
+  SetIsOrganizationAgencyArea,
+  GetAlertsForCurrentUser
 } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
+import { Observable, tap } from 'rxjs';
 
 export interface AppStateModel {
   isMobile: boolean;
@@ -20,6 +25,7 @@ export interface AppStateModel {
   isFirstLoad: boolean;
   isSidebarOpened: boolean;
   isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
+  getAlertsForCurrentUser: GetAlertsForUserStateModel[];
 }
 
 @State<AppStateModel>({
@@ -34,7 +40,8 @@ export interface AppStateModel {
     isOrganizationAgencyArea: {
       isOrganizationArea: false,
       isAgencyArea: false
-    }
+    },
+    getAlertsForCurrentUser : []
   },
 })
 @Injectable()
@@ -59,6 +66,11 @@ export class AppState {
 
   @Selector()
   static isOrganizationAgencyArea(state: AppStateModel): IsOrganizationAgencyAreaStateModel { return state.isOrganizationAgencyArea; }
+  
+  @Selector()
+  static getAlertsForCurrentUser(state: AppStateModel): GetAlertsForUserStateModel[] { return state.getAlertsForCurrentUser; }
+
+  constructor(private userService: UserService) {}
 
   @Action(ToggleMobileView)
   ToggleMobileView({ patchState }: StateContext<AppStateModel>, { payload }: ToggleMobileView): void {
@@ -88,5 +100,15 @@ export class AppState {
   @Action(SetIsOrganizationAgencyArea)
   SetIsOrganizationAgencyArea({ patchState }: StateContext<AppStateModel>, { payload }: SetIsOrganizationAgencyArea): void {
     patchState({ isOrganizationAgencyArea: payload });
+  }
+  
+  @Action(GetAlertsForCurrentUser)
+  GetAlertsForCurrentUser({ patchState }: StateContext<AppStateModel>, { payload }: GetAlertsForCurrentUser): Observable<AlertsModel[]> {
+    return this.userService.getAlertsForUser().pipe(
+      tap((payload) => {
+        patchState({ getAlertsForCurrentUser: payload });        
+        return payload;
+      })
+    );
   }
 }

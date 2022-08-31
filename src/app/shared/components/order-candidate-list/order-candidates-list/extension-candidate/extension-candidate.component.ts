@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 
 import { RejectReason } from '@shared/models/reject-reason.model';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { EMPTY, Observable, Subject } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, Select, Store } from '@ngxs/store';
@@ -38,6 +39,7 @@ import { capitalize } from 'lodash';
   selector: 'app-extension-candidate',
   templateUrl: './extension-candidate.component.html',
   styleUrls: ['../accept-candidate/accept-candidate.component.scss', './extension-candidate.component.scss'],
+  providers: [MaskedDateTimeService],
 })
 export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   @Input() currentOrder: Order;
@@ -192,8 +194,10 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
             { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
             { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
           ]
+        : candidate.status === ApplicantStatusEnum.OnBoarded
+        ? [{ applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) }]
         : [
-            { applicantStatus: candidate.status, statusText:  capitalize(CandidatStatus[candidate.status]) },
+            { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
             { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
           ];
   }
@@ -224,34 +228,38 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
 
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
-    const updatedValue = {
-      organizationId: this.candidateJob.organizationId,
-      jobId: this.candidateJob.jobId,
-      orderId: this.candidateJob.orderId,
-      nextApplicantStatus: applicantStatus,
-      candidateBillRate: this.candidateJob.candidateBillRate,
-      offeredBillRate: value.offeredBillRate,
-      requestComment: value.comments,
-      actualStartDate: new Date(value.actualStartDate).toISOString(),
-      actualEndDate: new Date(value.actualEndDate).toISOString(),
-      allowDeployWoCredentials: value.allowDeployCredentials,
-      billRates: this.billRatesData,
-      guaranteedWorkWeek: value.guaranteedWorkWeek,
-      clockId: value.clockId,
-    };
-    const statusChanged = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
-    this.store
-      .dispatch(
-        this.isAgency ? new UpdateAgencyCandidateJob(updatedValue) : new UpdateOrganisationCandidateJob(updatedValue)
-      )
-      .subscribe(() => {
-        this.store.dispatch(
-          this.isAgency ? new ReloadOrderCandidatesLists() : new ReloadOrganisationOrderCandidatesLists()
-        );
-        if (statusChanged) {
-          this.dialogEvent.next(false);
-        }
-      });
+    if (this.form.valid) {
+      const updatedValue = {
+        organizationId: this.candidateJob.organizationId,
+        jobId: this.candidateJob.jobId,
+        orderId: this.candidateJob.orderId,
+        nextApplicantStatus: applicantStatus,
+        candidateBillRate: this.candidateJob.candidateBillRate,
+        offeredBillRate: value.offeredBillRate,
+        requestComment: value.comments,
+        actualStartDate: new Date(value.actualStartDate).toISOString(),
+        actualEndDate: new Date(value.actualEndDate).toISOString(),
+        allowDeployWoCredentials: value.allowDeployCredentials,
+        billRates: this.billRatesData,
+        guaranteedWorkWeek: value.guaranteedWorkWeek,
+        clockId: value.clockId,
+      };
+      const statusChanged = applicantStatus.applicantStatus === this.candidateJob.applicantStatus.applicantStatus;
+      this.store
+        .dispatch(
+          this.isAgency ? new UpdateAgencyCandidateJob(updatedValue) : new UpdateOrganisationCandidateJob(updatedValue)
+        )
+        .subscribe(() => {
+          this.store.dispatch(
+            this.isAgency ? new ReloadOrderCandidatesLists() : new ReloadOrganisationOrderCandidatesLists()
+          );
+          if (statusChanged) {
+            this.dialogEvent.next(false);
+          }
+        });
+    } else {
+      this.statusesFormControl.reset();
+    }
   }
 
   private createForm(): void {
@@ -268,7 +276,6 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
       clockId: new FormControl('', [Validators.maxLength(50)]),
       allowDeployCredentials: new FormControl(false),
     });
-    this.form.disable();
   }
 
   private getDateString(date: string): string | null {
@@ -291,6 +298,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
         if (this.candidateJob) {
           this.getComments();
           this.billRatesData = this.candidateJob?.billRates ? [...this.candidateJob.billRates] : [];
+          this.form.disable();
           this.form.patchValue({
             jobId: `${this.currentOrder?.organizationPrefix ?? ''}-${this.currentOrder?.publicId}`,
             avStartDate: this.getDateString(this.candidateJob.availableStartDate),
@@ -305,8 +313,12 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
             clockId: this.candidateJob.clockId,
             allowDeployCredentials: this.candidateJob.allowDeployCredentials,
           });
+
           if (this.isAgency && !this.isOnBoard) {
-            this.isAgency ? this.form.get('comments')?.enable() : this.form.get('offeredBillRate')?.enable();
+            this.form.get('comments')?.enable();
+          }
+          if (!this.isAgency) {
+            this.form.get('offeredBillRate')?.enable();
           }
           if (this.isAccepted && !this.isAgency) {
             this.form.get('guaranteedWorkWeek')?.enable();
@@ -324,3 +336,4 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
       });
   }
 }
+

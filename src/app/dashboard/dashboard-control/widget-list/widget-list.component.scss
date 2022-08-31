@@ -5,11 +5,11 @@
   flex-direction: column;
   height: 100%;
   padding: 0 !important;
-  .content {
-    margin-top: 25px;
+
     .widget-container {
       background-color: $secondary-dark-blue-50;
-      padding: 24px;
+      padding: 16px 24px;
+
       .e-mastertext {
         font-size: 14px;
         line-height: 20px;
@@ -36,13 +36,8 @@
         display: none;
       }
     }
-  }
+  
   .e-card-header {
-    margin: 24px;
-    .e-close-large {
-      font-size: 10px;
-      font-weight: 700;
-      color: $primary-active-blue-10;
-    }
+    margin: 0;
   }
 }
