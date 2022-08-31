@@ -173,22 +173,27 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   }
 
   private handleOrderIdChange(value: string): void {
-    const concatedValue = value.replace(/\s/g, '').toUpperCase();
+    const concatenatedValue: string = value.replace(/\s/g, '').toUpperCase();
+    const [currentOrgPrefix, currentOrderId, currentPosition] = ManualInvoiceAdapter.parseOrderId(concatenatedValue);
 
-    this.form?.get('orderId')?.patchValue(concatedValue, { emitEvent: false, onlySelf: true });
+    this.form?.get('orderId')?.patchValue(concatenatedValue, { emitEvent: false, onlySelf: true });
 
     if (this.isAgency) {
       this.form?.get('unitId')?.patchValue(this.store.snapshot().invoices.selectedOrganizationId);
     }
 
-    const item = this.searchOptions.find((item) => {
-      const concatedInputValue = item.formattedOrderId.replace(/\s/g, '').toUpperCase();
-      return concatedInputValue === concatedValue;
+    const item = this.searchOptions.find((item: ManualInvoiceMeta) => {
+      const [orgPrefix, orderId, position] = ManualInvoiceAdapter.parseOrderId(item.formattedOrderIdFull);
+      const orgPrefixMatch: boolean = currentOrgPrefix ? currentOrgPrefix === orgPrefix : true;
+      const orderIdMatch: boolean = currentOrderId === orderId;
+      const positionMatch: boolean = currentPosition === position;
+
+      return orgPrefixMatch && orderIdMatch && positionMatch;
     });
 
     if (!item) {
       this.postionSearch = null;
-      const basedOnOrder = this.searchOptions.filter((item) => item.orderId.toString() === concatedValue) || [];
+      const basedOnOrder = this.searchOptions.filter((item) => item.orderPublicId.toString() === concatenatedValue) || [];
       this.strategy.populateOptions(basedOnOrder, this.dropDownOptions,
         this.form as CustomFormGroup<AddManInvoiceForm>, this.dialogConfig, false);
     } else {
@@ -225,10 +230,9 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
 
   public setOrderIdOnEdit(): void {
     if (this.invoiceToEdit) {
-      const { formattedOrderId } = this.invoiceToEdit;
+      const { formattedOrderIdFull } = this.invoiceToEdit;
 
-      const [orderId, position] = formattedOrderId.replace(/\s/g, '').split('-');
-      this.handleOrderIdChange(Number(position) ? formattedOrderId : orderId);
+      this.handleOrderIdChange(formattedOrderIdFull);
     }
   }
 
@@ -245,10 +249,10 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
 
   public populateLocations(id: number): void {
     const regions = this.store.snapshot().invoices.regions as OrganizationRegion[];
-    const orderId = this.form?.get('orderId')?.value.split('-')[0];
+    const [, orderId] = ManualInvoiceAdapter.parseOrderId(this.form?.get('orderId')?.value);
 
     const candidateLocationId = this.searchOptions.find((item) => {
-      return (item.orderId === Number(orderId)
+      return (item.orderPublicId === orderId
       && item.candidateId === Number(id));
     })?.locationId;
 
