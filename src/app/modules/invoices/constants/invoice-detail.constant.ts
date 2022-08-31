@@ -72,25 +72,29 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
     {
       field: 'timeIn',
       headerName: 'Time in',
-      minWidth: 90,
+      minWidth: 85,
       flex: 1,
       type: 'rightAligned',
-      cellClass: 'align-right',
+      autoHeight: true,
+      wrapText: true,
+      cellClass: 'align-right custom-line-height',
       headerClass: 'custom-wrap align-right',
       valueFormatter: (params: ValueFormatterParams) => {
-        return `${GridValuesHelper.formatDate(params.value, 'HH:mm')}`
+        return `${GridValuesHelper.formatDate(params.value, 'M/d/yy HH:mm')}`
       },
     },
     {
       field: 'timeOut',
       headerName: 'Time out',
-      minWidth: 90,
+      minWidth: 85,
       flex: 1,
       type: 'rightAligned',
-      cellClass: 'align-right',
+      autoHeight: true,
+      wrapText: true,
+      cellClass: 'align-right custom-line-height',
       headerClass: 'custom-wrap align-right',
       valueFormatter: (params: ValueFormatterParams) => {
-        return `${GridValuesHelper.formatDate(params.value, 'HH:mm')}`
+        return `${GridValuesHelper.formatDate(params.value, 'M/d/yy HH:mm')}`
       },
     },
     {
