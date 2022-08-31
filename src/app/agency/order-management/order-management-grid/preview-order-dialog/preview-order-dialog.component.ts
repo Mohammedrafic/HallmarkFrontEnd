@@ -9,7 +9,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { Observable, Subject, takeUntil, takeWhile, zip } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -105,12 +105,19 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private subscribeOnOrderCandidatePage(): void {
-    this.orderCandidatePage$.pipe(takeWhile(() => this.isAlive)).subscribe((order: OrderCandidatesListPage) => {
-      this.extensions = [];
-      if (order?.items[0]?.deployedCandidateInfo?.jobId) {
-        this.store.dispatch(new GetAgencyExtensions(order.items[0].deployedCandidateInfo.jobId, this.order.organizationId));
-      }
-    });
+    zip([this.orderCandidatePage$, this.selectedOrder$])
+      .pipe(takeWhile(() => this.isAlive))
+      .subscribe(([order, selectedOrder]: [OrderCandidatesListPage, Order]) => {
+        this.extensions = [];
+        if (
+          order?.items[0]?.deployedCandidateInfo?.jobId &&
+          (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
+        ) {
+          this.store.dispatch(
+            new GetAgencyExtensions(order.items[0].deployedCandidateInfo.jobId, this.order.organizationId)
+          );
+        }
+      });
     this.extensions$.pipe(takeWhile(() => this.isAlive)).subscribe((extensions) => {
       this.extensions = extensions?.filter((extension: any) => extension.id !== this.order.id);
     });
