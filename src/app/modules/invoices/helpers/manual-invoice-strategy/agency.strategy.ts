@@ -5,8 +5,10 @@ import { Actions, ofActionCompleted, Store } from '@ngxs/store';
 
 import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { MessageTypes } from '@shared/enums/message-types';
-import { AddManInvoiceDialogConfig, AddManInvoiceForm, ManualInvoiceInputOptions,
-  ManualInvoiceMeta } from '../../interfaces';
+import {
+  AddManInvoiceDialogConfig, AddManInvoiceForm, ManInvoiceInputConfig, ManualInvoiceInputOptions,
+  ManualInvoiceMeta
+} from '../../interfaces';
 import { InvoiceMetaAdapter } from '../invoice-meta.adapter';
 import { ManualInvoiceStrategy } from './strategy.interface';
 import { Invoices } from '../../store/actions/invoices.actions';
@@ -60,7 +62,7 @@ export class AgencyStrategy implements ManualInvoiceStrategy {
   }
 
   public connectConfigOptions(config: AddManInvoiceDialogConfig, options: ManualInvoiceInputOptions): void {
-    config.fields.forEach((item) => {
+    config.fields.forEach((item: ManInvoiceInputConfig) => {
       if (item.optionsStateKey) {
         item.options = options[item.optionsStateKey] as DropdownOption[];
       }
