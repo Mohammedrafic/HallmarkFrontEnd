@@ -119,6 +119,11 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       this.billRateForm.controls['intervalMax'].updateValueAndValidity();
     }
 
+    if (value.isPredefined) {
+      this.billRateForm.get('billRateConfigId')?.disable();
+      this.billRateForm.get('effectiveDate')?.disable();
+    }
+
     this.selectedBillRateUnit = foundBillRateOption?.unit as BillRateUnit;
 
     this.store.dispatch(new ShowSideDialog(true));
