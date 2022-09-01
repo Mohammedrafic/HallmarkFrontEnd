@@ -396,6 +396,7 @@
                     appValidateWithMessage
                     [dataSource]="(reasons$ | async)?.items"
                     [fields]="reasonForRequisitionFields"
+                    (change)="onRequisitionChange($event)"
                   >
                   </ejs-dropdownlist>
                 </div>
