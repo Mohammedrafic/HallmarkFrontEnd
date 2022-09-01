@@ -390,26 +390,31 @@
   }
 }
 
-#alert-sidebar{
-  .sidebar-header{
+#alert-sidebar {
+  .sidebar-header {
     background-color: $alert-side-bar-bgcolor;
-    i-feather{
+    height: 50px !important;
+
+    i-feather {
       position: absolute;
       top: 0px;
-      padding: 0.5rem;
+      padding: 1rem 0rem 0rem 0.5rem;
       color: white;
       width: 20px;
       height: 20px;
     }
+
     h5 {
-      color: white; 
-      padding: 0.5rem 1.5rem;
-      font-size: 1.17em !important;
+      color: white;
+      padding: 0.8rem 1.5rem 0rem 1.5rem;
+      font-size: 1.5em !important;
       margin: auto;
-      span{
+
+      span {
         padding: 0 0.8rem !important;
       }
     }
+
     .closebtn {
       top: 2px;
       line-height: 26px;
@@ -418,15 +423,16 @@
       position: absolute;
       right: 4px;
       background-color: transparent !important;
+      padding: 0.55rem 0.2rem 0rem 0rem;
 
       button {
         padding: 0.3rem 0.5rem !important;
-        border-radius:4px !important;  
+        border-radius: 4px !important;
         height: auto !important;
       }
     }
-  } 
-  
+  }
+
   #listcontainer {
     padding: 10px;
 
@@ -434,13 +440,13 @@
       background-color: $alert-side-bar-cardcolor;
       border-radius: 4px;
       padding: 10px;
-      font-size:0.85rem !important;
+      font-size: 0.85rem !important;
 
       .card-footer {
         text-align: right;
-        padding-top:4px;
-        border-top:1px solid $alert-side-bar-footerborder;
-        margin-top:6px; 
+        padding-top: 4px;
+        border-top: 1px solid $alert-side-bar-footerborder;
+        margin-top: 6px;
       }
     }
   }

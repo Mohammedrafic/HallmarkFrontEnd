@@ -76,9 +76,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   @Select(OrderCandidatesCredentialsState.predefinedCredentials)
   predefinedCredentials$: Observable<IOrderCredentialItem[]>;
 
-  @Select(OrderManagementContentState.saveOrder)
-  savedOrder$: Observable<Order>;
-
   public SelectedTab = SelectedTab;
   public orderId: number;
   public publicId: number;
@@ -93,7 +90,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   // todo: update/set credentials list in edit mode for order
   public orderCredentials: IOrderCredentialItem[] = [];
   public orderBillRates: BillRate[] = [];
-  private savedOrder:Order;
   private unsubscribe$: Subject<void> = new Subject();
   
   public isPerDiem = false;
@@ -154,13 +150,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       });
     }
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe((data) => {
-            const user = this.store.selectSnapshot(UserState.user) as User;
+      const user = this.store.selectSnapshot(UserState.user) as User;
       const agency = this.store.selectSnapshot(AgencyState.agency) as Agency;      
       let params:any={};
       params['@'+AlertParameterEnum[AlertParameterEnum.MyOrganization]]=user?.businessUnitName;
       params['@'+AlertParameterEnum[AlertParameterEnum.Agency]]=agency?.agencyDetails?.name;
-      params['@'+AlertParameterEnum[AlertParameterEnum.OrderId]]=this.savedOrder?.organizationPrefix +'-'+ this.savedOrder?.publicId;
-      params['@'+AlertParameterEnum[AlertParameterEnum.JobTitle]]=this.savedOrder?.title;
+      params['@'+AlertParameterEnum[AlertParameterEnum.OrderId]]=data?.order?.organizationPrefix==null?data?.order?.publicId+'':data?.order?.organizationPrefix +'-'+ data?.order?.publicId;
+      params['@'+AlertParameterEnum[AlertParameterEnum.JobTitle]]=data?.order?.title;
       params['@'+AlertParameterEnum[AlertParameterEnum.ClickbackURL]]='';
       
       let alertTriggerDto:AlertTriggerDto={
@@ -295,10 +291,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       } else {
         this.store.dispatch(new SaveOrder(order, documents, this.orderDetailsFormComponent.isEditMode ? undefined : this.orderDetailsFormComponent.comments));
       }
-      this.savedOrder$.pipe(takeUntil(this.unsubscribe$))
-      .subscribe((order: Order) => {
-        this.savedOrder=order;
-      });
+    
     } else {
       this.orderDetailsFormComponent.orderTypeForm.markAllAsTouched();
       this.orderDetailsFormComponent.generalInformationForm.markAllAsTouched();

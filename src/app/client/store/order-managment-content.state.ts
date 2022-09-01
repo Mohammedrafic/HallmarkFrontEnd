@@ -113,7 +113,6 @@ export interface OrderManagementContentStateModel {
   navigationTab: NavigationTabModel;
   contactDetails: Department | null;
   extensions: any;
-  order:Order|null;
 }
 
 @State<OrderManagementContentStateModel>({
@@ -149,8 +148,7 @@ export interface OrderManagementContentStateModel {
       current: null,
     },
     contactDetails: null,
-    extensions: null,
-    order:null
+    extensions: null
   },
 })
 @Injectable()
@@ -234,11 +232,7 @@ export class OrderManagementContentState {
   static applicantStatuses(state: OrderManagementContentStateModel): ApplicantStatus[] {
     return state.applicantStatuses;
   }
-  @Selector()
-  static saveOrder(state:OrderManagementContentStateModel):Order |null{
-    return state.order;
-  }
-
+  
   @Selector()
   static lastSelectedOrder(state: OrderManagementContentStateModel): (id: number) => [OrderManagement, number] | [] {
     return (id: number) => {
@@ -568,12 +562,11 @@ export class OrderManagementContentState {
 
   @Action(SaveOrder)
   SaveOrder(
-    { dispatch ,patchState}: StateContext<OrderManagementContentStateModel>,
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents, comments, lastSelectedBusinessUnitId }: SaveOrder
   ): Observable<Order | void> {
     return this.orderManagementService.saveOrder(order, documents, comments, lastSelectedBusinessUnitId).pipe(
       tap((payload) => {
-        patchState({ order: payload });
         let TOAST_MESSAGE = 'Record has been created';
         let MESSAGE_TYPE = MessageTypes.Success;
         const hasntOrderCredentials = order?.isQuickOrder && payload.credentials.length === 0;
@@ -591,8 +584,7 @@ export class OrderManagementContentState {
         } else if (hasntOrderBillRates) {
           TOAST_MESSAGE += `. ${ORDER_WITHOUT_BILLRATES}`;
           MESSAGE_TYPE = MessageTypes.Warning;
-        }
-        
+        }        
         dispatch([
           order?.isQuickOrder
             ? new ShowToast(
@@ -603,7 +595,7 @@ export class OrderManagementContentState {
                 payload.publicId
               )
             : new ShowToast(MessageTypes.Success, RECORD_ADDED),
-          new SaveOrderSucceeded(),
+          new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
         ]);
        
@@ -615,15 +607,14 @@ export class OrderManagementContentState {
 
   @Action(EditOrder)
   EditOrder(    
-    { dispatch ,patchState}: StateContext<OrderManagementContentStateModel>,
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents }: EditOrder
   ): Observable<Order | void> {
     return this.orderManagementService.editOrder(order, documents).pipe(
       tap((order) => {
-        patchState({ order: order });
         dispatch([
           new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
-          new SaveOrderSucceeded(),
+          new SaveOrderSucceeded(order),
           new SetIsDirtyOrderForm(false),
         ]);
         
