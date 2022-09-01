@@ -189,7 +189,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public openAddDialog(): void {
-    const startDate = this.store.snapshot().timesheets.selectedTimeSheet.startDate;
+    const startDate = this.store.snapshot().timesheets.timesheetDetails.startDate;
 
     this.openAddSideDialog.emit({
       currentTab: this.currentTab,
@@ -450,7 +450,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       });
       showSpinner(this.spinner.nativeElement);
 
-      const { organizationId, id, mileageTimesheetId } = this.store.snapshot().timesheets.selectedTimeSheet;
+      const { organizationId, id, mileageTimesheetId } = this.store.snapshot().timesheets.timesheetDetails;
       const dto = RecordsAdapter.adaptRecordPutDto(
         recordsToUpdate,
         organizationId,

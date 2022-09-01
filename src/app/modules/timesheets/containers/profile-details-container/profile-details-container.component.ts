@@ -265,9 +265,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       throttleTime(100),
       filter(Boolean),
       switchMap((timesheet: Timesheet) => {
-        this.timesheetId = timesheet.id;
-        this.mileageTimesheetId = timesheet.mileageTimesheetId;
-
         return this.store.dispatch(new Timesheets.GetTimesheetDetails(
           timesheet.id, timesheet.organizationId, this.isAgency));
       }),
@@ -282,6 +279,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       filter(Boolean),
       filter((details) => !details.isNotExist),
       switchMap((details) => {
+        this.timesheetId = details.id;
+        this.mileageTimesheetId = details.mileageTimesheetId;
+
         return this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(
           details.id, details.organizationId, this.isAgency))
       }),
