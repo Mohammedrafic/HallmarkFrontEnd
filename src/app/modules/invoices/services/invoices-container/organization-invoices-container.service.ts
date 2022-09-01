@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GridContainerTabConfig, InvoicesContainerService } from './invoices-container.service';
+import { InvoicesContainerService } from './invoices-container.service';
 import { ColDef, GridOptions } from '@ag-grid-community/core';
 import { Observable } from 'rxjs';
 import { InvoiceAttachment, InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
@@ -10,6 +10,7 @@ import { Attachment } from '@shared/components/attachments';
 import { PendingApprovalGridHelper } from '../../helpers/grid/pending-approval-grid.helper';
 import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
 import { invoiceDetailsColumnDefs, invoiceInfoItems, invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
+import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-config.interface';
 
 @Injectable()
 export class OrganizationInvoicesContainerService extends InvoicesContainerService {
@@ -135,9 +136,14 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
     const defaultConfig = super.getTabConfig(tab);
 
     switch (tab) {
+      case OrganizationInvoicesGridTab.Manual:
+        return this.createTabConfig({
+          manualInvoiceCreationEnabled: true,
+        });
       case OrganizationInvoicesGridTab.PendingRecords:
         return this.createTabConfig({
           groupingEnabled: true,
+          manualInvoiceCreationEnabled: true,
         });
       default:
         return defaultConfig;

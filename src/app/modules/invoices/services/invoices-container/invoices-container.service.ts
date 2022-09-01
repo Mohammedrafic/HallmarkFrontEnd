@@ -1,12 +1,10 @@
 import { ColDef, GridOptions } from '@ag-grid-community/core';
+
 import { Observable } from 'rxjs';
 import { Store } from '@ngxs/store';
-import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
-import { InvoiceDetail, InvoiceInfoUIItem } from '../../interfaces';
 
-export interface GridContainerTabConfig {
-  groupingEnabled?: boolean;
-}
+import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
+import { GridContainerTabConfig, InvoiceDetail, InvoiceInfoUIItem } from '../../interfaces';
 
 export abstract class InvoicesContainerService {
   constructor(
@@ -37,9 +35,10 @@ export abstract class InvoicesContainerService {
     return this.createTabConfig();
   }
 
-  protected createTabConfig(config: GridContainerTabConfig = {}): GridContainerTabConfig {
+  protected createTabConfig(config: Partial<GridContainerTabConfig> = {}): GridContainerTabConfig {
     return {
       groupingEnabled: false,
+      manualInvoiceCreationEnabled: false,
       ...config,
     }
   }
