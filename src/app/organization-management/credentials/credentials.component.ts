@@ -44,7 +44,7 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-    this.store.dispatch(new SetNavigationTab(CredentialsNavigationTabs.CredentialsList));
+    this.store.dispatch(new SetNavigationTab(CredentialsNavigationTabs.Setup));
   }
 
   public showFilters(): void {
