@@ -6,16 +6,19 @@
       [fields]="optionFields"
       [dataSource]="organizationsAgencies$ | async"
       [formControl]="organizationAgencyControl"
-      popupHeight="402px">
+      popupHeight="402px"
+    >
       <ng-template #itemTemplate let-data>
         <div class="item-container">
-          <div *ngIf="data.logo" class="logo-container">
-            <img [src]="data.logo" alt="logo">
+          <div class="logo-container">
+            <img
+              [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo'"
+              onerror="onerror=null; src='assets/icons/no-logo.svg'"
+              alt="logo"
+            />
           </div>
-
           <div class="details">
-            <p class="name">{{data.name}}</p>
-            <p class="type">{{data.type}}</p>
+            <p class="name">{{ data.name }}</p>
           </div>
         </div>
       </ng-template>
@@ -23,10 +26,10 @@
       <ng-template #valueTemplate let-data>
         <div class="value-container">
           <div *ngIf="selectedLogo$ | async as logo" class="logo-container">
-            <img  [src]="logo" alt="logo">
+            <img [src]="logo" alt="logo" />
           </div>
 
-          <p class="title">{{data.name}}</p>
+          <p class="title">{{ data.name }}</p>
         </div>
       </ng-template>
     </ejs-dropdownlist>
@@ -35,8 +38,8 @@
 
 <div *ngIf="isAgencyOrOrganization" class="organization-agency-title-container">
   <div *ngIf="selectedLogo$ | async as logo" class="logo-container">
-    <img class="e-avatar" [src]="logo" alt="logo">
+    <img class="e-avatar" [src]="logo" alt="logo" />
   </div>
 
-  <p class="title">{{organizationAgency?.name}}</p>
+  <p class="title">{{ organizationAgency?.name }}</p>
 </div>
