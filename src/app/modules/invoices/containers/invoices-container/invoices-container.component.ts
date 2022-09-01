@@ -31,7 +31,7 @@ import {
   PendingInvoicesData
 } from '../../interfaces/pending-invoice-record.interface';
 import { InvoicesTableTabsComponent } from '../../components/invoices-table-tabs/invoices-table-tabs.component';
-import { GridContainerTabConfig, InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
+import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import {
   RejectReasonInputDialogComponent
 } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
@@ -40,6 +40,7 @@ import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions }
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { UserState } from 'src/app/store/user.state';
 import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
+import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-config.interface';
 
 @Component({
   selector: 'app-invoices-container',
@@ -124,7 +125,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   public organizationId: number | null;
 
   public rejectInvoiceId: number;
-  public tabConfig: GridContainerTabConfig = {};
+  public tabConfig: GridContainerTabConfig | null;
   public groupInvoicesOverlayVisible: boolean = false;
   public selectedInvoiceIds: number[];
 
@@ -146,18 +147,11 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
 
-    this.actions$.pipe(
-      ofActionSuccessful(Invoices.ShowRejectInvoiceDialog),
-      takeUntil(this.componentDestroy()),
-    ).subscribe(({ invoiceId }: ShowRejectInvoiceDialog) => {
-      this.rejectInvoiceId = invoiceId;
-      this.rejectReasonInputDialogComponent.show();
-    });
-
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
   }
 
   public ngOnInit(): void {
+    this.watchDialogVisibility();
     this.onOrganizationChangedHandler();
     this.startFiltersWatching();
     this.initOrganizationsList();
@@ -168,6 +162,16 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
   public ngAfterViewInit(): void {
     this.setTabsVisibility();
+  }
+
+  public watchDialogVisibility(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(Invoices.ShowRejectInvoiceDialog),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(({ invoiceId }: ShowRejectInvoiceDialog) => {
+      this.rejectInvoiceId = invoiceId;
+      this.rejectReasonInputDialogComponent.show();
+    });
   }
 
   public setTabsVisibility(): void {
