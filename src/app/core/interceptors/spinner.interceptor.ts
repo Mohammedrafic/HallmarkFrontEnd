@@ -1,21 +1,14 @@
-import { throttleTime } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { SpinnerInterceptorHelperService } from './spinner-interceptor.service';
+import { catchError, tap } from 'rxjs/operators';
 
+import { SpinnerInterceptorHelperService } from '../services/spinner';
 
-/**
- * Spinner interceptor. Intercept request and stores them as queue in corresponding service.
- *
- * When response received, particular request would be deleted from queue. Spinner is showed untill queue is empty.
- *
- * If error occured queue would clear, spinner would hide.
- */
 @Injectable({ providedIn: 'root' })
 export class LoadingInterceptor implements HttpInterceptor {
   constructor(
@@ -29,18 +22,16 @@ export class LoadingInterceptor implements HttpInterceptor {
 
     return next.handle(request)
     .pipe(
-      catchError((error) => {
-        this.spinnerService.handleRequestError();
+      catchError((error: HttpErrorResponse) => {
+        this.spinnerService.deleteUrlFromQueue(error.url as string);
         return throwError(() => error);
       }),
-      map<HttpEvent<unknown>, unknown>((event: HttpEvent<unknown>) => {
+      tap((event: HttpEvent<unknown>) => {
         if (event instanceof HttpResponse) {
           this.spinnerService.deleteUrlFromQueue(request.url);
         }
         this.spinnerService.checkQueueState();
-        return event;
       }),
-
     ) as Observable<HttpEvent<unknown>>;
   }
 }

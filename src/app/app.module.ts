@@ -1,3 +1,4 @@
+import { LoadingInterceptor } from './core/interceptors/spinner.interceptor';
 import { Spinnermodule } from './core/components/spinner/spinner.module';
 import { NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -20,7 +21,6 @@ import { MsalModule, MsalRedirectComponent } from '@azure/msal-angular';
 import { MSAL_PROVIDERS } from './b2c-auth/b2c-auth.providers';
 import { B2cModule } from './b2c-auth/b2c-auth.module';
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
-import { LoadingInterceptor } from '@core/services/spinner/spinner.interceptor';
 import { Overlay } from '@angular/cdk/overlay';
 
 @NgModule({

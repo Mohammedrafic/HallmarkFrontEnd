@@ -1,6 +1,6 @@
+import { ElementRef, ViewChild, AfterViewInit, ChangeDetectionStrategy, Component } from '@angular/core';
+
 import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
-import { ElementRef, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'app-spinner',
