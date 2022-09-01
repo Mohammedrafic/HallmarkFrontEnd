@@ -1,8 +1,5 @@
 import { formatCurrency, formatNumber, formatDate } from '@angular/common';
 
-/**
- * TODO: Move to core helpers
- */
 export class GridValuesHelper {
   public static formatDate(value: string, pattern: string): string {
     if (!value) {

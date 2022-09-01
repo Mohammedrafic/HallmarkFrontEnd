@@ -4,44 +4,14 @@
   (selecting)="onSelect($event)"
   cssClass="{{ isDisabled && 'disabled' }}">
   <e-tabitems>
-    <e-tabitem>
+
+    <e-tabitem *ngFor="let tab of tabConfig; trackBy: trackBy">
       <ng-template #headerText>
-        All Timesheets
-        <span
-          *ngIf="tabConfig[0].amount"
+        {{ tab.title }}
+        <span *ngIf="tab?.amount"
           class="tab-navigation e-badge e-badge-success e-badge-circle">
-            {{ tabConfig[0].amount }}
-          </span>
-      </ng-template>
-    </e-tabitem>
-    <e-tabitem>
-      <ng-template #headerText>
-        Pending Approval
-        <span
-          *ngIf="tabConfig[1].amount"
-          class="tab-navigation e-badge e-badge-success e-badge-circle">
-            {{ tabConfig[1].amount }}
-          </span>
-      </ng-template>
-    </e-tabitem>
-    <e-tabitem>
-      <ng-template #headerText>
-        Missing
-        <span
-          *ngIf="tabConfig[2].amount"
-          class="tab-navigation e-badge e-badge-success e-badge-circle">
-            {{ tabConfig[2].amount }}
-          </span>
-      </ng-template>
-    </e-tabitem>
-    <e-tabitem>
-      <ng-template #headerText>
-        Rejected
-        <span
-          *ngIf="tabConfig[3].amount"
-          class="tab-navigation e-badge e-badge-success e-badge-circle">
-            {{ tabConfig[3].amount }}
-          </span>
+            {{ tab.amount }}
+        </span>
       </ng-template>
     </e-tabitem>
   </e-tabitems>

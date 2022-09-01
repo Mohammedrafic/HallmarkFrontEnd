@@ -1,9 +1,10 @@
-import { InvoiceDetail, InvoiceInfoUIItem } from '../interfaces';
-import { GridValuesHelper } from '../../timesheets/helpers';
+import { formatDate } from '@angular/common';
+
+import { DateTimeHelper, GridValuesHelper } from '@core/helpers';
 import { ColDef } from '@ag-grid-enterprise/all-modules';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
-import { formatDate } from '@angular/common';
-import { DateTimeHelper } from '@core/helpers';
+
+import { InvoiceDetail, InvoiceInfoUIItem } from '../interfaces';
 
 const hallmarkName = 'Hallmark';
 
@@ -21,12 +22,12 @@ export const invoiceInfoItems = (data: InvoiceDetail, isAgency: boolean): Invoic
   {
     title: 'Net Payment Terms',
     icon: 'package',
-    value: data.meta.paymentTerms,
+    value: GridValuesHelper.formatAbsNumber(data.meta.paymentTerms, '1.2-2'),
   },
   {
     title: 'Invoice Amount',
     icon: '',
-    value: `$${data.totals.calculatedTotal}`,
+    value: `$${GridValuesHelper.formatAbsNumber(data.totals.calculatedTotal, '1.2-2')}`,
     isAmount: true,
   },
   {
@@ -37,12 +38,12 @@ export const invoiceInfoItems = (data: InvoiceDetail, isAgency: boolean): Invoic
   {
     title: 'Invoice Date',
     icon: 'calendar',
-    value: `${GridValuesHelper.formatDate(data.meta.invoiceDate, 'MM/d/y')}`,
+    value: formatDate(DateTimeHelper.toUtcFormat(data.meta.invoiceDate), 'MM/d/y', 'en-US', 'utc'),
   },
   {
     title: 'Due Date',
     icon: 'calendar',
-    value: `${GridValuesHelper.formatDate(data.meta.dueDate, 'MM/d/y')}`,
+    value: formatDate(DateTimeHelper.toUtcFormat(data.meta.dueDate), 'MM/d/y', 'en-US', 'utc'),
   },
 ];
 
@@ -166,6 +167,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
       type: 'rightAligned',
       cellClass: 'font-weight-bold align-right',
       headerClass: 'custom-wrap align-right',
+      valueFormatter: (params: ValueFormatterParams) => GridValuesHelper.formatAbsNumber(params.value, '1.2-2'),
     },
     {
       field: 'rate',
@@ -175,7 +177,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
       type: 'rightAligned',
       cellClass: 'font-weight-bold align-right',
       headerClass: 'custom-wrap align-right',
-      valueFormatter: (params: ValueFormatterParams) => `$${params.value}`,
+      valueFormatter: (params: ValueFormatterParams) => `$${GridValuesHelper.formatAbsNumber(params.value, '1.2-2')}`,
     },
     {
       field: 'total',
@@ -185,7 +187,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
       type: 'rightAligned',
       cellClass: 'font-weight-bold align-right',
       headerClass: 'align-right',
-      valueFormatter: (params: ValueFormatterParams) => `$${params.value}`,
+      valueFormatter: (params: ValueFormatterParams) => `$${GridValuesHelper.formatAbsNumber(params.value, '1.2-2')}`,
     },
   ];
   if (isAgency) {
@@ -236,6 +238,7 @@ export const invoiceSummaryColumnDefs = (location: string): ColDef[] => [
     type: 'rightAligned',
     cellClass: 'font-weight-bold align-right',
     headerClass: 'custom-wrap align-right',
+    valueFormatter: (params: ValueFormatterParams) => GridValuesHelper.formatAbsNumber(params.value, '1.2-2'),
   },
   {
     field: 'calculatedTotal',
@@ -244,7 +247,7 @@ export const invoiceSummaryColumnDefs = (location: string): ColDef[] => [
     type: 'rightAligned',
     cellClass: 'font-weight-bold align-right',
     headerClass: 'custom-wrap align-right',
-    valueFormatter: (params: ValueFormatterParams) => `$${params.value}`,
+    valueFormatter: (params: ValueFormatterParams) => `$${GridValuesHelper.formatAbsNumber(params.value, '1.2-2')}`,
   },
   {
     field: 'details',
