@@ -294,7 +294,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       asapStart: [false],
       criticalOrder: [false],
       nO_OT: [false],
-      jobDescription: ['', Validators.maxLength(500)],
+      jobDescription: ['', Validators.maxLength(4000)],
       unitDescription: ['', Validators.maxLength(500)],
       orderRequisitionReasonId: [null, Validators.required],
       orderRequisitionReasonName: [null],
