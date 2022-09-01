@@ -12,7 +12,7 @@
         <div class="item-container">
           <div class="logo-container">
             <img
-              [src]="'https://dev.einstein2.com/einsteinapi/api/BusinessUnit/' + data.id + '/logo'"
+              [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo'"
               onerror="onerror=null; src='assets/icons/no-logo.svg'"
               alt="logo"
             />
