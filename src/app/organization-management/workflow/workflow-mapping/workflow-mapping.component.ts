@@ -3,6 +3,7 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { combineLatest, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { GetOrganizationStructure } from "src/app/store/user.actions";
 import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { OrganizationManagementState } from '../../store/organization-management.state';
@@ -376,6 +377,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   }
 
   public onAddMappingClick(): void {
+    this.store.dispatch(new GetOrganizationStructure());
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -422,7 +424,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       this.setFormArrayControls(data.stepMappings);
     })
 
-
+    this.store.dispatch(new GetOrganizationStructure());
     this.store.dispatch(new ShowSideDialog(true));
   }
 
