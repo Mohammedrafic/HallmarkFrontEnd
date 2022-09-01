@@ -3,8 +3,6 @@ import { formatDate } from '@angular/common';
 import { DateTimeHelper, GridValuesHelper } from '@core/helpers';
 import { ColDef } from '@ag-grid-enterprise/all-modules';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
-import { formatDate } from '@angular/common';
-import { DateTimeHelper } from '@core/helpers';
 
 import { InvoiceDetail, InvoiceInfoUIItem } from '../interfaces';
 
