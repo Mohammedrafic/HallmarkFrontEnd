@@ -72,6 +72,11 @@ export class AgencyState {
   static agencies(state: AgencyStateModel): AgencyPage | null {
     return state.agencyPage;
   }
+  
+  @Selector()
+  static agency(state: AgencyStateModel): Agency | null {
+    return state.agency;
+  }
 
   @Selector()
   static agencyFilteringOptions(state: AgencyStateModel): AgencyFilteringOptions | null {
