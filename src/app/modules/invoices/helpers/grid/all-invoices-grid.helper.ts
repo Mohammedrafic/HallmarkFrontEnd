@@ -6,11 +6,10 @@ import {
   RowHeightParams
 } from '@ag-grid-community/core';
 import { TitleValueCellRendererParams } from '@shared/components/grid/models';
-import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
 
 import { TypedColDef, TypedValueGetterParams } from '../../interfaces/typed-col-def.interface';
 import { PendingApprovalInvoice, PendingApprovalInvoiceRecord } from '../../interfaces/pending-approval-invoice.interface';
-import { amountValueFormatter, invoicesRowDetailsOffsetColDef, monthDayYearDateFormatter,
+import { numberValueFormatter, invoicesRowDetailsOffsetColDef, monthDayYearDateFormatter,
   titleValueCellRendererSelector, weekPeriodValueGetter } from '../../constants';
 import {
   InvoiceRecordsTableRowDetailsComponent
@@ -53,7 +52,7 @@ export class AllInvoicesGridHelper {
         minWidth: 280,
         headerName: 'Amount',
         cellClass: 'font-weight-bold',
-        valueFormatter: amountValueFormatter,
+        valueFormatter: numberValueFormatter,
       },
       {
         field: 'apDeliveryText',
@@ -139,7 +138,7 @@ export class AllInvoicesGridHelper {
                 headerName: 'Amount',
                 cellClass: 'font-weight-bold',
                 cellRendererSelector: titleValueCellRendererSelector,
-                valueFormatter: amountValueFormatter,
+                valueFormatter: numberValueFormatter,
               },
               {
                 ...weekPeriod,

@@ -7,7 +7,7 @@
   </ng-container>
 
   <ng-container right>
-    <div *ngIf="!!organizationId" class="bootstrap">
+    <div *ngIf="isAgency" class="bootstrap">
       <div class="input-container">
         <ejs-dropdownlist
           *ngIf="organizations$ | async as organizations"
@@ -46,7 +46,7 @@
         ejs-button
         class="e-primary"
         (click)="openAddDialog()"
-        *ngIf="selectedTabIdx === 0"
+        *ngIf="tabConfig?.manualInvoiceCreationEnabled"
         >
         Add Manual Invoice
       </button>
@@ -73,7 +73,7 @@
       <ejs-tooltip content="Select record in the table"
                    position="BottomCenter"
                    [opensOn]="!groupingInvoiceRecordsIds.length ? 'Auto' : 'Custom'">
-        <div class="invoices-split-button" *ngIf="tabConfig.groupingEnabled">
+        <div class="invoices-split-button" *ngIf="tabConfig?.groupingEnabled">
           <button ejs-button cssClass="e-primary"
                   class="main-button"
                   [disabled]="!groupingInvoiceRecordsIds.length"

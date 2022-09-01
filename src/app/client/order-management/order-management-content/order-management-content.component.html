@@ -41,7 +41,6 @@
     [allowResizing]="allowResizing"
     [allowTextWrap]="allowWrap"
     (actionBegin)="actionBegin($event)"
-    [enableVirtualization]="true"
     [selectionSettings]="selectionOptions"
     [textWrapSettings]="wrapSettings"
     (rowSelected)="onRowClick($event)"
@@ -82,10 +81,7 @@
           </div>
         </ng-template>
         <ng-template #template let-data>
-          <div
-            *ngIf="!data?.isTemplate; else templateButtons"
-            class="row-tool-buttons"
-          >
+          <div *ngIf="!data?.isTemplate; else templateButtons" class="row-tool-buttons">
             <button
               *ngIf="
                 activeTab !== OrganizationOrderManagementTabs.Incomplete && orderTypes.OpenPerDiem === data.orderType
@@ -93,24 +89,32 @@
               (click)="createReorder(data)"
               ejs-button
               cssClass="e-flat default-icon-button"
-              [disabled]="data.status === orderStatus.PreOpen || data.status === orderStatus.Closed || !settings[SettingsKeys.IsReOrder]?.value"
+              [disabled]="
+                data.status === orderStatus.PreOpen ||
+                data.status === orderStatus.Closed ||
+                !settings[SettingsKeys.IsReOrder]?.value
+              "
             >
               <span><i-feather name="calendar" class="icon"></i-feather></span>
             </button>
             <button ejs-button cssClass="e-flat default-icon-button with-badge">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
-              <span *ngIf="data.unreadComments" class="e-badge e-badge-success e-badge-pill right-overflow">{{ data.unreadComments }}</span>
+              <span *ngIf="data.unreadComments" class="e-badge e-badge-success e-badge-pill right-overflow">{{
+                data.unreadComments
+              }}</span>
             </button>
             <button
               ejs-button
               cssClass="e-flat secondary-icon-button"
               [class.green-background]="!data.isLocked"
               [disabled]="disabledLock(data.status) || data?.extensionFromId"
-              (click)="lockOrder(data); $event.stopPropagation();"
+              (click)="lockOrder(data); $event.stopPropagation()"
               *ngIf="isLockMenuButtonsShown"
             >
               <span *ngIf="data.isLocked"><i-feather name="lock" class="icon"></i-feather></span>
-              <span *ngIf="!data.isLocked"><app-custom-icon name="unlock" class="icon supportive-green-10"></app-custom-icon></span>
+              <span *ngIf="!data.isLocked"
+                ><app-custom-icon name="unlock" class="icon supportive-green-10"></app-custom-icon
+              ></span>
             </button>
             <button
               (click)="$event.stopPropagation()"
@@ -149,9 +153,7 @@
           >
             <div>
               <b>
-                <span>
-                  {{ data.organizationPrefix }}-{{ data.publicId }}
-                </span>
+                <span> {{ data.organizationPrefix }}-{{ data.publicId }} </span>
               </b>
             </div>
           </ng-container>
@@ -202,7 +204,7 @@
       <e-column field="jobTitle" headerText="JOB TITLE" width="200"></e-column>
       <e-column field="skillName" headerText="SKILL" textAlign="Left" width="200"></e-column>
       <e-column field="regionName" headerText="REGION" textAlign="Left" width="200" [visible]="false"></e-column>
-      <e-column field="openPositions" headerText="# OF POSITIONS" width="180">
+      <e-column field="openPositions" headerText="# OF POSITIONS AVAILABLE" width="180">
         <ng-template #template let-data>
           <ng-container *ngIf="data.orderType !== orderTypes.OpenPerDiem">
             <div class="align-right">{{ data.numberOfOpenPositions }}/{{ data.openPositions }}</div>
@@ -739,6 +741,7 @@
   [children]="selectedDataRow?.children"
   [settings]="settings"
   [openEvent]="openDetails"
+  [orderPositionSelected$]="orderPositionSelected$"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid()"
   (closeReOrderEmitter)="onAddReorderClose()"

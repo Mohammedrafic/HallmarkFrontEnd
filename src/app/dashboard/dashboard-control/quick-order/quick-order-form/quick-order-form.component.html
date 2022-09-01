@@ -343,10 +343,10 @@
       <div class="title">Job Distribution & Description</div>
       <form [formGroup]="jobDistributionDescriptionForm">
         <div class="job-description-form">
-          <div class="form-line-item-60">
+          <div class="form-line-item-30">
             <div class="row">
               <!-- Job Distribution -->
-              <div class="input-container bootstrap form-line-item-50">
+              <div class="input-container bootstrap form-line-item-100">
                 <label>Job Distribution<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-multiselect
@@ -362,9 +362,11 @@
                   </ejs-multiselect>
                 </div>
               </div>
+            </div>
 
+            <div class="row">
               <!-- Agency -->
-              <div class="input-container bootstrap form-line-item-50">
+              <div class="input-container bootstrap form-line-item-100">
                 <label>
                   Agency
                   <span *ngIf="agencyControlEnabled" class="required">*</span>
@@ -388,7 +390,7 @@
 
             <div class="row">
               <!-- Reason of Requisition -->
-              <div class="input-container bootstrap form-line-item-50">
+              <div class="input-container bootstrap form-line-item-100">
                 <label>Reason for Requisition<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
@@ -396,6 +398,7 @@
                     appValidateWithMessage
                     [dataSource]="(reasons$ | async)?.items"
                     [fields]="reasonForRequisitionFields"
+                    (change)="onRequisitionChange($event)"
                   >
                   </ejs-dropdownlist>
                 </div>
@@ -404,7 +407,7 @@
           </div>
 
           <!-- Job Description -->
-          <div class="input-container bootstrap job-description form-line-item-40">
+          <div class="input-container bootstrap job-description form-line-item-70">
             <label for="comments">Job Description</label>
             <div class="input-group">
               <ejs-textbox
@@ -412,7 +415,7 @@
                 type="text"
                 [multiline]="true"
                 appValidateWithMessage
-                maxlength="500"
+                maxlength="4000"
                 formControlName="jobDescription"
                 cssClass="text-area"
               >

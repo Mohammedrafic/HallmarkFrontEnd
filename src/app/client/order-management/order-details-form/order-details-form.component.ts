@@ -294,7 +294,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       asapStart: [false],
       criticalOrder: [false],
       nO_OT: [false],
-      jobDescription: ['', Validators.maxLength(500)],
+      jobDescription: ['', Validators.maxLength(4000)],
       unitDescription: ['', Validators.maxLength(500)],
       orderRequisitionReasonId: [null, Validators.required],
       orderRequisitionReasonName: [null],
@@ -1054,6 +1054,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     if (order.orderType === OrderType.OpenPerDiem && order.status === OrderStatus.Open) {
       this.generalInformationForm = disableControls(this.generalInformationForm, controlNames, false);
     }
+
+    controlNames.forEach((control) => {
+      this.generalInformationForm.controls[control].updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    })
   }
 
   private resetLocation(): void {

@@ -1,4 +1,4 @@
 export enum CredentialsNavigationTabs {
-  CredentialsList,
-  Setup
+  Setup,
+  CredentialsList
 }

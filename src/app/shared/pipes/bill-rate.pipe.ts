@@ -1,14 +1,15 @@
-import { Pipe, PipeTransform } from "@angular/core";
-import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
+import { Pipe, PipeTransform } from '@angular/core';
+import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 
 @Pipe({
-  name: 'billRate'
+  name: 'billRate',
 })
-
-export class BillRatePipe implements PipeTransform{
+export class BillRatePipe implements PipeTransform {
   transform(rate: number, candidateRate: number, status: number, offeredBillRate: number): string {
-    return candidateRate ?
-      `$${Number(rate).toFixed(2)} - ${ status === ApplicantStatus.OnBoarded ? Number(offeredBillRate).toFixed(2):Number(candidateRate).toFixed(2)}` :
-      `$${Number(rate).toFixed(2)} - ${Number(rate).toFixed(2)}`;
+    return candidateRate
+      ? `${
+          status === ApplicantStatus.OnBoarded ? Number(offeredBillRate).toFixed(2) : Number(candidateRate).toFixed(2)
+        }`
+      : `${Number(rate).toFixed(2)}`;
   }
 }

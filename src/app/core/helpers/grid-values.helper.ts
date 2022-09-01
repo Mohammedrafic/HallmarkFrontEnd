@@ -1,8 +1,5 @@
 import { formatCurrency, formatNumber, formatDate } from '@angular/common';
 
-/**
- * TODO: Move to core helpers
- */
 export class GridValuesHelper {
   public static formatDate(value: string, pattern: string): string {
     if (!value) {
@@ -19,7 +16,7 @@ export class GridValuesHelper {
   }
 
   public static formatNumber(value: string | number, format?: string): string {
-    if (!Number(value)) {
+    if (isNaN(Number(value))) {
       return '';
     }
 
