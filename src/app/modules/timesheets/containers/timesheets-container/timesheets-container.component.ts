@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  ChangeDetectorRef, ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef, ViewChild, } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl } from '@angular/forms';
 
@@ -23,12 +18,12 @@ import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.a
 import { UserState } from 'src/app/store/user.state';
 import { TabConfig, TabCountConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
 import {
-  TimesheetExportOptions,  TAB_ADMIN_TIMESHEETS,  UNIT_ORGANIZATIONS_FIELDS,
+  TimesheetExportOptions, TAB_ADMIN_TIMESHEETS, UNIT_ORGANIZATIONS_FIELDS,
   BulkApproveSuccessMessage } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { ExportType } from '../../enums';
-import { TimesheetsService } from '../../services/timesheets.service';
+import { TimesheetsService } from '../../services';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ProfileDetailsContainerComponent } from '../profile-details-container/profile-details-container.component';
 import { AppState } from '../../../../store/app.state';
@@ -106,7 +101,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.startFiltersWatching();
     this.startOrganizationWatching();
     this.startSearchWatching();
-    this.calcTabsChips();
+    this.calcTabsBadgeAmount();
     this.onOrganizationChangedHandler();
   }
 
@@ -254,7 +249,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     });
   }
 
-  private calcTabsChips(): void {
+  private calcTabsBadgeAmount(): void {
     this.tabCounts$
     .pipe(
       filter(Boolean),

@@ -11,6 +11,7 @@ import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.mo
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { BehaviorSubject, filter, takeUntil } from 'rxjs';
 import { Destroyable } from '@core/helpers';
+import { OutsideZone } from '@core/decorators';
 
 @Component({
   selector: 'app-invoices-table-tabs',
@@ -37,7 +38,7 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
   }
 
   public ngAfterViewInit(): void {
-    this.ngZone.runOutsideAngular(() => setTimeout(() => this.tabComponent.refreshActiveTabBorder()));
+    this.asyncRefresh();
   }
 
   public onSelect(selectEvent: SelectingEventArgs): void {
@@ -60,10 +61,6 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
     return item.title;
   }
 
-  private refreshTabsBorder(): void {
-    setTimeout(() => this.tabComponent.refreshActiveTabBorder());
-  }
-
   private hideTab(index: number): void {
     this.tabsComponentCreated$
       .pipe(
@@ -72,7 +69,7 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
       )
       .subscribe(() => {
         this.tabComponent.hideTab(index, true);
-        this.refreshTabsBorder();
+        this.asyncRefresh();
       });
   }
 
@@ -84,7 +81,14 @@ export class InvoicesTableTabsComponent extends Destroyable implements AfterView
       )
       .subscribe(() => {
         this.tabComponent.hideTab(index, false);
-        this.refreshTabsBorder();
+        this.asyncRefresh();
       });
+  }
+
+  @OutsideZone
+  private asyncRefresh(): void {
+    setTimeout(() => {
+      this.tabComponent.refreshActiveTabBorder();
+    });
   }
 }

@@ -99,19 +99,19 @@
 <ng-template #tableFooter let-showHours>
   <div class="table-footer">
     <div *ngIf="showHours" class="total">
-      <h5 class="total__value">{{ invoiceDetail.totals.total }}</h5>
+      <h5 class="total__value">{{ invoiceDetail.totals.total | numericalConverter }}</h5>
       <p class="total__text">Hours/Miles</p>
     </div>
     <div *ngIf="isAgency" class="total">
-      <h5 class="total__value">$ {{ invoiceDetail.totals.feeTotal }}</h5>
+      <h5 class="total__value">$ {{ invoiceDetail.totals.feeTotal | numericalConverter }}</h5>
       <p class="total__text">Total Fee Amount</p>
     </div>
     <div class="total">
-      <h5 class="total__value">$ {{ invoiceDetail.totals.calculatedTotal }}</h5>
+      <h5 class="total__value">$ {{ invoiceDetail.totals.calculatedTotal | numericalConverter }}</h5>
       <p class="total__text">Amount to be Paid</p>
     </div>
     <div *ngIf="isAgency" class="total">
-      <h5 class="total__value">$ {{ invoiceDetail.totals.amount }}</h5>
+      <h5 class="total__value">$ {{ invoiceDetail.totals.amount | numericalConverter }}</h5>
       <p class="total__text">Total Amount</p>
     </div>
   </div>
