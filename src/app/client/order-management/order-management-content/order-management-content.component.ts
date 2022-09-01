@@ -1361,21 +1361,19 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private handleRedirectFromQuickOrderToast(): void {
     if (this.isRedirectedFromToast) {
-      this.organizationId$.pipe(takeUntil(this.unsubscribe$), debounceTime(50)).subscribe(() => {
         this.filteredItems = [{text: this.quickOrderId.toString(), column: 'orderId', value: this.quickOrderId}];
         this.filters['orderId'] = this.quickOrderId;
         this.OrderFilterFormGroup.controls['orderId'].patchValue(this.quickOrderId);
         this.getOrders();
 
         this.ordersPage$.pipe(take(2), filter(Boolean)).subscribe((data) => {
-          if (data.items[0].publicId === this.quickOrderId) {
+          if (data.items[0]?.publicId === this.quickOrderId) {
             setTimeout(() => {
               this.gridWithChildRow.selectRow(0);
               this.isRedirectedFromToast = false;
             }, 100);
           }
         });
-      });
     }
   }
 }

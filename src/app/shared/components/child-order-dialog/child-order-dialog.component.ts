@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subject, takeWhile, tap } from 'rxjs';
+import { Observable, Subject, takeWhile } from 'rxjs';
 
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -59,6 +59,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ExtensionCandidateComponent } from '../order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
 import { filter } from 'rxjs/operators';
+import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 
 enum Template {
   accept,
@@ -136,7 +137,8 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     private router: Router,
     private store: Store,
     private commentsService: CommentsService,
-    private confirmService: ConfirmService
+    private confirmService: ConfirmService,
+    private orderCandidateListViewService: OrderCandidateListViewService
   ) {}
 
   ngOnInit(): void {
@@ -144,7 +146,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.isOrganization = this.router.url.includes('client');
     this.selectedOrder$ = this.isAgency ? this.agencySelectedOrder$ : this.orgSelectedOrder$;
     this.extensions$ = this.isAgency ? this.agencyExtensions$ : this.organizationExtensions$;
-    this.extensions$.pipe(takeWhile(() => this.isAlive)).subscribe(extensions => {
+    this.extensions$.pipe(takeWhile(() => this.isAlive), filter(Boolean)).subscribe(extensions => {
       this.extensions = extensions.filter((extension: Order) => extension.id !== this.order.id);
     });
     this.subscribeOnCandidateJob();
@@ -183,6 +185,8 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     if (event.isSwiped) {
       event.cancel = true;
     }
+
+    this.orderCandidateListViewService.setIsCandidateOpened(event.selectingIndex === 1);
   }
 
   public onTabCreated(): void {
@@ -261,14 +265,15 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public closeExtensionSidebar(): void {
     if (this.extensionSidebarComponent.extensionForm.dirty) {
       this.confirmService
-      .confirm(CANCEL_CONFIRM_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
-        okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
-        this.isExtensionSidebarShown = false;
-      });
+        .confirm(CANCEL_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => !!confirm))
+        .subscribe(() => {
+          this.isExtensionSidebarShown = false;
+        });
     } else {
       this.isExtensionSidebarShown = false;
     }
@@ -299,6 +304,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.sideDialog.hide();
     this.openEvent.next(null);
     this.selectedTemplate = null;
+    this.orderCandidateListViewService.setIsCandidateOpened(false);
   }
 
   private saveExtensionChanges(): Observable<boolean> {

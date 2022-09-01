@@ -1,3 +1,5 @@
+import { LoadingInterceptor } from './core/interceptors/spinner.interceptor';
+import { Spinnermodule } from './core/components/spinner/spinner.module';
 import { NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
@@ -19,6 +21,7 @@ import { MsalModule, MsalRedirectComponent } from '@azure/msal-angular';
 import { MSAL_PROVIDERS } from './b2c-auth/b2c-auth.providers';
 import { B2cModule } from './b2c-auth/b2c-auth.module';
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
+import { Overlay } from '@angular/cdk/overlay';
 
 @NgModule({
   declarations: [AppComponent],
@@ -26,6 +29,7 @@ import { RejectReasonState } from "@organization-management/store/reject-reason.
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    Spinnermodule,
 
     //STORE
     NgxsModule.forRoot([
@@ -54,6 +58,12 @@ import { RejectReasonState } from "@organization-management/store/reject-reason.
     LoginGuard,
     UserGuard,
     ...MSAL_PROVIDERS,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: LoadingInterceptor,
+      multi: true,
+    },
+    Overlay,
   ],
   bootstrap: [AppComponent, MsalRedirectComponent],
 })
