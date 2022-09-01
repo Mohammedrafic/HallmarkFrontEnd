@@ -50,6 +50,7 @@ import { GetOrderRequisitionByPage } from '@organization-management/store/reject
 import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
 import { ORDER_JOB_DISTRIBUTION_LIST } from '@shared/constants/order-job-distribution-list';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
+import { ManualInvoiceReason } from '@shared/models/manual-invoice-reasons.model';
 
 @Component({
   selector: 'app-quick-order-form',
@@ -260,6 +261,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       jobDistributions: [[]],
       jobDescription: ['', Validators.maxLength(500)],
       orderRequisitionReasonId: [null, Validators.required],
+      orderRequisitionReasonName: [null],
     });
   }
 
@@ -768,5 +770,10 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         this.isFormDirty = this.isAnyFormsDirty;
         this.store.dispatch(new SetIsDirtyQuickOrderForm(this.isAnyFormsDirty));
       });
+  }
+
+  public onRequisitionChange(event: ChangeEventArgs): void {
+    const reasonName = (event.itemData as ManualInvoiceReason).reason;
+    this.jobDistributionDescriptionForm.controls['orderRequisitionReasonName'].patchValue(reasonName);
   }
 }

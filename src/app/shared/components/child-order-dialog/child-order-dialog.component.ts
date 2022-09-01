@@ -146,7 +146,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.isOrganization = this.router.url.includes('client');
     this.selectedOrder$ = this.isAgency ? this.agencySelectedOrder$ : this.orgSelectedOrder$;
     this.extensions$ = this.isAgency ? this.agencyExtensions$ : this.organizationExtensions$;
-    this.extensions$.pipe(takeWhile(() => this.isAlive)).subscribe((extensions) => {
+    this.extensions$.pipe(takeWhile(() => this.isAlive), filter(Boolean)).subscribe(extensions => {
       this.extensions = extensions.filter((extension: Order) => extension.id !== this.order.id);
     });
     this.subscribeOnCandidateJob();
