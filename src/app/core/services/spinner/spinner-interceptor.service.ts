@@ -37,13 +37,6 @@ export class SpinnerInterceptorHelperService {
 
   checkQueueState(): void {
     if (this.loadQueue.size === 0) {
-      // timer(1500)
-      // .pipe(
-      //   tap(() => {
-      //     if (this.loadQueue.size === 0) {
-      //       this.spinnerService.hide();
-      //     }})
-      // ).subscribe();
       this.spinnerService.hide();
     }
   }

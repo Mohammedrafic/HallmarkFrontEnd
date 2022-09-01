@@ -23,7 +23,7 @@ export class LoadingInterceptor implements HttpInterceptor {
     return next.handle(request)
     .pipe(
       catchError((error: HttpErrorResponse) => {
-        this.spinnerService.deleteUrlFromQueue(error.url as string);
+        this.spinnerService.handleRequestError();
         return throwError(() => error);
       }),
       tap((event: HttpEvent<unknown>) => {
