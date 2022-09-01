@@ -13,7 +13,6 @@ import {
   PrintingPostDto
 } from '../../interfaces';
 import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums';
-import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
 
 export namespace Invoices {
   export class GetManualInvoices {

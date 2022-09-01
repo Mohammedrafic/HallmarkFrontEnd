@@ -6,7 +6,7 @@ import { InvoicesContainerGridHelper } from './invoices-container-grid.helper';
 import {
   ToggleRowExpansionHeaderCellComponent
 } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
-import { amountValueFormatter } from '../../constants';
+import { numberValueFormatter } from '../../constants';
 
 interface GetPendingInvoiceRecordsColDefsConfig {
   previewAttachment: (attachment: Attachment) => void,
@@ -64,7 +64,7 @@ export class PendingInvoicesGridHelper {
         width: 110,
         type: 'rightAligned',
         cellClass: 'font-weight-bold align-right',
-        valueFormatter: amountValueFormatter,
+        valueFormatter: numberValueFormatter,
       },
       {
         field: 'hours',
@@ -72,7 +72,7 @@ export class PendingInvoicesGridHelper {
         width: 110,
         type: 'rightAligned',
         cellClass: 'font-weight-bold align-right',
-        valueFormatter: amountValueFormatter,
+        valueFormatter: numberValueFormatter,
       },
       {
         field: 'miles',
@@ -80,7 +80,7 @@ export class PendingInvoicesGridHelper {
         width: 110,
         type: 'rightAligned',
         cellClass: 'font-weight-bold align-right',
-        valueFormatter: amountValueFormatter,
+        valueFormatter: numberValueFormatter,
       },
       {
         field: 'amount',
@@ -88,7 +88,7 @@ export class PendingInvoicesGridHelper {
         width: 110,
         type: 'rightAligned',
         cellClass: 'font-weight-bold align-right',
-        valueFormatter: amountValueFormatter,
+        valueFormatter: numberValueFormatter,
       },
     ];
   }
