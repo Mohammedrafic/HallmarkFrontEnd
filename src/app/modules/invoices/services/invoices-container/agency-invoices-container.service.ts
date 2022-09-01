@@ -9,6 +9,7 @@ import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums'
 import { DialogAction } from '@core/enums';
 import { invoiceDetailsColumnDefs, invoiceInfoItems, invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
 import { AllInvoicesGridHelper } from '../../helpers/grid/all-invoices-grid.helper';
+import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-config.interface';
 
 @Injectable()
 export class AgencyInvoicesContainerService extends InvoicesContainerService {
@@ -75,5 +76,12 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
 
   public getDetailsUIItems(data: InvoiceDetail): InvoiceInfoUIItem[] {
     return invoiceInfoItems(data, true);
+  }
+
+  public override getTabConfig(tab: AgencyInvoicesGridTab): GridContainerTabConfig {
+    return this.createTabConfig({
+      manualInvoiceCreationEnabled: [AgencyInvoicesGridTab.Manual].includes(tab),
+      groupingEnabled: false,
+    });
   }
 }

@@ -23,7 +23,7 @@ import {
   ToggleRowExpansionHeaderCellComponent
 } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
 import {
-  amountValueFormatter, weekPeriodValueGetter,
+  numberValueFormatter, weekPeriodValueGetter,
   invoicesRowDetailsOffsetColDef,
   monthDayYearDateFormatter,
   titleValueCellRendererSelector
@@ -98,7 +98,7 @@ export class PendingApprovalGridHelper {
         minWidth: 280,
         headerName: 'Amount',
         cellClass: 'font-weight-bold',
-        valueFormatter: amountValueFormatter,
+        valueFormatter: numberValueFormatter,
       },
       {
         field: 'apDeliveryText',
@@ -182,7 +182,7 @@ export class PendingApprovalGridHelper {
                 headerName: 'Amount',
                 cellClass: 'font-weight-bold',
                 cellRendererSelector: titleValueCellRendererSelector,
-                valueFormatter: amountValueFormatter,
+                valueFormatter: numberValueFormatter,
               },
               {
                 ...weekPeriod,
@@ -194,6 +194,7 @@ export class PendingApprovalGridHelper {
                 field: 'value',
                 headerName: 'Total Hours',
                 cellRendererSelector: titleValueCellRendererSelector,
+                valueFormatter: numberValueFormatter,
                 width: 100,
               },
               {
@@ -266,7 +267,7 @@ export class PendingApprovalGridHelper {
         minWidth: 280,
         headerName: 'Amount',
         cellClass: 'font-weight-bold',
-        valueFormatter: amountValueFormatter,
+        valueFormatter: numberValueFormatter,
       },
       {
         field: 'apDeliveryText',

@@ -155,8 +155,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public onAccept(): void {
     const value = this.acceptForm.getRawValue();
     const applicantStatus: ApplicantStatus = this.getNewApplicantStatus();
+
     const actualDate =
-      applicantStatus.applicantStatus === CandidatStatus.Accepted
+      applicantStatus.applicantStatus === CandidatStatus.OnBoard
         ? {
             actualStartDate: this.orderCandidateJob.reOrderDate,
             actualEndDate: this.orderCandidateJob.reOrderDate,

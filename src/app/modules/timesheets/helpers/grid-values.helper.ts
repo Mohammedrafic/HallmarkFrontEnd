@@ -19,7 +19,7 @@ export class GridValuesHelper {
   }
 
   public static formatNumber(value: string | number, format?: string): string {
-    if (!Number(value)) {
+    if (isNaN(Number(value))) {
       return '';
     }
 
