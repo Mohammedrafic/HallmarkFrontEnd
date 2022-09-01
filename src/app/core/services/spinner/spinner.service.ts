@@ -16,8 +16,6 @@ export class SpinnerService {
   constructor(private overlay: Overlay) {}
 
   show(): void {
-
-    console.log('show')
     if (!this.overlayRef) {
       this.overlayRef = this.overlay.create();
     }
@@ -25,7 +23,6 @@ export class SpinnerService {
     const spinnerPortal = new ComponentPortal(SpinnerComponent);
     this.overlayRef.attach(spinnerPortal);
     this.isShowing = true;
-    
   }
 
   hide(): void {

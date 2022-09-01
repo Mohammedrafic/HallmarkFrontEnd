@@ -1,3 +1,5 @@
+@import 'colors';
+
 .wrapper {
   position: fixed;
   width: 100%;
@@ -9,4 +11,10 @@
   left: 0;
   background-color: rgba(209, 214, 226, 0.4);
   z-index: 20000;
+}
+
+::ng-deep {
+  .e-spinner-pane .e-spinner-inner .e-spin-material {
+    stroke: $primary-active-blue-10;
+  }
 }

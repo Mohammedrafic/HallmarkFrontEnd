@@ -37,12 +37,12 @@ import { Overlay } from '@angular/cdk/overlay';
       UserState,
       RejectReasonState
     ]),
-    // NgxsReduxDevtoolsPluginModule.forRoot({
-    //   disabled: environment.production
-    // }),
-    // NgxsLoggerPluginModule.forRoot({
-    //   disabled: environment.production
-    // }),
+    NgxsReduxDevtoolsPluginModule.forRoot({
+      disabled: environment.production
+    }),
+    NgxsLoggerPluginModule.forRoot({
+      disabled: environment.production
+    }),
     NgxMaskModule.forRoot(),
 
     // B2C
