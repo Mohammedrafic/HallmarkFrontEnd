@@ -194,6 +194,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public selectedOrder: Order;
   public openDetails = new Subject<boolean>();
+  public orderPositionSelected$ = new Subject<boolean>();
   public selectionOptions: SelectionSettingsModel = {
     type: 'Single',
     mode: 'Row',
@@ -661,6 +662,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         );
         this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
         this.openChildDialog.next(false);
+        this.orderPositionSelected$.next(false);
         if (!isArray(event.data)) {
           this.openDetails.next(true);
           this.selectedRowRef = event;
@@ -842,6 +844,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
     this.selectedDataRow = order as any;
+    this.orderPositionSelected$.next(true);
     this.openChildDialog.next([order, candidate]);
     this.store.dispatch(new GetAvailableSteps(order.organizationId, candidate.jobId));
   }
@@ -1208,7 +1211,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public lockOrder(order: Order): void {
-    this.store.dispatch(new SetLock(order.id, !order.isLocked, this.filters, `${order.organizationPrefix || ''}-${order.publicId}`));
+    this.store.dispatch(
+      new SetLock(order.id, !order.isLocked, this.filters, `${order.organizationPrefix || ''}-${order.publicId}`)
+    );
   }
 
   public disabledLock(status: OrderStatus): boolean {
