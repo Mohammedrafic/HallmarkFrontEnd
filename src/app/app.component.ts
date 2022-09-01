@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
+import { SpinnerInterceptorHelperService } from '@core/services/spinner/spinner-interceptor.service';
 
 import { Store } from '@ngxs/store';
 import { filter, map, mergeMap } from 'rxjs/operators';
@@ -15,7 +16,12 @@ import { SetIsOrganizationAgencyArea } from './store/app.actions';
 export class AppComponent implements OnInit {
   public isIframe = false;
 
-  constructor(private router: Router, private store: Store, private b2CAuthService: B2CAuthService) {}
+  constructor(
+  private router: Router,
+  private store: Store,
+  private b2CAuthService: B2CAuthService,
+  private spinnerService: SpinnerInterceptorHelperService,
+  ) {}
 
   ngOnInit(): void {
     this.isIframe = window !== window.parent && !window.opener;
