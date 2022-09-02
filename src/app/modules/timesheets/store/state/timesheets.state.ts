@@ -282,7 +282,7 @@ export class TimesheetsState {
     .pipe(
       switchMap(() => {
         const state = ctx.getState();
-        const { id, organizationId } = state.selectedTimeSheet as Timesheet;
+        const { id, organizationId } = state.timesheetDetails as TimesheetDetailsModel;
         /**
          * TODO: make all messages for toast in one constant.
          */
@@ -581,21 +581,22 @@ export class TimesheetsState {
 
   @Action(TimesheetDetails.AddTimesheetRecord)
   AddTimesheetRecord(ctx: StateContext<TimesheetsModel>,
-    { body, isAgency }: TimesheetDetails.AddTimesheetRecord): Observable<void> {
-      const selectedTimesheet = ctx.getState().timesheetDetails as TimesheetDetailsModel;
+    { body, isAgency }: TimesheetDetails.AddTimesheetRecord
+  ): Observable<void> {
+      const timesheetDetails = ctx.getState().timesheetDetails as TimesheetDetailsModel;
 
-    const { organizationId, jobId, weekStartDate } = selectedTimesheet;
+    const { organizationId, jobId, weekStartDate } = timesheetDetails;
     const creatBody: AddMileageDto = {
       organizationId: organizationId,
       jobId: jobId,
       weekStartDate: weekStartDate,
     };
 
-    if (body.type === 2 && selectedTimesheet.mileageTimesheetId) {
-      body.timesheetId = selectedTimesheet.mileageTimesheetId;
+    if (body.type === 2 && timesheetDetails.mileageTimesheetId) {
+      body.timesheetId = timesheetDetails.mileageTimesheetId;
     }
 
-    return (body.type === 2 && !selectedTimesheet.mileageTimesheetId ?
+    return (body.type === 2 && !timesheetDetails.mileageTimesheetId ?
       this.timesheetDetailsApiService.createMilesEntity(creatBody)
       .pipe(
         switchMap((data) => {
@@ -606,9 +607,9 @@ export class TimesheetsState {
       .pipe(
         tap(() => {
           const state = ctx.getState();
-          const { id, organizationId } = state.selectedTimeSheet as Timesheet;
+          const { id, organizationId } = state.timesheetDetails as TimesheetDetailsModel;
 
-          if (body.type === 2 && !selectedTimesheet.mileageTimesheetId) {
+          if (body.type === 2 && !timesheetDetails.mileageTimesheetId) {
             ctx.dispatch(new Timesheets.GetAll())
           }
 

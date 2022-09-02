@@ -39,7 +39,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
 
   public saveRecord(): void {
     if (this.form?.valid) {
-      const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
+      const { organizationId, id } = this.store.snapshot().timesheets.timesheetDetails;
       const body = RecordsAdapter.adaptRecordAddDto(this.form.value, organizationId, id, this.formType);
 
       this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
