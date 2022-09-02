@@ -100,6 +100,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public isDNWEnabled: boolean = false;
 
+  public isNavigationAvaliable = true;
+
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
    * */
@@ -263,6 +265,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   private startSelectedTimesheetWatching(): void {
     this.selectedTimeSheet$.pipe(
       throttleTime(100),
+      tap((value) => {
+        this.isNavigationAvaliable = !!value;
+      }),
       filter(Boolean),
       switchMap((timesheet: Timesheet) => {
         return this.store.dispatch(new Timesheets.GetTimesheetDetails(

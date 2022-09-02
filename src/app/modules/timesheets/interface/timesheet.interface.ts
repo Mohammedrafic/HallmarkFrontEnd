@@ -48,6 +48,7 @@ export interface TimesheetsFilterState {
   billRate?: number;
   skillIds?: string[];
   isAgency?: boolean;
+  timesheetIds?: number[];
 }
 
 export interface TimesheetWeekFilter {

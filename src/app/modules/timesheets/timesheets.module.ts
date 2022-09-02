@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
@@ -175,6 +175,7 @@ const gridIcons = {
     DateWeekService,
     AddDialogHelper,
     FiltersDialogHelper,
+    Location,
     {
       provide: AddDialogHelperService,
       useClass: AddRecordService,

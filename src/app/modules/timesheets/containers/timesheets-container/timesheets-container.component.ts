@@ -1,18 +1,18 @@
 import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef, ViewChild, } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl } from '@angular/forms';
+import { Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, debounceTime } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, debounceTime, tap } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
+import { RowNode } from '@ag-grid-community/core';import { DialogAction } from '@core/enums';
 
 import { Destroyable } from '@core/helpers';
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { SearchComponent } from '@shared/components/search/search.component';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RowNode } from '@ag-grid-community/core';
-import { DialogAction } from '@core/enums';
 import { DataSourceItem } from '@core/interface';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -86,6 +86,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     private timesheetsService: TimesheetsService,
     private cd: ChangeDetectorRef,
     private route: ActivatedRoute,
+    private location: Location,
   ) {
     super();
     store.dispatch([
@@ -103,6 +104,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.startSearchWatching();
     this.calcTabsBadgeAmount();
     this.onOrganizationChangedHandler();
+    this.initOnRedirect();
   }
 
   public handleChangeTab(tabIndex: number): void {
@@ -235,7 +237,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private initOrganizationsList(): void {
-    this.store.dispatch(new Timesheets.GetOrganizations()).pipe(
+    this.store.dispatch(new Timesheets.GetOrganizations())
+    .pipe(
       switchMap(() => this.organizations$.pipe(
         filter((res: DataSourceItem[]) => !!res.length),
       )),
@@ -279,6 +282,24 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         new Timesheets.UpdateFiltersState(),
         new Timesheets.GetFiltersDataSource()
       ]);
+    }
+  }
+
+  private initOnRedirect(): void {
+    const state = this.location.getState() as { navigationId: number, timesheetId: number };
+    
+    if (state?.timesheetId) {
+      const subscription = this.organizationId$
+        .pipe(
+          filter((value) => !!value && !!state.timesheetId),
+          switchMap((value) => this.store.dispatch(new Timesheets.GetTimesheetDetails(
+            state.timesheetId, value, this.isAgency))),
+          tap(() => {
+            this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Open, undefined));
+            subscription.unsubscribe();
+          }),
+          takeUntil(this.componentDestroy()),
+        ).subscribe();
     }
   }
 }
