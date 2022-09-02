@@ -10,6 +10,11 @@ $chip-margin: 8px;
     ag-grid-angular {
       height: auto !important;
 
+      .ag-header-cell-text {
+        font-weight: 600;
+        color: $secondary-dark-blue-15;
+      }
+
       .ag-root-wrapper {
         height: auto !important;
       }
