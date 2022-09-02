@@ -19,6 +19,7 @@ import { ColumnDefinitionModel } from '@shared/components/grid/models/column-def
 import { GridReadyEventModel } from '@shared/components/grid/models/grid-ready-event.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { GRID_CONFIG } from '@shared/constants';
+import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
 
 @Component({
   selector: 'app-grid',
@@ -68,6 +69,7 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   public readonly defaultColumnDefinition: ColumnDefinitionModel = { minWidth: 100, resizable: true };
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public readonly modules: Module[] = [ClientSideRowModelModule];
+  public readonly gridEmptyMessage = GRID_EMPTY_MESSAGE;
   public selectedTableRows: RowNode[] = [];
 
   private readonly isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);

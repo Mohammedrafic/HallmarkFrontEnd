@@ -1,3 +1,4 @@
+@import 'colors';
 @import '@ag-grid-community/core/dist/styles/ag-grid.scss';
 @import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
 
@@ -9,6 +10,15 @@ app-grid {
   display: flex;
   flex-direction: column;
   height: 100%;
+
+  & .ag-row-selected {
+    background-color: $primary-active-blue-70 !important;
+  }
+
+  & .ag-overlay-wrapper.ag-overlay-no-rows-wrapper {
+    font-size: 14px;
+    color: $secondary-dark-blue-30;
+  }
 
   &.grid-title {
     position: relative;

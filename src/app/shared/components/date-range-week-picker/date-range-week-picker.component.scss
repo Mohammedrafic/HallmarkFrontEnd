@@ -1,3 +1,5 @@
+@import "src/app/styles/themes/material_l.scss";
+
 ::ng-deep {
   .e-calendar .e-content .e-range-hover {
     background-color: #2368EE!important;
@@ -17,8 +19,14 @@
       width: 247px!important;
     }
 
-    .e-input-group-icon.e-range-icon.e-icons {
-      background-color: #fff!important;
+    .e-input-group-icon.e-range-icon {
+      &::before {
+        content: $datepicker-icon !important;
+      }
+
+      &.e-icons {
+        background-color: #fff!important;
+      }
     }
   }
 }

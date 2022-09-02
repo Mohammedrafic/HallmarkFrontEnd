@@ -91,6 +91,7 @@
         [pagination]="false"
         [getRowStyle]="getRowStyle"
         [class.empty-table]="!recordsToShow[currentTab][currentMode].length"
+        [overlayNoRowsTemplate]="gridEmptyMessage"
         (gridReady)="onGridReady($event)"
         class="ag-theme-alpine app-grid__component"
         >

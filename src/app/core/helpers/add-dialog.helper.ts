@@ -60,7 +60,7 @@ export class AddDialogHelper<T> extends TimesheetDateHelper {
     if (this.form?.touched) {
       this.confirmService.confirm(this.confirmMessages.confirmAddFormCancel, {
         title: 'Unsaved Progress',
-        okButtonLabel: 'Proceed',
+        okButtonLabel: 'Leave',
         okButtonClass: 'delete-button',
       })
       .pipe(
