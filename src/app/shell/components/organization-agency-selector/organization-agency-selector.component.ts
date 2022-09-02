@@ -108,7 +108,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.unsubscribe$),
         debounceTime(300),
-        distinctUntilChanged(),
         mergeMap((id) => this.getLogo(id)),
         switchMap(() => this.user$)
       )
