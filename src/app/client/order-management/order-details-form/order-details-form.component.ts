@@ -1052,12 +1052,13 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.generalInformationForm = disableControls(this.generalInformationForm, controlNames, false);
     }
     if (order.orderType === OrderType.OpenPerDiem && order.status === OrderStatus.Open) {
+      this.handlePerDiemOrder();
       this.generalInformationForm = disableControls(this.generalInformationForm, controlNames, false);
     }
 
-    controlNames.forEach((control) => {
-      this.generalInformationForm.controls[control].updateValueAndValidity({ onlySelf: true, emitEvent: false });
-    })
+    Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
+      this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
+    });
   }
 
   private resetLocation(): void {
