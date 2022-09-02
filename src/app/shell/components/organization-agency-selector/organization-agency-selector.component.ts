@@ -182,7 +182,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         this.selectedLogo$.next(this.domSanitizer.bypassSecurityTrustUrl(url));
       }),
       catchError(() => {
-        this.selectedLogo$.next(null);
+        this.selectedLogo$.next('assets/icons/no-logo.svg');
         return of(false);
       })
     );
