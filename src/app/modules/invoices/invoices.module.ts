@@ -74,6 +74,7 @@ import {
 } from './services/invoices-container/organization-invoices-container.service';
 import { TableStatusCellModule } from '@shared/components/table-status-cell/table-status-cell.module';
 import { AllInvoicesActionCellComponent } from './components/all-invoices-action-cell/all-invoices-action-cell.component';
+import { NumericalConverterModule } from '@shared/pipes/numerical-converter/numerical-converter.module';
 
 @NgModule({
   declarations: [
@@ -127,6 +128,7 @@ import { AllInvoicesActionCellComponent } from './components/all-invoices-action
     ListBoxModule,
     A11yModule,
     TableStatusCellModule,
+    NumericalConverterModule
   ],
   providers: [
     InvoicesService,

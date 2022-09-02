@@ -317,6 +317,7 @@
                         format="hh:mm a"
                         [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                         [enableMask]="true"
+                        [max]="maxTime"
                         maskPlaceholder="HH:MM"
                       >
                       </ejs-timepicker>
@@ -334,6 +335,7 @@
                         format="hh:mm a"
                         [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                         [enableMask]="true"
+                        [min]="minTime"
                         maskPlaceholder="HH:MM"
                       >
                       </ejs-timepicker>
@@ -367,6 +369,7 @@
                         format="hh:mm a"
                         [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                         [enableMask]="true"
+                        [max]="maxTime"
                         maskPlaceholder="HH:MM"
                       >
                       </ejs-timepicker>
@@ -384,6 +387,7 @@
                         format="hh:mm a"
                         [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                         [enableMask]="true"
+                        [min]="minTime"
                         maskPlaceholder="HH:MM"
                       >
                       </ejs-timepicker>
@@ -478,7 +482,7 @@
                       type="text"
                       [multiline]="true"
                       appValidateWithMessage
-                      maxlength="500"
+                      maxlength="4000"
                       formControlName="jobDescription"
                     >
                     </ejs-textbox>

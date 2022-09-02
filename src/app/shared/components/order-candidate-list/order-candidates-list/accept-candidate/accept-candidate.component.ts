@@ -86,8 +86,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   get showWithdrawAction(): boolean {
     return (
-      (this.candidateStatus === ApplicantStatusEnum.Shortlisted ||
-        this.candidateStatus === ApplicantStatusEnum.PreOfferCustom) &&
+      [ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom, ApplicantStatusEnum.Applied].includes(
+        this.candidateStatus
+      ) &&
       !this.isWithdraw &&
       !this.isDeployedCandidate
     );

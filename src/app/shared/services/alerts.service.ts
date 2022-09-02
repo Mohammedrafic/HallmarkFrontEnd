@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { UserSubscription, UserSubscriptionFilters, UserSubscriptionPage ,UserSubscriptionRequest} from "@shared/models/user-subscription.model";
 import { observable, Observable, of } from "rxjs";
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
+import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, AlertTriggerDto, EditAlertsTemplate, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
 import { AlertChannel } from "@admin/alerts/alerts.enum";
 import { BusinessUnit } from "../models/business-unit.model";
 
@@ -114,6 +114,19 @@ export class AlertsService {
     EditAlertsTemplateRequest: EditAlertsTemplateRequest
   ): Observable<EditAlertsTemplate> {    
     return this.http.put<EditAlertsTemplate>(`/api/Templates/`, EditAlertsTemplateRequest);
+  }
+
+  /**
+   * Alert Trigger
+   * @param AlertTriggerDto
+   *
+   * @return number[]
+   */
+   public alertTrigger(
+    AlertTriggerDto: AlertTriggerDto
+   ): Observable<number[]> {     
+    return this.http.post<number[]>(`/api/Alerts/CreateAppAlert`, AlertTriggerDto);
+     
   }
   
 }

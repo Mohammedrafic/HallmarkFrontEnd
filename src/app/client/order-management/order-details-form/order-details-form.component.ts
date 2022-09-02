@@ -294,7 +294,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       asapStart: [false],
       criticalOrder: [false],
       nO_OT: [false],
-      jobDescription: ['', Validators.maxLength(500)],
+      jobDescription: ['', Validators.maxLength(4000)],
       unitDescription: ['', Validators.maxLength(500)],
       orderRequisitionReasonId: [null, Validators.required],
       orderRequisitionReasonName: [null],
@@ -414,6 +414,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
       this.autoSetupJobEndDateControl(duration, jobStartDate);
     });
+
+    this.defaultMaxTime.setHours(23, 59, 59);
+    this.defaultMinTime.setHours(0, 0, 0);
 
     shiftEndTimeControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
       this.maxTime = val || this.defaultMaxTime;
