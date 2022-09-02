@@ -10,7 +10,7 @@ import {
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ChangeEventArgs, FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { combineLatest, debounceTime, filter, merge, Observable, of, Subject, take, takeUntil } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged, filter, merge, Observable, of, Subject, take, takeUntil } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { OrderType } from '@shared/enums/order-type';
@@ -395,6 +395,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       if (!(jobStartDate instanceof Date)) {
         return;
       }
+      this.jobStartDateControl.patchValue(jobStartDate);    
       this.autoSetupJobEndDateControl(duration, jobStartDate);
     });
   }
@@ -449,7 +450,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private handleOrderTypeControlValueChanges(): void {
-    this.orderTypeControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
+    this.orderTypeControl.valueChanges.pipe(takeUntil(this.destroy$), distinctUntilChanged()).subscribe((value) => {
       this.cdr.markForCheck();
       this.isContactToPermOrder = value === OrderType.ContractToPerm;
       this.isTravelerOrder = value === OrderType.Traveler;
