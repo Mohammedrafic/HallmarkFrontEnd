@@ -1,22 +1,16 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { OrganizationService } from '@shared/services/organization.service';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import {
   BehaviorSubject,
-  catchError,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
-  mergeMap,
   Observable,
-  of,
   Subject,
   switchMap,
   takeUntil,
-  tap,
 } from 'rxjs';
 
 import {
@@ -53,7 +47,6 @@ interface IOrganizationAgency {
 })
 export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   public organizationAgencyControl: FormControl = new FormControl();
-  public selectedLogo$ = new BehaviorSubject<SafeUrl | null>(null);
   public baseUrl: string;
 
   public optionFields = {
@@ -91,8 +84,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store,
     private cd: ChangeDetectorRef,
-    private domSanitizer: DomSanitizer,
-    private organizationService: OrganizationService,
     private actions$: Actions,
     @Inject(APP_SETTINGS) private appSettings: AppSettings
   ) {
@@ -109,7 +100,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         takeUntil(this.unsubscribe$),
         debounceTime(300),
         distinctUntilChanged(),
-        mergeMap((id) => this.getLogo(id)),
         switchMap(() => this.user$)
       )
       .subscribe((user) => {
@@ -173,19 +163,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-  }
-
-  public getLogo(id: number): Observable<Blob | boolean> {
-    return this.organizationService.getOrganizationLogo(id).pipe(
-      tap((blob) => {
-        const url = window.URL.createObjectURL(blob);
-        this.selectedLogo$.next(this.domSanitizer.bypassSecurityTrustUrl(url));
-      }),
-      catchError(() => {
-        this.selectedLogo$.next('assets/icons/no-logo.svg');
-        return of(false);
-      })
-    );
   }
 
   private subscribeUserChange(): void {

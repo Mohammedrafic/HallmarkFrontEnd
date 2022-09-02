@@ -25,8 +25,12 @@
 
       <ng-template #valueTemplate let-data>
         <div class="value-container">
-          <div *ngIf="selectedLogo$ | async as logo" class="logo-container">
-            <img [src]="logo" alt="logo" />
+          <div class="logo-container">
+            <img
+              [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo'"
+              onerror="onerror=null; src='assets/icons/no-logo.svg'"
+              alt="logo"
+            />
           </div>
 
           <p class="title">{{ data.name }}</p>
@@ -37,8 +41,12 @@
 </div>
 
 <div *ngIf="isAgencyOrOrganization" class="organization-agency-title-container">
-  <div *ngIf="selectedLogo$ | async as logo" class="logo-container">
-    <img class="e-avatar" [src]="logo" alt="logo" />
+  <div class="logo-container">
+    <img
+      [src]="baseUrl + '/api/BusinessUnit/' + organizationAgency.id + '/logo'"
+      onerror="onerror=null; src='assets/icons/no-logo.svg'"
+      alt="logo"
+    />
   </div>
 
   <p class="title">{{ organizationAgency?.name }}</p>
