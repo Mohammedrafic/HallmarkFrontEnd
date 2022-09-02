@@ -24,15 +24,25 @@
     <e-column headerTextAlign="Right" width="120">
       <ng-template #headerTemplate let-data>
         <div class="controls-header">
-          <button ejs-button cssClass="e-flat icon-button" *ngIf="!isSubrowDisplay; else onSubrowToggle" (click)="expandAll()">
-            <span><img src="assets/icons/menu-expand.svg" alt="coll" class="icon"></span>
+          <button
+            ejs-button
+            cssClass="e-flat icon-button"
+            *ngIf="!isSubrowDisplay; else onSubrowToggle"
+            (click)="expandAll()"
+          >
+            <span><img src="assets/icons/menu-expand.svg" alt="coll" class="icon" /></span>
           </button>
           <ng-template #onSubrowToggle>
             <button ejs-button cssClass="e-flat icon-button" (click)="collapseAll()">
-              <span><img src="assets/icons/menu-collapse.svg" alt="coll" class="icon c"></span>
+              <span><img src="assets/icons/menu-collapse.svg" alt="coll" class="icon c" /></span>
             </button>
           </ng-template>
-          <button ejs-button cssClass="e-flat icon-button" *ngIf="isRowScaleUp; else onRowScaleDown" (click)="onRowScaleUpClick()">
+          <button
+            ejs-button
+            cssClass="e-flat icon-button"
+            *ngIf="isRowScaleUp; else onRowScaleDown"
+            (click)="onRowScaleUpClick()"
+          >
             <span><i-feather name="menu" class="icon"></i-feather></span>
           </button>
           <ng-template #onRowScaleDown>
@@ -50,7 +60,9 @@
           </button>
           <button ejs-button cssClass="e-flat default-icon-button with-badge" (click)="openDetailsTab = true">
             <span><i-feather name="message-square" class="icon"></i-feather></span>
-            <span *ngIf="data.unreadComments" class="e-badge e-badge-success e-badge-pill right-overflow">{{ data.unreadComments }}</span>
+            <span *ngIf="data.unreadComments" class="e-badge e-badge-success e-badge-pill right-overflow">{{
+              data.unreadComments
+            }}</span>
           </button>
         </div>
       </ng-template>
@@ -58,13 +70,11 @@
     <e-column field="orderId" headerText="ORDER ID" isPrimaryKey="true" width="142">
       <ng-template #template let-data>
         <ng-container
-        *ngIf="
-          data.orderType === orderTypes.OpenPerDiem
-            ? !data.reOrders?.length
-            : !data.children?.length;
-          else withToggle
-        "
-      >
+          *ngIf="
+            data.orderType === orderTypes.OpenPerDiem ? !data.reOrders?.length : !data.children?.length;
+            else withToggle
+          "
+        >
           <div>
             <b>{{ data.organizationPrefix }}-{{ data.publicId }}</b>
           </div>
@@ -145,14 +155,20 @@
       </ng-template>
     </e-column>
     <e-column field="shiftsNext90Days" headerText="# of Shifts Next 90 Days " width="150" [visible]="false"></e-column>
-    <e-column field="annualSalaryRangeFrom" headerText="Annual Salary From" textAlign="Left" width="200" [visible]="false">
+    <e-column
+      field="annualSalaryRangeFrom"
+      headerText="Annual Salary From"
+      textAlign="Left"
+      width="200"
+      [visible]="false"
+    >
       <ng-template #template let-data>
-        <span>{{ data.annualSalaryRangeFrom | currency: 'USD': 'symbol':'1.0-2' }}</span>
+        <span>{{ data.annualSalaryRangeFrom | currency: 'USD':'symbol':'1.0-2' }}</span>
       </ng-template>
     </e-column>
     <e-column field="annualSalaryRangeTo" headerText="Annual Salary To" textAlign="Left" width="200" [visible]="false">
       <ng-template #template let-data>
-        <span>{{ data.annualSalaryRangeTo | currency: 'USD': 'symbol':'1.0-2' }}</span>
+        <span>{{ data.annualSalaryRangeTo | currency: 'USD':'symbol':'1.0-2' }}</span>
       </ng-template>
     </e-column>
   </e-columns>
@@ -177,8 +193,7 @@
         [candidat]="child"
         [order]="data"
         [selected]="
-          selectedCandidate?.selected?.order === data.id &&
-          selectedCandidate?.selected.positionId === child.positionId
+          selectedCandidate?.selected?.order === data.id && selectedCandidate?.selected.positionId === child.positionId
         "
         [isAgency]="false"
         (clickEvent)="onOpenCandidateDialog($event, data)"
@@ -242,6 +257,7 @@
   #detailsDialog
   [order]="selectedOrder"
   [openEvent]="openPreview"
+  [orderPositionSelected$]="orderPositionSelected$"
   [openDetailsTab]="openDetailsTab"
   [openCandidateTab]="!!previousSelectedOrderId"
   (compareEvent)="onCompare()"
@@ -251,7 +267,11 @@
 
 <app-candidat-dialog [openEvent]="openCandidat"></app-candidat-dialog>
 
-<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidate"  [openEvent]="openChildDialog"></app-child-order-dialog>
+<app-child-order-dialog
+  [order]="$any(selectedOrder)"
+  [candidate]="selectedCandidate"
+  [openEvent]="openChildDialog"
+></app-child-order-dialog>
 
 <app-filter-dialog
   [items]="filteredItems"

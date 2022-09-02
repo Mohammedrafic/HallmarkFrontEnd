@@ -68,7 +68,13 @@ import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectsService } from '@shared/services/projects.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { ORDER_WITHOUT_BILLRATES, ORDER_WITHOUT_CREDENTIALS, ORDER_WITHOUT_CRED_BILLRATES, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import {
+  ORDER_WITHOUT_BILLRATES,
+  ORDER_WITHOUT_CRED_BILLRATES,
+  ORDER_WITHOUT_CREDENTIALS,
+  RECORD_ADDED,
+  RECORD_MODIFIED,
+} from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { OrderManagementModel } from '@agency/store/order-management.state';
@@ -148,7 +154,7 @@ export interface OrderManagementContentStateModel {
       current: null,
     },
     contactDetails: null,
-    extensions: null
+    extensions: null,
   },
 })
 @Injectable()
@@ -232,7 +238,7 @@ export class OrderManagementContentState {
   static applicantStatuses(state: OrderManagementContentStateModel): ApplicantStatus[] {
     return state.applicantStatuses;
   }
-  
+
   @Selector()
   static lastSelectedOrder(state: OrderManagementContentStateModel): (id: number) => [OrderManagement, number] | [] {
     return (id: number) => {
@@ -584,7 +590,7 @@ export class OrderManagementContentState {
         } else if (hasntOrderBillRates) {
           TOAST_MESSAGE += `. ${ORDER_WITHOUT_BILLRATES}`;
           MESSAGE_TYPE = MessageTypes.Warning;
-        }        
+        }
         dispatch([
           order?.isQuickOrder
             ? new ShowToast(
@@ -598,7 +604,7 @@ export class OrderManagementContentState {
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
         ]);
-       
+
         return payload;
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
@@ -606,7 +612,7 @@ export class OrderManagementContentState {
   }
 
   @Action(EditOrder)
-  EditOrder(    
+  EditOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents }: EditOrder
   ): Observable<Order | void> {
@@ -617,7 +623,7 @@ export class OrderManagementContentState {
           new SaveOrderSucceeded(order),
           new SetIsDirtyOrderForm(false),
         ]);
-        
+
         return order;
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
@@ -760,9 +766,11 @@ export class OrderManagementContentState {
   @Action(GetExtensions)
   GetExtensions(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { id }: GetExtensions
+    { id, orderId }: GetExtensions
   ): Observable<ExtensionGridModel[]> {
-    return this.extensionSidebarService.getExtensions(id).pipe(tap((extensions) => patchState({ extensions })));
+    return this.extensionSidebarService
+      .getExtensions(id, orderId)
+      .pipe(tap((extensions) => patchState({ extensions })));
   }
 
   @Action(SetIsDirtyQuickOrderForm)

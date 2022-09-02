@@ -332,9 +332,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private subscribeOnOrderCandidatePage(): void {
-    zip([this.orderCandidatePage$, this.selectedOrder])
+    zip([this.orderCandidatePage$, this.selectedOrder, this.orderPositionSelected$])
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(([order, selectedOrder]: [OrderCandidatesListPage, Order]) => {
+      .subscribe(([order, selectedOrder, isOrderPositionSelected]: [OrderCandidatesListPage, Order, boolean]) => {
         this.candidateOrderPage = order;
         this.candidatesCounter =
           order &&
@@ -345,9 +345,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         this.extensions = [];
         if (
           order?.items[0]?.deployedCandidateInfo?.jobId &&
+          isOrderPositionSelected &&
           (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
         ) {
-          this.store.dispatch(new GetExtensions(order.items[0].deployedCandidateInfo.jobId));
+          this.store.dispatch(new GetExtensions(order.items[0].deployedCandidateInfo.jobId, selectedOrder.id!));
         }
       });
 

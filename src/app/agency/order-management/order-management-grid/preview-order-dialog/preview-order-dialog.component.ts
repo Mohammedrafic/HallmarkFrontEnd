@@ -33,6 +33,7 @@ import { GetAgencyExtensions } from '@agency/store/order-management.actions';
 export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() order: AgencyOrderManagement;
   @Input() openEvent: Subject<boolean>;
+  @Input() orderPositionSelected$: Subject<boolean>;
   @Input() openCandidateTab: boolean;
   @Input() openDetailsTab: boolean;
 
@@ -105,16 +106,21 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private subscribeOnOrderCandidatePage(): void {
-    zip([this.orderCandidatePage$, this.selectedOrder$])
+    zip([this.orderCandidatePage$, this.selectedOrder$, this.orderPositionSelected$])
       .pipe(takeWhile(() => this.isAlive))
-      .subscribe(([order, selectedOrder]: [OrderCandidatesListPage, Order]) => {
+      .subscribe(([order, selectedOrder, isOrderPositionSelected]: [OrderCandidatesListPage, Order, boolean]) => {
         this.extensions = [];
         if (
           order?.items[0]?.deployedCandidateInfo?.jobId &&
+          isOrderPositionSelected &&
           (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
         ) {
           this.store.dispatch(
-            new GetAgencyExtensions(order.items[0].deployedCandidateInfo.jobId, this.order.organizationId)
+            new GetAgencyExtensions(
+              order.items[0].deployedCandidateInfo.jobId,
+              selectedOrder.id!,
+              this.order.organizationId
+            )
           );
         }
       });

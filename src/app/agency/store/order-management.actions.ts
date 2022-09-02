@@ -116,5 +116,5 @@ export class ClearAgencyHistoricalData {
 
 export class GetAgencyExtensions {
   static readonly type = '[order management] Get Extensions';
-  constructor(public id: number, public organizationId: number) {}
+  constructor(public id: number, public orderId: number, public organizationId: number) {}
 }

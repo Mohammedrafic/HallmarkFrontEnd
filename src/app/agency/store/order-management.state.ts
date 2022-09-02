@@ -411,10 +411,10 @@ export class OrderManagementState {
   @Action(GetAgencyExtensions)
   GetAgencyExtensions(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { id, organizationId }: GetAgencyExtensions
+    { id, orderId, organizationId }: GetAgencyExtensions
   ): Observable<ExtensionGridModel[]> {
     return this.extensionSidebarService
-      .getExtensions(id, organizationId)
+      .getExtensions(id, orderId, organizationId)
       .pipe(tap((extensions) => patchState({ extensions })));
   }
 }

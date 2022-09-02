@@ -146,9 +146,14 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.isOrganization = this.router.url.includes('client');
     this.selectedOrder$ = this.isAgency ? this.agencySelectedOrder$ : this.orgSelectedOrder$;
     this.extensions$ = this.isAgency ? this.agencyExtensions$ : this.organizationExtensions$;
-    this.extensions$.pipe(takeWhile(() => this.isAlive), filter(Boolean)).subscribe(extensions => {
-      this.extensions = extensions.filter((extension: Order) => extension.id !== this.order.id);
-    });
+    this.extensions$
+      .pipe(
+        takeWhile(() => this.isAlive),
+        filter(Boolean)
+      )
+      .subscribe((extensions) => {
+        this.extensions = extensions.filter((extension: Order) => extension.id !== this.order.id);
+      });
     this.subscribeOnCandidateJob();
     this.onOpenEvent();
   }
@@ -284,12 +289,18 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public getExtensions(): void {
+    if (!this.candidateJob?.jobId) {
+      return;
+    }
+
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
 
     if (isAgencyArea) {
-      this.store.dispatch(new GetAgencyExtensions(this.candidateJob?.jobId!, this.candidateJob?.organizationId!));
+      this.store.dispatch(
+        new GetAgencyExtensions(this.candidateJob?.jobId, this.order.id, this.candidateJob?.organizationId!)
+      );
     } else {
-      this.store.dispatch(new GetExtensions(this.candidateJob?.jobId!));
+      this.store.dispatch(new GetExtensions(this.candidateJob?.jobId, this.order.id));
     }
   }
 
