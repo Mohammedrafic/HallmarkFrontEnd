@@ -497,6 +497,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         this.generalInformationForm.controls[control].patchValue(null, { emitEvent: false });
       });
     } else {
+      this.populateQuickOrderFormValues();
+      this.populateShiftTimes();
       listOfCommonControls.forEach((control) => {
         if (control === 'hourlyRate' || control === 'openPositions') {
           this.generalInformationForm.controls[control]?.setValidators([
@@ -572,7 +574,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.orderManagementService
         .getRegularLocalBillRate(orderType, departmentId, skillId, organizationId)
         .pipe(take(1))
-        .subscribe((billRates: BillRate[]) => this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0]?.rateHour || null));
+        .subscribe((billRates: BillRate[]) => this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0]?.rateHour.toFixed(2) || null));
     }
   }
 
