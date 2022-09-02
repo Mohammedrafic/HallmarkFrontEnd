@@ -22,6 +22,12 @@ export const candidateProfileColumns: ColDef[] = [
     cellRenderer: GridErroredCellComponent,
   },
   {
+    field: 'profileStatus',
+    width: 150,
+    headerName: 'Profile Status',
+    cellRenderer: GridErroredCellComponent,
+  },
+  {
     field: 'dob',
     width: 150,
     headerName: 'DOB',

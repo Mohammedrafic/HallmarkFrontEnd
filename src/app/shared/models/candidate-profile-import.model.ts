@@ -15,6 +15,7 @@ export type CandidateProfile = {
   firstName: string;
   middleName: string;
   lastName: string;
+  profileStatus: string;
   email: string;
   skill: string;
   dob: string;
@@ -36,9 +37,6 @@ export type CandidateProfile = {
 export type CandidateExperiencesImport = {
   email: string;
   ssn: string;
-  firstName: string;
-  middleName: string;
-  lastName: string;
   employer: string;
   jobTitle: string;
   startDate: string;
@@ -51,9 +49,6 @@ export type CandidateExperiencesImport = {
 export type CandidateEducationImport = {
   email: string;
   ssn: string;
-  firstName: string;
-  middleName: string;
-  lastName: string;
   degreeType: string;
   schoolName: string;
   graduationMonth: string;
