@@ -415,6 +415,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.autoSetupJobEndDateControl(duration, jobStartDate);
     });
 
+    this.defaultMaxTime.setHours(23, 59, 59);
+    this.defaultMinTime.setHours(0, 0, 0);
+
     shiftEndTimeControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
       this.maxTime = val || this.defaultMaxTime;
       shiftStartTimeControl.updateValueAndValidity({ onlySelf: true, emitEvent: false });

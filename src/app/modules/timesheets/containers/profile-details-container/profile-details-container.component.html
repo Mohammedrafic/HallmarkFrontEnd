@@ -135,6 +135,7 @@
 
     </section>
     <app-navigation-panel
+            *ngIf="isNavigationAvaliable"
             prevLabel="Previous Timesheet"
             nextLabel="Next Timesheet"
             [prevDisabled]="currentSelectedRowIndex === 0"
