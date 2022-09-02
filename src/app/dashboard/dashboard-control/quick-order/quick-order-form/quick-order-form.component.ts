@@ -259,7 +259,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       jobDistribution: [[], Validators.required],
       agency: [null],
       jobDistributions: [[]],
-      jobDescription: ['', Validators.maxLength(500)],
+      jobDescription: ['', Validators.maxLength(4000)],
       orderRequisitionReasonId: [null, Validators.required],
       orderRequisitionReasonName: [null],
     });

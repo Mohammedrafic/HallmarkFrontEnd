@@ -64,3 +64,9 @@ export class Alert{
     agency:boolean;
     isDeleted:boolean;
 }
+
+export type AlertTriggerDto = {
+  BusinessUnitId:number |null;
+  AlertId :number;
+  Parameters: any;
+}

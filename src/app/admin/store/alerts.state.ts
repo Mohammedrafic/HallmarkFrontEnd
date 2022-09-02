@@ -1,11 +1,11 @@
 import { Injectable } from "@angular/core";
 import { UserSubscriptionPage, UserSubscriptionRequest } from "@shared/models/user-subscription.model";
 import { Action, Selector, StateContext} from '@ngxs/store';
-import { GetAlertsTemplatePage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
+import { AlertTrigger, GetAlertsTemplatePage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
 import { Observable ,tap} from "rxjs";
 import { AlertsService } from "@shared/services/alerts.service";
 import { BusinessUnitService } from "@shared/services/business-unit.service";
-import { AlertsTemplate, AlertsTemplatePage, EditAlertsTemplate } from "@shared/models/alerts-template.model";
+import { AlertsTemplate, AlertsTemplatePage, AlertTriggerDto, EditAlertsTemplate } from "@shared/models/alerts-template.model";
 
 interface AlertsStateModel {
   userSubscriptionPage: UserSubscriptionPage | null;
@@ -14,6 +14,7 @@ interface AlertsStateModel {
     editAlertsTemplate: EditAlertsTemplate | null;
     saveAlertsTemplate: EditAlertsTemplate | null;
     updateAlertsTemplate: EditAlertsTemplate | null;
+    alertTriggerDetails:number[];
 }
 
 @Injectable()
@@ -120,6 +121,18 @@ export class AlertsState {
     return this.alertsService.saveTemplateByAlertId(addAlertsTemplateRequest).pipe(
       tap((payload) => {
         patchState({ saveAlertsTemplate: payload });
+        return payload;
+      })
+    );
+  }
+  @Action(AlertTrigger)
+  AlertTrigger(
+    { patchState }: StateContext<AlertsStateModel>,
+    { alertTriggerDto }: AlertTrigger
+  ): Observable<number[]> {
+    return this.alertsService.alertTrigger(alertTriggerDto).pipe(
+      tap((payload) => {
+        patchState({ alertTriggerDetails: payload });
         return payload;
       })
     );

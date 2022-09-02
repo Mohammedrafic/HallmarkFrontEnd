@@ -3,6 +3,7 @@ import {
   AcceptJobDTO,
   CreateOrderDto,
   EditOrderDto,
+  Order,
   OrderFilter,
   OrderManagementFilter,
 } from '@shared/models/order-management.model';
@@ -145,7 +146,7 @@ export class SaveOrder {
 
 export class SaveOrderSucceeded {
   static readonly type = '[order management] Save Order Succeeded';
-  constructor() {}
+  constructor(public order: Order) {}
 }
 
 export class EditOrder {

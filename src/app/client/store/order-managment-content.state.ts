@@ -148,7 +148,7 @@ export interface OrderManagementContentStateModel {
       current: null,
     },
     contactDetails: null,
-    extensions: null,
+    extensions: null
   },
 })
 @Injectable()
@@ -232,7 +232,7 @@ export class OrderManagementContentState {
   static applicantStatuses(state: OrderManagementContentStateModel): ApplicantStatus[] {
     return state.applicantStatuses;
   }
-
+  
   @Selector()
   static lastSelectedOrder(state: OrderManagementContentStateModel): (id: number) => [OrderManagement, number] | [] {
     return (id: number) => {
@@ -584,8 +584,7 @@ export class OrderManagementContentState {
         } else if (hasntOrderBillRates) {
           TOAST_MESSAGE += `. ${ORDER_WITHOUT_BILLRATES}`;
           MESSAGE_TYPE = MessageTypes.Warning;
-        }
-
+        }        
         dispatch([
           order?.isQuickOrder
             ? new ShowToast(
@@ -596,9 +595,10 @@ export class OrderManagementContentState {
                 payload.publicId
               )
             : new ShowToast(MessageTypes.Success, RECORD_ADDED),
-          new SaveOrderSucceeded(),
+          new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
         ]);
+       
         return payload;
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
@@ -606,7 +606,7 @@ export class OrderManagementContentState {
   }
 
   @Action(EditOrder)
-  EditOrder(
+  EditOrder(    
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents }: EditOrder
   ): Observable<Order | void> {
@@ -614,9 +614,10 @@ export class OrderManagementContentState {
       tap((order) => {
         dispatch([
           new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
-          new SaveOrderSucceeded(),
+          new SaveOrderSucceeded(order),
           new SetIsDirtyOrderForm(false),
         ]);
+        
         return order;
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))

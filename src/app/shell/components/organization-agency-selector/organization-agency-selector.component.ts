@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { OrganizationService } from '@shared/services/organization.service';
@@ -37,12 +37,12 @@ import {
 } from '@shared/models/user-agency-organization.model';
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
+import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 
 interface IOrganizationAgency {
   id: number;
   name: string;
   type: 'Organization' | 'Agency';
-  logo?: string;
 }
 
 @Component({
@@ -54,6 +54,7 @@ interface IOrganizationAgency {
 export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   public organizationAgencyControl: FormControl = new FormControl();
   public selectedLogo$ = new BehaviorSubject<SafeUrl | null>(null);
+  public baseUrl: string;
 
   public optionFields = {
     text: 'name',
@@ -92,8 +93,11 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     private cd: ChangeDetectorRef,
     private domSanitizer: DomSanitizer,
     private organizationService: OrganizationService,
-    private actions$: Actions
-  ) {}
+    private actions$: Actions,
+    @Inject(APP_SETTINGS) private appSettings: AppSettings
+  ) {
+    this.baseUrl = this.appSettings.host;
+  }
 
   ngOnInit(): void {
     this.subscribeUserChange();
@@ -238,23 +242,15 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         const organizations = this.userOrganizations.businessUnits;
 
         this.agencies = agencies.map((a: UserAgencyOrganizationBusinessUnit) => {
-          const { id, name, logo } = a;
+          const { id, name } = a;
           const agency: IOrganizationAgency = { id, name, type: 'Agency' };
-
-          if (logo) {
-            agency.logo = logo;
-          }
 
           return agency;
         });
 
         this.organizations = organizations.map((o: UserAgencyOrganizationBusinessUnit) => {
-          const { id, name, logo } = o;
+          const { id, name } = o;
           const organization: IOrganizationAgency = { id, name, type: 'Organization' };
-
-          if (logo) {
-            organization.logo = logo;
-          }
 
           return organization;
         });

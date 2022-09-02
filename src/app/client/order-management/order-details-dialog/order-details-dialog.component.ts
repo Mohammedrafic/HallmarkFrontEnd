@@ -55,6 +55,7 @@ import { ExtensionCandidateComponent } from '@shared/components/order-candidate-
 export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() order: Order;
   @Input() openEvent: Subject<boolean>;
+  @Input() orderPositionSelected$: Subject<boolean>;
   @Input() children: OrderManagementChild[] | undefined;
   @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
 
