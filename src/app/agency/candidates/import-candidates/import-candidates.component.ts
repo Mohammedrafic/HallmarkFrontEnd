@@ -208,12 +208,8 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
 
   private getListBoxData(records: CandidateImportRecord[]): ListBoxItem[] {
     return records.map((item: CandidateImportRecord) => {
-      const firstName = item.candidateProfile?.firstName
-        || item.candidateExperiencesImportDtos[0]?.firstName
-        || item.candidatEducationImportDtos[0]?.firstName || '';
-      const lastName = item.candidateProfile?.lastName
-        || item.candidateExperiencesImportDtos[0]?.lastName
-        || item.candidatEducationImportDtos[0]?.lastName || '';
+      const firstName = item.candidateProfile?.firstName || '';
+      const lastName = item.candidateProfile?.lastName || '';
 
       return {
         name: firstName || lastName ? `${firstName} ${lastName}` : item.key,

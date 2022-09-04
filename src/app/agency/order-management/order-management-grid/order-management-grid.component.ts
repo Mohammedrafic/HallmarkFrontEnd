@@ -117,6 +117,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
   public openCandidat = new Subject<boolean>();
+  public orderPositionSelected$ = new Subject<boolean>();
   public openChildDialog = new Subject<any>();
   public typeValueAccess = typeValueAccess;
   public previousSelectedOrderId: number | null;
@@ -420,6 +421,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           this.orderManagementAgencyService.excludeDeployed
         )
       );
+      this.orderPositionSelected$.next(false);
       this.store.dispatch(new GetAgencyOrderGeneralInformation(event.data.orderId, event.data.organizationId));
       this.selectedIndex = Number(event.rowIndex);
     }
@@ -512,6 +514,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.orderManagementAgencyService.excludeDeployed
       )
     );
+    this.orderPositionSelected$.next(true);
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));
     this.openChildDialog.next([order, candidate]);

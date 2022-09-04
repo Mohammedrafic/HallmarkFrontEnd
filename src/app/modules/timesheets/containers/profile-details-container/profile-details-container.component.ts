@@ -102,6 +102,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public isNavigationAvaliable = true;
 
+  public countOfTimesheetUpdates = 0;
+
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
    * */
@@ -270,6 +272,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       }),
       filter(Boolean),
       switchMap((timesheet: Timesheet) => {
+        this.countOfTimesheetUpdates = 0;
         return this.store.dispatch(new Timesheets.GetTimesheetDetails(
           timesheet.id, timesheet.organizationId, this.isAgency));
       }),
@@ -291,7 +294,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
           details.id, details.organizationId, this.isAgency))
       }),
       takeUntil(this.componentDestroy()),
-    ).subscribe();
+    ).subscribe(() => {
+      this.countOfTimesheetUpdates++;
+      this.chipList?.refresh();
+      this.cd.detectChanges();
+    });
   }
 
   private getDialogState(): void {
@@ -367,7 +374,12 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
     .pipe(
       takeUntil(this.componentDestroy())
-    ).subscribe(() => this.candidateDialog.hide());
+    ).subscribe(() => {
+      this.candidateDialog.hide();
+      if (this.countOfTimesheetUpdates > 1) {
+        this.store.dispatch(new Timesheets.GetAll());
+      }
+    });
   }
 
   private setOrgId(): void {

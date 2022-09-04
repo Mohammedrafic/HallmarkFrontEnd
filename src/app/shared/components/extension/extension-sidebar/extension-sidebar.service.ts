@@ -17,14 +17,18 @@ export class ExtensionSidebarService {
     return this.http.post<void>('/api/candidatejobs/extensions', payload);
   }
 
-  public getExtensions(id: number, organizationId?: number): Observable<ExtensionGridModel[]> {
+  public getExtensions(id: number, orderId: number, organizationId?: number): Observable<ExtensionGridModel[]> {
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     if (isAgencyArea) {
       return this.http
-        .get<ExtensionGridModel[]>(`/api/organizations/${organizationId}/candidatejobs/${id}/extensions`)
+        .get<ExtensionGridModel[]>(`/api/organizations/${organizationId}/candidatejobs/${id}/extensions`, {
+          params: { orderId },
+        })
         .pipe(catchError(() => of([])));
     } else {
-      return this.http.get<ExtensionGridModel[]>(`/api/candidatejobs/${id}/extensions`).pipe(catchError(() => of([])));
+      return this.http
+        .get<ExtensionGridModel[]>(`/api/candidatejobs/${id}/extensions`, { params: { orderId } })
+        .pipe(catchError(() => of([])));
     }
   }
 

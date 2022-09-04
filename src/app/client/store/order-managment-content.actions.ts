@@ -244,7 +244,7 @@ export class GetContactDetails {
 
 export class GetExtensions {
   static readonly type = '[order management] Get Extensions';
-  constructor(public id: number) {}
+  constructor(public id: number, public orderId: number) {}
 }
 
 export class SetIsDirtyQuickOrderForm {

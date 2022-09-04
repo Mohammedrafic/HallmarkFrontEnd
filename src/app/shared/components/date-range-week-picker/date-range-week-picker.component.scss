@@ -17,8 +17,14 @@
       width: 247px!important;
     }
 
-    .e-input-group-icon.e-range-icon.e-icons {
-      background-color: #fff!important;
+    .e-input-group-icon.e-range-icon {
+      &::before {
+        content: '\e901' !important;
+      }
+
+      &.e-icons {
+        background-color: #fff!important;
+      }
     }
   }
 }

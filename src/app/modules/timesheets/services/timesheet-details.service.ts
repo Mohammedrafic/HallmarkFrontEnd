@@ -132,7 +132,7 @@ export class TimesheetDetailsService {
   public confirmTimesheetLeave(message: string): Observable<boolean> {
     return this.confirmService.confirm(message, {
       title: 'Unsaved Progress',
-      okButtonLabel: 'Proceed',
+      okButtonLabel: 'Leave',
       okButtonClass: 'delete-button',
     })
     .pipe(

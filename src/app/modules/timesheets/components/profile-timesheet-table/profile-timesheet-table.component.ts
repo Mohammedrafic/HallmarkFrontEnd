@@ -10,6 +10,7 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
 import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
+import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
 
 import { Destroyable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
@@ -66,6 +67,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private readonly costCenters$: Observable<DropdownOption[]>;
 
   public isEditOn = false;
+
+  public readonly gridEmptyMessage = GRID_EMPTY_MESSAGE;
 
   public timesheetColDef = TimesheetRecordsColdef(false);
 
