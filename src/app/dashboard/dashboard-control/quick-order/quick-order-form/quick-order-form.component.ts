@@ -10,7 +10,7 @@ import {
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ChangeEventArgs, FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { combineLatest, debounceTime, filter, merge, Observable, of, Subject, take, takeUntil } from 'rxjs';
+import { combineLatest, debounceTime, filter, merge, Observable, of, Subject, take, takeUntil, switchMap } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { OrderType } from '@shared/enums/order-type';
@@ -594,7 +594,15 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private getContactDetails(): void {
-    this.contactDetails$.pipe(filter(Boolean), takeUntil(this.destroy$)).subscribe((contactDetails) => {
+    this.organizationForm.controls['organization'].valueChanges
+    .pipe(
+      switchMap(() => {
+          return this.contactDetails$;
+      }),
+      filter(Boolean),
+      takeUntil(this.destroy$)
+    )
+    .subscribe((contactDetails) => {
       const { facilityContact, facilityEmail } = contactDetails;
       this.populateContactDetailsForm(facilityContact, facilityEmail);
     });
