@@ -192,7 +192,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public openAddDialog(): void {
-    const startDate = this.store.snapshot().timesheets.timesheetDetails.startDate;
+    const startDate = this.store.snapshot().timesheets.timesheetDetails.weekStartDate;
 
     this.openAddSideDialog.emit({
       currentTab: this.currentTab,

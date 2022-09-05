@@ -98,4 +98,8 @@ export class DateTimeHelper {
 
     return `${startWeekDay} - ${endWeekDay}`;
   }
+
+  public static formatDateUTC(date: string, format: string): string {
+    return formatDate(date, format, 'en-US', 'UTC');
+  }
 }

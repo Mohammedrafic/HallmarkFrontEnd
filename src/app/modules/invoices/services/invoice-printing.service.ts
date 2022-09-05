@@ -491,12 +491,12 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
             }
           },
           {
-            content: formatDate(DateTimeHelper.toUtcFormat(record.timeIn), 'MM/dd/YYYY HH:mm', 'en-US', 'utc'),
+            content: DateTimeHelper.formatDateUTC(record.timeIn, 'MM/dd/YYYY HH:mm'),
             styles: {
               halign: 'left',
             }
           },
-          formatDate(DateTimeHelper.toUtcFormat(record.timeOut), 'MM/dd/YYYY HH:mm', 'en-US', 'utc'),
+          DateTimeHelper.formatDateUTC(record.timeOut, 'MM/dd/YYYY HH:mm'),
           record.billRateConfigName,
           record.costCenterFormattedName,
           record.formattedJobId,
@@ -939,7 +939,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
       tableLineWidth: 1,
       showFoot: 'lastPage',
       head: [['Week End', 'Time in', 'TimeOut', 'Bill Rate Type', 'Cost Center', 'Job ID', 'Candidate Name',
-      'Organization', 'Skill', 'Hours/Miles', 'Bill Rate', 'Fee', 'Total']],
+      'Organization', 'Skill', 'Hours/Miles', 'Bill Rate', 'Fee, %', 'Total']],
       headStyles: {
         fillColor: '#CFCFCF',
         fontStyle: 'bold',
@@ -985,7 +985,7 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
             },
           },
           {
-            content: `${GridValuesHelper.formatPercentage(record.fee)}`,
+            content: `${GridValuesHelper.formatNumber(record.fee, '1.2-2')}`,
             styles: {
               halign: 'right',
             },
