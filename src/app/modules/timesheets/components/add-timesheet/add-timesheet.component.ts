@@ -7,14 +7,13 @@ import { switchMap, tap } from 'rxjs/operators';
 import { DialogAction } from '@core/enums';
 import { AddDialogHelper } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
-import { TimesheetsState } from './../../store/state/timesheets.state';
+import { TimesheetsState } from '../../store/state/timesheets.state';
 import { AddTimsheetForm } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { RecordAddDialogConfig, TimesheetConfirmMessages } from '../../constants';
 import { RecordFields } from '../../enums';
-import { RecordsAdapter } from '../../helpers/records.adapter';
+import { RecordsAdapter } from '../../helpers';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
-
 
 @Component({
   selector: 'app-add-timesheet',
