@@ -82,9 +82,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
       wrapText: true,
       cellClass: 'align-right custom-line-height',
       headerClass: 'custom-wrap align-right',
-      valueFormatter: (params: ValueFormatterParams) => {
-        return formatDate(DateTimeHelper.toUtcFormat(params.value), 'MM/dd/YYYY HH:mm', 'en-US', 'utc');
-      },
+      valueFormatter: (params: ValueFormatterParams) => DateTimeHelper.formatDateUTC(params.value, 'MM/dd/YYYY HH:mm'),
     },
     {
       field: 'timeOut',
@@ -96,9 +94,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
       wrapText: true,
       cellClass: 'align-right custom-line-height',
       headerClass: 'custom-wrap align-right',
-      valueFormatter: (params: ValueFormatterParams) => {
-        return formatDate(DateTimeHelper.toUtcFormat(params.value), 'MM/dd/YYYY HH:mm', 'en-US', 'utc');
-      },
+      valueFormatter: (params: ValueFormatterParams) => DateTimeHelper.formatDateUTC(params.value, 'MM/dd/YYYY HH:mm'),
     },
     {
       field: 'billRateConfigName',

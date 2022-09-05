@@ -96,24 +96,29 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       return;
     }
 
-    const orgId = this.store.snapshot().user.lastSelectedOrganizationId;
-    const dto = ManualInvoiceAdapter.adapPostDto(this.form.value, this.searchOptions, orgId);
+    this.selectedOrg$
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((orgId: number) => {
+        const dto = this.form?.value ? ManualInvoiceAdapter.adapPostDto(this.form.value, this.searchOptions, orgId) : null;
 
-    if (!dto) {
-      this.store.dispatch(new ShowToast(MessageTypes.Warning, 'Sorry such job ID not found'));
-      return;
-    }
+        if (!dto) {
+          this.store.dispatch(new ShowToast(MessageTypes.Warning, 'Sorry such job ID not found'));
+          return;
+        }
 
-    if (this.invoiceToEdit) {
-      this.store.dispatch(new Invoices.UpdateManualInvoice({
-        ...dto,
-        timesheetId: this.invoiceToEdit.id,
-      }, this.filesForUpload, this.filesForDelete, this.isAgency));
-    } else {
-      this.store.dispatch(new Invoices.SaveManulaInvoice(dto, this.filesForUpload, this.isAgency));
-    }
+        if (this.invoiceToEdit) {
+          this.store.dispatch(new Invoices.UpdateManualInvoice({
+            ...dto,
+            timesheetId: this.invoiceToEdit.id,
+          }, this.filesForUpload, this.filesForDelete, this.isAgency));
+        } else {
+          this.store.dispatch(new Invoices.SaveManulaInvoice(dto, this.filesForUpload, this.isAgency));
+        }
 
-    this.closeDialog();
+        this.closeDialog();
+      })
   }
 
   public setFilesForUpload(files: FileForUpload[]): void {
