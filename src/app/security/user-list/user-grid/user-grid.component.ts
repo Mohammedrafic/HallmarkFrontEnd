@@ -107,8 +107,8 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.serverSideInfiniteScroll = true,
       this.serverSideFilterOnServer = true,
       this.pagination = true;
-    this.paginationPageSize = 2,
-      this.cacheBlockSize = 2;
+    this.paginationPageSize = this.pageSize,
+      this.cacheBlockSize = this.pageSize;
     this.maxBlocksInCache = 1;
     this.columnDefs = [
       {
