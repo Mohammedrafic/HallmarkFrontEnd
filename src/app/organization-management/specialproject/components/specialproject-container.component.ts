@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { SpecialProjectTabs, AddButtonText } from '@shared/enums/special-project-tabs.enum'
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
@@ -37,6 +37,7 @@ import { SavePurchaseOrderMapping, ShowConfirmationPopUp } from '../../store/pur
 import { PurchaseOrderMappingState } from '../../store/purchase-order-mapping.state';
 import { PurchaseOrderNames, SavePurchaseOrderMappingDto } from '../../../shared/models/purchase-order-mapping.model';
 import { PurchaseOrderMappingComponent } from '../components/purchase-order-mapping/purchase-order-mapping.component';
+import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 
 @Component({
   selector: 'app-specialproject-container',
@@ -115,6 +116,10 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
 
   @Select(PurchaseOrderState.purchaseOrderPage)
   purchaseOrderPage$: Observable<PurchaseOrderPage>;
+
+  public startDateField: AbstractControl;
+  public endDateField: AbstractControl;
+  public today = new Date();
 
   constructor(private store: Store,
     private changeDetectorRef: ChangeDetectorRef,
@@ -255,6 +260,15 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
     this.addRemoveFormcontrols();
   }
 
+  private applyDateValidations() {
+    this.startDateField = this.form.get('startDate') as AbstractControl;
+    this.startDateField.addValidators(startDateValidator(this.form, 'endDate', this.today));
+    this.startDateField.valueChanges.subscribe(() => this.endDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+    this.endDateField = this.form.get('endDate') as AbstractControl;
+    this.endDateField.addValidators(endDateValidator(this.form, 'startDate', this.today));
+    this.endDateField.valueChanges.subscribe(() => this.startDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+  }
+
   public onTabSelected(selectedTab: any): void {
     this.selectedTab = selectedTab.selectedIndex;
     this.addRemoveFormcontrols();
@@ -269,6 +283,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         this.form.addControl(FormControlNames.StartDate, new FormControl(null, [Validators.required]));
         this.form.addControl(FormControlNames.EndDate, new FormControl(null, [Validators.required]));
         this.form.addControl(FormControlNames.ProjectBudget, new FormControl(null, [Validators.required, Validators.minLength(1), Validators.maxLength(11)]));
+        this.applyDateValidations();
         if (this.form.contains(FormControlNames.PrePopulateInOrders)) this.form.removeControl(FormControlNames.PrePopulateInOrders);
         if (this.form.contains(FormControlNames.projectCategoryMapping)) this.form.removeControl(FormControlNames.projectCategoryMapping);
         if (this.form.contains(FormControlNames.projectNameMapping)) this.form.removeControl(FormControlNames.projectNameMapping);
@@ -280,6 +295,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         if (this.form.contains(FormControlNames.PoDescription)) this.form.removeControl(FormControlNames.PoDescription);
         if (this.form.contains(FormControlNames.SpecialProjectCategoryName)) this.form.removeControl(FormControlNames.SpecialProjectCategoryName);
         if (this.form.contains(FormControlNames.PoNamesMapping)) this.form.removeControl(FormControlNames.PoNamesMapping);
+        
         break;
       case SpecialProjectTabs.PurchaseOrders:
         this.addButtonTitle = AddButtonText.AddPurchaseOrder;
@@ -288,6 +304,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         this.form.addControl(FormControlNames.StartDate, new FormControl(null, [Validators.required]));
         this.form.addControl(FormControlNames.EndDate, new FormControl(null, [Validators.required]));
         this.form.addControl(FormControlNames.ProjectBudget, new FormControl(null, [Validators.required, Validators.minLength(1), Validators.maxLength(11)]));
+        this.applyDateValidations();
         if (this.form.contains(FormControlNames.PrePopulateInOrders)) this.form.removeControl(FormControlNames.PrePopulateInOrders);
         if (this.form.contains(FormControlNames.projectCategoryMapping)) this.form.removeControl(FormControlNames.projectCategoryMapping);
         if (this.form.contains(FormControlNames.projectNameMapping)) this.form.removeControl(FormControlNames.projectNameMapping);
