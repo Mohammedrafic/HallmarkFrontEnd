@@ -202,6 +202,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.orderTypeDeparmnetSkillListener();
     this.handleJobStartDateValueChanges();
     this.handleJobDistributionValueChanges();
+    this.handleAgencyValueChanges();
     this.handleDurationControlValueChanges();
     this.populateQuickOrderFormValues();
     this.populateJobDistributionForm();
@@ -559,7 +560,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         if (isNaN(parseInt(orderType)) || !departmentId || !skillId) {
           return;
         }
-       
+
         this.populateHourlyRateField(orderType, departmentId, skillId, organizationId);
       });
   }
@@ -569,12 +570,14 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     departmentId: number,
     skillId: number,
     organizationId?: number
-  ): void {;
+  ): void {
     if (this.isTravelerOrder || this.isContactToPermOrder) {
       this.orderManagementService
         .getRegularLocalBillRate(orderType, departmentId, skillId, organizationId)
         .pipe(take(1))
-        .subscribe((billRates: BillRate[]) => this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0]?.rateHour.toFixed(2) || null));
+        .subscribe((billRates: BillRate[]) =>
+          this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0]?.rateHour.toFixed(2) || null)
+        );
     }
   }
 
@@ -630,6 +633,24 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     });
   }
 
+  private handleAgencyValueChanges(): void {
+    this.agencyControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((agencyIds) => {
+      const selectedJobDistributions: JobDistributionModel[] = [];
+      if (agencyIds) {
+        agencyIds.forEach((agencyId: number) => {
+          selectedJobDistributions.push({
+            id: 0,
+            orderId: 0,
+            jobDistributionOption: JobDistribution.Selected,
+            agencyId,
+          });
+        });
+        this.jobDistributionDescriptionForm.controls['jobDistributions'].patchValue(selectedJobDistributions, {
+          emitEvent: false,
+        });
+      }
+    });
+  }
   private handleJobDistributionValueChanges(): void {
     this.jobDistributionControl.valueChanges
       .pipe(takeUntil(this.destroy$))
@@ -648,20 +669,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         }
 
         this.agencyControlEnabled = jobDistributionIds.includes(JobDistribution.Selected);
-        const selectedJobDistributions: JobDistributionModel[] = [];
         if (this.agencyControlEnabled) {
           this.agencyControl.addValidators(Validators.required);
-          const agencyIds = this.agencyControl.value;
-          if (agencyIds) {
-            agencyIds.forEach((agencyId: number) => {
-              selectedJobDistributions.push({
-                id: 0,
-                orderId: 0,
-                jobDistributionOption: JobDistribution.Selected,
-                agencyId,
-              });
-            });
-          }
         } else {
           this.agencyControl.removeValidators(Validators.required);
           this.agencyControl.reset();
@@ -678,12 +687,9 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
             };
           });
 
-        this.jobDistributionDescriptionForm.controls['jobDistributions'].patchValue(
-          [...jobDistributions, ...selectedJobDistributions],
-          {
-            emitEvent: false,
-          }
-        );
+        this.jobDistributionDescriptionForm.controls['jobDistributions'].patchValue(jobDistributions, {
+          emitEvent: false,
+        });
       });
   }
 
