@@ -71,6 +71,7 @@ import { GetOrderRequisitionByPage } from '@organization-management/store/reject
 import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
 import { ORDER_JOB_DISTRIBUTION_LIST } from '@shared/constants/order-job-distribution-list';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
+import { DurationService } from '@shared/services/duration.service';
 
 @Component({
   selector: 'app-order-details-form',
@@ -229,7 +230,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private alertService: AlertService,
     private orderManagementService: OrderManagementContentService,
-    private commentsService: CommentsService
+    private commentsService: CommentsService,
+    private durationService: DurationService
   ) {
     this.orderTypeForm = this.formBuilder.group({
       orderType: [null, Validators.required],
@@ -972,38 +974,12 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
-    const jobEndDateControl = this.generalInformationForm.get('jobEndDate') as AbstractControl;
-
-    jobEndDateControl.reset();
-
     /** Clone Date object to avoid modifying */
     const jobStartDateValue = new Date(jobStartDate.getTime());
-
-    switch (duration) {
-      case Duration.TwelveWeeks:
-        jobEndDateControl.patchValue(new Date(jobStartDateValue.setDate(jobStartDateValue.getDate() + 12 * 7)));
-        break;
-
-      case Duration.ThirteenWeeks:
-        jobEndDateControl.patchValue(new Date(jobStartDateValue.setDate(jobStartDateValue.getDate() + 13 * 7)));
-        break;
-
-      case Duration.TwentySixWeeks:
-        jobEndDateControl.patchValue(new Date(jobStartDateValue.setDate(jobStartDateValue.getDate() + 26 * 7)));
-        break;
-
-      case Duration.Month:
-        jobEndDateControl.patchValue(new Date(jobStartDateValue.setMonth(jobStartDateValue.getMonth() + 1)));
-        break;
-
-      case Duration.Year:
-        jobEndDateControl.patchValue(new Date(jobStartDateValue.setFullYear(jobStartDateValue.getFullYear() + 1)));
-        break;
-
-      case Duration.NinetyDays:
-        jobEndDateControl.patchValue(new Date(jobStartDateValue.setDate(jobStartDateValue.getDate() + 90)));
-        break;
-    }
+    const jobEndDateControl = this.generalInformationForm.get('jobEndDate') as AbstractControl;
+    
+    const jobEndDate: Date = this.durationService.getEndDate(duration, jobStartDateValue);
+    jobEndDateControl.patchValue(jobEndDate);
   }
 
   private createContactForm(): void {
