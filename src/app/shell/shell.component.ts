@@ -277,9 +277,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     const user = this.store.selectSnapshot(UserState.user);
     let url = '';
     if (user?.businessUnitType === BusinessUnitType.Agency) {
-      url = 'https://lemon-sea-05b5a7c0f.1.azurestaticapps.net/';
-    } else if (user?.businessUnitType === BusinessUnitType.Organization) {
-      url = 'https://green-pebble-0878e040f.1.azurestaticapps.net/'
+      url = 'https://green-pebble-0878e040f.1.azurestaticapps.net/';
     } else {
       url = 'https://lemon-sea-05b5a7c0f.1.azurestaticapps.net/'
     }

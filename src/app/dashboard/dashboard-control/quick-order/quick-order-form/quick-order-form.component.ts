@@ -1,3 +1,4 @@
+import { startTimeValidator, endTimeValidator } from '@shared/validators/date.validator';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -10,7 +11,7 @@ import {
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ChangeEventArgs, FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { combineLatest, debounceTime, distinctUntilChanged, filter, merge, Observable, of, Subject, take, takeUntil } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged, filter, merge, Observable, of, Subject, take, takeUntil, switchMap } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { OrderType } from '@shared/enums/order-type';
@@ -117,6 +118,13 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public today = new Date();
 
   public isJobEndDateControlEnabled = false;
+
+  public shiftStartTimeFild: AbstractControl;
+  public shiftEndTimeFild: AbstractControl;
+  public defaultMaxTime = new Date();
+  public defaultMinTime = new Date();
+  public maxTime = this.defaultMaxTime;
+  public minTime = this.defaultMinTime;
 
   public readonly jobDistributions = ORDER_JOB_DISTRIBUTION_LIST;
   public readonly jobDistributionFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -255,6 +263,20 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       annualSalaryRangeFrom: [null, Validators.required],
       annualSalaryRangeTo: [null, Validators.required],
     });
+
+    this.defaultMaxTime.setHours(23, 59, 59);
+    this.defaultMinTime.setHours(0, 0, 0);
+
+    this.shiftStartTimeFild = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
+    this.shiftEndTimeFild = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
+    this.shiftEndTimeFild.valueChanges.subscribe(val => { 
+      this.maxTime = val || this.defaultMaxTime; this.shiftStartTimeFild.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    });
+    this.shiftStartTimeFild.valueChanges.subscribe(val => {
+      this.minTime = val || this.defaultMinTime; this.shiftEndTimeFild.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    });
+    this.shiftStartTimeFild.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
+    this.shiftEndTimeFild.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
   }
 
   private initJobDistributionDescriptionForm(): void {
@@ -581,7 +603,15 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private getContactDetails(): void {
-    this.contactDetails$.pipe(filter(Boolean), takeUntil(this.destroy$)).subscribe((contactDetails) => {
+    this.organizationForm.controls['organization'].valueChanges
+    .pipe(
+      switchMap(() => {
+          return this.contactDetails$;
+      }),
+      filter(Boolean),
+      takeUntil(this.destroy$)
+    )
+    .subscribe((contactDetails) => {
       const { facilityContact, facilityEmail } = contactDetails;
       this.populateContactDetailsForm(facilityContact, facilityEmail);
     });

@@ -1,3 +1,4 @@
+import { SaveLastSelectedOrganizationAgencyId } from './../../store/user.actions';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { getAllErrors } from '@shared/utils/error.utils';
@@ -603,6 +604,13 @@ export class OrderManagementContentState {
             : new ShowToast(MessageTypes.Success, RECORD_ADDED),
           new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
+          new SaveLastSelectedOrganizationAgencyId(
+            {
+              lastSelectedOrganizationId: Number(payload.organizationId),
+              lastSelectedAgencyId: null,
+            },
+            true,
+          )
         ]);
 
         return payload;
