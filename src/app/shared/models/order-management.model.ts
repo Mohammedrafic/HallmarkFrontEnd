@@ -312,6 +312,7 @@ export class Order {
   extensionPublicId?: number | null;
   hasParentExtension?: boolean;
   hasExtensions?: boolean;
+  extensionInitialOrderPublicId?: number;
 }
 
 export class ReOrder {

@@ -74,9 +74,9 @@ export class ExtensionSidebarService {
 
       switch (true) {
         case shiftSecondary === Duration.Days:
-          return new Date(date.setDate(date.getDate() + shiftTertiary));
+          return new Date(date.setDate(date.getDate() + shiftTertiary - 1));
         case shiftSecondary === Duration.Weeks:
-          return new Date(date.setDate(date.getDate() + shiftTertiary * week));
+          return new Date(date.setDate(date.getDate() + shiftTertiary * week - 1));
         case shiftSecondary === Duration.Months:
           return new Date(date.setMonth(date.getMonth() + shiftTertiary));
         default:

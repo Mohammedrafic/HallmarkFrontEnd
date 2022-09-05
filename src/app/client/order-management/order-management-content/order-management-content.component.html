@@ -245,7 +245,7 @@
           <span>{{ data.shiftStartTime | date: 'shortTime' }}-{{ data.shiftEndTime | date: 'shortTime' }}</span>
         </ng-template>
       </e-column>
-      <e-column field="agencies" headerText="AGENCY" width="150" [visible]="false">
+      <e-column field="agencies" headerText="AGENCY" width="200" [visible]="false">
         <ng-template #template let-data>
           <ng-container *ngIf="!data.agency?.length">
             <span>All</span>
