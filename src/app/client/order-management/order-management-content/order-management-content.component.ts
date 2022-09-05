@@ -232,6 +232,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private quickOrderId: number;
   private dashboardFilterSubscription: Subscription;
   private orderPerDiemId: number | null;
+  private orderId: number | null;
   private creatingReorder = false;
 
   constructor(
@@ -606,13 +607,13 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   /* Trigger when user redirect to per diem order from re-order */
   private openPerDiemDetails(): void {
-    if (this.orderPerDiemId && this.ordersPage?.items) {
-      const orderPerDiem = this.ordersPage.items.find((order: OrderManagement) => order.id === this.orderPerDiemId);
+    if ((this.orderPerDiemId || this.orderId) && this.ordersPage?.items) {
+      const orderPerDiem = this.ordersPage.items.find((order: OrderManagement) => order.publicId === this.orderPerDiemId || this.orderId);
       const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex(
         (order: Order) => order.id === orderPerDiem?.id
       );
       this.gridWithChildRow.selectRow(index);
-      this.orderPerDiemId = null;
+      this.orderPerDiemId = this.orderId = null;
     }
   }
 
@@ -975,6 +976,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private onGridPageChangedHandler(): void {
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
+      if (this.orderPerDiemId || this.orderId) {
+        this.filters.orderId = this.orderPerDiemId;
+        this.OrderFilterFormGroup.controls['orderId'].setValue((this.orderPerDiemId || this.orderId)?.toString());
+        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns)
+      }
       this.getOrders();
     });
   }
@@ -1311,15 +1317,20 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private listenRedirectFromExtension(): void {
     this.orderManagementService.orderId$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((id: number) => {
-      const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex((order: Order) => order.id === id);
-      this.gridWithChildRow.selectRow(index);
+      this.orderId = id;
+      this.filters.orderId = this.orderId;
+      this.OrderFilterFormGroup.controls['orderId'].setValue(this.orderId.toString());
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns)
+      this.getOrders();
     });
   }
 
   private listenRedirectFromReOrder(): void {
     this.orderManagementService.orderPerDiemId$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((orderId: number) => (this.orderPerDiemId = orderId));
+      .subscribe((orderId: number) => {
+        this.orderPerDiemId = orderId;
+      });
   }
 
   private hasOrderAllOrdersId(): void {

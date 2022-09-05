@@ -67,7 +67,7 @@
       </div>
     </div>
     <div class="column last-column">
-      <div class="accent link" (click)="moveToPerDiem()">Order Per Diem ID: {{ orderInformation?.reOrderFromId }}</div>
+      <div class="accent link" (click)="moveToPerDiem()">Order Per Diem ID: {{ orderInformation?.organizationPrefix }}-{{ orderInformation?.reOrderFrom?.publicId }}</div>
     </div>
   </div>
 </section>

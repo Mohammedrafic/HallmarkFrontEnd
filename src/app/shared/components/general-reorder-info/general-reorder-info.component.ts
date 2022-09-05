@@ -62,7 +62,7 @@ export class GeneralReorderInfoComponent extends DestroyableDirective implements
     if (isAgencyArea) {
       this.orderManagementAgencyService.orderPerDiemId$.next(this.orderInformation.reOrderFromId!);
     } else {
-      this.orderManagementService.orderPerDiemId$.next(this.orderInformation.reOrderFromId!);
+      this.orderManagementService.orderPerDiemId$.next(this.orderInformation.reOrderFrom?.publicId!);
     }
   }
 }
