@@ -26,6 +26,7 @@ import { OrderManagementService } from '@client/order-management/order-managemen
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 enum THEME {
   light = 'light',
   dark = 'dark',
@@ -273,7 +274,16 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   }
 
   public onGetHelp(): void {
-    window.open('https://lemon-sea-05b5a7c0f.1.azurestaticapps.net/', '_blank');
+    const user = this.store.selectSnapshot(UserState.user);
+    let url = '';
+    if (user?.businessUnitType === BusinessUnitType.Agency) {
+      url = 'https://lemon-sea-05b5a7c0f.1.azurestaticapps.net/';
+    } else if (user?.businessUnitType === BusinessUnitType.Organization) {
+      url = 'https://green-pebble-0878e040f.1.azurestaticapps.net/'
+    } else {
+      url = 'https://lemon-sea-05b5a7c0f.1.azurestaticapps.net/'
+    }
+    window.open(url, '_blank');
   }
 
   private setSideBarForFirstLoad(route: string): void {
