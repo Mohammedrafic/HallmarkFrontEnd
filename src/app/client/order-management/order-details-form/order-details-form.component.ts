@@ -3,7 +3,7 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { combineLatest, debounceTime, filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
+import { combineLatest, debounceTime, filter, Observable, Subject, take, takeUntil, throttleTime, switchMap } from 'rxjs';
 
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -590,7 +590,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         filter((billRate) => !!billRate.length)
       )
       .subscribe((billRates: BillRate[]) =>
-        this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour)
+        this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour.toFixed(2))
       );
   }
 
@@ -1055,7 +1055,15 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.controls['duration'].patchValue(Duration.ThirteenWeeks);
     this.jobDistributionForm.controls['jobDistribution'].patchValue([JobDistribution.All]);
 
-    this.contactDetails$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((contactDetails) => {
+    this.generalInformationForm.controls['departmentId'].valueChanges
+    .pipe(
+      switchMap(() => {
+          return this.contactDetails$;
+      }),
+      filter(Boolean),
+      takeUntil(this.unsubscribe$)
+    )
+    .subscribe((contactDetails) => {
       const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
       this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
     });

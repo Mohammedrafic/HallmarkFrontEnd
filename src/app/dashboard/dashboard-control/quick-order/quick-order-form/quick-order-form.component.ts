@@ -240,7 +240,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   private initOrderTypeForm(): void {
     this.orderTypeForm = this.fb.group({
-      orderType: [null, Validators.required],
+      orderType: [OrderType.Traveler, Validators.required],
     });
   }
 
@@ -593,7 +593,6 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private populateQuickOrderFormValues(): void {
-    this.orderTypeControl.patchValue(OrderType.Traveler);
     this.generalInformationForm.controls['openPositions'].patchValue(1);
     this.durationControl.patchValue(Duration.ThirteenWeeks);
     const nextSundayAfterThreeWeeks: Date = this.getNextSundayAfterThreeWeeks();

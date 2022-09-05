@@ -4,8 +4,10 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, I
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { combineLatestWith, debounceTime, distinctUntilChanged, filter, map, Observable,
-  switchMap, takeUntil, tap, } from 'rxjs';
+import {
+  combineLatestWith, debounceTime, distinctUntilChanged, filter, map, Observable,
+  switchMap, takeUntil, tap,
+} from 'rxjs';
 
 import { PageOfCollections } from '@shared/models/page.model';
 import { Destroyable } from '@core/helpers';
@@ -16,15 +18,12 @@ import {
   PrintingPostDto, SelectedInvoiceRow
 } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { InvoicePrintingService, InvoicesService } from '../../services';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { UNIT_ORGANIZATIONS_FIELDS } from 'src/app/modules/timesheets/constants';
 import { DataSourceItem } from '@core/interface';
-import { AppState } from '../../../../store/app.state';
-import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
-import { InvoiceTabs, InvoiceTabsProvider, OrganizationId, OrganizationIdProvider } from '../../tokens';
+import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
 import {
   PendingInvoice,
   PendingInvoiceRecord,
@@ -51,9 +50,6 @@ import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-conf
 export class InvoicesContainerComponent extends Destroyable implements OnInit, AfterViewInit {
   @Select(InvoicesState.invoicesOrganizations)
   readonly organizations$: Observable<DataSourceItem[]>;
-
-  @ViewChild('createInvoiceDialog')
-  public createInvoiceDialog: DialogComponent;
 
   @ViewChild(InvoicesTableTabsComponent)
   public invoicesTableTabsComponent: InvoicesTableTabsComponent;
@@ -85,14 +81,13 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   @Select(InvoicesState.invoicesFilters)
   public readonly invoicesFilters$: Observable<PendingInvoicesData>;
 
-  @Select(AppState.isOrganizationAgencyArea)
-  public readonly isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
-
   @Select(UserState.lastSelectedOrganizationId)
-  organizationChangeId$: Observable<number>;
+  public readonly organizationChangeId$: Observable<number>;
 
   @Select(UserState.lastSelectedAgencyId)
-  agencyId$: Observable<number>;
+  public readonly agencyId$: Observable<number>;
+
+  public organizationId$: Observable<number>;
 
   public colDefs: ColDef[] = [];
 
@@ -122,7 +117,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     = this.invoicesService.getCurrentTableIdxStream();
   public isLoading: boolean;
   public newSelectedIndex: number;
-  public organizationId: number | null;
+  public organizationId: number;
 
   public rejectInvoiceId: number;
   public tabConfig: GridContainerTabConfig | null;
@@ -141,27 +136,61 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     private printingService: InvoicePrintingService,
     private route: ActivatedRoute,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
-    @Inject(OrganizationId) public organizationId$: OrganizationIdProvider,
   ) {
     super();
 
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
 
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
+    this.organizationId$ = this.isAgency ? this.organizationControl.valueChanges : this.organizationChangeId$;
   }
 
   public ngOnInit(): void {
     this.watchDialogVisibility();
-    this.onOrganizationChangedHandler();
     this.startFiltersWatching();
-    this.initOrganizationsList();
-    this.startOrganizationWatching();
-    this.handleChangeTab(0);
     this.watchForInvoiceStatusChange();
+
+    this.watchOrganizationId();
+    this.watchAgencyId();
   }
 
   public ngAfterViewInit(): void {
     this.setTabsVisibility();
+  }
+
+  public watchAgencyId(): void {
+    if (this.isAgency) {
+      this.agencyId$
+        .pipe(
+          distinctUntilChanged(),
+          switchMap(() => this.store.dispatch(new Invoices.GetOrganizations())),
+          switchMap(() => this.organizations$),
+          filter((organizations: DataSourceItem[]) => !!organizations.length),
+          map(([firstOrganization]: DataSourceItem[]) => firstOrganization.id),
+          takeUntil(this.componentDestroy())
+        )
+        .subscribe((orgId: number) => {
+          this.organizationControl.setValue(orgId, {emitEvent: true, onlySelf: false});
+        });
+    }
+  }
+
+  public watchOrganizationId(): void {
+    this.organizationId$
+      .pipe(
+        tap((id: number) => {
+          const orgIdSet: boolean = !!this.organizationId;
+          this.organizationId = id;
+
+          if (!orgIdSet) {
+            this.handleChangeTab(0);
+          }
+        }),
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((id: number) => {
+        this.store.dispatch(new Invoices.SelectOrganization(id));
+      });
   }
 
   public watchDialogVisibility(): void {
@@ -175,14 +204,16 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   }
 
   public setTabsVisibility(): void {
-    this.pendingInvoicesData$
-      .pipe(
-        filter(Boolean),
-        takeUntil(this.componentDestroy()),
-      )
-      .subscribe(({items}: PageOfCollections<BaseInvoice>) => {
-        this.invoicesTableTabsComponent.setTabVisibility(0, !!items.length);
-      });
+    if (!this.isAgency) {
+      this.organizationId$
+        .pipe(
+          switchMap((orgId: number) => this.store.dispatch(new Invoices.GetManualInvoices(orgId))),
+          switchMap(() => this.manualInvoicesData$),
+          takeUntil(this.componentDestroy()),
+        )
+        .subscribe(({ items }: PageOfCollections<BaseInvoice>) =>
+          this.invoicesTableTabsComponent.setTabVisibility(0, !!items.length));
+    }
   }
 
   public startFiltersWatching(): void {
@@ -192,7 +223,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
       takeUntil(this.componentDestroy()),
     ).subscribe(([orgId]) => {
       this.organizationId = orgId;
-      this.invoicesContainerService.getRowData(this.selectedTabIdx, orgId);
+      this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? orgId : null);
       this.cdr.markForCheck();
     });
   }
@@ -209,24 +240,17 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     this.clearSelections();
     this.clearTab();
 
-    this.organizationId$.pipe(
-      takeUntil(this.componentDestroy())
-    )
-      .subscribe((orgId: number | null) => {
-        this.organizationId = orgId;
-        this.gridOptions = {
-          ...this.defaultGridOptions,
-          ...this.invoicesContainerService.getGridOptions(tabIdx, orgId),
-        };
+    this.gridOptions = {
+      ...this.defaultGridOptions,
+      ...this.invoicesContainerService.getGridOptions(tabIdx, this.organizationId),
+    };
 
-        this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx, { organizationId: orgId });
-        this.tabConfig = this.invoicesContainerService.getTabConfig(tabIdx);
+    this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx, { organizationId: this.organizationId });
+    this.tabConfig = this.invoicesContainerService.getTabConfig(tabIdx);
 
-        this.cdr.markForCheck();
+    this.cdr.markForCheck();
 
-        this.resetFilters();
-      });
-
+    this.resetFilters();
   }
 
   public openAddDialog(): void {
@@ -262,11 +286,10 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
       this.store.dispatch(
         new Invoices.ToggleInvoiceDialog(
           DialogAction.Open,
+          this.isAgency,
           {
             invoiceIds: [selectedRowData.data!.invoiceId],
-            ...(this.organizationId && {
-              organizationIds: [this.organizationId],
-            })
+            organizationIds: [this.organizationId],
           },
           prevId,
           nextId
@@ -337,7 +360,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
         takeUntil(this.componentDestroy()),
       )
       .subscribe(() => {
-        this.createInvoiceDialog.hide();
         this.invoicesContainerService.getRowData(this.selectedTabIdx, this.organizationId);
       });
   }
@@ -398,60 +420,8 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   private getInvoicesByTab(): void {
   }
 
-  private startOrganizationWatching(): void {
-    this.organizationControl.valueChanges
-    .pipe(
-      filter(Boolean),
-      distinctUntilChanged(),
-      tap((organizationId: number) => {
-        this.store.dispatch(
-        [
-          new Invoices.SelectOrganization(organizationId),
-        ]
-      )}),
-      takeUntil(this.componentDestroy()),
-    ).subscribe((orgId) => {
-      this.setOrgId(orgId);
-    });
-  }
-
-  private initOrganizationsList(): void {
-    this.store.dispatch(new Invoices.GetOrganizations())
-    .pipe(
-      switchMap(() => this.organizations$.pipe(
-        filter((res: DataSourceItem[]) => !!res.length),
-      )),
-      takeUntil(this.componentDestroy()),
-    ).subscribe(res => {
-      this.organizationControl.setValue(res[0].id, { emitEvent: false });
-      this.store.dispatch(new Invoices.SelectOrganization(res[0].id),
-      )
-    });
-  }
-
   private clearSelections(): void {
     this.selectedInvoiceIds = [];
-  }
-
-  private onOrganizationChangedHandler(): void {
-    (this.isAgency ? this.agencyId$ : this.organizationChangeId$)
-    .pipe(
-      tap((id) => {
-        if (this.isAgency) {
-          this.initOrganizationsList();
-        } else {
-          this.store.dispatch(new Invoices.SelectOrganization(id as number),)
-        }
-      }),
-      takeUntil(this.componentDestroy())
-    ).subscribe((orgId) => {
-      this.setOrgId(orgId);
-    });
-  }
-
-  private setOrgId(id: number): void {
-    this.organizationId = id;
-    this.invoicesContainerService.getRowData(this.selectedTabIdx, id);
   }
 
   private watchForInvoiceStatusChange(): void {
