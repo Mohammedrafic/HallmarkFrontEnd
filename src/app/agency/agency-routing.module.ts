@@ -77,7 +77,6 @@ const routes: Routes = [
       {
         path: 'candidates/edit/:id',
         component: AddEditCandidateComponent,
-        canDeactivate: [PendingChangesGuard],
         data: {
           isAgencyArea: true,
         },
