@@ -407,7 +407,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
     this.rowSelected(event, this.gridWithChildRow);
 
-    if (!event.isInteracted) {
+    if (!event.isInteracted && event.data.orderId) {
       this.selectedOrder = event.data;
       const options = this.getDialogNextPreviousOption(event.data);
       this.store.dispatch(new GetOrderById(event.data.orderId, event.data.organizationId, options));
