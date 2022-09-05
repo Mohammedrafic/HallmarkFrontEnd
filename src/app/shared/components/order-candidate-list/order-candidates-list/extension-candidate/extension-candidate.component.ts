@@ -17,6 +17,7 @@ import {
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
   GetCandidateJob,
+  GetRejectReasonsForAgency,
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
@@ -30,6 +31,8 @@ import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { Router } from '@angular/router';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
+  GetRejectReasonsForOrganisation,
+  RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
@@ -56,13 +59,15 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
 
+  @Select(OrderManagementContentState.rejectionReasonsList)
+  rejectionReasonsList$: Observable<RejectReason[]>;
+
   public form: FormGroup;
   public statusesFormControl = new FormControl();
   public candidateJob: OrderCandidateJob;
   public candidatStatus = CandidatStatus;
   public workflowStepType = WorkflowStepType;
   public billRatesData: BillRate[] = [];
-  public rejectReasons: RejectReason[] = [];
   public isReadOnly = false;
   public openRejectDialog = new Subject<boolean>();
   public priceUtils = PriceUtils;
@@ -90,7 +95,6 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store,
-    private actions$: Actions,
     private datePipe: DatePipe,
     private commentsService: CommentsService,
     private router: Router,
@@ -156,9 +160,22 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   }
 
   public onReject(): void {
-    // TODO
-    console.error('has not been implemented yet');
+    this.store.dispatch(new GetRejectReasonsForOrganisation());
+    this.openRejectDialog.next(true);
   }
+
+  public rejectCandidateJob(event: { rejectReason: number }): void {  
+      if (this.candidateJob) {
+        const payload = {
+          organizationId: this.candidateJob.organizationId,
+          jobId: this.candidateJob.jobId,
+          rejectReasonId: event.rejectReason,
+        };
+  
+        this.store.dispatch(new RejectCandidateJob(payload));
+        this.dialogEvent.next(false);
+      }
+    }
 
   public onAccept(): void {
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });

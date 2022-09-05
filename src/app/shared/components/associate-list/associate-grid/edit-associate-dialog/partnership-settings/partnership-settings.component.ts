@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select } from '@ngxs/store';
-import { Observable, takeUntil } from 'rxjs';
+import { delay, Observable, takeUntil } from 'rxjs';
 import {
   FeeSettingsClassification,
   JobDistributionInitialData,
@@ -87,7 +87,7 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
   }
 
   private subscribeOnPartnershipSettings(): void {
-    this.partnershipSettings$.pipe(takeUntil(this.destroy$)).subscribe((settings: PartnershipSettings) => {
+    this.partnershipSettings$.pipe(takeUntil(this.destroy$), delay(300)).subscribe((settings: PartnershipSettings) => {
       this.partnershipSettings = settings;
       this.partnershipForm.reset();
       this.partnershipForm.patchValue({ ...settings });

@@ -219,3 +219,9 @@
   </section>
 </section>
 
+<app-reject-reason-dialog
+  [rejectReasonsList]="$any(rejectionReasonsList$ | async)"
+  [openEvent]="openRejectDialog"
+  (applyReject)="rejectCandidateJob($event)"
+></app-reject-reason-dialog>
+
