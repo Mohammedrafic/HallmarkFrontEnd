@@ -144,6 +144,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
               true
             )
           );
+          
         }
         if (selectedType === 'Agency') {
           this.store.dispatch(new LastSelectedOrganisationAgency(selectedType));
