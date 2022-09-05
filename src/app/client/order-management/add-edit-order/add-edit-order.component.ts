@@ -96,6 +96,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public isPermPlacementOrder = false;
   public disableOrderType = false;
   public isSaveForTemplate = false;
+  public isTemplate = false;
 
   public constructor(
     private store: Store,
@@ -107,6 +108,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
 
     this.orderId = Number(this.route.snapshot.paramMap.get('orderId'));
+    this.isTemplate = !!this.route.snapshot.paramMap.get('fromTemplate');
 
     if (this.orderId > 0) {
       this.title = 'Edit';
@@ -127,12 +129,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         this.prefix = order?.organizationPrefix as string;
         this.publicId = order?.publicId as number;
         this.isPermPlacementOrder = order?.orderType === OrderType.PermPlacement;
-        if (order?.credentials) {
-          this.orderCredentials = [...order.credentials];
-        }
-        if (order?.billRates) {
-          this.orderBillRates = [...order.billRates];
-        }
+        this.initCredentialsAndBillRates(order);
         if (this.isPermPlacementOrder) {
           this.tab.hideTab(SelectedTab.BillRates, this.isPermPlacementOrder);
         }
@@ -147,6 +144,12 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
           this.removeMenuItem(SubmitButtonItem.SaveForLater);
         }
+      });
+    }
+    if (this.isTemplate) {
+      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe((order: Order) => {
+        this.initCredentialsAndBillRates(order);
       });
     }
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe((data) => {
@@ -191,6 +194,15 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.store.dispatch(new ClearPredefinedBillRates());
     this.store.dispatch(new UpdatePredefinedCredentials([]));
     this.store.dispatch(new SetIsDirtyOrderForm(false));
+  }
+
+  private initCredentialsAndBillRates(order: Order): void {
+    if (order?.credentials) {
+      this.orderCredentials = [...order.credentials];
+    }
+    if (order?.billRates) {
+      this.orderBillRates = [...order.billRates];
+    }
   }
 
   public onOrderTypeChange(orderType: OrderType): void {

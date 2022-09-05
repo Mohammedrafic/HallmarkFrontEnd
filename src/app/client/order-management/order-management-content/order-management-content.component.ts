@@ -645,7 +645,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     if (!event.isInteracted) {
       if (event.data.isTemplate) {
-        this.navigateToOrderForm();
+        this.navigateToOrderTemplateForm();
         this.store.dispatch(new GetSelectedOrderById(event.data.id));
       } else {
         this.selectedDataRow = event.data;
@@ -703,6 +703,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public navigateToOrderForm(): void {
     this.router.navigate(['./add'], { relativeTo: this.route });
+  }
+
+  public navigateToOrderTemplateForm(): void {
+    this.router.navigate(['./add/fromTemplate'], { relativeTo: this.route });
   }
 
   public onRowScaleUpClick(): void {
