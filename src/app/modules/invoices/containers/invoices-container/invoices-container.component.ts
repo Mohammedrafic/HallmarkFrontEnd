@@ -117,7 +117,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     = this.invoicesService.getCurrentTableIdxStream();
   public isLoading: boolean;
   public newSelectedIndex: number;
-  public organizationId: number | null;
+  public organizationId: number;
 
   public rejectInvoiceId: number;
   public tabConfig: GridContainerTabConfig | null;
@@ -286,11 +286,10 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
       this.store.dispatch(
         new Invoices.ToggleInvoiceDialog(
           DialogAction.Open,
+          this.isAgency,
           {
             invoiceIds: [selectedRowData.data!.invoiceId],
-            ...(this.organizationId && {
-              organizationIds: [this.organizationId],
-            })
+            organizationIds: [this.organizationId],
           },
           prevId,
           nextId

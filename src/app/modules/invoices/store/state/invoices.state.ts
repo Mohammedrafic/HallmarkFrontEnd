@@ -136,7 +136,7 @@ export class InvoicesState {
   @Action(Invoices.ToggleInvoiceDialog)
   ToggleInvoiceDialog(
     { patchState, dispatch }: StateContext<InvoicesModel>,
-    { action, payload, prevId, nextId }: Invoices.ToggleInvoiceDialog
+    { action, isAgency, payload, prevId, nextId }: Invoices.ToggleInvoiceDialog
   ): Observable<InvoiceDetail[] | void> | void {
     const isOpen: boolean = action === DialogAction.Open;
 
@@ -148,7 +148,7 @@ export class InvoicesState {
       return;
     }
 
-    return this.invoicesAPIService.getInvoicesForPrinting(payload!, !!payload?.organizationIds?.length).pipe(
+    return this.invoicesAPIService.getInvoicesForPrinting(payload!, !!isAgency).pipe(
       tap((res: InvoiceDetail[]) => patchState({
         invoiceDetail: res[0],
         isInvoiceDetailDialogOpen: isOpen,
