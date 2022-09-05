@@ -24,7 +24,7 @@ import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { RECORD_ADDED, RECORD_MODIFIED, GRID_CONFIG } from '@shared/constants';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
 @Component({
@@ -120,6 +120,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   get businessControl(): AbstractControl {
     return this.businessForm.get('business') as AbstractControl;
   }
+  public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
   constructor(private actions$: Actions,
     private confirmService: ConfirmService,

@@ -115,10 +115,10 @@ export class PurchaseOrderMappingComponent extends AbstractGridConfigurationComp
     noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
     onFilterChanged: (event: FilterChangedEvent) => {
       if (!event.api.getDisplayedRowCount()) {
-        this.gridApi.showNoRowsOverlay();
+        this.gridApi?.showNoRowsOverlay();
       }
       else {
-        this.gridApi.hideOverlay();
+        this.gridApi?.hideOverlay();
       }
     }
   };
@@ -132,10 +132,10 @@ export class PurchaseOrderMappingComponent extends AbstractGridConfigurationComp
     this.store.dispatch(new GetPurchaseOrderMappings({getAll:true}));
     this.purchaseOrderMappingPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (!data || !data?.items.length) {
-        this.gridApi.showNoRowsOverlay();
+        this.gridApi?.showNoRowsOverlay();
       }
       else {
-        this.gridApi.hideOverlay();
+        this.gridApi?.hideOverlay();
         this.rowData = data.items;
         this.gridApi?.setRowData(this.rowData);
       }

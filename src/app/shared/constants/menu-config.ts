@@ -33,7 +33,7 @@ export const MENU_CONFIG: any = {
     6: {
       // Security
       icon: 'lock',
-      route: '',
+      route: 'security/roles-and-permissions',
     },
     7: {
       // Financial Module
@@ -224,7 +224,7 @@ export const MENU_CONFIG: any = {
     6: {
       // Security
       icon: 'lock',
-      route: '',
+      route: 'security/roles-and-permissions',
     },
     7: {
       // Financial Module
@@ -405,7 +405,7 @@ export const MENU_CONFIG: any = {
     6: {
       // Security
       icon: 'lock',
-      route: '',
+      route: 'security/roles-and-permissions',
     },
     7: {
       // Financial Module
@@ -587,7 +587,7 @@ export const MENU_CONFIG: any = {
     6: {
       // Security
       icon: 'lock',
-      route: '',
+      route: 'security/roles-and-permissions',
     },
     7: {
       // Financial Module
