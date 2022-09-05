@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-search',
@@ -7,6 +7,9 @@ import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular
 })
 export class SearchComponent  {
   @ViewChild('inputWithIcon') search: ElementRef;
+
+  @Input() placeholder: string = 'Search';
+
   @Output() inputKeyUpEnter = new EventEmitter();
 
   constructor() { }

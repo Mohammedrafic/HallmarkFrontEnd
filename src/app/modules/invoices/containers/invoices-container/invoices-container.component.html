@@ -18,7 +18,11 @@
         </ejs-dropdownlist>
       </div>
     </div>
-    <app-search class="search" *ngIf="selectedTabIdx >= 2"></app-search>
+    <app-search
+      class="search"
+      *ngIf="selectedTabIdx >= 2"
+      [placeholder]="'Candidate name'"
+    ></app-search>
     <button
       ejs-button
       cssClass="e-outline button-filter button--no-wrap"

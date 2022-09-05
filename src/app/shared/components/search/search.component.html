@@ -5,7 +5,7 @@
   <div class="e-input-in-wrap">
     <input
       class="e-input" type="text"
-      placeholder="Search"
+      [placeholder]="placeholder"
       (click)='onSearchClick()'
       (blur)='onSearchBlur()'
       (keyup)="onKeyUp($event)"
