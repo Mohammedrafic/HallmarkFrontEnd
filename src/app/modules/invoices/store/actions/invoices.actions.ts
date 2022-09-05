@@ -51,7 +51,8 @@ export namespace Invoices {
 
     constructor(
       public readonly action: DialogAction,
-      public readonly payload?: { organizationIds?: number[]; invoiceIds: number[] },
+      public readonly isAgency?: boolean,
+      public readonly payload?: { organizationIds: number[]; invoiceIds: number[] },
       public readonly prevId?: number | null,
       public readonly nextId?: number | null
     ) {

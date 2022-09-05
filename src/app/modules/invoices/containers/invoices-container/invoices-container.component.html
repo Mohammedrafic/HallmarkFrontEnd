@@ -18,7 +18,11 @@
         </ejs-dropdownlist>
       </div>
     </div>
-    <app-search class="search" *ngIf="selectedTabIdx >= 2"></app-search>
+    <app-search
+      class="search"
+      *ngIf="selectedTabIdx >= 2"
+      [placeholder]="'Candidate name'"
+    ></app-search>
     <button
       ejs-button
       cssClass="e-outline button-filter button--no-wrap"
@@ -158,48 +162,6 @@
 </ng-template>
 
 <app-invoice-record-dialog #invoiceRecordDialog></app-invoice-record-dialog>
-
-<ejs-dialog
-        #createInvoiceDialog
-        cssClass="dialog filter"
-        [width]="470"
-        [visible]="false"
-        [isModal]="true"
-        [animationSettings]="{ effect: 'SlideRight' }"
->
-  <ng-template #content>
-    <form class="create-invoice-dialog-content">
-      <div class="title">
-        <h2>Create Invoice</h2>
-
-        <div class="spacer"></div>
-
-        <button ejs-button
-                class="e-outline"
-                type="button"
-                (click)="createInvoiceDialog.hide()"
-        >
-          Cancel
-        </button>
-        <button ejs-button
-                class="e-primary"
-                type="submit"
-                (click)="$event.preventDefault(); groupInvoices();"
-        >
-          Create
-        </button>
-      </div>
-
-      <div class="dropdown-container bootstrap">
-        <label>Group Invoice by</label>
-        <ejs-dropdownlist [dataSource]="groupInvoicesOptions"
-                          [value]="groupInvoicesBy.text"
-                          (select)="onInvoiceGrouping($event)"
-        ></ejs-dropdownlist>
-      </div>
-    </form>
-  </ng-template>
-</ejs-dialog>
 
 <app-invoice-detail-container
   [currentSelectedRowIndex]="currentSelectedTableRowIndex | async"
