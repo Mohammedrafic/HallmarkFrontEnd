@@ -1,3 +1,4 @@
+import { startTimeValidator, endTimeValidator } from '@shared/validators/date.validator';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -117,6 +118,13 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public today = new Date();
 
   public isJobEndDateControlEnabled = false;
+
+  public shiftStartTimeFild: AbstractControl;
+  public shiftEndTimeFild: AbstractControl;
+  public defaultMaxTime = new Date();
+  public defaultMinTime = new Date();
+  public maxTime = this.defaultMaxTime;
+  public minTime = this.defaultMinTime;
 
   public readonly jobDistributions = ORDER_JOB_DISTRIBUTION_LIST;
   public readonly jobDistributionFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -255,6 +263,20 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       annualSalaryRangeFrom: [null, Validators.required],
       annualSalaryRangeTo: [null, Validators.required],
     });
+
+    this.defaultMaxTime.setHours(23, 59, 59);
+    this.defaultMinTime.setHours(0, 0, 0);
+
+    this.shiftStartTimeFild = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
+    this.shiftEndTimeFild = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
+    this.shiftEndTimeFild.valueChanges.subscribe(val => { 
+      this.maxTime = val || this.defaultMaxTime; this.shiftStartTimeFild.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    });
+    this.shiftStartTimeFild.valueChanges.subscribe(val => {
+      this.minTime = val || this.defaultMinTime; this.shiftEndTimeFild.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    });
+    this.shiftStartTimeFild.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
+    this.shiftEndTimeFild.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
   }
 
   private initJobDistributionDescriptionForm(): void {
