@@ -57,7 +57,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
 
   private filesDetails: Blob[] = [];
   private unsubscribe$: Subject<void> = new Subject();
-  private fetchedCandidate: Candidate;
+  public fetchedCandidate: Candidate;
 
   @Select(CandidateState.isCandidateCreated)
   public isCandidateCreated$: Observable<boolean>;
