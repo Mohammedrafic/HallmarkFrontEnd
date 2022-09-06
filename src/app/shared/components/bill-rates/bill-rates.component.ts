@@ -120,12 +120,11 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     }
 
     if (value.isPredefined) {
-      this.billRateForm.get('billRateConfigId')?.disable();
-      this.billRateForm.get('effectiveDate')?.disable();
+      this.billRateForm.get('billRateConfigId')?.disable({ emitEvent: false });
+      this.billRateForm.get('effectiveDate')?.disable({ emitEvent: false });
     }
 
     this.selectedBillRateUnit = foundBillRateOption?.unit as BillRateUnit;
-
     this.store.dispatch(new ShowSideDialog(true));
   }
 
