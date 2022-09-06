@@ -18,13 +18,6 @@
         </ejs-dropdownlist>
       </div>
     </div>
-    <app-search
-      #search
-      ngDefaultControl
-      [formControl]="searchControl"
-      class="search"
-      [placeholder]="'Candidate name'"
-    ></app-search>
     <app-date-range-week-picker (range)="setRange($event)"></app-date-range-week-picker>
     <button
       ejs-button

@@ -46,6 +46,8 @@ export enum INVOICES_ACTIONS {
 }
 
 export enum InvoicesTableFiltersColumns {
+  SearchTerm = 'searchTerm',
+  StatusIds = 'statusIds',
   OrderBy = 'orderBy',
   PageNumber = 'pageNumber',
   PageSize = 'pageSize',

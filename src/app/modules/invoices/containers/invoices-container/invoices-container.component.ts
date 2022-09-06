@@ -1,7 +1,7 @@
 import { ActivatedRoute } from '@angular/router';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit,
   ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
@@ -39,7 +39,7 @@ import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions }
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { UserState } from 'src/app/store/user.state';
 import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
-import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-config.interface';
+import { GridContainerTabConfig } from '../../interfaces';
 import { InvoicesModel } from '../../store/invoices.model';
 
 @Component({
@@ -60,10 +60,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
   public selectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab = 0;
   public appliedFiltersAmount = 0;
-
-  public readonly formGroup: FormGroup = this.fb.group({
-    search: ['']
-  });
 
   public readonly organizationControl: FormControl = new FormControl(null);
 
@@ -103,10 +99,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   };
 
   public gridOptions: GridOptions = {};
-
-  public get dateControl(): FormControl {
-    return this.formGroup.get('date') as FormControl;
-  }
 
   public readonly groupInvoicesOptions = groupInvoicesOptions;
   public readonly defaultGroupInvoicesOption: GroupInvoicesOption = defaultGroupInvoicesOption;

@@ -135,6 +135,11 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
   ];
 };
 
+const defaultInputMapping = {
+  type: ControlTypes.Text,
+  valueType: ValueType.Text,
+};
+
 const defaultColumnMapping = {
   type: ControlTypes.Multiselect,
   valueType: ValueType.Id,
@@ -143,6 +148,7 @@ const defaultColumnMapping = {
 };
 
 export const DefaultFilterColumns: FilterColumns = {
+  searchTerm: defaultInputMapping,
   orderIds: defaultColumnMapping,
   statusIds: defaultColumnMapping,
   skillIds: defaultColumnMapping,
@@ -159,7 +165,6 @@ export const SavedFiltersParams: TimesheetsTableFiltersColumns[] = [
   TimesheetsTableFiltersColumns.OrderBy,
   TimesheetsTableFiltersColumns.StartDate,
   TimesheetsTableFiltersColumns.EndDate,
-  TimesheetsTableFiltersColumns.SearchTerm,
   TimesheetsTableFiltersColumns.StatusIds,
 ];
 

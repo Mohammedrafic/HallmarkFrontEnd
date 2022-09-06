@@ -49,8 +49,8 @@ import {
 } from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetailsApiService } from '../../services';
-import { reduceFiltersState } from '../../helpers';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { reduceFiltersState } from '@core/helpers/functions.helper';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
