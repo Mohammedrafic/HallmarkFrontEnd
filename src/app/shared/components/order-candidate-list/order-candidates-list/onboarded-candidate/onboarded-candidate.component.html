@@ -27,6 +27,7 @@
             </ng-template>
           </ejs-dropdownlist>
         </div>
+        <button *ngIf="isDeployedCandidate" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>

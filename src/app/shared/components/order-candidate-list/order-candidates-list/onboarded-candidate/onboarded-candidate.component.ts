@@ -275,7 +275,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
           comments: value.requestComment,
           workWeek: value.guaranteedWorkWeek ? value.guaranteedWorkWeek : '',
           clockId: value.clockId ? value.clockId : '',
-          offeredBillRate: PriceUtils.formatNumbers(value.offeredBillRate),
+          offeredBillRate: value.offeredBillRate ? PriceUtils.formatNumbers(value.offeredBillRate) : null,
           allow: value.allowDeployCredentials,
           startDate: value.actualStartDate ? value.actualStartDate : value.order.jobStartDate,
           endDate: value.actualEndDate ? value.actualEndDate : value.order.jobEndDate,
@@ -395,5 +395,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     } else {
       this.form?.enable();
     }
+  }
+
+  public onReject(): void {
+    this.store.dispatch(new GetRejectReasonsForOrganisation());
+    this.openRejectDialog.next(true);
   }
 }

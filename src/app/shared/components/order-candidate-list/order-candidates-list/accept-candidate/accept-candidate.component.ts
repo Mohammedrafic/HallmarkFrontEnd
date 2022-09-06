@@ -86,11 +86,15 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   get showWithdrawAction(): boolean {
     return (
-      [ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom, ApplicantStatusEnum.Applied].includes(
+      !this.isWithdraw &&
+      ([ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom, ApplicantStatusEnum.Applied].includes(
         this.candidateStatus
       ) &&
-      !this.isWithdraw &&
-      !this.isDeployedCandidate
+      !this.isDeployedCandidate) || 
+      (this.isAgency &&
+      [ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom].includes(
+        this.candidateStatus
+      ))
     );
   }
 
