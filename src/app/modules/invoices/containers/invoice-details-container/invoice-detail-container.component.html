@@ -41,12 +41,11 @@
           </button>
           <div class="separator"></div>
           <button
-            *ngIf="!isAgency"
+            *ngIf="actionBtnText"
             ejs-button
-            [disabled]="isApproveDisable"
             cssClass="e-primary"
             (click)="handleApprove()">
-            Approve
+            {{ actionBtnText }}
           </button>
         </div>
 
