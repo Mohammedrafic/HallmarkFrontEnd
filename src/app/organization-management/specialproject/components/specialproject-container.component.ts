@@ -37,7 +37,7 @@ import { SavePurchaseOrderMapping, ShowConfirmationPopUp } from '../../store/pur
 import { PurchaseOrderMappingState } from '../../store/purchase-order-mapping.state';
 import { PurchaseOrderNames, SavePurchaseOrderMappingDto } from '../../../shared/models/purchase-order-mapping.model';
 import { PurchaseOrderMappingComponent } from '../components/purchase-order-mapping/purchase-order-mapping.component';
-import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
+import { datesValidator } from '@shared/validators/date.validator';
 
 @Component({
   selector: 'app-specialproject-container',
@@ -124,7 +124,9 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   constructor(private store: Store,
     private changeDetectorRef: ChangeDetectorRef,
     private actions$: Actions,
-    private confirmService: ConfirmService) { }
+    private confirmService: ConfirmService) {
+    this.today.setHours(0, 0, 0);
+}
 
   ngOnInit(): void {
     this.orgStructureDataSetup();
@@ -261,11 +263,11 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   }
 
   private applyDateValidations() {
-    this.startDateField = this.form.get('startDate') as AbstractControl;
-    this.startDateField.addValidators(startDateValidator(this.form, 'endDate', this.today));
+    this.startDateField = this.form.get(FormControlNames.StartDate) as AbstractControl;
+    this.startDateField.addValidators(datesValidator(this.form, FormControlNames.StartDate, FormControlNames.EndDate));
     this.startDateField.valueChanges.subscribe(() => this.endDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
-    this.endDateField = this.form.get('endDate') as AbstractControl;
-    this.endDateField.addValidators(endDateValidator(this.form, 'startDate', this.today));
+    this.endDateField = this.form.get(FormControlNames.EndDate) as AbstractControl;
+    this.endDateField.addValidators(datesValidator(this.form, FormControlNames.StartDate, FormControlNames.EndDate));
     this.endDateField.valueChanges.subscribe(() => this.startDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
   }
 

@@ -125,7 +125,7 @@
                               placeholder="MM/DD/YYYY"
                               appValidateWithMessage
                               formControlName="startDate"
-                              [min]="startDateField.value || today">
+                              [min]="today">
               </ejs-datepicker>
             </div>
           </div>
@@ -138,7 +138,7 @@
                               placeholder="MM/DD/YYYY"
                               appValidateWithMessage
                               formControlName="endDate"
-                              [min]="startDateField.value || today">
+                              [min]="form.controls['startDate'].value">
               </ejs-datepicker>
             </div>
           </div>
