@@ -1,8 +1,7 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
-import { InvoiceFilterColumns, } from '../interfaces';
-import { FilteringOptionsFields } from '../../timesheets/enums';
-import { InvoicesTableFiltersColumns } from '../enums/invoices.enum';
+import { InvoiceFilterColumns } from '../interfaces';
+import { InvoicesTableFiltersColumns } from '../enums';
 import { CustomTabItemModel } from '../interfaces/custom-tab-item-model.interface';
 
 export const AGENCY_INVOICE_TABS: CustomTabItemModel[] = [
@@ -45,6 +44,26 @@ export const DEFAULT_ALL_INVOICES = {
   hasNextPage: false,
 };
 
+export const SavedInvoicesFiltersParams: InvoicesTableFiltersColumns[] = [
+  InvoicesTableFiltersColumns.PageNumber,
+  InvoicesTableFiltersColumns.PageSize,
+  InvoicesTableFiltersColumns.OrderBy,
+  InvoicesTableFiltersColumns.StatusIds,
+];
+
+export enum FilteringInvoicesOptionsFields {
+  Agencies = 'agencies',
+  Orders = 'orders',
+  Regions = 'regions',
+  Skills = 'skills',
+  Statuses = 'statuses'
+}
+
+const defaultInputMapping = {
+  type: ControlTypes.Text,
+  valueType: ValueType.Text,
+};
+
 const defaultColumnMapping = {
   type: ControlTypes.Multiselect,
   valueType: ValueType.Id,
@@ -53,6 +72,7 @@ const defaultColumnMapping = {
 };
 
 export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
+  [InvoicesTableFiltersColumns.SearchTerm]: defaultInputMapping,
   [InvoicesTableFiltersColumns.OrderIds]: defaultColumnMapping,
   [InvoicesTableFiltersColumns.SkillIds]: defaultColumnMapping,
   [InvoicesTableFiltersColumns.DepartmentIds]: defaultColumnMapping,
@@ -62,8 +82,8 @@ export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
 } as InvoiceFilterColumns;
 
 
-export const InvoicesFilteringOptionsMapping: Map<FilteringOptionsFields, InvoicesTableFiltersColumns> = new Map()
-  .set(FilteringOptionsFields.Agencies, InvoicesTableFiltersColumns.AgencyIds)
-  .set(FilteringOptionsFields.Orders, InvoicesTableFiltersColumns.OrderIds)
-  .set(FilteringOptionsFields.Regions, InvoicesTableFiltersColumns.RegionsIds)
-  .set(FilteringOptionsFields.Skills, InvoicesTableFiltersColumns.SkillIds);
+export const InvoicesFilteringOptionsMapping: Map<FilteringInvoicesOptionsFields, InvoicesTableFiltersColumns> = new Map()
+  .set(FilteringInvoicesOptionsFields.Agencies, InvoicesTableFiltersColumns.AgencyIds)
+  .set(FilteringInvoicesOptionsFields.Orders, InvoicesTableFiltersColumns.OrderIds)
+  .set(FilteringInvoicesOptionsFields.Regions, InvoicesTableFiltersColumns.RegionsIds)
+  .set(FilteringInvoicesOptionsFields.Skills, InvoicesTableFiltersColumns.SkillIds);

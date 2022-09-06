@@ -5,7 +5,7 @@ export class GridValuesHelper {
     if (!value) {
       return '';
     }
-    return formatDate(value, pattern, 'en-US');
+    return formatDate(value, pattern, 'en-US', 'utc');
   }
 
   public static formatCurrency(value: string): string {

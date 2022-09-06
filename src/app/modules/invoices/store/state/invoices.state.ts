@@ -24,10 +24,14 @@ import {
   ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData, ManualInvoiceTimesheetResponse
 } from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
-import { FilteringOptionsFields } from '../../../timesheets/enums';
-import { DefaultInvoicesState, InvoicesFilteringOptionsMapping, ManualInvoiceMessages } from '../../constants';
-import { SavedFiltersParams } from '../../../timesheets/constants';
-import { reduceFiltersState } from '../../../timesheets/helpers';
+import {
+  DefaultFiltersState,
+  DefaultInvoicesState,
+  FilteringInvoicesOptionsFields,
+  InvoicesFilteringOptionsMapping,
+  ManualInvoiceMessages,
+  SavedInvoicesFiltersParams
+} from '../../constants';
 import { InvoicesTableFiltersColumns } from '../../enums';
 import { InvoiceMessageHelper, InvoiceMetaAdapter } from '../../helpers';
 import { OrganizationStructure } from '@shared/models/organization.model';
@@ -39,13 +43,7 @@ import { downloadBlobFile } from '@shared/utils/file.utils';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PendingApprovalInvoice, PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
 import { Attachment } from '@shared/components/attachments';
-
-const DefaultFiltersState: InvoicesFilterState = {
-  pageNumber: 1,
-  pageSize: 30,
-  organizationId: null,
-};
-
+import { reduceFiltersState } from '@core/helpers/functions.helper';
 
 @State<InvoicesModel>({
   name: 'invoices',
@@ -183,7 +181,7 @@ export class InvoicesState {
     { payload }: Invoices.UpdateFiltersState,
   ): Observable<null> {
     const oldFilters: InvoicesFilterState = getState().invoicesFilters || DefaultFiltersState;
-    let filters: InvoicesFilterState = reduceFiltersState(oldFilters, SavedFiltersParams);
+    let filters: InvoicesFilterState = reduceFiltersState(oldFilters, SavedInvoicesFiltersParams);
     filters = Object.assign({}, filters, payload);
 
     return of(null).pipe(
@@ -214,12 +212,12 @@ export class InvoicesState {
       tap((res) => {
         setState(patch({
           invoiceFiltersColumns: patch(Object.keys(res).reduce((acc: any, key) => {
-            if (key === FilteringOptionsFields.Statuses) { // TODO remove when would be correct api call
+            if (key === FilteringInvoicesOptionsFields.Statuses) { // TODO remove when would be correct api call
               return acc;
             }
 
-            acc[InvoicesFilteringOptionsMapping.get((key as FilteringOptionsFields)) as InvoicesTableFiltersColumns] = patch({
-              dataSource: res[key as FilteringOptionsFields],
+            acc[InvoicesFilteringOptionsMapping.get((key as FilteringInvoicesOptionsFields)) as InvoicesTableFiltersColumns] = patch({
+              dataSource: res[key as FilteringInvoicesOptionsFields],
             });
             return acc;
           }, {})),

@@ -1,5 +1,6 @@
 import { InvoicesModel } from '../store/invoices.model';
 import { InvoiceDefaultFilterColumns } from './invoices.constant';
+import { InvoicesFilterState } from '../interfaces';
 
 export const DefaultInvoicesState: InvoicesModel = {
   invoicesData: null,
@@ -26,4 +27,10 @@ export const DefaultInvoicesState: InvoicesModel = {
     agencyCanPay: false,
   },
   selectedTabIdx: 0,
+};
+
+export const DefaultFiltersState: InvoicesFilterState = {
+  pageNumber: 1,
+  pageSize: 30,
+  organizationId: null,
 };

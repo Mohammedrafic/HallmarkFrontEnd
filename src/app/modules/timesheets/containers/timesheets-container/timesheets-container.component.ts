@@ -4,14 +4,14 @@ import { FormControl } from '@angular/forms';
 import { Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, debounceTime, tap } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-import { RowNode } from '@ag-grid-community/core';import { DialogAction } from '@core/enums';
+import { RowNode } from '@ag-grid-community/core';
+import { DialogAction } from '@core/enums';
 
 import { Destroyable } from '@core/helpers';
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
-import { SearchComponent } from '@shared/components/search/search.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { DataSourceItem } from '@core/interface';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
@@ -37,9 +37,6 @@ import { AppState } from '../../../../store/app.state';
 export class TimesheetsContainerComponent extends Destroyable implements OnInit {
   @ViewChild(ProfileDetailsContainerComponent)
   public timesheetDetailsComponent: ProfileDetailsContainerComponent;
-
-  @ViewChild('search')
-  public search: SearchComponent;
 
   @Select(TimesheetsState.timesheets)
   readonly timesheets$: Observable<TimeSheetsPage>;
@@ -74,7 +71,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
   public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
   public filters: TimesheetsFilterState | undefined;
-  public readonly searchControl: FormControl = new FormControl('');
   public readonly organizationControl: FormControl = new FormControl(null);
   public readonly currentSelectedTableRowIndex: Observable<number>
     = this.timesheetsService.getStream();
@@ -101,7 +97,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   ngOnInit(): void {
     this.startFiltersWatching();
     this.startOrganizationWatching();
-    this.startSearchWatching();
     this.calcTabsBadgeAmount();
     this.onOrganizationChangedHandler();
     this.initOnRedirect();
@@ -109,8 +104,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public handleChangeTab(tabIndex: number): void {
     this.activeTabIdx = tabIndex;
-    this.searchControl.setValue('', { emitEvent: false });
-    this.search?.clear();
     this.store.dispatch(new Timesheets.UpdateFiltersState({
       statusIds: this.tabConfig[tabIndex].value,
     }));
@@ -225,17 +218,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     ).subscribe();
   }
 
-  private startSearchWatching(): void {
-    this.searchControl.valueChanges.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      switchMap((searchTerm) =>
-        this.store.dispatch(new Timesheets.UpdateFiltersState({ searchTerm }, this.activeTabIdx !== 0))
-      ),
-      takeUntil(this.componentDestroy()),
-    ).subscribe();
-  }
-
   private initOrganizationsList(): void {
     this.store.dispatch(new Timesheets.GetOrganizations())
     .pipe(
@@ -287,7 +269,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   private initOnRedirect(): void {
     const state = this.location.getState() as { navigationId: number, timesheetId: number };
-    
+
     if (state?.timesheetId) {
       const subscription = this.organizationId$
         .pipe(

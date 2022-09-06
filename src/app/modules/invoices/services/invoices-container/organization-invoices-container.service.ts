@@ -51,7 +51,7 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
           actionTitle: 'Pay'
         });
       case OrganizationInvoicesGridTab.Paid:
-        return  PendingApprovalGridHelper.getOrganizationColDefs({});
+        return  PendingApprovalGridHelper.getOrganizationPaidColDefs();
       case OrganizationInvoicesGridTab.All:
         return PendingApprovalGridHelper.getOrganizationAllColDefs({
           approve: (invoice: PendingApprovalInvoice) =>
