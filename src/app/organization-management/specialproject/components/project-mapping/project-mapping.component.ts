@@ -21,8 +21,7 @@ import { DeletSpecialProjectMapping, GetSpecialProjectMappings } from '../../../
 @Component({
   selector: 'app-project-mapping',
   templateUrl: './project-mapping.component.html',
-  styleUrls: ['./project-mapping.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./project-mapping.component.scss']
 })
 export class ProjectMappingComponent extends AbstractGridConfigurationComponent implements OnInit {
   @Input() form: FormGroup;
@@ -113,10 +112,10 @@ export class ProjectMappingComponent extends AbstractGridConfigurationComponent 
     noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
     onFilterChanged: (event: FilterChangedEvent) => {
       if (!event.api.getDisplayedRowCount()) {
-        this.gridApi.showNoRowsOverlay();
+        this.gridApi?.showNoRowsOverlay();
       }
       else {
-        this.gridApi.hideOverlay();
+        this.gridApi?.hideOverlay();
       }
     }
   };
@@ -132,10 +131,10 @@ export class ProjectMappingComponent extends AbstractGridConfigurationComponent 
     }));
     this.specialProjectMappingPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (!data || !data?.items.length) {
-        this.gridApi.showNoRowsOverlay();
+        this.gridApi?.showNoRowsOverlay();
       }
       else {
-        this.gridApi.hideOverlay();
+        this.gridApi?.hideOverlay();
         this.rowData = data.items;
         this.gridApi?.setRowData(this.rowData);
       }

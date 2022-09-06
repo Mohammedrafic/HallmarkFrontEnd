@@ -287,7 +287,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   }
 
   private pagePermissions(): void {
-    const location = this.location.getState() as { readonly: boolean };
+    const location = this.location.getState() as { readonly: boolean; isRedirectFromOrder: boolean };
 
     this.route.data.subscribe((data) => {
       if (data['readonly']) {
@@ -300,7 +300,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
     if (location.readonly) {
       this.candidateForm.disable();
       this.readonlyMode = true;
-      this.isCredentialStep = false;
+      this.isCredentialStep = location.isRedirectFromOrder ?? false;
     }
   }
 

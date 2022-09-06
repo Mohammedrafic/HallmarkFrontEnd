@@ -27,6 +27,7 @@
             </ng-template>
           </ejs-dropdownlist>
         </div>
+        <button *ngIf="isDeployedCandidate" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
@@ -59,7 +60,7 @@
                       </div>
                     </div>
                     <div class="input-container bootstrap">
-                      <label class="input-group">Candidates</label>
+                      <label class="input-group">Candidate</label>
                       <div class="input-group input-readonly">
                         <input appValidateWithMessage formControlName="candidates" class="e-input" type="text" readonly/>
                       </div>

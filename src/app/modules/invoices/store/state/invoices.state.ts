@@ -29,7 +29,7 @@ import { DefaultInvoicesState, InvoicesFilteringOptionsMapping, ManualInvoiceMes
 import { SavedFiltersParams } from '../../../timesheets/constants';
 import { reduceFiltersState } from '../../../timesheets/helpers';
 import { InvoicesTableFiltersColumns } from '../../enums';
-import { InvoiceMetaAdapter } from '../../helpers';
+import { InvoiceMessageHelper, InvoiceMetaAdapter } from '../../helpers';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { PendingInvoicesData } from '../../interfaces/pending-invoice-record.interface';
 import { getAllErrors } from '@shared/utils/error.utils';
@@ -37,7 +37,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
 import { downloadBlobFile } from '@shared/utils/file.utils';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
+import { PendingApprovalInvoice, PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
 import { Attachment } from '@shared/components/attachments';
 
 const DefaultFiltersState: InvoicesFilterState = {
@@ -306,10 +306,14 @@ export class InvoicesState {
       switchMap((res) => this.invoicesAPIService.saveManualInvoiceAttachments(
         files, isAgency ? res.organizationId : null,  res.timesheetId,)),
       tap(() => {
+        const tabIdx = ctx.getState().selectedTabIdx;
+
         ctx.dispatch([
           new ShowToast(MessageTypes.Success, ManualInvoiceMessages.successAdd),
-          new Invoices.GetManualInvoices(payload.organizationId),
+          tabIdx === 0 ? new Invoices.GetManualInvoices(payload.organizationId) :
+          new Invoices.GetPendingInvoices(payload.organizationId),
         ]);
+        
       }),
       catchError((err: HttpErrorResponse) => {
         return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
@@ -473,7 +477,7 @@ export class InvoicesState {
       ...state.invoicesFilters,
       ...payload,
     },
-      !!payload?.organizationId
+      getState().isAgencyArea,
     ).pipe(
       tap((data: PendingApprovalInvoicesData) => patchState({
         pendingApprovalInvoicesData: data,
@@ -604,11 +608,11 @@ export class InvoicesState {
   GroupInvoices(
     { patchState, dispatch }: StateContext<InvoicesModel>,
     { payload  }: Invoices.GroupInvoices
-  ): Observable<void> {
+  ): Observable<PendingApprovalInvoice[] | void> {
     return this.invoicesAPIService.groupInvoices(payload)
       .pipe(
-        tap(() => {
-          dispatch(new ShowToast(MessageTypes.Success, 'Invoice was created successfully'));
+        tap((res) => {
+          dispatch(new ShowToast(MessageTypes.Success, `Invoice ${InvoiceMessageHelper.getInvoiceIds(res)} was created successfully`));
         }),
         catchError(({ error }: HttpErrorResponse) => dispatch(
           new ShowToast(MessageTypes.Error, getAllErrors(error))
@@ -619,16 +623,18 @@ export class InvoicesState {
   @Action(Invoices.ChangeInvoiceState)
   ChangeInvoiceState(
     { patchState, dispatch }: StateContext<InvoicesModel>,
-    { invoiceId, stateId }: Invoices.ChangeInvoiceState,
-  ): Observable<void> {
+    { invoiceId, stateId, orgId }: Invoices.ChangeInvoiceState,
+  ): Observable<PendingApprovalInvoice | void> {
     const body: InvoiceStateDto = {
       invoiceId,
       targetState: stateId,
-    }
+      organizationId: orgId,
+    };
+    
     return this.invoicesAPIService.changeInvoiceStatus(body)
       .pipe(
-        tap(() => {
-          dispatch(new ShowToast(MessageTypes.Success, 'Invoice status was changed successfully'));
+        tap((res) => {
+          dispatch(new ShowToast(MessageTypes.Success, `Invoice ${res.formattedInvoiceId} status was changed successfully`));
         }),
         catchError(({ error }: HttpErrorResponse) => dispatch(
           new ShowToast(MessageTypes.Error, getAllErrors(error)),
@@ -638,7 +644,7 @@ export class InvoicesState {
 
   @Action(Invoices.GetPrintData)
   GetPrintingData(
-    { patchState, dispatch } : StateContext<InvoicesModel>,
+    { patchState, dispatch }: StateContext<InvoicesModel>,
     { body, isAgency }: Invoices.GetPrintData,
   ): Observable<PrintInvoiceData[] | void> {
     return this.invoicesAPIService.getPrintData(body, isAgency)
@@ -652,5 +658,40 @@ export class InvoicesState {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
       }),
     )
+  }
+
+  @Action(Invoices.SetIsAgencyArea)
+  SetIsAgencyArea(
+    { patchState }: StateContext<InvoicesModel>,
+  { isAgency }: Invoices.SetIsAgencyArea
+  ): void {
+    patchState({
+      isAgencyArea: isAgency,
+    });
+  }
+
+  @Action(Invoices.SetInvoicePermissions)
+  SetPermissions(
+    { patchState, getState }: StateContext<InvoicesModel>,
+    { payload }: Invoices.SetInvoicePermissions,
+  ): void {
+    const state = getState();
+
+    patchState({
+      permissions: {
+        ...state.permissions,
+        ...payload,
+      },
+    });
+  }
+
+  @Action(Invoices.SetTabIndex)
+  SetTabIndex(
+    { patchState }: StateContext<InvoicesModel>,
+    { index }: Invoices.SetTabIndex,
+  ): void {
+    patchState({
+      selectedTabIdx: index,
+    })
   }
 }

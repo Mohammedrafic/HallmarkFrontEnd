@@ -1,14 +1,16 @@
 <section class="specialproject-grid app-grid table-wrapper">
-  <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
-                   [gridOptions]="gridOptions"
-                   (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
-                   [headerHeight]="52"></ag-grid-angular>
-  <div class="row">
-    <ejs-dropdownlist id="rowsPerPage"
-                      class="dropdown-no-border"
-                      [dataSource]="rowsPerPageDropDown"
-                      [(value)]="activeRowsPerPageDropDown"
-                      (change)="onPageSizeChanged($event)">
-    </ejs-dropdownlist>
+  <div class="custom-grid">
+    <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
+                     [gridOptions]="gridOptions"
+                     (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
+                     [headerHeight]="52"></ag-grid-angular>
+    <div class="grid-pagination">
+      <ejs-dropdownlist id="rowsPerPage"
+                        class="dropdown-no-border"
+                        [dataSource]="rowsPerPageDropDown"
+                        [(value)]="activeRowsPerPageDropDown"
+                        (change)="onPageSizeChanged($event)">
+      </ejs-dropdownlist>
+    </div>
   </div>
 </section>
