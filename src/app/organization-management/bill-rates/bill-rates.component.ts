@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ShowExportDialog, ShowFilterDialog, ShowSideDialog} from '../../store/app.actions';
 import {Select, Store} from '@ngxs/store';
 import {UserState} from '../../store/user.state';
@@ -12,6 +12,7 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import {SecurityState} from "../../security/store/security.state";
 import {RoleTreeField} from "../../security/roles-and-permissions/role-form/role-form.component";
 import {ExternalBillRatePermissions} from "@organization-management/bill-rates/models/external-bill-rate-permissions.enum";
+import { GetPermissionsTree } from 'src/app/security/store/security.actions';
 
 export enum BillRateNavigationTabs {
   BillRateSetup,
@@ -22,7 +23,8 @@ export enum BillRateNavigationTabs {
 @Component({
   selector: 'app-bill-rates',
   templateUrl: './bill-rates.component.html',
-  styleUrls: ['./bill-rates.component.scss']
+  styleUrls: ['./bill-rates.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BillRatesComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
   @Select(SecurityState.roleTreeField)
@@ -112,10 +114,12 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  // TODO: temporary solution, until specific service provided
   private handlePagePermission(): void {
     const user = this.store.selectSnapshot(UserState.user);
     this.isReadOnly = user?.businessUnitType === BusinessUnitType.Organization;
+    if (this.isReadOnly) {
+      this.store.dispatch(new GetPermissionsTree(BusinessUnitType.Organization));
+    }
   }
 
   subsToSearch(): void {
