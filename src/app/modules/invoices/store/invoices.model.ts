@@ -3,6 +3,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 import {
   BaseInvoice, InvoiceDetail,
   InvoiceFilterColumns,
+  InvoicePermissions,
   InvoiceRecord,
   InvoicesFilterState,
   ManualInvoiceMeta,
@@ -12,7 +13,7 @@ import {
 } from '../interfaces';
 import { OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
-import { PendingApprovalInvoice, PendingApprovalInvoicesData } from '../interfaces/pending-approval-invoice.interface';
+import { PendingApprovalInvoicesData } from '../interfaces/pending-approval-invoice.interface';
 
 export interface InvoicesModel {
   invoicesData: PageOfCollections<InvoiceRecord> | null;
@@ -34,4 +35,7 @@ export interface InvoicesModel {
   selectedOrganizationId: number;
   regions: OrganizationRegion[];
   printData: PrintInvoiceData[];
+  isAgencyArea: boolean;
+  permissions: Partial<InvoicePermissions>;
+  selectedTabIdx: number;
 }

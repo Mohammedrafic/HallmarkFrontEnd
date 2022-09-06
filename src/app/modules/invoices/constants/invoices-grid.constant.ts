@@ -21,7 +21,7 @@ export const currencyFormatter: ValueFormatterFunc =
   ({ value }: ValueFormatterParams) => GridValuesHelper.formatCurrency(value);
 
 export const monthDayYearDateFormatter: ValueFormatterFunc =
-  ({ value }: ValueFormatterParams) => GridValuesHelper.formatDate(value, 'shortDate');
+  ({ value }: ValueFormatterParams) => GridValuesHelper.formatDate(value, 'MM/dd/yyyy');
 
 export const titleValueCellRendererSelector: CellRendererSelectorFunc = (params: ICellRendererParams) => {
   return params.value !== null ? {

@@ -91,6 +91,7 @@ export interface ManualInvoiceTimesheetResponse {
 export interface InvoiceStateDto {
   invoiceId: number;
   targetState: number;
+  organizationId?: number;
 }
 
 export interface SelectedInvoiceRow {
@@ -101,4 +102,9 @@ export interface SelectedInvoiceRow {
 export interface InvoiceDialogActionPayload {
   dialogState: boolean;
   invoiceDetail: InvoiceDetail | null;
+}
+
+
+export interface InvoicePermissions {
+  agencyCanPay: boolean;
 }

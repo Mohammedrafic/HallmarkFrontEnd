@@ -40,6 +40,7 @@ import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { UserState } from 'src/app/store/user.state';
 import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
 import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-config.interface';
+import { InvoicesModel } from '../../store/invoices.model';
 
 @Component({
   selector: 'app-invoices-container',
@@ -141,7 +142,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
 
-    this.isAgency = this.route.snapshot.data['isAgencyArea'];
+    this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
     this.organizationId$ = this.isAgency ? this.organizationControl.valueChanges : this.organizationChangeId$;
   }
 
@@ -237,6 +238,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
   public handleChangeTab(tabIdx: number): void {
     this.selectedTabIdx = tabIdx;
+    this.store.dispatch(new Invoices.SetTabIndex(tabIdx));
     this.clearSelections();
     this.clearTab();
 
@@ -245,7 +247,10 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
       ...this.invoicesContainerService.getGridOptions(tabIdx, this.organizationId),
     };
 
-    this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx, { organizationId: this.organizationId });
+    this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx,
+      { organizationId: this.organizationId,
+        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay,
+      });
     this.tabConfig = this.invoicesContainerService.getTabConfig(tabIdx);
 
     this.cdr.markForCheck();

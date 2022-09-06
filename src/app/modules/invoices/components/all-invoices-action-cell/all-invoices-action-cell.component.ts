@@ -3,6 +3,9 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
+import { Store } from '@ngxs/store';
+import { InvoicesModel } from '../../store/invoices.model';
+import { InvoiceState } from '../../enums';
 
 @Component({
   selector: 'app-all-invoices-action-cell',
@@ -16,6 +19,10 @@ export class AllInvoicesActionCellComponent implements ICellRendererAngularComp 
   public actionName: string;
 
   public invoice: PendingApprovalInvoice;
+
+  constructor(
+    private store: Store,
+  ) {}
 
   public agInit(params: ICellRendererParams & { approve: () => void, pay: () => void }): void {
     this.setAction(params);
@@ -33,12 +40,13 @@ export class AllInvoicesActionCellComponent implements ICellRendererAngularComp 
 
   private setAction(params: ICellRendererParams & { approve: () => void, pay: () => void }): void {
     this.invoice = params.data;
+    const state = this.store.snapshot().invoices as InvoicesModel;
 
-
-    if (this.invoice.invoiceState === 1) {
+    if (this.invoice.invoiceState === InvoiceState.SubmittedPendingApproval && !state.isAgencyArea) {
       this.action = params.approve;
       this.actionName = 'Approve';
-    } else if (this.invoice.invoiceState === 2) {
+    } else if (this.invoice.invoiceState === InvoiceState.PendingPayment
+      || (state.isAgencyArea && (this.invoice.invoiceState === InvoiceState.SubmittedPendingApproval))) {
       this.action = params.pay;
       this.actionName = 'Pay';
     }

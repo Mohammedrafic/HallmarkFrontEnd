@@ -5,3 +5,4 @@ export * from './grid/manual-invoices-grid.helper';
 export * from './grid/invoices-container-grid.helper';
 export * from './invoices-adapter.helper';
 export * from './manual-invoice.adapter';
+export * from './message-helper';

@@ -1,19 +1,25 @@
 import { Injectable } from '@angular/core';
-import { InvoicesContainerService } from './invoices-container.service';
-import { ManualInvoicesGridHelper } from '../../helpers';
+
 import { ColDef, GridOptions } from '@ag-grid-community/core';
 import { Observable } from 'rxjs';
+
+import { DialogAction } from '@core/enums';
+import { InvoicesContainerService } from './invoices-container.service';
+import { ManualInvoicesGridHelper } from '../../helpers';
 import { InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
-import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
-import { DialogAction } from '@core/enums';
+import { AgencyInvoicesGridTab, InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
 import { invoiceDetailsColumnDefs, invoiceInfoItems, invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
 import { AllInvoicesGridHelper } from '../../helpers/grid/all-invoices-grid.helper';
 import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-config.interface';
+import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
 
 @Injectable()
 export class AgencyInvoicesContainerService extends InvoicesContainerService {
-  public getColDefsByTab(tab: AgencyInvoicesGridTab, { organizationId }: { organizationId: number }): ColDef[] {
+  public getColDefsByTab(
+    tab: AgencyInvoicesGridTab,
+    { organizationId, canPay }: { organizationId: number, canPay: boolean },
+    ): ColDef[] {
     switch (tab) {
       case 0:
         return ManualInvoicesGridHelper.getAgencyColDefs({
@@ -32,7 +38,13 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
           ),
         });
       case 1:
-        return AllInvoicesGridHelper.getColDefs();
+        return AllInvoicesGridHelper.getColDefs(
+          canPay,
+          {
+            pay: (invoice: PendingApprovalInvoice) =>
+            this.store.dispatch(
+              new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.Paid, invoice.organizationId)),
+          });
       default:
         return [];
     }
