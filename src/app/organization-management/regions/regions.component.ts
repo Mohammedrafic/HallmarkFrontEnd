@@ -94,6 +94,7 @@ public regionFilterFormGroup:FormGroup;
 
   selectedRegion: any;
   submited: boolean=false;
+  public customAttributes: object;
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
@@ -131,6 +132,7 @@ public regionFilterFormGroup:FormGroup;
   }
 
   ngOnInit(): void {
+    
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
       this.currentPage = page;
      this.getRegions();
@@ -164,6 +166,7 @@ public regionFilterFormGroup:FormGroup;
       this.regions = structure.regions;
 
     });
+    this.customAttributes = {class: 'grideditcolumn'};
   }
 
   ngOnDestroy(): void {
