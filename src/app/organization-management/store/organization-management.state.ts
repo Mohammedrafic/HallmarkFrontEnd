@@ -92,7 +92,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialPage } from '@shared/models/credential.model';
-import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED, usedByOrderErrorMessage } from 'src/app/shared/constants/messages';
+import { RECORD_ADDED, RECORD_ALREADY_EXISTS, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED, RECORD_SAVED, usedByOrderErrorMessage } from 'src/app/shared/constants/messages';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { CategoriesService } from '@shared/services/categories.service';
@@ -452,16 +452,31 @@ export class OrganizationManagementState {
     patchState({ isLocationLoading: true });
     return this.regionService.saveRegion(region).pipe(tap((payload) => {
       patchState({ isLocationLoading: false});
+      if( payload.id!=0)
+      {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
       dispatch(new GetRegions());
+      }else{
+        dispatch(new ShowToast(MessageTypes.Error, RECORD_ALREADY_EXISTS));
+      }
       return payload;
     }));
   }
 
   @Action(UpdateRegion)
-  UpdateRegion({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { region }: UpdateRegion): Observable<void> {
+  UpdateRegion({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { region }: UpdateRegion): Observable<Region> {
     return this.regionService.updateRegion(region).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
+      
+      if( payload.id!=0)
+      {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       dispatch(new GetRegions());
+      }
+      else
+      {
+        dispatch(new ShowToast(MessageTypes.Error, RECORD_ALREADY_EXISTS));
+      }
       return payload;
     }));
   }
