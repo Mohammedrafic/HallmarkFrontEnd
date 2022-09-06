@@ -22,8 +22,7 @@ import { DeletPurchaseOrder, GetPurchaseOrders } from '../../../store/purchase-o
 @Component({
   selector: 'app-purchase-orders',
   templateUrl: './purchase-orders.component.html',
-  styleUrls: ['./purchase-orders.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./purchase-orders.component.scss']
 })
 
 export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
@@ -122,10 +121,10 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
     noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
     onFilterChanged: (event: FilterChangedEvent) => {
       if (!event.api.getDisplayedRowCount()) {
-        this.gridApi.showNoRowsOverlay();
+        this.gridApi?.showNoRowsOverlay();
       }
       else {
-        this.gridApi.hideOverlay();
+        this.gridApi?.hideOverlay();
       }
     }
   };
@@ -139,10 +138,10 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
     this.store.dispatch(new GetPurchaseOrders());
     this.purchaseOrderPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (!data || !data?.items.length) {
-        this.gridApi.showNoRowsOverlay();
+        this.gridApi?.showNoRowsOverlay();
       }
       else {
-        this.gridApi.hideOverlay();
+        this.gridApi?.hideOverlay();
         this.rowData = data.items;
         this.gridApi?.setRowData(this.rowData);
       }
