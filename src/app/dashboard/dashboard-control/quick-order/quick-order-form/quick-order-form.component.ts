@@ -80,7 +80,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public isPermPlacementOrder = false;
   public isContactToPermOrder = false;
   public isEditContactTitle = false;
-  public isTravelerOrder = false;
+  public isTravelerOrder = true;
   public isOpenPerDiem = false;
   public isReOrder = false;
   public orderStatus = 'Open';
@@ -119,8 +119,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   public isJobEndDateControlEnabled = false;
 
-  public shiftStartTimeFild: AbstractControl;
-  public shiftEndTimeFild: AbstractControl;
+  public shiftStartTimeField: AbstractControl;
+  public shiftEndTimeField: AbstractControl;
   public defaultMaxTime = new Date();
   public defaultMinTime = new Date();
   public maxTime = this.defaultMaxTime;
@@ -209,13 +209,12 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   public ngOnInit(): void {
     this.handleOrderTypeControlValueChanges();
-    this.orderTypeDeparmnetSkillListener();
+    this.orderTypeDepartmentSkillListener();
     this.handleJobStartDateValueChanges();
     this.handleJobDistributionValueChanges();
     this.handleAgencyValueChanges();
     this.handleDurationControlValueChanges();
     this.populateQuickOrderFormValues();
-    this.populateJobDistributionForm();
     this.populateShiftTimes();
     this.refreshMultiSelectAfterOpenDialog();
     this.subscribeForSettings();
@@ -224,6 +223,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.cleanUpValidatorsForOrganizationUser();
     this.submitQuickOrder();
     this.detectFormValueChanges();
+    this.populateJobDistributionForm();
     this.setIsFormDirty();
   }
 
@@ -267,16 +267,16 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.defaultMaxTime.setHours(23, 59, 59);
     this.defaultMinTime.setHours(0, 0, 0);
 
-    this.shiftStartTimeFild = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
-    this.shiftEndTimeFild = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
-    this.shiftEndTimeFild.valueChanges.subscribe(val => { 
-      this.maxTime = val || this.defaultMaxTime; this.shiftStartTimeFild.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    this.shiftStartTimeField = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
+    this.shiftEndTimeField = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
+    this.shiftEndTimeField.valueChanges.subscribe(val => { 
+      this.maxTime = val || this.defaultMaxTime; this.shiftStartTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
     });
-    this.shiftStartTimeFild.valueChanges.subscribe(val => {
-      this.minTime = val || this.defaultMinTime; this.shiftEndTimeFild.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    this.shiftStartTimeField.valueChanges.subscribe(val => {
+      this.minTime = val || this.defaultMinTime; this.shiftEndTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
     });
-    this.shiftStartTimeFild.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
-    this.shiftEndTimeFild.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
+    this.shiftStartTimeField.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
+    this.shiftEndTimeField.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
   }
 
   private initJobDistributionDescriptionForm(): void {
@@ -554,7 +554,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     });
   }
 
-  private orderTypeDeparmnetSkillListener(): void {
+  private orderTypeDepartmentSkillListener(): void {
     combineLatest([
       this.orderTypeControl.valueChanges,
       this.generalInformationForm.controls['departmentId'].valueChanges,
@@ -667,7 +667,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
   private handleJobDistributionValueChanges(): void {
     this.jobDistributionControl.valueChanges
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$), debounceTime(300))
       .subscribe((jobDistributionIds: JobDistribution[]) => {
         this.cdr.markForCheck();
         if (jobDistributionIds.includes(JobDistribution.All)) {
