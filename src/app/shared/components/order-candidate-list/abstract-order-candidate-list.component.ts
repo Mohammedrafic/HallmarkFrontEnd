@@ -6,7 +6,12 @@ import { Select, Store } from '@ngxs/store';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { AgencyOrder, CandidateListEvent, OrderCandidateJob, OrderCandidatesListPage } from '@shared/models/order-management.model';
+import {
+  AgencyOrder,
+  CandidateListEvent,
+  OrderCandidateJob,
+  OrderCandidatesListPage,
+} from '@shared/models/order-management.model';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -74,7 +79,9 @@ export abstract class AbstractOrderCandidateListComponent
       );
     }
     const pageToBack = this.router.url;
-    this.router.navigate([url, data.candidateId], { state: { orderId: this.order.orderId, pageToBack } });
+    this.router.navigate([url, data.candidateId], {
+      state: { orderId: this.order.orderId, pageToBack, readonly: !this.isAgency, isRedirectFromOrder: true },
+    });
     disabledBodyOverflow(false);
   }
 
@@ -116,4 +123,3 @@ export abstract class AbstractOrderCandidateListComponent
     );
   }
 }
-
