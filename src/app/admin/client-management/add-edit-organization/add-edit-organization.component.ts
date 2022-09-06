@@ -57,6 +57,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   public titles = Titles;
   public isMspUser = false;
   public organizationTypes = OrganizationTypes;
+  private showDataBaseControlValue: boolean = false;
 
   public createUnderFields = {
     text: 'name',
@@ -69,7 +70,11 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   };
 
   get showDataBaseControl(): boolean {
-    return this.title === 'Add' && this.user?.businessUnitType === BusinessUnitType.Hallmark;
+    return this.showDataBaseControlValue;
+  }
+
+  set showDataBaseControl(value: boolean) {
+    this.showDataBaseControlValue = value;
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -154,12 +159,12 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     }
     if (!this.profileMode) {
       actions$
-      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveOrganizationSucceeded))
-      .subscribe((organization: { payload: Organization }) => {
-        this.currentBusinessUnitId = organization.payload.organizationId as number;
-        this.uploadImages(this.currentBusinessUnitId);
-        this.navigateBack();
-      });
+        .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveOrganizationSucceeded))
+        .subscribe((organization: { payload: Organization }) => {
+          this.currentBusinessUnitId = organization.payload.organizationId as number;
+          this.uploadImages(this.currentBusinessUnitId);
+          this.navigateBack();
+        });
     }
   }
 
@@ -373,12 +378,8 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     this.CreateUnderFormGroup = this.fb.group({
       createUnder: new FormControl(businessUnitId, [Validators.required]),
     });
-
     this.dataBaseConnectionsFormGroup = this.fb.group({
-      connectionName: new FormControl(
-        organization?.createUnder?.dbConnectionName ?? '',
-        this.showDataBaseControl ? [Validators.required] : []
-      ),
+      connectionName: new FormControl(organization?.createUnder?.dbConnectionName ?? ''),
     });
 
     this.CreateUnderFormGroup.valueChanges.subscribe(() => {
@@ -394,15 +395,13 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
         Validators.minLength(9),
         Validators.pattern(/^[0-9\s\-]+$/),
       ]),
-      organizationPrefix: new FormControl({
-        value: organization ? organization.generalInformation.organizationPrefix : '',
-        disabled: this.user?.businessUnitType === BusinessUnitType.Organization || organization?.isOrganizationUsed
-      }, [
-        Validators.required,
-        Validators.maxLength(3),
-        Validators.minLength(3),
-        Validators.pattern(ONLY_LETTERS)
-      ]),
+      organizationPrefix: new FormControl(
+        {
+          value: organization ? organization.generalInformation.organizationPrefix : '',
+          disabled: this.user?.businessUnitType === BusinessUnitType.Organization || organization?.isOrganizationUsed,
+        },
+        [Validators.required, Validators.maxLength(3), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)]
+      ),
       addressLine1: new FormControl(organization ? organization.generalInformation.addressLine1 : '', [
         Validators.required,
       ]),
@@ -474,7 +473,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     });
     this.ContactFormArray = this.ContactFormGroup.get('contacts') as FormArray;
     this.PreferencesFormGroup = this.fb.group({
-      id: new FormControl(organization ? organization.preferences.id : 0),     
+      id: new FormControl(organization ? organization.preferences.id : 0),
       weekStartsOn: new FormControl(organization ? organization.preferences.weekStartsOn : '', [Validators.required]),
       paymentOptions: new FormControl(organization ? organization.preferences.paymentOptions.toString() : '0', [
         Validators.required,
@@ -501,6 +500,14 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   private subscribeOnUser(): void {
     this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
       this.user = user;
+      this.showDataBaseControl = this.title === 'Add' && this.user?.businessUnitType === BusinessUnitType.Hallmark;
+      this.updateDataBaseValidators();
     });
+  }
+
+  private updateDataBaseValidators(): void {
+    if (this.showDataBaseControl) {
+      this.dataBaseConnectionsFormGroup.get('connectionName')?.addValidators([Validators.required]);
+    }
   }
 }
