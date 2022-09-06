@@ -217,6 +217,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.populateQuickOrderFormValues();
     this.populateShiftTimes();
     this.refreshMultiSelectAfterOpenDialog();
+    this.handleOrganizationUserDataStructure();
     this.subscribeForSettings();
     this.getContactDetails();
     this.getDataForOrganizationUser();
@@ -318,6 +319,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.store.dispatch(new GetAssociateAgencies(organizationId));
     this.store.dispatch(new GetProjectSpecialData(organizationId));
     this.store.dispatch(new GetOrderRequisitionByPage(undefined, undefined, undefined, organizationId));
+    this.orderTypeControl.updateValueAndValidity();
   }
 
   public onRegionDropDownSelected(event: ChangeEventArgs): void {
@@ -385,6 +387,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     if (!this.userIsAdmin && this.organizationStructure) {
       this.regionDataSource = this.organizationStructure.regions;
       this.populateRegLocDepSkillFields(this.regionDataSource[0]);
+      this.orderTypeControl.updateValueAndValidity();
     }
   }
 
@@ -642,7 +645,6 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.openEvent.pipe(takeUntil(this.destroy$), debounceTime(300)).subscribe((isOpen) => {
       if (isOpen) {
         this.multiselect.refresh();
-        this.handleOrganizationUserDataStructure();
       }
     });
   }
