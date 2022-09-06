@@ -7,6 +7,7 @@ import { ExportPayload } from '@shared/models/export.model';
 import {
   GetPendingApprovalParams,
   GroupInvoicesParams,
+  InvoicePermissions,
   InvoicesFilterState,
   ManualInvoice,
   ManualInvoicePostDto,ManualInvoicePutDto,
@@ -277,6 +278,7 @@ export namespace Invoices {
     constructor(
       public readonly invoiceId: number,
       public readonly stateId: number,
+      public readonly orgId?: number,
     ) {
     }
   }
@@ -288,5 +290,24 @@ export namespace Invoices {
       public readonly body: PrintingPostDto,
       public readonly isAgency: boolean,
       ) {}
+  }
+
+  export class SetIsAgencyArea {
+    static readonly type = INVOICES_ACTIONS.SetIsAgency;
+
+    constructor(public readonly isAgency: boolean) {}
+  }
+
+  export class SetInvoicePermissions {
+    static readonly type = INVOICES_ACTIONS.SetPermissions;
+
+    constructor(public readonly payload: Partial<InvoicePermissions>) {}
+  }
+
+  export class SetTabIndex {
+    static readonly type = INVOICES_ACTIONS.SetTabIndex;
+
+    constructor(
+      public readonly index: number) {}
   }
 }

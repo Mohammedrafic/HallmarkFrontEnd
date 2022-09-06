@@ -10,8 +10,7 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 @Component({
   selector: 'app-special-project-table',
   templateUrl: './special-project-table.component.html',
-  styleUrls: ['./special-project-table.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./special-project-table.component.scss']
 })
 export class SpecialProjectTableComponent extends AbstractGridConfigurationComponent implements OnInit {
 

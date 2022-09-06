@@ -332,4 +332,9 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       this.formGroup?.enable();
     }
   }
+
+  public onReject(): void {
+    this.store.dispatch(new GetRejectReasonsForOrganisation());
+    this.openRejectDialog.next(true);
+  }
 }

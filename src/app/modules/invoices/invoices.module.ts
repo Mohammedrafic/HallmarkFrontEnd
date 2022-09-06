@@ -75,6 +75,7 @@ import {
 import { TableStatusCellModule } from '@shared/components/table-status-cell/table-status-cell.module';
 import { AllInvoicesActionCellComponent } from './components/all-invoices-action-cell/all-invoices-action-cell.component';
 import { NumericalConverterModule } from '@shared/pipes/numerical-converter/numerical-converter.module';
+import { InvoiceAgencyResolver } from './resolvers/invoice-agency.resolver';
 
 @NgModule({
   declarations: [
@@ -138,6 +139,7 @@ import { NumericalConverterModule } from '@shared/pipes/numerical-converter/nume
     FiltersDialogHelper,
     ManualInvoiceAttachmentsApiService,
     InvoicePrintingService,
+    InvoiceAgencyResolver,
     {
       provide: AddDialogHelperService,
       useClass: AddInvoiceService,

@@ -1,7 +1,7 @@
 import { ActivatedRoute } from '@angular/router';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit,
   ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
@@ -39,7 +39,8 @@ import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions }
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { UserState } from 'src/app/store/user.state';
 import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
-import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-config.interface';
+import { GridContainerTabConfig } from '../../interfaces';
+import { InvoicesModel } from '../../store/invoices.model';
 
 @Component({
   selector: 'app-invoices-container',
@@ -59,10 +60,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
   public selectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab = 0;
   public appliedFiltersAmount = 0;
-
-  public readonly formGroup: FormGroup = this.fb.group({
-    search: ['']
-  });
 
   public readonly organizationControl: FormControl = new FormControl(null);
 
@@ -103,10 +100,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
   public gridOptions: GridOptions = {};
 
-  public get dateControl(): FormControl {
-    return this.formGroup.get('date') as FormControl;
-  }
-
   public readonly groupInvoicesOptions = groupInvoicesOptions;
   public readonly defaultGroupInvoicesOption: GroupInvoicesOption = defaultGroupInvoicesOption;
   public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
@@ -141,7 +134,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
 
-    this.isAgency = this.route.snapshot.data['isAgencyArea'];
+    this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
     this.organizationId$ = this.isAgency ? this.organizationControl.valueChanges : this.organizationChangeId$;
   }
 
@@ -237,6 +230,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
   public handleChangeTab(tabIdx: number): void {
     this.selectedTabIdx = tabIdx;
+    this.store.dispatch(new Invoices.SetTabIndex(tabIdx));
     this.clearSelections();
     this.clearTab();
 
@@ -245,7 +239,10 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
       ...this.invoicesContainerService.getGridOptions(tabIdx, this.organizationId),
     };
 
-    this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx, { organizationId: this.organizationId });
+    this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx,
+      { organizationId: this.organizationId,
+        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay,
+      });
     this.tabConfig = this.invoicesContainerService.getTabConfig(tabIdx);
 
     this.cdr.markForCheck();

@@ -12,9 +12,10 @@ import { GetPendingApprovalParams, GroupInvoicesParams, InvoicesFilteringOptions
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ExportPayload } from '@shared/models/export.model';
 
-import { PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
+import { PendingInvoice, PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
 import { ChangeStatusData } from '../../timesheets/interface';
 import { PendingApprovalInvoice, PendingApprovalInvoicesData } from '../interfaces/pending-approval-invoice.interface';
+import { CurrentUserPermission } from '@shared/models/permission.model';
 
 @Injectable()
 export class InvoicesApiService {
@@ -105,16 +106,17 @@ export class InvoicesApiService {
     return this.http.post<void>(`/api/TimesheetState/setstatus`, data);
   }
 
-  public changeInvoiceStatus(data: InvoiceStateDto): Observable<void> {
-    return this.http.post<void>(`/api/Invoices/setstatus`, data);
+  public changeInvoiceStatus(data: InvoiceStateDto): Observable<PendingApprovalInvoice> {
+    const endpoint = !data.organizationId ? '/api/Invoices/setstatus' : '/api/Invoices/agency/setstatus';
+    return this.http.post<PendingApprovalInvoice>(endpoint, data);
   }
 
   public bulkApprove(timesheetIds: number[]): Observable<void> {
     return this.http.post<void>('/api/TimesheetState/bulkapprove', { timesheetIds });
   }
 
-  public groupInvoices(data: GroupInvoicesParams): Observable<void> {
-    return this.http.post<void>('/api/Invoices', data);
+  public groupInvoices(data: GroupInvoicesParams): Observable<PendingApprovalInvoice[]> {
+    return this.http.post<PendingApprovalInvoice[]>('/api/Invoices', data);
   }
 
   public getInvoicesForPrinting(
@@ -135,6 +137,10 @@ export class InvoicesApiService {
   public getPrintData(body: PrintingPostDto, isAgency: boolean): Observable<PrintInvoiceData[]> {
     const endpoint = isAgency ? '/api/Invoices/agency/printing' : '/api/Invoices/printing';
     return this.http.post<PrintInvoiceData[]>(endpoint, body);
+  }
+
+  public getAgencyPermissions(): Observable<CurrentUserPermission[]> {
+    return this.http.get<CurrentUserPermission[]>('/api/Permissions/currentUser');
   }
 
   private organizationDeleteManualInvoice(id: number): Observable<void> {

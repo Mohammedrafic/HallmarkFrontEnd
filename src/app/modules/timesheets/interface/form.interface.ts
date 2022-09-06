@@ -8,7 +8,7 @@ export interface AddTimsheetForm {
 }
 
 export interface TimsheetForm {
-  search: string;
+  searchTerm: string;
   orderIds: string[];
   statusIds: string[];
   skillIds: string[];
