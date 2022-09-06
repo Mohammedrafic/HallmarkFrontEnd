@@ -116,6 +116,7 @@ export class PendingApprovalGridHelper {
         headerName: 'Issued Date',
         valueFormatter: monthDayYearDateFormatter,
       },
+
       {
         field: 'dueDate',
         minWidth: 200,
@@ -129,6 +130,64 @@ export class PendingApprovalGridHelper {
       colDef.splice(0, 1);
     }
 
+    return colDef;
+  }
+
+  public static getOrganizationPaidColDefs(): TypedColDef<PendingApprovalInvoice>[] {
+    const colDef = [
+      {
+        field: 'formattedInvoiceId',
+        minWidth: 160,
+        headerName: 'Invoice Id',
+        cellRenderer: 'agGroupCellRenderer',
+        cellClass: 'expansion-toggle-icons-order-1 color-primary-active-blue-10 font-weight-bold',
+        flex: 1,
+      },
+      {
+        field: 'invoiceStateText',
+        headerName: 'Status',
+        minWidth: 190,
+        flex: 1,
+        cellRenderer: TableStatusCellComponent,
+        cellClass: 'status-cell',
+      },
+      {
+        field: 'amount',
+        minWidth: 280,
+        headerName: 'Amount',
+        cellClass: 'font-weight-bold',
+        valueFormatter: numberValueFormatter,
+      },
+      {
+        field: 'apDeliveryText',
+        headerName: 'Ap Delivery',
+        minWidth: 270,
+      },
+      {
+        field: 'aggregateByTypeText',
+        headerName: 'Group By Type',
+        minWidth: 360,
+      },
+      {
+        field: 'issuedDate',
+        minWidth: 230,
+        headerName: 'Issued Date',
+        valueFormatter: monthDayYearDateFormatter,
+      },
+      {
+        field: 'payDate',
+        minWidth: 230,
+        headerName: 'Paid Date',
+        valueFormatter: monthDayYearDateFormatter,
+      },
+      {
+        field: 'dueDate',
+        minWidth: 200,
+        headerName: 'Due Date',
+        type: 'rightAligned',
+        valueFormatter: monthDayYearDateFormatter,
+      },
+    ];
     return colDef;
   }
 
@@ -283,6 +342,12 @@ export class PendingApprovalGridHelper {
         field: 'issuedDate',
         minWidth: 230,
         headerName: 'Issued Date',
+        valueFormatter: monthDayYearDateFormatter,
+      },
+      {
+        field: 'payDate',
+        minWidth: 230,
+        headerName: 'Paid Date',
         valueFormatter: monthDayYearDateFormatter,
       },
       {
