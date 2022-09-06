@@ -161,7 +161,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public SettingsKeys = SettingsKeys;
 
   @Select(UserState.lastSelectedOrganizationId)
-  organizationId$: Observable<number>;
+  private organizationId$: Observable<number>;
 
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order | null>;
@@ -509,20 +509,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.organizationId$.subscribe((res) => {
-      this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
-      this.store.dispatch(new GetRegions());
-      this.store.dispatch(new GetMasterSkillsByOrganization());
-      this.store.dispatch(new GetProjectSpecialData());
-      this.store.dispatch(new GetAssociateAgencies());
-      this.store.dispatch(new GetOrganizationStatesWithKeyCode());
-      this.generalInformationForm.reset();
-      this.jobDescriptionForm.reset();
-      this.contactDetailsForm.reset();
-      this.workLocationForm.reset();
-      this.specialProject.reset();
-      this.populateNewOrderForm();
-    });
+    this.resetFormAfterSwichingOrganization();
 
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
       const isEditMode = !!this.orderId;
@@ -571,6 +558,24 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   public onRequisitionChange(event: any): void {
     this.jobDescriptionForm.controls['orderRequisitionReasonName'].patchValue(event.itemData.reason);
+  }
+
+  private resetFormAfterSwichingOrganization(): void {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$))
+    .subscribe(() => {
+      this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
+      this.store.dispatch(new GetRegions());
+      this.store.dispatch(new GetMasterSkillsByOrganization());
+      this.store.dispatch(new GetProjectSpecialData());
+      this.store.dispatch(new GetAssociateAgencies());
+      this.store.dispatch(new GetOrganizationStatesWithKeyCode());
+      this.generalInformationForm.reset();
+      this.jobDescriptionForm.reset();
+      this.contactDetailsForm.reset();
+      this.workLocationForm.reset();
+      this.specialProject.reset();
+      this.populateNewOrderForm();
+    });
   }
 
   private getSettings(): void {
