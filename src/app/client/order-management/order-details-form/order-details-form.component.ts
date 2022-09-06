@@ -72,6 +72,7 @@ import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
 import { ORDER_JOB_DISTRIBUTION_LIST } from '@shared/constants/order-job-distribution-list';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 import { DurationService } from '@shared/services/duration.service';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-order-details-form',
@@ -158,6 +159,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public isSpecialProjectFieldsRequired: boolean;
   public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   public SettingsKeys = SettingsKeys;
+
+  @Select(UserState.lastSelectedOrganizationId)
+  private organizationId$: Observable<number>;
 
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order | null>;
@@ -505,12 +509,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
-    this.store.dispatch(new GetRegions());
-    this.store.dispatch(new GetMasterSkillsByOrganization());
-    this.store.dispatch(new GetProjectSpecialData());
-    this.store.dispatch(new GetAssociateAgencies());
-    this.store.dispatch(new GetOrganizationStatesWithKeyCode());
+    this.resetFormAfterSwichingOrganization();
 
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
       const isEditMode = !!this.orderId;
@@ -559,6 +558,24 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   public onRequisitionChange(event: any): void {
     this.jobDescriptionForm.controls['orderRequisitionReasonName'].patchValue(event.itemData.reason);
+  }
+
+  private resetFormAfterSwichingOrganization(): void {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$))
+    .subscribe(() => {
+      this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
+      this.store.dispatch(new GetRegions());
+      this.store.dispatch(new GetMasterSkillsByOrganization());
+      this.store.dispatch(new GetProjectSpecialData());
+      this.store.dispatch(new GetAssociateAgencies());
+      this.store.dispatch(new GetOrganizationStatesWithKeyCode());
+      this.generalInformationForm.reset();
+      this.jobDescriptionForm.reset();
+      this.contactDetailsForm.reset();
+      this.workLocationForm.reset();
+      this.specialProject.reset();
+      this.populateNewOrderForm();
+    });
   }
 
   private getSettings(): void {
