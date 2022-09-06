@@ -1,7 +1,7 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
 
 import { RejectReason } from '@shared/models/reject-reason.model';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { EMPTY, Observable, Subject } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, Select, Store } from '@ngxs/store';
@@ -37,12 +37,14 @@ import {
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { capitalize } from 'lodash';
+import { DurationService } from '../../../../services/duration.service';
 
 @Component({
   selector: 'app-extension-candidate',
   templateUrl: './extension-candidate.component.html',
   styleUrls: ['../accept-candidate/accept-candidate.component.scss', './extension-candidate.component.scss'],
   providers: [MaskedDateTimeService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   @Input() currentOrder: Order;
@@ -93,12 +95,17 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     return this.candidateJob && this.isAgency && !this.isOnBoard;
   }
 
+  get actualStartDateValue(): Date {
+    return this.form.controls['startDate'].value;
+  }
+
   constructor(
     private store: Store,
     private datePipe: DatePipe,
     private commentsService: CommentsService,
     private router: Router,
-    private orderManagementContentService: OrderManagementContentService
+    private orderManagementContentService: OrderManagementContentService,
+    private durationService: DurationService
   ) {
     this.isAgency = this.router.url.includes('agency');
   }
@@ -164,18 +171,18 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     this.openRejectDialog.next(true);
   }
 
-  public rejectCandidateJob(event: { rejectReason: number }): void {  
-      if (this.candidateJob) {
-        const payload = {
-          organizationId: this.candidateJob.organizationId,
-          jobId: this.candidateJob.jobId,
-          rejectReasonId: event.rejectReason,
-        };
-  
-        this.store.dispatch(new RejectCandidateJob(payload));
-        this.dialogEvent.next(false);
-      }
+  public rejectCandidateJob(event: { rejectReason: number }): void {
+    if (this.candidateJob) {
+      const payload = {
+        organizationId: this.candidateJob.organizationId,
+        jobId: this.candidateJob.jobId,
+        rejectReasonId: event.rejectReason,
+      };
+
+      this.store.dispatch(new RejectCandidateJob(payload));
+      this.dialogEvent.next(false);
     }
+  }
 
   public onAccept(): void {
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
@@ -202,6 +209,14 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
         }
         break;
     }
+  }
+
+  public onStartDateChange(event: ChangedEventArgs): void {
+    const actualStartDate = new Date(event.value!);
+    const actualEndDate = this.durationService.getEndDate(this.currentOrder.duration, actualStartDate);
+    this.form.patchValue({
+      actualEndDate,
+    });
   }
 
   private setAllowedStatuses(candidate: OrderCandidatesList): void {
@@ -353,4 +368,3 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
       });
   }
 }
-

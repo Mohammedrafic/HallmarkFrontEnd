@@ -1,6 +1,15 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, merge, Observable, Subject, takeUntil } from 'rxjs';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
@@ -9,7 +18,11 @@ import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-man
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
+import {
+  ApplicantStatus,
+  ApplicantStatus as ApplicantStatusEnum,
+  CandidatStatus,
+} from '@shared/enums/applicant-status.enum';
 import {
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
@@ -18,7 +31,6 @@ import {
   SetIsDirtyOrderForm,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
-import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -29,12 +41,15 @@ import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
+import { Duration } from '../../../../enums/durations';
+import { DurationService } from '../../../../services/duration.service';
 
 @Component({
   selector: 'app-onboarded-candidate',
   templateUrl: './onboarded-candidate.component.html',
   styleUrls: ['./onboarded-candidate.component.scss'],
   providers: [MaskedDateTimeService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
@@ -53,6 +68,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   @Input() candidate: OrderCandidatesList;
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
+  @Input() orderDuration: Duration;
 
   public form: FormGroup;
   public jobStatusControl: FormControl;
@@ -92,6 +108,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     return this.candidate.status || (this.candidate.candidateStatus as any);
   }
 
+  get actualStartDateValue(): Date {
+    return this.form.controls['startDate'].value;
+  }
+
   private unsubscribe$: Subject<void> = new Subject();
 
   public comments: Comment[] = [];
@@ -102,7 +122,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     private actions$: Actions,
     private orderCandidateListViewService: OrderCandidateListViewService,
     private confirmService: ConfirmService,
-    private commentsService: CommentsService
+    private commentsService: CommentsService,
+    private durationService: DurationService
   ) {}
 
   ngOnInit(): void {
@@ -202,6 +223,14 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
           this.store.dispatch(new SetIsDirtyOrderForm(true));
         });
     }
+  }
+
+  public onStartDateChange(event: ChangedEventArgs): void {
+    const actualStartDate = new Date(event.value!);
+    const actualEndDate = this.durationService.getEndDate(this.orderDuration, actualStartDate);
+    this.form.patchValue({
+      endDate: actualEndDate,
+    });
   }
 
   getBillRateForUpdate(value: BillRate): BillRate[] {

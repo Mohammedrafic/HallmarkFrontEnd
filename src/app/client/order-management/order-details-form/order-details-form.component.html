@@ -265,7 +265,6 @@
                         appValidateWithMessage
                         [enableMask]="true"
                         [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                        [min]="today"
                       >
                       </ejs-datepicker>
                     </div>
@@ -719,7 +718,7 @@
             <div class="form-line">
               <!-- Special Project Category -->
               <div class="input-container bootstrap form-line-item-30">
-       
+
                 <label>Special Project Category<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist

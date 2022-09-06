@@ -167,10 +167,10 @@
                         format="MM/dd/yyyy"
                         appValidateWithMessage
                         placeholder="MM/DD/YYYY"
-                        [min]="today"
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                         formControlName="startDate"
+                        (change)="onStartDateChange($event)"
                       >
                       </ejs-datepicker>
                     </div>
@@ -184,7 +184,7 @@
                         format="MM/dd/yyyy"
                         appValidateWithMessage
                         placeholder="MM/DD/YYYY"
-                        [min]="today"
+                        [min]="actualStartDateValue"
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                         formControlName="endDate"

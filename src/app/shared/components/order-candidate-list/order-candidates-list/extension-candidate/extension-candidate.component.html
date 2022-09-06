@@ -138,6 +138,7 @@
                           [enableMask]="true"
                           [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                           formControlName="actualStartDate"
+                          (change)="onStartDateChange($event)"
                         >
                         </ejs-datepicker>
                         </div>
@@ -150,8 +151,8 @@
                           class="datepicker"
                           format="MM/dd/yyyy"
                           placeholder="MM/DD/YYYY"
+                          [min]="actualStartDateValue"
                           [enableMask]="true"
-                          [min]="startDate.value"
                           [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                           formControlName="actualEndDate"
                         >

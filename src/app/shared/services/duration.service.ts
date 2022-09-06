@@ -34,7 +34,7 @@ export class DurationService {
         break;
 
       default:
-        return new Date();
+        return jobStartDate;
     }
   }
 }

@@ -84,6 +84,7 @@
                         [candidate]="$any(candidate)"
                         [isTab]="true"
                         (closeModalEvent)="onClose()"
+                        [orderDuration]="(selectedOrder$ | async)!.duration"
                       ></app-onboarded-candidate>
                       <section *ngIf="isReorderType" class="container onboarded-candidate-container">
                         <section class="header-container">
