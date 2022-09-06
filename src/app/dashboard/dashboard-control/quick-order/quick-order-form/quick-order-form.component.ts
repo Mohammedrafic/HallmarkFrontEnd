@@ -642,6 +642,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.openEvent.pipe(takeUntil(this.destroy$), debounceTime(300)).subscribe((isOpen) => {
       if (isOpen) {
         this.multiselect.refresh();
+        this.handleOrganizationUserDataStructure();
       }
     });
   }
