@@ -1,4 +1,4 @@
-import {Component, Inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, Inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -152,7 +152,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
               @Inject(FormBuilder) private builder: FormBuilder,
               private confirmService: ConfirmService,
               private filterService: FilterService,
-              private datePipe: DatePipe) {
+              private datePipe: DatePipe,
+              private cd: ChangeDetectorRef) {
     super();
     this.formBuilder = builder;
     this.createFormGroups();
@@ -260,6 +261,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns);
         this.filteredItems$.next(this.filteredItems.length);
       }
+      this.cd.markForCheck();
     });
 
     this.billRateFilterFormGroup.get('locationIds')?.valueChanges.subscribe((locationIds: number[]) => {
@@ -275,6 +277,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns);
           this.filteredItems$.next(this.filteredItems.length);
         }
+        this.cd.markForCheck();
       });
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUpdateBillRateSucceed))
@@ -393,7 +396,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         regularLocal: this.billRatesFormGroup.controls['regularLocal'].value ? this.billRatesFormGroup.controls['regularLocal'].value : false,
         displayInTimesheet: this.billRatesFormGroup.controls['displayInTimesheet'].value ? this.billRatesFormGroup.controls['displayInTimesheet'].value : false,
         displayInJob: this.billRatesFormGroup.controls['displayInJob'].value ? this.billRatesFormGroup.controls['displayInJob'].value : false,
-        editAllowed: this.billRatesFormGroup.controls['editAllowed'].value || false,
       }
 
       this.billRateToPost = billRate;
@@ -455,10 +457,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public displayInJobChange(data: any, event: any): void {
     this.onClickedCheckboxHandler(data, 'displayInJob', event.checked);
-  }
-
-  public displayInEditAllowedChange(data: any, event: any): void {
-    this.onClickedCheckboxHandler(data, 'editAllowed', event.checked);
   }
 
   public onRowsDropDownChanged(): void {
@@ -549,8 +547,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       considerFor7thDayOt: [null],
       regularLocal: [null],
       displayInTimesheet: [null],
-      displayInJob: [null],
-      editAllowed: [null]
+      displayInJob: [null]
     });
 
     this.billRateFilterFormGroup = this.formBuilder.group({
@@ -604,6 +601,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
         this.billRatesFormGroup.controls['locationIds'].setValue(null);
         this.billRatesFormGroup.controls['departmentIds'].setValue(null);
+        this.cd.markForCheck();
       });
   }
 
@@ -622,6 +620,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       }
 
       this.billRatesFormGroup.controls['departmentIds'].setValue(null);
+      this.cd.markForCheck();
     });
   }
 
@@ -659,6 +658,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           this.billRatesFormGroup.get('intervalMax')?.disable();
           this.billRatesFormGroup.get('intervalMax')?.removeValidators([Validators.required, Validators.minLength(1), Validators.maxLength(10)]);
         }
+        this.cd.markForCheck();
     });
   }
 
@@ -736,7 +736,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRatesFormGroup.controls['regularLocal'].setValue(data.regularLocal);
     this.billRatesFormGroup.controls['displayInTimesheet'].setValue(data.displayInTimesheet);
     this.billRatesFormGroup.controls['displayInJob'].setValue(data.displayInJob);
-    this.billRatesFormGroup.controls['editAllowed'].setValue(data.editAllowed);
     this.billRatesFormGroup.controls['billRatesType'].setValue(data.billType);
   }
 

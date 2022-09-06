@@ -60,17 +60,6 @@
       <e-column headerText="Effective Date" textAlign="Right">
         <ng-template #template let-data>{{data.effectiveDate | date:'M/d/y'}}</ng-template>
       </e-column>
-
-      <e-column headerText="Allow Edit">
-        <ng-template #template let-data>
-          <div class="checkbox bootstrap">
-            <ejs-checkbox
-              [checked]="data.editAllowed"
-              [disabled]="true">
-            </ejs-checkbox>
-          </div>
-        </ng-template>
-      </e-column>
     </e-columns>
   </ejs-grid>
   <div class="grid-footer"></div>
