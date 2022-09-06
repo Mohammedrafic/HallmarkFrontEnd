@@ -21,4 +21,9 @@ export const DefaultInvoicesState: InvoicesModel = {
   selectedOrganizationId: 0,
   regions: [],
   printData: [],
+  isAgencyArea: false,
+  permissions: {
+    agencyCanPay: false,
+  },
+  selectedTabIdx: 0,
 };

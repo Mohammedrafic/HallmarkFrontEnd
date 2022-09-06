@@ -19,6 +19,10 @@ ejs-grid.e-control.e-grid {
     border-bottom-width: 1px;
   }
 
+  .e-spinner-pane {
+    display: none!important;
+  }
+
   .checkbox-header {
     .e-headercelldiv {
       padding: 0 !important;

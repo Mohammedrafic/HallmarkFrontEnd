@@ -17,11 +17,34 @@ import {
 import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
 import { InvoicesContainerGridHelper } from './invoices-container-grid.helper';
 import { ToggleRowExpansionHeaderCellComponent } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
+import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
+import { AllInvoicesActionCellComponent } from '../../components/all-invoices-action-cell/all-invoices-action-cell.component';
+
+interface AllColDefsConfig {
+  approve?: (invoice: PendingApprovalInvoice) => void;
+  pay?: (invoice: PendingApprovalInvoice) => void;
+  actionTitle?: string,
+}
 
 export class AllInvoicesGridHelper {
-  public static getColDefs(): TypedColDef<PendingApprovalInvoice>[] {
+  public static getColDefs(canPay: boolean, { pay }: AllColDefsConfig): TypedColDef<PendingApprovalInvoice>[] {
     return [
-      {
+      canPay ?  {
+        headerName: '',
+        headerCheckboxSelection: true,
+        headerCheckboxSelectionFilteredOnly: true,
+        checkboxSelection: true,
+        width: 160,
+        headerComponent: ToggleRowExpansionHeaderCellComponent,
+        cellRenderer: AllInvoicesActionCellComponent,
+        cellRendererParams: {
+          pay: pay,
+        },
+        sortable: false,
+        suppressMenu: true,
+        filter: false,
+        resizable: false,
+      } :       {
         field: '',
         headerName: '',
         headerCheckboxSelection: true,
@@ -29,7 +52,6 @@ export class AllInvoicesGridHelper {
         checkboxSelection: true,
         width: 80,
         headerComponent: ToggleRowExpansionHeaderCellComponent,
-        cellRenderer: 'agGroupCellRenderer',
       },
       {
         field: 'formattedInvoiceId',
@@ -39,14 +61,14 @@ export class AllInvoicesGridHelper {
         cellClass: 'expansion-toggle-icons-order-1 color-primary-active-blue-10 font-weight-bold',
         flex: 1,
       },
-      // {
-      //   field: 'invoiceStateText',
-      //   headerName: 'Status',
-      //   minWidth: 190,
-      //   flex: 1,
-      //   cellRenderer: TableStatusCellComponent,
-      //   cellClass: 'status-cell',
-      // },
+      {
+        field: 'invoiceStateText',
+        headerName: 'Status',
+        minWidth: 190,
+        flex: 1,
+        cellRenderer: TableStatusCellComponent,
+        cellClass: 'status-cell',
+      },
       {
         field: 'amount',
         minWidth: 280,
@@ -71,7 +93,7 @@ export class AllInvoicesGridHelper {
         valueFormatter: monthDayYearDateFormatter,
       },
       {
-        field: 'paidDate',
+        field: 'payDate',
         minWidth: 230,
         headerName: 'Paid Date',
         valueFormatter: monthDayYearDateFormatter,
