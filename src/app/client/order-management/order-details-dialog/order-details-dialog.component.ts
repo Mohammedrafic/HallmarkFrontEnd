@@ -332,7 +332,11 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private subscribeOnOrderCandidatePage(): void {
-    zip([this.orderCandidatePage$, this.selectedOrder, this.orderPositionSelected$])
+    zip([
+      this.orderCandidatePage$.pipe(filter((data) => !!data)),
+      this.selectedOrder.pipe(filter((data) => !!data)),
+      this.orderPositionSelected$,
+    ])
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(([order, selectedOrder, isOrderPositionSelected]: [OrderCandidatesListPage, Order, boolean]) => {
         this.candidateOrderPage = order;
