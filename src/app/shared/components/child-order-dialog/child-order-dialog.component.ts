@@ -122,6 +122,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public isAddExtensionBtnAvailable: boolean;
   public extensions$: Observable<any>;
   public extensions: Order[];
+  public selectedOrder: Order;
 
   public readonly buttonTypeEnum = ButtonTypeEnum;
   public readonly orderStatus = OrderStatus;
@@ -146,11 +147,17 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.isOrganization = this.router.url.includes('client');
     this.selectedOrder$ = this.isAgency ? this.agencySelectedOrder$ : this.orgSelectedOrder$;
     this.extensions$ = this.isAgency ? this.agencyExtensions$ : this.organizationExtensions$;
-    this.extensions$.pipe(takeWhile(() => this.isAlive), filter(Boolean)).subscribe(extensions => {
-      this.extensions = extensions.filter((extension: Order) => extension.id !== this.order?.id);
-    });
+    this.extensions$
+      .pipe(
+        takeWhile(() => this.isAlive),
+        filter(Boolean)
+      )
+      .subscribe((extensions) => {
+        this.extensions = extensions.filter((extension: Order) => extension.id !== this.order?.id);
+      });
     this.subscribeOnCandidateJob();
     this.onOpenEvent();
+    this.subscribeOnSelectedOrder();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -292,7 +299,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
     if (isAgencyArea) {
       this.store.dispatch(
-        new GetAgencyExtensions(this.candidateJob?.jobId, this.order.id, this.candidateJob?.organizationId!)
+        new GetAgencyExtensions(this.candidateJob?.jobId, this.selectedOrder.id!, this.candidateJob?.organizationId!)
       );
     } else {
       this.store.dispatch(new GetExtensions(this.candidateJob?.jobId, this.order.id));
@@ -483,5 +490,11 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
       default:
         break;
     }
+  }
+
+  private subscribeOnSelectedOrder() {
+    this.selectedOrder$.subscribe((data) => {
+      this.selectedOrder = data;
+    });
   }
 }
