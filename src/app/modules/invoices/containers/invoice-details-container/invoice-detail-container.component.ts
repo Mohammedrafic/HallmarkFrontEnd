@@ -1,3 +1,4 @@
+import { InvoicesModel } from './../../store/invoices.model';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 
@@ -77,7 +78,15 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
 
   public get actionBtnText(): string {
     const status = this.invoiceDetail.meta.invoiceStateText.toLowerCase() as INVOICES_STATUSES;
-    const result = this.isAgency ? AgencyActionBtnOnStatus.get(status) : ActionBtnOnStatus.get(status);
+    let result: string;
+
+    if (this.isAgency) {
+      const permission = (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay;
+      result = permission ? AgencyActionBtnOnStatus.get(status) as string : '';
+
+    } else {
+      result = ActionBtnOnStatus.get(status) as string;
+    }
 
     return result || '';
   }
