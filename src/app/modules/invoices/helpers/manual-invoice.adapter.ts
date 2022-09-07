@@ -2,10 +2,11 @@ import { DateTimeHelper } from '@core/helpers';
 import { AddManInvoiceForm, ManualInvoiceMeta, ManualInvoicePostDto } from '../interfaces';
 
 export class ManualInvoiceAdapter {
-  static parseOrderId(id: string): [string | null, number | null, number] {
+  static parseOrderId(id: string): [string | null, number | null, number | null] {
     const orgPrefix = id.match(/[A-Z]+/g)?.[0] ?? null;
     const orderId = Number(id.match(/\d+/g)?.[0]) || null;
-    const position = Number(id.match(/\d+/g)?.[1]) || 0;
+    const positionValue = Number(id.match(/\d+/g)?.[1]);
+    const position = isNaN(positionValue) ? null : positionValue;
 
     return [orgPrefix, orderId, position];
   }
