@@ -17,7 +17,7 @@ export const myAgencyColumnsToExport: ExportColumn[] = [
   { text: 'Status', column: 'OrderStatus' },
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Organization', column: 'Organization' },
-  { text: '# of Positions', column: 'NumberOfPositions' },
+  { text: '# of Positions ', column: 'NumberOfPositions' },
   { text: 'Candidates', column: 'CandidatesCount' },
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Skill', column: 'OrderSkill' },
@@ -122,7 +122,7 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: false,
-  }
+  },
 ];
 
 export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
@@ -140,6 +140,10 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
   },
   {
     fieldName: 'organizationName',
+    visible: true,
+  },
+  {
+    fieldName: 'numberOfPositions',
     visible: true,
   },
   {
@@ -161,7 +165,7 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: false,
-  }
+  },
 ];
 
 export const PerDiemColumnsConfig = [
@@ -204,7 +208,7 @@ export const PerDiemColumnsConfig = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: false,
-  }
+  },
 ];
 
 export const PermPlacementColumnsConfig = [
@@ -251,5 +255,5 @@ export const PermPlacementColumnsConfig = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: true,
-  }
+  },
 ];
