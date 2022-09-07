@@ -36,7 +36,7 @@
         ejs-dropdownbutton
         [items]="exportOptions"
         (select)="exportSelected($event)"
-        id="importButton"
+        id="exportButton"
         cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
       <button
         ejs-button
@@ -329,7 +329,7 @@
               appValidateWithMessage
               formControlName="timeZone"
               [fields]="timeZoneOptionFields"
-              [dataSource]="timeZoneIds$ | async" 
+              [dataSource]="timeZoneIds$ | async"
             >
             </ejs-dropdownlist>
           </div>
@@ -482,7 +482,7 @@
       </div>
 
       <div class="group">
-       
+
         <div>
           <div class="input-container calendar">
             <label for="inactiveDate">Inactive Date</label>
@@ -555,4 +555,4 @@
   </ng-template>
 </ejs-dialog>
 
-<app-file-upload-dialog></app-file-upload-dialog>
+<app-import-locations [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-import-locations>

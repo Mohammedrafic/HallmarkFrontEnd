@@ -1,10 +1,11 @@
+import { ImportResult } from "@shared/models/import.model";
 import { Country } from "src/app/shared/enums/states";
 import { Organization } from "src/app/shared/models/organization.model";
 import { SkillCategory } from "src/app/shared/models/skill-category.model";
 import { Skill, SkillFilters } from "src/app/shared/models/skill.model";
 import { Department, DepartmentFilter } from '@shared/models/department.model';
 import { Region, regionFilter } from '@shared/models/region.model';
-import { Location, LocationFilter, LocationType } from '@shared/models/location.model';
+import { ImportedLocation, Location, LocationFilter } from '@shared/models/location.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialFilter } from '@shared/models/credential.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
@@ -374,4 +375,44 @@ export class GetUSCanadaTimeZoneIds
 {
   static readonly type ='[organizationManagement] Get US Canada TimeZoneIds'
   constructor() {}
+}
+
+export class GetLocationsImportTemplate {
+  static readonly type = '[organizationManagement] Get Locations Import Template';
+  constructor(public payload: ImportedLocation[]) { }
+}
+
+export class GetLocationsImportTemplateSucceeded {
+  static readonly type = '[organizationManagement] Get Locations Import Template Succeeded';
+  constructor(public payload: Blob) { }
+}
+
+export class GetLocationsImportErrors {
+  static readonly type = '[organizationManagement] Get Locations Import Errors';
+  constructor(public payload: ImportedLocation[]) { }
+}
+
+export class GetLocationsImportErrorsSucceeded {
+  static readonly type = '[organizationManagement] Get Locations Import Errors Succeeded';
+  constructor(public payload: Blob) { }
+}
+
+export class UploadLocationsFile {
+  static readonly type = '[organizationManagement] Upload Locations File';
+  constructor(public payload: Blob) { }
+}
+
+export class UploadLocationsFileSucceeded {
+  static readonly type = '[organizationManagement] Upload Locations File Succeeded';
+  constructor(public payload: ImportResult<ImportedLocation>) { }
+}
+
+export class SaveLocationsImportResult {
+  static readonly type = '[candidate] Save Locations Import Result';
+  constructor(public payload: ImportedLocation[]) { }
+}
+
+export class SaveLocationsImportResultSucceeded {
+  static readonly type = '[candidate] Save Locations Import Result Succeeded';
+  constructor(public payload: ImportResult<ImportedLocation>) { }
 }

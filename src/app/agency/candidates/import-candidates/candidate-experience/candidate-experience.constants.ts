@@ -1,6 +1,6 @@
 import { ColDef } from "@ag-grid-community/core";
 
-import { GridErroredCellComponent } from "../grid-errored-cell/grid-errored-cell.component";
+import { GridErroredCellComponent } from "@shared/components/import-dialog-content/grid-errored-cell/grid-errored-cell.component";
 
 export const candidateExperienceColumns: ColDef[] = [
    {
