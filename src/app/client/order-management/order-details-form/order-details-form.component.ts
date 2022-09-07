@@ -93,7 +93,7 @@ import { UserState } from 'src/app/store/user.state';
 })
 export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Input() isActive = false;
-  @Input('disableOrderType') set disableOrderType(value: boolean) {
+  @Input() set disableOrderType(value: boolean) {
     if (value) {
       this.orderTypeForm.controls['orderType'].disable();
     }
@@ -518,6 +518,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
+    this.getFormData();
     this.resetFormAfterSwichingOrganization();
 
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
@@ -572,18 +573,24 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private resetFormAfterSwichingOrganization(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$), skip(1)).subscribe((id) => {
       this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
-      this.store.dispatch(new GetRegions());
-      this.store.dispatch(new GetMasterSkillsByOrganization());
-      this.store.dispatch(new GetProjectSpecialData());
-      this.store.dispatch(new GetAssociateAgencies());
-      this.store.dispatch(new GetOrganizationStatesWithKeyCode());
-      this.generalInformationForm.reset();
-      this.jobDescriptionForm.reset();
-      this.contactDetailsForm.reset();
-      this.workLocationForm.reset();
-      this.specialProject.reset();
-      this.populateNewOrderForm();
+      this.getFormData(Boolean(id));
     });
+  }
+
+  private getFormData(force: boolean = false): void {
+    this.store.dispatch(new GetRegions());
+    this.store.dispatch(new GetMasterSkillsByOrganization());
+    this.store.dispatch(new GetProjectSpecialData());
+    this.store.dispatch(new GetAssociateAgencies());
+    this.store.dispatch(new GetOrganizationStatesWithKeyCode());
+    this.generalInformationForm.reset();
+    this.jobDescriptionForm.reset();
+    this.contactDetailsForm.reset();
+    this.workLocationForm.reset();
+    this.specialProject.reset();
+    if (force) {
+      this.populateNewOrderForm();
+    }
   }
 
   private getSettings(): void {
