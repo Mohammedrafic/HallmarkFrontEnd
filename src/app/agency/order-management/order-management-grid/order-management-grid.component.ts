@@ -338,6 +338,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private onTabChange(): void {
     this.ordersTab$
       .pipe(
+        debounceTime(100),
         takeUntil(this.unsubscribe$),
         tap((selected) => {
           const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
