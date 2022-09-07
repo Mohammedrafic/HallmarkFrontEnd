@@ -94,7 +94,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const user = this.store.selectSnapshot(UserState.user);
-    console.log(11111, user?.businessUnitType);
     this.subscribeUserChange();
     this.isOrganizationAgencyAreaChange();
     this.subscribeOrganizationAgencies();
@@ -260,7 +259,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
     if (this.isAgencyOrOrganization) {
       this.organizationAgency = this.organizations[0] || this.agencies[0];
-      console.log(11111111111112, this.organizationAgency);
       
     } else {
       this.organizationsAgencies$.next(organizationsAgencies);
