@@ -1,5 +1,5 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subscription, takeWhile } from 'rxjs';
@@ -75,7 +75,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   }
 
   get isAddMode(): boolean {
-    return this.title === 'Add'
+    return this.title === 'Add';
   }
 
   get billingControl(): AbstractControl | null {
@@ -118,19 +118,34 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
     this.onBillingPopulatedChange();
     this.enableCreateUnderControl();
 
-    this.actions$.pipe(takeWhile(() => this.isAlive), ofActionSuccessful(SaveAgencySucceeded)).subscribe((agency: { payload: Agency }) => {
-      this.agencyId = agency.payload.agencyDetails.id as number;
-      this.uploadImages(this.agencyId);
-      this.agencyForm.markAsPristine();
-    });
-    this.actions$.pipe(takeWhile(() => this.isAlive), ofActionSuccessful(GetAgencyByIdSucceeded)).subscribe((agency: { payload: Agency }) => {
-      this.agencyId = agency.payload.agencyDetails.id as number;
-      this.fetchedAgency = agency.payload;
-      this.patchAgencyFormValue(this.fetchedAgency);
-    });
-    this.actions$.pipe(takeWhile(() => this.isAlive), ofActionSuccessful(GetAgencyLogoSucceeded)).subscribe((logo: { payload: Blob }) => {
-      this.logo = logo.payload;
-    });
+    this.actions$
+      .pipe(
+        takeWhile(() => this.isAlive),
+        ofActionSuccessful(SaveAgencySucceeded)
+      )
+      .subscribe((agency: { payload: Agency }) => {
+        this.agencyId = agency.payload.agencyDetails.id as number;
+        this.uploadImages(this.agencyId);
+        this.agencyForm.markAsPristine();
+      });
+    this.actions$
+      .pipe(
+        takeWhile(() => this.isAlive),
+        ofActionSuccessful(GetAgencyByIdSucceeded)
+      )
+      .subscribe((agency: { payload: Agency }) => {
+        this.agencyId = agency.payload.agencyDetails.id as number;
+        this.fetchedAgency = agency.payload;
+        this.patchAgencyFormValue(this.fetchedAgency);
+      });
+    this.actions$
+      .pipe(
+        takeWhile(() => this.isAlive),
+        ofActionSuccessful(GetAgencyLogoSucceeded)
+      )
+      .subscribe((logo: { payload: Blob }) => {
+        this.logo = logo.payload;
+      });
 
     if (this.route.snapshot.paramMap.get('id')) {
       this.title = 'Edit';
@@ -201,7 +216,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   @HostListener('window:beforeunload')
   public canDeactivate(): Observable<boolean> | boolean {
     return !this.agencyForm.dirty;
-  } ;
+  }
 
   public onImageSelect(event: Blob | null) {
     this.agencyForm.markAsDirty();
@@ -226,9 +241,11 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
       ?.valueChanges.pipe(takeWhile(() => this.isAlive))
       .subscribe((checked: boolean) => {
         if (checked) {
-          this.populatedSubscription = this.agencyControl?.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
-            this.populateBillingFromGeneral();
-          });
+          this.populatedSubscription = this.agencyControl?.valueChanges
+            .pipe(takeWhile(() => this.isAlive))
+            .subscribe(() => {
+              this.populateBillingFromGeneral();
+            });
           this.agencyControl?.updateValueAndValidity();
           this.billingControl?.disable();
         } else {
@@ -257,7 +274,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
 
   private generateAgencyForm(): void {
     this.agencyForm = this.fb.group({
-      parentBusinessUnitId: this.fb.control(null),
+      parentBusinessUnitId: this.fb.control(null, [Validators.required]),
       agencyDetails: GeneralInfoGroupComponent.createFormGroup(),
       isBillingPopulated: false,
       agencyBillingDetails: BillingDetailsGroupComponent.createFormGroup(),
@@ -288,7 +305,13 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
     };
   }
 
-  private patchAgencyFormValue({ agencyDetails, agencyBillingDetails, agencyContactDetails, agencyPaymentDetails, createUnder }: Agency) {
+  private patchAgencyFormValue({
+    agencyDetails,
+    agencyBillingDetails,
+    agencyContactDetails,
+    agencyPaymentDetails,
+    createUnder,
+  }: Agency) {
     this.agencyForm.get('parentBusinessUnitId')?.patchValue(createUnder?.parentUnitId || 0);
     this.agencyForm.get('isBillingPopulated')?.patchValue(agencyBillingDetails.sameAsAgency);
     this.agencyControl?.patchValue({ ...agencyDetails });
