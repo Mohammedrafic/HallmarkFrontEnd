@@ -11,7 +11,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { Observable, Subject, takeUntil, takeWhile, zip } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, takeWhile, zip } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -110,7 +110,11 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private subscribeOnOrderCandidatePage(): void {
-    zip([this.orderCandidatePage$, this.selectedOrder$, this.orderPositionSelected$])
+    zip([
+      this.orderCandidatePage$.pipe(filter((data) => !!data)),
+      this.selectedOrder$.pipe(filter((data) => !!data)),
+      this.orderPositionSelected$,
+    ])
       .pipe(takeWhile(() => this.isAlive))
       .subscribe(([order, selectedOrder, isOrderPositionSelected]: [OrderCandidatesListPage, Order, boolean]) => {
         this.extensions = [];
@@ -123,7 +127,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
             new GetAgencyExtensions(
               order.items[0].deployedCandidateInfo.jobId,
               selectedOrder.id!,
-              this.order.organizationId
+              selectedOrder.organizationId!
             )
           );
         }
