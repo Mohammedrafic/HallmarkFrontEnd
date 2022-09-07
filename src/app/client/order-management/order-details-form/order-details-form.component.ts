@@ -3,7 +3,18 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { combineLatest, debounceTime, filter, Observable, Subject, take, takeUntil, throttleTime, switchMap } from 'rxjs';
+import {
+  combineLatest,
+  debounceTime,
+  filter,
+  Observable,
+  Subject,
+  take,
+  takeUntil,
+  throttleTime,
+  switchMap,
+  skip,
+} from 'rxjs';
 
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -510,7 +521,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.resetFormAfterSwichingOrganization();
 
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-      const isEditMode = !!this.orderId;
+      const isEditMode = this.route.snapshot.data['isEditing'];
       if (order && isEditMode) {
         this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
         this.isEditMode = true;
@@ -523,7 +534,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         this.order = order;
         this.populateForms(order);
         this.subscribeForSettings();
-      } else {
+      } else if (!isEditMode) {
         this.subscribeForSettings();
         this.isEditMode = false;
         this.order = null;
@@ -559,8 +570,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private resetFormAfterSwichingOrganization(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$))
-    .subscribe(() => {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$), skip(1)).subscribe((id) => {
       this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
       this.store.dispatch(new GetRegions());
       this.store.dispatch(new GetMasterSkillsByOrganization());
@@ -726,25 +736,30 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private subscribeForSettings(): void {
-    this.organizationSettings$.pipe(takeUntil(this.unsubscribe$), filter(settings => !!settings.length)).subscribe((settings) => {
-      this.settings = SettingsHelper.mapSettings(settings);
-      this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
-      this.orderTypeDataSourceHandler();
-      if (this.specialProject != null) {
-        if (this.isSpecialProjectFieldsRequired) {
-          this.specialProject.controls['projectTypeId'].setValidators(Validators.required);
-          this.specialProject.controls['projectNameId'].setValidators(Validators.required);
-          this.specialProject.controls['poNumberId'].setValidators(Validators.required);
-        } else {
-          this.specialProject.controls['projectTypeId'].clearValidators();
-          this.specialProject.controls['projectNameId'].clearValidators();
-          this.specialProject.controls['poNumberId'].clearValidators();
+    this.organizationSettings$
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((settings) => !!settings.length)
+      )
+      .subscribe((settings) => {
+        this.settings = SettingsHelper.mapSettings(settings);
+        this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
+        this.orderTypeDataSourceHandler();
+        if (this.specialProject != null) {
+          if (this.isSpecialProjectFieldsRequired) {
+            this.specialProject.controls['projectTypeId'].setValidators(Validators.required);
+            this.specialProject.controls['projectNameId'].setValidators(Validators.required);
+            this.specialProject.controls['poNumberId'].setValidators(Validators.required);
+          } else {
+            this.specialProject.controls['projectTypeId'].clearValidators();
+            this.specialProject.controls['projectNameId'].clearValidators();
+            this.specialProject.controls['poNumberId'].clearValidators();
+          }
+          this.specialProject.controls['projectTypeId'].updateValueAndValidity();
+          this.specialProject.controls['projectNameId'].updateValueAndValidity();
+          this.specialProject.controls['poNumberId'].updateValueAndValidity();
         }
-        this.specialProject.controls['projectTypeId'].updateValueAndValidity();
-        this.specialProject.controls['projectNameId'].updateValueAndValidity();
-        this.specialProject.controls['poNumberId'].updateValueAndValidity();
-      }
-    });
+      });
   }
 
   private isFieldTouched(field: string): boolean {
@@ -990,7 +1005,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     /** Clone Date object to avoid modifying */
     const jobStartDateValue = new Date(jobStartDate.getTime());
     const jobEndDateControl = this.generalInformationForm.get('jobEndDate') as AbstractControl;
-    
+
     const jobEndDate: Date = this.durationService.getEndDate(duration, jobStartDateValue);
     jobEndDateControl.patchValue(jobEndDate);
   }
@@ -1069,17 +1084,17 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.jobDistributionForm.controls['jobDistribution'].patchValue([JobDistribution.All]);
 
     this.generalInformationForm.controls['departmentId'].valueChanges
-    .pipe(
-      switchMap(() => {
+      .pipe(
+        switchMap(() => {
           return this.contactDetails$;
-      }),
-      filter(Boolean),
-      takeUntil(this.unsubscribe$)
-    )
-    .subscribe((contactDetails) => {
-      const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
-      this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
-    });
+        }),
+        filter(Boolean),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((contactDetails) => {
+        const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
+        this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
+      });
   }
 
   public selectPrimaryContact(event: ChangeArgs): void {
