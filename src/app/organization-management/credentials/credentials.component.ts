@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
@@ -7,16 +7,21 @@ import { CredentialsState } from '../store/credentials.state';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
 import { CredentialsNavigationTabs } from '@shared/enums/credentials-navigation-tabs';
-import { SetCredentialsFilterCount, SetNavigationTab, ShowExportCredentialListDialog } from '../store/credentials.actions';
+import {
+  SetCredentialsFilterCount,
+  SetNavigationTab,
+  ShowExportCredentialListDialog,
+} from '../store/credentials.actions';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { GetOrganizationStructure } from '../../store/user.actions';
 
 @Component({
   selector: 'app-credentials',
   templateUrl: './credentials.component.html',
-  styleUrls: ['./credentials.component.scss']
+  styleUrls: ['./credentials.component.scss'],
 })
-export class CredentialsComponent extends AbstractGridConfigurationComponent implements OnDestroy {
+export class CredentialsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('navigationTabs') navigationTabs: TabComponent;
 
   @Select(CredentialsState.activeTab)
@@ -33,13 +38,16 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
 
   public filteredItemsCount = 0;
 
-  constructor(private router: Router,
-              private route: ActivatedRoute,
-              private store: Store,
-              private actions$: Actions) {
-                super();
-                actions$.pipe(ofActionDispatched(SetCredentialsFilterCount)).subscribe(count => this.filteredItemsCount = count.payload);
-              }
+  constructor(private router: Router, private route: ActivatedRoute, private store: Store, private actions$: Actions) {
+    super();
+    actions$
+      .pipe(ofActionDispatched(SetCredentialsFilterCount))
+      .subscribe((count) => (this.filteredItemsCount = count.payload));
+  }
+
+  ngOnInit(): void {
+    this.store.dispatch(new GetOrganizationStructure());
+  }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
@@ -81,8 +89,9 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
   }
 
   public onTabsCreated(): void {
-    this.activeTab$.pipe(takeUntil(this.unsubscribe$))
-      .subscribe(activeTab => this.onTabSelected({ selectedIndex: activeTab }));
+    this.activeTab$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((activeTab) => this.onTabSelected({ selectedIndex: activeTab }));
   }
 
   public onGroupsSetupClick(): void {
