@@ -1,4 +1,4 @@
-<div *ngIf="!isAgencyOrOrganization" class="dropdown-container bootstrap">
+<div *ngIf="!isAgencyOrOrganization; else agencyOrOrganization" class="dropdown-container bootstrap">
   <div class="input-group dropdown">
     <ejs-dropdownlist
       id="organization-agency-dropdown"
@@ -11,9 +11,8 @@
       <ng-template #itemTemplate let-data>
         <div class="item-container">
           <div class="logo-container">
-            <img
+            <img *ngIf="data.hasLogo; else noLogo"
               [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo'"
-              onerror="onerror=null; src='assets/icons/no-logo.svg'"
               alt="logo"
             />
           </div>
@@ -26,9 +25,8 @@
       <ng-template #valueTemplate let-data>
         <div class="value-container">
           <div class="logo-container">
-            <img
+            <img *ngIf="data.hasLogo; else noLogo"
               [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo'"
-              onerror="onerror=null; src='assets/icons/no-logo.svg'"
               alt="logo"
             />
           </div>
@@ -36,18 +34,23 @@
           <p class="title">{{ data.name }}</p>
         </div>
       </ng-template>
+
     </ejs-dropdownlist>
   </div>
 </div>
 
-<div *ngIf="isAgencyOrOrganization" class="organization-agency-title-container">
-  <div class="logo-container">
-    <img
-      [src]="baseUrl + '/api/BusinessUnit/' + organizationAgency.id + '/logo'"
-      onerror="onerror=null; src='assets/icons/no-logo.svg'"
-      alt="logo"
-    />
+<ng-template #agencyOrOrganization>
+  <div class="organization-agency-title-container" *ngIf="organizationAgency">
+    <div class="logo-container">
+      <img *ngIf="organizationAgency.hasLogo; else noLogo"
+        [src]="baseUrl + '/api/BusinessUnit/' + organizationAgency.id + '/logo'"
+        alt="logo"
+      />
+    </div>
+    <p class="title">{{ organizationAgency?.name }}</p>
   </div>
+</ng-template>
 
-  <p class="title">{{ organizationAgency?.name }}</p>
-</div>
+<ng-template #noLogo>
+  <div class="has-no-logo"></div>
+</ng-template>
