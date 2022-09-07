@@ -3,7 +3,18 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { combineLatest, debounceTime, filter, Observable, Subject, take, takeUntil, throttleTime, switchMap } from 'rxjs';
+import {
+  combineLatest,
+  debounceTime,
+  filter,
+  Observable,
+  Subject,
+  take,
+  takeUntil,
+  throttleTime,
+  switchMap,
+  skip,
+} from 'rxjs';
 
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -82,7 +93,7 @@ import { UserState } from 'src/app/store/user.state';
 })
 export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Input() isActive = false;
-  @Input('disableOrderType') set disableOrderType(value: boolean) {
+  @Input() set disableOrderType(value: boolean) {
     if (value) {
       this.orderTypeForm.controls['orderType'].disable();
     }
@@ -173,13 +184,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   @Select(OrganizationManagementState.locationsByRegionId)
   locations$: Observable<Location[]>;
-  isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedLocation: Location;
 
   @Select(OrganizationManagementState.departments)
   departments$: Observable<Department[]>;
-  isDepartmentsDropDownEnabled: boolean = false;
   departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   selectedDepartment: Department;
 
@@ -509,10 +518,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
+    this.getFormData();
     this.resetFormAfterSwichingOrganization();
 
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-      const isEditMode = !!this.orderId;
+      const isEditMode = this.route.snapshot.data['isEditing'];
       if (order && isEditMode) {
         this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
         this.isEditMode = true;
@@ -525,7 +535,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         this.order = order;
         this.populateForms(order);
         this.subscribeForSettings();
-      } else {
+      } else if (!isEditMode) {
         this.subscribeForSettings();
         this.isEditMode = false;
         this.order = null;
@@ -561,21 +571,26 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private resetFormAfterSwichingOrganization(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$))
-    .subscribe(() => {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$), skip(1)).subscribe((id) => {
       this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
-      this.store.dispatch(new GetRegions());
-      this.store.dispatch(new GetMasterSkillsByOrganization());
-      this.store.dispatch(new GetProjectSpecialData());
-      this.store.dispatch(new GetAssociateAgencies());
-      this.store.dispatch(new GetOrganizationStatesWithKeyCode());
-      this.generalInformationForm.reset();
-      this.jobDescriptionForm.reset();
-      this.contactDetailsForm.reset();
-      this.workLocationForm.reset();
-      this.specialProject.reset();
-      this.populateNewOrderForm();
+      this.getFormData(Boolean(id));
     });
+  }
+
+  private getFormData(force: boolean = false): void {
+    this.store.dispatch(new GetRegions());
+    this.store.dispatch(new GetMasterSkillsByOrganization());
+    this.store.dispatch(new GetProjectSpecialData());
+    this.store.dispatch(new GetAssociateAgencies());
+    this.store.dispatch(new GetOrganizationStatesWithKeyCode());
+    this.generalInformationForm.reset();
+    this.jobDescriptionForm.reset();
+    this.contactDetailsForm.reset();
+    this.workLocationForm.reset();
+    this.specialProject.reset();
+    if (force) {
+      this.populateNewOrderForm();
+    }
   }
 
   private getSettings(): void {
@@ -618,7 +633,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     if (this.selectedRegion.id) {
       this.markTouchedField(fieldName);
       this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
-      this.isLocationsDropDownEnabled = true;
       this.resetLocation();
       this.resetDepartment();
     }
@@ -631,7 +645,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     if (this.selectedLocation?.id) {
       this.markTouchedField(fieldName);
       this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.id));
-      this.isDepartmentsDropDownEnabled = true;
       this.resetDepartment();
     }
   }
@@ -693,6 +706,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.generalInformationForm.controls['shiftStartTime'].setValidators(Validators.required);
       this.generalInformationForm.controls['shiftEndTime'].setValidators(Validators.required);
     }
+    Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
+      this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
+    });
   }
 
   private userEditsOrder(fieldIsTouched: boolean): void {
@@ -730,25 +746,30 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private subscribeForSettings(): void {
-    this.organizationSettings$.pipe(takeUntil(this.unsubscribe$), filter(settings => !!settings.length)).subscribe((settings) => {
-      this.settings = SettingsHelper.mapSettings(settings);
-      this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
-      this.orderTypeDataSourceHandler();
-      if (this.specialProject != null) {
-        if (this.isSpecialProjectFieldsRequired) {
-          this.specialProject.controls['projectTypeId'].setValidators(Validators.required);
-          this.specialProject.controls['projectNameId'].setValidators(Validators.required);
-          this.specialProject.controls['poNumberId'].setValidators(Validators.required);
-        } else {
-          this.specialProject.controls['projectTypeId'].clearValidators();
-          this.specialProject.controls['projectNameId'].clearValidators();
-          this.specialProject.controls['poNumberId'].clearValidators();
+    this.organizationSettings$
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((settings) => !!settings.length)
+      )
+      .subscribe((settings) => {
+        this.settings = SettingsHelper.mapSettings(settings);
+        this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
+        this.orderTypeDataSourceHandler();
+        if (this.specialProject != null) {
+          if (this.isSpecialProjectFieldsRequired) {
+            this.specialProject.controls['projectTypeId'].setValidators(Validators.required);
+            this.specialProject.controls['projectNameId'].setValidators(Validators.required);
+            this.specialProject.controls['poNumberId'].setValidators(Validators.required);
+          } else {
+            this.specialProject.controls['projectTypeId'].clearValidators();
+            this.specialProject.controls['projectNameId'].clearValidators();
+            this.specialProject.controls['poNumberId'].clearValidators();
+          }
+          this.specialProject.controls['projectTypeId'].updateValueAndValidity();
+          this.specialProject.controls['projectNameId'].updateValueAndValidity();
+          this.specialProject.controls['poNumberId'].updateValueAndValidity();
         }
-        this.specialProject.controls['projectTypeId'].updateValueAndValidity();
-        this.specialProject.controls['projectNameId'].updateValueAndValidity();
-        this.specialProject.controls['poNumberId'].updateValueAndValidity();
-      }
-    });
+      });
   }
 
   private isFieldTouched(field: string): boolean {
@@ -875,6 +896,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private populateForms(order: Order): void {
+    this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
     this.orderTypeChanged.emit(order.orderType);
 
@@ -988,13 +1010,15 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.workLocationsFormArray.push(this.newWorkLocationFormGroup());
     }
     this.disableFormControls(order);
+    this.handlePerDiemOrder();
+    this.handlePermPlacementOrder();
   }
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
     /** Clone Date object to avoid modifying */
     const jobStartDateValue = new Date(jobStartDate.getTime());
     const jobEndDateControl = this.generalInformationForm.get('jobEndDate') as AbstractControl;
-    
+
     const jobEndDate: Date = this.durationService.getEndDate(duration, jobStartDateValue);
     jobEndDateControl.patchValue(jobEndDate);
   }
@@ -1073,17 +1097,17 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.jobDistributionForm.controls['jobDistribution'].patchValue([JobDistribution.All]);
 
     this.generalInformationForm.controls['departmentId'].valueChanges
-    .pipe(
-      switchMap(() => {
+      .pipe(
+        switchMap(() => {
           return this.contactDetails$;
-      }),
-      filter(Boolean),
-      takeUntil(this.unsubscribe$)
-    )
-    .subscribe((contactDetails) => {
-      const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
-      this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
-    });
+        }),
+        filter(Boolean),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((contactDetails) => {
+        const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
+        this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
+      });
   }
 
   public selectPrimaryContact(event: ChangeArgs): void {

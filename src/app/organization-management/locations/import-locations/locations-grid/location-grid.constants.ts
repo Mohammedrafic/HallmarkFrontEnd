@@ -2,65 +2,29 @@ import { ColDef } from "@ag-grid-community/core";
 
 import { GridErroredCellComponent } from "@shared/components/import-dialog-content/grid-errored-cell/grid-errored-cell.component";
 
-export const candidateProfileColumns: ColDef[] = [
+export const locationsColumns: ColDef[] = [
   {
-    field: 'firstName',
+    field: 'regionName',
     width: 150,
-    headerName: 'First Name',
+    headerName: 'Region',
     cellRenderer: GridErroredCellComponent,
   },
   {
-    field: 'middleName',
-    width: 150,
-    headerName: 'Middle Name',
-    cellRenderer: GridErroredCellComponent,
-  },
-  {
-    field: 'lastName',
-    width: 150,
-    headerName: 'Last Name',
-    cellRenderer: GridErroredCellComponent,
-  },
-  {
-    field: 'profileStatus',
-    width: 150,
-    headerName: 'Profile Status',
-    cellRenderer: GridErroredCellComponent,
-  },
-  {
-    field: 'dob',
-    width: 150,
-    headerName: 'DOB',
-    cellRenderer: GridErroredCellComponent,
-  },
-  {
-    field: 'email',
-    width: 150,
-    headerName: 'Email',
-    cellRenderer: GridErroredCellComponent,
-  },
-  {
-    field: 'skill',
-    width: 150,
-    headerName: 'Skills',
-    cellRenderer: GridErroredCellComponent,
-  },
-  {
-    field: 'candidateAgencyStatus',
+    field: 'locationName',
     width: 200,
-    headerName: 'Cand. Agency Status',
+    headerName: 'Location Name',
     cellRenderer: GridErroredCellComponent,
   },
   {
-    field: 'classification',
-    width: 150,
-    headerName: 'Classification',
+    field: 'externalId',
+    width: 200,
+    headerName: 'Ext Location ID',
     cellRenderer: GridErroredCellComponent,
   },
   {
-    field: 'ssn',
-    width: 150,
-    headerName: 'SSN',
+    field: 'invoiceId',
+    width: 200,
+    headerName: 'Invoice Location ID',
     cellRenderer: GridErroredCellComponent,
   },
   {
@@ -73,12 +37,6 @@ export const candidateProfileColumns: ColDef[] = [
     field: 'address2',
     width: 150,
     headerName: 'Address 2',
-    cellRenderer: GridErroredCellComponent,
-  },
-  {
-    field: 'country',
-    width: 150,
-    headerName: 'Country',
     cellRenderer: GridErroredCellComponent,
   },
   {
@@ -100,21 +58,51 @@ export const candidateProfileColumns: ColDef[] = [
     cellRenderer: GridErroredCellComponent,
   },
   {
-    field: 'phone1',
-    width: 150,
-    headerName: 'Phone 1',
+    field: 'contactPerson',
+    width: 200,
+    headerName: 'Contact Person',
     cellRenderer: GridErroredCellComponent,
   },
   {
-    field: 'phone2',
-    width: 150,
-    headerName: 'Phone 2',
+    field: 'contactEmail',
+    width: 200,
+    headerName: 'Contact Person Email',
     cellRenderer: GridErroredCellComponent,
   },
   {
-    field: 'professionalSummary',
-    width: 220,
-    headerName: 'Professional Summary',
+    field: 'phoneNumber',
+    width: 150,
+    headerName: 'Phone Number',
+    cellRenderer: GridErroredCellComponent,
+  },
+  {
+    field: 'phoneType',
+    width: 150,
+    headerName: 'Phone Type',
+    cellRenderer: GridErroredCellComponent,
+  },
+  {
+    field: 'ext',
+    width: 150,
+    headerName: 'Ext',
+    cellRenderer: GridErroredCellComponent,
+  },
+  {
+    field: 'glNumber',
+    width: 150,
+    headerName: 'GL Number',
+    cellRenderer: GridErroredCellComponent,
+  },
+  {
+    field: 'invoiceNote',
+    width: 150,
+    headerName: 'Invoice Note',
+    cellRenderer: GridErroredCellComponent,
+  },
+  {
+    field: 'inactiveDate',
+    width: 150,
+    headerName: 'Inactive Date',
     cellRenderer: GridErroredCellComponent,
   },
 ];

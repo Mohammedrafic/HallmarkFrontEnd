@@ -1,5 +1,7 @@
+import { CandidateStateModel } from "@agency/store/candidate.state";
 import { Injectable } from '@angular/core';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
+import { ImportResult } from "@shared/models/import.model";
 import { catchError, Observable, of, tap } from 'rxjs';
 import { Days } from 'src/app/shared/enums/days';
 import { SendDocumentAgency } from 'src/app/shared/enums/send-document-agency';
@@ -79,11 +81,26 @@ import {
   ExportRegions,
   GetOrganizationSettingsFilterOptions,
   GetLocationTypes,
-  GetUSCanadaTimeZoneIds
+  GetUSCanadaTimeZoneIds,
+  GetLocationsImportTemplate,
+  GetLocationsImportTemplateSucceeded,
+  GetLocationsImportErrors,
+  GetLocationsImportErrorsSucceeded,
+  SaveLocationsImportResult,
+  SaveLocationsImportResultSucceeded,
+  UploadLocationsFile,
+  UploadLocationsFileSucceeded
 } from './organization-management.actions';
 import { Department, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
 import { Region, regionFilter } from '@shared/models/region.model';
-import { Location, LocationFilterOptions, LocationsPage, LocationType, TimeZoneModel } from '@shared/models/location.model';
+import {
+  ImportedLocation,
+  Location,
+  LocationFilterOptions,
+  LocationsPage,
+  LocationType,
+  TimeZoneModel
+} from '@shared/models/location.model';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
 import { MasterSkillByOrganization, Skill, SkillsPage, SkillDataSource } from 'src/app/shared/models/skill.model';
@@ -432,9 +449,9 @@ export class OrganizationManagementState {
   @Action(GetRegions)
   GetRegions({ patchState }: StateContext<OrganizationManagementStateModel>, { filter }: any): Observable<Region[]> {
 
-    
+
     return this.regionService.getRegionsByOrganizationId(filter).pipe(tap((payload:any) => {
-  
+
       if("items" in payload){
         patchState({ regions: payload.items});
         return payload.items;
@@ -442,8 +459,8 @@ export class OrganizationManagementState {
         patchState({ regions: payload});
         return payload
       }
-   
-    
+
+
     }));
   }
 
@@ -482,7 +499,7 @@ export class OrganizationManagementState {
   }
 
   @Action(DeleteRegionById)
-  DeleteRegionById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, 
+  DeleteRegionById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
     { regionId }: DeleteRegionById): Observable<void> {
     return this.regionService.deleteRegionById(regionId).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
@@ -516,7 +533,7 @@ export class OrganizationManagementState {
   }
 
   @Action(SaveLocation)
-  SaveLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, 
+  SaveLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
     { location, regionId, filters }: SaveLocation):
      Observable<Location|void> {
     patchState({ isLocationLoading: true });
@@ -530,14 +547,14 @@ export class OrganizationManagementState {
       }
       return payload;
     }),
-    catchError((error) => 
+    catchError((error) =>
     dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
     );
 }
 
   @Action(UpdateLocation)
-  UpdateLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, 
-    { location, regionId, filters}: UpdateLocation): 
+  UpdateLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { location, regionId, filters}: UpdateLocation):
       Observable<void> {
           return this.locationService.updateLocation(location).pipe(tap((payload) => {
             patchState({ isLocationLoading: false });
@@ -549,12 +566,12 @@ export class OrganizationManagementState {
             }
             return payload;
           }),
-          catchError((error) => 
+          catchError((error) =>
           dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
           );
     }
 
- 
+
   @Action(DeleteLocationById)
   DeleteLocationById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { locationId, regionId, filters }: DeleteLocationById): Observable<any> {
     return this.locationService.deleteLocationById(locationId).pipe(tap((payload) => {
@@ -845,7 +862,7 @@ export class OrganizationManagementState {
 
   @Action(ExportLocations)
   ExportLocations({ }: StateContext<OrganizationManagementStateModel>, { payload }: ExportLocations): Observable<any> {
-  
+
     return this.locationService.export(payload).pipe(tap(file => {
       const url = window.URL.createObjectURL(file);
       saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
@@ -933,7 +950,7 @@ export class OrganizationManagementState {
       })
     );
   }
-  
+
  @Action(GetUSCanadaTimeZoneIds)
   GetUSCanadaTimeZoneIds({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetUSCanadaTimeZoneIds): Observable<TimeZoneModel[]> {
     return this.nodatimeService.getUSCanadaTimeZoneIds().pipe(
@@ -941,6 +958,50 @@ export class OrganizationManagementState {
         patchState({ timeZones: payload });
         return payload;
       })
+    );
+  }
+
+  @Action(GetLocationsImportTemplate)
+  GetLocationsImportTemplate({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: GetLocationsImportTemplate): Observable<any> {
+    return this.locationService.getLocationsImportTemplate(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetLocationsImportTemplateSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(GetLocationsImportErrors)
+  GetLocationsImportErrors({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: GetLocationsImportErrors): Observable<any> {
+    return this.locationService.getLocationsImportTemplate(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetLocationsImportErrorsSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(UploadLocationsFile)
+  UploadLocationsFile({ dispatch }: StateContext<CandidateStateModel>, { payload }: UploadLocationsFile): Observable<ImportResult<ImportedLocation> | Observable<void>> {
+    return this.locationService.uploadLocationsFile(payload).pipe(
+      tap((payload) => {
+        dispatch(new UploadLocationsFileSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : 'File was not uploaded'))))
+    );
+  }
+
+  @Action(SaveLocationsImportResult)
+  SaveLocationsImportResult({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveLocationsImportResult): Observable<ImportResult<ImportedLocation> | Observable<void>> {
+    return this.locationService.saveLocationImportResult(payload).pipe(
+      tap((payload) => {
+        dispatch(new SaveLocationsImportResultSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Locations were not imported'))))
     );
   }
 }

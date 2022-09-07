@@ -7,9 +7,9 @@ import { OrderTab } from '@shared/components/candidate-details/models/candidate.
   providedIn: 'root',
 })
 export class OrderManagementAgencyService extends DestroyableDirective {
-  public orderPerDiemId$: Subject<number> = new Subject<number>();
+  public orderPerDiemId$: Subject<{id: number, prefix: string}> = new Subject<{id: number, prefix: string}>();
   public selectedOrderAfterRedirect$: Subject<OrderTab> = new Subject<OrderTab>();
-  public orderId$: Subject<number> = new Subject<number>();
+  public orderId$: Subject<{id: number, prefix: string}> = new Subject<{id: number, prefix: string}>();
   public excludeDeployed: boolean;
 
   private _orderPerDiemId: number | null;
@@ -17,7 +17,7 @@ export class OrderManagementAgencyService extends DestroyableDirective {
 
   constructor() {
     super();
-    this.orderPerDiemId$.pipe(takeUntil(this.destroy$)).subscribe((id: number) => (this.orderPerDiemId = id));
+    this.orderPerDiemId$.pipe(takeUntil(this.destroy$)).subscribe((data: {id: number, prefix: string}) => (this.orderPerDiemId = data.id));
     this.selectedOrderAfterRedirect$
       .pipe(takeUntil(this.destroy$))
       .subscribe((order: OrderTab) => (this.selectedOrderAfterRedirect = order));

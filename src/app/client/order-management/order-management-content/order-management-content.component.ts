@@ -232,6 +232,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private quickOrderId: number;
   private dashboardFilterSubscription: Subscription;
   private orderPerDiemId: number | null;
+  private prefix: string | null;
   private orderId: number | null;
   private creatingReorder = false;
 
@@ -255,10 +256,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromDashboard'] || false;
     this.isRedirectedFromToast = this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromToast'] || false;
     this.quickOrderId = this.router.getCurrentNavigation()?.extras?.state?.['publicId'];
+    this.prefix = this.router.getCurrentNavigation()?.extras?.state?.['prefix'];
 
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.fb.group({
-      orderId: new FormControl(null),
+      orderPublicId: new FormControl(null),
       regionIds: new FormControl([]),
       locationIds: new FormControl([]),
       departmentsIds: new FormControl([]),
@@ -283,7 +285,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   ngOnInit(): void {
-    this.handleRedirectFromQuickOrderToast();
     this.handleDashboardFilters();
     this.orderFilterColumnsSetup();
     this.onOrderFilterDataSourcesLoadHandler();
@@ -312,6 +313,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.onCommentRead();
     this.listenRedirectFromExtension();
     this.subscribeForSettings();
+    this.handleRedirectFromQuickOrderToast();
   }
 
   ngOnDestroy(): void {
@@ -394,7 +396,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public getOrders(): void {
     this.filters.orderBy = this.orderBy;
-    this.filters.orderId ? this.filters.orderId : null;
+    this.filters.orderPublicId = this.filters.orderPublicId ? this.filters.orderPublicId.toUpperCase() : null;
     this.filters.jobStartDate ? this.filters.jobStartDate : null;
     this.filters.jobEndDate ? this.filters.jobEndDate : null;
     this.filters.billRateFrom ? this.filters.billRateFrom : null;
@@ -444,7 +446,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public onFilterClose() {
     this.OrderFilterFormGroup.setValue({
-      orderId: this.filters.orderId || null,
+      orderPublicId: this.filters.orderPublicId || null,
       regionIds: this.filters.regionIds || [],
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
@@ -534,7 +536,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public onFilterApply(): void {
     this.filters = this.OrderFilterFormGroup.getRawValue();
-    this.filters.orderId = this.filters.orderId || null;
+    this.filters.orderPublicId = this.filters.orderPublicId || null;
     this.filters.billRateFrom = this.filters.billRateFrom || null;
     this.filters.billRateTo = this.filters.billRateTo || null;
     this.filters.jobStartDate = this.filters.jobStartDate || null;
@@ -613,7 +615,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         (order: Order) => order.id === orderPerDiem?.id
       );
       this.gridWithChildRow.selectRow(index);
-      this.orderPerDiemId = this.orderId = null;
+      this.prefix = this.orderPerDiemId = this.orderId = null;
     }
   }
 
@@ -981,8 +983,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
       if (this.orderPerDiemId || this.orderId) {
-        this.filters.orderId = this.orderPerDiemId;
-        this.OrderFilterFormGroup.controls['orderId'].setValue((this.orderPerDiemId || this.orderId)?.toString());
+        this.filters.orderPublicId = this.prefix + '-' + this.orderPerDiemId;
+        this.OrderFilterFormGroup.controls['orderPublicId'].setValue((this.prefix + '-' + (this.orderPerDiemId || this.orderId))?.toString());
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns)
       }
       this.getOrders();
@@ -991,7 +993,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
-      orderId: { type: ControlTypes.Text, valueType: ValueType.Text },
+      orderPublicId: { type: ControlTypes.Text, valueType: ValueType.Text },
       regionIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
@@ -1320,10 +1322,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private listenRedirectFromExtension(): void {
-    this.orderManagementService.orderId$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((id: number) => {
-      this.orderId = id;
-      this.filters.orderId = this.orderId;
-      this.OrderFilterFormGroup.controls['orderId'].setValue(this.orderId.toString());
+    this.orderManagementService.orderId$.pipe(takeUntil(this.unsubscribe$), filter(Boolean), debounceTime(300)).subscribe((data: {id: number, prefix: string}) => {
+      this.orderId = data.id;
+      this.prefix = data.prefix;
+      this.filters.orderPublicId = this.prefix + '-' + this.orderId;
+      this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
       this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns)
       this.getOrders();
     });
@@ -1332,8 +1335,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private listenRedirectFromReOrder(): void {
     this.orderManagementService.orderPerDiemId$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((orderId: number) => {
-        this.orderPerDiemId = orderId;
+      .subscribe((data: {id: number, prefix: string}) => {
+        this.orderPerDiemId = data.id;
+        this.prefix = data.prefix;
       });
   }
 
@@ -1342,7 +1346,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     if (selectedOrderAfterRedirect) {
       this.OrderFilterFormGroup.patchValue({ orderId: selectedOrderAfterRedirect.orderId.toString() });
       this.filters = this.OrderFilterFormGroup.getRawValue();
-      this.filters.orderId = selectedOrderAfterRedirect.orderId;
+      this.filters.orderPublicId = selectedOrderAfterRedirect.prefix + '-' + selectedOrderAfterRedirect.orderId;
       this.filters.agencyType = null;
       this.filters.includeReOrders = false;
       this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
@@ -1380,20 +1384,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private handleRedirectFromQuickOrderToast(): void {
-    if (this.isRedirectedFromToast) {
-        this.filteredItems = [{text: this.quickOrderId.toString(), column: 'orderId', value: this.quickOrderId}];
-        this.filters['orderId'] = this.quickOrderId;
-        this.OrderFilterFormGroup.controls['orderId'].patchValue(this.quickOrderId);
-        this.getOrders();
-
-        this.ordersPage$.pipe(take(2), filter(Boolean)).subscribe((data) => {
-          if (data.items[0]?.publicId === this.quickOrderId) {
-            setTimeout(() => {
-              this.gridWithChildRow.selectRow(0);
-              this.isRedirectedFromToast = false;
-            }, 100);
-          }
-        });
+     if (this.isRedirectedFromToast) {
+      let prefix = this.prefix || '';
+      this.orderManagementService.orderId$.next({id: this.quickOrderId, prefix: prefix});
     }
   }
 }

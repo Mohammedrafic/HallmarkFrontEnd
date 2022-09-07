@@ -1,4 +1,6 @@
 import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -9,7 +11,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { Observable, Subject, takeUntil, takeWhile, zip } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, takeWhile, zip } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -29,6 +31,7 @@ import { GetAgencyExtensions } from '@agency/store/order-management.actions';
   selector: 'app-preview-order-dialog',
   templateUrl: './preview-order-dialog.component.html',
   styleUrls: ['./preview-order-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() order: AgencyOrderManagement;
@@ -71,14 +74,14 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
 
   @Output() selectReOrder = new EventEmitter<any>();
 
-  constructor(private chipsCssClass: ChipsCssClass, private store: Store) {}
+  constructor(private chipsCssClass: ChipsCssClass, private store: Store, private cd: ChangeDetectorRef) {}
 
   public get isReOrder(): boolean {
     return !isNil(this.order?.reOrderId || this.order?.id);
   }
 
   public get getTitle(): string {
-    return this.isReOrder ? `Re-Order ID ` : `Order ID ` + `${this.order?.organizationPrefix}-${this.order?.publicId}`;
+    return (this.isReOrder ? `Re-Order ID ` : `Order ID `) + `${this.order?.organizationPrefix}-${this.order?.publicId}`;
   }
 
   ngOnInit(): void {
@@ -102,11 +105,16 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   private subsToSelectedOrder(): void {
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
       this.currentOrder = order;
+      this.cd.markForCheck();
     });
   }
 
   private subscribeOnOrderCandidatePage(): void {
-    zip([this.orderCandidatePage$, this.selectedOrder$, this.orderPositionSelected$])
+    zip([
+      this.orderCandidatePage$.pipe(filter((data) => !!data)),
+      this.selectedOrder$.pipe(filter((data) => !!data)),
+      this.orderPositionSelected$,
+    ])
       .pipe(takeWhile(() => this.isAlive))
       .subscribe(([order, selectedOrder, isOrderPositionSelected]: [OrderCandidatesListPage, Order, boolean]) => {
         this.extensions = [];
@@ -119,13 +127,15 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
             new GetAgencyExtensions(
               order.items[0].deployedCandidateInfo.jobId,
               selectedOrder.id!,
-              this.order.organizationId
+              selectedOrder.organizationId!
             )
           );
         }
+        this.cd.markForCheck();
       });
     this.extensions$.pipe(takeWhile(() => this.isAlive)).subscribe((extensions) => {
       this.extensions = extensions?.filter((extension: any) => extension.id !== this.order.id);
+      this.cd.markForCheck();
     });
   }
 
@@ -144,6 +154,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
       } else {
         this.firstActive = true;
       }
+      this.cd.markForCheck();
     });
   }
 

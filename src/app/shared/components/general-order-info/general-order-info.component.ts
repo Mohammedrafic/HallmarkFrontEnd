@@ -37,11 +37,12 @@ export class GeneralOrderInfoComponent {
   }
 
   public moveToInitialOrder(): void {
-    this.orderManagementService.orderId$.next(this.orderInformation.extensionInitialOrderPublicId!);
-    this.orderManagementAgencyService.orderId$.next(this.orderInformation.extensionInitialOrderId!);
+    this.orderManagementService.orderId$.next({id: this.orderInformation.extensionInitialOrderPublicId!, prefix: this.orderInformation.organizationPrefix!});
+    this.orderManagementAgencyService.orderId$.next({id: this.orderInformation.extensionInitialOrderPublicId!, prefix: this.orderInformation.organizationPrefix!});
   }
 
   public moveToPreviousExtension(): void {
-    this.orderManagementService.orderId$.next(this.orderInformation.extensionPublicId!);
+    this.orderManagementService.orderId$.next({id: this.orderInformation.extensionPublicId!, prefix: this.orderInformation.organizationPrefix!});
+    this.orderManagementAgencyService.orderId$.next({id: this.orderInformation.extensionPublicId!, prefix: this.orderInformation.organizationPrefix!});
   }
 }

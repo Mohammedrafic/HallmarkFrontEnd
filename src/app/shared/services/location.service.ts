@@ -1,7 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+
 import { Observable } from 'rxjs';
-import { Location, LocationFilter, LocationFilterOptions, LocationsPage, LocationType, TimeZoneModel } from '../../shared/models/location.model';
+
+import { ImportResult } from "@shared/models/import.model";
+import {
+  ImportedLocation,
+  Location,
+  LocationFilter,
+  LocationFilterOptions,
+  LocationsPage,
+  LocationType,
+  TimeZoneModel
+} from '../../shared/models/location.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
@@ -88,5 +99,23 @@ export class LocationService {
    */
   public getUSCanadaTimeZoneIds(): Observable<TimeZoneModel[]> {
     return this.http.get<TimeZoneModel[]>(`/api/NodaTime/uscanadatimezones`);
+  }
+
+  /**
+   * Get Locations import template
+   * @return blob
+   */
+  public getLocationsImportTemplate(errorRecords: ImportedLocation[]): Observable<any> {
+    return this.http.post('/api/Locations/template', errorRecords, { responseType: 'blob' });
+  }
+
+  public uploadLocationsFile(file: Blob): Observable<ImportResult<ImportedLocation>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ImportResult<ImportedLocation>>('/api/Locations/import', formData);
+  }
+
+  public saveLocationImportResult(successfulRecords: ImportedLocation[]): Observable<ImportResult<ImportedLocation>> {
+    return this.http.post<ImportResult<ImportedLocation>>('/api/Locations/saveimport', successfulRecords);
   }
 }
