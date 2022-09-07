@@ -23,7 +23,7 @@ export class ExtensionGridIdRendererComponent implements ICellRendererAngularCom
   }
 
   public redirectAndSelectExtension(): void {
-    this.orderManagementService.orderId$.next({id: this.params.data?.id, prefix: this.params.data?.organizationPrefix});
-    this.orderManagementAgencyService.orderId$.next(this.params.data?.id);
+    this.orderManagementService.orderId$.next({id: this.params.data?.publicId, prefix: this.params.data?.organizationPrefix});
+    this.orderManagementAgencyService.orderId$.next({id: this.params.data?.publicId, prefix: this.params.data?.organizationPrefix});
   }
 }
