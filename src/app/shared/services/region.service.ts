@@ -44,10 +44,9 @@ export class RegionService {
   /**
    * Update the region
    */
-  public updateRegion(region: Region): Observable<void> {
-    return this.http.put<void>(`/api/Regions/`, region);
+   public updateRegion(region: Region): Observable<Region> {
+    return this.http.put<Region>(`/api/Regions/`, region);
   }
-
   /**
    * Delete the region by id
    */

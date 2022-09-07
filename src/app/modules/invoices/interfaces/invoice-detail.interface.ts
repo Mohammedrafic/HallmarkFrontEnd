@@ -1,3 +1,5 @@
+import { InvoiceState } from '../enums';
+
 export interface InvoiceDetail {
   meta: InvoiceDetailMeta;
   invoiceRecords: InvoiceDetailRecord[];
@@ -78,3 +80,10 @@ export interface InvoiceInfoUIItem {
   isHide?: boolean;
   isAmount?: boolean;
 }
+
+export interface InvoiceUpdateEmmit {
+  invoiceId: number;
+  status: InvoiceState;
+  organizationId?: number;
+}
+

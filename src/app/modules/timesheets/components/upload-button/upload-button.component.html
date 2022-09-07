@@ -2,6 +2,7 @@
         ejs-button
         cssClass="e-outline"
         class="upload-button"
+        [disabled]="disabled"
         #uploadBtn
         (click)="uploadTooltip.open(container)"
 >Upload

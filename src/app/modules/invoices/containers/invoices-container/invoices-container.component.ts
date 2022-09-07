@@ -14,7 +14,7 @@ import { Destroyable } from '@core/helpers';
 import { DialogAction } from '@core/enums';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import {
-  BaseInvoice, InvoicesFilterState, ManualInvoice, ManualInvoicesData,
+  BaseInvoice, InvoicesFilterState, InvoiceUpdateEmmit, ManualInvoice, ManualInvoicesData,
   PrintingPostDto, SelectedInvoiceRow
 } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
@@ -300,8 +300,8 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     this.cdr.markForCheck();
   }
 
-  public handleUpdateTable(invoiceId: number): void {
-    this.store.dispatch(new Invoices.ChangeInvoiceState(invoiceId, InvoiceState.PendingPayment))
+  public handleUpdateTable({ invoiceId, status, organizationId }: InvoiceUpdateEmmit): void {
+    this.store.dispatch(new Invoices.ChangeInvoiceState(invoiceId, status, organizationId))
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
         this.store.dispatch(new Invoices.ToggleInvoiceDialog(DialogAction.Close))
