@@ -127,6 +127,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
         this.agencyId = agency.payload.agencyDetails.id as number;
         this.uploadImages(this.agencyId);
         this.agencyForm.markAsPristine();
+        this.navigateToAgencyList();
       });
     this.actions$
       .pipe(
