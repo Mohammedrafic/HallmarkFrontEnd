@@ -1,6 +1,14 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
-  Input, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { filter, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
@@ -18,10 +26,23 @@ import { AttachmentsListConfig } from '@shared/components/attachments';
 import { TimesheetTargetStatus } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { CandidateMilesData, ChangeStatusData, CustomExport, DialogActionPayload, OpenAddDialogMeta,
-  Timesheet, TimesheetDetailsModel, WorkWeek, } from '../../interface';
-import { ConfirmDeleteTimesheetDialogContent, rejectTimesheetDialogData, TimesheetConfirmMessages,
-  TimesheetDetailsExportOptions } from '../../constants';
+import {
+  CandidateMilesData,
+  ChangeStatusData,
+  CustomExport,
+  DialogActionPayload,
+  OpenAddDialogMeta,
+  Timesheet,
+  TimesheetDetailsModel,
+  WorkWeek,
+} from '../../interface';
+import {
+  ConfirmApprovedTimesheetDeleteDialogContent,
+  ConfirmDeleteTimesheetDialogContent,
+  rejectTimesheetDialogData,
+  TimesheetConfirmMessages,
+  TimesheetDetailsExportOptions
+} from '../../constants';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services';
@@ -191,12 +212,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   }
 
   public onDWNCheckboxSelectedChange({checked}: {checked: boolean}, switchComponent: SwitchComponent): void {
-    checked ? this.confirmService.confirm(ConfirmDeleteTimesheetDialogContent, {
-      title: 'Delete Timesheet',
-      okButtonLabel: 'Proceed',
-      okButtonClass: 'delete-button',
-    })
+    checked ? this.timesheetDetails$
       .pipe(
+        map(({ status }: TimesheetDetailsModel) => status === TimesheetStatus.Approved),
+        switchMap((approved: boolean) => this.confirmService.confirm(
+          approved ? ConfirmApprovedTimesheetDeleteDialogContent : ConfirmDeleteTimesheetDialogContent, {
+            title: 'Delete Timesheet',
+            okButtonLabel: approved ? 'Yes' : 'Proceed',
+            okButtonClass: 'delete-button',
+          })),
         take(1),
         tap((submitted: boolean) => !submitted && switchComponent.writeValue(false)),
         filter(Boolean),
@@ -205,8 +229,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
         ))
       )
       .subscribe(() => {
-        this.closeDialog();
+        this.store.dispatch(new Timesheets.GetAll())
         this.refreshData();
+        this.closeDialog();
       }) : this.store.dispatch(
       new TimesheetDetails.NoWorkPerformed(false, this.timesheetId, this.organizationId)
     )

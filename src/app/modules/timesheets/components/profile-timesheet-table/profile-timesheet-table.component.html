@@ -16,10 +16,9 @@
         </ejs-tab>
       </div>
 
-      <ng-container *ngIf="!actionsDisabled">
         <ng-container *ngIf="isEditEnabled">
           <button
-            *ngIf="currentTab !== tableTypes.Expenses"
+            *ngIf="!actionsDisabled && (currentTab !== tableTypes.Expenses)"
             class="add-action spaced"
             cssClass="e-action-button"
             ejs-button
@@ -28,7 +27,7 @@
             <i-feather name="plus" class="icon"></i-feather> Add Record
           </button>
 
-          <ng-container *ngIf="recordsToShow?.[currentTab]?.[modeValues.Edit]?.length || isEditOn">
+          <ng-container *ngIf="!actionsDisabled && (recordsToShow?.[currentTab]?.[modeValues.Edit]?.length || isEditOn)">
             <button
               *ngIf="!isEditOn; else editHandlers"
               (click)="editTimesheets()"
@@ -55,7 +54,7 @@
 
         <div *ngIf="currentTab !== tableTypes.Expenses && !isEditOn" class="btn-group">
           <button
-            *ngIf="isRejectBtnEnabled"
+            *ngIf="isRejectBtnEnabled && !actionsDisabled"
             ejs-button
             [disabled]="actionButtonDisabled"
             cssClass="e-outline privilege"
@@ -77,7 +76,6 @@
             </ng-template>
           </button>
         </div>
-      </ng-container>
     </div>
 
     <div class="timesheet-table-container">

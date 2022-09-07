@@ -54,8 +54,9 @@
               [isAbleToChange]="isChangesSaved">
             </app-date-week-picker>
 
-            <app-upload-button [container]="uploadContainer"
-                              (filesSelected)="onFilesSelected($event)"
+            <app-upload-button [disabled]="timesheetDetails.noWorkPerformed"
+                    [container]="uploadContainer"
+                    (filesSelected)="onFilesSelected($event)"
             ></app-upload-button>
 
             <app-export-button
@@ -109,7 +110,8 @@
             <app-profile-miles [milesData]="milesData"></app-profile-miles>
           </div>
 
-          <div class="tile-dark-blue profile-attachments" *ngIf="timesheetDetails?.attachments?.length">
+          <div class="tile-dark-blue profile-attachments"
+               *ngIf="!timesheetDetails.noWorkPerformed && timesheetDetails?.attachments?.length">
               <h3 class="attachments-title">Attachments</h3>
 
               <app-attachments-list [attachments]="timesheetDetails.attachments"
