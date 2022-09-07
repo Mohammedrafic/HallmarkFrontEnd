@@ -305,6 +305,7 @@ export class OrderManagementContentState {
     { patchState }: StateContext<OrderManagementContentStateModel>,
     { payload, isIncomplete }: GetOrders
   ): Observable<OrderManagementPage> {
+    patchState({ ordersPage: null });
     return !isIncomplete
       ? this.orderManagementService.getOrders(payload).pipe(
           tap((payload) => {

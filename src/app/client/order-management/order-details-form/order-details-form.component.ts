@@ -699,6 +699,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.generalInformationForm.controls['shiftStartTime'].setValidators(Validators.required);
       this.generalInformationForm.controls['shiftEndTime'].setValidators(Validators.required);
     }
+    Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
+      this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
+    });
   }
 
   private userEditsOrder(fieldIsTouched: boolean): void {
@@ -886,6 +889,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private populateForms(order: Order): void {
+    this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
     this.orderTypeChanged.emit(order.orderType);
 
@@ -999,6 +1003,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.workLocationsFormArray.push(this.newWorkLocationFormGroup());
     }
     this.disableFormControls(order);
+    this.handlePerDiemOrder();
+    this.handlePermPlacementOrder();
   }
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
