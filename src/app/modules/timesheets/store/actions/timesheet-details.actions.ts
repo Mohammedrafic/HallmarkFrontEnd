@@ -44,17 +44,6 @@ export namespace TimesheetDetails {
     }
   }
 
-  // for organization/agency submit/approve
-  export class SubmitTimesheet {
-    static readonly type = TIMESHEETS_ACTIONS.ORGANIZATION_APPROVE_TIMESHEET;
-
-    constructor(
-      public readonly id: number,
-      public readonly orgId: number | null,
-    ) {
-    }
-  }
-
   export class ChangeTimesheetStatus {
     static readonly type = TIMESHEETS_ACTIONS.REJECT_TIMESHEET;
 
@@ -112,14 +101,6 @@ export namespace TimesheetDetails {
 
     constructor(
       public readonly payload: DownloadAttachmentData,
-    ) {}
-  }
-
-  export class FileLoaded {
-    static readonly type = '[file viewer] file loaded';
-
-    constructor(
-      public readonly file: Blob,
     ) {}
   }
 
