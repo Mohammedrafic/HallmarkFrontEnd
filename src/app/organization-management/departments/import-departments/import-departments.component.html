@@ -1,0 +1,20 @@
+<app-import-dialog-content
+  [importResponse]="importResponse"
+  [dialogEvent]="dialogEvent"
+  [selectErrorsTab]="selectErrorsTab"
+  (downloadErrorsEvent)="downloadErrors($event)"
+  (downloadTemplateEvent)="downloadTemplate()"
+  (saveImportResult)="saveImportResult($event)"
+  (uploadImportFile)="uploadImportFile($event)"
+>
+  <app-departments-grid
+    successful
+    *ngIf="importResponse?.succesfullRecords?.length"
+    [importedDepartments]="importResponse?.succesfullRecords || []"
+  ></app-departments-grid>
+  <app-departments-grid
+    errors
+    *ngIf="importResponse?.errorRecords?.length"
+    [importedDepartments]="importResponse?.errorRecords || []"
+  ></app-departments-grid>
+</app-import-dialog-content>

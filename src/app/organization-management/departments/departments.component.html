@@ -18,7 +18,7 @@
         [dataSource]="locations$ | async"
         [fields]="locationFields"
         (change)="onLocationDropDownChanged($event)"
-        [value]="defaultLocationValue"             
+        [value]="defaultLocationValue"
       ></ejs-dropdownlist>
     </section>
     <section>
@@ -41,7 +41,7 @@
         ejs-dropdownbutton
         [items]="exportOptions"
         (select)="exportSelected($event)"
-        id="importButton"
+        id="exportButton"
         cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
       <button
         ejs-button
@@ -331,4 +331,5 @@
     </div>
   </form>
 </app-side-dialog>
-<app-file-upload-dialog></app-file-upload-dialog>
+
+<app-import-departments [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-import-departments>

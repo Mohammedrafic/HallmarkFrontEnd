@@ -89,9 +89,17 @@ import {
   SaveLocationsImportResult,
   SaveLocationsImportResultSucceeded,
   UploadLocationsFile,
-  UploadLocationsFileSucceeded
+  UploadLocationsFileSucceeded,
+  GetDepartmentsImportTemplate,
+  GetDepartmentsImportTemplateSucceeded,
+  GetDepartmentsImportErrors,
+  GetDepartmentsImportErrorsSucceeded,
+  UploadDepartmentsFile,
+  UploadDepartmentsFileSucceeded,
+  SaveDepartmentsImportResult,
+  SaveDepartmentsImportResultSucceeded
 } from './organization-management.actions';
-import { Department, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
+import { Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
 import { Region, regionFilter } from '@shared/models/region.model';
 import {
   ImportedLocation,
@@ -484,7 +492,7 @@ export class OrganizationManagementState {
   UpdateRegion({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { region }: UpdateRegion): Observable<Region> {
     return this.regionService.updateRegion(region).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
-      
+
       if( payload.id!=0)
       {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
@@ -1002,6 +1010,50 @@ export class OrganizationManagementState {
         return payload;
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Locations were not imported'))))
+    );
+  }
+
+  @Action(GetDepartmentsImportTemplate)
+  GetDepartmentsImportTemplate({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: GetDepartmentsImportTemplate): Observable<any> {
+    return this.departmentService.getDepartmentsImportTemplate(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetDepartmentsImportTemplateSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(GetDepartmentsImportErrors)
+  GetDepartmentsImportErrors({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: GetDepartmentsImportErrors): Observable<any> {
+    return this.departmentService.getDepartmentsImportTemplate(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetDepartmentsImportErrorsSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(UploadDepartmentsFile)
+  UploadDepartmentsFile({ dispatch }: StateContext<CandidateStateModel>, { payload }: UploadDepartmentsFile): Observable<ImportResult<ImportedDepartment> | Observable<void>> {
+    return this.departmentService.uploadDepartmentsFile(payload).pipe(
+      tap((payload) => {
+        dispatch(new UploadDepartmentsFileSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : 'File was not uploaded'))))
+    );
+  }
+
+  @Action(SaveDepartmentsImportResult)
+  SaveDepartmentsImportResult({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveDepartmentsImportResult): Observable<ImportResult<ImportedDepartment> | Observable<void>> {
+    return this.departmentService.saveDepartmentsImportResult(payload).pipe(
+      tap((payload) => {
+        dispatch(new SaveDepartmentsImportResultSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Departments were not imported'))))
     );
   }
 }
