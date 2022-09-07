@@ -86,15 +86,13 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   get showWithdrawAction(): boolean {
     return (
-      !this.isWithdraw &&
-      ([ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom, ApplicantStatusEnum.Applied].includes(
-        this.candidateStatus
-      ) &&
-      !this.isDeployedCandidate) || 
+      (!this.isWithdraw &&
+        [ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom, ApplicantStatusEnum.Applied].includes(
+          this.candidateStatus
+        ) &&
+        !this.isDeployedCandidate) ||
       (this.isAgency &&
-      [ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom].includes(
-        this.candidateStatus
-      ))
+        [ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom].includes(this.candidateStatus))
     );
   }
 
@@ -179,7 +177,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch(new RejectCandidateJob(payload));
+      this.store.dispatch(new RejectCandidateJob(payload)).subscribe(() => {
+        this.store.dispatch(new ReloadOrderCandidatesLists());
+      });
+
       this.closeDialog();
     }
   }
