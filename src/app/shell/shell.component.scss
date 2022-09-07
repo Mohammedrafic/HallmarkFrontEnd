@@ -37,6 +37,8 @@
   .logout-button {
     margin: 0 25px;
   }
+
+ 
 }
 
 .shell {
@@ -350,6 +352,7 @@
 
 .e-logout::before {
   content: "\e702";
+  font-size: 15px;
 }
 
 .e-dashboard::before {
@@ -366,6 +369,15 @@
 
 .e-settings::before {
   content: "\e701";
+  font-size:15px;
+}
+
+.e-theme-light::before {
+  content: "\e7ed";
+}
+
+.e-theme-dark::before {
+  content: "\e72f";
 }
 
 .nav-search-input {
@@ -389,7 +401,9 @@
     cursor: pointer;
   }
 }
-
+.e-menu-item {
+  font-weight: 500;
+}
 #alert-sidebar {
   .sidebar-header {
     background-color: $alert-side-bar-bgcolor;

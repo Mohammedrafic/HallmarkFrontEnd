@@ -5,9 +5,6 @@
   </div>
 
   <div class="stick-right header-content">
-    <div class="other-icons">
-      <i-feather name="help-circle" class="icon" (click)="onGetHelp()"></i-feather>
-    </div>
 
     <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
       <app-organization-agency-selector></app-organization-agency-selector>
@@ -26,14 +23,9 @@
     <!-- Temporary solution to log out from the application -->
 
     <div class="header-item">
-
-      <button ejs-dropdownbutton [items]='profileDatasource'
-              (select)="onSelectProfileMenu($event)">
-
-        <span>{{userLogin.firstName}} {{userLogin.lastName}}</span>
-
-      </button>
-
+      <ejs-menu [items]='profileDatasource'
+                (select)="onSelectProfileMenu($event)">
+      </ejs-menu>
     </div>
     <!-- Temporary solution to log out from the application -->
     <!--<button class="logout-button" ejs-button cssClass="e-primary" (click)="logout()">Logout</button>-->
