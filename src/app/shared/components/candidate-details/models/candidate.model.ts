@@ -6,6 +6,7 @@ export type OrderTab = {
   orderId: number;
   candidateId: number;
   orderType: number;
+  prefix: string;
 };
 
 export interface CandidatesDetailsModel extends CandidatesBasicInfo {

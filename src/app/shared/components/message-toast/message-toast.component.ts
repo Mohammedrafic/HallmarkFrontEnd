@@ -20,7 +20,7 @@ export class MessageToastComponent implements OnInit, OnDestroy {
   type: MessageTypes;
   messageType = MessageTypes;
   isQuickOrder: boolean | undefined;
-  publicId: number | undefined;
+  publicId: string | undefined;
   organizationPrefix: string | undefined
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -31,7 +31,7 @@ export class MessageToastComponent implements OnInit, OnDestroy {
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowToast))
       .pipe(tap(() => this.toast.hide()), delay(500))
-      .subscribe((payload: { type: MessageTypes; messageContent: string; isQuickOrder?: boolean; organizationPrefix?: string; publicId?: number }) => {
+      .subscribe((payload: { type: MessageTypes; messageContent: string; isQuickOrder?: boolean; organizationPrefix?: string; publicId?: string }) => {
         this.type = payload.type;
         this.messageContent = payload.messageContent;
         this.isQuickOrder = payload.isQuickOrder;
@@ -59,6 +59,6 @@ export class MessageToastComponent implements OnInit, OnDestroy {
   }
 
   navigateToAllOrders(): void {
-    this.router.navigate(['/client/order-management'], { state: { redirectedFromToast: true, publicId: this.publicId } }).then(() => this.toast.hide());
+    this.router.navigate(['/client/order-management'], { state: { redirectedFromToast: true, publicId: this.publicId, prefix: this.organizationPrefix } }).then(() => this.toast.hide());
   }
 }

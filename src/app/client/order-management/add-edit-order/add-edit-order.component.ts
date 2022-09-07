@@ -134,11 +134,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.tab.hideTab(SelectedTab.BillRates, this.isPermPlacementOrder);
         }
 
-        if (order?.status === OrderStatus.Incomplete) {
+        if (order?.status === OrderStatus.Incomplete ) {
           this.addMenuItem(SubmitButtonItem.SaveForLater, 'Save For Later');
           this.removeMenuItem(SubmitButtonItem.Save);
         } else {
-          if (order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement || order?.extensionFromId) {
+          if ((order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement || order?.extensionFromId) && order?.status !== OrderStatus.PreOpen) {
             this.disableOrderType = true;
           }
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
@@ -563,10 +563,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private markControlsAsRequired(): void {
     this.getOrderDetailsControl('regionId')?.markAsTouched();
     this.getOrderDetailsControl('skillId')?.markAsTouched();
-    if (this.orderDetailsFormComponent.isLocationsDropDownEnabled) {
+    if (!this.getOrderDetailsControl('locationId')?.disabled) {
       this.getOrderDetailsControl('locationId')?.markAsTouched();
     }
-    if (this.orderDetailsFormComponent.isDepartmentsDropDownEnabled) {
+    if (!this.getOrderDetailsControl('departmentId')?.disabled) {
       this.getOrderDetailsControl('departmentId')?.markAsTouched();
     }
   }

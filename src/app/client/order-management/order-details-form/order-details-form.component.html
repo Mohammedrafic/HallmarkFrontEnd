@@ -67,7 +67,6 @@
                     <ejs-dropdownlist
                       formControlName="locationId"
                       appValidateWithMessage
-                      [enabled]="isLocationsDropDownEnabled"
                       [dataSource]="locations$ | async"
                       [fields]="locationFields"
                       (select)="onLocationDropDownChanged($event)"
@@ -83,7 +82,6 @@
                     <ejs-dropdownlist
                       formControlName="departmentId"
                       appValidateWithMessage
-                      [enabled]="isDepartmentsDropDownEnabled"
                       [dataSource]="departments$ | async"
                       [fields]="departmentFields"
                       (select)="onDepartmentDropDownChanged($event)"

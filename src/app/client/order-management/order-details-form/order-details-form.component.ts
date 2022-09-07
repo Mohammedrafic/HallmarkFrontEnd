@@ -173,13 +173,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   @Select(OrganizationManagementState.locationsByRegionId)
   locations$: Observable<Location[]>;
-  isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedLocation: Location;
 
   @Select(OrganizationManagementState.departments)
   departments$: Observable<Department[]>;
-  isDepartmentsDropDownEnabled: boolean = false;
   departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   selectedDepartment: Department;
 
@@ -618,7 +616,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     if (this.selectedRegion.id) {
       this.markTouchedField(fieldName);
       this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
-      this.isLocationsDropDownEnabled = true;
       this.resetLocation();
       this.resetDepartment();
     }
@@ -631,7 +628,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     if (this.selectedLocation?.id) {
       this.markTouchedField(fieldName);
       this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.id));
-      this.isDepartmentsDropDownEnabled = true;
       this.resetDepartment();
     }
   }

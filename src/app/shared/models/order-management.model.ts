@@ -172,7 +172,7 @@ export type AgencyOrderFilters = {
   regionIds?: number[];
   locationIds?: number[];
   departmentsIds?: number[];
-  orderId?: number | null;
+  orderPublicId?: string | null;
   reOrderId?: number;
   skillIds?: number[];
   candidateStatuses?: number[];
@@ -479,7 +479,7 @@ export class OrderFilter {
   locationIds?: number[];
   departmentsIds?: number[];
   reOrderId?: number;
-  orderId?: number | null;
+  orderPublicId?: string | null;
   skillIds?: number[];
   orderTypes?: number[];
   jobTitle?: string;
