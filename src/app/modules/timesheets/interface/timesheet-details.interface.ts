@@ -5,8 +5,7 @@ import { TimesheetInvoice } from './timesheet-invoice.interface';
 import { RecordValue } from './common.interface';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn } from '@shared/models/export.model';
-import { Invoice, InvoiceDetail } from '../../invoices/interfaces';
-import { PendingApprovalInvoice } from '../../invoices/interfaces/pending-approval-invoice.interface';
+import { TimesheetStatus } from '../enums/timesheet-status.enum';
 
 export interface DetailsColumnConfig {
   align: TableColumnAlign;
@@ -57,7 +56,7 @@ export interface CostCenterOption {
 export interface TimesheetDetailsModel {
   id: number;
   statusText: string;
-  status: number;
+  status: TimesheetStatus;
   mileageStatusText: string;
   mileageStatus: number;
   canApproveMileage: boolean;

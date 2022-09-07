@@ -13,6 +13,9 @@ export class UploadButtonComponent {
   @Input()
   public container: HTMLElement;
 
+  @Input()
+  public disabled: boolean = false;
+
   @Output()
   public readonly filesSelected: EventEmitter<FileForUpload[]> = new EventEmitter<FileForUpload[]>();
 
