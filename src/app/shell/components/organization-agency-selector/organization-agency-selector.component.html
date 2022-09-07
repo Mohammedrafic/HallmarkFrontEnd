@@ -12,7 +12,7 @@
         <div class="item-container">
           <div class="logo-container">
             <img *ngIf="data.hasLogo; else noLogo"
-              [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo'"
+              [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo?lastUpdateTicks=' + data.lastUpdateTicks"
               alt="logo"
             />
           </div>
@@ -26,7 +26,7 @@
         <div class="value-container">
           <div class="logo-container">
             <img *ngIf="data.hasLogo; else noLogo"
-              [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo'"
+              [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo?lastUpdateTicks=' + data.lastUpdateTicks"
               alt="logo"
             />
           </div>
@@ -42,7 +42,7 @@
   <div class="organization-agency-title-container" *ngIf="organizationAgency">
     <div class="logo-container">
       <img *ngIf="organizationAgency.hasLogo; else noLogo"
-        [src]="baseUrl + '/api/BusinessUnit/' + organizationAgency.id + '/logo'"
+        [src]="baseUrl + '/api/BusinessUnit/' + organizationAgency.id + '/logo?lastUpdateTicks=' + organizationAgency.lastUpdateTicks"
         alt="logo"
       />
     </div>

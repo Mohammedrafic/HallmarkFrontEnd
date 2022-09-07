@@ -223,15 +223,15 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         const organizations = this.userOrganizations.businessUnits;
 
         this.agencies = agencies.map((a: UserAgencyOrganizationBusinessUnit) => {
-          const { id, name, hasLogo } = a;
-          const agency: IOrganizationAgency = { id, name, type: 'Agency', hasLogo };
+          const { id, name, hasLogo, lastUpdateTicks } = a;
+          const agency: IOrganizationAgency = { id, name, type: 'Agency', hasLogo, lastUpdateTicks };
 
           return agency;
         });
 
         this.organizations = organizations.map((o: UserAgencyOrganizationBusinessUnit) => {
-          const { id, name, hasLogo } = o;
-          const organization: IOrganizationAgency = { id, name, type: 'Organization', hasLogo };
+          const { id, name, hasLogo, lastUpdateTicks } = o;
+          const organization: IOrganizationAgency = { id, name, type: 'Organization', hasLogo, lastUpdateTicks };
 
           return organization;
         });
