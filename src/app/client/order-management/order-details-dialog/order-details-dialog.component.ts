@@ -26,7 +26,12 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ApproveOrder, DeleteOrder, GetExtensions, SetLock } from '@client/store/order-managment-content.actions';
+import {
+  ApproveOrder,
+  DeleteOrder,
+  GetOrganizationExtensions,
+  SetLock,
+} from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
   CANCEL_CONFIRM_TEXT,
@@ -352,7 +357,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           isOrderPositionSelected &&
           (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
         ) {
-          this.store.dispatch(new GetExtensions(order.items[0].deployedCandidateInfo.jobId, selectedOrder.id!));
+          this.store.dispatch(
+            new GetOrganizationExtensions(order.items[0].deployedCandidateInfo.jobId, selectedOrder.id!)
+          );
         }
       });
 

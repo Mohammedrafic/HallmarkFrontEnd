@@ -38,8 +38,8 @@ import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.
 import { GetAgencyExtensions, GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import {
   GetAvailableSteps,
-  GetExtensions,
   GetOrganisationCandidateJob,
+  GetOrganizationExtensions,
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
@@ -302,7 +302,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
         new GetAgencyExtensions(this.candidateJob?.jobId, this.selectedOrder.id!, this.candidateJob?.organizationId!)
       );
     } else {
-      this.store.dispatch(new GetExtensions(this.candidateJob?.jobId, this.order.id));
+      this.store.dispatch(new GetOrganizationExtensions(this.candidateJob?.jobId, this.order.id));
     }
   }
 

@@ -20,12 +20,12 @@ import {
   GetAssociateAgencies,
   GetAvailableSteps,
   GetContactDetails,
-  GetExtensions,
   GetHistoricalData,
   GetOrderById,
   GetOrderFilterDataSources,
   GetOrders,
   GetOrganisationCandidateJob,
+  GetOrganizationExtensions,
   GetOrganizationStatesWithKeyCode,
   GetPredefinedBillRates,
   GetProjectNames,
@@ -610,8 +610,8 @@ export class OrderManagementContentState {
               lastSelectedOrganizationId: Number(payload.organizationId),
               lastSelectedAgencyId: null,
             },
-            true,
-          )
+            true
+          ),
         ]);
 
         return payload;
@@ -772,10 +772,10 @@ export class OrderManagementContentState {
     );
   }
 
-  @Action(GetExtensions)
-  GetExtensions(
+  @Action(GetOrganizationExtensions)
+  GetOrganizationExtensions(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { id, orderId }: GetExtensions
+    { id, orderId }: GetOrganizationExtensions
   ): Observable<ExtensionGridModel[]> {
     return this.extensionSidebarService
       .getExtensions(id, orderId)
