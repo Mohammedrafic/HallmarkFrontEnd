@@ -19,6 +19,7 @@ import { ConfirmService } from "@shared/services/confirm.service";
 import { ClosePositionPayload } from "@client/order-management/close-order/models/closePositionPayload.model";
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-close-order',
@@ -30,6 +31,9 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   @Input() candidate: OrderManagementChild;
   @Output() private closeOrderSuccess: EventEmitter<Order | OrderManagement> = new EventEmitter<Order | OrderManagement>();
   @Output() private closePositionSuccess: EventEmitter<OrderManagementChild> = new EventEmitter<OrderManagementChild>();
+
+  @Select(UserState.lastSelectedOrganizationId)
+  public organizationId$: Observable<number>;
 
   @Select(RejectReasonState.closureReasonsPage)
   public closureReasonsPage$: Observable<RejectReasonPage>;
@@ -63,7 +67,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   public ngOnInit(): void {
-    this.store.dispatch(new GetClosureReasonsByPage(undefined, undefined, undefined, true));
+    this.onOrganizationChangedClosureReasons();
     this.initForm();
     this.subscribeOnCloseSideBar();
   }
@@ -91,6 +95,12 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     } else {
       this.submit();
     }
+  }
+
+  private onOrganizationChangedClosureReasons(): void {
+    this.organizationId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.store.dispatch(new GetClosureReasonsByPage(undefined, undefined, undefined, true));
+    });
   }
 
   private initForm(): void {
