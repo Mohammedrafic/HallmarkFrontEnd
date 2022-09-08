@@ -4,6 +4,12 @@ import { GridErroredCellComponent } from "@shared/components/import-dialog-conte
 
 export const departmentsColumns: ColDef[] = [
   {
+    field: 'orgName',
+    width: 150,
+    headerName: 'Organization',
+    cellRenderer: GridErroredCellComponent,
+  },
+  {
     field: 'region',
     width: 150,
     headerName: 'Region',
