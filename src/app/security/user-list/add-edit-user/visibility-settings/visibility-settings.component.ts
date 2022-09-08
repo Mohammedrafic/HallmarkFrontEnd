@@ -3,10 +3,10 @@ import { FormBuilder } from "@angular/forms";
 
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
-import { debounceTime, filter, Observable, Subject, takeUntil } from "rxjs";
+import { debounceTime, filter, Observable, Subject, takeUntil,throttleTime } from "rxjs";
 
 import { User } from "@shared/models/user-managment-page.model";
-import { UserVisibilitySetting, UserVisibilitySettingsPage } from "@shared/models/visibility-settings.model";
+import { UserVisibilitySetting, UserVisibilitySettingsPage, UserVisibilityFilter } from "@shared/models/visibility-settings.model";
 import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from "@shared/constants";
 import { ConfirmService } from "@shared/services/confirm.service";
@@ -41,6 +41,10 @@ export class VisibilitySettingsComponent extends AbstractGridConfigurationCompon
   private unsubscribe$: Subject<void> = new Subject();
   private userId: string;
 
+  public filters: UserVisibilityFilter = {
+    userId: ''
+  };
+
   constructor(private store: Store,
               private fb: FormBuilder,
               private actions$: Actions,
@@ -49,15 +53,20 @@ export class VisibilitySettingsComponent extends AbstractGridConfigurationCompon
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetUserVisibilitySettingsPage(this.userId));
+    this.currentPage= 1;
+    this.filters.userId = this.userId;
+    this.filters.pageNumber = this.currentPage;
+    this.filters.pageSize = this.pageSize;
+
+    this.store.dispatch(new GetUserVisibilitySettingsPage(this.filters));
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new GetUserVisibilitySettingsPage(this.userId));
+      this.store.dispatch(new GetUserVisibilitySettingsPage(this.filters));
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUserVisibilitySettingsSucceeded))
-      .subscribe(() => this.store.dispatch(new GetUserVisibilitySettingsPage(this.userId)));
+      .subscribe(() => this.store.dispatch(new GetUserVisibilitySettingsPage(this.filters)));
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RemoveUserVisibilitySettingSucceeded))
-      .subscribe(() => this.store.dispatch(new GetUserVisibilitySettingsPage(this.userId)));
+      .subscribe(() => this.store.dispatch(new GetUserVisibilitySettingsPage(this.filters)));
   }
 
   ngOnDestroy(): void {
@@ -98,6 +107,8 @@ export class VisibilitySettingsComponent extends AbstractGridConfigurationCompon
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
+      this.filters.pageNumber = this.currentPage;
+      this.currentPage=event.currentPage;
     }
   }
 }

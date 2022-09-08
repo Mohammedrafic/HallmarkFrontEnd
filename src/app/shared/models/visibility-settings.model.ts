@@ -49,3 +49,10 @@ export type Region = {
   locations: Location[];
   organisationName?: string;
 }
+
+export class UserVisibilityFilter {
+  userId: string;
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+}
