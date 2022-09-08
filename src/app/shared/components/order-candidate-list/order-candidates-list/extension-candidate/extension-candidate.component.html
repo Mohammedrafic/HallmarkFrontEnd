@@ -224,5 +224,6 @@
   [rejectReasonsList]="$any(rejectionReasonsList$ | async)"
   [openEvent]="openRejectDialog"
   (applyReject)="rejectCandidateJob($event)"
+  (cancelReject)="cancelRejectCandidate()"
 ></app-reject-reason-dialog>
 

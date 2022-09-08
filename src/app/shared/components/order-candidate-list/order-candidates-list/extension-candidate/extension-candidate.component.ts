@@ -4,7 +4,7 @@ import { RejectReason } from '@shared/models/reject-reason.model';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { EMPTY, Observable, Subject } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Actions, Select, Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
@@ -17,7 +17,6 @@ import {
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
   GetCandidateJob,
-  GetRejectReasonsForAgency,
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
@@ -37,7 +36,7 @@ import {
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { capitalize } from 'lodash';
-import { DurationService } from '../../../../services/duration.service';
+import { DurationService } from '@shared/services/duration.service';
 
 @Component({
   selector: 'app-extension-candidate',
@@ -182,6 +181,10 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
       this.store.dispatch(new RejectCandidateJob(payload));
       this.dialogEvent.next(false);
     }
+  }
+
+  public cancelRejectCandidate(): void {
+    this.statusesFormControl.reset();
   }
 
   public onAccept(): void {

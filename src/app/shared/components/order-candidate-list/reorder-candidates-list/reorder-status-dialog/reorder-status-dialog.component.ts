@@ -221,6 +221,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     }
   }
 
+  public cancelRejectCandidate(): void {
+    this.jobStatusControl.reset();
+  }
+
   public onReject(): void {
     this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
@@ -446,4 +450,3 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     );
   }
 }
-

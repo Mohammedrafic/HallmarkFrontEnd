@@ -176,6 +176,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     }
   }
 
+  public cancelRejectCandidate(): void {
+    this.jobStatusControl.reset();
+  }
+
   public onClose(): void {
     if (this.form.dirty) {
       this.confirmService
