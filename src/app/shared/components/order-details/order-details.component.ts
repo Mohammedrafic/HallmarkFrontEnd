@@ -5,7 +5,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { Store } from '@ngxs/store';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
-import { SetIsDirtyOrderForm } from "@client/store/order-managment-content.actions";
+import { SetIsDirtyOrderForm } from '@client/store/order-managment-content.actions';
 
 type ContactDetails = Partial<OrderContactDetails> & Partial<OrderWorkLocation>;
 @Component({
@@ -27,7 +27,7 @@ export class OrderDetailsComponent implements OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store, private commentsService: CommentsService) { }
+  constructor(private store: Store, private commentsService: CommentsService) {}
 
   public ngOnDestroy(): void {
     this.unsubscribe$.next();
@@ -55,16 +55,17 @@ export class OrderDetailsComponent implements OnDestroy {
       return;
     }
     const { contactDetails, workLocations, reOrderFrom } = this.order || {};
-    const contact = contactDetails?.length ? contactDetails.filter((contact) => contact.isPrimaryContact) : reOrderFrom?.contactDetails!;
+    const contact = contactDetails?.length
+      ? contactDetails.find((contact) => contact.isPrimaryContact) || contactDetails[0]
+      : reOrderFrom?.contactDetails[0];
     const location = workLocations?.length ? workLocations : reOrderFrom?.workLocations!;
     this.contactDetails = {
-      name: contact?.[0]?.name,
-      email: contact?.[0]?.email,
+      name: contact?.name,
+      email: contact?.email,
       address: location?.[0]?.address,
       city: location?.[0]?.city,
       state: location?.[0]?.state,
       zipCode: location?.[0]?.zipCode,
     };
   }
-
 }

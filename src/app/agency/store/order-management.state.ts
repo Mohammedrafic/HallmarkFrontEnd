@@ -75,6 +75,7 @@ export interface OrderManagementModel {
   orderFilteringOptions: AgencyOrderFilteringOptions | null;
   organizationStructure: OrganizationStructure[];
   ordersTab: AgencyOrderManagementTabs;
+  extensions: any;
 }
 
 @State<OrderManagementModel>({
@@ -96,6 +97,7 @@ export interface OrderManagementModel {
     organizationStructure: [],
     historicalEvents: null,
     ordersTab: AgencyOrderManagementTabs.MyAgency,
+    extensions: null,
   },
 })
 @Injectable()
@@ -410,7 +412,7 @@ export class OrderManagementState {
 
   @Action(GetAgencyExtensions)
   GetAgencyExtensions(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { patchState }: StateContext<OrderManagementModel>,
     { id, orderId, organizationId }: GetAgencyExtensions
   ): Observable<ExtensionGridModel[]> {
     return this.extensionSidebarService

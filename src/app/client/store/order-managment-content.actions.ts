@@ -242,7 +242,7 @@ export class GetContactDetails {
   constructor(public departmentId: number, public lastSelectedBusinessId?: number) {}
 }
 
-export class GetExtensions {
+export class GetOrganizationExtensions {
   static readonly type = '[order management] Get Extensions';
   constructor(public id: number, public orderId: number) {}
 }

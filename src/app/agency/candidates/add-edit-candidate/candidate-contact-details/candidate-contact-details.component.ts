@@ -1,15 +1,15 @@
-import { AfterViewInit, Component, Input } from '@angular/core';
-import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { Subject } from "rxjs";
+import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { BehaviorSubject } from 'rxjs';
 
-import { CanadaStates, Country, UsaStates } from "src/app/shared/enums/states";
+import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
 
 @Component({
   selector: 'app-candidate-contact-details',
   templateUrl: './candidate-contact-details.component.html',
-  styleUrls: ['./candidate-contact-details.component.scss']
+  styleUrls: ['./candidate-contact-details.component.scss'],
 })
-export class CandidateContactDetailsComponent implements AfterViewInit {
+export class CandidateContactDetailsComponent implements OnInit, AfterViewInit {
   @Input() formGroup: FormGroup;
 
   public optionFields = {
@@ -20,12 +20,21 @@ export class CandidateContactDetailsComponent implements AfterViewInit {
     { id: Country.USA, text: Country[0] },
     { id: Country.Canada, text: Country[1] },
   ];
-  public states$ = new Subject();
+  public states$: BehaviorSubject<Array<string>>;
+
+  ngOnInit(): void {
+    this.setCountryState();
+  }
 
   ngAfterViewInit(): void {
-    this.formGroup.get('country')?.valueChanges.subscribe(country => {
+    this.formGroup.get('country')?.valueChanges.subscribe((country) => {
       this.states$.next(country === Country.USA ? UsaStates : CanadaStates);
-    })
+    });
+  }
+
+  private setCountryState(): void {
+    const country = this.formGroup.value.country ?? Country.USA;
+    this.states$ = new BehaviorSubject(country === Country.USA ? UsaStates : CanadaStates);
   }
 
   static createFormGroup(): FormGroup {

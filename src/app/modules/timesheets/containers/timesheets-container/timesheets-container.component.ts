@@ -109,12 +109,22 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     }));
   }
 
-  public handleChangePage(page: number): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState({ pageNumber: page }, this.activeTabIdx !== 0));
+  public handleChangePage(pageNumber: number): void {
+    this.store.dispatch(new Timesheets.UpdateFiltersState(
+      { pageNumber },
+      this.activeTabIdx !== 0,
+      false,
+      true
+    ));
   }
 
   public handleChangePerPage(pageSize: number): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState({ pageSize: pageSize }, this.activeTabIdx !== 0));
+    this.store.dispatch(new Timesheets.UpdateFiltersState(
+      { pageSize },
+      this.activeTabIdx !== 0,
+      false,
+      true
+    ));
   }
 
   public exportSelected(event: any): void {

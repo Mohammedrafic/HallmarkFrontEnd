@@ -221,6 +221,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     }
   }
 
+  public cancelRejectCandidate(): void {
+    this.jobStatusControl.reset();
+  }
+
   public onReject(): void {
     this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
@@ -323,6 +327,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
             skillName: value.skillName,
             offeredBillRate: value.hourlyRate,
             candidateBillRate: value.candidateBillRate,
+            billRates: this.orderCandidateJob.billRates,
+            actualStartDate: value.shiftStartTime,
+            actualEndDate: value.shiftEndTime,
             nextApplicantStatus: {
               applicantStatus: status.applicantStatus,
               statusText: status.statusText,
@@ -446,4 +453,3 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     );
   }
 }
-

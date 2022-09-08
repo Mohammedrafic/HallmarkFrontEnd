@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { EMPTY, Observable, Subject } from 'rxjs';
+import { EMPTY, merge, Observable, Subject } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Actions, Select, Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
@@ -17,7 +17,6 @@ import {
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
   GetCandidateJob,
-  GetRejectReasonsForAgency,
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
@@ -26,7 +25,7 @@ import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/
 import PriceUtils from '@shared/utils/price.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
-import { map } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { Router } from '@angular/router';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
@@ -37,7 +36,7 @@ import {
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { capitalize } from 'lodash';
-import { DurationService } from '../../../../services/duration.service';
+import { DurationService } from '@shared/services/duration.service';
 
 @Component({
   selector: 'app-extension-candidate',
@@ -61,9 +60,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
 
-  @Select(OrderManagementContentState.rejectionReasonsList)
-  rejectionReasonsList$: Observable<RejectReason[]>;
-
+  public rejectReasons: RejectReason[];
   public form: FormGroup;
   public statusesFormControl = new FormControl();
   public candidateJob: OrderCandidateJob;
@@ -87,6 +84,10 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     return this.candidateJob?.applicantStatus?.applicantStatus === this.candidatStatus.Accepted;
   }
 
+  get isRejected(): boolean {
+    return this.candidateJob?.applicantStatus?.applicantStatus === this.candidatStatus.Rejected;
+  }
+
   get isOnBoard(): boolean {
     return this.candidateJob?.applicantStatus?.applicantStatus === this.candidatStatus.OnBoard;
   }
@@ -96,7 +97,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   }
 
   get actualStartDateValue(): Date {
-    return this.form.controls['startDate'].value;
+    return this.form.get('startDate')?.value;
   }
 
   constructor(
@@ -105,13 +106,15 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     private commentsService: CommentsService,
     private router: Router,
     private orderManagementContentService: OrderManagementContentService,
-    private durationService: DurationService
+    private durationService: DurationService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     this.isAgency = this.router.url.includes('agency');
   }
 
   ngOnInit(): void {
     this.subsToCandidate();
+    this.subscribeOnReasonsList();
     this.createForm();
   }
 
@@ -131,6 +134,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
           jobId: this.candidateJob.jobId,
           skillName: value.skillName,
           offeredBillRate: this.candidateJob?.offeredBillRate,
+          offeredStartDate: this.candidateJob?.offeredStartDate,
           candidateBillRate: this.candidateJob.candidateBillRate,
           nextApplicantStatus: {
             applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
@@ -182,6 +186,10 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
       this.store.dispatch(new RejectCandidateJob(payload));
       this.dialogEvent.next(false);
     }
+  }
+
+  public cancelRejectCandidate(): void {
+    this.statusesFormControl.reset();
   }
 
   public onAccept(): void {
@@ -307,6 +315,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
       guaranteedWorkWeek: new FormControl('', [Validators.maxLength(50)]),
       clockId: new FormControl('', [Validators.maxLength(50)]),
       allowDeployCredentials: new FormControl(false),
+      rejectReason: new FormControl(''),
     });
   }
 
@@ -344,27 +353,48 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
             guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
             clockId: this.candidateJob.clockId,
             allowDeployCredentials: this.candidateJob.allowDeployCredentials,
+            rejectReason: this.candidateJob.rejectReason,
           });
 
-          if (this.isAgency && !this.isOnBoard) {
-            this.form.get('comments')?.enable();
-          }
-          if (!this.isAgency) {
-            this.form.get('offeredBillRate')?.enable();
-          }
-          if (this.isAccepted && !this.isAgency) {
-            this.form.get('guaranteedWorkWeek')?.enable();
-            this.form.get('clockId')?.enable();
-            this.form.get('actualStartDate')?.enable();
-            this.form.get('actualEndDate')?.enable();
-            this.form.get('allowDeployCredentials')?.enable();
-          }
-          if (this.isOnBoard && !this.isAgency) {
-            this.form.get('clockId')?.enable();
-            this.form.get('actualStartDate')?.enable();
-            this.form.get('actualEndDate')?.enable();
+          if (!this.isRejected) {
+            this.fieldsEnableHandlear();
           }
         }
+
+        this.changeDetectorRef.markForCheck();
+      });
+  }
+
+  private fieldsEnableHandlear(): void {
+    if (this.isAgency && !this.isOnBoard) {
+      this.form.get('comments')?.enable();
+    }
+    if (!this.isAgency) {
+      this.form.get('offeredBillRate')?.enable();
+    }
+    if (this.isAccepted && !this.isAgency) {
+      this.form.get('guaranteedWorkWeek')?.enable();
+      this.form.get('clockId')?.enable();
+      this.form.get('actualStartDate')?.enable();
+      this.form.get('actualEndDate')?.enable();
+      this.form.get('allowDeployCredentials')?.enable();
+    }
+    if (this.isOnBoard && !this.isAgency) {
+      this.form.get('clockId')?.enable();
+      this.form.get('actualStartDate')?.enable();
+      this.form.get('actualEndDate')?.enable();
+    }
+  }
+
+  private subscribeOnReasonsList(): void {
+    merge(
+      this.store.select(OrderManagementContentState.rejectionReasonsList),
+      this.store.select(OrderManagementState.rejectionReasonsList)
+    )
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((reasons) => {
+        this.rejectReasons = reasons ?? [];
       });
   }
 }
+

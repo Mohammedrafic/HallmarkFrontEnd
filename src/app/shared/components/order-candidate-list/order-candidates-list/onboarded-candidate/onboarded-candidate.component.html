@@ -1,5 +1,5 @@
 <section class="container">
-  <section class="header-container">
+  <section class="header-container" *ngIf="candidate">
     <div class="e-card-header">
       <div class="e-card-header-caption candidat-status">
           <h3 class="e-card-title candidate-title">
@@ -236,4 +236,5 @@
   [rejectReasonsList]="rejectReasons"
   [openEvent]="openRejectDialog"
   (applyReject)="onRejectCandidate($event)"
+  (cancelReject)="cancelRejectCandidate()"
 ></app-reject-reason-dialog>

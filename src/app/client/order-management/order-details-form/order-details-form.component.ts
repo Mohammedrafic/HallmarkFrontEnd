@@ -618,11 +618,16 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.orderManagementService
       .getRegularLocalBillRate(orderType, departmentId, skillId)
       .pipe(
-        takeUntil(this.unsubscribe$),
-        filter((billRate) => !!billRate.length)
+        takeUntil(this.unsubscribe$)
       )
-      .subscribe((billRates: BillRate[]) =>
-        this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour.toFixed(2))
+      .subscribe((billRates: BillRate[]) => {
+        if (billRates.length) {
+          this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour.toFixed(2));
+        } else {
+          this.generalInformationForm.controls['hourlyRate'].patchValue('');
+        }
+      }
+        
       );
   }
 
@@ -1073,7 +1078,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     }
     if (order.orderType === OrderType.OpenPerDiem && order.status === OrderStatus.Open) {
       this.handlePerDiemOrder();
-      this.generalInformationForm = disableControls(this.generalInformationForm, controlNames, false);
+      this.generalInformationForm = disableControls(this.generalInformationForm, ['title', ...controlNames], false);
     }
 
     Object.keys(this.generalInformationForm.controls).forEach((key: string) => {

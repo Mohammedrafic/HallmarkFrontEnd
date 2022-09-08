@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { DialogComponent } from "@syncfusion/ej2-angular-popups";
-import { Subject, takeUntil } from "rxjs";
-import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { RejectReason } from "@shared/models/reject-reason.model";
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { Subject, takeUntil } from 'rxjs';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { RejectReason } from '@shared/models/reject-reason.model';
 
 @Component({
   selector: 'app-reject-reason-dialog',
   templateUrl: './reject-reason-dialog.component.html',
-  styleUrls: ['./reject-reason-dialog.component.scss']
+  styleUrls: ['./reject-reason-dialog.component.scss'],
 })
 export class RejectReasonDialogComponent implements OnInit, OnDestroy {
   @ViewChild('rejectDialog') rejectDialog: DialogComponent;
@@ -15,7 +15,8 @@ export class RejectReasonDialogComponent implements OnInit, OnDestroy {
   @Input() openEvent: Subject<boolean>;
   @Input() rejectReasonsList: RejectReason[];
 
-  @Output() applyReject = new EventEmitter<{rejectReason: number}>();
+  @Output() applyReject = new EventEmitter<{ rejectReason: number }>();
+  @Output() cancelReject = new EventEmitter();
 
   public form: FormGroup;
   public optionFields = {
@@ -36,12 +37,13 @@ export class RejectReasonDialogComponent implements OnInit, OnDestroy {
   }
 
   public onCancel(): void {
+    this.cancelReject.emit();
     this.rejectDialog.hide();
   }
 
   public onReject(): void {
     this.form.markAllAsTouched();
-    if(this.form.valid){
+    if (this.form.valid) {
       this.applyReject.emit(this.form.value);
       this.form.reset();
       this.rejectDialog.hide();
@@ -52,14 +54,14 @@ export class RejectReasonDialogComponent implements OnInit, OnDestroy {
     this.openEvent.pipe(takeUntil(this.unsubscribe$)).subscribe((status: boolean) => {
       if (status) {
         this.rejectDialog.show();
-        this.form.reset()
+        this.form.reset();
       }
     });
   }
 
   private createForm(): void {
     this.form = new FormGroup({
-      rejectReason: new FormControl('', [Validators.required])
+      rejectReason: new FormControl('', [Validators.required]),
     });
   }
 }
