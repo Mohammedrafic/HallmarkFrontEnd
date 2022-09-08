@@ -134,6 +134,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
           jobId: this.candidateJob.jobId,
           skillName: value.skillName,
           offeredBillRate: this.candidateJob?.offeredBillRate,
+          offeredStartDate: this.candidateJob?.offeredStartDate,
           candidateBillRate: this.candidateJob.candidateBillRate,
           nextApplicantStatus: {
             applicantStatus: this.candidateJob.applicantStatus.applicantStatus,

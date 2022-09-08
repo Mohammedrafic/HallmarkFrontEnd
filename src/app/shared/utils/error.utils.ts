@@ -5,4 +5,4 @@ error['errors']
   ? Object.values(error['errors'])
       .flatMap((val) => val)
       .toString()
-  : error.error.detail;
+  : error.error?.detail;
