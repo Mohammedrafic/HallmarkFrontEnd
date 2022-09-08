@@ -51,7 +51,7 @@
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column headerTextAlign="Right" width="165">
         <ng-template #headerTemplate let-data>
-          <div class="controls-header">
+          <div class="controls-header" [class.hidden]="!isLoaded">
             <button
               ejs-button
               cssClass="e-flat icon-button"
@@ -81,7 +81,7 @@
           </div>
         </ng-template>
         <ng-template #template let-data>
-          <div *ngIf="!data?.isTemplate; else templateButtons" class="row-tool-buttons">
+          <div *ngIf="!data?.isTemplate; else templateButtons" [class.hidden]="!isLoaded" class="row-tool-buttons">
             <button
               *ngIf="
                 activeTab !== OrganizationOrderManagementTabs.Incomplete && orderTypes.OpenPerDiem === data.orderType
