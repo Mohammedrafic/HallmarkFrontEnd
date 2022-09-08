@@ -4,6 +4,12 @@ import { GridErroredCellComponent } from "@shared/components/import-dialog-conte
 
 export const locationsColumns: ColDef[] = [
   {
+    field: 'orgName',
+    width: 150,
+    headerName: 'Organization',
+    cellRenderer: GridErroredCellComponent,
+  },
+  {
     field: 'regionName',
     width: 150,
     headerName: 'Region',
@@ -25,6 +31,24 @@ export const locationsColumns: ColDef[] = [
     field: 'invoiceId',
     width: 200,
     headerName: 'Invoice Location ID',
+    cellRenderer: GridErroredCellComponent,
+  },
+  {
+    field: 'businessLine',
+    width: 200,
+    headerName: 'Business Line',
+    cellRenderer: GridErroredCellComponent,
+  },
+  {
+    field: 'locationType',
+    width: 200,
+    headerName: 'Location Type',
+    cellRenderer: GridErroredCellComponent,
+  },
+  {
+    field: 'timeZone',
+    width: 200,
+    headerName: 'Time Zone',
     cellRenderer: GridErroredCellComponent,
   },
   {

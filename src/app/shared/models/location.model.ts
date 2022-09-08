@@ -74,6 +74,9 @@ export type ImportedLocation = {
   locationName: string;
   externalId: string;
   invoiceId: string;
+  businessLine: string;
+  locationType: string;
+  timeZone: string;
   address1: string;
   address2: string;
   state: string;
