@@ -74,6 +74,7 @@ export namespace Invoices {
 
     constructor(
       public readonly payload?: InvoicesFilterState | null,
+      public readonly usePrevFiltersState = false,
     ) {}
   }
 

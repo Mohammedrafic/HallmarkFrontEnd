@@ -10,7 +10,7 @@
   [suppressRowClickSelection]="false"
   [rowSelection]="rowSelection"
   [columnDefinitions]="columnDefinitions"
-  [currentPage]="currentPage"
+  [currentPage]="(currentPage$ | async) || 1"
   [isLoading]="isLoading"
   [pageSize]="pageSize"
   [rowData]="tableData?.items"
