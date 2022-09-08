@@ -27,6 +27,7 @@ import {
   PaginationChangedEvent,
 } from '@ag-grid-enterprise/all-modules';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
+import { AppState } from '../../../store/app.state';
 
 enum Visibility {
   Unassigned,
@@ -53,6 +54,9 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
   @Select(SecurityState.rolesPage)
   public rolesPage$: Observable<RolesPage>;
+
+  @Select(AppState.isDarkTheme)
+  isDarkTheme$: Observable<boolean>;
 
   public userGridData$: Observable<User[]>;
   public hasVisibility = (_: string, { assigned }: User) => {

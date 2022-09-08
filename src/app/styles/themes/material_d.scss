@@ -118,6 +118,7 @@ $border-left-radius: 0 !default;
 $border-right-radius: 0 !default;
 $border-top-radius: 0 !default;
 $border-bottom-radius: 0 !default;
+$secondary-dark-blue-30:#9198ac;
 
 $css: '' !default;
 $imported-modules: () !default;
@@ -63772,7 +63773,7 @@ $grid-bigger-icon-font-size: $grid-icon-font-size !default;
 
     &.e-default .e-grouptopleftcell {
       border-color: $grid-header-border-color;
-  }
+    }
 
     .e-frozenhdrcont .e-headercontent > .e-table,
     .e-frozenhdrcont .e-frozenheader > .e-table,
@@ -63790,24 +63791,24 @@ $grid-bigger-icon-font-size: $grid-icon-font-size !default;
     .e-frozencontent .e-virtualtable > .e-table,
     .e-frozenheader .e-virtualtable > .e-table {
       border-right-color: $frozen-border-color;
-  }
+    }
 
     .e-frozenheader.e-frozen-right-header > .e-table,
     .e-frozencontent.e-frozen-right-content > .e-table {
       border-left-color: $frozen-border-color;
-  }
+    }
 
     &.e-rtl .e-frozenheader > .e-table,
     &.e-rtl .e-frozencontent > .e-table,
     &.e-rtl .e-frozenheader .e-virtualtable > .e-table,
     &.e-rtl .e-frozencontent .e-virtualtable > .e-table {
       border-left-color: $frozen-border-color;
-  }
+    }
 
     &.e-rtl .e-frozenheader.e-frozen-right-header > .e-table,
     &.e-rtl .e-frozencontent.e-frozen-right-content > .e-table {
       border-right-color: $frozen-border-color;
-  }
+    }
 
     &.e-gridhover tr[role='row']:not(.e-editedrow):hover .e-rowcell,
     &.e-gridhover tr[role='row']:hover .e-detailrowcollapse,
@@ -63816,7 +63817,7 @@ $grid-bigger-icon-font-size: $grid-icon-font-size !default;
     &.e-gridhover tr[role='row']:hover .e-detailrowexpand {
       &:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
         background-color: $grid-hover-bg-color;
-        color: $grid-hover-content-font-color;
+        color: $grey-black;
       }
     }
 
@@ -64053,7 +64054,7 @@ $grid-bigger-icon-font-size: $grid-icon-font-size !default;
       .e-footer-content {
         border-color: $grid-columnchooser-footer-border-color;
         opacity: $grid-columnchooser-footer-border-opacity;
-       }
+      }
 
       .e-cc-searchdiv {
         border-color: $grid-columnchooser-search-border-color;
@@ -64079,7 +64080,7 @@ $grid-bigger-icon-font-size: $grid-icon-font-size !default;
 
       & .e-verticallines tr th:first-child:not(.e-firstcell) {
         border-color:  $grid-header-border-color;
-    }
+      }
 
       &.e-default .e-gridheader .e-headercell.e-firstheader,
       &.e-default.e-horizontallines .e-headercell.e-firstheader,
@@ -64139,7 +64140,7 @@ $grid-bigger-icon-font-size: $grid-icon-font-size !default;
   .e-dropitemscount {
     background-color: $grid-clone-dropitemscount-bg-color;
     color: $grid-dropitemscount-color;
-   }
+  }
 
   .e-filterbaroperator.e-dropdownlist {
     position: absolute;
@@ -74091,6 +74092,28 @@ $schedule-tree-content-color: #fff !default;
     .e-close-icon::before {
       content: '\e7fc';
     }
+  }
+}
+
+@include export-module('dashboard') {
+  .e-dashboardlayout.e-control .e-panel {
+    background: $grey-dark;
+    border: none;
+  }
+  .widget .widget-data .widget-value .widget-value-number,
+  .app-widget-wrapper__header h3,
+  .widget-legend__legend-text,
+  .widget-legend__score, .widget__title,
+  .app-accumulation-chart__legend-Total-score {
+    color: $grey-white !important;
+  }
+  .widget {
+    &__type {
+      color: $secondary-dark-blue-30 !important;
+    }
+  }
+  .e-maps > svg > rect {
+    fill: $grey-dark;
   }
 }
 

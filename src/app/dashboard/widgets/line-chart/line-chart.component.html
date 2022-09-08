@@ -4,19 +4,19 @@
       <h3 class="widget-header__title">{{ 'Positions Trend' }}</h3>
       <div class="widget-header__actions">
         <button
-          ejs-button
-          [isPrimary]="monthMode"
-          [cssClass]="monthMode ? 'e-small' : 'e-outline e-small'"
-          (click)="onSwicthTo(monthlySelection)"
-        >
+                ejs-button
+                [isPrimary]="monthMode"
+                [cssClass]="monthMode ? 'e-small' : 'e-outline e-small'"
+                (click)="onSwicthTo(monthlySelection)"
+                >
           Monthly
         </button>
         <button
-          ejs-button
-          [isPrimary]="!monthMode"
-          [cssClass]="!monthMode ? 'e-small' : 'e-outline e-small'"
-          (click)="onSwicthTo(weeklySelection)"
-        >
+                ejs-button
+                [isPrimary]="!monthMode"
+                [cssClass]="!monthMode ? 'e-small' : 'e-outline e-small'"
+                (click)="onSwicthTo(weeklySelection)"
+                >
           Weekly
         </button>
       </div>
@@ -26,13 +26,14 @@
     <ejs-chart
       #sfComponent
       [chartArea]="chartArea"
-      [primaryXAxis]="primaryXAxis"
-      [primaryYAxis]="primaryYAxis"
+      [primaryXAxis]="isDarkTheme ? primaryXAxisDarkTheme : primaryXAxis"
+      [primaryYAxis]="isDarkTheme ? primaryYAxisDarkTheme : primaryYAxis"
       [crosshair]="crosshairSettings"
       [legendSettings]="legendSettings"
       [tooltip]="tooltipSettings"
       class="app-line-chart__component"
       [palettes]="palettes"
+      [background]="isDarkTheme ? 'var(--chart-dark-bg)' : 'var(--chart-light-bg)'"
     >
       <e-series-collection>
         <!-- ngFor structural directive can't be used due to an error in Syncfusion library v.20.1.57 during rendering -->

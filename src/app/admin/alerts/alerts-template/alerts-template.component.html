@@ -22,7 +22,7 @@
   </ng-container>
 
 </app-page-toolbar>
-<section class="alerts-template-top-padding table-wrapper app-grid">
+<section class="alerts-template-top-padding table-wrapper" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'">
   <div class="custom-grid">
     <ag-grid-angular #agGridPagination
                      class="ag-theme-alpine app-grid__component"

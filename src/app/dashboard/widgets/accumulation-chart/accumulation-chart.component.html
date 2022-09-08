@@ -8,7 +8,9 @@
                            [id]="chartData?.id"
                            [legendSettings]="legendSettings"
                            [tooltip]="tooltipSettings"
-                           class="app-accumulation-chart__component">
+                           class="app-accumulation-chart__component"
+                           [background]="isDarkTheme==true ? 'var(--chart-dark-bg)' : 'var(--chart-light-bg)'"
+                           >
       <e-accumulation-series-collection>
         <e-accumulation-series [dataSource]="filteredChartData$ | async"
                                pointColorMapping="color"
