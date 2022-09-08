@@ -12,6 +12,7 @@ import { GridValuesHelper } from '@core/helpers/grid-values.helper';
 import { InputEditorComponent } from '../components/cell-editors/input-editor/input-editor.component';
 import { EditFieldTypes } from '@core/enums';
 import { RecordStatusCellComponent } from '../components/cell-editors/record-status-cell/record-status-cell.component';
+import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
 const commonColumn: ColDef = {
   filter: true,
@@ -64,6 +65,7 @@ const amountColdef = (headerText: string): ColDef => (
     ...commonColumn,
     cellClass: 'common-cell',
     width: 110,
+    valueFormatter: (params: ValueFormatterParams) => GridValuesHelper.formatNumber(params.value, '1.2-2'),
   }
 );
 

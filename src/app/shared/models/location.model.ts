@@ -67,3 +67,25 @@ export class TimeZoneModel {
   SystemTimeZoneName: string;
   TimeZoneId: string;
 }
+
+export type ImportedLocation = {
+  orgName: string;
+  regionName: string;
+  locationName: string;
+  externalId: string;
+  invoiceId: string;
+  address1: string;
+  address2: string;
+  state: string;
+  city: string;
+  zip: string;
+  contactPerson: string;
+  contactEmail: string;
+  phoneNumber: string;
+  phoneType: string;
+  ext: string;
+  glNumber: string;
+  invoiceNote: string;
+  inactiveDate: string;
+  errorProperties: string[];
+}

@@ -1,9 +1,9 @@
 <ng-container *ngIf="milesData.weekMiles || milesData.cumulativeMiles">
     <div class="mile-title">Week Miles</div>
-    <div class="mile-value">{{milesData.weekMiles}}</div>
+    <div class="mile-value">{{milesData.weekMiles | number : '1.2-2'}}</div>
 
     <div class="mile-title">Cumulative Miles</div>
-    <div class="mile-value">{{milesData.cumulativeMiles}}</div>
+    <div class="mile-value">{{milesData.cumulativeMiles | number : '1.2-2'}}</div>
 </ng-container>
 
 <ng-container *ngIf="milesData.weekCharge || milesData.cumulativeCharge">

@@ -1,7 +1,8 @@
 export class UserAgencyOrganizationBusinessUnit {
   id: number;
   name: string;
-  logo?: string;
+  hasLogo?: boolean;
+  lastUpdateTicks?: number;
 }
 
 export class UserAgencyOrganization {

@@ -133,6 +133,8 @@ import { SmsSideDialogComponent } from '@shared/components/sms-side-dialog/sms-s
 import { OnScreenSideDialogComponent } from '@shared/components/on-screen-side-dialog/on-screen-side-dialog.component';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { AlertsState } from '@admin/store/alerts.state';
+import { ImportDialogContentComponent } from './components/import-dialog-content/import-dialog-content.component';
+import { GridErroredCellComponent } from "./components/import-dialog-content/grid-errored-cell/grid-errored-cell.component";
 
 const icons = {
   AlertCircle,
@@ -211,10 +213,10 @@ const COMPONENTS = [
   ExtensionCandidateComponent,
   ActionCellRendererComponent,
   CustomIconComponent,
-  ActionCellRendererComponent, 
-  EmailSideDialogComponent,  
+  ActionCellRendererComponent,
+  EmailSideDialogComponent,
   SmsSideDialogComponent,
-  OnScreenSideDialogComponent,  
+  OnScreenSideDialogComponent,
   OrderCloseReasonInfoComponent
 ];
 
@@ -267,6 +269,7 @@ const COMPONENTS = [
     ErrorMessageComponent,
     CandidateAvatarPipe,
     AcceptFormComponent,
+    ImportDialogContentComponent,
   ],
   declarations: [
     ...COMPONENTS,
@@ -280,6 +283,8 @@ const COMPONENTS = [
     ReorderStatusDialogComponent,
     AcceptFormComponent,
     CustomNoRowsOverlayComponent,
+    GridErroredCellComponent,
+    ImportDialogContentComponent,
   ],
   providers: [
     DatePipe,

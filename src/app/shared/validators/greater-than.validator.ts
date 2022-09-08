@@ -13,6 +13,10 @@ export function greaterThanValidator(primaryControlName: string, secondaryContro
     }
 
     if (primaryControlValue > secondaryControlValue) {
+      if (!primaryControl.pristine && !secondaryControl.pristine) {
+        secondaryControl.setErrors(invalidTimeError);
+      }
+
       if (primaryControl.pristine) {
         secondaryControl.setErrors(invalidTimeError);
       }

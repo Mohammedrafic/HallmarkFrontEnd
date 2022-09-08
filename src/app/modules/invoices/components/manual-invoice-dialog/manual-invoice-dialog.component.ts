@@ -191,7 +191,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       const [orgPrefix, orderId, position] = ManualInvoiceAdapter.parseOrderId(item.formattedOrderIdFull);
       const orgPrefixMatch: boolean = currentOrgPrefix ? currentOrgPrefix === orgPrefix : true;
       const orderIdMatch: boolean = currentOrderId === orderId;
-      const positionMatch: boolean = currentPosition === position;
+      const positionMatch: boolean =  currentPosition === null || currentPosition === position;
 
       return orgPrefixMatch && orderIdMatch && positionMatch;
     });

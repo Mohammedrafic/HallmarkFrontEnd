@@ -307,11 +307,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private listenRedirectFromReOrder(): void {
     this.orderManagementAgencyService.orderPerDiemId$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: {id: number, prefix: string}) => {
+      .subscribe((data: { id: number; prefix: string }) => {
         this.orderPerDiemId = data.id;
         this.prefix = data.prefix;
         this.filters.orderPublicId = this.prefix + '-' + this.orderPerDiemId;
-        this.OrderFilterFormGroup.controls['orderPublicId'].setValue((this.prefix + '-' + (this.orderPerDiemId || this.orderId))?.toString());
+        this.OrderFilterFormGroup.controls['orderPublicId'].setValue(
+          (this.prefix + '-' + (this.orderPerDiemId || this.orderId))?.toString()
+        );
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
         this.filteredItems$.next(this.filteredItems.length);
         this.dispatchNewPage();
@@ -336,6 +338,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private onTabChange(): void {
     this.ordersTab$
       .pipe(
+        debounceTime(100),
         takeUntil(this.unsubscribe$),
         tap((selected) => {
           const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
@@ -348,7 +351,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           this.selectedIndex = null;
           if (this.orderPerDiemId || this.orderId) {
             this.filters.orderPublicId = this.prefix + '-' + this.orderPerDiemId;
-            this.OrderFilterFormGroup.controls['orderPublicId'].setValue((this.prefix + '-' + (this.orderPerDiemId || this.orderId))?.toString());
+            this.OrderFilterFormGroup.controls['orderPublicId'].setValue(
+              (this.prefix + '-' + (this.orderPerDiemId || this.orderId))?.toString()
+            );
             this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
             this.filteredItems$.next(this.filteredItems.length);
           }
@@ -665,7 +670,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private listenRedirectFromExtension(): void {
     this.orderManagementAgencyService.orderId$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean), debounceTime(300))
-      .subscribe((data: {id: number, prefix: string}) => {
+      .subscribe((data: { id: number; prefix: string }) => {
         this.orderId = data.id;
         this.prefix = data.prefix;
         this.filters.orderPublicId = this.prefix + '-' + this.orderId;
