@@ -264,6 +264,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     if (this.selectedIndex) {
       this.gridWithChildRow.selectRow(this.selectedIndex);
     }
+    this.contentLoadedHandler();
 
     this.openPerDiemDetails();
     this.openMyAgencyTabWithCandidate();

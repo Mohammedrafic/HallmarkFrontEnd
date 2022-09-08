@@ -262,6 +262,10 @@ a, a:hover, a:focus, a:active {
   overflow: hidden !important;
 }
 
+.hidden {
+  visibility: hidden;
+}
+
 .widget-tooltip {
   text-align: center;
   padding: 10px 20px;

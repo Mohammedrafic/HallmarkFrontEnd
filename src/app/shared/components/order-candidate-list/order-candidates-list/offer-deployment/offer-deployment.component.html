@@ -19,6 +19,7 @@
         <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isDeployedCandidate && !isReadOnly">
           <ejs-dropdownlist [fields]="optionFields"
                             [dataSource]="nextApplicantStatuses"
+                            [formControl]="statusesFormControl"
                             [itemTemplate]="itemTemplate"
                             placeholder="Select Status"
                             (select)="updateCandidateJob($event)">
@@ -199,4 +200,5 @@
   [rejectReasonsList]="rejectReasons"
   [openEvent]="openRejectDialog"
   (applyReject)="onRejectCandidate($event)"
+  (cancelReject)="cancelRejectCandidate()"
 ></app-reject-reason-dialog>

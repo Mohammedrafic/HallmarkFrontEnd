@@ -3,9 +3,11 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -51,7 +53,7 @@ import { DurationService } from '../../../../services/duration.service';
   providers: [MaskedDateTimeService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OnboardedCandidateComponent implements OnInit, OnDestroy {
+export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
 
   @Select(OrderManagementContentState.rejectionReasonsList)
@@ -105,11 +107,11 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   }
 
   get candidateStatus(): ApplicantStatusEnum {
-    return this.candidate.status || (this.candidate.candidateStatus as any);
+    return this.candidate?.status || (this.candidate?.candidateStatus as any);
   }
 
   get actualStartDateValue(): Date {
-    return this.form.controls['startDate'].value;
+    return this.form.controls['startDate']?.value;
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -136,6 +138,13 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.subscribeOnSuccessRejection();
     this.subscribeOnUpdateOrganisationCandidateJobError();
     this.subscribeOnGetStatus();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    const { candidate } = changes;
+    if (candidate?.currentValue && !candidate?.isFirstChange()) {
+      this.getComments();
+    }
   }
 
   ngOnDestroy(): void {
@@ -174,6 +183,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       this.store.dispatch([new RejectCandidateJob(payload), new ReloadOrganisationOrderCandidatesLists()]);
       this.closeDialog();
     }
+  }
+
+  public cancelRejectCandidate(): void {
+    this.jobStatusControl.reset();
   }
 
   public onClose(): void {
