@@ -98,13 +98,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   get showWithdrawAction(): boolean {
     return (
-      (!this.isWithdraw &&
-        [ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom, ApplicantStatusEnum.Applied].includes(
-          this.candidateStatus
-        ) &&
-        !this.isDeployedCandidate) ||
-      (this.isAgency &&
-        [ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom].includes(this.candidateStatus))
+      [ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom].includes(this.candidateStatus) &&
+      ((!this.isWithdraw && !this.isDeployedCandidate) || this.isAgency)
     );
   }
 
@@ -343,3 +338,4 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.form.markAsPristine();
   }
 }
+
