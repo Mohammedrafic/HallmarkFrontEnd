@@ -220,24 +220,34 @@ export class TimesheetsState {
   @Action(Timesheets.UpdateFiltersState)
   UpdateFiltersState(
     { setState, getState }: StateContext<TimesheetsModel>,
-    { payload, saveStatuses, saveOrganizationId }: Timesheets.UpdateFiltersState,
+    { payload, saveStatuses, saveOrganizationId, usePrevFiltersState }: Timesheets.UpdateFiltersState,
   ): Observable<null> {
     const oldFilters: TimesheetsFilterState = getState().timesheetsFilters || DefaultFiltersState;
-    const savedFiltersKeys = SavedFiltersParams.filter((key: TimesheetsTableFiltersColumns) =>
-      saveStatuses || key !== TimesheetsTableFiltersColumns.StatusIds
-    );
-    let filters: TimesheetsFilterState = reduceFiltersState(oldFilters, savedFiltersKeys);
-    filters = Object.assign({}, filters, payload);
+
+    let filters: TimesheetsFilterState;
+
+    if (!usePrevFiltersState) {
+      const savedFiltersKeys = SavedFiltersParams.filter(
+        (key: TimesheetsTableFiltersColumns) => saveStatuses || key !== TimesheetsTableFiltersColumns.StatusIds
+      );
+
+      filters = reduceFiltersState(oldFilters, savedFiltersKeys);
+      filters = Object.assign({}, filters, payload);
+    } else {
+      filters = Object.assign({}, oldFilters, payload);
+    }
+
+    const timesheetsFilters = payload ?
+      filters :
+      Object.assign({}, DefaultFiltersState, saveOrganizationId && {
+        organizationId: oldFilters.organizationId,
+      });
 
     return of(null).pipe(
       throttleTime(100),
       tap(() =>
         setState(patch<TimesheetsModel>({
-          timesheetsFilters: payload ?
-            filters :
-            Object.assign({}, DefaultFiltersState, saveOrganizationId && {
-              organizationId: oldFilters.organizationId,
-            }),
+          timesheetsFilters,
         })
       )),
     );

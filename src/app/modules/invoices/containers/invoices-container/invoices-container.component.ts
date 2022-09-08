@@ -309,10 +309,10 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
       });
   }
 
-  public handlePageChange(page: number): void {
+  public handlePageChange(pageNumber: number): void {
     this.store.dispatch(new Invoices.UpdateFiltersState({
-      pageNumber: page,
-    }))
+      pageNumber,
+    }, true))
       .pipe(
         takeUntil(this.componentDestroy()),
       );
@@ -321,7 +321,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   public handlePageSizeChange(pageSize: number): void {
     this.store.dispatch(new Invoices.UpdateFiltersState({
       pageSize,
-    }))
+    }, true))
       .pipe(
         takeUntil(this.componentDestroy()),
       );

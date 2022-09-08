@@ -178,16 +178,25 @@ export class InvoicesState {
   @Action(Invoices.UpdateFiltersState)
   UpdateFiltersState(
     { setState, getState }: StateContext<InvoicesModel>,
-    { payload }: Invoices.UpdateFiltersState,
+    { payload, usePrevFiltersState }: Invoices.UpdateFiltersState,
   ): Observable<null> {
     const oldFilters: InvoicesFilterState = getState().invoicesFilters || DefaultFiltersState;
-    let filters: InvoicesFilterState = reduceFiltersState(oldFilters, SavedInvoicesFiltersParams);
-    filters = Object.assign({}, filters, payload);
+
+    let filters: InvoicesFilterState;
+
+    if (!usePrevFiltersState) {
+      filters = reduceFiltersState(oldFilters, SavedInvoicesFiltersParams);
+      filters = Object.assign({}, filters, payload);
+    } else {
+      filters = Object.assign({}, oldFilters, payload);
+    }
+
+    const invoicesFilters = payload ? filters : DefaultFiltersState;
 
     return of(null).pipe(
       throttleTime(100),
       tap(() => setState(patch<InvoicesModel>({
-        invoicesFilters: payload ? filters : DefaultFiltersState,
+        invoicesFilters,
       })))
     );
   }
@@ -311,7 +320,7 @@ export class InvoicesState {
           tabIdx === 0 ? new Invoices.GetManualInvoices(payload.organizationId) :
           new Invoices.GetPendingInvoices(payload.organizationId),
         ]);
-        
+
       }),
       catchError((err: HttpErrorResponse) => {
         return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
@@ -628,7 +637,7 @@ export class InvoicesState {
       targetState: stateId,
       organizationId: orgId,
     };
-    
+
     return this.invoicesAPIService.changeInvoiceStatus(body)
       .pipe(
         tap((res) => {
