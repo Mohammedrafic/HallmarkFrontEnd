@@ -39,3 +39,17 @@ export class DepartmentFilterOptions {
   facilityContacts: string[];
   facilityEmails: string[];
 }
+
+export type ImportedDepartment = {
+  orgName: string;
+  region: string;
+  location: string;
+  departmentName: string;
+  extDepartmentId: string;
+  invoiceDepartmentId: string;
+  facilityContact: string;
+  facilityEmail: string;
+  facilityPhoneNo: string;
+  inactiveDate: string;
+  errorProperties: string[];
+}

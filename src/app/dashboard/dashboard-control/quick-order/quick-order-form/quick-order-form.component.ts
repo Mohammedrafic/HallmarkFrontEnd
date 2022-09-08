@@ -388,6 +388,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.regionDataSource = this.organizationStructure.regions;
       this.populateRegLocDepSkillFields(this.regionDataSource[0]);
       this.orderTypeControl.updateValueAndValidity();
+      this.getContactDetails();
     }
   }
 
@@ -605,7 +606,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private getContactDetails(): void {
-    this.organizationForm.controls['organization'].valueChanges
+    this.generalInformationForm.controls['departmentId'].valueChanges
     .pipe(
       switchMap(() => {
           return this.contactDetails$;

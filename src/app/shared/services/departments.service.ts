@@ -3,7 +3,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { Department, DepartmentFilter, DepartmentFilterOptions, DepartmentsPage } from '../../shared/models/department.model';
+import {
+  Department,
+  DepartmentFilter,
+  DepartmentFilterOptions,
+  DepartmentsPage,
+  ImportedDepartment
+} from '@shared/models/department.model';
+import { ImportResult } from "@shared/models/import.model";
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
@@ -73,5 +80,19 @@ export class DepartmentsService {
    */
   public getDepartmentFilterOptions(locationId: number): Observable<DepartmentFilterOptions> {
     return this.http.get<DepartmentFilterOptions>(`/api/Departments/filteringoptions`, { params: { LocationId: locationId }});
+  }
+
+  public getDepartmentsImportTemplate(errorRecords: ImportedDepartment[]): Observable<any> {
+    return this.http.post('/api/Departments/template', errorRecords, { responseType: 'blob' });
+  }
+
+  public uploadDepartmentsFile(file: Blob): Observable<ImportResult<ImportedDepartment>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ImportResult<ImportedDepartment>>('/api/Departments/import', formData);
+  }
+
+  public saveDepartmentsImportResult(successfulRecords: ImportedDepartment[]): Observable<ImportResult<ImportedDepartment>> {
+    return this.http.post<ImportResult<ImportedDepartment>>('/api/Departments/saveimport', successfulRecords);
   }
 }

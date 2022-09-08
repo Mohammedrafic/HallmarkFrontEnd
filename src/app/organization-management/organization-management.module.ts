@@ -101,6 +101,8 @@ import { BusinessLinesState } from './store/business-lines.state';
 import { ImportLocationsComponent } from './locations/import-locations/import-locations.component';
 import { LocationsGridComponent } from './locations/import-locations/locations-grid/locations-grid.component';
 import { GridModule as AppGridModule } from "@shared/components/grid/grid.module";
+import { ImportDepartmentsComponent } from './departments/import-departments/import-departments.component';
+import { DepartmentsGridComponent } from './departments/import-departments/departments-grid/departments-grid.component';
 
 const sidebarIcons = {
   Download,
@@ -159,7 +161,9 @@ const sidebarIcons = {
     PurchaseOrderMappingComponent,
     BusinessLinesComponent,
     ImportLocationsComponent,
-    LocationsGridComponent
+    LocationsGridComponent,
+    ImportDepartmentsComponent,
+    DepartmentsGridComponent
   ],
   imports: [
     CommonModule,

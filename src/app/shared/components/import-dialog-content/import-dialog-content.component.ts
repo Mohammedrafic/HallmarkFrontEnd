@@ -1,6 +1,4 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { ImportResult } from "@shared/models/import.model";
-import { ImportedLocation } from "@shared/models/location.model";
 
 import { SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
 import { SelectEventArgs, TabComponent } from "@syncfusion/ej2-angular-navigations";
@@ -11,6 +9,7 @@ import { filter, Subject, takeUntil } from "rxjs";
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, IMPORT_CONFIRM_TEXT, IMPORT_CONFIRM_TITLE } from "@shared/constants";
 import { DestroyableDirective } from "@shared/directives/destroyable.directive";
 import { ConfirmService } from "@shared/services/confirm.service";
+import { ImportResult } from "@shared/models/import.model";
 
 @Component({
   selector: 'app-import-dialog-content',
@@ -24,9 +23,9 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   @ViewChild('tab') tab: TabComponent;
 
   @Output() public downloadTemplateEvent: EventEmitter<void> = new EventEmitter<void>();
-  @Output() public downloadErrorsEvent: EventEmitter<ImportedLocation[]> = new EventEmitter<ImportedLocation[]>();
-  @Output() public saveImportResult: EventEmitter<any> = new EventEmitter<any>(); // TODO
-  @Output() public uploadImportFile: EventEmitter<any> = new EventEmitter<any>(); // TODO
+  @Output() public downloadErrorsEvent: EventEmitter<any[]> = new EventEmitter<any[]>();
+  @Output() public saveImportResult: EventEmitter<any[]> = new EventEmitter<any[]>();
+  @Output() public uploadImportFile: EventEmitter<Blob> = new EventEmitter<Blob>();
 
   @Input() public dialogEvent: Subject<boolean>;
   @Input() public selectErrorsTab: Subject<void>;
