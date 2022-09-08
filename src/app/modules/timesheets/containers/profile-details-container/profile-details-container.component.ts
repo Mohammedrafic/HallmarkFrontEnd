@@ -23,7 +23,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
 import { AttachmentsListConfig } from '@shared/components/attachments';
-import { TimesheetTargetStatus } from '../../enums';
+import { TimesheetTargetStatus, TIMETHEETS_STATUSES } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import {
@@ -122,6 +122,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public isDNWEnabled: boolean = false;
 
   public isNavigationAvaliable = true;
+
+  public isMileageStatusAvailable = true;
 
   public countOfTimesheetUpdates = 0;
 
@@ -314,6 +316,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       switchMap((details) => {
         this.timesheetId = details.id;
         this.mileageTimesheetId = details.mileageTimesheetId;
+        this.isMileageStatusAvailable = details.mileageStatusText.toLocaleLowerCase() !== TIMETHEETS_STATUSES.NO_MILEAGES_EXIST;
 
         return this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(
           details.id, details.organizationId, this.isAgency))

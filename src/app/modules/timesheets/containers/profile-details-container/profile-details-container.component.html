@@ -32,6 +32,7 @@
                 >
                 </e-chip>
                 <e-chip
+                  *ngIf="isMileageStatusAvailable"
                   [text]="timesheetDetails.mileageStatusText"
                   [cssClass]="timesheetDetails.mileageStatusText || '' | chipsCssClass"
                 >

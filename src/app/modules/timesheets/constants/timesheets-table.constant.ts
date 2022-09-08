@@ -1,10 +1,10 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 
-import { ColDef } from '@ag-grid-community/core';
+import { ColDef, ValueGetterParams } from '@ag-grid-community/core';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
-import { FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns } from '../enums';
+import { FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
 import { FilterColumns, TimesheetsFilterState } from '../interface';
 import {
   TimesheetTableApproveCellComponent
@@ -65,6 +65,12 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       minWidth: 170,
       cellRenderer: TableStatusCellComponent,
       cellClass: 'status-cell',
+      valueGetter: (params: ValueGetterParams) => {
+        const status = params.data.mileageStatusText || '';
+
+        return status.toLowerCase() !== TIMETHEETS_STATUSES.NO_MILEAGES_EXIST
+          ? status : '';
+      },
       ...commonColumn,
     },
     {
