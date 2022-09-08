@@ -204,8 +204,8 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
           switchMap(() => this.manualInvoicesData$),
           takeUntil(this.componentDestroy()),
         )
-        .subscribe(({ items }: PageOfCollections<BaseInvoice>) =>
-          this.invoicesTableTabsComponent.setTabVisibility(0, !!items.length));
+        .subscribe(({ totalCount }: PageOfCollections<BaseInvoice>) =>
+          this.invoicesTableTabsComponent.setTabVisibility(0, !!totalCount));
     }
   }
 
