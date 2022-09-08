@@ -68,6 +68,8 @@ export abstract class AbstractGridConfigurationComponent {
   filteredItems: FilteredItem[] = [];
   filteredCount = 0;
 
+  isLoaded = false;
+
   protected constructor() {}
 
   generateDateTime(datePipe: DatePipe): string {
@@ -169,6 +171,13 @@ export abstract class AbstractGridConfigurationComponent {
     this.updatePage();
   }
 
+  contentLoadedHandler() {
+    // Syncfusion Support ticket #403476
+    setTimeout(() => {
+      this.isLoaded = true;
+    });
+  }
+
   gridDataBound(grid: any): void {
     if (this.selectedItems.length) {
       const selectedIndexes: number[] = [];
@@ -179,6 +188,7 @@ export abstract class AbstractGridConfigurationComponent {
       });
       grid.selectRows(selectedIndexes);
     }
+    this.contentLoadedHandler();
   }
 
   actionBegin(args: PageEventArgs, grid?: any): void {
@@ -194,6 +204,11 @@ export abstract class AbstractGridConfigurationComponent {
         this.refreshing = false;
       }
     }
+    // Syncfusion Support ticket #403476
+    if ( args.requestType == 'paging' || args.requestType == 'filtering' || args.requestType == 'sorting' || args.requestType == 'refresh') {
+      this.isLoaded = false;
+    }
+
   }
 
   stopPropagation(event: Event): void {

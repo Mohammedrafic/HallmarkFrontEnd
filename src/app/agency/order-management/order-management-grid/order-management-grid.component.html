@@ -23,7 +23,7 @@
     <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
     <e-column headerTextAlign="Right" width="120">
       <ng-template #headerTemplate let-data>
-        <div class="controls-header">
+        <div class="controls-header" [class.hidden]="!isLoaded">
           <button
             ejs-button
             cssClass="e-flat icon-button"
@@ -53,7 +53,7 @@
         </div>
       </ng-template>
       <ng-template #template let-data>
-        <div class="row-tool-buttons">
+        <div class="row-tool-buttons" [class.hidden]="!isLoaded">
           <button *ngIf="isLockMenuButtonsShown" ejs-button cssClass="e-flat" [disabled]="true">
             <span *ngIf="data.isLocked"><i-feather name="lock" class="icon"></i-feather></span>
             <span *ngIf="!data.isLocked"><app-custom-icon name="unlock" class="icon"></app-custom-icon></span>
