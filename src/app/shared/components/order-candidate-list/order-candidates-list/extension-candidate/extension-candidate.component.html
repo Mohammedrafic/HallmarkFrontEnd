@@ -11,7 +11,7 @@
           </ejs-chiplist>
         </ng-container>
       </div>
-      <div class="e-card-content button-container">
+      <div class="e-card-content button-container" *ngIf="!isRejected">
         <div class="input-group dropdown bootstrap">
           <ejs-dropdownlist
             *ngIf="!isAgency"
@@ -177,6 +177,12 @@
                     </div>
                   </div>
                 </div>
+                <div class="input-container bootstrap" *ngIf="isRejected">
+                  <label>Rejection Reason</label>
+                  <div class="input-group">
+                    <input appValidateWithMessage readonly formControlName="rejectReason" class="e-input" type="text"  maxlength="50"/>
+                  </div>
+                </div>
               </form>
             </ng-template>
           </e-accordionitem>
@@ -205,7 +211,7 @@
     </div>
   </section>
   <section class="bill-rates">
-    <ng-container [ngTemplateOutlet]="isAgency ? billRates : editBillRates"></ng-container>
+    <ng-container [ngTemplateOutlet]="isAgency || isRejected ? billRates : editBillRates"></ng-container>
     <ng-template #billRates>
       <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
     </ng-template>
@@ -221,7 +227,7 @@
 </section>
 
 <app-reject-reason-dialog
-  [rejectReasonsList]="$any(rejectionReasonsList$ | async)"
+  [rejectReasonsList]="rejectReasons"
   [openEvent]="openRejectDialog"
   (applyReject)="rejectCandidateJob($event)"
   (cancelReject)="cancelRejectCandidate()"
