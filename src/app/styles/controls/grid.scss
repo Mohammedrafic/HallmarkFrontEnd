@@ -235,9 +235,17 @@ ejs-grid.e-control.e-grid {
 
         &:hover {
           background-color: $supportive-red-40;
+        }
 
-          &.green-background {
+        &.green-background {
+
+          &:hover {
             background-color: $supportive-green-40;
+          }
+
+          &:focus {
+            color: $white;
+            background-color: $supportive-green;
           }
         }
 
