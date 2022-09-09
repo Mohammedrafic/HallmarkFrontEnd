@@ -39,6 +39,7 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
 
   public ngOnInit(): void {
     this.selectPerDiemTab();
+    this.selectReorderAfterNavigation();
 
     const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
@@ -64,6 +65,13 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
     //TODO: change perDiemTabIndex to 3 , when we implemented other tabs
     const perDiemTabIndex = 1;
     this.orderManagementAgencyService.orderPerDiemId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.tabNavigation.select(perDiemTabIndex);
+    });
+  }
+
+  private selectReorderAfterNavigation(): void {
+    const perDiemTabIndex = 3;
+    this.orderManagementAgencyService.reorderId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.tabNavigation.select(perDiemTabIndex);
     });
   }

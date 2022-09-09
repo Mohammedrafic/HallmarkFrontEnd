@@ -312,6 +312,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.listenRedirectFromReOrder();
     this.onCommentRead();
     this.listenRedirectFromExtension();
+    this.listenRedirectFromPerDiem();
     this.subscribeForSettings();
     this.handleRedirectFromQuickOrderToast();
   }
@@ -1323,6 +1324,17 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private listenRedirectFromExtension(): void {
     this.orderManagementService.orderId$.pipe(takeUntil(this.unsubscribe$), filter(Boolean), debounceTime(300)).subscribe((data: {id: number, prefix: string}) => {
+      this.orderId = data.id;
+      this.prefix = data.prefix;
+      this.filters.orderPublicId = this.prefix + '-' + this.orderId;
+      this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns)
+      this.getOrders();
+    });
+  }
+
+  private listenRedirectFromPerDiem(): void {
+    this.orderManagementService.reorderId$.pipe(takeUntil(this.unsubscribe$), filter(Boolean), debounceTime(300)).subscribe((data: {id: number, prefix: string}) => {
       this.orderId = data.id;
       this.prefix = data.prefix;
       this.filters.orderPublicId = this.prefix + '-' + this.orderId;
