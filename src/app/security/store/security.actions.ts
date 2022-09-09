@@ -1,7 +1,7 @@
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Role, RoleDTO, RolesFilters } from '@shared/models/roles.model';
 import { User, UserDTO } from '@shared/models/user-managment-page.model';
-import { UserVisibilitySettingBody } from '@shared/models/visibility-settings.model';
+import { UserVisibilityFilter, UserVisibilitySettingBody } from '@shared/models/visibility-settings.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 export class GetBusinessByUnitType {
@@ -98,7 +98,7 @@ export class GetRolesForCopy {
 
 export class GetUserVisibilitySettingsPage {
   static readonly type = '[security] Get User Visibility Settings Page';
-  constructor(public userId: string) {}
+  constructor(public filters: UserVisibilityFilter) { }
 }
 
 export class SaveUserVisibilitySettings {

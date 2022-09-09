@@ -379,9 +379,9 @@ export class SecurityState {
   @Action(GetUserVisibilitySettingsPage)
   GetUserVisibilitySettingsPage(
     { patchState, dispatch }: StateContext<SecurityStateModel>,
-    { userId }: GetUserVisibilitySettingsPage
+    { filters }: GetUserVisibilitySettingsPage
   ): Observable<UserVisibilitySettingsPage | void> {
-    return this.userService.getUserVisibilitySettingsPage(userId).pipe(
+    return this.userService.getUserVisibilitySettingsPage(filters).pipe(
       tap((payload) => {
         patchState({ userVisibilitySettingsPage: payload });
         return payload;
