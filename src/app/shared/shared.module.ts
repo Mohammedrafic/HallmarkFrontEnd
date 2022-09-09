@@ -134,7 +134,8 @@ import { OnScreenSideDialogComponent } from '@shared/components/on-screen-side-d
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { AlertsState } from '@admin/store/alerts.state';
 import { ImportDialogContentComponent } from './components/import-dialog-content/import-dialog-content.component';
-import { GridErroredCellComponent } from "./components/import-dialog-content/grid-errored-cell/grid-errored-cell.component";
+import { GridErroredCellComponent } from './components/import-dialog-content/grid-errored-cell/grid-errored-cell.component';
+import { HideBeforeSyncfusionLoadDirective } from './directives/hide-before-syncfusion-load.directive';
 
 const icons = {
   AlertCircle,
@@ -169,6 +170,7 @@ const COMPONENTS = [
   BillRatePipe,
   ExBillRateNamesPipe,
   ValidateDirective,
+  HideBeforeSyncfusionLoadDirective,
   AlwaysOpenFirstAccordition,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
@@ -217,7 +219,7 @@ const COMPONENTS = [
   EmailSideDialogComponent,
   SmsSideDialogComponent,
   OnScreenSideDialogComponent,
-  OrderCloseReasonInfoComponent
+  OrderCloseReasonInfoComponent,
 ];
 
 @NgModule({
@@ -249,7 +251,7 @@ const COMPONENTS = [
     TextBoxModule,
     MaskedTextBoxAllModule,
     TabAllModule,
-    NgxsModule.forFeature([BillRateState, SecurityState, CommentsState,AlertsState]),
+    NgxsModule.forFeature([BillRateState, SecurityState, CommentsState, AlertsState]),
     PageToolbarModule,
     FilterDialogModule,
     SideMenuModule,

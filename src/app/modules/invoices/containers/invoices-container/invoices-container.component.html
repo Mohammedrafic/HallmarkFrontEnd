@@ -20,6 +20,7 @@
     </div>
     <button
       ejs-button
+      hideBeforeSyncfusionLoad
       cssClass="e-outline button-filter button--no-wrap"
       (click)="showFilters()">
       <div class="filter-button-content">
@@ -43,6 +44,7 @@
     <div class="invoices-actions-container">
       <button
         ejs-button
+        hideBeforeSyncfusionLoad
         class="e-primary"
         (click)="openAddDialog()"
         *ngIf="tabConfig?.manualInvoiceCreationEnabled"

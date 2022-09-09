@@ -3,7 +3,7 @@
     <section>
       <h3>Shifts</h3>
     </section>
-    <section>
+    <section [class.hidden]="!isLoaded">
       <button
         ejs-dropdownbutton
         [items]="exportOptions"

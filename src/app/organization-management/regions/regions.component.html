@@ -1,7 +1,7 @@
 <section class="flex-column">
   <section class="toolbar">
-  
-    <section>
+
+    <section [class.hidden]="!isLoaded">
       <button
       ejs-button
       id="importButton"
@@ -50,7 +50,7 @@
     [selectionSettings]="selectionSettings"
   >
     <e-columns>
-    
+
       <e-column  [customAttributes]='customAttributes'>
         <ng-template #template let-data >
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
@@ -129,7 +129,7 @@
 </ejs-multiselect>
       </div>
     </div>
-  
+
   </form>
 </app-filter-dialog>
 <app-side-dialog
