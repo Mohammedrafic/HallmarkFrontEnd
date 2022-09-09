@@ -95,7 +95,7 @@ export interface OrderManagementModel {
     },
     orderFilteringOptions: null,
     organizationStructure: [],
-    historicalEvents: null,
+    historicalEvents: [],
     ordersTab: AgencyOrderManagementTabs.MyAgency,
     extensions: null,
   },
@@ -347,7 +347,7 @@ export class OrderManagementState {
 
   @Action(GetAgencyHistoricalData)
   GetAgencyHistoricalData(
-    { patchState }: StateContext<OrderManagementModel>,
+    { patchState, dispatch }: StateContext<OrderManagementModel>,
     { organizationId, candidateJobId }: GetAgencyHistoricalData
   ): Observable<HistoricalEvent[]> {
     return this.orderManagementContentService.getHistoricalData(organizationId, candidateJobId).pipe(
@@ -356,7 +356,7 @@ export class OrderManagementState {
         return payload;
       }),
       catchError(() => {
-        patchState({ historicalEvents: [] });
+        dispatch(new ClearAgencyHistoricalData());
         return of();
       })
     );

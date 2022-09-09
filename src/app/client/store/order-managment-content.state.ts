@@ -148,7 +148,7 @@ export interface OrderManagementContentStateModel {
     isDirtyQuickOrderForm: false,
     rejectionReasonsList: null,
     orderFilterDataSources: null,
-    historicalEvents: null,
+    historicalEvents: [],
     navigationTab: {
       active: null,
       pending: null,
@@ -697,7 +697,7 @@ export class OrderManagementContentState {
 
   @Action(GetHistoricalData)
   GetHistoricalData(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
     { organizationId, candidateJobId }: GetHistoricalData
   ): Observable<HistoricalEvent[]> {
     return this.orderManagementService.getHistoricalData(organizationId, candidateJobId).pipe(
@@ -706,7 +706,7 @@ export class OrderManagementContentState {
         return payload;
       }),
       catchError(() => {
-        patchState({ historicalEvents: [] });
+        dispatch(new ClearHistoricalData());
         return of();
       })
     );

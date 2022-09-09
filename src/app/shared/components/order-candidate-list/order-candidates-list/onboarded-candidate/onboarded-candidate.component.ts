@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -125,7 +126,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
     private orderCandidateListViewService: OrderCandidateListViewService,
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
-    private durationService: DurationService
+    private durationService: DurationService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -157,6 +159,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
       .getComments(this.candidateJob?.commentContainerId as number, null)
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
+        this.changeDetectorRef.markForCheck();
       });
   }
 
@@ -324,9 +327,9 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
           rejectReason: value.rejectReason,
           offeredStartDate: this.getDateString(value.offeredStartDate),
         });
-
         this.switchFormState();
       }
+      this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -352,6 +355,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
   private subscribeOnReasonsList(): void {
     this.rejectionReasonsList$.pipe(takeUntil(this.unsubscribe$)).subscribe((reasons) => {
       this.rejectReasons = reasons;
+      this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -382,9 +386,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
   }
 
   private subscribeOnGetStatus(): void {
-    this.applicantStatuses$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: ApplicantStatus[]) => (this.nextApplicantStatuses = data));
+    this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ApplicantStatus[]) => {
+      this.nextApplicantStatuses = data;
+      this.changeDetectorRef.markForCheck();
+    });
   }
 
   private handleOnboardedCandidate(event: { itemData: { applicantStatus: ApplicantStatus } }): void {
@@ -429,6 +434,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
     this.nextApplicantStatuses = [];
     this.orderCandidateListViewService.setIsCandidateOpened(false);
     this.form.markAsPristine();
+    this.changeDetectorRef.markForCheck();
   }
 
   private switchFormState(): void {
