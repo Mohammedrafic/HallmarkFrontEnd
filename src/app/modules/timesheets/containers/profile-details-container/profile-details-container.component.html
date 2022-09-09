@@ -8,7 +8,7 @@
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
-    <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails">
+    <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails; else closeTemplate">
       <div class="profile-details-header">
         <ng-container>
             <img class="e-avatar e-avatar-xlarge" alt="avatar" [src]="timesheetDetails.candidateId | candidateAvatar"/>
@@ -70,7 +70,7 @@
           <button ejs-button type="submit" cssClass="e-flat close-button" (click)="handleProfileClose()">
             <i-feather name="x" class="icon"></i-feather>
           </button>
-       </div>
+        </div>
       </div>
 
       <div class="order-header">
@@ -139,8 +139,14 @@
       </section>
 
     </section>
+    <ng-template #closeTemplate>
+      <section class="container d-flex justify-end">
+        <button ejs-button type="submit" cssClass="e-flat close-button" (click)="handleProfileClose()">
+          <i-feather name="x" class="icon"></i-feather>
+        </button>
+      </section>
+    </ng-template>
     <app-navigation-panel
-            *ngIf="isNavigationAvaliable"
             prevLabel="Previous Timesheet"
             nextLabel="Next Timesheet"
             [prevDisabled]="currentSelectedRowIndex === 0"
