@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { catchError, debounceTime, EMPTY, empty, forkJoin, mergeMap, Observable, of, switchMap, tap, throttleTime, throwError } from 'rxjs';
+import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap, throttleTime } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -12,7 +12,7 @@ import { DialogAction } from '@core/enums';
 import { DataSourceItem, DropdownOption } from '@core/interface';
 
 import { TimesheetsModel, TimeSheetsPage } from '../model/timesheets.model';
-import { TimesheetsApiService } from '../../services';
+import { TimesheetDetailsApiService, TimesheetsApiService } from '../../services';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import {
@@ -48,7 +48,6 @@ import {
   TimesheetStatistics
 } from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
-import { TimesheetDetailsApiService } from '../../services';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { reduceFiltersState } from '@core/helpers/functions.helper';
 
@@ -356,6 +355,10 @@ export class TimesheetsState {
           ctx.dispatch(new TimesheetDetails.GetCostCenters(res.jobId, orgId, isAgency)),
         ])),
         catchError((err: HttpErrorResponse) => {
+          ctx.patchState({
+            timesheetDetails: null,
+          });
+
           return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
         }),
       )
