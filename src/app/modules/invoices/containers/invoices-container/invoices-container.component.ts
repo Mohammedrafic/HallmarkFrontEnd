@@ -84,6 +84,9 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   @Select(UserState.lastSelectedAgencyId)
   public readonly agencyId$: Observable<number>;
 
+  @Select(InvoicesState.manualInvoicesExist)
+  public readonly manualInvoicesExist$: Observable<boolean>;
+
   public organizationId$: Observable<number>;
 
   public colDefs: ColDef[] = [];
@@ -148,7 +151,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   }
 
   public ngAfterViewInit(): void {
-    this.setTabsVisibility();
+    this.setManualInvoicesTabVisibility();
   }
 
   public watchAgencyId(): void {
@@ -196,16 +199,17 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     });
   }
 
-  public setTabsVisibility(): void {
+  public setManualInvoicesTabVisibility(): void {
     if (!this.isAgency) {
       this.organizationId$
         .pipe(
-          switchMap((orgId: number) => this.store.dispatch(new Invoices.GetManualInvoices(orgId))),
-          switchMap(() => this.manualInvoicesData$),
+          switchMap((orgId: number) => this.store.dispatch(new Invoices.CheckManualInvoicesExist(orgId))),
+          switchMap(() => this.manualInvoicesExist$),
           takeUntil(this.componentDestroy()),
         )
-        .subscribe(({ totalCount }: PageOfCollections<BaseInvoice>) =>
-          this.invoicesTableTabsComponent.setTabVisibility(0, !!totalCount));
+        .subscribe((invoicesExist: boolean) =>
+          this.invoicesTableTabsComponent.setTabVisibility(0, invoicesExist)
+        );
     }
   }
 
@@ -230,7 +234,11 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
   public handleChangeTab(tabIdx: number): void {
     this.selectedTabIdx = tabIdx;
-    this.store.dispatch(new Invoices.SetTabIndex(tabIdx));
+    this.store.dispatch([
+      new Invoices.SetTabIndex(tabIdx),
+      new Invoices.CheckManualInvoicesExist(this.organizationId),
+    ]);
+
     this.clearSelections();
     this.clearTab();
 

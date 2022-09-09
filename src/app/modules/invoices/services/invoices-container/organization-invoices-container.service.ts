@@ -16,13 +16,21 @@ import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-conf
 export class OrganizationInvoicesContainerService extends InvoicesContainerService {
   public getColDefsByTab(
     tabIndex: OrganizationInvoicesGridTab,
-    { organizationId }: { organizationId: number | null }
+    { organizationId }: { organizationId: number }
   ): ColDef[] {
     switch (tabIndex) {
       case OrganizationInvoicesGridTab.Manual:
         return ManualInvoicesGridHelper.getOrganizationColDefs({
-          approve: ({ id }: ManualInvoice) => this.store.dispatch(new Invoices.ApproveInvoice(id)),
-          reject: ({ id }: ManualInvoice) => this.store.dispatch(new Invoices.ShowRejectInvoiceDialog(id)),
+          approve: ({ id }: ManualInvoice) =>
+            this.store.dispatch(new Invoices.ApproveInvoice(id))
+              .subscribe(
+                () => this.store.dispatch(new Invoices.CheckManualInvoicesExist(organizationId))
+              ),
+          reject: ({ id }: ManualInvoice) =>
+            this.store.dispatch(new Invoices.ShowRejectInvoiceDialog(id))
+              .subscribe(
+                () => this.store.dispatch(new Invoices.CheckManualInvoicesExist(organizationId))
+              ),
           previewAttachment: (attachment) => this.store.dispatch(
             new Invoices.PreviewAttachment(organizationId, attachment)
           ),

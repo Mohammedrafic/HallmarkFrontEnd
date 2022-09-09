@@ -311,4 +311,12 @@ export namespace Invoices {
     constructor(
       public readonly index: number) {}
   }
+
+  export class CheckManualInvoicesExist {
+    static readonly type = INVOICES_ACTIONS.CheckManualInvoicesExist;
+
+    constructor(
+      public readonly organizationId: number,
+    ) {}
+  }
 }
