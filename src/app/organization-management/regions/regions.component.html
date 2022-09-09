@@ -53,7 +53,7 @@
     
       <e-column  [customAttributes]='customAttributes'>
         <ng-template #template let-data >
-          <div class="row-tool-buttons">
+          <div class="row-tool-buttons" [class.hidden]="!isLoaded">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>

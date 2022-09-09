@@ -249,7 +249,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     } else {
       isBillRatePending = offeredBillRate;
     }
-
+    this.acceptForm.reset();
     this.acceptForm.patchValue({
       reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
       offeredBillRate: PriceUtils.formatNumbers(hourlyRate),

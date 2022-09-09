@@ -294,9 +294,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   private startSelectedTimesheetWatching(): void {
     this.selectedTimeSheet$.pipe(
       throttleTime(100),
-      tap((value) => {
-        this.isNavigationAvaliable = !!value;
-      }),
       filter(Boolean),
       switchMap((timesheet: Timesheet) => {
         this.countOfTimesheetUpdates = 0;

@@ -62,7 +62,7 @@
             <div class="controls-header"></div>
           </ng-template>
           <ng-template #template let-data>
-            <div class="row-tool-buttons">
+            <div class="row-tool-buttons" [class.hidden]="!isLoaded">
               <button ejs-button cssClass="e-flat default-icon-button">
                 <span><i-feather name="file-text" class="icon"></i-feather></span>
               </button>

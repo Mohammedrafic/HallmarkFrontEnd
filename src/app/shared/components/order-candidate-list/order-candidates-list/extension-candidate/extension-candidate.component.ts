@@ -279,6 +279,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
         requestComment: value.comments,
         actualStartDate: new Date(value.actualStartDate).toISOString(),
         actualEndDate: new Date(value.actualEndDate).toISOString(),
+        offeredStartDate: this.candidateJob?.offeredStartDate,
         allowDeployWoCredentials: value.allowDeployCredentials,
         billRates: this.billRatesData,
         guaranteedWorkWeek: value.guaranteedWorkWeek,

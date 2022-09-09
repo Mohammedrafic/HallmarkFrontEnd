@@ -14,6 +14,25 @@ body.light, body.dark {
     }
   }
 
+  .e-control.e-toast {
+    .error-toast.e-toast {
+      background-color: $error !important;
+      border-left: 6px solid $supportive-red;
+  
+      .e-toast-message {
+  
+        .e-toast-content {
+          color: $black;
+          white-space: pre-wrap;
+        }
+  
+        .e-toast-title {
+          color: $supportive-red !important;
+        }
+      }
+    }
+  }
+
   .success-toast {
     .e-toast {
       background-color: $green !important;
