@@ -58,6 +58,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   public isMspUser = false;
   public organizationTypes = OrganizationTypes;
   private showDataBaseControlValue: boolean = false;
+  private logoToDelete: boolean = false;
 
   public createUnderFields = {
     text: 'name',
@@ -355,15 +356,17 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   public uploadImages(businessUnitId: number): void {
     if (this.filesDetails.length) {
       this.store.dispatch(new UploadOrganizationLogo(this.filesDetails[0] as Blob, businessUnitId));
-    } else if (this.logo) {
+    } else if (this.logo && this.logoToDelete) {
       this.store.dispatch(new RemoveOrganizationLogo(businessUnitId));
     }
   }
 
   public onImageSelect(event: Blob | null): void {
     if (event) {
+      this.logoToDelete = false;
       this.filesDetails = [event as Blob];
     } else {
+      this.logoToDelete = true;
       this.filesDetails = [];
     }
   }

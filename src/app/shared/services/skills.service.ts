@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import {
+  ListOfSkills,
   MasterSkillByOrganization,
   MasterSkillDataSources,
   MasterSkillFilters,
@@ -29,8 +30,8 @@ export class SkillsService {
    * Get all master skills array
    * @return list of master skills
    */
-  public getAllMasterSkillsArray(): Observable<Skill[]> {
-    return this.http.get<Skill[]>('/api/MasterSkills/listByActiveBusinessUnit');
+  public getAllMasterSkillsArray(): Observable<ListOfSkills[]> {
+    return this.http.get<ListOfSkills[]>('/api/MasterSkills/listByActiveBusinessUnit');
   }
 
   /**

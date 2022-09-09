@@ -14,9 +14,10 @@
         ejs-button
         cssClass="e-flat button-with-icon"
         (click)="onAddRegionClick()"
+        [class.hidden]="!isLoaded"
       ><i-feather name="plus" class="icon"></i-feather> Add Region</button>
     </section>
-    <section>
+    <section [class.hidden]="!isLoaded">
       <button
         ejs-button
         id="filterButton"
