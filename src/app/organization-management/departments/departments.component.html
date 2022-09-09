@@ -21,7 +21,7 @@
         [value]="defaultLocationValue"
       ></ejs-dropdownlist>
     </section>
-    <section>
+    <section [class.hidden]="!isLoaded">
       <button
         ejs-button
         id="filterButton"
