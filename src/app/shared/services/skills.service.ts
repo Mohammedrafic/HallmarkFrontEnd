@@ -2,20 +2,27 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
-import { MasterSkillByOrganization, MasterSkillDataSources, MasterSkillFilters, Skill, SkillDataSource, SkillFilters, SkillsPage } from '@shared/models/skill.model';
+import {
+  MasterSkillByOrganization,
+  MasterSkillDataSources,
+  MasterSkillFilters,
+  Skill,
+  SkillDataSource,
+  SkillFilters,
+  SkillsPage,
+} from '@shared/models/skill.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
 export class SkillsService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Get all master skills
    * @return skills page
    */
   public getAllMasterSkills(): Observable<SkillsPage> {
-    return this.http.get<SkillsPage>(`/api/masterSkills`, { params: { PageNumber: 1, PageSize: 100 }});
+    return this.http.get<SkillsPage>(`/api/masterSkills`, { params: { PageNumber: 1, PageSize: 100 } });
   }
 
   /**
@@ -23,7 +30,7 @@ export class SkillsService {
    * @return list of master skills
    */
   public getAllMasterSkillsArray(): Observable<Skill[]> {
-    return this.http.get<Skill[]>('/api/masterSkills/forAgency');
+    return this.http.get<Skill[]>('/api/MasterSkills/listByActiveBusinessUnit');
   }
 
   /**
@@ -38,7 +45,7 @@ export class SkillsService {
       filters.pageNumber = pageNumber;
       return this.http.post<SkillsPage>(`/api/masterSkills/filter`, filters);
     }
-    return this.http.get<SkillsPage>(`/api/masterSkills`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+    return this.http.get<SkillsPage>(`/api/masterSkills`, { params: { PageNumber: pageNumber, PageSize: pageSize } });
   }
 
   /**
@@ -55,9 +62,9 @@ export class SkillsService {
    * @return Created/Updated master skill
    */
   public saveMasterSkill(skill: Skill): Observable<Skill> {
-    return skill.id ?
-      this.http.put<Skill>(`/api/masterSkills`, skill) :
-      this.http.post<Skill>(`/api/masterSkills`, skill);
+    return skill.id
+      ? this.http.put<Skill>(`/api/masterSkills`, skill)
+      : this.http.post<Skill>(`/api/masterSkills`, skill);
   }
 
   /**
@@ -80,11 +87,11 @@ export class SkillsService {
       filters.pageSize = pageSize;
       filters.allowOnboard = filters.allowOnboard || null;
       if (filters.glNumbers) {
-        filters.glNumbers = filters.glNumbers.map((val: string) => val === 'blank' ? null : val) as [];
+        filters.glNumbers = filters.glNumbers.map((val: string) => (val === 'blank' ? null : val)) as [];
       }
       return this.http.post<SkillsPage>(`/api/AssignedSkills/filter`, filters);
     }
-    return this.http.get<SkillsPage>(`/api/AssignedSkills`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+    return this.http.get<SkillsPage>(`/api/AssignedSkills`, { params: { PageNumber: pageNumber, PageSize: pageSize } });
   }
 
   /**
@@ -93,9 +100,9 @@ export class SkillsService {
    * @return Created/Updated Assigned skill
    */
   public saveAssignedSkill(skill: Skill): Observable<Skill> {
-    return skill.id ?
-      this.http.put<Skill>(`/api/AssignedSkills`, skill) :
-      this.http.post<Skill>(`/api/AssignedSkills`, skill);
+    return skill.id
+      ? this.http.put<Skill>(`/api/AssignedSkills`, skill)
+      : this.http.post<Skill>(`/api/AssignedSkills`, skill);
   }
 
   /**
