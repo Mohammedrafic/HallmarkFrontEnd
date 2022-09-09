@@ -241,14 +241,14 @@ export class OrderManagementContentState {
   }
 
   @Selector()
-  static lastSelectedOrder(state: OrderManagementContentStateModel): (id: number) => [OrderManagement, number] | [] {
+  static lastSelectedOrder(state: OrderManagementContentStateModel): (id: number) => [OrderManagement, number | undefined] | [] {
     return (id: number) => {
       let rowIndex;
       const order = state.ordersPage?.items.find((order, index) => {
         rowIndex = index;
         return order.id === id;
       });
-      return order && rowIndex ? [order, rowIndex] : [];
+      return order ? [order, rowIndex] : [];
     };
   }
 

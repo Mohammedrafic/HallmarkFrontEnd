@@ -218,10 +218,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
             orderId: this.candidateJob?.orderId as number,
             organizationId: this.candidateJob?.organizationId as number,
             jobId: this.candidateJob?.jobId as number,
-            nextApplicantStatus: {
-              applicantStatus: 60,
-              statusText: 'Onboard',
-            },
+            nextApplicantStatus: this.candidateJob?.applicantStatus,
             actualStartDate: this.candidateJob?.actualStartDate as string,
             actualEndDate: this.candidateJob?.actualEndDate as string,
             offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.availableStartDate as string),
