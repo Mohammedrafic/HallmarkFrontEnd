@@ -47,6 +47,10 @@ $chip-margin: 8px;
   justify-content: center;
 }
 
+.justify-end {
+  justify-content: flex-end;
+}
+
 .spacer {
   flex-grow: 1;
 }
