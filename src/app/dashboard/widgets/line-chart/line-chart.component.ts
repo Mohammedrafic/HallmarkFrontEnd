@@ -95,6 +95,15 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
     header: '',
   };
 
+  public tooltipDarkSettings: TooltipSettingsModel = {
+    enable: true,
+    shared: true,
+    fill: 'var(--tooltip-dark-background)',
+    textStyle: { color: 'var(--tooltip-dark-text)' },
+    opacity: 1,
+    header: '',
+  };
+
   public readonly legendSettings: LegendSettingsModel = { visible: false };
 
   private readonly selectedEntries$: BehaviorSubject<string[] | null> = new BehaviorSubject<string[] | null>(null);

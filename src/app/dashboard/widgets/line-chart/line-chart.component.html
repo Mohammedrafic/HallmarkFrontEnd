@@ -30,7 +30,7 @@
       [primaryYAxis]="isDarkTheme ? primaryYAxisDarkTheme : primaryYAxis"
       [crosshair]="crosshairSettings"
       [legendSettings]="legendSettings"
-      [tooltip]="tooltipSettings"
+      [tooltip]="isDarkTheme ? tooltipDarkSettings : tooltipSettings"
       class="app-line-chart__component"
       [palettes]="palettes"
       [background]="isDarkTheme ? 'var(--chart-dark-bg)' : 'var(--chart-light-bg)'"

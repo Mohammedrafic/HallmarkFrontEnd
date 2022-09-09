@@ -79,3 +79,8 @@ body.light, body.dark {
   }
 
 }
+body.dark {
+  .e-card-title {
+    color: $white !important;
+  }
+}

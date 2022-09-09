@@ -105,8 +105,8 @@ body.light, body.dark {
   }
 }
 
-/** Begin organization-agency-dropdown styles */
 
+/** Begin organization-agency-dropdown styles */
 #organization-agency-dropdown {
   .e-input-group {
     height: 56px;
@@ -156,3 +156,22 @@ body.light, body.dark {
 }
 
 /** End organization-agency-dropdown styles */
+
+body.dark {
+  .bootstrap {
+    ejs-dropdownlist.e-control, ejs-multiselect.e-control, ejs-autocomplete.e-control {
+      span.e-input-group, .e-multiselect.e-input-group {
+        .e-input-group-icon {
+          &.e-search-icon {
+            color: $white !important;
+          }
+        }
+
+        &.e-disabled {
+          background-color: $secondary-dark-blue-20 !important;
+         
+        }
+      }
+    }
+  }
+}

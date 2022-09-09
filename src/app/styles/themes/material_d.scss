@@ -19005,8 +19005,8 @@ $ddl-list-border-size: 0 !default;
 $ddl-list-bottom-border: $ddl-list-border-size !default;
 $ddl-list-border-color: transparent !default;
 $ddl-list-gradient-color: transparent !default;
-$ddl-list-bg-color: $grey-800 !default;
-$ddl-list-header-bg-color: $grey-800 !default;
+$ddl-list-bg-color: $grey-dark !default;
+$ddl-list-header-bg-color: $grey-dark !default;
 $ddl-list-header-border-color: $grey-700 !default;
 $ddl-nodata-font-color: rgba($grey-dark-font, .7) !default;
 $ddl-list-default-font-color: $grey-dark-font !default;
@@ -26428,7 +26428,7 @@ $drop-down-btn-parent-ul-box-shadow: 0 3px 8px 0 rgba($grey-black, .26) !default
 $drop-down-btn-seperator-padding: 8px 0 !default;
 $drop-down-btn-selected-color: $grey-dark-font !default;
 $drop-down-btn-sub-ul-box-shadow: 0 8px 10px 0 rgba($grey-black, .24) !default;
-$drop-down-btn-ul-bgcolor: $grey-800 !default;
+$drop-down-btn-ul-bgcolor: $grey-dark !default;
 $drop-down-btn-ul-border-radius: 0 !default;
 $drop-down-btn-ul-border: none !default;
 $drop-down-btn-ul-padding: 8px 0 !default;
@@ -31957,7 +31957,7 @@ $cmenu-seperator-padding: 8px 0 !default;
 $cmenu-seperator-bigger-padding: 8px 0 !default;
 $cmenu-selected-color: $grey-dark-font !default;
 $cmenu-sub-ul-box-shadow: 0 8px 10px 0 rgba($grey-black, .24) !default;
-$cmenu-ul-bgcolor: $grey-800 !default;
+$cmenu-ul-bgcolor: $grey-dark !default;
 $cmenu-ul-border-radius: 0 !default;
 $cmenu-ul-border: none !default;
 $cmenu-ul-padding: 0 !default;
@@ -38249,7 +38249,7 @@ $dialog-resize-handler-position: 0;
 $resize-hanlder-bottom-rtl: 2px;
 
 //default 
-$dialog-bg-color: $grey-800 !default;
+$dialog-bg-color: $grey-dark !default;
 $dialog-icon-color: $grey-dark-font !default;
 $dialog-active-icon-color: $grey-dark-font !default;
 $dialog-close-button-left: 6px !default;
@@ -38271,10 +38271,10 @@ $dialog-bigger-close-icon-button-padding: 0 12px !default;
 $dialog-bigger-close-icon-font-size: 12px !default;
 $dialog-hover-icon-color: $grey-dark-font !default;
 $dialog-icon-bg-normal: $grey-dark-font !default;
-$dialog-header-bg-color: $grey-800 !default;
+$dialog-header-bg-color: $grey-dark !default;
 $dialog-overlay-opacity: .7 !default;
-$dialog-content-bg-color: $grey-800 !default;
-$dialog-footer-bg-color: $grey-800 !default;
+$dialog-content-bg-color: $grey-dark !default;
+$dialog-footer-bg-color: $grey-dark !default;
 $dialog-shadow-color: 0 12px 40px 5px rgba($grey-light-font, .26) !default;
 $dialog-header-font-size: 18px !default;
 $dialog-header-font-weight: normal !default;
@@ -46642,7 +46642,7 @@ $tbar-alt-ribble-animation-shadow-frame-end: 0 0 0 200px rgba(0, 0, 0, .12) !def
         }
 
         &.e-active {
-          border: $tab-active-item-border;
+          border-bottom: $tab-active-item-border;
           border-radius: $tab-top-active-item-border-radius;
 
           .e-tab-wrap {
@@ -50463,7 +50463,7 @@ $menu-bigger-caret-font-size: $cmenu-bigger-caret-font-size !default;
 $menu-separator-bigger-padding: 0 !default;
 $menu-ul-bigger-header-padding: 0 !default;
 $menu-blank-icon-bigger: 42px !default;
-$menu-ul-bgcolor: $grey-900 !default;
+$menu-ul-bgcolor: $grey-dark !default;
 $menu-li-border-color: $cmenu-li-border-color !default;
 $menu-color: $cmenu-color !default;
 $menu-seperator-border-color: $grey-700 !default;
@@ -59530,7 +59530,7 @@ $grid-hover-content-font-color: $grey-dark-font !default;
 $grid-conent-font-opacity: .87 !default;
 $grid-row-selection-bg-color: rgba($grey-white, .28) !default;
 $grid-row-selection-color: $grey-dark-font !default;
-$grid-hover-bg-color: rgba($grey-white, .18) !default;
+$grid-hover-bg-color: #ecf2ff !default;
 $grid-cell-selection-bg-color: rgba($grey-white, .28) !default;
 $grid-cell-selection-color: $grey-dark-font !default;
 $grid-filterbar-input-border-width: 0 0 2px 0 !default;
@@ -59553,7 +59553,7 @@ $grouped-droparea-bg-color: $grey-900 !default;
 $group-droparea-hover-bg-color: $grey-900 !default;
 $group-expand-icon-text-indent: 12px !default;
 $group-collapse-icon-text-indent: 12px !default;
-$group-row-bg-color: $grey-800 !default;
+$group-row-bg-color: $grey-dark !default;
 $grid-group-broder-color: $grey-700 !default;
 $grid-header-font-weight: 500 !default;
 $grid-header-font-size: 12px !default;
@@ -63816,7 +63816,7 @@ $grid-bigger-icon-font-size: $grid-icon-font-size !default;
     &.e-rtl .e-gridhover tr[role='row']:hover .e-rowdragdrop,
     &.e-gridhover tr[role='row']:hover .e-detailrowexpand {
       &:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
-        background-color: $grid-hover-bg-color;
+        background-color: $grid-hover-bg-color !important;
         color: $grey-black;
       }
     }

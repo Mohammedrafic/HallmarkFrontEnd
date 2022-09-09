@@ -23,7 +23,7 @@
 
       <div *ngIf="chartData?.unknownStateCandidates" class="app-maps-chart__unknown-candidates">
         <span class="app-maps-chart__text">Applicants with no state indicated</span>
-        <span class="app-maps-chart__number">{{ chartData?.unknownStateCandidates }}</span>
+        <span class="app-maps-chart__number" [ngClass]="isDarkTheme?' app-maps-chart__dark-number':''">{{ chartData?.unknownStateCandidates }}</span>
       </div>
     </div>
   </ng-template>

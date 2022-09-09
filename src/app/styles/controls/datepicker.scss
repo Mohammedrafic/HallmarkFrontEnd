@@ -56,7 +56,7 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
     align-items: center;
 
     &.e-error {
-      border-color: $supportive-red!important;
+      border-color: $supportive-red !important;
     }
 
     .e-input {
@@ -143,6 +143,17 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
     &.e-disabled {
       background-color: $secondary-dark-blue-50 !important;
       color: $secondary-dark-blue-30 !important;
+    }
+  }
+}
+
+body.dark {
+  ejs-datepicker.datepicker, ejs-daterangepicker.e-daterangepicker, ejs-timepicker.e-timepicker, ejs-datetimepicker.e-datetimepicker {
+    .e-input-group.e-control-wrapper.e-date-wrapper, .e-input-group.e-control-wrapper.e-time-wrapper, .e-input-group.e-control-wrapper.e-datetime-wrapper, .e-input-group.e-control-wrapper.e-date-range-wrapper {
+      .e-input[readonly],
+      .e-input[readonly] ~ span.e-input-group-icon {
+        background-color:transparent !important;
+      }
     }
   }
 }

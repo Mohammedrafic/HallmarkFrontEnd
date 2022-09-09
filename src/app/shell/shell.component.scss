@@ -398,6 +398,10 @@
 .e-menu-item {
   font-weight: 500;
 }
+.e-menu-wrapper.e-popup.e-menu-popup{
+    width:150px;
+    border-radius:8px;
+}
 #alert-sidebar {
   .sidebar-header {
     background-color: $alert-side-bar-bgcolor;

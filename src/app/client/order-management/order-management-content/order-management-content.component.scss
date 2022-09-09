@@ -11,7 +11,7 @@
   }
 
   &.e-gridhover tr[role=row]:not(.e-editedrow):hover .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
-    background-color: $primary-active-blue-90 !important;
+    background-color: $primary-active-blue-90;
   }
 
   .e-success-row {

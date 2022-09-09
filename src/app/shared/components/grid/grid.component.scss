@@ -88,11 +88,7 @@ app-grid {
 
 .app-grid-dark {
 
-  .ag-header {
-    background-color: $sidebar-background;
-  }
-
-  .ag-root-wrapper {
+  .ag-root-wrapper, .ag-header {
     background-color: $sidebar-background;
   }
 
@@ -103,5 +99,13 @@ app-grid {
   .ag-row-hover {
     background-color: var(--grid-row-background-color-hover);
     color: $black;
+  }
+
+  .ag-root-wrapper, .ag-row, .ag-header {
+    border-color: $grid-border-color !important;
+  }
+
+  .bootstrap .e-input-group.e-control-wrapper {
+    background: transparent !important;
   }
 }
