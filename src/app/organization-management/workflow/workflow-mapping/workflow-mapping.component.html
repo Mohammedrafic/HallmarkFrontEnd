@@ -31,6 +31,7 @@
             (actionBegin)="actionBegin($event)"
             [allowSorting]="allowSorting"
             [allowResizing]="allowResizing"
+            (dataBound)="gridDataBound(grid)"
   >
     <ng-template #detailTemplate let-data>
       <table
@@ -86,7 +87,7 @@
     <e-columns>
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
-          <div class="row-tool-buttons">
+          <div class="row-tool-buttons" [class.hidden]="!isLoaded">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
