@@ -22,7 +22,7 @@
             (select)="onDropDownChanged($event)"
           ></ejs-dropdownlist>
         </div>
-        <button ejs-button cssClass="e-outline" [isPrimary]="true" *ngIf="!isAccepted && canAccept" (click)="onReject()">Reject</button>
+        <button ejs-button cssClass="e-outline" [isPrimary]="true" *ngIf="canAccept" (click)="onReject()">Reject</button>
         <button ejs-button [isPrimary]="true" *ngIf="canAccept" (click)="onAccept()">Accept</button>
       </div>
     </div>
@@ -227,7 +227,7 @@
 </section>
 
 <app-reject-reason-dialog
-  [rejectReasonsList]="rejectReasons"
+  [rejectReasonsList]="$any(rejectReasons$ | async)"
   [openEvent]="openRejectDialog"
   (applyReject)="rejectCandidateJob($event)"
   (cancelReject)="cancelRejectCandidate()"

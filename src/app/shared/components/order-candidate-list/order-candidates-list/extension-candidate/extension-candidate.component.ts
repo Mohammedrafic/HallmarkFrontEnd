@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ChangeDet
 
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { EMPTY, merge, Observable, Subject } from 'rxjs';
+import { EMPTY, merge, Observable, Subject, map } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
@@ -17,15 +17,16 @@ import {
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
   GetCandidateJob,
+  GetRejectReasonsForAgency,
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
+  RejectCandidateJob as RejectCandidateJobAgency,
 } from '@agency/store/order-management.actions';
 import { DatePipe } from '@angular/common';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import PriceUtils from '@shared/utils/price.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
-import { map, takeUntil } from 'rxjs/operators';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { Router } from '@angular/router';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
@@ -60,7 +61,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
 
-  public rejectReasons: RejectReason[];
+  public rejectReasons$: Observable<RejectReason[]>;
   public form: FormGroup;
   public statusesFormControl = new FormControl();
   public candidateJob: OrderCandidateJob;
@@ -114,7 +115,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subsToCandidate();
-    this.subscribeOnReasonsList();
+    this.rejectReasons$ = this.subscribeOnReasonsList();
     this.createForm();
   }
 
@@ -171,7 +172,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   }
 
   public onReject(): void {
-    this.store.dispatch(new GetRejectReasonsForOrganisation());
+    this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
   }
 
@@ -183,7 +184,11 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
         rejectReasonId: event.rejectReason,
       };
 
-      this.store.dispatch(new RejectCandidateJob(payload));
+      this.store.dispatch(
+        this.isAgency
+          ? [new RejectCandidateJobAgency(payload), new ReloadOrderCandidatesLists()]
+          : [new RejectCandidateJob(payload), new ReloadOrganisationOrderCandidatesLists()]
+      );
       this.dialogEvent.next(false);
     }
   }
@@ -232,13 +237,13 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
       candidate.status === ApplicantStatusEnum.Accepted
         ? [
             { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
-            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
+            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
           ]
         : candidate.status === ApplicantStatusEnum.OnBoarded
         ? [{ applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) }]
         : [
             { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
+            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
           ];
   }
 
@@ -387,15 +392,11 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     }
   }
 
-  private subscribeOnReasonsList(): void {
-    merge(
+  private subscribeOnReasonsList(): Observable<RejectReason[]> {
+    return merge(
       this.store.select(OrderManagementContentState.rejectionReasonsList),
       this.store.select(OrderManagementState.rejectionReasonsList)
-    )
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((reasons) => {
-        this.rejectReasons = reasons ?? [];
-      });
+    ).pipe(map((reasons) => reasons ?? []));
   }
 }
 
