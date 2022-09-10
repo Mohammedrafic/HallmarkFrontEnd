@@ -59,6 +59,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
 
+  public statusesFormControl = new FormControl();
   public openRejectDialog = new Subject<boolean>();
   public billRatesData: BillRate[] = [];
   public formGroup: FormGroup;
@@ -181,6 +182,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       this.store.dispatch(new RejectCandidateJob(payload));
       this.closeDialog();
     }
+  }
+
+  public cancelRejectCandidate(): void {
+    this.statusesFormControl.reset();
   }
 
   public updateCandidateJob(event: { itemData: ApplicantStatus }, reloadJob = false): void {
@@ -331,5 +336,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       this.formGroup?.enable();
     }
+  }
+
+  public onReject(): void {
+    this.store.dispatch(new GetRejectReasonsForOrganisation());
+    this.openRejectDialog.next(true);
   }
 }

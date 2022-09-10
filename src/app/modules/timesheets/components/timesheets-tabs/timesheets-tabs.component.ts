@@ -1,7 +1,12 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, EventEmitter,
+  Input, NgZone, OnChanges, Output, SimpleChanges, ViewChild
+} from '@angular/core';
 
-import { SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
+import { Destroyable } from '@core/helpers';
+import { OutsideZone } from '@core/decorators';
 
 @Component({
   selector: 'app-timesheets-tabs',
@@ -9,7 +14,10 @@ import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.mo
   styleUrls: ['./timesheets-tabs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimesheetsTabsComponent {
+export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
+  @ViewChild(TabComponent)
+  public tabComponent: TabComponent;
+
   @Input()
   public tabConfig: TabsListConfig[];
 
@@ -19,11 +27,30 @@ export class TimesheetsTabsComponent {
   @Output()
   public readonly changeTab: EventEmitter<number> = new EventEmitter<number>();
 
-  public trackByFn(idx: number): number {
-    return idx;
+  constructor(
+    private readonly ngZone: NgZone,
+  ) {
+    super();
+  }
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    if (this.tabConfig) {
+      this.asyncRefresh();
+    }
+  }
+
+  public trackBy(_: number, item: TabsListConfig): string {
+    return item.title;
   }
 
   public onSelect(selectEvent: SelectingEventArgs): void {
     this.changeTab.emit(selectEvent.selectingIndex);
+  }
+
+  @OutsideZone
+  private asyncRefresh(): void {
+    setTimeout(() => {
+      this.tabComponent.refreshActiveTabBorder();
+    });
   }
 }

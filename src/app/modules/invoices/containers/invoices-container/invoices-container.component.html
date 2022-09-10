@@ -7,7 +7,7 @@
   </ng-container>
 
   <ng-container right>
-    <div *ngIf="!!organizationId" class="bootstrap">
+    <div *ngIf="isAgency" class="bootstrap">
       <div class="input-container">
         <ejs-dropdownlist
           *ngIf="organizations$ | async as organizations"
@@ -18,9 +18,9 @@
         </ejs-dropdownlist>
       </div>
     </div>
-    <app-search class="search" *ngIf="selectedTabIdx >= 2"></app-search>
     <button
       ejs-button
+      hideBeforeSyncfusionLoad
       cssClass="e-outline button-filter button--no-wrap"
       (click)="showFilters()">
       <div class="filter-button-content">
@@ -44,9 +44,10 @@
     <div class="invoices-actions-container">
       <button
         ejs-button
+        hideBeforeSyncfusionLoad
         class="e-primary"
         (click)="openAddDialog()"
-        *ngIf="selectedTabIdx === 0"
+        *ngIf="tabConfig?.manualInvoiceCreationEnabled"
         >
         Add Manual Invoice
       </button>
@@ -73,7 +74,7 @@
       <ejs-tooltip content="Select record in the table"
                    position="BottomCenter"
                    [opensOn]="!groupingInvoiceRecordsIds.length ? 'Auto' : 'Custom'">
-        <div class="invoices-split-button" *ngIf="tabConfig.groupingEnabled">
+        <div class="invoices-split-button" *ngIf="tabConfig?.groupingEnabled">
           <button ejs-button cssClass="e-primary"
                   class="main-button"
                   [disabled]="!groupingInvoiceRecordsIds.length"
@@ -158,48 +159,6 @@
 </ng-template>
 
 <app-invoice-record-dialog #invoiceRecordDialog></app-invoice-record-dialog>
-
-<ejs-dialog
-        #createInvoiceDialog
-        cssClass="dialog filter"
-        [width]="470"
-        [visible]="false"
-        [isModal]="true"
-        [animationSettings]="{ effect: 'SlideRight' }"
->
-  <ng-template #content>
-    <form class="create-invoice-dialog-content">
-      <div class="title">
-        <h2>Create Invoice</h2>
-
-        <div class="spacer"></div>
-
-        <button ejs-button
-                class="e-outline"
-                type="button"
-                (click)="createInvoiceDialog.hide()"
-        >
-          Cancel
-        </button>
-        <button ejs-button
-                class="e-primary"
-                type="submit"
-                (click)="$event.preventDefault(); groupInvoices();"
-        >
-          Create
-        </button>
-      </div>
-
-      <div class="dropdown-container bootstrap">
-        <label>Group Invoice by</label>
-        <ejs-dropdownlist [dataSource]="groupInvoicesOptions"
-                          [value]="groupInvoicesBy.text"
-                          (select)="onInvoiceGrouping($event)"
-        ></ejs-dropdownlist>
-      </div>
-    </form>
-  </ng-template>
-</ejs-dialog>
 
 <app-invoice-detail-container
   [currentSelectedRowIndex]="currentSelectedTableRowIndex | async"

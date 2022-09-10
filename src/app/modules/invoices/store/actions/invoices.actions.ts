@@ -7,13 +7,13 @@ import { ExportPayload } from '@shared/models/export.model';
 import {
   GetPendingApprovalParams,
   GroupInvoicesParams,
+  InvoicePermissions,
   InvoicesFilterState,
   ManualInvoice,
   ManualInvoicePostDto,ManualInvoicePutDto,
   PrintingPostDto
 } from '../../interfaces';
 import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums';
-import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
 
 export namespace Invoices {
   export class GetManualInvoices {
@@ -52,7 +52,8 @@ export namespace Invoices {
 
     constructor(
       public readonly action: DialogAction,
-      public readonly payload?: { organizationIds?: number[]; invoiceIds: number[] },
+      public readonly isAgency?: boolean,
+      public readonly payload?: { organizationIds: number[]; invoiceIds: number[] },
       public readonly prevId?: number | null,
       public readonly nextId?: number | null
     ) {
@@ -73,6 +74,7 @@ export namespace Invoices {
 
     constructor(
       public readonly payload?: InvoicesFilterState | null,
+      public readonly usePrevFiltersState = false,
     ) {}
   }
 
@@ -277,6 +279,7 @@ export namespace Invoices {
     constructor(
       public readonly invoiceId: number,
       public readonly stateId: number,
+      public readonly orgId?: number,
     ) {
     }
   }
@@ -288,5 +291,32 @@ export namespace Invoices {
       public readonly body: PrintingPostDto,
       public readonly isAgency: boolean,
       ) {}
+  }
+
+  export class SetIsAgencyArea {
+    static readonly type = INVOICES_ACTIONS.SetIsAgency;
+
+    constructor(public readonly isAgency: boolean) {}
+  }
+
+  export class SetInvoicePermissions {
+    static readonly type = INVOICES_ACTIONS.SetPermissions;
+
+    constructor(public readonly payload: Partial<InvoicePermissions>) {}
+  }
+
+  export class SetTabIndex {
+    static readonly type = INVOICES_ACTIONS.SetTabIndex;
+
+    constructor(
+      public readonly index: number) {}
+  }
+
+  export class CheckManualInvoicesExist {
+    static readonly type = INVOICES_ACTIONS.CheckManualInvoicesExist;
+
+    constructor(
+      public readonly organizationId: number,
+    ) {}
   }
 }

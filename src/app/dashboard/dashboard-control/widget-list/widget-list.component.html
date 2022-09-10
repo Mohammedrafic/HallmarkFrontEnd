@@ -2,27 +2,31 @@
   #sideDialog
   [animationSettings]="{ effect: 'SlideRight' }"
   [isModal]="true"
+  [visible]="false"
+  [showCloseIcon]="true"
   [target]="targetElement"
-  cssClass="dialog"
+  cssClass="dialog filter"
   id="dialog"
   width="444px"
 >
-  <ng-template #content>
+  <ng-template #header>
     <section class="container">
       <section class="header-container">
         <div class="e-card-header">
           <div class="e-card-header-caption">
             <h3 class="e-card-title">Manage Widgets</h3>
           </div>
-          <div class="e-card-content">
-            <span class="e-icons e-close-large" (click)="closeDialogEmitter.emit()"></span>
-          </div>
         </div>
       </section>
+    </section>
+  </ng-template>
+
+  <ng-template #content>
+    <section class="container">
       <section class="content">
         <div class="widget-container">
           <app-inline-loader *ngIf="isLoading"></app-inline-loader>
-          <ng-container *ngIf="widgets?.length">
+          <ng-container *ngIf="widgets.length">
             <div class="e-mastertext">Select widgets to view in the dashboard</div>
             <ejs-grid
               #gridComponent

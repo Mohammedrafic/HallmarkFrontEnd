@@ -1,9 +1,11 @@
+import { formatNumber } from '@angular/common';
 import {
   GetDetailRowDataParams,
   GridOptions,
   ICellRendererParams,
   IDetailCellRendererParams,
-  RowHeightParams
+  RowHeightParams,
+  ValueFormatterParams
 } from '@ag-grid-community/core';
 import {
   TitleValueCellRendererComponent
@@ -72,6 +74,7 @@ const timesheetTypeColDefs: TypedColDef<PendingInvoiceRecord>[] = [
     width: 80,
     headerName: 'Hours',
     cellRendererSelector: titleValueCellRendererSelector,
+    valueFormatter: (params: ValueFormatterParams) => formatNumber(params.value, 'en', '1.2-2'),
   },
   totalColDef,
   {
@@ -146,7 +149,7 @@ const milesInvoiceTypeColDefs: GetPendingInvoiceDetailsColDefsFn = ({ downloadMi
     headerName: 'Miles',
     width: 110,
     cellRendererSelector: titleValueCellRendererSelector,
-    valueFormatter: currencyFormatter
+    valueFormatter: (params: ValueFormatterParams) => formatNumber(params.value, 'en', '1.2-2'),
   },
   totalColDef,
   {

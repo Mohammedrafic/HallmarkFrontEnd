@@ -35,6 +35,7 @@ export class InvoicesService {
 
   public createForm(): CustomFormGroup<InvoiceFilterForm> {
     return this.fb.group({
+      searchTerm: [''],
       orderIds: [''],
       regionsIds: [''],
       locationIds: [''],

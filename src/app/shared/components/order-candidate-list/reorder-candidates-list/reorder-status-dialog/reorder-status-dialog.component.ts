@@ -155,8 +155,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public onAccept(): void {
     const value = this.acceptForm.getRawValue();
     const applicantStatus: ApplicantStatus = this.getNewApplicantStatus();
+
     const actualDate =
-      applicantStatus.applicantStatus === CandidatStatus.Accepted
+      applicantStatus.applicantStatus === CandidatStatus.OnBoard
         ? {
             actualStartDate: this.orderCandidateJob.reOrderDate,
             actualEndDate: this.orderCandidateJob.reOrderDate,
@@ -220,6 +221,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     }
   }
 
+  public cancelRejectCandidate(): void {
+    this.jobStatusControl.reset();
+  }
+
   public onReject(): void {
     this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
@@ -244,7 +249,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     } else {
       isBillRatePending = offeredBillRate;
     }
-
+    this.acceptForm.reset();
     this.acceptForm.patchValue({
       reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
       offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
@@ -322,6 +327,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
             skillName: value.skillName,
             offeredBillRate: value.hourlyRate,
             candidateBillRate: value.candidateBillRate,
+            billRates: this.orderCandidateJob.billRates,
+            actualStartDate: value.shiftStartTime,
+            actualEndDate: value.shiftEndTime,
             nextApplicantStatus: {
               applicantStatus: status.applicantStatus,
               statusText: status.statusText,
@@ -445,4 +453,3 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     );
   }
 }
-

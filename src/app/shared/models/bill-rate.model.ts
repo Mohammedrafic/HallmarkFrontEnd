@@ -134,7 +134,6 @@ export class BillRateSetupPost {
   displayInJob: boolean;
   forceUpsert?: boolean;
   billType: number;
-  editAllowed: number;
 }
 
 export class BillRateFilters {

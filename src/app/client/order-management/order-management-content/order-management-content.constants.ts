@@ -34,12 +34,12 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
 ];
 
 export const perDiemColumnsToExport: ExportColumn[] = [
-  { text: 'Order ID', column: 'Id' },
-  { text: 'Status', column: 'StatusText' },
+  { text: 'Order ID', column: 'OrderId' },
+  { text: 'Status', column: 'Status' },
   { text: 'Job Title', column: 'JobTitle' },
-  { text: 'Skill', column: 'SkillName' },
-  { text: 'Location', column: 'LocationName' },
-  { text: 'Department', column: 'DepartmentName' },
+  { text: 'Skill', column: 'Skill' },
+  { text: 'Location', column: 'Location' },
+  { text: 'Department', column: 'Department' },
   { text: 'Candidates', column: 'Candidates' },
   { text: '# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days' },
 ];

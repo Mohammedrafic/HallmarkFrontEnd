@@ -75,6 +75,7 @@ export interface OrderManagementModel {
   orderFilteringOptions: AgencyOrderFilteringOptions | null;
   organizationStructure: OrganizationStructure[];
   ordersTab: AgencyOrderManagementTabs;
+  extensions: any;
 }
 
 @State<OrderManagementModel>({
@@ -94,8 +95,9 @@ export interface OrderManagementModel {
     },
     orderFilteringOptions: null,
     organizationStructure: [],
-    historicalEvents: null,
+    historicalEvents: [],
     ordersTab: AgencyOrderManagementTabs.MyAgency,
+    extensions: null,
   },
 })
 @Injectable()
@@ -308,7 +310,10 @@ export class OrderManagementState {
   ): Observable<any> {
     return this.orderManagementContentService.updateCandidateJob(payload).pipe(
       tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'))),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Candidate cannot be updated'))))
+      catchError((error) => {
+        const errorMessage = error?.error?.errors?.CandidateBillRate[0] ?? 'Candidate cannot be updated';
+        return of(dispatch(new ShowToast(MessageTypes.Error, errorMessage)))
+      })
     );
   }
 
@@ -345,7 +350,7 @@ export class OrderManagementState {
 
   @Action(GetAgencyHistoricalData)
   GetAgencyHistoricalData(
-    { patchState }: StateContext<OrderManagementModel>,
+    { patchState, dispatch }: StateContext<OrderManagementModel>,
     { organizationId, candidateJobId }: GetAgencyHistoricalData
   ): Observable<HistoricalEvent[]> {
     return this.orderManagementContentService.getHistoricalData(organizationId, candidateJobId).pipe(
@@ -354,7 +359,7 @@ export class OrderManagementState {
         return payload;
       }),
       catchError(() => {
-        patchState({ historicalEvents: [] });
+        dispatch(new ClearAgencyHistoricalData());
         return of();
       })
     );
@@ -410,11 +415,11 @@ export class OrderManagementState {
 
   @Action(GetAgencyExtensions)
   GetAgencyExtensions(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
-    { id, organizationId }: GetAgencyExtensions
+    { patchState }: StateContext<OrderManagementModel>,
+    { id, orderId, organizationId }: GetAgencyExtensions
   ): Observable<ExtensionGridModel[]> {
     return this.extensionSidebarService
-      .getExtensions(id, organizationId)
+      .getExtensions(id, orderId, organizationId)
       .pipe(tap((extensions) => patchState({ extensions })));
   }
 }

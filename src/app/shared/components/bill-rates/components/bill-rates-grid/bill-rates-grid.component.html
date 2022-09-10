@@ -28,7 +28,7 @@
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit($event, data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove($event, data)">
+            <button ejs-button cssClass="e-flat secondary-icon-button" [disabled]="data.isPredefined" (click)="onRemove($event, data)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -59,17 +59,6 @@
 
       <e-column headerText="Effective Date" textAlign="Right">
         <ng-template #template let-data>{{data.effectiveDate | date:'M/d/y'}}</ng-template>
-      </e-column>
-
-      <e-column headerText="Allow Edit">
-        <ng-template #template let-data>
-          <div class="checkbox bootstrap">
-            <ejs-checkbox
-              [checked]="data.editAllowed"
-              [disabled]="true">
-            </ejs-checkbox>
-          </div>
-        </ng-template>
       </e-column>
     </e-columns>
   </ejs-grid>

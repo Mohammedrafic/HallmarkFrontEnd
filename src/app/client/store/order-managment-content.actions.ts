@@ -3,6 +3,7 @@ import {
   AcceptJobDTO,
   CreateOrderDto,
   EditOrderDto,
+  Order,
   OrderFilter,
   OrderManagementFilter,
 } from '@shared/models/order-management.model';
@@ -145,7 +146,7 @@ export class SaveOrder {
 
 export class SaveOrderSucceeded {
   static readonly type = '[order management] Save Order Succeeded';
-  constructor() {}
+  constructor(public order: Order) {}
 }
 
 export class EditOrder {
@@ -241,9 +242,9 @@ export class GetContactDetails {
   constructor(public departmentId: number, public lastSelectedBusinessId?: number) {}
 }
 
-export class GetExtensions {
+export class GetOrganizationExtensions {
   static readonly type = '[order management] Get Extensions';
-  constructor(public id: number) {}
+  constructor(public id: number, public orderId: number) {}
 }
 
 export class SetIsDirtyQuickOrderForm {

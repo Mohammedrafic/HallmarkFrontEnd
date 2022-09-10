@@ -13,11 +13,11 @@
       <app-organization-agency-selector></app-organization-agency-selector>
       <div class="devider"></div>
     </div>
-    <div class="bell-button">
+    <div class="bell-button" style="cursor: pointer;" (click)="bellIconClicked()">
 
       <i-feather name="bell" class="bell-icon"></i-feather>
 
-      <span class="bell-button__badge">2</span>
+      <span class="bell-button__badge">{{alerts?.length}}</span>
 
     </div>
 
@@ -128,3 +128,28 @@
 </section>
 
 <app-message-toast></app-message-toast>
+<ejs-sidebar id="alert-sidebar" *ngIf="showAlertSidebar" #alertSidebar 
+  [width]="alertSidebarWidth" [type]="alertSidebarType" [position]="alertSidebarPosition" 
+  showBackdrop="true" style="visibility: hidden" (created)="onAlertSidebarCreated()">    
+  <div class="sidebar-header header-cover">    
+    <i-feather name="bell"></i-feather>
+    <h5>      
+      <span>Alerts Center</span>
+    </h5>
+    <div class="closebtn">
+      <button ejs-button id="close" class="e-btn close-btn" (click)="alertSideBarCloseClick()">
+          <fa-icon [icon]='faTimes'></fa-icon>
+      </button>
+    </div>
+  </div>
+  <div id="listcontainer">
+    <div class="card" *ngFor="let item of alerts">
+      <div class="card-body">
+        <div [innerHTML]="item.content"></div>        
+      </div>
+      <div class="card-footer">
+        <small>{{item.createdAt | date:'medium'}}</small>
+      </div>
+    </div>
+  </div>
+</ejs-sidebar>

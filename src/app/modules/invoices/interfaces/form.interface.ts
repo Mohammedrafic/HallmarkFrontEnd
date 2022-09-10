@@ -1,4 +1,5 @@
 export interface InvoiceFilterForm {
+  searchTerm: string;
   orderIds: string[];
   regionsIds: string[];
   locationIds: string[];

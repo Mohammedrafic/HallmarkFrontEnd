@@ -11,7 +11,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { distinctUntilChanged, filter, map, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { distinctUntilChanged, filter, map, Observable, Subject, takeUntil, zip } from 'rxjs';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -26,7 +26,12 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ApproveOrder, DeleteOrder, GetExtensions, SetLock } from '@client/store/order-managment-content.actions';
+import {
+  ApproveOrder,
+  DeleteOrder,
+  GetOrganizationExtensions,
+  SetLock,
+} from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
   CANCEL_CONFIRM_TEXT,
@@ -55,6 +60,7 @@ import { ExtensionCandidateComponent } from '@shared/components/order-candidate-
 export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() order: Order;
   @Input() openEvent: Subject<boolean>;
+  @Input() orderPositionSelected$: Subject<boolean>;
   @Input() children: OrderManagementChild[] | undefined;
   @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
 
@@ -75,6 +81,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   @Select(OrderManagementContentState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
+
+  @Select(OrderManagementContentState.selectedOrder) selectedOrder: Observable<Order>;
 
   @Select(OrderManagementContentState.extensions) extensions$: Observable<any>;
   public extensions: any[] = [];
@@ -329,18 +337,32 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private subscribeOnOrderCandidatePage(): void {
-    this.orderCandidatePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: OrderCandidatesListPage) => {
-      this.candidateOrderPage = order;
-      this.candidatesCounter =
-        order &&
-        order.items?.filter(
-          (candidate) => candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
-        ).length;
-      this.extensions = [];
-      if (order?.items[0]?.deployedCandidateInfo?.jobId) {
-        this.store.dispatch(new GetExtensions(order.items[0].deployedCandidateInfo.jobId));
-      }
-    });
+    zip([
+      this.orderCandidatePage$.pipe(filter((data) => !!data)),
+      this.selectedOrder.pipe(filter((data) => !!data)),
+      this.orderPositionSelected$,
+    ])
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(([order, selectedOrder, isOrderPositionSelected]: [OrderCandidatesListPage, Order, boolean]) => {
+        this.candidateOrderPage = order;
+        this.candidatesCounter =
+          order &&
+          order.items?.filter(
+            (candidate) =>
+              candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
+          ).length;
+        this.extensions = [];
+        if (
+          order?.items[0]?.deployedCandidateInfo?.jobId &&
+          isOrderPositionSelected &&
+          (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
+        ) {
+          this.store.dispatch(
+            new GetOrganizationExtensions(order.items[0].deployedCandidateInfo.jobId, selectedOrder.id!)
+          );
+        }
+      });
+
     this.extensions$.pipe(takeUntil(this.unsubscribe$)).subscribe((extensions) => {
       this.extensions = extensions?.filter((extension: any) => extension.id !== this.order.id);
     });

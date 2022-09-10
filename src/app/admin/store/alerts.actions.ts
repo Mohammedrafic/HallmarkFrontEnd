@@ -1,6 +1,6 @@
 import { AlertChannel } from "@admin/alerts/alerts.enum";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
-import { AddAlertsTemplateRequest, AlertsTemplateFilters, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
+import { AddAlertsTemplateRequest, AlertsTemplateFilters, AlertTriggerDto, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
 import { UserSubscriptionFilters, UserSubscriptionRequest } from "@shared/models/user-subscription.model";
 
 export class GetUserSubscriptionPage {
@@ -53,4 +53,10 @@ export class SaveTemplateByAlertId {
   constructor(
     public addAlertsTemplateRequest: AddAlertsTemplateRequest
   ) { }
+}
+export class AlertTrigger {
+  static readonly type = '[alerts] Create Order Alert Trigger';
+  constructor(
+    public alertTriggerDto: AlertTriggerDto
+  ) {}
 }

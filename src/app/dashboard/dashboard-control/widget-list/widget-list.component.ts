@@ -23,6 +23,8 @@ import { BehaviorSubject, Subject, takeUntil, filter, startWith, distinctUntilCh
 import isEqual from 'lodash/fp/isEqual';
 import { WidgetToggleModel } from '../../models/widget-toggle.model';
 import type { GridRowSelectEventModel, GridRowDeselectEventModel } from '@shared/models/grid-row-selection-event.model';
+import { Actions, ofActionSuccessful } from '@ngxs/store';
+import { ShowSideDialog } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-widget-list',
@@ -33,7 +35,7 @@ import type { GridRowSelectEventModel, GridRowDeselectEventModel } from '@shared
 export class WidgetListComponent extends DestroyableDirective implements OnChanges, OnInit {
   @Input() public isLoading: boolean | null;
   @Input() public selectedWidgets: WidgetTypeEnum[] | null;
-  @Input() public widgets: WidgetOptionModel[] | null;
+  @Input() public widgets: WidgetOptionModel[];
 
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
   @Output() public widgetToggleEmitter: EventEmitter<WidgetToggleModel> = new EventEmitter();
@@ -41,13 +43,16 @@ export class WidgetListComponent extends DestroyableDirective implements OnChang
   @ViewChild('sideDialog', { static: true }) public sideDialog: DialogComponent;
   @ViewChild('gridComponent', { static: false }) public gridComponent: GridComponent;
 
-  public readonly selectionSettings: SelectionSettingsModel = { type: 'Multiple', enableSimpleMultiRowSelection: true };
+  public readonly selectionSettings: SelectionSettingsModel = {
+    type: 'Multiple',
+    enableSimpleMultiRowSelection: true,
+  };
   public readonly targetElement: HTMLElement = document.body;
 
   private readonly dataBoundTrigger$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private readonly widgetDataChange$: Subject<void> = new Subject();
 
-  public constructor() {
+  public constructor(private readonly asction$: Actions) {
     super();
   }
 
@@ -57,6 +62,7 @@ export class WidgetListComponent extends DestroyableDirective implements OnChang
 
   public ngOnInit(): void {
     this.initDataChangesStream();
+    this.openDialog();
   }
 
   public dataBoundHandler(): void {
@@ -95,5 +101,13 @@ export class WidgetListComponent extends DestroyableDirective implements OnChang
     );
 
     this.gridComponent.selectRows(selectedWidgetIndexes);
+  }
+
+  private openDialog(): void {
+    this.asction$.pipe(takeUntil(this.destroy$), ofActionSuccessful(ShowSideDialog)).subscribe((data) => {
+      if (data) {
+        this.sideDialog.show();
+      }
+    });
   }
 }

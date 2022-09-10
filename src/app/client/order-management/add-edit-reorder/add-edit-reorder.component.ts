@@ -128,8 +128,15 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.reorderForm
       .get('candidates')
       ?.valueChanges.pipe(
-        tap((candidateIds: number[]) => this.reorderForm.patchValue({ openPosition: candidateIds?.length || 1 })),
-        filter((candidateIds: number[]) => !isNil(candidateIds)),
+        tap((candidateIds: number[]) => {
+          if (!candidateIds.length) {
+            this.reorderForm.patchValue({ openPosition: null, agencies: [] });
+            this.reorderForm.updateValueAndValidity();
+          } else {
+            this.reorderForm.patchValue({ openPosition: candidateIds?.length || 1 });
+          }
+        }),
+        filter((candidateIds: number[]) => !!candidateIds?.length),
         switchMap(() => this.candidates$.pipe(map(this.getAgenciesBelongToCandidates)))
       )
       .subscribe((agencies: number[]) => {

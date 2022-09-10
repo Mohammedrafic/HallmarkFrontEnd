@@ -83,6 +83,7 @@ export namespace Timesheets {
       public readonly payload?: TimesheetsFilterState | null,
       public readonly saveStatuses = false,
       public readonly saveOrganizationId = false,
+      public readonly usePrevFiltersState = false,
     ) {
     }
   }

@@ -1,4 +1,15 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { RejectReason } from '@shared/models/reject-reason.model';
@@ -29,6 +40,7 @@ import { Comment } from '@shared/models/comment.model';
   templateUrl: './accept-candidate.component.html',
   styleUrls: ['./accept-candidate.component.scss'],
   providers: [MaskedDateTimeService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
@@ -86,11 +98,17 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   get showWithdrawAction(): boolean {
     return (
-      (this.candidateStatus === ApplicantStatusEnum.Shortlisted ||
-        this.candidateStatus === ApplicantStatusEnum.PreOfferCustom) &&
-      !this.isWithdraw &&
-      !this.isDeployedCandidate
+      [ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom].includes(this.candidateStatus) &&
+      ((!this.isWithdraw && !this.isDeployedCandidate) || this.isAgency)
     );
+  }
+
+  get isAgencyAndOnboard(): boolean {
+    return this.isAgency && this.candidateStatus === ApplicantStatusEnum.OnBoarded;
+  }
+
+  get showRejectButton(): boolean {
+    return (this.isDeployedCandidate && !this.showWithdrawAction && !this.isAgencyAndOnboard) || !this.isReadOnly;
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -103,7 +121,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     private actions$: Actions,
     private datePipe: DatePipe,
     private confirmService: ConfirmService,
-    private commentsService: CommentsService
+    private commentsService: CommentsService,
+    private changeDetectionRef: ChangeDetectorRef
   ) {}
 
   ngOnChanges(): void {
@@ -174,7 +193,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch(new RejectCandidateJob(payload));
+      this.store.dispatch(new RejectCandidateJob(payload)).subscribe(() => {
+        this.store.dispatch(new ReloadOrderCandidatesLists());
+      });
+
       this.closeDialog();
     }
   }
@@ -238,6 +260,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       .getComments(this.candidateJob?.commentContainerId as number, null)
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
+        this.changeDetectionRef.markForCheck();
       });
   }
 
@@ -266,13 +289,15 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           actualEndDate: this.getDateString(value.actualEndDate),
         });
       }
+      this.changeDetectionRef.markForCheck();
     });
   }
 
   private subscribeOnReasonsList(): void {
-    this.rejectionReasonsList$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((reasons) => (this.rejectReasons = reasons));
+    this.rejectionReasonsList$.pipe(takeUntil(this.unsubscribe$)).subscribe((reasons) => {
+      this.rejectReasons = reasons;
+      this.changeDetectionRef.markForCheck();
+    });
   }
 
   private subscribeOnSuccessRejection(): void {
@@ -313,3 +338,4 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.form.markAsPristine();
   }
 }
+

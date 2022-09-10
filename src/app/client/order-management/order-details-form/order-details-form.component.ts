@@ -3,7 +3,18 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { combineLatest, debounceTime, filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
+import {
+  combineLatest,
+  debounceTime,
+  filter,
+  Observable,
+  Subject,
+  take,
+  takeUntil,
+  throttleTime,
+  switchMap,
+  skip,
+} from 'rxjs';
 
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -71,6 +82,8 @@ import { GetOrderRequisitionByPage } from '@organization-management/store/reject
 import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
 import { ORDER_JOB_DISTRIBUTION_LIST } from '@shared/constants/order-job-distribution-list';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
+import { DurationService } from '@shared/services/duration.service';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-order-details-form',
@@ -80,7 +93,7 @@ import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shi
 })
 export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Input() isActive = false;
-  @Input('disableOrderType') set disableOrderType(value: boolean) {
+  @Input() set disableOrderType(value: boolean) {
     if (value) {
       this.orderTypeForm.controls['orderType'].disable();
     }
@@ -158,6 +171,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   public SettingsKeys = SettingsKeys;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  private organizationId$: Observable<number>;
+
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order | null>;
 
@@ -168,13 +184,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   @Select(OrganizationManagementState.locationsByRegionId)
   locations$: Observable<Location[]>;
-  isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedLocation: Location;
 
   @Select(OrganizationManagementState.departments)
   departments$: Observable<Department[]>;
-  isDepartmentsDropDownEnabled: boolean = false;
   departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   selectedDepartment: Department;
 
@@ -234,7 +248,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private alertService: AlertService,
     private orderManagementService: OrderManagementContentService,
-    private commentsService: CommentsService
+    private commentsService: CommentsService,
+    private durationService: DurationService
   ) {
     this.orderTypeForm = this.formBuilder.group({
       orderType: [null, Validators.required],
@@ -299,7 +314,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       asapStart: [false],
       criticalOrder: [false],
       nO_OT: [false],
-      jobDescription: ['', Validators.maxLength(500)],
+      jobDescription: ['', Validators.maxLength(4000)],
       unitDescription: ['', Validators.maxLength(500)],
       orderRequisitionReasonId: [null, Validators.required],
       orderRequisitionReasonName: [null],
@@ -420,6 +435,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.autoSetupJobEndDateControl(duration, jobStartDate);
     });
 
+    this.defaultMaxTime.setHours(23, 59, 59);
+    this.defaultMinTime.setHours(0, 0, 0);
+
     shiftEndTimeControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
       this.maxTime = val || this.defaultMaxTime;
       shiftStartTimeControl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
@@ -505,15 +523,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
-    this.store.dispatch(new GetRegions());
-    this.store.dispatch(new GetMasterSkillsByOrganization());
-    this.store.dispatch(new GetProjectSpecialData());
-    this.store.dispatch(new GetAssociateAgencies());
-    this.store.dispatch(new GetOrganizationStatesWithKeyCode());
+    this.getFormData();
+    this.resetFormAfterSwichingOrganization();
 
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-      const isEditMode = !!this.orderId;
+      const isEditMode = this.route.snapshot.data['isEditing'];
       if (order && isEditMode) {
         this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
         this.isEditMode = true;
@@ -526,7 +540,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         this.order = order;
         this.populateForms(order);
         this.subscribeForSettings();
-      } else {
+      } else if (!isEditMode) {
         this.subscribeForSettings();
         this.isEditMode = false;
         this.order = null;
@@ -561,6 +575,29 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.jobDescriptionForm.controls['orderRequisitionReasonName'].patchValue(event.itemData.reason);
   }
 
+  private resetFormAfterSwichingOrganization(): void {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$), skip(1)).subscribe((id) => {
+      this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
+      this.getFormData(Boolean(id));
+    });
+  }
+
+  private getFormData(force: boolean = false): void {
+    this.store.dispatch(new GetRegions());
+    this.store.dispatch(new GetMasterSkillsByOrganization());
+    this.store.dispatch(new GetProjectSpecialData());
+    this.store.dispatch(new GetAssociateAgencies());
+    this.store.dispatch(new GetOrganizationStatesWithKeyCode());
+    this.generalInformationForm.reset();
+    this.jobDescriptionForm.reset();
+    this.contactDetailsForm.reset();
+    this.workLocationForm.reset();
+    this.specialProject.reset();
+    if (force) {
+      this.populateNewOrderForm();
+    }
+  }
+
   private getSettings(): void {
     this.store.dispatch(new GetOrganizationSettings());
   }
@@ -586,11 +623,16 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.orderManagementService
       .getRegularLocalBillRate(orderType, departmentId, skillId)
       .pipe(
-        takeUntil(this.unsubscribe$),
-        filter((billRate) => !!billRate.length)
+        takeUntil(this.unsubscribe$)
       )
-      .subscribe((billRates: BillRate[]) =>
-        this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour)
+      .subscribe((billRates: BillRate[]) => {
+        if (billRates.length) {
+          this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour.toFixed(2));
+        } else {
+          this.generalInformationForm.controls['hourlyRate'].patchValue('');
+        }
+      }
+        
       );
   }
 
@@ -601,7 +643,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     if (this.selectedRegion.id) {
       this.markTouchedField(fieldName);
       this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
-      this.isLocationsDropDownEnabled = true;
       this.resetLocation();
       this.resetDepartment();
     }
@@ -614,7 +655,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     if (this.selectedLocation?.id) {
       this.markTouchedField(fieldName);
       this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.id));
-      this.isDepartmentsDropDownEnabled = true;
       this.resetDepartment();
     }
   }
@@ -676,6 +716,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.generalInformationForm.controls['shiftStartTime'].setValidators(Validators.required);
       this.generalInformationForm.controls['shiftEndTime'].setValidators(Validators.required);
     }
+    Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
+      this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
+    });
   }
 
   private userEditsOrder(fieldIsTouched: boolean): void {
@@ -865,6 +908,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private populateForms(order: Order): void {
+    this.isPerDiem = order.orderType === OrderType.OpenPerDiem;
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
     this.orderTypeChanged.emit(order.orderType);
 
@@ -978,41 +1022,17 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.workLocationsFormArray.push(this.newWorkLocationFormGroup());
     }
     this.disableFormControls(order);
+    this.handlePerDiemOrder();
+    this.handlePermPlacementOrder();
   }
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
-    const jobEndDateControl = this.generalInformationForm.get('jobEndDate') as AbstractControl;
-
-    jobEndDateControl.reset();
-
     /** Clone Date object to avoid modifying */
     const jobStartDateValue = new Date(jobStartDate.getTime());
+    const jobEndDateControl = this.generalInformationForm.get('jobEndDate') as AbstractControl;
 
-    switch (duration) {
-      case Duration.TwelveWeeks:
-        jobEndDateControl.patchValue(new Date(jobStartDateValue.setDate(jobStartDateValue.getDate() + 12 * 7)));
-        break;
-
-      case Duration.ThirteenWeeks:
-        jobEndDateControl.patchValue(new Date(jobStartDateValue.setDate(jobStartDateValue.getDate() + 13 * 7)));
-        break;
-
-      case Duration.TwentySixWeeks:
-        jobEndDateControl.patchValue(new Date(jobStartDateValue.setDate(jobStartDateValue.getDate() + 26 * 7)));
-        break;
-
-      case Duration.Month:
-        jobEndDateControl.patchValue(new Date(jobStartDateValue.setMonth(jobStartDateValue.getMonth() + 1)));
-        break;
-
-      case Duration.Year:
-        jobEndDateControl.patchValue(new Date(jobStartDateValue.setFullYear(jobStartDateValue.getFullYear() + 1)));
-        break;
-
-      case Duration.NinetyDays:
-        jobEndDateControl.patchValue(new Date(jobStartDateValue.setDate(jobStartDateValue.getDate() + 90)));
-        break;
-    }
+    const jobEndDate: Date = this.durationService.getEndDate(duration, jobStartDateValue);
+    jobEndDateControl.patchValue(jobEndDate);
   }
 
   private createContactForm(): void {
@@ -1064,8 +1084,13 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.generalInformationForm = disableControls(this.generalInformationForm, controlNames, false);
     }
     if (order.orderType === OrderType.OpenPerDiem && order.status === OrderStatus.Open) {
-      this.generalInformationForm = disableControls(this.generalInformationForm, controlNames, false);
+      this.handlePerDiemOrder();
+      this.generalInformationForm = disableControls(this.generalInformationForm, ['title', ...controlNames], false);
     }
+
+    Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
+      this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
+    });
   }
 
   private resetLocation(): void {
@@ -1083,10 +1108,18 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.controls['duration'].patchValue(Duration.ThirteenWeeks);
     this.jobDistributionForm.controls['jobDistribution'].patchValue([JobDistribution.All]);
 
-    this.contactDetails$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((contactDetails) => {
-      const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
-      this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
-    });
+    this.generalInformationForm.controls['departmentId'].valueChanges
+      .pipe(
+        switchMap(() => {
+          return this.contactDetails$;
+        }),
+        filter(Boolean),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((contactDetails) => {
+        const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
+        this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
+      });
   }
 
   public selectPrimaryContact(event: ChangeArgs): void {

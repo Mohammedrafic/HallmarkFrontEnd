@@ -24,6 +24,7 @@
   <ng-template #content>
     <app-quick-order-form
       #quickOrderForm
+      *ngIf="isFormShown"
       [submitQuickOrder$]="submitQuickOrder$"
       [allOrganizations]="allOrganizations"
       [userIsAdmin]="userIsAdmin"

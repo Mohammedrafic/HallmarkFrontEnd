@@ -59,6 +59,15 @@ const routes: Routes = [
         canDeactivate: [UnsavedOrderChangesGuard],
       },
       {
+        path: 'order-management/add/:fromTemplate',
+        component: AddEditOrderComponent,
+        data: {
+          isOrganizationArea: true,
+          isEditing: false,
+        },
+        canDeactivate: [UnsavedOrderChangesGuard],
+      },
+      {
         path: 'time-sheets/:param',
         component: TimesheetsContentComponent,
       },

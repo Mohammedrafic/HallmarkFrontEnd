@@ -1,6 +1,18 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, merge, Observable, Subject, takeUntil } from 'rxjs';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
@@ -9,7 +21,11 @@ import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-man
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
+import {
+  ApplicantStatus,
+  ApplicantStatus as ApplicantStatusEnum,
+  CandidatStatus,
+} from '@shared/enums/applicant-status.enum';
 import {
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
@@ -18,7 +34,6 @@ import {
   SetIsDirtyOrderForm,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
-import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -29,14 +44,17 @@ import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
+import { Duration } from '../../../../enums/durations';
+import { DurationService } from '../../../../services/duration.service';
 
 @Component({
   selector: 'app-onboarded-candidate',
   templateUrl: './onboarded-candidate.component.html',
   styleUrls: ['./onboarded-candidate.component.scss'],
   providers: [MaskedDateTimeService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OnboardedCandidateComponent implements OnInit, OnDestroy {
+export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
 
   @Select(OrderManagementContentState.rejectionReasonsList)
@@ -53,6 +71,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   @Input() candidate: OrderCandidatesList;
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
+  @Input() orderDuration: Duration;
 
   public form: FormGroup;
   public jobStatusControl: FormControl;
@@ -89,7 +108,11 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   }
 
   get candidateStatus(): ApplicantStatusEnum {
-    return this.candidate.status || (this.candidate.candidateStatus as any);
+    return this.candidate?.status || (this.candidate?.candidateStatus as any);
+  }
+
+  get actualStartDateValue(): Date {
+    return this.form.controls['startDate']?.value;
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -102,7 +125,9 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     private actions$: Actions,
     private orderCandidateListViewService: OrderCandidateListViewService,
     private confirmService: ConfirmService,
-    private commentsService: CommentsService
+    private commentsService: CommentsService,
+    private durationService: DurationService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -117,6 +142,13 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.subscribeOnGetStatus();
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    const { candidate } = changes;
+    if (candidate?.currentValue && !candidate?.isFirstChange()) {
+      this.getComments();
+    }
+  }
+
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -127,6 +159,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       .getComments(this.candidateJob?.commentContainerId as number, null)
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
+        this.changeDetectorRef.markForCheck();
       });
   }
 
@@ -150,9 +183,13 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch(new RejectCandidateJob(payload));
+      this.store.dispatch([new RejectCandidateJob(payload), new ReloadOrganisationOrderCandidatesLists()]);
       this.closeDialog();
     }
+  }
+
+  public cancelRejectCandidate(): void {
+    this.jobStatusControl.reset();
   }
 
   public onClose(): void {
@@ -181,10 +218,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
             orderId: this.candidateJob?.orderId as number,
             organizationId: this.candidateJob?.organizationId as number,
             jobId: this.candidateJob?.jobId as number,
-            nextApplicantStatus: {
-              applicantStatus: 60,
-              statusText: 'Onboard',
-            },
+            nextApplicantStatus: this.candidateJob?.applicantStatus,
             actualStartDate: this.candidateJob?.actualStartDate as string,
             actualEndDate: this.candidateJob?.actualEndDate as string,
             offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.availableStartDate as string),
@@ -202,6 +236,14 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
           this.store.dispatch(new SetIsDirtyOrderForm(true));
         });
     }
+  }
+
+  public onStartDateChange(event: ChangedEventArgs): void {
+    const actualStartDate = new Date(event.value!);
+    const actualEndDate = this.durationService.getEndDate(this.orderDuration, actualStartDate);
+    this.form.patchValue({
+      endDate: actualEndDate,
+    });
   }
 
   getBillRateForUpdate(value: BillRate): BillRate[] {
@@ -275,16 +317,16 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
           comments: value.requestComment,
           workWeek: value.guaranteedWorkWeek ? value.guaranteedWorkWeek : '',
           clockId: value.clockId ? value.clockId : '',
-          offeredBillRate: PriceUtils.formatNumbers(value.offeredBillRate),
+          offeredBillRate: value.offeredBillRate ? PriceUtils.formatNumbers(value.offeredBillRate) : null,
           allow: value.allowDeployCredentials,
           startDate: value.actualStartDate ? value.actualStartDate : value.order.jobStartDate,
           endDate: value.actualEndDate ? value.actualEndDate : value.order.jobEndDate,
           rejectReason: value.rejectReason,
           offeredStartDate: this.getDateString(value.offeredStartDate),
         });
-
         this.switchFormState();
       }
+      this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -310,6 +352,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   private subscribeOnReasonsList(): void {
     this.rejectionReasonsList$.pipe(takeUntil(this.unsubscribe$)).subscribe((reasons) => {
       this.rejectReasons = reasons;
+      this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -340,9 +383,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   }
 
   private subscribeOnGetStatus(): void {
-    this.applicantStatuses$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: ApplicantStatus[]) => (this.nextApplicantStatuses = data));
+    this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ApplicantStatus[]) => {
+      this.nextApplicantStatuses = data;
+      this.changeDetectorRef.markForCheck();
+    });
   }
 
   private handleOnboardedCandidate(event: { itemData: { applicantStatus: ApplicantStatus } }): void {
@@ -387,6 +431,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.nextApplicantStatuses = [];
     this.orderCandidateListViewService.setIsCandidateOpened(false);
     this.form.markAsPristine();
+    this.changeDetectorRef.markForCheck();
   }
 
   private switchFormState(): void {
@@ -395,5 +440,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     } else {
       this.form?.enable();
     }
+  }
+
+  public onReject(): void {
+    this.store.dispatch(new GetRejectReasonsForOrganisation());
+    this.openRejectDialog.next(true);
   }
 }

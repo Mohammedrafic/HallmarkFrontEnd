@@ -14,14 +14,14 @@ import { TypedColDef, TypedValueGetterParams } from '../interfaces/typed-col-def
 import { ManualInvoice } from '../interfaces';
 import { PendingInvoice } from '../interfaces/pending-invoice-record.interface';
 
-export const amountValueFormatter: (params: ValueFormatterParams) => string =
+export const numberValueFormatter: (params: ValueFormatterParams) => string =
   ({ value }: ValueFormatterParams) => GridValuesHelper.formatNumber(value, '1.2-2');
 
 export const currencyFormatter: ValueFormatterFunc =
   ({ value }: ValueFormatterParams) => GridValuesHelper.formatCurrency(value);
 
 export const monthDayYearDateFormatter: ValueFormatterFunc =
-  ({ value }: ValueFormatterParams) => GridValuesHelper.formatDate(value, 'shortDate');
+  ({ value }: ValueFormatterParams) => GridValuesHelper.formatDate(value, 'MM/dd/yyyy');
 
 export const titleValueCellRendererSelector: CellRendererSelectorFunc = (params: ICellRendererParams) => {
   return params.value !== null ? {
@@ -54,7 +54,7 @@ export const amountColDef: TypedColDef<ManualInvoice> = {
   width: 110,
   type: 'rightAligned',
   cellClass: 'font-weight-bold align-right',
-  valueFormatter: amountValueFormatter,
+  valueFormatter: numberValueFormatter,
 };
 
 export const rejectionReasonColDef: TypedColDef<ManualInvoice> = {

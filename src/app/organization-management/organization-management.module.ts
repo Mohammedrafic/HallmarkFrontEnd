@@ -98,6 +98,11 @@ import { PurchaseOrderMappingComponent } from './specialproject/components/purch
 import { PurchaseOrderMappingState } from './store/purchase-order-mapping.state';
 import { BusinessLinesComponent } from './business-lines/business-lines.component';
 import { BusinessLinesState } from './store/business-lines.state';
+import { ImportLocationsComponent } from './locations/import-locations/import-locations.component';
+import { LocationsGridComponent } from './locations/import-locations/locations-grid/locations-grid.component';
+import { GridModule as AppGridModule } from "@shared/components/grid/grid.module";
+import { ImportDepartmentsComponent } from './departments/import-departments/import-departments.component';
+import { DepartmentsGridComponent } from './departments/import-departments/departments-grid/departments-grid.component';
 
 const sidebarIcons = {
   Download,
@@ -154,7 +159,11 @@ const sidebarIcons = {
     ProjectMappingComponent,
     SpecialProjectTableComponent,
     PurchaseOrderMappingComponent,
-    BusinessLinesComponent
+    BusinessLinesComponent,
+    ImportLocationsComponent,
+    LocationsGridComponent,
+    ImportDepartmentsComponent,
+    DepartmentsGridComponent
   ],
   imports: [
     CommonModule,
@@ -187,6 +196,7 @@ const sidebarIcons = {
     DropDownButtonModule,
     MaskedTextBoxModule,
     AgGridModule,
+    AppGridModule,
 
     FeatherModule.pick(sidebarIcons),
 

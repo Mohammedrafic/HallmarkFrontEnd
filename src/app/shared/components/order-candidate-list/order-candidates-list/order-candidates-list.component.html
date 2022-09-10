@@ -162,6 +162,7 @@
       (closeModalEvent)="onCloseDialog()"
       [candidate]="candidate"
       [isAgency]="isAgency"
+      [orderDuration]="selectedOrder.duration"
     ></app-onboarded-candidate>
   </ng-template>
 
@@ -176,11 +177,11 @@
   <ng-template #apply>
     <app-apply-candidate
       (closeDialogEmitter)="onCloseDialog()"
-      [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
+      [billRatesData]="$any((selectedAgOrder$ | async)?.billRates)"
       [candidate]="candidate"
       [isAgency]="isAgency"
-      [order]="$any((selectedOrder$ | async))"
-      [isLocked]="(selectedOrder$ | async)?.isLocked"
+      [order]="$any((selectedAgOrder$ | async))"
+      [isLocked]="(selectedAgOrder$ | async)?.isLocked"
     >
     </app-apply-candidate>
   </ng-template>

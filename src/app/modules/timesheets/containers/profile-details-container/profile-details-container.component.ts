@@ -1,6 +1,14 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
-  Input, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { filter, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
@@ -15,13 +23,26 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
 import { AttachmentsListConfig } from '@shared/components/attachments';
-import { TimesheetTargetStatus } from '../../enums';
+import { TimesheetTargetStatus, TIMETHEETS_STATUSES } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { CandidateMilesData, ChangeStatusData, CustomExport, DialogActionPayload, OpenAddDialogMeta,
-  Timesheet, TimesheetDetailsModel, WorkWeek, } from '../../interface';
-import { ConfirmDeleteTimesheetDialogContent, rejectTimesheetDialogData, TimesheetConfirmMessages,
-  TimesheetDetailsExportOptions } from '../../constants';
+import {
+  CandidateMilesData,
+  ChangeStatusData,
+  CustomExport,
+  DialogActionPayload,
+  OpenAddDialogMeta,
+  Timesheet,
+  TimesheetDetailsModel,
+  WorkWeek,
+} from '../../interface';
+import {
+  ConfirmApprovedTimesheetDeleteDialogContent,
+  ConfirmDeleteTimesheetDialogContent,
+  rejectTimesheetDialogData,
+  TimesheetConfirmMessages,
+  TimesheetDetailsExportOptions
+} from '../../constants';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services';
@@ -99,6 +120,12 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public attachmentsListConfig$: Observable<AttachmentsListConfig>;
 
   public isDNWEnabled: boolean = false;
+
+  public isNavigationAvaliable = true;
+
+  public isMileageStatusAvailable = true;
+
+  public countOfTimesheetUpdates = 0;
 
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
@@ -187,12 +214,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   }
 
   public onDWNCheckboxSelectedChange({checked}: {checked: boolean}, switchComponent: SwitchComponent): void {
-    checked ? this.confirmService.confirm(ConfirmDeleteTimesheetDialogContent, {
-      title: 'Delete Timesheet',
-      okButtonLabel: 'Proceed',
-      okButtonClass: 'delete-button',
-    })
+    checked ? this.timesheetDetails$
       .pipe(
+        map(({ status }: TimesheetDetailsModel) => status === TimesheetStatus.Approved),
+        switchMap((approved: boolean) => this.confirmService.confirm(
+          approved ? ConfirmApprovedTimesheetDeleteDialogContent : ConfirmDeleteTimesheetDialogContent, {
+            title: 'Delete Timesheet',
+            okButtonLabel: approved ? 'Yes' : 'Proceed',
+            okButtonClass: 'delete-button',
+          })),
         take(1),
         tap((submitted: boolean) => !submitted && switchComponent.writeValue(false)),
         filter(Boolean),
@@ -201,8 +231,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
         ))
       )
       .subscribe(() => {
-        this.closeDialog();
+        this.store.dispatch(new Timesheets.GetAll())
         this.refreshData();
+        this.closeDialog();
       }) : this.store.dispatch(
       new TimesheetDetails.NoWorkPerformed(false, this.timesheetId, this.organizationId)
     )
@@ -265,9 +296,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       throttleTime(100),
       filter(Boolean),
       switchMap((timesheet: Timesheet) => {
-        this.timesheetId = timesheet.id;
-        this.mileageTimesheetId = timesheet.mileageTimesheetId;
-
+        this.countOfTimesheetUpdates = 0;
         return this.store.dispatch(new Timesheets.GetTimesheetDetails(
           timesheet.id, timesheet.organizationId, this.isAgency));
       }),
@@ -282,11 +311,19 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       filter(Boolean),
       filter((details) => !details.isNotExist),
       switchMap((details) => {
+        this.timesheetId = details.id;
+        this.mileageTimesheetId = details.mileageTimesheetId;
+        this.isMileageStatusAvailable = details.mileageStatusText.toLocaleLowerCase() !== TIMETHEETS_STATUSES.NO_MILEAGES_EXIST;
+
         return this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(
           details.id, details.organizationId, this.isAgency))
       }),
       takeUntil(this.componentDestroy()),
-    ).subscribe();
+    ).subscribe(() => {
+      this.countOfTimesheetUpdates++;
+      this.chipList?.refresh();
+      this.cd.detectChanges();
+    });
   }
 
   private getDialogState(): void {
@@ -362,7 +399,12 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
     .pipe(
       takeUntil(this.componentDestroy())
-    ).subscribe(() => this.candidateDialog.hide());
+    ).subscribe(() => {
+      this.candidateDialog.hide();
+      if (this.countOfTimesheetUpdates > 1) {
+        this.store.dispatch(new Timesheets.GetAll());
+      }
+    });
   }
 
   private setOrgId(): void {

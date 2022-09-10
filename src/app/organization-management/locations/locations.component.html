@@ -14,9 +14,10 @@
         ejs-button
         cssClass="e-flat button-with-icon"
         (click)="onAddRegionClick()"
+        [class.hidden]="!isLoaded"
       ><i-feather name="plus" class="icon"></i-feather> Add Region</button>
     </section>
-    <section>
+    <section [class.hidden]="!isLoaded">
       <button
         ejs-button
         id="filterButton"
@@ -36,7 +37,7 @@
         ejs-dropdownbutton
         [items]="exportOptions"
         (select)="exportSelected($event)"
-        id="importButton"
+        id="exportButton"
         cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
       <button
         ejs-button
@@ -67,7 +68,7 @@
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
-          <div class="row-tool-buttons">
+          <div class="row-tool-buttons" [class.hidden]="!isLoaded">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
@@ -329,7 +330,7 @@
               appValidateWithMessage
               formControlName="timeZone"
               [fields]="timeZoneOptionFields"
-              [dataSource]="timeZoneIds$ | async" 
+              [dataSource]="timeZoneIds$ | async"
             >
             </ejs-dropdownlist>
           </div>
@@ -482,7 +483,7 @@
       </div>
 
       <div class="group">
-       
+
         <div>
           <div class="input-container calendar">
             <label for="inactiveDate">Inactive Date</label>
@@ -555,4 +556,4 @@
   </ng-template>
 </ejs-dialog>
 
-<app-file-upload-dialog></app-file-upload-dialog>
+<app-import-locations [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-import-locations>

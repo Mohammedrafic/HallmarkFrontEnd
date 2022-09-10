@@ -19,6 +19,10 @@ ejs-grid.e-control.e-grid {
     border-bottom-width: 1px;
   }
 
+  .e-spinner-pane {
+    display: none!important;
+  }
+
   .checkbox-header {
     .e-headercelldiv {
       padding: 0 !important;
@@ -231,9 +235,20 @@ ejs-grid.e-control.e-grid {
 
         &:hover {
           background-color: $supportive-red-40;
+        }
 
-          &.green-background {
+        &.green-background {
+
+          &:hover {
             background-color: $supportive-green-40;
+          }
+
+          &:focus {
+            background-color: $supportive-green-15;
+
+            .supportive-green-10  {
+                color: $white;
+            }
           }
         }
 

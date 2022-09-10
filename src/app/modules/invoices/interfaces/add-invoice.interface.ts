@@ -42,8 +42,10 @@ export interface ManualInvoiceReason {
 export interface ManualInvoiceMeta {
   jobId: number;
   orderId: number;
+  orderPublicId: number;
   positionId: number;
   formattedOrderId: string;
+  formattedOrderIdFull: string;
   candidateId: number;
   candidateFirstName: string;
   candidateMiddleName: string;

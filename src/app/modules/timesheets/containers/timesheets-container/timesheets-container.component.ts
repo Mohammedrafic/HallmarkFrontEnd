@@ -1,34 +1,29 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  ChangeDetectorRef, ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef, ViewChild, } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl } from '@angular/forms';
+import { Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, debounceTime } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
+import { RowNode } from '@ag-grid-community/core';
+import { DialogAction } from '@core/enums';
 
 import { Destroyable } from '@core/helpers';
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
-import { SearchComponent } from '@shared/components/search/search.component';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RowNode } from '@ag-grid-community/core';
-import { DialogAction } from '@core/enums';
 import { DataSourceItem } from '@core/interface';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { TabConfig, TabCountConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
 import {
-  TimesheetExportOptions,  TAB_ADMIN_TIMESHEETS,  UNIT_ORGANIZATIONS_FIELDS,
+  TimesheetExportOptions, TAB_ADMIN_TIMESHEETS, UNIT_ORGANIZATIONS_FIELDS,
   BulkApproveSuccessMessage } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { ExportType } from '../../enums';
-import { TimesheetsService } from '../../services/timesheets.service';
+import { TimesheetsService } from '../../services';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ProfileDetailsContainerComponent } from '../profile-details-container/profile-details-container.component';
 import { AppState } from '../../../../store/app.state';
@@ -42,9 +37,6 @@ import { AppState } from '../../../../store/app.state';
 export class TimesheetsContainerComponent extends Destroyable implements OnInit {
   @ViewChild(ProfileDetailsContainerComponent)
   public timesheetDetailsComponent: ProfileDetailsContainerComponent;
-
-  @ViewChild('search')
-  public search: SearchComponent;
 
   @Select(TimesheetsState.timesheets)
   readonly timesheets$: Observable<TimeSheetsPage>;
@@ -79,7 +71,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
   public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
   public filters: TimesheetsFilterState | undefined;
-  public readonly searchControl: FormControl = new FormControl('');
   public readonly organizationControl: FormControl = new FormControl(null);
   public readonly currentSelectedTableRowIndex: Observable<number>
     = this.timesheetsService.getStream();
@@ -91,6 +82,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     private timesheetsService: TimesheetsService,
     private cd: ChangeDetectorRef,
     private route: ActivatedRoute,
+    private location: Location,
   ) {
     super();
     store.dispatch([
@@ -105,26 +97,34 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   ngOnInit(): void {
     this.startFiltersWatching();
     this.startOrganizationWatching();
-    this.startSearchWatching();
-    this.calcTabsChips();
+    this.calcTabsBadgeAmount();
     this.onOrganizationChangedHandler();
+    this.initOnRedirect();
   }
 
   public handleChangeTab(tabIndex: number): void {
     this.activeTabIdx = tabIndex;
-    this.searchControl.setValue('', { emitEvent: false });
-    this.search?.clear();
     this.store.dispatch(new Timesheets.UpdateFiltersState({
       statusIds: this.tabConfig[tabIndex].value,
     }));
   }
 
-  public handleChangePage(page: number): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState({ pageNumber: page }, this.activeTabIdx !== 0));
+  public handleChangePage(pageNumber: number): void {
+    this.store.dispatch(new Timesheets.UpdateFiltersState(
+      { pageNumber },
+      this.activeTabIdx !== 0,
+      false,
+      true
+    ));
   }
 
   public handleChangePerPage(pageSize: number): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState({ pageSize: pageSize }, this.activeTabIdx !== 0));
+    this.store.dispatch(new Timesheets.UpdateFiltersState(
+      { pageSize },
+      this.activeTabIdx !== 0,
+      false,
+      true
+    ));
   }
 
   public exportSelected(event: any): void {
@@ -228,19 +228,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     ).subscribe();
   }
 
-  private startSearchWatching(): void {
-    this.searchControl.valueChanges.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      switchMap((searchTerm) =>
-        this.store.dispatch(new Timesheets.UpdateFiltersState({ searchTerm }, this.activeTabIdx !== 0))
-      ),
-      takeUntil(this.componentDestroy()),
-    ).subscribe();
-  }
-
   private initOrganizationsList(): void {
-    this.store.dispatch(new Timesheets.GetOrganizations()).pipe(
+    this.store.dispatch(new Timesheets.GetOrganizations())
+    .pipe(
       switchMap(() => this.organizations$.pipe(
         filter((res: DataSourceItem[]) => !!res.length),
       )),
@@ -254,7 +244,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     });
   }
 
-  private calcTabsChips(): void {
+  private calcTabsBadgeAmount(): void {
     this.tabCounts$
     .pipe(
       filter(Boolean),
@@ -284,6 +274,24 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
         new Timesheets.UpdateFiltersState(),
         new Timesheets.GetFiltersDataSource()
       ]);
+    }
+  }
+
+  private initOnRedirect(): void {
+    const state = this.location.getState() as { navigationId: number, timesheetId: number };
+
+    if (state?.timesheetId) {
+      const subscription = this.organizationId$
+        .pipe(
+          filter((value) => !!value && !!state.timesheetId),
+          switchMap((value) => this.store.dispatch(new Timesheets.GetTimesheetDetails(
+            state.timesheetId, value, this.isAgency))),
+          tap(() => {
+            this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Open, undefined));
+            subscription.unsubscribe();
+          }),
+          takeUntil(this.componentDestroy()),
+        ).subscribe();
     }
   }
 }

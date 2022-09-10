@@ -4,7 +4,9 @@ export class DateTimeHelper {
   public static getLastDayOfWeekFromFirstDay(startDate: string, days: number): Date {
     const start = new Date(startDate);
     const offset = new Date().getTimezoneOffset() * 60 * 1000;
-    const initDate = new Date(start.setUTCDate(start.getDate() - start.getDay() + days));
+    const utcDate = new Date(start.getTime() + offset);
+
+    const initDate = new Date(utcDate.setUTCDate(utcDate.getDate() - utcDate.getDay() + days));
     const dayToSet = initDate > new Date() ? new Date() : initDate;
 
     const lastDay = dayToSet.setUTCHours(23, 59, 59, 999) + offset;
@@ -23,7 +25,7 @@ export class DateTimeHelper {
 
   public static convertDateToUtc(date: string): Date {
     const init = new Date(date);
-    const offset = new Date().getTimezoneOffset() * 60 * 1000;
+    const offset = init.getTimezoneOffset() * 60 * 1000;
     const day = new Date(init.setUTCDate(init.getUTCDate()) + offset);
 
     return day;
@@ -97,5 +99,9 @@ export class DateTimeHelper {
     endWeekDay = formatDate(DateTimeHelper.getWeekDate(date), 'MM/dd/YYYY', 'en-US');
 
     return `${startWeekDay} - ${endWeekDay}`;
+  }
+
+  public static formatDateUTC(date: string, format: string): string {
+    return formatDate(date, format, 'en-US', 'UTC');
   }
 }

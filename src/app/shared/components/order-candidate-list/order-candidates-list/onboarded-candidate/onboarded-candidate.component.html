@@ -1,5 +1,5 @@
 <section class="container">
-  <section class="header-container">
+  <section class="header-container" *ngIf="candidate">
     <div class="e-card-header">
       <div class="e-card-header-caption candidat-status">
           <h3 class="e-card-title candidate-title">
@@ -27,6 +27,7 @@
             </ng-template>
           </ejs-dropdownlist>
         </div>
+        <button *ngIf="isDeployedCandidate" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
@@ -59,7 +60,7 @@
                       </div>
                     </div>
                     <div class="input-container bootstrap">
-                      <label class="input-group">Candidates</label>
+                      <label class="input-group">Candidate</label>
                       <div class="input-group input-readonly">
                         <input appValidateWithMessage formControlName="candidates" class="e-input" type="text" readonly/>
                       </div>
@@ -166,25 +167,24 @@
                         format="MM/dd/yyyy"
                         appValidateWithMessage
                         placeholder="MM/DD/YYYY"
-                        [min]="today"
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                         formControlName="startDate"
+                        (change)="onStartDateChange($event)"
                       >
                       </ejs-datepicker>
                     </div>
                   </div>
                   <div class="input-container bootstrap">
                     <label class="input-group">Actual End Date</label>
-                    <div class="input-group datepicker" [ngClass]="{'input-readonly': isOnBoarded}">
+                    <div class="input-group datepicker">
                       <ejs-datepicker
                         id="endDate"
                         class="datepicker"
                         format="MM/dd/yyyy"
                         appValidateWithMessage
                         placeholder="MM/DD/YYYY"
-                        [readonly]="isOnBoarded"
-                        [min]="today"
+                        [min]="actualStartDateValue"
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                         formControlName="endDate"
@@ -236,4 +236,5 @@
   [rejectReasonsList]="rejectReasons"
   [openEvent]="openRejectDialog"
   (applyReject)="onRejectCandidate($event)"
+  (cancelReject)="cancelRejectCandidate()"
 ></app-reject-reason-dialog>

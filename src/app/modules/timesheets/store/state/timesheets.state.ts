@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { catchError, debounceTime, EMPTY, empty, forkJoin, mergeMap, Observable, of, switchMap, tap, throttleTime, throwError } from 'rxjs';
+import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap, throttleTime } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -12,7 +12,7 @@ import { DialogAction } from '@core/enums';
 import { DataSourceItem, DropdownOption } from '@core/interface';
 
 import { TimesheetsModel, TimeSheetsPage } from '../model/timesheets.model';
-import { TimesheetsApiService } from '../../services';
+import { TimesheetDetailsApiService, TimesheetsApiService } from '../../services';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import {
@@ -48,9 +48,8 @@ import {
   TimesheetStatistics
 } from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
-import { TimesheetDetailsApiService } from '../../services';
-import { reduceFiltersState } from '../../helpers';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { reduceFiltersState } from '@core/helpers/functions.helper';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -220,24 +219,34 @@ export class TimesheetsState {
   @Action(Timesheets.UpdateFiltersState)
   UpdateFiltersState(
     { setState, getState }: StateContext<TimesheetsModel>,
-    { payload, saveStatuses, saveOrganizationId }: Timesheets.UpdateFiltersState,
+    { payload, saveStatuses, saveOrganizationId, usePrevFiltersState }: Timesheets.UpdateFiltersState,
   ): Observable<null> {
     const oldFilters: TimesheetsFilterState = getState().timesheetsFilters || DefaultFiltersState;
-    const savedFiltersKeys = SavedFiltersParams.filter((key: TimesheetsTableFiltersColumns) =>
-      saveStatuses || key !== TimesheetsTableFiltersColumns.StatusIds
-    );
-    let filters: TimesheetsFilterState = reduceFiltersState(oldFilters, savedFiltersKeys);
-    filters = Object.assign({}, filters, payload);
+
+    let filters: TimesheetsFilterState;
+
+    if (!usePrevFiltersState) {
+      const savedFiltersKeys = SavedFiltersParams.filter(
+        (key: TimesheetsTableFiltersColumns) => saveStatuses || key !== TimesheetsTableFiltersColumns.StatusIds
+      );
+
+      filters = reduceFiltersState(oldFilters, savedFiltersKeys);
+      filters = Object.assign({}, filters, payload);
+    } else {
+      filters = Object.assign({}, oldFilters, payload);
+    }
+
+    const timesheetsFilters = payload ?
+      filters :
+      Object.assign({}, DefaultFiltersState, saveOrganizationId && {
+        organizationId: oldFilters.organizationId,
+      });
 
     return of(null).pipe(
       throttleTime(100),
       tap(() =>
         setState(patch<TimesheetsModel>({
-          timesheetsFilters: payload ?
-            filters :
-            Object.assign({}, DefaultFiltersState, saveOrganizationId && {
-              organizationId: oldFilters.organizationId,
-            }),
+          timesheetsFilters,
         })
       )),
     );
@@ -282,7 +291,7 @@ export class TimesheetsState {
     .pipe(
       switchMap(() => {
         const state = ctx.getState();
-        const { id, organizationId } = state.selectedTimeSheet as Timesheet;
+        const { id, organizationId } = state.timesheetDetails as TimesheetDetailsModel;
         /**
          * TODO: make all messages for toast in one constant.
          */
@@ -346,6 +355,10 @@ export class TimesheetsState {
           ctx.dispatch(new TimesheetDetails.GetCostCenters(res.jobId, orgId, isAgency)),
         ])),
         catchError((err: HttpErrorResponse) => {
+          ctx.patchState({
+            timesheetDetails: null,
+          });
+
           return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
         }),
       )
@@ -581,21 +594,22 @@ export class TimesheetsState {
 
   @Action(TimesheetDetails.AddTimesheetRecord)
   AddTimesheetRecord(ctx: StateContext<TimesheetsModel>,
-    { body, isAgency }: TimesheetDetails.AddTimesheetRecord): Observable<void> {
-      const selectedTimesheet = ctx.getState().timesheetDetails as TimesheetDetailsModel;
+    { body, isAgency }: TimesheetDetails.AddTimesheetRecord
+  ): Observable<void> {
+      const timesheetDetails = ctx.getState().timesheetDetails as TimesheetDetailsModel;
 
-    const { organizationId, jobId, weekStartDate } = selectedTimesheet;
+    const { organizationId, jobId, weekStartDate } = timesheetDetails;
     const creatBody: AddMileageDto = {
       organizationId: organizationId,
       jobId: jobId,
       weekStartDate: weekStartDate,
     };
 
-    if (body.type === 2 && selectedTimesheet.mileageTimesheetId) {
-      body.timesheetId = selectedTimesheet.mileageTimesheetId;
+    if (body.type === 2 && timesheetDetails.mileageTimesheetId) {
+      body.timesheetId = timesheetDetails.mileageTimesheetId;
     }
 
-    return (body.type === 2 && !selectedTimesheet.mileageTimesheetId ?
+    return (body.type === 2 && !timesheetDetails.mileageTimesheetId ?
       this.timesheetDetailsApiService.createMilesEntity(creatBody)
       .pipe(
         switchMap((data) => {
@@ -606,9 +620,9 @@ export class TimesheetsState {
       .pipe(
         tap(() => {
           const state = ctx.getState();
-          const { id, organizationId } = state.selectedTimeSheet as Timesheet;
+          const { id, organizationId } = state.timesheetDetails as TimesheetDetailsModel;
 
-          if (body.type === 2 && !selectedTimesheet.mileageTimesheetId) {
+          if (body.type === 2 && !timesheetDetails.mileageTimesheetId) {
             ctx.dispatch(new Timesheets.GetAll())
           }
 

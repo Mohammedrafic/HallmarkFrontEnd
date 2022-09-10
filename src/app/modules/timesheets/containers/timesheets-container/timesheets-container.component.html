@@ -18,10 +18,10 @@
         </ejs-dropdownlist>
       </div>
     </div>
-    <app-search #search ngDefaultControl [formControl]="searchControl" class="search"></app-search>
     <app-date-range-week-picker (range)="setRange($event)"></app-date-range-week-picker>
     <button
       ejs-button
+      hideBeforeSyncfusionLoad
       cssClass="e-outline button-filter button--no-wrap"
       (click)="showFilters()">
       <div class="filter-button-content">

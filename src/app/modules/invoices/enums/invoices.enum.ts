@@ -40,9 +40,15 @@ export enum INVOICES_ACTIONS {
   ApprovePendingApprovalInvoice = '[invoices] Approve Pending Payment Invoice',
   GetPrintingData = '[invoices] Get printing data',
   GetAllInvoices ='[invoices] Get invoices with all statuses',
+  SetIsAgency = '[invoices] Set is agency state',
+  SetPermissions = '[invoices] Set permissions',
+  SetTabIndex = '[invoices] set tab index',
+  CheckManualInvoicesExist = '[invoices] check manual invoices existing',
 }
 
 export enum InvoicesTableFiltersColumns {
+  SearchTerm = 'searchTerm',
+  StatusIds = 'statusIds',
   OrderBy = 'orderBy',
   PageNumber = 'pageNumber',
   PageSize = 'pageSize',
@@ -52,4 +58,8 @@ export enum InvoicesTableFiltersColumns {
   DepartmentIds = 'departmentIds',
   AgencyIds = 'agencyIds',
   SkillIds = 'skillIds',
+}
+
+export enum PermissionCodes {
+  AgencyCanPay = 3201,
 }

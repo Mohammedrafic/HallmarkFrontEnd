@@ -51,3 +51,12 @@ export function endTimeValidator(form: AbstractControl, controlName: string): Va
     return null;
   };
 }
+
+export function datesValidator(form: AbstractControl, startDateControlName: string, endDateControlName: string): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const start = form.get(startDateControlName);
+    const end = form.get(endDateControlName);
+    return start?.value !== null && end?.value !== null && start?.value <= end?.value
+      ? null : { dateValid: true };
+  };
+}

@@ -1,3 +1,4 @@
+import { SaveLastSelectedOrganizationAgencyId } from './../../store/user.actions';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { getAllErrors } from '@shared/utils/error.utils';
@@ -19,12 +20,12 @@ import {
   GetAssociateAgencies,
   GetAvailableSteps,
   GetContactDetails,
-  GetExtensions,
   GetHistoricalData,
   GetOrderById,
   GetOrderFilterDataSources,
   GetOrders,
   GetOrganisationCandidateJob,
+  GetOrganizationExtensions,
   GetOrganizationStatesWithKeyCode,
   GetPredefinedBillRates,
   GetProjectNames,
@@ -68,7 +69,13 @@ import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectsService } from '@shared/services/projects.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { ORDER_WITHOUT_BILLRATES, ORDER_WITHOUT_CREDENTIALS, ORDER_WITHOUT_CRED_BILLRATES, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import {
+  ORDER_WITHOUT_BILLRATES,
+  ORDER_WITHOUT_CRED_BILLRATES,
+  ORDER_WITHOUT_CREDENTIALS,
+  RECORD_ADDED,
+  RECORD_MODIFIED,
+} from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { OrderManagementModel } from '@agency/store/order-management.state';
@@ -141,7 +148,7 @@ export interface OrderManagementContentStateModel {
     isDirtyQuickOrderForm: false,
     rejectionReasonsList: null,
     orderFilterDataSources: null,
-    historicalEvents: null,
+    historicalEvents: [],
     navigationTab: {
       active: null,
       pending: null,
@@ -234,14 +241,14 @@ export class OrderManagementContentState {
   }
 
   @Selector()
-  static lastSelectedOrder(state: OrderManagementContentStateModel): (id: number) => [OrderManagement, number] | [] {
+  static lastSelectedOrder(state: OrderManagementContentStateModel): (id: number) => [OrderManagement, number | undefined] | [] {
     return (id: number) => {
       let rowIndex;
       const order = state.ordersPage?.items.find((order, index) => {
         rowIndex = index;
         return order.id === id;
       });
-      return order && rowIndex ? [order, rowIndex] : [];
+      return order ? [order, rowIndex] : [];
     };
   }
 
@@ -298,6 +305,7 @@ export class OrderManagementContentState {
     { patchState }: StateContext<OrderManagementContentStateModel>,
     { payload, isIncomplete }: GetOrders
   ): Observable<OrderManagementPage> {
+    patchState({ ordersPage: null });
     return !isIncomplete
       ? this.orderManagementService.getOrders(payload).pipe(
           tap((payload) => {
@@ -585,7 +593,6 @@ export class OrderManagementContentState {
           TOAST_MESSAGE += `. ${ORDER_WITHOUT_BILLRATES}`;
           MESSAGE_TYPE = MessageTypes.Warning;
         }
-
         dispatch([
           order?.isQuickOrder
             ? new ShowToast(
@@ -596,9 +603,17 @@ export class OrderManagementContentState {
                 payload.publicId
               )
             : new ShowToast(MessageTypes.Success, RECORD_ADDED),
-          new SaveOrderSucceeded(),
+          new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
+          new SaveLastSelectedOrganizationAgencyId(
+            {
+              lastSelectedOrganizationId: Number(payload.organizationId),
+              lastSelectedAgencyId: null,
+            },
+            true
+          ),
         ]);
+
         return payload;
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
@@ -614,9 +629,10 @@ export class OrderManagementContentState {
       tap((order) => {
         dispatch([
           new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
-          new SaveOrderSucceeded(),
+          new SaveOrderSucceeded(order),
           new SetIsDirtyOrderForm(false),
         ]);
+
         return order;
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
@@ -681,7 +697,7 @@ export class OrderManagementContentState {
 
   @Action(GetHistoricalData)
   GetHistoricalData(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
     { organizationId, candidateJobId }: GetHistoricalData
   ): Observable<HistoricalEvent[]> {
     return this.orderManagementService.getHistoricalData(organizationId, candidateJobId).pipe(
@@ -690,7 +706,7 @@ export class OrderManagementContentState {
         return payload;
       }),
       catchError(() => {
-        patchState({ historicalEvents: [] });
+        dispatch(new ClearHistoricalData());
         return of();
       })
     );
@@ -756,12 +772,14 @@ export class OrderManagementContentState {
     );
   }
 
-  @Action(GetExtensions)
-  GetExtensions(
+  @Action(GetOrganizationExtensions)
+  GetOrganizationExtensions(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { id }: GetExtensions
+    { id, orderId }: GetOrganizationExtensions
   ): Observable<ExtensionGridModel[]> {
-    return this.extensionSidebarService.getExtensions(id).pipe(tap((extensions) => patchState({ extensions })));
+    return this.extensionSidebarService
+      .getExtensions(id, orderId)
+      .pipe(tap((extensions) => patchState({ extensions })));
   }
 
   @Action(SetIsDirtyQuickOrderForm)

@@ -1,6 +1,6 @@
 import { ColDef } from "@ag-grid-community/core";
 
-import { GridErroredCellComponent } from "../grid-errored-cell/grid-errored-cell.component";
+import { GridErroredCellComponent } from "@shared/components/import-dialog-content/grid-errored-cell/grid-errored-cell.component";
 
 export const candidateProfileColumns: ColDef[] = [
   {
@@ -19,6 +19,12 @@ export const candidateProfileColumns: ColDef[] = [
     field: 'lastName',
     width: 150,
     headerName: 'Last Name',
+    cellRenderer: GridErroredCellComponent,
+  },
+  {
+    field: 'profileStatus',
+    width: 150,
+    headerName: 'Profile Status',
     cellRenderer: GridErroredCellComponent,
   },
   {

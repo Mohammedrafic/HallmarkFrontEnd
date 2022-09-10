@@ -13,7 +13,7 @@
         </ejs-chiplist>
       </div>
       <div class="e-card-content">
-        <button *ngIf="!isReadOnly" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
+        <button *ngIf="showRejectButton" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
         <button *ngIf="showWithdrawAction" ejs-button cssClass="e-outline" (click)="onWithdraw()">Withdraw</button>
         <button ejs-button [isPrimary]="true" *ngIf="isApplied && !candidate.deployedCandidateInfo" class="apply-button" (click)="onApply()">Apply</button>
         <button ejs-button [isPrimary]="true" *ngIf="candidate?.statusName !== 'Accepted' && !isReadOnly && !candidate.deployedCandidateInfo" class="apply-button" (click)="onAccept()">Accept</button>

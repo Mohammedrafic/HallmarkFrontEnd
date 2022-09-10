@@ -1,5 +1,5 @@
 import { CandidateAgencyComponent } from '@agency/candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
-import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -28,19 +28,19 @@ import { Candidate } from 'src/app/shared/models/candidate.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserState } from 'src/app/store/user.state';
 import { Location } from '@angular/common';
-import { ComponentCanDeactivate } from '@shared/guards/pending-changes.guard';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
 import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
 import { SelectNavigation, SetCandidateMessage } from '@shared/components/candidate-details/store/candidate.actions';
 import { CandidateMessage } from '@shared/components/candidate-details/models/candidate.model';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 
 @Component({
   selector: 'app-add-edit-candidate',
   templateUrl: './add-edit-candidate.component.html',
   styleUrls: ['./add-edit-candidate.component.scss'],
 })
-export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCanDeactivate {
+export class AddEditCandidateComponent implements OnInit, OnDestroy {
   @Select(CandidateDetailsState.candidateMessage)
   public candidateMessage$: Observable<CandidateMessage>;
 
@@ -57,7 +57,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
 
   private filesDetails: Blob[] = [];
   private unsubscribe$: Subject<void> = new Subject();
-  private fetchedCandidate: Candidate;
+  public fetchedCandidate: Candidate;
 
   @Select(CandidateState.isCandidateCreated)
   public isCandidateCreated$: Observable<boolean>;
@@ -122,12 +122,20 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
   }
 
   public navigateBack(): void {
-    this.navigateToCandidates();
-  }
-
-  @HostListener('window:beforeunload')
-  public canDeactivate(): boolean | Observable<boolean> {
-    return !this.candidateForm.dirty;
+    if (this.candidateForm.dirty) {
+      this.confirmService
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => !!confirm))
+        .subscribe(() => {
+          this.navigateToCandidates();
+        });
+    } else {
+      this.navigateToCandidates();
+    }
   }
 
   public save(): void {
@@ -279,7 +287,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
   }
 
   private pagePermissions(): void {
-    const location = this.location.getState() as { readonly: boolean };
+    const location = this.location.getState() as { readonly: boolean; isRedirectFromOrder: boolean };
 
     this.route.data.subscribe((data) => {
       if (data['readonly']) {
@@ -292,7 +300,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
     if (location.readonly) {
       this.candidateForm.disable();
       this.readonlyMode = true;
-      this.isCredentialStep = false;
+      this.isCredentialStep = location.isRedirectFromOrder ?? false;
     }
   }
 

@@ -3,6 +3,7 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { combineLatest, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { OrganizationManagementState } from '../../store/organization-management.state';
@@ -22,16 +23,27 @@ import {
   GetWorkflowsSucceed,
   RemoveWorkflowMapping,
   SaveWorkflowMapping,
-  SaveWorkflowMappingSucceed
+  SaveWorkflowMappingSucceed,
 } from '../../store/workflow.actions';
 import { UserState } from '../../../store/user.state';
 import { RolesPerUser, User } from '@shared/models/user-managment-page.model';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
-import { RoleWithUser, StepMapping, StepRoleUser, WorkflowMappingPage, WorkflowMappingPost } from '@shared/models/workflow-mapping.model';
+import {
+  RoleWithUser,
+  StepMapping,
+  StepRoleUser,
+  WorkflowMappingPage,
+  WorkflowMappingPost,
+} from '@shared/models/workflow-mapping.model';
 import { WorkflowType } from '@shared/enums/workflow-type';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import {
+  OrganizationDepartment,
+  OrganizationLocation,
+  OrganizationRegion,
+  OrganizationStructure,
+} from '@shared/models/organization.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
@@ -40,7 +52,7 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
   selector: 'app-workflow-mapping',
   templateUrl: './workflow-mapping.component.html',
   styleUrls: ['./workflow-mapping.component.scss'],
-  providers: [DetailRowService, MaskedDateTimeService]
+  providers: [DetailRowService, MaskedDateTimeService],
 })
 export class WorkflowMappingComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
@@ -80,7 +92,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   public applicationWorkflowSteps: Step[] = [];
 
   @Select(WorkflowState.workflowMappingPages)
-  workflowMappings$: Observable<WorkflowMappingPage>
+  workflowMappings$: Observable<WorkflowMappingPage>;
 
   @Select(WorkflowState.rolesPerUsers)
   rolesPerUsers$: Observable<RolesPerUser[]>;
@@ -98,6 +110,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   public editedRecordId?: number;
   public isMappingSectionShown: boolean = false;
   public workflowTypes = WorkflowType;
+  public showForm: boolean;
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -118,18 +131,21 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
   public filters: WorkflowFilters = {
     pageSize: this.pageSize,
-    pageNumber: 1
+    pageNumber: 1,
   };
   public filterColumns: any;
   public optionFields = {
-    text: 'name', value: 'id'
+    text: 'name',
+    value: 'id',
   };
 
-  constructor(private store: Store,
-              private actions$: Actions,
-              private filterService: FilterService,
-              @Inject(FormBuilder) private builder: FormBuilder,
-              private confirmService: ConfirmService) {
+  constructor(
+    private store: Store,
+    private actions$: Actions,
+    private filterService: FilterService,
+    @Inject(FormBuilder) private builder: FormBuilder,
+    private confirmService: ConfirmService
+  ) {
     super();
     this.formBuilder = builder;
     this.createWorkflowMappingFormGroup();
@@ -145,13 +161,43 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
   ngOnInit(): void {
     this.filterColumns = {
-      regionIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      departmentsIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      skillIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'skillDescription', valueId: 'id' },
-      types: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      regionIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      locationIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      departmentsIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      skillIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'skillDescription',
+        valueId: 'id',
+      },
+      types: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
       names: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
-    }
+    };
     this.filterColumns.types.dataSource = [{ id: WorkflowGroupType.Organization, name: this.jobOrderWorkflow }];
 
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
@@ -171,38 +217,37 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
     combineLatest([this.users$, this.rolesPerUsers$])
       .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
-      .subscribe(response => {
+      .subscribe((response) => {
         let [users, roles] = response;
         this.rolesWithUsers = [];
 
         if (users && users.length > 0) {
-          users.forEach(user => {
-            this.rolesWithUsers.push({id: user.id, name: user.firstName + ' ' + user.lastName});
+          users.forEach((user) => {
+            this.rolesWithUsers.push({ id: user.id, name: user.firstName + ' ' + user.lastName });
           });
         }
 
         if (roles && roles.length > 0) {
           roles.forEach((role) => {
-            this.rolesWithUsers.push({ id: role.id.toString(), name: role.name })
+            this.rolesWithUsers.push({ id: role.id.toString(), name: role.name });
           });
         }
       });
 
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetWorkflowsSucceed))
-      .subscribe((workflows) => {
-        this.workflows = workflows.payload;
-        this.filterColumns.names.dataSource = workflows.payload.map((item: WorkflowWithDetails) => item.name);
-      });
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetWorkflowsSucceed)).subscribe((workflows) => {
+      this.workflows = workflows.payload;
+      this.filterColumns.names.dataSource = workflows.payload.map((item: WorkflowWithDetails) => item.name);
+    });
 
     this.workflowMappingFormGroup.get('regions')?.valueChanges.subscribe((regionIds: number[]) => {
       if (regionIds && regionIds.length > 0) {
         this.locations = [];
         regionIds.forEach((id) => {
-          const selectedRegion = this.orgRegions.find(region => region.id === id);
-          this.locations.push(...selectedRegion?.locations as any);
+          const selectedRegion = this.orgRegions.find((region) => region.id === id);
+          this.locations.push(...(selectedRegion?.locations as any));
         });
         this.departments = [];
-        this.locations.forEach(location => {
+        this.locations.forEach((location) => {
           this.departments.push(...location.departments);
         });
       } else {
@@ -214,20 +259,24 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       this.workflowMappingFormGroup.controls['departments'].setValue(null);
     });
 
-    this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
-      this.orgStructure = structure;
-      this.orgRegions = structure.regions;
-      this.allRegions = [...this.orgRegions];
-      this.filterColumns.regionIds.dataSource = this.allRegions;
-    });
+    this.organizationStructure$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .subscribe((structure: OrganizationStructure) => {
+        this.orgStructure = structure;
+        this.orgRegions = structure.regions;
+        this.allRegions = [...this.orgRegions];
+        this.filterColumns.regionIds.dataSource = this.allRegions;
+      });
 
     this.WorkflowFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = [];
-        val.forEach(id => selectedRegions.push(this.allRegions.find(region => region.id === id) as OrganizationRegion));
+        val.forEach((id) =>
+          selectedRegions.push(this.allRegions.find((region) => region.id === id) as OrganizationRegion)
+        );
         this.filterColumns.locationIds.dataSource = [];
-        selectedRegions.forEach(region => {
-          this.filterColumns.locationIds.dataSource.push(...region.locations as [])
+        selectedRegions.forEach((region) => {
+          this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
         });
       } else {
         this.filterColumns.locationIds.dataSource = [];
@@ -239,10 +288,14 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.WorkflowFilterFormGroup.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = [];
-        val.forEach(id => selectedLocations.push(this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)));
+        val.forEach((id) =>
+          selectedLocations.push(
+            this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)
+          )
+        );
         this.filterColumns.departmentsIds.dataSource = [];
-        selectedLocations.forEach(location => {
-          this.filterColumns.departmentsIds.dataSource.push(...location.departments as [])
+        selectedLocations.forEach((location) => {
+          this.filterColumns.departmentsIds.dataSource.push(...(location.departments as []));
         });
       } else {
         this.filterColumns.departmentsIds.dataSource = [];
@@ -251,7 +304,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       }
     });
 
-    this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe(skills => {
+    this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe((skills) => {
       if (skills && skills.length > 0) {
         this.allSkills = skills;
         this.filterColumns.skillIds.dataSource = skills;
@@ -261,9 +314,9 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.workflowMappingFormGroup.get('locations')?.valueChanges.subscribe((locationIds: number[]) => {
       if (locationIds && locationIds.length > 0) {
         this.departments = [];
-        locationIds.forEach(id => {
-          const selectedLocation = this.locations.find(location => location.id === id);
-          this.departments.push(...selectedLocation?.departments as []);
+        locationIds.forEach((id) => {
+          const selectedLocation = this.locations.find((location) => location.id === id);
+          this.departments.push(...(selectedLocation?.departments as []));
         });
       } else {
         this.departments = [];
@@ -281,24 +334,26 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
         this.applicationRoleUserFormArray.clear();
       }
 
-      const foundWorkflow = this.workflows.find(item => item.id === id);
+      const foundWorkflow = this.workflows.find((item) => item.id === id);
       // sort steps by order
       foundWorkflow?.workflows?.forEach((workflow: Workflow) => {
         workflow.steps.sort((first: Step, second: Step) => (first.order as number) - (second.order as number));
-      })
+      });
       // add nextStepStatus field
       foundWorkflow?.workflows?.forEach((workflow: Workflow) => {
         workflow.steps = workflow.steps.map((item: Step, index: number, array: Step[]) => {
           return {
             ...item,
-            nextStepStatus: array[index+1]?.status
+            nextStepStatus: array[index + 1]?.status,
           };
-        })
-      })
+        });
+      });
 
       if (foundWorkflow && foundWorkflow.workflows) {
-        this.orderWorkflowSteps = foundWorkflow.workflows[0].steps.filter(step => step.type === WorkflowStepType.Incomplete || step.type === WorkflowStepType.Custom); // includes required Order step
-        this.applicationWorkflowSteps = foundWorkflow.workflows[1].steps.filter(step => step.requirePermission);  // excludes not required App step
+        this.orderWorkflowSteps = foundWorkflow.workflows[0].steps.filter(
+          (step) => step.type === WorkflowStepType.Incomplete || step.type === WorkflowStepType.Custom
+        ); // includes required Order step
+        this.applicationWorkflowSteps = foundWorkflow.workflows[1].steps.filter((step) => step.requirePermission); // excludes not required App step
       }
 
       if (this.orderWorkflowSteps.length > 0) {
@@ -313,15 +368,14 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
         });
       }
 
-      this.isMappingSectionShown = true
+      this.isMappingSectionShown = true;
     });
 
     // close modal window with form and clear details
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveWorkflowMappingSucceed))
-      .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
-        this.clearFormDetails();
-      });
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveWorkflowMappingSucceed)).subscribe(() => {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.clearFormDetails();
+    });
   }
 
   ngOnDestroy(): void {
@@ -376,38 +430,40 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   }
 
   public onAddMappingClick(): void {
+    this.store.dispatch(new GetOrganizationStructure());
     this.store.dispatch(new ShowSideDialog(true));
+    this.showForm = true;
   }
 
   public onEditButtonClick(data: any, event: any): void {
+    this.showForm = true;
     this.addActiveCssClass(event);
     this.isMappingSectionShown = true;
     this.isEdit = true;
     this.editedRecordId = data.mappingId;
 
-
     setTimeout(() => {
-      const foundWorkflow = this.workflows.find(w => w.name === data.workflowName);
+      const foundWorkflow = this.workflows.find((w) => w.name === data.workflowName);
 
       this.workflowMappingFormGroup.controls['workflowType'].setValue(WorkflowGroupType.Organization);
       this.workflowMappingFormGroup.controls['workflowName'].setValue(foundWorkflow?.id);
 
       if (!data.regionId) {
-        const allRegionsIds = this.allRegions.map(region => region.id);
+        const allRegionsIds = this.allRegions.map((region) => region.id);
         this.workflowMappingFormGroup.controls['regions'].setValue(allRegionsIds);
       } else {
         this.workflowMappingFormGroup.controls['regions'].setValue([data.regionId]);
       }
 
       if (!data.locationId) {
-        const locationIds = this.locations.map(location => location.id);
+        const locationIds = this.locations.map((location) => location.id);
         this.workflowMappingFormGroup.controls['locations'].setValue(locationIds);
       } else {
         this.workflowMappingFormGroup.controls['locations'].setValue([data.locationId]);
       }
 
       if (!data.departmentId) {
-        const departmentIds = this.departments.map(department => department.id);
+        const departmentIds = this.departments.map((department) => department.id);
         this.workflowMappingFormGroup.controls['departments'].setValue(departmentIds);
       } else {
         this.workflowMappingFormGroup.controls['departments'].setValue([data.departmentId]);
@@ -420,9 +476,9 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       }
 
       this.setFormArrayControls(data.stepMappings);
-    })
+    });
 
-
+    this.store.dispatch(new GetOrganizationStructure());
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -432,7 +488,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       })
       .subscribe((confirm) => {
         if (confirm) {
@@ -448,15 +504,18 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => !!confirm))
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));
+          this.showForm = false;
           this.clearFormDetails();
           this.removeActiveCssClass();
         });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
+      this.showForm = false;
       this.clearFormDetails();
       this.removeActiveCssClass();
     }
@@ -468,14 +527,20 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       const workflowMapping: WorkflowMappingPost = {
         mappingId: this.editedRecordId,
         regionIds: isAllRegions ? [] : this.workflowMappingFormGroup.controls['regions'].value, // [] means All on the BE side
-        locationIds: isAllRegions && this.workflowMappingFormGroup.controls['locations'].value.length === this.locations.length
-          ? [] : this.workflowMappingFormGroup.controls['locations'].value, // [] means All on the BE side
-        departmentIds: isAllRegions && this.workflowMappingFormGroup.controls['departments'].value.length === this.departments.length
-          ? [] : this.workflowMappingFormGroup.controls['departments'].value, // [] means All on the BE side
-        skillIds: this.workflowMappingFormGroup.controls['skills'].value.length === this.allSkills.length
-          ? [] : this.workflowMappingFormGroup.controls['skills'].value, // [] means All on the BE side
+        locationIds:
+          isAllRegions && this.workflowMappingFormGroup.controls['locations'].value.length === this.locations.length
+            ? []
+            : this.workflowMappingFormGroup.controls['locations'].value, // [] means All on the BE side
+        departmentIds:
+          isAllRegions && this.workflowMappingFormGroup.controls['departments'].value.length === this.departments.length
+            ? []
+            : this.workflowMappingFormGroup.controls['departments'].value, // [] means All on the BE side
+        skillIds:
+          this.workflowMappingFormGroup.controls['skills'].value.length === this.allSkills.length
+            ? []
+            : this.workflowMappingFormGroup.controls['skills'].value, // [] means All on the BE side
         workflowGroupId: this.workflowMappingFormGroup.controls['workflowName'].value, // workflowName contains selected workflow id, on the BE workflowGroupId is just workflowId
-        stepMappings: this.getStepMappings()
+        stepMappings: this.getStepMappings(),
       };
 
       this.store.dispatch(new SaveWorkflowMapping(workflowMapping, this.filters));
@@ -498,24 +563,29 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
   public rowDataBound(args: any): void {
     // hides expand button if no children
-    if(args.data.stepMappings.length === 0) {
+    if (args.data.stepMappings.length === 0) {
       args.row.querySelector('td').innerHTML = ' ';
       args.row.querySelector('td').className = 'e-customized-expand-cell';
     }
   }
 
   public getStepDetails(stepMappings: StepMapping[], workflowName: string, workflowType: WorkflowType): StepRoleUser[] {
-    const foundWorkflow = this.workflows.find(flow => flow.name === workflowName);
+    const foundWorkflow = this.workflows.find((flow) => flow.name === workflowName);
     const stepDetails: StepRoleUser[] = [];
 
     if (foundWorkflow && foundWorkflow.workflows) {
-      const workflowIndex = workflowType === WorkflowType.OrderWorkflow ? WorkflowType.OrderWorkflow : WorkflowType.ApplicationWorkflow;
+      const workflowIndex =
+        workflowType === WorkflowType.OrderWorkflow ? WorkflowType.OrderWorkflow : WorkflowType.ApplicationWorkflow;
 
-      stepMappings.forEach(stepMap => {
+      stepMappings.forEach((stepMap) => {
         if (foundWorkflow.workflows) {
-          const foundStep = foundWorkflow.workflows[workflowIndex - 1].steps.find(st => st.id === stepMap.workflowStepId);
-          const foundUserRole = this.rolesWithUsers.find(r => r.id === stepMap.userId || r.id === stepMap.roleId?.toString());
-          if (foundStep && foundUserRole) stepDetails.push({ step: foundStep, roleUser: foundUserRole});
+          const foundStep = foundWorkflow.workflows[workflowIndex - 1].steps.find(
+            (st) => st.id === stepMap.workflowStepId
+          );
+          const foundUserRole = this.rolesWithUsers.find(
+            (r) => r.id === stepMap.userId || r.id === stepMap.roleId?.toString()
+          );
+          if (foundStep && foundUserRole) stepDetails.push({ step: foundStep, roleUser: foundUserRole });
         }
       });
     }
@@ -524,19 +594,31 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   }
 
   private setFormArrayControls(stepMappings: StepMapping[]): void {
-    this.setUsersAndRolesForEdit(stepMappings.filter(s => s.workflowType === WorkflowType.OrderWorkflow), this.orderWorkflowSteps, this.orderRoleUserFormArray);
-    this.setUsersAndRolesForEdit(stepMappings.filter(s => s.workflowType === WorkflowType.ApplicationWorkflow), this.applicationWorkflowSteps, this.applicationRoleUserFormArray);
+    this.setUsersAndRolesForEdit(
+      stepMappings.filter((s) => s.workflowType === WorkflowType.OrderWorkflow),
+      this.orderWorkflowSteps,
+      this.orderRoleUserFormArray
+    );
+    this.setUsersAndRolesForEdit(
+      stepMappings.filter((s) => s.workflowType === WorkflowType.ApplicationWorkflow),
+      this.applicationWorkflowSteps,
+      this.applicationRoleUserFormArray
+    );
   }
 
   private setUsersAndRolesForEdit(stepMappings: StepMapping[], workflowSteps: Step[], formArray: FormArray): void {
     workflowSteps.forEach((step, i) => {
-      let foundMatchedSteps = stepMappings.filter(s => s.workflowStepId === step.id);
+      let foundMatchedSteps = stepMappings.filter((s) => s.workflowStepId === step.id);
 
       if (foundMatchedSteps.length) {
         foundMatchedSteps.forEach((foundMatchedStep: StepMapping) => {
-          const foundUserRole = this.rolesWithUsers.find(r => r.id === foundMatchedStep?.userId || r.id === foundMatchedStep?.roleId?.toString());
+          const foundUserRole = this.rolesWithUsers.find(
+            (r) => r.id === foundMatchedStep?.userId || r.id === foundMatchedStep?.roleId?.toString()
+          );
           if (foundUserRole) {
-            const value = formArray.controls[i].value ? [...formArray.controls[i].value, foundUserRole.id] : [foundUserRole.id];
+            const value = formArray.controls[i].value
+              ? [...formArray.controls[i].value, foundUserRole.id]
+              : [foundUserRole.id];
             formArray.controls[i].setValue(value);
           }
         });
@@ -549,7 +631,8 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
     this.orderWorkflowSteps.forEach((step, i) => {
       this.orderRoleUserFormArray.controls[i].value.forEach((roleUserId: string) => {
-        if (roleUserId.includes('-')) { // define if roleUserId is GUID and then assign it to userId instead of roleId
+        if (roleUserId.includes('-')) {
+          // define if roleUserId is GUID and then assign it to userId instead of roleId
           const stepMapping: StepMapping = { workflowStepId: step.id, userId: roleUserId };
           mappings.push(stepMapping);
         } else {
@@ -561,11 +644,12 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
     this.applicationWorkflowSteps.forEach((step, i) => {
       this.applicationRoleUserFormArray.controls[i].value.forEach((roleUserId: string) => {
-        if (roleUserId.includes('-')) { // define if roleUserId is GUID and then assign it to userId instead of roleId
-          const stepMapping: StepMapping = {workflowStepId: step.id, userId: roleUserId};
+        if (roleUserId.includes('-')) {
+          // define if roleUserId is GUID and then assign it to userId instead of roleId
+          const stepMapping: StepMapping = { workflowStepId: step.id, userId: roleUserId };
           mappings.push(stepMapping);
         } else {
-          const stepMapping: StepMapping = {workflowStepId: step.id, roleId: parseInt(roleUserId)};
+          const stepMapping: StepMapping = { workflowStepId: step.id, roleId: parseInt(roleUserId) };
           mappings.push(stepMapping);
         }
       });
@@ -575,16 +659,16 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   }
 
   private createWorkflowMappingFormGroup(): void {
-   this.workflowMappingFormGroup = this.formBuilder.group({
-     regions: ['', Validators.required],
-     locations: ['', Validators.required],
-     departments: ['', Validators.required],
-     skills: ['', Validators.required],
-     workflowType: [ '', Validators.required],
-     workflowName: ['', Validators.required],
-     orderRoleUserFormArray: this.formBuilder.array([]),
-     applicationRoleUserFormArray: this.formBuilder.array([])
-   });
+    this.workflowMappingFormGroup = this.formBuilder.group({
+      regions: ['', Validators.required],
+      locations: ['', Validators.required],
+      departments: ['', Validators.required],
+      skills: ['', Validators.required],
+      workflowType: ['', Validators.required],
+      workflowName: ['', Validators.required],
+      orderRoleUserFormArray: this.formBuilder.array([]),
+      applicationRoleUserFormArray: this.formBuilder.array([]),
+    });
   }
 
   private clearFormDetails(): void {
@@ -594,4 +678,3 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.isMappingSectionShown = false;
   }
 }
-

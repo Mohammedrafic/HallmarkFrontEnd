@@ -34,6 +34,14 @@ import isNil from 'lodash/fp/isNil';
 import { AbstractControl } from '@angular/forms';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { SaveTemplateDialogService } from '@client/order-management/save-template-dialog/save-template-dialog.service';
+import { AlertTrigger } from '@admin/store/alerts.actions';
+import { AlertTriggerDto } from '@shared/models/alerts-template.model';
+import { UserState } from 'src/app/store/user.state';
+import { User } from '@shared/models/user.model';
+import { AgencyState } from '@agency/store/agency.state';
+import { Agency } from '@shared/models/agency.model';
+import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
+import { ToastUtility } from '@syncfusion/ej2-notifications';
 
 enum SelectedTab {
   OrderDetails,
@@ -45,6 +53,28 @@ enum SubmitButtonItem {
   SaveForLater = '0',
   Save = '1',
   SaveAsTemplate = '2',
+}
+
+enum FieldName {
+  'title' = 'Job Title',
+  'regionId' = 'Region',
+  'locationId' = 'Location',
+  'departmentId' = 'Department',
+  'skillId' = 'Skill',
+  'hourlyRate' = 'Hourly rate',
+  'openPositions' = '# Open Positions',
+  'jobStartDate' = 'Job Start Date',
+  'jobEndDate' = 'Job End Date',
+  'shift' = 'Shift Name',
+  'shiftStartTime' = 'Shift Start Time',
+  'shiftEndTime' = 'Shift End Time',
+  'jobDistribution' = 'Job Distribution',
+  'orderRequisitionReasonId' = 'Reason for Requisition',
+  'contactDetails' = 'Contact Details',
+  'workLocations' = 'Work Location',
+  'projectTypeId' = 'Special Project Category',
+  'projectNameId' = 'Project Name',
+  'poNumberId' = 'PO#'
 }
 
 @Component({
@@ -73,7 +103,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public orderId: number;
   public publicId: number;
   public prefix: string;
-
+  
   public title: string;
   public submitMenuItems: ItemModel[] = [
     { id: SubmitButtonItem.SaveForLater, text: 'Save For Later' },
@@ -83,13 +113,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   // todo: update/set credentials list in edit mode for order
   public orderCredentials: IOrderCredentialItem[] = [];
   public orderBillRates: BillRate[] = [];
-
   private unsubscribe$: Subject<void> = new Subject();
-
+  
   public isPerDiem = false;
   public isPermPlacementOrder = false;
   public disableOrderType = false;
   public isSaveForTemplate = false;
+  public isTemplate = false;
 
   public constructor(
     private store: Store,
@@ -101,6 +131,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
 
     this.orderId = Number(this.route.snapshot.paramMap.get('orderId'));
+    this.isTemplate = !!this.route.snapshot.paramMap.get('fromTemplate');
 
     if (this.orderId > 0) {
       this.title = 'Edit';
@@ -121,21 +152,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         this.prefix = order?.organizationPrefix as string;
         this.publicId = order?.publicId as number;
         this.isPermPlacementOrder = order?.orderType === OrderType.PermPlacement;
-        if (order?.credentials) {
-          this.orderCredentials = [...order.credentials];
-        }
-        if (order?.billRates) {
-          this.orderBillRates = [...order.billRates];
-        }
+        this.initCredentialsAndBillRates(order);
         if (this.isPermPlacementOrder) {
           this.tab.hideTab(SelectedTab.BillRates, this.isPermPlacementOrder);
         }
 
-        if (order?.status === OrderStatus.Incomplete) {
+        if (order?.status === OrderStatus.Incomplete ) {
           this.addMenuItem(SubmitButtonItem.SaveForLater, 'Save For Later');
           this.removeMenuItem(SubmitButtonItem.Save);
         } else {
-          if (order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement || order?.extensionFromId) {
+          if ((order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement || order?.extensionFromId) && order?.status !== OrderStatus.PreOpen) {
             this.disableOrderType = true;
           }
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
@@ -143,7 +169,29 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         }
       });
     }
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe(() => {
+    if (this.isTemplate) {
+      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe((order: Order) => {
+        this.initCredentialsAndBillRates(order);
+      });
+    }
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe((data) => {
+      const user = this.store.selectSnapshot(UserState.user) as User;
+      const agency = this.store.selectSnapshot(AgencyState.agency) as Agency;      
+      let params:any={};
+      params['@'+AlertParameterEnum[AlertParameterEnum.MyOrganization]]=user?.businessUnitName;
+      params['@'+AlertParameterEnum[AlertParameterEnum.Agency]]=agency?.agencyDetails?.name;
+      params['@'+AlertParameterEnum[AlertParameterEnum.OrderId]]=data?.order?.organizationPrefix==null?data?.order?.publicId+'':data?.order?.organizationPrefix +'-'+ data?.order?.publicId;
+      params['@'+AlertParameterEnum[AlertParameterEnum.JobTitle]]=data?.order?.title;
+      var url = location.origin + '/#/client/order-management/edit/' + data?.order?.publicId;
+      params['@'+AlertParameterEnum[AlertParameterEnum.ClickbackURL]]=url;      
+      
+      let alertTriggerDto:AlertTriggerDto={
+        BusinessUnitId: user?.businessUnitId,
+        AlertId: this.orderId>0?AlertIdEnum.OrderUpdated:AlertIdEnum.OrderCreated,
+        Parameters: params
+      }
+      this.store.dispatch(new AlertTrigger(alertTriggerDto));
       this.router.navigate(['/client/order-management']);
     });
 
@@ -170,6 +218,15 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.store.dispatch(new ClearPredefinedBillRates());
     this.store.dispatch(new UpdatePredefinedCredentials([]));
     this.store.dispatch(new SetIsDirtyOrderForm(false));
+  }
+
+  private initCredentialsAndBillRates(order: Order): void {
+    if (order?.credentials) {
+      this.orderCredentials = [...order.credentials];
+    }
+    if (order?.billRates) {
+      this.orderBillRates = [...order.billRates];
+    }
   }
 
   public onOrderTypeChange(orderType: OrderType): void {
@@ -239,19 +296,69 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
+  private collectInvalidFieldsFromForm(controls: any, fields: string[]) {
+    for (const name in controls) {
+      if (controls[name].invalid) {
+        fields.push(` \u2022 ${FieldName[name as keyof typeof FieldName]}`);
+      }
+    }
+  }
+
+  private collectInvalidFields(): string[] {
+    const fields: string[] = [];
+    const forms = [
+      this.orderDetailsFormComponent.generalInformationForm.controls,
+      this.orderDetailsFormComponent.jobDistributionForm.controls,
+      this.orderDetailsFormComponent.jobDescriptionForm.controls,
+      this.orderDetailsFormComponent.contactDetailsForm.controls,
+      this.orderDetailsFormComponent.workLocationForm.controls,
+      this.orderDetailsFormComponent.specialProject.controls
+    ];
+    forms.forEach((form) => this.collectInvalidFieldsFromForm(form, fields));
+    return fields;
+  }
+
   public save(): void {
-    if (
-      (this.orderDetailsFormComponent.orderTypeForm.disabled || this.orderDetailsFormComponent.orderTypeForm.valid) &&
+    const billRatesValid = (this.billRatesComponent?.billRatesControl.value.length ||
+      this.orderBillRates.length ||
+      this.isPerDiem ||
+      this.isPermPlacementOrder);
+    const credentialsValid = this.orderCredentials?.length;
+    const orderValid = (this.orderDetailsFormComponent.orderTypeForm.disabled || this.orderDetailsFormComponent.orderTypeForm.valid) &&
       this.orderDetailsFormComponent.generalInformationForm.valid &&
       this.orderDetailsFormComponent.jobDistributionForm.valid &&
       this.orderDetailsFormComponent.jobDescriptionForm.valid &&
       this.orderDetailsFormComponent.contactDetailsForm.valid &&
       this.orderDetailsFormComponent.workLocationForm.valid &&
-      this.orderDetailsFormComponent.specialProject.valid &&
-      (this.billRatesComponent?.billRatesControl.valid ||
-        this.orderBillRates.length ||
-        this.isPerDiem ||
-        this.isPermPlacementOrder)
+      this.orderDetailsFormComponent.specialProject.valid;
+
+    if (!billRatesValid) {
+      ToastUtility.show({
+        title: 'Error',
+        content: 'Please add Bill Rates in Bill Rates tab',
+        position: { X: 'Center', Y: 'Top' },
+        cssClass: 'error-toast',
+      });
+    }
+    if (!credentialsValid) {
+      ToastUtility.show({
+        title: 'Error',
+        content: 'Please add Credentials in Credentials tab',
+        position: { X: 'Center', Y: 'Top' },
+        cssClass: 'error-toast',
+      })
+    }
+    if (!orderValid) {
+      ToastUtility.show({
+        title: 'Error',
+        content: 'Please fill in the required fields in Order Details tab:\n' + this.collectInvalidFields().join(',\n'),
+        position: { X: 'Center', Y: 'Top' },
+        cssClass: 'error-toast',
+      })
+    }
+
+    if (
+      orderValid && billRatesValid && credentialsValid
     ) {
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
@@ -270,6 +377,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       } else {
         this.store.dispatch(new SaveOrder(order, documents, this.orderDetailsFormComponent.isEditMode ? undefined : this.orderDetailsFormComponent.comments));
       }
+    
     } else {
       this.orderDetailsFormComponent.orderTypeForm.markAllAsTouched();
       this.orderDetailsFormComponent.generalInformationForm.markAllAsTouched();
@@ -277,7 +385,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.jobDescriptionForm.markAllAsTouched();
       this.orderDetailsFormComponent.contactDetailsForm.markAllAsTouched();
       this.orderDetailsFormComponent.workLocationForm.markAllAsTouched();
-      this.orderDetailsFormComponent.specialProject.markAllAsTouched();
+      this.orderDetailsFormComponent.specialProject.markAllAsTouched();      
     }
   }
 
@@ -470,6 +578,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         order, documents, this.orderDetailsFormComponent.comments
       ));
     }
+    
   }
 
   private subscribeOnPredefinedCredentials(): void {
@@ -528,10 +637,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private markControlsAsRequired(): void {
     this.getOrderDetailsControl('regionId')?.markAsTouched();
     this.getOrderDetailsControl('skillId')?.markAsTouched();
-    if (this.orderDetailsFormComponent.isLocationsDropDownEnabled) {
+    if (!this.getOrderDetailsControl('locationId')?.disabled) {
       this.getOrderDetailsControl('locationId')?.markAsTouched();
     }
-    if (this.orderDetailsFormComponent.isDepartmentsDropDownEnabled) {
+    if (!this.getOrderDetailsControl('departmentId')?.disabled) {
       this.getOrderDetailsControl('departmentId')?.markAsTouched();
     }
   }

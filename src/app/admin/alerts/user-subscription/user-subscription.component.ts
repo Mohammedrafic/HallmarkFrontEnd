@@ -22,7 +22,7 @@ import { SetHeaderState, ShowToast } from 'src/app/store/app.actions';
 import { User, UsersPage } from '@shared/models/user.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_MODIFIED } from '@shared/constants';
+import { RECORD_MODIFIED, GRID_CONFIG } from '@shared/constants';
 
 @Component({
   selector: 'app-user-subscription',
@@ -77,7 +77,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   serverSideStoreType: any;
   maxBlocksInCache: any;
   defaultValue:any;
-  userData:User[];
+  userData: User[];
+  public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
   }

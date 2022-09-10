@@ -8,11 +8,11 @@ import { ActionsCellComponent } from './../components/cell-editors/actions-cell/
 import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor/dropdown-editor.component';
 import { GridDateEditorComponent } from '../components/cell-editors/grid-date-editor/grid-date-editor.component';
 import { GridDayComponent } from '../components/cell-editors/grid-day/grid-day.component';
-import { GridValuesHelper } from '../helpers/grid-values.helper';
+import { GridValuesHelper } from '@core/helpers/grid-values.helper';
 import { InputEditorComponent } from '../components/cell-editors/input-editor/input-editor.component';
 import { EditFieldTypes } from '@core/enums';
 import { RecordStatusCellComponent } from '../components/cell-editors/record-status-cell/record-status-cell.component';
-import { TimesheetDetailsModel } from '../interface';
+import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
 const commonColumn: ColDef = {
   filter: true,
@@ -65,6 +65,7 @@ const amountColdef = (headerText: string): ColDef => (
     ...commonColumn,
     cellClass: 'common-cell',
     width: 110,
+    valueFormatter: (params: ValueFormatterParams) => GridValuesHelper.formatNumber(params.value, '1.2-2'),
   }
 );
 

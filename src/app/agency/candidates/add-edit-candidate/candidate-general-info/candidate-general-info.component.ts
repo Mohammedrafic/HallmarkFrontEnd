@@ -1,14 +1,16 @@
-import { Component, Input } from '@angular/core';
-import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
-import { Skill } from "@shared/models/skill.model";
-import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
+import { ListOfSkills, Skill } from '@shared/models/skill.model';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { CheckBoxSelectionService } from '@syncfusion/ej2-angular-dropdowns';
-import { Observable } from 'rxjs';
+import { filter, Observable, takeUntil } from 'rxjs';
 import { GetAllSkills } from 'src/app/agency/store/candidate.actions';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
-import { CandidateStatus, CreatedCandidateStatus } from "src/app/shared/enums/status";
+import { CandidateStatus, CreatedCandidateStatus } from 'src/app/shared/enums/status';
 import { valuesOnly } from 'src/app/shared/utils/enum.utils';
+import { JobDistributionMasterSkills } from '@shared/models/associate-organizations.model';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 enum Classification {
   Alumni = 0,
@@ -16,16 +18,17 @@ enum Classification {
   Interns = 2,
   Locums = 3,
   Students = 4,
-  Volunteers = 5
+  Volunteers = 5,
 }
 @Component({
   selector: 'app-candidate-general-info',
   templateUrl: './candidate-general-info.component.html',
   styleUrls: ['./candidate-general-info.component.scss'],
-  providers: [CheckBoxSelectionService, MaskedDateTimeService]
+  providers: [CheckBoxSelectionService, MaskedDateTimeService],
 })
-export class CandidateGeneralInfoComponent {
+export class CandidateGeneralInfoComponent extends DestroyableDirective implements OnInit {
   @Input() formGroup: FormGroup;
+  @Input() selectedSkills: JobDistributionMasterSkills[] | undefined;
 
   @Input() set isCandidateCreated(value: boolean | null) {
     this.enableStatusFields = value as boolean;
@@ -35,35 +38,49 @@ export class CandidateGeneralInfoComponent {
   }
 
   @Select(CandidateState.skills)
-  skills$: Observable<Skill[]>;
+  private skills$: Observable<ListOfSkills[]>;
 
+  public skills: ListOfSkills[];
   public readonly limitDate: Date = new Date();
-
   public enableStatusFields = false;
-
   public agencyFields = {
     text: 'createUnder.name',
     value: 'createUnder.id',
   };
-
   public optionFields = {
     text: 'text',
     value: 'id',
   };
-
   public skillsFields = {
-    text: 'skillDescription',
+    text: 'name',
     value: 'id',
   };
-
   public statuses: any;
-
   public classifications = Object.values(Classification)
     .filter(valuesOnly)
     .map((text, id) => ({ text, id }));
 
   constructor(private store: Store) {
+    super();
+
     store.dispatch(new GetAllSkills());
+  }
+
+  ngOnInit(): void {
+    this.getCandidateSkills();
+  }
+
+  private getCandidateSkills(): void {
+    this.skills$
+      .pipe(
+        filter((skills: ListOfSkills[]) => skills?.length !== 0),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((skills: ListOfSkills[]) => {
+        this.skills = skills;
+        const updatedSkills = this.selectedSkills?.map((skill: Skill) => skill.id);
+        this.formGroup.get('candidateProfileSkills')?.patchValue(updatedSkills);
+      });
   }
 
   static createFormGroup(): FormGroup {

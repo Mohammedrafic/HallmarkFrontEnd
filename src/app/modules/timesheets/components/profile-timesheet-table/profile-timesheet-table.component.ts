@@ -10,6 +10,7 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
 import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
+import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
 
 import { Destroyable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
@@ -66,6 +67,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private readonly costCenters$: Observable<DropdownOption[]>;
 
   public isEditOn = false;
+
+  public readonly gridEmptyMessage = GRID_EMPTY_MESSAGE;
 
   public timesheetColDef = TimesheetRecordsColdef(false);
 
@@ -189,7 +192,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public openAddDialog(): void {
-    const startDate = this.store.snapshot().timesheets.selectedTimeSheet.startDate;
+    const startDate = this.store.snapshot().timesheets.timesheetDetails.weekStartDate;
 
     this.openAddSideDialog.emit({
       currentTab: this.currentTab,
@@ -450,7 +453,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       });
       showSpinner(this.spinner.nativeElement);
 
-      const { organizationId, id, mileageTimesheetId } = this.store.snapshot().timesheets.selectedTimeSheet;
+      const { organizationId, id, mileageTimesheetId } = this.store.snapshot().timesheets.timesheetDetails;
       const dto = RecordsAdapter.adaptRecordPutDto(
         recordsToUpdate,
         organizationId,

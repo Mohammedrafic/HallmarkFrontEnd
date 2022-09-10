@@ -5,9 +5,9 @@ import { DataSourceItem } from '@core/interface';
 import { DetailsColumnConfig } from '../../timesheets/interface';
 import { InvoiceRecord } from './invoice-record.model';
 import { INVOICES_STATUSES, InvoicesTableFiltersColumns } from '../enums';
-import { FilteringOptionsFields } from '../../timesheets/enums';
 import { InvoiceDetail } from './invoice-detail.interface';
 import { PendingApprovalInvoice } from './pending-approval-invoice.interface';
+import { FilteringInvoicesOptionsFields } from '../constants';
 
 export interface Invoice extends InvoiceRecord {
   groupBy: string;
@@ -71,7 +71,7 @@ export type InvoiceFilterColumns = {
 }
 
 export type InvoicesFilteringOptions = {
-  [key in FilteringOptionsFields]: DataSourceItem[];
+  [key in FilteringInvoicesOptionsFields]: DataSourceItem[];
 }
 
 export interface ManualInvoiceTimesheetResponse {
@@ -91,6 +91,7 @@ export interface ManualInvoiceTimesheetResponse {
 export interface InvoiceStateDto {
   invoiceId: number;
   targetState: number;
+  organizationId?: number;
 }
 
 export interface SelectedInvoiceRow {
@@ -101,4 +102,9 @@ export interface SelectedInvoiceRow {
 export interface InvoiceDialogActionPayload {
   dialogState: boolean;
   invoiceDetail: InvoiceDetail | null;
+}
+
+
+export interface InvoicePermissions {
+  agencyCanPay: boolean;
 }

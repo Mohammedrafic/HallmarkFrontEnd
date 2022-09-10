@@ -7,14 +7,13 @@ import { switchMap, tap } from 'rxjs/operators';
 import { DialogAction } from '@core/enums';
 import { AddDialogHelper } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
-import { TimesheetsState } from './../../store/state/timesheets.state';
+import { TimesheetsState } from '../../store/state/timesheets.state';
 import { AddTimsheetForm } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { RecordAddDialogConfig, TimesheetConfirmMessages } from '../../constants';
 import { RecordFields } from '../../enums';
-import { RecordsAdapter } from '../../helpers/records.adapter';
+import { RecordsAdapter } from '../../helpers';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
-
 
 @Component({
   selector: 'app-add-timesheet',
@@ -39,7 +38,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
 
   public saveRecord(): void {
     if (this.form?.valid) {
-      const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
+      const { organizationId, id } = this.store.snapshot().timesheets.timesheetDetails;
       const body = RecordsAdapter.adaptRecordAddDto(this.form.value, organizationId, id, this.formType);
 
       this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));

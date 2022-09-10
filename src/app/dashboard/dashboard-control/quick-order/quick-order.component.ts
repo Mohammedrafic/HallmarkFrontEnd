@@ -36,6 +36,8 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
 
   private isFormDirty: boolean;
 
+  public isFormShown: boolean = false;
+
   constructor(private confirmService: ConfirmService, private store: Store) {
     super();
   }
@@ -47,6 +49,7 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
 
   private onOpenEvent(): void {
     this.openEvent.pipe(takeUntil(this.destroy$)).subscribe((isOpen) => {
+      this.isFormShown = isOpen;
       if (isOpen) {
         this.sideDialog.show();
       } else {

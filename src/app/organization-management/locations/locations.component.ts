@@ -19,8 +19,9 @@ import {
   GetLocationsByRegionId,
   GetOrganizationById,
   GetRegions,
-  SaveLocation, SaveRegion, SetGeneralStatesByCountry,
-  SetImportFileDialogState,
+  SaveLocation,
+  SaveRegion,
+  SetGeneralStatesByCountry,
   UpdateLocation,
   GetLocationTypes,
   GetUSCanadaTimeZoneIds
@@ -91,7 +92,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   @Select(OrganizationManagementState.locationFilterOptions)
   locationFilterOptions$: Observable<LocationFilterOptions>;
 
-  
+
   @Select(OrganizationManagementState.locationTypes)
   locationTypes$: Observable<GetLocationTypes>;
   locationTypeOptionFields:FieldSettingsModel ={    text: 'name', value: 'locationTypeId'  };
@@ -135,6 +136,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     pageSize: this.pageSizePager
   };
   public filterColumns: any;
+  public importDialogEvent: Subject<boolean> = new Subject<boolean>();
 
   constructor(private store: Store,
     @Inject(FormBuilder) private builder: FormBuilder,
@@ -324,8 +326,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   onImportDataClick(): void {
-    this.store.dispatch(new SetImportFileDialogState(true));
-    // TODO: implement data parse after BE implementation
+    this.importDialogEvent.next(true);
   }
 
   onAddDepartmentClick(): void {
@@ -372,7 +373,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       organizationId :this.businessUnitId
     });
 
-    this.getBusinessLineDataSource(location.businessLineId, location.businessLine); 
+    this.getBusinessLineDataSource(location.businessLineId, location.businessLine);
     this.editedLocationId = location.id;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));

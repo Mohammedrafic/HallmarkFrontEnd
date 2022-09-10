@@ -262,6 +262,10 @@ a, a:hover, a:focus, a:active {
   overflow: hidden !important;
 }
 
+.hidden {
+  visibility: hidden;
+}
+
 .widget-tooltip {
   text-align: center;
   padding: 10px 20px;
@@ -319,4 +323,8 @@ html, body {
   @media screen and (max-width: 1700px) {
     top: 0 !important;
   }
+}
+
+.hideBtn {
+  display: none;
 }

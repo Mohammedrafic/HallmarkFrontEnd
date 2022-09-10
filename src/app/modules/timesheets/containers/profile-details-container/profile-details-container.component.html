@@ -8,7 +8,7 @@
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
-    <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails">
+    <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails; else closeTemplate">
       <div class="profile-details-header">
         <ng-container>
             <img class="e-avatar e-avatar-xlarge" alt="avatar" [src]="timesheetDetails.candidateId | candidateAvatar"/>
@@ -32,6 +32,7 @@
                 >
                 </e-chip>
                 <e-chip
+                  *ngIf="isMileageStatusAvailable"
                   [text]="timesheetDetails.mileageStatusText"
                   [cssClass]="timesheetDetails.mileageStatusText || '' | chipsCssClass"
                 >
@@ -54,8 +55,9 @@
               [isAbleToChange]="isChangesSaved">
             </app-date-week-picker>
 
-            <app-upload-button [container]="uploadContainer"
-                              (filesSelected)="onFilesSelected($event)"
+            <app-upload-button [disabled]="timesheetDetails.noWorkPerformed"
+                    [container]="uploadContainer"
+                    (filesSelected)="onFilesSelected($event)"
             ></app-upload-button>
 
             <app-export-button
@@ -65,8 +67,10 @@
             ></app-export-button>
          </div>
 
-         <i-feather name="x" class="icon close-button" (click)="handleProfileClose()"></i-feather>
-       </div>
+          <button ejs-button type="submit" cssClass="e-flat close-button" (click)="handleProfileClose()">
+            <i-feather name="x" class="icon"></i-feather>
+          </button>
+        </div>
       </div>
 
       <div class="order-header">
@@ -107,7 +111,8 @@
             <app-profile-miles [milesData]="milesData"></app-profile-miles>
           </div>
 
-          <div class="tile-dark-blue profile-attachments" *ngIf="timesheetDetails?.attachments?.length">
+          <div class="tile-dark-blue profile-attachments"
+               *ngIf="!timesheetDetails.noWorkPerformed && timesheetDetails?.attachments?.length">
               <h3 class="attachments-title">Attachments</h3>
 
               <app-attachments-list [attachments]="timesheetDetails.attachments"
@@ -134,6 +139,13 @@
       </section>
 
     </section>
+    <ng-template #closeTemplate>
+      <section class="container d-flex justify-end">
+        <button ejs-button type="submit" cssClass="e-flat close-button" (click)="handleProfileClose()">
+          <i-feather name="x" class="icon"></i-feather>
+        </button>
+      </section>
+    </ng-template>
     <app-navigation-panel
             prevLabel="Previous Timesheet"
             nextLabel="Next Timesheet"

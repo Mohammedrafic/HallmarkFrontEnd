@@ -23,7 +23,7 @@ import {
   ToggleRowExpansionHeaderCellComponent
 } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
 import {
-  amountValueFormatter, weekPeriodValueGetter,
+  numberValueFormatter, weekPeriodValueGetter,
   invoicesRowDetailsOffsetColDef,
   monthDayYearDateFormatter,
   titleValueCellRendererSelector
@@ -98,7 +98,65 @@ export class PendingApprovalGridHelper {
         minWidth: 280,
         headerName: 'Amount',
         cellClass: 'font-weight-bold',
-        valueFormatter: amountValueFormatter,
+        valueFormatter: numberValueFormatter,
+      },
+      {
+        field: 'apDeliveryText',
+        headerName: 'Ap Delivery',
+        minWidth: 270,
+      },
+      {
+        field: 'aggregateByTypeText',
+        headerName: 'Group By Type',
+        minWidth: 360,
+      },
+      {
+        field: 'issuedDate',
+        minWidth: 230,
+        headerName: 'Issued Date',
+        valueFormatter: monthDayYearDateFormatter,
+      },
+
+      {
+        field: 'dueDate',
+        minWidth: 200,
+        headerName: 'Due Date',
+        type: 'rightAligned',
+        valueFormatter: monthDayYearDateFormatter,
+      },
+    ];
+
+    if (!colDef[0].headerComponent) {
+      colDef.splice(0, 1);
+    }
+
+    return colDef;
+  }
+
+  public static getOrganizationPaidColDefs(): TypedColDef<PendingApprovalInvoice>[] {
+    const colDef = [
+      {
+        field: 'formattedInvoiceId',
+        minWidth: 160,
+        headerName: 'Invoice Id',
+        cellRenderer: 'agGroupCellRenderer',
+        cellClass: 'expansion-toggle-icons-order-1 color-primary-active-blue-10 font-weight-bold',
+        flex: 1,
+      },
+      {
+        field: 'invoiceStateText',
+        headerName: 'Status',
+        minWidth: 190,
+        flex: 1,
+        cellRenderer: TableStatusCellComponent,
+        cellClass: 'status-cell',
+      },
+      {
+        field: 'amount',
+        minWidth: 280,
+        headerName: 'Amount',
+        cellClass: 'font-weight-bold',
+        valueFormatter: numberValueFormatter,
       },
       {
         field: 'apDeliveryText',
@@ -117,6 +175,12 @@ export class PendingApprovalGridHelper {
         valueFormatter: monthDayYearDateFormatter,
       },
       {
+        field: 'payDate',
+        minWidth: 230,
+        headerName: 'Paid Date',
+        valueFormatter: monthDayYearDateFormatter,
+      },
+      {
         field: 'dueDate',
         minWidth: 200,
         headerName: 'Due Date',
@@ -124,11 +188,6 @@ export class PendingApprovalGridHelper {
         valueFormatter: monthDayYearDateFormatter,
       },
     ];
-
-    if (!colDef[0].headerComponent) {
-      colDef.splice(0, 1);
-    }
-
     return colDef;
   }
 
@@ -182,7 +241,7 @@ export class PendingApprovalGridHelper {
                 headerName: 'Amount',
                 cellClass: 'font-weight-bold',
                 cellRendererSelector: titleValueCellRendererSelector,
-                valueFormatter: amountValueFormatter,
+                valueFormatter: numberValueFormatter,
               },
               {
                 ...weekPeriod,
@@ -194,6 +253,7 @@ export class PendingApprovalGridHelper {
                 field: 'value',
                 headerName: 'Total Hours',
                 cellRendererSelector: titleValueCellRendererSelector,
+                valueFormatter: numberValueFormatter,
                 width: 100,
               },
               {
@@ -266,7 +326,7 @@ export class PendingApprovalGridHelper {
         minWidth: 280,
         headerName: 'Amount',
         cellClass: 'font-weight-bold',
-        valueFormatter: amountValueFormatter,
+        valueFormatter: numberValueFormatter,
       },
       {
         field: 'apDeliveryText',
@@ -282,6 +342,12 @@ export class PendingApprovalGridHelper {
         field: 'issuedDate',
         minWidth: 230,
         headerName: 'Issued Date',
+        valueFormatter: monthDayYearDateFormatter,
+      },
+      {
+        field: 'payDate',
+        minWidth: 230,
+        headerName: 'Paid Date',
         valueFormatter: monthDayYearDateFormatter,
       },
       {

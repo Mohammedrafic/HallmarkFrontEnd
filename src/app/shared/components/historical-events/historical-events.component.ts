@@ -6,10 +6,10 @@ import {
   GetAgencyHistoricalData,
   GetAgencyOrderCandidatesList,
   GetOrderApplicantsData,
-  ReloadOrderCandidatesLists,
   GetOrderById,
+  ReloadOrderCandidatesLists,
 } from '@agency/store/order-management.actions';
-import { combineLatest, Observable, Subject, takeUntil } from 'rxjs';
+import { combineLatest, merge, Observable, of, Subject, takeUntil } from 'rxjs';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
@@ -20,13 +20,15 @@ import {
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { OrderCandidatesListPage } from '../../models/order-management.model';
+import { DestroyableDirective } from '../../directives/destroyable.directive';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-historical-events',
   templateUrl: './historical-events.component.html',
   styleUrls: ['./historical-events.component.scss'],
 })
-export class HistoricalEventsComponent implements OnInit, OnChanges, OnDestroy {
+export class HistoricalEventsComponent extends DestroyableDirective implements OnInit, OnChanges {
   @Input() candidateJobId: number;
   @Input() organizationId: number;
   @Input() candidateId: number;
@@ -44,43 +46,33 @@ export class HistoricalEventsComponent implements OnInit, OnChanges, OnDestroy {
   @Select(OrderManagementContentState.orderCandidatePage)
   candidateListOrg$: Observable<OrderCandidatesListPage>;
 
-  public historicalEvents: HistoricalEvent[] = [];
+  public historicalEvents$: Observable<HistoricalEvent[]>;
+  private selectedOrgId: number;
+  private selectedJobId: number;
 
-  private unsubscribe$: Subject<void> = new Subject();
-
-  constructor(private store: Store, private actions$: Actions) {}
+  constructor(private store: Store, private actions$: Actions) {
+    super();
+  }
 
   ngOnInit(): void {
+    this.historicalEvents$ = merge(this.historicalEventsOrg$, this.historicalEventsAg$);
     this.subscribeToInitialObs();
   }
 
   ngOnChanges() {
-    this.dispatchHistoricalEvents();
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.dispatchHistoricalEvents(this.organizationId, this.candidateJobId);
   }
 
   private subscribeToInitialObs(): void {
-    combineLatest([this.historicalEventsOrg$, this.historicalEventsAg$])
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(([dataOrg, dataAg]) => {
-        this.historicalEvents = dataOrg ?? dataAg;
-      });
-
     if (!this.candidateJobId) {
-      combineLatest([this.candidateListAg$, this.candidateListOrg$])
-        .pipe(takeUntil(this.unsubscribe$))
-        .subscribe(([dataOrg, dataAg]) => {
-          const data = dataOrg ?? dataAg;
+      merge(this.candidateListAg$, this.candidateListOrg$)
+        .pipe(
+          takeUntil(this.destroy$),
+          filter((value) => !!value)
+        )
+        .subscribe((data: OrderCandidatesListPage) => {
           const [currentCandidate] = data.items.filter((item) => item.candidateId === this.candidateId);
-          if (this.isAgency) {
-            this.store.dispatch(new GetAgencyHistoricalData(this.organizationId, currentCandidate.candidateJobId));
-          } else {
-            this.store.dispatch(new GetHistoricalData(this.organizationId, currentCandidate.candidateJobId));
-          }
+          this.dispatchHistoricalEvents(this.organizationId, currentCandidate.candidateJobId);
         });
     }
 
@@ -95,26 +87,24 @@ export class HistoricalEventsComponent implements OnInit, OnChanges, OnDestroy {
           GetOrderById,
           GetOrgOrderById
         ),
-        takeUntil(this.unsubscribe$)
+        takeUntil(this.destroy$)
       )
       .subscribe(() => {
-        this.dispatchHistoricalEvents();
+        this.dispatchHistoricalEvents(this.organizationId, this.candidateJobId);
       });
   }
 
-  private dispatchHistoricalEvents() {
-    if (this.isAgency) {
-      if (this.organizationId && this.candidateJobId) {
-        this.store.dispatch(new GetAgencyHistoricalData(this.organizationId, this.candidateJobId));
-      } else {
-        this.store.dispatch(new ClearAgencyHistoricalData());
-      }
+  private dispatchHistoricalEvents(orgId: number, jobId: number): void {
+    if (this.selectedOrgId === orgId && this.selectedJobId === jobId) {
+      return;
     } else {
-      if (this.organizationId && this.candidateJobId) {
-        this.store.dispatch(new GetHistoricalData(this.organizationId, this.candidateJobId));
-      } else {
-        this.store.dispatch(new ClearHistoricalData());
-      }
+      this.selectedOrgId = orgId;
+      this.selectedJobId = jobId;
+    }
+    if (this.isAgency) {
+      this.store.dispatch(new GetAgencyHistoricalData(orgId, jobId));
+    } else {
+      this.store.dispatch(new GetHistoricalData(orgId, jobId));
     }
   }
 }

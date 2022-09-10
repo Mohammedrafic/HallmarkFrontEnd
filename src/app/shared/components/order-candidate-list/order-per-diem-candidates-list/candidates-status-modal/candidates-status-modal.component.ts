@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { merge, Observable, Subject, takeUntil } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -111,6 +111,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
 
+  public statusesFormControl = new FormControl();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public form: FormGroup;
@@ -175,6 +176,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     }
   }
 
+  public cancelRejectCandidate(): void {
+    this.statusesFormControl.reset();
+  }
+
   public onApply(): void {
     if (this.orderApplicantsInitialData) {
       this.store
@@ -209,7 +214,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
           new UpdateOrganisationCandidateJob({
             organizationId: this.orderCandidateJob.organizationId,
             orderId: this.orderCandidateJob.orderId,
-            jobId: value.jobId,
+            jobId: this.orderCandidateJob.jobId,
             clockId: value.clockId,
             allowDeployWoCredentials: value.allow,
             nextApplicantStatus: {

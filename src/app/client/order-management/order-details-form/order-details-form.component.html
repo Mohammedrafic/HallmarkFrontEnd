@@ -67,7 +67,6 @@
                     <ejs-dropdownlist
                       formControlName="locationId"
                       appValidateWithMessage
-                      [enabled]="isLocationsDropDownEnabled"
                       [dataSource]="locations$ | async"
                       [fields]="locationFields"
                       (select)="onLocationDropDownChanged($event)"
@@ -83,7 +82,6 @@
                     <ejs-dropdownlist
                       formControlName="departmentId"
                       appValidateWithMessage
-                      [enabled]="isDepartmentsDropDownEnabled"
                       [dataSource]="departments$ | async"
                       [fields]="departmentFields"
                       (select)="onDepartmentDropDownChanged($event)"
@@ -265,7 +263,6 @@
                         appValidateWithMessage
                         [enableMask]="true"
                         [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                        [min]="today"
                       >
                       </ejs-datepicker>
                     </div>
@@ -317,6 +314,7 @@
                         format="hh:mm a"
                         [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                         [enableMask]="true"
+                        [max]="maxTime"
                         maskPlaceholder="HH:MM"
                       >
                       </ejs-timepicker>
@@ -334,6 +332,7 @@
                         format="hh:mm a"
                         [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                         [enableMask]="true"
+                        [min]="minTime"
                         maskPlaceholder="HH:MM"
                       >
                       </ejs-timepicker>
@@ -367,6 +366,7 @@
                         format="hh:mm a"
                         [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                         [enableMask]="true"
+                        [max]="maxTime"
                         maskPlaceholder="HH:MM"
                       >
                       </ejs-timepicker>
@@ -384,6 +384,7 @@
                         format="hh:mm a"
                         [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                         [enableMask]="true"
+                        [min]="minTime"
                         maskPlaceholder="HH:MM"
                       >
                       </ejs-timepicker>
@@ -478,7 +479,7 @@
                       type="text"
                       [multiline]="true"
                       appValidateWithMessage
-                      maxlength="500"
+                      maxlength="4000"
                       formControlName="jobDescription"
                     >
                     </ejs-textbox>
@@ -715,7 +716,7 @@
             <div class="form-line">
               <!-- Special Project Category -->
               <div class="input-container bootstrap form-line-item-30">
-       
+
                 <label>Special Project Category<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist

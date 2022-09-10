@@ -41,6 +41,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public today = new Date();
   public organizationId: number;
   public priceUtils = PriceUtils;
+  public orderId: number;
 
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
@@ -83,12 +84,13 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   applyOrderApplicants(): void {
+    this.formGroup.markAllAsTouched();
     if (this.formGroup.valid) {
       const value = this.formGroup.getRawValue();
       this.store
         .dispatch(
           new ApplyOrderApplicants({
-            orderId: value.orderId,
+            orderId: this.orderId,
             organizationId: this.organizationId,
             candidateId: this.candidateId,
             candidateBillRate: value.candidateBillRate,
@@ -154,6 +156,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
         if (data) {
           this.organizationId = data.organizationId;
           this.candidateId = data.candidateId;
+          this.orderId = data.orderId;
           this.setFormValue(data);
         }
       });

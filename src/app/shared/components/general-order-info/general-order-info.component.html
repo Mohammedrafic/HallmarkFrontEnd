@@ -55,7 +55,7 @@
       </div>
       <div>
         <div class="title">{{ orderInformation.jobStartDate | date: 'MM/dd/yyy' }}</div>
-        <div class="sup-title">{{dateFieldName}}</div>
+        <div class="sup-title">{{ dateFieldName }}</div>
       </div>
     </div>
     <div *ngIf="!hideEndDate" class="column">
@@ -70,10 +70,10 @@
     <div class="column"></div>
     <div class="column last-column">
       <div *ngIf="orderInformation?.extensionInitialOrderId" class="accent link" (click)="moveToInitialOrder()">
-        Initial Order ID: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionPublicId }}
+        Initial Order ID: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionInitialOrderPublicId }}
       </div>
       <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
-        Previous Extension: {{ orderInformation?.extensionFromId }}
+        Previous Extension: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionPublicId }}
       </div>
     </div>
     <div *ngIf="orderInformation.orderType === orderType.PermPlacement" class="column">
@@ -116,7 +116,7 @@
       <div class="sup-title">Shift</div>
     </div>
     <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
-      <div class="title">${{ orderInformation.joiningBonus }} / ${{ orderInformation.compBonus }}</div>
+      <div class="title">${{ (orderInformation.joiningBonus || 0) | currency: '' : '' }} / ${{ (orderInformation.compBonus || 0) | currency: '' : '' }}</div>
       <div class="sup-title">Start / End Bonus</div>
     </div>
     <div class="column">

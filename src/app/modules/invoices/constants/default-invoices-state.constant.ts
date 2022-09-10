@@ -1,9 +1,11 @@
 import { InvoicesModel } from '../store/invoices.model';
 import { InvoiceDefaultFilterColumns } from './invoices.constant';
+import { InvoicesFilterState } from '../interfaces';
 
 export const DefaultInvoicesState: InvoicesModel = {
   invoicesData: null,
   manualInvoicesData: null,
+  manualInvoicesExist: false,
   pendingInvoicesData: null,
   pendingApprovalInvoicesData: null,
   pendingPaymentInvoicesData: null,
@@ -21,4 +23,15 @@ export const DefaultInvoicesState: InvoicesModel = {
   selectedOrganizationId: 0,
   regions: [],
   printData: [],
+  isAgencyArea: false,
+  permissions: {
+    agencyCanPay: false,
+  },
+  selectedTabIdx: 0,
+};
+
+export const DefaultFiltersState: InvoicesFilterState = {
+  pageNumber: 1,
+  pageSize: 30,
+  organizationId: null,
 };

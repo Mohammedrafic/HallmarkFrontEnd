@@ -1,4 +1,4 @@
-<div *ngIf="!isAgencyOrOrganization" class="dropdown-container bootstrap">
+<div *ngIf="!isAgencyOrOrganization; else agencyOrOrganization" class="dropdown-container bootstrap">
   <div class="input-group dropdown">
     <ejs-dropdownlist
       id="organization-agency-dropdown"
@@ -6,37 +6,50 @@
       [fields]="optionFields"
       [dataSource]="organizationsAgencies$ | async"
       [formControl]="organizationAgencyControl"
-      popupHeight="402px">
+      popupHeight="402px"
+    >
       <ng-template #itemTemplate let-data>
         <div class="item-container">
-          <div *ngIf="data.logo" class="logo-container">
-            <img [src]="data.logo" alt="logo">
+          <div class="logo-container">
+            <img *ngIf="data.hasLogo; else noLogo"
+              [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo?lastUpdateTicks=' + data.lastUpdateTicks"
+              alt="logo"
+            />
           </div>
-
           <div class="details">
-            <p class="name">{{data.name}}</p>
-            <p class="type">{{data.type}}</p>
+            <p class="name">{{ data.name }}</p>
           </div>
         </div>
       </ng-template>
 
       <ng-template #valueTemplate let-data>
         <div class="value-container">
-          <div *ngIf="selectedLogo$ | async as logo" class="logo-container">
-            <img  [src]="logo" alt="logo">
+          <div class="logo-container">
+            <img *ngIf="data.hasLogo; else noLogo"
+              [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo?lastUpdateTicks=' + data.lastUpdateTicks"
+              alt="logo"
+            />
           </div>
 
-          <p class="title">{{data.name}}</p>
+          <p class="title">{{ data.name }}</p>
         </div>
       </ng-template>
     </ejs-dropdownlist>
   </div>
 </div>
 
-<div *ngIf="isAgencyOrOrganization" class="organization-agency-title-container">
-  <div *ngIf="selectedLogo$ | async as logo" class="logo-container">
-    <img class="e-avatar" [src]="logo" alt="logo">
+<ng-template #agencyOrOrganization>
+  <div class="organization-agency-title-container" *ngIf="organizationAgency">
+    <div class="logo-container">
+      <img *ngIf="organizationAgency.hasLogo; else noLogo"
+        [src]="baseUrl + '/api/BusinessUnit/' + organizationAgency.id + '/logo?lastUpdateTicks=' + organizationAgency.lastUpdateTicks"
+        alt="logo"
+      />
+    </div>
+    <p class="title">{{ organizationAgency?.name }}</p>
   </div>
+</ng-template>
 
-  <p class="title">{{organizationAgency?.name}}</p>
-</div>
+<ng-template #noLogo>
+  <div class="has-no-logo"></div>
+</ng-template>

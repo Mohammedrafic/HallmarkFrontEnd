@@ -132,6 +132,10 @@ import { EmailSideDialogComponent } from '@shared/components/email-side-dialog/e
 import { SmsSideDialogComponent } from '@shared/components/sms-side-dialog/sms-side-dialog.component';
 import { OnScreenSideDialogComponent } from '@shared/components/on-screen-side-dialog/on-screen-side-dialog.component';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
+import { AlertsState } from '@admin/store/alerts.state';
+import { ImportDialogContentComponent } from './components/import-dialog-content/import-dialog-content.component';
+import { GridErroredCellComponent } from './components/import-dialog-content/grid-errored-cell/grid-errored-cell.component';
+import { HideBeforeSyncfusionLoadDirective } from './directives/hide-before-syncfusion-load.directive';
 
 const icons = {
   AlertCircle,
@@ -166,6 +170,7 @@ const COMPONENTS = [
   BillRatePipe,
   ExBillRateNamesPipe,
   ValidateDirective,
+  HideBeforeSyncfusionLoadDirective,
   AlwaysOpenFirstAccordition,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
@@ -210,11 +215,11 @@ const COMPONENTS = [
   ExtensionCandidateComponent,
   ActionCellRendererComponent,
   CustomIconComponent,
-  ActionCellRendererComponent, 
-  EmailSideDialogComponent,  
+  ActionCellRendererComponent,
+  EmailSideDialogComponent,
   SmsSideDialogComponent,
-  OnScreenSideDialogComponent,  
-  OrderCloseReasonInfoComponent
+  OnScreenSideDialogComponent,
+  OrderCloseReasonInfoComponent,
 ];
 
 @NgModule({
@@ -246,7 +251,7 @@ const COMPONENTS = [
     TextBoxModule,
     MaskedTextBoxAllModule,
     TabAllModule,
-    NgxsModule.forFeature([BillRateState, SecurityState, CommentsState]),
+    NgxsModule.forFeature([BillRateState, SecurityState, CommentsState, AlertsState]),
     PageToolbarModule,
     FilterDialogModule,
     SideMenuModule,
@@ -266,6 +271,7 @@ const COMPONENTS = [
     ErrorMessageComponent,
     CandidateAvatarPipe,
     AcceptFormComponent,
+    ImportDialogContentComponent,
   ],
   declarations: [
     ...COMPONENTS,
@@ -279,6 +285,8 @@ const COMPONENTS = [
     ReorderStatusDialogComponent,
     AcceptFormComponent,
     CustomNoRowsOverlayComponent,
+    GridErroredCellComponent,
+    ImportDialogContentComponent,
   ],
   providers: [
     DatePipe,

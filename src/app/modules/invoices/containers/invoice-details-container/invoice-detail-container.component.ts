@@ -1,6 +1,5 @@
-import {
-  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input,
-  OnInit, Output, ViewChild } from '@angular/core';
+import { InvoicesModel } from './../../store/invoices.model';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 
 import { map, Observable, takeUntil, throttleTime } from 'rxjs';
@@ -17,11 +16,12 @@ import { ExportPayload } from '@shared/models/export.model';
 import { ColDef, GridOptions } from '@ag-grid-community/core';
 
 import { InvoicesState } from '../../store/state/invoices.state';
-import { InvoiceDetail, InvoiceDialogActionPayload, PrintingPostDto } from '../../interfaces';
+import { InvoiceDetail, InvoiceDialogActionPayload, InvoiceUpdateEmmit, PrintingPostDto } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
-import { INVOICES_STATUSES } from '../../enums';
+import { INVOICES_STATUSES, InvoiceState } from '../../enums';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { InvoicePrintingService } from '../../services';
+import { ActionBtnOnStatus, AgencyActionBtnOnStatus, NewStatusDependsOnAction } from '../../constants/invoice-detail.constant';
 
 interface ExportOption extends ItemModel {
   ext: string | null;
@@ -43,7 +43,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   @Input() currentSelectedRowIndex: number | null = null;
   @Input() maxRowIndex: number = 30;
 
-  @Output() updateTable: EventEmitter<number> = new EventEmitter<number>();
+  @Output() updateTable: EventEmitter<InvoiceUpdateEmmit> = new EventEmitter<InvoiceUpdateEmmit>();
+
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
 
   @Select(InvoicesState.nextInvoiceId)
@@ -66,12 +67,28 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     private store: Store,
     private invoicesContainerService: InvoicesContainerService,
     private printingService: InvoicePrintingService,
+    private chipsCssClass: ChipsCssClass,
   ) {
     super();
   }
 
   public get isApproveDisable(): boolean {
-    return this.invoiceDetail.meta.invoiceStateText === INVOICES_STATUSES.PENDING_PAYMENT;
+    return this.invoiceDetail.meta.invoiceStateText.toLowerCase() === INVOICES_STATUSES.PENDING_PAYMENT;
+  }
+
+  public get actionBtnText(): string {
+    const status = this.invoiceDetail.meta.invoiceStateText.toLowerCase() as INVOICES_STATUSES;
+    let result: string;
+
+    if (this.isAgency) {
+      const permission = (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay;
+      result = permission ? AgencyActionBtnOnStatus.get(status) as string : '';
+
+    } else {
+      result = ActionBtnOnStatus.get(status) as string;
+    }
+
+    return result || '';
   }
 
   ngOnInit(): void {
@@ -99,7 +116,6 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
       invoiceIds: [this.invoiceDetail.meta.invoiceId],
       organizationIds: [this.invoiceDetail.meta.organizationIds[0]],
     } : {
-      organizationId: this.invoiceDetail.meta.organizationIds[0],
       invoiceIds: [this.invoiceDetail.meta.invoiceId],
     };
 
@@ -119,7 +135,13 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   }
 
   public handleApprove(): void {
-    this.updateTable.emit(this.invoiceDetail.meta.invoiceId);
+    this.updateTable.emit({
+      invoiceId: this.invoiceDetail.meta.invoiceId,
+      status: NewStatusDependsOnAction.get(this.actionBtnText) as InvoiceState,
+      ...(this.isAgency && {
+        organizationId: this.invoiceDetail.meta.organizationIds[0],
+      }),
+    });
   }
 
   public onNextPreviousOrder(next: boolean): void {
@@ -140,6 +162,10 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
           this.invoiceDetail = payload.invoiceDetail as InvoiceDetail;
           if (payload.invoiceDetail) {
             this.initTableColumns(this.invoiceDetail.summary[0]?.locationName || '');
+            if (this.chipList) {
+              this.chipList.cssClass = this.chipsCssClass.transform(this.invoiceDetail.meta.invoiceStateText);
+              this.chipList.text = this.invoiceDetail.meta.invoiceStateText.toUpperCase();
+            }
           }
         } else {
           this.sideDialog.hide();

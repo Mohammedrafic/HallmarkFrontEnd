@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GridContainerTabConfig, InvoicesContainerService } from './invoices-container.service';
+import { InvoicesContainerService } from './invoices-container.service';
 import { ColDef, GridOptions } from '@ag-grid-community/core';
 import { Observable } from 'rxjs';
 import { InvoiceAttachment, InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
@@ -10,18 +10,27 @@ import { Attachment } from '@shared/components/attachments';
 import { PendingApprovalGridHelper } from '../../helpers/grid/pending-approval-grid.helper';
 import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
 import { invoiceDetailsColumnDefs, invoiceInfoItems, invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
+import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-config.interface';
 
 @Injectable()
 export class OrganizationInvoicesContainerService extends InvoicesContainerService {
   public getColDefsByTab(
     tabIndex: OrganizationInvoicesGridTab,
-    { organizationId }: { organizationId: number | null }
+    { organizationId }: { organizationId: number }
   ): ColDef[] {
     switch (tabIndex) {
       case OrganizationInvoicesGridTab.Manual:
         return ManualInvoicesGridHelper.getOrganizationColDefs({
-          approve: ({ id }: ManualInvoice) => this.store.dispatch(new Invoices.ApproveInvoice(id)),
-          reject: ({ id }: ManualInvoice) => this.store.dispatch(new Invoices.ShowRejectInvoiceDialog(id)),
+          approve: ({ id }: ManualInvoice) =>
+            this.store.dispatch(new Invoices.ApproveInvoice(id))
+              .subscribe(
+                () => this.store.dispatch(new Invoices.CheckManualInvoicesExist(organizationId))
+              ),
+          reject: ({ id }: ManualInvoice) =>
+            this.store.dispatch(new Invoices.ShowRejectInvoiceDialog(id))
+              .subscribe(
+                () => this.store.dispatch(new Invoices.CheckManualInvoicesExist(organizationId))
+              ),
           previewAttachment: (attachment) => this.store.dispatch(
             new Invoices.PreviewAttachment(organizationId, attachment)
           ),
@@ -50,7 +59,7 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
           actionTitle: 'Pay'
         });
       case OrganizationInvoicesGridTab.Paid:
-        return  PendingApprovalGridHelper.getOrganizationColDefs({});
+        return  PendingApprovalGridHelper.getOrganizationPaidColDefs();
       case OrganizationInvoicesGridTab.All:
         return PendingApprovalGridHelper.getOrganizationAllColDefs({
           approve: (invoice: PendingApprovalInvoice) =>
@@ -135,9 +144,14 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
     const defaultConfig = super.getTabConfig(tab);
 
     switch (tab) {
+      case OrganizationInvoicesGridTab.Manual:
+        return this.createTabConfig({
+          manualInvoiceCreationEnabled: true,
+        });
       case OrganizationInvoicesGridTab.PendingRecords:
         return this.createTabConfig({
           groupingEnabled: true,
+          manualInvoiceCreationEnabled: true,
         });
       default:
         return defaultConfig;

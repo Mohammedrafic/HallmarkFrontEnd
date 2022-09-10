@@ -1,7 +1,7 @@
 <section class="flex-column">
   <section class="container">
     <div class="toolbar-buttons">
-      <button ejs-button [isPrimary]="true" (click)="handleOnAdd()">{{addButtonTitle}}</button>
+      <button ejs-button hideBeforeSyncfusionLoad [isPrimary]="true" (click)="handleOnAdd()">{{addButtonTitle}}</button>
     </div>
     <ejs-tab (selected)="onTabSelected($event)">
       <e-tabitems>
@@ -124,7 +124,8 @@
                               format="MM/dd/yyyy"
                               placeholder="MM/DD/YYYY"
                               appValidateWithMessage
-                              formControlName="startDate">
+                              formControlName="startDate"
+                              [min]="today">
               </ejs-datepicker>
             </div>
           </div>
@@ -136,7 +137,8 @@
                               format="MM/dd/yyyy"
                               placeholder="MM/DD/YYYY"
                               appValidateWithMessage
-                              formControlName="endDate">
+                              formControlName="endDate"
+                              [min]="form.controls['startDate'].value">
               </ejs-datepicker>
             </div>
           </div>

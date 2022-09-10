@@ -1,22 +1,16 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { OrganizationService } from '@shared/services/organization.service';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import {
   BehaviorSubject,
-  catchError,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
-  mergeMap,
   Observable,
-  of,
   Subject,
   switchMap,
   takeUntil,
-  tap,
 } from 'rxjs';
 
 import {
@@ -37,12 +31,14 @@ import {
 } from '@shared/models/user-agency-organization.model';
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
+import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 
 interface IOrganizationAgency {
   id: number;
   name: string;
   type: 'Organization' | 'Agency';
-  logo?: string;
+  hasLogo?: boolean;
+  lastUpdateTicks?: number;
 }
 
 @Component({
@@ -53,7 +49,7 @@ interface IOrganizationAgency {
 })
 export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   public organizationAgencyControl: FormControl = new FormControl();
-  public selectedLogo$ = new BehaviorSubject<SafeUrl | null>(null);
+  public baseUrl: string;
 
   public optionFields = {
     text: 'name',
@@ -90,12 +86,14 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store,
     private cd: ChangeDetectorRef,
-    private domSanitizer: DomSanitizer,
-    private organizationService: OrganizationService,
-    private actions$: Actions
-  ) {}
+    private actions$: Actions,
+    @Inject(APP_SETTINGS) private appSettings: AppSettings
+  ) {
+    this.baseUrl = this.appSettings.host;
+  }
 
   ngOnInit(): void {
+    const user = this.store.selectSnapshot(UserState.user);
     this.subscribeUserChange();
     this.isOrganizationAgencyAreaChange();
     this.subscribeOrganizationAgencies();
@@ -105,7 +103,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         takeUntil(this.unsubscribe$),
         debounceTime(300),
         distinctUntilChanged(),
-        mergeMap((id) => this.getLogo(id)),
         switchMap(() => this.user$)
       )
       .subscribe((user) => {
@@ -150,6 +147,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
               true
             )
           );
+          
         }
         if (selectedType === 'Agency') {
           this.store.dispatch(new LastSelectedOrganisationAgency(selectedType));
@@ -169,19 +167,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-  }
-
-  public getLogo(id: number): Observable<Blob | boolean> {
-    return this.organizationService.getOrganizationLogo(id).pipe(
-      tap((blob) => {
-        const url = window.URL.createObjectURL(blob);
-        this.selectedLogo$.next(this.domSanitizer.bypassSecurityTrustUrl(url));
-      }),
-      catchError(() => {
-        this.selectedLogo$.next(null);
-        return of(false);
-      })
-    );
   }
 
   private subscribeUserChange(): void {
@@ -238,23 +223,15 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         const organizations = this.userOrganizations.businessUnits;
 
         this.agencies = agencies.map((a: UserAgencyOrganizationBusinessUnit) => {
-          const { id, name, logo } = a;
-          const agency: IOrganizationAgency = { id, name, type: 'Agency' };
-
-          if (logo) {
-            agency.logo = logo;
-          }
+          const { id, name, hasLogo, lastUpdateTicks } = a;
+          const agency: IOrganizationAgency = { id, name, type: 'Agency', hasLogo, lastUpdateTicks };
 
           return agency;
         });
 
         this.organizations = organizations.map((o: UserAgencyOrganizationBusinessUnit) => {
-          const { id, name, logo } = o;
-          const organization: IOrganizationAgency = { id, name, type: 'Organization' };
-
-          if (logo) {
-            organization.logo = logo;
-          }
+          const { id, name, hasLogo, lastUpdateTicks } = o;
+          const organization: IOrganizationAgency = { id, name, type: 'Organization', hasLogo, lastUpdateTicks };
 
           return organization;
         });

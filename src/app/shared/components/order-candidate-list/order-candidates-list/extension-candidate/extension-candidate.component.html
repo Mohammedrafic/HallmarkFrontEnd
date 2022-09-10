@@ -11,7 +11,7 @@
           </ejs-chiplist>
         </ng-container>
       </div>
-      <div class="e-card-content button-container">
+      <div class="e-card-content button-container" *ngIf="!isRejected">
         <div class="input-group dropdown bootstrap">
           <ejs-dropdownlist
             *ngIf="!isAgency"
@@ -22,7 +22,7 @@
             (select)="onDropDownChanged($event)"
           ></ejs-dropdownlist>
         </div>
-        <button ejs-button cssClass="e-outline" [isPrimary]="true" *ngIf="!isAccepted && canAccept" (click)="onReject()">Reject</button>
+        <button ejs-button cssClass="e-outline" [isPrimary]="true" *ngIf="canAccept" (click)="onReject()">Reject</button>
         <button ejs-button [isPrimary]="true" *ngIf="canAccept" (click)="onAccept()">Accept</button>
       </div>
     </div>
@@ -134,11 +134,11 @@
                           #startDate
                           class="datepicker"
                           format="MM/dd/yyyy"
-                          appValidateWithMessage
                           placeholder="MM/DD/YYYY"
                           [enableMask]="true"
                           [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                           formControlName="actualStartDate"
+                          (change)="onStartDateChange($event)"
                         >
                         </ejs-datepicker>
                         </div>
@@ -150,10 +150,9 @@
                           id="endDate"
                           class="datepicker"
                           format="MM/dd/yyyy"
-                          appValidateWithMessage
                           placeholder="MM/DD/YYYY"
+                          [min]="actualStartDateValue"
                           [enableMask]="true"
-                          [min]="startDate.value"
                           [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                           formControlName="actualEndDate"
                         >
@@ -176,6 +175,12 @@
                         <input appValidateWithMessage formControlName="clockId" class="e-input" type="text"  maxlength="50"/>
                       </div>
                     </div>
+                  </div>
+                </div>
+                <div class="input-container bootstrap" *ngIf="isRejected">
+                  <label>Rejection Reason</label>
+                  <div class="input-group">
+                    <input appValidateWithMessage readonly formControlName="rejectReason" class="e-input" type="text"  maxlength="50"/>
                   </div>
                 </div>
               </form>
@@ -206,7 +211,7 @@
     </div>
   </section>
   <section class="bill-rates">
-    <ng-container [ngTemplateOutlet]="isAgency ? billRates : editBillRates"></ng-container>
+    <ng-container [ngTemplateOutlet]="isAgency || isRejected ? billRates : editBillRates"></ng-container>
     <ng-template #billRates>
       <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
     </ng-template>
@@ -220,4 +225,11 @@
     </ng-template>
   </section>
 </section>
+
+<app-reject-reason-dialog
+  [rejectReasonsList]="$any(rejectReasons$ | async)"
+  [openEvent]="openRejectDialog"
+  (applyReject)="rejectCandidateJob($event)"
+  (cancelReject)="cancelRejectCandidate()"
+></app-reject-reason-dialog>
 
