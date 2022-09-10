@@ -1,3 +1,97 @@
+<Section>
+    <form class="bootstrap" [formGroup]="jobDetailsForm">
+    <div class="form-line">
+       
+        <!-- Region -->
+       
+        <div class="input-container bootstrap form-line-item-20">
+          <label>Organization Name</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="business"
+              placeholder="All"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [fields]="bussinesDataFields"
+              [dataSource]="filterColumns.businessIds.dataSource"
+            >
+            </ejs-multiselect>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div class="input-container bootstrap form-line-item-20">
+          <label>Start Date<span class="required">*</span></label>
+          <div class="input-group dropdown">
+           
+          </div>
+        </div>
+
+        <!-- Department -->
+        <div class="input-container bootstrap form-line-item-20">
+          <label>End Date<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            
+          </div>
+        </div>
+
+        
+      </div>
+      <div class="form-line">
+        <div class="input-container bootstrap form-line-item-20">
+            <label>Region<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-multiselect
+                mode="CheckBox"
+                formControlName="regionId"
+                appValidateWithMessage
+                placeholder="All"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                [dataSource]="filterColumns.regionIds.dataSource"
+                [fields]="regionFields"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div class="input-container bootstrap form-line-item-20">
+            <label>Location<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-multiselect
+                mode="CheckBox"
+                formControlName="locationId"
+                appValidateWithMessage
+                placeholder="All"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"  
+                [dataSource]="filterColumns.locationIds.dataSource"
+                [fields]="locationFields"
+              >
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div class="input-container bootstrap form-line-item-20">
+            <label>Department<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-multiselect
+                mode="CheckBox"
+                formControlName="departmentId"
+                appValidateWithMessage
+                placeholder="All"
+                [allowFiltering]="true"
+                [showDropDownIcon]="true"
+                [dataSource]="filterColumns.departmentIds.dataSource"
+              [fields]="departmentFields"
+              >
+              </ejs-multiselect>
+            </div>
+            </div>
+        
+        
+      </div>
+    </form>
+</Section>
 <section class="container page-report-section">    
     <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName" [reportType]="reportType"></app-logi-report>
     <router-outlet></router-outlet>

@@ -13,6 +13,7 @@ export class LogiReportComponent implements OnInit {
   private factory: any;
   private reportIframeName: string = "reportIframe";
   private uId: string = "admin";
+  private pwd: string = "admin";
   private jrdPrefer: any;
   private reportUrl: string;
   @Input() paramsData: any | {};
@@ -48,7 +49,8 @@ export class LogiReportComponent implements OnInit {
     }
     let server = {
       url: this.reportUrl,
-      authorized_user: this.uId,
+      user: this.uId,
+      pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
       jrd_dashboard_mode: "edit",
     },
@@ -56,6 +58,7 @@ export class LogiReportComponent implements OnInit {
         reslst: this.resultList,
         active: 1
       };
+      console.log(this.reportUrl);
     let task = this.factory.runDashboard(server, resExt, entryId);
   }
 
@@ -91,13 +94,15 @@ export class LogiReportComponent implements OnInit {
     }
     let server = {
       url: this.reportUrl,
-      authorized_user: this.uId,
+      user: this.uId,
+      pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
       jrd_studio_mode: "edit",
       "jrs.param_page": true
     };
     let prptRes = this.reportName;
     let catRes = this.catelogName;
+    console.log(this.reportUrl);
     let test = this.factory.runReport(
       server, prptRes, catRes, this.paramsData, entryId);
   };

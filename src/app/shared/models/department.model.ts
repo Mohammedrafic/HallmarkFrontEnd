@@ -53,3 +53,10 @@ export type ImportedDepartment = {
   inactiveDate: string;
   errorProperties: string[];
 }
+export class DepartmentsByLocationsFilter {
+  ids?: number[];  
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+  getAll?:boolean;
+}

@@ -14,14 +14,23 @@ const routes: Routes = [
       {
         path: 'state-wise-skills',
         component: StateWiseSkillsComponent,
+        data: {
+          isOrganizationArea: true,
+        }
       },
       {
         path: 'candidate-stats',
         component: CandidateStatsComponent,
+        data: {
+          isOrganizationArea: true,
+        }
       },
       {
         path: 'page-report',
         component: PageReportComponent,
+        data: {
+          isOrganizationArea: true,
+        }
       },
      
     ],

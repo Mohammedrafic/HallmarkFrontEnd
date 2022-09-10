@@ -11,13 +11,13 @@ import { SetHeaderState } from 'src/app/store/app.actions';
 })
 export class StateWiseSkillsComponent {
   public paramsData: any = {};
-  public reportName: LogiReportFileDetails = { name: "/POC/1st_dashboard.dsh" };
-  public catelogName: LogiReportFileDetails = { name: "/POC/POC.cat" };
+  public reportName: LogiReportFileDetails = { name: "/JobDetails/JobDetails.wls" };
+  public catelogName: LogiReportFileDetails = { name: "/JobDetails/Dashbord.cat" };
   public resultList: LogiReportFileDetails[] = [
-    { name: "/POC - 1st_dashboard.dsh" }
+    { name: "/JobDetails - JobDetails.wls" }
   ];
   public title: string = "Dashboard";
-  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
+  public reportType: LogiReportTypes = LogiReportTypes.WebReport;
 
   constructor(store: Store) {
     store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
