@@ -132,11 +132,11 @@ body {
   .stick-right {
     margin-left: auto !important;
   }
-
   // Default icon size
   i-feather.icon, app-custom-icon.icon {
     width: 16px;
     height: 16px;
+
     &.fill-red {
       stroke: #FF5858
     }
@@ -195,93 +195,7 @@ body {
       background-color: $background;
     }
 
-    .app-maps-chart__text {
-      color: $secondary-dark-blue-30;
-    }
-
-    .header-item {
-      .e-menu-wrapper,
-      .e-menu-wrapper .e-menu .e-menu-item.e-selected {
-        background-color: $background;
-      }
-    }
-
-    .week-picker-container .e-input-group.e-control-wrapper {
-      background-color: $background !important;
-    }
-
-    .widget-tooltip {
-      text-align: center;
-      padding: 10px 20px;
-      background-color: var(--tooltip-dark-background);
-      box-shadow: 0 3px 15px rgb(0 0 0 / 0.2);
-      color: var(--tooltip-dark-text);
-
-      &::after {
-        content: "";
-        display: block;
-        width: 15px;
-        height: 15px;
-        position: absolute;
-        left: 40%;
-        background-color: var(--tooltip-dark-background);
-        transform: rotate(45deg);
-      }
-    }
-
-    #organization-agency-dropdown .e-input-group {
-      background: $sidebar-background !important;
-      color: $white;
-    }
-
-    .e-input-group.e-control-wrapper.e-ddl.e-valid-input {
-      &:hover {
-        background: transparent !important;
-      }
-    }
-
-    .e-input-group.e-float-icon-left.search-with-icon {
-      background: $sidebar-background;
-      border: 1px solid $grid-border-color;
-    }
-
-    .bootstrap .e-input-group.e-control-wrapper {
-      background: $sidebar-background !important;
-    }
-
-    .custom-chip,
-    .candidates-additional-info .container-row,
-    .search {
-      background: $sidebar-background !important;
-    }
-
-    .container-row,
-    .comments-container.background,
-    .credentials,
-    .credentials .e-accordion, .credentials .e-acrdn-item,
-    .contacts {
-      background: $widget-dark-tooltip !important;
-    }
-
-    .container-row .title, .comments-container .comments-header .title, .comment .comment-header .name,
-    .comment .comment-body, .credentials-title, .contact-title, .contacts .contact-details,
-    .contacts .contact-details i-feather, .general-information .title, .job-distibution .title,
-    .job-description .title, .contact-header .contact-title, .contact-header .title, .work-location-header .title,
-    .special-project .title, .candidates-info .column .cost,
-    .dialog-header .title, .cards-container .card.e-card h4,
-    .tree-lebel label, .section-tittle {
-      color: $white !important;
-    }
-
-    .input-container label,
-    .e-switch-wrapper label {
-      color: $secondary-dark-blue-40 !important;
-    }
-
-    .comment .icon.visibility,
-    .comment .comment-header .controls .date {
-      color: $secondary-dark-blue-30 !important;
-    }
+    @include meta.load-css("./dark-styles");
 
     @include meta.load-css("./themes/material_d");
 
