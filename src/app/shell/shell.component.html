@@ -137,7 +137,7 @@
   <div id="listcontainer">
     <div class="card" *ngFor="let item of alerts">
       <div class="card-body">
-        {{item.content}}        
+        <div [innerHTML]="item.content"></div>        
       </div>
       <div class="card-footer">
         <small>{{item.createdAt | date:'medium'}}</small>

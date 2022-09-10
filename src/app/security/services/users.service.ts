@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import {
   Organisation,
+  UserVisibilityFilter,
   UserVisibilitySettingBody,
   UserVisibilitySettingsPage,
 } from '@shared/models/visibility-settings.model';
@@ -79,11 +80,11 @@ export class UsersService {
 
   /**
    * Get the list of User Visibility Settings
-   * @param userId
+   * @param filters of type UserVisibilityFilter
    * @return UserVisibilitySettingsPage
    */
-  public getUserVisibilitySettingsPage(userId: string): Observable<UserVisibilitySettingsPage> {
-    return this.http.get<UserVisibilitySettingsPage>(`/api/UserVisibilitySettings/${userId}`);
+  public getUserVisibilitySettingsPage(filters: UserVisibilityFilter): Observable<UserVisibilitySettingsPage> {
+    return this.http.post<UserVisibilitySettingsPage>(`/api/UserVisibilitySettings/filter`,filters);
   }
 
   /**

@@ -148,7 +148,7 @@ export interface OrderManagementContentStateModel {
     isDirtyQuickOrderForm: false,
     rejectionReasonsList: null,
     orderFilterDataSources: null,
-    historicalEvents: null,
+    historicalEvents: [],
     navigationTab: {
       active: null,
       pending: null,
@@ -241,14 +241,14 @@ export class OrderManagementContentState {
   }
 
   @Selector()
-  static lastSelectedOrder(state: OrderManagementContentStateModel): (id: number) => [OrderManagement, number] | [] {
+  static lastSelectedOrder(state: OrderManagementContentStateModel): (id: number) => [OrderManagement, number | undefined] | [] {
     return (id: number) => {
       let rowIndex;
       const order = state.ordersPage?.items.find((order, index) => {
         rowIndex = index;
         return order.id === id;
       });
-      return order && rowIndex ? [order, rowIndex] : [];
+      return order ? [order, rowIndex] : [];
     };
   }
 
@@ -697,7 +697,7 @@ export class OrderManagementContentState {
 
   @Action(GetHistoricalData)
   GetHistoricalData(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
     { organizationId, candidateJobId }: GetHistoricalData
   ): Observable<HistoricalEvent[]> {
     return this.orderManagementService.getHistoricalData(organizationId, candidateJobId).pipe(
@@ -706,7 +706,7 @@ export class OrderManagementContentState {
         return payload;
       }),
       catchError(() => {
-        patchState({ historicalEvents: [] });
+        dispatch(new ClearHistoricalData());
         return of();
       })
     );

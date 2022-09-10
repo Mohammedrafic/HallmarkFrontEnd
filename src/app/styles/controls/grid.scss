@@ -244,11 +244,14 @@ body.light, body.dark {
               background-color: $supportive-green-40;
             }
 
-            &:focus {
-              color: $white;
-              background-color: $supportive-green-15;
+          &:focus {
+            background-color: $supportive-green-15;
+
+            .supportive-green-10  {
+                color: $white;
             }
           }
+        }
 
           &[disabled] {
             pointer-events: none;

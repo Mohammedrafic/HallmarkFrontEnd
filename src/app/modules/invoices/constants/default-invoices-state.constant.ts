@@ -5,6 +5,7 @@ import { InvoicesFilterState } from '../interfaces';
 export const DefaultInvoicesState: InvoicesModel = {
   invoicesData: null,
   manualInvoicesData: null,
+  manualInvoicesExist: false,
   pendingInvoicesData: null,
   pendingApprovalInvoicesData: null,
   pendingPaymentInvoicesData: null,

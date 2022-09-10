@@ -451,8 +451,13 @@
     .card {
       background-color: $alert-side-bar-cardcolor;
       border-radius: 4px;
-      padding: 10px;
+      padding: 4px 10px;
       font-size: 0.85rem !important;
+      margin-bottom: 4px;
+
+      a {
+        color: $alert-side-bar-anchorforecolor !important;      
+      }
 
       .card-footer {
         text-align: right;

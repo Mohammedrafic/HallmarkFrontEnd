@@ -6,6 +6,9 @@ import { AgencyOrderManagement, Order, OrderManagement, ReOrder } from '@shared/
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { AddEditReorderService } from "@client/order-management/add-edit-reorder/add-edit-reorder.service";
 import { SidebarDialogTitlesEnum } from "@shared/enums/sidebar-dialog-titles.enum";
+import { AppState } from "src/app/store/app.state";
+import { OrderManagementAgencyService } from "@agency/order-management/order-management-agency.service";
+import { OrderManagementService } from "@client/order-management/order-management-content/order-management.service";
 
 @Component({
   selector: 'app-order-reorders-list',
@@ -24,7 +27,11 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
   @Output() selectReOrder = new EventEmitter<{ reOrder: OrderManagement | AgencyOrderManagement, order: Order | OrderManagement | AgencyOrderManagement }>()
   @Output() editReorder = new EventEmitter();
 
-  constructor(private store: Store, private orderManagementService: OrderManagementContentService, private addEditReOrderService: AddEditReorderService) {
+  constructor(private store: Store, 
+              private orderManagementService: OrderManagementContentService,
+              private addEditReOrderService: AddEditReorderService,
+              private orderManagementAgencyService: OrderManagementAgencyService,
+              private orderService: OrderManagementService) {
     super();
   }
 
@@ -51,6 +58,21 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
 
   onViewNavigation(reOrder: OrderManagement): void {
     this.selectReOrder.emit({reOrder: reOrder, order: this.order});
+    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+
+    if (reOrder.publicId) {
+      if (isAgencyArea) {
+        this.orderManagementAgencyService.reorderId$.next({
+          id: reOrder.publicId,
+          prefix: reOrder.organizationPrefix
+        });
+      } else {
+        this.orderService.reorderId$.next({
+          id: reOrder.publicId,
+          prefix: reOrder.organizationPrefix
+        });
+      }
+    }
   }
 
   edit(order: OrderManagement): void {

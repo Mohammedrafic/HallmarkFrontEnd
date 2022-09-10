@@ -21,7 +21,7 @@
         [value]="defaultLocationValue"
       ></ejs-dropdownlist>
     </section>
-    <section>
+    <section [class.hidden]="!isLoaded">
       <button
         ejs-button
         id="filterButton"
@@ -72,7 +72,7 @@
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
-          <div class="row-tool-buttons">
+          <div class="row-tool-buttons" [class.hidden]="!isLoaded">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditDepartmentClick(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>

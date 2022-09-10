@@ -10,6 +10,7 @@ export class OrderManagementAgencyService extends DestroyableDirective {
   public orderPerDiemId$: Subject<{id: number, prefix: string}> = new Subject<{id: number, prefix: string}>();
   public selectedOrderAfterRedirect$: Subject<OrderTab> = new Subject<OrderTab>();
   public orderId$: Subject<{id: number, prefix: string}> = new Subject<{id: number, prefix: string}>();
+  public reorderId$: Subject<{id: number, prefix: string}> = new Subject<{id: number, prefix: string}>();
   public excludeDeployed: boolean;
 
   private _orderPerDiemId: number | null;

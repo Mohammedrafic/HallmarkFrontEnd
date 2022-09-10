@@ -9,12 +9,10 @@ import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { MessageTypes } from '@shared/enums/message-types';
-import { LocationFilterOptions } from '@shared/models/location.model';
 import { Region, regionFilter } from '@shared/models/region.model';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import {
-  ClearLocationList, DeleteRegionById, ExportLocations, ExportRegions, GetLocationFilterOptions, GetLocationsByRegionId, GetOrganizationById,
-  GetRegionFilterOptions,
+  ClearLocationList, DeleteRegionById, ExportRegions, GetOrganizationById,
   GetRegions, SaveRegion, SetGeneralStatesByCountry, SetImportFileDialogState, UpdateRegion
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
@@ -25,9 +23,7 @@ import {
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
-  RECORD_ADDED,
   RECORD_DELETE,
-  RECORD_MODIFIED
 } from '@shared/constants';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -72,7 +68,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
   organizationStructure$: Observable<OrganizationStructure>;
 
   public regionFormGroup: FormGroup;
-public regionFilterFormGroup:FormGroup;
+  public regionFilterFormGroup:FormGroup;
   formBuilder: FormBuilder;
 
   @Select(OrganizationManagementState.organization)

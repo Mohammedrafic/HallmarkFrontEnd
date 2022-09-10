@@ -99,7 +99,7 @@ import { TabNavigationComponent } from '@client/order-management/order-managemen
 import { OrderDetailsDialogComponent } from '@client/order-management/order-details-dialog/order-details-dialog.component';
 import isNil from 'lodash/fp/isNil';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
-import { isArray } from 'lodash';
+import { isArray, isUndefined } from 'lodash';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
@@ -312,6 +312,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.listenRedirectFromReOrder();
     this.onCommentRead();
     this.listenRedirectFromExtension();
+    this.listenRedirectFromPerDiem();
     this.subscribeForSettings();
     this.handleRedirectFromQuickOrderToast();
   }
@@ -559,8 +560,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     if (this.previousSelectedOrderId) {
       const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
         this.previousSelectedOrderId
-      );
-      if (data && index) {
+        );
+      if (data && !isUndefined(index)) {
         this.gridWithChildRow.selectRow(index);
         this.onRowClick({ data });
       }
@@ -1323,6 +1324,17 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private listenRedirectFromExtension(): void {
     this.orderManagementService.orderId$.pipe(takeUntil(this.unsubscribe$), filter(Boolean), debounceTime(300)).subscribe((data: {id: number, prefix: string}) => {
+      this.orderId = data.id;
+      this.prefix = data.prefix;
+      this.filters.orderPublicId = this.prefix + '-' + this.orderId;
+      this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns)
+      this.getOrders();
+    });
+  }
+
+  private listenRedirectFromPerDiem(): void {
+    this.orderManagementService.reorderId$.pipe(takeUntil(this.unsubscribe$), filter(Boolean), debounceTime(300)).subscribe((data: {id: number, prefix: string}) => {
       this.orderId = data.id;
       this.prefix = data.prefix;
       this.filters.orderPublicId = this.prefix + '-' + this.orderId;

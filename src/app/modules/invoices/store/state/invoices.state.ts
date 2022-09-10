@@ -131,6 +131,11 @@ export class InvoicesState {
     return state.selectedOrganizationId;
   }
 
+  @Selector([InvoicesState])
+  static manualInvoicesExist(state: InvoicesModel): boolean {
+    return state.manualInvoicesExist;
+  }
+
   @Action(Invoices.ToggleInvoiceDialog)
   ToggleInvoiceDialog(
     { patchState, dispatch }: StateContext<InvoicesModel>,
@@ -450,6 +455,22 @@ export class InvoicesState {
       catchError((err: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
       }),
+    );
+  }
+
+  @Action(Invoices.CheckManualInvoicesExist)
+  CheckManualInvoicesExist(
+    { patchState }: StateContext<InvoicesModel>,
+    { organizationId }: Invoices.CheckManualInvoicesExist
+  ): Observable<ManualInvoicesData | void> {
+    return this.invoicesAPIService.getManualInvoices({
+      pageNumber: 1,
+      pageSize: 1,
+      organizationId,
+    }).pipe(
+      tap(({ totalCount }: ManualInvoicesData) => patchState({
+        manualInvoicesExist: !!totalCount,
+      })),
     );
   }
 

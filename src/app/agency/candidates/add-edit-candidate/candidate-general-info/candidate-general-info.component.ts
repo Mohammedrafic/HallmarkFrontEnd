@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
-import { Skill } from '@shared/models/skill.model';
+import { ListOfSkills, Skill } from '@shared/models/skill.model';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { CheckBoxSelectionService } from '@syncfusion/ej2-angular-dropdowns';
 import { filter, Observable, takeUntil } from 'rxjs';
@@ -38,9 +38,9 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
   }
 
   @Select(CandidateState.skills)
-  private skills$: Observable<Skill[]>;
+  private skills$: Observable<ListOfSkills[]>;
 
-  public skills: Skill[];
+  public skills: ListOfSkills[];
   public readonly limitDate: Date = new Date();
   public enableStatusFields = false;
   public agencyFields = {
@@ -52,7 +52,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
     value: 'id',
   };
   public skillsFields = {
-    text: 'skillDescription',
+    text: 'name',
     value: 'id',
   };
   public statuses: any;
@@ -73,10 +73,10 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
   private getCandidateSkills(): void {
     this.skills$
       .pipe(
-        filter((skills: Skill[]) => skills?.length !== 0),
+        filter((skills: ListOfSkills[]) => skills?.length !== 0),
         takeUntil(this.destroy$)
       )
-      .subscribe((skills: Skill[]) => {
+      .subscribe((skills: ListOfSkills[]) => {
         this.skills = skills;
         const updatedSkills = this.selectedSkills?.map((skill: Skill) => skill.id);
         this.formGroup.get('candidateProfileSkills')?.patchValue(updatedSkills);
