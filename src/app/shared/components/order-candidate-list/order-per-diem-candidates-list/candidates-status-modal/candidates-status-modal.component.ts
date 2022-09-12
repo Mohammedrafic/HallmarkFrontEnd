@@ -99,8 +99,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
 
   get showClockId(): boolean {
     return (
-      [ApplicantStatusEnum.Accepted, ApplicantStatusEnum.OnBoarded].includes(this.candidate?.status) &&
-      !this.orderCandidateJob?.hasAllRequiredOnboardedCredentials
+      [ApplicantStatusEnum.Accepted, ApplicantStatusEnum.OnBoarded].includes(this.candidate?.status)
     );
   }
 
