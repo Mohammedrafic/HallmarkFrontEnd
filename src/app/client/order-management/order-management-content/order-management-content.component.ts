@@ -10,7 +10,6 @@ import {
   Observable,
   Subject,
   Subscription,
-  take,
   takeUntil,
   throttleTime,
 } from 'rxjs';
@@ -194,7 +193,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public selectedOrder: Order;
   public openDetails = new Subject<boolean>();
-  public orderPositionSelected$ = new Subject<boolean>();
+  public orderPositionSelected$ = new Subject<{ state: boolean; index?: number }>();
   public selectionOptions: SelectionSettingsModel = {
     type: 'Single',
     mode: 'Row',
@@ -560,7 +559,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     if (this.previousSelectedOrderId) {
       const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
         this.previousSelectedOrderId
-        );
+      );
       if (data && !isUndefined(index)) {
         this.gridWithChildRow.selectRow(index);
         this.onRowClick({ data });
@@ -611,7 +610,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   /* Trigger when user redirect to per diem order from re-order */
   private openPerDiemDetails(): void {
     if ((this.orderPerDiemId || this.orderId) && this.ordersPage?.items) {
-      const orderPerDiem = this.ordersPage.items.find((order: OrderManagement) => order.publicId === this.orderPerDiemId || this.orderId);
+      const orderPerDiem = this.ordersPage.items.find(
+        (order: OrderManagement) => order.publicId === this.orderPerDiemId || this.orderId
+      );
       const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex(
         (order: Order) => order.id === orderPerDiem?.id
       );
@@ -666,7 +667,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         );
         this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
         this.openChildDialog.next(false);
-        this.orderPositionSelected$.next(false);
+        this.orderPositionSelected$.next({ state: false });
         if (!isArray(event.data)) {
           this.openDetails.next(true);
           this.selectedRowRef = event;
@@ -834,7 +835,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     );
   }
 
-  public onOpenCandidateDialog(candidate: OrderManagementChild, order: OrderManagement): void {
+  public onOpenCandidateDialog(candidate: OrderManagementChild, order: OrderManagement, index?: number): void {
     this.selectedCandidate = candidate;
     this.selectedCandidateMeta = this.selectedCandidate.selected = {
       order: order.id,
@@ -852,7 +853,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
     this.selectedDataRow = order as any;
-    this.orderPositionSelected$.next(true);
+    this.orderPositionSelected$.next({ state: true, index });
     this.openChildDialog.next([order, candidate]);
     this.store.dispatch(new GetAvailableSteps(order.organizationId, candidate.jobId));
   }
@@ -985,8 +986,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.currentPage = page;
       if (this.orderPerDiemId || this.orderId) {
         this.filters.orderPublicId = this.prefix + '-' + this.orderPerDiemId;
-        this.OrderFilterFormGroup.controls['orderPublicId'].setValue((this.prefix + '-' + (this.orderPerDiemId || this.orderId))?.toString());
-        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns)
+        this.OrderFilterFormGroup.controls['orderPublicId'].setValue(
+          (this.prefix + '-' + (this.orderPerDiemId || this.orderId))?.toString()
+        );
+        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
       }
       this.getOrders();
     });
@@ -1081,6 +1084,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       .subscribe((data: OrderFilterDataSource) => {
         let statuses = [];
         let candidateStatuses = [];
+        const statusesByDefault = [
+          CandidatStatus.Applied,
+          CandidatStatus.Shortlisted,
+          CandidatStatus.Offered,
+          CandidatStatus.Accepted,
+          CandidatStatus.OnBoard,
+          CandidatStatus.Withdraw,
+          CandidatStatus.Offboard,
+          CandidatStatus.Rejected,
+        ];
         if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
           statuses = data.orderStatuses.filter((status) =>
             [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status)
@@ -1097,19 +1110,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           statuses = data.orderStatuses.filter((status) =>
             [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status)
           );
-          candidateStatuses = data.candidateStatuses.filter((status) =>
-            [
-              CandidatStatus['Not Applied'],
-              CandidatStatus.Applied,
-              CandidatStatus.Offered,
-              CandidatStatus.Accepted,
-              CandidatStatus.OnBoard,
-              CandidatStatus.Rejected,
-            ].includes(status.status)
-          );
+          candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         } else {
           statuses = data.orderStatuses;
-          candidateStatuses = data.candidateStatuses;
+          candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         }
         this.filterColumns.orderStatuses.dataSource = statuses;
         this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
@@ -1323,31 +1327,35 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private listenRedirectFromExtension(): void {
-    this.orderManagementService.orderId$.pipe(takeUntil(this.unsubscribe$), filter(Boolean), debounceTime(300)).subscribe((data: {id: number, prefix: string}) => {
-      this.orderId = data.id;
-      this.prefix = data.prefix;
-      this.filters.orderPublicId = this.prefix + '-' + this.orderId;
-      this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
-      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns)
-      this.getOrders();
-    });
+    this.orderManagementService.orderId$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean), debounceTime(300))
+      .subscribe((data: { id: number; prefix: string }) => {
+        this.orderId = data.id;
+        this.prefix = data.prefix;
+        this.filters.orderPublicId = this.prefix + '-' + this.orderId;
+        this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
+        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
+        this.getOrders();
+      });
   }
 
   private listenRedirectFromPerDiem(): void {
-    this.orderManagementService.reorderId$.pipe(takeUntil(this.unsubscribe$), filter(Boolean), debounceTime(300)).subscribe((data: {id: number, prefix: string}) => {
-      this.orderId = data.id;
-      this.prefix = data.prefix;
-      this.filters.orderPublicId = this.prefix + '-' + this.orderId;
-      this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
-      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns)
-      this.getOrders();
-    });
+    this.orderManagementService.reorderId$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean), debounceTime(300))
+      .subscribe((data: { id: number; prefix: string }) => {
+        this.orderId = data.id;
+        this.prefix = data.prefix;
+        this.filters.orderPublicId = this.prefix + '-' + this.orderId;
+        this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
+        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
+        this.getOrders();
+      });
   }
 
   private listenRedirectFromReOrder(): void {
     this.orderManagementService.orderPerDiemId$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: {id: number, prefix: string}) => {
+      .subscribe((data: { id: number; prefix: string }) => {
         this.orderPerDiemId = data.id;
         this.prefix = data.prefix;
       });
@@ -1396,9 +1404,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private handleRedirectFromQuickOrderToast(): void {
-     if (this.isRedirectedFromToast) {
+    if (this.isRedirectedFromToast) {
       let prefix = this.prefix || '';
-      this.orderManagementService.orderId$.next({id: this.quickOrderId, prefix: prefix});
+      this.orderManagementService.orderId$.next({ id: this.quickOrderId, prefix: prefix });
     }
   }
 }
