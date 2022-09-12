@@ -28,6 +28,10 @@ export class LogiReportComponent implements OnInit {
   ngOnInit(): void {
     this.factory = com.jinfonet.api.AppFactory;
     this.reportUrl = this.appSettings.reportServerUrl + 'jinfonet/tryView.jsp';
+    
+  }
+  public RenderReport():void
+  {
     if (this.reportType == LogiReportTypes.DashBoard) {
       this.showDashBoard(this.reportIframeName);
     }
@@ -36,7 +40,7 @@ export class LogiReportComponent implements OnInit {
     }
   }
 
-  public showDashBoard(entryId: string): void {
+  private showDashBoard(entryId: string): void {
     this.jrdPrefer = {
       // For dashboard
       dashboard: {
@@ -62,7 +66,7 @@ export class LogiReportComponent implements OnInit {
     let task = this.factory.runDashboard(server, resExt, entryId);
   }
 
-  public ShowReport(entryId: string): void {
+  private ShowReport(entryId: string): void {
     if (this.reportType == LogiReportTypes.PageReport) {
       this.jrdPrefer = {
         // For page report
@@ -102,7 +106,6 @@ export class LogiReportComponent implements OnInit {
     };
     let prptRes = this.reportName;
     let catRes = this.catelogName;
-    console.log(this.reportUrl);
     let test = this.factory.runReport(
       server, prptRes, catRes, this.paramsData, entryId);
   };
