@@ -120,6 +120,7 @@
             <button
               (click)="$event.stopPropagation()"
               ejs-dropdownbutton
+              [disabled]="data.orderType === orderTypes.ReOrder && data.status === orderStatus.Closed"
               [items]="
                 (data.status === orderStatus.Closed && closedOrderMenu) ||
                 (activeTab === OrganizationOrderManagementTabs.ReOrders && getMenuForReorders(data)) ||
