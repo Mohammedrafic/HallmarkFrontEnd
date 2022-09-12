@@ -318,6 +318,34 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     return fields;
   }
 
+  private showOrderFormValidationMessage(fieldsString?: string): void {
+    const fields = fieldsString || this.collectInvalidFields().join(',\n');
+    ToastUtility.show({
+      title: 'Error',
+      content: 'Please fill in the required fields in Order Details tab:\n' + fields,
+      position: { X: 'Center', Y: 'Top' },
+      cssClass: 'error-toast',
+    });
+  }
+
+  private showCredentialsValidationMessage(): void {
+    ToastUtility.show({
+      title: 'Error',
+      content: 'Please add Credentials in Credentials tab',
+      position: { X: 'Center', Y: 'Top' },
+      cssClass: 'error-toast',
+    });
+  }
+
+  private showBillRatesValidationMessage(): void {
+    ToastUtility.show({
+      title: 'Error',
+      content: 'Please add Bill Rates in Bill Rates tab',
+      position: { X: 'Center', Y: 'Top' },
+      cssClass: 'error-toast',
+    });
+  }
+
   public save(): void {
     const billRatesValid = (this.billRatesComponent?.billRatesControl.value.length ||
       this.orderBillRates.length ||
@@ -333,28 +361,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.specialProject.valid;
 
     if (!billRatesValid) {
-      ToastUtility.show({
-        title: 'Error',
-        content: 'Please add Bill Rates in Bill Rates tab',
-        position: { X: 'Center', Y: 'Top' },
-        cssClass: 'error-toast',
-      });
+      this.showBillRatesValidationMessage();
     }
     if (!credentialsValid) {
-      ToastUtility.show({
-        title: 'Error',
-        content: 'Please add Credentials in Credentials tab',
-        position: { X: 'Center', Y: 'Top' },
-        cssClass: 'error-toast',
-      })
+      this.showCredentialsValidationMessage();
     }
     if (!orderValid) {
-      ToastUtility.show({
-        title: 'Error',
-        content: 'Please fill in the required fields in Order Details tab:\n' + this.collectInvalidFields().join(',\n'),
-        position: { X: 'Center', Y: 'Top' },
-        cssClass: 'error-toast',
-      })
+      this.showOrderFormValidationMessage();
     }
 
     if (
@@ -552,6 +565,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
     if (titleControl.invalid) {
       titleControl.markAsTouched();
+      this.showOrderFormValidationMessage(FieldName.title);
       return;
     }
 
@@ -605,13 +619,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private saveAsTemplate(): void {
     const { regionId, locationId, departmentId, skillId } =
       this.orderDetailsFormComponent.generalInformationForm.getRawValue();
-    const requiredFields = [regionId, skillId, departmentId, locationId];
+    const requiredFields = [regionId, departmentId, locationId, skillId];
     const isRequiredFieldsFilled = !some(isNil, requiredFields);
 
     if (isRequiredFieldsFilled) {
       this.isSaveForTemplate = true;
     } else {
       this.markControlsAsRequired();
+      const fields = [FieldName.regionId, FieldName.locationId, FieldName.departmentId, FieldName.skillId]
+      const invalidFields = fields.filter((field, i) => !requiredFields[i]).join(',\n');
+      this.showOrderFormValidationMessage(invalidFields);
     }
   }
 
