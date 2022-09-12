@@ -31,7 +31,7 @@
                             placeholder="MM/DD/YYYY"
                             appValidateWithMessage
                             formControlName="startDate"
-                            [min]="today">
+                            >
             </ejs-datepicker>
           </div>
         </div>
@@ -50,7 +50,7 @@
         </div>
         <div class="input-container form-line-item-20">
           <button ejs-button type="submit"
-          [isPrimary]="true" (click)="SearchReport()">Search</button>
+          [isPrimary]="true" (click)="SearchReport()">Get Details</button>
         </div>
 
         
@@ -109,7 +109,7 @@
       </div>
     </form>
 </Section>
-<section class="container page-report-section">    
+<section class="page-report-section">    
     <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName" [reportType]="reportType"></app-logi-report>
     <router-outlet></router-outlet>
 </section>

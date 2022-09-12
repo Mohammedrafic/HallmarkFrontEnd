@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { GetDepartmentsByLocationId, GetLocationsByRegionId } from '@organization-management/store/organization-management.actions';
@@ -21,6 +21,7 @@ import { GetDepartmentsByLocations, GetLocationsByRegions, GetRegionsByOrganizat
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
+import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 @Component({
   selector: 'app-page-report',
   templateUrl: './page-report.component.html',
@@ -28,14 +29,14 @@ import { formatDate } from '@angular/common';
 })
 export class PageReportComponent implements OnInit {
   public paramsData: any = {
-    organizations:[],
-    startDate:'',
-    endDate:'',
-    regions:[],
-    locations:[],
-    departments:[]
+    "OrganizationParamJD":"",
+    "StartDateParamJD":"",
+    "EndDateParamJD":"",
+    "RegionParamJD":"",
+    "LocationParamJD":"",
+    "DepartmentParamJD":""
   };
-  public reportName: LogiReportFileDetails = { name: "/JobDetails/JobDetails.wls" };
+  public reportName: LogiReportFileDetails = { name: "/JobDetails/JobDetailsPage.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JobDetails/Dashbord.cat" };
   public title: string = "Job Details";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
@@ -76,6 +77,7 @@ export class PageReportComponent implements OnInit {
   public departments: Department[] = [];
   public organizations:BusinessUnit[]=[];
   public today = new Date();
+  @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   constructor(private store: Store,
     private formBuilder: FormBuilder) {
     this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
@@ -152,13 +154,15 @@ export class PageReportComponent implements OnInit {
       let {startDate,endDate}=this.jobDetailsForm.getRawValue();
       this.paramsData=
         {
-          organizations:this.selectedOrganizations?.map((list) => list.name)?.join(","),
-          startDate:formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-          endDate:formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-          regions:this.selectedRegions?.map((list) => list.name)?.join(","),
-          locations:this.selectedLocations?.map((list) => list.name)?.join(","),
-          departments:this.selectedDepartments?.map((list) => list.departmentName)?.join(",")
+          "OrganizationParamJD":this.selectedOrganizations?.map((list) => list.name),
+          "StartDateParamJD":formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+          "EndDateParamJD":formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+          "RegionParamJD":this.selectedRegions?.map((list) => list.name),
+          "LocationParamJD":this.selectedLocations?.map((list) => list.name),
+          "DepartmentParamJD":this.selectedDepartments?.map((list) => list.departmentName)
         };
+        this.logiReportComponent.paramsData=this.paramsData;
+        this.logiReportComponent.RenderReport();
     } else {
       this.jobDetailsForm?.updateValueAndValidity();
     }

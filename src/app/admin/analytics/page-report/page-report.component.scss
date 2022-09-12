@@ -1,7 +1,7 @@
 .page-report-section{
     display: flex;
-     height: 85%;
-     padding-top: 20px;
+     height: 65%;
+     padding-top: 10px;
 }
 
 .form-line {
@@ -9,12 +9,12 @@
     align-items: flex-end;
     padding-top: 10px;
     &:not(:last-child) {
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
   
     > *:not(:first-child) {
       box-sizing: border-box;
-      padding-left: 16px;
+      padding-left: 10px;
     }
   }
   .form-line-item-20 {
