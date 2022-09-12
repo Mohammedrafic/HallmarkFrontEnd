@@ -15,10 +15,18 @@ import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.const
 import { Destroyable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
 import { RecordFields, RecordsMode, SubmitBtnText, TIMETHEETS_STATUSES, RecordStatus } from '../../enums';
-import { RecordsTabConfig, TimesheetConfirmMessages, TimesheetRecordsColConfig, TimesheetRecordsColdef } from '../../constants';
+import { RecordsTabConfig, TimesheetConfirmMessages, TimesheetRecordsColdef } from '../../constants';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DialogActionPayload, OpenAddDialogMeta, TabConfig, TimesheetDetailsModel, TimesheetRecordsDto } from '../../interface';
-import { TimesheetRecordsService } from '../../services';
+import {
+  Attachment,
+  DialogActionPayload,
+  OpenAddDialogMeta,
+  TabConfig,
+  TimesheetAttachments,
+  TimesheetDetailsModel,
+  TimesheetRecordsDto
+} from '../../interface';
+import { TimesheetDetailsTableService, TimesheetRecordsService } from '../../services';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { RecordsAdapter } from '../../helpers';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
@@ -47,6 +55,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   @Input() actionsDisabled: boolean = false;
 
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
+
+  @Output() readonly uploadSideDialog: EventEmitter<TimesheetAttachments> = new EventEmitter<TimesheetAttachments>();
 
   @Output() readonly changesSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
 
@@ -130,6 +140,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     private store: Store,
     private confirmService: ConfirmService,
     private timesheetRecordsService: TimesheetRecordsService,
+    private timesheetDetailsTableService: TimesheetDetailsTableService,
     private cd: ChangeDetectorRef,
   ) {
     super();
@@ -271,6 +282,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.approveEvent.emit(this.currentTab === RecordFields.Time);
   }
 
+  public uploadAttachments(id: number, attachments: Attachment[]): void {
+    this.uploadSideDialog.emit({ id, attachments });
+  }
+
   private selectTab(index: number): void {
     this.changeColDefs(index);
   }
@@ -364,9 +379,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   private changeColDefs(idx: number): void {
+    const { organizationId } = this.store.snapshot().timesheets.timesheetDetails;
     this.currentTab = this.timesheetRecordsService.getCurrentTabName(idx);
     this.checkForStatusCol();
-    this.timesheetColDef = TimesheetRecordsColConfig[this.currentTab](this.isStatusColAvaliable);
+    this.timesheetColDef = this.timesheetDetailsTableService.getTableRecordsConfig()[this.currentTab](this.isStatusColAvaliable, organizationId);
     this.cd.markForCheck();
   }
 
@@ -428,6 +444,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   private checkForStatusCol(): void {
+    const { organizationId } = this.store.snapshot().timesheets.timesheetDetails;
     this.isStatusColAvaliable =  this.timesheetRecordsService
     .checkForStatus(this.recordsToShow[this.currentTab][this.currentMode]);
 
@@ -435,7 +452,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       this.isStatusColAvaliable = false;
     }
 
-    this.timesheetColDef  = TimesheetRecordsColConfig[this.currentTab](this.isStatusColAvaliable);
+    this.timesheetColDef = this.timesheetDetailsTableService.getTableRecordsConfig()[this.currentTab](this.isStatusColAvaliable, organizationId);
   }
 
   private saveRecords(): void {

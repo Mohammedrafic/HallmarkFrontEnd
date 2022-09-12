@@ -70,6 +70,8 @@ import {
 } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.module';
 import { RecordStatusCellComponent } from './components/cell-editors/record-status-cell/record-status-cell.component';
 import { TableStatusCellModule } from '@shared/components/table-status-cell/table-status-cell.module';
+import { UploadDocumentsComponent } from './components/upload-documents/upload-documents.component';
+import { TimesheetDetailsTableService } from './services';
 
 const gridIcons = {
   MessageSquare,
@@ -121,6 +123,7 @@ const gridIcons = {
     TimesheetsTabsComponent,
     UploadButtonComponent,
     RecordStatusCellComponent,
+    UploadDocumentsComponent,
   ],
   imports: [
     CommonModule,
@@ -172,6 +175,7 @@ const gridIcons = {
     ChipsCssClass,
     TimesheetRecordsService,
     TimesheetDetailsService,
+    TimesheetDetailsTableService,
     DateWeekService,
     AddDialogHelper,
     FiltersDialogHelper,

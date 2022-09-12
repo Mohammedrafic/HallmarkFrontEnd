@@ -33,15 +33,15 @@ export class OrganizationStrategy implements ManualInvoiceStrategy {
       }
 
       if (isPosition) {
-        options.invoiceCandidates = [{
-          text: `${meta[0].candidateFirstName} ${meta[0].candidateLastName}`,
-          value: meta[0].candidateId,
-        }];
+        options.invoiceCandidates = meta.map(el => ({
+          text: `${el.candidateFirstName} ${el.candidateLastName}`,
+          value: el.candidateId,
+        }));
 
-        options.invoiceAgencies = [{
-          text: meta[0].agencyName,
-          value: meta[0].agencyId,
-        }];
+        options.invoiceAgencies = meta.map(el => ({
+          text: el.agencyName,
+          value: el.agencyId,
+        }));
 
         this.connectConfigOptions(config, options);
         form.get('unitId')?.patchValue(meta[0].agencyId, { emitEvent: false, onlySelf: true });
@@ -53,7 +53,7 @@ export class OrganizationStrategy implements ManualInvoiceStrategy {
         form.get('nameId')?.patchValue(options.invoiceCandidates[0].value);
       }
       form.get('locationId')?.patchValue(meta[0].locationId);
-      form.get('departmentId')?.patchValue(meta[0].departmentId);   
+      form.get('departmentId')?.patchValue(meta[0].departmentId);
   }
 
   public populateCandidates(

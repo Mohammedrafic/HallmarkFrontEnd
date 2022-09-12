@@ -1,5 +1,20 @@
-<div class="actions-container" *ngIf="editable" [ngClass]="{ 'disabled': isDeletable}">
-  <button ejs-button [disabled]="isDeletable" cssClass="e-flat secondary-icon-button" (click)="deleteRecord()">
+<div class="actions-container">
+  <button
+    *ngIf="uploadAllowed"
+    ejs-button
+    cssClass="e-flat secondary-icon-button"
+    (click)="uploadAttachments()"
+  >
+    <span class="upload-button"><i-feather name="download" class="icon"></i-feather></span>
+  </button>
+  <button
+    *ngIf="editable"
+    ejs-button
+    [disabled]="isDeletable"
+    [class.disabled]="isDeletable"
+    cssClass="e-flat secondary-icon-button custom-btn"
+    (click)="deleteRecord()"
+  >
     <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
   </button>
 </div>
