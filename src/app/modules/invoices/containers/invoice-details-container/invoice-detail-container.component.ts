@@ -72,10 +72,6 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     super();
   }
 
-  public get isApproveDisable(): boolean {
-    return this.invoiceDetail.meta.invoiceStateText.toLowerCase() === INVOICES_STATUSES.PENDING_PAYMENT;
-  }
-
   public get actionBtnText(): string {
     const status = this.invoiceDetail.meta.invoiceStateText.toLowerCase() as INVOICES_STATUSES;
     let result: string;
