@@ -22,7 +22,8 @@ export class AgencyStrategy implements ManualInvoiceStrategy {
     private store: Store,
     ) {}
 
-  public populateOptions(meta: ManualInvoiceMeta[],
+  public populateOptions(
+    meta: ManualInvoiceMeta[],
     options: ManualInvoiceInputOptions,
     form: CustomFormGroup<AddManInvoiceForm>,
     config: AddManInvoiceDialogConfig,
@@ -34,10 +35,10 @@ export class AgencyStrategy implements ManualInvoiceStrategy {
       }
 
       if (isPosition) {
-        options.invoiceCandidates = [{
-          text: `${meta[0].candidateFirstName} ${meta[0].candidateLastName}`,
-          value: meta[0].candidateId,
-        }];
+        options.invoiceCandidates = meta.map(el => ({
+          text: `${el.candidateFirstName} ${el.candidateLastName}`,
+          value: el.candidateId,
+        }));
       } else {
         options.invoiceCandidates = InvoiceMetaAdapter.createCandidateOptions(meta);
       }

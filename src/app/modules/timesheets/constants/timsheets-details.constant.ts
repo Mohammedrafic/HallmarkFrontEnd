@@ -1,18 +1,19 @@
 import { Validators } from '@angular/forms';
 
-import { ColDef } from '@ag-grid-community/core';
+import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
+import { GridValuesHelper } from '@core/helpers/grid-values.helper';
+import { EditFieldTypes } from '@core/enums';
+import { Attachment, AttachmentsListComponent, AttachmentsListParams } from '@shared/components/attachments';
+import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
-import { RecordFields } from './../enums/timesheet-common.enum';
-import { TabConfig } from './../interface/common.interface';
-import { ActionsCellComponent } from './../components/cell-editors/actions-cell/actions-cell.component';
+import { RecordFields } from '../enums';
+import { TabConfig } from '../interface';
+import { ActionsCellComponent } from '../components/cell-editors/actions-cell/actions-cell.component';
 import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor/dropdown-editor.component';
 import { GridDateEditorComponent } from '../components/cell-editors/grid-date-editor/grid-date-editor.component';
 import { GridDayComponent } from '../components/cell-editors/grid-day/grid-day.component';
-import { GridValuesHelper } from '@core/helpers/grid-values.helper';
 import { InputEditorComponent } from '../components/cell-editors/input-editor/input-editor.component';
-import { EditFieldTypes } from '@core/enums';
 import { RecordStatusCellComponent } from '../components/cell-editors/record-status-cell/record-status-cell.component';
-import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
 const commonColumn: ColDef = {
   filter: true,
@@ -20,7 +21,7 @@ const commonColumn: ColDef = {
   resizable: true,
 }
 
-const dayColDef: ColDef = {
+export const dayColDef: ColDef = {
   field: 'day',
   headerName: 'Day',
   ...commonColumn,
@@ -28,7 +29,7 @@ const dayColDef: ColDef = {
   cellRenderer: GridDayComponent,
 };
 
-const editableCostCenterDef: ColDef = {
+export const editableCostCenterDef: ColDef = {
   field: 'departmentId',
   headerName: 'Cost center',
   ...commonColumn,
@@ -43,7 +44,7 @@ const editableCostCenterDef: ColDef = {
   }
 };
 
-const billRateColDef: ColDef = {
+export const billRateColDef: ColDef = {
   field: 'billRate',
   headerName: 'Bill rate',
   type: 'rightAligned',
@@ -56,7 +57,7 @@ const billRateColDef: ColDef = {
   },
 };
 
-const amountColdef = (headerText: string): ColDef => (
+export const amountColdef = (headerText: string): ColDef => (
   {
     field: 'value',
     headerName: headerText,
@@ -69,20 +70,26 @@ const amountColdef = (headerText: string): ColDef => (
   }
 );
 
-const actionCol: ColDef = {
-  field: 'id',
-  headerName: '',
-  type: 'rightAligned',
-  flex: 1,
-  resizable: true,
-  cellRenderer: ActionsCellComponent,
-  cellRendererParams: {
-    editMode: true,
-    isEditable: false,
+export const actionCol = (isUploadAllowed = false): ColDef => (
+  {
+    field: 'id',
+    headerName: '',
+    type: 'rightAligned',
+    flex: 1,
+    ...(isUploadAllowed && {
+      minWidth: 120,
+    }),
+    resizable: true,
+    cellRenderer: ActionsCellComponent,
+    cellRendererParams: {
+      editMode: true,
+      isEditable: false,
+      isUploadAllowed,
+    }
   }
-};
+);
 
-const totalCol: ColDef = {
+export const totalCol: ColDef = {
   field: 'total',
   headerName: 'Total',
   type: 'rightAligned',
@@ -95,7 +102,17 @@ const totalCol: ColDef = {
   },
 };
 
-const billRateTypeStatic: ColDef = {
+export const attachmentsCol: ColDef = {
+  field: 'attachments',
+  headerName: 'Attachments',
+  ...commonColumn,
+  width: 200,
+  cellRenderer: AttachmentsListComponent,
+  cellClass: 'invoice-records-attachments-list custom-scroll',
+  type: 'rightAligned',
+};
+
+export const billRateTypeStatic: ColDef = {
   field: 'billRateConfigName',
   headerName: 'Bill rate type',
   ...commonColumn,
@@ -103,7 +120,7 @@ const billRateTypeStatic: ColDef = {
   type: 'rightAligned',
 };
 
-const recordStatusCell: ColDef = {
+export const recordStatusCell: ColDef = {
   field: 'stateText',
   headerName: 'Status',
   ...commonColumn,
@@ -152,7 +169,7 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
   amountColdef('Hours'),
   billRateColDef,
   totalCol,
-  actionCol,
+  actionCol(),
 ]);
 
 export const MilesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
@@ -166,6 +183,7 @@ export const MilesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
     ...billRateTypeStatic,
     width: 200,
   },
+  attachmentsCol,
   {
     ...amountColdef('Miles'),
     width: 200,
@@ -185,7 +203,7 @@ export const MilesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
     ...totalCol,
     width: 200,
   },
-  actionCol,
+  actionCol(true),
 ]);
 
 export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
@@ -230,10 +248,10 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
       validators: [Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER), Validators.required],
     }
   },
-  actionCol,
+  actionCol(),
 ]);
 
-export const TimesheetRecordsColConfig: Record<string, ((isStatusAvaliable: boolean) => ColDef[])>  = {
+export const TimesheetRecordsColConfig: Record<string, ((isStatusAvaliable: boolean) => ColDef[])> = {
   [RecordFields.Time]: TimesheetRecordsColdef,
   [RecordFields.Miles]: MilesRecordsColDef,
   [RecordFields.Expenses]: ExpensesRecordsColDef,

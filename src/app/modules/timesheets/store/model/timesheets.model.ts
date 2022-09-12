@@ -2,9 +2,11 @@ import { DataSourceItem, DropdownOption } from '@core/interface';
 import { PageOfCollections } from '@shared/models/page.model';
 import { RecordFields } from '../../enums';
 import {
+  Attachment,
   CandidateHoursAndMilesData, CandidateInfo, FilterColumns,
   TabCountConfig, Timesheet, TimesheetAttachments, TimesheetDetailsModel, TimesheetInvoice,
-  TimesheetRecordsDto, TimesheetsFilterState } from '../../interface';
+  TimesheetRecordsDto, TimesheetsFilterState
+} from '../../interface';
 
 
 export type TimeSheetsPage = PageOfCollections<Timesheet>;
@@ -26,6 +28,11 @@ export interface TimesheetsModel {
     action: boolean;
     dialogType: RecordFields;
     initTime: string;
+  };
+  isUploadDialogOpen: {
+    action: boolean;
+    itemId: number | null;
+    recordAttachments: Attachment[] | null;
   };
   tabCounts: TabCountConfig | null;
   timesheetsFiltersColumns: FilterColumns;

@@ -6,6 +6,7 @@ import { RecordValue } from './common.interface';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn } from '@shared/models/export.model';
 import { TimesheetStatus } from '../enums/timesheet-status.enum';
+import { FileForUpload } from '@core/interface';
 
 export interface DetailsColumnConfig {
   align: TableColumnAlign;
@@ -161,4 +162,15 @@ export interface MileageCreateResponse {
   organizationId: number;
   weekStart: string;
   status: number;
+}
+
+export interface UploadDialogState {
+  state: boolean;
+  itemId: number | null;
+  recordAttachments: Attachment[] | null;
+}
+
+export interface UploadDocumentsModel {
+  fileForUpload: FileForUpload[];
+  filesForDelete: Attachment[];
 }

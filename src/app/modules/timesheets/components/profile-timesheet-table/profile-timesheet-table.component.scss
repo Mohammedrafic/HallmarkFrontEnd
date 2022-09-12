@@ -27,6 +27,10 @@
 
   .button-cancel {
     margin-right: 12px;
+
+    &.spaced {
+      margin-left: auto;
+    }
   }
 }
 
@@ -77,6 +81,10 @@
     padding-left: 17px!important;
     padding-right: 17px!important;
     text-align: right;
+  }
+
+  .custom-scroll {
+    overflow-y: auto;
   }
 }
 

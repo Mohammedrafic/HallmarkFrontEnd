@@ -1,6 +1,7 @@
 export interface FileForUpload {
   blob: Blob;
   fileName: string;
+  size?: string;
 }
 
 export interface DropdownOption {

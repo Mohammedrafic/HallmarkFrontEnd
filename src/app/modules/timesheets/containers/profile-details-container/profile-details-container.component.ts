@@ -22,7 +22,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
-import { AttachmentsListConfig } from '@shared/components/attachments';
+import { Attachment, AttachmentsListConfig } from '@shared/components/attachments';
 import { TimesheetTargetStatus, TIMETHEETS_STATUSES } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
@@ -33,8 +33,10 @@ import {
   DialogActionPayload,
   OpenAddDialogMeta,
   Timesheet,
+  TimesheetAttachments,
   TimesheetDetailsModel,
-  WorkWeek,
+  UploadDocumentsModel,
+  WorkWeek
 } from '../../interface';
 import {
   ConfirmApprovedTimesheetDeleteDialogContent,
@@ -48,6 +50,7 @@ import { TimesheetDetails } from '../../store/actions/timesheet-details.actions'
 import { TimesheetDetailsService } from '../../services';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import { FileForUpload } from '@core/interface';
+import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
 
 @Component({
   selector: 'app-profile-details-container',
@@ -189,6 +192,13 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public openAddDialog(meta: OpenAddDialogMeta): void {
     this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open, meta.currentTab, meta.initDate));
+  }
+
+  public openUploadSideDialog(timesheetAttachments: TimesheetAttachments): void {
+    this.store.dispatch(new Timesheets.ToggleTimesheetUploadAttachmentsDialog(
+      DialogAction.Open,
+      timesheetAttachments,
+    ));
   }
 
   public handleProfileClose(): void {
@@ -380,6 +390,27 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
           new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
         );
       });
+  }
+
+  public saveFilesOnRecord(uploadData: UploadDocumentsModel): void {
+    this.store.dispatch([
+      new Timesheets.UploadMilesAttachments(uploadData.fileForUpload, this.organizationId),
+      ...this.prepareFilesForDelete(uploadData.filesForDelete, this.timesheetId, this.organizationId),
+    ]).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.store.dispatch(
+        new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
+      );
+    });
+  }
+
+  private prepareFilesForDelete(
+    arr: Attachment[],
+    timesheetId: number,
+    organizationId: number | null = null
+  ): DeleteRecordAttachment[] {
+    return arr.map(file => new Timesheets.DeleteRecordAttachment(timesheetId, organizationId, file));
   }
 
   private refreshData(): Observable<TimesheetDetailsModel> {
