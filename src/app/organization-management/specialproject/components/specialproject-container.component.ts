@@ -264,11 +264,19 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
 
   private applyDateValidations() {
     this.startDateField = this.form.get(FormControlNames.StartDate) as AbstractControl;
-    this.startDateField.addValidators(datesValidator(this.form, FormControlNames.StartDate, FormControlNames.EndDate));
-    this.startDateField.valueChanges.subscribe(() => this.endDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
     this.endDateField = this.form.get(FormControlNames.EndDate) as AbstractControl;
-    this.endDateField.addValidators(datesValidator(this.form, FormControlNames.StartDate, FormControlNames.EndDate));
-    this.endDateField.valueChanges.subscribe(() => this.startDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+    this.startDateField.valueChanges.subscribe(() => {
+      if (this.endDateField?.value != null) {
+        this.endDateField.addValidators(datesValidator(this.form, FormControlNames.StartDate, FormControlNames.EndDate));
+        this.endDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+      }
+    });
+    this.endDateField.valueChanges.subscribe(() => {
+      if (this.startDateField?.value != null) {
+        this.startDateField.addValidators(datesValidator(this.form, FormControlNames.StartDate, FormControlNames.EndDate));
+        this.startDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+      }
+    });
   }
 
   public onTabSelected(selectedTab: any): void {
