@@ -559,7 +559,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     if (this.previousSelectedOrderId) {
       const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
         this.previousSelectedOrderId
-        );
+      );
       if (data && !isUndefined(index)) {
         this.gridWithChildRow.selectRow(index);
         this.onRowClick({ data });
@@ -1084,6 +1084,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       .subscribe((data: OrderFilterDataSource) => {
         let statuses = [];
         let candidateStatuses = [];
+        const statusesByDefault = [
+          CandidatStatus.Applied,
+          CandidatStatus.Shortlisted,
+          CandidatStatus.Offered,
+          CandidatStatus.Accepted,
+          CandidatStatus.OnBoard,
+          CandidatStatus.Withdraw,
+          CandidatStatus.Offboard,
+          CandidatStatus.Rejected,
+        ];
         if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
           statuses = data.orderStatuses.filter((status) =>
             [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status)
@@ -1100,19 +1110,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           statuses = data.orderStatuses.filter((status) =>
             [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status)
           );
-          candidateStatuses = data.candidateStatuses.filter((status) =>
-            [
-              CandidatStatus['Not Applied'],
-              CandidatStatus.Applied,
-              CandidatStatus.Offered,
-              CandidatStatus.Accepted,
-              CandidatStatus.OnBoard,
-              CandidatStatus.Rejected,
-            ].includes(status.status)
-          );
+          candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         } else {
           statuses = data.orderStatuses;
-          candidateStatuses = data.candidateStatuses;
+          candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         }
         this.filterColumns.orderStatuses.dataSource = statuses;
         this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
