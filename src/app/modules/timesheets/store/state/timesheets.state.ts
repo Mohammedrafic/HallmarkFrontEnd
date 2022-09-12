@@ -45,11 +45,13 @@ import {
   TimesheetRecordsDto,
   TimesheetsFilteringOptions,
   TimesheetsFilterState,
-  TimesheetStatistics
+  TimesheetStatistics,
+  UploadDialogState
 } from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { reduceFiltersState } from '@core/helpers/functions.helper';
+import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -152,6 +154,15 @@ export class TimesheetsState {
       state: state.isAddDialogOpen.action,
       type: state.isAddDialogOpen.dialogType,
       initDate: state.isAddDialogOpen.initTime,
+    };
+  }
+
+  @Selector([TimesheetsState])
+  static uploadDialogOpen(state: TimesheetsModel): UploadDialogState {
+    return {
+      state: state.isUploadDialogOpen.action,
+      itemId: state.isUploadDialogOpen.itemId,
+      recordAttachments: state.isUploadDialogOpen.recordAttachments,
     };
   }
 
@@ -339,6 +350,45 @@ export class TimesheetsState {
     });
   }
 
+  @Action(Timesheets.ToggleTimesheetUploadAttachmentsDialog)
+  ToggleTimesheetUploadAttachmentsDialog({ patchState }: StateContext<TimesheetsModel>,
+    { action, timesheetAttachments }: Timesheets.ToggleTimesheetUploadAttachmentsDialog): void {
+    patchState({
+      isUploadDialogOpen: {
+        action: action === DialogAction.Open,
+        itemId: timesheetAttachments?.id as number || null,
+        recordAttachments: timesheetAttachments?.attachments || null,
+      },
+    });
+  }
+
+  @Action(Timesheets.UploadMilesAttachments)
+  UploadMilesAttachments(
+    { getState }: StateContext<TimesheetsModel>,
+    { files, organizationId }: Timesheets.UploadMilesAttachments
+  ): Observable<void> | void {
+    const { itemId } = getState().isUploadDialogOpen;
+
+    if (!files?.length) {
+      return;
+    }
+
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file.blob, file.fileName));
+
+    return this.timesheetsApiService.uploadMilesAttachments(itemId, formData, organizationId);
+  }
+
+  @Action(Timesheets.DeleteMilesAttachment)
+  DeleteMilesAttachment(
+    { getState }: StateContext<TimesheetsModel>,
+    { fileId, organizationId }: Timesheets.DeleteMilesAttachment
+  ): Observable<void> {
+    const { itemId } = getState().isUploadDialogOpen;
+
+    return this.timesheetsApiService.deleteMilesAttachment(itemId, fileId, organizationId);
+  }
+
   @Action(Timesheets.GetTimesheetDetails)
   GetTimesheetDetails(
     ctx: StateContext<TimesheetsModel>,
@@ -425,6 +475,59 @@ export class TimesheetsState {
           return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
         }),
       );
+  }
+
+  @Action(Timesheets.PreviewAttachment)
+  PreviewAttachment(
+    { patchState, dispatch }: StateContext<TimesheetsModel>,
+    { timesheetRecordId, organizationId, payload: { id, fileName } }: Timesheets.PreviewAttachment
+  ): Observable<void> {
+    return dispatch(
+      new FileViewer.Open({
+        fileName,
+        getPDF: () => this.timesheetDetailsApiService.downloadRecordPDFAttachment({
+          timesheetRecordId,
+          fileId: id,
+          organizationId,
+        }),
+        getOriginal: () => this.timesheetDetailsApiService.downloadRecordAttachment({
+          timesheetRecordId,
+          fileId: id,
+          organizationId
+        })
+      })
+    );
+  }
+
+  @Action(Timesheets.DownloadRecordAttachment)
+  DownloadRecordAttachment(
+    { patchState, dispatch }: StateContext<TimesheetsModel>,
+    { timesheetRecordId, organizationId, payload: { id, fileName } }: Timesheets.DownloadRecordAttachment
+  ): Observable<void | Blob> {
+    return this.timesheetDetailsApiService.downloadRecordAttachment({
+      timesheetRecordId, fileId: id, organizationId
+    }).pipe(
+      tap((file: Blob) => downloadBlobFile(file, fileName)),
+      catchError(() => dispatch(
+        new ShowToast(MessageTypes.Error, 'File not found')
+      ))
+    );
+  }
+
+  @Action(Timesheets.DeleteRecordAttachment)
+  DeleteRecordAttachment(
+    { patchState, dispatch }: StateContext<TimesheetsModel>,
+    { timesheetRecordId, organizationId, payload: { id } }: Timesheets.DeleteRecordAttachment
+  ): Observable<void | Blob> {
+    return this.timesheetDetailsApiService.deleteRecordAttachment({
+      timesheetId: timesheetRecordId,
+      fileId: id,
+      organizationId
+    }).pipe(
+      catchError(() => dispatch(
+        new ShowToast(MessageTypes.Error, 'File not found')
+      )),
+    );
   }
 
   @Action(TimesheetDetails.UploadFiles)

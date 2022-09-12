@@ -1,9 +1,9 @@
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { DialogAction } from '@core/enums';
-import { DataSourceItem } from '@core/interface';
+import { DataSourceItem, FileForUpload } from '@core/interface';
 
 import { RecordFields, TIMESHEETS_ACTIONS, TimesheetsTableFiltersColumns } from '../../enums';
-import { Timesheet, TimesheetsFilterState } from '../../interface';
+import { Attachment, Timesheet, TimesheetAttachments, TimesheetsFilterState } from '../../interface';
 
 export namespace Timesheets {
   export class GetAll {
@@ -29,6 +29,64 @@ export namespace Timesheets {
       public readonly dateTime: string) {}
   }
 
+  export class ToggleTimesheetUploadAttachmentsDialog {
+    static readonly type = TIMESHEETS_ACTIONS.TOGGLE_TIMESHEET_UPLOAD_ATTACHMENTS_DIALOG;
+
+    constructor(
+      public readonly action: DialogAction,
+      public readonly timesheetAttachments: TimesheetAttachments | null,
+    ) {}
+  }
+
+  export class UploadMilesAttachments {
+    static readonly type = TIMESHEETS_ACTIONS.UPLOAD_MILES_ATTACHMENTS;
+
+    constructor(
+      public readonly files: FileForUpload[],
+      public readonly organizationId: number | null = null
+    ) {}
+  }
+
+  export class DeleteMilesAttachment {
+    static readonly type = TIMESHEETS_ACTIONS.DELETE_MILES_ATTACHMENT;
+
+    constructor(
+      public readonly fileId: number,
+      public readonly organizationId: number | null = null
+    ) {}
+  }
+
+  export class PreviewAttachment {
+    static readonly type = TIMESHEETS_ACTIONS.PREVIEW_ATTACHMENT;
+
+    constructor(
+      public readonly timesheetRecordId: number,
+      public readonly organizationId: number | null,
+      public readonly payload: Attachment,
+    ) {}
+  }
+
+  export class DownloadRecordAttachment {
+    static readonly type = TIMESHEETS_ACTIONS.DOWNLOAD_ATTACHMENT;
+
+    constructor(
+      public readonly timesheetRecordId: number,
+      public readonly organizationId: number | null,
+      public readonly payload: Attachment,
+    ) {
+    }
+  }
+
+  export class DeleteRecordAttachment {
+    static readonly type = TIMESHEETS_ACTIONS.DELETE_ATTACHMENT;
+
+    constructor(
+      public readonly timesheetRecordId: number,
+      public readonly organizationId: number | null,
+      public readonly payload: Attachment,
+    ) {
+    }
+  }
 
   export class CloseProfileTimesheetAddDialog {
     static readonly type = TIMESHEETS_ACTIONS.CLOSE_PROFILE_TIMESHEET_ADD_DIALOG;
