@@ -1,0 +1,48 @@
+.upload-custom-dialog {
+  &::ng-deep {
+    & .e-dlg-header {
+      width: 100% !important;
+    }
+
+    & .e-dlg-content {
+      padding: 0 24px 24px !important;
+    }
+  }
+}
+
+.dialog-header {
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #060715 !important;
+  margin: 0 !important;
+}
+
+.button-cancel {
+  margin-right: 8px;
+}
+
+.upload-custom::ng-deep {
+  & .e-file-container {
+    margin-left: 0 !important;
+  }
+
+  & .e-file-status {
+    display: none !important;
+  }
+
+  & .e-upload-file-list {
+    border-bottom: 1px solid #EAECF2 !important;
+  }
+}
+
+.button-clear {
+  width: 100%;
+  margin-top: 28px;
+}

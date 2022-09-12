@@ -36,6 +36,11 @@ export const DefaultTimesheetState: TimesheetsModel = {
     dialogType: RecordFields.Time,
     initTime: '',
   },
+  isUploadDialogOpen: {
+    action: false,
+    itemId: null,
+    recordAttachments: null,
+  },
   timesheetsFiltersColumns: DefaultFilterColumns,
   timesheetDetails: null,
   organizations: [],

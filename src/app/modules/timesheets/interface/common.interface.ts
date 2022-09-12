@@ -4,8 +4,8 @@ import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-g
 import { FieldType, FieldWidthStyle } from '@core/enums';
 import { DropdownOption } from '@core/interface';
 import { Attachment } from '@shared/components/attachments/models/attachment.interface';
-import { TimesheetsModel } from './../store/model/timesheets.model';
-import { RecordFields, RecordsMode, RecordStatus } from './../enums';
+import { TimesheetsModel } from '../store/model/timesheets.model';
+import { RecordFields, RecordsMode, RecordStatus } from '../enums';
 
 export interface DialogConfigField {
   title: string;
@@ -68,10 +68,12 @@ export interface RecordValue {
   value: 10;
   state: number;
   stateText: RecordStatus;
+  timesheetRecordId?: number;
 }
 
 export interface TimesheetAttachments {
   attachments: Attachment[];
+  id?: number;
 }
 
 export interface TabConfig {

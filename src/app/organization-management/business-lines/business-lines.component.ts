@@ -13,9 +13,7 @@ import {
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
-  RECORD_ADDED,
   RECORD_DELETE,
-  RECORD_MODIFIED,
 } from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { BusinessLines } from '@shared/models/business-line.model';
@@ -174,6 +172,5 @@ export class BusinessLinesComponent extends AbstractGridConfigurationComponent i
   public onRowsDropDownChanged(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
-    this.getData();
   }
 }

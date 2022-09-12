@@ -411,7 +411,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
       comments: new FormControl(''),
       workWeek: new FormControl('', [Validators.maxLength(50)]),
       clockId: new FormControl('', [Validators.maxLength(50)]),
-      offeredBillRate: new FormControl(''),
+      offeredBillRate: new FormControl('', [Validators.required]),
       allow: new FormControl(false),
       startDate: new FormControl(''),
       endDate: new FormControl(''),
