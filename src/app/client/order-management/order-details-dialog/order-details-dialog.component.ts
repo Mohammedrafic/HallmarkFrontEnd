@@ -28,6 +28,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
 import {
   ApproveOrder,
+  ClearOrderCandidatePage,
   DeleteOrder,
   GetOrganizationExtensions,
   SetLock,
@@ -149,6 +150,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   ngOnDestroy(): void {
+    this.store.dispatch(new ClearOrderCandidatePage());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }

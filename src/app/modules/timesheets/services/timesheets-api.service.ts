@@ -116,4 +116,26 @@ export class TimesheetsApiService {
       })),
     );
   }
+
+  public uploadMilesAttachments(
+    timesheetRecordId: number | null,
+    formData: FormData,
+    organizationId: number | null = null,
+  ): Observable<void> {
+    if(organizationId) {
+      return this.http.post<void>(`/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files`, formData);
+    }
+    return this.http.post<void>(`/api/TimesheetRecords/${timesheetRecordId}/files`, formData);
+  }
+
+  public deleteMilesAttachment(
+    timesheetRecordId: number | null,
+    fileId: number,
+    organizationId: number | null = null,
+  ): Observable<void> {
+    if(organizationId) {
+      return this.http.delete<void>(`/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files/${fileId}`);
+    }
+    return this.http.delete<void>(`/api/TimesheetRecords/${timesheetRecordId}/files/${fileId}`);
+  }
 }

@@ -131,6 +131,7 @@
           [timesheetDetails]="timesheetDetails"
           [actionsDisabled]="timesheetDetails.noWorkPerformed"
           (openAddSideDialog)="openAddDialog($event)"
+          (uploadSideDialog)="openUploadSideDialog($event)"
           (changesSaved)="handleEditChanges($event)"
           (rejectEvent)="onRejectButtonClick($event)"
           (approveEvent)="handleApprove($event)"
@@ -164,6 +165,8 @@
 ></app-reject-reason-input-dialog>
 
 <app-add-timesheet></app-add-timesheet>
+
+<app-upload-documents (fileChange)="saveFilesOnRecord($event)"></app-upload-documents>
 
 <app-export-dialog
         [columns]="columnsToExport"

@@ -187,7 +187,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       this.form?.get('unitId')?.patchValue(this.store.snapshot().invoices.selectedOrganizationId);
     }
 
-    const item = this.searchOptions.find((item: ManualInvoiceMeta) => {
+    const items = this.searchOptions.filter((item: ManualInvoiceMeta) => {
       const [orgPrefix, orderId, position] = ManualInvoiceAdapter.parseOrderId(item.formattedOrderIdFull);
       const orgPrefixMatch: boolean = currentOrgPrefix ? currentOrgPrefix === orgPrefix : true;
       const orderIdMatch: boolean = currentOrderId === orderId;
@@ -196,14 +196,14 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       return orgPrefixMatch && orderIdMatch && positionMatch;
     });
 
-    if (!item) {
+    if (!items.length) {
       this.postionSearch = null;
       const basedOnOrder = this.searchOptions.filter((item) => item.orderPublicId.toString() === concatenatedValue) || [];
       this.strategy.populateOptions(basedOnOrder, this.dropDownOptions,
         this.form as CustomFormGroup<AddManInvoiceForm>, this.dialogConfig, false);
     } else {
-      this.postionSearch = item;
-      this.strategy.populateOptions([item], this.dropDownOptions,
+      this.postionSearch = items[0];
+      this.strategy.populateOptions(items, this.dropDownOptions,
         this.form as CustomFormGroup<AddManInvoiceForm>, this.dialogConfig, true);
     }
 
@@ -315,7 +315,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   private populateDepartments(id: number): void {
     const locations: OrganizationLocation[] = this.store.snapshot().invoices.organizationLocations;
     const deps = locations.find((location) => location.id === id)?.departments as OrganizationDepartment[];
-    
+
     this.dropDownOptions.invoiceDepartments = InvoiceMetaAdapter.createDepartmentsOptions(deps);
     this.updateOptions();
   }

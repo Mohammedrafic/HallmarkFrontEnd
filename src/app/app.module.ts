@@ -36,9 +36,10 @@ import { Overlay } from '@angular/cdk/overlay';
     NgxsReduxDevtoolsPluginModule.forRoot({
       disabled: environment.production,
     }),
-    NgxsLoggerPluginModule.forRoot({
-      disabled: environment.production,
-    }),
+    // In case you don't have Redux DevTools uncomment import below.
+    // NgxsLoggerPluginModule.forRoot({
+    //   disabled: environment.production,
+    // }),
     NgxMaskModule.forRoot(),
 
     // B2C

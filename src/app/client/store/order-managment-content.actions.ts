@@ -251,3 +251,7 @@ export class SetIsDirtyQuickOrderForm {
   static readonly type = '[order management] Set Quick Order Dirty';
   constructor(public isDirtyQuickOrderForm: boolean) {}
 }
+
+export class ClearOrderCandidatePage {
+  static readonly type = '[order management] Clear Order Candidate Page';
+}

@@ -1,4 +1,4 @@
-import { Directive, ElementRef, OnDestroy, OnInit } from '@angular/core';
+import { Directive, OnInit } from '@angular/core';
 import { Actions, ofActionSuccessful } from '@ngxs/store';
 import { GetCandidateJob } from '@agency/store/order-management.actions';
 import {
@@ -6,30 +6,27 @@ import {
   GetOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { GetOrderById } from '@agency/store/order-management.actions';
-import { Subject, takeUntil } from 'rxjs';
+import { takeUntil } from 'rxjs';
+import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
+import { DestroyableDirective } from './destroyable.directive';
 
 @Directive({
-  selector: '[openFirstAccordion]',
+  selector: '[appOpenFirstAccordion]',
 })
-export class AlwaysOpenFirstAccordition implements OnInit, OnDestroy {
-  private unsubscribe$: Subject<void> = new Subject();
-
-  constructor(private actions$: Actions, private el: ElementRef) {}
+export class OpenFirstAccordionDirective extends DestroyableDirective implements OnInit {
+  constructor(private actions$: Actions, private accordion: AccordionComponent) {
+    super();
+  }
 
   public ngOnInit(): void {
     this.actions$
       .pipe(
         ofActionSuccessful(GetCandidateJob, GetOrganisationCandidateJob, GetOrderById, GetOrgOrderById),
-        takeUntil(this.unsubscribe$)
+        takeUntil(this.destroy$)
       )
       .subscribe(() => {
-        const accordionComponent = this.el.nativeElement.ej2_instances[0];
-        accordionComponent.expandItem(true, 0);
+        const firstItem = 0;
+        this.accordion.expandItem(true, firstItem);
       });
-  }
-
-  public ngOnDestroy() {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
   }
 }

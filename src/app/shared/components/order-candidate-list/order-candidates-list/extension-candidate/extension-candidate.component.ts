@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ChangeDet
 
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { EMPTY, merge, Observable, Subject, map } from 'rxjs';
+import { EMPTY, merge, Observable, Subject, map, mergeMap, takeUntil, takeWhile } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
@@ -21,6 +21,7 @@ import {
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
   RejectCandidateJob as RejectCandidateJobAgency,
+  RejectCandidateForAgencySuccess,
 } from '@agency/store/order-management.actions';
 import { DatePipe } from '@angular/common';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
@@ -32,12 +33,14 @@ import { Router } from '@angular/router';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
   GetRejectReasonsForOrganisation,
+  RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { capitalize } from 'lodash';
 import { DurationService } from '@shared/services/duration.service';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({
   selector: 'app-extension-candidate',
@@ -46,7 +49,7 @@ import { DurationService } from '@shared/services/duration.service';
   providers: [MaskedDateTimeService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ExtensionCandidateComponent implements OnInit, OnDestroy {
+export class ExtensionCandidateComponent extends DestroyableDirective implements OnInit {
   @Input() currentOrder: Order;
   @Input() candidateOrder: OrderCandidatesListPage;
   @Input() dialogEvent: Subject<boolean>;
@@ -77,8 +80,6 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   ];
   public isAgency: boolean = false;
 
-  private unsubscribe$: Subject<void> = new Subject();
-
   public comments: Comment[] = [];
 
   get isAccepted(): boolean {
@@ -103,6 +104,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store,
+    private action$: Actions,
     private datePipe: DatePipe,
     private commentsService: CommentsService,
     private router: Router,
@@ -110,6 +112,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     private durationService: DurationService,
     private changeDetectorRef: ChangeDetectorRef
   ) {
+    super();
     this.isAgency = this.router.url.includes('agency');
   }
 
@@ -117,11 +120,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     this.subsToCandidate();
     this.rejectReasons$ = this.subscribeOnReasonsList();
     this.createForm();
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.onRejectSuccess();
   }
 
   public updateOrganizationCandidateJobWithBillRate(bill: BillRate): void {
@@ -184,11 +183,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
         rejectReasonId: event.rejectReason,
       };
 
-      this.store.dispatch(
-        this.isAgency
-          ? [new RejectCandidateJobAgency(payload), new ReloadOrderCandidatesLists()]
-          : [new RejectCandidateJob(payload), new ReloadOrganisationOrderCandidatesLists()]
-      );
+      this.store.dispatch(this.isAgency ? [new RejectCandidateJobAgency(payload)] : [new RejectCandidateJob(payload)]);
       this.dialogEvent.next(false);
     }
   }
@@ -397,6 +392,19 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
       this.store.select(OrderManagementContentState.rejectionReasonsList),
       this.store.select(OrderManagementState.rejectionReasonsList)
     ).pipe(map((reasons) => reasons ?? []));
+  }
+
+  private onRejectSuccess(): void {
+    merge(
+      this.action$.pipe(
+        ofActionSuccessful(RejectCandidateForOrganisationSuccess),
+        mergeMap(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()))
+      ),
+      this.action$.pipe(
+        ofActionSuccessful(RejectCandidateForAgencySuccess),
+        mergeMap(() => this.store.dispatch(new ReloadOrderCandidatesLists()))
+      )
+    ).pipe(takeUntil(this.destroy$)).subscribe();
   }
 }
 

@@ -334,13 +334,13 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   private setAddExtensionBtnState(candidate: OrderManagementChild): void {
     const isOrderTravelerOrContractToPerm =
       this.order.orderType === OrderType.Traveler || this.order.orderType === OrderType.ContractToPerm;
-    const isOrderFilledOrProgress =
-      this.order.status === OrderStatus.Filled || this.order.status === OrderStatus.InProgress;
+      const isOrderFilledOrProgressOrClosed =
+      this.order.status === OrderStatus.Filled || this.order.status === OrderStatus.InProgress || this.order.status === OrderStatus.Closed;
     const dateAvailable = candidate.closeDate
       ? addDays(candidate.closeDate, 14)?.getTime()! >= new Date().getTime()
       : true;
     this.isAddExtensionBtnAvailable =
-      this.isOrganization && isOrderFilledOrProgress && dateAvailable && isOrderTravelerOrContractToPerm;
+      this.isOrganization && isOrderFilledOrProgressOrClosed && dateAvailable && isOrderTravelerOrContractToPerm;
   }
 
   private getTemplate(): void {
