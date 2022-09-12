@@ -2,13 +2,13 @@
   <div class="toolbar-buttons" *ngIf="isJobOrderWorkflowTabActive">
     <button
       ejs-button
-      hideBeforeSyncfusionLoad
+      appHideBeforeSyncfusionLoad
       cssClass="e-outline delete-button"
       *ngIf="workflowsWithDetails.length !== 0"
       (click)="onDeleteWorkflowClick()">Delete</button>
     <button
       ejs-button
-      hideBeforeSyncfusionLoad
+      appHideBeforeSyncfusionLoad
       cssClass="save-button"
       [isPrimary]="true"
       [disabled]="workflowsWithDetails.length === 0"

@@ -9,6 +9,7 @@ import {
   ChangeStatusData,
   DeleteAttachmentData,
   DownloadAttachmentRequestData,
+  DownloadRecordAttachmentRequestData,
   MileageCreateResponse,
   TimesheetDetailsModel,
   TimesheetFileData
@@ -67,7 +68,13 @@ export class TimesheetDetailsApiService {
   public deleteAttachment({fileId, timesheetId, organizationId}: DeleteAttachmentData): Observable<void> {
     return organizationId === null ?
       this.organizationDeleteAttachment(fileId, timesheetId) :
-      this.agencyDeleteAttachment(fileId, timesheetId, organizationId)
+      this.agencyDeleteAttachment(fileId, timesheetId, organizationId);
+  }
+
+  public deleteRecordAttachment({ fileId, timesheetId, organizationId }: DeleteAttachmentData): Observable<void> {
+    return organizationId === null ?
+      this.organizationRecordDeleteAttachment(timesheetId, fileId) :
+      this.agencyRecordDeleteAttachment(timesheetId, fileId, organizationId);
   }
 
   public downloadAttachment({fileId, organizationId}: DownloadAttachmentRequestData): Observable<Blob> {
@@ -76,10 +83,24 @@ export class TimesheetDetailsApiService {
       this.agencyDownloadAttachment(fileId, organizationId);
   }
 
+  public downloadRecordAttachment({ timesheetRecordId, fileId, organizationId}: DownloadRecordAttachmentRequestData): Observable<Blob> {
+    return organizationId === null ?
+      this.organizationRecordDownloadAttachment(timesheetRecordId, fileId) :
+      this.agencyRecordDownloadAttachment(timesheetRecordId, fileId, organizationId);
+  }
+
   public downloadPDFAttachment({fileId, organizationId}: DownloadAttachmentRequestData): Observable<Blob> {
     return organizationId === null ?
       this.organizationDownloadPDFAttachment(fileId) :
       this.agencyDownloadPDFAttachment(fileId, organizationId);
+  }
+
+  public downloadRecordPDFAttachment(
+    { timesheetRecordId, fileId, organizationId }: DownloadRecordAttachmentRequestData
+  ): Observable<Blob> {
+    return organizationId === null ?
+      this.organizationRecordDownloadPDFAttachment(timesheetRecordId, fileId) :
+      this.agencyRecordDownloadPDFAttachment(timesheetRecordId, fileId, organizationId);
   }
 
   public changeTimesheetStatus(data: ChangeStatusData): Observable<void> {
@@ -104,8 +125,20 @@ export class TimesheetDetailsApiService {
     });
   }
 
+  private organizationRecordDownloadAttachment(timesheetRecordId: number, fileId: number): Observable<Blob> {
+    return this.http.get(`/api/TimesheetRecords/${timesheetRecordId}/files/${fileId}`, {
+      responseType: 'blob',
+    });
+  }
+
   private organizationDownloadPDFAttachment(fileId: number): Observable<Blob> {
     return this.http.get(`/api/Timesheets/files/${fileId}/pdf`, {
+      responseType: 'blob'
+    });
+  }
+
+  private organizationRecordDownloadPDFAttachment(timesheetRecordId: number, fileId: number): Observable<Blob> {
+    return this.http.get(`/api/TimesheetRecords/${timesheetRecordId}/files/${fileId}/pdf`, {
       responseType: 'blob'
     });
   }
@@ -116,8 +149,20 @@ export class TimesheetDetailsApiService {
     });
   }
 
+  private agencyRecordDownloadAttachment(timesheetRecordId: number, fileId: number, organizationId: number): Observable<Blob> {
+    return this.http.get(`/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files/${fileId}`, {
+      responseType: 'blob'
+    });
+  }
+
   private agencyDownloadPDFAttachment(fileId: number, organizationId: number): Observable<Blob> {
     return this.http.get(`/api/Timesheets/organization/${organizationId}/files/${fileId}/pdf`, {
+      responseType: 'blob',
+    });
+  }
+
+  private agencyRecordDownloadPDFAttachment(timesheetRecordId: number, fileId: number, organizationId: number): Observable<Blob> {
+    return this.http.get(`/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files/${fileId}/pdf`, {
       responseType: 'blob',
     });
   }
@@ -126,7 +171,15 @@ export class TimesheetDetailsApiService {
     return this.http.delete<void>(`/api/Timesheets/${timesheetId}/files/${fileId}`);
   }
 
+  private organizationRecordDeleteAttachment(timesheetRecordId: number, fileId: number): Observable<void> {
+    return this.http.delete<void>(`/api/TimesheetRecords/${timesheetRecordId}/files/${fileId}`);
+  }
+
   private agencyDeleteAttachment(fileId: number, timesheetId: number, organizationId: number): Observable<void> {
     return this.http.delete<void>(`/api/Timesheets/${timesheetId}/organization/${organizationId}/files/${fileId}`);
-  }  
+  }
+
+  private agencyRecordDeleteAttachment(timesheetRecordId: number, fileId: number, organizationId: number): Observable<void> {
+    return this.http.delete<void>(`/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files/${fileId}`);
+  }
 }

@@ -27,14 +27,15 @@
   </ng-container>
   <ng-container right>
     <ng-container>
-     
+
       <button
         ejs-dropdownbutton
+        appHideBeforeSyncfusionLoad
         [items]="exportOptions"
-        (select)="exportSelected($event)"        
+        (select)="exportSelected($event)"
         id="importButton"
         cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
-      <button ejs-button [isPrimary]="true" (click)="onAddNewRole()">Add Role</button>
+      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="onAddNewRole()">Add Role</button>
     </ng-container>
   </ng-container>
 </app-page-toolbar>

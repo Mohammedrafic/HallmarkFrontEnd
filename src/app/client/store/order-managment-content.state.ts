@@ -6,6 +6,7 @@ import { catchError, Observable, of, tap } from 'rxjs';
 import {
   ApproveOrder,
   ClearHistoricalData,
+  ClearOrderCandidatePage,
   ClearOrders,
   ClearPredefinedBillRates,
   ClearSelectedOrder,
@@ -241,7 +242,9 @@ export class OrderManagementContentState {
   }
 
   @Selector()
-  static lastSelectedOrder(state: OrderManagementContentStateModel): (id: number) => [OrderManagement, number | undefined] | [] {
+  static lastSelectedOrder(
+    state: OrderManagementContentStateModel
+  ): (id: number) => [OrderManagement, number | undefined] | [] {
     return (id: number) => {
       let rowIndex;
       const order = state.ordersPage?.items.find((order, index) => {
@@ -373,6 +376,11 @@ export class OrderManagementContentState {
           return payload;
         })
       );
+  }
+
+  @Action(ClearOrderCandidatePage)
+  ClearOrderCandidatePage({ patchState }: StateContext<OrderManagementContentStateModel>): void {
+    patchState({ orderCandidatesListPage: null });
   }
 
   @Action(GetSelectedOrderById)

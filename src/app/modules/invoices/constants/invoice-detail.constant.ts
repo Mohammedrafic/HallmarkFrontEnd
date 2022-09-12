@@ -139,9 +139,9 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
       },
     },
     {
-      field: 'agencyName',
-      headerName: 'Agency',
-      minWidth: 110,
+      field: isAgency ? 'organizationName' : 'agencyName',
+      headerName: isAgency ? 'Organization' : 'Agency',
+      minWidth: isAgency ? 160 : 110,
       flex: 1,
       autoHeight: true,
       wrapText: true,

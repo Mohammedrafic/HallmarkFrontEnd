@@ -1,0 +1,40 @@
+<ejs-dialog
+  id="upload-documents"
+  #sideUploadDialog
+  cssClass="dialog upload-custom-dialog"
+  [width]="'556px'"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #header>
+    <div class="dialog-header">
+      <h3 class="title">Upload Documents</h3>
+      <div class="controls">
+        <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
+        <button (click)="saveRecord()" ejs-button [isPrimary]="true">Save</button>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #content>
+    <app-file-uploader
+      *ngIf="(dialogState$ | async)?.state"
+      class="upload-custom"
+      [allowedFileExtensions]="allowedFileExtensions"
+      [maxFileSize]="maxFileSize"
+      [maxFiles]="100"
+      [clearAll]="filesClearEvent"
+      [attachments]="existingFiles"
+      (existingFileDelete)="deleteFile($event)"
+      (selectedFilesChanged)="selectedFiles($event)"
+    ></app-file-uploader>
+    <button
+      ejs-button
+      *ngIf="fileForUploads.length"
+      cssClass="e-outline button-clear"
+      (click)="clearFiles()"
+    >
+      Clear
+    </button>
+  </ng-template>
+</ejs-dialog>
