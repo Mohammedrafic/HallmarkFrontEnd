@@ -315,7 +315,7 @@
 
       <ng-template #defaultSubRow>
         <app-grid-subrow-candidate
-          *ngFor="let child of data.children"
+          *ngFor="let child of data.children; index as i"
           [candidat]="child"
           [order]="data"
           [selected]="
@@ -323,7 +323,7 @@
             selectedCandidate?.selected.positionId === child.positionId
           "
           [isAgency]="true"
-          (clickEvent)="onOpenCandidateDialog($event, data)"
+          (clickEvent)="onOpenCandidateDialog($event, data, i)"
         ></app-grid-subrow-candidate>
       </ng-template>
     </ng-template>

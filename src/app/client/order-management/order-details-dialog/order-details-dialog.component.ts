@@ -60,7 +60,7 @@ import { ExtensionCandidateComponent } from '@shared/components/order-candidate-
 export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() order: Order;
   @Input() openEvent: Subject<boolean>;
-  @Input() orderPositionSelected$: Subject<boolean>;
+  @Input() orderPositionSelected$: Subject<{ state: boolean; index?: number }>;
   @Input() children: OrderManagementChild[] | undefined;
   @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
 
@@ -343,25 +343,34 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       this.orderPositionSelected$,
     ])
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(([order, selectedOrder, isOrderPositionSelected]: [OrderCandidatesListPage, Order, boolean]) => {
-        this.candidateOrderPage = order;
-        this.candidatesCounter =
-          order &&
-          order.items?.filter(
-            (candidate) =>
-              candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
-          ).length;
-        this.extensions = [];
-        if (
-          order?.items[0]?.deployedCandidateInfo?.jobId &&
-          isOrderPositionSelected &&
-          (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
-        ) {
-          this.store.dispatch(
-            new GetOrganizationExtensions(order.items[0].deployedCandidateInfo.jobId, selectedOrder.id!)
-          );
+      .subscribe(
+        ([order, selectedOrder, isOrderPositionSelected]: [
+          OrderCandidatesListPage,
+          Order,
+          { state: boolean; index?: number }
+        ]) => {
+          this.candidateOrderPage = order;
+          this.candidatesCounter =
+            order &&
+            order.items?.filter(
+              (candidate) =>
+                candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
+            ).length;
+          this.extensions = [];
+          if (
+            selectedOrder?.extensionFromId &&
+            order?.items[isOrderPositionSelected.index ?? 0]?.deployedCandidateInfo?.jobId &&
+            (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
+          ) {
+            this.store.dispatch(
+              new GetOrganizationExtensions(
+                order.items[isOrderPositionSelected.index ?? 0].deployedCandidateInfo?.jobId!,
+                selectedOrder.id!
+              )
+            );
+          }
         }
-      });
+      );
 
     this.extensions$.pipe(takeUntil(this.unsubscribe$)).subscribe((extensions) => {
       this.extensions = extensions?.filter((extension: any) => extension.id !== this.order.id);
