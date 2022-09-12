@@ -3,7 +3,7 @@
     <h3>Agency list</h3>
   </ng-container>
   <ng-container right>
-    <button ejs-button cssClass="e-outline button-filter" (click)="showFilters()">
+    <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline button-filter" (click)="showFilters()">
       <div class="filter-button-content">
           <span *ngIf="(filteredItems$ | async) as filteredItems" class="e-badge e-badge-success e-badge-circle">{{filteredItems}}</span>
         Filters <i-feather name="sliders" class="icon"></i-feather>
@@ -11,11 +11,12 @@
     </button>
     <button
       ejs-dropdownbutton
+      appHideBeforeSyncfusionLoad
       [items]="exportOptions"
       (select)="exportSelected($event)"
       id="importButton"
       cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
-    <button ejs-button [isPrimary]="true" (click)="navigateToAgencyForm()">Add Agency</button>
+    <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToAgencyForm()">Add Agency</button>
   </ng-container>
 </app-page-toolbar>
 
