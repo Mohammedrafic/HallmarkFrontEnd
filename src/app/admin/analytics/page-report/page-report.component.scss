@@ -1,12 +1,13 @@
 .page-report-section{
     display: flex;
      height: 85%;
+     padding-top: 20px;
 }
 
 .form-line {
     display: flex;
     align-items: flex-end;
-  
+    padding-top: 10px;
     &:not(:last-child) {
       margin-bottom: 15px;
     }

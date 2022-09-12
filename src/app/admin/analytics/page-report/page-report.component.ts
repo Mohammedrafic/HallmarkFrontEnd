@@ -19,13 +19,22 @@ import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { GetDepartmentsByLocations, GetLocationsByRegions, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
+import { startDateValidator } from '@shared/validators/date.validator';
+import { formatDate } from '@angular/common';
 @Component({
   selector: 'app-page-report',
   templateUrl: './page-report.component.html',
   styleUrls: ['./page-report.component.scss']
 })
 export class PageReportComponent implements OnInit {
-  public paramsData: any = {};
+  public paramsData: any = {
+    organizations:[],
+    startDate:'',
+    endDate:'',
+    regions:[],
+    locations:[],
+    departments:[]
+  };
   public reportName: LogiReportFileDetails = { name: "/JobDetails/JobDetails.wls" };
   public catelogName: LogiReportFileDetails = { name: "/JobDetails/Dashbord.cat" };
   public title: string = "Job Details";
@@ -45,12 +54,13 @@ export class PageReportComponent implements OnInit {
   @Select(LogiReportState.departments)
   public departments$: Observable<Department[]>;
   isDepartmentsDropDownEnabled: boolean = false;
-  departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   selectedDepartments: Department[];
 
 
   @Select(SecurityState.bussinesData)
   public businessData$: Observable<BusinessUnit[]>;
+  selectedOrganizations: BusinessUnit[];
 
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
   private unsubscribe$: Subject<void> = new Subject();
@@ -64,6 +74,8 @@ export class PageReportComponent implements OnInit {
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
+  public organizations:BusinessUnit[]=[];
+  public today = new Date();
   constructor(private store: Store,
     private formBuilder: FormBuilder) {
     this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
@@ -74,6 +86,8 @@ export class PageReportComponent implements OnInit {
     this.jobDetailsForm = this.formBuilder.group(
       {
         business: [null, Validators.required],
+        startDate:[null, Validators.required],
+        endDate:[null, Validators.required],
         regionId: [null, Validators.required],
         locationId: [null, Validators.required],
         departmentId: [null, Validators.required]
@@ -85,11 +99,14 @@ export class PageReportComponent implements OnInit {
   ngOnInit(): void {
     this.orderFilterColumnsSetup();
     this.businessData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.organizations=data;
       this.filterColumns.businessIds.dataSource = data;
 
     });
     this.bussinessControl = this.jobDetailsForm.get('business') as AbstractControl;
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      
+      this.selectedOrganizations=this.organizations?.filter((x) => data?.includes(x.id));
       let regionFilter: regionFilter = {
         ids: data,
         getAll: true
@@ -99,6 +116,7 @@ export class PageReportComponent implements OnInit {
     this.regionIdControl = this.jobDetailsForm.get('regionId') as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {      
     const fieldName = 'region';
+    this.selectedRegions=this.regions?.filter((object) => data?.includes(object.id));
       let locationFilter: LocationsByRegionsFilter = {
         ids: data,
         getAll: true
@@ -110,6 +128,7 @@ export class PageReportComponent implements OnInit {
     this.locationIdControl = this.jobDetailsForm.get('locationId') as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       const fieldName = 'location';
+      this.selectedLocations=this.locations?.filter((object) => data?.includes(object.id));
       let departmentFilter: DepartmentsByLocationsFilter = {
         ids: data,
         getAll: true
@@ -119,7 +138,8 @@ export class PageReportComponent implements OnInit {
     });
     this.departmentIdControl = this.jobDetailsForm.get('departmentId') as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      const fieldName = 'department';      
+      const fieldName = 'department';    
+      this.selectedDepartments=this.departments?.filter((object) => data?.includes(object.departmentId));  
       this.markTouchedField(fieldName);
     });
     this.onOrganizationsChange();
@@ -127,7 +147,22 @@ export class PageReportComponent implements OnInit {
     this.onLocationsChange();
   }
   
-
+  public SearchReport(): void {
+    if (this.jobDetailsForm?.valid) {
+      let {startDate,endDate}=this.jobDetailsForm.getRawValue();
+      this.paramsData=
+        {
+          organizations:this.selectedOrganizations?.map((list) => list.name)?.join(","),
+          startDate:formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+          endDate:formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+          regions:this.selectedRegions?.map((list) => list.name)?.join(","),
+          locations:this.selectedLocations?.map((list) => list.name)?.join(","),
+          departments:this.selectedDepartments?.map((list) => list.departmentName)?.join(",")
+        };
+    } else {
+      this.jobDetailsForm?.updateValueAndValidity();
+    }
+  }
   private resetLocation(): void {
     this.locationIdControl.reset(null, { emitValue: false });
     this.locationIdControl.markAsUntouched();
@@ -165,7 +200,9 @@ export class PageReportComponent implements OnInit {
         dataSource: [],
         valueField: 'name',
         valueId: 'id',
-      }
+      },
+      startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      endDate: { type: ControlTypes.Date, valueType: ValueType.Text }
     }
   }
   private onOrganizationsChange(): void {

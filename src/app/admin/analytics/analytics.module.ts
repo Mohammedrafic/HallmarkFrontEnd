@@ -13,6 +13,8 @@ import { UserState } from 'src/app/store/user.state';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
+import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
+import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 
 @NgModule({
   declarations: [
@@ -28,6 +30,8 @@ import { LogiReportState } from '@organization-management/store/logi-report.stat
     AnalyticsRoutingModule,
     MultiSelectAllModule,
     DropDownListModule,
+    DatePickerModule,
+    ButtonModule,
     NgxsModule.forFeature([OrganizationManagementState,UserState,SecurityState,LogiReportState])
   ]
 })

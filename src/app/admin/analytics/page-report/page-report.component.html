@@ -2,10 +2,10 @@
     <form class="bootstrap" [formGroup]="jobDetailsForm">
     <div class="form-line">
        
-        <!-- Region -->
+        <!-- Organization -->
        
         <div class="input-container bootstrap form-line-item-20">
-          <label>Organization Name</label>
+          <label>Organization Name<span class="required">*</span></label>
           <div class="input-group dropdown">
             <ejs-multiselect
               mode="CheckBox"
@@ -13,6 +13,7 @@
               placeholder="All"
               [allowFiltering]="true"
               [showDropDownIcon]="true"
+              appValidateWithMessage
               [fields]="bussinesDataFields"
               [dataSource]="filterColumns.businessIds.dataSource"
             >
@@ -20,20 +21,36 @@
           </div>
         </div>
 
-        <!-- Location -->
+        <!-- Start Date -->
         <div class="input-container bootstrap form-line-item-20">
           <label>Start Date<span class="required">*</span></label>
-          <div class="input-group dropdown">
-           
+          <div class="input-group datepicker">
+            <ejs-datepicker id="startDate"
+                            class="datepicker"
+                            format="MM/dd/yyyy"
+                            placeholder="MM/DD/YYYY"
+                            appValidateWithMessage
+                            formControlName="startDate"
+                            [min]="today">
+            </ejs-datepicker>
           </div>
         </div>
 
-        <!-- Department -->
+        <!-- End Date -->
         <div class="input-container bootstrap form-line-item-20">
           <label>End Date<span class="required">*</span></label>
-          <div class="input-group dropdown">
-            
-          </div>
+          <ejs-datepicker id="endDate"
+                              class="datepicker"
+                              format="MM/dd/yyyy"
+                              placeholder="MM/DD/YYYY"
+                              appValidateWithMessage
+                              formControlName="endDate"
+                              [min]="jobDetailsForm.controls['startDate'].value">
+              </ejs-datepicker>
+        </div>
+        <div class="input-container form-line-item-20">
+          <button ejs-button type="submit"
+          [isPrimary]="true" (click)="SearchReport()">Search</button>
         </div>
 
         
