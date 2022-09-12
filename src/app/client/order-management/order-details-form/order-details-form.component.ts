@@ -1101,6 +1101,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.controls['duration'].patchValue(Duration.ThirteenWeeks);
     this.jobDistributionForm.controls['jobDistribution'].patchValue([JobDistribution.All]);
 
+    const contactDetails = (this.contactDetailsForm.controls['contactDetails'] as FormArray).at(0) as FormGroup;
+    contactDetails.controls['isPrimaryContact'].patchValue(true);
+
     this.generalInformationForm.controls['departmentId'].valueChanges
       .pipe(
         switchMap(() => {
