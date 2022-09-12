@@ -8,12 +8,12 @@ import {
   debounceTime,
   filter,
   Observable,
+  skip,
   Subject,
+  switchMap,
   take,
   takeUntil,
   throttleTime,
-  switchMap,
-  skip,
 } from 'rxjs';
 
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
@@ -617,18 +617,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     }
     this.orderManagementService
       .getRegularLocalBillRate(orderType, departmentId, skillId)
-      .pipe(
-        takeUntil(this.unsubscribe$)
-      )
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe((billRates: BillRate[]) => {
         if (billRates.length) {
           this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour.toFixed(2));
         } else {
           this.generalInformationForm.controls['hourlyRate'].patchValue('');
         }
-      }
-        
-      );
+      });
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -867,8 +863,12 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     if (this.isPermPlacementOrder)
       this.generalInformationForm.patchValue({
         orderPlacementFee: order?.orderPlacementFee,
-        annualSalaryRangeFrom: order?.annualSalaryRangeFrom,
-        annualSalaryRangeTo: order?.annualSalaryRangeTo,
+        annualSalaryRangeFrom: order?.annualSalaryRangeFrom
+          ? parseFloat(order.annualSalaryRangeFrom.toString()).toFixed(2)
+          : '',
+        annualSalaryRangeTo: order?.annualSalaryRangeTo
+          ? parseFloat(order.annualSalaryRangeTo.toString()).toFixed(2)
+          : '',
       });
   }
 

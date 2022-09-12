@@ -12,7 +12,9 @@
       <section class="header-container">
         <div class="e-card-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title">{{ isReOrder ? 'Re-Order' : 'Order' }} ID {{ order?.organizationPrefix }}-{{ order?.publicId }}</h3>
+            <h3 class="e-card-title">
+              {{ isReOrder ? 'Re-Order' : 'Order' }} ID {{ order?.organizationPrefix }}-{{ order?.publicId }}
+            </h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList>
                 <e-chips>
@@ -61,7 +63,11 @@
               cssClass="e-outline"
               *ngIf="orderType.OpenPerDiem === order?.orderType"
               (click)="createReOrder()"
-              [disabled]="order?.status === orderStatus.PreOpen || order?.status === orderStatus.Closed || !settings[SettingsKeys.IsReOrder]?.value"
+              [disabled]="
+                order?.status === orderStatus.PreOpen ||
+                order?.status === orderStatus.Closed ||
+                !settings[SettingsKeys.IsReOrder]?.value
+              "
             >
               Create Re-Order
             </button>
@@ -102,7 +108,7 @@
             </e-tabitem>
             <e-tabitem>
               <ng-template #headerText>
-                Candidates
+                {{ order?.extensionFromId ? 'Candidate' : 'Candidates' }}
                 <span class="e-badge e-badge-success e-badge-circle">{{ candidatesCounter }}</span>
               </ng-template>
               <ng-template #content>
@@ -110,7 +116,8 @@
                   [currentOrder]="order"
                   [candidateOrder]="candidateOrderPage"
                   [dialogEvent]="openEvent"
-                  *ngIf="order?.extensionFromId; else candidateOrder">
+                  *ngIf="order?.extensionFromId; else candidateOrder"
+                >
                 </app-extension-candidate>
                 <ng-template #candidateOrder>
                   <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>
@@ -131,7 +138,13 @@
                 </app-order-reorders-container>
               </ng-template>
             </e-tabitem>
-            <e-tabitem *ngIf="(order?.orderType === orderType.Traveler || order?.orderType === orderType.ContractToPerm) && !isReOrder && order?.extensionFromId">
+            <e-tabitem
+              *ngIf="
+                (order?.orderType === orderType.Traveler || order?.orderType === orderType.ContractToPerm) &&
+                !isReOrder &&
+                order?.extensionFromId
+              "
+            >
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content>
                 <section class="job-details">
