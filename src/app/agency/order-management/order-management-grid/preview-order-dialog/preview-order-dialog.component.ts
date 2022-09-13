@@ -31,7 +31,7 @@ import { GetAgencyExtensions } from '@agency/store/order-management.actions';
   selector: 'app-preview-order-dialog',
   templateUrl: './preview-order-dialog.component.html',
   styleUrls: ['./preview-order-dialog.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() order: AgencyOrderManagement;
@@ -81,7 +81,9 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public get getTitle(): string {
-    return (this.isReOrder ? `Re-Order ID ` : `Order ID `) + `${this.order?.organizationPrefix}-${this.order?.publicId}`;
+    return (
+      (this.isReOrder ? `Re-Order ID ` : `Order ID `) + `${this.order?.organizationPrefix}-${this.order?.publicId}`
+    );
   }
 
   ngOnInit(): void {
@@ -152,6 +154,10 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
       if (event.selectedIndex !== visibilityTabIndex) {
         this.firstActive = false;
       } else {
+        this.firstActive = true;
+      }
+      if (event.selectedIndex === event.previousIndex) {
+        this.tab.select(0);
         this.firstActive = true;
       }
       this.cd.markForCheck();

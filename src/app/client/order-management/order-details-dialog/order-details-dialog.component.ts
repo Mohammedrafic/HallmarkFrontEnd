@@ -52,6 +52,7 @@ import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enu
 import { SettingsKeys } from '@shared/enums/settings';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { ExtensionCandidateComponent } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
+import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -128,12 +129,14 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     private confirmService: ConfirmService,
     private location: Location,
     private actions: Actions,
-    private addEditReorderService: AddEditReorderService
+    private addEditReorderService: AddEditReorderService,
+    private orderManagementService: OrderManagementService
   ) {}
 
   ngOnInit(): void {
     this.onOpenEvent();
     this.subscribeOnOrderCandidatePage();
+    this.subsToTabChange();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -322,6 +325,12 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       this.tab.select(1);
       this.secondHasOpenedOnes = true;
     }
+  }
+
+  public subsToTabChange(): void {
+    this.orderManagementService.selectedTab$.pipe(takeUntil(this.unsubscribe$)).subscribe((tab) => {
+      this.tab.select(tab);
+    });
   }
 
   private onOpenEvent(): void {
