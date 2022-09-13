@@ -183,7 +183,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch([new RejectCandidateJob(payload), new ReloadOrganisationOrderCandidatesLists()]);
+      this.store.dispatch(new RejectCandidateJob(payload));
       this.closeDialog();
     }
   }
@@ -365,7 +365,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
 
   private subscribeOnSuccessRejection(): void {
     this.actions$
-      .pipe(ofActionSuccessful(RejectCandidateForOrganisationSuccess), takeUntil(this.unsubscribe$))
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RejectCandidateForOrganisationSuccess))
       .subscribe(() => {
         this.form.disable();
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
