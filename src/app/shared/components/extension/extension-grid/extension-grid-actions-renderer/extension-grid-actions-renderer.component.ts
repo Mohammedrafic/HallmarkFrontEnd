@@ -6,6 +6,7 @@ import { AppState } from '../../../../../store/app.state';
 import { Select } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
+import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 
 @Component({
   selector: 'app-extension-edit-icon',
@@ -29,6 +30,7 @@ export class ExtensionGridActionsRendererComponent implements ICellRendererAngul
   }
 
   public onEdit(): void {
+    disabledBodyOverflow(false);
     this.router.navigate(['./edit', this.params.data.id], { relativeTo: this.activatedRoute });
   }
 }
