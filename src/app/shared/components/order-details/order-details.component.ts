@@ -1,6 +1,6 @@
-import { Component, Input, OnDestroy, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
-import { Subject } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { OrderType } from '@shared/enums/order-type';
 import { Store } from '@ngxs/store';
 import { CommentsService } from '@shared/services/comments.service';
@@ -13,7 +13,7 @@ type ContactDetails = Partial<OrderContactDetails> & Partial<OrderWorkLocation>;
   templateUrl: './order-details.component.html',
   styleUrls: ['./order-details.component.scss'],
 })
-export class OrderDetailsComponent implements OnDestroy {
+export class OrderDetailsComponent implements OnChanges, OnDestroy {
   @Input() isPosition: boolean = false;
   @Input() set currentOrder(value: Order) {
     this.order = value;
@@ -27,23 +27,29 @@ export class OrderDetailsComponent implements OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store, private commentsService: CommentsService) {}
+  constructor(private store: Store, private commentsService: CommentsService, private cdr: ChangeDetectorRef) {}
 
   public ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['currentOrder']?.currentValue) {
+  public ngOnChanges(changes: SimpleChanges): void {
+    const { currentOrder } = changes;
+
+    if (currentOrder?.currentValue) {
       this.getComments();
     }
   }
 
   private getComments(): void {
-    this.commentsService.getComments(this.order.commentContainerId as number, null).subscribe((comments: Comment[]) => {
-      this.comments = comments;
-    });
+    this.commentsService
+      .getComments(this.order.commentContainerId as number, null)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+        this.cdr.markForCheck();
+      });
   }
 
   public onBillRatesChanged(): void {

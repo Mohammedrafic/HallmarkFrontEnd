@@ -4,7 +4,7 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Comment } from '@shared/models/comment.model';
 import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { TextBoxComponent } from '@syncfusion/ej2-angular-inputs';
-import { debounceTime, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { UserState } from 'src/app/store/user.state';
 import { MarkCommentAsRead, SaveComment, UpdateGridCommentsCounter } from './store/comments.actions';
 import { CommentsState } from './store/comments.state';
@@ -62,7 +62,7 @@ export class CommentsComponent {
   public markAsRead$ = new Subject<number[]>();
   public initView$ = new Subject<void>();
 
-  public readMessagesIds: number[] = []; 
+  public readMessagesIds: number[] = [];
 
   private hasUnreadMessages = false;
 
@@ -145,13 +145,13 @@ export class CommentsComponent {
     }
     const user = this.store.selectSnapshot(UserState).user;
     const comment = {
-      id: 0, 
-      text: this.message, 
+      id: 0,
+      text: this.message,
       createdAt: new Date(),
       firstName: user.firstName,
       lastName: user.lastName,
-      isExternal: this.isExternal, 
-      new: true, 
+      isExternal: this.isExternal,
+      new: true,
       commentContainerId: this.commentContainerId,
       isRead: true
     };
@@ -160,7 +160,7 @@ export class CommentsComponent {
     this.scroll$.next(null);
     if (!this.isCreating) {
       this.store.dispatch(new SaveComment(comment))
-    } 
+    }
   }
 
   public onFilterChange(event: SelectEventArgs): void {
