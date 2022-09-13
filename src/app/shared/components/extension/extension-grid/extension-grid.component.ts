@@ -15,9 +15,9 @@ export class ExtensionGridComponent {
   @Input() public data: any = [];
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = [
-    {  
-      headerName: 'Extension ID', 
-      cellRenderer: ExtensionGridIdRendererComponent, 
+    {
+      headerName: 'Extension ID',
+      cellRenderer: ExtensionGridIdRendererComponent,
       maxWidth: 140,
       valueGetter: (params) => `${params.data.organizationPrefix}-${params.data.publicId}`,
     },
@@ -46,7 +46,13 @@ export class ExtensionGridComponent {
       valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
       maxWidth: 150,
     },
-    { field: '', headerName: '', cellRenderer: ExtensionGridActionsRendererComponent, maxWidth: 80 },
+    {
+      field: '',
+      headerName: '',
+      cellRenderer: ExtensionGridActionsRendererComponent,
+      maxWidth: 80,
+      cellClass: 'extension-buttons',
+    },
   ];
 
   public constructor(private datePipe: DatePipe) {}

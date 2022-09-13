@@ -99,6 +99,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   private filesDetails: Blob[] = [];
   private fetchedAgency: Agency;
   private agencyId: number | null = null;
+  private isRemoveLogo: boolean = false;
 
   constructor(
     private store: Store,
@@ -157,6 +158,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
 
   ngOnDestroy(): void {
     this.isAlive = false;
+    this.isRemoveLogo = false;
   }
 
   public enableCreateUnderControl(): void {
@@ -223,15 +225,17 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
     this.agencyForm.markAsDirty();
     if (event) {
       this.filesDetails = [event as Blob];
+      this.isRemoveLogo = false;
     } else {
       this.filesDetails = [];
+      this.isRemoveLogo = true;
     }
   }
 
   private uploadImages(businessUnitId: number): void {
     if (this.filesDetails.length) {
       this.store.dispatch(new UploadAgencyLogo(this.filesDetails[0] as Blob, businessUnitId));
-    } else if (this.logo) {
+    } else if (this.logo && this.isRemoveLogo) {
       this.store.dispatch(new RemoveAgencyLogo(businessUnitId));
     }
   }

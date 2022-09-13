@@ -12,8 +12,9 @@ export class RegionMapping {
 
 export class regionFilter {
   ids?: number[];
-name?:string[];
-orderBy?: string;
-pageSize?: number;
-pageNumber?: number;
+  name?:string[];
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+  getAll?:boolean;
 }
