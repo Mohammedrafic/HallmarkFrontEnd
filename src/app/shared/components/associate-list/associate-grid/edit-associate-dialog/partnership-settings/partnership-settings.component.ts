@@ -71,7 +71,7 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
 
       regionIds: new FormControl([], [Validators.required]),
       orderTypes: new FormControl([], [Validators.required]),
-      classifications: new FormControl([], [Validators.required]),
+      classifications: new FormControl([]),
       skillCategoryIds: new FormControl([], [Validators.required]),
 
       allowOnBoard: new FormControl(false),
