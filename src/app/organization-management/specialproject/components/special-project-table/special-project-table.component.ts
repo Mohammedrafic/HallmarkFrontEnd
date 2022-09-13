@@ -6,6 +6,9 @@ import {
 import { Component, OnInit, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
 import { GRID_CONFIG } from '@shared/constants';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { Select } from '@ngxs/store';
+import { AppState } from '../../../../store/app.state';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-special-project-table',
@@ -19,6 +22,9 @@ export class SpecialProjectTableComponent extends AbstractGridConfigurationCompo
 
   @Output() onGridReadyEvent: EventEmitter<GridReadyEvent> = new EventEmitter<GridReadyEvent>();
   @Output() onGridPageSizeChanged = new EventEmitter<any>();
+
+  @Select(AppState.isDarkTheme)
+  isDarkTheme$: Observable<boolean>;
 
   constructor() { super(); }
 

@@ -33,3 +33,10 @@ body.dark {
     }
   }
 }
+body.dark {
+  .e-treeview {
+    .e-list-text {
+      color: $white;
+    }
+  }
+}

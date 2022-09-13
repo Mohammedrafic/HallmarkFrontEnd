@@ -1,3 +1,5 @@
+@import 'colors';
+
 .app-grid-pagination {
   background-color: #fff;
   border: 1px solid #e0e0e0;
@@ -91,4 +93,8 @@
     border-width: 0;
     border-bottom-right-radius: var(--grid-border-radius);
   }
+}
+
+.app-grid-dark-pagination {
+  background-color: $sidebar-background;
 }

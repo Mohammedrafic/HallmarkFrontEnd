@@ -9,7 +9,8 @@
     timeSelection: timeSelection$ | async,
     allOrganizations: allOrganizations$ | async,
     skills: allOrganizationsSkills$ | async,
-    userIsAdmin: userIsAdmin$ | async
+    userIsAdmin: userIsAdmin$ | async,
+    isDarkTheme: isDarkTheme$ | async
   }"
 ></ng-container>
 
@@ -24,6 +25,7 @@
   let-allOrganizations="allOrganizations"
   let-skills="skills"
   let-userIsAdmin="userIsAdmin"
+  let-isDarkTheme="isDarkTheme"
 >
   <app-dashboard-control
     (widgetToggleEmitter)="handleWidgetToggleEvent($event)"
@@ -48,6 +50,7 @@
         [panels]="panels"
         [widgetsData]="widgetsData"
         [timeSelection]="timeSelection"
+        [isDarkTheme]="isDarkTheme"
       ></app-dashboard-widgets>
     </div>
   </ng-template>

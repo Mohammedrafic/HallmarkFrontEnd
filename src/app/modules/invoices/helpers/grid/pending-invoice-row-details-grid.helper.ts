@@ -134,7 +134,8 @@ const getManualTypeColDefs: GetPendingInvoiceDetailsColDefsFn =
     }
   ];
 
-const milesInvoiceTypeColDefs: GetPendingInvoiceDetailsColDefsFn = ({ downloadMilesAttachments, previewMilesAttachments }) => [
+const milesInvoiceTypeColDefs: (invoiceId: number, config: PendingInvoiceRowDetailsConfig) => TypedColDef<PendingInvoiceRecord>[] =
+  (invoiceId, { downloadMilesAttachments, previewMilesAttachments }) => [
   invoicesRowDetailsOffsetColDef,
   dayColDef,
   {
@@ -167,9 +168,8 @@ const milesInvoiceTypeColDefs: GetPendingInvoiceDetailsColDefsFn = ({ downloadMi
       return {
         attachments,
         attachmentsListConfig: {
-          // TODO: Uncomment after BE for miles attachments implemented, implement endpoints
-          // preview: previewMilesAttachments,
-          // download: downloadMilesAttachments,
+          preview: previewMilesAttachments(invoiceId),
+          download: downloadMilesAttachments(invoiceId),
         },
       }
     }
@@ -194,11 +194,12 @@ export class PendingInvoiceRowDetailsGridHelper {
       },
       detailCellRendererParams: (params: IDetailCellRendererParams): IDetailCellRendererParams => {
         const { timesheetType } = params.data as PendingInvoice;
+        const data = params.data as PendingInvoice;
 
         return {
           ...params,
           detailGridOptions: {
-            columnDefs: PendingInvoiceRowDetailsGridHelper.getRowDetailsColumnDefinitions(timesheetType, config),
+            columnDefs: PendingInvoiceRowDetailsGridHelper.getRowDetailsColumnDefinitions(timesheetType, data, config),
           },
           getDetailRowData: (params: GetDetailRowDataParams) => params.successCallback(
             (params.data as PendingInvoice).invoiceRecords,
@@ -210,6 +211,7 @@ export class PendingInvoiceRowDetailsGridHelper {
 
   public static getRowDetailsColumnDefinitions(
     invoiceType: InvoiceType,
+    data: PendingInvoice,
     config: PendingInvoiceRowDetailsConfig
   ): TypedColDef<PendingInvoiceRecord>[] {
     switch (invoiceType) {
@@ -218,7 +220,7 @@ export class PendingInvoiceRowDetailsGridHelper {
       case InvoiceType.Manual:
         return getManualTypeColDefs(config);
       case InvoiceType.Mileage:
-        return milesInvoiceTypeColDefs(config);
+        return milesInvoiceTypeColDefs(data.id, config);
       default:
         throw new Error(`Invoice record type "${invoiceType}" is not supported`);
     }

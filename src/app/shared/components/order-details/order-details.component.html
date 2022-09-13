@@ -13,7 +13,11 @@
       </e-accordionitems>
     </ejs-accordion>
     <div class="comments" *ngIf="!isPosition">
-      <app-comments [comments]="comments" [orderId]="order.id" [commentContainerId]="order.commentContainerId || 0"></app-comments>
+      <app-comments
+        [comments]="comments"
+        [orderId]="order.id"
+        [commentContainerId]="order.commentContainerId || 0"
+      ></app-comments>
     </div>
     <div class="contacts-container">
       <div class="contacts">

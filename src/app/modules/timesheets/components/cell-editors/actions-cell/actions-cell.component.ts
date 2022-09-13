@@ -5,6 +5,7 @@ import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 
 import { ProfileTimesheetTableComponent } from '../../profile-timesheet-table/profile-timesheet-table.component';
 import { Attachment, RecordValue } from '../../../interface';
+import { TimesheetDetailRecordStatuses } from '../../../enums';
 
 @Component({
   selector: 'app-actions-cell',
@@ -44,7 +45,9 @@ export class ActionsCellComponent implements ICellRendererAngularComp {
 
   private setData(params: ICellRendererParams): void {
     this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
-    this.uploadAllowed = (params.colDef as ColDef).cellRendererParams.isUploadAllowed;
+    this.uploadAllowed =
+      (params.colDef as ColDef).cellRendererParams.isUploadAllowed
+      && params.data.state !== TimesheetDetailRecordStatuses.Deleted;
     this.recordId = params.value;
     this.uploadRecordId = params.data.timesheetRecordId;
     this.recordAttachments = params.data.attachments;

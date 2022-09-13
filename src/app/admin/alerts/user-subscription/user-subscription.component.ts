@@ -23,6 +23,7 @@ import { User, UsersPage } from '@shared/models/user.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_MODIFIED, GRID_CONFIG } from '@shared/constants';
+import { AppState } from '../../../store/app.state';
 
 @Component({
   selector: 'app-user-subscription',
@@ -41,6 +42,9 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
 
   @Select(AlertsState.UpdateUserSubscription)
   public updateUserSubscription$: Observable<boolean>;
+
+  @Select(AppState.isDarkTheme)
+  isDarkTheme$: Observable<boolean>;
 
   @Input() filterForm: FormGroup;
   public businessForm: FormGroup;
