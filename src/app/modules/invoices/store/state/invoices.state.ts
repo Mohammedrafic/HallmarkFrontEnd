@@ -21,7 +21,7 @@ import {
   InvoicesFilterState,
   InvoiceStateDto,
   ManualInvoiceMeta,
-  ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData, ManualInvoiceTimesheetResponse
+  ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData
 } from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
 import {
@@ -607,13 +607,13 @@ export class InvoicesState {
   @Action(Invoices.PreviewMilesAttachment)
   PreviewMilesAttachment(
     { patchState, dispatch }: StateContext<InvoicesModel>,
-    { organizationId, payload: { id, fileName } }: Invoices.PreviewMilesAttachment
+    { invoiceId, organizationId, payload: { id, fileName } }: Invoices.PreviewMilesAttachment
   ): Observable<Blob | void> {
     return dispatch(
       new FileViewer.Open({
         fileName,
-        getPDF: () => this.manualInvoiceAttachmentsApiService.downloadMilesPDFAttachment(id, organizationId),
-        getOriginal: () => this.manualInvoiceAttachmentsApiService.downloadMilesAttachment(id, organizationId)
+        getPDF: () => this.manualInvoiceAttachmentsApiService.downloadMilesPDFAttachment(invoiceId, id, organizationId),
+        getOriginal: () => this.manualInvoiceAttachmentsApiService.downloadMilesAttachment(invoiceId, id, organizationId)
       })
     );
   }
@@ -621,9 +621,9 @@ export class InvoicesState {
   @Action(Invoices.DownloadMilesAttachment)
   DownloadMilesAttachment(
     { patchState, dispatch }: StateContext<InvoicesModel>,
-    { organizationId, payload: { id, fileName } }: Invoices.DownloadMilesAttachment
+    { invoiceId, organizationId, payload: { id, fileName } }: Invoices.DownloadMilesAttachment
   ): Observable<Blob | void> {
-    return this.manualInvoiceAttachmentsApiService.downloadMilesAttachment(id, organizationId)
+    return this.manualInvoiceAttachmentsApiService.downloadMilesAttachment(invoiceId, id, organizationId)
       .pipe(
         tap((file: Blob) => downloadBlobFile(file, fileName)),
         catchError(() => dispatch(
