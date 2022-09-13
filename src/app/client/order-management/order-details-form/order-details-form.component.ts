@@ -519,6 +519,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.getFormData();
+    this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
     this.resetFormAfterSwichingOrganization();
 
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
