@@ -1,4 +1,4 @@
-import { PageOfCollections } from "@shared/models/page.model";
+import { PageOfCollections } from '@shared/models/page.model';
 
 export type UserVisibilitySetting = {
   id: number;
@@ -7,10 +7,10 @@ export type UserVisibilitySetting = {
   regionId: number;
   regionName: string;
   locationId: number;
-  locationName: string
-  departmentId: number
+  locationName: string;
+  departmentId: number;
   departmentName: string;
-}
+};
 
 export type UserVisibilitySettingsPage = PageOfCollections<UserVisibilitySetting>;
 
@@ -21,34 +21,39 @@ export type UserVisibilitySettingBody = {
   locationIds: number[];
   departmentIds: number[];
   id?: number | null;
-}
+};
 
 export type Organisation = {
   organizationId: number;
   name: string;
   regions: Region[];
-}
+  id?: number;
+};
 
 export type Department = {
   id: number;
   name: string;
   locationName?: string;
   organizationId: number;
-}
+  uniqId?: string | number;
+};
 
 export type Location = {
   id: number;
   name: string;
   regionName?: string;
   departments: Department[];
-}
+  organizationId: number;
+  uniqId?: string | number;
+};
 
 export type Region = {
   id: number;
   name: string;
   locations: Location[];
   organisationName?: string;
-}
+  organizationId: number;
+};
 
 export class UserVisibilityFilter {
   userId: string;
@@ -56,3 +61,5 @@ export class UserVisibilityFilter {
   pageSize?: number;
   pageNumber?: number;
 }
+
+export type VisibilitySettingControls = Region | Location | Department | Organisation;

@@ -2,9 +2,9 @@ import { SendDocumentAgency } from '../enums/send-document-agency';
 
 export class Organization {
   createUnder?: {
-    id: number,
-    businessUnitType: number,
-    name: string,
+    id: number;
+    businessUnitType: number;
+    name: string;
     parentUnitId?: number;
     dbConnectionName: string;
   };
@@ -18,7 +18,16 @@ export class Organization {
   isOrganizationUsed?: boolean;
   organizationPrefix: string;
 
-  constructor(organizationId: number, businessUnitId: number, generalInformation: GeneralInformation, billingDetails: BillingDetails, contactDetails: ContactDetails[], preferences: Preferences, isSameAsOrg: boolean, dataBaseConnection: string) {
+  constructor(
+    organizationId: number,
+    businessUnitId: number,
+    generalInformation: GeneralInformation,
+    billingDetails: BillingDetails,
+    contactDetails: ContactDetails[],
+    preferences: Preferences,
+    isSameAsOrg: boolean,
+    dataBaseConnection: string
+  ) {
     if (organizationId) {
       this.organizationId = organizationId;
     }
@@ -33,9 +42,9 @@ export class Organization {
     this.billingDetails.organizationId = organizationId || 0;
     this.billingDetails.sameAsOrganization = isSameAsOrg;
     this.contactDetails = contactDetails;
-    this.contactDetails.forEach((contact: ContactDetails) => contact.organizationId = organizationId || 0);
+    this.contactDetails.forEach((contact: ContactDetails) => (contact.organizationId = organizationId || 0));
     this.preferences = preferences;
-    this.preferences.paymentOptions = parseInt(this.preferences.paymentOptions as string, 10);    
+    this.preferences.paymentOptions = parseInt(this.preferences.paymentOptions as string, 10);
     this.preferences.organizationId = organizationId || 0;
     this.dbConnectionStringName = dataBaseConnection;
   }
@@ -111,7 +120,7 @@ export class OrganizationDepartment {
   name: string;
   organizationId?: number;
   regionId?: number | null;
-  locationId?: number
+  locationId?: number;
 }
 
 export class OrganizationLocation {
@@ -121,7 +130,7 @@ export class OrganizationLocation {
   departments: OrganizationDepartment[];
   organizationId?: number;
   regionId?: number | null;
-  locationId?: number
+  locationId?: number;
 }
 
 export class OrganizationRegion {
