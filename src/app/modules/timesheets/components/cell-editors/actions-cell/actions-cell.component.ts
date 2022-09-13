@@ -2,8 +2,10 @@ import { ChangeDetectionStrategy, Component, ChangeDetectorRef } from '@angular/
 
 import { ICellRendererParams, ColDef } from '@ag-grid-community/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
+
 import { ProfileTimesheetTableComponent } from '../../profile-timesheet-table/profile-timesheet-table.component';
-import { RecordValue } from '../../../interface';
+import { Attachment, RecordValue } from '../../../interface';
+import { TimesheetDetailRecordStatuses } from '../../../enums';
 
 @Component({
   selector: 'app-actions-cell',
@@ -14,11 +16,17 @@ import { RecordValue } from '../../../interface';
 export class ActionsCellComponent implements ICellRendererAngularComp {
   public editable = false;
 
+  public uploadAllowed = false;
+
   public isDeletable = true;
 
   private recordId: number;
 
-  private componentParent: ProfileTimesheetTableComponent;
+  private uploadRecordId: number;
+
+  private recordAttachments: Attachment[];
+
+  componentParent: ProfileTimesheetTableComponent;
 
   constructor(
     private cd: ChangeDetectorRef,
@@ -31,12 +39,18 @@ export class ActionsCellComponent implements ICellRendererAngularComp {
 
   public refresh(params: ICellRendererParams): boolean {
     this.setData(params);
+
     return true;
   }
 
   private setData(params: ICellRendererParams): void {
-    this.editable = (params.colDef as ColDef).cellRendererParams.isEditable ;
+    this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
+    this.uploadAllowed =
+      (params.colDef as ColDef).cellRendererParams.isUploadAllowed
+      && params.data.state !== TimesheetDetailRecordStatuses.Deleted;
     this.recordId = params.value;
+    this.uploadRecordId = params.data.timesheetRecordId;
+    this.recordAttachments = params.data.attachments;
     this.isDeletable = (params.data as RecordValue).isGenerated as boolean;
     this.cd.markForCheck();
   }
@@ -45,4 +59,7 @@ export class ActionsCellComponent implements ICellRendererAngularComp {
     this.componentParent.deleteRecord(this.recordId);
   }
 
+  uploadAttachments(): void {
+    this.componentParent.uploadAttachments(this.uploadRecordId, this.recordAttachments);
+  }
 }

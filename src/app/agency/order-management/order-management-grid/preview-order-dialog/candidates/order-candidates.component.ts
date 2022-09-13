@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { Observable, takeUntil } from 'rxjs';
 
@@ -16,7 +16,8 @@ import { OrderStatus } from '@shared/enums/order-management';
   templateUrl: './order-candidates.component.html',
   styleUrls: ['./order-candidates.component.scss'],
 })
-export class OrderCandidatesComponent extends DestroyableDirective implements OnInit {
+export class OrderCandidatesComponent extends DestroyableDirective implements OnInit, OnChanges {
+  @Input() currentOrder: Order;
   public orderCandidateInformation: Order;
   public orderCandidates: AgencyOrder;
   public orderType = OrderType;
@@ -30,6 +31,19 @@ export class OrderCandidatesComponent extends DestroyableDirective implements On
 
   constructor(private store: Store, private orderManagementAgencyService: OrderManagementAgencyService) {
     super();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const order = changes['currentOrder']?.currentValue;
+
+    if (order) {
+      this.orderCandidates = {
+        isClosed: order?.status === OrderStatus.Closed,
+        orderId: order?.id,
+        organizationId: order?.organizationId as number,
+        isLocked: order?.isLocked as boolean,
+      };
+    }
   }
 
   ngOnInit(): void {
@@ -53,12 +67,6 @@ export class OrderCandidatesComponent extends DestroyableDirective implements On
   private subscribeOnOrderCandidates(): void {
     this.orderCandidatesInformation$.pipe(takeUntil(this.destroy$)).subscribe((order) => {
       this.orderCandidateInformation = order;
-      this.orderCandidates = {
-        orderId: order?.id,
-        organizationId: order?.organizationId as number,
-        isLocked: order?.isLocked as boolean,
-        isClosed: this.orderCandidateInformation?.status === OrderStatus.Closed,
-      };
     });
   }
 }

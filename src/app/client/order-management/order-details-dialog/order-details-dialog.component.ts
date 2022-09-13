@@ -26,7 +26,13 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ApproveOrder, DeleteOrder, GetExtensions, SetLock } from '@client/store/order-managment-content.actions';
+import {
+  ApproveOrder,
+  ClearOrderCandidatePage,
+  DeleteOrder,
+  GetOrganizationExtensions,
+  SetLock,
+} from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
   CANCEL_CONFIRM_TEXT,
@@ -46,6 +52,7 @@ import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enu
 import { SettingsKeys } from '@shared/enums/settings';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { ExtensionCandidateComponent } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
+import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -55,7 +62,7 @@ import { ExtensionCandidateComponent } from '@shared/components/order-candidate-
 export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() order: Order;
   @Input() openEvent: Subject<boolean>;
-  @Input() orderPositionSelected$: Subject<boolean>;
+  @Input() orderPositionSelected$: Subject<{ state: boolean; index?: number }>;
   @Input() children: OrderManagementChild[] | undefined;
   @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
 
@@ -122,12 +129,14 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     private confirmService: ConfirmService,
     private location: Location,
     private actions: Actions,
-    private addEditReorderService: AddEditReorderService
+    private addEditReorderService: AddEditReorderService,
+    private orderManagementService: OrderManagementService
   ) {}
 
   ngOnInit(): void {
     this.onOpenEvent();
     this.subscribeOnOrderCandidatePage();
+    this.subsToTabChange();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -144,6 +153,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   ngOnDestroy(): void {
+    this.store.dispatch(new ClearOrderCandidatePage());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
@@ -317,6 +327,12 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     }
   }
 
+  public subsToTabChange(): void {
+    this.orderManagementService.selectedTab$.pipe(takeUntil(this.unsubscribe$)).subscribe((tab) => {
+      this.tab.select(tab);
+    });
+  }
+
   private onOpenEvent(): void {
     this.openEvent.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen) => {
       if (isOpen) {
@@ -338,23 +354,34 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       this.orderPositionSelected$,
     ])
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(([order, selectedOrder, isOrderPositionSelected]: [OrderCandidatesListPage, Order, boolean]) => {
-        this.candidateOrderPage = order;
-        this.candidatesCounter =
-          order &&
-          order.items?.filter(
-            (candidate) =>
-              candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
-          ).length;
-        this.extensions = [];
-        if (
-          order?.items[0]?.deployedCandidateInfo?.jobId &&
-          isOrderPositionSelected &&
-          (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
-        ) {
-          this.store.dispatch(new GetExtensions(order.items[0].deployedCandidateInfo.jobId, selectedOrder.id!));
+      .subscribe(
+        ([order, selectedOrder, isOrderPositionSelected]: [
+          OrderCandidatesListPage,
+          Order,
+          { state: boolean; index?: number }
+        ]) => {
+          this.candidateOrderPage = order;
+          this.candidatesCounter =
+            order &&
+            order.items?.filter(
+              (candidate) =>
+                candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
+            ).length;
+          this.extensions = [];
+          if (
+            selectedOrder?.extensionFromId &&
+            order?.items[isOrderPositionSelected.index ?? 0]?.deployedCandidateInfo?.jobId &&
+            (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
+          ) {
+            this.store.dispatch(
+              new GetOrganizationExtensions(
+                order.items[isOrderPositionSelected.index ?? 0].deployedCandidateInfo?.jobId!,
+                selectedOrder.id!
+              )
+            );
+          }
         }
-      });
+      );
 
     this.extensions$.pipe(takeUntil(this.unsubscribe$)).subscribe((extensions) => {
       this.extensions = extensions?.filter((extension: any) => extension.id !== this.order.id);

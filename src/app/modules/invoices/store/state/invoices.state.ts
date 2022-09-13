@@ -21,7 +21,7 @@ import {
   InvoicesFilterState,
   InvoiceStateDto,
   ManualInvoiceMeta,
-  ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData, ManualInvoiceTimesheetResponse
+  ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData
 } from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
 import {
@@ -131,6 +131,11 @@ export class InvoicesState {
     return state.selectedOrganizationId;
   }
 
+  @Selector([InvoicesState])
+  static manualInvoicesExist(state: InvoicesModel): boolean {
+    return state.manualInvoicesExist;
+  }
+
   @Action(Invoices.ToggleInvoiceDialog)
   ToggleInvoiceDialog(
     { patchState, dispatch }: StateContext<InvoicesModel>,
@@ -178,16 +183,25 @@ export class InvoicesState {
   @Action(Invoices.UpdateFiltersState)
   UpdateFiltersState(
     { setState, getState }: StateContext<InvoicesModel>,
-    { payload }: Invoices.UpdateFiltersState,
+    { payload, usePrevFiltersState }: Invoices.UpdateFiltersState,
   ): Observable<null> {
     const oldFilters: InvoicesFilterState = getState().invoicesFilters || DefaultFiltersState;
-    let filters: InvoicesFilterState = reduceFiltersState(oldFilters, SavedInvoicesFiltersParams);
-    filters = Object.assign({}, filters, payload);
+
+    let filters: InvoicesFilterState;
+
+    if (!usePrevFiltersState) {
+      filters = reduceFiltersState(oldFilters, SavedInvoicesFiltersParams);
+      filters = Object.assign({}, filters, payload);
+    } else {
+      filters = Object.assign({}, oldFilters, payload);
+    }
+
+    const invoicesFilters = payload ? filters : DefaultFiltersState;
 
     return of(null).pipe(
       throttleTime(100),
       tap(() => setState(patch<InvoicesModel>({
-        invoicesFilters: payload ? filters : DefaultFiltersState,
+        invoicesFilters,
       })))
     );
   }
@@ -311,7 +325,7 @@ export class InvoicesState {
           tabIdx === 0 ? new Invoices.GetManualInvoices(payload.organizationId) :
           new Invoices.GetPendingInvoices(payload.organizationId),
         ]);
-        
+
       }),
       catchError((err: HttpErrorResponse) => {
         return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
@@ -441,6 +455,22 @@ export class InvoicesState {
       catchError((err: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
       }),
+    );
+  }
+
+  @Action(Invoices.CheckManualInvoicesExist)
+  CheckManualInvoicesExist(
+    { patchState }: StateContext<InvoicesModel>,
+    { organizationId }: Invoices.CheckManualInvoicesExist
+  ): Observable<ManualInvoicesData | void> {
+    return this.invoicesAPIService.getManualInvoices({
+      pageNumber: 1,
+      pageSize: 1,
+      organizationId,
+    }).pipe(
+      tap(({ totalCount }: ManualInvoicesData) => patchState({
+        manualInvoicesExist: !!totalCount,
+      })),
     );
   }
 
@@ -577,13 +607,13 @@ export class InvoicesState {
   @Action(Invoices.PreviewMilesAttachment)
   PreviewMilesAttachment(
     { patchState, dispatch }: StateContext<InvoicesModel>,
-    { organizationId, payload: { id, fileName } }: Invoices.PreviewMilesAttachment
+    { invoiceId, organizationId, payload: { id, fileName } }: Invoices.PreviewMilesAttachment
   ): Observable<Blob | void> {
     return dispatch(
       new FileViewer.Open({
         fileName,
-        getPDF: () => this.manualInvoiceAttachmentsApiService.downloadMilesPDFAttachment(id, organizationId),
-        getOriginal: () => this.manualInvoiceAttachmentsApiService.downloadMilesAttachment(id, organizationId)
+        getPDF: () => this.manualInvoiceAttachmentsApiService.downloadMilesPDFAttachment(invoiceId, id, organizationId),
+        getOriginal: () => this.manualInvoiceAttachmentsApiService.downloadMilesAttachment(invoiceId, id, organizationId)
       })
     );
   }
@@ -591,9 +621,9 @@ export class InvoicesState {
   @Action(Invoices.DownloadMilesAttachment)
   DownloadMilesAttachment(
     { patchState, dispatch }: StateContext<InvoicesModel>,
-    { organizationId, payload: { id, fileName } }: Invoices.DownloadMilesAttachment
+    { invoiceId, organizationId, payload: { id, fileName } }: Invoices.DownloadMilesAttachment
   ): Observable<Blob | void> {
-    return this.manualInvoiceAttachmentsApiService.downloadMilesAttachment(id, organizationId)
+    return this.manualInvoiceAttachmentsApiService.downloadMilesAttachment(invoiceId, id, organizationId)
       .pipe(
         tap((file: Blob) => downloadBlobFile(file, fileName)),
         catchError(() => dispatch(
@@ -628,7 +658,7 @@ export class InvoicesState {
       targetState: stateId,
       organizationId: orgId,
     };
-    
+
     return this.invoicesAPIService.changeInvoiceStatus(body)
       .pipe(
         tap((res) => {

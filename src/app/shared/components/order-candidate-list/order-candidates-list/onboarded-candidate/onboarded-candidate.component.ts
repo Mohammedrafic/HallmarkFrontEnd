@@ -1,11 +1,14 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -51,7 +54,7 @@ import { DurationService } from '../../../../services/duration.service';
   providers: [MaskedDateTimeService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OnboardedCandidateComponent implements OnInit, OnDestroy {
+export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
 
   @Select(OrderManagementContentState.rejectionReasonsList)
@@ -105,11 +108,11 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   }
 
   get candidateStatus(): ApplicantStatusEnum {
-    return this.candidate.status || (this.candidate.candidateStatus as any);
+    return this.candidate?.status || (this.candidate?.candidateStatus as any);
   }
 
   get actualStartDateValue(): Date {
-    return this.form.controls['startDate'].value;
+    return this.form.controls['startDate']?.value;
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -123,7 +126,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     private orderCandidateListViewService: OrderCandidateListViewService,
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
-    private durationService: DurationService
+    private durationService: DurationService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -133,9 +137,15 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.subscribeOnDate();
     this.subscribeOnReasonsList();
     this.checkRejectReason();
-    this.subscribeOnSuccessRejection();
     this.subscribeOnUpdateOrganisationCandidateJobError();
     this.subscribeOnGetStatus();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    const { candidate } = changes;
+    if (candidate?.currentValue && !candidate?.isFirstChange()) {
+      this.getComments();
+    }
   }
 
   ngOnDestroy(): void {
@@ -148,6 +158,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       .getComments(this.candidateJob?.commentContainerId as number, null)
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
+        this.changeDetectorRef.markForCheck();
       });
   }
 
@@ -171,7 +182,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch([new RejectCandidateJob(payload), new ReloadOrganisationOrderCandidatesLists()]);
+      this.store.dispatch(new RejectCandidateJob(payload)).subscribe(() => {
+        this.form.disable();
+        this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+      });
       this.closeDialog();
     }
   }
@@ -206,10 +220,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
             orderId: this.candidateJob?.orderId as number,
             organizationId: this.candidateJob?.organizationId as number,
             jobId: this.candidateJob?.jobId as number,
-            nextApplicantStatus: {
-              applicantStatus: 60,
-              statusText: 'Onboard',
-            },
+            nextApplicantStatus: this.candidateJob?.applicantStatus,
             actualStartDate: this.candidateJob?.actualStartDate as string,
             actualEndDate: this.candidateJob?.actualEndDate as string,
             offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.availableStartDate as string),
@@ -315,9 +326,9 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
           rejectReason: value.rejectReason,
           offeredStartDate: this.getDateString(value.offeredStartDate),
         });
-
         this.switchFormState();
       }
+      this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -343,6 +354,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   private subscribeOnReasonsList(): void {
     this.rejectionReasonsList$.pipe(takeUntil(this.unsubscribe$)).subscribe((reasons) => {
       this.rejectReasons = reasons;
+      this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -351,15 +363,6 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       this.isRejected = true;
       this.form.disable();
     }
-  }
-
-  private subscribeOnSuccessRejection(): void {
-    this.actions$
-      .pipe(ofActionSuccessful(RejectCandidateForOrganisationSuccess), takeUntil(this.unsubscribe$))
-      .subscribe(() => {
-        this.form.disable();
-        this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-      });
   }
 
   private subscribeOnUpdateOrganisationCandidateJobError(): void {
@@ -373,9 +376,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   }
 
   private subscribeOnGetStatus(): void {
-    this.applicantStatuses$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: ApplicantStatus[]) => (this.nextApplicantStatuses = data));
+    this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ApplicantStatus[]) => {
+      this.nextApplicantStatuses = data;
+      this.changeDetectorRef.markForCheck();
+    });
   }
 
   private handleOnboardedCandidate(event: { itemData: { applicantStatus: ApplicantStatus } }): void {
@@ -400,7 +404,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       comments: new FormControl(''),
       workWeek: new FormControl('', [Validators.maxLength(50)]),
       clockId: new FormControl('', [Validators.maxLength(50)]),
-      offeredBillRate: new FormControl(''),
+      offeredBillRate: new FormControl('', [Validators.required]),
       allow: new FormControl(false),
       startDate: new FormControl(''),
       endDate: new FormControl(''),
@@ -420,6 +424,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.nextApplicantStatuses = [];
     this.orderCandidateListViewService.setIsCandidateOpened(false);
     this.form.markAsPristine();
+    this.changeDetectorRef.markForCheck();
   }
 
   private switchFormState(): void {

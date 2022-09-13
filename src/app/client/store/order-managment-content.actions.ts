@@ -242,7 +242,7 @@ export class GetContactDetails {
   constructor(public departmentId: number, public lastSelectedBusinessId?: number) {}
 }
 
-export class GetExtensions {
+export class GetOrganizationExtensions {
   static readonly type = '[order management] Get Extensions';
   constructor(public id: number, public orderId: number) {}
 }
@@ -250,4 +250,8 @@ export class GetExtensions {
 export class SetIsDirtyQuickOrderForm {
   static readonly type = '[order management] Set Quick Order Dirty';
   constructor(public isDirtyQuickOrderForm: boolean) {}
+}
+
+export class ClearOrderCandidatePage {
+  static readonly type = '[order management] Clear Order Candidate Page';
 }

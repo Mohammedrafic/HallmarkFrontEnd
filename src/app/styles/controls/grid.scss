@@ -4,96 +4,97 @@
 $grid-border-radius: 10px;
 $grid-box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
 
-.e-grid.e-resize-lines {
-  .e-headercell .e-rhandler {
-    height: 20px !important;
-    margin-top: 15px;
-  }
-}
-
-ejs-grid.e-control.e-grid {
-  border-radius: $grid-border-radius;
-  box-shadow: $grid-box-shadow;
-
-  &.e-default .e-row:last-child .e-rowcell {
-    border-bottom-width: 1px;
-  }
-
-  .e-spinner-pane {
-    display: none!important;
-  }
-
-  .checkbox-header {
-    .e-headercelldiv {
-      padding: 0 !important;
-      overflow: visible;
+body.light, body.dark {
+  .e-grid.e-resize-lines {
+    .e-headercell .e-rhandler {
+      height: 20px !important;
+      margin-top: 15px;
     }
   }
 
-  &.e-gridsubheader {
-    thead tr {
-      height: 25px !important;
+  ejs-grid.e-control.e-grid {
+    border-radius: $grid-border-radius;
+    box-shadow: $grid-box-shadow;
+
+    &.e-default .e-row:last-child .e-rowcell {
+      border-bottom-width: 1px;
     }
 
-    .e-gridheader table th[rowspan] {
-      padding-bottom: 16px;
+    .e-spinner-pane {
+      display: none!important;
     }
 
-    .sub-header, .e-stackedheadercell {
-      .e-rhandler.e-rcursor {
-        height: 100%;
-        margin-top: 2px;
+    .checkbox-header {
+      .e-headercelldiv {
+        padding: 0 !important;
+        overflow: visible;
       }
     }
-  }
 
-  .e-gridchkbox, .e-headercell {
-    .e-checkbox-wrapper {
-      vertical-align: middle;
+    &.e-gridsubheader {
+      thead tr {
+        height: 25px !important;
+      }
 
-      .e-frame {
-        width: 16px;
-        height: 16px;
-        border-radius: 2px;
-        line-height: 14px;
-        font-size: 10px;
+      .e-gridheader table th[rowspan] {
+        padding-bottom: 16px;
+      }
 
-        &.e-check {
-          background-color: #fff;
-          color: $primary-active-blue-10;
+      .sub-header, .e-stackedheadercell {
+        .e-rhandler.e-rcursor {
+          height: 100%;
+          margin-top: 2px;
         }
       }
     }
-  }
 
-  .e-gridheader {
-    .e-stackedheadercelldiv {
-      padding: 0;
-    }
-  }
+    .e-gridchkbox, .e-headercell {
+      .e-checkbox-wrapper {
+        vertical-align: middle;
 
-  &.e-gridwithheader {
-    border-top-left-radius: unset;
-    border-top-right-radius: unset;
-    .e-gridheader:not(.e-gridtoolbar) {
-      border-radius: unset;
-      border-top: none;
-    }
-  }
+        .e-frame {
+          width: 16px;
+          height: 16px;
+          border-radius: 2px;
+          line-height: 14px;
+          font-size: 10px;
 
-  .e-gridcontent {
-    .e-content {
-      .e-virtualtrack {
-        height: 0 !important;
-      }
-      .e-frozencontent {
-        .e-emptyrow {
-          display: none !important;
+          &.e-check {
+            background-color: #fff;
+            color: $primary-active-blue-10;
+          }
         }
       }
+    }
 
-      .e-table {
-        tr[role="row"]:not(.e-editedrow):hover
+    .e-gridheader {
+      .e-stackedheadercelldiv {
+        padding: 0;
+      }
+    }
+
+    &.e-gridwithheader {
+      border-top-left-radius: unset;
+      border-top-right-radius: unset;
+      .e-gridheader:not(.e-gridtoolbar) {
+        border-radius: unset;
+        border-top: none;
+      }
+    }
+
+    .e-gridcontent {
+      .e-content {
+        .e-virtualtrack {
+          height: 0 !important;
+        }
+        .e-frozencontent {
+          .e-emptyrow {
+            display: none !important;
+          }
+        }
+
+        .e-table {
+          tr[role="row"]:not(.e-editedrow):hover
           .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell),
           .e-frozenhover {
             background-color: $primary-active-blue-90;
@@ -122,421 +123,468 @@ ejs-grid.e-control.e-grid {
             display: none;
           }
         }
-      }
-    }
-  }
-
-  &.search-grid {
-    border: none;
-    box-shadow: none;
-
-    .e-gridheader {
-      display: none;
-    }
-  }
-
-  ejs-pager {
-    border-top: none;
-  }
-
-  .e-pager {
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-  }
-
-  .e-headercelldiv,
-  .e-stackedheadercelldiv {
-    font-size: 12px;
-    font-weight: 600;
-
-    .controls-header {
-      .icon-button {
-        padding: 10px;
-        border: none;
-
-        &.e-ripple {
-          position: initial;
-        }
-      }
-    }
-  }
-
-  .e-templatecell {
-    .e-grid-tool-buttons {
-      & > *:not(:first-child) {
-        margin-left: 20px;
-      }
-
-      .icon {
-        cursor: pointer;
-      }
-
-      .edit-button {
-        .icon {
-          color: $primary-active-blue-10;
-        }
-      }
-
-      .remove-button {
-        .icon {
-          color: $supportive-red;
         }
       }
     }
 
-    .row-tool-buttons {
-      button.e-control.e-btn {
-        i-feather {
-          margin: 0;
-        }
-      }
+    &.search-grid {
+      border: none;
+      box-shadow: none;
 
-      .default-icon-button,
-      .secondary-icon-button,
-      .primary-icon-button {
-        padding: 10px;
-        border: none;
-        &.e-ripple {
-          overflow: initial;
-          position: initial;
-          transform: none;
-        }
-      }
-
-      .default-icon-button {
-        color: $secondary_dark-blue-20;
-
-        &.e-active,
-        &:focus {
-          color: $white;
-          background-color: $primary-active-blue;
-        }
-
-        &:hover {
-          color: $primary-active-blue-10;
-          background-color: $primary-active-blue-70;
-        }
-
-        &[disabled] {
-          pointer-events: none;
-          background-color: transparent;
-          color: $secondary-dark-blue-40;
-        }
-      }
-
-      .secondary-icon-button {
-        color: $supportive-red;
-
-        &.e-active,
-        &:focus {
-          color: $white;
-          background-color: $supportive-red-00;
-        }
-
-        &:hover {
-          background-color: $supportive-red-40;
-
-          &.green-background {
-            background-color: $supportive-green-40;
-          }
-        }
-
-        &[disabled] {
-          pointer-events: none;
-          background-color: transparent;
-          color: $supportive-red-40;
-
-          app-custom-icon.icon.supportive-green-10 {
-            color: $supportive-green-40;
-          }
-        }
-      }
-
-      .primary-icon-button {
-        color: $primary-active-blue-10;
-
-        &.e-active,
-        &:focus {
-          color: $white;
-          background-color: $primary-active-blue;
-        }
-
-        &:hover {
-          color: $primary-active-blue-10;
-          background-color: $primary-active-blue-70;
-        }
-
-        &[disabled] {
-          pointer-events: none;
-          background-color: transparent;
-          color: $primary-active-blue-50;
-        }
-      }
-    }
-  }
-
-  .e-selectionbackground.e-active {
-    .row-tool-buttons {
-      .default-icon-button,
-      .secondary-icon-button,
-      .primary-icon-button {
-        &:hover {
-          background-color: $primary-active-blue-50;
-        }
-      }
-    }
-  }
-
-  .e-pagertemplate {
-    .content-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 51px;
-
-      .left-side-pager-controls {
-        display: flex;
-        margin-left: 16px;
-        align-items: center;
-
-        #goToPage {
-          margin-left: 35px;
-        }
-      }
-    }
-  }
-
-  thead tr {
-    height: 52px !important;
-  }
-
-  thead tr,
-  .e-gridheader {
-    border-radius: $grid-border-radius $grid-border-radius 0 0;
-
-    .e-headertext,
-    .e-stackedheadercelldiv {
-      text-transform: uppercase;
-      font-weight: 600;
-      color: $secondary-dark-blue-15;
-    }
-
-    .e-icon-ascending::before {
-      content: "\e910";
-    }
-
-    .e-icon-descending::before {
-      content: "\e916";
-    }
-  }
-
-  tbody {
-    .e-detailrow {
-      background-color: $secondary_dark-blue-50;
-
-      .e-detailindentcell,
-      .e-detailcell {
-        border: none;
-      }
-
-      .e-detailcell {
-        padding: 0;
-        td:last-child {
-          padding-right: 19px;
-          text-align: end;
-        }
-      }
-    }
-  }
-
-  tbody tr {
-    td.e-detailrowcollapse {
-      div.e-icons.e-dtdiagonalright.e-icon-grightarrow::before {
-        content: "\e913" !important;
+      .e-gridheader {
+        display: none;
       }
     }
 
-    td.e-detailrowexpand {
-      div.e-icons.e-dtdiagonaldown.e-icon-gdownarrow::before {
-        content: "\e916" !important;
-      }
-    }
-  }
-
-  td.e-active {
-    background-color: $primary-active-blue-70;
-    .subrow-toggle {
-      color: $white !important;
-    }
-  }
-
-  .e-frozenheader.e-frozen-right-header > .e-table {
-    border-left: none;
-  }
-
-  .e-frozencontent.e-frozen-right-content > .e-table {
-    border-left: 1px solid $grid-row-border;
-  }
-
-  .e-emptyrow {
-    .e-lastrowcell,
-    td {
-      padding-left: 21px;
-    }
-  }
-
-  &.e-gridwithchildrow {
-    .e-detailrowcollapse, .e-detailrowexpand, .e-detailheadercell {
-      visibility: hidden;
-    }
-
-    .e-detail-intent {
-      width: 0 !important;
-    }
-  }
-
-  .subrow-toggle {
-    color: $primary-active-blue-10;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-
-    i-feather {
-      margin-left: 4px;
-      width: 14px;
-      height: 14px;
-    }
-  }
-}
-
-
-.empty-grid {
-  background-color: $secondary-dark-blue-45 !important;
-  .e-emptyrow {
-    background-color: transparent !important;
-  }
-}
-
-.e-gridcustomheader {
-  box-shadow: $grid-box-shadow;
-  background-color: $white;
-  border: 1px solid $grid-row-border;
-  border-radius: 10px 10px 0 0;
-  height: 67px;
-  padding: 0 21px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-
-  .title h3 {
-    color: $title-black;
-    font-weight: 700;
-    font-size: 16px;
-    margin: 0;
-  }
-  .actions {
-    display: flex;
-
-    .action-link {
-      &:not(:first-child) {
-        margin-left: 12px;
-      }
-      @include linkWithIcon;
-    }
-  }
-}
-
-.table-block {
-  ejs-grid.e-control.e-grid {
-    border-radius: initial;
-
-    .e-headercontent {
-      border-right-color: transparent;
-    }
-
-    .e-gridheader {
-      border-top-color: transparent;
-    }
-  }
-}
-
-.table-block {
-  ejs-grid.e-control.e-grid {
-    border-radius: initial;
-
-    .e-headercontent {
-      border-right-color: transparent;
-    }
-
-    .e-gridheader {
-      border-top-color: transparent;
-    }
-  }
-}
-
-.table-block {
-  ejs-grid.e-control.e-grid {
-    border-radius: initial;
-
-    .e-headercontent {
-      border-right-color: transparent;
-    }
-
-    .e-gridheader {
-      border-top-color: transparent;
-    }
-  }
-}
-
-.timesheet-table-container {
-  ag-grid-angular {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-
-    .ag-header {
-      background-color: var(--grid-background-color);
-    }
-
-    .ag-root-wrapper {
+    ejs-pager {
       border-top: none;
     }
 
-    .ag-root-wrapper,
-    .ag-row,
-    .ag-header {
-      border-color: var(--grid-border-color);
+    .e-pager {
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
     }
 
-    .ag-cell {
-      padding-top: 10px;
-      padding-bottom: 10px;
+    .e-headercelldiv,
+    .e-stackedheadercelldiv {
+      font-size: 12px;
+      font-weight: 600;
 
-      &.ag-cell-inline-editing {
-        height: 40px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        margin-top: 12px;
+      .controls-header {
+        .icon-button {
+          padding: 10px;
+          border: none;
+
+          &.e-ripple {
+            position: initial;
+          }
+        }
       }
     }
 
-    .ag-row {
-      background-color: inherit;
+    .e-templatecell {
+      .e-grid-tool-buttons {
+        & > *:not(:first-child) {
+          margin-left: 20px;
+        }
+
+        .icon {
+          cursor: pointer;
+        }
+
+        .edit-button {
+          .icon {
+            color: $primary-active-blue-10;
+          }
+        }
+
+        .remove-button {
+          .icon {
+            color: $supportive-red;
+          }
+        }
+      }
+
+      .row-tool-buttons {
+        button.e-control.e-btn {
+          i-feather {
+            margin: 0;
+          }
+        }
+
+        .default-icon-button,
+        .secondary-icon-button,
+        .primary-icon-button {
+          padding: 10px;
+          border: none;
+          &.e-ripple {
+            overflow: initial;
+            position: initial;
+            transform: none;
+          }
+        }
+
+        .default-icon-button {
+          color: $secondary_dark-blue-20;
+
+          &.e-active,
+          &:focus {
+            color: $white;
+            background-color: $primary-active-blue;
+          }
+
+          &:hover {
+            color: $primary-active-blue-10;
+            background-color: $primary-active-blue-70;
+          }
+
+          &[disabled] {
+            pointer-events: none;
+            background-color: transparent;
+            color: $secondary-dark-blue-40;
+          }
+        }
+
+        .secondary-icon-button {
+          color: $supportive-red;
+
+          &.e-active,
+          &:focus {
+            color: $white;
+            background-color: $supportive-red-00;
+          }
+
+          &:hover {
+            background-color: $supportive-red-40;
+          }
+
+          &.green-background {
+
+            &:hover {
+              background-color: $supportive-green-40;
+            }
+
+          &:focus {
+            background-color: $supportive-green-15;
+
+            .supportive-green-10  {
+                color: $white;
+            }
+          }
+        }
+
+          &[disabled] {
+            pointer-events: none;
+            background-color: transparent;
+            color: $supportive-red-40;
+
+            app-custom-icon.icon.supportive-green-10 {
+              color: $supportive-green-40;
+            }
+          }
+        }
+
+        .primary-icon-button {
+          color: $primary-active-blue-10;
+
+          &.e-active,
+          &:focus {
+            color: $white;
+            background-color: $primary-active-blue;
+          }
+
+          &:hover {
+            color: $primary-active-blue-10;
+            background-color: $primary-active-blue-70;
+          }
+
+          &[disabled] {
+            pointer-events: none;
+            background-color: transparent;
+            color: $primary-active-blue-50;
+          }
+        }
+      }
     }
 
-    .ag-row-hover {
-      background-color: var(--grid-row-background-color-hover);
+    .e-selectionbackground.e-active {
+      .row-tool-buttons {
+        .default-icon-button,
+        .secondary-icon-button,
+        .primary-icon-button {
+          &:hover {
+            background-color: $primary-active-blue-50;
+          }
+        }
+      }
     }
 
-    .ag-header-cell-text {
-      text-transform: uppercase;
-      font-size: 12px;
+    .e-pagertemplate {
+      .content-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 51px;
+
+        .left-side-pager-controls {
+          display: flex;
+          margin-left: 16px;
+          align-items: center;
+
+          #goToPage {
+            margin-left: 35px;
+          }
+        }
+      }
+    }
+
+    thead tr {
+      height: 52px !important;
+    }
+
+    thead tr,
+    .e-gridheader {
+      border-radius: $grid-border-radius $grid-border-radius 0 0;
+
+      .e-headertext,
+      .e-stackedheadercelldiv {
+        text-transform: uppercase;
+        font-weight: 600;
+        color: $secondary-dark-blue-15;
+      }
+
+      .e-icon-ascending::before {
+        content: "\e910";
+      }
+
+      .e-icon-descending::before {
+        content: "\e916";
+      }
+    }
+
+    tbody {
+      .e-detailrow {
+        background-color: $secondary_dark-blue-50;
+
+        .e-detailindentcell,
+        .e-detailcell {
+          border: none;
+        }
+
+        .e-detailcell {
+          padding: 0;
+          td:last-child {
+            padding-right: 19px;
+            text-align: end;
+          }
+        }
+      }
+    }
+
+    tbody tr {
+      td.e-detailrowcollapse {
+        div.e-icons.e-dtdiagonalright.e-icon-grightarrow::before {
+          content: "\e913" !important;
+        }
+      }
+
+      td.e-detailrowexpand {
+        div.e-icons.e-dtdiagonaldown.e-icon-gdownarrow::before {
+          content: "\e916" !important;
+        }
+      }
+    }
+
+    td.e-active {
+      background-color: $primary-active-blue-70;
+      .subrow-toggle {
+        color: $white !important;
+      }
+    }
+
+    .e-frozenheader.e-frozen-right-header > .e-table {
+      border-left: none;
+    }
+
+    .e-frozencontent.e-frozen-right-content > .e-table {
+      border-left: 1px solid $grid-row-border;
+    }
+
+    .e-emptyrow {
+      .e-lastrowcell,
+      td {
+        padding-left: 21px;
+      }
+    }
+
+    &.e-gridwithchildrow {
+      .e-detailrowcollapse, .e-detailrowexpand, .e-detailheadercell {
+        visibility: hidden;
+      }
+
+      .e-detail-intent {
+        width: 0 !important;
+      }
+    }
+
+    .subrow-toggle {
+      color: $primary-active-blue-10;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+
+      i-feather {
+        margin-left: 4px;
+        width: 14px;
+        height: 14px;
+      }
     }
   }
 
+
+  .empty-grid {
+    background-color: $secondary-dark-blue-45 !important;
+    .e-emptyrow {
+      background-color: transparent !important;
+    }
+  }
+
+  .e-gridcustomheader {
+    box-shadow: $grid-box-shadow;
+    background-color: $white;
+    border: 1px solid $grid-row-border;
+    border-radius: 10px 10px 0 0;
+    height: 67px;
+    padding: 0 21px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    .title h3 {
+      color: $title-black;
+      font-weight: 700;
+      font-size: 16px;
+      margin: 0;
+    }
+    .actions {
+      display: flex;
+
+      .action-link {
+        &:not(:first-child) {
+          margin-left: 12px;
+        }
+        @include linkWithIcon;
+      }
+    }
+  }
+
+  .table-block {
+    ejs-grid.e-control.e-grid {
+      border-radius: initial;
+
+      .e-headercontent {
+        border-right-color: transparent;
+      }
+
+      .e-gridheader {
+        border-top-color: transparent;
+      }
+    }
+  }
+
+  .table-block {
+    ejs-grid.e-control.e-grid {
+      border-radius: initial;
+
+      .e-headercontent {
+        border-right-color: transparent;
+      }
+
+      .e-gridheader {
+        border-top-color: transparent;
+      }
+    }
+  }
+
+  .table-block {
+    ejs-grid.e-control.e-grid {
+      border-radius: initial;
+
+      .e-headercontent {
+        border-right-color: transparent;
+      }
+
+      .e-gridheader {
+        border-top-color: transparent;
+      }
+    }
+  }
+
+  .timesheet-table-container {
+    ag-grid-angular {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+
+      .ag-header {
+        background-color: var(--grid-background-color);
+      }
+
+      .ag-root-wrapper {
+        border-top: none;
+      }
+
+      .ag-root-wrapper,
+      .ag-row,
+      .ag-header {
+        border-color: var(--grid-border-color);
+      }
+
+      .ag-cell {
+        padding-top: 10px;
+        padding-bottom: 10px;
+
+        &.ag-cell-inline-editing {
+          height: 40px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          margin-top: 12px;
+        }
+      }
+
+      .ag-row {
+        background-color: inherit;
+      }
+
+      .ag-row-hover {
+        background-color: var(--grid-row-background-color-hover);
+      }
+
+      .ag-header-cell-text {
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+body.dark {
+  ejs-grid.e-control.e-grid {
+    tbody {
+      .e-detailrow {
+        background-color: $grid-detail-row-bgcolor;
+
+        .reorder-row:hover {
+          background-color: $grid-detail-row-bgcolor !important;
+        }
+
+        .candidate-row:hover {
+          background-color: $grid-detail-row-bgcolor !important;
+        }
+
+        .reorder-row .info .data,
+        .candidate-row .info .data {
+          color: $white !important;
+        }
+      }
+
+      td.e-active {
+        background-color: $grid-active-row-bgcolor;
+      }
+    }
+  }
+
+  .e-gridcustomheader {
+    background-color: $sidebar-background;
+    border:1px solid $grid-border-color;
+
+    .title h3 {
+      color: $white;
+    }
+  }
 }

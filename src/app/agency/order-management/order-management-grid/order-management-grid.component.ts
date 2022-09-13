@@ -185,6 +185,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onTabChange();
     this.onCommentRead();
     this.listenRedirectFromExtension();
+    this.listenRedirectFromPerDiem();
     this.listenRedirectFromReOrder();
   }
 
@@ -264,6 +265,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     if (this.selectedIndex) {
       this.gridWithChildRow.selectRow(this.selectedIndex);
     }
+    this.contentLoadedHandler();
 
     this.openPerDiemDetails();
     this.openMyAgencyTabWithCandidate();
@@ -515,13 +517,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.openPreview.next(true);
   }
 
-  selectReOrder(event: { reOrder: AgencyOrderManagement; order: Order | AgencyOrderManagement }): void {
+  public selectReOrder(event: { reOrder: AgencyOrderManagement; order: Order | AgencyOrderManagement }): void {
     const tabSwitchAnimation = 400;
-    const { reOrder, order } = event;
     const tabId = Object.values(AgencyOrderManagementTabs).indexOf(AgencyOrderManagementTabs.ReOrders);
     this.selectTab.emit(tabId);
     setTimeout(() => {
-      this.onOpenReorderDialog(reOrder, order as AgencyOrderManagement);
       this.detailsDialog.tab.select(0);
     }, tabSwitchAnimation);
   }
@@ -669,6 +669,20 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   private listenRedirectFromExtension(): void {
     this.orderManagementAgencyService.orderId$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean), debounceTime(300))
+      .subscribe((data: { id: number; prefix: string }) => {
+        this.orderId = data.id;
+        this.prefix = data.prefix;
+        this.filters.orderPublicId = this.prefix + '-' + this.orderId;
+        this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
+        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
+        this.filteredItems$.next(this.filteredItems.length);
+        this.dispatchNewPage();
+      });
+  }
+
+  private listenRedirectFromPerDiem(): void {
+    this.orderManagementAgencyService.reorderId$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean), debounceTime(300))
       .subscribe((data: { id: number; prefix: string }) => {
         this.orderId = data.id;

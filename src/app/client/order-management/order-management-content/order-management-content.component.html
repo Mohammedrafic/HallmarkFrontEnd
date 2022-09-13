@@ -4,7 +4,7 @@
   </ng-container>
   <ng-container right>
     <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
-    <button ejs-button cssClass="e-outline button-filter" (click)="showFilters()">
+    <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline button-filter" (click)="showFilters()">
       <div class="filter-button-content">
         <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{
           filteredItems.length
@@ -15,6 +15,7 @@
     <button
       *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates"
       ejs-dropdownbutton
+      appHideBeforeSyncfusionLoad
       [items]="exportOptions"
       (select)="exportSelected($event)"
       id="importButton"
@@ -22,7 +23,7 @@
     >
       Export <i-feather name="download" class="icon"></i-feather>
     </button>
-    <button ejs-button [isPrimary]="true" (click)="navigateToOrderForm()">Create Order</button>
+    <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToOrderForm()">Create Order</button>
   </ng-container>
 </app-page-toolbar>
 
@@ -51,7 +52,7 @@
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column headerTextAlign="Right" width="165">
         <ng-template #headerTemplate let-data>
-          <div class="controls-header">
+          <div class="controls-header" [class.hidden]="!isLoaded">
             <button
               ejs-button
               cssClass="e-flat icon-button"
@@ -81,7 +82,7 @@
           </div>
         </ng-template>
         <ng-template #template let-data>
-          <div *ngIf="!data?.isTemplate; else templateButtons" class="row-tool-buttons">
+          <div *ngIf="!data?.isTemplate; else templateButtons" [class.hidden]="!isLoaded" class="row-tool-buttons">
             <button
               *ngIf="
                 activeTab !== OrganizationOrderManagementTabs.Incomplete && orderTypes.OpenPerDiem === data.orderType
@@ -99,7 +100,7 @@
             </button>
             <button ejs-button cssClass="e-flat default-icon-button with-badge">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
-              <span *ngIf="data.unreadComments" class="e-badge e-badge-success e-badge-pill right-overflow">{{
+              <span *ngIf="data.unreadComments > 0" class="e-badge e-badge-success e-badge-pill right-overflow">{{
                 data.unreadComments
               }}</span>
             </button>
@@ -119,6 +120,7 @@
             <button
               (click)="$event.stopPropagation()"
               ejs-dropdownbutton
+              [disabled]="data.orderType === orderTypes.ReOrder && data.status === orderStatus.Closed"
               [items]="
                 (data.status === orderStatus.Closed && closedOrderMenu) ||
                 (activeTab === OrganizationOrderManagementTabs.ReOrders && getMenuForReorders(data)) ||
@@ -314,7 +316,7 @@
 
       <ng-template #defaultSubRow>
         <app-grid-subrow-candidate
-          *ngFor="let child of data.children"
+          *ngFor="let child of data.children; index as i"
           [candidat]="child"
           [order]="data"
           [selected]="
@@ -322,7 +324,7 @@
             selectedCandidate?.selected.positionId === child.positionId
           "
           [isAgency]="true"
-          (clickEvent)="onOpenCandidateDialog($event, data)"
+          (clickEvent)="onOpenCandidateDialog($event, data, i)"
         ></app-grid-subrow-candidate>
       </ng-template>
     </ng-template>
@@ -389,7 +391,7 @@
   (applyFilterClicked)="onFilterApply()"
   (closeDialogClicked)="onFilterClose()"
 >
-  <form [formGroup]="OrderFilterFormGroup">
+  <form [formGroup]="OrderFilterFormGroup" *ngIf="showFilterForm">
     <div class="bootstrap">
       <div class="input-container">
         <label for="orderId">{{

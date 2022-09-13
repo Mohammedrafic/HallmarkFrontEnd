@@ -55,19 +55,17 @@
             <e-tabitem>
               <ng-template #headerText>Order Details</ng-template>
               <ng-template #content>
-                  <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">
-                    <section class="job-details">
-                      <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
-                    </section>
+                <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">
+                  <section class="job-details">
+                    <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
+                  </section>
+                  <hr />
+                  <ng-container *ngIf="currentOrder?.orderClosureReasonId || candidate?.positionClosureReasonId">
+                    <app-order-close-reason-info [candidate]="candidate" [orderInformation]="currentOrder">
+                    </app-order-close-reason-info>
                     <hr />
-                    <ng-container *ngIf="currentOrder?.orderClosureReasonId || candidate?.positionClosureReasonId">
-                      <app-order-close-reason-info
-                        [candidate]="candidate"
-                        [orderInformation]="currentOrder">
-                      </app-order-close-reason-info>
-                      <hr />
-                    </ng-container>
-                    <app-order-details [isPosition]="true" [currentOrder]="currentOrder"></app-order-details>
+                  </ng-container>
+                  <app-order-details [isPosition]="true" [currentOrder]="currentOrder"></app-order-details>
                 </section>
               </ng-template>
             </e-tabitem>
@@ -84,7 +82,7 @@
                         [candidate]="$any(candidate)"
                         [isTab]="true"
                         (closeModalEvent)="onClose()"
-                        [orderDuration]="(selectedOrder$ | async)!.duration"
+                        [orderDuration]="(selectedOrder$ | async)?.duration!"
                       ></app-onboarded-candidate>
                       <section *ngIf="isReorderType" class="container onboarded-candidate-container">
                         <section class="header-container">
@@ -94,7 +92,7 @@
                                 {{ candidate?.lastName }}, {{ candidate?.firstName }}
                               </h3>
                               <ejs-chiplist
-                                *ngIf="candidate.candidateStatus"
+                                *ngIf="candidate?.candidateStatus"
                                 [text]="candidateStatus[candidate.candidateStatus]"
                               >
                                 <e-chips>
@@ -108,11 +106,7 @@
                         </section>
                         <section class="content-container">
                           <div class="job-details">
-                            <ejs-accordion
-                              #accordionElement
-                              expandMode="Single"
-                              openFirstAccordion
-                            >
+                            <ejs-accordion #accordionElement expandMode="Single" openFirstAccordion>
                               <e-accordionitems>
                                 <e-accordionitem expanded="true">
                                   <ng-template #header>
@@ -166,6 +160,7 @@
                         [candidate]="$any(candidate)"
                         [isTab]="true"
                         (closeModalEvent)="onClose()"
+                        [isAgency]="isAgency"
                       ></app-accept-candidate>
                     </ng-container>
 
@@ -173,7 +168,7 @@
                       <app-apply-candidate
                         [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
                         [candidate]="$any(candidate)"
-                        [order]="$any((selectedOrder$ | async))"
+                        [order]="$any(selectedOrder$ | async)"
                         [isTab]="true"
                       >
                       </app-apply-candidate>
@@ -188,9 +183,7 @@
 
                   <ng-template #extensionCandidate>
                     <section class="container onboarded-candidate-container">
-                      <app-extension-candidate
-                        [dialogEvent]="$any(openEvent)"
-                        [currentOrder]="order">
+                      <app-extension-candidate [dialogEvent]="$any(openEvent)" [currentOrder]="order">
                       </app-extension-candidate>
                     </section>
                   </ng-template>

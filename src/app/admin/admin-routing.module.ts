@@ -86,7 +86,10 @@ const routes: Routes = [
       },
       {
         path: 'analytics',
-        component: AnalyticsComponent
+        component: AnalyticsComponent,
+        data: {
+          isOrganizationArea: true,
+        },
       },
       {
         path: ':profile',

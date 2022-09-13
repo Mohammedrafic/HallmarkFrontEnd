@@ -9,6 +9,7 @@ import { Select, Store } from '@ngxs/store';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import {
   ContextMenuComponent,
+  MenuItemModel,
   NodeSelectEventArgs,
   SidebarComponent,
   TreeViewComponent,
@@ -22,7 +23,6 @@ import { User } from '../shared/models/user.model';
 import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
 import { GetUserMenuConfig, LogoutUser } from '../store/user.actions';
 import { UserState } from '../store/user.state';
-import { ItemModel } from '@syncfusion/ej2-angular-splitbuttons';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
@@ -32,6 +32,14 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 enum THEME {
   light = 'light',
   dark = 'dark',
+}
+enum profileMenuItem {
+  edit_profile = 0,
+  theme = 1,
+  help=2,
+  log_out = 3,
+  light_theme = 4,
+  dark_theme=5
 }
 
 @Component({
@@ -98,14 +106,17 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   public isSearching: boolean = false;
   public isMaximized: boolean = true;
   public searchHeight: number;
-
+  public ProfileMenuItemNames = {
+    [profileMenuItem.edit_profile]: 'Edit Profile',
+    [profileMenuItem.theme]: 'Theme',
+    [profileMenuItem.help]: 'Help',
+    [profileMenuItem.log_out]: 'LogOut',
+    [profileMenuItem.light_theme]: "Light",
+    [profileMenuItem.dark_theme]: "Dark"
+  }
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
-  profileDatasource: ItemModel[] = [
-    { text: 'Edit Profile', id: '0', iconCss: 'e-ddb-icons e-settings' },
-
-    { text: 'LogOut', id: '1', iconCss: 'e-ddb-icons e-logout' },
-  ];
+  profileDatasource: MenuItemModel[] = []; 
   private routers: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
 
   faTimes = faTimes as IconDefinition;
@@ -139,6 +150,21 @@ export class ShellPageComponent implements OnInit, OnDestroy {
         this.userLogin = user;
         this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
         this.getAlertsForUser();
+        this.profileDatasource = [
+          {
+            text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
+            items: [{ text: this.ProfileMenuItemNames[profileMenuItem.edit_profile], id: profileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },
+            {
+              text: this.ProfileMenuItemNames[profileMenuItem.theme], id: profileMenuItem.theme.toString(), iconCss: this.isDarkTheme ?'e-theme-dark e-icons': 'e-theme-light e-icons', items: [
+                { text: this.ProfileMenuItemNames[profileMenuItem.light_theme], id: profileMenuItem.light_theme.toString() },
+                { text: this.ProfileMenuItemNames[profileMenuItem.dark_theme], id: profileMenuItem.dark_theme.toString() }
+              ]
+              },
+              { text: this.ProfileMenuItemNames[profileMenuItem.help], id: profileMenuItem.help.toString(), iconCss: 'e-circle-info e-icons' },
+              { text: this.ProfileMenuItemNames[profileMenuItem.log_out], id: profileMenuItem.log_out.toString(), iconCss: 'e-ddb-icons e-logout' }]
+          },
+
+        ];
       }
     });
   }
@@ -159,10 +185,20 @@ export class ShellPageComponent implements OnInit, OnDestroy {
 
   onSelectProfileMenu(event: any) {
     switch (Number(event.item.properties.id)) {
-      case 0:
+      case profileMenuItem.edit_profile:
         break;
-
-      case 1:
+      case profileMenuItem.light_theme:
+        this.isDarkTheme = true;
+        this.toggleTheme();
+        break;
+      case profileMenuItem.dark_theme:
+        this.isDarkTheme = false;
+        this.toggleTheme();
+        break;
+      case profileMenuItem.help:
+        this.onGetHelp();
+        break;
+      case profileMenuItem.log_out:
         this.logout();
         break;
     }

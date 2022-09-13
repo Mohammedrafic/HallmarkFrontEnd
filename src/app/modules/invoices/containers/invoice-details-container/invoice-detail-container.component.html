@@ -13,7 +13,7 @@
         <div class="flex flex-column">
           <h3 class="username">Invoice ID {{ invoiceDetail.meta.formattedInvoiceNumber }}</h3>
           <div class="wrapper">
-            <ejs-chiplist *ngIf="!isAgency" #chipList>
+            <ejs-chiplist #chipList>
               <e-chips>
                 <e-chip
                   [text]="invoiceDetail.meta.invoiceStateText"
@@ -21,7 +21,7 @@
                 </e-chip>
               </e-chips>
             </ejs-chiplist>
-            <div [class.spaced]="isAgency" class="grouped">
+            <div class="grouped">
               By {{ invoiceDetail.meta.aggregateByTypeText }}
             </div>
           </div>
@@ -33,7 +33,6 @@
           <app-export-button (optionSelected)="export($event)"></app-export-button>
           <button
             ejs-button
-            [disabled]="isApproveDisable"
             cssClass="e-outline print-btn"
             (click)="handlePrint()">
             Print

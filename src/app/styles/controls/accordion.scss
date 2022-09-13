@@ -67,7 +67,7 @@ body.dark {
       &.e-select.e-expand-state {
         & > .e-acrdn-header {
           border-color: $primary-active-blue-10 !important;
-          background: $primary-active-blue-90 !important;
+          background: $primary-active-blue-90;
 
           &:hover {
             background: $primary-active-blue-80 !important;

@@ -38,8 +38,8 @@ import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.
 import { GetAgencyExtensions, GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import {
   GetAvailableSteps,
-  GetExtensions,
   GetOrganisationCandidateJob,
+  GetOrganizationExtensions,
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
@@ -299,10 +299,10 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
     if (isAgencyArea) {
       this.store.dispatch(
-        new GetAgencyExtensions(this.candidateJob?.jobId, this.selectedOrder.id!, this.candidateJob?.organizationId!)
+        new GetAgencyExtensions(this.candidateJob?.jobId, this.selectedOrder?.id!, this.candidateJob?.organizationId!)
       );
     } else {
-      this.store.dispatch(new GetExtensions(this.candidateJob?.jobId, this.order.id));
+      this.store.dispatch(new GetOrganizationExtensions(this.candidateJob?.jobId, this.order.id));
     }
   }
 
@@ -334,13 +334,15 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   private setAddExtensionBtnState(candidate: OrderManagementChild): void {
     const isOrderTravelerOrContractToPerm =
       this.order.orderType === OrderType.Traveler || this.order.orderType === OrderType.ContractToPerm;
-    const isOrderFilledOrProgress =
-      this.order.status === OrderStatus.Filled || this.order.status === OrderStatus.InProgress;
+    const isOrderFilledOrProgressOrClosed =
+      this.order.status === OrderStatus.Filled ||
+      this.order.status === OrderStatus.InProgress ||
+      this.order.status === OrderStatus.Closed;
     const dateAvailable = candidate.closeDate
       ? addDays(candidate.closeDate, 14)?.getTime()! >= new Date().getTime()
       : true;
     this.isAddExtensionBtnAvailable =
-      this.isOrganization && isOrderFilledOrProgress && dateAvailable && isOrderTravelerOrContractToPerm;
+      this.isOrganization && isOrderFilledOrProgressOrClosed && dateAvailable && isOrderTravelerOrContractToPerm;
   }
 
   private getTemplate(): void {

@@ -16,13 +16,21 @@ import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-conf
 export class OrganizationInvoicesContainerService extends InvoicesContainerService {
   public getColDefsByTab(
     tabIndex: OrganizationInvoicesGridTab,
-    { organizationId }: { organizationId: number | null }
+    { organizationId }: { organizationId: number }
   ): ColDef[] {
     switch (tabIndex) {
       case OrganizationInvoicesGridTab.Manual:
         return ManualInvoicesGridHelper.getOrganizationColDefs({
-          approve: ({ id }: ManualInvoice) => this.store.dispatch(new Invoices.ApproveInvoice(id)),
-          reject: ({ id }: ManualInvoice) => this.store.dispatch(new Invoices.ShowRejectInvoiceDialog(id)),
+          approve: ({ id }: ManualInvoice) =>
+            this.store.dispatch(new Invoices.ApproveInvoice(id))
+              .subscribe(
+                () => this.store.dispatch(new Invoices.CheckManualInvoicesExist(organizationId))
+              ),
+          reject: ({ id }: ManualInvoice) =>
+            this.store.dispatch(new Invoices.ShowRejectInvoiceDialog(id))
+              .subscribe(
+                () => this.store.dispatch(new Invoices.CheckManualInvoicesExist(organizationId))
+              ),
           previewAttachment: (attachment) => this.store.dispatch(
             new Invoices.PreviewAttachment(organizationId, attachment)
           ),
@@ -113,11 +121,11 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
           downloadExpensesAttachment: (attachment: InvoiceAttachment) => this.store.dispatch(
             new Invoices.DownloadAttachment(organizationId, attachment),
           ),
-          previewMilesAttachments: (attachment: InvoiceAttachment) => this.store.dispatch(
-            new Invoices.PreviewMilesAttachment(organizationId, attachment)
+          previewMilesAttachments: (invoiceId: number) => (attachment: InvoiceAttachment) => this.store.dispatch(
+            new Invoices.PreviewMilesAttachment(invoiceId, organizationId, attachment)
           ),
-          downloadMilesAttachments: (attachment: InvoiceAttachment) => this.store.dispatch(
-            new Invoices.DownloadMilesAttachment(organizationId, attachment)
+          downloadMilesAttachments: (invoiceId: number) => (attachment: InvoiceAttachment) => this.store.dispatch(
+            new Invoices.DownloadMilesAttachment(invoiceId, organizationId, attachment)
           ),
         });
       case OrganizationInvoicesGridTab.PendingApproval:

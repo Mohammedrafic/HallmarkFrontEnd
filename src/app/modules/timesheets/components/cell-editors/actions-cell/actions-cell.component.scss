@@ -1,8 +1,14 @@
+@import '../../../../../styles/variables/colors';
+
 .remove-button {
-  color: #FF5858
+  color: #FF5858;
 }
 
-.actions-container {
+.upload-button {
+  color: $secondary-dark-blue-20;
+}
+
+.custom-btn {
   &.disabled {
     opacity: 0.5;
   }

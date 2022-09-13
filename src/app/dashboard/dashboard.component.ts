@@ -35,6 +35,7 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { DashboartFilterDto } from './models/dashboard-filter-dto.model';
 import { User } from '@shared/models/user.model';
 import { AllOrganizationsSkill } from './models/all-organization-skill.model';
+import { AppState } from '../store/app.state';
 
 @Component({
   selector: 'app-dashboard',
@@ -64,6 +65,9 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(UserState.user) public readonly user$: Observable<User | null>;
 
   @Select(SecurityState.organisations) public readonly allOrganizations$: Observable<UserStateModel['organizations']>;
+
+  @Select(AppState.isDarkTheme)
+  isDarkTheme$: Observable<boolean>;
 
   private panelsAreDragged = false;
   private readonly filterData$: BehaviorSubject<DashboartFilterDto> = new BehaviorSubject<DashboartFilterDto>({organizationFilter: []});

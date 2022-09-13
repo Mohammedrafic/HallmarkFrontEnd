@@ -6,6 +6,7 @@
     <section>
       <button
         ejs-button
+        appHideBeforeSyncfusionLoad
         id="filterButton"
         cssClass="e-outline button-filter"
         (click)="showFilters()">
@@ -28,6 +29,8 @@
     [resizeSettings]="resizeSettings"
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
+    (dataBound)="gridDataBound(grid)"
+    (actionBegin)="actionBegin($event, grid)"
     class="grid-component"
   >
     <ng-template #detailTemplate let-data>
@@ -78,7 +81,7 @@
     <e-columns>
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
-          <div class="row-tool-buttons">
+          <div class="row-tool-buttons" [class.hidden]="!isLoaded">
             <button
               ejs-button
               cssClass="e-flat primary-icon-button"

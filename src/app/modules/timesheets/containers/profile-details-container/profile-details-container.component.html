@@ -8,7 +8,7 @@
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
-    <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails">
+    <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails; else closeTemplate">
       <div class="profile-details-header">
         <ng-container>
             <img class="e-avatar e-avatar-xlarge" alt="avatar" [src]="timesheetDetails.candidateId | candidateAvatar"/>
@@ -32,6 +32,7 @@
                 >
                 </e-chip>
                 <e-chip
+                  *ngIf="isMileageStatusAvailable"
                   [text]="timesheetDetails.mileageStatusText"
                   [cssClass]="timesheetDetails.mileageStatusText || '' | chipsCssClass"
                 >
@@ -69,7 +70,7 @@
           <button ejs-button type="submit" cssClass="e-flat close-button" (click)="handleProfileClose()">
             <i-feather name="x" class="icon"></i-feather>
           </button>
-       </div>
+        </div>
       </div>
 
       <div class="order-header">
@@ -130,6 +131,7 @@
           [timesheetDetails]="timesheetDetails"
           [actionsDisabled]="timesheetDetails.noWorkPerformed"
           (openAddSideDialog)="openAddDialog($event)"
+          (uploadSideDialog)="openUploadSideDialog($event)"
           (changesSaved)="handleEditChanges($event)"
           (rejectEvent)="onRejectButtonClick($event)"
           (approveEvent)="handleApprove($event)"
@@ -138,8 +140,14 @@
       </section>
 
     </section>
+    <ng-template #closeTemplate>
+      <section class="container d-flex justify-end">
+        <button ejs-button type="submit" cssClass="e-flat close-button" (click)="handleProfileClose()">
+          <i-feather name="x" class="icon"></i-feather>
+        </button>
+      </section>
+    </ng-template>
     <app-navigation-panel
-            *ngIf="isNavigationAvaliable"
             prevLabel="Previous Timesheet"
             nextLabel="Next Timesheet"
             [prevDisabled]="currentSelectedRowIndex === 0"
@@ -157,6 +165,8 @@
 ></app-reject-reason-input-dialog>
 
 <app-add-timesheet></app-add-timesheet>
+
+<app-upload-documents (fileChange)="saveFilesOnRecord($event)"></app-upload-documents>
 
 <app-export-dialog
         [columns]="columnsToExport"

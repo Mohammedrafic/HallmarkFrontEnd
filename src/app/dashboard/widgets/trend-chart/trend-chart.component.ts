@@ -11,6 +11,7 @@ import { PositionTrend } from '../../models/position-trend.model';
 })
 export class TrendChartComponent extends AbstractSFComponentDirective<ChartComponent> {
   @Input() public widget: PositionTrend | undefined;
+  @Input() public isDarkTheme: boolean;
 
   public primaryXAxis: AxisModel = {
     valueType: 'Category',
@@ -25,6 +26,6 @@ export class TrendChartComponent extends AbstractSFComponentDirective<ChartCompo
   public chartArea: ChartAreaModel = {
     border: {
       width: 0,
-    },
+    }
   };
 }

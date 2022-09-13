@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ChangeDet
 
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { EMPTY, merge, Observable, Subject } from 'rxjs';
+import { EMPTY, merge, Observable, Subject, map, mergeMap, takeUntil, takeWhile } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
@@ -17,26 +17,30 @@ import {
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
   GetCandidateJob,
+  GetRejectReasonsForAgency,
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
+  RejectCandidateJob as RejectCandidateJobAgency,
+  RejectCandidateForAgencySuccess,
 } from '@agency/store/order-management.actions';
 import { DatePipe } from '@angular/common';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import PriceUtils from '@shared/utils/price.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
-import { map, takeUntil } from 'rxjs/operators';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { Router } from '@angular/router';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
   GetRejectReasonsForOrganisation,
+  RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { capitalize } from 'lodash';
 import { DurationService } from '@shared/services/duration.service';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({
   selector: 'app-extension-candidate',
@@ -45,7 +49,7 @@ import { DurationService } from '@shared/services/duration.service';
   providers: [MaskedDateTimeService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ExtensionCandidateComponent implements OnInit, OnDestroy {
+export class ExtensionCandidateComponent extends DestroyableDirective implements OnInit {
   @Input() currentOrder: Order;
   @Input() candidateOrder: OrderCandidatesListPage;
   @Input() dialogEvent: Subject<boolean>;
@@ -60,7 +64,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
 
-  public rejectReasons: RejectReason[];
+  public rejectReasons$: Observable<RejectReason[]>;
   public form: FormGroup;
   public statusesFormControl = new FormControl();
   public candidateJob: OrderCandidateJob;
@@ -75,8 +79,6 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
   ];
   public isAgency: boolean = false;
-
-  private unsubscribe$: Subject<void> = new Subject();
 
   public comments: Comment[] = [];
 
@@ -102,6 +104,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store,
+    private action$: Actions,
     private datePipe: DatePipe,
     private commentsService: CommentsService,
     private router: Router,
@@ -109,18 +112,15 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     private durationService: DurationService,
     private changeDetectorRef: ChangeDetectorRef
   ) {
+    super();
     this.isAgency = this.router.url.includes('agency');
   }
 
   ngOnInit(): void {
     this.subsToCandidate();
-    this.subscribeOnReasonsList();
+    this.rejectReasons$ = this.subscribeOnReasonsList();
     this.createForm();
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.onRejectSuccess();
   }
 
   public updateOrganizationCandidateJobWithBillRate(bill: BillRate): void {
@@ -134,6 +134,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
           jobId: this.candidateJob.jobId,
           skillName: value.skillName,
           offeredBillRate: this.candidateJob?.offeredBillRate,
+          offeredStartDate: this.candidateJob?.offeredStartDate,
           candidateBillRate: this.candidateJob.candidateBillRate,
           nextApplicantStatus: {
             applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
@@ -170,7 +171,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
   }
 
   public onReject(): void {
-    this.store.dispatch(new GetRejectReasonsForOrganisation());
+    this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
   }
 
@@ -182,7 +183,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
         rejectReasonId: event.rejectReason,
       };
 
-      this.store.dispatch(new RejectCandidateJob(payload));
+      this.store.dispatch(this.isAgency ? [new RejectCandidateJobAgency(payload)] : [new RejectCandidateJob(payload)]);
       this.dialogEvent.next(false);
     }
   }
@@ -231,13 +232,13 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
       candidate.status === ApplicantStatusEnum.Accepted
         ? [
             { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
-            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
+            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
           ]
         : candidate.status === ApplicantStatusEnum.OnBoarded
         ? [{ applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) }]
         : [
             { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
+            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
           ];
   }
 
@@ -278,6 +279,7 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
         requestComment: value.comments,
         actualStartDate: new Date(value.actualStartDate).toISOString(),
         actualEndDate: new Date(value.actualEndDate).toISOString(),
+        offeredStartDate: this.candidateJob?.offeredStartDate,
         allowDeployWoCredentials: value.allowDeployCredentials,
         billRates: this.billRatesData,
         guaranteedWorkWeek: value.guaranteedWorkWeek,
@@ -385,15 +387,24 @@ export class ExtensionCandidateComponent implements OnInit, OnDestroy {
     }
   }
 
-  private subscribeOnReasonsList(): void {
-    merge(
+  private subscribeOnReasonsList(): Observable<RejectReason[]> {
+    return merge(
       this.store.select(OrderManagementContentState.rejectionReasonsList),
       this.store.select(OrderManagementState.rejectionReasonsList)
-    )
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((reasons) => {
-        this.rejectReasons = reasons ?? [];
-      });
+    ).pipe(map((reasons) => reasons ?? []));
+  }
+
+  private onRejectSuccess(): void {
+    merge(
+      this.action$.pipe(
+        ofActionSuccessful(RejectCandidateForOrganisationSuccess),
+        mergeMap(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()))
+      ),
+      this.action$.pipe(
+        ofActionSuccessful(RejectCandidateForAgencySuccess),
+        mergeMap(() => this.store.dispatch(new ReloadOrderCandidatesLists()))
+      )
+    ).pipe(takeUntil(this.destroy$)).subscribe();
   }
 }
 

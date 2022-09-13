@@ -32,9 +32,9 @@
             <label>State</label>
             <div class="input-group dropdown">
               <ejs-dropdownlist appValidateWithMessage
+                                [fields]="optionFields"
                                 formControlName="state"
                                 [dataSource]="states$ | async">
-
               </ejs-dropdownlist>
             </div>
           </div>

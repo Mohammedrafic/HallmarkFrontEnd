@@ -6,6 +6,7 @@ import { catchError, Observable, of, tap } from 'rxjs';
 import {
   ApproveOrder,
   ClearHistoricalData,
+  ClearOrderCandidatePage,
   ClearOrders,
   ClearPredefinedBillRates,
   ClearSelectedOrder,
@@ -20,12 +21,12 @@ import {
   GetAssociateAgencies,
   GetAvailableSteps,
   GetContactDetails,
-  GetExtensions,
   GetHistoricalData,
   GetOrderById,
   GetOrderFilterDataSources,
   GetOrders,
   GetOrganisationCandidateJob,
+  GetOrganizationExtensions,
   GetOrganizationStatesWithKeyCode,
   GetPredefinedBillRates,
   GetProjectNames,
@@ -148,7 +149,7 @@ export interface OrderManagementContentStateModel {
     isDirtyQuickOrderForm: false,
     rejectionReasonsList: null,
     orderFilterDataSources: null,
-    historicalEvents: null,
+    historicalEvents: [],
     navigationTab: {
       active: null,
       pending: null,
@@ -241,14 +242,16 @@ export class OrderManagementContentState {
   }
 
   @Selector()
-  static lastSelectedOrder(state: OrderManagementContentStateModel): (id: number) => [OrderManagement, number] | [] {
+  static lastSelectedOrder(
+    state: OrderManagementContentStateModel
+  ): (id: number) => [OrderManagement, number | undefined] | [] {
     return (id: number) => {
       let rowIndex;
       const order = state.ordersPage?.items.find((order, index) => {
         rowIndex = index;
         return order.id === id;
       });
-      return order && rowIndex ? [order, rowIndex] : [];
+      return order ? [order, rowIndex] : [];
     };
   }
 
@@ -373,6 +376,11 @@ export class OrderManagementContentState {
           return payload;
         })
       );
+  }
+
+  @Action(ClearOrderCandidatePage)
+  ClearOrderCandidatePage({ patchState }: StateContext<OrderManagementContentStateModel>): void {
+    patchState({ orderCandidatesListPage: null });
   }
 
   @Action(GetSelectedOrderById)
@@ -610,8 +618,8 @@ export class OrderManagementContentState {
               lastSelectedOrganizationId: Number(payload.organizationId),
               lastSelectedAgencyId: null,
             },
-            true,
-          )
+            true
+          ),
         ]);
 
         return payload;
@@ -697,7 +705,7 @@ export class OrderManagementContentState {
 
   @Action(GetHistoricalData)
   GetHistoricalData(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
     { organizationId, candidateJobId }: GetHistoricalData
   ): Observable<HistoricalEvent[]> {
     return this.orderManagementService.getHistoricalData(organizationId, candidateJobId).pipe(
@@ -706,7 +714,7 @@ export class OrderManagementContentState {
         return payload;
       }),
       catchError(() => {
-        patchState({ historicalEvents: [] });
+        dispatch(new ClearHistoricalData());
         return of();
       })
     );
@@ -772,10 +780,10 @@ export class OrderManagementContentState {
     );
   }
 
-  @Action(GetExtensions)
-  GetExtensions(
+  @Action(GetOrganizationExtensions)
+  GetOrganizationExtensions(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { id, orderId }: GetExtensions
+    { id, orderId }: GetOrganizationExtensions
   ): Observable<ExtensionGridModel[]> {
     return this.extensionSidebarService
       .getExtensions(id, orderId)

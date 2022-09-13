@@ -25,3 +25,7 @@ export interface DownloadAttachmentRequestData {
   fileId: number;
   organizationId: number | null;
 }
+
+export interface DownloadRecordAttachmentRequestData extends DownloadAttachmentRequestData {
+  timesheetRecordId: number;
+}

@@ -173,6 +173,16 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       .subscribe(({ candidateStatuses, masterSkills, orderStatuses, partneredOrganizations }) => {
         let statuses = [];
         let candidateStatusesData = [];
+        const statusesByDefault = [
+          CandidatStatus.Applied,
+          CandidatStatus.Shortlisted,
+          CandidatStatus.Offered,
+          CandidatStatus.Accepted,
+          CandidatStatus.OnBoard,
+          CandidatStatus.Withdraw,
+          CandidatStatus.Offboard,
+          CandidatStatus.Rejected,
+        ];
         if (this.activeTab === AgencyOrderManagementTabs.ReOrders) {
           statuses = orderStatuses.filter((status) =>
             [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status)
@@ -189,19 +199,10 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           statuses = orderStatuses.filter((status) =>
             [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status)
           );
-          candidateStatusesData = candidateStatuses.filter((status) =>
-            [
-              CandidatStatus['Not Applied'],
-              CandidatStatus.Applied,
-              CandidatStatus.Offered,
-              CandidatStatus.Accepted,
-              CandidatStatus.OnBoard,
-              CandidatStatus.Rejected,
-            ].includes(status.status)
-          );
+          candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         } else {
           statuses = orderStatuses;
-          candidateStatusesData = candidateStatuses;
+          candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         }
 
         this.filterColumns.organizationIds.dataSource = partneredOrganizations;

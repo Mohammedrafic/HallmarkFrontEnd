@@ -20,6 +20,7 @@
     </div>
     <button
       ejs-button
+      appHideBeforeSyncfusionLoad
       cssClass="e-outline button-filter button--no-wrap"
       (click)="showFilters()">
       <div class="filter-button-content">
@@ -43,6 +44,7 @@
     <div class="invoices-actions-container">
       <button
         ejs-button
+        appHideBeforeSyncfusionLoad
         class="e-primary"
         (click)="openAddDialog()"
         *ngIf="tabConfig?.manualInvoiceCreationEnabled"
@@ -73,7 +75,7 @@
                    position="BottomCenter"
                    [opensOn]="!groupingInvoiceRecordsIds.length ? 'Auto' : 'Custom'">
         <div class="invoices-split-button" *ngIf="tabConfig?.groupingEnabled">
-          <button ejs-button cssClass="e-primary"
+          <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-primary"
                   class="main-button"
                   [disabled]="!groupingInvoiceRecordsIds.length"
                   (click)="groupInvoices()">

@@ -29,6 +29,7 @@ import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/expor
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
+import { AppState } from '../../../store/app.state';
 
 enum Active {
   No,
@@ -57,6 +58,9 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   public bussinesData$: Observable<BusinessUnit[]>;
   @Select(SecurityState.permissionsTree)
   public permissionsTree$: Observable<PermissionsTree>;
+
+  @Select(AppState.isDarkTheme)
+  isDarkTheme$: Observable<boolean>;
 
   public activeValueAccess = (_: string, { isActive }: Role) => {
     return Active[Number(isActive)];

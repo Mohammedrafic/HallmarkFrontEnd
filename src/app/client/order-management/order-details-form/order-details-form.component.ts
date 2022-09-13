@@ -8,12 +8,12 @@ import {
   debounceTime,
   filter,
   Observable,
+  skip,
   Subject,
+  switchMap,
   take,
   takeUntil,
   throttleTime,
-  switchMap,
-  skip,
 } from 'rxjs';
 
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
@@ -519,6 +519,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.getFormData();
+    this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
     this.resetFormAfterSwichingOrganization();
 
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
@@ -617,13 +618,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     }
     this.orderManagementService
       .getRegularLocalBillRate(orderType, departmentId, skillId)
-      .pipe(
-        takeUntil(this.unsubscribe$),
-        filter((billRate) => !!billRate.length)
-      )
-      .subscribe((billRates: BillRate[]) =>
-        this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour.toFixed(2))
-      );
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((billRates: BillRate[]) => {
+        if (billRates.length) {
+          this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour.toFixed(2));
+        } else {
+          this.generalInformationForm.controls['hourlyRate'].patchValue('');
+        }
+      });
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -862,8 +864,12 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     if (this.isPermPlacementOrder)
       this.generalInformationForm.patchValue({
         orderPlacementFee: order?.orderPlacementFee,
-        annualSalaryRangeFrom: order?.annualSalaryRangeFrom,
-        annualSalaryRangeTo: order?.annualSalaryRangeTo,
+        annualSalaryRangeFrom: order?.annualSalaryRangeFrom
+          ? parseFloat(order.annualSalaryRangeFrom.toString()).toFixed(2)
+          : '',
+        annualSalaryRangeTo: order?.annualSalaryRangeTo
+          ? parseFloat(order.annualSalaryRangeTo.toString()).toFixed(2)
+          : '',
       });
   }
 
@@ -1073,7 +1079,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     }
     if (order.orderType === OrderType.OpenPerDiem && order.status === OrderStatus.Open) {
       this.handlePerDiemOrder();
-      this.generalInformationForm = disableControls(this.generalInformationForm, controlNames, false);
+      this.generalInformationForm = disableControls(this.generalInformationForm, ['title', ...controlNames], false);
     }
 
     Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
@@ -1095,6 +1101,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.orderTypeForm.controls['orderType'].patchValue(OrderType.Traveler);
     this.generalInformationForm.controls['duration'].patchValue(Duration.ThirteenWeeks);
     this.jobDistributionForm.controls['jobDistribution'].patchValue([JobDistribution.All]);
+
+    const contactDetails = (this.contactDetailsForm.controls['contactDetails'] as FormArray).at(0) as FormGroup;
+    contactDetails.controls['isPrimaryContact'].patchValue(true);
 
     this.generalInformationForm.controls['departmentId'].valueChanges
       .pipe(

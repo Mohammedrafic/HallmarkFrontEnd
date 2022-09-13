@@ -11,6 +11,6 @@ export interface PendingInvoiceRowDetailsConfig {
   previewExpensesAttachment: InvoiceAttachmentAction;
   downloadExpensesAttachment: InvoiceAttachmentAction;
 
-  previewMilesAttachments: InvoiceAttachmentAction;
-  downloadMilesAttachments: InvoiceAttachmentAction;
+  previewMilesAttachments: (invoiceId: number) => InvoiceAttachmentAction;
+  downloadMilesAttachments: (invoiceId: number) => InvoiceAttachmentAction;
 }

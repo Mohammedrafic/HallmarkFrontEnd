@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { catchError, debounceTime, EMPTY, empty, forkJoin, mergeMap, Observable, of, switchMap, tap, throttleTime, throwError } from 'rxjs';
+import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap, throttleTime } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -12,7 +12,7 @@ import { DialogAction } from '@core/enums';
 import { DataSourceItem, DropdownOption } from '@core/interface';
 
 import { TimesheetsModel, TimeSheetsPage } from '../model/timesheets.model';
-import { TimesheetsApiService } from '../../services';
+import { TimesheetDetailsApiService, TimesheetsApiService } from '../../services';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import {
@@ -45,12 +45,13 @@ import {
   TimesheetRecordsDto,
   TimesheetsFilteringOptions,
   TimesheetsFilterState,
-  TimesheetStatistics
+  TimesheetStatistics,
+  UploadDialogState
 } from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
-import { TimesheetDetailsApiService } from '../../services';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { reduceFiltersState } from '@core/helpers/functions.helper';
+import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -157,6 +158,15 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
+  static uploadDialogOpen(state: TimesheetsModel): UploadDialogState {
+    return {
+      state: state.isUploadDialogOpen.action,
+      itemId: state.isUploadDialogOpen.itemId,
+      recordAttachments: state.isUploadDialogOpen.recordAttachments,
+    };
+  }
+
+  @Selector([TimesheetsState])
   static costCenters(state: TimesheetsModel): unknown {
     return state.costCenterOptions;
   }
@@ -220,24 +230,34 @@ export class TimesheetsState {
   @Action(Timesheets.UpdateFiltersState)
   UpdateFiltersState(
     { setState, getState }: StateContext<TimesheetsModel>,
-    { payload, saveStatuses, saveOrganizationId }: Timesheets.UpdateFiltersState,
+    { payload, saveStatuses, saveOrganizationId, usePrevFiltersState }: Timesheets.UpdateFiltersState,
   ): Observable<null> {
     const oldFilters: TimesheetsFilterState = getState().timesheetsFilters || DefaultFiltersState;
-    const savedFiltersKeys = SavedFiltersParams.filter((key: TimesheetsTableFiltersColumns) =>
-      saveStatuses || key !== TimesheetsTableFiltersColumns.StatusIds
-    );
-    let filters: TimesheetsFilterState = reduceFiltersState(oldFilters, savedFiltersKeys);
-    filters = Object.assign({}, filters, payload);
+
+    let filters: TimesheetsFilterState;
+
+    if (!usePrevFiltersState) {
+      const savedFiltersKeys = SavedFiltersParams.filter(
+        (key: TimesheetsTableFiltersColumns) => saveStatuses || key !== TimesheetsTableFiltersColumns.StatusIds
+      );
+
+      filters = reduceFiltersState(oldFilters, savedFiltersKeys);
+      filters = Object.assign({}, filters, payload);
+    } else {
+      filters = Object.assign({}, oldFilters, payload);
+    }
+
+    const timesheetsFilters = payload ?
+      filters :
+      Object.assign({}, DefaultFiltersState, saveOrganizationId && {
+        organizationId: oldFilters.organizationId,
+      });
 
     return of(null).pipe(
       throttleTime(100),
       tap(() =>
         setState(patch<TimesheetsModel>({
-          timesheetsFilters: payload ?
-            filters :
-            Object.assign({}, DefaultFiltersState, saveOrganizationId && {
-              organizationId: oldFilters.organizationId,
-            }),
+          timesheetsFilters,
         })
       )),
     );
@@ -330,6 +350,45 @@ export class TimesheetsState {
     });
   }
 
+  @Action(Timesheets.ToggleTimesheetUploadAttachmentsDialog)
+  ToggleTimesheetUploadAttachmentsDialog({ patchState }: StateContext<TimesheetsModel>,
+    { action, timesheetAttachments }: Timesheets.ToggleTimesheetUploadAttachmentsDialog): void {
+    patchState({
+      isUploadDialogOpen: {
+        action: action === DialogAction.Open,
+        itemId: timesheetAttachments?.id as number || null,
+        recordAttachments: timesheetAttachments?.attachments || null,
+      },
+    });
+  }
+
+  @Action(Timesheets.UploadMilesAttachments)
+  UploadMilesAttachments(
+    { getState }: StateContext<TimesheetsModel>,
+    { files, organizationId }: Timesheets.UploadMilesAttachments
+  ): Observable<void> | void {
+    const { itemId } = getState().isUploadDialogOpen;
+
+    if (!files?.length) {
+      return;
+    }
+
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file.blob, file.fileName));
+
+    return this.timesheetsApiService.uploadMilesAttachments(itemId, formData, organizationId);
+  }
+
+  @Action(Timesheets.DeleteMilesAttachment)
+  DeleteMilesAttachment(
+    { getState }: StateContext<TimesheetsModel>,
+    { fileId, organizationId }: Timesheets.DeleteMilesAttachment
+  ): Observable<void> {
+    const { itemId } = getState().isUploadDialogOpen;
+
+    return this.timesheetsApiService.deleteMilesAttachment(itemId, fileId, organizationId);
+  }
+
   @Action(Timesheets.GetTimesheetDetails)
   GetTimesheetDetails(
     ctx: StateContext<TimesheetsModel>,
@@ -346,6 +405,10 @@ export class TimesheetsState {
           ctx.dispatch(new TimesheetDetails.GetCostCenters(res.jobId, orgId, isAgency)),
         ])),
         catchError((err: HttpErrorResponse) => {
+          ctx.patchState({
+            timesheetDetails: null,
+          });
+
           return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
         }),
       )
@@ -412,6 +475,59 @@ export class TimesheetsState {
           return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
         }),
       );
+  }
+
+  @Action(Timesheets.PreviewAttachment)
+  PreviewAttachment(
+    { patchState, dispatch }: StateContext<TimesheetsModel>,
+    { timesheetRecordId, organizationId, payload: { id, fileName } }: Timesheets.PreviewAttachment
+  ): Observable<void> {
+    return dispatch(
+      new FileViewer.Open({
+        fileName,
+        getPDF: () => this.timesheetDetailsApiService.downloadRecordPDFAttachment({
+          timesheetRecordId,
+          fileId: id,
+          organizationId,
+        }),
+        getOriginal: () => this.timesheetDetailsApiService.downloadRecordAttachment({
+          timesheetRecordId,
+          fileId: id,
+          organizationId
+        })
+      })
+    );
+  }
+
+  @Action(Timesheets.DownloadRecordAttachment)
+  DownloadRecordAttachment(
+    { patchState, dispatch }: StateContext<TimesheetsModel>,
+    { timesheetRecordId, organizationId, payload: { id, fileName } }: Timesheets.DownloadRecordAttachment
+  ): Observable<void | Blob> {
+    return this.timesheetDetailsApiService.downloadRecordAttachment({
+      timesheetRecordId, fileId: id, organizationId
+    }).pipe(
+      tap((file: Blob) => downloadBlobFile(file, fileName)),
+      catchError(() => dispatch(
+        new ShowToast(MessageTypes.Error, 'File not found')
+      ))
+    );
+  }
+
+  @Action(Timesheets.DeleteRecordAttachment)
+  DeleteRecordAttachment(
+    { patchState, dispatch }: StateContext<TimesheetsModel>,
+    { timesheetRecordId, organizationId, payload: { id } }: Timesheets.DeleteRecordAttachment
+  ): Observable<void | Blob> {
+    return this.timesheetDetailsApiService.deleteRecordAttachment({
+      timesheetId: timesheetRecordId,
+      fileId: id,
+      organizationId
+    }).pipe(
+      catchError(() => dispatch(
+        new ShowToast(MessageTypes.Error, 'File not found')
+      )),
+    );
   }
 
   @Action(TimesheetDetails.UploadFiles)

@@ -39,7 +39,7 @@
       </section>
       <section class="content-container">
         <div class="candidate-info">
-          <ejs-accordion #accordionElement expandMode="Single" openFirstAccordion>
+          <ejs-accordion #accordionElement expandMode="Single" appOpenFirstAccordion>
             <e-accordionitems>
               <e-accordionitem expanded="true">
                 <ng-template #header>
@@ -79,7 +79,7 @@
                       </div>
                     </div>
                     <!--TODO: create and use ReadOnly Mode for it-->
-                    <div *ngIf="showClockId" class="input-container bootstrap">
+                    <div *ngIf="showClockId && !orderCandidateJob?.hasAllRequiredOnboardedCredentials" class="input-container bootstrap">
                       <ejs-checkbox [disabled]="isAgency || isOnboard" formControlName="allow" label="Allow deploy w/o credentials"
                                     maxlength="50"></ejs-checkbox>
                     </div>

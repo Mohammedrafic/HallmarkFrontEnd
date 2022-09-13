@@ -27,6 +27,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { RECORD_ADDED, RECORD_MODIFIED, GRID_CONFIG } from '@shared/constants';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
+import { AppState } from '../../../store/app.state';
 @Component({
   selector: 'app-template',
   templateUrl: './alerts-template.component.html',
@@ -68,6 +69,9 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   public updateTemplateByAlertId$: Observable<EditAlertsTemplate>;
   @Select(AlertsState.SaveTemplateByAlertId)
   public saveTemplateByAlertId$: Observable<EditAlertsTemplate>;
+
+  @Select(AppState.isDarkTheme)
+  isDarkTheme$: Observable<boolean>;
 
   public editAlertTemplateData: EditAlertsTemplate = {
     id: 0,
