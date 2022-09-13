@@ -391,7 +391,7 @@
   (applyFilterClicked)="onFilterApply()"
   (closeDialogClicked)="onFilterClose()"
 >
-  <form [formGroup]="OrderFilterFormGroup">
+  <form [formGroup]="OrderFilterFormGroup" *ngIf="showFilterForm">
     <div class="bootstrap">
       <div class="input-container">
         <label for="orderId">{{
