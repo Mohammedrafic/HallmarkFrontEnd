@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionCompleted, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
@@ -8,7 +8,6 @@ import {
   filter,
   first,
   Observable,
-  skip,
   Subject,
   Subscription,
   takeUntil,
@@ -108,7 +107,6 @@ import { UpdateGridCommentsCounter } from '@shared/components/comments/store/com
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { SettingsKeys } from '@shared/enums/settings';
 import { SettingsHelper } from '@core/helpers/settings.helper';
-import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 
 @Component({
   selector: 'app-order-management-content',
@@ -121,7 +119,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @ViewChild('search') search: SearchComponent;
   @ViewChild('detailsDialog') detailsDialog: OrderDetailsDialogComponent;
   @ViewChild('tabNavigation') tabNavigation: TabNavigationComponent;
-  @ViewChildren('multiselect') private readonly multiselectList: QueryList<MultiSelectComponent>;
 
   @Select(OrderManagementContentState.ordersPage)
   ordersPage$: Observable<OrderManagementPage>;
@@ -151,6 +148,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public activeTab: OrganizationOrderManagementTabs = OrganizationOrderManagementTabs.AllOrders;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
+  public showFilterForm = false;
   public isLockMenuButtonsShown = true;
   public moreMenuWithDeleteButton: ItemModel[] = [
     { text: MoreMenuType[0], id: '0' },
@@ -317,7 +315,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.listenRedirectFromPerDiem();
     this.subscribeForSettings();
     this.handleRedirectFromQuickOrderToast();
-    this.refreshMultiSelectAfterOpenDialog();
+    this.showFilterFormAfterOpenDialog();
   }
 
   ngOnDestroy(): void {
@@ -1409,21 +1407,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
   }
 
-  private refreshMultiSelectAfterOpenDialog(): void {
+  private showFilterFormAfterOpenDialog(): void {
     this.actions
-      .pipe(
-        ofActionDispatched(ShowFilterDialog),
-        filter((data) => data.isDialogShown),
-        takeUntil(this.unsubscribe$),
-        skip(1),
-        debounceTime(300)
-      )
-      .subscribe(() => {
-        this.multiselectList.map((item) => {   
-          if (item.value?.length > 0) {
-            item.refresh();
-          }
-        });
-      });
+      .pipe(ofActionDispatched(ShowFilterDialog), takeUntil(this.unsubscribe$), debounceTime(200))
+      .subscribe((isOpen) => (this.showFilterForm = isOpen.isDialogShown));
   }
 }

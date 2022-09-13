@@ -391,7 +391,7 @@
   (applyFilterClicked)="onFilterApply()"
   (closeDialogClicked)="onFilterClose()"
 >
-  <form [formGroup]="OrderFilterFormGroup">
+  <form [formGroup]="OrderFilterFormGroup" *ngIf="showFilterForm">
     <div class="bootstrap">
       <div class="input-container">
         <label for="orderId">{{
@@ -456,7 +456,6 @@
         <label>Select Agency</label>
         <div class="input-group multiselect">
           <ejs-multiselect
-            #multiselect
             mode="CheckBox"
             formControlName="agencyIds"
             placeholder="All"
@@ -513,7 +512,6 @@
         <label>Order Status</label>
         <div class="input-group multiselect">
           <ejs-multiselect
-            #multiselect
             mode="CheckBox"
             formControlName="orderStatuses"
             placeholder="All"
@@ -529,7 +527,6 @@
         <label>Candidate Status</label>
         <div class="input-group multiselect">
           <ejs-multiselect
-            #multiselect
             mode="CheckBox"
             formControlName="candidateStatuses"
             placeholder="All"
