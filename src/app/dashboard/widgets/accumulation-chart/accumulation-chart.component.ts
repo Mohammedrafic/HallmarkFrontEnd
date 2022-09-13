@@ -29,6 +29,7 @@ export class AccumulationChartComponent
   implements OnChanges, OnInit {
   @Input() public chartData: ChartAccumulation | undefined;
   @Input() public isLoading: boolean;
+  @Input() public isDarkTheme: boolean;
 
   public toggleLegend: number[] = [];
   public filteredChartData$: Observable<DonutChartData[]>;

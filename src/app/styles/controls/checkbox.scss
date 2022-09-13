@@ -9,15 +9,25 @@ body.light, body.dark {
 
       .e-frame {
         border-radius: 2px;
-  
+
         &.e-check {
           background-color: $primary-active-blue-10;
         }
-  
+
         &:hover {
           border-color: $primary-active-blue-10;
         }
       }
     }
   }
-} 
+}
+
+body.dark {
+  .bootstrap {
+    .e-checkbox-wrapper {
+      .e-label {
+        color: $secondary-dark-blue-40;
+      }
+    }
+  }
+}

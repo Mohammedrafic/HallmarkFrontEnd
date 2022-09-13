@@ -98,8 +98,8 @@ app-grid {
   }
 
   .ag-root-wrapper {
-    border-bottom-right-radius: 15px !important;
-    border-bottom-left-radius: 15px !important;
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
   }
 
   .ag-header-cell-text {
@@ -115,5 +115,43 @@ app-grid {
     position: absolute;
     left: 0;
     bottom: 0;
+  }
+}
+
+.app-grid-dark {
+
+  .ag-header, .ag-root-wrapper {
+    background-color: $sidebar-background !important;
+  }
+
+  .ag-row {
+    background-color: $sidebar-background !important;
+    color: $white !important;
+  }
+
+  .ag-row-hover {
+    background-color: var(--grid-row-background-color-hover) !important;
+    color: $black !important;
+  }
+
+  .ag-root-wrapper, .ag-row, .ag-header {
+    border-color: $grid-border-color !important;
+  }
+
+  .ag-header-icon {
+    color: $white !important;
+  }
+
+  .e-input-group.e-control-wrapper.e-ddl.e-valid-input {
+    &:hover {
+      background: transparent !important;
+    }
+  }
+
+  .ag-paging-row-summary-panel,
+  .ag-paging-page-summary-panel,
+  .ag-paging-page-summary-panel > .ag-paging-button,
+  .ag-side-buttons {
+    color: $secondary-dark-blue-30 !important;
   }
 }

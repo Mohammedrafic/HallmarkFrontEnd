@@ -1,6 +1,6 @@
 <div
   [class.highlight]="allowBulkSelection && selectedTableRowsAmount"
-  class="app-grid-pagination"
+  [ngClass]="isDarkTheme ? 'app-grid-pagination app-grid-dark-pagination' : 'app-grid-pagination'"
 >
   <div class="app-grid-pagination__controls">
     <section

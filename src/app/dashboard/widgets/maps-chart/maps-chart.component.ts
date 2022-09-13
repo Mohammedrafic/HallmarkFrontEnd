@@ -12,6 +12,7 @@ import { DashboardService } from '../../services/dashboard.service';
 export class MapsChartComponent {
   @Input() public chartData: CandidatesByStateWidgetAggregatedDataModel | undefined;
   @Input() public isLoading: boolean;
+  @Input() public isDarkTheme: boolean | false;
 
   constructor(private readonly dashboardService: DashboardService) {}
 

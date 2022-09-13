@@ -1,4 +1,4 @@
-<div class="app-grid" [class.grid-title]="title">
+<div [class.grid-title]="title" [ngClass]="(isDarkTheme$ | async) ? 'app-grid app-grid-dark' : 'app-grid'">
   <p *ngIf="title" class="title">{{ title }}</p>
   <ag-grid-angular
     (gridReady)="handleGridReadyEvent($event)"
@@ -28,5 +28,6 @@
     [selectedTableRowsAmount]="selectedTableRows.length"
     [allowBulkSelection]="allowBulkSelection"
     [allowBulkButton]="allowBulkButton"
+    [isDarkTheme]="isDarkTheme$ | async"
   ></app-grid-pagination>
 </div>

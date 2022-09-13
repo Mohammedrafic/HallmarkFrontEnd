@@ -24,20 +24,20 @@
         <ng-template #content [ngSwitch]="panel.id">
           <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.CANDIDATES"
                                   [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
-                                  [isLoading]="isLoading"></app-accumulation-chart>
+                                  [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"></app-accumulation-chart>
           <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.ACTIVE_POSITIONS"
                                   [chartData]="widgetsData?.[widgetTypeEnum.ACTIVE_POSITIONS]"
-                                  [isLoading]="isLoading"></app-accumulation-chart>
+                                  [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"></app-accumulation-chart>
           <app-maps-chart *ngSwitchCase="widgetTypeEnum.APPLICANTS_BY_REGION"
                           [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_REGION]"
-                          [isLoading]="isLoading"></app-maps-chart>
+                          [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"></app-maps-chart>
           <app-maps-chart *ngSwitchCase="widgetTypeEnum.APPLICANTS_BY_POSITIONS"
                           [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_POSITIONS]"
-                          [isLoading]="isLoading"></app-maps-chart>
+                          [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"></app-maps-chart>
           <app-line-chart *ngSwitchCase="widgetTypeEnum.POSITIONS_BY_TYPES"
                           [chartData]="widgetsData?.[widgetTypeEnum.POSITIONS_BY_TYPES]"
                           [isLoading]="isLoading"
-                          [timeSelection]="timeSelection"></app-line-chart>
+                          [timeSelection]="timeSelection" [isDarkTheme]="isDarkTheme"></app-line-chart>
           <app-position-chart *ngSwitchCase="widgetTypeEnum.IN_PROGRESS_POSITIONS"
                               [chartData]="widgetsData?.[widgetTypeEnum.IN_PROGRESS_POSITIONS]"
                               [isLoading]="isLoading"></app-position-chart>
@@ -50,11 +50,11 @@
           <app-tasks *ngSwitchCase="widgetTypeEnum.TASKS"
                      [tasks]="widgetsData?.[widgetTypeEnum.TASKS]"></app-tasks>
           <app-trend-chart *ngSwitchCase="widgetTypeEnum.FILLED_POSITIONS_TREND"
-                           [widget]="widgetsData?.[widgetTypeEnum.FILLED_POSITIONS_TREND]"></app-trend-chart>
+                           [widget]="widgetsData?.[widgetTypeEnum.FILLED_POSITIONS_TREND]" [isDarkTheme]="isDarkTheme"></app-trend-chart>
           <app-trend-chart *ngSwitchCase="widgetTypeEnum.OPEN_POSITIONS_TREND"
-                           [widget]="widgetsData?.[widgetTypeEnum.OPEN_POSITIONS_TREND]"></app-trend-chart>
+                           [widget]="widgetsData?.[widgetTypeEnum.OPEN_POSITIONS_TREND]" [isDarkTheme]="isDarkTheme"></app-trend-chart>
           <app-trend-chart *ngSwitchCase="widgetTypeEnum.IN_PROGRESS_POSITIONS_TREND"
-                           [widget]="widgetsData?.[widgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]"></app-trend-chart>
+                           [widget]="widgetsData?.[widgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]" [isDarkTheme]="isDarkTheme"></app-trend-chart>
           <app-chat *ngSwitchCase="widgetTypeEnum.CHAT"
                     [chatData]="widgetsData?.[widgetTypeEnum.CHAT]"></app-chat>
           <app-invoices-chart *ngSwitchCase="widgetTypeEnum.INVOICES"

@@ -57,6 +57,8 @@ app-grid {
   .ag-root-wrapper {
     border-top-left-radius: var(--grid-border-radius);
     border-top-right-radius: var(--grid-border-radius);
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
   }
 
   .ag-root-wrapper,
@@ -81,5 +83,29 @@ app-grid {
   .ag-header-cell-text {
     text-transform: uppercase;
     font-size: 12px;
+  }
+}
+
+.app-grid-dark {
+
+  .ag-root-wrapper, .ag-header {
+    background-color: $sidebar-background;
+  }
+
+  .ag-row {
+    color: $white;
+  }
+
+  .ag-row-hover {
+    background-color: var(--grid-row-background-color-hover);
+    color: $black;
+  }
+
+  .ag-root-wrapper, .ag-row, .ag-header {
+    border-color: $grid-border-color !important;
+  }
+
+  .bootstrap .e-input-group.e-control-wrapper {
+    background: transparent !important;
   }
 }

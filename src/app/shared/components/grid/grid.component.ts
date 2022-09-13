@@ -1,7 +1,7 @@
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import type { GridOptions, Module, SelectionChangedEvent, SortChangedEvent } from '@ag-grid-community/core';
 import { RowNode } from '@ag-grid-community/core';
-import { BehaviorSubject, combineLatest, delay, filter, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, delay, filter, Observable, takeUntil } from 'rxjs';
 
 import {
   ChangeDetectionStrategy,
@@ -20,6 +20,8 @@ import { GridReadyEventModel } from '@shared/components/grid/models/grid-ready-e
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { GRID_CONFIG } from '@shared/constants';
 import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
+import { Select } from '@ngxs/store';
+import { AppState } from '../../../store/app.state';
 
 @Component({
   selector: 'app-grid',
@@ -76,6 +78,9 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
 
   private readonly gridInstance$: BehaviorSubject<GridReadyEventModel | null> =
     new BehaviorSubject<GridReadyEventModel | null>(null);
+
+  @Select(AppState.isDarkTheme)
+  isDarkTheme$: Observable<boolean>;
 
   public ngOnChanges(changes: SimpleChanges): void {
     changes['isLoading'] && this.isLoading$.next(!!this.isLoading);
