@@ -1,6 +1,6 @@
 <div class="actions-container">
   <button
-    *ngIf="uploadAllowed"
+    *ngIf="uploadAllowed && !editable"
     ejs-button
     cssClass="e-flat secondary-icon-button"
     (click)="uploadAttachments()"
