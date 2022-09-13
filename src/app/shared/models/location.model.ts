@@ -92,3 +92,10 @@ export type ImportedLocation = {
   inactiveDate: string;
   errorProperties: string[];
 }
+export class LocationsByRegionsFilter {
+  ids?: number[];  
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+  getAll?:boolean;
+}

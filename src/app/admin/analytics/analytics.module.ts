@@ -6,6 +6,15 @@ import { CandidateStatsComponent } from './candidate-stats/candidate-stats.compo
 import { AnalyticsRoutingModule } from './analytics-routing.module';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { PageReportComponent } from './page-report/page-report.component';
+import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxsModule } from '@ngxs/store';
+import { UserState } from 'src/app/store/user.state';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { SecurityState } from 'src/app/security/store/security.state';
+import { LogiReportState } from '@organization-management/store/logi-report.state';
+import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
+import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 
 @NgModule({
   declarations: [
@@ -16,7 +25,14 @@ import { PageReportComponent } from './page-report/page-report.component';
     PageReportComponent],
   imports: [
     CommonModule,
-    AnalyticsRoutingModule
+    FormsModule,    
+    ReactiveFormsModule,
+    AnalyticsRoutingModule,
+    MultiSelectAllModule,
+    DropDownListModule,
+    DatePickerModule,
+    ButtonModule,
+    NgxsModule.forFeature([OrganizationManagementState,UserState,SecurityState,LogiReportState])
   ]
 })
 export class AnalyticsModule { }

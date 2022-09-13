@@ -190,6 +190,10 @@ export class OrderManagementState {
   static ordersTab(state: OrderManagementModel): AgencyOrderManagementTabs | null {
     return state.ordersTab;
   }
+  @Selector()
+  static organizationStructure(state: OrderManagementModel): OrganizationStructure[] | null {
+    return state.organizationStructure;
+  }
 
   @Selector()
   static extensions(state: OrderManagementContentStateModel): any | null {
