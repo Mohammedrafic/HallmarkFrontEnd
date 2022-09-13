@@ -1,3 +1,5 @@
+import { DismissAlertDto } from './../shared/models/alerts-template.model';
+import { DismissAlert, DismissAllAlerts } from './../admin/store/alerts.actions';
 import { GetAlertsForCurrentUser } from './../store/app.actions';
 import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
@@ -24,7 +26,7 @@ import { ItemModel } from '@syncfusion/ej2-angular-splitbuttons';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faBan, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 enum THEME {
@@ -42,9 +44,9 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   width = SIDEBAR_CONFIG.width;
   dockSize = SIDEBAR_CONFIG.dockSize;
   sideBarType = SIDEBAR_CONFIG.type;
-  alertSidebarWidth = "360px";
-  alertSidebarType = "auto";
-  alertSidebarPosition = "Right";
+  alertSidebarWidth = '360px';
+  alertSidebarType = 'auto';
+  alertSidebarPosition = 'Right';
   showAlertSidebar = false;
 
   isDarkTheme: boolean;
@@ -88,7 +90,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   menu$: Observable<Menu>;
 
   @Select(AppState.getAlertsForCurrentUser)
-  alertStateModel$: Observable<GetAlertsForUserStateModel[]>
+  alertStateModel$: Observable<GetAlertsForUserStateModel[]>;
 
   public searchString: string = '';
   public isClosingSearch: boolean = false;
@@ -107,6 +109,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   private routers: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
 
   faTimes = faTimes as IconDefinition;
+  faBan = faBan;
   alerts: any;
   constructor(
     private store: Store,
@@ -114,11 +117,9 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     private orderManagementService: OrderManagementService,
     private orderManagementAgencyService: OrderManagementAgencyService
   ) {
-    router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((data: any) => {
+    router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((data: any) => {
       if (this.tree) {
-        const menuItem = this.tree.getTreeData().find((el => el['route'] === data['url']));
+        const menuItem = this.tree.getTreeData().find((el) => el['route'] === data['url']);
         if (menuItem) {
           this.tree.selectedNodes = [menuItem['title'] as string];
         }
@@ -137,10 +138,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
       if (user) {
         this.userLogin = user;
         this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
-        this.store.dispatch(new GetAlertsForCurrentUser({}))
-        this.alertStateModel$.subscribe((x)=>{
-          this.alerts = x;          
-        });
+        this.getAlertsForUser();
       }
     });
   }
@@ -188,8 +186,8 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  onAlertSidebarCreated(): void{
-    this.sidebar.element.classList.add("e-hidden");
+  onAlertSidebarCreated(): void {
+    this.sidebar.element.classList.add('e-hidden');
   }
 
   toggleClick(): void {
@@ -279,7 +277,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     if (user?.businessUnitType === BusinessUnitType.Agency) {
       url = 'https://green-pebble-0878e040f.1.azurestaticapps.net/';
     } else {
-      url = 'https://lemon-sea-05b5a7c0f.1.azurestaticapps.net/'
+      url = 'https://lemon-sea-05b5a7c0f.1.azurestaticapps.net/';
     }
     window.open(url, '_blank');
   }
@@ -345,12 +343,42 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     }, 500);
   }
 
-  bellIconClicked(){
-    this.showAlertSidebar = true;
-    this.alertSidebar.show();    
+  getAlertsForUser(){
+    this.store.dispatch(new GetAlertsForCurrentUser({}));
+    this.alertStateModel$.subscribe((x) => {
+      this.alerts = x;
+    });
   }
 
-  alertSideBarCloseClick(){
-    this.alertSidebar.hide();    
+  bellIconClicked() {
+    this.showAlertSidebar = true;
+    this.alertSidebar.show();
+  }
+
+  alertSideBarCloseClick() {
+    this.alertSidebar.hide();
+  }
+
+  alertSideBarClearAllClick(){
+    this.allAlertDismiss();
+  }
+
+  alertDismiss(id: any) {    
+    var model: DismissAlertDto = {
+      Id: id,
+    };
+    this.store.dispatch(new DismissAlert(model)).subscribe((x)=>{
+      if(x){
+        this.getAlertsForUser();
+      }
+    });
+  }
+
+  allAlertDismiss() {
+    this.store.dispatch(new DismissAllAlerts()).subscribe((x) => {
+      if (x) {
+        this.getAlertsForUser();
+      }
+    });
   }
 }

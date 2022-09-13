@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { UserSubscription, UserSubscriptionFilters, UserSubscriptionPage ,UserSubscriptionRequest} from "@shared/models/user-subscription.model";
 import { observable, Observable, of } from "rxjs";
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, AlertTriggerDto, EditAlertsTemplate, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
+import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, AlertTriggerDto, DismissAlertDto, EditAlertsTemplate, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
 import { AlertChannel } from "@admin/alerts/alerts.enum";
 import { BusinessUnit } from "../models/business-unit.model";
 
@@ -127,6 +127,21 @@ export class AlertsService {
    ): Observable<number[]> {     
     return this.http.post<number[]>(`/api/Alerts/CreateAppAlert`, AlertTriggerDto);
      
+  }
+
+  /**
+   * Dismiss alert
+   * @param model
+   */
+   public dismissAlert(model: DismissAlertDto): Observable<any> {
+    return this.http.post(`/api/Alerts/DismissAlert`, model);
+  }
+
+  /**
+   * Dismiss all alert
+   */
+  public dismissAllAlerts(): Observable<any> {
+    return this.http.post(`/api/Alerts/DismissAllAlerts`,{});
   }
   
 }
