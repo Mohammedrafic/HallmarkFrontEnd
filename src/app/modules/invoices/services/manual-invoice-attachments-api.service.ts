@@ -40,16 +40,16 @@ export class ManualInvoiceAttachmentsApiService {
     );
   }
 
-  public downloadMilesAttachment(fileId: number, organizationId: number | null): Observable<Blob> {
+  public downloadMilesAttachment(invoiceId: number, fileId: number, organizationId: number | null): Observable<Blob> {
     return organizationId === null ?
-      this.organizationDownloadMilesAttachment(fileId) :
-      this.agencyDownloadMilesAttachment(fileId, organizationId);
+      this.organizationDownloadMilesAttachment(invoiceId, fileId) :
+      this.agencyDownloadMilesAttachment(invoiceId, organizationId, fileId);
   }
 
-  public downloadMilesPDFAttachment(fileId: number, organizationId: number | null): Observable<Blob> {
+  public downloadMilesPDFAttachment(invoiceId: number, fileId: number, organizationId: number | null): Observable<Blob> {
     return organizationId === null ?
-      this.organizationDownloadMilesPDFAttachment(fileId) :
-      this.agencyDownloadMilesPDFAttachment(fileId, organizationId);
+      this.organizationDownloadMilesPDFAttachment(invoiceId, fileId) :
+      this.agencyDownloadMilesPDFAttachment(invoiceId, organizationId, fileId);
   }
 
   private organizationDownloadAttachment(fileId: number): Observable<Blob> {
@@ -64,14 +64,12 @@ export class ManualInvoiceAttachmentsApiService {
     });
   }
 
-  private organizationDownloadMilesAttachment(fileId: number): Observable<Blob> {
-    // TODO: Bind with API after BE implementation
-    return of(new Blob([]));
+  private organizationDownloadMilesAttachment(invoiceId: number, fileId: number): Observable<Blob> {
+    return this.http.get<Blob>(`/api/TimesheetRecords/${invoiceId}/files/${fileId}/pdf`);
   }
 
-  private organizationDownloadMilesPDFAttachment(fileId: number): Observable<Blob> {
-    // TODO: Bind with API after BE implementation
-    return of(new Blob([]));
+  private organizationDownloadMilesPDFAttachment(invoiceId: number, fileId: number): Observable<Blob> {
+    return this.http.get<Blob>(`/api/TimesheetRecords/${invoiceId}/files/${fileId}/pdf`);
   }
 
   private agencyDownloadAttachment(fileId: number, organizationId: number): Observable<Blob> {
@@ -86,14 +84,12 @@ export class ManualInvoiceAttachmentsApiService {
     });
   }
 
-  private agencyDownloadMilesAttachment(fileId: number, organizationId: number): Observable<Blob> {
-    // TODO: Bind with API after BE implementation
-    return of(new Blob([]));
+  private agencyDownloadMilesAttachment(invoiceId: number, organizationId: number, fileId: number): Observable<Blob> {
+    return this.http.get<Blob>(`/api/TimesheetRecords/${invoiceId}/organizations/${organizationId}/files/${fileId}`);
   }
 
-  private agencyDownloadMilesPDFAttachment(fileId: number, organizationId: number): Observable<Blob> {
-    // TODO: Bind with API after BE implementation
-    return of(new Blob([]));
+  private agencyDownloadMilesPDFAttachment(invoiceId: number, organizationId: number, fileId: number): Observable<Blob> {
+    return this.http.get<Blob>(`/api/TimesheetRecords/${invoiceId}/organizations/${organizationId}/files/${fileId}/pdf`);
   }
 
   private organizationDeleteAttachment(fileId: number, timesheetId: number): Observable<number> {
