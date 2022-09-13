@@ -571,11 +571,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
 
     if (this.selectedCandidate) {
-      const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
-        this.selectedDataRow.id
-      );
-      const updatedCandidate = data?.children.find((child) => child.candidateId === this.selectedCandidate.candidateId);
-      this.selectedCandidate = updatedCandidate;
       if (this.selectedCandidateMeta) {
         this.selectedCandidate.selected = this.selectedCandidateMeta;
         const rowIndex = this.gridWithChildRow.getRowIndexByPrimaryKey(this.selectedCandidateMeta.order);
@@ -652,8 +647,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.navigateToOrderTemplateForm();
         this.store.dispatch(new GetSelectedOrderById(event.data.id));
       } else {
-        this.selectedDataRow = event.data;
-        const data = event.data;
+        const data = isArray(event.data) ? event.data[0] : event.data;
+        this.selectedDataRow = data;
         const options = this.getDialogNextPreviousOption(data);
         this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
         this.store.dispatch(
@@ -668,7 +663,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
         this.openChildDialog.next(false);
         this.orderPositionSelected$.next({ state: false });
-        if (!isArray(event.data)) {
+        if (!isArray(data)) {
           this.openDetails.next(true);
           this.selectedRowRef = event;
         }
