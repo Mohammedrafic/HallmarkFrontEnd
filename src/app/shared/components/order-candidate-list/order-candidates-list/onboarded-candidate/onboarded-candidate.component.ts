@@ -137,7 +137,6 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
     this.subscribeOnDate();
     this.subscribeOnReasonsList();
     this.checkRejectReason();
-    this.subscribeOnSuccessRejection();
     this.subscribeOnUpdateOrganisationCandidateJobError();
     this.subscribeOnGetStatus();
   }
@@ -183,7 +182,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch(new RejectCandidateJob(payload));
+      this.store.dispatch(new RejectCandidateJob(payload)).subscribe(() => {
+        this.form.disable();
+        this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+      });
       this.closeDialog();
     }
   }
@@ -361,15 +363,6 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
       this.isRejected = true;
       this.form.disable();
     }
-  }
-
-  private subscribeOnSuccessRejection(): void {
-    this.actions$
-      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RejectCandidateForOrganisationSuccess))
-      .subscribe(() => {
-        this.form.disable();
-        this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-      });
   }
 
   private subscribeOnUpdateOrganisationCandidateJobError(): void {
