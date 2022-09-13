@@ -218,6 +218,7 @@ export namespace Invoices {
     static readonly type = INVOICES_ACTIONS.PreviewMilesAttachment;
 
     constructor(
+      public readonly invoiceId: number,
       public readonly organizationId: number | null,
       public readonly payload: Attachment,
     ) {
@@ -238,6 +239,7 @@ export namespace Invoices {
     static readonly type = INVOICES_ACTIONS.DownloadMilesAttachment;
 
     constructor(
+      public readonly invoiceId: number,
       public readonly organizationId: number | null,
       public readonly payload: Attachment,
     ) {

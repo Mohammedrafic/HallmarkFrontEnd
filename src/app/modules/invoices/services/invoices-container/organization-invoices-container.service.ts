@@ -121,11 +121,11 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
           downloadExpensesAttachment: (attachment: InvoiceAttachment) => this.store.dispatch(
             new Invoices.DownloadAttachment(organizationId, attachment),
           ),
-          previewMilesAttachments: (attachment: InvoiceAttachment) => this.store.dispatch(
-            new Invoices.PreviewMilesAttachment(organizationId, attachment)
+          previewMilesAttachments: (invoiceId: number) => (attachment: InvoiceAttachment) => this.store.dispatch(
+            new Invoices.PreviewMilesAttachment(invoiceId, organizationId, attachment)
           ),
-          downloadMilesAttachments: (attachment: InvoiceAttachment) => this.store.dispatch(
-            new Invoices.DownloadMilesAttachment(organizationId, attachment)
+          downloadMilesAttachments: (invoiceId: number) => (attachment: InvoiceAttachment) => this.store.dispatch(
+            new Invoices.DownloadMilesAttachment(invoiceId, organizationId, attachment)
           ),
         });
       case OrganizationInvoicesGridTab.PendingApproval:
