@@ -45,7 +45,7 @@ export const perDiemColumnsToExport: ExportColumn[] = [
 ];
 
 export const reOrdersColumnsToExport: ExportColumn[] = [
-  { text: 'Re-Order ID', column: 'Id' },
+  { text: 'Re-Order ID', column: 'ReOrderId' },
   { text: 'Status', column: 'Status' },
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Skill', column: 'Skill' },
@@ -151,7 +151,7 @@ export const ReOrdersColumnsConfig = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: false,
-  }
+  },
 ];
 
 export const AllOrdersColumnsConfig = [
@@ -218,7 +218,7 @@ export const AllOrdersColumnsConfig = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: false,
-  }
+  },
 ];
 
 export const PerDiemColumnsConfig = [
@@ -281,7 +281,7 @@ export const PerDiemColumnsConfig = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: false,
-  }
+  },
 ];
 
 export const orderTemplateColumnsConfig = [
@@ -352,7 +352,7 @@ export const orderTemplateColumnsConfig = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: false,
-  }
+  },
 ];
 
 export const PermPlacementColumnsConfig = [
@@ -419,5 +419,5 @@ export const PermPlacementColumnsConfig = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: true,
-  }
+  },
 ];
