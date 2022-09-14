@@ -1,4 +1,4 @@
-import { ExportedFileType } from "@shared/enums/exported-file-type";
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 export class ExportColumn {
   text: string;
@@ -25,7 +25,7 @@ export class ExportPayload {
     properties?: string[],
     ids?: any[] | null,
     fileName?: string,
-    offset?: number,
+    offset?: number | null
   ) {
     this.exportFileType = exportedFileType;
     if (filterQuery) {
@@ -40,7 +40,7 @@ export class ExportPayload {
     if (fileName) {
       this.filename = fileName;
     }
-    if(offset) {
+    if (offset) {
       this.offset = offset;
     }
   }
