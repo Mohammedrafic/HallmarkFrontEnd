@@ -148,6 +148,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public activeTab: OrganizationOrderManagementTabs = OrganizationOrderManagementTabs.AllOrders;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
+  public showFilterForm = false;
   public isLockMenuButtonsShown = true;
   public moreMenuWithDeleteButton: ItemModel[] = [
     { text: MoreMenuType[0], id: '0' },
@@ -314,6 +315,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.listenRedirectFromPerDiem();
     this.subscribeForSettings();
     this.handleRedirectFromQuickOrderToast();
+    this.showFilterFormAfterOpenDialog();
   }
 
   ngOnDestroy(): void {
@@ -1403,5 +1405,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       let prefix = this.prefix || '';
       this.orderManagementService.orderId$.next({ id: this.quickOrderId, prefix: prefix });
     }
+  }
+
+  private showFilterFormAfterOpenDialog(): void {
+    this.actions
+      .pipe(ofActionDispatched(ShowFilterDialog), takeUntil(this.unsubscribe$), debounceTime(200))
+      .subscribe((isOpen) => (this.showFilterForm = isOpen.isDialogShown));
   }
 }
