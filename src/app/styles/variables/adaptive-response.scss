@@ -1,0 +1,26 @@
+$mobile-width: '360px';
+$tablet-width: '1024px';
+$desktop-small-width: '1366px';
+$desktop-large-width: '1920px';
+
+$min-mobile: '(min-width: ' + $mobile-width + ')';
+$min-tablet: '(min-width: ' + $tablet-width + ')';
+$min-desktop-small: '(min-width: ' + $desktop-small-width + ')';
+$min-desktop-large: '(min-width: ' + $desktop-large-width + ')';
+
+$max-mobile: '(max-width: ' + $mobile-width + ')';
+$max-tablet: '(max-width: ' + $tablet-width + ')';
+$max-desktop-small: '(max-width: ' + $desktop-small-width + ')';
+$max-desktop-large: '(max-width: ' + $desktop-large-width + ')';
+
+
+/*
+  * Reuse for adaptive layout. Example:
+  *
+  * @media #{$max-desktop-large} {
+  *   flex: 0 1 25%;
+  * }
+  * @media #{$max-tablet} {
+  *   flex: 0 1 50%;
+  * }
+ */

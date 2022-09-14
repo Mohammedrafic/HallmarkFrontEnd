@@ -241,7 +241,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
-      options?.fileName || this.defaultFileName
+      options?.fileName || this.defaultFileName,
+      this.selectedItems.length ? 180 : null
     )));
     this.clearSelection(this.grid);
   }
