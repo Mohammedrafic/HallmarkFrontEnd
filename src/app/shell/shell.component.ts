@@ -1,6 +1,6 @@
 import { GetAlertsForCurrentUser } from './../store/app.actions';
 import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
@@ -27,6 +27,7 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { AnalyticsMenuId } from '@shared/constants/menu-config';
 enum THEME {
   light = 'light',
   dark = 'dark',
@@ -45,7 +46,7 @@ enum profileMenuItem {
   templateUrl: './shell.component.html',
   styleUrls: ['./shell.component.scss'],
 })
-export class ShellPageComponent implements OnInit, OnDestroy {
+export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   enableDock = SIDEBAR_CONFIG.isDock;
   width = SIDEBAR_CONFIG.width;
   dockSize = SIDEBAR_CONFIG.dockSize;
@@ -175,6 +176,9 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
+  ngAfterViewInit(): void {
+    this.hideAnalyticsSubMenuItems();
+  }
 
   subsToOrderAgencyIds(): void {
     this.orderManagementAgencyService.selectedOrderAfterRedirect$.subscribe(
@@ -250,11 +254,13 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   }
 
   nodeSelect(args: NodeSelectEventArgs): void {
+  
     if (args.node.classList.contains('e-level-1') && this.sidebar.isOpen) {
       this.tree.collapseAll();
       this.tree.expandAll([args.node]);
       this.tree.expandOn = 'None';
     }
+    this.hideAnalyticsSubMenuItems();
   }
 
   onMenuItemClick(menuItem: MenuItem): void {
@@ -270,7 +276,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
 
   showContextMenu(data: MenuItem, event: any): void {
     this.contextmenu.items = [];
-    if (data.children && data.children.length > 0 && !this.sidebar.isOpen) {
+    if (data.id != AnalyticsMenuId && data.children && data.children.length > 0 && !this.sidebar.isOpen) {
       this.activeMenuItemData = data;
       const boundingRectangle = event.target.getBoundingClientRect();
       this.contextmenu.items =
@@ -282,6 +288,13 @@ export class ShellPageComponent implements OnInit, OnDestroy {
       // workaround to eliminate UI glitch with context menu resizing
       setTimeout(() => this.contextmenu.open(boundingRectangle.top, parseInt(this.dockSize)));
     }
+    this.hideAnalyticsSubMenuItems();
+  }
+
+  hideAnalyticsSubMenuItems() {
+    let element = this.tree.element.querySelector('[data-uid="Analytics"]');
+    element?.querySelectorAll('ul li').forEach((el: any) => { el.style.display = 'none' });
+    element?.querySelectorAll('.e-text-content .e-icons').forEach((el: any) => { el.style.display = 'none' });
   }
 
   onBeforeContextMenuOpen(event: any): void {

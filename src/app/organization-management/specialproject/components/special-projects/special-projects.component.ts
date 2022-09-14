@@ -29,7 +29,7 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
   @Input() form: FormGroup;
   @Output() onEdit = new EventEmitter<SpecialProject>();
 
-  @Select(SpecialProjectState.specialProjectPage)
+  @Select(SpecialProjectState.specialProjectPage) 
   specialProjectPage$: Observable<SpecialProjectPage>;
 
   private unsubscribe$: Subject<void> = new Subject();
