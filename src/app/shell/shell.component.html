@@ -129,18 +129,43 @@
       <span>Alerts Center</span>
     </h5>
     <div class="closebtn">
-      <button ejs-button id="close" class="e-btn close-btn" (click)="alertSideBarCloseClick()">
+      <button ejs-button id="close" class="e-btn close-btn" title="Close" (click)="alertSideBarCloseClick()">
           <fa-icon [icon]='faTimes'></fa-icon>
+      </button>
+    </div>
+    <div class="clearAllbtn">
+      <button ejs-button id="clearAll" class="e-btn close-btn" title="Dismiss All" (click)="alertSideBarClearAllClick()">
+          <fa-icon [icon]='faBan'></fa-icon>
       </button>
     </div>
   </div>
   <div id="listcontainer">
     <div class="card" *ngFor="let item of alerts">
       <div class="card-body">
-        <div [innerHTML]="item.content"></div>        
-      </div>
-      <div class="card-footer">
-        <small>{{item.createdAt | date:'medium'}}</small>
+        <div class="row">
+          <div class="col col-1">
+              <i-feather *ngIf="item.alertType == 1" class="badge-info" name="bell"></i-feather>
+              <i-feather *ngIf="item.alertType == 2" class="badge-warning" name="bell"></i-feather>
+              <i-feather *ngIf="item.alertType == 3" class="badge-success" name="bell"></i-feather>              
+          </div>
+          <div class="col col-11">
+              <h6>{{item.title}}
+              <br>
+              </h6>
+          </div>
+        </div>
+        <div [innerHTML]="item.content"></div>                
+        <br />
+        <div class="row">
+            <div class="col col-6">
+                <small>{{item.createdAt | date: 'MM/dd/yyyy hh:mm a'}}</small>
+                <br/><small>Timestamp</small>
+            </div>
+            <div class="col col-4"></div>
+            <div class="col col-2 dismiss" (click)="alertDismiss(item.id)">
+                <a style="text-decoration: none;">X <br/><small>Dismiss</small></a>
+            </div>
+        </div>
       </div>
     </div>
   </div>
