@@ -8,6 +8,7 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
@@ -60,6 +61,7 @@ import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '
 import { ExtensionCandidateComponent } from '../order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
 import { filter } from 'rxjs/operators';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
+import { UnsavedFormDirective } from '@shared/directives/unsaved-form.directive';
 
 enum Template {
   accept,
@@ -87,7 +89,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('tab') tab: TabComponent;
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
   @ViewChild(ExtensionSidebarComponent) extensionSidebarComponent: ExtensionSidebarComponent;
-  @ViewChild(ExtensionCandidateComponent) extensionCandidateComponent: ExtensionCandidateComponent;
+  @ViewChild(UnsavedFormDirective) unsavedForm: UnsavedFormDirective;
 
   @Select(OrderManagementState.selectedOrder)
   public agencySelectedOrder$: Observable<Order>;
@@ -209,7 +211,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public onClose(): void {
-    if (this.extensionCandidateComponent?.form.dirty) {
+    if (this.unsavedForm?.hasChanges) {
       this.saveExtensionChanges().subscribe(() => this.closeSideDialog());
     } else {
       this.closeSideDialog();

@@ -343,15 +343,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private showBillRatesValidationMessage(): void {
     ToastUtility.show({
       title: 'Error',
-      content: 'Please add Bill Rates in Bill Rates tab',
+      content: 'Please set up at least one Regular Bill Rate in Organization Settings',
       position: { X: 'Center', Y: 'Top' },
       cssClass: 'error-toast',
     });
   }
 
   public save(): void {
-    const billRatesValid = (this.billRatesComponent?.billRatesControl.value.length ||
-      this.orderBillRates.length ||
+    const isRegularBillRate = this.billRatesComponent?.billRatesControl.value.some((item: BillRate) => item.billRateConfigId === 1) ||
+      this.orderBillRates.some((item: BillRate) => item.billRateConfigId === 1);
+    const billRatesValid = (isRegularBillRate ||
       this.isPerDiem ||
       this.isPermPlacementOrder);
     const credentialsValid = this.orderCredentials?.length;

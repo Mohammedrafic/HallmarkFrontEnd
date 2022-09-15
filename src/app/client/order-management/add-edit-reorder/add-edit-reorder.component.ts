@@ -215,17 +215,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;
     const payload = { reorder, agencyIds, reOrderId, reOrderFromId };
 
-    if (this.isWrongOpenPositionCount(<ReorderRequestModel>payload)) {
-      this.showSaveErrorPositionsIssue();
-      return;
-    }
-
-    if (this.hasFilledPositions()) {
-      if (this.isDatesChanged()) {
-        this.showSaveErrorDateTimeIssue();
-      } else {
-        this.save(<ReorderRequestModel>payload);
-      }
+    if (this.isEditMode) {
+      this.checkPositionsAndSave(<ReorderRequestModel>payload);
     } else {
       this.save(<ReorderRequestModel>payload);
     }
@@ -241,6 +232,23 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     const message =
       'Open Positions number CANNOT be less than the number of already Filled positions for this Re-Order';
     this.store.dispatch(new ShowToast(MessageTypes.Error, message));
+  }
+
+  private checkPositionsAndSave(payload: ReorderRequestModel): void {
+    if (this.isWrongOpenPositionCount(<ReorderRequestModel>payload)) {
+      this.showSaveErrorPositionsIssue();
+      return;
+    }
+
+    if (this.hasFilledPositions()) {
+      if (this.isDatesChanged()) {
+        this.showSaveErrorDateTimeIssue();
+      } else {
+        this.save(<ReorderRequestModel>payload);
+      }
+    } else {
+      this.save(<ReorderRequestModel>payload);
+    }
   }
 
   private save(payload: ReorderRequestModel): void {
