@@ -41,15 +41,18 @@ import {
 import { capitalize } from 'lodash';
 import { DurationService } from '@shared/services/duration.service';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { UnsavedFormComponentRef, UNSAVED_FORM_PROVIDERS } from '@shared/directives/unsaved-form.directive';
+
+interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> {}
 
 @Component({
   selector: 'app-extension-candidate',
   templateUrl: './extension-candidate.component.html',
   styleUrls: ['../accept-candidate/accept-candidate.component.scss', './extension-candidate.component.scss'],
-  providers: [MaskedDateTimeService],
+  providers: [MaskedDateTimeService, UNSAVED_FORM_PROVIDERS(ExtensionCandidateComponent)],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ExtensionCandidateComponent extends DestroyableDirective implements OnInit {
+export class ExtensionCandidateComponent extends DestroyableDirective implements OnInit, IExtensionCandidate {
   @Input() currentOrder: Order;
   @Input() candidateOrder: OrderCandidatesListPage;
   @Input() dialogEvent: Subject<boolean>;
