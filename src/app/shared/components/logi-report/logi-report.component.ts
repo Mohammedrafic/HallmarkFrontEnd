@@ -56,7 +56,7 @@ export class LogiReportComponent implements OnInit {
       user: this.uId,
       pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
-      jrd_dashboard_mode: "edit",
+      jrd_dashboard_mode: "view",
     },
       resExt = {
         reslst: this.resultList,
@@ -101,7 +101,7 @@ export class LogiReportComponent implements OnInit {
       user: this.uId,
       pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
-      jrd_studio_mode: "edit",
+      jrd_studio_mode: "view",
       "jrs.param_page": true
     };
     let prptRes = this.reportName;
