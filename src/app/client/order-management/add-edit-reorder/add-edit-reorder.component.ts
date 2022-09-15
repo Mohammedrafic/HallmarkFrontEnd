@@ -175,6 +175,16 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     return this.order.candidates.some((candidate) => candidate.status === ONBOARDED_STATUS);
   }
 
+  private isWrongOpenPositionCount(payload: ReorderRequestModel): boolean {
+    if (!this.order.candidates?.length) {
+      return false;
+    }
+
+    const onboardedCandidates = this.order.candidates?.filter((candidate) => candidate.status === ONBOARDED_STATUS);
+
+    return onboardedCandidates.length > payload.reorder.openPosition;
+  }
+
   isDatesChanged(): boolean {
     const { reorderDate, shiftEndTime, shiftStartTime } = this.reorderForm.getRawValue();
     const {
@@ -205,21 +215,40 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;
     const payload = { reorder, agencyIds, reOrderId, reOrderFromId };
 
+    if (this.isEditMode) {
+      this.checkPositionsAndSave(<ReorderRequestModel>payload);
+    } else {
+      this.save(<ReorderRequestModel>payload);
+    }
+  }
+
+  private showSaveErrorDateTimeIssue(): void {
+    const message =
+      'Re-order Date, Shift Start Time and Shift End Time CANNOT be edited if there is at least one Filled Position in this order.';
+    this.store.dispatch(new ShowToast(MessageTypes.Error, message));
+  }
+
+  private showSaveErrorPositionsIssue(): void {
+    const message =
+      'Open Positions number CANNOT be less than the number of already Filled positions for this Re-Order';
+    this.store.dispatch(new ShowToast(MessageTypes.Error, message));
+  }
+
+  private checkPositionsAndSave(payload: ReorderRequestModel): void {
+    if (this.isWrongOpenPositionCount(<ReorderRequestModel>payload)) {
+      this.showSaveErrorPositionsIssue();
+      return;
+    }
+
     if (this.hasFilledPositions()) {
       if (this.isDatesChanged()) {
-        this.showSaveError();
+        this.showSaveErrorDateTimeIssue();
       } else {
         this.save(<ReorderRequestModel>payload);
       }
     } else {
       this.save(<ReorderRequestModel>payload);
     }
-  }
-
-  private showSaveError(): void {
-    const message =
-      'Re-order Date, Shift Start Time and Shift End Time CANNOT be edited if there is at least one Filled Position in this order.';
-    this.store.dispatch(new ShowToast(MessageTypes.Error, message));
   }
 
   private save(payload: ReorderRequestModel): void {

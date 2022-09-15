@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  forwardRef,
   Input,
   OnChanges,
   OnDestroy,
@@ -46,15 +47,19 @@ import { Comment } from '@shared/models/comment.model';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { Duration } from '../../../../enums/durations';
 import { DurationService } from '../../../../services/duration.service';
+import { UnsavedFormComponentRef, UNSAVED_FORM_PROVIDERS } from '@shared/directives/unsaved-form.directive';
 
 @Component({
   selector: 'app-onboarded-candidate',
   templateUrl: './onboarded-candidate.component.html',
   styleUrls: ['./onboarded-candidate.component.scss'],
-  providers: [MaskedDateTimeService],
+  providers: [
+    MaskedDateTimeService,
+    UNSAVED_FORM_PROVIDERS(OnboardedCandidateComponent),
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges {
+export class OnboardedCandidateComponent extends UnsavedFormComponentRef implements OnInit, OnDestroy, OnChanges {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
 
   @Select(OrderManagementContentState.rejectionReasonsList)
@@ -73,7 +78,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
   @Input() isAgency: boolean = false;
   @Input() orderDuration: Duration;
 
-  public form: FormGroup;
+  public override form: FormGroup;
   public jobStatusControl: FormControl;
   public optionFields = OPTION_FIELDS;
   public candidateJob: OrderCandidateJob | null;
@@ -128,7 +133,9 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
     private commentsService: CommentsService,
     private durationService: DurationService,
     private changeDetectorRef: ChangeDetectorRef
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
@@ -221,8 +228,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
             organizationId: this.candidateJob?.organizationId as number,
             jobId: this.candidateJob?.jobId as number,
             nextApplicantStatus: this.candidateJob?.applicantStatus,
-            actualStartDate: this.candidateJob?.actualStartDate as string,
-            actualEndDate: this.candidateJob?.actualEndDate as string,
+            actualStartDate: toCorrectTimezoneFormat(this.candidateJob?.actualStartDate) as string,
+            actualEndDate: toCorrectTimezoneFormat(this.candidateJob?.actualEndDate) as string,
             offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.availableStartDate as string),
             candidateBillRate: this.candidateJob?.candidateBillRate as number,
             offeredBillRate: this.candidateJob?.offeredBillRate,
@@ -440,3 +447,4 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
     this.openRejectDialog.next(true);
   }
 }
+

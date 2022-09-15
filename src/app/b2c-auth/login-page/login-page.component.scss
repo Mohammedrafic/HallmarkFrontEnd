@@ -1,4 +1,7 @@
-@import "colors";
+@import 'colors';
+@import 'adaptive-response';
+
+$max-login-mobile: '(max-width: 550px)';
 
 .login-page {
   .row {
@@ -8,12 +11,34 @@
 
     .left-column {
       padding: 70px;
-      width: 20%;
       min-width: 400px;
       position: relative;
+      flex-grow: 1;
+
+      @media #{$max-login-mobile} {
+        padding: 24px;
+        min-width: unset;
+
+        .logo {
+          text-align: center;
+        }
+      }
+
+      .form-wrapper {
+        max-width: 400px;
+        margin: 0 auto;
+
+        @media #{$max-login-mobile} {
+          min-width: unset;
+        }
+      }
 
       .text-box {
-        margin-top: 180px;
+        margin-top: 18vh;
+
+        @media #{$max-login-mobile} {
+          text-align: center;
+        }
 
         h2 {
           font-size: 34px;
@@ -74,12 +99,17 @@
     }
 
     .right-column {
-      background-image: url("../../../assets/login.jpg");
+      background-image: url('../../../assets/login.jpg');
       background-repeat: no-repeat;
       background-size: cover;
       background-position: center;
       height: 100vh;
       width: 100%;
+      max-width: 80%;
+
+      @media #{$max-tablet} {
+        display: none;
+      }
     }
   }
 }
@@ -93,4 +123,3 @@
     width: 100%;
   }
 }
-

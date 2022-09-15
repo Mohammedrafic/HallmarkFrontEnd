@@ -136,6 +136,8 @@ import { AlertsState } from '@admin/store/alerts.state';
 import { ImportDialogContentComponent } from './components/import-dialog-content/import-dialog-content.component';
 import { GridErroredCellComponent } from './components/import-dialog-content/grid-errored-cell/grid-errored-cell.component';
 import { HideBeforeSyncfusionLoadDirective } from './directives/hide-before-syncfusion-load.directive';
+import { UnsavedFormDirective } from './directives/unsaved-form.directive';
+import { ClearCacheComponent } from './components/clear-cache/clear-cache.component';
 
 const icons = {
   AlertCircle,
@@ -220,6 +222,8 @@ const COMPONENTS = [
   SmsSideDialogComponent,
   OnScreenSideDialogComponent,
   OrderCloseReasonInfoComponent,
+  UnsavedFormDirective,
+  ClearCacheComponent,
 ];
 
 @NgModule({
