@@ -1397,7 +1397,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         positionClosureReason: res.positionClosureReason,
         positionClosureReasonId: res.positionClosureReasonId,
         orderStatus: res.orderStatus,
-        candidateStatus: res.candidateStatus,
+        candidateStatus: res.applicantStatus.applicantStatus,
       };
     });
   }
