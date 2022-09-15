@@ -435,7 +435,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       case OrganizationOrderManagementTabs.Incomplete:
         this.columnsToExport = allOrdersColumnsToExport;
         this.filters.isTemplate = false;
-        this.store.dispatch(new GetOrders({ pageNumber: this.currentPage, pageSize: this.pageSize }, true));
+        this.store.dispatch(new GetOrders({ ...this.filters, pageNumber: this.currentPage, pageSize: this.pageSize }, true));
         break;
       case OrganizationOrderManagementTabs.OrderTemplates:
         this.filters.isTemplate = true;
