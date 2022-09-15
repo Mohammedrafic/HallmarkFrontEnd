@@ -23,11 +23,11 @@ import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 
 @Component({
-  selector: 'app-credential-expiry',
-  templateUrl: './credential-expiry.component.html',
-  styleUrls: ['./credential-expiry.component.scss']
+  selector: 'app-client-finance-accrual-report',
+  templateUrl: './client-finance-accrual-report.component.html',
+  styleUrls: ['./client-finance-accrual-report.component.scss']
 })
-export class CredentialExpiryComponent implements OnInit {
+export class ClientFinanceAccrualReportComponent implements OnInit {
   public paramsData: any = {
     "OrganizationParamACCR": "",
     "StartDateParamACCR": "",
@@ -36,9 +36,9 @@ export class CredentialExpiryComponent implements OnInit {
     "LocationParamACCR": "",
     "DepartmentParamACCR": ""
   };
-  public reportName: LogiReportFileDetails = { name: "/CredentialExpiry/CredentialExpiry.wls" };
-  public catelogName: LogiReportFileDetails = { name: "/CredentialExpiry/Dashbord.cat" };
-  public title: string = "Credential Expiry";
+  public reportName: LogiReportFileDetails = { name: "/AccrualReport/AccrualReportWeb.wls" };
+  public catelogName: LogiReportFileDetails = { name: "/AccrualReport/Dashbord.cat" };
+  public title: string = "Client Finance Accrual Report";
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
 
   @Select(LogiReportState.regions)
@@ -67,7 +67,7 @@ export class CredentialExpiryComponent implements OnInit {
   private unsubscribe$: Subject<void> = new Subject();
   public filterColumns: any;
   private touchedFields: Set<string> = new Set();
-  public credentialExpiryForm: FormGroup;
+  public accrualReportForm: FormGroup;
   public bussinessControl: AbstractControl;
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
@@ -85,7 +85,7 @@ export class CredentialExpiryComponent implements OnInit {
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
     }
-    this.credentialExpiryForm = this.formBuilder.group(
+    this.accrualReportForm = this.formBuilder.group(
       {
         business: [null, Validators.required],
         startDate: [null, Validators.required],
@@ -105,7 +105,7 @@ export class CredentialExpiryComponent implements OnInit {
       this.filterColumns.businessIds.dataSource = data;
 
     });
-    this.bussinessControl = this.credentialExpiryForm.get('business') as AbstractControl;
+    this.bussinessControl = this.accrualReportForm.get('business') as AbstractControl;
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
 
       this.selectedOrganizations = this.organizations?.filter((x) => data?.includes(x.id));
@@ -115,7 +115,7 @@ export class CredentialExpiryComponent implements OnInit {
       };
       this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
     });
-    this.regionIdControl = this.credentialExpiryForm.get('regionId') as AbstractControl;
+    this.regionIdControl = this.accrualReportForm.get('regionId') as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       const fieldName = 'region';
       this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
@@ -127,7 +127,7 @@ export class CredentialExpiryComponent implements OnInit {
       this.markTouchedField(fieldName);
       this.store.dispatch(new GetLocationsByRegions(locationFilter));
     });
-    this.locationIdControl = this.credentialExpiryForm.get('locationId') as AbstractControl;
+    this.locationIdControl = this.accrualReportForm.get('locationId') as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       const fieldName = 'location';
       this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
@@ -138,7 +138,7 @@ export class CredentialExpiryComponent implements OnInit {
       this.markTouchedField(fieldName);
       this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));
     });
-    this.departmentIdControl = this.credentialExpiryForm.get('departmentId') as AbstractControl;
+    this.departmentIdControl = this.accrualReportForm.get('departmentId') as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       const fieldName = 'department';
       this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));
@@ -150,8 +150,8 @@ export class CredentialExpiryComponent implements OnInit {
   }
 
   public SearchReport(): void {
-    if (this.credentialExpiryForm?.valid) {
-      let { startDate, endDate } = this.credentialExpiryForm.getRawValue();
+    if (this.accrualReportForm?.valid) {
+      let { startDate, endDate } = this.accrualReportForm.getRawValue();
       this.paramsData =
       {
         "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.name),
@@ -164,7 +164,7 @@ export class CredentialExpiryComponent implements OnInit {
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
     } else {
-      this.credentialExpiryForm?.updateValueAndValidity();
+      this.accrualReportForm?.updateValueAndValidity();
     }
   }
   private resetLocation(): void {
@@ -252,5 +252,4 @@ export class CredentialExpiryComponent implements OnInit {
   private markTouchedField(field: string) {
     this.touchedFields.add(field);
   }
-
 }
