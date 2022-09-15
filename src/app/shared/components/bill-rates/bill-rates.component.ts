@@ -144,6 +144,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         const removeIndex = Number(index);
         this.billRatesControl.removeAt(removeIndex);
         this.billRatesChanged.emit(removeIndex);
+        this.emitManuallyAddedBillRates();
       });
   }
 
@@ -196,8 +197,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         this.billRatesControl.push(this.fromValueToBillRate(value));
       }
 
-      const manuallyAddedBillRates = this.billRatesControl.getRawValue().filter((billRate: BillRate) => billRate.id === 0); 
-      this.manuallyAddedBillRates.emit(manuallyAddedBillRates);
+      this.emitManuallyAddedBillRates();
       this.billRatesChanged.emit(this.billRateForm.value);
       this.billRateForm.reset();
       this.store.dispatch(new ShowSideDialog(false));
@@ -211,5 +211,12 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     billRateConfig?.patchValue({ ...value.billRateConfig });
     billRateControl.patchValue({ ...value, billRateConfig });
     return billRateControl;
+  }
+
+  private emitManuallyAddedBillRates(): void {
+    const manuallyAddedBillRates = this.billRatesControl
+      .getRawValue()
+      .filter((billRate: BillRate) => billRate.id === 0);
+    this.manuallyAddedBillRates.emit(manuallyAddedBillRates);
   }
 }
