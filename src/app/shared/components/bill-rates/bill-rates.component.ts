@@ -30,6 +30,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   }
 
   @Output() billRatesChanged: EventEmitter<any> = new EventEmitter();
+  @Output() manuallyAddedBillRates: EventEmitter<BillRate[]> = new EventEmitter();
 
   public billRateFormHeader: string;
   public billRatesControl: FormArray;
@@ -195,6 +196,8 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         this.billRatesControl.push(this.fromValueToBillRate(value));
       }
 
+      const manuallyAddedBillRates = this.billRatesControl.getRawValue().filter((billRate: BillRate) => billRate.id === 0); 
+      this.manuallyAddedBillRates.emit(manuallyAddedBillRates);
       this.billRatesChanged.emit(this.billRateForm.value);
       this.billRateForm.reset();
       this.store.dispatch(new ShowSideDialog(false));
