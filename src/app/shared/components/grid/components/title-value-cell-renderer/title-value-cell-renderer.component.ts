@@ -30,7 +30,7 @@ export class TitleValueCellRendererComponent extends GridCellRenderer<TitleValue
     event.stopImmediatePropagation();
     const id = this.params.data.timesheetId;
 
-    if (id && this.params.data.timesheetTypeText !== 'Expenses') {
+    if (id) {
       this.router.navigate(['../timesheets'], { relativeTo: this.route, state: { timesheetId: id }});
     }
   }
