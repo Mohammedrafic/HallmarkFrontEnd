@@ -41,6 +41,7 @@ import {
 import { capitalize } from 'lodash';
 import { DurationService } from '@shared/services/duration.service';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { toCorrectTimezoneFormat } from '../../../../utils/date-time.utils';
 import { UnsavedFormComponentRef, UNSAVED_FORM_PROVIDERS } from '@shared/directives/unsaved-form.directive';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> {}
@@ -137,7 +138,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
           jobId: this.candidateJob.jobId,
           skillName: value.skillName,
           offeredBillRate: this.candidateJob?.offeredBillRate,
-          offeredStartDate: this.candidateJob?.offeredStartDate,
+          offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.offeredStartDate),
           candidateBillRate: this.candidateJob.candidateBillRate,
           nextApplicantStatus: {
             applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
@@ -407,7 +408,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         ofActionSuccessful(RejectCandidateForAgencySuccess),
         mergeMap(() => this.store.dispatch(new ReloadOrderCandidatesLists()))
       )
-    ).pipe(takeUntil(this.destroy$)).subscribe();
+    )
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
   }
 }
-
