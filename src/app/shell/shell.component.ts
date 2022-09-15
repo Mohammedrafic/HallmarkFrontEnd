@@ -120,7 +120,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   private routers: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
 
   faTimes = faTimes as IconDefinition;
-  faBan = faBan;
+  faBan = faBan as IconDefinition;
   alerts: any;
   constructor(
     private store: Store,
