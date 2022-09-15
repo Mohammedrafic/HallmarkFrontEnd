@@ -347,8 +347,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   public save(): void {
-    const isRegularBillRate = this.billRatesComponent?.billRatesControl.value.some((item: any) => item.billRateConfigId === 1) ||
-      this.orderBillRates.some((item: any) => item.billRateConfigId === 1);
+    const isRegularBillRate = this.billRatesComponent?.billRatesControl.value.some((item: BillRate) => item.billRateConfigId === 1) ||
+      this.orderBillRates.some((item: BillRate) => item.billRateConfigId === 1);
     const billRatesValid = (isRegularBillRate ||
       this.isPerDiem ||
       this.isPermPlacementOrder);
