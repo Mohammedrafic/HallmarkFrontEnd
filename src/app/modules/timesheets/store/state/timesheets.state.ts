@@ -254,7 +254,6 @@ export class TimesheetsState {
       });
 
     return of(null).pipe(
-      throttleTime(100),
       tap(() =>
         setState(patch<TimesheetsModel>({
           timesheetsFilters,

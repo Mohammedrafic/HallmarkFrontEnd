@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, throttleTime } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction } from '@core/enums';
@@ -199,6 +199,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   private onOrganizationChangedHandler(): void {
     (this.isAgency ? this.agencyId$ : this.organizationId$).pipe(
+      filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
       this.store.dispatch(new Timesheets.ResetFiltersState());
@@ -209,6 +210,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   private startFiltersWatching(): void {
     this.timesheetsFilters$.pipe(
       filter(Boolean),
+      throttleTime(100),
       switchMap(() => this.store.dispatch(new Timesheets.GetAll())),
       takeUntil(this.componentDestroy()),
     ).subscribe();
