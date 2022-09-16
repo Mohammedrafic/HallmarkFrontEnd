@@ -33,8 +33,6 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { OrganizationHierarchy } from '@shared/enums/organization-hierarchy';
 import { OrganizationSettingValidationType } from '@shared/enums/organization-setting-validation-type';
-import { User } from '@shared/models/user.model';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { customEmailValidator } from '@shared/validators/email.validator';
 import { UserState } from '../../store/user.state';
@@ -188,7 +186,6 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       this.getSettings();
     });
     this.mapGridData();
-    this.isEditOverrideAccessible();
 
     this.organizationStructure$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
@@ -693,17 +690,6 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
 
   private getLastPage(data: object[]): number {
     return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
-  }
-
-  // TODO: remove after permission service implementation
-  private isEditOverrideAccessible(): void {
-    const storedUser = localStorage.getItem('User');
-    if (storedUser) {
-      const user = JSON.parse(storedUser) as User;
-      if ([BusinessUnitType.Hallmark, BusinessUnitType.MSP].includes(user.businessUnitType)) {
-        this.hasAccess = true;
-      }
-    }
   }
 
   private setPermissionsToManageSettings(): void {

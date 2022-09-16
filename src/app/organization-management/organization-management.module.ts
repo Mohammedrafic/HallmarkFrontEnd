@@ -103,6 +103,7 @@ import { LocationsGridComponent } from './locations/import-locations/locations-g
 import { GridModule as AppGridModule } from "@shared/components/grid/grid.module";
 import { ImportDepartmentsComponent } from './departments/import-departments/import-departments.component';
 import { DepartmentsGridComponent } from './departments/import-departments/departments-grid/departments-grid.component';
+import { CanManageSettingPipe } from '@shared/pipes/can-manage-setting.pipe';
 
 const sidebarIcons = {
   Download,
@@ -163,7 +164,8 @@ const sidebarIcons = {
     ImportLocationsComponent,
     LocationsGridComponent,
     ImportDepartmentsComponent,
-    DepartmentsGridComponent
+    DepartmentsGridComponent,
+    CanManageSettingPipe
   ],
   imports: [
     CommonModule,
