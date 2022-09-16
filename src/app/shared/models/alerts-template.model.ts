@@ -70,3 +70,7 @@ export type AlertTriggerDto = {
   AlertId :number;
   Parameters: any;
 }
+
+export type DismissAlertDto = {
+  Id: number;
+}
