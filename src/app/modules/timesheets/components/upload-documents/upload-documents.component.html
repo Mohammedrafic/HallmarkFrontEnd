@@ -25,12 +25,13 @@
       [maxFiles]="100"
       [clearAll]="filesClearEvent"
       [attachments]="existingFiles"
+      [useRedTrashBin]="true"
       (existingFileDelete)="deleteFile($event)"
       (selectedFilesChanged)="selectedFiles($event)"
     ></app-file-uploader>
     <button
       ejs-button
-      *ngIf="fileForUploads.length"
+      *ngIf="fileForUploads.length || existingFiles.length"
       cssClass="e-outline button-clear"
       (click)="clearFiles()"
     >

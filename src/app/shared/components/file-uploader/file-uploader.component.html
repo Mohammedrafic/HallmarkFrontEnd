@@ -11,6 +11,7 @@
     [autoUpload]="false"
     [files]="existingFiles"
     [showFileList]="showSelectedFiles"
+    [cssClass]="useRedTrashBin ? 'custom-trash' : ''"
     (selected)="filesSelected($event)"
     (removing)="removeFile($event)"
   ></ejs-uploader>
