@@ -1,10 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
 
 @NgModule({
   declarations: [],
-  providers: [ReOpenOrderService],
+  providers: [],
   imports: [CommonModule],
   exports: [],
 })
