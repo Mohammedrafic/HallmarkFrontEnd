@@ -4,8 +4,11 @@
   background-color: #fff;
   margin-right: 25px;
   height: 100%;
+  width: 231px;
+  margin-left: -25px;
+  overflow-y: auto;
 
-  .list-box {
+   .list-box {
     .e-listbox-wrapper {
       border: none;
 

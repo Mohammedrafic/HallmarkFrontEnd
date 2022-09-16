@@ -1,0 +1,109 @@
+<Section>
+    <form class="bootstrap" [formGroup]="accrualReportForm">
+      <div class="form-line">
+  
+        <!-- Organization -->
+  
+        <div class="input-container bootstrap form-line-item-20">
+          <label>Organization Name<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="business"
+                             placeholder="All"
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             appValidateWithMessage
+                             [fields]="bussinesDataFields"
+                             [dataSource]="filterColumns.businessIds.dataSource">
+            </ejs-multiselect>
+          </div>
+        </div>
+  
+        <!-- Start Date -->
+        <div class="input-container bootstrap form-line-item-20">
+          <label>Start Date<span class="required">*</span></label>
+          <div class="input-group datepicker">
+            <ejs-datepicker id="startDate"
+                            class="datepicker"
+                            format="MM/dd/yyyy"
+                            placeholder="MM/DD/YYYY"
+                            appValidateWithMessage
+                            formControlName="startDate">
+            </ejs-datepicker>
+          </div>
+        </div>
+  
+        <!-- End Date -->
+        <div class="input-container bootstrap form-line-item-20">
+          <label>End Date<span class="required">*</span></label>
+          <ejs-datepicker id="endDate"
+                          class="datepicker"
+                          format="MM/dd/yyyy"
+                          placeholder="MM/DD/YYYY"
+                          appValidateWithMessage
+                          formControlName="endDate"
+                          [min]="accrualReportForm.controls['startDate'].value">
+          </ejs-datepicker>
+        </div>
+        <div class="input-container form-line-item-20">
+          <button ejs-button type="submit"
+                  [isPrimary]="true" (click)="SearchReport()">
+            Get Details
+          </button>
+        </div>
+  
+  
+      </div>
+      <div class="form-line">
+        <div class="input-container bootstrap form-line-item-20">
+          <label>Region<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="regionId"
+                             appValidateWithMessage
+                             placeholder="All"
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.regionIds.dataSource"
+                             [fields]="regionFields">
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container bootstrap form-line-item-20">
+          <label>Location<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="locationId"
+                             appValidateWithMessage
+                             placeholder="All"
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.locationIds.dataSource"
+                             [fields]="locationFields">
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container bootstrap form-line-item-20">
+          <label>Department<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="departmentId"
+                             appValidateWithMessage
+                             placeholder="All"
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.departmentIds.dataSource"
+                             [fields]="departmentFields">
+            </ejs-multiselect>
+          </div>
+        </div>
+  
+  
+      </div>
+    </form>
+  </Section>
+  <section class="accrual-report-section">
+    <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName" [reportType]="reportType"></app-logi-report>
+    <router-outlet></router-outlet>
+  </section>
+  
