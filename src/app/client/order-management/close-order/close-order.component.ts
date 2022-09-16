@@ -11,12 +11,12 @@ import { ShowCloseOrderDialog } from '../../../store/app.actions';
 import { OrderType, OrderTypeTitlesMap } from '@shared/enums/order-type';
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { CloseOrderService } from '@client/order-management/close-order/close-order.service';
-import { GetClosureReasonsByPage } from "@organization-management/store/reject-reason.actions";
-import { RejectReasonState } from "@organization-management/store/reject-reason.state";
-import { CloseOrderPayload } from "@client/order-management/close-order/models/closeOrderPayload.model";
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
-import { ConfirmService } from "@shared/services/confirm.service";
-import { ClosePositionPayload } from "@client/order-management/close-order/models/closePositionPayload.model";
+import { GetClosureReasonsByPage } from '@organization-management/store/reject-reason.actions';
+import { RejectReasonState } from '@organization-management/store/reject-reason.state';
+import { CloseOrderPayload } from '@client/order-management/close-order/models/closeOrderPayload.model';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { ClosePositionPayload } from '@client/order-management/close-order/models/closePositionPayload.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { UserState } from 'src/app/store/user.state';
@@ -29,7 +29,9 @@ import { UserState } from 'src/app/store/user.state';
 export class CloseOrderComponent extends DestroyableDirective implements OnChanges, OnInit {
   @Input() public order: Order | OrderManagement;
   @Input() candidate: OrderManagementChild;
-  @Output() private closeOrderSuccess: EventEmitter<Order | OrderManagement> = new EventEmitter<Order | OrderManagement>();
+  @Output() private closeOrderSuccess: EventEmitter<Order | OrderManagement> = new EventEmitter<
+    Order | OrderManagement
+  >();
   @Output() private closePositionSuccess: EventEmitter<OrderManagementChild> = new EventEmitter<OrderManagementChild>();
 
   @Select(UserState.lastSelectedOrganizationId)
@@ -61,8 +63,8 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   public ngOnChanges(changes: SimpleChanges) {
     if (changes['order']?.currentValue) {
-     this.dialogTitleType = OrderTypeTitlesMap.get(this.order.orderType) as string;
-     this.setMinDate();
+      this.dialogTitleType = OrderTypeTitlesMap.get(this.order.orderType) as string;
+      this.setMinDate();
     }
   }
 
@@ -105,13 +107,13 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   private initForm(): void {
     this.closeForm = this.formBuilder.group({
-        reasonId: [null, Validators.required],
-        closingDate: [null, Validators.required],
-      });
+      reasonId: [null, Validators.required],
+      closingDate: [null, Validators.required],
+    });
   }
 
   private setMinDate(): void {
-    this.minDate = this.order.orderType !== OrderType.OpenPerDiem ? this.order?.jobStartDate as Date : null;
+    this.minDate = this.order.orderType !== OrderType.OpenPerDiem ? (this.order?.jobStartDate as Date) : null;
   }
 
   private getComments(): void {
@@ -131,7 +133,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public setCloseDateAvailability(isPosition: boolean): void {
     this.isPosition = isPosition;
     if (this.isPosition && this.order?.orderType === OrderType.ReOrder) {
-      this.closeForm.patchValue({closingDate: new Date(this.order.jobStartDate as Date)});
+      this.closeForm.patchValue({ closingDate: new Date(this.order.jobStartDate as Date) });
       this.closeForm.get('closingDate')?.disable();
     } else {
       this.closeForm.get('closingDate')?.enable();
@@ -154,29 +156,22 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   private closeOrder(formData: Omit<CloseOrderPayload, 'orderId'>): void {
-    this.closeOrderService
-      .closeOrder({...formData, orderId: this.order.id})
-      .subscribe(() => {
-        this.closeOrderSuccess.emit(this.order);
-        this.closeDialog();
-      });
+    this.closeOrderService.closeOrder({ ...formData, orderId: this.order.id }).subscribe(() => {
+      this.closeOrderSuccess.emit(this.order);
+      this.closeDialog();
+    });
   }
 
   private closePosition(formData: ClosePositionPayload): void {
-    this.closeOrderService
-      .closePosition({...formData, jobId: this.candidate.jobId})
-      .subscribe(() => {
-        this.closePositionSuccess.emit(this.candidate);
-        this.closeDialog();
-      });
+    this.closeOrderService.closePosition({ ...formData, jobId: this.candidate.jobId }).subscribe(() => {
+      this.closePositionSuccess.emit(this.candidate);
+      this.closeDialog();
+    });
   }
 
   private subscribeOnCloseSideBar(): void {
-    this.actions.pipe(
-      ofActionSuccessful(ShowCloseOrderDialog),
-      takeUntil(this.destroy$)
-    ).subscribe((res) => {
-      if(!res.isDialogShown) {
+    this.actions.pipe(ofActionSuccessful(ShowCloseOrderDialog), takeUntil(this.destroy$)).subscribe((res) => {
+      if (!res.isDialogShown) {
         this.closeForm.reset();
       }
     });

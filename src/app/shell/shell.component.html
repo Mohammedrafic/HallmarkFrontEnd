@@ -59,11 +59,11 @@
       <section class="menu">
         <section class="sidebar-menu">
           <ejs-treeview id="template" #treevalidate [fields]="sideBarMenuField" (nodeClicked)='nodeSelect($event)'
-                        [fullRowSelect]="true" [loadOnDemand]="false">
+                        [fullRowSelect]="true" [loadOnDemand]="false" >
             <ng-template #nodeTemplate="" let-data="">
               <section class="icon-container"
                        (click)="onMenuItemClick(data)"
-                       (mouseenter)="showContextMenu(data, $event)">
+                       (mouseenter)="showContextMenu(data, $event)" >
                 <i-feather [name]="data.icon" class="icon"></i-feather>
                 <span class="e-text">{{ data.title }}</span>
                 <span class=" e-badge e-badge-success e-badge-circle" *ngIf="data.count">{{ data.count }}</span>

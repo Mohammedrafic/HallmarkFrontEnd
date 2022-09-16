@@ -165,6 +165,10 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.watchForRangeChange();
   }
 
+  public onOpen(args: { preventFocus: boolean }): void {
+    args.preventFocus = true;
+  }
+
   public closeDialogOnNavigationStart(): void {
     this.router.events.pipe(
       filter((e) => e instanceof NavigationStart),

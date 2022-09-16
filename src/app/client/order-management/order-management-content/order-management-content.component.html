@@ -749,6 +749,7 @@
   (closeReOrderEmitter)="onAddReorderClose()"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
   (updateOrders)="getOrders()"
+  (reOpenOrderSuccess)="updateOrderDetails($event)"
 ></app-order-details-dialog>
 
 <app-child-order-dialog
@@ -757,6 +758,7 @@
   [openEvent]="openChildDialog"
   [filters]="filters"
   (saveEmitter)="updateGrid()"
+  (reOpenPositionSuccess)="updatePositionDetails($event)"
 ></app-child-order-dialog>
 
 <app-close-order

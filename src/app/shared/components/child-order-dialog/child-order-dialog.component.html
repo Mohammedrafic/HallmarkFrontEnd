@@ -37,11 +37,19 @@
             <button
               ejs-button
               cssClass="e-outline"
-              *ngIf="!isAgency"
+              *ngIf="!canReOpen"
               [disabled]="disabledCloseButton"
               (click)="closeOrder(order)"
             >
               Close Position
+            </button>
+            <button
+              ejs-button
+              cssClass="e-outline"
+              *ngIf="canReOpen"
+              (click)="reOpenPosition()"
+            >
+              Re-Open
             </button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>

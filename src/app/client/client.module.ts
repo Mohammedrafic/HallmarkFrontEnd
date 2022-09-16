@@ -87,6 +87,7 @@ import { ChildOrderDialogModule } from '@shared/components/child-order-dialog/ch
 import { ExtensionModule } from '@shared/components/extension/extension.module';
 import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
 import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
+import { ReopenOrderModule } from '@client/order-management/reopen-order/reopen-order.module';
 
 const gridIcons = {
   MessageSquare,
@@ -163,6 +164,7 @@ const gridIcons = {
     AddEditReorderModule,
     SaveTemplateDialogModule,
     CloseOrderModule,
+    ReopenOrderModule,
     CandidateListModule,
     SwitchModule,
     CandidateDetailsModule,

@@ -61,6 +61,14 @@
             <button
               ejs-button
               cssClass="e-outline"
+              *ngIf="canReOpen"
+              (click)="reOpenOrder(order)"
+            >
+              Re-Open
+            </button>
+            <button
+              ejs-button
+              cssClass="e-outline"
               *ngIf="orderType.OpenPerDiem === order?.orderType"
               (click)="createReOrder()"
               [disabled]="
