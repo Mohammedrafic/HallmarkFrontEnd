@@ -15,6 +15,9 @@ export class AttachmentsListComponent implements AttachmentsListParams {
   @Input()
   public attachmentsListConfig: AttachmentsListConfig | null;
 
+  @Input()
+  public deleteIconColor: '#FF5858' | 'initial' = 'initial';
+
   public agInit(params: AttachmentsListParams): void {
     this.attachments = params.attachments;
     this.attachmentsListConfig = params.attachmentsListConfig;

@@ -6,6 +6,7 @@
   [visible]="false"
   [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
+  (open)="onOpen($event)"
 >
   <ng-template #content>
     <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails; else closeTemplate">
@@ -117,6 +118,7 @@
 
               <app-attachments-list [attachments]="timesheetDetails.attachments"
                                     [attachmentsListConfig]="attachmentsListConfig$ | async"
+                                    [deleteIconColor]="'#FF5858'"
               ></app-attachments-list>
           </div>
 

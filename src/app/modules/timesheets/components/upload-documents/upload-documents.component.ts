@@ -118,11 +118,18 @@ export class UploadDocumentsComponent extends Destroyable implements OnInit {
 
   private closeDialog(closeModal = true): void {
     this.fileForUploads = [];
+    this.filesForDelete = [...this.existingFiles];
     this.existingFiles = [];
-    this.filesForDelete = [];
     this.filesClearEvent = FilesClearEvent.ClearAll;
 
     if (closeModal) {
+      if (this.filesForDelete.length) {
+        this.fileChange.emit({
+          fileForUpload: this.fileForUploads,
+          filesForDelete: this.filesForDelete,
+        });
+        this.filesForDelete = [];
+      }
       this.sideUploadDialog.hide();
       this.store.dispatch(new Timesheets.ToggleTimesheetUploadAttachmentsDialog(DialogAction.Close, null));
     }
