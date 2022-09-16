@@ -1,17 +1,24 @@
-$mobile-width: '360px';
-$tablet-width: '1024px';
-$desktop-small-width: '1366px';
-$desktop-large-width: '1920px';
+$mobile-min: '360px';
+$mobile-max: '640px';
 
-$min-mobile: '(min-width: ' + $mobile-width + ')';
-$min-tablet: '(min-width: ' + $tablet-width + ')';
-$min-desktop-small: '(min-width: ' + $desktop-small-width + ')';
-$min-desktop-large: '(min-width: ' + $desktop-large-width + ')';
+$tablet-min: '641px';
+$tablet-max: '1024px';
 
-$max-mobile: '(max-width: ' + $mobile-width + ')';
-$max-tablet: '(max-width: ' + $tablet-width + ')';
-$max-desktop-small: '(max-width: ' + $desktop-small-width + ')';
-$max-desktop-large: '(max-width: ' + $desktop-large-width + ')';
+$desktop-sm-min: '1025px';
+$desktop-sm-max: '1366px';
+
+$desktop-lg-min: '1367px';
+$desktop-lg-max: '1920px';
+
+$min-mobile: '(min-width: ' + $mobile-min + ')';
+$min-tablet: '(min-width: ' + $tablet-min + ')';
+$min-desktop-small: '(min-width: ' + $desktop-sm-min + ')';
+$min-desktop-large: '(min-width: ' + $desktop-lg-min + ')';
+
+$max-mobile: '(max-width: ' + $mobile-max + ')';
+$max-tablet: '(max-width: ' + $tablet-max + ')';
+$max-desktop-small: '(max-width: ' + $desktop-sm-max + ')';
+$max-desktop-large: '(max-width: ' + $desktop-lg-max + ')';
 
 
 /*
