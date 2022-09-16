@@ -86,7 +86,7 @@
               ejs-button
               cssClass="e-flat primary-icon-button"
               (click)="onEditButtonClick(data, undefined, $event)"
-              [disabled]="!data.overridableByOrganization || !hasAccess"
+              [disabled]="hasAccess ? false : !(!!hasPermissions[data.settingKey] && !hasAccess) || !data.overridableByOrganization"
             >
               <span class="edit-button" ><i-feather name="edit" class="icon"></i-feather></span>
             </button>
@@ -94,7 +94,7 @@
               ejs-button
               cssClass="e-flat default-icon-button"
               (click)="onOverrideButtonClick(data)"
-              [disabled]="(!data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment) || !hasAccess"
+              [disabled]="hasAccess ? false : !(!!hasPermissions[data.settingKey] && !hasAccess) || (!data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment)"
             >
               <span class="edit-button" ><i-feather name="plus" class="icon"></i-feather></span>
             </button>
