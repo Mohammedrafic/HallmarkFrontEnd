@@ -80,6 +80,7 @@
             [billRates]="orderBillRates"
             [isActive]="selectedTab === SelectedTab.BillRates"
             (billRatesChanged)="onBillRatesChanged()"
+            (manuallyAddedBillRates)="saveManuallyAddedBillRates($event)"
           >
           </app-bill-rates>
         </section>

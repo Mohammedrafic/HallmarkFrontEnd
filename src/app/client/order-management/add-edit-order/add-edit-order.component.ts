@@ -103,7 +103,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public orderId: number;
   public publicId: number;
   public prefix: string;
-  
+
   public title: string;
   public submitMenuItems: ItemModel[] = [
     { id: SubmitButtonItem.SaveForLater, text: 'Save For Later' },
@@ -113,8 +113,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   // todo: update/set credentials list in edit mode for order
   public orderCredentials: IOrderCredentialItem[] = [];
   public orderBillRates: BillRate[] = [];
+  private manuallyAddedBillRates: BillRate[] = [];
   private unsubscribe$: Subject<void> = new Subject();
-  
+
   public isPerDiem = false;
   public isPermPlacementOrder = false;
   public disableOrderType = false;
@@ -147,8 +148,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     if (this.orderId > 0) {
       this.store.dispatch(new GetSelectedOrderById(this.orderId));
-      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$))
-      .subscribe((order: Order) => {
+      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
         this.prefix = order?.organizationPrefix as string;
         this.publicId = order?.publicId as number;
         this.isPermPlacementOrder = order?.orderType === OrderType.PermPlacement;
@@ -157,7 +157,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.tab.hideTab(SelectedTab.BillRates, this.isPermPlacementOrder);
         }
 
-        if (order?.status === OrderStatus.Incomplete ) {
+        if (order?.status === OrderStatus.Incomplete) {
           this.addMenuItem(SubmitButtonItem.SaveForLater, 'Save For Later');
           this.removeMenuItem(SubmitButtonItem.Save);
         } else {
@@ -177,20 +177,23 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe((data) => {
       const user = this.store.selectSnapshot(UserState.user) as User;
-      const agency = this.store.selectSnapshot(AgencyState.agency) as Agency;      
-      let params:any={};
-      params['@'+AlertParameterEnum[AlertParameterEnum.MyOrganization]]=user?.businessUnitName;
-      params['@'+AlertParameterEnum[AlertParameterEnum.Agency]]=agency?.agencyDetails?.name;
-      params['@'+AlertParameterEnum[AlertParameterEnum.OrderId]]=data?.order?.organizationPrefix==null?data?.order?.publicId+'':data?.order?.organizationPrefix +'-'+ data?.order?.publicId;
-      params['@'+AlertParameterEnum[AlertParameterEnum.JobTitle]]=data?.order?.title;
+      const agency = this.store.selectSnapshot(AgencyState.agency) as Agency;
+      let params: any = {};
+      params['@' + AlertParameterEnum[AlertParameterEnum.MyOrganization]] = user?.businessUnitName;
+      params['@' + AlertParameterEnum[AlertParameterEnum.Agency]] = agency?.agencyDetails?.name;
+      params['@' + AlertParameterEnum[AlertParameterEnum.OrderId]] =
+        data?.order?.organizationPrefix == null
+          ? data?.order?.publicId + ''
+          : data?.order?.organizationPrefix + '-' + data?.order?.publicId;
+      params['@' + AlertParameterEnum[AlertParameterEnum.JobTitle]] = data?.order?.title;
       var url = location.origin + '/#/client/order-management/edit/' + data?.order?.publicId;
-      params['@'+AlertParameterEnum[AlertParameterEnum.ClickbackURL]]=url;      
-      
-      let alertTriggerDto:AlertTriggerDto={
+      params['@' + AlertParameterEnum[AlertParameterEnum.ClickbackURL]] = url;
+
+      let alertTriggerDto: AlertTriggerDto = {
         BusinessUnitId: user?.businessUnitId,
-        AlertId: this.orderId>0?AlertIdEnum.OrderUpdated:AlertIdEnum.OrderCreated,
-        Parameters: params
-      }
+        AlertId: this.orderId > 0 ? AlertIdEnum.OrderUpdated : AlertIdEnum.OrderCreated,
+        Parameters: params,
+      };
       this.store.dispatch(new AlertTrigger(alertTriggerDto));
       this.router.navigate(['/client/order-management']);
     });
@@ -198,7 +201,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.getPredefinedBillRatesData$
       .pipe(
         switchMap((getPredefinedBillRatesData) => {
-          if (getPredefinedBillRatesData && !this.orderBillRates.length) {
+          if (getPredefinedBillRatesData) {
             return this.store.dispatch(new GetPredefinedBillRates());
           } else {
             return of(null);
@@ -399,7 +402,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.jobDescriptionForm.markAllAsTouched();
       this.orderDetailsFormComponent.contactDetailsForm.markAllAsTouched();
       this.orderDetailsFormComponent.workLocationForm.markAllAsTouched();
-      this.orderDetailsFormComponent.specialProject.markAllAsTouched();      
+      this.orderDetailsFormComponent.specialProject.markAllAsTouched();
     }
   }
 
@@ -556,7 +559,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (!order.compBonus) {
       order.compBonus = null;
     }
-    
+
     return order;
   }
 
@@ -589,11 +592,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         )
       );
     } else {
-      this.store.dispatch(new SaveOrder(
-        order, documents, this.orderDetailsFormComponent.comments
-      ));
+      this.store.dispatch(new SaveOrder(order, documents, this.orderDetailsFormComponent.comments));
     }
-    
   }
 
   private subscribeOnPredefinedCredentials(): void {
@@ -609,7 +609,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private subscribeOnPredefinedBillRates(): void {
     this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe((predefinedBillRates) => {
-      this.orderBillRates = predefinedBillRates;
+      this.orderBillRates = [...predefinedBillRates, ...this.manuallyAddedBillRates];
     });
   }
 
@@ -627,7 +627,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.isSaveForTemplate = true;
     } else {
       this.markControlsAsRequired();
-      const fields = [FieldName.regionId, FieldName.locationId, FieldName.departmentId, FieldName.skillId]
+      const fields = [FieldName.regionId, FieldName.locationId, FieldName.departmentId, FieldName.skillId];
       const invalidFields = fields.filter((field, i) => !requiredFields[i]).join(',\n');
       this.showOrderFormValidationMessage(invalidFields);
     }
@@ -665,5 +665,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private selectOrderTemplatesTab(): void {
     this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.OrderTemplates));
+  }
+
+  public saveManuallyAddedBillRates(event: BillRate[]): void {
+    this.manuallyAddedBillRates = event;
   }
 }

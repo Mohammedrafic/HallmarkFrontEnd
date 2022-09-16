@@ -415,7 +415,7 @@ export type OrderCandidateJob = {
   offeredBillRate: number;
   order: Order;
   orderId: number;
-  orderStatus: OrderStatus
+  orderStatus: OrderStatus;
   organizationId: number;
   rejectBy: string;
   rejectDate: string;
