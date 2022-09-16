@@ -265,7 +265,8 @@ body {
     .credentials .e-accordion, .credentials .e-acrdn-item,
     .contacts,
     .tile-dark-blue,
-    .partnership-settings .main-content {
+    .partnership-settings .main-content,
+    .alert-panel {
       background: $widget-dark-tooltip !important;
     }
 
@@ -278,13 +279,15 @@ body {
     .tree-lebel label, .section-tittle,
     .profile-details-header .username, .job-info-container .value,
     .profile-hours-statistics-container section h3,
-    .partnership-settings .title {
+    .partnership-settings .title,
+    .alert-panel .alert-panel-header__title {
       color: $white !important;
     }
 
     .input-container label,
     .e-switch-wrapper label,
-    .dropdown-container label {
+    .dropdown-container label,
+    .alert-panel-footer {
       color: $secondary-dark-blue-40 !important;
     }
 
