@@ -1,0 +1,34 @@
+<ejs-dialog
+  #chatDialog
+  cssClass="dialog filter"
+  [width]="488"
+  [visible]="false"
+  [isModal]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <div class="dialog-header">
+      <h3 class="title">{{ title | titlecase }}</h3>
+      <div class="controls">
+        <button ejs-button type="submit" cssClass="e-flat close-button" (click)="closeChat()">
+          <i-feather name="x" class="icon"></i-feather>
+        </button>
+      </div>
+    </div>
+    <ng-container [ngSwitch]="currentChatState">
+      <ng-template [ngSwitchCase]="chatStates.List">
+        <div class="chat-controls">
+          <div class="input-container">
+            <div class="input-group">
+              <input
+                class="e-input"
+                appValidateWithMessage
+                formControlName="searchCriteria"
+              />
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ng-container>
+  </ng-template>
+</ejs-dialog>
