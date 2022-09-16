@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subject, takeWhile } from 'rxjs';
+import { catchError, EMPTY, Observable, Subject, take, takeWhile } from 'rxjs';
 
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -47,7 +47,7 @@ import {
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrderStatusText } from '@shared/enums/status';
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
-import { ShowCloseOrderDialog } from '../../../store/app.actions';
+import { ShowCloseOrderDialog, ShowToast } from '../../../store/app.actions';
 import { OrderStatus } from '@shared/enums/order-management';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
@@ -62,6 +62,8 @@ import { ExtensionCandidateComponent } from '../order-candidate-list/order-candi
 import { filter } from 'rxjs/operators';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { UnsavedFormDirective } from '@shared/directives/unsaved-form.directive';
+import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
+import { MessageTypes } from '@shared/enums/message-types';
 
 enum Template {
   accept,
@@ -83,6 +85,10 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
   @Output() saveEmitter = new EventEmitter<void>();
+
+  // TODO: Delete it when we will have re-open sidebar
+  @Output() private reOpenPositionSuccess: EventEmitter<OrderManagementChild> =
+    new EventEmitter<OrderManagementChild>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -141,7 +147,8 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     private store: Store,
     private commentsService: CommentsService,
     private confirmService: ConfirmService,
-    private orderCandidateListViewService: OrderCandidateListViewService
+    private orderCandidateListViewService: OrderCandidateListViewService,
+    private reOpenOrderService: ReOpenOrderService
   ) {}
 
   ngOnInit(): void {
@@ -188,6 +195,29 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   closeOrder(order: MergedOrder): void {
     this.store.dispatch(new ShowCloseOrderDialog(true, true));
     this.order = { ...order };
+  }
+
+  get canReOpen(): boolean {
+    const canReOpen =
+      this.candidate?.orderStatus !== OrderStatus.Closed && Boolean(this.candidate?.positionClosureReasonId);
+    if (!canReOpen) {
+      return false;
+    } else {
+      return !this.isAgency;
+    }
+  }
+
+  public reOpenPosition(): void {
+    this.reOpenOrderService
+      .reOpenPosition({ positionId: this.candidate.positionId })
+      .pipe(
+        catchError((err) => {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, err.message));
+          return EMPTY;
+        }),
+        take(1)
+      )
+      .subscribe(() => this.reOpenPositionSuccess.emit(this.candidate));
   }
 
   public onTabSelecting(event: SelectingEventArgs): void {
