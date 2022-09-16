@@ -14,7 +14,9 @@
                              [showDropDownIcon]="true"
                              appValidateWithMessage
                              [fields]="bussinesDataFields"
-                             [dataSource]="filterColumns.businessIds.dataSource">
+                             [dataSource]="filterColumns.businessIds.dataSource" 
+                             [selectAllText]='allOption'
+                             showSelectAll=true [value]="defaultOrganizations">
             </ejs-multiselect>
           </div>
         </div>
@@ -36,6 +38,7 @@
         <!-- End Date -->
         <div class="input-container bootstrap form-line-item-20">
           <label>End Date<span class="required">*</span></label>
+          <div class="input-group datepicker">
           <ejs-datepicker id="endDate"
                           class="datepicker"
                           format="MM/dd/yyyy"
@@ -45,13 +48,7 @@
                           [min]="accrualReportForm.controls['startDate'].value">
           </ejs-datepicker>
         </div>
-        <div class="input-container form-line-item-20">
-          <button ejs-button type="submit"
-                  [isPrimary]="true" (click)="SearchReport()">
-            Get Details
-          </button>
         </div>
-  
   
       </div>
       <div class="form-line">
@@ -65,8 +62,11 @@
                              [allowFiltering]="true"
                              [showDropDownIcon]="true"
                              [dataSource]="filterColumns.regionIds.dataSource"
-                             [fields]="regionFields">
+                             [fields]="regionFields"
+                             [selectAllText]='allOption'
+                             showSelectAll=true [value]="defaultRegions">
             </ejs-multiselect>
+           
           </div>
         </div>
         <div class="input-container bootstrap form-line-item-20">
@@ -79,7 +79,9 @@
                              [allowFiltering]="true"
                              [showDropDownIcon]="true"
                              [dataSource]="filterColumns.locationIds.dataSource"
-                             [fields]="locationFields">
+                             [fields]="locationFields"
+                             [selectAllText]='allOption'
+                             showSelectAll=true [value]="defaultLocations">
             </ejs-multiselect>
           </div>
         </div>
@@ -93,12 +95,18 @@
                              [allowFiltering]="true"
                              [showDropDownIcon]="true"
                              [dataSource]="filterColumns.departmentIds.dataSource"
-                             [fields]="departmentFields">
+                             [fields]="departmentFields"
+                             [selectAllText]='allOption'
+                             showSelectAll=true [value]="defaultDepartments">
             </ejs-multiselect>
           </div>
+        </div>  
+        <div class="input-container form-line-item-20">
+          <button ejs-button type="submit"
+                  [isPrimary]="true" (click)="SearchReport()">
+            Get Details
+          </button>
         </div>
-  
-  
       </div>
     </form>
   </Section>

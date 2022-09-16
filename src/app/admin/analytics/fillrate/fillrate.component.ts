@@ -40,7 +40,7 @@ export class FillRateComponent implements OnInit {
   public catelogName: LogiReportFileDetails = { name: "/FillRate/Dashbord.cat" };
   public title: string = "Fill Rate";
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
-
+  public allOption:string="All";
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -66,7 +66,6 @@ export class FillRateComponent implements OnInit {
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
   private unsubscribe$: Subject<void> = new Subject();
   public filterColumns: any;
-  private touchedFields: Set<string> = new Set();
   public fillRateForm: FormGroup;
   public bussinessControl: AbstractControl;
   public regionIdControl: AbstractControl;
@@ -76,6 +75,10 @@ export class FillRateComponent implements OnInit {
   public locations: Location[] = [];
   public departments: Department[] = [];
   public organizations: BusinessUnit[] = [];
+  public defaultOrganizations:number[] =[];
+  public defaultRegions:(number|undefined)[] =[];
+  public defaultLocations:(number|undefined)[]=[];
+  public defaultDepartments:(number|undefined)[]=[];
   public today = new Date();
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   constructor(private store: Store,
@@ -84,28 +87,29 @@ export class FillRateComponent implements OnInit {
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
-    }
-    this.fillRateForm = this.formBuilder.group(
-      {
-        business: [null, Validators.required],
-        startDate: [null, Validators.required],
-        endDate: [null, Validators.required],
-        regionId: [null, Validators.required],
-        locationId: [null, Validators.required],
-        departmentId: [null, Validators.required]
-
-      }
-    );
+    }   
   }
 
   ngOnInit(): void {
+    this.fillRateForm = this.formBuilder.group(
+      {
+        business: new FormControl(null,[Validators.required]),
+        startDate:new FormControl(null,[Validators.required]),
+        endDate: new FormControl(null,[Validators.required]),
+        regionId: new FormControl(null,[Validators.required]),
+        locationId: new FormControl(null,[Validators.required]),
+        departmentId: new FormControl(null,[Validators.required])
+
+      }
+    );
     this.orderFilterColumnsSetup();
+    this.bussinessControl = this.fillRateForm.get('business') as AbstractControl;
     this.businessData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.organizations = data;
       this.filterColumns.businessIds.dataSource = data;
-
+      this.defaultOrganizations=data.map((list) => list.id);
     });
-    this.bussinessControl = this.fillRateForm.get('business') as AbstractControl;
+   
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
 
       this.selectedOrganizations = this.organizations?.filter((x) => data?.includes(x.id));
@@ -117,64 +121,50 @@ export class FillRateComponent implements OnInit {
     });
     this.regionIdControl = this.fillRateForm.get('regionId') as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      const fieldName = 'region';
       this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
       let locationFilter: LocationsByRegionsFilter = {
         ids: data,
         getAll: true
       };
-
-      this.markTouchedField(fieldName);
       this.store.dispatch(new GetLocationsByRegions(locationFilter));
     });
     this.locationIdControl = this.fillRateForm.get('locationId') as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      const fieldName = 'location';
       this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
       let departmentFilter: DepartmentsByLocationsFilter = {
         ids: data,
         getAll: true
       };
-      this.markTouchedField(fieldName);
       this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));
     });
     this.departmentIdControl = this.fillRateForm.get('departmentId') as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      const fieldName = 'department';
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));
-      this.markTouchedField(fieldName);
+      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));    
     });
     this.onOrganizationsChange();
     this.onRegionsChange();
     this.onLocationsChange();
   }
-
+ 
   public SearchReport(): void {
-    if (this.fillRateForm?.valid) {
+    this.fillRateForm.markAllAsTouched();
+    if (this.fillRateForm?.invalid) {
+      return;
+    }
+   
       let { startDate, endDate } = this.fillRateForm.getRawValue();
       this.paramsData =
       {
-        "OrganizationParamFR": this.selectedOrganizations?.map((list) => list.name),
-        "StartDateFR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-        "EndDateFR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-        "RegionFR": this.selectedRegions?.map((list) => list.name),
-        "LocationParamFR": this.selectedLocations?.map((list) => list.name),
-        "DepartmentParamFR": this.selectedDepartments?.map((list) => list.departmentName)
+        "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.name),
+        "StartDateParamACCR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+        "EndDateParamACCR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+        "RegionParamACCR": this.selectedRegions?.map((list) => list.name),
+        "LocationParamACCR": this.selectedLocations?.map((list) => list.name),
+        "DepartmentParamACCR": this.selectedDepartments?.map((list) => list.departmentName)
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
-    } else {
-      this.fillRateForm?.updateValueAndValidity();
-    }
-  }
-  private resetLocation(): void {
-    this.locationIdControl.reset(null, { emitValue: false });
-    this.locationIdControl.markAsUntouched();
-  }
-  private resetRegion(): void {
-    this.regionIdControl.reset(null, { emitValue: false });
-    this.regionIdControl.markAsUntouched();
-  }
+  }  
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
       businessIds: {
@@ -216,9 +206,9 @@ export class FillRateComponent implements OnInit {
         if (data != undefined) {
           this.regions = data;
           this.filterColumns.regionIds.dataSource = this.regions;
-          this.resetRegion();
-          this.resetLocation();
-          this.resetDepartment();
+          this.defaultRegions=data.map((list) => list.id);
+          this.defaultLocations=[];
+          this.defaultDepartments=[];
         }
       });
   }
@@ -229,8 +219,8 @@ export class FillRateComponent implements OnInit {
         if (data != undefined) {
           this.locations = data;
           this.filterColumns.locationIds.dataSource = this.locations;
-          this.resetLocation();
-          this.resetDepartment();
+          this.defaultLocations=data.map((list) => list.id);
+          this.defaultDepartments=[];
         }
       });
   }
@@ -241,17 +231,10 @@ export class FillRateComponent implements OnInit {
         if (data != undefined) {
           this.departments = data;
           this.filterColumns.departmentIds.dataSource = this.departments;
-          this.resetDepartment();
+          this.defaultDepartments=data.map((list) => list.departmentId);
         }
       });
-  }
-  private resetDepartment(): void {
-    this.departmentIdControl.reset(null, { emitValue: false });
-    this.departmentIdControl.markAsUntouched();
-  }
-  private markTouchedField(field: string) {
-    this.touchedFields.add(field);
-  }
+  }  
 }
 
 
