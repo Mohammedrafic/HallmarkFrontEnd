@@ -6,7 +6,9 @@ import {
   ReopenPositionPayload,
 } from '@client/order-management/reopen-order/models/reopen-order.model';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class ReOpenOrderService {
   public constructor(private http: HttpClient) {}
 
