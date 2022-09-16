@@ -117,7 +117,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   get actualStartDateValue(): Date {
-    return this.form.controls['startDate']?.value;
+    return toCorrectTimezoneFormat(this.form.controls['startDate'].value);
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -447,4 +447,3 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.openRejectDialog.next(true);
   }
 }
-
