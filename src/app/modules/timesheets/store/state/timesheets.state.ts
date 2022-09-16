@@ -267,7 +267,6 @@ export class TimesheetsState {
     { setState }: StateContext<TimesheetsModel>,
   ): Observable<null> {
     return of(null).pipe(
-      throttleTime(100),
       tap(() => setState(patch<TimesheetsModel>({
         timesheetsFilters: null
       })))

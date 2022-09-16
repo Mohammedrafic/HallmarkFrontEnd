@@ -95,10 +95,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   ngOnInit(): void {
-    this.startFiltersWatching();
-    this.startOrganizationWatching();
-    this.calcTabsBadgeAmount();
     this.onOrganizationChangedHandler();
+    this.startOrganizationWatching();
+    this.startFiltersWatching();
+    this.calcTabsBadgeAmount();
     this.initOnRedirect();
   }
 
@@ -211,6 +211,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.timesheetsFilters$.pipe(
       filter(Boolean),
       throttleTime(100),
+      filter((filters) => this.isAgency ? !isNaN(filters.organizationId as number) : true),
       switchMap(() => this.store.dispatch(new Timesheets.GetAll())),
       takeUntil(this.componentDestroy()),
     ).subscribe();
