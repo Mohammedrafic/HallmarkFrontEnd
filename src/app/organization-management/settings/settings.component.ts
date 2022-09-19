@@ -113,7 +113,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public organizationId: number;
   public maxFieldLength = 100;
   public hasPermissions: Record<string, boolean> = {};
-  public permissionFields: string[] = [
+  public settingFields: string[] = [
     'AllowDocumentUpload',
     'AllowAgencyToBidOnCandidateBillRateBeyondOrderBillRate',
     'AutoLockOrder',
@@ -702,8 +702,8 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
         takeUntil(this.unsubscribe$)
       )
       .subscribe((permissions) => {
-        const permission = permissions.includes(PermissionTypes.ManageOrganizationConfigurations);
-        this.permissionFields.forEach((key) => this.hasPermissions[key] = permission);
+        const hasPermission = permissions.includes(PermissionTypes.ManageOrganizationConfigurations);
+        this.settingFields.forEach((key) => this.hasPermissions[key] = hasPermission);
       });
   }
 }
