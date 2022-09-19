@@ -1,5 +1,6 @@
 <div class="header" [class.expanded]="sidebar?.isOpen">
   <div class="header-item">
+    <div class="header-item__sidebar-menu" *ngIf="isMobile$ | async" (click)="toggleMobileSidebar()"></div>
     <i-feather *ngIf="(headerState$ | async)?.iconName" name="{{ (headerState$ | async)?.iconName }}" class="icon"></i-feather>
     <h1>{{ (headerState$ | async)?.title }}</h1>
   </div>
@@ -7,8 +8,10 @@
   <div class="stick-right header-content">
 
     <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
-      <app-organization-agency-selector></app-organization-agency-selector>
-      <div class="devider"></div>
+      <ng-container *ngIf="isDekstop$ | async">
+        <app-organization-agency-selector></app-organization-agency-selector>
+      </ng-container>
+      <div class="devider" *ngIf="!(isMobile$ | async)"></div>
     </div>
     <div class="bell-button" style="cursor: pointer;" (click)="bellIconClicked()">
 
@@ -18,11 +21,11 @@
 
     </div>
 
-    <div class="devider"></div>
+    <div class="devider" *ngIf="!(isMobile$ | async)"></div>
 
     <!-- Temporary solution to log out from the application -->
 
-    <div class="header-item">
+    <div class="header-item" *ngIf="!(isMobile$ | async)">
       <ejs-menu [items]='profileDatasource'
                 (select)="onSelectProfileMenu($event)">
       </ejs-menu>
@@ -32,10 +35,19 @@
   </div>
 </div>
 <section class="shell">
-  <ejs-sidebar id="sidebar" #sidebar [enableGestures]="false" [enableDock]="enableDock" [width]="width" [dockSize]="dockSize" [type]="sideBarType"
-               (created)="onSideBarCreated()">
+  <ejs-sidebar
+    id="sidebar"
+    #sidebar
+    [enableGestures]="false"
+    [enableDock]="enableDock"
+    [width]="width"
+    [dockSize]="dockSize"
+    [type]="sideBarType"
+    (created)="onSideBarCreated()"
+    *ngIf="!isSidebarHidden || (isTablet$ | async) || (isDekstop$ | async)">
     <section class="primary-container">
       <section class="logo-container">
+        <div class="close-btn" *ngIf="(sidebar.isOpen) && (isMobile$ | async)" (click)="toggleMobileSidebar()"></div>
         <div class="logo" *ngIf="sidebar.isOpen"></div>
         <div class="small-logo" *ngIf="!sidebar.isOpen"></div>
       </section>
@@ -92,7 +104,22 @@
           </a>
         </section>
       </section>
-      <section class="collapse">
+      <section class="username sidebar-item">
+        <div class="header-item header-item__inner" *ngIf="isMobile$ | async">
+          <div class="header-item__img"></div>
+          <ejs-menu class="user" [items]="profileDatasource"
+                    (select)="onSelectProfileMenu($event)">
+          </ejs-menu>
+        </div>
+      </section>
+      <section class="org-agency sidebar-item">
+        <div class="switcher-container switcher-container--tablet" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
+          <ng-container *ngIf="(isMobile$ | async) || (isTablet$ | async)">
+            <app-organization-agency-selector></app-organization-agency-selector>
+          </ng-container>
+        </div>
+      </section>
+      <section class="collapse" *ngIf="!(isMobile$ | async)">
         <a class="icon-container" (click)="toggleClick()">
           <i-feather name="sidebar" class="icon"></i-feather>
           <span class="e-text">Collapse</span>
