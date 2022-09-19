@@ -224,7 +224,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
     this.isMobile$.pipe(
       takeUntil(this.unsubscribe$),
-      filter((isMobile) => isMobile)
+      filter((isMobile: boolean) => isMobile)
       )
       .subscribe(() => {
        this.store.dispatch(new ToggleSidebarState(true));
