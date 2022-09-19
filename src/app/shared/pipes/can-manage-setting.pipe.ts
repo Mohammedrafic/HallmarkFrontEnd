@@ -14,6 +14,6 @@ export class CanManageSettingPipe implements PipeTransform {
       ? !data.overridableByOrganization
       : !data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment;
 
-    return isAdmin ? false : !(hasPermission[data.settingKey] && !isAdmin) || overridableBy;
+    return isAdmin ? false : !hasPermission[data.settingKey] || overridableBy;
   }
 }
