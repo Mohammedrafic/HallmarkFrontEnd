@@ -1,4 +1,5 @@
-@import "../variables/colors.scss";
+@import "colors.scss";
+@import "adaptive-response.scss";
 
 body.light, body.dark {
   .bootstrap {
@@ -113,9 +114,21 @@ body.light, body.dark {
     border: none;
     background-color: transparent;
     color: $secondary-dark-blue-15;
+
+    @media #{$max-tablet} {
+      color: $white;
+      border-radius: 0;
+      height: 3rem;
+    }
+
     &:hover {
       background-color: $primary-active-blue-70;
       color: $primary-active-blue-10;
+
+      @media #{$max-tablet} {
+        background-color: $secondary-dark-blue-10-1;
+        color: inherit;
+      }
     }
     &:active {
       background-color: $primary-active-blue;

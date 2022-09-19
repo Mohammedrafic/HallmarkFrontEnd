@@ -1,10 +1,25 @@
 @import "colors";
 @import "mixins";
+@import "adaptive-response.scss";
 
 .item-container {
   display: flex;
   align-items: center;
   padding: 20px;
+}
+
+#organization-agency-dropdown {
+  span {
+    font-size: 11px;
+    font-weight: 700;
+    min-height: 24px;
+
+    &::before {
+      @media #{$max-tablet} {
+        color: $white;
+      }
+    }
+  }
 }
 
 .organization-agency-dropdown-popup {
@@ -19,6 +34,10 @@
     width: 34px;
     height: 34px;
     border-radius: 8px;
+
+    @media #{$max-tablet} {
+      border: 2px solid $white;
+    }
   }
 }
 
@@ -46,6 +65,10 @@
   max-width: 231px;
   padding: 10px 14px 10px 10px;
 
+  @media #{$max-tablet} {
+    padding: 0 14px;
+  }
+
   .logo-container {
     margin-right: 12px;
   }
@@ -54,6 +77,10 @@
     font-size: 14px;
     font-weight: 700;
     @include with-ellipsis;
+
+    @media #{$max-tablet} {
+      font-weight: 400;
+    }
   }
 }
 
@@ -64,6 +91,7 @@
   .logo-container {
     margin-right: 12px;
   }
+
   .title {
     font-size: 14px;
     font-weight: 700;
