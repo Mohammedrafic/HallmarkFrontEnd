@@ -198,18 +198,12 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   get canReOpen(): boolean {
-    const canReOpen =
-      this.candidate?.orderStatus !== OrderStatus.Closed && Boolean(this.candidate?.positionClosureReasonId);
-    if (!canReOpen) {
-      return false;
-    } else {
-      return !this.isAgency;
-    }
+    return this.candidate?.orderStatus !== OrderStatus.Closed && Boolean(this.candidate?.positionClosureReasonId);
   }
 
   public reOpenPosition(): void {
     this.reOpenOrderService
-      .reOpenPosition({ positionId: this.candidate.positionId })
+      .reOpenPosition({ positionId: this.candidate.jobId })
       .pipe(
         catchError((err) => {
           this.store.dispatch(new ShowToast(MessageTypes.Error, err.message));
