@@ -5,7 +5,7 @@ import { Store } from '@ngxs/store';
 import { filter, map, mergeMap } from 'rxjs/operators';
 import { B2CAuthService } from './b2c-auth/b2c-auth.service';
 
-import { SetIsOrganizationAgencyArea } from './store/app.actions';
+import { CheckScreen, SetIsOrganizationAgencyArea } from './store/app.actions';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +18,8 @@ export class AppComponent implements OnInit {
   constructor(private router: Router, private store: Store, private b2CAuthService: B2CAuthService) {}
 
   ngOnInit(): void {
+    this.store.dispatch(new CheckScreen());
+
     this.isIframe = window !== window.parent && !window.opener;
 
     this.b2CAuthService.interactionStatusNone().subscribe();

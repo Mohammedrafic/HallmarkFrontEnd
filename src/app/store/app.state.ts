@@ -11,11 +11,13 @@ import {
   ToggleSidebarState,
   SetIsFirstLoadState,
   SetIsOrganizationAgencyArea,
-  GetAlertsForCurrentUser
+  GetAlertsForCurrentUser,
+  CheckScreen
 } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
-import { Observable, tap } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 export interface AppStateModel {
   isMobile: boolean;
@@ -26,6 +28,9 @@ export interface AppStateModel {
   isSidebarOpened: boolean;
   isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
   getAlertsForCurrentUser: GetAlertsForUserStateModel[];
+  isMobileScreen: boolean;
+  isTabletScreen: boolean;
+  isDekstopScreen: boolean;
 }
 
 @State<AppStateModel>({
@@ -41,7 +46,10 @@ export interface AppStateModel {
       isOrganizationArea: false,
       isAgencyArea: false
     },
-    getAlertsForCurrentUser : []
+    getAlertsForCurrentUser : [],
+    isMobileScreen: false,
+    isTabletScreen: false,
+    isDekstopScreen: false,
   },
 })
 @Injectable()
@@ -70,7 +78,19 @@ export class AppState {
   @Selector()
   static getAlertsForCurrentUser(state: AppStateModel): GetAlertsForUserStateModel[] { return state.getAlertsForCurrentUser; }
 
-  constructor(private userService: UserService) {}
+  @Selector()
+  static isMobileScreen(state: AppStateModel): boolean { return state.isMobileScreen; }
+
+  @Selector()
+  static isTabletScreen(state: AppStateModel): boolean { return state.isTabletScreen; }
+
+  @Selector()
+  static isDekstopScreen(state: AppStateModel): boolean { return state.isDekstopScreen; }
+
+  constructor(
+    private userService: UserService,
+    private breakpointObserver: BreakpointObserver
+    ) {}
 
   @Action(ToggleMobileView)
   ToggleMobileView({ patchState }: StateContext<AppStateModel>, { payload }: ToggleMobileView): void {
@@ -110,5 +130,21 @@ export class AppState {
         return payload;
       })
     );
+  }
+
+  @Action(CheckScreen)
+  checkScreen({ patchState }: StateContext<AppStateModel>): void {
+    this.breakpointObserver.observe('(max-width: 640px)').pipe(map(({matches}) => matches))
+    .subscribe((res) => {
+      patchState({ isMobileScreen: res});
+    });
+    this.breakpointObserver.observe('(min-width: 641px)').pipe(map(({matches}) => matches))
+    .subscribe((res) => {
+      patchState({ isTabletScreen: res});
+    });
+    this.breakpointObserver.observe('(min-width: 1025px)').pipe(map(({matches}) => matches))
+    .subscribe((res) => {
+      patchState({ isDekstopScreen: res});
+    });
   }
 }

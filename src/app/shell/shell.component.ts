@@ -30,6 +30,7 @@ import { faBan, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { AnalyticsMenuId } from '@shared/constants/menu-config';
+
 enum THEME {
   light = 'light',
   dark = 'dark',
@@ -57,6 +58,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   alertSidebarType = 'auto';
   alertSidebarPosition = 'Right';
   showAlertSidebar = false;
+
+  public isSidebarHidden: boolean = true;
 
   isDarkTheme: boolean;
   isFirstLoad: boolean;
@@ -119,6 +122,15 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
   profileDatasource: MenuItemModel[] = []; 
   private routers: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
+
+  @Select(AppState.isMobileScreen)
+  public isMobile$: Observable<boolean>;
+
+  @Select(AppState.isTabletScreen)
+  public isTablet$: Observable<boolean>;
+
+  @Select(AppState.isDekstopScreen)
+  public isDekstop$: Observable<boolean>;
 
   faTimes = faTimes as IconDefinition;
   faBan = faBan as IconDefinition;
@@ -210,6 +222,14 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onSideBarCreated(): void {
     // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
+    this.isMobile$.pipe(
+      takeUntil(this.unsubscribe$),
+      filter((isMobile: boolean) => isMobile)
+      )
+      .subscribe(() => {
+       this.store.dispatch(new ToggleSidebarState(true));
+    });
+
     this.isSideBarDocked$.pipe(takeUntil(this.unsubscribe$)).subscribe((isDocked) => (this.sidebar.isOpen = isDocked));
     this.isFirstLoad$.pipe(takeUntil(this.unsubscribe$)).subscribe((isFirstLoad) => {
       this.isFirstLoad = isFirstLoad;
@@ -233,6 +253,10 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   toggleClick(): void {
     this.store.dispatch(new ToggleSidebarState(!this.sidebar.isOpen));
     this.tree.collapseAll();
+  }
+
+  public toggleMobileSidebar(): void {
+    this.isSidebarHidden = !this.isSidebarHidden;
   }
 
   toggleTheme(): void {
