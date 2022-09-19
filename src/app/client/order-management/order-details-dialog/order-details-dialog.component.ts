@@ -307,7 +307,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public reOpenOrder(order: Order): void {
     this.reOpenOrderService
-      .reOpenOrder({ orderId: order.orderId as number })
+      .reOpenOrder({ orderId: order.id })
       .pipe(
         catchError((err) => {
           this.store.dispatch(new ShowToast(MessageTypes.Error, err.message));

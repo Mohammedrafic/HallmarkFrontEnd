@@ -1,5 +1,7 @@
 export enum PermissionTypes {
   CanCreateDeleteOrganization = 102,
+  ViewOrganizationConfigurations = 1500,
+  ManageOrganizationConfigurations = 1501,
   CanOrganizationEditOrders = 1801,
   DashboardWidgets = 2000,
   WidgetApplicantsByRegion = 2010,

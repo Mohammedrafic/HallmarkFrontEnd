@@ -258,7 +258,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         locationId: [null, Validators.required],
         departmentId: [null, Validators.required],
         skillId: [null, Validators.required],
-        hourlyRate: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
+        hourlyRate: [null, [Validators.required, Validators.maxLength(10)]],
         openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
         minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
         joiningBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
@@ -682,7 +682,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.generalInformationForm.controls['hourlyRate']?.setValidators([
         Validators.required,
         Validators.maxLength(10),
-        currencyValidator(1),
       ]);
       this.generalInformationForm.controls['openPositions'].setValidators([
         Validators.required,
@@ -906,7 +905,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
     this.orderTypeChanged.emit(order.orderType);
 
-    const hourlyRate = order.hourlyRate ? parseFloat(order.hourlyRate.toString()).toFixed(2) : '';
+    const hourlyRate = order.hourlyRate ? parseFloat(order.hourlyRate.toString()).toFixed(2) : '0.00';
     const joiningBonus = order.joiningBonus ? parseFloat(order.joiningBonus.toString()).toFixed(2) : '';
     const compBonus = order.compBonus ? parseFloat(order.compBonus.toString()).toFixed(2) : '';
 

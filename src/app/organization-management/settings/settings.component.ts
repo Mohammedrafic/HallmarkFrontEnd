@@ -1,6 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, map, Observable, Subject, takeUntil } from 'rxjs';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
@@ -33,8 +33,6 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { OrganizationHierarchy } from '@shared/enums/organization-hierarchy';
 import { OrganizationSettingValidationType } from '@shared/enums/organization-setting-validation-type';
-import { User } from '@shared/models/user.model';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { customEmailValidator } from '@shared/validators/email.validator';
 import { UserState } from '../../store/user.state';
@@ -42,7 +40,10 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { GetOrganizationStructure } from '../../store/user.actions';
+import { GetCurrentUserPermissions, GetOrganizationStructure } from '../../store/user.actions';
+
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { CurrentUserPermission } from '@shared/models/permission.model';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -64,6 +65,8 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public locationFormGroup: FormGroup;
   public departmentFormGroup: FormGroup;
   public formBuilder: FormBuilder;
+
+  @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<CurrentUserPermission[]>;
 
   @Select(OrganizationManagementState.organizationSettings)
   public settings$: Observable<OrganizationSettingsGet[]>;
@@ -109,6 +112,13 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public textFieldTypeControl = TextFieldTypeControl;
   public organizationId: number;
   public maxFieldLength = 100;
+  public hasPermissions: Record<string, boolean> = {};
+  public settingFields: string[] = [
+    'AllowDocumentUpload',
+    'AllowAgencyToBidOnCandidateBillRateBeyondOrderBillRate',
+    'AutoLockOrder',
+    'IsReOrder',
+  ];
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -176,7 +186,6 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       this.getSettings();
     });
     this.mapGridData();
-    this.isEditOverrideAccessible();
 
     this.organizationStructure$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
@@ -228,6 +237,8 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
         this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
       }
     });
+
+    this.setPermissionsToManageSettings();
   }
 
   ngOnDestroy(): void {
@@ -681,14 +692,18 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
   }
 
-  // TODO: remove after permission service implementation
-  private isEditOverrideAccessible(): void {
-    const storedUser = localStorage.getItem('User');
-    if (storedUser) {
-      const user = JSON.parse(storedUser) as User;
-      if ([BusinessUnitType.Hallmark, BusinessUnitType.MSP].includes(user.businessUnitType)) {
-        this.hasAccess = true;
-      }
-    }
+  private setPermissionsToManageSettings(): void {
+    this.store.dispatch(new GetCurrentUserPermissions());
+
+    this.currentUserPermissions$
+      .pipe(
+        filter((permissions) => !!permissions.length),
+        map((permissions) => permissions.map((permission) => permission.permissionId)),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((permissions) => {
+        const hasPermission = permissions.includes(PermissionTypes.ManageOrganizationConfigurations);
+        this.settingFields.forEach((key) => this.hasPermissions[key] = hasPermission);
+      });
   }
 }
