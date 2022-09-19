@@ -375,7 +375,11 @@
 .nav-search-input {
   background: transparent;
   border: 0px;
-  color: white;
+  color: $white;
+
+  &::placeholder {
+    color: $secondary-dark-blue-40 !important;
+  }
 }
 
 .dashboardSearchMenus {

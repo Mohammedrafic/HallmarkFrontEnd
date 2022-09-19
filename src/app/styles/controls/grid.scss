@@ -579,9 +579,18 @@ body.dark {
     }
   }
 
+  thead tr,
+  .e-gridheader {
+    .e-headertext,
+    .e-stackedheadercelldiv {
+        font-weight:700 !important;
+      color: $secondary-dark-blue-30 !important;
+    }
+  }
+
   .e-gridcustomheader {
     background-color: $sidebar-background;
-    border:1px solid $grid-border-color;
+    border: 1px solid $grid-border-color;
 
     .title h3 {
       color: $white;

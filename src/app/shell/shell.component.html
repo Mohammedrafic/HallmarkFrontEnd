@@ -112,7 +112,8 @@
                              [searchResult]="searchResult"
                              [searchString]="searchString"
                              (searchFocusOut)="onSearchFocusOut()"
-                             [searchHeight]="searchHeight">
+                             [searchHeight]="searchHeight"
+                             [isDarkTheme]="isDarkTheme$ | async">
       </dashboard-search-menu>
     </div>
   </section>

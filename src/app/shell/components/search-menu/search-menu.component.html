@@ -1,7 +1,7 @@
 <div
-  class="search-menu-content row"
+  class="search-menu-content  row"
  
-  [style.marginTop]="searchContentWindowHeight"
+  [style.marginTop]="searchContentWindowHeight" [ngClass]="isDarkTheme?'search-dark-menu-content':''"
 >
   <div class="col-12" *ngIf="!isMaximized">
     <div class="e-input-group">
