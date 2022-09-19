@@ -38,6 +38,7 @@ import {
   GetOrderById,
   GetOrderFilterDataSources,
   GetOrders,
+  GetOrganisationCandidateJob,
   GetSelectedOrderById,
   LockUpdatedSuccessfully,
   ReloadOrganisationOrderCandidatesLists,
@@ -47,6 +48,7 @@ import {
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
   Order,
+  OrderCandidateJob,
   OrderFilter,
   OrderFilterDataSource,
   OrderManagement,
@@ -140,6 +142,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   @Select(OrganizationManagementState.organizationSettings)
   organizationSettings$: Observable<OrganizationSettingsGet[]>;
+
+  @Select(OrderManagementContentState.candidatesJob) private readonly candidatesJob$: Observable<OrderCandidateJob | null>;
 
   @Select(DashboardState.filteredItems) private readonly filteredItems$: Observable<FilteredItem[]>;
 
@@ -1390,7 +1394,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   updatePositionDetails(position: OrderManagementChild): void {
     this.getOrders();
-    this.orderManagementContentService.getCandidateJob(position.organizationId, position.jobId).subscribe((res) => {
+    this.store.dispatch(new GetOrganisationCandidateJob(position.organizationId, position.jobId))
+    this.candidatesJob$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((res) => {
       this.selectedCandidate = {
         ...position,
         closeDate: res.closeDate,
