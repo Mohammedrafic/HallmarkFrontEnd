@@ -1,5 +1,5 @@
 import unionBy from 'lodash/fp/unionBy';
-import { filter, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { filter, Observable, skip, Subject, takeUntil } from 'rxjs';
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
@@ -115,6 +115,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public orderBillRates: BillRate[] = [];
   private manuallyAddedBillRates: BillRate[] = [];
   private unsubscribe$: Subject<void> = new Subject();
+  private order: Order;
+  private areBillRatesPopulated = false
 
   public isPerDiem = false;
   public isPermPlacementOrder = false;
@@ -148,7 +150,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     if (this.orderId > 0) {
       this.store.dispatch(new GetSelectedOrderById(this.orderId));
-      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
+      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((order: Order) => {
+        this.order = order;
         this.prefix = order?.organizationPrefix as string;
         this.publicId = order?.publicId as number;
         this.isPermPlacementOrder = order?.orderType === OrderType.PermPlacement;
@@ -198,18 +201,12 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.router.navigate(['/client/order-management']);
     });
 
-    this.getPredefinedBillRatesData$
-      .pipe(
-        switchMap((getPredefinedBillRatesData) => {
-          if (getPredefinedBillRatesData) {
-            return this.store.dispatch(new GetPredefinedBillRates());
-          } else {
-            return of(null);
-          }
-        }),
-        takeUntil(this.unsubscribe$),
-      )
-      .subscribe();
+    this.getPredefinedBillRatesData$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe((getPredefinedBillRatesData) => {
+        if (getPredefinedBillRatesData) {
+           this.store.dispatch(new GetPredefinedBillRates());
+        }
+      });
 
     this.subscribeOnPredefinedCredentials();
     this.subscribeOnPredefinedBillRates();
@@ -608,8 +605,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private subscribeOnPredefinedBillRates(): void {
-    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe((predefinedBillRates) => {
-      this.orderBillRates = [...predefinedBillRates, ...this.manuallyAddedBillRates];
+    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$), skip(1)).subscribe((predefinedBillRates) => {
+      this.orderBillRates = !this.areBillRatesPopulated && this.order ? [...this.order.billRates] : [...predefinedBillRates, ...this.manuallyAddedBillRates];
+      this.areBillRatesPopulated = true;
     });
   }
 
