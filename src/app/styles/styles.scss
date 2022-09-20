@@ -172,7 +172,7 @@ body {
         color: $white;
 
         & .e-selected, .e-focused {
-          background-color: $secondary-dark-blue-10-1;
+          background-color: transparent;
         }
 
         & .e-menu-item {
@@ -337,8 +337,9 @@ body {
     .candidates-additional-info .container-row,
     .search, .credentials-container,
     .side-menu,
-    .e-toolbar .e-toolbar-items,
-    .e-toolbar .e-tbar-btn {
+    .e-toolbar .e-tbar-btn,
+    .dialog .applied-filters .chips-container .e-chip-list .e-chip,
+    .filter-chips .e-chip-list .e-chip {
       background: $sidebar-background !important;
     }
 
@@ -349,7 +350,8 @@ body {
     .contacts,
     .tile-dark-blue,
     .partnership-settings .main-content,
-    .alert-panel {
+    .alert-panel,
+    .dialog .applied-filters .chips-container {
       background: $widget-dark-tooltip !important;
     }
 
@@ -363,7 +365,11 @@ body {
     .profile-details-header .username, .job-info-container .value,
     .profile-hours-statistics-container section h3,
     .partnership-settings .title,
-    .alert-panel .alert-panel-header__title {
+    .alert-panel .alert-panel-header__title,
+    .ordered-chips__title,
+    .dialog .applied-filters .chips-container .e-chip-list .e-chip,
+    .e-chip-list .e-chip .e-chip-delete.e-dlt-btn,
+    .filter-chips .e-chip-list .e-chip {
       color: $white !important;
     }
 

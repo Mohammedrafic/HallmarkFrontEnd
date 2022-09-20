@@ -1,6 +1,7 @@
+@import '../../styles/variables/colors.scss';
 .search-menu-content {
   color: var(--side-nav-text-color) !important;
-  background-color: white;
+  background-color: $white;
   position: absolute;
   z-index: 1100;
   border-radius: 0 5px 5px 0;
@@ -77,3 +78,9 @@
 .max-menu {
   margin-left: 260px;
 }
+
+.search-dark-menu-content {
+  background-color: $widget-dark-tooltip !important;
+  color: $secondary-dark-blue-45 !important;
+}
+
