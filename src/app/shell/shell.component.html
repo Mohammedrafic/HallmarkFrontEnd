@@ -114,7 +114,7 @@
       </section>
       <section class="org-agency sidebar-item">
         <div class="switcher-container switcher-container--tablet" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
-          <ng-container *ngIf="(isMobile$ | async) || (isTablet$ | async)">
+          <ng-container *ngIf="!(isDekstop$ | async)">
             <app-organization-agency-selector></app-organization-agency-selector>
           </ng-container>
         </div>
