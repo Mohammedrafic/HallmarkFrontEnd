@@ -89,6 +89,11 @@
   display: flex;
   max-width: 231px;
   margin-right: 30px;
+
+  @media #{$max-tablet} {
+    padding-left: 14px;
+  }
+
   .logo-container {
     margin-right: 12px;
   }
@@ -98,6 +103,11 @@
     font-weight: 700;
     color: $secondary-dark-blue-15;
     @include with-ellipsis;
+
+    @media #{$max-tablet} {
+      color: white;
+      font-weight: 500;
+    }
   }
 }
 
