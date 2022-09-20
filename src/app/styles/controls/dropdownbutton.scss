@@ -4,6 +4,7 @@ body.light,
 body.dark {
   .e-dropdown-btn {
     &.menu-mobile {
+      padding-left: 2px;
       .e-btn-icon.e-icons {
         display: none;
       }
