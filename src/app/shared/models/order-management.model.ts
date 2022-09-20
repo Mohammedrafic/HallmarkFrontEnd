@@ -510,6 +510,14 @@ export class OrderFilter {
   templateTitle?: string;
   annualSalaryRangeFrom?: string | null;
   annualSalaryRangeTo?: string | null;
+  creationDateFrom?: Date | null;
+  creationDateTo?: Date | null;
+  distributedOnFrom?: Date | null;
+  distributedOnTo?: Date | null;
+  candidateName?: string | null;
+  projectTypeId?: number | null;
+  projectNameId?: number | null;
+  poNumberId?: number | null;
 }
 
 export class SortModel {

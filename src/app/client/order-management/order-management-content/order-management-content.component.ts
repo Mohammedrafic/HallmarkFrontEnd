@@ -43,6 +43,7 @@ import {
   GetOrderFilterDataSources,
   GetOrders,
   GetOrganisationCandidateJob,
+  GetProjectSpecialData,
   GetSelectedOrderById,
   LockUpdatedSuccessfully,
   ReloadOrganisationOrderCandidatesLists,
@@ -115,6 +116,8 @@ import { SettingsKeys } from '@shared/enums/settings';
 import { SettingsHelper } from '@core/helpers/settings.helper';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
+import { ProjectSpecialData } from '@shared/models/project-special-data.model';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 @Component({
   selector: 'app-order-management-content',
@@ -149,9 +152,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @Select(OrganizationManagementState.organizationSettings)
   organizationSettings$: Observable<OrganizationSettingsGet[]>;
 
-  @Select(OrderManagementContentState.candidatesJob) private readonly candidatesJob$: Observable<OrderCandidateJob | null>;
+  @Select(OrderManagementContentState.candidatesJob)
+  private readonly candidatesJob$: Observable<OrderCandidateJob | null>;
 
   @Select(DashboardState.filteredItems) private readonly filteredItems$: Observable<FilteredItem[]>;
+
+  @Select(OrderManagementContentState.projectSpecialData)
+  public readonly projectSpecialData$: Observable<ProjectSpecialData>;
+  public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
+  public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
+  public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
 
   public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   public SettingsKeys = SettingsKeys;
@@ -298,6 +308,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       agencyIds: new FormControl([]),
       agencyType: new FormControl('0'),
       templateTitle: new FormControl(null),
+      creationDateFrom: new FormControl(null),
+      creationDateTo: new FormControl(null),
+      distributedOnFrom: new FormControl(null),
+      distributedOnTo: new FormControl(null),
+      candidateName: new FormControl(null),
+      projectTypeId: new FormControl(null),
+      projectNameId: new FormControl(null),
+      poNumberId: new FormControl(null),
     });
   }
 
@@ -333,6 +351,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.subscribeForSettings();
     this.handleRedirectFromQuickOrderToast();
     this.showFilterFormAfterOpenDialog();
+    this.getProjectSpecialData();
   }
 
   ngOnDestroy(): void {
@@ -493,6 +512,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       templateTitle: this.filters.templateTitle || null,
       annualSalaryRangeFrom: this.filters.annualSalaryRangeFrom || null,
       annualSalaryRangeTo: this.filters.annualSalaryRangeTo || null,
+      creationDateFrom: this.filters.creationDateFrom || null,
+      creationDateTo: this.filters.creationDateTo || null,
+      distributedOnFrom: this.filters.distributedOnFrom || null,
+      distributedOnTo: this.filters.distributedOnTo || null,
+      candidateName: this.filters.candidateName || null,
+      projectTypeId: this.filters.projectTypeId || null,
+      projectNameId: this.filters.projectNameId || null,
+      poNumberId: this.filters.poNumberId || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }
@@ -1104,6 +1131,32 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         type: ControlTypes.Text,
         valueType: ValueType.Text,
       },
+      creationDateFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
+      creationDateTo: { type: ControlTypes.Date, valueType: ValueType.Text },
+      distributedOnFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
+      distributedOnTo: { type: ControlTypes.Date, valueType: ValueType.Text },
+      candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
+      projectTypeId: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'projectType',
+        valueId: 'id',
+      },
+      projectNameId: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'projectName',
+        valueId: 'id',
+      },
+      poNumberId: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'poNumber',
+        valueId: 'id',
+      },
     };
     this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe(() => {
       this.onFilterApply();
@@ -1429,7 +1482,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   updatePositionDetails(position: OrderManagementChild): void {
     this.getOrders();
-    this.store.dispatch(new GetOrganisationCandidateJob(position.organizationId, position.jobId))
+    this.store.dispatch(new GetOrganisationCandidateJob(position.organizationId, position.jobId));
     this.candidatesJob$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((res) => {
       this.selectedCandidate = {
         ...position,
@@ -1453,5 +1506,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.actions
       .pipe(ofActionDispatched(ShowFilterDialog), takeUntil(this.unsubscribe$), debounceTime(200))
       .subscribe((isOpen) => (this.showFilterForm = isOpen.isDialogShown));
+  }
+
+  private getProjectSpecialData(): void {
+    this.store.dispatch(new GetProjectSpecialData());
   }
 }
