@@ -91,7 +91,7 @@
                   <div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Offered Bill Rate</label>
-                      <div class="input-group">
+                      <div class="input-group" [class.input-readonly]="isOnBoard && !isAgency">
                         <input
                           appValidateWithMessage
                           formControlName="offeredBillRate"
@@ -99,6 +99,7 @@
                           (focus)="priceUtils.setPriceMask(form, 'offeredBillRate', $event)"
                           (blur)="priceUtils.setTwoDecimals(form, 'offeredBillRate', $event)"
                           type="text"
+                          [readonly]="isOnBoard && !isAgency"
                         />
                       </div>
                     </div>
