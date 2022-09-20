@@ -10,6 +10,14 @@
       <app-organization-agency-selector></app-organization-agency-selector>
       <div class="devider"></div>
     </div>
+    <div class="bell-button left" style="cursor: pointer;" (click)="toggleChatDialog()">
+
+      <i-feather name="mail"></i-feather>
+
+      <span class="bell-button__badge">5</span>
+
+    </div>
+
     <div class="bell-button" style="cursor: pointer;" (click)="bellIconClicked()">
 
       <i-feather name="bell"></i-feather>
@@ -145,3 +153,5 @@
     </div>
   </div>
 </ejs-sidebar>
+
+<app-chat-container></app-chat-container>

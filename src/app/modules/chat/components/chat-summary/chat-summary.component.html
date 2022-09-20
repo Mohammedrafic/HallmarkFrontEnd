@@ -1,14 +1,15 @@
-<div class="summary-container">
-  <div class="summary-info">
-    <div>
-      <img>
+<div class="message-container" (click)="enter()">
+  <div class="message-header">
+    <div class="user-info-container">
+      <img class="avatar" src="/assets/default-avatar.svg" alt="avatar" width="32" height="32">
+      <div class="user-block">
+        <span class="user-name">{{ thread.displayName }}</span>
+        <span class="user-unit">{{ thread.businessUnitName}}</span>
+      </div>
     </div>
-    <div class="summary-user-info">
-      <span class="user-name"></span>
-      <span class="user-unit"></span>
+    <div class="timestamp">
+      <span>{{ lastMessage?.timestamp | date: 'HH:mm a'}}</span>
     </div>
   </div>
-  <div class="summary-text">
-    <span class="text"></span>
-  </div>
+  <span class="message-preview">{{ lastMessage?.message }}</span>
 </div>

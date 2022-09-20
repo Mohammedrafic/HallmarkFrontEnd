@@ -1,0 +1,55 @@
+<div class="chat-room-container">
+  <div class="chat-room-area" #chatArea>
+    <div class="message-block">
+      <ng-container *ngFor="let message of messages">
+        <div class="message" [ngClass]="{ 'right': message.isCurrentUser }">
+          <!-- <div>
+            <img class="avatar" src="/assets/default-avatar.svg" alt="avatar" width="34" height="34">
+          </div> -->
+          <div class="content-block">
+            <div *ngIf="!message.isCurrentUser; else rightMessageBlock">
+              <span class="sender">{{ message.sender }}</span>
+              <span class="timestamp">{{ message.timestamp | date: 'HH:mm a'}}</span>
+            </div>
+
+            <ng-template #rightMessageBlock>
+              <div>
+                <span class="timestamp left-position">{{ message.timestamp | date: 'HH:mm a'}}</span>
+                <span class="sender left-position">{{ message.sender }}</span>
+              </div>
+            </ng-template>
+
+            <div class="text-block" [ngClass]="{ 'right-text': message.isCurrentUser }">
+              <span>{{ message.message }}</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+  </div>
+
+  <div class="controls-block">
+    <div class="chat-room-controls" *ngIf="chatform">
+      <form [formGroup]="chatform" (keyup.enter)="sendBykeyPress($event)" class="chat-form">
+          <textarea
+          [spellcheck]="true"
+          [rows]="1"
+          [maxlength]="1500"
+          placeholder="Type your message"
+          class="chat-input"
+          [formControlName]="'chatMessage'"
+        ></textarea>
+
+      </form>
+
+      <button
+        class="send-btn"
+        (click)="sendByButton()"
+      >
+        <i-feather name="send" class="icon"></i-feather>
+      </button>
+    </div>
+  </div>
+</div>
+

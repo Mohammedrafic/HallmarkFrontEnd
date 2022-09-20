@@ -29,7 +29,8 @@ import {
   Search,
   HelpCircle,
   PieChart,
-  AlertCircle
+  AlertCircle,
+  Mail,
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -39,6 +40,7 @@ import { SharedModule } from '../shared/shared.module';
 import { OrganizationAgencySelectorComponent } from './components/organization-agency-selector/organization-agency-selector.component';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
+import { UserChatModule } from '../modules/chat/chat.module';
 
 const sidebarIcons = {
   Sidebar,
@@ -60,7 +62,8 @@ const sidebarIcons = {
   Search,
   HelpCircle,
   PieChart,
-  AlertCircle
+  AlertCircle,
+  Mail,
 };
 
 @NgModule({
@@ -81,7 +84,8 @@ const sidebarIcons = {
     ReactiveFormsModule,
     DropDownButtonModule,
     FormsModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    UserChatModule,
   ],
   providers: [],
 })

@@ -27,6 +27,8 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { ToggleChatDialog } from '@core/actions';
+
 enum THEME {
   light = 'light',
   dark = 'dark',
@@ -318,6 +320,10 @@ export class ShellPageComponent implements OnInit, OnDestroy {
       url = 'https://lemon-sea-05b5a7c0f.1.azurestaticapps.net/'
     }
     window.open(url, '_blank');
+  }
+
+  toggleChatDialog(): void {
+    this.store.dispatch(new ToggleChatDialog());
   }
 
   private setSideBarForFirstLoad(route: string): void {

@@ -1,15 +1,15 @@
-
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { NgxsModule } from '@ngxs/store';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { TextBoxAllModule } from '@syncfusion/ej2-angular-inputs';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
-import { X } from 'angular-feather/icons';
-import { TextBoxAllModule } from '@syncfusion/ej2-angular-inputs';
-import { NgxsModule } from '@ngxs/store';
+import { X, Send } from 'angular-feather/icons';
 
-import { ChatSummaryComponent } from './components/chat-summary/chat-summary.component';
+import { ChatRoomComponent, ChatContactComponent, ChatSummaryComponent } from './components';
 import { ChatContainerComponent } from './containers/chat-container/chat-container.component';
 import { ChatApiService, ChatCommunicationService, ChatService } from './services';
 import { ChatState } from './store/state/chat.state';
@@ -19,19 +19,23 @@ import { ChatState } from './store/state/chat.state';
   imports: [
     CommonModule,
     DialogModule,
-    FeatherModule.pick({X}),
+    FeatherModule.pick({X, Send}),
     ButtonModule,
     TextBoxAllModule,
     NgxsModule.forFeature([ChatState]),
+    ReactiveFormsModule,
   ],
   declarations: [
     ChatContainerComponent,
     ChatSummaryComponent,
+    ChatContactComponent,
+    ChatRoomComponent,
   ],
   providers: [
     ChatApiService,
     ChatCommunicationService,
     ChatService,
   ],
+  exports: [ChatContainerComponent, ChatRoomComponent],
 })
-export class ChatModule {}
+export class UserChatModule {}

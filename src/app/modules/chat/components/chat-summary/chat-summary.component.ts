@@ -1,14 +1,56 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+
+import { ChatClient } from '@azure/communication-chat';
+
+import { ChatMessagesHelper } from '../../helpers';
+import { ChatThread, EnterChatEvent, ReceivedChatMessage } from '../../interfaces';
 
 @Component({
   selector: 'app-chat-summary',
   templateUrl: './chat-summary.component.html',
-  styleUrls: ['./chat-summary.component.scss']
+  styleUrls: ['./chat-summary.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChatSummaryComponent {
-  @Input() name: string;
+export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
+  @Input() thread: ChatThread;
 
-  @Input() organization: string;
+  @Output() enterChat: EventEmitter<EnterChatEvent> = new EventEmitter();
 
-  @Input() lastMessage: string;
+  public lastMessage: ReceivedChatMessage | undefined;
+
+  ngOnInit(): void {
+    this.updateMessages();
+    this.watchForUpdate();
+  }
+
+  enter(): void {
+    this.enterChat.emit({
+      id: this.thread.threadId as string,
+      displayName: this.thread.displayName,
+    });
+  }
+
+  override async updateMessages(): Promise<void> {
+    const client = this.store.snapshot().chat.chatClient as ChatClient;
+    const chatThreadClient = client.getChatThreadClient(this.thread.threadId as string);
+
+    const messages: ReceivedChatMessage[] = [];
+    const iterableAsync = chatThreadClient.listMessages();
+    
+    for await (const message of iterableAsync) {
+      if (message.type === 'text') {
+  
+        const msg: ReceivedChatMessage = {
+          sender: message.senderDisplayName as string,
+          message: message.content?.message as string,
+          timestamp: message.createdOn,
+          isCurrentUser: false,
+        };
+        messages.push(msg);
+      }
+    }
+
+    this.lastMessage = messages[0];
+    this.cd.markForCheck();
+  }
 }
