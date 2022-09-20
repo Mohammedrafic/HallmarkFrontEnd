@@ -301,13 +301,11 @@
           <span>{{ data.annualSalaryRangeTo | currency: 'USD':'symbol':'1.0-2' }}</span>
         </ng-template>
       </e-column>
-
       <e-column field="creationDate" headerText="Creation Date" width="150">
         <ng-template #template let-data>
           <span>{{ data.creationDate | date: 'MM/dd/yyyy' }}</span>
         </ng-template>
       </e-column>
-
       <e-column field="endDate" headerText="End Date" width="150">
         <ng-template #template let-data>
           <span>{{ data.endDate | date: 'MM/dd/yyyy' }}</span>
