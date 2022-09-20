@@ -61,7 +61,8 @@ export class ProfileDetailsJobInfoComponent implements OnChanges {
       {
         title: 'Start - End Date',
         icon: 'calendar',
-        value: `${this.datePipe.transform(data.jobStartDate, 'MM/d/y')} - ${this.datePipe.transform(data.jobEndDate, 'MM/d/y')}`,
+        value: `${this.datePipe.transform(data.jobStartDate, 'MM/dd/yyyy')}
+         - ${this.datePipe.transform(data.jobEndDate, 'MM/dd/yyyy')}`,
       },
       {
         title: !this.isAgency ? 'Agency' : 'Organization',

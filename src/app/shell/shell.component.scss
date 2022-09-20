@@ -282,6 +282,10 @@
 
   .sidebar-item {
     border-bottom: 1px solid $secondary-dark-blue-45-1;
+    
+    &:hover {
+      background-color: $secondary-dark-blue-10-1;
+    }
   }
 
   .collapse {
@@ -389,6 +393,17 @@
     }
 }
 
+.bell-button:hover {
+  background:$bell-button-hover-bg;
+  border-radius: 4px !important;
+}
+
+.bell-button:active {
+  background:$bell-button-active-bg;
+  color:white;
+  border-radius: 4px !important;
+}
+
 .bell-button__badge {
   background-color: #558eff;
   border-radius: 50%;
@@ -462,7 +477,11 @@
 .nav-search-input {
   background: transparent;
   border: 0px;
-  color: white;
+  color: $white;
+
+  &::placeholder {
+    color: $secondary-dark-blue-40 !important;
+  }
 }
 
 .dashboardSearchMenus {
@@ -608,7 +627,7 @@
 
       .badge-info {
         color: $white;
-        background-color: $alert-side-bar-alert-info;
+        background-color: $primary-active-blue-10;
       }
 
       .badge-danger {

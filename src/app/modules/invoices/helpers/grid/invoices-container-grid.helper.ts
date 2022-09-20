@@ -80,7 +80,7 @@ export class InvoicesContainerGridHelper {
         valueGetter: (params: ValueGetterParams) => {
           const { weekNumber, weekStartDate: date } = params.data as PendingInvoice;
 
-          return `${weekNumber} - ${GridValuesHelper.formatDate(date, 'cccccc')}<br>${GridValuesHelper.formatDate(date, 'M/d/yy')}`;
+          return `${weekNumber} - ${GridValuesHelper.formatDate(date, 'cccccc')}<br>${GridValuesHelper.formatDate(date, 'MM/dd/yyyy')}`;
         },
         cellRendererParams: (params: ICellRendererParams): GridCellLinkParams => {
           const { id, organizationId } = params.data as BaseInvoice;
