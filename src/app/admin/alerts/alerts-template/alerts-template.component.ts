@@ -147,7 +147,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         hide: true
       },
       {
-        headerName: 'Alert Description',
+        headerName: 'Notfication Description',
         field: 'alertTitle',
         filter: 'agTextColumnFilter',
         filterParams: {

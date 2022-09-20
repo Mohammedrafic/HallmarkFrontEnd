@@ -113,7 +113,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         hide: true
       },
       {
-        headerName: 'Alert Description',
+        headerName: 'Notification Description',
         field: 'alert.alertTitle',
         filter: 'agTextColumnFilter',
         filterParams: {
@@ -220,20 +220,23 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           this.defaultValue = data[0]?.id;
         }
       });
-      this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => { 
-        if(data!=undefined)
-        {       
-        this.userData=data.items;
-        }
-      });
-
-      this.shouldDisableUserDropDown$.pipe(takeUntil(this.unsubscribe$)).subscribe((disable: boolean) => {
-        if (disable != undefined && disable==true) {  
-            this.businessForm.controls['user'].disable();
+    this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+      if (data != undefined) {
+        this.userData = data.items;
+        this.shouldDisableUserDropDown$.pipe(takeUntil(this.unsubscribe$)).subscribe((disable: boolean) => {
+          if (disable != undefined && disable == true) {
+            let user = this.store.selectSnapshot(UserState.user);
+            this.businessForm.controls['user'].setValue(this.userData.find(x=>x.id==user?.id)?.id);
             this.store.dispatch(new ShouldDisableUserDropDown(false));
-        }
-      });
+            this.businessForm.controls['user'].disable();
+            this.businessForm.controls['business'].disable();
+            this.businessForm.controls['businessUnit'].disable();
+          }
+        });
+      }
+    });
   }
+  
   public onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;

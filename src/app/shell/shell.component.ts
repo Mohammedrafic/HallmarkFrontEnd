@@ -178,7 +178,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
               {
                 text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
                 items: [{ text: this.ProfileMenuItemNames[profileMenuItem.edit_profile], id: profileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },
-                //{ text: this.ProfileMenuItemNames[profileMenuItem.manage_notifications], id: profileMenuItem.manage_notifications.toString(), iconCss: 'e-settings e-icons' },
+                { text: this.ProfileMenuItemNames[profileMenuItem.manage_notifications], id: profileMenuItem.manage_notifications.toString(), iconCss: 'e-settings e-icons' },
                 {
                   text: this.ProfileMenuItemNames[profileMenuItem.theme], id: profileMenuItem.theme.toString(), iconCss: this.isDarkTheme ? 'e-theme-dark e-icons' : 'e-theme-light e-icons', items: [
                     { text: this.ProfileMenuItemNames[profileMenuItem.light_theme], id: profileMenuItem.light_theme.toString() },
@@ -201,11 +201,11 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   }
 
   private addManageNotificationOptionInHeader(): void {
-    if (this.canManageNotificationTemplates && this.canManageOtherUserNotifications) {
-      let index = this.profileDatasource[0].items?.findIndex((data: MenuItemModel) => data.id === profileMenuItem.manage_notifications.toString());
-      if (index == undefined || index < 0) {
-        this.profileDatasource[0].items?.push({ text: this.ProfileMenuItemNames[profileMenuItem.manage_notifications], id: profileMenuItem.manage_notifications.toString(), iconCss: 'e-settings e-icons' });
-      }
+    if (this.canManageNotificationTemplates == false || this.canManageOtherUserNotifications == false) {
+        const n = this.profileDatasource[0].items?.findIndex(x=>x.id==profileMenuItem.manage_notifications.toString());
+        if (n == undefined || n > 0){
+          this.profileDatasource[0].items?.splice(n!,1);
+        }
     }
   }
 
@@ -280,17 +280,13 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   manageNotifications(): void {
     this.menu$.pipe(takeUntil(this.unsubscribe$)).subscribe((menu: Menu) => {
       if (menu.menuItems.length) {
-        menu.menuItems.forEach(element => {
-          if (element.title == "Administration"){
-            element.children.forEach(e => {
-              if (e.title == "Notification Subscription"){
-                this.store.dispatch(new ShouldDisableUserDropDown(true));
-                this.router.navigate([e.route]);
-            }
-          });
+
+        let r = menu.menuItems.find(element=>element.id == 6)?.children.find(e=>e.route == "/alerts/user-subscription");
+        if(r != undefined){
+          this.store.dispatch(new ShouldDisableUserDropDown(true));
+          this.router.navigate([r.route]);
         }
-      });
-    }
+      }
   });
 }
 
