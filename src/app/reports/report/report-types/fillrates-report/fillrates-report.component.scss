@@ -1,3 +1,5 @@
+@import "adaptive-response";
+
 .app-fillrates-report {
   &__filters-form {
     display: flex;
@@ -7,7 +9,25 @@
 
   &__row-controls {
     display: flex;
-    column-gap: var(--form-control-gap-x);
+    flex-wrap: wrap;
+
+    @media #{$min-tablet} {
+      justify-content: space-between;
+      flex-wrap: nowrap;
+    }
+
+    .input-container {
+      width: 100%;
+
+      &:nth-child(n+2) {
+        margin-left: 0;
+
+        @media #{$min-tablet} {
+          margin-left: var(--form-control-gap-x);
+        }
+
+      }
+    }
   }
 
   &__row-control {

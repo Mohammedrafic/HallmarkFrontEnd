@@ -10,6 +10,7 @@ export enum MoreMenuType {
   'Duplicate',
   'Close',
   'Delete',
+  'Re-Open',
 }
 
 export enum OrderTypeName {

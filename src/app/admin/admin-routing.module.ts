@@ -12,7 +12,6 @@ import {
 } from './master-data/master-credentials/master-credentials-types/master-credentials-types.component';
 import { MasterHolidaysComponent } from './master-data/holidays/holidays.component';
 import { RejectReasonMasterComponent } from "@admin/master-data/reject-reason-master/reject-reason-master.component";
-import { AnalyticsComponent } from './analytics/analytics.component';
 import { ManualInvoiceReasonsComponent } from '@admin/master-data/manual-invoice-reasons/manual-invoice-reasons.component';
 import { OrganizationProfileComponent } from './organization-profile/organization-profile.component';
 
@@ -86,10 +85,8 @@ const routes: Routes = [
       },
       {
         path: 'analytics',
-        component: AnalyticsComponent,
-        data: {
-          isOrganizationArea: true,
-        },
+        loadChildren: () =>
+          import('./analytics/analytics.module').then((m) => m.AnalyticsModule),
       },
       {
         path: ':profile',

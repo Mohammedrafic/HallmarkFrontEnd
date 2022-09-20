@@ -37,11 +37,19 @@
             <button
               ejs-button
               cssClass="e-outline"
-              *ngIf="!isAgency"
+              *ngIf="!this.isAgency && !canReOpen"
               [disabled]="disabledCloseButton"
               (click)="closeOrder(order)"
             >
               Close Position
+            </button>
+            <button
+              ejs-button
+              cssClass="e-outline"
+              *ngIf="canReOpen"
+              (click)="reOpenPosition()"
+            >
+              Re-Open
             </button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>
@@ -81,6 +89,7 @@
                         *ngIf="!isReorderType"
                         [candidate]="$any(candidate)"
                         [isTab]="true"
+                        appUnsavedForm
                         (closeModalEvent)="onClose()"
                         [orderDuration]="(selectedOrder$ | async)?.duration!"
                       ></app-onboarded-candidate>
@@ -183,7 +192,7 @@
 
                   <ng-template #extensionCandidate>
                     <section class="container onboarded-candidate-container">
-                      <app-extension-candidate [dialogEvent]="$any(openEvent)" [currentOrder]="order">
+                      <app-extension-candidate appUnsavedForm [dialogEvent]="$any(openEvent)" [currentOrder]="order">
                       </app-extension-candidate>
                     </section>
                   </ng-template>

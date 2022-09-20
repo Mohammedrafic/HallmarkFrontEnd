@@ -3,13 +3,14 @@
 
 @use "root";
 
-@import "./variables/colors.scss";
+@import "colors.scss";
 @import "./fusion";
 @import "./ag-grid-styles";
 
 @import "../../assets/fonts/open-sans.scss";
 @import '@ag-grid-community/core/dist/styles/ag-grid.scss';
 @import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
+@import "adaptive-response.scss";
 
 html {
   height: 100%;
@@ -162,6 +163,34 @@ body {
       color: $secondary-dark-blue-15;
     }
 
+    #sidebar .username .header-item .e-menu-wrapper {
+      background: none;
+      width: calc(100% - 34px);
+
+      & ul.e-menu {
+        width: 100%;
+        color: $white;
+
+        & .e-selected, .e-focused {
+          background-color: transparent;
+        }
+
+        & .e-menu-item {
+          width: 100%;
+          height: 3rem;
+          font-size: 14px;
+          flex-direction: row;
+          align-items: center;
+
+          & .e-caret {
+            width: 18px;
+            color: $white;
+            line-height: 55px;
+          }
+        }
+      }
+    }
+
     .header-item {
       .e-menu-wrapper,
       .e-menu-wrapper .e-menu .e-menu-item.e-selected {
@@ -254,8 +283,9 @@ body {
     .candidates-additional-info .container-row,
     .search, .credentials-container,
     .side-menu,
-    .e-toolbar .e-toolbar-items,
-    .e-toolbar .e-tbar-btn {
+    .e-toolbar .e-tbar-btn,
+    .dialog .applied-filters .chips-container .e-chip-list .e-chip,
+    .filter-chips .e-chip-list .e-chip {
       background: $sidebar-background !important;
     }
 
@@ -265,7 +295,9 @@ body {
     .credentials .e-accordion, .credentials .e-acrdn-item,
     .contacts,
     .tile-dark-blue,
-    .partnership-settings .main-content {
+    .partnership-settings .main-content,
+    .alert-panel,
+    .dialog .applied-filters .chips-container {
       background: $widget-dark-tooltip !important;
     }
 
@@ -278,13 +310,19 @@ body {
     .tree-lebel label, .section-tittle,
     .profile-details-header .username, .job-info-container .value,
     .profile-hours-statistics-container section h3,
-    .partnership-settings .title {
+    .partnership-settings .title,
+    .alert-panel .alert-panel-header__title,
+    .ordered-chips__title,
+    .dialog .applied-filters .chips-container .e-chip-list .e-chip,
+    .e-chip-list .e-chip .e-chip-delete.e-dlt-btn,
+    .filter-chips .e-chip-list .e-chip {
       color: $white !important;
     }
 
     .input-container label,
     .e-switch-wrapper label,
-    .dropdown-container label {
+    .dropdown-container label,
+    .alert-panel-footer {
       color: $secondary-dark-blue-40 !important;
     }
 

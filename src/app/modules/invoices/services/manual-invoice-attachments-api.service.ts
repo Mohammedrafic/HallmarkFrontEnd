@@ -65,11 +65,15 @@ export class ManualInvoiceAttachmentsApiService {
   }
 
   private organizationDownloadMilesAttachment(invoiceId: number, fileId: number): Observable<Blob> {
-    return this.http.get<Blob>(`/api/TimesheetRecords/${invoiceId}/files/${fileId}/pdf`);
+    return this.http.get(`/api/TimesheetRecords/${invoiceId}/files/${fileId}`, {
+      responseType: 'blob'
+    });
   }
 
   private organizationDownloadMilesPDFAttachment(invoiceId: number, fileId: number): Observable<Blob> {
-    return this.http.get<Blob>(`/api/TimesheetRecords/${invoiceId}/files/${fileId}/pdf`);
+    return this.http.get(`/api/TimesheetRecords/${invoiceId}/files/${fileId}/pdf`, {
+      responseType: 'blob'
+    });
   }
 
   private agencyDownloadAttachment(fileId: number, organizationId: number): Observable<Blob> {
@@ -79,17 +83,21 @@ export class ManualInvoiceAttachmentsApiService {
   }
 
   private agencyDownloadPDFAttachment(fileId: number, organizationId: number): Observable<Blob> {
-    return this.http.get(`/api/Timesheets/organization/${organizationId}/files/${fileId}/pdf`, {
+    return this.http.get(`/api/Timesheets/organization/${organizationId}/files/${fileId}`, {
       responseType: 'blob',
     });
   }
 
   private agencyDownloadMilesAttachment(invoiceId: number, organizationId: number, fileId: number): Observable<Blob> {
-    return this.http.get<Blob>(`/api/TimesheetRecords/${invoiceId}/organizations/${organizationId}/files/${fileId}`);
+    return this.http.get(`/api/TimesheetRecords/${invoiceId}/organizations/${organizationId}/files/${fileId}`, {
+      responseType: 'blob'
+    });
   }
 
   private agencyDownloadMilesPDFAttachment(invoiceId: number, organizationId: number, fileId: number): Observable<Blob> {
-    return this.http.get<Blob>(`/api/TimesheetRecords/${invoiceId}/organizations/${organizationId}/files/${fileId}/pdf`);
+    return this.http.get(`/api/TimesheetRecords/${invoiceId}/organizations/${organizationId}/files/${fileId}/pdf`, {
+      responseType: 'blob'
+    });
   }
 
   private organizationDeleteAttachment(fileId: number, timesheetId: number): Observable<number> {

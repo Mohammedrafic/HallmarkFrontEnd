@@ -75,7 +75,6 @@ export class RolesService {
   * @param payload
   */
   public export(payload: ExportPayload): Observable<Blob> {
-    console.log(payload);
     return this.http.post(`/api/Roles/export`, payload, { responseType: 'blob' });
   }
 }

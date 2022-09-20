@@ -127,6 +127,7 @@
                            [maxFiles]="5"
                            [clearAll]="clearFiles"
                            [attachments]="invoiceToEdit?.attachments || []"
+                           [useRedTrashBin]="true"
                            (existingFileDelete)="deleteFile($event)"
                            (selectedFilesChanged)="setFilesForUpload($event)">
         </app-file-uploader>

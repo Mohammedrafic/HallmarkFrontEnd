@@ -45,6 +45,8 @@ export class FileUploaderComponent implements OnChanges {
 
   @Input() clearAll: FilesClearEvent | null;
 
+  @Input() useRedTrashBin: boolean = false;
+
   @Output() selectedFilesChanged: EventEmitter<FileForUpload[]> = new EventEmitter();
 
   @Output()

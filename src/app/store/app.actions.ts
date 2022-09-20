@@ -84,6 +84,11 @@ export class GetAlertsForCurrentUser {
   constructor(public payload: any) { }
 }
 
+export class CheckScreen {
+  static readonly type = '[app] Check screen';
+  constructor() { }
+}
+
 export class ShouldDisableUserDropDown {
   static readonly type = '[app] Disable user dropdown';
   constructor(public payload: boolean) { }

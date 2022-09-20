@@ -407,6 +407,7 @@ export type OrderCandidateJob = {
   candidateBillRate: number;
   candidateProfile: CandidateProfile;
   candidateProfileId: number;
+  candidateStatus: CandidateStatus;
   clockId: number;
   expAsTravelers: string;
   guaranteedWorkWeek: string;
@@ -414,6 +415,7 @@ export type OrderCandidateJob = {
   offeredBillRate: number;
   order: Order;
   orderId: number;
+  orderStatus: OrderStatus;
   organizationId: number;
   rejectBy: string;
   rejectDate: string;

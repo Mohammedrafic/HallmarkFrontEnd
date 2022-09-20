@@ -3,13 +3,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionCompleted, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
 import {
+  catchError,
   combineLatest,
   debounceTime,
+  EMPTY,
   filter,
   first,
   Observable,
   Subject,
   Subscription,
+  take,
   takeUntil,
   throttleTime,
 } from 'rxjs';
@@ -19,6 +22,7 @@ import {
   ShowExportDialog,
   ShowFilterDialog,
   ShowSideDialog,
+  ShowToast,
 } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
@@ -38,6 +42,7 @@ import {
   GetOrderById,
   GetOrderFilterDataSources,
   GetOrders,
+  GetOrganisationCandidateJob,
   GetSelectedOrderById,
   LockUpdatedSuccessfully,
   ReloadOrganisationOrderCandidatesLists,
@@ -47,6 +52,7 @@ import {
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
   Order,
+  OrderCandidateJob,
   OrderFilter,
   OrderFilterDataSource,
   OrderManagement,
@@ -107,6 +113,8 @@ import { UpdateGridCommentsCounter } from '@shared/components/comments/store/com
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { SettingsKeys } from '@shared/enums/settings';
 import { SettingsHelper } from '@core/helpers/settings.helper';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
 
 @Component({
   selector: 'app-order-management-content',
@@ -141,6 +149,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @Select(OrganizationManagementState.organizationSettings)
   organizationSettings$: Observable<OrganizationSettingsGet[]>;
 
+  @Select(OrderManagementContentState.candidatesJob) private readonly candidatesJob$: Observable<OrderCandidateJob | null>;
+
   @Select(DashboardState.filteredItems) private readonly filteredItems$: Observable<FilteredItem[]>;
 
   public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
@@ -159,6 +169,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     { text: MoreMenuType[0], id: '0' },
     { text: MoreMenuType[1], id: '1' },
     { text: MoreMenuType[2], id: '2' },
+  ];
+
+  public moreMenuWithReOpenButton: ItemModel[] = [
+    { text: MoreMenuType[0], id: '0' },
+    { text: MoreMenuType[1], id: '1' },
+    { text: MoreMenuType[4], id: '4' },
   ];
 
   public moreMenu: ItemModel[] = [
@@ -249,7 +265,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     private readonly actions: Actions,
     private orderManagementService: OrderManagementService,
     private orderManagementContentService: OrderManagementContentService,
-    private addEditReOrderService: AddEditReorderService
+    private addEditReOrderService: AddEditReorderService,
+    private reOpenOrderService: ReOpenOrderService
   ) {
     super();
     this.isRedirectedFromDashboard =
@@ -435,7 +452,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       case OrganizationOrderManagementTabs.Incomplete:
         this.columnsToExport = allOrdersColumnsToExport;
         this.filters.isTemplate = false;
-        this.store.dispatch(new GetOrders({ pageNumber: this.currentPage, pageSize: this.pageSize }, true));
+        this.store.dispatch(
+          new GetOrders({ ...this.filters, pageNumber: this.currentPage, pageSize: this.pageSize }, true)
+        );
         break;
       case OrganizationOrderManagementTabs.OrderTemplates:
         this.filters.isTemplate = true;
@@ -886,6 +905,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       case MoreMenuType['Delete']:
         this.deleteOrder(data.id);
         break;
+      case MoreMenuType['Re-Open']:
+        this.reOpenOrder(data);
+        break;
     }
   }
 
@@ -899,6 +921,19 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public collapseAll(): void {
     this.isSubrowDisplay = false;
     super.onSubrowAllToggle();
+  }
+
+  public reOpenOrder(order: OrderManagement): void {
+    this.reOpenOrderService
+      .reOpenOrder({ orderId: order.id })
+      .pipe(
+        catchError((err) => {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, err.message));
+          return EMPTY;
+        }),
+        take(1)
+      )
+      .subscribe(() => this.updateOrderDetails(order));
   }
 
   public editOrder(data: OrderManagement): void {
@@ -1251,7 +1286,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         return this.moreMenu;
       }
     }
-    return this.moreMenuWithCloseButton;
+    return this.canReOpen(order) ? this.moreMenuWithReOpenButton : this.moreMenuWithCloseButton;
   }
 
   public getMenuForReorders(order: OrderManagement): ItemModel[] {
@@ -1260,6 +1295,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
 
     return this.reOrdersMenu;
+  }
+
+  canReOpen(order: OrderManagement): boolean {
+    return order?.status !== OrderStatus.Closed && Boolean(order?.orderClosureReasonId);
   }
 
   private onCommentRead(): void {
@@ -1390,12 +1429,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   updatePositionDetails(position: OrderManagementChild): void {
     this.getOrders();
-    this.orderManagementContentService.getCandidateJob(position.organizationId, position.jobId).subscribe((res) => {
+    this.store.dispatch(new GetOrganisationCandidateJob(position.organizationId, position.jobId))
+    this.candidatesJob$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((res) => {
       this.selectedCandidate = {
         ...position,
         closeDate: res.closeDate,
         positionClosureReason: res.positionClosureReason,
         positionClosureReasonId: res.positionClosureReasonId,
+        orderStatus: res.orderStatus,
+        candidateStatus: res.applicantStatus.applicantStatus,
       };
     });
   }

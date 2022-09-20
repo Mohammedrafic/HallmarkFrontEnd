@@ -1,6 +1,8 @@
+import { DismissAlertDto } from './../shared/models/alerts-template.model';
+import { DismissAlert, DismissAllAlerts } from './../admin/store/alerts.actions';
 import { GetAlertsForCurrentUser, ShouldDisableUserDropDown } from './../store/app.actions';
 import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
@@ -24,9 +26,11 @@ import { UserState } from '../store/user.state';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faBan, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { AnalyticsMenuId } from '@shared/constants/menu-config';
+
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 enum THEME {
@@ -48,15 +52,17 @@ enum profileMenuItem {
   templateUrl: './shell.component.html',
   styleUrls: ['./shell.component.scss'],
 })
-export class ShellPageComponent implements OnInit, OnDestroy {
+export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   enableDock = SIDEBAR_CONFIG.isDock;
   width = SIDEBAR_CONFIG.width;
   dockSize = SIDEBAR_CONFIG.dockSize;
   sideBarType = SIDEBAR_CONFIG.type;
-  alertSidebarWidth = "360px";
-  alertSidebarType = "auto";
-  alertSidebarPosition = "Right";
+  alertSidebarWidth = '360px';
+  alertSidebarType = 'auto';
+  alertSidebarPosition = 'Right';
   showAlertSidebar = false;
+
+  public isSidebarHidden: boolean = true;
 
   isDarkTheme: boolean;
   isFirstLoad: boolean;
@@ -99,7 +105,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   menu$: Observable<Menu>;
 
   @Select(AppState.getAlertsForCurrentUser)
-  alertStateModel$: Observable<GetAlertsForUserStateModel[]>
+  alertStateModel$: Observable<GetAlertsForUserStateModel[]>;
 
   @Select(UserState.currentUserPermissions)
   currentUserPermissions$: Observable<CurrentUserPermission[]>
@@ -124,7 +130,17 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   profileDatasource: MenuItemModel[] = []; 
   private routers: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
 
+  @Select(AppState.isMobileScreen)
+  public isMobile$: Observable<boolean>;
+
+  @Select(AppState.isTabletScreen)
+  public isTablet$: Observable<boolean>;
+
+  @Select(AppState.isDekstopScreen)
+  public isDekstop$: Observable<boolean>;
+
   faTimes = faTimes as IconDefinition;
+  faBan = faBan as IconDefinition;
   alerts: any;
   private permissions: CurrentUserPermission[] = [];
   canManageOtherUserNotifications: boolean;
@@ -136,11 +152,9 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     private orderManagementService: OrderManagementService,
     private orderManagementAgencyService: OrderManagementAgencyService
   ) {
-    router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((data: any) => {
+    router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((data: any) => {
       if (this.tree) {
-        const menuItem = this.tree.getTreeData().find((el => el['route'] === data['url']));
+        const menuItem = this.tree.getTreeData().find((el) => el['route'] === data['url']);
         if (menuItem) {
           this.tree.selectedNodes = [menuItem['title'] as string];
         }
@@ -155,6 +169,28 @@ export class ShellPageComponent implements OnInit, OnDestroy {
       this.setTheme(isDark);
     });
     this.initSidebarFields();
+    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+      if (user) {
+        this.userLogin = user;
+        this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
+        this.getAlertsForUser();
+        this.profileDatasource = [
+          {
+            text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
+            items: [{ text: this.ProfileMenuItemNames[profileMenuItem.edit_profile], id: profileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },
+            {
+              text: this.ProfileMenuItemNames[profileMenuItem.theme], id: profileMenuItem.theme.toString(), iconCss: this.isDarkTheme ?'e-theme-dark e-icons': 'e-theme-light e-icons', items: [
+                { text: this.ProfileMenuItemNames[profileMenuItem.light_theme], id: profileMenuItem.light_theme.toString() },
+                { text: this.ProfileMenuItemNames[profileMenuItem.dark_theme], id: profileMenuItem.dark_theme.toString() }
+              ]
+              },
+              { text: this.ProfileMenuItemNames[profileMenuItem.help], id: profileMenuItem.help.toString(), iconCss: 'e-circle-info e-icons' },
+              { text: this.ProfileMenuItemNames[profileMenuItem.log_out], id: profileMenuItem.log_out.toString(), iconCss: 'e-ddb-icons e-logout' }]
+          },
+
+        ];
+      }
+    });
     this.getCurrentUserPermissions();
     this.currentUserPermissions$
       .pipe(
@@ -198,6 +234,9 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+  ngAfterViewInit(): void {
+    this.hideAnalyticsSubMenuItems();
   }
 
   private addManageNotificationOptionInHeader(): void {
@@ -252,6 +291,14 @@ export class ShellPageComponent implements OnInit, OnDestroy {
 
   onSideBarCreated(): void {
     // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
+    this.isMobile$.pipe(
+      takeUntil(this.unsubscribe$),
+      filter((isMobile: boolean) => isMobile)
+      )
+      .subscribe(() => {
+       this.store.dispatch(new ToggleSidebarState(true));
+    });
+
     this.isSideBarDocked$.pipe(takeUntil(this.unsubscribe$)).subscribe((isDocked) => (this.sidebar.isOpen = isDocked));
     this.isFirstLoad$.pipe(takeUntil(this.unsubscribe$)).subscribe((isFirstLoad) => {
       this.isFirstLoad = isFirstLoad;
@@ -268,8 +315,8 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  onAlertSidebarCreated(): void{
-    this.sidebar.element.classList.add("e-hidden");
+  onAlertSidebarCreated(): void {
+    this.sidebar.element.classList.add('e-hidden');
   }
 
   toggleClick(): void {
@@ -290,6 +337,10 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   });
 }
 
+  public toggleMobileSidebar(): void {
+    this.isSidebarHidden = !this.isSidebarHidden;
+  }
+
   toggleTheme(): void {
     this.store.dispatch(new ToggleTheme(!this.isDarkTheme));
   }
@@ -307,11 +358,13 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   }
 
   nodeSelect(args: NodeSelectEventArgs): void {
+  
     if (args.node.classList.contains('e-level-1') && this.sidebar.isOpen) {
       this.tree.collapseAll();
       this.tree.expandAll([args.node]);
       this.tree.expandOn = 'None';
     }
+    this.hideAnalyticsSubMenuItems();
   }
 
   onMenuItemClick(menuItem: MenuItem): void {
@@ -327,7 +380,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
 
   showContextMenu(data: MenuItem, event: any): void {
     this.contextmenu.items = [];
-    if (data.children && data.children.length > 0 && !this.sidebar.isOpen) {
+    if (data.id != AnalyticsMenuId && data.children && data.children.length > 0 && !this.sidebar.isOpen) {
       this.activeMenuItemData = data;
       const boundingRectangle = event.target.getBoundingClientRect();
       this.contextmenu.items =
@@ -339,6 +392,13 @@ export class ShellPageComponent implements OnInit, OnDestroy {
       // workaround to eliminate UI glitch with context menu resizing
       setTimeout(() => this.contextmenu.open(boundingRectangle.top, parseInt(this.dockSize)));
     }
+    this.hideAnalyticsSubMenuItems();
+  }
+
+  hideAnalyticsSubMenuItems() {
+    let element = this.tree.element.querySelector('[data-uid="Analytics"]');
+    element?.querySelectorAll('ul li').forEach((el: any) => { el.style.display = 'none' });
+    element?.querySelectorAll('.e-text-content .e-icons').forEach((el: any) => { el.style.display = 'none' });
   }
 
   onBeforeContextMenuOpen(event: any): void {
@@ -372,7 +432,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     if (user?.businessUnitType === BusinessUnitType.Agency) {
       url = 'https://green-pebble-0878e040f.1.azurestaticapps.net/';
     } else {
-      url = 'https://lemon-sea-05b5a7c0f.1.azurestaticapps.net/'
+      url = 'https://lemon-sea-05b5a7c0f.1.azurestaticapps.net/';
     }
     window.open(url, '_blank');
   }
@@ -438,12 +498,42 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     }, 500);
   }
 
-  bellIconClicked(){
-    this.showAlertSidebar = true;
-    this.alertSidebar.show();    
+  getAlertsForUser(){
+    this.store.dispatch(new GetAlertsForCurrentUser({}));
+    this.alertStateModel$.subscribe((x) => {
+      this.alerts = x;
+    });
   }
 
-  alertSideBarCloseClick(){
-    this.alertSidebar.hide();    
+  bellIconClicked() {
+    this.showAlertSidebar = true;
+    this.alertSidebar.show();
+  }
+
+  alertSideBarCloseClick() {
+    this.alertSidebar.hide();
+  }
+
+  alertSideBarClearAllClick(){
+    this.allAlertDismiss();
+  }
+
+  alertDismiss(id: any) {    
+    var model: DismissAlertDto = {
+      Id: id,
+    };
+    this.store.dispatch(new DismissAlert(model)).subscribe((x)=>{
+      if(x){
+        this.getAlertsForUser();
+      }
+    });
+  }
+
+  allAlertDismiss() {
+    this.store.dispatch(new DismissAllAlerts()).subscribe((x) => {
+      if (x) {
+        this.getAlertsForUser();
+      }
+    });
   }
 }
