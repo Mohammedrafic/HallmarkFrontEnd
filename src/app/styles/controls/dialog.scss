@@ -1,4 +1,6 @@
-@import '../variables/colors';
+@import "colors";
+@import "adaptive-response";
+
 
 body.light, body.dark {
   .e-dialog {
@@ -24,10 +26,17 @@ body.light, body.dark {
 
   .e-dialog.dialog {
     right: 0;
-    top: 80px !important;
     left: auto !important;
-    height: calc(100% - 80px) !important;
     position: fixed !important;
+    top: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+
+
+    @media #{$min-tablet} {
+      top: 80px !important;
+      max-height: calc(100% - 80px) !important;
+    }
 
     &.e-dialogleft {
       right: auto;
@@ -79,6 +88,14 @@ body.light, body.dark {
   }
 
 }
+
+.e-dialog.dialog.filter {
+  width: 100% !important;
+  @media #{$min-tablet} {
+    width: 532px !important;
+  }
+}
+
 body.dark {
   .e-card-title {
     color: $white !important;
