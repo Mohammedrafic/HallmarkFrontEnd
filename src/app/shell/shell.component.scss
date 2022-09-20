@@ -389,6 +389,17 @@
     }
 }
 
+.bell-button:hover {
+  background:$bell-button-hover-bg;
+  border-radius: 4px !important;
+}
+
+.bell-button:active {
+  background:$bell-button-active-bg;
+  color:white;
+  border-radius: 4px !important;
+}
+
 .bell-button__badge {
   background-color: #558eff;
   border-radius: 50%;
