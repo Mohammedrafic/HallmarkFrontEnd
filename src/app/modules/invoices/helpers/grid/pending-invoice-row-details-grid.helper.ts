@@ -10,6 +10,7 @@ import {
 import {
   TitleValueCellRendererComponent
 } from '@shared/components/grid/components/title-value-cell-renderer/title-value-cell-renderer.component';
+
 import {
   InvoiceRecordsTableRowDetailsComponent
 } from '../../components/invoice-records-table-row-details/invoice-records-table-row-details.component';
@@ -89,8 +90,8 @@ const getManualTypeColDefs: GetPendingInvoiceDetailsColDefsFn =
     invoicesRowDetailsOffsetColDef,
     dayColDef,
     {
-      field: 'invoiceRecordTypeText',
-      headerName: 'Type',
+      field: 'reasonCode',
+      headerName: 'Reason Code',
       width: 300,
       cellRendererSelector: titleValueCellRendererSelector,
     },
@@ -106,11 +107,6 @@ const getManualTypeColDefs: GetPendingInvoiceDetailsColDefsFn =
       cellRendererSelector: titleValueCellRendererSelector,
       valueGetter: (params: TypedValueGetterParams<PendingInvoiceRecord>) =>
         params.data.vendorFeeApplicable ? 'Yes' : 'No',
-    },
-    {
-      field: 'reasonCode',
-      headerName: 'Reason Code',
-      cellRendererSelector: titleValueCellRendererSelector,
     },
     {
       field: 'comment',
