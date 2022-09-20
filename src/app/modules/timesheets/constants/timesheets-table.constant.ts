@@ -107,7 +107,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       ...commonColumn,
       valueFormatter: (params: ValueFormatterParams) => {
         const weekNum = params.data.workWeek;
-        return `${weekNum} - ${GridValuesHelper.formatDate(params.value, 'ccc M/d/yy')}`
+        return `${weekNum} - ${GridValuesHelper.formatDate(params.value, 'ccc MM/dd/yyyy')}`
       },
     },
     {

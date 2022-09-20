@@ -32,7 +32,7 @@ export const titleValueCellRendererSelector: CellRendererSelectorFunc = (params:
 export const weekPeriodValueGetter: ValueGetterFunc = (params: ValueGetterParams) => {
   const { weekNumber, weekStartDate: date } = params.data as PendingInvoice;
 
-  return `${weekNumber} - ${GridValuesHelper.formatDate(date, 'cccccc M/d/yy')}`;
+  return `${weekNumber} - ${GridValuesHelper.formatDate(date, 'cccccc MM/dd/yyyy')}`;
 };
 
 export const invoicesRowDetailsOffsetColDef: ColDef = {
