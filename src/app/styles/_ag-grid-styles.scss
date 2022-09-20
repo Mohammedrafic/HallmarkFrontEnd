@@ -148,6 +148,11 @@ app-grid {
     }
   }
 
+  .ag-header-cell-text {
+    font-weight: 700 !important;
+    color: $secondary-dark-blue-30 !important;
+  }
+
   .ag-paging-row-summary-panel,
   .ag-paging-page-summary-panel,
   .ag-paging-page-summary-panel > .ag-paging-button,

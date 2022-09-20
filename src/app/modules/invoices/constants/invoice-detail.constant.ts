@@ -39,12 +39,12 @@ export const invoiceInfoItems = (data: InvoiceDetail, isAgency: boolean): Invoic
   {
     title: 'Invoice Date',
     icon: 'calendar',
-    value: formatDate(DateTimeHelper.toUtcFormat(data.meta.invoiceDate), 'MM/d/y', 'en-US', 'utc'),
+    value: formatDate(DateTimeHelper.toUtcFormat(data.meta.invoiceDate), 'MM/dd/yyyy', 'en-US', 'utc'),
   },
   {
     title: 'Due Date',
     icon: 'calendar',
-    value: formatDate(DateTimeHelper.toUtcFormat(data.meta.dueDate), 'MM/d/y', 'en-US', 'utc'),
+    value: formatDate(DateTimeHelper.toUtcFormat(data.meta.dueDate), 'MM/dd/yyyy', 'en-US', 'utc'),
   },
 ];
 
@@ -63,14 +63,14 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
     {
       field: 'weekDate',
       headerName: 'Week',
-      minWidth: 100,
+      minWidth: 102,
       flex: 1,
       autoHeight: true,
       wrapText: true,
       cellClass: 'font-weight-bold custom-line-height',
       valueFormatter: (params: ValueFormatterParams) => {
         const weekNum = params.data.weekNumber;
-        return `${weekNum} - ${GridValuesHelper.formatDate(params.value, 'ccc M/d/yy')}`.toUpperCase()
+        return `${weekNum} - ${GridValuesHelper.formatDate(params.value, 'ccc MM/dd/yyyy')}`.toUpperCase()
       },
     },
     {

@@ -138,7 +138,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   private editRecordId?: number;
-  private billRateValueValidators = [currencyValidator(1), Validators.minLength(1)];
+  private billRateValueValidators = [currencyValidator(0), Validators.minLength(1)];
 
   public columnsToExport: ExportColumn[] = [
     { text: 'Region', column: 'Region' },

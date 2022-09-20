@@ -402,7 +402,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap">
+    <div class="filter-row bootstrap">
       <div class="input-container">
         <label>Region</label>
         <div class="input-group multiselect">
@@ -468,7 +468,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap">
+    <div class="filter-row bootstrap">
       <div class="input-container">
         <label>Skill</label>
         <div class="input-group multiselect">
@@ -507,7 +507,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap">
+    <div class="filter-row bootstrap">
       <div class="input-container">
         <label>Order Status</label>
         <div class="input-group multiselect">
@@ -548,7 +548,7 @@
       </div>
     </div>
     <div
-      class="row bootstrap"
+      class="filter-row bootstrap"
       *ngIf="
         activeTab !== OrganizationOrderManagementTabs.PerDiem &&
         activeTab !== OrganizationOrderManagementTabs.PermPlacement
@@ -567,7 +567,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap">
+    <div class="filter-row bootstrap">
       <div class="input-container">
         <label>Candidates Count From</label>
         <div class="input-group">
@@ -581,7 +581,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="activeTab === OrganizationOrderManagementTabs.PermPlacement" class="row bootstrap">
+    <div *ngIf="activeTab === OrganizationOrderManagementTabs.PermPlacement" class="filter-row bootstrap">
       <div class="input-container">
         <label>Annual Salary From</label>
         <div class="input-group">
@@ -603,7 +603,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
+    <div class="filter-row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
       <div class="input-container calendar">
         <label for="jobStartDate">{{
           activeTab !== OrganizationOrderManagementTabs.ReOrders ? 'Job Start Date' : 'Re-Order Date'
@@ -668,7 +668,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap">
+    <div class="filter-row bootstrap">
       <div class="input-container">
         <label>Region</label>
         <div class="input-group multiselect">
