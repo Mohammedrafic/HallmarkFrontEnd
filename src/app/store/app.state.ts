@@ -11,7 +11,8 @@ import {
   ToggleSidebarState,
   SetIsFirstLoadState,
   SetIsOrganizationAgencyArea,
-  GetAlertsForCurrentUser
+  GetAlertsForCurrentUser,
+  ShouldDisableUserDropDown
 } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
@@ -26,6 +27,7 @@ export interface AppStateModel {
   isSidebarOpened: boolean;
   isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
   getAlertsForCurrentUser: GetAlertsForUserStateModel[];
+  shouldDisableUserDropDown:boolean;
 }
 
 @State<AppStateModel>({
@@ -41,7 +43,8 @@ export interface AppStateModel {
       isOrganizationArea: false,
       isAgencyArea: false
     },
-    getAlertsForCurrentUser : []
+    getAlertsForCurrentUser : [],
+    shouldDisableUserDropDown:false
   },
 })
 @Injectable()
@@ -69,6 +72,9 @@ export class AppState {
   
   @Selector()
   static getAlertsForCurrentUser(state: AppStateModel): GetAlertsForUserStateModel[] { return state.getAlertsForCurrentUser; }
+
+  @Selector()
+  static shouldDisableUserDropDown(state: AppStateModel): boolean { return state.shouldDisableUserDropDown; }
 
   constructor(private userService: UserService) {}
 
@@ -110,5 +116,10 @@ export class AppState {
         return payload;
       })
     );
+  }
+
+  @Action(ShouldDisableUserDropDown)
+  ShouldDisableUserDropDown({ patchState }: StateContext<AppStateModel>, { payload }: ShouldDisableUserDropDown): void {
+    patchState({ shouldDisableUserDropDown: payload });
   }
 }

@@ -18,7 +18,7 @@ import { AlertsState } from '@admin/store/alerts.state';
 import { GetAllUsersPage, GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { SetHeaderState, ShowToast } from 'src/app/store/app.actions';
+import { SetHeaderState, ShouldDisableUserDropDown, ShowToast } from 'src/app/store/app.actions';
 import { User, UsersPage } from '@shared/models/user.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -46,6 +46,9 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   @Select(AppState.isDarkTheme)
   isDarkTheme$: Observable<boolean>;
 
+  @Select(AppState.shouldDisableUserDropDown)
+  public shouldDisableUserDropDown$: Observable<boolean>;
+
   @Input() filterForm: FormGroup;
   public businessForm: FormGroup;
   public isEditRole = false;
@@ -60,7 +63,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public export$ = new Subject<ExportedFileType>();
   public defaultColDef: any;
   public autoGroupColumnDef: any;
-  public title: string = "User Subscription";
+  public title: string = "Notification Subscription";
   public userGuid: string = "";
   public unsubscribe$: Subject<void> = new Subject();
   itemList: Array<UserSubscription> | undefined;
@@ -221,6 +224,13 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         if(data!=undefined)
         {       
         this.userData=data.items;
+        }
+      });
+
+      this.shouldDisableUserDropDown$.pipe(takeUntil(this.unsubscribe$)).subscribe((disable: boolean) => {
+        if (disable != undefined && disable==true) {  
+            this.businessForm.controls['user'].disable();
+            this.store.dispatch(new ShouldDisableUserDropDown(false));
         }
       });
   }
