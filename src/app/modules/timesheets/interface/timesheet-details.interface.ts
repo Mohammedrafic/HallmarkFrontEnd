@@ -92,6 +92,7 @@ export interface TimesheetDetailsModel {
   weekStartDate: string;
   candidateWorkPeriods: WorkWeek<string>[];
   isNotExist?: boolean;
+  allowDNWInTimesheets?: boolean;
   mileageTimesheetId: number;
 }
 
