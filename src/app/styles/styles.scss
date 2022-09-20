@@ -172,7 +172,7 @@ body {
         color: $white;
 
         & .e-selected, .e-focused {
-          background-color: $secondary-dark-blue-10-1;
+          background-color: transparent;
         }
 
         & .e-menu-item {
