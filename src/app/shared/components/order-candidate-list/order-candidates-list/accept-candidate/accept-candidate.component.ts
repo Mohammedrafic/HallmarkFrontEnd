@@ -108,7 +108,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get showRejectButton(): boolean {
-    return (this.isDeployedCandidate && !this.showWithdrawAction && !this.isAgencyAndOnboard) || !this.isReadOnly;
+    return (!this.isDeployedCandidate && !this.showWithdrawAction && !this.isAgencyAndOnboard) || !this.isReadOnly;
   }
 
   private unsubscribe$: Subject<void> = new Subject();

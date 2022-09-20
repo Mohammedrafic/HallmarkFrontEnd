@@ -51,7 +51,7 @@ import {
   RadioButtonModule,
   SwitchModule,
 } from '@syncfusion/ej2-angular-buttons';
-import { DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { DropDownButtonAllModule, DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
@@ -170,6 +170,7 @@ const gridIcons = {
     CandidateDetailsModule,
     ChildOrderDialogModule,
     AssociateListModule,
+    DropDownButtonAllModule,
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
     ExtensionModule,

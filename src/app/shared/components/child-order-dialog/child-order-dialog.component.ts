@@ -18,6 +18,7 @@ import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import {
   AccordionComponent,
+  MenuEventArgs,
   SelectEventArgs,
   SelectingEventArgs,
   TabComponent,
@@ -58,7 +59,6 @@ import { ExtensionSidebarComponent } from '@shared/components/extension/extensio
 import { AppState } from '../../../store/app.state';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { ExtensionCandidateComponent } from '../order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
 import { filter } from 'rxjs/operators';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { UnsavedFormDirective } from '@shared/directives/unsaved-form.directive';
@@ -73,6 +73,12 @@ enum Template {
 }
 
 type MergedOrder = AgencyOrderManagement & Order;
+
+enum MobileMenuItems {
+  AddExtension = 'Add Extension',
+  ClosePosition = 'Close Position',
+  ReOpen = 'Re-Open'
+}
 
 @Component({
   selector: 'app-child-order-dialog',
@@ -139,6 +145,32 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
   get isReorderType(): boolean {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
+  }
+
+  get showAddExtension(): boolean {
+    return this.isAddExtensionBtnAvailable && !this.extensions?.length;
+  }
+
+  get disableAddExtension(): boolean {
+    return this.candidate?.orderStatus === this.orderStatus.InProgressOfferAccepted;
+  }
+
+  get showCloseOrder(): boolean {
+    return !this.isAgency && !this.canReOpen;
+  }
+
+  get mobileMenu(): any {
+    let menu: { text: string }[] = [];
+    if (this.showAddExtension && !this.disableAddExtension) {
+      menu = [...menu, { text: MobileMenuItems.AddExtension }];
+    }
+    if (!this.disabledCloseButton && this.showCloseOrder) {
+      menu = [...menu, { text: MobileMenuItems.ClosePosition }];
+    }
+    if (this.canReOpen) {
+      menu = [...menu, { text: MobileMenuItems.ReOpen }];
+    }
+    return menu;
   }
 
   constructor(
@@ -344,6 +376,24 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.openEvent.next(null);
     this.selectedTemplate = null;
     this.orderCandidateListViewService.setIsCandidateOpened(false);
+  }
+
+
+  public onMobileMenuSelect({ item: { text } }: MenuEventArgs): void {
+    switch (text) {
+      case MobileMenuItems.AddExtension:
+        this.showExtensionDialog()
+        break;
+      case MobileMenuItems.ClosePosition:
+        this.closeOrder(this.order)
+        break;
+      case MobileMenuItems.ReOpen:
+        this.reOpenPosition()
+        break;
+    
+      default:
+        break;
+    }
   }
 
   private saveExtensionChanges(): Observable<boolean> {

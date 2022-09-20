@@ -61,6 +61,19 @@ import { ExtensionCandidateComponent } from '@shared/components/order-candidate-
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
 import { MessageTypes } from '@shared/enums/message-types';
+import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
+
+enum MobileMenuItems {
+  Cancel = 'Cancel',
+  Approve = 'Approve',
+  Edit = 'Edit',
+  CloseOrder = 'Close Order',
+  ReOpen = 'Re-Open',
+  CreateReOrder = 'Create Re-Order',
+  Delete = 'Delete',
+  Unlock = 'Unlock',
+  Lock = 'Lock',
+}
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -134,6 +147,60 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   get canReOpen(): boolean {
     return this.order?.status !== OrderStatus.Closed && Boolean(this.order?.orderClosureReasonId);
+  }
+
+  get showApproveAndCancel(): boolean {
+    return this.order?.canApprove && !this.order?.orderOpenDate && this.order?.status === this.orderStatus.PreOpen;
+  }
+
+  get showLockOrder(): boolean {
+    return this.orderType.ReOrder !== this.order?.orderType && !this.order?.extensionFromId;
+  }
+
+  get showCreateReOrder(): boolean {
+    return this.orderType.OpenPerDiem === this.order?.orderType;
+  }
+
+  get disableCreateReOrder(): boolean {
+    return (
+      this.order?.status === this.orderStatus.PreOpen ||
+      this.order?.status === this.orderStatus.Closed ||
+      !this.settings[SettingsKeys.IsReOrder]?.value
+    );
+  }
+
+  get disableEdit(): boolean {
+    return this.order?.status === this.orderStatus.Closed;
+  }
+
+  get disableCloseOrder(): boolean {
+    return !!(this.order?.orderClosureReasonId || this.order?.orderCloseDate) || this.disabledCloseButton;
+  }
+
+  get mobileMenu(): any {
+    let menu: { text: string }[] = [];
+    if (this.showApproveAndCancel) {
+      menu = [...menu, { text: MobileMenuItems.Cancel }, { text: MobileMenuItems.Approve }];
+    }
+    if (!this.disableEdit) {
+      menu = [...menu, { text: MobileMenuItems.Edit }];
+    }
+    if (!this.canCloseOrder && !this.disableCloseOrder) {
+      menu = [...menu, { text: MobileMenuItems.CloseOrder }];
+    }
+    if (this.canReOpen) {
+      menu = [...menu, { text: MobileMenuItems.ReOpen }];
+    }
+    if (this.showCreateReOrder && !this.disableCreateReOrder) {
+      menu = [...menu, { text: MobileMenuItems.CreateReOrder }];
+    }
+    if (!this.showCloseButton) {
+      menu = [...menu, { text: MobileMenuItems.Delete }];
+    }
+    if (!this.disabledLock && this.showLockOrder) {
+      menu = [...menu, { text: this.order?.isLocked ? MobileMenuItems.Unlock : MobileMenuItems.Lock }];
+    }
+    return menu;
   }
 
   constructor(
@@ -332,6 +399,39 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     this.nextPreviousOrderEvent.emit(next);
   }
 
+  public onMobileMenuSelect({ item: { text } }: MenuEventArgs): void {
+    switch (text) {
+      case MobileMenuItems.Approve:
+        this.approveOrder(this.order.id);
+        break;
+      case MobileMenuItems.Cancel:
+        this.cancelOrder(this.order.id);
+        break;
+      case MobileMenuItems.Edit:
+        this.editOrder(this.order);
+        break;
+      case MobileMenuItems.CloseOrder:
+        this.closeOrder(this.order);
+        break;
+      case MobileMenuItems.ReOpen:
+        this.reOpenOrder(this.order);
+        break;
+      case MobileMenuItems.CreateReOrder:
+        this.createReOrder();
+        break;
+      case MobileMenuItems.Delete:
+        this.deleteOrder(this.order.id);
+        break;
+      case MobileMenuItems.Lock:
+      case MobileMenuItems.Unlock:
+        this.lockOrder();
+        break;
+
+      default:
+        break;
+    }
+  }
+
   private closeSideDialog(): void {
     this.sideDialog.hide();
     this.openEvent.next(false);
@@ -424,3 +524,5 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     );
   }
 }
+
+
