@@ -169,7 +169,7 @@
       <ejs-dropdownlist
         formControlName="projectTypeId"
         appValidateWithMessage
-        [dataSource]="[]"
+        [dataSource]="(projectSpecialData$ | async)?.specialProjectCategories"
         [fields]="specialProjectCategoriesFields"
       >
       </ejs-dropdownlist>
@@ -184,7 +184,7 @@
       <ejs-dropdownlist
         formControlName="projectNameId"
         appValidateWithMessage
-        [dataSource]="[]"
+        [dataSource]="(projectSpecialData$ | async)?.projectNames"
         [fields]="projectNameFields"
       >
       </ejs-dropdownlist>
@@ -197,7 +197,7 @@
       <ejs-dropdownlist
         formControlName="poNumberId"
         appValidateWithMessage
-        [dataSource]="[]"
+        [dataSource]="(projectSpecialData$ | async)?.poNumbers"
         [fields]="poNumberFields"
       >
       </ejs-dropdownlist>
