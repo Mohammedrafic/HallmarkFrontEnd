@@ -13,4 +13,6 @@ export enum PermissionTypes {
   WidgetTasks = 2070,
   WidgetTrendsFilled = 2080,
   WidgetInvoicesStatuses = 2090,
+  CanManageNotificationsForOtherUsers = 3202,
+  CanManageNotificationTemplates = 3203
 }
