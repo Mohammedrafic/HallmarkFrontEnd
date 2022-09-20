@@ -149,9 +149,9 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.formBuilder = builder;
     this.createSettingsForm();
     this.createRegionLocationDepartmentForm();
-    
+
     const user = JSON.parse(localStorage.getItem('User') || '');
-    this.hasAccess = [BusinessUnitType.Hallmark, BusinessUnitType.MSP].includes(user.businessUnitType);
+    this.hasAccess = [BusinessUnitType.Hallmark, BusinessUnitType.MSP].includes(user?.businessUnitType);
   }
 
   ngOnInit(): void {
