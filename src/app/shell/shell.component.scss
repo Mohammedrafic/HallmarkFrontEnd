@@ -282,6 +282,10 @@
 
   .sidebar-item {
     border-bottom: 1px solid $secondary-dark-blue-45-1;
+    
+    &:hover {
+      background-color: $secondary-dark-blue-10-1;
+    }
   }
 
   .collapse {
