@@ -2,7 +2,7 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, filter, forkJoin, Observable, takeUntil, tap } from 'rxjs';
 
 import { isEmpty } from 'lodash';
@@ -44,6 +44,10 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
 
   @Select(OrderManagementState.gridFilterRegions)
   gridFilterRegions$: Observable<OrganizationRegion[]>;
+
+  public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
+  public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
+  public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
 
   public optionFields = {
     text: 'name',
@@ -233,6 +237,14 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       jobEndDate: new FormControl(null),
       annualSalaryRangeFrom: new FormControl(null),
       annualSalaryRangeTo: new FormControl(null),
+      creationDateFrom: new FormControl(null),
+      creationDateTo: new FormControl(null),
+      distributedOnFrom: new FormControl(null),
+      distributedOnTo: new FormControl(null),
+      candidateName: new FormControl(null),
+      projectTypeId: new FormControl(null),
+      projectNameId: new FormControl(null),
+      poNumberId: new FormControl(null),
     });
   }
 
@@ -305,6 +317,32 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       annualSalaryRangeFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
       annualSalaryRangeTo: { type: ControlTypes.Text, valueType: ValueType.Text },
+      creationDateFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
+      creationDateTo: { type: ControlTypes.Date, valueType: ValueType.Text },
+      distributedOnFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
+      distributedOnTo: { type: ControlTypes.Date, valueType: ValueType.Text },
+      candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
+      projectTypeId: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'projectType',
+        valueId: 'id',
+      },
+      projectNameId: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'projectName',
+        valueId: 'id',
+      },
+      poNumberId: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'poNumber',
+        valueId: 'id',
+      },
     };
   }
 }
