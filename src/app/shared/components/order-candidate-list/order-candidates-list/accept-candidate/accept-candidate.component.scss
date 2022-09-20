@@ -1,12 +1,12 @@
-@import "colors";
+@import 'colors';
+@import 'adaptive-response';
 
 :host {
   overflow-y: auto;
 }
 
 .container {
-
-  .deployed-icon{
+  .deployed-icon {
     color: $primary-active-blue;
   }
 
@@ -21,6 +21,10 @@
   .content-container {
     display: flex;
     margin-top: 24px;
+
+    @media (max-width: $tablet-min) {
+      flex-direction: column;
+    }
 
     .candidate-info {
       width: 55%;
@@ -43,10 +47,23 @@
     }
 
     .input-group.input-readonly {
-      .e-input[readonly], ejs-daterangepicker .e-input-group, ejs-datepicker .e-input-group {
+      .e-input[readonly],
+      ejs-daterangepicker .e-input-group,
+      ejs-datepicker .e-input-group {
         background-color: $secondary-dark-blue-50;
         color: $secondary-dark-blue-30;
         border: 1px solid $secondary-dark-blue-40 !important;
+      }
+    }
+
+    @media (max-width: $tablet-min) {
+      flex-direction: column;
+      .candidate-info {
+        width: 100%;
+      }
+
+      .comments {
+        width: 100%;
       }
     }
   }
@@ -59,6 +76,11 @@
 .candidat-status {
   display: flex;
   align-items: center;
+
+  @media (max-width: $tablet-min) {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
 }
 
 .d-flex {
@@ -83,3 +105,4 @@
   display: flex;
   flex-wrap: nowrap;
 }
+

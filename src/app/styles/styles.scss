@@ -193,10 +193,35 @@ body {
 
     .header-item {
       .e-menu-wrapper,
-      .e-menu-wrapper .e-menu .e-menu-item.e-selected {
+      .e-menu-wrapper .e-menu .e-menu-item {
         background-color: $background;
+        font-size: 14px !important;
+        font-weight: 600;
+        height: 56px;
+        line-height: 56px;
+      }
+
+      .e-menu-item.e-selected {
+        border-radius: 8px;
+        background-color: $primary-active-blue-70 !important;
+        color: $primary-active-blue-10 !important;
+      }
+
+      .e-menu-wrapper .e-menu .e-menu-item .e-caret {
+        display: none;
       }
     }
+
+    .e-menu-wrapper .e-ul .e-menu-item {
+      font-size: 14px;
+    }
+
+    .e-menu-wrapper .e-ul .e-menu-item.e-focused,
+    .e-menu-wrapper .e-ul .e-menu-item.e-selected {
+      background-color: $primary-active-blue-10 !important;
+      color: $white !important;
+    }
+
 
     @include meta.load-css("./themes/material_l");
 
@@ -230,9 +255,33 @@ body {
 
     .header-item {
       .e-menu-wrapper,
-      .e-menu-wrapper .e-menu .e-menu-item.e-selected {
+      .e-menu-wrapper .e-menu .e-menu-item {
         background-color: $background;
+        font-size: 14px !important;
+        font-weight: 600;
+        height: 56px;
+        line-height: 56px;
       }
+
+      .e-menu-item.e-selected {
+        border-radius: 8px;
+        background-color: $primary-active-blue-70 !important;
+        color: $primary-active-blue-10 !important;
+      }
+
+      .e-menu-wrapper .e-menu .e-menu-item .e-caret {
+        display: none;
+      }
+    }
+
+    .e-menu-wrapper .e-ul .e-menu-item {
+      font-size: 14px;
+    }
+
+    .e-menu-wrapper .e-ul .e-menu-item.e-focused,
+    .e-menu-wrapper .e-ul .e-menu-item.e-selected {
+      background-color: $primary-active-blue-10 !important;
+      color: $white !important;
     }
 
     .week-picker-container .e-input-group.e-control-wrapper {
@@ -259,8 +308,13 @@ body {
     }
 
     #organization-agency-dropdown .e-input-group {
-      background: $sidebar-background !important;
+      background: $background !important;
       color: $white;
+    }
+
+    #organization-agency-dropdown .e-input-group:hover {
+      background: $primary-active-blue-70 !important;
+      color: $primary-active-blue-10;
     }
 
     .e-input-group.e-control-wrapper.e-ddl.e-valid-input {
@@ -394,6 +448,7 @@ hr {
 @import './controls/pdf-viewer';
 @import './controls/tooltip';
 @import './controls/custom-buttons';
+@import './controls/dropdownbutton.scss';
 @import 'text';
 
 a, a:hover, a:focus, a:active {

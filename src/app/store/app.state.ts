@@ -12,7 +12,8 @@ import {
   SetIsFirstLoadState,
   SetIsOrganizationAgencyArea,
   GetAlertsForCurrentUser,
-  CheckScreen
+  CheckScreen,
+  ShouldDisableUserDropDown
 } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
@@ -31,6 +32,7 @@ export interface AppStateModel {
   isMobileScreen: boolean;
   isTabletScreen: boolean;
   isDekstopScreen: boolean;
+  shouldDisableUserDropDown:boolean;
 }
 
 @State<AppStateModel>({
@@ -50,6 +52,7 @@ export interface AppStateModel {
     isMobileScreen: false,
     isTabletScreen: false,
     isDekstopScreen: false,
+    shouldDisableUserDropDown:false
   },
 })
 @Injectable()
@@ -91,6 +94,9 @@ export class AppState {
     private userService: UserService,
     private breakpointObserver: BreakpointObserver
     ) {}
+  @Selector()
+  static shouldDisableUserDropDown(state: AppStateModel): boolean { return state.shouldDisableUserDropDown; }
+
 
   @Action(ToggleMobileView)
   ToggleMobileView({ patchState }: StateContext<AppStateModel>, { payload }: ToggleMobileView): void {
@@ -146,5 +152,10 @@ export class AppState {
     .subscribe((res) => {
       patchState({ isDekstopScreen: res});
     });
+  }
+
+  @Action(ShouldDisableUserDropDown)
+  ShouldDisableUserDropDown({ patchState }: StateContext<AppStateModel>, { payload }: ShouldDisableUserDropDown): void {
+    patchState({ shouldDisableUserDropDown: payload });
   }
 }

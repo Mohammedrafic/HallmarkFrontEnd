@@ -1,4 +1,6 @@
 @import "colors";
+@import 'adaptive-response';
+
 
 :host {
   overflow-y: auto;
@@ -58,6 +60,18 @@
       background-color: $secondary-dark-blue-50;
       border-radius: 8px;
     }
+
+    @media (max-width: $tablet-min) {
+      flex-direction: column;
+      .job-details  {
+        width: 100%;
+      }
+
+      .comments {
+        margin-top: 20px;
+        width: 100%;
+      }
+    }
   }
 
   .bill-rates {
@@ -68,4 +82,9 @@
 .candidat-status {
   display: flex;
   align-items: center;
+  
+  @media (max-width: $tablet-min) {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
 }

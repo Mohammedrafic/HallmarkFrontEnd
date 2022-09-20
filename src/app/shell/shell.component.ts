@@ -1,6 +1,6 @@
 import { DismissAlertDto } from './../shared/models/alerts-template.model';
 import { DismissAlert, DismissAllAlerts } from './../admin/store/alerts.actions';
-import { GetAlertsForCurrentUser } from './../store/app.actions';
+import { GetAlertsForCurrentUser, ShouldDisableUserDropDown } from './../store/app.actions';
 import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
@@ -14,14 +14,14 @@ import {
   SidebarComponent,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, map, Observable, Subject, takeUntil } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '../client/client.config';
 import { Menu, MenuItem } from '../shared/models/menu.model';
 import { User } from '../shared/models/user.model';
 import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
-import { GetUserMenuConfig, LogoutUser } from '../store/user.actions';
+import { GetCurrentUserPermissions, GetUserMenuConfig, LogoutUser } from '../store/user.actions';
 import { UserState } from '../store/user.state';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
@@ -31,6 +31,8 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { AnalyticsMenuId } from '@shared/constants/menu-config';
 
+import { CurrentUserPermission } from '@shared/models/permission.model';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 enum THEME {
   light = 'light',
   dark = 'dark',
@@ -41,7 +43,8 @@ enum profileMenuItem {
   help=2,
   log_out = 3,
   light_theme = 4,
-  dark_theme=5
+  dark_theme=5,
+  manage_notifications = 6
 }
 
 @Component({
@@ -104,6 +107,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   @Select(AppState.getAlertsForCurrentUser)
   alertStateModel$: Observable<GetAlertsForUserStateModel[]>;
 
+  @Select(UserState.currentUserPermissions)
+  currentUserPermissions$: Observable<CurrentUserPermission[]>
+
   public searchString: string = '';
   public isClosingSearch: boolean = false;
   public searchResult: MenuItem[] = [];
@@ -116,7 +122,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     [profileMenuItem.help]: 'Help',
     [profileMenuItem.log_out]: 'LogOut',
     [profileMenuItem.light_theme]: "Light",
-    [profileMenuItem.dark_theme]: "Dark"
+    [profileMenuItem.dark_theme]: "Dark",
+    [profileMenuItem.manage_notifications]: "Manage Notifications"
   }
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
@@ -135,6 +142,10 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   faTimes = faTimes as IconDefinition;
   faBan = faBan as IconDefinition;
   alerts: any;
+  private permissions: CurrentUserPermission[] = [];
+  canManageOtherUserNotifications: boolean;
+  canManageNotificationTemplates: boolean;
+  
   constructor(
     private store: Store,
     private router: Router,
@@ -180,6 +191,44 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
         ];
       }
     });
+    this.getCurrentUserPermissions();
+    this.currentUserPermissions$
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((permissions) => !!permissions.length),
+        map((permissions) => permissions.map((permission) => permission.permissionId))
+      )
+      .subscribe((permissionsIds: number[]) => {
+        this.canManageOtherUserNotifications = this.hasPermission(permissionsIds, PermissionTypes.CanManageNotificationsForOtherUsers);
+        this.canManageNotificationTemplates = this.hasPermission(permissionsIds, PermissionTypes.CanManageNotificationTemplates);
+
+        this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+          if (user) {
+            this.userLogin = user;
+            this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
+            this.store.dispatch(new GetAlertsForCurrentUser({}))
+            this.alertStateModel$.subscribe((x) => {
+              this.alerts = x;
+            });
+            this.profileDatasource = [
+              {
+                text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
+                items: [{ text: this.ProfileMenuItemNames[profileMenuItem.edit_profile], id: profileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },
+                { text: this.ProfileMenuItemNames[profileMenuItem.manage_notifications], id: profileMenuItem.manage_notifications.toString(), iconCss: 'e-settings e-icons' },
+                {
+                  text: this.ProfileMenuItemNames[profileMenuItem.theme], id: profileMenuItem.theme.toString(), iconCss: this.isDarkTheme ? 'e-theme-dark e-icons' : 'e-theme-light e-icons', items: [
+                    { text: this.ProfileMenuItemNames[profileMenuItem.light_theme], id: profileMenuItem.light_theme.toString() },
+                    { text: this.ProfileMenuItemNames[profileMenuItem.dark_theme], id: profileMenuItem.dark_theme.toString() }
+                  ]
+                },
+                { text: this.ProfileMenuItemNames[profileMenuItem.help], id: profileMenuItem.help.toString(), iconCss: 'e-circle-info e-icons' },
+                { text: this.ProfileMenuItemNames[profileMenuItem.log_out], id: profileMenuItem.log_out.toString(), iconCss: 'e-ddb-icons e-logout' }]
+              },
+            ];
+          }
+        });
+        this.addManageNotificationOptionInHeader();
+      });
   }
 
   ngOnDestroy(): void {
@@ -188,6 +237,23 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngAfterViewInit(): void {
     this.hideAnalyticsSubMenuItems();
+  }
+
+  private addManageNotificationOptionInHeader(): void {
+    if (this.canManageNotificationTemplates == false || this.canManageOtherUserNotifications == false) {
+        const n = this.profileDatasource[0].items?.findIndex(x=>x.id==profileMenuItem.manage_notifications.toString());
+        if (n == undefined || n > 0){
+          this.profileDatasource[0].items?.splice(n!,1);
+        }
+    }
+  }
+
+  private getCurrentUserPermissions(): void {
+    this.store.dispatch(new GetCurrentUserPermissions());
+  }
+
+  private hasPermission(permissions: number[], id: number): boolean{
+    return permissions.includes(id);
   }
 
   subsToOrderAgencyIds(): void {
@@ -202,6 +268,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   onSelectProfileMenu(event: any) {
     switch (Number(event.item.properties.id)) {
       case profileMenuItem.edit_profile:
+        break;
+      case profileMenuItem.manage_notifications:
+        this.manageNotifications();
         break;
       case profileMenuItem.light_theme:
         this.isDarkTheme = true;
@@ -254,6 +323,19 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.store.dispatch(new ToggleSidebarState(!this.sidebar.isOpen));
     this.tree.collapseAll();
   }
+
+  manageNotifications(): void {
+    this.menu$.pipe(takeUntil(this.unsubscribe$)).subscribe((menu: Menu) => {
+      if (menu.menuItems.length) {
+
+        let r = menu.menuItems.find(element=>element.id == 6)?.children.find(e=>e.route == "/alerts/user-subscription");
+        if(r != undefined){
+          this.store.dispatch(new ShouldDisableUserDropDown(true));
+          this.router.navigate([r.route]);
+        }
+      }
+  });
+}
 
   public toggleMobileSidebar(): void {
     this.isSidebarHidden = !this.isSidebarHidden;

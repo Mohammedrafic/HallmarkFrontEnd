@@ -8,6 +8,7 @@ import { AccordionModule, TabModule } from '@syncfusion/ej2-angular-navigations'
 import { FeatherModule } from 'angular-feather';
 import { SharedModule } from '@shared/shared.module';
 import { ExtensionModule } from '@shared/components/extension/extension.module';
+import { DropDownButtonAllModule } from '@syncfusion/ej2-angular-splitbuttons';
 
 @NgModule({
   declarations: [ChildOrderDialogComponent],
@@ -23,6 +24,7 @@ import { ExtensionModule } from '@shared/components/extension/extension.module';
     AccordionModule,
     ExtensionModule,
     CustomButtonModule,
+    DropDownButtonAllModule
   ],
   exports: [ChildOrderDialogComponent],
 })

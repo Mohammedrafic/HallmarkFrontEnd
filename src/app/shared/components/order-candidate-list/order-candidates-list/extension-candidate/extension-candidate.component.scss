@@ -1,3 +1,5 @@
+@import 'adaptive-response';
+
 :host {
   overflow-y: auto;
   .container.extension-container.container-tab {
@@ -13,4 +15,14 @@
 
 .comments {
   border-radius: 8px;
+}
+
+@media (max-width: $tablet-min) {
+  .extension-container {
+    padding: 0 !important;
+  }
+
+  .form-mobile {
+    flex-direction: column;
+  }
 }

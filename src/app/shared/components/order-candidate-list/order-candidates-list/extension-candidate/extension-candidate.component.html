@@ -1,3 +1,4 @@
+<hr />
 <section class="container extension-container container-tab" *ngIf="candidate$ | async as candidate">
   <section class="header-container">
     <div class="e-card-header">
@@ -37,7 +38,7 @@
             </ng-template>
             <ng-template #content>
               <form [formGroup]="form">
-                <div class="d-flex">
+                <div class="d-flex form-mobile">
                   <div class="f-grow-2">
                     <div class="input-container bootstrap">
                       <label class="input-group">Job ID</label>
@@ -90,7 +91,7 @@
                   <div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Offered Bill Rate</label>
-                      <div class="input-group">
+                      <div class="input-group" [class.input-readonly]="isOnBoard && !isAgency">
                         <input
                           appValidateWithMessage
                           formControlName="offeredBillRate"
@@ -98,6 +99,7 @@
                           (focus)="priceUtils.setPriceMask(form, 'offeredBillRate', $event)"
                           (blur)="priceUtils.setTwoDecimals(form, 'offeredBillRate', $event)"
                           type="text"
+                          [readonly]="isOnBoard && !isAgency"
                         />
                       </div>
                     </div>
