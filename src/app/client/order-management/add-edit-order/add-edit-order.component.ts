@@ -667,6 +667,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private subscribeOnPredefinedBillRates(): void {
     this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$), skip(1)).subscribe((predefinedBillRates) => {
+      if(this.areBillRatesPopulated && this.order) {
+        this.manuallyAddedBillRates = this.order.billRates.filter((billrate) => !billrate.isPredefined);
+      }
+
       this.orderBillRates =
         !this.areBillRatesPopulated && this.order
           ? [...this.order.billRates]
