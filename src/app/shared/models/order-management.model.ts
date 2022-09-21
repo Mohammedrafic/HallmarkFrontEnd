@@ -8,7 +8,6 @@ import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
 import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
 import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
-import { RejectReason } from './reject-reason.model';
 
 export class OrderManagement {
   id: number;
@@ -190,6 +189,14 @@ export type AgencyOrderFilters = {
   includeReOrders?: boolean;
   annualSalaryRangeFrom?: string | null;
   annualSalaryRangeTo?: string | null;
+  creationDateFrom?: Date | null;
+  creationDateTo?: Date | null;
+  distributedOnFrom?: Date | null;
+  distributedOnTo?: Date | null;
+  candidateName?: string | null;
+  projectTypeId?: number | null;
+  projectNameId?: number | null;
+  poNumberId?: number | null;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -503,6 +510,14 @@ export class OrderFilter {
   templateTitle?: string;
   annualSalaryRangeFrom?: string | null;
   annualSalaryRangeTo?: string | null;
+  creationDateFrom?: Date | null;
+  creationDateTo?: Date | null;
+  distributedOnFrom?: Date | null;
+  distributedOnTo?: Date | null;
+  candidateName?: string | null;
+  projectTypeId?: number | null;
+  projectNameId?: number | null;
+  poNumberId?: number | null;
 }
 
 export class SortModel {
