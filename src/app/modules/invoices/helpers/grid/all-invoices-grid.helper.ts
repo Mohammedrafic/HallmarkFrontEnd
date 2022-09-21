@@ -19,6 +19,7 @@ import { InvoicesContainerGridHelper } from './invoices-container-grid.helper';
 import { ToggleRowExpansionHeaderCellComponent } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
 import { AllInvoicesActionCellComponent } from '../../components/all-invoices-action-cell/all-invoices-action-cell.component';
+import { BaseInvoice } from '../../interfaces';
 
 interface AllColDefsConfig {
   approve?: (invoice: PendingApprovalInvoice) => void;
@@ -128,6 +129,12 @@ export class AllInvoicesGridHelper {
           weekPeriod,
         } = InvoicesContainerGridHelper.getColDefsMap(agency);
 
+        const rendererParams: Pick<TitleValueCellRendererParams, 'titleValueParams'> = {
+          titleValueParams: {
+            organizationId: (params.data as BaseInvoice).organizationId
+          },
+        };
+
         return {
           ...params,
           detailGridOptions: {
@@ -150,7 +157,8 @@ export class AllInvoicesGridHelper {
                   return {
                     ...params,
                     titleValueParams: {
-                      valueClass: 'font-weight-bold color-primary-active-blue-10'
+                      valueClass: 'font-weight-bold color-primary-active-blue-10',
+                      ...rendererParams.titleValueParams,
                     }
                   }
                 }
@@ -160,6 +168,7 @@ export class AllInvoicesGridHelper {
                 headerName: 'Amount',
                 cellClass: 'font-weight-bold',
                 cellRendererSelector: titleValueCellRendererSelector,
+                cellRendererParams: rendererParams,
                 valueFormatter: numberValueFormatter,
               },
               {
@@ -167,11 +176,13 @@ export class AllInvoicesGridHelper {
                 valueGetter: weekPeriodValueGetter,
                 headerName: 'Week Period',
                 cellRendererSelector: titleValueCellRendererSelector,
+                cellRendererParams: rendererParams,
               },
               {
                 field: 'value',
                 headerName: 'Total Hours',
                 cellRendererSelector: titleValueCellRendererSelector,
+                cellRendererParams: rendererParams,
                 width: 100,
               },
               {
@@ -179,18 +190,21 @@ export class AllInvoicesGridHelper {
                 minWidth: 210,
                 headerName: 'Location',
                 cellRendererSelector: titleValueCellRendererSelector,
+                cellRendererParams: rendererParams,
               },
               {
                 field: 'departmentName',
                 minWidth: 160,
                 headerName: 'Department',
                 cellRendererSelector: titleValueCellRendererSelector,
+                cellRendererParams: rendererParams,
               },
               {
                 field: 'timesheetTypeText',
                 width: 90,
                 headerName: 'Type',
                 cellRendererSelector: titleValueCellRendererSelector,
+                cellRendererParams: rendererParams,
               },
             ] as TypedColDef<PendingApprovalInvoiceRecord>[],
           },
