@@ -449,14 +449,27 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     document.body.classList.add(darkTheme ? THEME.dark : THEME.light);
   }
 
-  public onSearchFocus(): void {
+  public onSearchMenuClick(): void {
     this.searchHeight = 100;
-    this.isSearching = true;
-
+    this.isSearching = !this.isSearching;
     if (this.isMaximized) {
       this.searchInput?.nativeElement?.focus();
-    } else {
-      this.searchMenuInstance.setFocus();
+    } 
+    if (!this.sidebar.isOpen)
+      this.isMaximized = false;
+    else
+      this.isMaximized = true;
+  }
+
+  public handleOnSearchMenuTextKeyUp(event: KeyboardEvent): void {
+    const { value } = event.target as HTMLInputElement;
+    if (value != '') {
+      this.searchString = value;
+      this.searchResult = this.getData(this.searchString.toLowerCase());
+    }
+    else {
+      this.searchString = '';
+      this.searchResult = [];
     }
   }
 
@@ -466,8 +479,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getData(searchText: string) {
     const menuItems = [...this.sideBarMenu];
-
-    return this.getValueLogic(menuItems, searchText);
+    const filterMenuItems = menuItems.filter((item: MenuItem) => item.id != AnalyticsMenuId);
+    return this.getValueLogic((filterMenuItems != null && filterMenuItems.length > 0) ? filterMenuItems : menuItems, searchText);
   }
 
   getValueLogic(data: any, filterText: string) {

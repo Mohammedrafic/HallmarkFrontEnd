@@ -480,7 +480,7 @@
   color: $white;
 
   &::placeholder {
-    color: $secondary-dark-blue-40 !important;
+    color: $secondary-dark-blue-30 !important;
   }
 }
 
@@ -505,6 +505,18 @@
 }
 .e-menu-wrapper.e-popup.e-menu-popup{
     border-radius:8px;
+}
+
+.search-menu:hover {
+  background: $secondary-dark-blue-10-1 !important;
+  color: $primary-active-blue;
+}
+.search-menuitem-expand {
+  border-left: 4px solid $sidebar-background;
+}
+.search-menu-item-active {
+  background: $secondary-dark-blue-10-1 !important;
+  color: $primary-active-blue;
 }
 
 #alert-sidebar {

@@ -51,7 +51,8 @@
         <div class="logo" *ngIf="sidebar.isOpen"></div>
         <div class="small-logo" *ngIf="!sidebar.isOpen"></div>
       </section>
-      <section class="collapse">
+      <section class="collapse search-menu" (click)="onSearchMenuClick()"
+               [ngClass]="{'search-menuitem-expand': sidebar.isOpen , 'search-menu-item-active':isSearching}" >
         <a class="icon-container" #searchInputContainer>
           <i-feather name="search" class="icon"></i-feather>
           <span class="e-text">
@@ -62,7 +63,6 @@
                    placeholder="Start typing"
                    [value]="searchString"
                    (ngModelChange)="onSearchChange()"
-                   (focus)="onSearchFocus()"
                    (focusout)="onSearchFocusOut()" />
           </span>
         </a>
@@ -129,20 +129,19 @@
   </ejs-sidebar>
 
   <section id="main">
-
-
     <div class="content">
       <router-outlet></router-outlet>
-      <dashboard-search-menu #searchMenuInstance class="dashboardSearchMenus"
-                             *ngIf="isSearching"
-                             [isMaximized]="isMaximized"
-                             [searchResult]="searchResult"
-                             [searchString]="searchString"
-                             (searchFocusOut)="onSearchFocusOut()"
-                             [searchHeight]="searchHeight"
-                             [isDarkTheme]="isDarkTheme$ | async">
-      </dashboard-search-menu>
     </div>
+    <dashboard-search-menu #searchMenuInstance class="dashboardSearchMenus"
+                           *ngIf="isSearching"
+                           [isMaximized]="isMaximized"
+                           [searchResult]="searchResult"
+                           [searchString]="searchString"
+                           (searchFocusOut)="onSearchFocusOut()"
+                           [searchHeight]="searchHeight"
+                           [isDarkTheme]="isDarkTheme$ | async"
+                           (handleOnSearchTextKeyUp)="handleOnSearchMenuTextKeyUp($event)">
+    </dashboard-search-menu>
   </section>
 </section>
 

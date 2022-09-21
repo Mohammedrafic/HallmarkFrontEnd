@@ -4,24 +4,21 @@
   [style.marginTop]="searchContentWindowHeight" [ngClass]="isDarkTheme?'search-dark-menu-content':''"
 >
   <div class="col-12" *ngIf="!isMaximized">
-    <div class="e-input-group">
-      <span class="input-search-icon">search</span>
-      <input
-        #searchInput
-        class="input-search e-input"
-        id="search-menu-search-input"
-        type="text"
-        placeholder="Start typing"
-    
-      />
+    <div style="padding:10px;">
+      <app-search #search class="search" (inputKeyUpEnter)="searchMenuItems($event)" [placeholder]="placeholder" (searchFocusOut)="onSearchFocusOut($event)"></app-search>
     </div>
   </div>
   <div class="col-12 search-menu-result-container">
-    <div class="history-container" >
+    <div class="history-container">
       <div class="section-label-container">
         <span class="section-label">Recent History</span>
       </div>
-    
+      <div class="center-align" *ngIf="uniqueHistoryMenuItems === null || uniqueHistoryMenuItems.length === 0">
+        <span class="list-text">No Results</span>
+      </div>
+      <div class="list-item" *ngFor="let item of uniqueHistoryMenuItems" (mousedown)="onItemClick(item)">
+        <span class="list-text">{{ item.title }}</span>
+      </div>
     </div>
     <div class="result-container">
       <div class="section-label-container">
