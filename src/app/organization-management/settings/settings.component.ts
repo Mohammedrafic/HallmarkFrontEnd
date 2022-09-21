@@ -44,7 +44,6 @@ import { GetCurrentUserPermissions, GetOrganizationStructure } from '../../store
 
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { CurrentUserPermission } from '@shared/models/permission.model';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -98,7 +97,6 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
 
   public isEdit: boolean;
   public isParentEdit = false;
-  public hasAccess = false;
   public isFormShown = false;
   public organizationSettingControlType = OrganizationSettingControlType;
   public formControlType: number;
@@ -149,9 +147,6 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.formBuilder = builder;
     this.createSettingsForm();
     this.createRegionLocationDepartmentForm();
-
-    const user = JSON.parse(localStorage.getItem('User') || '');
-    this.hasAccess = [BusinessUnitType.Hallmark, BusinessUnitType.MSP].includes(user?.businessUnitType);
   }
 
   ngOnInit(): void {
