@@ -34,7 +34,8 @@ export const DefaultTimesheetState: TimesheetsModel = {
   isAddDialogOpen: {
     action: false,
     dialogType: RecordFields.Time,
-    initTime: '',
+    startDate: '',
+    endDate: '',
   },
   isUploadDialogOpen: {
     action: false,

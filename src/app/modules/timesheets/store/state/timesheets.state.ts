@@ -40,6 +40,7 @@ import {
   FilterColumns,
   TabCountConfig,
   Timesheet,
+  TimesheetDetailsAddDialogState,
   TimesheetDetailsModel,
   TimesheetInvoice,
   TimesheetRecordsDto,
@@ -149,11 +150,12 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static addDialogOpen(state: TimesheetsModel): { state: boolean, type: RecordFields, initDate: string } {
+  static addDialogOpen(state: TimesheetsModel): TimesheetDetailsAddDialogState {
     return {
       state: state.isAddDialogOpen.action,
       type: state.isAddDialogOpen.dialogType,
-      initDate: state.isAddDialogOpen.initTime,
+      startDate: state.isAddDialogOpen.startDate,
+      endDate: state.isAddDialogOpen.endDate,
     };
   }
 
@@ -338,12 +340,13 @@ export class TimesheetsState {
 
   @Action(Timesheets.ToggleTimesheetAddDialog)
   ToggleAddDialog({ patchState }: StateContext<TimesheetsModel>,
-    { action, type, dateTime }: { action: DialogAction, type: RecordFields, dateTime: string}): void {
+    { action, type, startDate, endDate }: Timesheets.ToggleTimesheetAddDialog): void {
     patchState({
       isAddDialogOpen: {
         action: action === DialogAction.Open,
         dialogType: type,
-        initTime: dateTime,
+        startDate: startDate,
+        endDate: endDate,
       },
     });
   }

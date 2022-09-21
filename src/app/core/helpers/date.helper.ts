@@ -12,12 +12,12 @@ export class TimesheetDateHelper extends Destroyable {
     }
   }
 
-  protected setDateBounds(initValue: string, dayBound: number): void {
-    this.dateSettings.timeIn.min = DateTimeHelper.getFirstDayOfWeekUtc(initValue);
-    this.dateSettings.timeIn.max = DateTimeHelper.getLastDayOfWeekFromFirstDay(initValue, dayBound - 1);
+  protected setDateBounds(startDate: string, endDate: string): void {
+    this.dateSettings.timeIn.min = DateTimeHelper.getFirstDayOfWeekUtc(startDate);
+    this.dateSettings.timeIn.max = DateTimeHelper.getFirstDayOfWeekUtc(endDate);
 
-    this.dateSettings.timeOut.min = DateTimeHelper.getFirstDayOfWeekUtc(initValue);
-    this.dateSettings.timeOut.max = DateTimeHelper.getLastDayOfWeekFromFirstDay(initValue, dayBound);
+    this.dateSettings.timeOut.min = DateTimeHelper.getFirstDayOfWeekUtc(startDate);
+    this.dateSettings.timeOut.max = DateTimeHelper.getFirstDayOfWeekUtc(endDate);
   }
 
   protected setdateBoundsForDay(initValue: string): void {
