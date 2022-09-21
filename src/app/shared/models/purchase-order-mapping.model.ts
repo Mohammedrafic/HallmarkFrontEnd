@@ -11,11 +11,11 @@ export class PurchaseOrderMapping {
   departmentId: number;
   departmentName: string;
   skills: MasterSkillByOrganization[];
-  skillName: string;
+  skillNames: string;
   orderPoNumberId: number;
   orderPoNumber: string;
-  orderPoName:string;
-  prePopulateInOrders : boolean;
+  orderPoName: string;
+  prePopulateInOrders: boolean;
 }
 
 export type PurchaseOrderMappingPage = PageOfCollections<PurchaseOrderMapping>;
@@ -28,7 +28,7 @@ export class SavePurchaseOrderMappingDto {
   departmentIds: number[];
   skillIds: number[];
   forceUpsert?: boolean;
-  prePopulateInOrders : boolean;
+  prePopulateInOrders: boolean;
 }
 
 export class PurchaseOrderNames {

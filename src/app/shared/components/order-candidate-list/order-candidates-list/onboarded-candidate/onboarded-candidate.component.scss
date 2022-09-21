@@ -45,14 +45,6 @@
           display: flex;
           flex-direction: row;
 
-          .input-container {
-            margin-bottom: 12px;
-
-            label {
-              white-space: nowrap;
-            }
-          }
-
           .left-column {
             width: 64%;
             margin-right: 12px;
@@ -60,6 +52,14 @@
 
           .right-column {
             width: 36%;
+          }
+        }
+
+        .input-container {
+          margin-bottom: 12px;
+
+          label {
+            white-space: nowrap;
           }
         }
 
@@ -114,5 +114,14 @@
   @media (max-width: $tablet-min) {
     flex-wrap: wrap;
     align-items: flex-start;
+  }
+}
+
+.d-flex {
+  display: flex;
+  gap: 12px;
+
+  .input-container {
+    flex: 1 1 0;
   }
 }

@@ -138,6 +138,7 @@ import { GridErroredCellComponent } from './components/import-dialog-content/gri
 import { HideBeforeSyncfusionLoadDirective } from './directives/hide-before-syncfusion-load.directive';
 import { UnsavedFormDirective } from './directives/unsaved-form.directive';
 import { ClearCacheComponent } from './components/clear-cache/clear-cache.component';
+import { CandidateCancellationDialogComponent } from './components/candidate-cancellation-dialog/candidate-cancellation-dialog.component';
 
 const icons = {
   AlertCircle,
@@ -292,6 +293,7 @@ const COMPONENTS = [
     CustomNoRowsOverlayComponent,
     GridErroredCellComponent,
     ImportDialogContentComponent,
+    CandidateCancellationDialogComponent,
   ],
   providers: [
     DatePipe,

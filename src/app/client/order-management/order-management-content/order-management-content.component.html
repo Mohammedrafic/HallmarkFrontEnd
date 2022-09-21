@@ -23,7 +23,9 @@
     >
       Export <i-feather name="download" class="icon"></i-feather>
     </button>
-    <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToOrderForm()">Create Order</button>
+    <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToOrderForm()">
+      Create Order
+    </button>
   </ng-container>
 </app-page-toolbar>
 
@@ -239,7 +241,7 @@
           </span>
         </ng-template>
         <ng-template #template let-data>
-          <span>{{ data.startDate | date: 'MM/dd/yyyy' }}</span>
+          <span>{{ data.startDate | date: formatDate }}</span>
         </ng-template>
       </e-column>
       <e-column field="shift" headerText="SHIFT" width="150" [visible]="false">
@@ -297,6 +299,16 @@
       >
         <ng-template #template let-data>
           <span>{{ data.annualSalaryRangeTo | currency: 'USD':'symbol':'1.0-2' }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="creationDate" headerText="Creation Date" width="150">
+        <ng-template #template let-data>
+          <span>{{ data.creationDate | date: formatDate }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="endDate" headerText="End Date" width="150">
+        <ng-template #template let-data>
+          <span>{{ data.endDate | date: formatDate }}</span>
         </ng-template>
       </e-column>
     </e-columns>
@@ -541,9 +553,57 @@
     </div>
     <div class="bootstrap">
       <div class="input-container">
+        <label>Special Project Category</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            formControlName="projectTypeId"
+            appValidateWithMessage
+            [dataSource]="(projectSpecialData$ | async)?.specialProjectCategories"
+            [fields]="specialProjectCategoriesFields"
+          >
+          </ejs-dropdownlist>
+        </div>
+      </div>
+    </div>
+    <div class="row bootstrap">
+      <div class="input-container">
+        <label>Project Name</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            formControlName="projectNameId"
+            appValidateWithMessage
+            [dataSource]="(projectSpecialData$ | async)?.projectNames"
+            [fields]="projectNameFields"
+          >
+          </ejs-dropdownlist>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>PO #</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            formControlName="poNumberId"
+            appValidateWithMessage
+            [dataSource]="(projectSpecialData$ | async)?.poNumbers"
+            [fields]="poNumberFields"
+          >
+          </ejs-dropdownlist>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
         <label>Job Title</label>
         <div class="input-group">
           <input class="e-input" type="text" maxlength="50" formControlName="jobTitle" />
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Candidate Name</label>
+        <div class="input-group">
+          <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
         </div>
       </div>
     </div>
@@ -612,8 +672,8 @@
           <ejs-datepicker
             id="jobStartDate"
             class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
             formControlName="jobStartDate"
           >
           </ejs-datepicker>
@@ -631,9 +691,60 @@
           <ejs-datepicker
             id="jobEndDate"
             class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
             formControlName="jobEndDate"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-container calendar">
+        <label>Creation Date From</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            class="datepicker"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            formControlName="creationDateFrom"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+      <div class="input-container calendar">
+        <label>Creation Date To</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            class="datepicker"
+            
+            formControlName="creationDateTo"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-container calendar">
+        <label>Distributed On From</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            class="datepicker"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            formControlName="distributedOnFrom"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+      <div class="input-container calendar">
+        <label>Distributed On To</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            class="datepicker"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            formControlName="distributedOnTo"
           >
           </ejs-datepicker>
         </div>

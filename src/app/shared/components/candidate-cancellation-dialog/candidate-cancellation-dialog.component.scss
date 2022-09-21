@@ -1,0 +1,48 @@
+@import "colors";
+
+.candidate-cancellation-dialog {
+  border-radius: 10px !important;
+
+  & + .e-dlg-overlay {
+    background-color: $black;
+  }
+
+  .e-dlg-header-content {
+    border-bottom: 1px solid $secondary-dark-blue-45;
+
+    .e-card-header {
+      h3 {
+        font-size: 24px;
+        font-weight: 700;
+        color: $black;
+      }
+    }
+  }
+
+  .e-dlg-content {
+    padding: 24px 24px 12px !important;
+  }
+
+  .e-footer-content {
+    border-top: 1px solid $secondary-dark-blue-45;
+    padding: 16px 24px;
+
+    .submit-btn {
+      margin-left: 8px;
+    }
+  }
+}
+
+.d-flex {
+  display: flex;
+  gap: 12px;
+}
+
+.input-container, .dropdown-container {
+  margin-bottom: 12px;
+  flex: 1 1 0;
+
+  label {
+    white-space: nowrap;
+  }
+}
