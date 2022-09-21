@@ -659,7 +659,6 @@ export class TimesheetsState {
     .pipe(
       tap((organizations: DataSourceItem[]) => patchState({
         organizations,
-        selectedOrganizationId: organizations[0]?.id,
       })),
       catchError((err: HttpErrorResponse) => dispatch(
         new ShowToast(MessageTypes.Error, getAllErrors(err.error))
