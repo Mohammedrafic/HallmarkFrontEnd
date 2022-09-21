@@ -1,7 +1,10 @@
 <section class="flex-column">
-  <section class="toolbar">
-
-    <section [class.hidden]="!isLoaded">
+  <section class="toolbar" [class.hidden]="!isLoaded">
+    <section>
+      <h3>Regions</h3>
+    </section>
+    <section >
+      
       <button
       ejs-button
       id="importButton"
@@ -151,7 +154,7 @@
 
 
       <div class="input-container">
-        <label for="name">Region<span class="required">*</span></label>
+        <label for="name">Region Name <span class="required">*</span></label>
         <div class="input-group">
           <input id="name"
                   class="e-input"
