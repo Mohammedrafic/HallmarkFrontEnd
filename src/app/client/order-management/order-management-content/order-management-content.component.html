@@ -241,7 +241,7 @@
           </span>
         </ng-template>
         <ng-template #template let-data>
-          <span>{{ data.startDate | date: 'MM/dd/yyyy' }}</span>
+          <span>{{ data.startDate | date: formatDate }}</span>
         </ng-template>
       </e-column>
       <e-column field="shift" headerText="SHIFT" width="150" [visible]="false">
@@ -303,12 +303,12 @@
       </e-column>
       <e-column field="creationDate" headerText="Creation Date" width="150">
         <ng-template #template let-data>
-          <span>{{ data.creationDate | date: 'MM/dd/yyyy' }}</span>
+          <span>{{ data.creationDate | date: formatDate }}</span>
         </ng-template>
       </e-column>
       <e-column field="endDate" headerText="End Date" width="150">
         <ng-template #template let-data>
-          <span>{{ data.endDate | date: 'MM/dd/yyyy' }}</span>
+          <span>{{ data.endDate | date: formatDate }}</span>
         </ng-template>
       </e-column>
     </e-columns>
@@ -672,8 +672,8 @@
           <ejs-datepicker
             id="jobStartDate"
             class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
             formControlName="jobStartDate"
           >
           </ejs-datepicker>
@@ -691,8 +691,8 @@
           <ejs-datepicker
             id="jobEndDate"
             class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
             formControlName="jobEndDate"
           >
           </ejs-datepicker>
@@ -705,8 +705,8 @@
         <div class="input-group datepicker">
           <ejs-datepicker
             class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
             formControlName="creationDateFrom"
           >
           </ejs-datepicker>
@@ -717,8 +717,7 @@
         <div class="input-group datepicker">
           <ejs-datepicker
             class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
+            
             formControlName="creationDateTo"
           >
           </ejs-datepicker>
@@ -731,8 +730,8 @@
         <div class="input-group datepicker">
           <ejs-datepicker
             class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
             formControlName="distributedOnFrom"
           >
           </ejs-datepicker>
@@ -743,8 +742,8 @@
         <div class="input-group datepicker">
           <ejs-datepicker
             class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
             formControlName="distributedOnTo"
           >
           </ejs-datepicker>

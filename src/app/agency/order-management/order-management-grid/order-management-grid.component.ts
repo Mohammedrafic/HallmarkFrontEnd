@@ -74,6 +74,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PreviewOrderDialogComponent } from '@agency/order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
+import { formatDate } from '@shared/constants/format-date';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -147,6 +148,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
+  public readonly formatDate = formatDate;
 
   constructor(
     private store: Store,

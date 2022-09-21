@@ -20,6 +20,8 @@ import { CandidatesStatusText, OrderStatusText } from '@shared/enums/status';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { ProjectsService } from '@shared/services/projects.service';
+import { placeholderDate } from '@shared/constants/placeholder-date';
+import { formatDate } from '@shared/constants/format-date';
 
 enum RLDLevel {
   Orginization,
@@ -51,6 +53,9 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
+
+  public readonly formatDate = formatDate;
+  public readonly placeholderDate = placeholderDate;
 
   public optionFields = {
     text: 'name',

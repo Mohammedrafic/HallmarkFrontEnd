@@ -118,6 +118,8 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { formatDate } from '@shared/constants/format-date';
+import { placeholderDate } from '@shared/constants/placeholder-date';
 
 @Component({
   selector: 'app-order-management-content',
@@ -261,6 +263,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private prefix: string | null;
   private orderId: number | null;
   private creatingReorder = false;
+  public readonly formatDate = formatDate;
+  public readonly placeholderDate = placeholderDate;
 
   constructor(
     private store: Store,

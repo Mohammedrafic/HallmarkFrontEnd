@@ -280,14 +280,14 @@
     <div class="input-container calendar">
       <label for="jobStartDate">{{ activeTab !== AgencyOrderManagementTabs.ReOrders ? 'Job Start Date' : 'Re-Order Date' }}</label>
       <div class="input-group datepicker">
-        <ejs-datepicker id="jobStartDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobStartDate">
+        <ejs-datepicker id="jobStartDate" class="datepicker" [format]="formatDate" [placeholder]="placeholderDate" formControlName="jobStartDate">
         </ejs-datepicker>
       </div>
     </div>
     <div class="input-container calendar" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders && activeTab !== AgencyOrderManagementTabs.PermPlacement">
       <label for="jobEndDate">Job End Date</label>
       <div class="input-group datepicker">
-        <ejs-datepicker id="jobEndDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobEndDate">
+        <ejs-datepicker id="jobEndDate" class="datepicker" [format]="formatDate" [placeholder]="placeholderDate" formControlName="jobEndDate">
         </ejs-datepicker>
       </div>
     </div>
@@ -296,14 +296,14 @@
     <div class="input-container calendar">
       <label>Creation Date From</label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="creationDateFrom">
+        <ejs-datepicker class="datepicker" [format]="formatDate" [placeholder]="placeholderDate" formControlName="creationDateFrom">
         </ejs-datepicker>
       </div>
     </div>
     <div class="input-container calendar">
       <label>Creation Date To</label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="creationDateTo">
+        <ejs-datepicker class="datepicker" [format]="formatDate" [placeholder]="placeholderDate" formControlName="creationDateTo">
         </ejs-datepicker>
       </div>
     </div>
@@ -312,14 +312,14 @@
     <div class="input-container calendar">
       <label>Distributed On From</label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="distributedOnFrom">
+        <ejs-datepicker class="datepicker" [format]="formatDate" [placeholder]="placeholderDate" formControlName="distributedOnFrom">
         </ejs-datepicker>
       </div>
     </div>
     <div class="input-container calendar">
       <label>Distributed On To</label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="distributedOnTo">
+        <ejs-datepicker class="datepicker" [format]="formatDate" [placeholder]="placeholderDate" formControlName="distributedOnTo">
         </ejs-datepicker>
       </div>
     </div>
