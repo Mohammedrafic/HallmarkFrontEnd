@@ -186,7 +186,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           ? data?.order?.publicId + ''
           : data?.order?.organizationPrefix + '-' + data?.order?.publicId;
       params['@' + AlertParameterEnum[AlertParameterEnum.JobTitle]] = data?.order?.title;
-      var url = location.origin + '/#/client/order-management/edit/' + data?.order?.publicId;
+      var url = location.origin + '/ui/client/order-management/edit/' + data?.order?.publicId;
       params['@' + AlertParameterEnum[AlertParameterEnum.ClickbackURL]] = url;
 
       let alertTriggerDto: AlertTriggerDto = {
