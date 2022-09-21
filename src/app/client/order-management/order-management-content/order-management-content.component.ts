@@ -1429,7 +1429,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   updatePositionDetails(position: OrderManagementChild): void {
     this.getOrders();
-    this.store.dispatch(new GetOrganisationCandidateJob(position.organizationId, position.jobId))
+    this.store.dispatch(new GetOrganisationCandidateJob(position.organizationId, position.jobId));
     this.candidatesJob$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((res) => {
       this.selectedCandidate = {
         ...position,
