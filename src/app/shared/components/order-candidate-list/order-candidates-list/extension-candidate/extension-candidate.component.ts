@@ -131,22 +131,32 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.form.markAllAsTouched();
     if (!this.form.errors && this.candidateJob) {
       const value = this.form.getRawValue();
-      this.store.dispatch(
-        new UpdateOrganisationCandidateJob({
-          organizationId: this.candidateJob.organizationId,
-          orderId: this.candidateJob.orderId,
-          jobId: this.candidateJob.jobId,
-          skillName: value.skillName,
-          offeredBillRate: this.candidateJob?.offeredBillRate,
-          offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.offeredStartDate),
-          candidateBillRate: this.candidateJob.candidateBillRate,
-          nextApplicantStatus: {
-            applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
-            statusText: this.candidateJob.applicantStatus.statusText,
-          },
-          billRates: this.getBillRateForUpdate(bill),
-        })
-      );
+      let additionalValues = {};
+      if (this.isOnBoard) {
+        additionalValues = {
+          actualStartDate: this.candidateJob.actualStartDate,
+          actualEndDate: this.candidateJob.actualEndDate,
+          guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
+          clockId: this.candidateJob.clockId,
+        };
+      }
+      const valueForUpdate = {
+        ...additionalValues,
+        organizationId: this.candidateJob.organizationId,
+        orderId: this.candidateJob.orderId,
+        jobId: this.candidateJob.jobId,
+        skillName: value.skillName,
+        offeredBillRate: this.candidateJob?.offeredBillRate,
+        offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.offeredStartDate),
+        candidateBillRate: this.candidateJob.candidateBillRate,
+        nextApplicantStatus: {
+          applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
+          statusText: this.candidateJob.applicantStatus.statusText,
+        },
+        billRates: this.getBillRateForUpdate(bill),
+      };
+
+      this.store.dispatch(new UpdateOrganisationCandidateJob(valueForUpdate));
     }
   }
 
@@ -413,3 +423,4 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       .subscribe();
   }
 }
+
