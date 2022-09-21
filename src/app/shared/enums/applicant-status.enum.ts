@@ -8,7 +8,8 @@ export enum ApplicantStatus {
   Accepted = 50,
   OnBoarded = 60,
   Offboard = 90,
-  Rejected = 100
+  Rejected = 100,
+  Cancelled = 110,
 }
 
 export enum CandidatStatus {
@@ -25,5 +26,5 @@ export enum CandidatStatus {
   End = 70,
   Offboard = 90,
   Rejected = 100,
-
+  Cancelled = 110,
 }

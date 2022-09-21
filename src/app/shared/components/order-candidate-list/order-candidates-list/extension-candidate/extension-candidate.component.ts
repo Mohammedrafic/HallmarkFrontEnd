@@ -1,12 +1,17 @@
-import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { EMPTY, merge, Observable, Subject, map, mergeMap, takeUntil, takeWhile } from 'rxjs';
+import { EMPTY, merge, Observable, Subject, map, mergeMap, takeUntil } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import {
+  CancellationReasonsMap,
+  PenaltiesMap
+} from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
+import { PenaltyCriteria } from "@shared/enums/candidate-cancellation";
 import {
   ApplicantStatus,
   Order,
@@ -32,16 +37,18 @@ import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { Router } from '@angular/router';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
+  CancelOrganizationCandidateJob, CancelOrganizationCandidateJobSuccess,
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
+import { JobCancellation } from "@shared/models/candidate-cancellation.model";
 import { capitalize } from 'lodash';
 import { DurationService } from '@shared/services/duration.service';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { toCorrectTimezoneFormat } from '../../../../utils/date-time.utils';
+import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { UnsavedFormComponentRef, UNSAVED_FORM_PROVIDERS } from '@shared/directives/unsaved-form.directive';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> {}
@@ -77,13 +84,15 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public billRatesData: BillRate[] = [];
   public isReadOnly = false;
   public openRejectDialog = new Subject<boolean>();
+  public openCandidateCancellationDialog = new Subject<void>();
   public priceUtils = PriceUtils;
   public optionFields = { text: 'statusText', value: 'applicantStatus' };
   public applicantStatuses: ApplicantStatus[] = [
     { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
   ];
   public isAgency: boolean = false;
-
+  public showHoursControl: boolean = false;
+  public showPercentage: boolean = false;
   public comments: Comment[] = [];
 
   get isAccepted(): boolean {
@@ -96,6 +105,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   get isOnBoard(): boolean {
     return this.candidateJob?.applicantStatus?.applicantStatus === this.candidatStatus.OnBoard;
+  }
+
+  get isCancelled(): boolean {
+    return this.candidateJob?.applicantStatus?.applicantStatus === this.candidatStatus.Cancelled;
   }
 
   get canAccept(): boolean {
@@ -125,6 +138,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.rejectReasons$ = this.subscribeOnReasonsList();
     this.createForm();
     this.onRejectSuccess();
+    this.subscribeOnCancelOrganizationCandidateJobSuccess();
   }
 
   public updateOrganizationCandidateJobWithBillRate(bill: BillRate): void {
@@ -202,7 +216,18 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
   }
 
-  public cancelRejectCandidate(): void {
+  public cancelCandidate(jobCancellationDto: JobCancellation): void {
+    if (this.candidateJob) {
+      this.store.dispatch(new CancelOrganizationCandidateJob({
+        organizationId: this.candidateJob.organizationId,
+        jobId: this.candidateJob.jobId,
+        jobCancellationDto,
+      }));
+      this.dialogEvent.next(false);
+    }
+  }
+
+  public resetStatusesFormControl(): void {
     this.statusesFormControl.reset();
   }
 
@@ -217,6 +242,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         break;
       case ApplicantStatusEnum.Rejected:
         this.onReject();
+        break;
+      case ApplicantStatusEnum.Cancelled:
+        this.openCandidateCancellationDialog.next();
         break;
       case ApplicantStatusEnum.OnBoarded:
         this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' });
@@ -249,7 +277,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
           ]
         : candidate.status === ApplicantStatusEnum.OnBoarded
-        ? [{ applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) }]
+        ? [
+            { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
+            { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled' },
+          ]
         : [
             { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
             { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
@@ -331,6 +362,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       clockId: new FormControl('', [Validators.maxLength(50)]),
       allowDeployCredentials: new FormControl(false),
       rejectReason: new FormControl(''),
+      jobCancellationReason: new FormControl(''),
+      penaltyCriteria: new FormControl(''),
+      rate: new FormControl(''),
+      hours: new FormControl(''),
     });
   }
 
@@ -352,6 +387,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       .subscribe((value) => {
         this.candidateJob = value;
         if (this.candidateJob) {
+          this.setCancellationControls(this.candidateJob.jobCancellation?.penaltyCriteria || 0);
           this.getComments();
           this.billRatesData = this.candidateJob?.billRates ? [...this.candidateJob.billRates] : [];
           this.form.disable();
@@ -369,6 +405,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             clockId: this.candidateJob.clockId,
             allowDeployCredentials: this.candidateJob.allowDeployCredentials,
             rejectReason: this.candidateJob.rejectReason,
+            jobCancellationReason: CancellationReasonsMap[this.candidateJob.jobCancellation?.jobCancellationReason || 0],
+            penaltyCriteria: PenaltiesMap[this.candidateJob.jobCancellation?.penaltyCriteria || 0],
+            rate: this.candidateJob.jobCancellation?.rate,
+            hours: this.candidateJob.jobCancellation?.hours,
           });
 
           if (!this.isRejected) {
@@ -380,11 +420,16 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       });
   }
 
+  private setCancellationControls(value: PenaltyCriteria): void{
+    this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
+    this.showPercentage = value === PenaltyCriteria.RateOfHours;
+  }
+
   private fieldsEnableHandlear(): void {
-    if (this.isAgency && !this.isOnBoard) {
+    if (this.isAgency && !this.isOnBoard && !this.isCancelled) {
       this.form.get('comments')?.enable();
     }
-    if (!this.isAgency) {
+    if (!this.isAgency && !this.isCancelled) {
       this.form.get('offeredBillRate')?.enable();
     }
     if (this.isAccepted && !this.isAgency) {
@@ -421,6 +466,14 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     )
       .pipe(takeUntil(this.destroy$))
       .subscribe();
+  }
+
+  private subscribeOnCancelOrganizationCandidateJobSuccess(): void {
+    this.action$
+      .pipe(takeUntil(this.destroy$), ofActionSuccessful(CancelOrganizationCandidateJobSuccess))
+      .subscribe(() => {
+        this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+      });
   }
 }
 

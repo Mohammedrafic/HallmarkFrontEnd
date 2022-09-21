@@ -1,33 +1,7 @@
+import { DatePipe, Location } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Actions, ofActionCompleted, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
-import {
-  catchError,
-  combineLatest,
-  debounceTime,
-  EMPTY,
-  filter,
-  first,
-  Observable,
-  Subject,
-  Subscription,
-  take,
-  takeUntil,
-  throttleTime,
-} from 'rxjs';
-import {
-  SetHeaderState,
-  ShowCloseOrderDialog,
-  ShowExportDialog,
-  ShowFilterDialog,
-  ShowSideDialog,
-  ShowToast,
-} from 'src/app/store/app.actions';
-import { ORDERS_GRID_CONFIG } from '../../client.config';
-import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
-import { CandidatesStatusText, OrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
-import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
   ApproveOrder,
   ClearOrders,
@@ -50,7 +24,17 @@ import {
   SelectNavigationTab,
   SetLock,
 } from '@client/store/order-managment-content.actions';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { Actions, ofActionCompleted, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { GetAllOrganizationSkills, GetOrganizationSettings, } from '@organization-management/store/organization-management.actions';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
+import { FilteredItem } from '@shared/models/filter.model';
 import {
   Order,
   OrderCandidateJob,
@@ -60,25 +44,38 @@ import {
   OrderManagementChild,
   OrderManagementPage,
 } from '@shared/models/order-management.model';
-import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-import { UserState } from '../../../store/user.state';
-import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { FilteredItem } from '@shared/models/filter.model';
-import { FilterService } from '@shared/services/filter.service';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Skill } from '@shared/models/skill.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { FilterService } from '@shared/services/filter.service';
+import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
+import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
+import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import {
-  GetAllOrganizationSkills,
-  GetOrganizationSettings,
-} from '@organization-management/store/organization-management.actions';
-import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
-import { DatePipe, Location } from '@angular/common';
-import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+  catchError,
+  combineLatest,
+  debounceTime,
+  EMPTY,
+  filter,
+  first,
+  Observable,
+  Subject,
+  Subscription,
+  take,
+  takeUntil,
+  throttleTime,
+} from 'rxjs';
+import { CandidatesStatusText, OrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
+import {
+  SetHeaderState,
+  ShowCloseOrderDialog,
+  ShowExportDialog,
+  ShowFilterDialog,
+  ShowSideDialog,
+  ShowToast,
+} from 'src/app/store/app.actions';
+import { UserState } from 'src/app/store/user.state';
+import { ORDERS_GRID_CONFIG } from '../../client.config';
 import {
   allOrdersChildColumnsToExport,
   AllOrdersColumnsConfig,
@@ -1182,6 +1179,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           CandidatStatus.Withdraw,
           CandidatStatus.Offboard,
           CandidatStatus.Rejected,
+          CandidatStatus.Cancelled,
         ];
         if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
           statuses = data.orderStatuses.filter((status) =>
@@ -1193,6 +1191,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
               CandidatesStatusText['Offered Bill Rate'],
               CandidatesStatusText.Onboard,
               CandidatesStatusText.Rejected,
+              CandidatStatus.Cancelled,
             ].includes(status.status)
           ); // TODO: after BE implementation also add Pending, Rejected
         } else if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {

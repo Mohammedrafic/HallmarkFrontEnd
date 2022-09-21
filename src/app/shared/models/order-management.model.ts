@@ -1,3 +1,4 @@
+import { JobCancellation } from "@shared/models/candidate-cancellation.model";
 import { PageOfCollections } from '@shared/models/page.model';
 import { Document } from '@shared/models/document.model';
 import { OrderStatus } from '@shared/enums/order-management';
@@ -447,6 +448,7 @@ export type OrderCandidateJob = {
   positionClosureReasonId?: number;
   commentContainerId?: number;
   reOrderDate?: string;
+  jobCancellation?: JobCancellation;
 };
 
 export type CandidatesBasicInfo = {

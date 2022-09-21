@@ -1,43 +1,10 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChanges,
-  ViewChild,
-  ViewChildren,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild, } from '@angular/core';
 import { Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
-import { catchError, EMPTY, Observable, Subject, take, takeWhile } from 'rxjs';
 
-import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import {
-  AccordionComponent,
-  MenuEventArgs,
-  SelectEventArgs,
-  SelectingEventArgs,
-  TabComponent,
-} from '@syncfusion/ej2-angular-navigations';
-
-import { OrderManagementState } from '@agency/store/order-management.state';
-import { OrderType } from '@shared/enums/order-type';
-import {
-  AgencyOrderManagement,
-  Order,
-  OrderCandidateJob,
-  OrderFilter,
-  OrderManagementChild,
-} from '@shared/models/order-management.model';
-import { AcceptFormComponent } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
-import PriceUtils from '@shared/utils/price.utils';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { GetAgencyExtensions, GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import { OrderManagementState } from '@agency/store/order-management.state';
+import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
 import {
   GetAvailableSteps,
   GetOrganisationCandidateJob,
@@ -46,24 +13,39 @@ import {
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { OrderStatusText } from '@shared/enums/status';
-import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
-import { ShowCloseOrderDialog, ShowToast } from '../../../store/app.actions';
-import { OrderStatus } from '@shared/enums/order-management';
-import { CommentsService } from '@shared/services/comments.service';
-import { Comment } from '@shared/models/comment.model';
-import { BillRate } from '@shared/models';
-import { addDays, toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
+import { Select, Store } from '@ngxs/store';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
+import {
+  CancellationReasonsMap,
+  PenaltiesMap
+} from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
 import { ExtensionSidebarComponent } from '@shared/components/extension/extension-sidebar/extension-sidebar.component';
-import { AppState } from '../../../store/app.state';
-import { ConfirmService } from '@shared/services/confirm.service';
+import { AcceptFormComponent } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { filter } from 'rxjs/operators';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { UnsavedFormDirective } from '@shared/directives/unsaved-form.directive';
-import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
+import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { MessageTypes } from '@shared/enums/message-types';
+import { OrderStatus } from '@shared/enums/order-management';
+import { OrderType } from '@shared/enums/order-type';
+import { OrderStatusText } from '@shared/enums/status';
+import { BillRate } from '@shared/models';
+import { Comment } from '@shared/models/comment.model';
+import { AgencyOrderManagement, Order, OrderCandidateJob, OrderFilter, OrderManagementChild, } from '@shared/models/order-management.model';
+import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { CommentsService } from '@shared/services/comments.service';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { addDays, toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
+import PriceUtils from '@shared/utils/price.utils';
+import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
+
+import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
+import { AccordionComponent, SelectEventArgs, SelectingEventArgs, TabComponent, } from '@syncfusion/ej2-angular-navigations';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { catchError, EMPTY, Observable, Subject, take, takeWhile } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { ShowCloseOrderDialog, ShowToast } from 'src/app/store/app.actions';
+import { AppState } from 'src/app/store/app.state';
 
 enum Template {
   accept,
@@ -145,6 +127,10 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
   get isReorderType(): boolean {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
+  }
+
+  get isCancelled(): boolean {
+    return this.candidateJob?.applicantStatus.applicantStatus === CandidatStatus.Cancelled;
   }
 
   get showAddExtension(): boolean {
@@ -390,7 +376,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
       case MobileMenuItems.ReOpen:
         this.reOpenPosition()
         break;
-    
+
       default:
         break;
     }
@@ -450,7 +436,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
           ApplicantStatus.Offered,
           ApplicantStatus.Offboard,
         ];
-        const allowedOnboardedStatuses = [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded];
+        const allowedOnboardedStatuses = [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded, ApplicantStatus.Cancelled];
 
         if (allowedOfferDeploymentStatuses.includes(this.candidate.candidateStatus)) {
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.jobId));
@@ -529,6 +515,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     offeredBillRate,
     organizationPrefix,
     orderPublicId,
+    jobCancellation,
   }: OrderCandidateJob) {
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     const isBillRatePending =
@@ -547,12 +534,18 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
       shiftEndTime,
       openPositions,
       hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
+      jobCancellationReason: CancellationReasonsMap[jobCancellation?.jobCancellationReason || 0],
+      penaltyCriteria: PenaltiesMap[jobCancellation?.penaltyCriteria || 0],
+      rate: jobCancellation?.rate,
+      hours: jobCancellation?.hours,
     });
     this.enableFields();
   }
 
   private enableFields(): void {
-    this.acceptForm.get('candidateBillRate')?.enable();
+    if (!this.isCancelled) {
+      this.acceptForm.get('candidateBillRate')?.enable();
+    }
     switch (this.candidateJob?.applicantStatus.applicantStatus) {
       case !this.isAgency && CandidatStatus.BillRatePending:
         this.acceptForm.get('hourlyRate')?.enable();

@@ -23,7 +23,11 @@
       <e-column textAlign="Right" width="80">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <div ejs-button cssClass="e-flat primary-icon-button custom-button" [class.btn-icon__disabled]="order?.isClosed"  (click)="onEdit(data, $event)">
+            <div
+              ejs-button
+              cssClass="e-flat primary-icon-button custom-button"
+              [class.btn-icon__disabled]="order?.isClosed && data.statusName !== cancelledStatusName"
+              (click)="onEdit(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </div>
           </div>
@@ -52,6 +56,9 @@
                     <e-chip [text]="data.statusName" cssClass="e-filled"></e-chip>
                   </ng-container>
                   <ng-container *ngSwitchCase="candidateStatuses.Rejected">
+                    <e-chip [text]="data.statusName" cssClass="e-default"></e-chip>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="candidateStatuses.Cancelled">
                     <e-chip [text]="data.statusName" cssClass="e-default"></e-chip>
                   </ng-container>
                   <ng-container *ngSwitchDefault>
