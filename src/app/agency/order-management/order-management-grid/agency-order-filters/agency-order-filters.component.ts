@@ -49,7 +49,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   @Select(OrderManagementState.gridFilterRegions)
   gridFilterRegions$: Observable<OrganizationRegion[]>;
 
-  public readonly projectSpecialData$: Observable<ProjectSpecialData>;
+  public projectSpecialData$: Observable<ProjectSpecialData>;
   public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
@@ -80,11 +80,11 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
 
   constructor(private store: Store, private actions$: Actions, private projectsService: ProjectsService) {
     super();
-    this.projectSpecialData$ = this.projectsService.getProjectSpecialData();
   }
 
   ngOnInit(): void {
     this.onOrderFilteringOptionsChange();
+    this.getProjectSpecialData();
   }
 
   ngAfterViewInit(): void {
@@ -353,5 +353,9 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         valueId: 'id',
       },
     };
+  }
+
+  private getProjectSpecialData(): void {
+    this.projectSpecialData$ = this.projectsService.getProjectSpecialData();
   }
 }
