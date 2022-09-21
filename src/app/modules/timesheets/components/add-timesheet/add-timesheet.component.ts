@@ -8,7 +8,7 @@ import { DialogAction } from '@core/enums';
 import { AddDialogHelper } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { AddTimsheetForm } from '../../interface';
+import { AddTimsheetForm, TimesheetDetailsAddDialogState } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { RecordAddDialogConfig, TimesheetConfirmMessages } from '../../constants';
 import { RecordFields } from '../../enums';
@@ -29,7 +29,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
   public formType: RecordFields = RecordFields.Time;
 
   @Select(TimesheetsState.addDialogOpen)
-  public readonly dialogState$: Observable<{ state: boolean, type: RecordFields, initDate: string }>
+  public readonly dialogState$: Observable<TimesheetDetailsAddDialogState>
 
   ngOnInit(): void {
     this.getDialogState();
@@ -60,7 +60,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
         }
         this.form = this.addService.createForm(value.type) as CustomFormGroup<AddTimsheetForm>;
         this.formType = value.type;
-        this.setDateBounds(value.initDate, 7);
+        this.setDateBounds(value.startDate, value.endDate);
         this.populateOptions();
         this.sideAddDialog.show();
         this.cd.detectChanges();
@@ -78,7 +78,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
 
   public override closeDialog(): void {
     super.closeDialog();
-    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Close, this.formType, ''));
+    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Close, this.formType, '', ''));
   }
 
   private populateOptions(): void {
