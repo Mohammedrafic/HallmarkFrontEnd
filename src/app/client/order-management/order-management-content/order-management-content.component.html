@@ -205,9 +205,11 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="orderType" headerText="TYPE" width="150">
+      <e-column field="type" headerText="TYPE" width="180">
         <ng-template #template let-data>
-          <span>{{ getOrderTypeName(data.orderType) }}</span>
+          <div class="order-type-column" *ngIf="orderTypes[data.orderType] as orderType">
+            <span class="e-badge e-badge-primary e-badge-circle">{{ orderType[0] }}</span> <span>{{ orderType }}</span>
+          </div>
         </ng-template>
       </e-column>
       <e-column field="jobTitle" headerText="JOB TITLE" width="200"></e-column>

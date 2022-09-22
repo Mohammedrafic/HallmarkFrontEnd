@@ -82,7 +82,6 @@ import {
   allOrdersColumnsToExport,
   MoreMenuType,
   orderTemplateColumnsConfig,
-  OrderTypeName,
   perDiemChildColumnsToExport,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
@@ -829,9 +828,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
   }
 
-  public getOrderTypeName(orderType: number): string {
-    return OrderTypeName[OrderType[orderType] as OrderTypeName];
-  }
 
   public onOpenReorderDialog(reOrder: OrderManagement, order: OrderManagement): void {
     this.selectedReOrder = reOrder;

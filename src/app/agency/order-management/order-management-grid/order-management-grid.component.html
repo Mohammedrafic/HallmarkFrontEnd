@@ -116,7 +116,13 @@
         </div>
       </ng-template>
     </e-column>
-    <e-column field="type" headerText="TYPE" width="150" [valueAccessor]="typeValueAccess"></e-column>
+    <e-column field="type" headerText="TYPE" width="180">
+      <ng-template #template let-data>
+        <div class="order-type-column" *ngIf="orderTypes[data.orderType] as orderType">
+          <span class="e-badge e-badge-primary e-badge-circle">{{ orderType[0] }}</span> <span>{{ orderType }}</span>
+        </div>
+      </ng-template>
+    </e-column>
     <e-column field="jobTitle" headerText="JOB TITLE" width="200"></e-column>
     <e-column field="organizationName" headerText="Organization" width="200"></e-column>
     <e-column field="numberOfPositions" headerText="{{ '# of positions available' | uppercase }}" width="160">
