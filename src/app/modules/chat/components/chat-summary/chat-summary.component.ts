@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, SecurityContext } from '@angular/core';
 
 import { ChatClient } from '@azure/communication-chat';
 
@@ -15,6 +15,8 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
   @Input() thread: ChatThread;
 
   @Output() enterChat: EventEmitter<EnterChatEvent> = new EventEmitter();
+
+  @Output() readyThread: EventEmitter<ChatThread> = new EventEmitter();
 
   public lastMessage: ReceivedChatMessage | undefined;
 
@@ -33,6 +35,7 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
   override async updateMessages(): Promise<void> {
     const client = this.store.snapshot().chat.chatClient as ChatClient;
     const chatThreadClient = client.getChatThreadClient(this.thread.threadId as string);
+    const Parser = new DOMParser();
 
     const messages: ReceivedChatMessage[] = [];
     const iterableAsync = chatThreadClient.listMessages();
@@ -52,6 +55,14 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
     }
 
     this.lastMessage = messages[0];
+    this.thread.lastMessage = messages[0];
+    const html = Parser.parseFromString(
+      this.sanitizer.sanitize(SecurityContext.HTML, this.lastMessage.message) as string,
+      'text/html',
+    ).body;
+
+    this.lastMessage.message = html.textContent as string;
     this.cd.markForCheck();
+    this.readyThread.emit(this.thread);
   }
 }

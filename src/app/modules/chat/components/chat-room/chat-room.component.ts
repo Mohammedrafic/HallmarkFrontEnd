@@ -7,8 +7,9 @@ import { FormGroup, Validators } from '@angular/forms';
 import { ChatClient, ChatMessageReadReceipt, ChatThreadClient } from '@azure/communication-chat';
 import { CommunicationUserKind, TypingIndicatorReceivedEvent } from '@azure/communication-signaling';
 import { Select } from '@ngxs/store';
-import { Observable, debounceTime } from 'rxjs';
+import { debounceTime, Observable } from 'rxjs';
 import { filter, takeUntil, tap, throttleTime } from 'rxjs/operators';
+import { HtmlEditorService, ImageService, LinkService, RichTextEditorComponent, ToolbarService } from '@syncfusion/ej2-angular-richtexteditor';
 
 import { ChatMessagesHelper } from '../../helpers';
 import { ChatThread, MessageRequestMeta, ReceivedChatMessage } from '../../interfaces';
@@ -21,9 +22,12 @@ import { ChatState } from '../../store/state/chat.state';
   templateUrl: './chat-room.component.html',
   styleUrls: ['./chat-room.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [LinkService, ImageService, HtmlEditorService]
 })
 export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, AfterViewChecked {
   @ViewChild('chatArea') chatArea: ElementRef;
+
+  @ViewChild('textEditor') textEditor: RichTextEditorComponent;
 
   public currentThread: ChatThread | null;
 
@@ -157,13 +161,14 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   }
 
   private async sendMessage(): Promise<void> {
-    const message = this.chatform.get('chatMessage')?.value;
+    // const message = this.chatform.get('chatMessage')?.value;
+    const message = this.textEditor.getHtml();
 
     if (message && this.chatThreadClient) {
       const meta = this.createMessageRequest();
   
       this.chatThreadClient.sendMessage(meta.req, meta.options);
-      this.chatform.get('chatMessage')?.reset();
+      this.textEditor.value = '';
     } else if (message) {
       this.createThreadAndSend();
     }
@@ -217,7 +222,7 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
         type: 'text',
       },
       req: {
-        content: this.chatform.get('chatMessage')?.value,
+        content: this.textEditor.getHtml(),
       },
     };
   }

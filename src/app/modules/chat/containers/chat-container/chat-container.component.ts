@@ -96,6 +96,10 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
     return item.userId;
   }
 
+  checkSorting(thread: ChatThread): void {
+    
+  }
+
   private watchForSearch(): void {
     this.searchForm.get('searchCriteria')?.valueChanges
     .pipe(

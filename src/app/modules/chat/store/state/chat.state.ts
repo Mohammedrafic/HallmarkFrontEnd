@@ -1,18 +1,19 @@
 import { Injectable } from '@angular/core';
 
-import { ChatClient, ChatThreadCreatedEvent, TypingIndicatorReceivedEvent } from '@azure/communication-chat';
+import { ChatClient, ChatThreadItem, TypingIndicatorReceivedEvent } from '@azure/communication-chat';
 import { AzureCommunicationTokenCredential } from '@azure/communication-common';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Observable, tap } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { ToggleChatDialog } from '@core/actions';
 import { DefaultChatState } from '../../constants';
 import { ChatDialogState, ChatSearchType } from '../../enums';
+import { ChatHelper, ThreadsHelper } from '../../helpers';
 import { ChatThread, UserChatConfig } from '../../interfaces';
 import { ChatApiService } from '../../services';
 import { Chat } from '../actions';
 import { ChatModel } from '../chat.model';
-import { switchMap } from 'rxjs/operators';
 
 @State<ChatModel>({
   name: 'chat',
@@ -89,9 +90,10 @@ export class ChatState {
 
         chatClient.on('chatMessageReceived', () => {
           dispatch(new Chat.UpdateMessages());
+          dispatch(new Chat.SortThreads());
         });
 
-        chatClient.on("typingIndicatorReceived", (event: TypingIndicatorReceivedEvent) => {
+        chatClient.on('typingIndicatorReceived', (event: TypingIndicatorReceivedEvent) => {
           patchState({
             typingIndicator: event,
           }); 
@@ -118,10 +120,21 @@ export class ChatState {
   }
 
   @Action(Chat.GetUserThreads)
-  GetThreads({ patchState }: StateContext<ChatModel>): Observable<ChatThread[]> {
+  GetThreads({ patchState, getState }: StateContext<ChatModel>): Observable<ChatThread[]> {
     return this.apiService.getUserThreads()
     .pipe(
-      tap((threadsDto) => {
+      tap(async (threadsDto) => {
+        const client = getState().chatClient as ChatClient;
+        const iterableThreadItems = client.listChatThreads();
+        const threadItems: ChatThreadItem[] = [];
+
+        for await (const item of iterableThreadItems) {
+          threadItems.push(item);
+        }
+
+        ThreadsHelper.addLastMessageDate(threadsDto, threadItems);
+        ThreadsHelper.sortThreadsByLastMessage(threadsDto);
+
         patchState({
           activeThreads: threadsDto,
           displayedThreads: threadsDto,
@@ -188,7 +201,7 @@ export class ChatState {
   UpdateAllMessages(): void {}
 
   @Action(Chat.StartNewConversation)
-  StartConversation(
+  StartNewConversation(
     { patchState, dispatch }: StateContext<ChatModel>,
     { userId }: Chat.StartNewConversation,
   ): void {
@@ -214,37 +227,40 @@ export class ChatState {
   ): void {
     if (searchType === ChatSearchType.Participant) {
       const participants = getState().avaliableParticipants;
+      const foundByTearm = !searchText ? participants : ChatHelper.findThreads(participants, searchText);
 
-      if (!searchText) {
-        patchState({
-          displayedParticipants: participants,
-        });
-      } else {
-        const foundByTearm = participants.filter((participant) => participant.displayName.toLowerCase()
-        .includes(searchText.toLowerCase())
-        || participant.businessUnitName.toLowerCase().includes(searchText.toLowerCase()));
-
-        patchState({
-          displayedParticipants: foundByTearm,
-        });
-      }
-    } else if (searchType === ChatSearchType.ActiveThread) {
-
-      const threads = getState().activeThreads;
-
-      if (!searchText) {
-        patchState({
-          displayedThreads: threads,
-        });
-      }  else {
-        const foundByTearm = threads.filter((thread) => thread.displayName.toLowerCase()
-        .includes(searchText.toLowerCase())
-        || thread.businessUnitName.toLowerCase().includes(searchText.toLowerCase()));
-
-        patchState({
-          displayedThreads: foundByTearm,
-        });
-      }
+      patchState({
+        displayedParticipants: foundByTearm,
+      });
     }
+
+    if (searchType === ChatSearchType.ActiveThread) {
+      const threads = getState().activeThreads;
+      const foundByTearm = !searchText ? threads : ChatHelper.findThreads(threads, searchText);
+
+      patchState({
+        displayedThreads: foundByTearm,
+      });
+    }
+  }
+
+  @Action(Chat.SortThreads)
+  async SortThreads({ getState, patchState }: StateContext<ChatModel>): Promise<void> {
+    const threads = getState().activeThreads;
+    const client = getState().chatClient as ChatClient;
+    const iterableThreadItems = client.listChatThreads();
+    const threadItems: ChatThreadItem[] = [];
+
+    for await (const item of iterableThreadItems) {
+      threadItems.push(item);
+    }
+
+    ThreadsHelper.addLastMessageDate(threads, threadItems);
+    ThreadsHelper.sortThreadsByLastMessage(threads);
+
+    patchState({
+      activeThreads: threads,
+      displayedThreads: threads,
+    });
   }
 }

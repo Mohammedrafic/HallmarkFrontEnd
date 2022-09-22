@@ -6,6 +6,7 @@ export interface ChatThread {
   displayName: string;
   businessUnitName: string;
   lastMessage?: ReceivedChatMessage;
+  lasMessageOn: Date;
 }
 
 export interface UserThreadsDto {

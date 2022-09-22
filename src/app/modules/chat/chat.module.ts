@@ -6,6 +6,7 @@ import { NgxsModule } from '@ngxs/store';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { TextBoxAllModule } from '@syncfusion/ej2-angular-inputs';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
+import { RichTextEditorModule } from '@syncfusion/ej2-angular-richtexteditor';
 import { FeatherModule } from 'angular-feather';
 import { X, Send } from 'angular-feather/icons';
 
@@ -24,6 +25,7 @@ import { ChatState } from './store/state/chat.state';
     TextBoxAllModule,
     NgxsModule.forFeature([ChatState]),
     ReactiveFormsModule,
+    RichTextEditorModule,
   ],
   declarations: [
     ChatContainerComponent,

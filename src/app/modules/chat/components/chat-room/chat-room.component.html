@@ -21,7 +21,7 @@
             </ng-template>
 
             <div class="text-block" [ngClass]="{ 'right-text': message.isCurrentUser }">
-              <span>{{ message.message }}</span>
+              <span [innerHtml]="message.message"></span>
             </div>
           </div>
         </div>
@@ -55,15 +55,8 @@
   <div class="controls-block">
     <div class="chat-room-controls" *ngIf="chatform">
       <form [formGroup]="chatform" (keyup.enter)="sendBykeyPress($event)" class="chat-form">
-          <textarea
-          [spellcheck]="true"
-          [rows]="1"
-          [maxlength]="1500"
-          placeholder="Type your message"
-          class="chat-input"
-          [formControlName]="'chatMessage'"
-        ></textarea>
-
+        <ejs-richtexteditor formControlName="chatMessage" #textEditor>
+        </ejs-richtexteditor>
       </form>
 
       <button

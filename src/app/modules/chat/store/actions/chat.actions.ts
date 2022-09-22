@@ -57,4 +57,8 @@ export namespace Chat {
       public readonly searchType: ChatSearchType,
       ) {}
   }
+
+  export class SortThreads {
+    static readonly type = ChatActions.SortThreads;
+  }
 }

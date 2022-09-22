@@ -31,7 +31,7 @@
 .chat-input {
   border: none;
   resize: none;
-  width: 250px;
+  width: 335px;
   height: 20px;
   font-size: 14px;
   font-weight: 400;
@@ -100,6 +100,7 @@
   background: #F5F5FA;
   border-radius: 0px 18.5px 18.5px 18.5px;
   color: #171721;
+  word-break: break-all;
 
   &.right-text {
     border-radius: 18.5px 0px 18.5px 18.5px;
@@ -112,11 +113,29 @@
   }
 }
 
+::ng-deep {
+  .text-block {
+    &.right-text {
+      a {
+        color: white;
+        font-size: 14px;
+        text-decoration: underline;
+      }
+    }
+
+    a {
+      color: #3E7EFF;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+  }
+}
+
 .chat-form {
   margin: 0;
   padding: 0;
-  display: flex;
-  align-items: center;
+  width: 335px;
+  height: 20px;
 }
 
 .chat-room-area {
@@ -181,4 +200,31 @@
 .empty-room-text {
   font-size: 14px;
   font-weight: 400;
+}
+
+ejs-richtexteditor {
+  border: none!important;
+  resize: none;
+  height: 20px!important;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: 'Open Sans';
+  color: $secondary-dark-blue-15!important;
+  line-height: 20px!important;
+  padding: 0;
+  margin: 0;
+}
+
+::ng-deep {
+  .chat-room-controls {
+    .e-richtexteditor .e-rte-content {
+      height: 20px!important;
+      overflow-y: scroll;
+    }
+    .e-richtexteditor .e-rte-content .e-content {
+        padding: 0!important;
+        height: auto!important;
+        min-height: 20px!important;
+    }
+  }
 }

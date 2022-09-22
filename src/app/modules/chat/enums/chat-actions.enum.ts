@@ -10,4 +10,5 @@ export enum ChatActions {
   StartNewConversation = '[chat] Start new conversation',
   CloseChat = '[chat] Close chat window',
   SearchFor = '[chat] Search for participant or active thread',
+  SortThreads = '[chat] Sort threads by last message',
 }
