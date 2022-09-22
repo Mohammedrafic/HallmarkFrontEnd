@@ -3,7 +3,7 @@ import {
   extensionDurationPrimary,
   extensionDurationSecondary,
 } from '@shared/components/extension/extension-sidebar/config';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Duration } from '@shared/enums/durations';
 import { combineLatest, distinctUntilChanged, filter } from 'rxjs';
@@ -19,6 +19,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED } from '@shared/constants';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { BillRate } from '@shared/models';
 
 @Component({
   selector: 'app-extension-sidebar',
@@ -42,13 +43,79 @@ export class ExtensionSidebarComponent implements OnInit {
   public extensionForm: FormGroup;
   public comments: Comment[] = [];
 
-  public constructor(public formBuilder: FormBuilder, private extensionSidebarService: ExtensionSidebarService, private store: Store) {}
+  get billRateControl(): FormControl {
+    return this.extensionForm?.get('billRate') as FormControl;
+  }
+
+  public constructor(
+    public formBuilder: FormBuilder,
+    private extensionSidebarService: ExtensionSidebarService,
+    private store: Store
+  ) {}
 
   public ngOnInit(): void {
     this.minDate = addDays(this.candidateJob?.actualEndDate, 1)!;
     this.initExtensionForm();
     this.listenPrimaryDuration();
     this.listenDurationChanges();
+    this.subsToBillRateControlChange();
+  }
+
+  subsToBillRateControlChange(): void {
+    this.billRateControl.valueChanges.subscribe((value) => {
+      if (!this.billRatesComponent?.billRatesControl.value) {
+        return;
+      }
+
+      let billRateToUpdate: BillRate | null = this.getBillRateForSync();
+
+      if (!billRateToUpdate) {
+        return;
+      }
+
+      const restBillRates = this.billRatesComponent?.billRatesControl.value.filter(
+        (billRate: BillRate) => billRate.id !== billRateToUpdate?.id
+      );
+
+      billRateToUpdate.rateHour = value || '0.00';
+
+      this.billRatesComponent.billRatesControl.patchValue([billRateToUpdate, ...restBillRates]);
+    });
+  }
+
+  hourlyRateToOrderSync(event: { value: string; billRate?: BillRate }): void {
+    const { value, billRate } = event;
+    if (!value) {
+      return;
+    }
+    let billRateToUpdate: BillRate | null = this.getBillRateForSync();
+
+    if (billRateToUpdate?.id !== billRate?.id) {
+      return;
+    }
+
+    this.billRateControl.patchValue(value, { emitEvent: false, onlySelf: true });
+  }
+
+  private getDESCsortedBillRates(): BillRate[] {
+    return this.billRatesComponent?.billRatesControl.value.sort((item1: BillRate, item2: BillRate) => {
+      return new Date(item2.effectiveDate).getTime() - new Date(item1.effectiveDate).getTime();
+    });
+  }
+
+  private getBillRateForSync(): BillRate | null {
+    const todayTimeStamp = new Date().getTime();
+    let billRateForSync: BillRate | null = null;
+    const sortedBillRates = this.getDESCsortedBillRates().filter((billRate) => billRate.billRateConfig.id === 1);
+    for (let billRate of sortedBillRates) {
+      const timeStamp = new Date(billRate.effectiveDate).getTime();
+      if (timeStamp < todayTimeStamp) {
+        billRateForSync = billRate;
+        break;
+      }
+    }
+
+    return billRateForSync;
   }
 
   public saveExtension(positionDialog: DialogComponent): void {
@@ -64,13 +131,13 @@ export class ExtensionSidebarComponent implements OnInit {
         ...extension,
         jobId: this.orderPosition.jobId,
         orderId: this.candidateJob.orderId,
-        comments: this.comments
+        comments: this.comments,
       })
       .subscribe({
         next: () => {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
           positionDialog.hide();
-          return this.saveEmitter.emit()
+          return this.saveEmitter.emit();
         },
       });
   }

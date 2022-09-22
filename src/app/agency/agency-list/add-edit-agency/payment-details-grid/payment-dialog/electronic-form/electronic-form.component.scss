@@ -1,0 +1,33 @@
+@import "colors";
+
+.form-title {
+  color: $title-black;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 12px 0;
+}
+
+.form-container {
+  display: flex;
+  gap: 10px;
+
+  .colum-fl {
+    display: flex;
+    gap: 10px;
+  }
+
+  .column {
+    width: 50%;
+
+    .input-container,
+    .dropdown-container {
+      margin-bottom: 12px;
+      width: 100%;
+
+      .input-group {
+        margin-top: 5px;
+      }
+    }
+
+  }
+}

@@ -195,6 +195,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           CandidatStatus.Withdraw,
           CandidatStatus.Offboard,
           CandidatStatus.Rejected,
+          CandidatStatus.Cancelled,
         ];
         if (this.activeTab === AgencyOrderManagementTabs.ReOrders) {
           statuses = orderStatuses.filter((status) =>
@@ -206,6 +207,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
               CandidatesStatusText['Offered Bill Rate'],
               CandidatesStatusText.Onboard,
               CandidatesStatusText.Rejected,
+              CandidatStatus.Cancelled,
             ].includes(status.status)
           ); // TODO: after BE implementation also add Pending, Rejected
         } else if (this.activeTab === AgencyOrderManagementTabs.PerDiem) {

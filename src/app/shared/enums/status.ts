@@ -38,6 +38,8 @@ export const STATUS_COLOR_GROUP = {
     'inactive',
     'Closed',
     'withdraw',
+    'Cancelled',
+    'cancelled',
     TIMETHEETS_STATUSES.REJECTED,
     TIMETHEETS_STATUSES.ARCHIVED,
   ], // hard gray

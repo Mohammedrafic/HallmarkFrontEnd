@@ -6,10 +6,9 @@
           {{candidate?.lastName}}, {{candidate?.firstName}}
           <i-feather name="briefcase" class="icon deployed-icon" *ngIf="isDeployedCandidate"></i-feather>
         </h3>
-        <ejs-chiplist *ngIf="isTab && candidateJob?.applicantStatus && !isDeployedCandidate">
+        <ejs-chiplist *ngIf="isTab && candidateJob?.applicantStatus && !isDeployedCandidate" [text]="statusText">
           <e-chips>
             <e-chip
-              [text]="statusText"
               [cssClass]="candidatStatus[applicationStatus] | chipsCssClass">
             </e-chip>
           </e-chips>

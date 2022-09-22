@@ -1,4 +1,3 @@
-<hr />
 <section class="container extension-container container-tab" *ngIf="candidate$ | async as candidate">
   <section class="header-container">
     <div class="e-card-header">
@@ -12,7 +11,7 @@
           </ejs-chiplist>
         </ng-container>
       </div>
-      <div class="e-card-content button-container" *ngIf="!isRejected">
+      <div class="e-card-content button-container" *ngIf="!isRejected && !isCancelled">
         <div class="input-group dropdown bootstrap">
           <ejs-dropdownlist
             *ngIf="!isAgency"
@@ -185,6 +184,34 @@
                     <input appValidateWithMessage readonly formControlName="rejectReason" class="e-input" type="text"  maxlength="50"/>
                   </div>
                 </div>
+                <div *ngIf="isCancelled">
+                  <div class="input-container bootstrap">
+                    <label class="input-group">Reason</label>
+                    <div class="input-group input-readonly">
+                      <input appValidateWithMessage formControlName="jobCancellationReason" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                  <div class="input-container bootstrap">
+                    <label class="input-group">Penalty Criteria</label>
+                    <div class="input-group input-readonly">
+                      <input appValidateWithMessage formControlName="penaltyCriteria" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                  <div class="d-flex">
+                    <div class="input-container bootstrap">
+                      <label class="input-group">{{ showPercentage ? '% ' : '' }}Rate</label>
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="rate" class="e-input" type="text" readonly/>
+                      </div>
+                    </div>
+                    <div class="input-container bootstrap" *ngIf="showHoursControl">
+                      <label class="input-group">Hours</label>
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="hours" class="e-input" type="text" readonly/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </form>
             </ng-template>
           </e-accordionitem>
@@ -213,7 +240,7 @@
     </div>
   </section>
   <section class="bill-rates">
-    <ng-container [ngTemplateOutlet]="isAgency || isRejected ? billRates : editBillRates"></ng-container>
+    <ng-container [ngTemplateOutlet]="isAgency || isRejected || isCancelled ? billRates : editBillRates"></ng-container>
     <ng-template #billRates>
       <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
     </ng-template>
@@ -232,6 +259,13 @@
   [rejectReasonsList]="$any(rejectReasons$ | async)"
   [openEvent]="openRejectDialog"
   (applyReject)="rejectCandidateJob($event)"
-  (cancelReject)="cancelRejectCandidate()"
+  (cancelReject)="resetStatusesFormControl()"
 ></app-reject-reason-dialog>
+
+<app-candidate-cancellation-dialog
+  [openEvent]="openCandidateCancellationDialog"
+  [orderType]="candidateJob?.order?.orderType"
+  (submitCandidateCancellation)="cancelCandidate($event)"
+  (cancelCandidateCancellation)="resetStatusesFormControl()"
+></app-candidate-cancellation-dialog>
 

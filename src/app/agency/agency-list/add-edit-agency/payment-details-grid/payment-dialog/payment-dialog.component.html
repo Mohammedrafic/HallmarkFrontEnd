@@ -1,0 +1,20 @@
+<app-side-dialog [header]="'Add Payment Details'" [width]="'926px'" (formCancelClicked)="onCancel()" (formSaveClicked)="onSave()">
+  <div class="radio-button payment-mode bootstrap">
+    <label>Mode<span class="required">*</span></label>
+    <div>
+      <ul>
+        <li *ngFor="let payment of paymentModeList">
+          <ejs-radiobutton
+            (change)="onChangePaymentMode($event)"
+            [formControl]="paymentModeControl"
+            [label]="payment.text"
+            [value]="payment.id"
+            name="payment">
+          </ejs-radiobutton>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <ng-container #paymentFormContainer></ng-container>
+</app-side-dialog>
