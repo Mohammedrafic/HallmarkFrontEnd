@@ -208,7 +208,6 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
           const filteredLocation = this.getFilteredControlValues(region.locations, 'locationName', region);
           locations = [...locations, ...filteredLocation] as Location[];
         });
-
         this.locations = [...locations];
         this.setControlValue(this.locationsControl as FormControl, this.locations, this.editVisibility?.locationId);
       }
@@ -220,7 +219,6 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
     this.locationsControl?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((values: string[]) => {
       if (values?.length) {
         const controlValues = this.mapCorrectControlValueIds(values);
-
         let selectedLocations: Location[] = this.getSelectedFilteredValues(this.locations, controlValues) as Location[];
         let departments: Department[] = [];
 
@@ -250,7 +248,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
   }
 
   private mapCorrectControlValueIds(values: string[]): number[] {
-    return [...values].map((id: string) => +id.split('-')[0]);
+    return [...values].map((id: string) => +id.split('-')[1]);
   }
 
   private getFilteredControlValues(
@@ -272,7 +270,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
   }
 
   private setControlValue(control: FormControl, controlDataSource: any[], value?: number): void {
-    if (!!value) {
+    if (!!value || value === null) {
       control.setValue(controlDataSource.map((item) => item.uniqId));
       return;
     }
