@@ -243,7 +243,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   private emitManuallyAddedBillRates(): void {
     const manuallyAddedBillRates = this.billRatesControl
       .getRawValue()
-      .filter((billRate: BillRate) => billRate.id === 0);
+      .filter((billRate: BillRate) => !billRate.isPredefined);
     this.manuallyAddedBillRates.emit(manuallyAddedBillRates);
   }
 }
