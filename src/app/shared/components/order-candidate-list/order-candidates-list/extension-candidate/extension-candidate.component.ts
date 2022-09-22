@@ -148,8 +148,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       let additionalValues = {};
       if (this.isOnBoard) {
         additionalValues = {
-          actualStartDate: this.candidateJob.actualStartDate,
-          actualEndDate: this.candidateJob.actualEndDate,
+          actualStartDate: toCorrectTimezoneFormat(this.candidateJob.actualStartDate),
+          actualEndDate: toCorrectTimezoneFormat(this.candidateJob.actualEndDate),
           guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
           clockId: this.candidateJob.clockId,
         };
@@ -322,8 +322,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         candidateBillRate: this.candidateJob.candidateBillRate,
         offeredBillRate: value.offeredBillRate,
         requestComment: value.comments,
-        actualStartDate: new Date(value.actualStartDate).toISOString(),
-        actualEndDate: new Date(value.actualEndDate).toISOString(),
+        actualStartDate: toCorrectTimezoneFormat(new Date(value.actualStartDate).toISOString()),
+        actualEndDate: toCorrectTimezoneFormat(new Date(value.actualEndDate).toISOString()),
         offeredStartDate: this.candidateJob?.offeredStartDate,
         allowDeployWoCredentials: value.allowDeployCredentials,
         billRates: this.billRatesData,
@@ -420,7 +420,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       });
   }
 
-  private setCancellationControls(value: PenaltyCriteria): void{
+  private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
   }
@@ -476,4 +476,3 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       });
   }
 }
-
