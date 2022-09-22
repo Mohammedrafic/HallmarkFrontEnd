@@ -416,6 +416,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
           ApplicantStatus.Accepted,
           ApplicantStatus.Rejected,
           ApplicantStatus.OnBoarded,
+          ApplicantStatus.Cancelled,
           ApplicantStatus.Offboard,
         ];
 
