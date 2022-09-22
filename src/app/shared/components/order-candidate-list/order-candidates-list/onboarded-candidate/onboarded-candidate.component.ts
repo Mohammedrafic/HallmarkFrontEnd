@@ -59,10 +59,7 @@ import { UnsavedFormComponentRef, UNSAVED_FORM_PROVIDERS } from '@shared/directi
   selector: 'app-onboarded-candidate',
   templateUrl: './onboarded-candidate.component.html',
   styleUrls: ['./onboarded-candidate.component.scss'],
-  providers: [
-    MaskedDateTimeService,
-    UNSAVED_FORM_PROVIDERS(OnboardedCandidateComponent),
-  ],
+  providers: [MaskedDateTimeService, UNSAVED_FORM_PROVIDERS(OnboardedCandidateComponent)],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OnboardedCandidateComponent extends UnsavedFormComponentRef implements OnInit, OnDestroy, OnChanges {
@@ -316,8 +313,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             candidateBillRate: value.candidateBillRate,
             offeredBillRate: value.offeredBillRate,
             requestComment: value.comments,
-            actualStartDate: value.startDate,
-            actualEndDate: value.endDate,
+            actualStartDate: toCorrectTimezoneFormat(value.startDate),
+            actualEndDate: toCorrectTimezoneFormat(value.endDate),
             clockId: value.clockId,
             guaranteedWorkWeek: value.workWeek,
             allowDeployWoCredentials: value.allow,
