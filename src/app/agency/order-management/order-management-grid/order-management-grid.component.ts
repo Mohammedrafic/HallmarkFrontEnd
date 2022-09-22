@@ -74,6 +74,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PreviewOrderDialogComponent } from '@agency/order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
+import { formatDate } from '@shared/constants/format-date';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -147,6 +148,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
+  public readonly formatDate = formatDate;
 
   constructor(
     private store: Store,
@@ -588,6 +590,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       orderStatuses: this.filters.orderStatuses || [],
       annualSalaryRangeFrom: this.filters.annualSalaryRangeFrom || null,
       annualSalaryRangeTo: this.filters.annualSalaryRangeTo || null,
+      creationDateFrom: this.filters.creationDateFrom || null,
+      creationDateTo: this.filters.creationDateTo || null,
+      distributedOnFrom: this.filters.distributedOnFrom || null,
+      distributedOnTo: this.filters.distributedOnTo || null,
+      candidateName: this.filters.candidateName || null,
+      projectTypeId: this.filters.projectTypeId || null,
+      projectNameId: this.filters.projectNameId || null,
+      poNumberId: this.filters.poNumberId || null
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.filteredItems$.next(this.filteredItems.length);

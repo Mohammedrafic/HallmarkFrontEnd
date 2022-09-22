@@ -12,6 +12,8 @@ import {
   DollarSign,
   Download,
   Edit,
+  Eye,
+  EyeOff,
   Folder,
   Mail,
   MapPin,
@@ -21,8 +23,6 @@ import {
   Sliders,
   Trash2,
   User,
-  Eye,
-  EyeOff,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
@@ -138,6 +138,8 @@ import { GridErroredCellComponent } from './components/import-dialog-content/gri
 import { HideBeforeSyncfusionLoadDirective } from './directives/hide-before-syncfusion-load.directive';
 import { UnsavedFormDirective } from './directives/unsaved-form.directive';
 import { ClearCacheComponent } from './components/clear-cache/clear-cache.component';
+import { CandidateCancellationDialogComponent } from './components/candidate-cancellation-dialog/candidate-cancellation-dialog.component';
+import { OrderHistoricalEventsComponent } from './components/order-historical-events/order-historical-events.component';
 
 const icons = {
   AlertCircle,
@@ -292,6 +294,8 @@ const COMPONENTS = [
     CustomNoRowsOverlayComponent,
     GridErroredCellComponent,
     ImportDialogContentComponent,
+    CandidateCancellationDialogComponent,
+    OrderHistoricalEventsComponent,
   ],
   providers: [
     DatePipe,

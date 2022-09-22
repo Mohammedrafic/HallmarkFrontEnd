@@ -1,5 +1,5 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subscription, takeWhile } from 'rxjs';
@@ -7,13 +7,7 @@ import { filter, Observable, Subscription, takeWhile } from 'rxjs';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { DELETE_RECORD_TEXT } from '@shared/constants/messages';
-import {
-  Agency,
-  AgencyBillingDetails,
-  AgencyContactDetails,
-  AgencyDetails,
-  AgencyPaymentDetails,
-} from 'src/app/shared/models/agency.model';
+import { Agency, AgencyBillingDetails, AgencyContactDetails, AgencyDetails } from 'src/app/shared/models/agency.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import {
@@ -36,8 +30,11 @@ import { UserState } from 'src/app/store/user.state';
 import { User } from '@shared/models/user.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { PaymentDetailsGridComponent } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component';
 import { ComponentCanDeactivate } from '@shared/guards/pending-changes.guard';
+import {
+  ElectronicPaymentDetails,
+  PaymentDetails,
+} from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
 
 type AgencyFormValue = {
   parentBusinessUnitId: number;
@@ -45,7 +42,7 @@ type AgencyFormValue = {
   isBillingPopulated: boolean;
   agencyBillingDetails: Omit<AgencyBillingDetails, 'sameAsAgency'>;
   agencyContactDetails: AgencyContactDetails[];
-  agencyPaymentDetails: AgencyPaymentDetails[];
+  agencyPaymentDetails: PaymentDetails[] | ElectronicPaymentDetails[];
 };
 
 @Component({
@@ -291,7 +288,9 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   private valueToAngency(agencyFormValue: AgencyFormValue): Agency {
     const id = this.fetchedAgency?.agencyDetails.id;
     const agencyContactDetails: AgencyContactDetails[] = [...agencyFormValue.agencyContactDetails];
-    const agencyPaymentDetails: AgencyPaymentDetails[] = [...agencyFormValue.agencyPaymentDetails];
+    const agencyPaymentDetails: PaymentDetails[] | ElectronicPaymentDetails[] = [
+      ...agencyFormValue.agencyPaymentDetails,
+    ];
 
     agencyContactDetails.forEach((contact) => (contact.agencyId = id));
     agencyPaymentDetails.forEach((payment) => (payment.agencyId = id));
@@ -317,13 +316,13 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
     agencyPaymentDetails,
     createUnder,
   }: Agency) {
+    const paymentDetailsForms = this.createPaymentDetails(agencyPaymentDetails);
+
     this.agencyForm.get('parentBusinessUnitId')?.patchValue(createUnder?.parentUnitId || 0);
     this.agencyForm.get('isBillingPopulated')?.patchValue(agencyBillingDetails.sameAsAgency);
     this.agencyControl?.patchValue({ ...agencyDetails });
     this.billingControl?.patchValue({ ...agencyBillingDetails });
-    agencyPaymentDetails.forEach((payment) => {
-      this.paymentDetailsControl?.push(PaymentDetailsGridComponent.generatePaymentForm(payment));
-    });
+    paymentDetailsForms.forEach((form: FormGroup) => this.paymentDetailsControl?.push(form));
     this.contacts.clear();
     agencyContactDetails.forEach((contact) => this.addContact(contact));
   }
@@ -335,5 +334,19 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   private checkAgencyUser(): void {
     const user = this.store.selectSnapshot(UserState.user);
     this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
+  }
+
+  private createPaymentDetails(paymentDetails: PaymentDetails[] | ElectronicPaymentDetails[]): FormGroup[] {
+    return paymentDetails.map((paymentDetail: any) => {
+      let controls = {};
+      for (let key in paymentDetail) {
+        controls = {
+          ...controls,
+          [key]: new FormControl(paymentDetail[key]),
+        };
+      }
+
+      return new FormGroup(controls);
+    });
   }
 }

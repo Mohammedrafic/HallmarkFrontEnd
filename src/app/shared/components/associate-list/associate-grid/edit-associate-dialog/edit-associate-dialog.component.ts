@@ -104,7 +104,6 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
           this.store.dispatch(
             new SavePartnershipSettings({ ...jobDistributionFormValue, associateOrganizationId: this.editAgencyOrg.id })
           );
-          this.partnershipForm.markAsUntouched();
         }
         break;
       case Tabs.FeeSettings:
@@ -112,12 +111,15 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
         if (this.feeSettingsForm.valid && this.editAgencyOrg.id) {
           const { baseFee } = this.feeSettingsForm.getRawValue();
           this.store.dispatch(new SaveBaseFee(this.editAgencyOrg.id, baseFee ? baseFee : null));
-          this.feeSettingsForm.markAsPristine();
         }
         break;
       default:
         break;
     }
+    this.partnershipForm.markAsUntouched();
+    this.partnershipForm.markAsPristine();
+    this.feeSettingsForm.markAsUntouched();
+    this.feeSettingsForm.markAsPristine();
   }
 
   public onTabSelecting(tab: { selectingIndex: number }): void {

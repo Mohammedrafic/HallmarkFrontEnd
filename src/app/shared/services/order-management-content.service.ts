@@ -20,6 +20,7 @@ import {
   OrderManagementPage,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
+import { CandidateCancellation } from "@shared/models/candidate-cancellation.model";
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
@@ -285,7 +286,7 @@ export class OrderManagementContentService {
     if (lastSelectedBusinessUnitId) {
       headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
     }
-    
+
     return this.http.post<Order>('/api/Orders', order, { headers }).pipe(
       switchMap((createdOrder) => {
         const formData = new FormData();
@@ -338,6 +339,14 @@ export class OrderManagementContentService {
    */
   public rejectCandidateJob(payload: RejectReasonPayload): Observable<void> {
     return this.http.post<void>('/api/AppliedCandidates/rejectCandidateJob', payload);
+  }
+
+  /**
+   * Cancel Candidate Job
+   * @param payload
+   */
+  public cancelCandidateJob(payload: CandidateCancellation): Observable<void> {
+    return this.http.post<void>('/api/AppliedCandidates/cancelCandidateJob', payload);
   }
 
   /**

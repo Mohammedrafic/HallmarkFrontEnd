@@ -127,7 +127,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
     private actions$: Actions,
     private confirmService: ConfirmService) {
     this.today.setHours(0, 0, 0);
-}
+  }
 
   ngOnInit(): void {
     this.startDate = null;
@@ -283,6 +283,23 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
 
   public onTabSelected(selectedTab: any): void {
     this.selectedTab = selectedTab.selectedIndex;
+    switch (this.selectedTab) {
+      case SpecialProjectTabs.SpecialProjects:
+        this.childC?.getSpecialProjects();
+        break;
+      case SpecialProjectTabs.PurchaseOrders:
+        this.childPurchaseComponent?.getPurchaseOrders();
+        break;
+      case SpecialProjectTabs.SpecialProjectCategories:
+        this.childSpecialProjectCategoryComponent?.getSpecialProjectCategories();
+        break;
+      case SpecialProjectTabs.SpecialProjectsMapping:
+        this.childSpecialProjectMappingComponent?.getSpecialProjectMappings();
+        break;
+      case SpecialProjectTabs.PurchaseOrdersMapping:
+        this.childPurchaseOrderMappingComponent?.getPurchaseOrderMappings();
+        break;
+    }
     this.addRemoveFormcontrols();
   }
 
@@ -307,7 +324,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         if (this.form.contains(FormControlNames.PoDescription)) this.form.removeControl(FormControlNames.PoDescription);
         if (this.form.contains(FormControlNames.SpecialProjectCategoryName)) this.form.removeControl(FormControlNames.SpecialProjectCategoryName);
         if (this.form.contains(FormControlNames.PoNamesMapping)) this.form.removeControl(FormControlNames.PoNamesMapping);
-        
+
         break;
       case SpecialProjectTabs.PurchaseOrders:
         this.addButtonTitle = AddButtonText.AddPurchaseOrder;
