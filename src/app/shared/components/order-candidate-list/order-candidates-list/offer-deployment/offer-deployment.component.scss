@@ -1,14 +1,12 @@
-@import "colors";
+@import 'colors';
 @import 'adaptive-response';
-
 
 :host {
   overflow-y: auto;
 }
 
 .container {
-
-  .deployed-icon{
+  .deployed-icon {
     color: $primary-active-blue;
   }
 
@@ -16,6 +14,13 @@
     .button-container {
       display: flex;
       gap: 12px;
+
+      @media (max-width: $tablet-min) {
+        button:not(.close-button),
+        .dropdown {
+          display: none;
+        }
+      }
     }
   }
 
@@ -23,12 +28,13 @@
     display: flex;
     margin-top: 24px;
 
-
     .job-details {
       margin-right: 12px;
       width: 55%;
 
-      .input-container, .dropdown-container, .datepicker-container {
+      .input-container,
+      .dropdown-container,
+      .datepicker-container {
         margin-bottom: 12px;
         flex: 1 1 0px;
 
@@ -38,7 +44,9 @@
       }
 
       .input-group.input-readonly {
-        .e-input[readonly], ejs-daterangepicker .e-input-group, ejs-datepicker .e-input-group {
+        .e-input[readonly],
+        ejs-daterangepicker .e-input-group,
+        ejs-datepicker .e-input-group {
           background-color: $secondary-dark-blue-50;
           color: $secondary-dark-blue-30;
           border: 1px solid $secondary-dark-blue-40 !important;
@@ -63,7 +71,7 @@
 
     @media (max-width: $tablet-min) {
       flex-direction: column;
-      .job-details  {
+      .job-details {
         width: 100%;
       }
 
@@ -82,9 +90,39 @@
 .candidat-status {
   display: flex;
   align-items: center;
-  
+
   @media (max-width: $tablet-min) {
     flex-wrap: wrap;
     align-items: flex-start;
   }
 }
+
+.mobile-actions {
+  position: fixed;
+  bottom: 73px;
+  left: 0;
+  width: 94%;
+  padding: 24px 16px;
+  background-color: $white;
+  z-index: 1001;
+  display: none;
+  border-top: 1px solid $secondary-dark-blue-45;
+
+  .dropdown {
+    width: 100%;
+  }
+
+  button {
+    width: 100%;
+    margin: 0 !important;
+
+    &:not(:first-child) {
+      margin-left: 16px !important;
+    }
+  }
+
+  @media (max-width: $tablet-min) {
+    display: flex;
+  }
+}
+
