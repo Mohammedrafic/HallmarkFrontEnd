@@ -19,6 +19,7 @@ import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { map, Observable, tap } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { IS_DARK_THEME } from '@shared/constants';
 
 export interface AppStateModel {
   isMobile: boolean;
@@ -39,7 +40,7 @@ export interface AppStateModel {
   name: 'app',
   defaults: {
     isMobile: false,
-    isDarkTheme: false,
+    isDarkTheme: JSON.parse(window.localStorage.getItem(IS_DARK_THEME) as string) as boolean || false,
     headerState: null,
     isLoading: false,
     isFirstLoad: true,
@@ -106,6 +107,7 @@ export class AppState {
   @Action(ToggleTheme)
   ToggleTheme({ patchState }: StateContext<AppStateModel>, { payload }: ToggleTheme): void {
     patchState({ isDarkTheme: payload });
+    window.localStorage.setItem(IS_DARK_THEME, JSON.stringify(payload));
   }
 
   @Action(SetHeaderState)
