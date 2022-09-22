@@ -42,10 +42,6 @@ export class OrderCredentialsComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const { credentials } = changes;
-    if (credentials) {
-      credentials.currentValue.forEach((cred: IOrderCredentialItem) => this.updateGroups(cred, true));
-    }
   }
 
   public addNew(): void {
@@ -116,31 +112,19 @@ export class OrderCredentialsComponent implements OnChanges {
     if (credToDelete) {
       const index = this.credentials.indexOf(credToDelete);
       this.credentials.splice(index, 1);
-      this.credentialsGroups.forEach((element) => {
-        element.items = [];
-      });
-      this.credentials.forEach((cred) => {
-        this.updateGroups(cred);
-      });
-      this.credentialsGroups = this.credentialsGroups.filter((element) => element.items.length);
       this.credentialDeleted.emit(Object.assign({}, { ...credToDelete }));
+      this.credentials = [...this.credentials];
     }
   }
 
   private editExistedCred(data?: IOrderCredentialItem): void {
     const cred = data || (this.CredentialForm.getRawValue() as IOrderCredentialItem);
-    this.updateExistedCredInGrid(cred);
+    this.updateCredList(cred);
     this.credentialChanged.emit(Object.assign({}, { ...cred }));
     this.isEditMode = false;
   }
 
-  private updateExistedCredInGrid(cred: IOrderCredentialItem): void {
-    const existedCredGroup = this.credentialsGroups.find(this.byType(cred)) as IOrderCredential;
-    const existedCred = existedCredGroup.items.find(this.byCredentilaId(cred)) as IOrderCredentialItem;
-    Object.assign(existedCred, cred);
-    existedCredGroup.items = [...existedCredGroup.items];
-  }
-
+  
   private resetToDefault(): void {
     this.CredentialForm.setValue({
       credentialId: 0,
@@ -155,7 +139,6 @@ export class OrderCredentialsComponent implements OnChanges {
 
   private addNewCred(): void {
     const value = this.CredentialForm.getRawValue();
-    this.updateGroups(value);
     this.credentialChanged.emit(Object.assign({}, { ...value }, { id: 0, orderId: 0 }));
     this.updateCredList(value);
   }
@@ -168,28 +151,6 @@ export class OrderCredentialsComponent implements OnChanges {
     this.credentials = [...this.credentials];
   }
 
-  private updateGroups(cred: IOrderCredentialItem, areDepartmentSkillChanged?: boolean): void {
-    const existedCredGroup = this.credentialsGroups.find(this.byType(cred)) as IOrderCredential;
-    if (existedCredGroup) {
-      if (areDepartmentSkillChanged) {
-        existedCredGroup.items = [cred];
-      } else {
-        existedCredGroup.items = [...existedCredGroup.items, cred];
-      }
-      existedCredGroup.totalCount = existedCredGroup.items.length;
-    } else {
-      this.credentialsGroups.push(this.createGroup(cred));
-    }
-  }
-
-  private createGroup(value: IOrderCredentialItem): IOrderCredential {
-    return {
-      type: value.credentialType,
-      items: [value],
-      totalCount: 1,
-      totalPages: 1,
-    };
-  }
 
   private handleOnCancel(): void {
     this.CredentialForm.reset();
@@ -197,11 +158,6 @@ export class OrderCredentialsComponent implements OnChanges {
     this.showForm = false;
     this.store.dispatch(new ShowSideDialog(false));
     this.formSubmitted = false;
-  }
-
-  // helpers
-  private byType(target: IOrderCredentialItem) {
-    return (iter: IOrderCredential) => iter.type === target.credentialType;
   }
 
   private byCredentilaId(target: IOrderCredentialItem) {
