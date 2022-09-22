@@ -57,13 +57,13 @@ export class InvoicesContainerGridHelper {
         width: 120,
         cellRenderer: GridCellLinkComponent,
         cellRendererParams: (params: ICellRendererParams): GridCellLinkParams => {
-          const orderId: number = (params.data as BaseInvoice).orderId;
+          const orderId = (params.data as BaseInvoice).formattedOrderIdFull;
 
           return {
             ...params,
             link: agency ? `/agency/order-management` : `/client/order-management`,
             navigationExtras: {
-              state: { orderId },
+              state: { fullOrderId: orderId },
             }
           };
         }

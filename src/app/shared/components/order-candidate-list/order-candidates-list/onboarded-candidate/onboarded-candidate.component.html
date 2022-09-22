@@ -253,11 +253,17 @@
     </div>
   </section>
   <section>
-    <app-bill-rates #billRates
-                    [billRates]="billRatesData"
-                    [isActive]="isActiveCandidateDialog$ | async"
-                    (billRatesChanged)="onBillRatesChanged($event)">
-    </app-bill-rates>
+    <ng-container [ngTemplateOutlet]="isCancelled ? billRates : editBillRates"></ng-container>
+    <ng-template #billRates>
+      <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
+    </ng-template>
+    <ng-template #editBillRates>
+      <app-bill-rates
+        [billRates]="billRatesData"
+        [isActive]="isActiveCandidateDialog$ | async"
+        (billRatesChanged)="onBillRatesChanged($event)">
+      </app-bill-rates>
+    </ng-template>
   </section>
 </section>
 

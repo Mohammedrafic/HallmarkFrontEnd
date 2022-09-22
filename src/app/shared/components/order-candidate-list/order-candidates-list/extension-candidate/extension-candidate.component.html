@@ -240,7 +240,7 @@
     </div>
   </section>
   <section class="bill-rates">
-    <ng-container [ngTemplateOutlet]="isAgency || isRejected ? billRates : editBillRates"></ng-container>
+    <ng-container [ngTemplateOutlet]="isAgency || isRejected || isCancelled ? billRates : editBillRates"></ng-container>
     <ng-template #billRates>
       <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
     </ng-template>
