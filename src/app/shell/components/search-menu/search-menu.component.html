@@ -17,7 +17,7 @@
         <span class="list-text">No Results</span>
       </div>
       <div class="list-item" *ngFor="let item of uniqueHistoryMenuItems" (mousedown)="onItemClick(item)">
-        <span class="list-text">{{ item.title }}</span>
+        <span class="list-text">{{ item.anch }}</span>
       </div>
     </div>
     <div class="result-container">
@@ -28,7 +28,7 @@
         <span class="list-text">No Results</span>
       </div>
       <div class="list-item" *ngFor="let item of searchResult" (mousedown)="onItemClick(item)" >
-        <span class="list-text">{{ item.title }}</span>
+        <span class="list-text">{{ item.anch }}</span>
       </div>
     </div>
   </div>

@@ -49,9 +49,8 @@ export class SearchMenuComponent implements OnChanges, OnInit {
 
   public onItemClick(item: MenuItem): void {
     this.recentHistoryMenuItems.push(item);
-    this.uniqueHistoryMenuItems = [];
-    this.uniqueHistoryMenuItems = [...new Set(this.recentHistoryMenuItems)];
-    window.localStorage.setItem("recentHistory", JSON.stringify(this.uniqueHistoryMenuItems));
+    this.uniqueHistoryMenuItems = Array.from(this.recentHistoryMenuItems.reduce((m, t) => m.set(t.anch, t), new Map()).values());
+    window.localStorage.setItem(RECENT_SEARCH_MENU_HISTROY, JSON.stringify(this.uniqueHistoryMenuItems));
     this.router.navigate([item.route]);
   }
 
