@@ -1,11 +1,3 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { AbstractControl, FormControl } from '@angular/forms';
-
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { BehaviorSubject, combineLatest, filter, merge, mergeMap, Observable, of, Subject, takeUntil, tap } from 'rxjs';
-
 import {
   GetRejectReasonsForAgency,
   RejectCandidateForAgencySuccess,
@@ -13,11 +5,9 @@ import {
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
-import {
-  CancellationReasonsMap,
-  PenaltiesMap
-} from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
 import { OrderManagementState } from '@agency/store/order-management.state';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AbstractControl, FormControl } from '@angular/forms';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
@@ -29,6 +19,12 @@ import {
   UpdateOrganisationCandidateJobSucceed,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import {
+  CancellationReasonsMap,
+  PenaltiesMap
+} from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-candidate.constants';
@@ -43,6 +39,9 @@ import { JobCancellation } from "@shared/models/candidate-cancellation.model";
 import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import PriceUtils from '@shared/utils/price.utils';
+import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { BehaviorSubject, combineLatest, filter, merge, mergeMap, Observable, of, Subject, takeUntil, tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { AcceptFormComponent } from './accept-form/accept-form.component';
 
@@ -99,7 +98,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   get showAccept(): boolean {
     return (
       this.isAgency &&
-      ![CandidatStatus.BillRatePending, CandidatStatus.OnBoard, CandidatStatus.Rejected].includes(
+      ![CandidatStatus.BillRatePending, CandidatStatus.OnBoard, CandidatStatus.Rejected, CandidatStatus.Cancelled].includes(
         this.currentCandidateApplicantStatus
       )
     );
@@ -112,6 +111,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   get billRatesViewMode(): boolean {
     return (
       this.isAgency ||
+      this.isCancelled ||
       !this.orderCandidateJob?.applicantStatus ||
       (this.orderCandidateJob?.applicantStatus.applicantStatus === CandidatesStatusText.Offered &&
         this.orderCandidateJob?.order.orderType === OrderType.ReOrder)
