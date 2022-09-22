@@ -1,5 +1,5 @@
 import unionBy from 'lodash/fp/unionBy';
-import { filter, Observable, skip, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
@@ -117,7 +117,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private manuallyAddedBillRates: BillRate[] = [];
   private unsubscribe$: Subject<void> = new Subject();
   private order: Order;
-  private areBillRatesPopulated = false;
 
   public isPerDiem = false;
   public isPermPlacementOrder = false;
@@ -666,16 +665,12 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private subscribeOnPredefinedBillRates(): void {
-    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$), skip(1)).subscribe((predefinedBillRates) => {
-      if(this.areBillRatesPopulated && this.order) {
-        this.manuallyAddedBillRates = this.order.billRates.filter((billrate) => !billrate.isPredefined);
+    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe((predefinedBillRates) => {
+      if (!this.billRatesComponent?.billRatesControl && this.order) return;
+      if (this.billRatesComponent?.billRatesControl) {
+        this.manuallyAddedBillRates = this.billRatesComponent.billRatesControl.getRawValue().filter((billrate) => !billrate.isPredefined);
       }
-
-      this.orderBillRates =
-        !this.areBillRatesPopulated && this.order
-          ? [...this.order.billRates]
-          : [...predefinedBillRates, ...this.manuallyAddedBillRates];
-      this.areBillRatesPopulated = true;
+      this.orderBillRates = [...predefinedBillRates, ...this.manuallyAddedBillRates];
     });
   }
 
@@ -733,7 +728,4 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.OrderTemplates));
   }
 
-  public saveManuallyAddedBillRates(event: BillRate[]): void {
-    this.manuallyAddedBillRates = event;
-  }
 }
