@@ -72,8 +72,8 @@ export class LogiReportComponent implements OnInit {
         // For page report
         pagereport: {
           feature_UserInfoBar: true,
-          feature_ToolBar: true,
-          feature_Toolbox: true,
+          feature_ToolBar: false,
+          feature_Toolbox: false,
           feature_DSOTree: true,
           feature_TOCTree: true,
           feature_PopupMenu: true,
@@ -86,7 +86,7 @@ export class LogiReportComponent implements OnInit {
         // For web report
         webreport: {
           viewMode: {
-            hasToolbar: true,
+            hasToolbar: false,
             hasSideArea: true
           },
           editMode: {
