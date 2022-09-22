@@ -31,6 +31,7 @@ import {
   PieChart,
   AlertCircle,
   Mail,
+  MessageSquare,
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -64,6 +65,7 @@ const sidebarIcons = {
   PieChart,
   AlertCircle,
   Mail,
+  MessageSquare,
 };
 
 @NgModule({

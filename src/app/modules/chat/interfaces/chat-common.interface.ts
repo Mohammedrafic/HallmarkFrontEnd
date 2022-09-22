@@ -1,12 +1,16 @@
+import { SendMessageOptions, SendMessageRequest } from '@azure/communication-chat';
+
 export interface ChatSearchForm {
   searchCriteria: string;
 }
 
 export interface ReceivedChatMessage {
+  id: string;
   sender: string,
   message: string,
   timestamp?: Date,
   isCurrentUser: boolean,
+  isRead?: boolean;
 }
 
 export interface UserChatConfig {
@@ -20,4 +24,9 @@ export interface UserChatConfig {
 export interface EnterChatEvent {
   id: string;
   displayName: string;
+}
+
+export interface MessageRequestMeta {
+  options: SendMessageOptions;
+  req: SendMessageRequest;
 }

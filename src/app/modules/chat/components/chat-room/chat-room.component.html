@@ -1,8 +1,9 @@
 <div class="chat-room-container">
   <div class="chat-room-area" #chatArea>
-    <div class="message-block">
-      <ng-container *ngFor="let message of messages">
+    <div class="message-block" *ngIf="currentThread; else noMessages">
+      <ng-container *ngFor="let message of messages; trackBy: trackById">
         <div class="message" [ngClass]="{ 'right': message.isCurrentUser }">
+          <!-- Commented for future implementation-->
           <!-- <div>
             <img class="avatar" src="/assets/default-avatar.svg" alt="avatar" width="34" height="34">
           </div> -->
@@ -26,7 +27,29 @@
         </div>
       </ng-container>
 
+      <div class="typing-indicator" *ngIf="typingEvent">
+        <div class="message indicator-wrapper">
+          <div>
+            <span class="sender">{{typingEvent.senderDisplayName}}</span>
+          </div>
+          <div class="text-block indicators">
+            <div class="indicator-container">
+              <div class="indicator wave1"></div>
+              <div class="indicator wave2"></div>
+              <div class="indicator wave3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
+
+    <ng-template #noMessages>
+      <div class="empty-room-block">
+        <span class="empty-room-header">You are starting a new conversation</span>
+        <span class="empty-room-text">Type your first message below</span>
+      </div>
+    </ng-template>
   </div>
 
   <div class="controls-block">

@@ -11,7 +11,7 @@
     <div class="dialog-header">
       <h3 class="title">{{ title | titlecase }}</h3>
       <div class="controls">
-        <button ejs-button type="submit" cssClass="e-flat close-button" (click)="closeChat()" style="outline: none;">
+        <button ejs-button type="submit" cssClass="e-flat close-blue-button" (click)="closeChat()" style="outline: none;">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
@@ -22,21 +22,37 @@
       <ng-template [ngSwitchCase]="chatStates.List">
         <div class="chat-controls">
           <div class="bootstrap input-container">
-            <div class="input-group">
-              <input
-                class="e-input"
-                appValidateWithMessage
-                placeholder="Search"
-                type="text"
-              />
-            </div>
+            <form [formGroup]="searchForm">
+              <div class="input-group">
+                <input
+                  class="e-input"
+                  appValidateWithMessage
+                  placeholder="Search"
+                  type="text"
+                  formControlName="searchCriteria"
+                />
+              </div>
+            </form>
           </div>
           <button class="controls-add-btn" (click)="addChat()">+</button>
         </div>
         <div class="chat-plot">
-          <ng-container *ngFor="let thread of activeThreads$ | async; trackBy: trackByStringId">
-            <app-chat-summary [thread]="thread" (enterChat)="enterChatRoom($event)"></app-chat-summary>
+          <ng-container *ngIf="activeThreads$ | async as threads">
+            <ng-container *ngIf="threads.length; else noListItems">
+              <ng-container *ngFor="let thread of activeThreads$ | async; trackBy: trackByStringId">
+                <app-chat-summary [thread]="thread" (enterChat)="enterChatRoom($event)"></app-chat-summary>
+              </ng-container>
+            </ng-container>
+
           </ng-container>
+
+          <ng-template #noListItems>
+            <div class="empty-list">
+              <span class="no-list-header">You don`t have active chats yet</span>
+              <span class="no-list-text">Start messaging to get started</span>
+            </div>
+          </ng-template>
+
         </div>
       </ng-template>
 
@@ -47,14 +63,17 @@
             ejs-button type="submit"
             (click)="back()">Back</button>
           <div class="bootstrap input-container">
-            <div class="input-group">
-              <input
-                class="e-input"
-                appValidateWithMessage
-                placeholder="Search"
-                type="text"
-              />
-            </div>
+            <form [formGroup]="searchForm">
+              <div class="input-group">
+                <input
+                  class="e-input"
+                  appValidateWithMessage
+                  placeholder="Search"
+                  type="text"
+                  formControlName="searchCriteria"
+                />
+              </div>
+            </form>
           </div>
         </div>
         <div class="chat-plot">

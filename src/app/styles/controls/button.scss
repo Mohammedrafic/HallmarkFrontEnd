@@ -57,6 +57,39 @@ button.e-control.e-btn {
         color: $supportive-red-40;
       }
     }
+
+    &.close-blue-button {
+      padding: 10px;
+      border: none;
+
+      i-feather {
+        margin: 0;
+      }
+
+      &.e-ripple {
+        overflow: initial;
+        position: initial;
+        transform: none;
+      }
+
+      color: $primary-active-blue-10;
+
+      &.e-active,
+      &:focus {
+        color: $white;
+        background-color: $primary-active-blue-10;
+      }
+
+      &:hover {
+        background-color: $primary-active-blue-40;
+      }
+
+      &[disabled] {
+        pointer-events: none;
+        background-color: transparent;
+        color: $primary-active-blue-40;
+      }
+    }
   }
 }
 

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChil
 
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, OpenEventArgs } from '@syncfusion/ej2-angular-popups';
-import { Observable, skip, takeUntil } from 'rxjs';
+import { Observable, skip, takeUntil, debounceTime } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
@@ -12,7 +12,7 @@ import { ChatThread } from '../../interfaces/chat-api.interface';
 import { ChatService } from '../../services';
 import { Chat } from '../../store/actions';
 import { ChatState } from '../../store/state/chat.state';
-import { ChatDialogState } from './../../enums';
+import { ChatDialogState, ChatSearchType } from './../../enums';
 
 @Component({
   selector: 'app-chat-container',
@@ -57,10 +57,13 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
   ngOnInit(): void {
     this.watchForDialogstate();
     this.watchForDialogView();
+    this.watchForSearch();
     this.store.dispatch(new Chat.GetUserChatConfig());
   }
 
-  closeChat(): void {}
+  closeChat(): void {
+    this.store.dispatch(new Chat.CloseChat());
+  }
 
   preventFocus(event: OpenEventArgs): void {
     event.preventFocus = true;
@@ -80,8 +83,9 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
     this.store.dispatch(new Chat.EnterChatRoom(event.id));
   }
 
-  startNewChat(userId: string): void {
-    this.store.dispatch(new Chat.CreateChatThread(userId));
+  startNewChat(thread: ChatThread): void {
+    this.chatTitle = thread.displayName;
+    this.store.dispatch(new Chat.StartNewConversation(thread.userId))
   };
 
   trackByStringId(idx: number, item: ChatThread): string {
@@ -90,6 +94,24 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
 
   trackById(idx: number, item: ChatThread): string {
     return item.userId;
+  }
+
+  private watchForSearch(): void {
+    this.searchForm.get('searchCriteria')?.valueChanges
+    .pipe(
+      debounceTime(1000),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((value) => {
+      console.log(this.currentChatState, 'current')
+      if (this.currentChatState === ChatDialogState.NewChat) {
+        this.store.dispatch(new Chat.SearcFor(value, ChatSearchType.Participant));
+        this.cd.markForCheck();
+      } else if (this.currentChatState === ChatDialogState.List) {
+        this.store.dispatch(new Chat.SearcFor(value, ChatSearchType.ActiveThread));
+        this.cd.markForCheck();
+      }
+    });
   }
 
   private watchForDialogstate(): void {

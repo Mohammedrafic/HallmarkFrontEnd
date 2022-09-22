@@ -8,7 +8,11 @@ export const DefaultChatState: ChatModel = {
   currentUserIdentity: '',
   currentDialogView: ChatDialogState.List,
   activeThreads: [],
+  displayedThreads: [],
   avaliableParticipants: [],
+  displayedParticipants: [],
   currentChatRoomData: null,
   chatClient: null,
+  typingIndicator: null,
+  userIdToStart: null,
 }

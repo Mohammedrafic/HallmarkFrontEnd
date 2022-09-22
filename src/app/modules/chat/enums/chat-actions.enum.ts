@@ -7,4 +7,7 @@ export enum ChatActions {
   EnterChatRoom = '[chat] Enter chat room',
   UpdateMessages = '[chat] Update messages in all active threads',
   GetChatConfig = '[chat] Get user chat configuration',
+  StartNewConversation = '[chat] Start new conversation',
+  CloseChat = '[chat] Close chat window',
+  SearchFor = '[chat] Search for participant or active thread',
 }

@@ -12,7 +12,7 @@
 }
 
 .chat-controls {
-  padding: 15px 24px 15px 24px;
+  padding: 15px 30px 15px 24px;
   background-color: $secondary-dark-blue-45;
   display: flex;
   justify-content: space-between;
@@ -47,4 +47,24 @@
   margin-left: 24px;
   font-size: 14px;
   font-weight: 700;
+}
+
+.empty-list {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-list-header {
+  font-size: 16px;
+  font-weight: 700;
+  color: $secondary-dark-blue-20;
+}
+
+.no-list-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: $secondary-dark-blue-20;
 }

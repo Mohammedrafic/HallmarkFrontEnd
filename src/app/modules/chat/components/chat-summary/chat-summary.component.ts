@@ -41,6 +41,7 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
       if (message.type === 'text') {
   
         const msg: ReceivedChatMessage = {
+          id: message.id,
           sender: message.senderDisplayName as string,
           message: message.content?.message as string,
           timestamp: message.createdOn,

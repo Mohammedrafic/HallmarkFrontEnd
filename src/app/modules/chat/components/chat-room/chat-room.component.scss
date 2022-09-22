@@ -58,6 +58,12 @@
   &.right {
     justify-content: flex-end;
   }
+
+  &.indicator-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .content-block {
@@ -100,6 +106,10 @@
     background: #3E7EFF;
     color: white;
   }
+  
+  &.indicators {
+    height: auto;
+  }
 }
 
 .chat-form {
@@ -111,4 +121,64 @@
 
 .chat-room-area {
   overflow: scroll;
+  height: 100%;
+}
+
+.indicator-container {
+  display: flex;
+  align-items: flex-end;
+  height: 20px;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  background: #8083A3;
+  margin-right: 6px;
+  border-radius: 50%;
+
+  &.wave1 {
+    animation: waveBlock .4s ease-in-out infinite alternate;
+  }
+
+  &.wave2 {
+    animation: waveBlock .4s ease-in-out 150ms infinite alternate;
+  }
+
+  &.wave3 {
+    animation: waveBlock .4s ease-in-out 300ms infinite alternate;
+  }
+}
+
+@keyframes waveBlock {
+  from {
+    transform: translateY(0px);
+  }
+
+  to {
+    transform: translateY(-5px);
+  }
+}
+
+.typing-indicator {
+  margin-top: 15px;
+}
+
+.empty-room-block {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: $secondary-dark-blue-20;
+}
+
+.empty-room-header {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.empty-room-text {
+  font-size: 14px;
+  font-weight: 400;
 }

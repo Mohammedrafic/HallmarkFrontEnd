@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { NgxsModule } from '@ngxs/store';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
@@ -19,7 +19,7 @@ import { ChatState } from './store/state/chat.state';
   imports: [
     CommonModule,
     DialogModule,
-    FeatherModule.pick({X, Send}),
+    FeatherModule.pick({X, Send }),
     ButtonModule,
     TextBoxAllModule,
     NgxsModule.forFeature([ChatState]),

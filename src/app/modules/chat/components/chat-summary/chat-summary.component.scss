@@ -45,7 +45,7 @@
 }
 
 .message-preview {
-  display: inline-block;
+  display: -webkit-box;
   padding: 15px 65px 0 48px;
   font-size: 14px;
   font-weight: 400;
@@ -54,6 +54,5 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  height: 25px;
-  display: -webkit-box;
+  max-height: 40px;
 }

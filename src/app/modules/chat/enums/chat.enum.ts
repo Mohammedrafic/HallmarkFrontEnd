@@ -3,3 +3,13 @@ export enum ChatDialogState {
   NewChat = 'newChat',
   Internal = 'internal',
 }
+
+export enum ChatTypings {
+  StartTyping = 'startTyping',
+  EndTyping = 'endTyping',
+}
+
+export enum ChatSearchType {
+  Participant = 'participant',
+  ActiveThread = 'activeThread',
+}

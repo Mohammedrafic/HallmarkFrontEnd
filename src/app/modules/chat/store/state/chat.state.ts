@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
 
-import { ChatClient } from '@azure/communication-chat';
+import { ChatClient, ChatThreadCreatedEvent, TypingIndicatorReceivedEvent } from '@azure/communication-chat';
 import { AzureCommunicationTokenCredential } from '@azure/communication-common';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Observable, tap } from 'rxjs';
 
 import { ToggleChatDialog } from '@core/actions';
 import { DefaultChatState } from '../../constants';
-import { ChatDialogState } from '../../enums';
+import { ChatDialogState, ChatSearchType } from '../../enums';
 import { ChatThread, UserChatConfig } from '../../interfaces';
 import { ChatApiService } from '../../services';
 import { Chat } from '../actions';
 import { ChatModel } from '../chat.model';
+import { switchMap } from 'rxjs/operators';
 
 @State<ChatModel>({
   name: 'chat',
@@ -35,12 +36,22 @@ export class ChatState {
 
   @Selector([ChatState])
   static activeThreads(state: ChatModel): ChatThread[] {
-    return state.activeThreads;
+    return state.displayedThreads;
   }
 
   @Selector([ChatState])
   static avaliableParticipants(state: ChatModel): ChatThread[] {
-    return state.avaliableParticipants;
+    return state.displayedParticipants;
+  }
+
+  @Selector([ChatState])
+  static typingIndicator(state: ChatModel): TypingIndicatorReceivedEvent | null {
+    return state.typingIndicator;
+  }
+
+  @Selector([ChatState])
+  static userToStart(state: ChatModel): string | null {
+    return state.userIdToStart;
   }
 
   @Action(ToggleChatDialog)
@@ -71,7 +82,7 @@ export class ChatState {
     return this.apiService.getChatConfig()
     .pipe(
       tap(async (response) => {
-        const chatClient = new ChatClient(response.connectionString,
+        const chatClient = new ChatClient(response.endpoint,
         new AzureCommunicationTokenCredential(response.accessToken));
 
         await chatClient.startRealtimeNotifications();
@@ -80,8 +91,18 @@ export class ChatState {
           dispatch(new Chat.UpdateMessages());
         });
 
-        chatClient.on("typingIndicatorReceived", (event: any) => {
-          console.log(event, 'eventtttttt')
+        chatClient.on("typingIndicatorReceived", (event: TypingIndicatorReceivedEvent) => {
+          patchState({
+            typingIndicator: event,
+          }); 
+        });
+
+        chatClient.on('chatThreadCreated', () => {
+          dispatch(new Chat.GetUserThreads());
+        });
+
+        chatClient.on('participantsAdded', () => {
+          dispatch(new Chat.GetUserThreads());
         });
 
         patchState({
@@ -103,6 +124,7 @@ export class ChatState {
       tap((threadsDto) => {
         patchState({
           activeThreads: threadsDto,
+          displayedThreads: threadsDto,
         });
       }),
     );
@@ -112,37 +134,35 @@ export class ChatState {
   CreateChatThread(
     { patchState, dispatch, getState }: StateContext<ChatModel>,
     { userId }: Chat.CreateChatThread,
-  ): Observable<string> {
+  ): Observable<void> {
+    let threadId: string;
+
     return this.apiService.createThread(userId)
     .pipe(
-      tap((response) => {
-        const client = getState().chatClient as ChatClient;
-        const threads = client.listChatThreads();
-        dispatch(new Chat.SetCurrentView(ChatDialogState.Internal));
-      }),
+      tap((response) => { threadId = response }),
+      switchMap(() => dispatch(new Chat.GetUserThreads())),
+      tap(() => {
+        const threads = getState().activeThreads;
+        const currentThread = threads.find((thread) => thread.threadId === threadId);
+
+        patchState({
+          currentChatRoomData: currentThread,
+        });
+      })
     )
   }
-
-  @Action(Chat.ConnectExistingThread)
-  ConnectThread(): void { }
 
   @Action(Chat.OpenAddView)
   GetParticipants(
     { patchState, dispatch }: StateContext<ChatModel>
   ): Observable<ChatThread[]> {
+
     return this.apiService.getParticipants()
     .pipe(
       tap((participants) => {
-
-        const parts: ChatThread[] = [...participants, {
-          businessUnitName: 'Hallmark',
-          displayName: 'Admin',
-          threadId: null,
-          userId: 'DF013403-9C22-4A36-B028-62F491DB0685',
-        }];
-
         patchState({
-          avaliableParticipants: parts,
+          avaliableParticipants: participants,
+          displayedParticipants: participants,
         });
 
         dispatch(new Chat.SetCurrentView(ChatDialogState.NewChat));
@@ -166,4 +186,65 @@ export class ChatState {
 
   @Action(Chat.UpdateMessages)
   UpdateAllMessages(): void {}
+
+  @Action(Chat.StartNewConversation)
+  StartConversation(
+    { patchState, dispatch }: StateContext<ChatModel>,
+    { userId }: Chat.StartNewConversation,
+  ): void {
+      patchState({
+        currentChatRoomData: null,
+        userIdToStart: userId,
+      });
+
+    dispatch(new Chat.SetCurrentView(ChatDialogState.Internal));
+  }
+
+  @Action(Chat.CloseChat)
+  CloseChatDialog({ patchState }: StateContext<ChatModel>): void {
+    patchState({
+      chatOpen: false,
+    });
+  }
+
+  @Action(Chat.SearcFor)
+  SearchForItems(
+    { patchState, getState }: StateContext<ChatModel>,
+    { searchText, searchType }: Chat.SearcFor,
+  ): void {
+    if (searchType === ChatSearchType.Participant) {
+      const participants = getState().avaliableParticipants;
+
+      if (!searchText) {
+        patchState({
+          displayedParticipants: participants,
+        });
+      } else {
+        const foundByTearm = participants.filter((participant) => participant.displayName.toLowerCase()
+        .includes(searchText.toLowerCase())
+        || participant.businessUnitName.toLowerCase().includes(searchText.toLowerCase()));
+
+        patchState({
+          displayedParticipants: foundByTearm,
+        });
+      }
+    } else if (searchType === ChatSearchType.ActiveThread) {
+
+      const threads = getState().activeThreads;
+
+      if (!searchText) {
+        patchState({
+          displayedThreads: threads,
+        });
+      }  else {
+        const foundByTearm = threads.filter((thread) => thread.displayName.toLowerCase()
+        .includes(searchText.toLowerCase())
+        || thread.businessUnitName.toLowerCase().includes(searchText.toLowerCase()));
+
+        patchState({
+          displayedThreads: foundByTearm,
+        });
+      }
+    }
+  }
 }

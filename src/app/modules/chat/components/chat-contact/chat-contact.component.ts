@@ -11,9 +11,9 @@ import { ChatThread } from '../../interfaces';
 export class ChatContactComponent {
   @Input() participant: ChatThread;
 
-  @Output() contactSelected: EventEmitter<string> = new EventEmitter();
+  @Output() contactSelected: EventEmitter<ChatThread> = new EventEmitter();
 
   public selectContact(): void {
-    this.contactSelected.emit(this.participant.userId);
+    this.contactSelected.emit(this.participant);
   }
 }
