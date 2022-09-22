@@ -192,6 +192,23 @@
                     (billRatesChanged)="onBillRatesChanged()">
     </app-bill-rates>
   </section>
+  <ng-container *ngIf="(!isRejected && !isDeployedCandidate && !isReadOnly) || (isDeployedCandidate && !isRejected)">
+    <div class="mobile-actions">
+      <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isDeployedCandidate && !isReadOnly">
+        <ejs-dropdownlist [fields]="optionFields"
+                          [dataSource]="nextApplicantStatuses"
+                          [formControl]="statusesFormControl"
+                          [itemTemplate]="itemTemplate"
+                          placeholder="Select Status"
+                          (select)="updateCandidateJob($event)">
+          <ng-template #itemTemplate let-data>
+            <span [ngClass]="{'disabled-item': !data.isEnabled}">{{data.statusText}}</span>
+          </ng-template>
+        </ejs-dropdownlist>
+      </div>
+      <button *ngIf="isDeployedCandidate && !isRejected" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
+    </div>
+  </ng-container>
 </section>
 
 <app-reject-reason-dialog

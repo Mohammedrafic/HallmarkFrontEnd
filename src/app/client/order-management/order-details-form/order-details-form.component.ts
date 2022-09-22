@@ -200,6 +200,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   @Select(OrderManagementContentState.projectSpecialData)
   projectSpecialData$: Observable<ProjectSpecialData>;
+
+  specialProjectCategories: Array<{ id: number | null; projectType: string }>;
+  projectNames: Array<{ id: number | null; projectName: string }>;
+  poNumbers: Array<{ id: number | null; poNumber: string }>;
+
   specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
@@ -355,7 +360,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       projectNameId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
       poNumberId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
     });
-
+    
     this.specialProject.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
       this.store.dispatch(new SetIsDirtyOrderForm(this.specialProject.dirty));
     });
@@ -755,30 +760,32 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private subscribeForSettings(): void {
-    this.organizationSettings$
-      .pipe(
-        takeUntil(this.unsubscribe$),
-        filter((settings) => !!settings.length)
-      )
-      .subscribe((settings) => {
-        this.settings = SettingsHelper.mapSettings(settings);
-        this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
-        this.orderTypeDataSourceHandler();
-        if (this.specialProject != null) {
-          if (this.isSpecialProjectFieldsRequired) {
-            this.specialProject.controls['projectTypeId'].setValidators(Validators.required);
-            this.specialProject.controls['projectNameId'].setValidators(Validators.required);
-            this.specialProject.controls['poNumberId'].setValidators(Validators.required);
-          } else {
-            this.specialProject.controls['projectTypeId'].clearValidators();
-            this.specialProject.controls['projectNameId'].clearValidators();
-            this.specialProject.controls['poNumberId'].clearValidators();
-          }
-          this.specialProject.controls['projectTypeId'].updateValueAndValidity();
-          this.specialProject.controls['projectNameId'].updateValueAndValidity();
-          this.specialProject.controls['poNumberId'].updateValueAndValidity();
+    this.organizationSettings$.pipe(takeUntil(this.unsubscribe$), filter(settings => !!settings.length)).subscribe((settings) => {
+      this.settings = SettingsHelper.mapSettings(settings);
+      this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
+      this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+        if (data != null) {
+          this.specialProjectCategories = this.isSpecialProjectFieldsRequired == true ? data.specialProjectCategories : [{ id: null, projectType: "" }, ...data.specialProjectCategories];
+          this.projectNames = this.isSpecialProjectFieldsRequired == true ? data.projectNames : [{ id: null, projectName: "" }, ...data.projectNames];
+          this.poNumbers = this.isSpecialProjectFieldsRequired == true ? data.poNumbers : [{ id: null, poNumber: "" }, ...data.poNumbers];
         }
       });
+      this.orderTypeDataSourceHandler();
+      if (this.specialProject != null) {
+        if (this.isSpecialProjectFieldsRequired) {
+          this.specialProject.controls['projectTypeId'].setValidators(Validators.required);
+          this.specialProject.controls['projectNameId'].setValidators(Validators.required);
+          this.specialProject.controls['poNumberId'].setValidators(Validators.required);
+        } else {
+          this.specialProject.controls['projectTypeId'].clearValidators();
+          this.specialProject.controls['projectNameId'].clearValidators();
+          this.specialProject.controls['poNumberId'].clearValidators();
+        }
+        this.specialProject.controls['projectTypeId'].updateValueAndValidity();
+        this.specialProject.controls['projectNameId'].updateValueAndValidity();
+        this.specialProject.controls['poNumberId'].updateValueAndValidity();
+      }
+    });
   }
 
   private isFieldTouched(field: string): boolean {

@@ -5,6 +5,12 @@
   overflow-y: auto;
 }
 
+.status-actions {
+  @media (max-width: $tablet-min) {
+    display: none;
+  }
+}
+
 .container {
   .deployed-icon {
     color: $primary-active-blue;
@@ -106,3 +112,31 @@
   flex-wrap: nowrap;
 }
 
+.mobile-actions {
+  position: fixed;
+  bottom: 73px;
+  left: 0;
+  width: 93%;
+  padding: 24px 16px;
+  background-color: $white;
+  z-index: 1001;
+  display: none;
+  border-top: 1px solid $secondary-dark-blue-45;
+
+  .dropdown {
+    width: 100%;
+  }
+
+  button {
+    width: 100%;
+    margin: 0 !important;
+
+    &:not(:first-child) {
+      margin-left: 16px !important;
+    }
+  }
+
+  @media (max-width: $tablet-min) {
+    display: flex;
+  }
+}

@@ -253,6 +253,21 @@
       </app-bill-rates>
     </ng-template>
   </section>
+  <ng-container *ngIf="canAccept || !isAgency">
+    <div class="mobile-actions">
+      <div class="input-group dropdown bootstrap" *ngIf="!isAgency">
+        <ejs-dropdownlist
+          [fields]="optionFields"
+          [dataSource]="applicantStatuses"
+          [formControl]="statusesFormControl"
+          placeholder="Select Status"
+          (select)="onDropDownChanged($event)"
+        ></ejs-dropdownlist>
+      </div>
+      <button ejs-button cssClass="e-outline" [isPrimary]="true" *ngIf="canAccept" (click)="onReject()">Reject</button>
+      <button ejs-button [isPrimary]="true" *ngIf="canAccept" (click)="onAccept()">Accept</button>
+    </div>
+  </ng-container>
 </section>
 
 <app-reject-reason-dialog

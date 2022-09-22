@@ -133,5 +133,17 @@ body.light, body.dark {
         }
       }
     }
+
+    &.candidate-dialog {
+      width: 59%;
+  
+      @media #{$max-desktop-small} {
+        width: 72%;
+      }
+
+      @media #{$max-tablet} {
+        width: 100%;
+      }
+    }
   }
 }

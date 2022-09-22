@@ -1,4 +1,14 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild, } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 
 import { MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
@@ -17,8 +27,8 @@ import { Select, Store } from '@ngxs/store';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 import {
   CancellationReasonsMap,
-  PenaltiesMap
-} from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
+  PenaltiesMap,
+} from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 import { ExtensionSidebarComponent } from '@shared/components/extension/extension-sidebar/extension-sidebar.component';
 import { AcceptFormComponent } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
@@ -31,7 +41,13 @@ import { OrderType } from '@shared/enums/order-type';
 import { OrderStatusText } from '@shared/enums/status';
 import { BillRate } from '@shared/models';
 import { Comment } from '@shared/models/comment.model';
-import { AgencyOrderManagement, Order, OrderCandidateJob, OrderFilter, OrderManagementChild, } from '@shared/models/order-management.model';
+import {
+  AgencyOrderManagement,
+  Order,
+  OrderCandidateJob,
+  OrderFilter,
+  OrderManagementChild,
+} from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -40,7 +56,12 @@ import PriceUtils from '@shared/utils/price.utils';
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
 
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
-import { AccordionComponent, SelectEventArgs, SelectingEventArgs, TabComponent, } from '@syncfusion/ej2-angular-navigations';
+import {
+  AccordionComponent,
+  SelectEventArgs,
+  SelectingEventArgs,
+  TabComponent,
+} from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { catchError, EMPTY, Observable, Subject, take, takeWhile } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -59,7 +80,7 @@ type MergedOrder = AgencyOrderManagement & Order;
 enum MobileMenuItems {
   AddExtension = 'Add Extension',
   ClosePosition = 'Close Position',
-  ReOpen = 'Re-Open'
+  ReOpen = 'Re-Open',
 }
 
 @Component({
@@ -216,7 +237,11 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   get canReOpen(): boolean {
-    return this.candidate?.orderStatus !== OrderStatus.Closed && Boolean(this.candidate?.positionClosureReasonId);
+    return (
+      this.candidate?.orderStatus !== OrderStatus.Closed &&
+      Boolean(this.candidate?.positionClosureReasonId) &&
+      !this.isAgency
+    );
   }
 
   public reOpenPosition(): void {
@@ -364,17 +389,16 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.orderCandidateListViewService.setIsCandidateOpened(false);
   }
 
-
   public onMobileMenuSelect({ item: { text } }: MenuEventArgs): void {
     switch (text) {
       case MobileMenuItems.AddExtension:
-        this.showExtensionDialog()
+        this.showExtensionDialog();
         break;
       case MobileMenuItems.ClosePosition:
-        this.closeOrder(this.order)
+        this.closeOrder(this.order);
         break;
       case MobileMenuItems.ReOpen:
-        this.reOpenPosition()
+        this.reOpenPosition();
         break;
 
       default:
@@ -437,7 +461,11 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
           ApplicantStatus.Offered,
           ApplicantStatus.Offboard,
         ];
-        const allowedOnboardedStatuses = [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded, ApplicantStatus.Cancelled];
+        const allowedOnboardedStatuses = [
+          ApplicantStatus.Accepted,
+          ApplicantStatus.OnBoarded,
+          ApplicantStatus.Cancelled,
+        ];
 
         if (allowedOfferDeploymentStatuses.includes(this.candidate.candidateStatus)) {
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.jobId));

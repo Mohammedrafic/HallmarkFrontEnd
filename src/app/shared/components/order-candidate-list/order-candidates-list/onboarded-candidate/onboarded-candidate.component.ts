@@ -130,6 +130,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     return toCorrectTimezoneFormat(this.form.controls['startDate'].value);
   }
 
+  get showStatusDropdown(): boolean {
+    return !this.isRejected && !this.isDeployedCandidate && !this.isCancelled
+  }
+
   private unsubscribe$: Subject<void> = new Subject();
 
   public comments: Comment[] = [];
