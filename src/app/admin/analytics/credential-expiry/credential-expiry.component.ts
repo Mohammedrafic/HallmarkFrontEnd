@@ -29,12 +29,12 @@ import { LogiReportComponent } from '@shared/components/logi-report/logi-report.
 })
 export class CredentialExpiryComponent implements OnInit {
   public paramsData: any = {
-    "OrganizationParamACCR": "",
-    "StartDateParamACCR": "",
-    "EndDateParamACCR": "",
-    "RegionParamACCR": "",
-    "LocationParamACCR": "",
-    "DepartmentParamACCR": ""
+    "OrganizationParamCREXP": "",
+    "StartDateParamCREXP": "",
+    "EndDateParamCREXP": "",
+    "RegionParamCREXP": "",
+    "LocationParamCREXP": "",
+    "DepartmentParamCREXP": ""
   };
   public reportName: LogiReportFileDetails = { name: "/CredentialExpiry/CredentialExpiry.wls" };
   public catelogName: LogiReportFileDetails = { name: "/CredentialExpiry/Dashbord.cat" };
@@ -155,12 +155,12 @@ export class CredentialExpiryComponent implements OnInit {
       let { startDate, endDate } = this.credentialExpiryForm.getRawValue();
       this.paramsData =
       {
-        "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.name),
-        "StartDateParamACCR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-        "EndDateParamACCR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-        "RegionParamACCR": this.selectedRegions?.map((list) => list.name),
-        "LocationParamACCR": this.selectedLocations?.map((list) => list.name),
-        "DepartmentParamACCR": this.selectedDepartments?.map((list) => list.departmentName)
+        "OrganizationParamCREXP": this.selectedOrganizations?.map((list) => list.name),
+        "StartDateParamCREXP": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+        "EndDateParamCREXP": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+        "RegionParamCREXP": this.selectedRegions?.map((list) => list.name),
+        "LocationParamCREXP": this.selectedLocations?.map((list) => list.name),
+        "DepartmentParamCREXP": this.selectedDepartments?.map((list) => list.departmentName)
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();

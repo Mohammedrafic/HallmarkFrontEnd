@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngxs/store';
-import { SetHeaderState } from '../../../store/app.actions';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
+import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 
 @Component({
   selector: 'app-aging-details',
@@ -8,13 +8,15 @@ import { SetHeaderState } from '../../../store/app.actions';
   styleUrls: ['./aging-details.component.scss']
 })
 export class AgingDetailsComponent implements OnInit {
-  public title: string = "Aging Details";
-
-  constructor(private store: Store) {
-    this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
-  }
-
+  public title: string = "Aging Report";
+  public paramsData: any = {
+  };
+  public reportName: LogiReportFileDetails = { name: "/AgingReport/AgingReport.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/AgingReport/Dashbord.cat" };
+  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
+  
   ngOnInit(): void {
+   
   }
 
 }

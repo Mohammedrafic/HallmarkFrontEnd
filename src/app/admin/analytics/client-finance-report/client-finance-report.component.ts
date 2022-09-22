@@ -17,7 +17,7 @@ export class ClientFinanceReportComponent implements OnInit {
   };
   public reportName: LogiReportFileDetails = { name: "/ClientFinanceReport/ClientFinanceReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/ClientFinanceReport/Dashbord.cat" };
-  public reportType: LogiReportTypes = LogiReportTypes.WebReport;
+  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   
   ngOnInit(): void {
    

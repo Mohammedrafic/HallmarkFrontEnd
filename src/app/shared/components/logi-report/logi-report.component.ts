@@ -102,7 +102,8 @@ export class LogiReportComponent implements OnInit {
       pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
       jrd_studio_mode: "view",
-      "jrs.param_page": true
+      "jrs.param_page": true //,
+      //"jrs.profile": "profilename"
     };
     let prptRes = this.reportName;
     let catRes = this.catelogName;
