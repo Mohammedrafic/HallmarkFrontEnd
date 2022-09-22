@@ -250,8 +250,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   public onStepperCreated(): void {
+    let forceHourlyRateSync = true;
     this.tab.selected.pipe(takeUntil(this.unsubscribe$)).subscribe((event: SelectEventArgs) => {
       this.selectedTab = event.selectedIndex;
+      if (this.selectedTab === SelectedTab.BillRates && forceHourlyRateSync) {
+        forceHourlyRateSync = false;
+        const value = this.orderDetailsFormComponent.generalInformationForm.value.hourlyRate;
+        setTimeout(() => this.hourlyRateToBillRateSync(value));
+      }
     });
   }
 
@@ -436,6 +442,37 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private isZeroRate(hourlyRate: string): boolean {
     return hourlyRate === '0.00';
+  }
+
+  hourlyRateToBillRateSync(value: string): void {
+    if (!this.billRatesComponent?.billRatesControl.value) {
+      return;
+    }
+
+    let regularBillRate = this.billRatesComponent?.billRatesControl.value.find(
+      (billRate: BillRate) => billRate.billRateConfig.id === 1
+    );
+
+    if (!regularBillRate) {
+      return;
+    }
+
+    const restBillRates = this.billRatesComponent?.billRatesControl.value.filter(
+      (billRate: BillRate) => billRate.billRateConfig.id !== 1
+    );
+
+    regularBillRate.rateHour = value;
+
+    this.billRatesComponent.billRatesControl.patchValue([...restBillRates, regularBillRate]);
+  }
+
+  hourlyRateToOrderSync(event: { value: string; billRate?: BillRate }): void {
+    const { value } = event;
+    if (!value) {
+      return;
+    }
+
+    this.orderDetailsFormComponent.generalInformationForm.patchValue({ hourlyRate: value });
   }
 
   private getMenuButtonIndex(menuItem: SubmitButtonItem): number {
