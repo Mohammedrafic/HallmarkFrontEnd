@@ -107,5 +107,12 @@
   [rejectReasonsList]="rejectReasons"
   [openEvent]="openRejectDialog"
   (applyReject)="applyReject($event)"
-  (cancelReject)="cancelRejectCandidate()"
+  (cancelReject)="resetStatusesFormControl()"
 ></app-reject-reason-dialog>
+
+<app-candidate-cancellation-dialog
+  [openEvent]="openCandidateCancellationDialog"
+  [orderType]="orderCandidateJob?.order?.orderType"
+  (submitCandidateCancellation)="cancelCandidate($event)"
+  (cancelCandidateCancellation)="resetStatusesFormControl()"
+></app-candidate-cancellation-dialog>

@@ -1,5 +1,6 @@
 import { Agency, AgencyListFilters } from 'src/app/shared/models/agency.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { FormGroup } from '@angular/forms';
 
 export class SaveAgency {
   static readonly type = '[agency] Save Agency';
@@ -64,4 +65,9 @@ export class ExportAgencyList {
 export class GetAgencyFilteringOptions {
   static readonly type = '[agency] Get Agency Filtering Options';
   constructor() {}
+}
+
+export class SetPaymentDetailsForm {
+  static readonly type = '[agency] Set Payment Details Form';
+  constructor(public form: FormGroup) {}
 }

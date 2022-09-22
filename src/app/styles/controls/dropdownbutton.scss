@@ -1,0 +1,36 @@
+@import '../variables/colors.scss';
+
+body.light,
+body.dark {
+  .e-dropdown-btn {
+    &.menu-mobile {
+      padding-left: 2px;
+      .e-btn-icon.e-icons {
+        display: none;
+      }
+    }
+
+    &.primary-icon-button {
+      color: $primary-active-blue-10;
+      background-color: transparent;
+      
+      &.e-active,
+      &:focus {
+        color: $white;
+        background-color: $primary-active-blue;
+      }
+
+      &:hover {
+        color: $primary-active-blue-10;
+        background-color: $primary-active-blue-70;
+      }
+
+      &[disabled] {
+        pointer-events: none;
+        background-color: transparent;
+        color: $primary-active-blue-50;
+      }
+    }
+  }
+}
+

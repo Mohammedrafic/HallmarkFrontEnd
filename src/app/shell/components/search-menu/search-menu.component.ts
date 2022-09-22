@@ -13,6 +13,7 @@ export class SearchMenuComponent implements OnChanges {
   @Input() public searchResult: MenuItem[];
   @Input() public searchString: string;
   @Input() public searchHeight: number;
+  @Input() public isDarkTheme: boolean | null;
 
   @Output() public searchFocusOut: EventEmitter<void> = new EventEmitter<void>();
 

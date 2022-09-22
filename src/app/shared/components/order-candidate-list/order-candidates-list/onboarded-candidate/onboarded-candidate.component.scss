@@ -1,4 +1,5 @@
 @import "colors";
+@import 'adaptive-response';
 
 :host {
   overflow-y: auto;
@@ -44,14 +45,6 @@
           display: flex;
           flex-direction: row;
 
-          .input-container {
-            margin-bottom: 12px;
-
-            label {
-              white-space: nowrap;
-            }
-          }
-
           .left-column {
             width: 64%;
             margin-right: 12px;
@@ -59,6 +52,14 @@
 
           .right-column {
             width: 36%;
+          }
+        }
+
+        .input-container {
+          margin-bottom: 12px;
+
+          label {
+            white-space: nowrap;
           }
         }
 
@@ -86,6 +87,17 @@
       border-radius: 8px;
       margin-bottom: 10px;
     }
+
+    @media (max-width: $tablet-min) {
+      flex-direction: column;
+      .candidate-info {
+        width: 100%;
+      }
+
+      .comments {
+        width: 100%;
+      }
+    }
   }
 
   .warning-deployed-candidate {
@@ -98,4 +110,18 @@
 .candidat-status {
   display: flex;
   align-items: center;
+
+  @media (max-width: $tablet-min) {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+}
+
+.d-flex {
+  display: flex;
+  gap: 12px;
+
+  .input-container {
+    flex: 1 1 0;
+  }
 }

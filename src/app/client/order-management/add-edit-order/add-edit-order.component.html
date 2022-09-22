@@ -43,6 +43,7 @@
               (orderTypeChanged)="onOrderTypeChange($event)"
               [disableOrderType]="disableOrderType"
               [isActive]="selectedTab === SelectedTab.OrderDetails"
+              (hourlyRateSync)="hourlyRateToBillRateSync($event)"
             ></app-order-details-form>
           </section>
         </ng-container>
@@ -80,6 +81,8 @@
             [billRates]="orderBillRates"
             [isActive]="selectedTab === SelectedTab.BillRates"
             (billRatesChanged)="onBillRatesChanged()"
+            (manuallyAddedBillRates)="saveManuallyAddedBillRates($event)"
+            (hourlyRateSync)="hourlyRateToOrderSync($event)"
           >
           </app-bill-rates>
         </section>

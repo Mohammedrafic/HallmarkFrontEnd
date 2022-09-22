@@ -100,6 +100,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   @Output() orderTypeChanged = new EventEmitter<OrderType>();
+  @Output() hourlyRateSync = new EventEmitter<string>();
 
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
@@ -258,7 +259,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         locationId: [null, Validators.required],
         departmentId: [null, Validators.required],
         skillId: [null, Validators.required],
-        hourlyRate: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
+        hourlyRate: [null, [Validators.required, Validators.maxLength(10)]],
         openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
         minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
         joiningBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
@@ -274,6 +275,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     );
 
     this.orderTypeForm.valueChanges.pipe(takeUntil(this.unsubscribe$), throttleTime(500)).subscribe((val) => {
+      const hourlyRate = this.generalInformationForm.value.hourlyRate;
+      this.hourlyRateSync.emit(hourlyRate);
       this.isPerDiem = val.orderType === OrderType.OpenPerDiem;
       this.isPermPlacementOrder = val.orderType === OrderType.PermPlacement;
       this.orderTypeChanged.emit(val.orderType);
@@ -359,6 +362,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
     const orderTypeControl = this.orderTypeForm.get('orderType') as AbstractControl;
     const departmentIdControl = this.generalInformationForm.get('departmentId') as AbstractControl;
+    const hourlyRateControl = this.generalInformationForm.get('hourlyRate') as AbstractControl;
     const skillIdControl = this.generalInformationForm.get('skillId') as AbstractControl;
     const durationControl = this.generalInformationForm.get('duration') as AbstractControl;
     const jobStartDateControl = this.generalInformationForm.get('jobStartDate') as AbstractControl;
@@ -511,6 +515,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       }
 
       jobDistributionsControl.patchValue(jobDistributions, { emitEvent: false });
+    });
+
+    hourlyRateControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
+      this.hourlyRateSync.emit(value);
     });
 
     shiftStartTimeControl.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
@@ -682,7 +690,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.generalInformationForm.controls['hourlyRate']?.setValidators([
         Validators.required,
         Validators.maxLength(10),
-        currencyValidator(1),
       ]);
       this.generalInformationForm.controls['openPositions'].setValidators([
         Validators.required,
@@ -906,7 +913,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
     this.orderTypeChanged.emit(order.orderType);
 
-    const hourlyRate = order.hourlyRate ? parseFloat(order.hourlyRate.toString()).toFixed(2) : '';
+    const hourlyRate = order.hourlyRate ? parseFloat(order.hourlyRate.toString()).toFixed(2) : '0.00';
     const joiningBonus = order.joiningBonus ? parseFloat(order.joiningBonus.toString()).toFixed(2) : '';
     const compBonus = order.compBonus ? parseFloat(order.compBonus.toString()).toFixed(2) : '';
 

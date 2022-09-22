@@ -10,6 +10,7 @@ export enum MoreMenuType {
   'Duplicate',
   'Close',
   'Delete',
+  'Re-Open',
 }
 
 export enum OrderTypeName {
@@ -31,6 +32,15 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Candidates', column: 'CandidatesCount' },
   { text: 'Start Date', column: 'JobStartDate' },
+  { text: 'End Date', column: 'EndDate' },
+  { text: 'Creation Date', column: 'CreationDate' },
+  { text: 'Distributed On', column: 'DistributedOn' },
+  { text: 'Distributed To', column: 'DistributedTo' },
+  { text: 'Special Project Category', column: 'SpecialProjectCategory' },
+  { text: 'Special Project Name', column: 'SpecialProjectName' },
+  { text: 'PO #', column: 'PONumber' },
+  { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Agency', column: 'Agency' },
 ];
 
 export const perDiemColumnsToExport: ExportColumn[] = [
@@ -42,6 +52,15 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Department', column: 'Department' },
   { text: 'Candidates', column: 'Candidates' },
   { text: '# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days' },
+  { text: 'End Date', column: 'EndDate' },
+  { text: 'Creation Date', column: 'CreationDate' },
+  { text: 'Distributed On', column: 'DistributedOn' },
+  { text: 'Distributed To', column: 'DistributedTo' },
+  { text: 'Special Project Category', column: 'SpecialProjectCategory' },
+  { text: 'Special Project Name', column: 'SpecialProjectName' },
+  { text: 'PO #', column: 'PONumber' },
+  { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Agency', column: 'Agency' },
 ];
 
 export const reOrdersColumnsToExport: ExportColumn[] = [
@@ -57,6 +76,14 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Re-Order Date', column: 'ReOrderDate' },
   { text: 'Shift', column: 'Shift' },
   { text: 'Agency', column: 'Agency' },
+  { text: 'End Date', column: 'EndDate' },
+  { text: 'Creation Date', column: 'CreationDate' },
+  { text: 'Distributed On', column: 'DistributedOn' },
+  { text: 'Distributed To', column: 'DistributedTo' },
+  { text: 'Special Project Category', column: 'SpecialProjectCategory' },
+  { text: 'Special Project Name', column: 'SpecialProjectName' },
+  { text: 'PO #', column: 'PONumber' },
+  { text: 'Offered Date', column: 'OfferedDate' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [

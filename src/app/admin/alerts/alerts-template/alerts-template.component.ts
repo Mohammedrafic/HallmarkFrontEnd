@@ -100,7 +100,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   private gridColumnApi: any;
   private isAlive = true;
   private filters: AlertsTemplateFilters = {};
-  public title: string = "Alerts Template";
+  public title: string = "Notification Templates";
   public export$ = new Subject<ExportedFileType>();
   defaultValue: any;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
@@ -147,7 +147,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         hide: true
       },
       {
-        headerName: 'Alert Description',
+        headerName: 'Notfication Description',
         field: 'alertTitle',
         filter: 'agTextColumnFilter',
         filterParams: {

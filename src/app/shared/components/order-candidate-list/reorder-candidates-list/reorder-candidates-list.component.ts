@@ -1,21 +1,22 @@
+import { GetCandidateJob, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
+import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
-import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
-import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { filter, merge, Observable, takeUntil, tap } from 'rxjs';
-import { GetCandidateJob, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
-import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
-import { CandidatStatus } from '@shared/enums/applicant-status.enum';
-import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
+import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 
-enum ReorderCandidateStutuses {
+enum ReorderCandidateStatuses {
   BillRatePending = 44,
   OfferedBR = 47,
   Onboard = 60,
   Rejected = 100,
+  Cancelled = 110,
 }
 
 @Component({
@@ -26,8 +27,10 @@ enum ReorderCandidateStutuses {
 export class ReorderCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit {
   public candidate: OrderCandidatesList;
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
-  public candidateStatuses = ReorderCandidateStutuses;
+  public candidateStatuses = ReorderCandidateStatuses;
   public candidateJob: OrderCandidateJob;
+
+  public readonly cancelledStatusName = ReorderCandidateStatuses[ReorderCandidateStatuses.Cancelled];
 
   private selectedIndex: number;
 
@@ -47,7 +50,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   }
 
   public onEdit(data: OrderCandidatesList & { index: string }, event: MouseEvent): void {
-    if (this.order?.isClosed) {
+    if (this.order?.isClosed && data.statusName !== this.cancelledStatusName) {
       return;
     }
 
@@ -66,7 +69,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
       if (this.isAgency) {
         this.store.dispatch(new GetCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
       } else if (this.isOrganization) {
-        const isGetAvailableSteps = [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR].includes(
+        const isGetAvailableSteps = [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard].includes(
           this.candidate.status
         );
 

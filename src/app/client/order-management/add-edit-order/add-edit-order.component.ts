@@ -1,5 +1,5 @@
 import unionBy from 'lodash/fp/unionBy';
-import { filter, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { filter, Observable, skip, Subject, takeUntil } from 'rxjs';
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
@@ -42,6 +42,7 @@ import { AgencyState } from '@agency/store/agency.state';
 import { Agency } from '@shared/models/agency.model';
 import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
 import { ToastUtility } from '@syncfusion/ej2-notifications';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 enum SelectedTab {
   OrderDetails,
@@ -74,7 +75,7 @@ enum FieldName {
   'workLocations' = 'Work Location',
   'projectTypeId' = 'Special Project Category',
   'projectNameId' = 'Project Name',
-  'poNumberId' = 'PO#'
+  'poNumberId' = 'PO#',
 }
 
 @Component({
@@ -103,7 +104,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public orderId: number;
   public publicId: number;
   public prefix: string;
-  
+
   public title: string;
   public submitMenuItems: ItemModel[] = [
     { id: SubmitButtonItem.SaveForLater, text: 'Save For Later' },
@@ -113,8 +114,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   // todo: update/set credentials list in edit mode for order
   public orderCredentials: IOrderCredentialItem[] = [];
   public orderBillRates: BillRate[] = [];
+  private manuallyAddedBillRates: BillRate[] = [];
   private unsubscribe$: Subject<void> = new Subject();
-  
+  private order: Order;
+  private areBillRatesPopulated = false;
+
   public isPerDiem = false;
   public isPermPlacementOrder = false;
   public disableOrderType = false;
@@ -126,7 +130,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private actions$: Actions,
-    private saveTemplateDialogService: SaveTemplateDialogService
+    private saveTemplateDialogService: SaveTemplateDialogService,
+    private confirmService: ConfirmService
   ) {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
 
@@ -147,8 +152,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     if (this.orderId > 0) {
       this.store.dispatch(new GetSelectedOrderById(this.orderId));
-      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$))
-      .subscribe((order: Order) => {
+      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((order: Order) => {
+        this.order = order;
         this.prefix = order?.organizationPrefix as string;
         this.publicId = order?.publicId as number;
         this.isPermPlacementOrder = order?.orderType === OrderType.PermPlacement;
@@ -157,11 +162,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.tab.hideTab(SelectedTab.BillRates, this.isPermPlacementOrder);
         }
 
-        if (order?.status === OrderStatus.Incomplete ) {
+        if (order?.status === OrderStatus.Incomplete) {
           this.addMenuItem(SubmitButtonItem.SaveForLater, 'Save For Later');
           this.removeMenuItem(SubmitButtonItem.Save);
         } else {
-          if ((order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement || order?.extensionFromId) && order?.status !== OrderStatus.PreOpen) {
+          if (
+            (order?.orderType === OrderType.OpenPerDiem ||
+              order?.orderType === OrderType.PermPlacement ||
+              order?.extensionFromId) &&
+            order?.status !== OrderStatus.PreOpen
+          ) {
             this.disableOrderType = true;
           }
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
@@ -170,43 +180,38 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       });
     }
     if (this.isTemplate) {
-      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$))
-      .subscribe((order: Order) => {
+      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
         this.initCredentialsAndBillRates(order);
       });
     }
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe((data) => {
       const user = this.store.selectSnapshot(UserState.user) as User;
-      const agency = this.store.selectSnapshot(AgencyState.agency) as Agency;      
-      let params:any={};
-      params['@'+AlertParameterEnum[AlertParameterEnum.MyOrganization]]=user?.businessUnitName;
-      params['@'+AlertParameterEnum[AlertParameterEnum.Agency]]=agency?.agencyDetails?.name;
-      params['@'+AlertParameterEnum[AlertParameterEnum.OrderId]]=data?.order?.organizationPrefix==null?data?.order?.publicId+'':data?.order?.organizationPrefix +'-'+ data?.order?.publicId;
-      params['@'+AlertParameterEnum[AlertParameterEnum.JobTitle]]=data?.order?.title;
-      var url = location.origin + '/#/client/order-management/edit/' + data?.order?.publicId;
-      params['@'+AlertParameterEnum[AlertParameterEnum.ClickbackURL]]=url;      
-      
-      let alertTriggerDto:AlertTriggerDto={
+      const agency = this.store.selectSnapshot(AgencyState.agency) as Agency;
+      let params: any = {};
+      params['@' + AlertParameterEnum[AlertParameterEnum.MyOrganization]] = user?.businessUnitName;
+      params['@' + AlertParameterEnum[AlertParameterEnum.Agency]] = agency?.agencyDetails?.name;
+      params['@' + AlertParameterEnum[AlertParameterEnum.OrderId]] =
+        data?.order?.organizationPrefix == null
+          ? data?.order?.publicId + ''
+          : data?.order?.organizationPrefix + '-' + data?.order?.publicId;
+      params['@' + AlertParameterEnum[AlertParameterEnum.JobTitle]] = data?.order?.title;
+      var url = location.origin + '/ui/client/order-management/edit/' + data?.order?.publicId;
+      params['@' + AlertParameterEnum[AlertParameterEnum.ClickbackURL]] = url;
+
+      let alertTriggerDto: AlertTriggerDto = {
         BusinessUnitId: user?.businessUnitId,
-        AlertId: this.orderId>0?AlertIdEnum.OrderUpdated:AlertIdEnum.OrderCreated,
-        Parameters: params
-      }
+        AlertId: this.orderId > 0 ? AlertIdEnum.OrderUpdated : AlertIdEnum.OrderCreated,
+        Parameters: params,
+      };
       this.store.dispatch(new AlertTrigger(alertTriggerDto));
       this.router.navigate(['/client/order-management']);
     });
 
-    this.getPredefinedBillRatesData$
-      .pipe(
-        switchMap((getPredefinedBillRatesData) => {
-          if (getPredefinedBillRatesData && !this.orderBillRates.length) {
-            return this.store.dispatch(new GetPredefinedBillRates());
-          } else {
-            return of(null);
-          }
-        }),
-        takeUntil(this.unsubscribe$),
-      )
-      .subscribe();
+    this.getPredefinedBillRatesData$.pipe(takeUntil(this.unsubscribe$)).subscribe((getPredefinedBillRatesData) => {
+      if (getPredefinedBillRatesData) {
+        this.store.dispatch(new GetPredefinedBillRates());
+      }
+    });
 
     this.subscribeOnPredefinedCredentials();
     this.subscribeOnPredefinedBillRates();
@@ -245,8 +250,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   public onStepperCreated(): void {
+    let forceHourlyRateSync = true;
     this.tab.selected.pipe(takeUntil(this.unsubscribe$)).subscribe((event: SelectEventArgs) => {
       this.selectedTab = event.selectedIndex;
+      if (this.selectedTab === SelectedTab.BillRates && forceHourlyRateSync) {
+        forceHourlyRateSync = false;
+        const value = this.orderDetailsFormComponent.generalInformationForm.value.hourlyRate;
+        setTimeout(() => this.hourlyRateToBillRateSync(value));
+      }
     });
   }
 
@@ -312,7 +323,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.jobDescriptionForm.controls,
       this.orderDetailsFormComponent.contactDetailsForm.controls,
       this.orderDetailsFormComponent.workLocationForm.controls,
-      this.orderDetailsFormComponent.specialProject.controls
+      this.orderDetailsFormComponent.specialProject.controls,
     ];
     forms.forEach((form) => this.collectInvalidFieldsFromForm(form, fields));
     return fields;
@@ -347,13 +358,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   public save(): void {
-    const isRegularBillRate = this.billRatesComponent?.billRatesControl.value.some((item: BillRate) => item.billRateConfigId === 1) ||
+    const isRegularBillRate =
+      this.billRatesComponent?.billRatesControl.value.some((item: BillRate) => item.billRateConfigId === 1) ||
       this.orderBillRates.some((item: BillRate) => item.billRateConfigId === 1);
-    const billRatesValid = (isRegularBillRate ||
-      this.isPerDiem ||
-      this.isPermPlacementOrder);
+    const billRatesValid = isRegularBillRate || this.isPerDiem || this.isPermPlacementOrder;
     const credentialsValid = this.orderCredentials?.length;
-    const orderValid = (this.orderDetailsFormComponent.orderTypeForm.disabled || this.orderDetailsFormComponent.orderTypeForm.valid) &&
+    const orderValid =
+      (this.orderDetailsFormComponent.orderTypeForm.disabled || this.orderDetailsFormComponent.orderTypeForm.valid) &&
       this.orderDetailsFormComponent.generalInformationForm.valid &&
       this.orderDetailsFormComponent.jobDistributionForm.valid &&
       this.orderDetailsFormComponent.jobDescriptionForm.valid &&
@@ -371,27 +382,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.showOrderFormValidationMessage();
     }
 
-    if (
-      orderValid && billRatesValid && credentialsValid
-    ) {
+    if (orderValid && billRatesValid && credentialsValid) {
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
 
-      if (this.orderId) {
-        this.store.dispatch(
-          new EditOrder(
-            {
-              ...order,
-              id: this.orderId,
-              deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids,
-            },
-            documents
-          )
-        );
+      const hourlyRate = this.orderDetailsFormComponent.generalInformationForm.getRawValue().hourlyRate;
+      if (this.isZeroRate(hourlyRate)) {
+        this.showConfirmPopupForZeroRate(order, documents);
       } else {
-        this.store.dispatch(new SaveOrder(order, documents, this.orderDetailsFormComponent.isEditMode ? undefined : this.orderDetailsFormComponent.comments));
+        this.proceedWithSaving(order, documents);
       }
-    
     } else {
       this.orderDetailsFormComponent.orderTypeForm.markAllAsTouched();
       this.orderDetailsFormComponent.generalInformationForm.markAllAsTouched();
@@ -399,8 +399,80 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.jobDescriptionForm.markAllAsTouched();
       this.orderDetailsFormComponent.contactDetailsForm.markAllAsTouched();
       this.orderDetailsFormComponent.workLocationForm.markAllAsTouched();
-      this.orderDetailsFormComponent.specialProject.markAllAsTouched();      
+      this.orderDetailsFormComponent.specialProject.markAllAsTouched();
     }
+  }
+
+  private showConfirmPopupForZeroRate(order: CreateOrderDto, documents: Blob[]): void {
+    this.confirmService
+      .confirm('Are you sure you want to submit order with $0.00 Hourly Rate?', {
+        title: 'Confirmation',
+        okButtonLabel: 'Yes',
+        cancelButtonLabel: 'No',
+        okButtonClass: 'delete-button',
+      })
+      .pipe(filter((confirm) => !!confirm))
+      .subscribe((res) => {
+        this.proceedWithSaving(order, documents);
+      });
+  }
+
+  private proceedWithSaving(order: CreateOrderDto, documents: Blob[]): void {
+    if (this.orderId) {
+      this.store.dispatch(
+        new EditOrder(
+          {
+            ...order,
+            id: this.orderId,
+            deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids,
+          },
+          documents
+        )
+      );
+    } else {
+      this.store.dispatch(
+        new SaveOrder(
+          order,
+          documents,
+          this.orderDetailsFormComponent.isEditMode ? undefined : this.orderDetailsFormComponent.comments
+        )
+      );
+    }
+  }
+
+  private isZeroRate(hourlyRate: string): boolean {
+    return hourlyRate === '0.00';
+  }
+
+  hourlyRateToBillRateSync(value: string): void {
+    if (!this.billRatesComponent?.billRatesControl.value) {
+      return;
+    }
+
+    let regularBillRate = this.billRatesComponent?.billRatesControl.value.find(
+      (billRate: BillRate) => billRate.billRateConfig.id === 1
+    );
+
+    if (!regularBillRate) {
+      return;
+    }
+
+    const restBillRates = this.billRatesComponent?.billRatesControl.value.filter(
+      (billRate: BillRate) => billRate.billRateConfig.id !== 1
+    );
+
+    regularBillRate.rateHour = value;
+
+    this.billRatesComponent.billRatesControl.patchValue([...restBillRates, regularBillRate]);
+  }
+
+  hourlyRateToOrderSync(event: { value: string; billRate?: BillRate }): void {
+    const { value } = event;
+    if (!value) {
+      return;
+    }
+
+    this.orderDetailsFormComponent.generalInformationForm.patchValue({ hourlyRate: value });
   }
 
   private getMenuButtonIndex(menuItem: SubmitButtonItem): number {
@@ -484,8 +556,34 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       orderPlacementFee,
     } = allValues;
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
-      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed, isPredefined, seventhDayOtEnabled, weeklyOtEnabled, dailyOtEnabled } = billRate;
-      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed, isPredefined, seventhDayOtEnabled, weeklyOtEnabled, dailyOtEnabled };
+      const {
+        id,
+        billRateConfigId,
+        rateHour,
+        intervalMin,
+        intervalMax,
+        effectiveDate,
+        billType,
+        editAllowed,
+        isPredefined,
+        seventhDayOtEnabled,
+        weeklyOtEnabled,
+        dailyOtEnabled,
+      } = billRate;
+      return {
+        id: id || 0,
+        billRateConfigId,
+        rateHour,
+        intervalMin,
+        intervalMax,
+        effectiveDate,
+        billType,
+        editAllowed,
+        isPredefined,
+        seventhDayOtEnabled,
+        weeklyOtEnabled,
+        dailyOtEnabled,
+      };
     });
 
     const order: CreateOrderDto | EditOrderDto = {
@@ -556,7 +654,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (!order.compBonus) {
       order.compBonus = null;
     }
-    
+
     return order;
   }
 
@@ -589,11 +687,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         )
       );
     } else {
-      this.store.dispatch(new SaveOrder(
-        order, documents, this.orderDetailsFormComponent.comments
-      ));
+      this.store.dispatch(new SaveOrder(order, documents, this.orderDetailsFormComponent.comments));
     }
-    
   }
 
   private subscribeOnPredefinedCredentials(): void {
@@ -608,8 +703,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private subscribeOnPredefinedBillRates(): void {
-    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe((predefinedBillRates) => {
-      this.orderBillRates = predefinedBillRates;
+    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$), skip(1)).subscribe((predefinedBillRates) => {
+      if(this.areBillRatesPopulated && this.order) {
+        this.manuallyAddedBillRates = this.order.billRates.filter((billrate) => !billrate.isPredefined);
+      }
+
+      this.orderBillRates =
+        !this.areBillRatesPopulated && this.order
+          ? [...this.order.billRates]
+          : [...predefinedBillRates, ...this.manuallyAddedBillRates];
+      this.areBillRatesPopulated = true;
     });
   }
 
@@ -627,7 +730,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.isSaveForTemplate = true;
     } else {
       this.markControlsAsRequired();
-      const fields = [FieldName.regionId, FieldName.locationId, FieldName.departmentId, FieldName.skillId]
+      const fields = [FieldName.regionId, FieldName.locationId, FieldName.departmentId, FieldName.skillId];
       const invalidFields = fields.filter((field, i) => !requiredFields[i]).join(',\n');
       this.showOrderFormValidationMessage(invalidFields);
     }
@@ -665,5 +768,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private selectOrderTemplatesTab(): void {
     this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.OrderTemplates));
+  }
+
+  public saveManuallyAddedBillRates(event: BillRate[]): void {
+    this.manuallyAddedBillRates = event;
   }
 }

@@ -1,42 +1,10 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChanges,
-  ViewChild,
-  ViewChildren,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild, } from '@angular/core';
 import { Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
-import { Observable, Subject, takeWhile } from 'rxjs';
 
-import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import {
-  AccordionComponent,
-  SelectEventArgs,
-  SelectingEventArgs,
-  TabComponent,
-} from '@syncfusion/ej2-angular-navigations';
-
-import { OrderManagementState } from '@agency/store/order-management.state';
-import { OrderType } from '@shared/enums/order-type';
-import {
-  AgencyOrderManagement,
-  Order,
-  OrderCandidateJob,
-  OrderFilter,
-  OrderManagementChild,
-} from '@shared/models/order-management.model';
-import { AcceptFormComponent } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
-import PriceUtils from '@shared/utils/price.utils';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { MenuEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { GetAgencyExtensions, GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import { OrderManagementState } from '@agency/store/order-management.state';
+import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
 import {
   GetAvailableSteps,
   GetOrganisationCandidateJob,
@@ -45,23 +13,39 @@ import {
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { OrderStatusText } from '@shared/enums/status';
-import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
-import { ShowCloseOrderDialog } from '../../../store/app.actions';
-import { OrderStatus } from '@shared/enums/order-management';
-import { CommentsService } from '@shared/services/comments.service';
-import { Comment } from '@shared/models/comment.model';
-import { BillRate } from '@shared/models';
-import { addDays, toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
+import { Select, Store } from '@ngxs/store';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
+import {
+  CancellationReasonsMap,
+  PenaltiesMap
+} from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
 import { ExtensionSidebarComponent } from '@shared/components/extension/extension-sidebar/extension-sidebar.component';
-import { AppState } from '../../../store/app.state';
-import { ConfirmService } from '@shared/services/confirm.service';
+import { AcceptFormComponent } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { ExtensionCandidateComponent } from '../order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
-import { filter } from 'rxjs/operators';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { UnsavedFormDirective } from '@shared/directives/unsaved-form.directive';
+import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { MessageTypes } from '@shared/enums/message-types';
+import { OrderStatus } from '@shared/enums/order-management';
+import { OrderType } from '@shared/enums/order-type';
+import { OrderStatusText } from '@shared/enums/status';
+import { BillRate } from '@shared/models';
+import { Comment } from '@shared/models/comment.model';
+import { AgencyOrderManagement, Order, OrderCandidateJob, OrderFilter, OrderManagementChild, } from '@shared/models/order-management.model';
+import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { CommentsService } from '@shared/services/comments.service';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { addDays, toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
+import PriceUtils from '@shared/utils/price.utils';
+import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
+
+import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
+import { AccordionComponent, SelectEventArgs, SelectingEventArgs, TabComponent, } from '@syncfusion/ej2-angular-navigations';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { catchError, EMPTY, Observable, Subject, take, takeWhile } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { ShowCloseOrderDialog, ShowToast } from 'src/app/store/app.actions';
+import { AppState } from 'src/app/store/app.state';
 
 enum Template {
   accept,
@@ -71,6 +55,12 @@ enum Template {
 }
 
 type MergedOrder = AgencyOrderManagement & Order;
+
+enum MobileMenuItems {
+  AddExtension = 'Add Extension',
+  ClosePosition = 'Close Position',
+  ReOpen = 'Re-Open'
+}
 
 @Component({
   selector: 'app-child-order-dialog',
@@ -83,6 +73,10 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() candidate: OrderManagementChild;
   @Input() filters: OrderFilter;
   @Output() saveEmitter = new EventEmitter<void>();
+
+  // TODO: Delete it when we will have re-open sidebar
+  @Output() private reOpenPositionSuccess: EventEmitter<OrderManagementChild> =
+    new EventEmitter<OrderManagementChild>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -135,13 +129,44 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
   }
 
+  get isCancelled(): boolean {
+    return this.candidateJob?.applicantStatus.applicantStatus === CandidatStatus.Cancelled;
+  }
+
+  get showAddExtension(): boolean {
+    return this.isAddExtensionBtnAvailable && !this.extensions?.length;
+  }
+
+  get disableAddExtension(): boolean {
+    return this.candidate?.orderStatus === this.orderStatus.InProgressOfferAccepted;
+  }
+
+  get showCloseOrder(): boolean {
+    return !this.isAgency && !this.canReOpen;
+  }
+
+  get mobileMenu(): any {
+    let menu: { text: string }[] = [];
+    if (this.showAddExtension && !this.disableAddExtension) {
+      menu = [...menu, { text: MobileMenuItems.AddExtension }];
+    }
+    if (!this.disabledCloseButton && this.showCloseOrder) {
+      menu = [...menu, { text: MobileMenuItems.ClosePosition }];
+    }
+    if (this.canReOpen) {
+      menu = [...menu, { text: MobileMenuItems.ReOpen }];
+    }
+    return menu;
+  }
+
   constructor(
     private chipsCssClass: ChipsCssClass,
     private router: Router,
     private store: Store,
     private commentsService: CommentsService,
     private confirmService: ConfirmService,
-    private orderCandidateListViewService: OrderCandidateListViewService
+    private orderCandidateListViewService: OrderCandidateListViewService,
+    private reOpenOrderService: ReOpenOrderService
   ) {}
 
   ngOnInit(): void {
@@ -188,6 +213,23 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   closeOrder(order: MergedOrder): void {
     this.store.dispatch(new ShowCloseOrderDialog(true, true));
     this.order = { ...order };
+  }
+
+  get canReOpen(): boolean {
+    return this.candidate?.orderStatus !== OrderStatus.Closed && Boolean(this.candidate?.positionClosureReasonId);
+  }
+
+  public reOpenPosition(): void {
+    this.reOpenOrderService
+      .reOpenPosition({ positionId: this.candidate.jobId })
+      .pipe(
+        catchError((err) => {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, err.message));
+          return EMPTY;
+        }),
+        take(1)
+      )
+      .subscribe(() => this.reOpenPositionSuccess.emit(this.candidate));
   }
 
   public onTabSelecting(event: SelectingEventArgs): void {
@@ -322,6 +364,24 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.orderCandidateListViewService.setIsCandidateOpened(false);
   }
 
+
+  public onMobileMenuSelect({ item: { text } }: MenuEventArgs): void {
+    switch (text) {
+      case MobileMenuItems.AddExtension:
+        this.showExtensionDialog()
+        break;
+      case MobileMenuItems.ClosePosition:
+        this.closeOrder(this.order)
+        break;
+      case MobileMenuItems.ReOpen:
+        this.reOpenPosition()
+        break;
+
+      default:
+        break;
+    }
+  }
+
   private saveExtensionChanges(): Observable<boolean> {
     const options = {
       title: DELETE_CONFIRM_TITLE,
@@ -356,6 +416,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
           ApplicantStatus.Accepted,
           ApplicantStatus.Rejected,
           ApplicantStatus.OnBoarded,
+          ApplicantStatus.Cancelled,
           ApplicantStatus.Offboard,
         ];
 
@@ -376,7 +437,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
           ApplicantStatus.Offered,
           ApplicantStatus.Offboard,
         ];
-        const allowedOnboardedStatuses = [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded];
+        const allowedOnboardedStatuses = [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded, ApplicantStatus.Cancelled];
 
         if (allowedOfferDeploymentStatuses.includes(this.candidate.candidateStatus)) {
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.jobId));
@@ -455,6 +516,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     offeredBillRate,
     organizationPrefix,
     orderPublicId,
+    jobCancellation,
   }: OrderCandidateJob) {
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     const isBillRatePending =
@@ -473,12 +535,18 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
       shiftEndTime,
       openPositions,
       hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
+      jobCancellationReason: CancellationReasonsMap[jobCancellation?.jobCancellationReason || 0],
+      penaltyCriteria: PenaltiesMap[jobCancellation?.penaltyCriteria || 0],
+      rate: jobCancellation?.rate,
+      hours: jobCancellation?.hours,
     });
     this.enableFields();
   }
 
   private enableFields(): void {
-    this.acceptForm.get('candidateBillRate')?.enable();
+    if (!this.isCancelled) {
+      this.acceptForm.get('candidateBillRate')?.enable();
+    }
     switch (this.candidateJob?.applicantStatus.applicantStatus) {
       case !this.isAgency && CandidatStatus.BillRatePending:
         this.acceptForm.get('hourlyRate')?.enable();

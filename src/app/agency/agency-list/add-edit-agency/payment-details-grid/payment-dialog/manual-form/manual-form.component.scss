@@ -1,0 +1,26 @@
+.form-container {
+  display: flex;
+  gap: 10px;
+
+  .column {
+    width: 50%;
+
+    .input-container,
+    .dropdown-container {
+      margin-bottom: 12px;
+
+      .input-group {
+        margin-top: 5px;
+      }
+    }
+
+    .d-flex {
+      display: flex;
+      gap: 10px;
+
+      .city {
+        width: 65%;
+      }
+    }
+  }
+}

@@ -266,7 +266,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         locationId: [null, Validators.required],
         departmentId: [null, Validators.required],
         skillId: [null, Validators.required],
-        hourlyRate: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
+        hourlyRate: [null, [Validators.required, Validators.maxLength(10)]],
         openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
         duration: [null, Validators.required],
         jobStartDate: [null, Validators.required],
@@ -529,8 +529,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.populateQuickOrderFormValues();
       this.populateShiftTimes();
       listOfCommonControls.forEach((control) => {
-        if (control === 'hourlyRate' || control === 'openPositions') {
-          this.generalInformationForm.controls[control]?.setValidators([
+        if (control === 'openPositions') {
+          this.generalInformationForm.controls['control']?.setValidators([
             Validators.required,
             Validators.maxLength(10),
             currencyValidator(1),

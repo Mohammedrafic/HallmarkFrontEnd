@@ -36,18 +36,23 @@
         </div>
       </ng-template>
     </e-column>
-    <e-column field="mode" headerText="Mode" textAlign="Left" [valueAccessor]="modeAccessor"></e-column>
-    <e-column field="payee" headerText="Payee" textAlign="left"></e-column>
-    <e-column field="address" headerText="Address" textAlign="left"></e-column>
-    <e-column field="city" headerText="City" textAlign="left"></e-column>
-    <e-column field="zip" headerText="Zip" textAlign="left"></e-column>
-    <e-column field="startDate" headerText="Start Date" textAlign="left">
+    <e-column field="mode" headerText="Mode" textAlign="left" [valueAccessor]="modeAccessor" minWidth="150"></e-column>
+    <e-column field="payee" headerText="Payee" textAlign="left" minWidth="120"></e-column>
+    <e-column field="bankAddress1" headerText="Address" textAlign="left" minWidth="160"></e-column>
+    <e-column field="bankCity" headerText="City" textAlign="left" minWidth="140"></e-column>
+    <e-column field="bankZipCode" headerText="Zip" textAlign="left" minWidth="120"></e-column>
+    <e-column field="startDate" headerText="Start Date" textAlign="left" minWidth="140">
       <ng-template #template let-data>
         {{ data.startDate | date:'MM/dd/yyy'}}
       </ng-template>
     </e-column>
+    <e-column field="bankName" headerText="Bank Name" textAlign="left" minWidth="160"></e-column>
+    <e-column field="bankCountry" headerText="Country" textAlign="left" [valueAccessor]="countryAccessor" minWidth="140"></e-column>
+    <e-column field="routingNumber" headerText="Routing Number" textAlign="left" minWidth="180"></e-column>
+    <e-column field="accountHolderName" headerText="Account Holder Name" textAlign="left" minWidth="210"></e-column>
+    <e-column field="accountHolderNumber" headerText="Account Holder Number" textAlign="left" minWidth="230"></e-column>
+    <e-column field="accountHolderCountry" headerText="Account Holder Country" textAlign="left" [valueAccessor]="countryAccessor" minWidth="230"></e-column>
   </e-columns>
-
   <ng-template #pagerTemplate let-data>
     <div class="e-pagertemplate">
       <div class="control-section">
@@ -81,86 +86,4 @@
   </ng-template>
 </ejs-grid>
 
-<app-side-dialog (formCancelClicked)="onPaymentFormCancel()" (formSaveClicked)="onPaymentFormSave()" [header]="'Add Payment Details'">
-  <form class="payment-details-form bootstrap" id="addPaymentForm" [formGroup]="paymentDetailsForm">
-    <div class="dropdown-container">
-      <label>Mode<span class="required">*</span></label>
-      <div class="input-group dropdown">
-        <ejs-dropdownlist
-          appValidateWithMessage
-          [fields]="optionFields"
-          formControlName="mode"
-          [dataSource]="paymentMode"
-        ></ejs-dropdownlist>
-      </div>
-    </div>
-
-    <div>
-      <div class="input-container">
-        <label for="payee">Payee<span class="required">*</span></label>
-        <div class="input-group">
-          <input id="payee" class="e-input" type="text" appValidateWithMessage formControlName="payee" maxlength="50" />
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="input-container">
-        <label for="address">Address</label>
-        <div class="input-group">
-          <input
-            id="address"
-            class="e-input"
-            type="text"
-            appValidateWithMessage
-            formControlName="address"
-            maxlength="500"
-          />
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="input-container">
-        <label for="city">City</label>
-        <div class="input-group">
-          <input id="city" class="e-input" type="text" appValidateWithMessage formControlName="city" maxlength="20" />
-        </div>
-      </div>
-    </div>
-
-    <div class="dropdown-container">
-      <label>Zipcode</label>
-      <div class="input-group dropdown">
-        <div class="input-group">
-          <ejs-maskedtextbox
-            id="Zip"
-            promptChar="_"
-            mask="00000"
-            appValidateWithMessage
-            formControlName="zip"
-            class="e-input"
-            placeholder=" "
-          ></ejs-maskedtextbox>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="input-container calendar">
-        <label for="inactiveDate">Start Date <span class="required">*</span></label>
-        <div class="input-group datepicker">
-          <ejs-datepicker
-            id="startDate"
-            class="datepicker"
-            format="MM/dd/yyyy"
-            appValidateWithMessage
-            placeholder="MM/DD/YYYY"
-            formControlName="startDate"
-          >
-          </ejs-datepicker>
-        </div>
-      </div>
-    </div>
-  </form>
-</app-side-dialog>
+<app-payment-dialog (modalClose)="onPaymentFormCancel($event)" [dialogEvent]="$any(openEvent)" [onEdit]="editedPaymentsDetails"></app-payment-dialog>

@@ -2,7 +2,7 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, filter, forkJoin, Observable, takeUntil, tap } from 'rxjs';
 
 import { isEmpty } from 'lodash';
@@ -18,6 +18,10 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { CandidatesStatusText, OrderStatusText } from '@shared/enums/status';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { ProjectSpecialData } from '@shared/models/project-special-data.model';
+import { ProjectsService } from '@shared/services/projects.service';
+import { placeholderDate } from '@shared/constants/placeholder-date';
+import { formatDate } from '@shared/constants/format-date';
 
 enum RLDLevel {
   Orginization,
@@ -45,6 +49,14 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   @Select(OrderManagementState.gridFilterRegions)
   gridFilterRegions$: Observable<OrganizationRegion[]>;
 
+  public projectSpecialData$: Observable<ProjectSpecialData>;
+  public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
+  public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
+  public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
+
+  public readonly formatDate = formatDate;
+  public readonly placeholderDate = placeholderDate;
+
   public optionFields = {
     text: 'name',
     value: 'id',
@@ -66,12 +78,13 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return this.form.get('departmentsIds') as AbstractControl;
   }
 
-  constructor(private store: Store, private actions$: Actions) {
+  constructor(private store: Store, private actions$: Actions, private projectsService: ProjectsService) {
     super();
   }
 
   ngOnInit(): void {
     this.onOrderFilteringOptionsChange();
+    this.getProjectSpecialData();
   }
 
   ngAfterViewInit(): void {
@@ -182,6 +195,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           CandidatStatus.Withdraw,
           CandidatStatus.Offboard,
           CandidatStatus.Rejected,
+          CandidatStatus.Cancelled,
         ];
         if (this.activeTab === AgencyOrderManagementTabs.ReOrders) {
           statuses = orderStatuses.filter((status) =>
@@ -193,6 +207,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
               CandidatesStatusText['Offered Bill Rate'],
               CandidatesStatusText.Onboard,
               CandidatesStatusText.Rejected,
+              CandidatStatus.Cancelled,
             ].includes(status.status)
           ); // TODO: after BE implementation also add Pending, Rejected
         } else if (this.activeTab === AgencyOrderManagementTabs.PerDiem) {
@@ -233,6 +248,14 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       jobEndDate: new FormControl(null),
       annualSalaryRangeFrom: new FormControl(null),
       annualSalaryRangeTo: new FormControl(null),
+      creationDateFrom: new FormControl(null),
+      creationDateTo: new FormControl(null),
+      distributedOnFrom: new FormControl(null),
+      distributedOnTo: new FormControl(null),
+      candidateName: new FormControl(null),
+      projectTypeId: new FormControl(null),
+      projectNameId: new FormControl(null),
+      poNumberId: new FormControl(null),
     });
   }
 
@@ -305,6 +328,36 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       annualSalaryRangeFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
       annualSalaryRangeTo: { type: ControlTypes.Text, valueType: ValueType.Text },
+      creationDateFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
+      creationDateTo: { type: ControlTypes.Date, valueType: ValueType.Text },
+      distributedOnFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
+      distributedOnTo: { type: ControlTypes.Date, valueType: ValueType.Text },
+      candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
+      projectTypeId: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'projectType',
+        valueId: 'id',
+      },
+      projectNameId: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'projectName',
+        valueId: 'id',
+      },
+      poNumberId: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'poNumber',
+        valueId: 'id',
+      },
     };
+  }
+
+  private getProjectSpecialData(): void {
+    this.projectSpecialData$ = this.projectsService.getProjectSpecialData();
   }
 }

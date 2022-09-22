@@ -10,8 +10,13 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
+import {
+  CancellationReasonsMap,
+  PenaltiesMap
+} from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
 
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { PenaltyCriteria } from "@shared/enums/candidate-cancellation";
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -66,6 +71,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public isReadOnly = false;
   public openRejectDialog = new Subject<boolean>();
   public priceUtils = PriceUtils;
+  public showHoursControl: boolean = false;
+  public showPercentage: boolean = false;
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
@@ -77,6 +84,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   get isOnboard(): boolean {
     return this.candidateStatus === ApplicantStatusEnum.OnBoarded;
+  }
+
+  get isCancelled(): boolean {
+    return this.candidateStatus === ApplicantStatusEnum.Cancelled;
   }
 
   get candidateStatus(): ApplicantStatusEnum {
@@ -108,7 +119,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get showRejectButton(): boolean {
-    return (this.isDeployedCandidate && !this.showWithdrawAction && !this.isAgencyAndOnboard) || !this.isReadOnly;
+    return (!this.isDeployedCandidate && !this.showWithdrawAction && !this.isAgencyAndOnboard) || !this.isReadOnly;
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -248,6 +259,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       clockId: new FormControl(''),
       actualStartDate: new FormControl(''),
       actualEndDate: new FormControl(''),
+      jobCancellationReason: new FormControl(''),
+      penaltyCriteria: new FormControl(''),
+      rate: new FormControl(''),
+      hours: new FormControl(''),
     });
   }
 
@@ -268,6 +283,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
       this.candidateJob = value;
       if (value) {
+        this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
@@ -287,6 +303,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           clockId: value.clockId,
           actualStartDate: this.getDateString(value.actualStartDate),
           actualEndDate: this.getDateString(value.actualEndDate),
+          jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
+          penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
+          rate: value.jobCancellation?.rate,
+          hours: value.jobCancellation?.hours,
         });
       }
       this.changeDetectionRef.markForCheck();
@@ -336,6 +356,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.isReadOnly = false;
     this.isWithdraw = false;
     this.form.markAsPristine();
+  }
+
+  private setCancellationControls(value: PenaltyCriteria): void{
+    this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
+    this.showPercentage = value === PenaltyCriteria.RateOfHours;
   }
 }
 

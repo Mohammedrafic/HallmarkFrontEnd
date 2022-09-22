@@ -28,3 +28,17 @@
     background: transparent !important;
   }
 }
+body.dark {
+  .numeric-input-no-border {
+    .e-input-group.e-numeric.e-control-wrapper {
+      background: $sidebar-background !important;
+      color: $white !important;
+    }
+
+    .e-input-group.e-numeric.e-control-wrapper {
+      &:hover {
+        color: $white !important;
+      }
+    }
+  }
+}

@@ -33,6 +33,18 @@
         </div>
       </div>
     </div>
+    <ejs-accordion class="historical-events">
+      <e-accordionitems>
+        <e-accordionitem expanded="true">
+          <ng-template #header>
+            <div>Historical Events</div>
+          </ng-template>
+          <ng-template #content>
+            <app-order-historical-events [events]="events$ | async"></app-order-historical-events>
+          </ng-template>
+        </e-accordionitem>
+      </e-accordionitems>
+    </ejs-accordion>
   </div>
   <div>
     <div class="credentials">

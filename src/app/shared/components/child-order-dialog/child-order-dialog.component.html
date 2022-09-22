@@ -1,8 +1,7 @@
 <ejs-dialog
   id="dialog"
   #sideDialog
-  cssClass="dialog"
-  width="50%"
+  cssClass="dialog order-details-dialog"
   [target]="targetElement"
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
@@ -28,21 +27,35 @@
           </div>
           <div class="e-card-content dialog-controls">
             <app-button
-              *ngIf="isAddExtensionBtnAvailable && !extensions?.length"
+              *ngIf="showAddExtension"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
-              [disabled]="candidate?.orderStatus === orderStatus.InProgressOfferAccepted"
+              [disabled]="disableAddExtension"
               text="Add Extension"
             ></app-button>
             <button
               ejs-button
               cssClass="e-outline"
-              *ngIf="!isAgency"
+              *ngIf="showCloseOrder"
               [disabled]="disabledCloseButton"
               (click)="closeOrder(order)"
             >
               Close Position
             </button>
+            <button
+              ejs-button
+              cssClass="e-outline"
+              *ngIf="canReOpen"
+              (click)="reOpenPosition()"
+            >
+              Re-Open
+            </button>
+
+            <button *ngIf="mobileMenu.length" ejs-dropdownbutton [items]="mobileMenu" (select)="onMobileMenuSelect($event)"
+              iconCss="e-icons" cssClass="e-caret-hide primary-icon-button menu-mobile">
+              <i-feather name="more-vertical" class="icon"></i-feather>
+            </button>
+
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>
             </button>
@@ -146,12 +159,17 @@
                         </section>
 
                         <section class="bill-rates">
-                          <app-bill-rates
-                            [billRates]="candidateJob?.billRates || []"
-                            [isActive]="true"
-                            (billRatesChanged)="onBillRatesChanged($event)"
-                          >
-                          </app-bill-rates>
+                          <ng-container [ngTemplateOutlet]="isCancelled ? billRates : editBillRates"></ng-container>
+                          <ng-template #billRates>
+                            <app-bill-rates-view-grid [billRatesData]="candidateJob?.billRates || []"></app-bill-rates-view-grid>
+                          </ng-template>
+                          <ng-template #editBillRates>
+                            <app-bill-rates
+                              [billRates]="candidateJob?.billRates || []"
+                              [isActive]="true"
+                              (billRatesChanged)="onBillRatesChanged($event)">
+                            </app-bill-rates>
+                          </ng-template>
                         </section>
                       </section>
                     </ng-container>

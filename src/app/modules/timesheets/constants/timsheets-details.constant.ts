@@ -214,6 +214,13 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
     ...billRateTypeStatic,
   },
   {
+    field: 'manualInvoiceReason',
+    headerName: 'Reason',
+    ...commonColumn,
+    width: 180,
+    type: 'rightAligned',
+  },
+  {
     field: 'description',
     headerName: 'Description',
     filter: false,
