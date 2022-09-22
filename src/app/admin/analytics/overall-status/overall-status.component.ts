@@ -18,7 +18,9 @@ export class OverallStatusComponent implements OnInit {
   public reportName: LogiReportFileDetails = { name: "/OverAllStatusReport/OverAllStatusReport.wls" };
   public catelogName: LogiReportFileDetails = { name: "/OverAllStatusReport/Dashbord.cat" };
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
-  
+  constructor(private store: Store) {
+    this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));   
+  }
   ngOnInit(): void {
    
   }

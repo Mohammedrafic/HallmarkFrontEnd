@@ -18,7 +18,9 @@ export class TimesheetReportComponent implements OnInit {
   public reportName: LogiReportFileDetails = { name: "/TimeSheetReport/TimeSheetReport.wls" };
   public catelogName: LogiReportFileDetails = { name: "/TimeSheetReport/Dashbord.cat" };
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
-  
+  constructor(private store: Store) {
+    this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));   
+  }
   ngOnInit(): void {
    
   }

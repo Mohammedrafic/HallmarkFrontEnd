@@ -19,7 +19,9 @@ export class OvertimeComponent implements OnInit {
   public reportName: LogiReportFileDetails = { name: "/OverTimeReport/OverTimeReport.wls" };
   public catelogName: LogiReportFileDetails = { name: "/OverTimeReport/Dashbord.cat" };
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
-  
+  constructor(private store: Store) {
+    this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));   
+  }
   ngOnInit(): void {
    
   }
