@@ -5,3 +5,4 @@ export const LAST_SELECTED_BUSINESS_UNIT_TYPE ='lastSelectedBusinessUnitType';
 export const DASHBOARD_FILTER_STATE = 'dashboardFilterState';
 export const TIME_SELECTION_OF_CHART_LINE = 'timeSelectionOfChartLine';
 export const IS_DARK_THEME = 'isDarkTheme';
+export const RECENT_SEARCH_MENU_HISTROY = 'recentHistory';
