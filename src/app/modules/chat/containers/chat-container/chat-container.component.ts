@@ -7,8 +7,7 @@ import { Observable, skip, takeUntil, debounceTime } from 'rxjs';
 import { Destroyable } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
 import { DialogTitles } from '../../constants';
-import { ChatSearchForm, EnterChatEvent } from '../../interfaces';
-import { ChatThread } from '../../interfaces/chat-api.interface';
+import { ChatSearchForm, EnterChatEvent, ChatThread } from '../../interfaces';
 import { ChatService } from '../../services';
 import { Chat } from '../../store/actions';
 import { ChatState } from '../../store/state/chat.state';
@@ -94,10 +93,6 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
 
   trackById(idx: number, item: ChatThread): string {
     return item.userId;
-  }
-
-  checkSorting(thread: ChatThread): void {
-    
   }
 
   private watchForSearch(): void {

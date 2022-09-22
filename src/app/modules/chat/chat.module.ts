@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { NgxsModule } from '@ngxs/store';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
@@ -26,6 +26,7 @@ import { ChatState } from './store/state/chat.state';
     NgxsModule.forFeature([ChatState]),
     ReactiveFormsModule,
     RichTextEditorModule,
+    FormsModule,
   ],
   declarations: [
     ChatContainerComponent,

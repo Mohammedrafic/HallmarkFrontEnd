@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Directive, Renderer2 } from '@angular/core';
+import { ChangeDetectorRef, Directive } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 
@@ -18,7 +18,6 @@ export class ChatMessagesHelper extends Destroyable {
     protected store: Store,
     protected cd: ChangeDetectorRef,
     protected fb: FormBuilder,
-    protected renderer: Renderer2,
     protected sanitizer: DomSanitizer,
   ) {
     super();

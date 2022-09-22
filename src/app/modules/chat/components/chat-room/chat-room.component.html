@@ -53,12 +53,10 @@
   </div>
 
   <div class="controls-block">
-    <div class="chat-room-controls" *ngIf="chatform">
-      <form [formGroup]="chatform" (keyup.enter)="sendBykeyPress($event)" class="chat-form">
-        <ejs-richtexteditor formControlName="chatMessage" #textEditor>
-        </ejs-richtexteditor>
-      </form>
-
+    <div class="chat-room-controls" (keyup)="trackKeyPress()">
+      <ejs-richtexteditor placeholder="Type your message" #textEditor
+      (actionBegin)="test($event)"
+      ></ejs-richtexteditor>
       <button
         class="send-btn"
         (click)="sendByButton()"

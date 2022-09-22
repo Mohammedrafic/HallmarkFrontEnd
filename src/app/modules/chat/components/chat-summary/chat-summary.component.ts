@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, SecurityContext } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output,
+  SecurityContext } from '@angular/core';
 
 import { ChatClient } from '@azure/communication-chat';
 
@@ -15,8 +16,6 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
   @Input() thread: ChatThread;
 
   @Output() enterChat: EventEmitter<EnterChatEvent> = new EventEmitter();
-
-  @Output() readyThread: EventEmitter<ChatThread> = new EventEmitter();
 
   public lastMessage: ReceivedChatMessage | undefined;
 
@@ -63,6 +62,5 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
 
     this.lastMessage.message = html.textContent as string;
     this.cd.markForCheck();
-    this.readyThread.emit(this.thread);
   }
 }

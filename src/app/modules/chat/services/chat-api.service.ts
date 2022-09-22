@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
-import { ChatThread, UserChatConfig, UserThreadsDto } from '../interfaces';
+import { ChatThread, UserChatConfig } from '../interfaces';
 
 @Injectable()
 export class ChatApiService {

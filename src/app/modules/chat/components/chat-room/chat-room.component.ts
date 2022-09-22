@@ -2,14 +2,14 @@ import {
   AfterViewChecked, ChangeDetectionStrategy, Component,
   ElementRef, OnInit, ViewChild
 } from '@angular/core';
-import { FormGroup, Validators } from '@angular/forms';
 
 import { ChatClient, ChatMessageReadReceipt, ChatThreadClient } from '@azure/communication-chat';
 import { CommunicationUserKind, TypingIndicatorReceivedEvent } from '@azure/communication-signaling';
 import { Select } from '@ngxs/store';
-import { debounceTime, Observable } from 'rxjs';
+import { debounceTime, Observable, Subject } from 'rxjs';
 import { filter, takeUntil, tap, throttleTime } from 'rxjs/operators';
-import { HtmlEditorService, ImageService, LinkService, RichTextEditorComponent, ToolbarService } from '@syncfusion/ej2-angular-richtexteditor';
+import { HtmlEditorService, ImageService, LinkService,
+  RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 
 import { ChatMessagesHelper } from '../../helpers';
 import { ChatThread, MessageRequestMeta, ReceivedChatMessage } from '../../interfaces';
@@ -33,23 +33,18 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
 
   public messages: ReceivedChatMessage[];
 
-  public chatform: FormGroup;
-
   private chatThreadClient: ChatThreadClient | null;
 
   private userDisplayName: string;
 
   private userIdentity: string;
 
+  private readonly typingStream: Subject<void> = new Subject();
+
   @Select(ChatState.typingIndicator)
   private readonly typing$: Observable<TypingIndicatorReceivedEvent>;
 
   ngOnInit(): void {
-    // TODO: move form creation to service
-    this.chatform = this.fb.group({
-      chatMessage: [null, [Validators.maxLength(1500)]],
-    });
-
     this.userDisplayName = this.store.snapshot().user.user.fullName;
     this.userIdentity = this.store.snapshot().chat.currentUserIdentity;
 
@@ -68,9 +63,17 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   }
 
   sendBykeyPress(event: Event): void {
-    if ((event as KeyboardEvent).ctrlKey) {
-      this.sendMessage();
-    }
+    // if ((event as KeyboardEvent).ctrlKey) {
+    //   this.sendMessage();
+    // }
+  }
+
+  test(event: any) {
+    console.log(event)
+  }
+
+  trackKeyPress(): void {
+    this.typingStream.next();
   }
 
   override async updateMessages(): Promise<void> {
@@ -161,7 +164,6 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   }
 
   private async sendMessage(): Promise<void> {
-    // const message = this.chatform.get('chatMessage')?.value;
     const message = this.textEditor.getHtml();
 
     if (message && this.chatThreadClient) {
@@ -175,7 +177,7 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   }
 
   private watchForInputTyping(): void {
-    this.chatform.get('chatMessage')?.valueChanges
+    this.typingStream.asObservable()
     .pipe(
       filter(() => !!this.chatThreadClient),
       throttleTime(4000),
@@ -238,7 +240,7 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
     .subscribe(() => {
       const meta = this.createMessageRequest();
       (this.chatThreadClient as ChatThreadClient).sendMessage(meta.req, meta.options);
-      this.chatform.get('chatMessage')?.reset();
+      this.textEditor.value = '';
     });
   }
 }
