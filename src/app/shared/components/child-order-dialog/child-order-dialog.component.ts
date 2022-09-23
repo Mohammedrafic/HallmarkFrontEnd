@@ -244,7 +244,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
   setCloseOrderButtonState(): void {
     this.disabledCloseButton =
-      !!this.candidate?.positionClosureReasonId || this.candidate.orderStatus !== OrderStatus.Filled;
+      !!this.candidate?.positionClosureReasonId || this.candidate.orderStatus !== OrderStatus.Filled || !!this.order?.orderCloseDate;
   }
 
   closeOrder(order: MergedOrder): void {
