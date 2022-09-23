@@ -495,6 +495,10 @@ a, a:hover, a:focus, a:active {
   }
 }
 
+.button-export-container {
+  display: flex;
+}
+
 #Active_Positions,
 #Candidates{
   &_SeriesCollection {
