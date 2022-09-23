@@ -532,3 +532,13 @@ html, body {
 .hideBtn {
   display: none;
 }
+
+.order-type-column {
+  display: flex;
+  align-items: center;
+
+  span:first-child {
+    margin-right: 7px;
+    background-color: $secondary-dark-blue-20 !important;
+  }
+}

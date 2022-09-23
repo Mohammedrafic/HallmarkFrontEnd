@@ -13,13 +13,6 @@ export enum MoreMenuType {
   'Re-Open',
 }
 
-export enum OrderTypeName {
-  ContractToPerm = 'ContractToPerm',
-  OpenPerDiem = 'OpenPerDiem',
-  PermPlacement = 'PermPlacement',
-  Traveler = 'Traveler',
-}
-
 export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Order ID', column: 'OrderId' },
   { text: 'Status', column: 'Status' },

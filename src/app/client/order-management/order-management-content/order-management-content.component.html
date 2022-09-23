@@ -207,6 +207,13 @@
           </div>
         </ng-template>
       </e-column>
+      <e-column field="type" headerText="TYPE" width="180">
+        <ng-template #template let-data>
+          <div class="order-type-column" *ngIf="orderTypes[data.orderType] as orderType">
+            <span class="e-badge e-badge-primary e-badge-circle">{{ orderType[0] }}</span> <span>{{ orderType }}</span>
+          </div>
+        </ng-template>
+      </e-column>
       <e-column field="jobTitle" headerText="JOB TITLE" width="200"></e-column>
       <e-column field="skillName" headerText="SKILL" textAlign="Left" width="200"></e-column>
       <e-column field="regionName" headerText="REGION" textAlign="Left" width="200" [visible]="false"></e-column>
@@ -219,11 +226,6 @@
       </e-column>
       <e-column field="locationName" headerText="LOCATION" textAlign="Left" width="200"></e-column>
       <e-column field="departmentName" headerText="DEPARTMENT" textAlign="Left" width="150"></e-column>
-      <e-column field="orderType" headerText="TYPE" width="100">
-        <ng-template #template let-data>
-          <span>{{ getOrderTypeName(data.orderType) }}</span>
-        </ng-template>
-      </e-column>
       <e-column field="billRate" headerText="BILL RATE" width="150">
         <ng-template #template let-data>
           <ng-container *ngIf="data.orderType !== orderTypes.PermPlacement">
@@ -717,12 +719,7 @@
       <div class="input-container calendar">
         <label>Creation Date To</label>
         <div class="input-group datepicker">
-          <ejs-datepicker
-            class="datepicker"
-
-            formControlName="creationDateTo"
-          >
-          </ejs-datepicker>
+          <ejs-datepicker class="datepicker" formControlName="creationDateTo"> </ejs-datepicker>
         </div>
       </div>
     </div>
