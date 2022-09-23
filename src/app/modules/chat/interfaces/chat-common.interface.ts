@@ -10,7 +10,7 @@ export interface ReceivedChatMessage {
   message: string,
   timestamp?: Date,
   isCurrentUser: boolean,
-  isRead?: boolean;
+  readIndicator?: boolean;
 }
 
 export interface UserChatConfig {
@@ -29,4 +29,11 @@ export interface EnterChatEvent {
 export interface MessageRequestMeta {
   options: SendMessageOptions;
   req: SendMessageRequest;
+}
+
+export interface SyncFusionActionBeginEvent {
+  cancel: boolean;
+  name: string;
+  requestType: string;
+  originalEvent: KeyboardEvent | ClipboardEvent;
 }

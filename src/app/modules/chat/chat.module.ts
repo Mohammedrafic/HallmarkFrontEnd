@@ -8,11 +8,11 @@ import { TextBoxAllModule } from '@syncfusion/ej2-angular-inputs';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { RichTextEditorModule } from '@syncfusion/ej2-angular-richtexteditor';
 import { FeatherModule } from 'angular-feather';
-import { X, Send } from 'angular-feather/icons';
+import { X, Send, Eye } from 'angular-feather/icons';
 
 import { ChatRoomComponent, ChatContactComponent, ChatSummaryComponent } from './components';
 import { ChatContainerComponent } from './containers/chat-container/chat-container.component';
-import { ChatApiService, ChatCommunicationService, ChatService } from './services';
+import { ChatApiService, ChatService } from './services';
 import { ChatState } from './store/state/chat.state';
 
 
@@ -20,7 +20,7 @@ import { ChatState } from './store/state/chat.state';
   imports: [
     CommonModule,
     DialogModule,
-    FeatherModule.pick({X, Send }),
+    FeatherModule.pick({X, Send, Eye }),
     ButtonModule,
     TextBoxAllModule,
     NgxsModule.forFeature([ChatState]),
@@ -36,7 +36,6 @@ import { ChatState } from './store/state/chat.state';
   ],
   providers: [
     ChatApiService,
-    ChatCommunicationService,
     ChatService,
   ],
   exports: [ChatContainerComponent, ChatRoomComponent],

@@ -11,4 +11,5 @@ export enum ChatActions {
   CloseChat = '[chat] Close chat window',
   SearchFor = '[chat] Search for participant or active thread',
   SortThreads = '[chat] Sort threads by last message',
+  UpdateReceipts = '[chat] Update read receipts',
 }

@@ -15,6 +15,7 @@
 
             <ng-template #rightMessageBlock>
               <div>
+                <i-feather class="read-indicator" name="eye" [ngClass]="{ 'show-ind': message.readIndicator }"></i-feather>
                 <span class="timestamp left-position">{{ message.timestamp | date: 'HH:mm a'}}</span>
                 <span class="sender left-position">{{ message.sender }}</span>
               </div>
@@ -53,9 +54,8 @@
   </div>
 
   <div class="controls-block">
-    <div class="chat-room-controls" (keyup)="trackKeyPress()">
-      <ejs-richtexteditor placeholder="Type your message" #textEditor
-      (actionBegin)="test($event)"
+    <div class="chat-room-controls" (keyup)="trackKeyPress()" #cont>
+      <ejs-richtexteditor placeholder="Type your message" #textEditor (actionBegin)="sendByCtrlEnterKeys($event)"
       ></ejs-richtexteditor>
       <button
         class="send-btn"

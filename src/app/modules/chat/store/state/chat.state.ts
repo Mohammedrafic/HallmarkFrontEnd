@@ -6,7 +6,7 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Observable, tap } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { ToggleChatDialog } from '@core/actions';
+import { ToggleChatDialog, UnreadMessage } from '@core/actions';
 import { DefaultChatState } from '../../constants';
 import { ChatDialogState, ChatSearchType } from '../../enums';
 import { ChatHelper, ThreadsHelper } from '../../helpers';
@@ -91,6 +91,7 @@ export class ChatState {
         chatClient.on('chatMessageReceived', () => {
           dispatch(new Chat.UpdateMessages());
           dispatch(new Chat.SortThreads());
+          dispatch(new UnreadMessage());
         });
 
         chatClient.on('typingIndicatorReceived', (event: TypingIndicatorReceivedEvent) => {
@@ -105,6 +106,11 @@ export class ChatState {
 
         chatClient.on('participantsAdded', () => {
           dispatch(new Chat.GetUserThreads());
+        });
+
+        chatClient.on('readReceiptReceived', (event: any) => {
+          console.log(event)
+          dispatch(new Chat.UpdateReceipts());
         });
 
         patchState({
@@ -263,4 +269,10 @@ export class ChatState {
       displayedThreads: threads,
     });
   }
+
+  @Action(Chat.UpdateReceipts)
+  UpdateReceipts(): void {}
+
+  @Action(UnreadMessage)
+  UnreadMessage(): void {}
 }

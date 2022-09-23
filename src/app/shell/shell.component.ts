@@ -3,7 +3,7 @@ import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-us
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, Select, Store } from '@ngxs/store';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import {
   ContextMenuComponent,
@@ -12,7 +12,7 @@ import {
   SidebarComponent,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, distinctUntilChanged, debounceTime, tap } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '../client/client.config';
@@ -27,7 +27,8 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { ToggleChatDialog } from '@core/actions';
+import { ToggleChatDialog, UnreadMessage } from '@core/actions';
+import { ofActionDispatched } from '@ngxs/store';
 
 enum THEME {
   light = 'light',
@@ -114,6 +115,8 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     [profileMenuItem.light_theme]: "Light",
     [profileMenuItem.dark_theme]: "Dark"
   }
+  public isUnreadMessages = false;
+
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
   profileDatasource: MenuItemModel[] = []; 
@@ -125,7 +128,8 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     private store: Store,
     private router: Router,
     private orderManagementService: OrderManagementService,
-    private orderManagementAgencyService: OrderManagementAgencyService
+    private orderManagementAgencyService: OrderManagementAgencyService,
+    private actions$: Actions,
   ) {
     router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -171,6 +175,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
         ];
       }
     });
+    this.watchForUnreadMessages();
   }
 
   ngOnDestroy(): void {
@@ -324,6 +329,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
 
   toggleChatDialog(): void {
     this.store.dispatch(new ToggleChatDialog());
+    this.isUnreadMessages = false;
   }
 
   private setSideBarForFirstLoad(route: string): void {
@@ -394,5 +400,19 @@ export class ShellPageComponent implements OnInit, OnDestroy {
 
   alertSideBarCloseClick(){
     this.alertSidebar.hide();    
+  }
+
+  private watchForUnreadMessages(): void {
+    this.actions$
+    .pipe(
+      ofActionDispatched(UnreadMessage),
+      filter(() => !this.store.snapshot().chat.chatOpen as boolean),
+      distinctUntilChanged(),
+      debounceTime(1500),
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((value) => {
+      this.isUnreadMessages = true;
+    });
   }
 }

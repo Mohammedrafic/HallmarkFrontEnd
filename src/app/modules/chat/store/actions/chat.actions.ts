@@ -61,4 +61,8 @@ export namespace Chat {
   export class SortThreads {
     static readonly type = ChatActions.SortThreads;
   }
+
+  export class UpdateReceipts {
+    static readonly type = ChatActions.UpdateReceipts;
+  }
 }

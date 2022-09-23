@@ -11,5 +11,6 @@
       <span>{{ lastMessage?.timestamp | date: 'MM/dd hh:mm a'}}</span>
     </div>
   </div>
-  <span class="message-preview" [innerText]="lastMessage?.message"></span>
+  <span class="message-preview" [innerText]="lastMessage?.message"
+  [ngClass]="{ 'unread': this.lastMessage?.readIndicator}"></span>
 </div>

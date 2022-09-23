@@ -56,4 +56,9 @@
   overflow: hidden;
   max-height: 40px;
   word-break: break-all;
+
+  &.unread {
+    font-weight: 700;
+    color: #171721;
+  }
 }

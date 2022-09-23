@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output,
   SecurityContext } from '@angular/core';
 
-import { ChatClient } from '@azure/communication-chat';
+import { ChatClient, ChatThreadClient } from '@azure/communication-chat';
+import { CommunicationUserKind } from '@azure/communication-signaling';
+import { UnreadMessage } from '@core/actions';
 
 import { ChatMessagesHelper } from '../../helpers';
 import { ChatThread, EnterChatEvent, ReceivedChatMessage } from '../../interfaces';
@@ -19,7 +21,11 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
 
   public lastMessage: ReceivedChatMessage | undefined;
 
+  private chatThreadClient: ChatThreadClient;
+
   ngOnInit(): void {
+    this.userIdentity = this.store.snapshot().chat.currentUserIdentity;
+
     this.updateMessages();
     this.watchForUpdate();
   }
@@ -33,11 +39,11 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
 
   override async updateMessages(): Promise<void> {
     const client = this.store.snapshot().chat.chatClient as ChatClient;
-    const chatThreadClient = client.getChatThreadClient(this.thread.threadId as string);
+    this.chatThreadClient = client.getChatThreadClient(this.thread.threadId as string);
     const Parser = new DOMParser();
 
     const messages: ReceivedChatMessage[] = [];
-    const iterableAsync = chatThreadClient.listMessages();
+    const iterableAsync = this.chatThreadClient.listMessages();
     
     for await (const message of iterableAsync) {
       if (message.type === 'text') {
@@ -47,7 +53,7 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
           sender: message.senderDisplayName as string,
           message: message.content?.message as string,
           timestamp: message.createdOn,
-          isCurrentUser: false,
+          isCurrentUser: (message.sender as CommunicationUserKind)?.communicationUserId === this.userIdentity,
         };
         messages.push(msg);
       }
@@ -61,6 +67,17 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
     ).body;
 
     this.lastMessage.message = html.textContent as string;
+    this.updateReadReceipts();
+  }
+
+  protected override async updateReadReceipts(): Promise<void> {
+    if (this.lastMessage && !this.lastMessage?.isCurrentUser) {
+      const receiptsId = await this.getReceiptIds(this.chatThreadClient);
+      if (!receiptsId.includes(this.lastMessage?.id)) {
+        this.lastMessage.readIndicator = true;
+      }
+    }
+
     this.cd.markForCheck();
   }
 }
