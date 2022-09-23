@@ -1,3 +1,5 @@
+@import 'adaptive-response';
+
 .input-container {
   margin-bottom: 12px;
 
@@ -16,6 +18,13 @@
   &.cl-3 {
     grid-template-columns: 1fr 1fr 1fr;
   }
+
+  @media (max-width: $tablet-min) {
+    &,
+    &.cl-3 {
+      grid-template-columns: 1fr;
+    }
+  }
 }
 
 .d-flex {
@@ -26,3 +35,4 @@
     flex: 1 1 0;
   }
 }
+

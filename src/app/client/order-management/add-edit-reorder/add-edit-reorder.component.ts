@@ -1,7 +1,7 @@
 import isNil from 'lodash/fp/isNil';
 import uniq from 'lodash/fp/uniq';
 
-import { filter, first, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { filter, first, map, Observable, switchMap, takeUntil, tap, catchError } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Store } from '@ngxs/store';
 
@@ -254,9 +254,11 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private save(payload: ReorderRequestModel): void {
     this.reorderService
       .saveReorder(<ReorderRequestModel>payload, this.comments)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+      takeUntil(this.destroy$),
+      tap(() => this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED))),
+      catchError((error) => this.store.dispatch(new ShowToast(MessageTypes.Error, error?.error?.errors?.RegularBillRate[0]))))
       .subscribe(() => {
-        this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED));
         this.saveEmitter.emit();
       });
   }

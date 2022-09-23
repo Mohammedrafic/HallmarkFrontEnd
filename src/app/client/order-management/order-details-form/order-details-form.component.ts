@@ -200,6 +200,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   @Select(OrderManagementContentState.projectSpecialData)
   projectSpecialData$: Observable<ProjectSpecialData>;
+
+  specialProjectCategories: Array<{ id: number | null; projectType: string }>;
+  projectNames: Array<{ id: number | null; projectName: string }>;
+  poNumbers: Array<{ id: number | null; poNumber: string }>;
+
   specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
@@ -462,6 +467,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
           jobDistributionControl.patchValue(jobDistributionIds, { emitEvent: false });
         }
 
+        const getAgencyId = (id: number) =>
+          this.jobDistributionForm.controls['jobDistributions'].value.find(
+            (item: JobDistributionModel) => item.agencyId === id
+          )?.id || 0;
         this.agencyControlEnabled = jobDistributionIds.includes(JobDistribution.Selected);
         const selectedJobDistributions: JobDistributionModel[] = [];
         if (this.agencyControlEnabled) {
@@ -470,7 +479,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
           if (agencyIds) {
             agencyIds.forEach((agencyId: number) => {
               selectedJobDistributions.push({
-                id: 0,
+                id: getAgencyId(agencyId),
                 orderId: this.order?.id || 0,
                 jobDistributionOption: JobDistribution.Selected,
                 agencyId,
@@ -481,14 +490,17 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
           agencyControl.removeValidators(Validators.required);
           agencyControl.reset();
         }
-
+        const getJobDistId = (id: number) =>
+          this.jobDistributionForm.controls['jobDistributions'].value.find(
+            (item: JobDistributionModel) => item.jobDistributionOption === id
+          )?.id || 0;
         agencyControl.updateValueAndValidity();
 
         let jobDistributions: JobDistributionModel[] = jobDistributionIds
           .filter((jobDistributionId) => jobDistributionId !== JobDistribution.Selected)
           .map((jobDistributionId) => {
             return {
-              id: 0,
+              id: getJobDistId(jobDistributionId),
               orderId: this.order?.id || 0,
               jobDistributionOption: jobDistributionId,
               agencyId: null,
@@ -763,6 +775,22 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       .subscribe((settings) => {
         this.settings = SettingsHelper.mapSettings(settings);
         this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
+        this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+          if (data != null) {
+            this.specialProjectCategories =
+              this.isSpecialProjectFieldsRequired == true
+                ? data.specialProjectCategories
+                : [{ id: null, projectType: '' }, ...data.specialProjectCategories];
+            this.projectNames =
+              this.isSpecialProjectFieldsRequired == true
+                ? data.projectNames
+                : [{ id: null, projectName: '' }, ...data.projectNames];
+            this.poNumbers =
+              this.isSpecialProjectFieldsRequired == true
+                ? data.poNumbers
+                : [{ id: null, poNumber: '' }, ...data.poNumbers];
+          }
+        });
         this.orderTypeDataSourceHandler();
         if (this.specialProject != null) {
           if (this.isSpecialProjectFieldsRequired) {

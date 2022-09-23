@@ -259,6 +259,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private prefix: string | null;
   private orderId: number | null;
   private creatingReorder = false;
+  private stateFullOrderId: string | null;
   public readonly formatDate = formatDate;
   public readonly placeholderDate = placeholderDate;
 
@@ -331,8 +332,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     this.onSelectedOrderDataLoadHandler();
 
-    const locationState = this.location.getState() as { orderId: number };
+    const locationState = this.location.getState() as { orderId: number, fullOrderId: string };
     this.previousSelectedOrderId = locationState.orderId;
+    this.stateFullOrderId = locationState.fullOrderId;
 
     this.onGridPageChangedHandler();
     this.onOrganizationChangedHandler();
@@ -448,8 +450,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       case OrganizationOrderManagementTabs.AllOrders:
         this.filters.isTemplate = false;
         this.filters.includeReOrders = true;
+
+        this.setFullOrderIdData();
         this.hasOrderAllOrdersId();
-        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
+
+        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()])
+          .subscribe(() => this.handleFullOrderId());
         break;
       case OrganizationOrderManagementTabs.PerDiem:
         this.filters.orderTypes = [OrderType.OpenPerDiem];
@@ -691,7 +697,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.rowSelected(event, this.gridWithChildRow);
 
     if (!event.isInteracted) {
-      if (event.data.isTemplate) {
+      if (event.data?.isTemplate) {
         this.navigateToOrderTemplateForm();
         this.store.dispatch(new GetSelectedOrderById(event.data.id));
       } else {
@@ -1509,5 +1515,24 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private getProjectSpecialData(): void {
     this.store.dispatch(new GetProjectSpecialData());
+  }
+
+  private setFullOrderIdData(): void {
+    if (this.stateFullOrderId) {
+      this.filters.orderPublicId = this.stateFullOrderId;
+      this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.filters.orderPublicId);
+    }
+  }
+
+  private handleFullOrderId(): void {
+    if (this.stateFullOrderId) {
+      const [ data ] = this.store.selectSnapshot(OrderManagementContentState.ordersPage)?.items || [];
+
+      if (data) {
+        this.onRowClick({ data });
+        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns)
+        this.stateFullOrderId = null;
+      }
+    }
   }
 }

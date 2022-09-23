@@ -85,6 +85,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           ApplicantStatus.Applied,
           ApplicantStatus.Shortlisted,
           ApplicantStatus.OnBoarded,
+          ApplicantStatus.Cancelled,
           ApplicantStatus.PreOfferCustom,
         ];
 

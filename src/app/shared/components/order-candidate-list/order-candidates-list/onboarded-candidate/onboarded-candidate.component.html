@@ -253,12 +253,37 @@
     </div>
   </section>
   <section>
-    <app-bill-rates #billRates
-                    [billRates]="billRatesData"
-                    [isActive]="isActiveCandidateDialog$ | async"
-                    (billRatesChanged)="onBillRatesChanged($event)">
-    </app-bill-rates>
+    <ng-container [ngTemplateOutlet]="isCancelled ? billRates : editBillRates"></ng-container>
+    <ng-template #billRates>
+      <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
+    </ng-template>
+    <ng-template #editBillRates>
+      <app-bill-rates
+        [billRates]="billRatesData"
+        [isActive]="isActiveCandidateDialog$ | async"
+        (billRatesChanged)="onBillRatesChanged($event)">
+      </app-bill-rates>
+    </ng-template>
   </section>
+  <ng-container *ngIf="showStatusDropdown || isDeployedCandidate">
+    <div class="mobile-actions">
+      <div class="input-group dropdown bootstrap input-readonly" *ngIf="showStatusDropdown">
+        <ejs-dropdownlist
+          [fields]="optionFields"
+          [formControl]="jobStatusControl"
+          [dataSource]="nextApplicantStatuses"
+          [itemTemplate]="itemTemplate"
+          placeholder="Select Status"
+          (select)="onDropDownChanged($event)"
+        >
+          <ng-template #itemTemplate let-data>
+            <span [ngClass]="{'disabled-item': !data.isEnabled}">{{data.statusText}}</span>
+          </ng-template>
+        </ejs-dropdownlist>
+      </div>
+      <button *ngIf="isDeployedCandidate" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
+    </div>
+  </ng-container>
 </section>
 
 <app-reject-reason-dialog

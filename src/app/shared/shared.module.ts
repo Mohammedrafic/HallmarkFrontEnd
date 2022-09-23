@@ -226,6 +226,7 @@ const COMPONENTS = [
   OrderCloseReasonInfoComponent,
   UnsavedFormDirective,
   ClearCacheComponent,
+  CandidateCancellationDialogComponent,
 ];
 
 @NgModule({
@@ -294,7 +295,6 @@ const COMPONENTS = [
     CustomNoRowsOverlayComponent,
     GridErroredCellComponent,
     ImportDialogContentComponent,
-    CandidateCancellationDialogComponent,
     OrderHistoricalEventsComponent,
   ],
   providers: [

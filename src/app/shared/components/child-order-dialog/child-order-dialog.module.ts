@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from "@angular/forms";
 import { ChildOrderDialogComponent } from '@shared/components/child-order-dialog/child-order-dialog.component';
 import { ButtonModule as CustomButtonModule } from '@shared/components/button/button.module';
+import { DropDownListModule } from "@syncfusion/ej2-angular-dropdowns";
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { ButtonModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import { AccordionModule, TabModule } from '@syncfusion/ej2-angular-navigations';
@@ -24,7 +26,9 @@ import { DropDownButtonAllModule } from '@syncfusion/ej2-angular-splitbuttons';
     AccordionModule,
     ExtensionModule,
     CustomButtonModule,
-    DropDownButtonAllModule
+    DropDownButtonAllModule,
+    DropDownListModule,
+    ReactiveFormsModule,
   ],
   exports: [ChildOrderDialogComponent],
 })
