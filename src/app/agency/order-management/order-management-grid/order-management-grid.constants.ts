@@ -111,6 +111,10 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
     visible: true,
   },
   {
+    fieldName: 'endDate',
+    visible: false,
+  },
+  {
     fieldName: 'shift',
     visible: true,
   },
@@ -151,6 +155,10 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
   },
   {
     fieldName: 'jobStartDate',
+    visible: true,
+  },
+  {
+    fieldName: 'endDate',
     visible: true,
   },
   {
@@ -197,6 +205,10 @@ export const PerDiemColumnsConfig = [
     visible: false,
   },
   {
+    fieldName: 'endDate',
+    visible: false,
+  },
+  {
     fieldName: 'reOrderId',
     visible: false,
   },
@@ -238,6 +250,10 @@ export const PermPlacementColumnsConfig = [
   {
     fieldName: 'jobStartDate',
     visible: true,
+  },
+  {
+    fieldName: 'endDate',
+    visible: false,
   },
   {
     fieldName: 'reOrderId',
