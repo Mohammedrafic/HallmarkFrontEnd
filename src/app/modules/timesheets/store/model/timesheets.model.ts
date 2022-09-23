@@ -27,7 +27,8 @@ export interface TimesheetsModel {
   isAddDialogOpen: {
     action: boolean;
     dialogType: RecordFields;
-    initTime: string;
+    startDate: string;
+    endDate: string;
   };
   isUploadDialogOpen: {
     action: boolean;
