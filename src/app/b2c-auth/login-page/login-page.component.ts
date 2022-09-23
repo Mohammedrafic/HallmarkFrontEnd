@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { combineLatest, takeUntil, tap } from 'rxjs';
 
@@ -11,17 +11,17 @@ import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.scss'],
 })
-export class LoginPageComponent extends DestroyableDirective implements OnInit, AfterViewInit, OnDestroy {
+export class LoginPageComponent extends DestroyableDirective implements AfterViewInit {
   @ViewChild('spiner') spiner: ElementRef;
 
-  constructor(
-    private router: Router,
-    private b2CAuthService: B2CAuthService
-  ) {
+  constructor(private router: Router, private b2CAuthService: B2CAuthService) {
     super();
   }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
+    createSpinner({
+      target: this.spiner.nativeElement,
+    });
     // B2C Login
     combineLatest([
       this.b2CAuthService.onLoginSuccess().pipe(
@@ -32,19 +32,13 @@ export class LoginPageComponent extends DestroyableDirective implements OnInit, 
       this.b2CAuthService.interactionStatusNone().pipe(
         tap(() => {
           if (!this.b2CAuthService.isLoggedIn()) {
-            // this.loginWithSSO();
+            this.loginWithSSO();
           }
         })
       ),
     ])
       .pipe(takeUntil(this.destroy$))
       .subscribe();
-  }
-
-  ngAfterViewInit(): void {
-    createSpinner({
-      target: this.spiner.nativeElement,
-    });
   }
 
   public loginWithSSO(): void {
