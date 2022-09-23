@@ -9,7 +9,7 @@
 
     <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
       <ng-container *ngIf="isDekstop$ | async">
-        <app-organization-agency-selector></app-organization-agency-selector>
+        <app-organization-agency-selector [isDarkTheme]="isDarkTheme"></app-organization-agency-selector>
       </ng-container>
       <div class="devider" *ngIf="!(isMobile$ | async)"></div>
     </div>
