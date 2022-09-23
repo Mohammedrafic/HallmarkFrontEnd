@@ -97,7 +97,7 @@ export class LogiReportComponent implements OnInit {
       user: this.uId,
       pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
-      jrd_studio_mode:this.reportType == LogiReportTypes.PageReport? "basic_only":"view",
+      jrd_studio_mode:this.reportType == LogiReportTypes.PageReport? "basic":"view",
       "jrs.param_page": true //,
       //"jrs.profile": "profilename"
     };
