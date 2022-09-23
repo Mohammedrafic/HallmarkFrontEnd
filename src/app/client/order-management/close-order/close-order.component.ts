@@ -20,6 +20,7 @@ import { ClosePositionPayload } from '@client/order-management/close-order/model
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { UserState } from 'src/app/store/user.state';
+import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 
 @Component({
   selector: 'app-close-order',
@@ -146,7 +147,9 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   private submit(): void {
-    const formData = this.closeForm.getRawValue();
+    let formData = this.closeForm.getRawValue();
+    const { closingDate } = formData;
+    formData = { ...formData, closingDate: toCorrectTimezoneFormat(closingDate) };
 
     if (this.isPosition) {
       this.closePosition(formData);
