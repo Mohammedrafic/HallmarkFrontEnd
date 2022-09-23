@@ -68,13 +68,13 @@ export class LogiWebReportComponent implements OnInit {
       this.jrdPrefer = {
         // For page report
         pagereport: {
-          feature_UserInfoBar: true,
-          feature_ToolBar: false,
+          feature_UserInfoBar: false,
+          feature_ToolBar: true,
           feature_Toolbox: false,
-          feature_DSOTree: true,
-          feature_TOCTree: true,
-          feature_PopupMenu: true,
-          feature_ADHOC: true
+          feature_DSOTree: false,
+          feature_TOCTree: false,
+          feature_PopupMenu: false,
+          feature_ADHOC: false
         }
       };
     }
@@ -83,10 +83,6 @@ export class LogiWebReportComponent implements OnInit {
         // For web report
         webreport: {
           viewMode: {
-            hasToolbar: false,
-            hasSideArea: true
-          },
-          editMode: {
             hasToolbar: true,
             hasSideArea: true
           }
@@ -98,7 +94,7 @@ export class LogiWebReportComponent implements OnInit {
       user: this.uId,
       pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
-      jrd_studio_mode: "view",
+      jrd_studio_mode:this.reportType == LogiReportTypes.PageReport? "basic_only":"view",
       "jrs.param_page": true
     };
     let prptRes = this.reportName;
