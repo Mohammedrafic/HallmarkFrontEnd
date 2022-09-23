@@ -90,11 +90,13 @@ export class CandidateListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    let startDate = new Date(Date.now());
+     startDate.setDate(startDate.getDate() -90);
     this.candidateRegularRateForm = this.formBuilder.group(
       {
         business: new FormControl(null,[Validators.required]),
-        startDate:new FormControl(null,[Validators.required]),
-        endDate: new FormControl(null,[Validators.required]),
+        startDate:new FormControl(startDate,[Validators.required]),
+        endDate: new FormControl(new Date(Date.now()),[Validators.required]),
         regionId: new FormControl(null,[Validators.required]),
         locationId: new FormControl(null,[Validators.required]),
         departmentId: new FormControl(null,[Validators.required])
@@ -154,12 +156,12 @@ export class CandidateListComponent implements OnInit {
       let { startDate, endDate } = this.candidateRegularRateForm.getRawValue();
       this.paramsData =
       {
-        "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.name),
-        "StartDateParamACCR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-        "EndDateParamACCR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-        "RegionParamACCR": this.selectedRegions?.map((list) => list.name),
-        "LocationParamACCR": this.selectedLocations?.map((list) => list.name),
-        "DepartmentParamACCR": this.selectedDepartments?.map((list) => list.departmentName)
+        "OrganizationParamCRRW": this.selectedOrganizations?.map((list) => list.name),
+        "StartDateParamCRRW": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+        "EndDateParamCRRW": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+        "RegionParamCRRW": this.selectedRegions?.map((list) => list.name),
+        "LocationParamCRRW": this.selectedLocations?.map((list) => list.name),
+        "DepartmentParamCRRW": this.selectedDepartments?.map((list) => list.departmentName)
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
