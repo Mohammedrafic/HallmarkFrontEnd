@@ -43,6 +43,7 @@ import { Agency } from '@shared/models/agency.model';
 import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
 import { ToastUtility } from '@syncfusion/ej2-notifications';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 
 enum SelectedTab {
   OrderDetails,
@@ -130,7 +131,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     private route: ActivatedRoute,
     private actions$: Actions,
     private saveTemplateDialogService: SaveTemplateDialogService,
-    private confirmService: ConfirmService
+    private confirmService: ConfirmService,
+    private billRatesSyncService: BillRatesSyncService
   ) {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
 
@@ -386,7 +388,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       const documents = this.orderDetailsFormComponent.documents;
 
       const hourlyRate = this.orderDetailsFormComponent.generalInformationForm.getRawValue().hourlyRate;
-      if (this.isZeroRate(hourlyRate)) {
+      if (this.needToShowConfirmPopup(order, hourlyRate)) {
         this.showConfirmPopupForZeroRate(order, documents);
       } else {
         this.proceedWithSaving(order, documents);
@@ -443,35 +445,48 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     return hourlyRate === '0.00';
   }
 
+  needToShowConfirmPopup(order: CreateOrderDto, hourlyRate: string): boolean {
+    return (
+      (order.orderType === OrderType.ContractToPerm || order.orderType === OrderType.Traveler) &&
+      this.isZeroRate(hourlyRate)
+    );
+  }
+
   hourlyRateToBillRateSync(value: string): void {
     if (!this.billRatesComponent?.billRatesControl.value) {
       return;
     }
 
-    let regularBillRate = this.billRatesComponent?.billRatesControl.value.find(
-      (billRate: BillRate) => billRate.billRateConfig.id === 1
-    );
+    const billRates = this.billRatesComponent?.billRatesControl.value;
+    let regularBillRate = this.billRatesSyncService.getBillRateForSync(billRates);
 
     if (!regularBillRate) {
       return;
     }
 
     const restBillRates = this.billRatesComponent?.billRatesControl.value.filter(
-      (billRate: BillRate) => billRate.billRateConfig.id !== 1
+      (billRate: BillRate) => billRate.billRateConfig.id !== regularBillRate?.id
     );
 
-    regularBillRate.rateHour = value;
+    regularBillRate.rateHour = Number(value);
 
     this.billRatesComponent.billRatesControl.patchValue([...restBillRates, regularBillRate]);
   }
 
   hourlyRateToOrderSync(event: { value: string; billRate?: BillRate }): void {
-    const { value } = event;
+    const { value, billRate } = event;
+
     if (!value) {
       return;
     }
+    const billRates = this.billRatesComponent?.billRatesControl.value;
+    const billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(billRates);
 
-    this.orderDetailsFormComponent.generalInformationForm.patchValue({ hourlyRate: value });
+    if (billRateToUpdate?.id !== billRate?.id) {
+      return;
+    }
+
+    this.orderDetailsFormComponent.generalInformationForm.patchValue({ hourlyRate: value }, { emitEvent: false });
   }
 
   private getMenuButtonIndex(menuItem: SubmitButtonItem): number {
@@ -502,7 +517,17 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       orderBillRates = null;
     } else {
       orderBillRates = this.billRatesComponent?.billRatesControl.value || this.orderBillRates;
+
+      const billRateToUpdate = this.billRatesSyncService.getBillRateForSync(orderBillRates as BillRate[]);
+      const index = orderBillRates?.indexOf(billRateToUpdate as BillRate) as number;
+      if (index > -1) {
+        const hourlyRate = this.orderDetailsFormComponent.generalInformationForm.getRawValue().hourlyRate;
+        if (orderBillRates) {
+          orderBillRates[index].rateHour = hourlyRate;
+        }
+      }
     }
+
     const allValues = {
       ...this.orderDetailsFormComponent.orderTypeForm.getRawValue(),
       ...this.orderDetailsFormComponent.generalInformationForm.getRawValue(),
@@ -705,7 +730,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe((predefinedBillRates) => {
       if (!this.billRatesComponent?.billRatesControl && this.order) return;
       if (this.billRatesComponent?.billRatesControl) {
-        this.manuallyAddedBillRates = this.billRatesComponent.billRatesControl.getRawValue().filter((billrate) => !billrate.isPredefined);
+        this.manuallyAddedBillRates = this.billRatesComponent.billRatesControl
+          .getRawValue()
+          .filter((billrate) => !billrate.isPredefined);
       }
       this.orderBillRates = [...predefinedBillRates, ...this.manuallyAddedBillRates];
     });
@@ -764,5 +791,4 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private selectOrderTemplatesTab(): void {
     this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.OrderTemplates));
   }
-
 }

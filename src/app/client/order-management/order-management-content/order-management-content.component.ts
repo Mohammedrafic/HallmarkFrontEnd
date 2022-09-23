@@ -26,7 +26,10 @@ import {
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Actions, ofActionCompleted, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { GetAllOrganizationSkills, GetOrganizationSettings, } from '@organization-management/store/organization-management.actions';
+import {
+  GetAllOrganizationSkills,
+  GetOrganizationSettings,
+} from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -332,7 +335,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     this.onSelectedOrderDataLoadHandler();
 
-    const locationState = this.location.getState() as { orderId: number, fullOrderId: string };
+    const locationState = this.location.getState() as { orderId: number; fullOrderId: string };
     this.previousSelectedOrderId = locationState.orderId;
     this.stateFullOrderId = locationState.fullOrderId;
 
@@ -454,7 +457,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.setFullOrderIdData();
         this.hasOrderAllOrdersId();
 
-        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()])
+        this.store
+          .dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()])
           .subscribe(() => this.handleFullOrderId());
         break;
       case OrganizationOrderManagementTabs.PerDiem:
@@ -833,7 +837,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.pageSubject.next(1);
     }
   }
-
 
   public onOpenReorderDialog(reOrder: OrderManagement, order: OrderManagement): void {
     this.selectedReOrder = reOrder;
@@ -1488,7 +1491,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   updatePositionDetails(position: OrderManagementChild): void {
     this.getOrders();
     this.store.dispatch(new GetOrganisationCandidateJob(position.organizationId, position.jobId));
-    this.candidatesJob$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((res) => {
+    this.candidatesJob$.pipe(take(2), filter(Boolean)).subscribe((res) => {
       this.selectedCandidate = {
         ...position,
         closeDate: res.closeDate,
@@ -1526,11 +1529,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private handleFullOrderId(): void {
     if (this.stateFullOrderId) {
-      const [ data ] = this.store.selectSnapshot(OrderManagementContentState.ordersPage)?.items || [];
+      const [data] = this.store.selectSnapshot(OrderManagementContentState.ordersPage)?.items || [];
 
       if (data) {
         this.onRowClick({ data });
-        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns)
+        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
         this.stateFullOrderId = null;
       }
     }
