@@ -88,3 +88,4 @@ istio:
   uriPrefix: "/einsteinapi/"
   uriExact: "/einsteinapi"
   credentialName: einstein2-com
+  backendgateway: backend-einsteincore
