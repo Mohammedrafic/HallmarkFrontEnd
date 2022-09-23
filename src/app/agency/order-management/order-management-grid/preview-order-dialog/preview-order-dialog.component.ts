@@ -26,6 +26,8 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import isNil from 'lodash/fp/isNil';
 import { GetAgencyExtensions } from '@agency/store/order-management.actions';
+import { OrderStatus } from '@shared/enums/order-management';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 @Component({
   selector: 'app-preview-order-dialog',
@@ -67,6 +69,22 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
+  public readonly reasonClosure = {
+    orderClosureReason: 'Candidate Rejected',
+  } as Order;
+
+  public get showRejectInfo(): boolean {
+    return !!(
+      this.currentOrder?.status === OrderStatus.Closed &&
+      this.currentOrder?.extensionFromId &&
+      this.currentOrder.candidates?.length &&
+      this.currentOrder.candidates[0].status === CandidatStatus[CandidatStatus.Rejected]
+    );
+  }
+
+  public get orderInformation(): Order {
+    return this.showRejectInfo ? this.reasonClosure : this.currentOrder;
+  }
 
   private excludeDeployed: boolean;
   private isAlive = true;

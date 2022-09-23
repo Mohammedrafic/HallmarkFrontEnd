@@ -195,7 +195,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   }
 
   public openAddDialog(meta: OpenAddDialogMeta): void {
-    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open, meta.currentTab, meta.initDate));
+    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open, meta.currentTab, meta.startDate, meta.endDate));
   }
 
   public openUploadSideDialog(timesheetAttachments: TimesheetAttachments): void {

@@ -68,7 +68,7 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
       accountHolderName: ['', [Validators.required]],
       accountHolderNumber: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
       accountHolderPhone: ['', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]],
-      accountHolderAddress1: ['', [Validators.required]],
+      accountHolderAddress1: [''],
       accountHolderAddress2: [''],
       accountHolderCountry: ['', [Validators.required]],
       accountHolderState: [''],

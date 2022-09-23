@@ -26,7 +26,9 @@ export namespace Timesheets {
     constructor(
       public readonly action: DialogAction,
       public readonly type: RecordFields,
-      public readonly dateTime: string) {}
+      public readonly startDate: string,
+      public readonly endDate: string
+    ) {}
   }
 
   export class ToggleTimesheetUploadAttachmentsDialog {

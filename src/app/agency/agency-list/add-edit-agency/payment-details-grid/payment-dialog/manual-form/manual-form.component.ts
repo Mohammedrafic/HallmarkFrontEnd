@@ -46,7 +46,7 @@ export class ManualFormComponent extends DestroyableDirective implements Payment
       payee: ['', [Validators.required, Validators.maxLength(50)]],
       bankAddress1: ['', [Validators.maxLength(500), Validators.required]],
       bankCity: ['', [Validators.maxLength(20)]],
-      bankZipCode: ['', [Validators.minLength(5)]],
+      bankZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
       startDate: ['', [Validators.required]],
     });
   }

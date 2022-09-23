@@ -8,6 +8,7 @@ $max-login-mobile: '(max-width: 550px)';
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    height: 100vh;
 
     .left-column {
       padding: 70px;

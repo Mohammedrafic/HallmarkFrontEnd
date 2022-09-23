@@ -1,4 +1,4 @@
-import { JobCancellation } from "@shared/models/candidate-cancellation.model";
+import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { PageOfCollections } from '@shared/models/page.model';
 import { Document } from '@shared/models/document.model';
 import { OrderStatus } from '@shared/enums/order-management';
@@ -101,6 +101,8 @@ export type AgencyOrderManagement = {
   orderClosureReason?: string;
   orderClosureReasonId?: string;
   organizationPrefix: string;
+  extensionFromId?: number;
+  candidates?: CandidateModel[];
 };
 
 export type OrderManagementChild = {

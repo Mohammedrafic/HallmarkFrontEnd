@@ -4,7 +4,7 @@
       <div class="title">{{closeReason}}</div>
       <div class="sup-title">Reason for Closing</div>
     </div>
-    <div class="column">
+    <div class="column" *ngIf="showCloseData">
       <div class="title">{{closeDate | date:'MM/dd/yyy'}}</div>
       <div class="sup-title">Closing Date</div>
     </div>

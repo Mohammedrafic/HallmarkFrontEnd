@@ -18,8 +18,6 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { CandidatesStatusText, OrderStatusText } from '@shared/enums/status';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
-import { ProjectSpecialData } from '@shared/models/project-special-data.model';
-import { ProjectsService } from '@shared/services/projects.service';
 import { placeholderDate } from '@shared/constants/placeholder-date';
 import { formatDate } from '@shared/constants/format-date';
 
@@ -49,7 +47,6 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   @Select(OrderManagementState.gridFilterRegions)
   gridFilterRegions$: Observable<OrganizationRegion[]>;
 
-  public projectSpecialData$: Observable<ProjectSpecialData>;
   public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
@@ -78,13 +75,12 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return this.form.get('departmentsIds') as AbstractControl;
   }
 
-  constructor(private store: Store, private actions$: Actions, private projectsService: ProjectsService) {
+  constructor(private store: Store, private actions$: Actions) {
     super();
   }
 
   ngOnInit(): void {
     this.onOrderFilteringOptionsChange();
-    this.getProjectSpecialData();
   }
 
   ngAfterViewInit(): void {
@@ -355,9 +351,5 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         valueId: 'id',
       },
     };
-  }
-
-  private getProjectSpecialData(): void {
-    this.projectSpecialData$ = this.projectsService.getProjectSpecialData();
   }
 }
