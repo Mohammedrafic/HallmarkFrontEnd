@@ -30,7 +30,6 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   }
 
   @Output() billRatesChanged: EventEmitter<any> = new EventEmitter();
-  @Output() manuallyAddedBillRates: EventEmitter<BillRate[]> = new EventEmitter();
   @Output() hourlyRateSync: EventEmitter<{ value: string; billRate: BillRate }> = new EventEmitter<{
     value: string;
     billRate: BillRate;
@@ -162,7 +161,6 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         const removeIndex = Number(index);
         this.billRatesControl.removeAt(removeIndex);
         this.billRatesChanged.emit(removeIndex);
-        this.emitManuallyAddedBillRates();
       });
   }
 
@@ -216,7 +214,6 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         this.billRatesControl.push(this.fromValueToBillRate(value));
       }
 
-      this.emitManuallyAddedBillRates();
       this.billRatesChanged.emit(this.billRateForm.value);
       this.billRateForm.reset();
       this.store.dispatch(new ShowSideDialog(false));
@@ -240,10 +237,4 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     return billRateControl;
   }
 
-  private emitManuallyAddedBillRates(): void {
-    const manuallyAddedBillRates = this.billRatesControl
-      .getRawValue()
-      .filter((billRate: BillRate) => !billRate.isPredefined);
-    this.manuallyAddedBillRates.emit(manuallyAddedBillRates);
-  }
 }
