@@ -21,9 +21,7 @@
       id="importButton"
       cssClass="e-outline button-export"
     >
-      <div class="button-export-container">
-        Export <i-feather name="download" class="icon"></i-feather>
-      </div>
+      <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
     </button>
     <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToOrderForm()">
       Create Order
@@ -207,7 +205,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="type" headerText="TYPE" width="180">
+      <e-column field="orderType" headerText="TYPE" width="180">
         <ng-template #template let-data>
           <div class="order-type-column" *ngIf="orderTypes[data.orderType] as orderType">
             <span class="e-badge e-badge-primary e-badge-circle">{{ orderType[0] }}</span> <span>{{ orderType }}</span>
@@ -719,7 +717,13 @@
       <div class="input-container calendar">
         <label>Creation Date To</label>
         <div class="input-group datepicker">
-          <ejs-datepicker class="datepicker" formControlName="creationDateTo"> </ejs-datepicker>
+          <ejs-datepicker
+            class="datepicker"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            formControlName="creationDateTo"
+          >
+          </ejs-datepicker>
         </div>
       </div>
     </div>
