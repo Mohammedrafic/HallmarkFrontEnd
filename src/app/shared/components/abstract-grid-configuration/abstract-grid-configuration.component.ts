@@ -9,6 +9,9 @@ import { GRID_CONFIG } from '@shared/constants';
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { GridColumn } from '@shared/models/grid-column.model';
 import { isArray } from 'lodash';
+import { datepickerMask } from '@shared/constants/datepicker-mask';
+import { formatDate } from '@shared/constants/format-date';
+import { placeholderDate } from '@shared/constants/placeholder-date';
 
 enum ExportType {
   'Excel File',
@@ -70,6 +73,10 @@ export abstract class AbstractGridConfigurationComponent {
   filteredCount = 0;
 
   isLoaded = false;
+
+  formatDate = formatDate;
+  placeholderDate = placeholderDate;
+  datepickerMask = datepickerMask;
 
   protected constructor() {}
 

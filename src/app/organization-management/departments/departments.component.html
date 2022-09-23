@@ -209,9 +209,12 @@
       <label for="inactiveDate">Inactive date</label>
       <div class="input-group datepicker">
         <ejs-datepicker
+          id="inactiveDate"
           class="datepicker"
-          format="MM/dd/yyyy"
-          placeholder="MM/DD/YYYY"
+          [format]="formatDate"
+          [placeholder]="placeholderDate"
+          [enableMask]="true"
+          [maskPlaceholder]="datepickerMask"
           formControlName="inactiveDate"
         >
         </ejs-datepicker>
@@ -325,8 +328,10 @@
           <ejs-datepicker
             id="inactiveDate"
             class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
             formControlName="inactiveDate"
           >
           </ejs-datepicker>

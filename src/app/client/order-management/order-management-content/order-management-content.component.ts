@@ -114,14 +114,13 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { formatDate } from '@shared/constants/format-date';
-import { placeholderDate } from '@shared/constants/placeholder-date';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 @Component({
   selector: 'app-order-management-content',
   templateUrl: './order-management-content.component.html',
   styleUrls: ['./order-management-content.component.scss'],
-  providers: [VirtualScrollService, DetailRowService],
+  providers: [VirtualScrollService, DetailRowService, MaskedDateTimeService],
 })
 export class OrderManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') override gridWithChildRow: GridComponent;
@@ -260,8 +259,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private orderId: number | null;
   private creatingReorder = false;
   private stateFullOrderId: string | null;
-  public readonly formatDate = formatDate;
-  public readonly placeholderDate = placeholderDate;
 
   constructor(
     private store: Store,
