@@ -87,3 +87,4 @@ istio:
   domain: dev.einstein2.com
   uriPrefix: "/einsteinapi/"
   uriExact: "/einsteinapi"
+  credentialName: einstein2-com

@@ -6,9 +6,14 @@ spec:
   selector:
     istio: ingressgateway # use Istio default gateway implementation
   servers:
-  - port:
-      number: 80
-      name: http
-      protocol: HTTP
-    hosts:
+  - hosts:
     - "{{ .Values.istio.domain }}"
+    port:
+      name: https
+      number: 443
+      protocol: HTTPS
+    tls:
+      credentialName: "{{ .Values.istio.credentialName }}"
+      maxProtocolVersion: TLSV1_3
+      minProtocolVersion: TLSV1_2
+      mode: SIMPLE
