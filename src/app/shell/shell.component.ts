@@ -179,7 +179,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe((permissionsIds: number[]) => {
         this.canManageOtherUserNotifications = this.hasPermission(permissionsIds, PermissionTypes.CanManageNotificationsForOtherUsers);
         this.canManageNotificationTemplates = this.hasPermission(permissionsIds, PermissionTypes.CanManageNotificationTemplates);
-
+      });
         this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
           if (user) {
             this.userLogin = user;
@@ -205,8 +205,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
             ];
           }
         });
-        this.addManageNotificationOptionInHeader();
-      });
+        this.removeManageNotificationOptionInHeader();
   }
 
   ngOnDestroy(): void {
@@ -217,7 +216,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.hideAnalyticsSubMenuItems();
   }
 
-  private addManageNotificationOptionInHeader(): void {
+  private removeManageNotificationOptionInHeader(): void {
     if (this.canManageNotificationTemplates == false || this.canManageOtherUserNotifications == false) {
         const n = this.profileDatasource[0].items?.findIndex(x=>x.id==profileMenuItem.manage_notifications.toString());
         if (n == undefined || n > 0){
