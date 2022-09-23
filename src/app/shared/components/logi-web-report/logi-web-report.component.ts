@@ -5,13 +5,13 @@ import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 declare const com: any;
 
 @Component({
-  selector: 'app-logi-report',
-  templateUrl: './logi-report.component.html',
-  styleUrls: ['./logi-report.component.scss']
+  selector: 'app-logi-web-report',
+  templateUrl: './logi-web-report.component.html',
+  styleUrls: ['./logi-web-report.component.scss']
 })
-export class LogiReportComponent implements OnInit {
+export class LogiWebReportComponent implements OnInit {
   private factory: any;
-  private reportIframeName: string = "reportIframe";
+  private reportIframeName: string = "reportIframeNew";
   private uId: string = "admin";
   private pwd: string = "admin";
   private jrdPrefer: any;
@@ -28,10 +28,7 @@ export class LogiReportComponent implements OnInit {
   ngOnInit(): void {
     this.factory = com.jinfonet.api.AppFactory;
     this.reportUrl = this.appSettings.reportServerUrl + 'jinfonet/tryView.jsp';
-    
-  }
-  public RenderReport():void
-  {
+      
     if (this.reportType == LogiReportTypes.DashBoard) {
       this.showDashBoard(this.reportIframeName);
     }
@@ -102,8 +99,7 @@ export class LogiReportComponent implements OnInit {
       pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
       jrd_studio_mode: "view",
-      "jrs.param_page": true //,
-      //"jrs.profile": "profilename"
+      "jrs.param_page": true
     };
     let prptRes = this.reportName;
     let catRes = this.catelogName;
@@ -111,3 +107,4 @@ export class LogiReportComponent implements OnInit {
       server, prptRes, catRes, this.paramsData, entryId);
   };
 }
+

@@ -184,6 +184,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
 
   }
   ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
     this.isAlive = false;
   }
   public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;

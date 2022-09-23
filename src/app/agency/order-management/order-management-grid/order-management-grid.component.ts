@@ -38,7 +38,6 @@ import {
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
   ROW_HEIGHT,
-  typeValueAccess,
 } from './order-management-grid.constants';
 import {
   ClearOrders,
@@ -120,7 +119,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public openCandidat = new Subject<boolean>();
   public orderPositionSelected$ = new Subject<boolean>();
   public openChildDialog = new Subject<any>();
-  public typeValueAccess = typeValueAccess;
   public previousSelectedOrderId: number | null;
   public selectedCandidate: any | null;
   public selectedReOrder: any | null;

@@ -4,6 +4,7 @@ import { AnalyticsComponent } from './analytics.component';
 import { CandidateListComponent } from './candidate-list/candidate-list.component';
 import { AnalyticsRoutingModule } from './analytics-routing.module';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
+import { LogiWebReportComponent } from '@shared/components/logi-web-report/logi-web-report.component';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxsModule } from '@ngxs/store';
@@ -54,6 +55,7 @@ import { OvertimeComponent } from './overtime/overtime.component';
     AnalyticsComponent,
     CandidateListComponent,
     LogiReportComponent,
+    LogiWebReportComponent,
     FillRateComponent,
     JobDetailsComponent,
     ClientFinanceAccrualReportComponent,

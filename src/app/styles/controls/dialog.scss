@@ -96,6 +96,13 @@ body.light, body.dark {
   }
 }
 
+.e-dialog.dialog.export-dialog {
+  width: 100% !important;
+  @media #{$min-tablet} {
+    width: 496px !important;
+  }
+}
+
 body.dark {
   .e-card-title {
     color: $white !important;
@@ -108,7 +115,7 @@ body.light, body.dark {
   & .e-dialog.e-popup {
     &.order-details-dialog {
       width: 65%;
-  
+
       @media #{$max-desktop-small} {
         width: 80%;
       }
@@ -131,6 +138,18 @@ body.light, body.dark {
             }
           }
         }
+      }
+    }
+
+    &.candidate-dialog {
+      width: 59%;
+  
+      @media #{$max-desktop-small} {
+        width: 72%;
+      }
+
+      @media #{$max-tablet} {
+        width: 100%;
       }
     }
   }

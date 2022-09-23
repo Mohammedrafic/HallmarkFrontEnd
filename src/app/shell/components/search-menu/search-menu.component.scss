@@ -1,7 +1,7 @@
 @import '../../styles/variables/colors.scss';
 .search-menu-content {
-  color: var(--side-nav-text-color) !important;
-  background-color: $white;
+  color: $white;
+  background-color: $sidebar-background;
   position: absolute;
   z-index: 1100;
   border-radius: 0 5px 5px 0;
@@ -55,6 +55,7 @@
       &:hover {
         box-shadow: 0 0 10px -5px rgb(0 0 0 / 0.5);
         cursor: pointer !important;
+        background: $secondary-dark-blue-10-1;
       }
     }
 
@@ -80,7 +81,7 @@
 }
 
 .search-dark-menu-content {
-  background-color: $widget-dark-tooltip !important;
+  background-color: $sidebar-background !important;
   color: $secondary-dark-blue-45 !important;
 }
 

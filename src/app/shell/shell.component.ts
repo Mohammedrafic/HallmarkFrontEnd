@@ -169,28 +169,6 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       this.setTheme(isDark);
     });
     this.initSidebarFields();
-    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
-      if (user) {
-        this.userLogin = user;
-        this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
-        this.getAlertsForUser();
-        this.profileDatasource = [
-          {
-            text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
-            items: [{ text: this.ProfileMenuItemNames[profileMenuItem.edit_profile], id: profileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },
-            {
-              text: this.ProfileMenuItemNames[profileMenuItem.theme], id: profileMenuItem.theme.toString(), iconCss: this.isDarkTheme ?'e-theme-dark e-icons': 'e-theme-light e-icons', items: [
-                { text: this.ProfileMenuItemNames[profileMenuItem.light_theme], id: profileMenuItem.light_theme.toString() },
-                { text: this.ProfileMenuItemNames[profileMenuItem.dark_theme], id: profileMenuItem.dark_theme.toString() }
-              ]
-              },
-              { text: this.ProfileMenuItemNames[profileMenuItem.help], id: profileMenuItem.help.toString(), iconCss: 'e-circle-info e-icons' },
-              { text: this.ProfileMenuItemNames[profileMenuItem.log_out], id: profileMenuItem.log_out.toString(), iconCss: 'e-ddb-icons e-logout' }]
-          },
-
-        ];
-      }
-    });
     this.getCurrentUserPermissions();
     this.currentUserPermissions$
       .pipe(
@@ -327,7 +305,6 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   manageNotifications(): void {
     this.menu$.pipe(takeUntil(this.unsubscribe$)).subscribe((menu: Menu) => {
       if (menu.menuItems.length) {
-
         let r = menu.menuItems.find(element=>element.id == 6)?.children.find(e=>e.route == "/alerts/user-subscription");
         if(r != undefined){
           this.store.dispatch(new ShouldDisableUserDropDown(true));
@@ -449,14 +426,27 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     document.body.classList.add(darkTheme ? THEME.dark : THEME.light);
   }
 
-  public onSearchFocus(): void {
+  public onSearchMenuClick(): void {
     this.searchHeight = 100;
-    this.isSearching = true;
-
+    this.isSearching = !this.isSearching;
     if (this.isMaximized) {
       this.searchInput?.nativeElement?.focus();
-    } else {
-      this.searchMenuInstance.setFocus();
+    } 
+    if (!this.sidebar.isOpen)
+      this.isMaximized = false;
+    else
+      this.isMaximized = true;
+  }
+
+  public handleOnSearchMenuTextKeyUp(event: KeyboardEvent): void {
+    const { value } = event.target as HTMLInputElement;
+    if (value != '') {
+      this.searchString = value;
+      this.searchResult = this.getData(this.searchString.toLowerCase());
+    }
+    else {
+      this.searchString = '';
+      this.searchResult = [];
     }
   }
 
@@ -466,8 +456,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getData(searchText: string) {
     const menuItems = [...this.sideBarMenu];
-
-    return this.getValueLogic(menuItems, searchText);
+    const filterMenuItems = menuItems.filter((item: MenuItem) => item.id != AnalyticsMenuId);
+    return this.getValueLogic((filterMenuItems != null && filterMenuItems.length > 0) ? filterMenuItems : menuItems, searchText);
   }
 
   getValueLogic(data: any, filterText: string) {

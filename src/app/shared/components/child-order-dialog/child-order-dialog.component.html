@@ -98,89 +98,22 @@
                         (closeModalEvent)="onClose()"
                         [orderDuration]="(selectedOrder$ | async)?.duration!"
                       ></app-onboarded-candidate>
-                      <section *ngIf="isReorderType" class="container onboarded-candidate-container">
-                        <section class="header-container">
-                          <div class="e-card-header">
-                            <div class="e-card-header-caption candidate-status">
-                              <h3 class="e-card-title candidate-title">
-                                {{ candidate?.lastName }}, {{ candidate?.firstName }}
-                              </h3>
-                              <ejs-chiplist
-                                *ngIf="candidate?.candidateStatus"
-                                [text]="candidateStatus[candidate.candidateStatus]"
-                              >
-                                <e-chips>
-                                  <e-chip
-                                    [cssClass]="candidateStatus[candidate.candidateStatus] | chipsCssClass"
-                                  ></e-chip>
-                                </e-chips>
-                              </ejs-chiplist>
-                            </div>
-                          </div>
-                        </section>
-                        <section class="content-container">
-                          <div class="job-details">
-                            <ejs-accordion #accordionElement expandMode="Single" openFirstAccordion>
-                              <e-accordionitems>
-                                <e-accordionitem expanded="true">
-                                  <ng-template #header>
-                                    <div>Job Details</div>
-                                  </ng-template>
-                                  <ng-template #content>
-                                    <app-accept-form
-                                      [formGroup]="acceptForm"
-                                      [status]="$any(candidateJob?.applicantStatus?.applicantStatus)"
-                                    ></app-accept-form>
-                                  </ng-template>
-                                </e-accordionitem>
-                                <e-accordionitem>
-                                  <ng-template #header>
-                                    <div>Historical Events</div>
-                                  </ng-template>
-                                  <ng-template #content>
-                                    <app-historical-events
-                                      [organizationId]="candidateJob?.organizationId!"
-                                      [candidateJobId]="candidate.jobId"
-                                      [candidateId]="candidate.candidateId"
-                                      [isAgency]="isAgency"
-                                    ></app-historical-events>
-                                  </ng-template>
-                                </e-accordionitem>
-                              </e-accordionitems>
-                            </ejs-accordion>
-                          </div>
-                          <div class="comments">
-                            <app-comments
-                              *ngIf="candidateJob"
-                              [comments]="comments"
-                              [commentContainerId]="candidateJob.commentContainerId || 0"
-                            ></app-comments>
-                          </div>
-                        </section>
-
-                        <section class="bill-rates">
-                          <ng-container [ngTemplateOutlet]="isCancelled ? billRates : editBillRates"></ng-container>
-                          <ng-template #billRates>
-                            <app-bill-rates-view-grid [billRatesData]="candidateJob?.billRates || []"></app-bill-rates-view-grid>
-                          </ng-template>
-                          <ng-template #editBillRates>
-                            <app-bill-rates
-                              [billRates]="candidateJob?.billRates || []"
-                              [isActive]="true"
-                              (billRatesChanged)="onBillRatesChanged($event)">
-                            </app-bill-rates>
-                          </ng-template>
-                        </section>
+                      <section *ngIf="isReorderType">
+                        <ng-container *ngTemplateOutlet="acceptFormSection"></ng-container>
                       </section>
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.accept">
                       <app-accept-candidate
+                        *ngIf="!isReorderType"
                         [candidate]="$any(candidate)"
                         [isTab]="true"
                         (closeModalEvent)="onClose()"
                         [isAgency]="isAgency"
                       ></app-accept-candidate>
+                      <section *ngIf="isReorderType">
+                        <ng-container *ngTemplateOutlet="acceptFormSection"></ng-container>
+                      </section>
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.apply">
@@ -272,3 +205,103 @@
     </div>
   </ng-template>
 </ejs-dialog>
+
+<ng-template #acceptFormSection>
+  <section class="container onboarded-candidate-container">
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption candidate-status">
+          <h3 class="e-card-title candidate-title">
+            {{ candidate?.lastName }}, {{ candidate?.firstName }}
+          </h3>
+          <ejs-chiplist
+            *ngIf="candidate?.candidateStatus"
+            [text]="candidateStatus[candidate.candidateStatus]"
+          >
+            <e-chips>
+              <e-chip
+                [cssClass]="candidateStatus[candidate.candidateStatus] | chipsCssClass"
+              ></e-chip>
+            </e-chips>
+          </ejs-chiplist>
+        </div>
+        <div class="e-card-content button-container" *ngIf="isOnboard && !isAgency">
+          <div class="input-group dropdown bootstrap input-readonly">
+            <ejs-dropdownlist
+              [fields]="optionFields"
+              [formControl]="jobStatusControl"
+              [dataSource]="nextApplicantStatuses"
+              [itemTemplate]="itemTemplate"
+              placeholder="Select Status"
+              (select)="onDropDownChanged($event)"
+            >
+              <ng-template #itemTemplate let-data>
+                <span [ngClass]="{'disabled-item': !data.isEnabled}">{{data.statusText}}</span>
+              </ng-template>
+            </ejs-dropdownlist>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="content-container">
+      <div class="job-details">
+        <ejs-accordion #accordionElement expandMode="Single" openFirstAccordion>
+          <e-accordionitems>
+            <e-accordionitem expanded="true">
+              <ng-template #header>
+                <div>Job Details</div>
+              </ng-template>
+              <ng-template #content>
+                <app-accept-form
+                  [formGroup]="acceptForm"
+                  [status]="$any(candidateJob?.applicantStatus?.applicantStatus)"
+                ></app-accept-form>
+              </ng-template>
+            </e-accordionitem>
+            <e-accordionitem>
+              <ng-template #header>
+                <div>Historical Events</div>
+              </ng-template>
+              <ng-template #content>
+                <app-historical-events
+                  [organizationId]="candidateJob?.organizationId!"
+                  [candidateJobId]="candidate.jobId"
+                  [candidateId]="candidate.candidateId"
+                  [isAgency]="isAgency"
+                ></app-historical-events>
+              </ng-template>
+            </e-accordionitem>
+          </e-accordionitems>
+        </ejs-accordion>
+      </div>
+      <div class="comments">
+        <app-comments
+          *ngIf="candidateJob"
+          [comments]="comments"
+          [commentContainerId]="candidateJob.commentContainerId || 0"
+        ></app-comments>
+      </div>
+    </section>
+
+    <section class="bill-rates">
+      <ng-container [ngTemplateOutlet]="isCancelled ? billRates : editBillRates"></ng-container>
+      <ng-template #billRates>
+        <app-bill-rates-view-grid [billRatesData]="candidateJob?.billRates || []"></app-bill-rates-view-grid>
+      </ng-template>
+      <ng-template #editBillRates>
+        <app-bill-rates
+          [billRates]="candidateJob?.billRates || []"
+          [isActive]="true"
+          (billRatesChanged)="onBillRatesChanged($event)">
+        </app-bill-rates>
+      </ng-template>
+    </section>
+  </section>
+</ng-template>
+
+<app-candidate-cancellation-dialog
+  [openEvent]="openCandidateCancellationDialog"
+  [orderType]="candidateJob?.order?.orderType"
+  (submitCandidateCancellation)="cancelCandidate($event)"
+  (cancelCandidateCancellation)="resetStatusesFormControl()"
+></app-candidate-cancellation-dialog>

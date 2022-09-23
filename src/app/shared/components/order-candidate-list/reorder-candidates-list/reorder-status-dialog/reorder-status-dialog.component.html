@@ -1,8 +1,7 @@
 <ejs-dialog
   id="dialog"
   #sideDialog
-  cssClass="dialog"
-  width="45%"
+  cssClass="dialog candidate-dialog"
   [target]="targetElement"
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
@@ -14,7 +13,6 @@
           <div class="e-card-header-caption candidat-status">
             <h3 class="e-card-title candidate-title">
               {{ candidate?.lastName }}, {{ candidate?.firstName }}
-              <!-- <i-feather name="briefcase" class="icon deployed-icon" *ngIf="isDeployedCandidate"></i-feather> -->
             </h3>
           </div>
           <div class="e-card-content button-container">
@@ -94,6 +92,27 @@
   </ng-template>
 
   <ng-template #footerTemplate>
+    <ng-container *ngIf="isBillRatePending || isOfferedBillRate || showAccept">
+      <div class="mobile-actions">
+        <div class="input-group dropdown bootstrap input-readonly" *ngIf="isBillRatePending">
+          <ejs-dropdownlist
+            [fields]="optionFields"
+            [formControl]="jobStatusControl"
+            [dataSource]="jobStatus$ | async"
+            [itemTemplate]="itemTemplate"
+            placeholder="Select Status"
+            (change)="onJobStatusChange($event)"
+          >
+            <ng-template #itemTemplate let-data>
+              <span [ngClass]="{'disabled-item': !data.isEnabled}">{{data.statusText}}</span>
+            </ng-template>
+          </ejs-dropdownlist>
+        </div>
+        <button ejs-button class="e-outline" (click)="onReject()" *ngIf="isOfferedBillRate">Reject</button>
+        <button ejs-button [isPrimary]="true" class="apply-button" (click)="onAccept()" *ngIf="showAccept">Accept</button>
+      </div>
+      <hr class="mobile" />
+    </ng-container>
     <app-dialog-next-previous
       title="Candidate"
       [options]="dialogNextPreviousOption"

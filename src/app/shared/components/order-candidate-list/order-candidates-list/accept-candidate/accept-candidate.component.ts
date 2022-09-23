@@ -114,6 +114,14 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     );
   }
 
+  get showApplyAction(): boolean {
+    return this.isApplied && !this.candidate.deployedCandidateInfo;
+  }
+
+  get showAccepteAction(): boolean {
+    return this.candidate?.statusName !== 'Accepted' && !this.isReadOnly && !this.candidate.deployedCandidateInfo;
+  }
+
   get isAgencyAndOnboard(): boolean {
     return this.isAgency && this.candidateStatus === ApplicantStatusEnum.OnBoarded;
   }

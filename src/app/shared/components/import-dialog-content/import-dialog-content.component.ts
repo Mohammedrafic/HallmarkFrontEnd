@@ -1,20 +1,25 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
-import { SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
-import { SelectEventArgs, TabComponent } from "@syncfusion/ej2-angular-navigations";
-import { DialogComponent } from "@syncfusion/ej2-angular-popups";
-import { FileInfo } from "@syncfusion/ej2-inputs/src/uploader/uploader";
-import { filter, Subject, takeUntil } from "rxjs";
+import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
+import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { FileInfo } from '@syncfusion/ej2-inputs/src/uploader/uploader';
+import { filter, Subject, takeUntil } from 'rxjs';
 
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, IMPORT_CONFIRM_TEXT, IMPORT_CONFIRM_TITLE } from "@shared/constants";
-import { DestroyableDirective } from "@shared/directives/destroyable.directive";
-import { ConfirmService } from "@shared/services/confirm.service";
-import { ImportResult } from "@shared/models/import.model";
+import {
+  DELETE_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  IMPORT_CONFIRM_TEXT,
+  IMPORT_CONFIRM_TITLE,
+} from '@shared/constants';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { ImportResult } from '@shared/models/import.model';
 
 @Component({
   selector: 'app-import-dialog-content',
   templateUrl: './import-dialog-content.component.html',
-  styleUrls: ['./import-dialog-content.component.scss']
+  styleUrls: ['./import-dialog-content.component.scss'],
 })
 export class ImportDialogContentComponent extends DestroyableDirective implements OnInit {
   @ViewChild('sideDialog') private sideDialog: DialogComponent;
@@ -28,11 +33,12 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   @Output() public uploadImportFile: EventEmitter<Blob> = new EventEmitter<Blob>();
 
   @Input() public dialogEvent: Subject<boolean>;
+  @Input() public title: string = 'Import';
   @Input() public selectErrorsTab: Subject<void>;
   @Input() public set importResponse(response: any) {
     this.importResult = response;
     this.firstActive = !!this.importResult?.succesfullRecords.length;
-  };
+  }
 
   public width = `${window.innerWidth * 0.6}px`;
   public targetElement: HTMLElement = document.body;
@@ -44,8 +50,8 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
 
   public fields = {
     text: 'name',
-    value: 'id'
-  }
+    value: 'id',
+  };
   public importResult: ImportResult<any> | null;
 
   get activeErrorTab(): boolean {
@@ -65,10 +71,8 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
     this.subscribeOnSelectErrorsTab();
   }
 
-  public browse() : void {
-    this.fileUploader?.nativeElement
-      ?.getElementsByClassName('e-file-select-wrap')[0]
-      ?.querySelector('button')?.click();
+  public browse(): void {
+    this.fileUploader?.nativeElement?.getElementsByClassName('e-file-select-wrap')[0]?.querySelector('button')?.click();
   }
 
   public clear(): void {
@@ -90,7 +94,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
         .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
+          okButtonClass: 'delete-button',
         })
         .pipe(filter((confirm) => confirm))
         .subscribe(() => {
@@ -125,7 +129,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
     if (this.importResult) {
       this.saveImportedItems();
     } else {
-      this.uploadFile()
+      this.uploadFile();
     }
   }
 
@@ -164,7 +168,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
         .confirm(IMPORT_CONFIRM_TEXT, {
           title: IMPORT_CONFIRM_TITLE,
           okButtonLabel: 'Import',
-          okButtonClass: ''
+          okButtonClass: '',
         })
         .pipe(filter((confirm) => confirm))
         .subscribe(() => {

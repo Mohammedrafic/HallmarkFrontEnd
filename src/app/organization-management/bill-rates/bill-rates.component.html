@@ -18,7 +18,11 @@
       ejs-dropdownbutton
       [items]="exportOptions"
       (select)="exportSelected($event)"
-      cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+      cssClass="e-outline button-export">
+      <div class="button-export-container">
+        Export <i-feather name="download" class="icon"></i-feather>
+      </div>
+    </button>
     <button
       *ngIf="showButton"
       ejs-button
