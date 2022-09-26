@@ -418,7 +418,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
       const jobStartDate = jobStartDateControl.value as Date | null;
 
-      if (!(jobStartDate instanceof Date)) {
+      if (!(jobStartDate instanceof Date) || this.isPermPlacementOrder) {
         return;
       }
 
@@ -941,7 +941,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
     this.orderTypeChanged.emit(order.orderType);
 
-    const hourlyRate = order.hourlyRate ? parseFloat(order.hourlyRate.toString()).toFixed(2) : '0.00';
+    const hourlyRate = this.isPermPlacementOrder ? null : order.hourlyRate ? parseFloat(order.hourlyRate.toString()).toFixed(2) : '0.00';
     const joiningBonus = order.joiningBonus ? parseFloat(order.joiningBonus.toString()).toFixed(2) : '';
     const compBonus = order.compBonus ? parseFloat(order.compBonus.toString()).toFixed(2) : '';
 
