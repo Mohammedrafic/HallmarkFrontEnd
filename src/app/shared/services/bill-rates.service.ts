@@ -6,16 +6,22 @@ import {
   BillRateOption,
   BillRateSetup,
   BillRateSetupPage,
-  BillRateSetupPost, ExternalBillRateTypePage,
-  ExternalBillRateType, ExternalBillRateSave, ExternalBillRateMappingPage, ExternalBillRateMapped
+  BillRateSetupPost,
+  ExternalBillRateMapped,
+  ExternalBillRateMappingPage,
+  ExternalBillRateSave,
+  ExternalBillRateType,
+  ExternalBillRateTypePage,
+  ImportedBillRate,
 } from '@shared/models/bill-rate.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { ImportResult } from '@shared/models/import.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BillRatesService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Get the list of bill rates
@@ -32,10 +38,10 @@ export class BillRatesService {
    * @return Array of bill rates types
    */
   public getExternalBillRates(filter: BillRateFilters): Observable<ExternalBillRateTypePage> {
-    const {pageNumber = 1, pageSize = 1, name = ''} = filter;
-    return this.http.get<ExternalBillRateTypePage>(
-      `/api/ExternalBillRates`,
-      { params: { PageNumber: pageNumber, PageSize: pageSize, Name: name }});
+    const { pageNumber = 1, pageSize = 1, name = '' } = filter;
+    return this.http.get<ExternalBillRateTypePage>(`/api/ExternalBillRates`, {
+      params: { PageNumber: pageNumber, PageSize: pageSize, Name: name },
+    });
   }
 
   /**
@@ -44,10 +50,10 @@ export class BillRatesService {
    * @return Array of bill rates mapping
    */
   public getExternalBillRateMapping(filter: BillRateFilters): Observable<ExternalBillRateMappingPage> {
-    const {pageNumber = 1, pageSize = 1, name = ''} = filter;
-    return this.http.get<ExternalBillRateMappingPage>(
-      `/api/BillRatesConfigs/ExternalBillRateMappings`,
-      { params: { PageNumber: pageNumber, PageSize: pageSize, Name: name }});
+    const { pageNumber = 1, pageSize = 1, name = '' } = filter;
+    return this.http.get<ExternalBillRateMappingPage>(`/api/BillRatesConfigs/ExternalBillRateMappings`, {
+      params: { PageNumber: pageNumber, PageSize: pageSize, Name: name },
+    });
   }
 
   /**
@@ -91,11 +97,13 @@ export class BillRatesService {
    * @param billRate object to save
    * @return Created/update bill rate mapping
    */
-  public saveUpdateExternalBillRateMapping(id: number, ids: Array<{id: number}>): Observable<ExternalBillRateType> {
-    return this.http.post<ExternalBillRateType>(`/api/BillRatesConfigs/${id}/ExternalBillRateMappings`, {externalBillRates: ids});
+  public saveUpdateExternalBillRateMapping(id: number, ids: Array<{ id: number }>): Observable<ExternalBillRateType> {
+    return this.http.post<ExternalBillRateType>(`/api/BillRatesConfigs/${id}/ExternalBillRateMappings`, {
+      externalBillRates: ids,
+    });
   }
 
-    /**
+  /**
    * Remove bill rate by its id
    * @param id
    */
@@ -146,5 +154,21 @@ export class BillRatesService {
    */
   public exportExternalBillRateMapping(payload: ExportPayload): Observable<any> {
     return this.http.post(`/api/BillRatesConfigs/export`, payload, { responseType: 'blob' });
+  }
+
+  public saveBillRatesImportResult(
+    successfulRecords: ImportedBillRate[]
+  ): Observable<ImportResult<ImportedBillRate>> {
+    return this.http.post<ImportResult<ImportedBillRate>>('/api/BillRates/saveimport', successfulRecords);
+  }
+
+  public uploadBillRatesFile(file: Blob): Observable<ImportResult<ImportedBillRate>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ImportResult<ImportedBillRate>>('/api/BillRates/import', formData);
+  }
+
+  public getBillRatesImportTemplate(errorRecords: ImportedBillRate[]): Observable<any> {
+    return this.http.post('/api/BillRates/template', errorRecords, { responseType: 'blob' });
   }
 }
