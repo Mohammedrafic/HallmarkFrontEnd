@@ -387,7 +387,7 @@
   display: inline-block;
   position: relative;
   padding: 10px 15px;
-  color: #4c5673;
+  color: $bell-button-color;
   &.left {
     margin-right: 40px;
   }
@@ -399,21 +399,21 @@
 .bell-button:hover {
   background:$bell-button-hover-bg;
   border-radius: 10px !important;
-  color: #3e7fff !important;
+  color: $bell-button-hover-color;
 }
 
 .bell-button:active {
   background:$bell-button-active-bg;
-  color:white;
+  color:$bell-button-active-color;
   border-radius: 10px !important;
 }
 
 .bell-button__badge {
-  border-color: white;
+  border-color: $bell-button-badge-border-color;
   border-style: solid;
-  background-color: #558eff;
+  background-color: $bell-button-badge-background-color;
   border-radius: 50%;
-  color: white;
+  color: $bell-button-badge-color;
   padding: 2px 6px;
   font-size: 11px;
   position: absolute;
