@@ -388,6 +388,9 @@
   position: relative;
   padding: 2px 5px;
 
+  &.left {
+    margin-right: 40px;
+  }
   @media #{$max-mobile} {
     padding-right: 30px;
     }
@@ -414,6 +417,11 @@
   top: 0;
   right: 0;
 
+  &.empty-chat {
+    height: 10px;
+    width: 3px;
+    // background-color: #E24D4D;
+  }
   @media #{$max-mobile} {
     right: 25px;
     }

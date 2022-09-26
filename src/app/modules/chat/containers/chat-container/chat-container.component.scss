@@ -1,0 +1,80 @@
+@import 'colors';
+
+.dialog-header {
+  padding: 30px 24px 30px 24px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.chat-controls {
+  padding: 15px 30px 15px 24px;
+  background-color: $secondary-dark-blue-45;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &.left {
+    justify-content: flex-start;
+  }
+}
+
+.input-group {
+  width: 318px;
+}
+
+.controls-add-btn {
+  font-size: 24px;
+  color: $secondary-dark-blue-20;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.button-back {
+  margin-right: 12px;
+}
+
+.chat-plot {
+  height: 80%;
+}
+
+.chat-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.chat-sub-title {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.chat-title-container {
+  margin-left: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.empty-list {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-list-header {
+  font-size: 16px;
+  font-weight: 700;
+  color: $secondary-dark-blue-20;
+}
+
+.no-list-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: $secondary-dark-blue-20;
+}

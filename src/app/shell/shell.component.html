@@ -13,6 +13,14 @@
       </ng-container>
       <div class="devider" *ngIf="!(isMobile$ | async)"></div>
     </div>
+    <div class="bell-button left" style="cursor: pointer;" (click)="toggleChatDialog()">
+
+      <i-feather name="message-square"></i-feather>
+
+      <span class="bell-button__badge empty-chat" *ngIf="isUnreadMessages"></span>
+
+    </div>
+
     <div class="bell-button" style="cursor: pointer;" (click)="bellIconClicked()">
 
       <i-feather name="bell"></i-feather>
@@ -191,3 +199,5 @@
     </section>
   </div>
 </ejs-sidebar>
+
+<app-chat-container></app-chat-container>
