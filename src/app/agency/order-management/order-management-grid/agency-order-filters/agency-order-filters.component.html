@@ -250,21 +250,13 @@
     <div class="input-container">
       <label>Candidates Count From</label>
       <div class="input-group">
-        <input
-          class="e-input"
-          type="text"
-          maxlength="50"
-          formControlName="candidatesCountFrom"/>
+        <input class="e-input" type="text" maxlength="50" formControlName="candidatesCountFrom" />
       </div>
     </div>
     <div class="input-container">
       <label>Candidates Count To</label>
       <div class="input-group">
-        <input
-          class="e-input"
-          type="text"
-          maxlength="50"
-          formControlName="candidatesCountTo"/>
+        <input class="e-input" type="text" maxlength="50" formControlName="candidatesCountTo" />
       </div>
     </div>
   </div>
@@ -280,14 +272,30 @@
     <div class="input-container calendar">
       <label for="jobStartDate">{{ activeTab !== AgencyOrderManagementTabs.ReOrders ? 'Job Start Date' : 'Re-Order Date' }}</label>
       <div class="input-group datepicker">
-        <ejs-datepicker id="jobStartDate" class="datepicker" [format]="formatDate" [placeholder]="placeholderDate" formControlName="jobStartDate">
+        <ejs-datepicker
+          id="jobStartDate"
+          class="datepicker"
+          [format]="formatDate"
+          [placeholder]="placeholderDate"
+          [enableMask]="true"
+          [maskPlaceholder]="datepickerMask"
+          formControlName="jobStartDate"
+        >
         </ejs-datepicker>
       </div>
     </div>
     <div class="input-container calendar" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders && activeTab !== AgencyOrderManagementTabs.PermPlacement">
       <label for="jobEndDate">Job End Date</label>
       <div class="input-group datepicker">
-        <ejs-datepicker id="jobEndDate" class="datepicker" [format]="formatDate" [placeholder]="placeholderDate" formControlName="jobEndDate">
+        <ejs-datepicker
+          id="jobEndDate"
+          class="datepicker"
+          [format]="formatDate"
+          [placeholder]="placeholderDate"
+          [enableMask]="true"
+          [maskPlaceholder]="datepickerMask"
+          formControlName="jobEndDate"
+        >
         </ejs-datepicker>
       </div>
     </div>
@@ -296,14 +304,28 @@
     <div class="input-container calendar">
       <label>Creation Date From</label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker" [format]="formatDate" [placeholder]="placeholderDate" formControlName="creationDateFrom">
+        <ejs-datepicker
+          class="datepicker"
+          [format]="formatDate"
+          [placeholder]="placeholderDate"
+          [enableMask]="true"
+          [maskPlaceholder]="datepickerMask"
+          formControlName="creationDateFrom"
+        >
         </ejs-datepicker>
       </div>
     </div>
     <div class="input-container calendar">
       <label>Creation Date To</label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker" [format]="formatDate" [placeholder]="placeholderDate" formControlName="creationDateTo">
+        <ejs-datepicker
+          class="datepicker"
+          [format]="formatDate"
+          [placeholder]="placeholderDate"
+          [enableMask]="true"
+          [maskPlaceholder]="datepickerMask"
+          formControlName="creationDateTo"
+          >
         </ejs-datepicker>
       </div>
     </div>
@@ -312,17 +334,30 @@
     <div class="input-container calendar">
       <label>Distributed On From</label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker" [format]="formatDate" [placeholder]="placeholderDate" formControlName="distributedOnFrom">
+        <ejs-datepicker
+          class="datepicker"
+          [format]="formatDate"
+          [placeholder]="placeholderDate"
+          [enableMask]="true"
+          [maskPlaceholder]="datepickerMask"
+          formControlName="distributedOnFrom"
+        >
         </ejs-datepicker>
       </div>
     </div>
     <div class="input-container calendar">
       <label>Distributed On To</label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker" [format]="formatDate" [placeholder]="placeholderDate" formControlName="distributedOnTo">
+        <ejs-datepicker
+          class="datepicker"
+          [format]="formatDate"
+          [placeholder]="placeholderDate"
+          [enableMask]="true"
+          [maskPlaceholder]="datepickerMask"
+          formControlName="distributedOnTo"
+        >
         </ejs-datepicker>
       </div>
     </div>
   </div>
 </form>
-

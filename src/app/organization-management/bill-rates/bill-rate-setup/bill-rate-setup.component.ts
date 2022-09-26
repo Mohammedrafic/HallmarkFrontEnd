@@ -69,11 +69,13 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
 import { valuesOnly } from '@shared/utils/enum.utils';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 @Component({
   selector: 'app-bill-rate-setup',
   templateUrl: './bill-rate-setup.component.html',
   styleUrls: ['./bill-rate-setup.component.scss'],
+  providers: [MaskedDateTimeService],
 })
 export class BillRateSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('grid') grid: GridComponent;

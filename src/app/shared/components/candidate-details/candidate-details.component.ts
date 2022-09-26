@@ -27,6 +27,7 @@ import {
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { UserState } from '../../../store/user.state';
 import { OrderTypeOptionsForCandidates } from '@shared/components/candidate-details/candidate-details.constant';
+import { toCorrectTimezoneFormat } from '../../utils/date-time.utils';
 
 @Component({
   selector: 'app-candidate-details',
@@ -111,7 +112,14 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   public onFilterApply(): void {
-    this.filters = this.filtersForm.getRawValue();
+    const formData = this.filtersForm.getRawValue();
+    const { startDate, endDate } = formData;
+    this.filters = {
+      ...formData,
+      startDate: toCorrectTimezoneFormat(startDate),
+      endDate: toCorrectTimezoneFormat(endDate),
+    };
+
     this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns, this.datePipe);
     this.updatePage();
     this.store.dispatch(new SetPageFilters(this.filters));

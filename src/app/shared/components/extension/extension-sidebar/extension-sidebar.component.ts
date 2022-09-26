@@ -3,7 +3,7 @@ import {
   extensionDurationPrimary,
   extensionDurationSecondary,
 } from '@shared/components/extension/extension-sidebar/config';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Duration } from '@shared/enums/durations';
 import { combineLatest, distinctUntilChanged, filter } from 'rxjs';
@@ -20,6 +20,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED } from '@shared/constants';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { BillRate } from '@shared/models';
+import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 
 @Component({
   selector: 'app-extension-sidebar',
@@ -50,7 +51,8 @@ export class ExtensionSidebarComponent implements OnInit {
   public constructor(
     public formBuilder: FormBuilder,
     private extensionSidebarService: ExtensionSidebarService,
-    private store: Store
+    private store: Store,
+    private billRatesSyncService: BillRatesSyncService
   ) {}
 
   public ngOnInit(): void {
@@ -67,7 +69,8 @@ export class ExtensionSidebarComponent implements OnInit {
         return;
       }
 
-      let billRateToUpdate: BillRate | null = this.getBillRateForSync();
+      const billRates = this.billRatesComponent?.billRatesControl.value;
+      let billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(billRates);
 
       if (!billRateToUpdate) {
         return;
@@ -88,34 +91,14 @@ export class ExtensionSidebarComponent implements OnInit {
     if (!value) {
       return;
     }
-    let billRateToUpdate: BillRate | null = this.getBillRateForSync();
+    const billRates = this.billRatesComponent?.billRatesControl.value;
+    let billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(billRates);
 
     if (billRateToUpdate?.id !== billRate?.id) {
       return;
     }
 
     this.billRateControl.patchValue(value, { emitEvent: false, onlySelf: true });
-  }
-
-  private getDESCsortedBillRates(): BillRate[] {
-    return this.billRatesComponent?.billRatesControl.value.sort((item1: BillRate, item2: BillRate) => {
-      return new Date(item2.effectiveDate).getTime() - new Date(item1.effectiveDate).getTime();
-    });
-  }
-
-  private getBillRateForSync(): BillRate | null {
-    const todayTimeStamp = new Date().getTime();
-    let billRateForSync: BillRate | null = null;
-    const sortedBillRates = this.getDESCsortedBillRates().filter((billRate) => billRate.billRateConfig.id === 1);
-    for (let billRate of sortedBillRates) {
-      const timeStamp = new Date(billRate.effectiveDate).getTime();
-      if (timeStamp < todayTimeStamp) {
-        billRateForSync = billRate;
-        break;
-      }
-    }
-
-    return billRateForSync;
   }
 
   public saveExtension(positionDialog: DialogComponent): void {
