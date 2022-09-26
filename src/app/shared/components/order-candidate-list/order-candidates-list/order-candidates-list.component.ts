@@ -1,25 +1,24 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
-import { Observable, Subject, combineLatest } from 'rxjs';
-
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { Select, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { Order, OrderCandidatesList } from '@shared/models/order-management.model';
+
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { combineLatest, Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { Duration } from '../../../enums/durations';
+import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { AcceptCandidateComponent } from './accept-candidate/accept-candidate.component';
 import { ApplyCandidateComponent } from './apply-candidate/apply-candidate.component';
 import { OfferDeploymentComponent } from './offer-deployment/offer-deployment.component';
 import { OnboardedCandidateComponent } from './onboarded-candidate/onboarded-candidate.component';
-import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
-import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
-import { Duration } from '../../../enums/durations';
-import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -86,6 +85,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           ApplicantStatus.Applied,
           ApplicantStatus.Shortlisted,
           ApplicantStatus.OnBoarded,
+          ApplicantStatus.Cancelled,
           ApplicantStatus.PreOfferCustom,
         ];
 
@@ -109,7 +109,11 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           ApplicantStatus.PreOfferCustom,
           ApplicantStatus.Offered,
         ];
-        const allowedOnboardedStatuses = [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded];
+        const allowedOnboardedStatuses = [
+          ApplicantStatus.Accepted,
+          ApplicantStatus.OnBoarded,
+          ApplicantStatus.Cancelled,
+        ];
 
         if (allowedOfferDeploymentStatuses.includes(this.candidate.status)) {
           this.store.dispatch(

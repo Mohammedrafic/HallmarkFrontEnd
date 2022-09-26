@@ -130,6 +130,7 @@ import { OrganizationSettingsService } from '@shared/services/organization-setti
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { NodatimeService } from '@shared/services/nodatime.service';
+import { HttpErrorResponse } from "@angular/common/http";
 
 interface DropdownOption {
   id: number;
@@ -839,11 +840,20 @@ export class OrganizationManagementState {
   }
 
   @Action(GetOrganizationSettings)
-  GetOrganizationSettingsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { filters, lastSelectedBusinessUnitId }: GetOrganizationSettings): Observable<OrganizationSettingsGet[]> {
-    return this.organizationSettingsService.getOrganizationSettings(filters, lastSelectedBusinessUnitId).pipe(tap((payload) => {
-      patchState({ organizationSettings: payload });
-      return payload;
-    }));
+  GetOrganizationSettingsByOrganizationId(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { filters, lastSelectedBusinessUnitId }: GetOrganizationSettings
+  ): Observable<OrganizationSettingsGet[] | unknown> {
+    return this.organizationSettingsService.getOrganizationSettings(filters, lastSelectedBusinessUnitId).pipe(
+      tap((payload) => {
+        patchState({ organizationSettings: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        patchState({ organizationSettings: [] });
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
   }
 
   @Action(SaveOrganizationSettings)

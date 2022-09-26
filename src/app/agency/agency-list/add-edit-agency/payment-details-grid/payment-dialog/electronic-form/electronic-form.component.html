@@ -1,0 +1,200 @@
+<form [formGroup]="paymentDetailsForm">
+  <div class="form-container bootstrap">
+   <div class="column colum-fl">
+     <div class="input-container">
+       <label for="startDate">Start Date<span class="required">*</span></label>
+       <div class="input-group datepicker">
+         <ejs-datepicker id="startDate"
+                         class="datepicker"
+                         format="{{formatInput}}"
+                         placeholder="{{placeholderInput}}"
+                         appValidateWithMessage
+                         formControlName="startDate"
+         >
+         </ejs-datepicker>
+       </div>
+     </div>
+     <div class="input-container">
+       <label for="endDate">End Date</label>
+       <div class="input-group datepicker">
+         <ejs-datepicker id="endDate"
+                         class="datepicker"
+                         format="{{formatInput}}"
+                         placeholder="{{placeholderInput}}"
+                         appValidateWithMessage
+                         formControlName="endDate"
+         >
+         </ejs-datepicker>
+       </div>
+     </div>
+   </div>
+  </div>
+  <div class="form-container bootstrap">
+    <div class="column">
+      <div class="input-container">
+        <label for="fee">Fee %</label>
+        <div class="input-group">
+          <input id="fee" maxlength="6" class="e-input" type="text" appValidateWithMessage formControlName="fee"/>
+        </div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="input-container">
+        <label for="swiftCode">Swift Code</label>
+        <div class="input-group">
+          <input id="swiftCode" maxlength="20" class="e-input" type="text" appValidateWithMessage formControlName="swiftCode"/>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-title">
+    Bank Details
+  </div>
+  <div class="form-container bootstrap">
+    <div class="column">
+      <div class="input-container">
+        <label for="bankName">Bank Name<span class="required">*</span></label>
+        <div class="input-group">
+          <input id="bankName" maxlength="100" class="e-input" type="text" appValidateWithMessage formControlName="bankName" />
+        </div>
+      </div>
+      <div class="input-container">
+        <label for="bankAddress1">Address 1 <span class="required">*</span></label>
+        <div class="input-group">
+          <input id="bankAddress1" maxlength="100" class="e-input" type="text" appValidateWithMessage formControlName="bankAddress1" />
+        </div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="input-container">
+        <label for="routingNumber">Routing Number<span class="required">*</span></label>
+        <div class="input-group">
+          <input id="routingNumber" maxlength="50" class="e-input" type="text" appValidateWithMessage formControlName="routingNumber"/>
+        </div>
+      </div>
+      <div class="input-container">
+        <label for="bankAddress2">Address 2</label>
+        <div class="input-group">
+          <input id="bankAddress2" maxlength="100" class="e-input" type="text" appValidateWithMessage formControlName="bankAddress2"/>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-container bootstrap">
+    <div class="column colum-fl">
+      <div class="dropdown-container">
+        <label for="bankCountry">Country<span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist id="bankCountry" appValidateWithMessage [fields]="optionFields" formControlName="bankCountry" [dataSource]="countries"></ejs-dropdownlist>
+        </div>
+      </div>
+      <div class="dropdown-container">
+        <label for="bankState">State</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist id="bankState" appValidateWithMessage formControlName="bankState" [dataSource]="bankCountryStates"></ejs-dropdownlist>
+        </div>
+      </div>
+    </div>
+    <div class="column colum-fl">
+      <div class="input-container">
+        <label for="bankCity">City</label>
+        <div class="input-group">
+          <input id="bankCity" maxlength="20" class="e-input" type="text" appValidateWithMessage formControlName="bankCity"/>
+        </div>
+      </div>
+      <div class="input-container">
+        <label for="bankZipCode">Zipcode</label>
+        <div class="input-group">
+          <input appValidateWithMessage
+                 id="bankZipCode"
+                 formControlName="bankZipCode"
+                 mask="{{zipCodeMask}}"
+                 class="e-input"
+                 type="text"/>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-title">
+    Account Holder Details
+  </div>
+  <div class="form-container bootstrap">
+    <div class="column">
+      <div class="input-container">
+        <label for="accountHolderName">Account Holder Name<span class="required">*</span></label>
+        <div class="input-group">
+          <input id="accountHolderName" maxlength="50" class="e-input" type="text" appValidateWithMessage formControlName="accountHolderName"/>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-container bootstrap">
+    <div class="column colum-fl">
+      <div class="input-container">
+        <label for="accountHolderNumber">Account Holder Number<span class="required">*</span></label>
+        <div class="input-group">
+          <input id="accountHolderNumber" maxlength="20" class="e-input" type="text" appValidateWithMessage formControlName="accountHolderNumber"/>
+        </div>
+      </div>
+      <div class="input-container">
+        <label for="accountHolderPhone">Account Holder Phone</label>
+        <div class="input-group">
+          <ejs-maskedtextbox id="accountHolderPhone" class="organization-input" promptChar="_" mask="{{holderPhoneMask}}" appValidateWithMessage formControlName="accountHolderPhone" maxlength="10"></ejs-maskedtextbox>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-container bootstrap">
+    <div class="column">
+      <div class="input-container">
+        <label for="accountHolderAddress1">Address 1</label>
+        <div class="input-group">
+          <input id="accountHolderAddress1" maxlength="100" class="e-input" type="text" appValidateWithMessage formControlName="accountHolderAddress1" />
+        </div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="input-container">
+        <label for="accountHolderAddress2">Address 2</label>
+        <div class="input-group">
+          <input id="accountHolderAddress2" maxlength="100" class="e-input" type="text" appValidateWithMessage formControlName="accountHolderAddress2"/>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-container bootstrap">
+    <div class="column colum-fl">
+      <div class="dropdown-container">
+        <label for="accountHolderCountry">Country<span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist id="accountHolderCountry" appValidateWithMessage [fields]="optionFields" formControlName="accountHolderCountry" [dataSource]="countries"></ejs-dropdownlist>
+        </div>
+      </div>
+      <div class="dropdown-container">
+        <label for="accountHolderState">State</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist id="accountHolderState" appValidateWithMessage formControlName="accountHolderState" [dataSource]="accountHolderCountryStates"></ejs-dropdownlist>
+        </div>
+      </div>
+    </div>
+    <div class="column colum-fl">
+      <div class="input-container">
+        <label for="accountHolderCity">City</label>
+        <div class="input-group">
+          <input id="accountHolderCity" maxlength="20" class="e-input" type="text" appValidateWithMessage formControlName="accountHolderCity"/>
+        </div>
+      </div>
+      <div class="input-container">
+        <label for="accountHolderZipCode">Zipcode</label>
+        <div class="input-group">
+          <input appValidateWithMessage
+                 id="accountHolderZipCode"
+                 formControlName="accountHolderZipCode"
+                 mask="{{zipCodeMask}}"
+                 class="e-input"
+                 type="text"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

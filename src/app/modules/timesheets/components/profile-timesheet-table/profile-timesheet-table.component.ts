@@ -1,4 +1,4 @@
-import { TimesheetStatus } from './../../enums/timesheet-status.enum';
+import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef,
   EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
@@ -12,7 +12,7 @@ import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-c
 import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
 
-import { Destroyable } from '@core/helpers';
+import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
 import { RecordFields, RecordsMode, SubmitBtnText, TIMETHEETS_STATUSES, RecordStatus } from '../../enums';
 import { RecordsTabConfig, TimesheetConfirmMessages, TimesheetRecordsColdef } from '../../constants';
@@ -203,11 +203,16 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public openAddDialog(): void {
-    const startDate = this.store.snapshot().timesheets.timesheetDetails.weekStartDate;
+    const { weekStartDate, weekEndDate, jobEndDate, jobStartDate } = this.store.snapshot().timesheets.timesheetDetails;
+    const startDate = DateTimeHelper.getFirstDayOfWeekUtc(jobStartDate) > DateTimeHelper.getFirstDayOfWeekUtc(weekStartDate)
+      ? jobStartDate : weekStartDate;
+    const endDate = DateTimeHelper.getFirstDayOfWeekUtc(jobEndDate) < DateTimeHelper.getFirstDayOfWeekUtc(weekEndDate)
+      ? jobEndDate : weekEndDate;
 
     this.openAddSideDialog.emit({
       currentTab: this.currentTab,
-      initDate: startDate,
+      startDate,
+      endDate,
     });
   }
 

@@ -1,4 +1,5 @@
-@import '../../../styles/variables/colors.scss';
+@import 'colors';
+@import 'adaptive-response';
 
 .order-tabs {
   margin-top: 24px;
@@ -77,8 +78,24 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 }
 
 .dialog-controls {
+  .menu-mobile {
+    display: none !important;
+  }
+
   button, app-button {
     margin-left: 12px;
+  }
+
+  @media (max-width: $tablet-min) {
+    display: flex;
+    
+    button:not(.close-button, .menu-mobile), app-button {
+      display: none;
+    }
+
+    .menu-mobile {
+      display: inline-block !important;
+    }
   }
 }
 

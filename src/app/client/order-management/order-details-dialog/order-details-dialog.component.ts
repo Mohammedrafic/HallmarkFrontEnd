@@ -11,7 +11,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { distinctUntilChanged, filter, map, Observable, Subject, takeUntil, zip } from 'rxjs';
+import { catchError, distinctUntilChanged, EMPTY, filter, map, Observable, Subject, take, takeUntil, zip } from 'rxjs';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -23,7 +23,12 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
+import {
+  Order,
+  OrderCandidatesListPage,
+  OrderManagement,
+  OrderManagementChild,
+} from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
 import {
@@ -42,10 +47,11 @@ import {
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
+  RECORD_MODIFIED,
 } from '@shared/constants';
 import { Location } from '@angular/common';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
-import { ShowCloseOrderDialog, ShowSideDialog } from '../../../store/app.actions';
+import { ShowCloseOrderDialog, ShowSideDialog, ShowToast } from '../../../store/app.actions';
 import { AddEditReorderComponent } from '@client/order-management/add-edit-reorder/add-edit-reorder.component';
 import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
@@ -53,6 +59,21 @@ import { SettingsKeys } from '@shared/enums/settings';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { ExtensionCandidateComponent } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
+import { MessageTypes } from '@shared/enums/message-types';
+import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
+
+enum MobileMenuItems {
+  Cancel = 'Cancel',
+  Approve = 'Approve',
+  Edit = 'Edit',
+  CloseOrder = 'Close Order',
+  ReOpen = 'Re-Open',
+  CreateReOrder = 'Create Re-Order',
+  Delete = 'Delete',
+  Unlock = 'Unlock',
+  Lock = 'Lock',
+}
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -71,6 +92,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Output() closeReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
   @Output() selectReOrder = new EventEmitter<any>();
   @Output() updateOrders = new EventEmitter();
+
+  // TODO: Delete it when we will have re-open sidebar
+  @Output() private reOpenOrderSuccess: EventEmitter<Order> = new EventEmitter<Order>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -118,7 +142,65 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
   get canCloseOrder(): boolean {
     const canNotClose = [this.orderStatus.PreOpen, this.orderStatus.Incomplete];
-    return canNotClose.includes(this.order?.status);
+    return this.canReOpen || canNotClose.includes(this.order?.status);
+  }
+
+  get canReOpen(): boolean {
+    return this.order?.status !== OrderStatus.Closed && Boolean(this.order?.orderClosureReasonId);
+  }
+
+  get showApproveAndCancel(): boolean {
+    return this.order?.canApprove && !this.order?.orderOpenDate && this.order?.status === this.orderStatus.PreOpen;
+  }
+
+  get showLockOrder(): boolean {
+    return this.orderType.ReOrder !== this.order?.orderType && !this.order?.extensionFromId;
+  }
+
+  get showCreateReOrder(): boolean {
+    return this.orderType.OpenPerDiem === this.order?.orderType;
+  }
+
+  get disableCreateReOrder(): boolean {
+    return (
+      this.order?.status === this.orderStatus.PreOpen ||
+      this.order?.status === this.orderStatus.Closed ||
+      !this.settings[SettingsKeys.IsReOrder]?.value
+    );
+  }
+
+  get disableEdit(): boolean {
+    return this.order?.status === this.orderStatus.Closed;
+  }
+
+  get disableCloseOrder(): boolean {
+    return !!(this.order?.orderClosureReasonId || this.order?.orderCloseDate) || this.disabledCloseButton;
+  }
+
+  get mobileMenu(): any {
+    let menu: { text: string }[] = [];
+    if (this.showApproveAndCancel) {
+      menu = [...menu, { text: MobileMenuItems.Cancel }, { text: MobileMenuItems.Approve }];
+    }
+    if (!this.disableEdit) {
+      menu = [...menu, { text: MobileMenuItems.Edit }];
+    }
+    if (!this.canCloseOrder && !this.disableCloseOrder) {
+      menu = [...menu, { text: MobileMenuItems.CloseOrder }];
+    }
+    if (this.canReOpen) {
+      menu = [...menu, { text: MobileMenuItems.ReOpen }];
+    }
+    if (this.showCreateReOrder && !this.disableCreateReOrder) {
+      menu = [...menu, { text: MobileMenuItems.CreateReOrder }];
+    }
+    if (!this.showCloseButton) {
+      menu = [...menu, { text: MobileMenuItems.Delete }];
+    }
+    if (!this.disabledLock && this.showLockOrder) {
+      menu = [...menu, { text: this.order?.isLocked ? MobileMenuItems.Unlock : MobileMenuItems.Lock }];
+    }
+    return menu;
   }
 
   constructor(
@@ -130,7 +212,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     private location: Location,
     private actions: Actions,
     private addEditReorderService: AddEditReorderService,
-    private orderManagementService: OrderManagementService
+    private orderManagementService: OrderManagementService,
+    private reOpenOrderService: ReOpenOrderService
   ) {}
 
   ngOnInit(): void {
@@ -289,6 +372,19 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     this.order = { ...order };
   }
 
+  public reOpenOrder(order: Order): void {
+    this.reOpenOrderService
+      .reOpenOrder({ orderId: order.id })
+      .pipe(
+        catchError((err) => {
+          this.store.dispatch(new ShowToast(MessageTypes.Error, err.message));
+          return EMPTY;
+        }),
+        take(1)
+      )
+      .subscribe(() => this.reOpenOrderSuccess.emit(this.order));
+  }
+
   public onClose(): void {
     if (this.extensionCandidateComponent?.form.dirty) {
       this.saveExtensionChanges().subscribe(() => {
@@ -301,6 +397,39 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public onNextPreviousOrder(next: boolean): void {
     this.nextPreviousOrderEvent.emit(next);
+  }
+
+  public onMobileMenuSelect({ item: { text } }: MenuEventArgs): void {
+    switch (text) {
+      case MobileMenuItems.Approve:
+        this.approveOrder(this.order.id);
+        break;
+      case MobileMenuItems.Cancel:
+        this.cancelOrder(this.order.id);
+        break;
+      case MobileMenuItems.Edit:
+        this.editOrder(this.order);
+        break;
+      case MobileMenuItems.CloseOrder:
+        this.closeOrder(this.order);
+        break;
+      case MobileMenuItems.ReOpen:
+        this.reOpenOrder(this.order);
+        break;
+      case MobileMenuItems.CreateReOrder:
+        this.createReOrder();
+        break;
+      case MobileMenuItems.Delete:
+        this.deleteOrder(this.order.id);
+        break;
+      case MobileMenuItems.Lock:
+      case MobileMenuItems.Unlock:
+        this.lockOrder();
+        break;
+
+      default:
+        break;
+    }
   }
 
   private closeSideDialog(): void {
@@ -395,3 +524,5 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     );
   }
 }
+
+

@@ -22,3 +22,13 @@
     font-weight: 700;
   }
 }
+
+:host::ng-deep .custom-trash {
+  & .e-icons {
+    &.e-file-delete-btn, &.e-file-remove-btn {
+      &::before {
+        content: url('../../../../assets/icons/trash-2-icon.svg') !important;
+      }
+    }
+  }
+}

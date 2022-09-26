@@ -1,4 +1,5 @@
-@import 'colors.scss';
+@import "colors";
+@import "adaptive-response";
 
 .container {
   padding-top: 24px;
@@ -25,6 +26,29 @@
 
     &:first-child {
       margin-right: 12px;
+    }
+  }
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+
+  @media #{$min-tablet} {
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+
+  .input-container {
+    width: 100%;
+
+    &:nth-child(n+2) {
+      margin-left: 0;
+
+      @media #{$min-tablet} {
+        margin-left: 12px;
+      }
+
     }
   }
 }

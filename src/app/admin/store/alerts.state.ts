@@ -1,11 +1,11 @@
 import { Injectable } from "@angular/core";
 import { UserSubscriptionPage, UserSubscriptionRequest } from "@shared/models/user-subscription.model";
 import { Action, Selector, StateContext} from '@ngxs/store';
-import { AlertTrigger, GetAlertsTemplatePage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
+import { AlertTrigger, DismissAlert, DismissAllAlerts, GetAlertsTemplatePage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
 import { Observable ,tap} from "rxjs";
 import { AlertsService } from "@shared/services/alerts.service";
 import { BusinessUnitService } from "@shared/services/business-unit.service";
-import { AlertsTemplate, AlertsTemplatePage, AlertTriggerDto, EditAlertsTemplate } from "@shared/models/alerts-template.model";
+import { AlertsTemplate, AlertsTemplatePage, AlertTriggerDto, DismissAlertDto, EditAlertsTemplate } from "@shared/models/alerts-template.model";
 
 interface AlertsStateModel {
   userSubscriptionPage: UserSubscriptionPage | null;
@@ -136,5 +136,20 @@ export class AlertsState {
         return payload;
       })
     );
+  }
+
+  @Action(DismissAlert)
+  DismissAlert(    
+    { patchState }: StateContext<AlertsStateModel>,
+    { model }: DismissAlert
+  ): Observable<any> {
+    return this.alertsService.dismissAlert(model);
+  }
+
+  @Action(DismissAllAlerts)
+  DismissAllAlerts(
+    { patchState }: StateContext<AlertsStateModel>
+  ): Observable<any> {
+    return this.alertsService.dismissAllAlerts();
   }
 }

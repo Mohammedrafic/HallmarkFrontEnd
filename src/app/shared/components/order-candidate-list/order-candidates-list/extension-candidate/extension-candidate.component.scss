@@ -1,3 +1,6 @@
+@import 'colors';
+@import 'adaptive-response';
+
 :host {
   overflow-y: auto;
   .container.extension-container.container-tab {
@@ -9,8 +12,63 @@
   button:not(:last-child) {
     margin-right: 12px;
   }
+
+  @media (max-width: $tablet-min) {
+    button,
+    .dropdown {
+      display: none;
+    }
+  }
+}
+
+.input-container {
+  margin-bottom: 12px;
 }
 
 .comments {
   border-radius: 8px;
 }
+
+.extension-container {
+  position: relative;
+}
+
+.mobile-actions {
+  position: fixed;
+  bottom: 73px;
+  left: 0;
+  width: 95%;
+  padding: 24px 16px;
+  background-color: $white;
+  z-index: 1001;
+  display: none;
+  border-top: 1px solid $secondary-dark-blue-45;
+
+  .dropdown {
+    width: 100%;
+  }
+
+  button {
+    width: 100%;
+    margin: 0 !important;
+
+    &:not(:first-child) {
+      margin-left: 16px !important;
+    }
+  }
+
+  @media (max-width: $tablet-min) {
+    display: flex;
+  }
+}
+
+@media (max-width: $tablet-min) {
+  .extension-container {
+    padding: 0 !important;
+  }
+
+  .form-mobile {
+    flex-direction: column;
+  }
+}
+

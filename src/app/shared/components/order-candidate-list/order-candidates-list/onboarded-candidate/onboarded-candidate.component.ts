@@ -11,6 +11,12 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
+import {
+  CancellationReasonsMap,
+  PenaltiesMap
+} from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
+import { PenaltyCriteria } from "@shared/enums/candidate-cancellation";
+import { JobCancellation } from "@shared/models/candidate-cancellation.model";
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, merge, Observable, Subject, takeUntil } from 'rxjs';
@@ -27,15 +33,16 @@ import {
   CandidatStatus,
 } from '@shared/enums/applicant-status.enum';
 import {
+  CancelOrganizationCandidateJob,
+  CancelOrganizationCandidateJobSuccess,
   GetRejectReasonsForOrganisation,
-  RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   SetIsDirtyOrderForm,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
-import { ShowToast } from '../../../../../store/app.actions';
+import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
@@ -44,17 +51,18 @@ import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
-import { Duration } from '../../../../enums/durations';
-import { DurationService } from '../../../../services/duration.service';
+import { Duration } from '@shared/enums/durations';
+import { DurationService } from '@shared/services/duration.service';
+import { UnsavedFormComponentRef, UNSAVED_FORM_PROVIDERS } from '@shared/directives/unsaved-form.directive';
 
 @Component({
   selector: 'app-onboarded-candidate',
   templateUrl: './onboarded-candidate.component.html',
   styleUrls: ['./onboarded-candidate.component.scss'],
-  providers: [MaskedDateTimeService],
+  providers: [MaskedDateTimeService, UNSAVED_FORM_PROVIDERS(OnboardedCandidateComponent)],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges {
+export class OnboardedCandidateComponent extends UnsavedFormComponentRef implements OnInit, OnDestroy, OnChanges {
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
 
   @Select(OrderManagementContentState.rejectionReasonsList)
@@ -73,7 +81,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
   @Input() isAgency: boolean = false;
   @Input() orderDuration: Duration;
 
-  public form: FormGroup;
+  public override form: FormGroup;
   public jobStatusControl: FormControl;
   public optionFields = OPTION_FIELDS;
   public candidateJob: OrderCandidateJob | null;
@@ -82,10 +90,13 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
   public billRatesData: BillRate[] = [];
   public rejectReasons: RejectReason[] = [];
   public openRejectDialog = new Subject<boolean>();
+  public openCandidateCancellationDialog = new Subject<void>();
   public isRejected = false;
   public priceUtils = PriceUtils;
   public nextApplicantStatuses: ApplicantStatus[];
   public isActiveCandidateDialog$: Observable<boolean>;
+  public showHoursControl: boolean = false;
+  public showPercentage: boolean = false;
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
@@ -103,6 +114,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
     return this.candidateStatus === ApplicantStatusEnum.OnBoarded;
   }
 
+  get isCancelled(): boolean {
+    return this.candidateStatus === ApplicantStatusEnum.Cancelled;
+  }
+
   get isDeployedCandidate(): boolean {
     return !!this.candidate?.deployedCandidateInfo && !this.isOnBoarded;
   }
@@ -112,7 +127,11 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
   }
 
   get actualStartDateValue(): Date {
-    return this.form.controls['startDate']?.value;
+    return toCorrectTimezoneFormat(this.form.controls['startDate'].value);
+  }
+
+  get showStatusDropdown(): boolean {
+    return !this.isRejected && !this.isDeployedCandidate && !this.isCancelled
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -128,7 +147,9 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
     private commentsService: CommentsService,
     private durationService: DurationService,
     private changeDetectorRef: ChangeDetectorRef
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
@@ -138,6 +159,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
     this.subscribeOnReasonsList();
     this.checkRejectReason();
     this.subscribeOnUpdateOrganisationCandidateJobError();
+    this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeOnGetStatus();
   }
 
@@ -190,7 +212,18 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
     }
   }
 
-  public cancelRejectCandidate(): void {
+  public cancelCandidate(jobCancellationDto: JobCancellation): void {
+    if (this.candidateJob) {
+      this.store.dispatch(new CancelOrganizationCandidateJob({
+        organizationId: this.candidateJob.organizationId,
+        jobId: this.candidateJob.jobId,
+        jobCancellationDto,
+      }));
+      this.closeDialog();
+    }
+  }
+
+  public resetStatusesFormControl(): void {
     this.jobStatusControl.reset();
   }
 
@@ -221,8 +254,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
             organizationId: this.candidateJob?.organizationId as number,
             jobId: this.candidateJob?.jobId as number,
             nextApplicantStatus: this.candidateJob?.applicantStatus,
-            actualStartDate: this.candidateJob?.actualStartDate as string,
-            actualEndDate: this.candidateJob?.actualEndDate as string,
+            actualStartDate: toCorrectTimezoneFormat(this.candidateJob?.actualStartDate) as string,
+            actualEndDate: toCorrectTimezoneFormat(this.candidateJob?.actualEndDate) as string,
             offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.availableStartDate as string),
             candidateBillRate: this.candidateJob?.candidateBillRate as number,
             offeredBillRate: this.candidateJob?.offeredBillRate,
@@ -284,8 +317,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
             candidateBillRate: value.candidateBillRate,
             offeredBillRate: value.offeredBillRate,
             requestComment: value.comments,
-            actualStartDate: value.startDate,
-            actualEndDate: value.endDate,
+            actualStartDate: toCorrectTimezoneFormat(value.startDate),
+            actualEndDate: toCorrectTimezoneFormat(value.endDate),
             clockId: value.clockId,
             guaranteedWorkWeek: value.workWeek,
             allowDeployWoCredentials: value.allow,
@@ -304,6 +337,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
       this.candidateJob = value;
       if (value) {
+        this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
         this.billRatesData = [...value?.billRates];
         this.form.patchValue({
@@ -325,6 +359,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
           endDate: value.actualEndDate ? value.actualEndDate : value.order.jobEndDate,
           rejectReason: value.rejectReason,
           offeredStartDate: this.getDateString(value.offeredStartDate),
+          jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
+          penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
+          rate: value.jobCancellation?.rate,
+          hours: value.jobCancellation?.hours,
         });
         this.switchFormState();
       }
@@ -375,6 +413,14 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
       .subscribe(() => this.jobStatusControl.reset());
   }
 
+  private subscribeOnCancelOrganizationCandidateJobSuccess(): void {
+    this.actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(CancelOrganizationCandidateJobSuccess))
+      .subscribe(() => {
+        this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+      });
+  }
+
   private subscribeOnGetStatus(): void {
     this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ApplicantStatus[]) => {
       this.nextApplicantStatuses = data;
@@ -385,6 +431,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
   private handleOnboardedCandidate(event: { itemData: { applicantStatus: ApplicantStatus } }): void {
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded) {
       this.onAccept();
+    } else if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
+      this.openCandidateCancellationDialog.next();
     } else {
       this.store.dispatch(new GetRejectReasonsForOrganisation());
       this.openRejectDialog.next(true);
@@ -410,6 +458,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
       endDate: new FormControl(''),
       rejectReason: new FormControl(''),
       offeredStartDate: new FormControl(''),
+      jobCancellationReason: new FormControl(''),
+      penaltyCriteria: new FormControl(''),
+      rate: new FormControl(''),
+      hours: new FormControl(''),
     });
 
     this.jobStatusControl = new FormControl('');
@@ -427,8 +479,13 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy, OnChanges
     this.changeDetectorRef.markForCheck();
   }
 
+  private setCancellationControls(value: PenaltyCriteria): void{
+    this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
+    this.showPercentage = value === PenaltyCriteria.RateOfHours;
+  }
+
   private switchFormState(): void {
-    if (this.isDeployedCandidate && !this.isAgency) {
+    if ((this.isDeployedCandidate && !this.isAgency) || this.isCancelled) {
       this.form?.disable();
     } else {
       this.form?.enable();

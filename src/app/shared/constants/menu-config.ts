@@ -165,22 +165,182 @@ export const MENU_CONFIG: any = {
     40: {
       // Custom Reports
       icon: 'pie-chart',
-      route: '/analytics/state-wise-skills',
+      route: '/analytics/client-finance-accrual-report',
     },
     41: {
-      // state wise skills
+      // Accrual Report
       icon: '',
-      route: '/analytics/state-wise-skills',
+      route: '/analytics/client-finance-accrual-report',
     },
     42: {
-      // Candidate Statistics
+      // Invoice Summary
       icon: '',
-      route: '/analytics/candidate-stats',
+      route: '/analytics/invoice-summary',
     },
     43: {
-      // Page Report
+      // Aging Details
       icon: '',
-      route: '/analytics/page-report',
+      route: '/analytics/aging-details',
+    },
+    48: {
+      // Client Finance Report
+      icon: '',
+      route: '/analytics/client-finance-report',
+    },
+    49: {
+      // Credential Expiry
+      icon: '',
+      route: '/analytics/credential-expiry',
+    },
+    50: {
+      // Timesheet Report
+      icon: '',
+      route: '/analytics/timesheet-report',
+    },
+    51: {
+      // VMS Invoice Report
+      icon: '',
+      route: '/analytics/vms-invoice-report',
+    },
+    52: {
+      // Finance Report
+      icon: '',
+      route: '/analytics/finance-report',
+    },
+    53: {
+      // Fill Rate
+      icon: '',
+      route: '/analytics/fillrate',
+    },
+    54: {
+      // YTD Summary
+      icon: '',
+      route: '/analytics/ytd-summary',
+    },
+    55: {
+      // Missing Credentials
+      icon: '',
+      route: '/analytics/missing-credentials',
+    },
+    56: {
+      // Head Count
+      icon: '',
+      route: '/analytics/head-count',
+    },
+    57: {
+      // Candidate Agency Status Report
+      icon: '',
+      route: '/analytics/candidate-agency-status-report',
+    },
+    58: {
+      // Candidate List
+      icon: '',
+      route: '/analytics/candidate-list',
+    },
+    59: {
+      // Vendor Scorecard
+      icon: '',
+      route: '/analytics/vendor-scorecard',
+    },
+    60: {
+      // Job Event
+      icon: '',
+      route: '/analytics/job-event',
+    },
+    61: {
+      // General Comments
+      icon: '',
+      route: '/analytics/general-comments',
+    },
+    62: {
+      // YTD Report
+      icon: '',
+      route: '/analytics/ytd-report',
+    },
+    63: {
+      // Agency & Department Spent Hours
+      icon: '',
+      route: '/analytics/agency-department-spent-hours',
+    },
+    64: {
+      // Staffing Summary
+      icon: '',
+      route: '/analytics/staffing-summary',
+    },
+    65: {
+      // Predicted Contract Labor Spent
+      icon: '',
+      route: '/analytics/predicted-contract-labor-spent',
+    },
+    66: {
+      // Job Summary
+      icon: '',
+      route: '/analytics/job-summary',
+    },
+    67: {
+      // Event Log
+      icon: '',
+      route: '/analytics/event-log',
+    },
+    68: {
+      // Missing Kronos ID's
+      icon: '',
+      route: '/analytics/missing-kronos-ids',
+    },
+    69: {
+      // Benchmarking Rate By State
+      icon: '',
+      route: '/analytics/benchmarking-rate-by-state',
+    },
+    70: {
+      // Organization Invoice
+      icon: '',
+      route: '/analytics/organization-invoice',
+    },
+    71: {
+      // Job - Compliance
+      icon: '',
+      route: '/analytics/job-compliance',
+    },
+    72: {
+      // Job - Fill Ratio
+      icon: '',
+      route: '/analytics/job-fill-ratio',
+    },
+    73: {
+      // Job - Job Details
+      icon: '',
+      route: '/analytics/job-details',
+    },
+    74: {
+      // Job - Job Details Summary
+      icon: '',
+      route: '/analytics/job-details-summary',
+    },
+    75: {
+      // Labor Utilization
+      icon: '',
+      route: '/analytics/labor-utilization',
+    },
+    76: {
+      // Message History
+      icon: '',
+      route: '/analytics/message-history',
+    },
+    77: {
+      // Order Check
+      icon: '',
+      route: '/analytics/order-check',
+    },
+    78: {
+      // Overall Status
+      icon: '',
+      route: '/analytics/overall-status',
+    },
+    79: {
+      // Overtime
+      icon: '',
+      route: '/analytics/overtime',
     },
     45: {
       // Alerts
@@ -343,26 +503,6 @@ export const MENU_CONFIG: any = {
       icon: 'users',
       route: 'agency/candidate-details',
     },
-    40: {
-      // Custom Reports
-      icon: 'pie-chart',
-      route: '/analytics/dashboard-report',
-    },
-    41: {
-      // state wise skills
-      icon: '',
-      route: '/analytics/state-wise-skills',
-    },
-    42: {
-      // Candidate Statistics
-      icon: '',
-      route: '/analytics/candidate-stats',
-    },
-    43: {
-      // Page Report
-      icon: '',
-      route: '/analytics/page-report',
-    },
     45: {
       // Alerts
       icon: 'alert-circle',
@@ -523,22 +663,162 @@ export const MENU_CONFIG: any = {
     40: {
       // Custom Reports
       icon: 'pie-chart',
-      route: '/analytics/state-wise-skills',
+      route: '/analytics/client-finance-accrual-report',
     },
     41: {
-      // state wise skills
+      // Accrual Report
       icon: '',
-      route: '/analytics/state-wise-skills',
+      route: '/analytics/client-finance-accrual-report',
     },
     42: {
-      // Candidate Statistics
+      // Invoice Summary
       icon: '',
-      route: '/analytics/candidate-stats',
+      route: '/analytics/invoice-summary',
     },
     43: {
-      // Page Report
+      // Aging Details
       icon: '',
-      route: '/analytics/page-report',
+      route: '/analytics/aging-details',
+    },
+    48: {
+      // Client Finance Rreport
+      icon: '',
+      route: '/analytics/client-finance-report',
+    },
+    49: {
+      // Credential Expiry
+      icon: '',
+      route: '/analytics/credential-expiry',
+    },
+    50: {
+      // Timesheet Report
+      icon: '',
+      route: '/analytics/timesheet-report',
+    },
+    53: {
+      // Fill Rate
+      icon: '',
+      route: '/analytics/fillrate',
+    },
+    54: {
+      // YTD Summary
+      icon: '',
+      route: '/analytics/ytd-summary',
+    },
+    55:{
+      // Missing Credentials
+      icon: '',
+      route: '/analytics/missing-credentials',
+    },
+    56: {
+      // Head Count
+      icon: '',
+      route: '/analytics/head-count',
+    },
+    58: {
+      // Candidate List
+      icon: '',
+      route: '/analytics/candidate-list',
+    },
+    59: {
+      // Vendor Scorecard
+      icon: '',
+      route: '/analytics/vendor-scorecard',
+    },
+    60: {
+      // Job Event
+      icon: '',
+      route: '/analytics/job-event',
+    },
+    61: {
+      // General Comments
+      icon: '',
+      route: '/analytics/general-comments',
+    },
+    62: {
+      // YTD Report
+      icon: '',
+      route: '/analytics/ytd-report',
+    },
+    63: {
+      // Agency & Department Spent Hours
+      icon: '',
+      route: '/analytics/agency-department-spent-hours',
+    },
+    64: {
+      // Staffing Summary
+      icon: '',
+      route: '/analytics/staffing-summary',
+    },
+    65: {
+      // Predicted Contract Labor Spent
+      icon: '',
+      route: '/analytics/predicted-contract-labor-spent',
+    },
+    66: {
+      // Job Summary
+      icon: '',
+      route: '/analytics/job-summary',
+    },
+    67: {
+      // Event Log
+      icon: '',
+      route: '/analytics/event-log',
+    },
+    68: {
+      // Missing Kronos ID's
+      icon: '',
+      route: '/analytics/missing-kronos-ids',
+    },
+    69: {
+      // Benchmarking Rate By State
+      icon: '',
+      route: '/analytics/benchmarking-rate-by-state',
+    },
+    70: {
+      // Organization Invoice
+      icon: '',
+      route: '/analytics/organization-invoice',
+    },
+    71: {
+      // Job - Compliance
+      icon: '',
+      route: '/analytics/job-compliance',
+    },
+    72: {
+      // Job - Fill Ratio
+      icon: '',
+      route: '/analytics/job-fill-ratio',
+    },
+    73: {
+      // Job - Job Details
+      icon: '',
+      route: '/analytics/job-details',
+    },
+    74: {
+      // Job - Job Details Summary
+      icon: '',
+      route: '/analytics/job-details-summary',
+    },
+    75: {
+      // Labor Utilization
+      icon: '',
+      route: '/analytics/labor-utilization',
+    },
+    76: {
+      // Message History
+      icon: '',
+      route: '/analytics/message-history',
+    },
+    78: {
+      // Overall Status
+      icon: '',
+      route: '/analytics/overall-status',
+    },
+    79: {
+      // Overtime
+      icon: '',
+      route: '/analytics/overtime',
     },
     44: {
       // Organization Profile
@@ -710,22 +990,47 @@ export const MENU_CONFIG: any = {
     40: {
       // Custom Reports
       icon: 'pie-chart',
-      route: '/analytics/state-wise-skills',
-    },
-    41: {
-      // state wise skills
-      icon: '',
-      route: '/analytics/state-wise-skills',
+      route: '/analytics/invoice-summary',
     },
     42: {
-      // Candidate Statistics
+      // Invoice Summary
       icon: '',
-      route: '/analytics/candidate-stats',
+      route: '/analytics/invoice-summary',
     },
-    43: {
-      // Page Report
+    50: {
+      // Timesheet Report
       icon: '',
-      route: '/analytics/page-report',
+      route: '/analytics/timesheet-report',
+    },
+    53: {
+      // Fill Rate
+      icon: '',
+      route: '/analytics/fillrate',
+    },
+    55: {
+      // Missing Credentials
+      icon: '',
+      route: '/analytics/missing-credentials',
+    },
+    58: {
+      // Candidate List
+      icon: '',
+      route: '/analytics/candidate-list',
+    },
+    61: {
+      // General Comments
+      icon: '',
+      route: '/analytics/general-comments',
+    },
+    76: {
+      // Message History
+      icon: '',
+      route: '/analytics/message-history',
+    },
+    77: {
+      // Order Check
+      icon: '',
+      route: '/analytics/order-check',
     },
     45: {
       // Alerts
@@ -744,3 +1049,5 @@ export const MENU_CONFIG: any = {
     },
   },
 };
+
+export const AnalyticsMenuId: number = 40;

@@ -27,7 +27,8 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
       field: 'classification',
       headerName: 'CLASSIFICATION',
       width: 170,
-      valueFormatter: (params: { data: CandidatesDetailsModel }) => `${JobClassification[params.data.classification]}`,
+      valueFormatter: (params: { data: CandidatesDetailsModel }) =>
+        `${JobClassification[params.data.classification] ?? ''}`,
       sortable: true,
     },
     {

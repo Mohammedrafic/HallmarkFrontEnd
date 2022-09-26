@@ -11,6 +11,8 @@ import { GridCellRenderer, TitleValueCellRendererParams } from '../../models';
 export class TitleValueCellRendererComponent extends GridCellRenderer<TitleValueCellRendererParams> {
   public title: string = '';
 
+  public showCell: boolean = false;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -22,16 +24,21 @@ export class TitleValueCellRendererComponent extends GridCellRenderer<TitleValue
     super.agInit(params);
     const titleValueParams = params.titleValueParams;
 
-    this.title = titleValueParams?.title || params.colDef?.headerName || '-';
-    this.value = [titleValueParams?.value, this.value, '-'].find((value: unknown) => value != null) as string;
+    this.title = titleValueParams?.title || params.colDef?.headerName || '';
+    this.value = [titleValueParams?.value, this.value].find((value: unknown) => value != null && value !== '') as string;
+    this.showCell = this.value != null && this.value !== '';
   }
 
   public handleNavigation(event: Event): void {
     event.stopImmediatePropagation();
     const id = this.params.data.timesheetId;
+    const organizationId = this.params.titleValueParams?.organizationId;
 
-    if (id && this.params.data.timesheetTypeText !== 'Expenses') {
-      this.router.navigate(['../timesheets'], { relativeTo: this.route, state: { timesheetId: id }});
+    if (id) {
+      this.router.navigate(['../timesheets'], {
+        relativeTo: this.route,
+        state: { timesheetId: id, organizationId },
+      });
     }
   }
 }

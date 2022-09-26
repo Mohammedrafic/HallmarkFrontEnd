@@ -6,7 +6,7 @@ spec:
   hosts:
   - "{{ .Values.istio.domain }}"
   gateways:
-  - {{ include "einsteinui.fullname" . }}
+  - "{{ .Values.istio.backendgateway }}"
   http:
   - match:
     - uri:
@@ -18,5 +18,3 @@ spec:
     route:
     - destination:
         host: {{ include "einsteinui.fullname" . }}
-        port:
-          number: 80

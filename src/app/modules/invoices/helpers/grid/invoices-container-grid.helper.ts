@@ -57,13 +57,13 @@ export class InvoicesContainerGridHelper {
         width: 120,
         cellRenderer: GridCellLinkComponent,
         cellRendererParams: (params: ICellRendererParams): GridCellLinkParams => {
-          const orderId: number = (params.data as BaseInvoice).orderId;
+          const orderId = (params.data as BaseInvoice).formattedOrderIdFull;
 
           return {
             ...params,
             link: agency ? `/agency/order-management` : `/client/order-management`,
             navigationExtras: {
-              state: { orderId },
+              state: { fullOrderId: orderId },
             }
           };
         }
@@ -80,7 +80,7 @@ export class InvoicesContainerGridHelper {
         valueGetter: (params: ValueGetterParams) => {
           const { weekNumber, weekStartDate: date } = params.data as PendingInvoice;
 
-          return `${weekNumber} - ${GridValuesHelper.formatDate(date, 'cccccc')}<br>${GridValuesHelper.formatDate(date, 'M/d/yy')}`;
+          return `${weekNumber} - ${GridValuesHelper.formatDate(date, 'cccccc')}<br>${GridValuesHelper.formatDate(date, 'MM/dd/yyyy')}`;
         },
         cellRendererParams: (params: ICellRendererParams): GridCellLinkParams => {
           const { id, organizationId } = params.data as BaseInvoice;

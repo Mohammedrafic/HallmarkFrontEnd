@@ -1,4 +1,5 @@
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { CandidateCancellation } from "@shared/models/candidate-cancellation.model";
 import {
   AcceptJobDTO,
   CreateOrderDto,
@@ -187,6 +188,16 @@ export class RejectCandidateForOrganisationSuccess {
 export class RejectCandidateJob {
   static readonly type = '[organizationManagement] Reject Candidate Job';
   constructor(public payload: RejectReasonPayload) {}
+}
+
+export class CancelOrganizationCandidateJob {
+  static readonly type = '[organizationManagement] Cancel Candidate Job';
+  constructor(public payload: CandidateCancellation) {}
+}
+
+export class CancelOrganizationCandidateJobSuccess {
+  static readonly type = '[organizationManagement] Cancel Candidate Success';
+  constructor() {}
 }
 
 export class ApproveOrder {

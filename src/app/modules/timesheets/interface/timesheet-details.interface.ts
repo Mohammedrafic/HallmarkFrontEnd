@@ -92,6 +92,7 @@ export interface TimesheetDetailsModel {
   weekStartDate: string;
   candidateWorkPeriods: WorkWeek<string>[];
   isNotExist?: boolean;
+  allowDNWInTimesheets?: boolean;
   mileageTimesheetId: number;
 }
 
@@ -108,7 +109,15 @@ export interface CustomExport {
 
 export interface OpenAddDialogMeta {
   currentTab: RecordFields;
-  initDate: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface TimesheetDetailsAddDialogState {
+  state: boolean;
+  type: RecordFields;
+  startDate: string;
+  endDate: string;
 }
 
 export interface RecordsPutDto {

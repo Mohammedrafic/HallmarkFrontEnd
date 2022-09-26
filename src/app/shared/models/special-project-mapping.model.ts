@@ -11,12 +11,12 @@ export class SpecialProjectMapping {
   departmentId: number;
   departmentName: string;
   skills: MasterSkillByOrganization[];
-  skillName: string;
+  skillNames: string;
   orderProjectName: string;
   orderSpecialProjectCategoryId: number;
   orderSpecialProjectCategoryName: string;
   orderSpecialProjectId: number;
-  prePopulateInOrders : boolean;
+  prePopulateInOrders: boolean;
 }
 
 export type SpecialProjectMappingPage = PageOfCollections<SpecialProjectMapping>;
@@ -29,13 +29,13 @@ export class SaveSpecialProjectMappingDto {
   departmentIds: number[];
   skillIds: number[];
   forceUpsert?: boolean;
-  prePopulateInOrders : boolean;
+  prePopulateInOrders: boolean;
 }
 
 export class ProjectNames {
   id: number;
   name: string;
-  projectTypeId:number
+  projectTypeId: number
 }
 
 export class SpecialProjectMappingFilters {
@@ -45,7 +45,7 @@ export class SpecialProjectMappingFilters {
   locationIds?: number[];
   departmentIds?: number[];
   skillIds?: number[];
-  getAll?:boolean
+  getAll?: boolean
 }
 
 

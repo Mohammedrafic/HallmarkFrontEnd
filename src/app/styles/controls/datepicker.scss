@@ -152,7 +152,13 @@ body.dark {
     .e-input-group.e-control-wrapper.e-date-wrapper, .e-input-group.e-control-wrapper.e-time-wrapper, .e-input-group.e-control-wrapper.e-datetime-wrapper, .e-input-group.e-control-wrapper.e-date-range-wrapper {
       .e-input[readonly],
       .e-input[readonly] ~ span.e-input-group-icon {
-        background-color:transparent !important;
+        background-color: transparent !important;
+      }
+    }
+
+    .e-input-group.e-control-wrapper {
+      &.e-disabled {
+        background-color: $secondary-dark-blue-20 !important;
       }
     }
   }

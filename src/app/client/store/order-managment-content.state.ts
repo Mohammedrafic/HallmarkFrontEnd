@@ -5,6 +5,8 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { catchError, Observable, of, tap } from 'rxjs';
 import {
   ApproveOrder,
+  CancelOrganizationCandidateJob,
+  CancelOrganizationCandidateJobSuccess,
   ClearHistoricalData,
   ClearOrderCandidatePage,
   ClearOrders,
@@ -677,6 +679,18 @@ export class OrderManagementContentState {
     return this.orderManagementService.rejectCandidateJob(payload).pipe(
       tap(() => {
         dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new RejectCandidateForOrganisationSuccess()]);
+      })
+    );
+  }
+
+  @Action(CancelOrganizationCandidateJob)
+  CancelOrganizationCandidateJob(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload }: CancelOrganizationCandidateJob
+  ): Observable<void> {
+    return this.orderManagementService.cancelCandidateJob(payload).pipe(
+      tap(() => {
+        dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new CancelOrganizationCandidateJobSuccess()]);
       })
     );
   }

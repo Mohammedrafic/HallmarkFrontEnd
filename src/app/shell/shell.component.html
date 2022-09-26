@@ -1,5 +1,6 @@
 <div class="header" [class.expanded]="sidebar?.isOpen">
   <div class="header-item">
+    <div class="header-item__sidebar-menu" *ngIf="isMobile$ | async" (click)="toggleMobileSidebar()"></div>
     <i-feather *ngIf="(headerState$ | async)?.iconName" name="{{ (headerState$ | async)?.iconName }}" class="icon"></i-feather>
     <h1>{{ (headerState$ | async)?.title }}</h1>
   </div>
@@ -7,8 +8,10 @@
   <div class="stick-right header-content">
 
     <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
-      <app-organization-agency-selector></app-organization-agency-selector>
-      <div class="devider"></div>
+      <ng-container *ngIf="isDekstop$ | async">
+        <app-organization-agency-selector [isDarkTheme]="isDarkTheme"></app-organization-agency-selector>
+      </ng-container>
+      <div class="devider" *ngIf="!(isMobile$ | async)"></div>
     </div>
     <div class="bell-button left" style="cursor: pointer;" (click)="toggleChatDialog()">
 
@@ -26,11 +29,11 @@
 
     </div>
 
-    <div class="devider"></div>
+    <div class="devider" *ngIf="!(isMobile$ | async)"></div>
 
     <!-- Temporary solution to log out from the application -->
 
-    <div class="header-item">
+    <div class="header-item" *ngIf="!(isMobile$ | async)">
       <ejs-menu [items]='profileDatasource'
                 (select)="onSelectProfileMenu($event)">
       </ejs-menu>
@@ -40,15 +43,25 @@
   </div>
 </div>
 <section class="shell">
-  <ejs-sidebar id="sidebar" #sidebar [enableGestures]="false" [enableDock]="enableDock" [width]="width" [dockSize]="dockSize" [type]="sideBarType"
-               (created)="onSideBarCreated()">
+  <ejs-sidebar
+    id="sidebar"
+    #sidebar
+    [enableGestures]="false"
+    [enableDock]="enableDock"
+    [width]="width"
+    [dockSize]="dockSize"
+    [type]="sideBarType"
+    (created)="onSideBarCreated()"
+    *ngIf="!isSidebarHidden || (isTablet$ | async) || (isDekstop$ | async)">
     <section class="primary-container">
       <section class="logo-container">
+        <div class="close-btn" *ngIf="(sidebar.isOpen) && (isMobile$ | async)" (click)="toggleMobileSidebar()"></div>
         <div class="logo" *ngIf="sidebar.isOpen"></div>
         <div class="small-logo" *ngIf="!sidebar.isOpen"></div>
       </section>
-      <section class="collapse">
-        <a class="icon-container"  #searchInputContainer>
+      <section class="collapse search-menu" (click)="onSearchMenuClick()"
+               [ngClass]="{'search-menuitem-expand': sidebar.isOpen , 'search-menu-item-active':isSearching}" >
+        <a class="icon-container" #searchInputContainer>
           <i-feather name="search" class="icon"></i-feather>
           <span class="e-text">
             <input #searchInput
@@ -58,20 +71,18 @@
                    placeholder="Start typing"
                    [value]="searchString"
                    (ngModelChange)="onSearchChange()"
-                   (focus)="onSearchFocus()"
-                   (focusout)="onSearchFocusOut()"
-                   />
+                   (focusout)="onSearchFocusOut()" />
           </span>
         </a>
       </section>
       <section class="menu">
         <section class="sidebar-menu">
           <ejs-treeview id="template" #treevalidate [fields]="sideBarMenuField" (nodeClicked)='nodeSelect($event)'
-                        [fullRowSelect]="true" [loadOnDemand]="false">
+                        [fullRowSelect]="true" [loadOnDemand]="false" >
             <ng-template #nodeTemplate="" let-data="">
               <section class="icon-container"
                        (click)="onMenuItemClick(data)"
-                       (mouseenter)="showContextMenu(data, $event)">
+                       (mouseenter)="showContextMenu(data, $event)" >
                 <i-feather [name]="data.icon" class="icon"></i-feather>
                 <span class="e-text">{{ data.title }}</span>
                 <span class=" e-badge e-badge-success e-badge-circle" *ngIf="data.count">{{ data.count }}</span>
@@ -101,7 +112,22 @@
           </a>
         </section>
       </section>
-      <section class="collapse">
+      <section class="username sidebar-item">
+        <div class="header-item header-item__inner" *ngIf="isMobile$ | async">
+          <div class="header-item__img"></div>
+          <ejs-menu class="user" [items]="profileDatasource"
+                    (select)="onSelectProfileMenu($event)">
+          </ejs-menu>
+        </div>
+      </section>
+      <section class="org-agency sidebar-item">
+        <div class="switcher-container switcher-container--tablet" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
+          <ng-container *ngIf="!(isDekstop$ | async)">
+            <app-organization-agency-selector></app-organization-agency-selector>
+          </ng-container>
+        </div>
+      </section>
+      <section class="collapse" *ngIf="!(isMobile$ | async)">
         <a class="icon-container" (click)="toggleClick()">
           <i-feather name="sidebar" class="icon"></i-feather>
           <span class="e-text">Collapse</span>
@@ -111,46 +137,66 @@
   </ejs-sidebar>
 
   <section id="main">
-
-
     <div class="content">
       <router-outlet></router-outlet>
-      <dashboard-search-menu #searchMenuInstance class="dashboardSearchMenus"
-                             *ngIf="isSearching"
-                             [isMaximized]="isMaximized"
-                             [searchResult]="searchResult"
-                             [searchString]="searchString"
-                             (searchFocusOut)="onSearchFocusOut()"
-                             [searchHeight]="searchHeight">
-      </dashboard-search-menu>
     </div>
+    <dashboard-search-menu #searchMenuInstance class="dashboardSearchMenus"
+                           *ngIf="isSearching"
+                           [isMaximized]="isMaximized"
+                           [searchResult]="searchResult"
+                           [searchString]="searchString"
+                           (searchFocusOut)="onSearchFocusOut()"
+                           [searchHeight]="searchHeight"
+                           [isDarkTheme]="isDarkTheme$ | async"
+                           (handleOnSearchTextKeyUp)="handleOnSearchMenuTextKeyUp($event)">
+    </dashboard-search-menu>
   </section>
 </section>
 
 <app-message-toast></app-message-toast>
-<ejs-sidebar id="alert-sidebar" *ngIf="showAlertSidebar" #alertSidebar 
-  [width]="alertSidebarWidth" [type]="alertSidebarType" [position]="alertSidebarPosition" 
-  showBackdrop="true" style="visibility: hidden" (created)="onAlertSidebarCreated()">    
-  <div class="sidebar-header header-cover">    
+<ejs-sidebar id="alert-sidebar" *ngIf="showAlertSidebar" #alertSidebar
+             [width]="alertSidebarWidth" [type]="alertSidebarType" [position]="alertSidebarPosition"
+             showBackdrop="true" style="visibility: hidden" (created)="onAlertSidebarCreated()">
+  <div class="sidebar-header header-cover">
     <i-feather name="bell"></i-feather>
-    <h5>      
+    <h5>
       <span>Alerts Center</span>
     </h5>
     <div class="closebtn">
-      <button ejs-button id="close" class="e-btn close-btn" (click)="alertSideBarCloseClick()">
-          <fa-icon [icon]='faTimes'></fa-icon>
+      <button ejs-button id="close" class="e-btn close-btn" title="Close" (click)="alertSideBarCloseClick()">
+        <fa-icon [icon]='faTimes'></fa-icon>
       </button>
     </div>
   </div>
   <div id="listcontainer">
-    <div class="card" *ngFor="let item of alerts">
-      <div class="card-body">
-        <div [innerHTML]="item.content"></div>        
-      </div>
-      <div class="card-footer">
-        <small>{{item.createdAt | date:'medium'}}</small>
-      </div>
+    <div class="e-row item-clear">
+      <span (click)="alertSideBarClearAllClick()">Clear All</span>
     </div>
+    <section class="alert-body">
+      <section class="alert-panel" *ngFor="let item of alerts">
+        <div class="alert-panel-header">
+          <div class="alert-panel-header__flex-child">
+            <span>
+              <i-feather class="badge-info" name="bell"></i-feather>
+            </span>
+          </div>
+          <div class="alert-panel-header__flex-child alert-panel-header__title">
+            {{item.title}}
+          </div>
+        </div>
+        <div class="alert-content" [innerHTML]="item.content"></div>
+        <div class="alert-panel-footer">
+          <div class="alert-panel-footer__footer_flex-child">
+            <div><span>{{item.createdAt | date: 'MM/dd/yyyy hh:mm a'}}</span></div>
+            <div><span>Timestamp</span></div>
+          </div>
+          <div class="alert-panel-footer__footer_flex-child" (click)="alertDismiss(item.id)">
+            <div class="dismiss-icon"><span>X</span></div>
+            <div class="dismiss-text"><span>Dismiss</span></div>
+          </div>
+        </div>
+      </section>
+    </section>
   </div>
 </ejs-sidebar>
 

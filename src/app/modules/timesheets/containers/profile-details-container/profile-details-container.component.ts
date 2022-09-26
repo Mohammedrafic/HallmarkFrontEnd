@@ -165,6 +165,10 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.watchForRangeChange();
   }
 
+  public onOpen(args: { preventFocus: boolean }): void {
+    args.preventFocus = true;
+  }
+
   public closeDialogOnNavigationStart(): void {
     this.router.events.pipe(
       filter((e) => e instanceof NavigationStart),
@@ -191,7 +195,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   }
 
   public openAddDialog(meta: OpenAddDialogMeta): void {
-    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open, meta.currentTab, meta.initDate));
+    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open, meta.currentTab, meta.startDate, meta.endDate));
   }
 
   public openUploadSideDialog(timesheetAttachments: TimesheetAttachments): void {
@@ -444,7 +448,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       filter(Boolean),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId, candidateWorkPeriods, canEditTimesheet }) => {
+    .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId, candidateWorkPeriods, canEditTimesheet, allowDNWInTimesheets }) => {
       this.organizationId = this.isAgency ? organizationId : null;
       this.jobId = jobId;
       this.weekPeriod = [
@@ -455,7 +459,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
         weekStartDate: new Date(DateTimeHelper.convertDateToUtc(el.weekStartDate)),
         weekEndDate: new Date(DateTimeHelper.convertDateToUtc(el.weekEndDate)),
       }));
-      this.setDNWBtnState(canEditTimesheet);
+      this.setDNWBtnState(canEditTimesheet, !!allowDNWInTimesheets);
       this.cd.markForCheck();
     });
   }
@@ -472,7 +476,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     });
   }
 
-  private setDNWBtnState(canEditTimesheet: boolean): void {
-    this.isDNWEnabled = this.isAgency || canEditTimesheet;
+  private setDNWBtnState(canEditTimesheet: boolean, allowDNWInTimesheets = false): void {
+    this.isDNWEnabled = (this.isAgency || canEditTimesheet) && allowDNWInTimesheets;
   }
 }

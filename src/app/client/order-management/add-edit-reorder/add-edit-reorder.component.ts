@@ -1,7 +1,7 @@
 import isNil from 'lodash/fp/isNil';
 import uniq from 'lodash/fp/uniq';
 
-import { filter, first, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { filter, first, map, Observable, switchMap, takeUntil, tap, catchError } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Store } from '@ngxs/store';
 
@@ -215,17 +215,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;
     const payload = { reorder, agencyIds, reOrderId, reOrderFromId };
 
-    if (this.isWrongOpenPositionCount(<ReorderRequestModel>payload)) {
-      this.showSaveErrorPositionsIssue();
-      return;
-    }
-
-    if (this.hasFilledPositions()) {
-      if (this.isDatesChanged()) {
-        this.showSaveErrorDateTimeIssue();
-      } else {
-        this.save(<ReorderRequestModel>payload);
-      }
+    if (this.isEditMode) {
+      this.checkPositionsAndSave(<ReorderRequestModel>payload);
     } else {
       this.save(<ReorderRequestModel>payload);
     }
@@ -243,12 +234,31 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.store.dispatch(new ShowToast(MessageTypes.Error, message));
   }
 
+  private checkPositionsAndSave(payload: ReorderRequestModel): void {
+    if (this.isWrongOpenPositionCount(<ReorderRequestModel>payload)) {
+      this.showSaveErrorPositionsIssue();
+      return;
+    }
+
+    if (this.hasFilledPositions()) {
+      if (this.isDatesChanged()) {
+        this.showSaveErrorDateTimeIssue();
+      } else {
+        this.save(<ReorderRequestModel>payload);
+      }
+    } else {
+      this.save(<ReorderRequestModel>payload);
+    }
+  }
+
   private save(payload: ReorderRequestModel): void {
     this.reorderService
       .saveReorder(<ReorderRequestModel>payload, this.comments)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+      takeUntil(this.destroy$),
+      tap(() => this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED))),
+      catchError((error) => this.store.dispatch(new ShowToast(MessageTypes.Error, error?.error?.errors?.RegularBillRate[0]))))
       .subscribe(() => {
-        this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED));
         this.saveEmitter.emit();
       });
   }

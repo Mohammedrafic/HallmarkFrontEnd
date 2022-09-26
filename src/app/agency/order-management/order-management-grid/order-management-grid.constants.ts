@@ -1,15 +1,9 @@
-import { OrderType } from '@shared/enums/order-type';
-import { AgencyOrderManagement } from '@shared/models/order-management.model';
 import { GridColumn } from '@shared/models/grid-column.model';
 import { ExportColumn } from '@shared/models/export.model';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
   SCALE_DOWN_HEIGHT: 64,
-};
-
-export const typeValueAccess = (_: string, { orderType }: AgencyOrderManagement) => {
-  return OrderType[orderType];
 };
 
 export const myAgencyColumnsToExport: ExportColumn[] = [
@@ -25,6 +19,13 @@ export const myAgencyColumnsToExport: ExportColumn[] = [
   { text: 'Department', column: 'Department' },
   { text: 'Type', column: 'OrderType' },
   { text: 'Start Date', column: 'StartDate' },
+  { text: 'End Date', column: 'EndDate' },
+  { text: 'Creation Date', column: 'CreationDate' },
+  { text: 'Distributed On', column: 'DistributedOn' },
+  { text: 'Special Project Category', column: 'SpecialProjectCategory' },
+  { text: 'Special Project Name', column: 'SpecialProjectName' },
+  { text: 'PO #', column: 'PONumber' },
+  { text: 'Offered Date', column: 'OfferedDate' },
 ];
 
 export const myAgencyChildColumnsToExport: ExportColumn[] = [
@@ -50,6 +51,13 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Re-Order Date', column: 'ReOrderDate' },
   { text: 'Shift', column: 'Shift' },
+  { text: 'End Date', column: 'EndDate' },
+  { text: 'Creation Date', column: 'CreationDate' },
+  { text: 'Distributed On', column: 'DistributedOn' },
+  { text: 'Special Project Category', column: 'SpecialProjectCategory' },
+  { text: 'Special Project Name', column: 'SpecialProjectName' },
+  { text: 'PO #', column: 'PONumber' },
+  { text: 'Offered Date', column: 'OfferedDate' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [
@@ -72,6 +80,13 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Location', column: 'LocationName' },
   { text: 'Department', column: 'DepartmentName' },
   { text: '# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days' },
+  { text: 'End Date', column: 'EndDate' },
+  { text: 'Creation Date', column: 'CreationDate' },
+  { text: 'Distributed On', column: 'DistributedOn' },
+  { text: 'Special Project Category', column: 'SpecialProjectCategory' },
+  { text: 'Special Project Name', column: 'SpecialProjectName' },
+  { text: 'PO #', column: 'PONumber' },
+  { text: 'Offered Date', column: 'OfferedDate' },
 ];
 
 export const perDiemChildColumnsToExport: ExportColumn[] = [

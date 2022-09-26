@@ -12,6 +12,8 @@ import {
   DollarSign,
   Download,
   Edit,
+  Eye,
+  EyeOff,
   Folder,
   Mail,
   MapPin,
@@ -21,8 +23,6 @@ import {
   Sliders,
   Trash2,
   User,
-  Eye,
-  EyeOff,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
@@ -54,7 +54,7 @@ import { SideDialogComponent } from './components/side-dialog/side-dialog.compon
 import { SearchComponent } from './components/search/search.component';
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { DropDownButtonAllModule, DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousComponent } from './components/dialog-next-previous/dialog-next-previous.component';
 import { OrderDetailsComponent } from './components/order-details/order-details.component';
@@ -136,6 +136,10 @@ import { AlertsState } from '@admin/store/alerts.state';
 import { ImportDialogContentComponent } from './components/import-dialog-content/import-dialog-content.component';
 import { GridErroredCellComponent } from './components/import-dialog-content/grid-errored-cell/grid-errored-cell.component';
 import { HideBeforeSyncfusionLoadDirective } from './directives/hide-before-syncfusion-load.directive';
+import { UnsavedFormDirective } from './directives/unsaved-form.directive';
+import { ClearCacheComponent } from './components/clear-cache/clear-cache.component';
+import { CandidateCancellationDialogComponent } from './components/candidate-cancellation-dialog/candidate-cancellation-dialog.component';
+import { OrderHistoricalEventsComponent } from './components/order-historical-events/order-historical-events.component';
 
 const icons = {
   AlertCircle,
@@ -220,6 +224,9 @@ const COMPONENTS = [
   SmsSideDialogComponent,
   OnScreenSideDialogComponent,
   OrderCloseReasonInfoComponent,
+  UnsavedFormDirective,
+  ClearCacheComponent,
+  CandidateCancellationDialogComponent,
 ];
 
 @NgModule({
@@ -251,6 +258,7 @@ const COMPONENTS = [
     TextBoxModule,
     MaskedTextBoxAllModule,
     TabAllModule,
+    DropDownButtonAllModule,
     NgxsModule.forFeature([BillRateState, SecurityState, CommentsState, AlertsState]),
     PageToolbarModule,
     FilterDialogModule,
@@ -287,6 +295,7 @@ const COMPONENTS = [
     CustomNoRowsOverlayComponent,
     GridErroredCellComponent,
     ImportDialogContentComponent,
+    OrderHistoricalEventsComponent,
   ],
   providers: [
     DatePipe,

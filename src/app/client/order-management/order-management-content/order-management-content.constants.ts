@@ -10,13 +10,7 @@ export enum MoreMenuType {
   'Duplicate',
   'Close',
   'Delete',
-}
-
-export enum OrderTypeName {
-  ContractToPerm = 'ContractToPerm',
-  OpenPerDiem = 'OpenPerDiem',
-  PermPlacement = 'PermPlacement',
-  Traveler = 'Traveler',
+  'Re-Open',
 }
 
 export const allOrdersColumnsToExport: ExportColumn[] = [
@@ -31,6 +25,15 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Candidates', column: 'CandidatesCount' },
   { text: 'Start Date', column: 'JobStartDate' },
+  { text: 'End Date', column: 'EndDate' },
+  { text: 'Creation Date', column: 'CreationDate' },
+  { text: 'Distributed On', column: 'DistributedOn' },
+  { text: 'Distributed To', column: 'DistributedTo' },
+  { text: 'Special Project Category', column: 'SpecialProjectCategory' },
+  { text: 'Special Project Name', column: 'SpecialProjectName' },
+  { text: 'PO #', column: 'PONumber' },
+  { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Agency', column: 'Agency' },
 ];
 
 export const perDiemColumnsToExport: ExportColumn[] = [
@@ -42,6 +45,14 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Department', column: 'Department' },
   { text: 'Candidates', column: 'Candidates' },
   { text: '# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days' },
+  { text: 'Creation Date', column: 'CreationDate' },
+  { text: 'Distributed On', column: 'DistributedOn' },
+  { text: 'Distributed To', column: 'DistributedTo' },
+  { text: 'Special Project Category', column: 'SpecialProjectCategory' },
+  { text: 'Special Project Name', column: 'SpecialProjectName' },
+  { text: 'PO #', column: 'PONumber' },
+  { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Agency', column: 'Agency' },
 ];
 
 export const reOrdersColumnsToExport: ExportColumn[] = [
@@ -57,6 +68,14 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Re-Order Date', column: 'ReOrderDate' },
   { text: 'Shift', column: 'Shift' },
   { text: 'Agency', column: 'Agency' },
+  { text: 'End Date', column: 'EndDate' },
+  { text: 'Creation Date', column: 'CreationDate' },
+  { text: 'Distributed On', column: 'DistributedOn' },
+  { text: 'Distributed To', column: 'DistributedTo' },
+  { text: 'Special Project Category', column: 'SpecialProjectCategory' },
+  { text: 'Special Project Name', column: 'SpecialProjectName' },
+  { text: 'PO #', column: 'PONumber' },
+  { text: 'Offered Date', column: 'OfferedDate' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [
@@ -117,6 +136,10 @@ export const ReOrdersColumnsConfig = [
     visible: true,
   },
   {
+    fieldName: 'endDate',
+    visible: false,
+  },
+  {
     fieldName: 'shiftsNext90Days',
     visible: false,
   },
@@ -165,6 +188,10 @@ export const AllOrdersColumnsConfig = [
   },
   {
     fieldName: 'startDate',
+    visible: true,
+  },
+  {
+    fieldName: 'endDate',
     visible: true,
   },
   {
@@ -235,6 +262,10 @@ export const PerDiemColumnsConfig = [
     visible: false,
   },
   {
+    fieldName: 'endDate',
+    visible: false,
+  },
+  {
     fieldName: 'reOrderFromId',
     visible: false,
   },
@@ -302,6 +333,10 @@ export const orderTemplateColumnsConfig = [
     visible: false,
   },
   {
+    fieldName: 'endDate',
+    visible: true,
+  },
+  {
     fieldName: 'reOrderFromId',
     visible: false,
   },
@@ -367,6 +402,10 @@ export const PermPlacementColumnsConfig = [
   {
     fieldName: 'startDate',
     visible: true,
+  },
+  {
+    fieldName: 'endDate',
+    visible: false,
   },
   {
     fieldName: 'reOrderFromId',

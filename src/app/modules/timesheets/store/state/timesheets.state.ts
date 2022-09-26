@@ -40,6 +40,7 @@ import {
   FilterColumns,
   TabCountConfig,
   Timesheet,
+  TimesheetDetailsAddDialogState,
   TimesheetDetailsModel,
   TimesheetInvoice,
   TimesheetRecordsDto,
@@ -149,11 +150,12 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static addDialogOpen(state: TimesheetsModel): { state: boolean, type: RecordFields, initDate: string } {
+  static addDialogOpen(state: TimesheetsModel): TimesheetDetailsAddDialogState {
     return {
       state: state.isAddDialogOpen.action,
       type: state.isAddDialogOpen.dialogType,
-      initDate: state.isAddDialogOpen.initTime,
+      startDate: state.isAddDialogOpen.startDate,
+      endDate: state.isAddDialogOpen.endDate,
     };
   }
 
@@ -254,7 +256,6 @@ export class TimesheetsState {
       });
 
     return of(null).pipe(
-      throttleTime(100),
       tap(() =>
         setState(patch<TimesheetsModel>({
           timesheetsFilters,
@@ -268,7 +269,6 @@ export class TimesheetsState {
     { setState }: StateContext<TimesheetsModel>,
   ): Observable<null> {
     return of(null).pipe(
-      throttleTime(100),
       tap(() => setState(patch<TimesheetsModel>({
         timesheetsFilters: null
       })))
@@ -340,12 +340,13 @@ export class TimesheetsState {
 
   @Action(Timesheets.ToggleTimesheetAddDialog)
   ToggleAddDialog({ patchState }: StateContext<TimesheetsModel>,
-    { action, type, dateTime }: { action: DialogAction, type: RecordFields, dateTime: string}): void {
+    { action, type, startDate, endDate }: Timesheets.ToggleTimesheetAddDialog): void {
     patchState({
       isAddDialogOpen: {
         action: action === DialogAction.Open,
         dialogType: type,
-        initTime: dateTime,
+        startDate: startDate,
+        endDate: endDate,
       },
     });
   }
@@ -661,7 +662,6 @@ export class TimesheetsState {
     .pipe(
       tap((organizations: DataSourceItem[]) => patchState({
         organizations,
-        selectedOrganizationId: organizations[0]?.id,
       })),
       catchError((err: HttpErrorResponse) => dispatch(
         new ShowToast(MessageTypes.Error, getAllErrors(err.error))

@@ -56,7 +56,7 @@ export class LogiReportComponent implements OnInit {
       user: this.uId,
       pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
-      jrd_dashboard_mode: "edit",
+      jrd_dashboard_mode: "view",
     },
       resExt = {
         reslst: this.resultList,
@@ -72,8 +72,8 @@ export class LogiReportComponent implements OnInit {
         // For page report
         pagereport: {
           feature_UserInfoBar: true,
-          feature_ToolBar: true,
-          feature_Toolbox: true,
+          feature_ToolBar: false,
+          feature_Toolbox: false,
           feature_DSOTree: true,
           feature_TOCTree: true,
           feature_PopupMenu: true,
@@ -86,7 +86,7 @@ export class LogiReportComponent implements OnInit {
         // For web report
         webreport: {
           viewMode: {
-            hasToolbar: true,
+            hasToolbar: false,
             hasSideArea: true
           },
           editMode: {
@@ -101,8 +101,9 @@ export class LogiReportComponent implements OnInit {
       user: this.uId,
       pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
-      jrd_studio_mode: "edit",
-      "jrs.param_page": true
+      jrd_studio_mode: "view",
+      "jrs.param_page": true //,
+      //"jrs.profile": "profilename"
     };
     let prptRes = this.reportName;
     let catRes = this.catelogName;

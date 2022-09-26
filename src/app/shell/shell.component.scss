@@ -1,4 +1,5 @@
-@import '../styles/variables/colors.scss';
+@import "colors.scss";
+@import "adaptive-response.scss";
 
 .header {
   height: 80px;
@@ -11,9 +12,19 @@
   padding-left: 60px;
   transition: 0.6s all ease;
 
+  @media #{$max-mobile} {
+    width: 100%;
+    padding-left: 0;
+    }
+
   &.expanded {
     width: calc(100% - 259px);
     padding-left: 257px;
+
+    @media #{$max-mobile} {
+      width: 100%;
+      padding-left: 0;
+      }
   }
 
   .header-item {
@@ -31,13 +42,30 @@
       height: 24px;
       width: 24px;
     }
+
+    &__sidebar-menu {
+      width: 18px;
+      height: 18px;
+      margin-right: 25px;
+      position: relative;
+      cursor: pointer;
+      
+      &::before {
+        content: '\2630';
+        color: $secondary-dark-blue-30;
+        font-size: 25px;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: -8px;
+        left: 0;
+      }
+    }
   }
 
   .logout-button {
     margin: 0 25px;
   }
-
- 
 }
 
 .shell {
@@ -45,10 +73,13 @@
 
   #main {
     height: 100%;
+
+    @media #{$max-mobile} {
+      margin-left: 0px !important;
+      }
   }
 
   #sidebar {
-    visibility: hidden;
     background-color: $sidebar-background;
     color: #ffffff;
     display: flex;
@@ -59,6 +90,22 @@
     .primary-container {
       overflow-x: hidden;
     }
+
+    .header-item {
+      &__inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 14px;
+      }
+  
+      &__img {
+        width: 36px;
+        height: 36px;
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzciIHZpZXdCb3g9IjAgMCAzNiAzNyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeT0iMC41IiB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHJ4PSI4IiBmaWxsPSIjRDFENkUyIi8+CjxwYXRoIGQ9Ik0yNyAyOC42MjVWMjYuMzc1QzI3IDI1LjE4MTUgMjYuNTI1OSAyNC4wMzY5IDI1LjY4MiAyMy4xOTNDMjQuODM4MSAyMi4zNDkxIDIzLjY5MzUgMjEuODc1IDIyLjUgMjEuODc1SDEzLjVDMTIuMzA2NSAyMS44NzUgMTEuMTYxOSAyMi4zNDkxIDEwLjMxOCAyMy4xOTNDOS40NzQxMSAyNC4wMzY5IDkgMjUuMTgxNSA5IDI2LjM3NVYyOC42MjUiIHN0cm9rZT0iIzY3NzA4OSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBhdGggZD0iTTE4IDE3LjM3NUMyMC40ODUzIDE3LjM3NSAyMi41IDE1LjM2MDMgMjIuNSAxMi44NzVDMjIuNSAxMC4zODk3IDIwLjQ4NTMgOC4zNzUgMTggOC4zNzVDMTUuNTE0NyA4LjM3NSAxMy41IDEwLjM4OTcgMTMuNSAxMi44NzVDMTMuNSAxNS4zNjAzIDE1LjUxNDcgMTcuMzc1IDE4IDE3LjM3NVoiIHN0cm9rZT0iIzY3NzA4OSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cg==);
+        background-repeat: no-repeat;
+      }
+    }
   }
 
   #sidebar.e-sidebar {
@@ -68,6 +115,27 @@
   .logo-container {
     height: 4rem;
     padding: 1.63rem 1.25rem;
+
+    @media #{$max-mobile} {
+      display: flex;
+      }
+
+    .close-btn {
+      width: 18px;
+      margin-right: 16px;
+      position: relative;
+      cursor: pointer;
+      
+      &::before {
+        content: '\2715';
+        color: $white;
+        font-size: 21px;
+        position: absolute;
+        top: 0px;
+        left: 8px;
+      }
+
+    }
 
     .logo {
       height: 34px;
@@ -200,8 +268,7 @@
       flex-direction: column;
       justify-content: center;
       margin-top: 0.5rem;
-      margin-bottom: 0.5rem;
-      border-bottom: 1px solid rgb(209 214 226 / 20%);
+      border-bottom: 1px solid $secondary-dark-blue-45-1;
     }
 
     .icon-container:hover {
@@ -210,6 +277,14 @@
       .icon {
         color: $primary-active-blue-15;
       }
+    }
+  }
+
+  .sidebar-item {
+    border-bottom: 1px solid $secondary-dark-blue-45-1;
+    
+    &:hover {
+      background-color: $secondary-dark-blue-10-1;
     }
   }
 
@@ -300,6 +375,12 @@
   &.hidden {
     display: none;
   }
+
+  &--tablet {
+    app-organization-agency-selector {
+      width: 100%;
+    }
+  }
 }
 
 .bell-button {
@@ -310,6 +391,20 @@
   &.left {
     margin-right: 40px;
   }
+  @media #{$max-mobile} {
+    padding-right: 30px;
+    }
+}
+
+.bell-button:hover {
+  background:$bell-button-hover-bg;
+  border-radius: 4px !important;
+}
+
+.bell-button:active {
+  background:$bell-button-active-bg;
+  color:white;
+  border-radius: 4px !important;
 }
 
 .bell-button__badge {
@@ -327,6 +422,9 @@
     width: 3px;
     // background-color: #E24D4D;
   }
+  @media #{$max-mobile} {
+    right: 25px;
+    }
 }
 
 .e-dropdown-popup {
@@ -373,7 +471,7 @@
 
 .e-settings::before {
   content: "\e701";
-  font-size:15px;
+  font-size: 15px;
 }
 
 .e-theme-light::before {
@@ -387,14 +485,18 @@
 .nav-search-input {
   background: transparent;
   border: 0px;
-  color:white;
+  color: $white;
+
+  &::placeholder {
+    color: $secondary-dark-blue-30 !important;
+  }
 }
 
 .dashboardSearchMenus {
   position: absolute;
   top: 10%;
   background: transparent;
-  width:100%;
+  width: 100%;
 }
 
 .other-icons {
@@ -405,13 +507,26 @@
     cursor: pointer;
   }
 }
+
 .e-menu-item {
   font-weight: 500;
 }
 .e-menu-wrapper.e-popup.e-menu-popup{
-    width:150px;
     border-radius:8px;
 }
+
+.search-menu:hover {
+  background: $secondary-dark-blue-10-1 !important;
+  color: $primary-active-blue;
+}
+.search-menuitem-expand {
+  border-left: 4px solid $sidebar-background;
+}
+.search-menu-item-active {
+  background: $secondary-dark-blue-10-1 !important;
+  color: $primary-active-blue;
+}
+
 #alert-sidebar {
   .sidebar-header {
     background-color: $alert-side-bar-bgcolor;
@@ -439,11 +554,26 @@
 
     .closebtn {
       top: 2px;
+      color: black;
+      position: absolute;
+      right: 4px;
+      background-color: transparent !important;
+      padding: 0.55rem 0.2rem 0rem 0rem;
+
+      button {
+        padding: 0.3rem 0.5rem !important;
+        border-radius: 4px !important;
+        height: auto !important;
+      }
+    }
+
+    .clearAllbtn {
+      top: 2px;
       line-height: 26px;
       height: 42px;
       color: black;
       position: absolute;
-      right: 4px;
+      right: 40px;
       background-color: transparent !important;
       padding: 0.55rem 0.2rem 0rem 0rem;
 
@@ -458,22 +588,95 @@
   #listcontainer {
     padding: 10px;
 
-    .card {
-      background-color: $alert-side-bar-cardcolor;
-      border-radius: 4px;
-      padding: 4px 10px;
-      font-size: 0.85rem !important;
-      margin-bottom: 4px;
+    .item-clear {
+      float: right;
+      font-weight: bold;
+      color: $primary-active-blue-10;
 
-      a {
-        color: $alert-side-bar-anchorforecolor !important;      
+      span {
+        cursor: pointer;
+      }
+    }
+
+    .alert-body {
+      padding-top: 21px;
+    }
+
+    .alert-panel {
+      margin-top: 5px;
+      padding: 1rem;
+      background: $primary-active-blue-90;
+      gap: 17px;
+
+      .alert-panel-header {
+        display: flex;
+
+        &__flex-child {
+        }
+
+        &__flex-child:first-child {
+          margin-right: 15px;
+        }
+
+        &__title {
+          font-weight: bold;
+        }
       }
 
-      .card-footer {
-        text-align: right;
-        padding-top: 4px;
-        border-top: 1px solid $alert-side-bar-footerborder;
-        margin-top: 6px;
+      .alert-content {
+        color: $primary-active-blue-20;
+        font-weight: 400;
+        padding: 5px;
+      }
+
+      i-feather {
+        height: 1rem;
+        width: 1rem;
+        display: inline-block;
+        padding: 0.25em 0.4em;
+        font-size: 75%;
+        font-weight: 400;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.35rem;
+      }
+
+      .badge-info {
+        color: $white;
+        background-color: $primary-active-blue-10;
+      }
+
+      .badge-danger {
+        color: $white;
+        background-color: $alert-side-bar-alert-danger;
+      }
+
+      .badge-success {
+        color: $white;
+        background-color: $alert-side-bar-alert-success;
+      }
+
+      .alert-panel-footer {
+        display: flex;
+        margin-top: 1rem;
+        color: $secondary-dark-blue-10;
+
+        &__footer_flex-child {
+          flex: 1;
+        }
+
+        .dismiss-icon {
+          text-align: right;
+          margin-right: 35px;
+          cursor: pointer;
+        }
+
+        .dismiss-text {
+          text-align: right;
+          cursor: pointer;
+        }
       }
     }
   }
