@@ -1,6 +1,6 @@
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -243,6 +243,24 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     this.smsTemplateFormGroup = AlertsSmsTemplateFromComponent.createForm();
     this.onScreenTemplateFormGroup = AlertsOnScreenTemplateFormComponent.createForm();
     this.closeDialog();
+    this.editAlertsTemplate$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+      this.templateParamsData = [];
+      if (data != undefined) {
+        data.alertId=this.alertTemplate.alertId;
+        data.alertChannel=this.alertChannel;
+        this.editAlertTemplateData = data;
+        if (data.parameters != undefined) {
+          data.parameters.forEach((paramter: string) => {
+            this.templateParamsData.push({
+              text: paramter,
+              id: paramter,
+              "htmlAttributes": { draggable: true }
+            })
+          });
+        }   
+        this.UpdateForm(data);
+      }
+    });
   }
   public onEmailTemplateEdit(data: any): void {
     this.alertChannel=AlertChannel.Email;
@@ -461,25 +479,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     this.store.dispatch(new ShowOnScreenSideDialog(false));
   }
   private SetEditData(alertId: number, alertChannel: AlertChannel,businessUnitId:number |null): void {
-    this.dispatchEditAlertTemplate(alertId, alertChannel,businessUnitId);
-
-    this.editAlertsTemplate$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
-      this.templateParamsData = [];
-      if (data != undefined) {
-        data.alertId=this.alertTemplate.alertId;
-        data.alertChannel=this.alertChannel;
-        this.editAlertTemplateData = data;
-        if (data.parameters != undefined) {
-          data.parameters.forEach((paramter: string) => {
-            this.templateParamsData.push({
-              text: paramter,
-              id: paramter,
-              "htmlAttributes": { draggable: true }
-            })
-          });
-        }
-      }
-    });
+    this.dispatchEditAlertTemplate(alertId, alertChannel,businessUnitId);    
   }
   private generateBusinessForm(): FormGroup {
     return new FormGroup({
@@ -530,5 +530,21 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         }
       });
     });
+  }
+  private UpdateForm(data:any):void
+  {
+    if (this.alertTemplateType === AlertChannel[AlertChannel.Email]) {
+      this.emailTemplateForm.alertBody=data.alertBody;
+      this.emailTemplateForm.alertTitle=data.alertTitle;
+    }
+    else if (this.alertTemplateType === AlertChannel[AlertChannel.SMS]) {
+      this.smsTemplateForm.alertBody=data.alertBody;
+      this.smsTemplateForm.alertTitle=data.alertTitle;
+    }
+    else if (this.alertTemplateType === AlertChannel[AlertChannel.OnScreen]) {
+      this.onScreenTemplateForm.alertBody=data.alertBody;
+      this.onScreenTemplateForm.alertTitle=data.alertTitle;
+    }
+
   }
 }
