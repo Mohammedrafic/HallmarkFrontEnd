@@ -56,6 +56,28 @@ export interface BillRate {
   dailyOtEnabled?: boolean;
 }
 
+export type ImportedBillRate = {
+  orgName: string;
+  region: string;
+  location: string;
+  department: string;
+  skill: string;
+  orderType: string;
+  billRateTitle: string;
+  billRateType: string;
+  amountMultiplier: string;
+  effectiveDate: string;
+  intervalMin: string;
+  intervalMax: string;
+  considerForWeeklyOT: string;
+  considerForDailyOT: string;
+  considerFor7thDayOT: string;
+  regularLocal: string;
+  displayInTimesheet: string;
+  displayInJob: string;
+  errorProperties: string[];
+}
+
 export interface OrderBillRateDto extends Omit<BillRate, 'billRateConfig' | 'billRateGroupId'> { }
 
 export class ExternalBillRateType {

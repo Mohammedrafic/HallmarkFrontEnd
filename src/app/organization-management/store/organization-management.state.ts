@@ -1,105 +1,118 @@
-import { CandidateStateModel } from "@agency/store/candidate.state";
+import { CandidateStateModel } from '@agency/store/candidate.state';
 import { Injectable } from '@angular/core';
-import { State, Action, StateContext, Selector } from '@ngxs/store';
-import { ImportResult } from "@shared/models/import.model";
+import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { ImportResult } from '@shared/models/import.model';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { Days } from 'src/app/shared/enums/days';
 import { SendDocumentAgency } from 'src/app/shared/enums/send-document-agency';
-import { Country, UsaStates, CanadaStates } from 'src/app/shared/enums/states';
+import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
 import { Status } from 'src/app/shared/enums/status';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 
 import {
-  SaveDepartment,
-  GetBusinessUnitList,
-  GetDepartmentsByLocationId,
-  GetLocationsByOrganizationId,
-  GetRegions,
-  SetBillingStatesByCountry,
-  SetDirtyState,
-  SaveOrganization,
-  UploadOrganizationLogo,
-  SaveOrganizationSucceeded,
-  GetOrganizationById,
-  GetOrganizationByIdSucceeded,
-  SetGeneralStatesByCountry,
-  UpdateDepartment,
-  DeleteDepartmentById,
-  GetLocationById,
-  UpdateLocation,
-  DeleteLocationById,
-  SaveLocation,
-  SaveRegion,
-  UpdateRegion,
-  DeleteRegionById,
-  GetLocationsByRegionId,
-  GetMasterSkillsByPage,
-  GetSkillsCategoriesByPage,
-  SaveSkillsCategory,
-  SaveSkillsCategorySucceeded,
-  RemoveSkillsCategory,
-  RemoveSkillsCategorySucceeded,
-  GetAllSkillsCategories,
-  SaveMasterSkill,
-  SaveMasterSkillSucceeded,
-  RemoveMasterSkill,
-  RemoveMasterSkillSucceeded,
-  SaveAssignedSkill,
-  GetAssignedSkillsByPage,
-  RemoveAssignedSkill,
-  SaveAssignedSkillSucceeded,
-  RemoveAssignedSkillSucceeded,
-  GetCredentialTypes,
-  SaveCredentialType,
-  RemoveCredentialType,
-  GetCredential,
-  SaveCredential,
-  RemoveCredential,
-  GetOrganizationLogo,
-  GetOrganizationLogoSucceeded,
-  UpdateCredentialType,
-  GetAllSkills,
-  GetCredentialSkillGroup,
-  SaveUpdateCredentialSkillGroup,
-  RemoveCredentialSkillGroup,
-  GetOrganizationSettings,
-  SaveOrganizationSettings,
   ClearDepartmentList,
   ClearLocationList,
-  GetSkillDataSources,
-  SaveCredentialSucceeded,
-  ExportLocations,
+  DeleteDepartmentById,
+  DeleteLocationById,
+  DeleteRegionById,
   ExportDepartments,
+  ExportLocations,
+  ExportRegions,
   ExportSkills,
   GetAllOrganizationSkills,
-  GetMasterSkillsByOrganization,
-  GetLocationFilterOptions,
+  GetAllSkills,
+  GetAllSkillsCategories,
+  GetAssignedSkillsByPage,
+  GetBillRatesImportErrors,
+  GetBillRatesImportErrorsSucceeded,
+  GetBillRatesImportTemplate,
+  GetBillRatesImportTemplateSucceeded,
+  GetBusinessUnitList,
+  GetCredential,
+  GetCredentialSkillGroup,
+  GetCredentialTypes,
   GetDepartmentFilterOptions,
-  GetRegionFilterOptions,
-  ExportRegions,
-  GetOrganizationSettingsFilterOptions,
-  GetLocationTypes,
-  GetUSCanadaTimeZoneIds,
-  GetLocationsImportTemplate,
-  GetLocationsImportTemplateSucceeded,
-  GetLocationsImportErrors,
-  GetLocationsImportErrorsSucceeded,
-  SaveLocationsImportResult,
-  SaveLocationsImportResultSucceeded,
-  UploadLocationsFile,
-  UploadLocationsFileSucceeded,
-  GetDepartmentsImportTemplate,
-  GetDepartmentsImportTemplateSucceeded,
+  GetDepartmentsByLocationId,
   GetDepartmentsImportErrors,
   GetDepartmentsImportErrorsSucceeded,
+  GetDepartmentsImportTemplate,
+  GetDepartmentsImportTemplateSucceeded,
+  GetLocationById,
+  GetLocationFilterOptions,
+  GetLocationsByOrganizationId,
+  GetLocationsByRegionId,
+  GetLocationsImportErrors,
+  GetLocationsImportErrorsSucceeded,
+  GetLocationsImportTemplate,
+  GetLocationsImportTemplateSucceeded,
+  GetLocationTypes,
+  GetMasterSkillsByOrganization,
+  GetMasterSkillsByPage,
+  GetOrganizationById,
+  GetOrganizationByIdSucceeded,
+  GetOrganizationLogo,
+  GetOrganizationLogoSucceeded,
+  GetOrganizationSettings,
+  GetOrganizationSettingsFilterOptions,
+  GetRegionFilterOptions,
+  GetRegions,
+  GetSkillDataSources,
+  GetSkillsCategoriesByPage,
+  GetUSCanadaTimeZoneIds,
+  RemoveAssignedSkill,
+  RemoveAssignedSkillSucceeded,
+  RemoveCredential,
+  RemoveCredentialSkillGroup,
+  RemoveCredentialType,
+  RemoveMasterSkill,
+  RemoveMasterSkillSucceeded,
+  RemoveSkillsCategory,
+  RemoveSkillsCategorySucceeded,
+  SaveAssignedSkill,
+  SaveAssignedSkillSucceeded,
+  SaveBillRatesImportResult,
+  SaveBillRatesImportResultSucceeded,
+  SaveCredential,
+  SaveCredentialSucceeded,
+  SaveCredentialType,
+  SaveDepartment,
+  SaveDepartmentsImportResult,
+  SaveDepartmentsImportResultSucceeded,
+  SaveLocation,
+  SaveLocationsImportResult,
+  SaveLocationsImportResultSucceeded,
+  SaveMasterSkill,
+  SaveMasterSkillSucceeded,
+  SaveOrganization,
+  SaveOrganizationSettings,
+  SaveOrganizationSucceeded,
+  SaveRegion,
+  SaveSkillsCategory,
+  SaveSkillsCategorySucceeded,
+  SaveUpdateCredentialSkillGroup,
+  SetBillingStatesByCountry,
+  SetDirtyState,
+  SetGeneralStatesByCountry,
+  UpdateCredentialType,
+  UpdateDepartment,
+  UpdateLocation,
+  UpdateRegion,
+  UploadBillRatesFile,
+  UploadBillRatesFileSucceeded,
   UploadDepartmentsFile,
   UploadDepartmentsFileSucceeded,
-  SaveDepartmentsImportResult,
-  SaveDepartmentsImportResultSucceeded
+  UploadLocationsFile,
+  UploadLocationsFileSucceeded,
+  UploadOrganizationLogo,
 } from './organization-management.actions';
-import { Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
+import {
+  Department,
+  DepartmentFilterOptions,
+  DepartmentsPage,
+  ImportedDepartment,
+} from '@shared/models/department.model';
 import { Region, regionFilter } from '@shared/models/region.model';
 import {
   ImportedLocation,
@@ -107,17 +120,24 @@ import {
   LocationFilterOptions,
   LocationsPage,
   LocationType,
-  TimeZoneModel
+  TimeZoneModel,
 } from '@shared/models/location.model';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
-import { MasterSkillByOrganization, Skill, SkillsPage, SkillDataSource } from 'src/app/shared/models/skill.model';
+import { MasterSkillByOrganization, Skill, SkillDataSource, SkillsPage } from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialPage } from '@shared/models/credential.model';
-import { RECORD_ADDED, RECORD_ALREADY_EXISTS, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED, RECORD_SAVED, usedByOrderErrorMessage } from 'src/app/shared/constants/messages';
+import {
+  RECORD_ADDED,
+  RECORD_ALREADY_EXISTS,
+  RECORD_CANNOT_BE_DELETED,
+  RECORD_MODIFIED,
+  RECORD_SAVED,
+  usedByOrderErrorMessage,
+} from 'src/app/shared/constants/messages';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { CategoriesService } from '@shared/services/categories.service';
@@ -131,6 +151,8 @@ import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { NodatimeService } from '@shared/services/nodatime.service';
 import { HttpErrorResponse } from "@angular/common/http";
+import { BillRatesService } from '@shared/services/bill-rates.service';
+import { ImportedBillRate } from '@shared/models';
 
 interface DropdownOption {
   id: number;
@@ -179,14 +201,17 @@ export interface OrganizationManagementStateModel {
   departmentFilterOptions: DepartmentFilterOptions | null;
   organizationSettingsFilterOptions: string[] | null;
   timeZones: TimeZoneModel[] | null;
-  loctionTypes: LocationType[] |null;
-  isLocationTypesLoading : boolean;
+  loctionTypes: LocationType[] | null;
+  isLocationTypesLoading: boolean;
 }
 
 @State<OrganizationManagementStateModel>({
   name: 'organizationManagement',
   defaults: {
-    countries: [{ id: Country.USA, text: Country[0] }, { id: Country.Canada, text: Country[1] }],
+    countries: [
+      { id: Country.USA, text: Country[0] },
+      { id: Country.Canada, text: Country[1] },
+    ],
     statesGeneral: UsaStates,
     statesBilling: UsaStates,
     phoneTypes: GeneralPhoneTypes,
@@ -194,10 +219,12 @@ export interface OrganizationManagementStateModel {
     sendDocumentAgencies: [
       { id: SendDocumentAgency.Accepted, text: 'Accepted' },
       { id: SendDocumentAgency.Offered, text: 'Offered' },
-      { id: SendDocumentAgency.Onboard, text: 'Onboard' }
+      { id: SendDocumentAgency.Onboard, text: 'Onboard' },
     ],
     days: Days,
-    statuses: Object.keys(Status).filter(StringIsNumber).map((statusName, index) => ({ id: index, text: statusName })),
+    statuses: Object.keys(Status)
+      .filter(StringIsNumber)
+      .map((statusName, index) => ({ id: index, text: statusName })),
     isOrganizationLoading: false,
     organization: null,
     isDepartmentLoading: false,
@@ -224,110 +251,173 @@ export interface OrganizationManagementStateModel {
     skillDataSource: { skillABBRs: [], skillDescriptions: [], glNumbers: [] },
     allOrganizationSkills: null,
     locationFilterOptions: null,
-    regionFilterOptions:null,
+    regionFilterOptions: null,
     departmentFilterOptions: null,
     organizationSettingsFilterOptions: null,
-    timeZones :[],
-    loctionTypes :[],
-    isLocationTypesLoading: false
-   },
+    timeZones: [],
+    loctionTypes: [],
+    isLocationTypesLoading: false,
+  },
 })
 @Injectable()
 export class OrganizationManagementState {
   @Selector()
-  static countries(state: OrganizationManagementStateModel): DropdownOption[] { return state.countries; }
+  static countries(state: OrganizationManagementStateModel): DropdownOption[] {
+    return state.countries;
+  }
 
   @Selector()
-  static statesGeneral(state: OrganizationManagementStateModel): string[] | null { return state.statesGeneral; }
+  static statesGeneral(state: OrganizationManagementStateModel): string[] | null {
+    return state.statesGeneral;
+  }
 
   @Selector()
-  static phoneTypes(state: OrganizationManagementStateModel): string[] | null { return state.phoneTypes; }
+  static phoneTypes(state: OrganizationManagementStateModel): string[] | null {
+    return state.phoneTypes;
+  }
 
   @Selector()
-  static statesBilling(state: OrganizationManagementStateModel): string[] | null { return state.statesBilling; }
+  static statesBilling(state: OrganizationManagementStateModel): string[] | null {
+    return state.statesBilling;
+  }
 
   @Selector()
-  static businessUnits(state: OrganizationManagementStateModel): BusinessUnit[] { return state.businessUnits; }
+  static businessUnits(state: OrganizationManagementStateModel): BusinessUnit[] {
+    return state.businessUnits;
+  }
 
   @Selector()
-  static sendDocumentAgencies(state: OrganizationManagementStateModel): DropdownOption[] { return state.sendDocumentAgencies; }
+  static sendDocumentAgencies(state: OrganizationManagementStateModel): DropdownOption[] {
+    return state.sendDocumentAgencies;
+  }
 
   @Selector()
-  static days(state: OrganizationManagementStateModel): DropdownOption[] { return state.days; }
+  static days(state: OrganizationManagementStateModel): DropdownOption[] {
+    return state.days;
+  }
 
   @Selector()
-  static statuses(state: OrganizationManagementStateModel): DropdownOption[] { return state.statuses; }
+  static statuses(state: OrganizationManagementStateModel): DropdownOption[] {
+    return state.statuses;
+  }
 
   @Selector()
-  static isDirty(state: OrganizationManagementStateModel): boolean { return state.isDirty; }
+  static isDirty(state: OrganizationManagementStateModel): boolean {
+    return state.isDirty;
+  }
 
   @Selector()
-  static departments(state: OrganizationManagementStateModel): Department[] | DepartmentsPage { return state.departments; }
+  static departments(state: OrganizationManagementStateModel): Department[] | DepartmentsPage {
+    return state.departments;
+  }
 
   @Selector()
-  static regions(state: OrganizationManagementStateModel): Region[] { return state.regions; }
+  static regions(state: OrganizationManagementStateModel): Region[] {
+    return state.regions;
+  }
   @Selector()
-  static GetRegionFilterOptions(state: OrganizationManagementStateModel): Region[] { return state.regions; }
+  static GetRegionFilterOptions(state: OrganizationManagementStateModel): Region[] {
+    return state.regions;
+  }
 
   @Selector()
-  static locationsByRegionId(state: OrganizationManagementStateModel): Location[] | LocationsPage { return state.locations; }
+  static locationsByRegionId(state: OrganizationManagementStateModel): Location[] | LocationsPage {
+    return state.locations;
+  }
 
   @Selector()
-  static locationById(state: OrganizationManagementStateModel): Location | null { return state.location; }
+  static locationById(state: OrganizationManagementStateModel): Location | null {
+    return state.location;
+  }
 
   @Selector()
-  static organization(state: OrganizationManagementStateModel): Organization | null { return state.organization; }
+  static organization(state: OrganizationManagementStateModel): Organization | null {
+    return state.organization;
+  }
 
   @Selector()
-  static masterSkills(state: OrganizationManagementStateModel): SkillsPage | null { return state.masterSkills; }
+  static masterSkills(state: OrganizationManagementStateModel): SkillsPage | null {
+    return state.masterSkills;
+  }
 
   @Selector()
-  static masterSkillsByOrganization(state: OrganizationManagementStateModel): MasterSkillByOrganization[] { return state.masterSkillsByOrganization; }
+  static masterSkillsByOrganization(state: OrganizationManagementStateModel): MasterSkillByOrganization[] {
+    return state.masterSkillsByOrganization;
+  }
 
   @Selector()
-  static skills(state: OrganizationManagementStateModel): SkillsPage | null { return state.skills; }
+  static skills(state: OrganizationManagementStateModel): SkillsPage | null {
+    return state.skills;
+  }
 
   @Selector()
-  static skillsCategories(state: OrganizationManagementStateModel): SkillCategoriesPage | null { return state.skillsCategories; }
+  static skillsCategories(state: OrganizationManagementStateModel): SkillCategoriesPage | null {
+    return state.skillsCategories;
+  }
 
   @Selector()
-  static allSkillsCategories(state: OrganizationManagementStateModel): SkillCategoriesPage | null { return state.allSkillsCategories; }
+  static allSkillsCategories(state: OrganizationManagementStateModel): SkillCategoriesPage | null {
+    return state.allSkillsCategories;
+  }
 
   @Selector()
-  static credentialTypes(state: OrganizationManagementStateModel): CredentialType[] { return state.credentialTypes; }
+  static credentialTypes(state: OrganizationManagementStateModel): CredentialType[] {
+    return state.credentialTypes;
+  }
 
   @Selector()
-  static credentials(state: OrganizationManagementStateModel): Credential[] | CredentialPage { return state.credentials }
+  static credentials(state: OrganizationManagementStateModel): Credential[] | CredentialPage {
+    return state.credentials;
+  }
 
   @Selector()
-  static skillGroups(state: OrganizationManagementStateModel): CredentialSkillGroupPage  | null { return state.skillGroups }
+  static skillGroups(state: OrganizationManagementStateModel): CredentialSkillGroupPage | null {
+    return state.skillGroups;
+  }
 
   @Selector()
-  static organizationSettings(state: OrganizationManagementStateModel): OrganizationSettingsGet[] { return state.organizationSettings }
+  static organizationSettings(state: OrganizationManagementStateModel): OrganizationSettingsGet[] {
+    return state.organizationSettings;
+  }
 
   @Selector()
-  static skillDataSource(state: OrganizationManagementStateModel): SkillDataSource { return state.skillDataSource; }
+  static skillDataSource(state: OrganizationManagementStateModel): SkillDataSource {
+    return state.skillDataSource;
+  }
 
   @Selector()
-  static allOrganizationSkills(state: OrganizationManagementStateModel): Skill[] | null { return state.allOrganizationSkills; }
+  static allOrganizationSkills(state: OrganizationManagementStateModel): Skill[] | null {
+    return state.allOrganizationSkills;
+  }
 
   @Selector()
-  static locationFilterOptions(state: OrganizationManagementStateModel): LocationFilterOptions | null { return state.locationFilterOptions; }
+  static locationFilterOptions(state: OrganizationManagementStateModel): LocationFilterOptions | null {
+    return state.locationFilterOptions;
+  }
   @Selector()
-  static regionFilterOptions(state: OrganizationManagementStateModel): regionFilter | null { return state.regionFilterOptions; }
+  static regionFilterOptions(state: OrganizationManagementStateModel): regionFilter | null {
+    return state.regionFilterOptions;
+  }
 
   @Selector()
-  static departmentFilterOptions(state: OrganizationManagementStateModel): DepartmentFilterOptions | null { return state.departmentFilterOptions; }
+  static departmentFilterOptions(state: OrganizationManagementStateModel): DepartmentFilterOptions | null {
+    return state.departmentFilterOptions;
+  }
 
   @Selector()
-  static organizationSettingsFilterOptions(state: OrganizationManagementStateModel): string[] | null { return state.organizationSettingsFilterOptions; }
+  static organizationSettingsFilterOptions(state: OrganizationManagementStateModel): string[] | null {
+    return state.organizationSettingsFilterOptions;
+  }
 
   @Selector()
-  static timeZones(state: OrganizationManagementStateModel): TimeZoneModel[] | null { return state.timeZones; }
+  static timeZones(state: OrganizationManagementStateModel): TimeZoneModel[] | null {
+    return state.timeZones;
+  }
 
   @Selector()
-  static locationTypes(state: OrganizationManagementStateModel): LocationType[] | null { return state.loctionTypes; }
-
+  static locationTypes(state: OrganizationManagementStateModel): LocationType[] | null {
+    return state.loctionTypes;
+  }
 
   constructor(
     private organizationService: OrganizationService,
@@ -339,67 +429,99 @@ export class OrganizationManagementState {
     private credentialsService: CredentialsService,
     private skillGroupService: SkillGroupService,
     private organizationSettingsService: OrganizationSettingsService,
-    private nodatimeService: NodatimeService
-  ) { }
+    private nodatimeService: NodatimeService,
+    private billRatesService: BillRatesService
+  ) {}
 
   @Action(SetGeneralStatesByCountry)
-  SetGeneralStatesByCountry({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: SetGeneralStatesByCountry): void {
+  SetGeneralStatesByCountry(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { payload }: SetGeneralStatesByCountry
+  ): void {
     patchState({ statesGeneral: payload === Country.USA ? UsaStates : CanadaStates });
   }
 
   @Action(SetBillingStatesByCountry)
-  SetBillingStatesByCountry({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: SetBillingStatesByCountry): void {
+  SetBillingStatesByCountry(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { payload }: SetBillingStatesByCountry
+  ): void {
     patchState({ statesBilling: payload === Country.USA ? UsaStates : CanadaStates });
   }
 
   @Action(GetOrganizationById)
-  GetOrganizationById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: GetOrganizationById): Observable<Organization> {
+  GetOrganizationById(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: GetOrganizationById
+  ): Observable<Organization> {
     patchState({ isOrganizationLoading: true });
-    return this.organizationService.getOrganizationById(payload).pipe(tap((payload) => {
-      patchState({ isOrganizationLoading: false, organization: payload });
-      dispatch(new GetOrganizationByIdSucceeded(payload));
-      return payload;
-    }));
+    return this.organizationService.getOrganizationById(payload).pipe(
+      tap((payload) => {
+        patchState({ isOrganizationLoading: false, organization: payload });
+        dispatch(new GetOrganizationByIdSucceeded(payload));
+        return payload;
+      })
+    );
   }
 
   @Action(SaveOrganization)
-  SaveOrganization({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveOrganization): Observable<Organization> {
+  SaveOrganization(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: SaveOrganization
+  ): Observable<Organization> {
     patchState({ isOrganizationLoading: true });
-    return this.organizationService.saveOrganization(payload).pipe(tap((payloadResponse) => {
-      patchState({ isOrganizationLoading: false });
-      dispatch(new SaveOrganizationSucceeded(payloadResponse));
-      if (payload.organizationId) {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      } else {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-      }
-      return payloadResponse;
-    }));
+    return this.organizationService.saveOrganization(payload).pipe(
+      tap((payloadResponse) => {
+        patchState({ isOrganizationLoading: false });
+        dispatch(new SaveOrganizationSucceeded(payloadResponse));
+        if (payload.organizationId) {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        } else {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        }
+        return payloadResponse;
+      })
+    );
   }
 
   @Action(UploadOrganizationLogo)
-  UploadOrganizationLogo({ patchState }: StateContext<OrganizationManagementStateModel>, { file, businessUnitId }: UploadOrganizationLogo): Observable<any> {
+  UploadOrganizationLogo(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { file, businessUnitId }: UploadOrganizationLogo
+  ): Observable<any> {
     patchState({ isOrganizationLoading: true });
-    return this.organizationService.saveOrganizationLogo(file, businessUnitId).pipe(tap((payload) => {
-      patchState({ isOrganizationLoading: false });
-      return payload;
-    }));
+    return this.organizationService.saveOrganizationLogo(file, businessUnitId).pipe(
+      tap((payload) => {
+        patchState({ isOrganizationLoading: false });
+        return payload;
+      })
+    );
   }
 
   @Action(GetOrganizationLogo)
-  GetOrganizationLogo({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: GetOrganizationLogo): Observable<any> {
-    return this.organizationService.getOrganizationLogo(payload).pipe(tap((payload) => {
-      dispatch(new GetOrganizationLogoSucceeded(payload));
-      return payload;
-    }));
+  GetOrganizationLogo(
+    { dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: GetOrganizationLogo
+  ): Observable<any> {
+    return this.organizationService.getOrganizationLogo(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetOrganizationLogoSucceeded(payload));
+        return payload;
+      })
+    );
   }
 
   @Action(GetBusinessUnitList)
-  GetBusinessUnitList({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetBusinessUnitList): Observable<BusinessUnit[]> {
-    return this.organizationService.getBusinessUnit().pipe(tap((payload) => {
-      patchState({ businessUnits: payload});
-      return payload;
-    }));
+  GetBusinessUnitList(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    {}: GetBusinessUnitList
+  ): Observable<BusinessUnit[]> {
+    return this.organizationService.getBusinessUnit().pipe(
+      tap((payload) => {
+        patchState({ businessUnits: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(SetDirtyState)
@@ -408,392 +530,529 @@ export class OrganizationManagementState {
   }
 
   @Action(SaveDepartment)
-  SaveDepartment({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload, filters }: SaveDepartment): Observable<Department> {
+  SaveDepartment(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload, filters }: SaveDepartment
+  ): Observable<Department> {
     patchState({ isDepartmentLoading: true });
-    return this.departmentService.saveDepartment(payload).pipe(tap((payload) => {
-      patchState({ isDepartmentLoading: false});
-      dispatch(new GetDepartmentsByLocationId(payload.locationId, filters));
-      if (filters) {
-        dispatch(new GetDepartmentFilterOptions(payload.locationId as number));
-      }
-      return payload;
-    }));
+    return this.departmentService.saveDepartment(payload).pipe(
+      tap((payload) => {
+        patchState({ isDepartmentLoading: false });
+        dispatch(new GetDepartmentsByLocationId(payload.locationId, filters));
+        if (filters) {
+          dispatch(new GetDepartmentFilterOptions(payload.locationId as number));
+        }
+        return payload;
+      })
+    );
   }
 
   @Action(GetDepartmentsByLocationId)
-  GetDepartmentsByLocationId({ patchState }: StateContext<OrganizationManagementStateModel>, { locationId, filters }: GetDepartmentsByLocationId): Observable<Department[] | DepartmentsPage> {
-    return this.departmentService.getDepartmentsByLocationId(locationId, filters).pipe(tap((payload) => {
-      patchState({ departments: payload});
-      return payload;
-    }));
+  GetDepartmentsByLocationId(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { locationId, filters }: GetDepartmentsByLocationId
+  ): Observable<Department[] | DepartmentsPage> {
+    return this.departmentService.getDepartmentsByLocationId(locationId, filters).pipe(
+      tap((payload) => {
+        patchState({ departments: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(UpdateDepartment)
-  UpdateDepartments({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { department, filters }: UpdateDepartment): Observable<void> {
-    return this.departmentService.updateDepartment(department).pipe(tap((payload) => {
-      patchState({ isDepartmentLoading: false });
-      dispatch(new GetDepartmentsByLocationId(department.locationId, filters));
-      if (filters) {
-        dispatch(new GetDepartmentFilterOptions(department.locationId as number));
-      }
-      return payload;
-    }));
+  UpdateDepartments(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { department, filters }: UpdateDepartment
+  ): Observable<void> {
+    return this.departmentService.updateDepartment(department).pipe(
+      tap((payload) => {
+        patchState({ isDepartmentLoading: false });
+        dispatch(new GetDepartmentsByLocationId(department.locationId, filters));
+        if (filters) {
+          dispatch(new GetDepartmentFilterOptions(department.locationId as number));
+        }
+        return payload;
+      })
+    );
   }
 
   @Action(DeleteDepartmentById)
-  DeleteDepartmentById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { department, filters }: DeleteDepartmentById): Observable<any> {
-    return this.departmentService.deleteDepartmentById(department.departmentId).pipe(tap((payload) => {
-      patchState({ isDepartmentLoading: false });
-      dispatch(new GetDepartmentsByLocationId(department.locationId, filters));
-      return payload;
-    }),
+  DeleteDepartmentById(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { department, filters }: DeleteDepartmentById
+  ): Observable<any> {
+    return this.departmentService.deleteDepartmentById(department.departmentId).pipe(
+      tap((payload) => {
+        patchState({ isDepartmentLoading: false });
+        dispatch(new GetDepartmentsByLocationId(department.locationId, filters));
+        return payload;
+      }),
       catchError((error: any) => {
-        const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Department', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+        const message = error.error.errors?.EntityInUse
+          ? usedByOrderErrorMessage('Department', error.error.errors['EntityInUse'])
+          : RECORD_CANNOT_BE_DELETED;
         return dispatch(new ShowToast(MessageTypes.Error, message));
-      }));
+      })
+    );
   }
-
-
 
   @Action(GetRegions)
   GetRegions({ patchState }: StateContext<OrganizationManagementStateModel>, { filter }: any): Observable<Region[]> {
-
-
-    return this.regionService.getRegionsByOrganizationId(filter).pipe(tap((payload:any) => {
-
-      if("items" in payload){
-        patchState({ regions: payload.items});
-        return payload.items;
-      }else{
-        patchState({ regions: payload});
-        return payload
-      }
-
-
-    }));
+    return this.regionService.getRegionsByOrganizationId(filter).pipe(
+      tap((payload: any) => {
+        if ('items' in payload) {
+          patchState({ regions: payload.items });
+          return payload.items;
+        } else {
+          patchState({ regions: payload });
+          return payload;
+        }
+      })
+    );
   }
 
   @Action(SaveRegion)
-  SaveRegion({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { region }: SaveRegion): Observable<Region> {
+  SaveRegion(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { region }: SaveRegion
+  ): Observable<Region> {
     patchState({ isLocationLoading: true });
-    return this.regionService.saveRegion(region).pipe(tap((payload) => {
-      patchState({ isLocationLoading: false});
-      if( payload.id!=0)
-      {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
-      dispatch(new GetRegions());
-      }else{
-        dispatch(new ShowToast(MessageTypes.Error, RECORD_ALREADY_EXISTS));
-      }
-      return payload;
-    }));
+    return this.regionService.saveRegion(region).pipe(
+      tap((payload) => {
+        patchState({ isLocationLoading: false });
+        if (payload.id != 0) {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
+          dispatch(new GetRegions());
+        } else {
+          dispatch(new ShowToast(MessageTypes.Error, RECORD_ALREADY_EXISTS));
+        }
+        return payload;
+      })
+    );
   }
 
   @Action(UpdateRegion)
-  UpdateRegion({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { region }: UpdateRegion): Observable<Region> {
-    return this.regionService.updateRegion(region).pipe(tap((payload) => {
-      patchState({ isLocationLoading: false });
+  UpdateRegion(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { region }: UpdateRegion
+  ): Observable<Region> {
+    return this.regionService.updateRegion(region).pipe(
+      tap((payload) => {
+        patchState({ isLocationLoading: false });
 
-      if( payload.id!=0)
-      {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      dispatch(new GetRegions());
-      }
-      else
-      {
-        dispatch(new ShowToast(MessageTypes.Error, RECORD_ALREADY_EXISTS));
-      }
-      return payload;
-    }));
+        if (payload.id != 0) {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+          dispatch(new GetRegions());
+        } else {
+          dispatch(new ShowToast(MessageTypes.Error, RECORD_ALREADY_EXISTS));
+        }
+        return payload;
+      })
+    );
   }
 
   @Action(DeleteRegionById)
-  DeleteRegionById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
-    { regionId }: DeleteRegionById): Observable<void> {
-    return this.regionService.deleteRegionById(regionId).pipe(tap((payload) => {
-      patchState({ isLocationLoading: false });
-      dispatch(new GetRegions());
-      return payload;
-    }));
+  DeleteRegionById(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { regionId }: DeleteRegionById
+  ): Observable<void> {
+    return this.regionService.deleteRegionById(regionId).pipe(
+      tap((payload) => {
+        patchState({ isLocationLoading: false });
+        dispatch(new GetRegions());
+        return payload;
+      })
+    );
   }
 
   @Action(GetLocationsByOrganizationId)
-  GetLocationsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { organizationId }: GetLocationsByOrganizationId): Observable<Location[]> {
-    return this.locationService.getLocationsByOrganizationId(organizationId).pipe(tap((payload) => {
-      patchState({ locations: payload});
-      return payload;
-    }));
+  GetLocationsByOrganizationId(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { organizationId }: GetLocationsByOrganizationId
+  ): Observable<Location[]> {
+    return this.locationService.getLocationsByOrganizationId(organizationId).pipe(
+      tap((payload) => {
+        patchState({ locations: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(GetLocationsByRegionId)
-  GetLocationsByRegionId({ patchState }: StateContext<OrganizationManagementStateModel>, { regionId, filters }: GetLocationsByRegionId): Observable<Location[] | LocationsPage> {
-    return this.locationService.getLocationsByRegionId(regionId, filters).pipe(tap((payload) => {
-      patchState({ locations: payload});
-      return payload;
-    }));
+  GetLocationsByRegionId(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { regionId, filters }: GetLocationsByRegionId
+  ): Observable<Location[] | LocationsPage> {
+    return this.locationService.getLocationsByRegionId(regionId, filters).pipe(
+      tap((payload) => {
+        patchState({ locations: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(GetLocationById)
-  GetLocationById({ patchState }: StateContext<OrganizationManagementStateModel>, { locationId }: GetLocationById): Observable<Location> {
-    return this.locationService.getLocationById(locationId).pipe(tap((payload) => {
-      patchState({ location: payload});
-      return payload;
-    }));
+  GetLocationById(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { locationId }: GetLocationById
+  ): Observable<Location> {
+    return this.locationService.getLocationById(locationId).pipe(
+      tap((payload) => {
+        patchState({ location: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(SaveLocation)
-  SaveLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
-    { location, regionId, filters }: SaveLocation):
-     Observable<Location|void> {
+  SaveLocation(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { location, regionId, filters }: SaveLocation
+  ): Observable<Location | void> {
     patchState({ isLocationLoading: true });
-    return this.locationService.saveLocation(location).pipe(tap((payload) => {
-      patchState({ isLocationLoading: false});
-      dispatch(
-        [new ShowToast(MessageTypes.Success, RECORD_ADDED),
-        new GetLocationsByRegionId(regionId, filters)]);
-      if (filters) {
-        dispatch(new GetLocationFilterOptions(regionId));
-      }
-      return payload;
-    }),
-    catchError((error) =>
-    dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
+    return this.locationService.saveLocation(location).pipe(
+      tap((payload) => {
+        patchState({ isLocationLoading: false });
+        dispatch([new ShowToast(MessageTypes.Success, RECORD_ADDED), new GetLocationsByRegionId(regionId, filters)]);
+        if (filters) {
+          dispatch(new GetLocationFilterOptions(regionId));
+        }
+        return payload;
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
     );
-}
+  }
 
   @Action(UpdateLocation)
-  UpdateLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
-    { location, regionId, filters}: UpdateLocation):
-      Observable<void> {
-          return this.locationService.updateLocation(location).pipe(tap((payload) => {
-            patchState({ isLocationLoading: false });
-            dispatch(
-              [new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
-              new GetLocationsByRegionId(regionId, filters)]);
-            if (filters) {
-              dispatch(new GetLocationFilterOptions(regionId));
-            }
-            return payload;
-          }),
-          catchError((error) =>
-          dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
-          );
-    }
-
+  UpdateLocation(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { location, regionId, filters }: UpdateLocation
+  ): Observable<void> {
+    return this.locationService.updateLocation(location).pipe(
+      tap((payload) => {
+        patchState({ isLocationLoading: false });
+        dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new GetLocationsByRegionId(regionId, filters)]);
+        if (filters) {
+          dispatch(new GetLocationFilterOptions(regionId));
+        }
+        return payload;
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
+    );
+  }
 
   @Action(DeleteLocationById)
-  DeleteLocationById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { locationId, regionId, filters }: DeleteLocationById): Observable<any> {
-    return this.locationService.deleteLocationById(locationId).pipe(tap((payload) => {
-      patchState({ isLocationLoading: false });
-      dispatch(new GetLocationsByRegionId(regionId, filters));
-      return payload;
-    }),
-    catchError((error: any) => {
-      const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Location', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
-      return dispatch(new ShowToast(MessageTypes.Error, message));
-    }));
+  DeleteLocationById(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { locationId, regionId, filters }: DeleteLocationById
+  ): Observable<any> {
+    return this.locationService.deleteLocationById(locationId).pipe(
+      tap((payload) => {
+        patchState({ isLocationLoading: false });
+        dispatch(new GetLocationsByRegionId(regionId, filters));
+        return payload;
+      }),
+      catchError((error: any) => {
+        const message = error.error.errors?.EntityInUse
+          ? usedByOrderErrorMessage('Location', error.error.errors['EntityInUse'])
+          : RECORD_CANNOT_BE_DELETED;
+        return dispatch(new ShowToast(MessageTypes.Error, message));
+      })
+    );
   }
 
   @Action(GetMasterSkillsByPage)
-  GetMasterSkillsByPage({ patchState }: StateContext<OrganizationManagementStateModel>, { pageNumber, pageSize }: GetMasterSkillsByPage): Observable<SkillsPage> {
+  GetMasterSkillsByPage(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { pageNumber, pageSize }: GetMasterSkillsByPage
+  ): Observable<SkillsPage> {
     patchState({ isOrganizationLoading: true });
-    return this.skillsService.getMasterSkills(pageNumber, pageSize).pipe(tap((payload) => {
-      patchState({ isOrganizationLoading: false, masterSkills: payload });
-      return payload;
-    }));
+    return this.skillsService.getMasterSkills(pageNumber, pageSize).pipe(
+      tap((payload) => {
+        patchState({ isOrganizationLoading: false, masterSkills: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(GetMasterSkillsByOrganization)
-  GetMasterSkillsByOrganization({ patchState }: StateContext<OrganizationManagementStateModel>): Observable<MasterSkillByOrganization[]> {
-    return this.skillsService.getMasterSkillsByOrganization().pipe(tap(payload => {
-      patchState({ masterSkillsByOrganization: payload });
-      return payload;
-    }));
+  GetMasterSkillsByOrganization({
+    patchState,
+  }: StateContext<OrganizationManagementStateModel>): Observable<MasterSkillByOrganization[]> {
+    return this.skillsService.getMasterSkillsByOrganization().pipe(
+      tap((payload) => {
+        patchState({ masterSkillsByOrganization: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(GetAllSkillsCategories)
-  GetAllSkillsCategories({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetAllSkillsCategories): Observable<SkillCategoriesPage> {
-    return this.categoriesService.getAllSkillsCategories().pipe(tap((payload) => {
-      patchState({ allSkillsCategories: payload });
-      return payload;
-    }));
+  GetAllSkillsCategories(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    {}: GetAllSkillsCategories
+  ): Observable<SkillCategoriesPage> {
+    return this.categoriesService.getAllSkillsCategories().pipe(
+      tap((payload) => {
+        patchState({ allSkillsCategories: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(GetSkillsCategoriesByPage)
-  GetSkillsCategoriesByPage({ patchState }: StateContext<OrganizationManagementStateModel>, { pageNumber, pageSize }: GetSkillsCategoriesByPage): Observable<SkillCategoriesPage> {
+  GetSkillsCategoriesByPage(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { pageNumber, pageSize }: GetSkillsCategoriesByPage
+  ): Observable<SkillCategoriesPage> {
     patchState({ isOrganizationLoading: true });
-    return this.categoriesService.getSkillsCategories(pageNumber, pageSize).pipe(tap((payload) => {
-      patchState({ isOrganizationLoading: false, skillsCategories: payload });
-      return payload;
-    }));
+    return this.categoriesService.getSkillsCategories(pageNumber, pageSize).pipe(
+      tap((payload) => {
+        patchState({ isOrganizationLoading: false, skillsCategories: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(SaveSkillsCategory)
-  SaveSkillsCategory({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveSkillsCategory): Observable<SkillCategory> {
+  SaveSkillsCategory(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: SaveSkillsCategory
+  ): Observable<SkillCategory> {
     patchState({ isOrganizationLoading: true });
     const isCreating = !payload.id;
-    return this.categoriesService.saveSkillCategory(payload).pipe(tap((payload) => {
-      patchState({ isOrganizationLoading: false });
-      dispatch(new SaveSkillsCategorySucceeded(payload));
-      dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
-      return payload;
-    }));
+    return this.categoriesService.saveSkillCategory(payload).pipe(
+      tap((payload) => {
+        patchState({ isOrganizationLoading: false });
+        dispatch(new SaveSkillsCategorySucceeded(payload));
+        dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
+        return payload;
+      })
+    );
   }
 
   @Action(RemoveSkillsCategory)
-  RemoveSkillsCategory({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: RemoveSkillsCategory): Observable<any> {
+  RemoveSkillsCategory(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: RemoveSkillsCategory
+  ): Observable<any> {
     patchState({ isOrganizationLoading: true });
-    return this.categoriesService.removeSkillCategory(payload).pipe(tap((payload) => {
-      patchState({ isOrganizationLoading: false });
-      dispatch(new RemoveSkillsCategorySucceeded);
-      return payload;
-    }),
-    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))));
+    return this.categoriesService.removeSkillCategory(payload).pipe(
+      tap((payload) => {
+        patchState({ isOrganizationLoading: false });
+        dispatch(new RemoveSkillsCategorySucceeded());
+        return payload;
+      }),
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error.error.detail))))
+    );
   }
 
   @Action(SaveMasterSkill)
-  SaveMasterSkill({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveMasterSkill): Observable<Skill> {
+  SaveMasterSkill(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: SaveMasterSkill
+  ): Observable<Skill> {
     const isCreating = !payload.id;
     patchState({ isOrganizationLoading: true });
-    return this.skillsService.saveMasterSkill(payload).pipe(tap((payload) => {
-      patchState({ isOrganizationLoading: false });
-      dispatch(new SaveMasterSkillSucceeded(payload));
-      dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
-      return payload;
-    }));
+    return this.skillsService.saveMasterSkill(payload).pipe(
+      tap((payload) => {
+        patchState({ isOrganizationLoading: false });
+        dispatch(new SaveMasterSkillSucceeded(payload));
+        dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
+        return payload;
+      })
+    );
   }
 
   @Action(RemoveMasterSkill)
-  RemoveMasterSkill({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: RemoveMasterSkill): Observable<any> {
+  RemoveMasterSkill(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: RemoveMasterSkill
+  ): Observable<any> {
     patchState({ isOrganizationLoading: true });
-    return this.skillsService.removeMasterSkill(payload).pipe(tap((payload) => {
-      patchState({ isOrganizationLoading: false });
-      dispatch(new RemoveMasterSkillSucceeded);
-      return payload;
-    }),
-    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))));
+    return this.skillsService.removeMasterSkill(payload).pipe(
+      tap((payload) => {
+        patchState({ isOrganizationLoading: false });
+        dispatch(new RemoveMasterSkillSucceeded());
+        return payload;
+      }),
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error.error.detail))))
+    );
   }
 
   @Action(SaveAssignedSkill)
-  SaveAssignedSkill({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveAssignedSkill): Observable<Skill | void> {
+  SaveAssignedSkill(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: SaveAssignedSkill
+  ): Observable<Skill | void> {
     const isCreating = !payload.id;
     patchState({ isOrganizationLoading: true });
-    return this.skillsService.saveAssignedSkill(payload).pipe(tap((payload) => {
-      patchState({ isOrganizationLoading: false });
-      dispatch(new SaveAssignedSkillSucceeded(payload));
-      dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
-      return payload;
-    }),
-    catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, 'Skill already exists')))
+    return this.skillsService.saveAssignedSkill(payload).pipe(
+      tap((payload) => {
+        patchState({ isOrganizationLoading: false });
+        dispatch(new SaveAssignedSkillSucceeded(payload));
+        dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
+        return payload;
+      }),
+      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, 'Skill already exists')))
     );
   }
 
   @Action(GetAssignedSkillsByPage)
-  GetAssignedSkillsByPage({ patchState }: StateContext<OrganizationManagementStateModel>, { pageNumber, pageSize, filters }: GetAssignedSkillsByPage): Observable<SkillsPage> {
+  GetAssignedSkillsByPage(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { pageNumber, pageSize, filters }: GetAssignedSkillsByPage
+  ): Observable<SkillsPage> {
     patchState({ isOrganizationLoading: true });
-    return this.skillsService.getAssignedSkills(pageNumber, pageSize, filters).pipe(tap((payload) => {
-      payload.items.forEach(item => {
-        item.foreignKey = item.id + '-' + item.masterSkill?.id;
-      });
-      patchState({ isOrganizationLoading: false, skills: payload });
-      return payload;
-    }));
+    return this.skillsService.getAssignedSkills(pageNumber, pageSize, filters).pipe(
+      tap((payload) => {
+        payload.items.forEach((item) => {
+          item.foreignKey = item.id + '-' + item.masterSkill?.id;
+        });
+        patchState({ isOrganizationLoading: false, skills: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(RemoveAssignedSkill)
-  RemoveAssignedSkill({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: RemoveAssignedSkill): Observable<any> {
+  RemoveAssignedSkill(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: RemoveAssignedSkill
+  ): Observable<any> {
     patchState({ isOrganizationLoading: true });
-    return this.skillsService.removeAssignedSkill(payload).pipe(tap((payload) => {
-      patchState({ isOrganizationLoading: false });
-      dispatch(new RemoveAssignedSkillSucceeded);
-      return payload;
-    }),
-    catchError((error: any) => {
-      const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Skill', error.error.errors['EntityInUse']) : 'Skill cannot be deleted';
-      return dispatch(new ShowToast(MessageTypes.Error, message));
-    }));
+    return this.skillsService.removeAssignedSkill(payload).pipe(
+      tap((payload) => {
+        patchState({ isOrganizationLoading: false });
+        dispatch(new RemoveAssignedSkillSucceeded());
+        return payload;
+      }),
+      catchError((error: any) => {
+        const message = error.error.errors?.EntityInUse
+          ? usedByOrderErrorMessage('Skill', error.error.errors['EntityInUse'])
+          : 'Skill cannot be deleted';
+        return dispatch(new ShowToast(MessageTypes.Error, message));
+      })
+    );
   }
 
   @Action(GetCredentialTypes)
-  GetCredentialTypes({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredentialTypes): Observable<CredentialType[]> {
-  return this.credentialsService.getCredentialTypes().pipe(tap((payload) => {
-      patchState({ credentialTypes: payload });
-      return payload;
-    }));
+  GetCredentialTypes(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    {}: GetCredentialTypes
+  ): Observable<CredentialType[]> {
+    return this.credentialsService.getCredentialTypes().pipe(
+      tap((payload) => {
+        patchState({ credentialTypes: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(SaveCredentialType)
-  SaveCredentialTypes({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveCredentialType): Observable<CredentialType> {
-    return this.credentialsService.saveUpdateCredentialType(payload).pipe(tap((payload) => {
-      patchState({ isCredentialTypesLoading: false });
-      dispatch(new GetCredentialTypes());
-      return payload;
-    }));
+  SaveCredentialTypes(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: SaveCredentialType
+  ): Observable<CredentialType> {
+    return this.credentialsService.saveUpdateCredentialType(payload).pipe(
+      tap((payload) => {
+        patchState({ isCredentialTypesLoading: false });
+        dispatch(new GetCredentialTypes());
+        return payload;
+      })
+    );
   }
 
   @Action(UpdateCredentialType)
-  UpdateCredentialTypes({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: UpdateCredentialType): Observable<CredentialType> {
-    return this.credentialsService.saveUpdateCredentialType(payload).pipe(tap((payload) => {
-      patchState({ isCredentialLoading: false });
-      dispatch(new GetCredentialTypes());
-      return payload;
-    }));
+  UpdateCredentialTypes(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: UpdateCredentialType
+  ): Observable<CredentialType> {
+    return this.credentialsService.saveUpdateCredentialType(payload).pipe(
+      tap((payload) => {
+        patchState({ isCredentialLoading: false });
+        dispatch(new GetCredentialTypes());
+        return payload;
+      })
+    );
   }
 
   @Action(RemoveCredentialType)
-  RemoveCredentialTypes({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: RemoveCredentialType): Observable<any> {
-    return this.credentialsService.removeCredentialType(payload).pipe(tap((payload) => {
-      patchState({ isCredentialTypesLoading: false });
-      dispatch(new GetCredentialTypes());
-      return payload;
-    }),
-    catchError((error: any) =>  dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
+  RemoveCredentialTypes(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: RemoveCredentialType
+  ): Observable<any> {
+    return this.credentialsService.removeCredentialType(payload).pipe(
+      tap((payload) => {
+        patchState({ isCredentialTypesLoading: false });
+        dispatch(new GetCredentialTypes());
+        return payload;
+      }),
+      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+    );
   }
 
   @Action(GetCredential)
-  GetCredential({ patchState }: StateContext<OrganizationManagementStateModel>,
-    { payload }: GetCredential): Observable<Credential[] | CredentialPage> {
-    return this.credentialsService.getCredential(payload).pipe(tap((payload) => {
-      patchState({ credentials: payload });
-      return payload;
-    }));
+  GetCredential(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { payload }: GetCredential
+  ): Observable<Credential[] | CredentialPage> {
+    return this.credentialsService.getCredential(payload).pipe(
+      tap((payload) => {
+        patchState({ credentials: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(SaveCredential)
-  SaveCredential({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveCredential): Observable<Credential | void> {
-    return this.credentialsService.saveUpdateCredential(payload)
-      .pipe(
-        tap((payloadResponse) => {
-          patchState({ isCredentialLoading: false });
-          if (payload.id) {
-            dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-          } else {
-            dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-          }
-          dispatch(new SaveCredentialSucceeded(payloadResponse));
-          return payloadResponse;
-        }),
-        catchError((error: any) => {
-          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
-        })
-      );
+  SaveCredential(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: SaveCredential
+  ): Observable<Credential | void> {
+    return this.credentialsService.saveUpdateCredential(payload).pipe(
+      tap((payloadResponse) => {
+        patchState({ isCredentialLoading: false });
+        if (payload.id) {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        } else {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        }
+        dispatch(new SaveCredentialSucceeded(payloadResponse));
+        return payloadResponse;
+      }),
+      catchError((error: any) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
   }
 
   @Action(RemoveCredential)
-  RemoveCredential({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload, filters }: RemoveCredential): Observable<any> {
-    return this.credentialsService.removeCredential(payload).pipe(tap(() => {
-      patchState({ isCredentialLoading: false });
-      dispatch(new GetCredential(filters));
-      return payload;
-    }),
-    catchError((error: any) => {
-      const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Credential', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
-      return dispatch(new ShowToast(MessageTypes.Error, message));
-    }));
+  RemoveCredential(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload, filters }: RemoveCredential
+  ): Observable<any> {
+    return this.credentialsService.removeCredential(payload).pipe(
+      tap(() => {
+        patchState({ isCredentialLoading: false });
+        dispatch(new GetCredential(filters));
+        return payload;
+      }),
+      catchError((error: any) => {
+        const message = error.error.errors?.EntityInUse
+          ? usedByOrderErrorMessage('Credential', error.error.errors['EntityInUse'])
+          : RECORD_CANNOT_BE_DELETED;
+        return dispatch(new ShowToast(MessageTypes.Error, message));
+      })
+    );
   }
 
   @Action(GetAllSkills)
-  GetAllSkills({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetAllSkills): Observable<SkillsPage> {
+  GetAllSkills(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    {}: GetAllSkills
+  ): Observable<SkillsPage> {
     return this.skillsService.getAllMasterSkills().pipe(
       tap((payload) => {
         patchState({ skills: payload });
@@ -803,37 +1062,52 @@ export class OrganizationManagementState {
   }
 
   @Action(GetCredentialSkillGroup)
-  GetSkillGroups({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredentialSkillGroup): Observable<CredentialSkillGroupPage> {
-    return this.skillGroupService.getSkillGroups().pipe(tap((payload) => {
-      patchState({ skillGroups: payload });
-      return payload;
-    }));
+  GetSkillGroups(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    {}: GetCredentialSkillGroup
+  ): Observable<CredentialSkillGroupPage> {
+    return this.skillGroupService.getSkillGroups().pipe(
+      tap((payload) => {
+        patchState({ skillGroups: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(SaveUpdateCredentialSkillGroup)
-  SaveUpdateSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveUpdateCredentialSkillGroup): Observable<CredentialSkillGroup> {
-    return this.skillGroupService.saveUpdateSkillGroup(payload).pipe(tap((response) => {
-      patchState({ isSkillGroupLoading: false });
-      if (payload.id) {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      } else {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-      }
-      dispatch(new GetCredentialSkillGroup());
-      return response;
-    }));
+  SaveUpdateSkillGroup(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: SaveUpdateCredentialSkillGroup
+  ): Observable<CredentialSkillGroup> {
+    return this.skillGroupService.saveUpdateSkillGroup(payload).pipe(
+      tap((response) => {
+        patchState({ isSkillGroupLoading: false });
+        if (payload.id) {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        } else {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        }
+        dispatch(new GetCredentialSkillGroup());
+        return response;
+      })
+    );
   }
 
   @Action(RemoveCredentialSkillGroup)
-  RemoveSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: RemoveCredentialSkillGroup): Observable<void> {
+  RemoveSkillGroup(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: RemoveCredentialSkillGroup
+  ): Observable<void> {
     return this.skillGroupService.removeSkillGroup(payload).pipe(
       tap((payload) => {
-      patchState({ isSkillGroupLoading: false });
-      dispatch(new GetCredentialSkillGroup());
-      return payload;
-    }),
+        patchState({ isSkillGroupLoading: false });
+        dispatch(new GetCredentialSkillGroup());
+        return payload;
+      }),
       catchError((error: any) => {
-        const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Group', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+        const message = error.error.errors?.EntityInUse
+          ? usedByOrderErrorMessage('Group', error.error.errors['EntityInUse'])
+          : RECORD_CANNOT_BE_DELETED;
         return dispatch(new ShowToast(MessageTypes.Error, message));
       })
     );
@@ -857,109 +1131,162 @@ export class OrganizationManagementState {
   }
 
   @Action(SaveOrganizationSettings)
-  SaveOverrideOrganizationSettings({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { organizationSettings }: SaveOrganizationSettings): Observable<void> {
-    return this.organizationSettingsService.saveOrganizationSetting(organizationSettings).pipe(tap((payload) => {
-      patchState({ isCredentialSetupLoading: false });
-      dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      dispatch(new GetOrganizationSettings());
-      return payload;
-    }));
+  SaveOverrideOrganizationSettings(
+    { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
+    { organizationSettings }: SaveOrganizationSettings
+  ): Observable<void> {
+    return this.organizationSettingsService.saveOrganizationSetting(organizationSettings).pipe(
+      tap((payload) => {
+        patchState({ isCredentialSetupLoading: false });
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        dispatch(new GetOrganizationSettings());
+        return payload;
+      })
+    );
   }
 
   @Action(ClearDepartmentList)
-  ClearDepartmentList({ patchState }: StateContext<OrganizationManagementStateModel>, { }: ClearDepartmentList): Observable<any> {
+  ClearDepartmentList(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    {}: ClearDepartmentList
+  ): Observable<any> {
     patchState({ departments: [] });
     return of([]);
-  };
+  }
 
   @Action(ClearLocationList)
-  ClearLocationList({ patchState }: StateContext<OrganizationManagementStateModel>, { }: ClearLocationList): Observable<any> {
-    patchState({locations: []});
+  ClearLocationList(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    {}: ClearLocationList
+  ): Observable<any> {
+    patchState({ locations: [] });
     return of([]);
-  };
+  }
 
   @Action(ExportLocations)
-  ExportLocations({ }: StateContext<OrganizationManagementStateModel>, { payload }: ExportLocations): Observable<any> {
-
-    return this.locationService.export(payload).pipe(tap(file => {
-      const url = window.URL.createObjectURL(file);
-      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
-    }));
-  };
+  ExportLocations({}: StateContext<OrganizationManagementStateModel>, { payload }: ExportLocations): Observable<any> {
+    return this.locationService.export(payload).pipe(
+      tap((file) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
+  }
   @Action(ExportRegions)
-  ExportRegions({ }: StateContext<OrganizationManagementStateModel>, { payload }: ExportRegions): Observable<any> {
-
-    return this.regionService.exportRegion(payload).pipe(tap(file => {
-      const url = window.URL.createObjectURL(file);
-      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
-    }));
-  };
+  ExportRegions({}: StateContext<OrganizationManagementStateModel>, { payload }: ExportRegions): Observable<any> {
+    return this.regionService.exportRegion(payload).pipe(
+      tap((file) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
+  }
 
   @Action(ExportDepartments)
-  ExportDepartments({ }: StateContext<OrganizationManagementStateModel>, { payload }: ExportDepartments): Observable<any> {
-    return this.departmentService.export(payload).pipe(tap(file => {
-      const url = window.URL.createObjectURL(file);
-      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
-    }));
-  };
+  ExportDepartments(
+    {}: StateContext<OrganizationManagementStateModel>,
+    { payload }: ExportDepartments
+  ): Observable<any> {
+    return this.departmentService.export(payload).pipe(
+      tap((file) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
+  }
 
   @Action(ExportSkills)
-  ExportSkills({ }: StateContext<OrganizationManagementStateModel>, { payload }: ExportSkills): Observable<any> {
-    return this.skillsService.exportAssignedSkills(payload).pipe(tap(file => {
-      const url = window.URL.createObjectURL(file);
-      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
-    }));
-  };
+  ExportSkills({}: StateContext<OrganizationManagementStateModel>, { payload }: ExportSkills): Observable<any> {
+    return this.skillsService.exportAssignedSkills(payload).pipe(
+      tap((file) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
+  }
 
   @Action(GetSkillDataSources)
-  GetSkillDataSources({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetSkillDataSources): Observable<SkillDataSource> {
-    return this.skillsService.getSkillsDataSources().pipe(tap(dataSource => {
-      patchState({ skillDataSource: dataSource });
-      return dataSource;
-    }));
-  };
+  GetSkillDataSources(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    {}: GetSkillDataSources
+  ): Observable<SkillDataSource> {
+    return this.skillsService.getSkillsDataSources().pipe(
+      tap((dataSource) => {
+        patchState({ skillDataSource: dataSource });
+        return dataSource;
+      })
+    );
+  }
 
   @Action(GetAllOrganizationSkills)
-  GetAllOrganizationSkills({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetAllOrganizationSkills): Observable<Skill[]> {
-    return this.skillsService.getAllOrganizationSkills().pipe(tap(skills => {
-      patchState({ allOrganizationSkills: skills });
-      return skills;
-    }));
-  };
+  GetAllOrganizationSkills(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    {}: GetAllOrganizationSkills
+  ): Observable<Skill[]> {
+    return this.skillsService.getAllOrganizationSkills().pipe(
+      tap((skills) => {
+        patchState({ allOrganizationSkills: skills });
+        return skills;
+      })
+    );
+  }
 
   @Action(GetLocationFilterOptions)
-  GetLocationFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetLocationFilterOptions): Observable<LocationFilterOptions> {
-    return this.locationService.getLocationFilterOptions(payload).pipe(tap(options => {
-      patchState({ locationFilterOptions: options });
-      return options;
-    }));
-  };
+  GetLocationFilterOptions(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { payload }: GetLocationFilterOptions
+  ): Observable<LocationFilterOptions> {
+    return this.locationService.getLocationFilterOptions(payload).pipe(
+      tap((options) => {
+        patchState({ locationFilterOptions: options });
+        return options;
+      })
+    );
+  }
   @Action(GetRegionFilterOptions)
-  GetRegionFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetRegionFilterOptions): Observable<regionFilter> {
-    return this.regionService.getRegionFilterOptions(payload).pipe(tap(options => {
-      patchState({ regionFilterOptions: options });
-      return options;
-    }));
-  };
+  GetRegionFilterOptions(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { payload }: GetRegionFilterOptions
+  ): Observable<regionFilter> {
+    return this.regionService.getRegionFilterOptions(payload).pipe(
+      tap((options) => {
+        patchState({ regionFilterOptions: options });
+        return options;
+      })
+    );
+  }
 
   @Action(GetDepartmentFilterOptions)
-  GetDepartmentFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetDepartmentFilterOptions): Observable<DepartmentFilterOptions> {
-    return this.departmentService.getDepartmentFilterOptions(payload).pipe(tap(options => {
-      patchState({ departmentFilterOptions: options });
-      return options;
-    }));
-  };
+  GetDepartmentFilterOptions(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { payload }: GetDepartmentFilterOptions
+  ): Observable<DepartmentFilterOptions> {
+    return this.departmentService.getDepartmentFilterOptions(payload).pipe(
+      tap((options) => {
+        patchState({ departmentFilterOptions: options });
+        return options;
+      })
+    );
+  }
 
   @Action(GetOrganizationSettingsFilterOptions)
-  GetOrganizationSettingsFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetOrganizationSettingsFilterOptions): Observable<string[]> {
-    return this.organizationSettingsService.getOrganizationSettingsFilteringOptions().pipe(tap(options => {
-      patchState({ organizationSettingsFilterOptions: options });
-      return options;
-    }));
-  };
+  GetOrganizationSettingsFilterOptions(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    {}: GetOrganizationSettingsFilterOptions
+  ): Observable<string[]> {
+    return this.organizationSettingsService.getOrganizationSettingsFilteringOptions().pipe(
+      tap((options) => {
+        patchState({ organizationSettingsFilterOptions: options });
+        return options;
+      })
+    );
+  }
 
   @Action(GetLocationTypes)
-  GetLocationTypes({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetLocationTypes): Observable<LocationType[]> {
+  GetLocationTypes(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    {}: GetLocationTypes
+  ): Observable<LocationType[]> {
     patchState({ isLocationTypesLoading: true });
     return this.locationService.getLocationTypes().pipe(
       tap((payload) => {
@@ -969,8 +1296,11 @@ export class OrganizationManagementState {
     );
   }
 
- @Action(GetUSCanadaTimeZoneIds)
-  GetUSCanadaTimeZoneIds({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetUSCanadaTimeZoneIds): Observable<TimeZoneModel[]> {
+  @Action(GetUSCanadaTimeZoneIds)
+  GetUSCanadaTimeZoneIds(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    {}: GetUSCanadaTimeZoneIds
+  ): Observable<TimeZoneModel[]> {
     return this.nodatimeService.getUSCanadaTimeZoneIds().pipe(
       tap((payload) => {
         patchState({ timeZones: payload });
@@ -980,7 +1310,10 @@ export class OrganizationManagementState {
   }
 
   @Action(GetLocationsImportTemplate)
-  GetLocationsImportTemplate({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: GetLocationsImportTemplate): Observable<any> {
+  GetLocationsImportTemplate(
+    { dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: GetLocationsImportTemplate
+  ): Observable<any> {
     return this.locationService.getLocationsImportTemplate(payload).pipe(
       tap((payload) => {
         dispatch(new GetLocationsImportTemplateSucceeded(payload));
@@ -991,7 +1324,10 @@ export class OrganizationManagementState {
   }
 
   @Action(GetLocationsImportErrors)
-  GetLocationsImportErrors({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: GetLocationsImportErrors): Observable<any> {
+  GetLocationsImportErrors(
+    { dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: GetLocationsImportErrors
+  ): Observable<any> {
     return this.locationService.getLocationsImportTemplate(payload).pipe(
       tap((payload) => {
         dispatch(new GetLocationsImportErrorsSucceeded(payload));
@@ -1002,18 +1338,33 @@ export class OrganizationManagementState {
   }
 
   @Action(UploadLocationsFile)
-  UploadLocationsFile({ dispatch }: StateContext<CandidateStateModel>, { payload }: UploadLocationsFile): Observable<ImportResult<ImportedLocation> | Observable<void>> {
+  UploadLocationsFile(
+    { dispatch }: StateContext<CandidateStateModel>,
+    { payload }: UploadLocationsFile
+  ): Observable<ImportResult<ImportedLocation> | Observable<void>> {
     return this.locationService.uploadLocationsFile(payload).pipe(
       tap((payload) => {
         dispatch(new UploadLocationsFileSucceeded(payload));
         return payload;
       }),
-      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : 'File was not uploaded'))))
+      catchError((error: any) =>
+        of(
+          dispatch(
+            new ShowToast(
+              MessageTypes.Error,
+              error && error.error ? getAllErrors(error.error) : 'File was not uploaded'
+            )
+          )
+        )
+      )
     );
   }
 
   @Action(SaveLocationsImportResult)
-  SaveLocationsImportResult({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveLocationsImportResult): Observable<ImportResult<ImportedLocation> | Observable<void>> {
+  SaveLocationsImportResult(
+    { dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: SaveLocationsImportResult
+  ): Observable<ImportResult<ImportedLocation> | Observable<void>> {
     return this.locationService.saveLocationImportResult(payload).pipe(
       tap((payload) => {
         dispatch(new SaveLocationsImportResultSucceeded(payload));
@@ -1024,7 +1375,10 @@ export class OrganizationManagementState {
   }
 
   @Action(GetDepartmentsImportTemplate)
-  GetDepartmentsImportTemplate({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: GetDepartmentsImportTemplate): Observable<any> {
+  GetDepartmentsImportTemplate(
+    { dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: GetDepartmentsImportTemplate
+  ): Observable<any> {
     return this.departmentService.getDepartmentsImportTemplate(payload).pipe(
       tap((payload) => {
         dispatch(new GetDepartmentsImportTemplateSucceeded(payload));
@@ -1035,7 +1389,10 @@ export class OrganizationManagementState {
   }
 
   @Action(GetDepartmentsImportErrors)
-  GetDepartmentsImportErrors({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: GetDepartmentsImportErrors): Observable<any> {
+  GetDepartmentsImportErrors(
+    { dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: GetDepartmentsImportErrors
+  ): Observable<any> {
     return this.departmentService.getDepartmentsImportTemplate(payload).pipe(
       tap((payload) => {
         dispatch(new GetDepartmentsImportErrorsSucceeded(payload));
@@ -1046,24 +1403,104 @@ export class OrganizationManagementState {
   }
 
   @Action(UploadDepartmentsFile)
-  UploadDepartmentsFile({ dispatch }: StateContext<CandidateStateModel>, { payload }: UploadDepartmentsFile): Observable<ImportResult<ImportedDepartment> | Observable<void>> {
+  UploadDepartmentsFile(
+    { dispatch }: StateContext<CandidateStateModel>,
+    { payload }: UploadDepartmentsFile
+  ): Observable<ImportResult<ImportedDepartment> | Observable<void>> {
     return this.departmentService.uploadDepartmentsFile(payload).pipe(
       tap((payload) => {
         dispatch(new UploadDepartmentsFileSucceeded(payload));
         return payload;
       }),
-      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : 'File was not uploaded'))))
+      catchError((error: any) =>
+        of(
+          dispatch(
+            new ShowToast(
+              MessageTypes.Error,
+              error && error.error ? getAllErrors(error.error) : 'File was not uploaded'
+            )
+          )
+        )
+      )
     );
   }
 
   @Action(SaveDepartmentsImportResult)
-  SaveDepartmentsImportResult({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveDepartmentsImportResult): Observable<ImportResult<ImportedDepartment> | Observable<void>> {
+  SaveDepartmentsImportResult(
+    { dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: SaveDepartmentsImportResult
+  ): Observable<ImportResult<ImportedDepartment> | Observable<void>> {
     return this.departmentService.saveDepartmentsImportResult(payload).pipe(
       tap((payload) => {
         dispatch(new SaveDepartmentsImportResultSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Departments were not imported'))))
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Bill rates were not imported'))))
+    );
+  }
+
+  @Action(GetBillRatesImportTemplate)
+  GetBillRatesImportTemplate(
+    { dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: GetBillRatesImportTemplate
+  ): Observable<any> {
+    return this.billRatesService.getBillRatesImportTemplate(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetBillRatesImportTemplateSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(GetBillRatesImportErrors)
+  GetBillRatesImportErrors(
+    { dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: GetBillRatesImportErrors
+  ): Observable<any> {
+    return this.billRatesService.getBillRatesImportTemplate(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetBillRatesImportErrorsSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(UploadBillRatesFile)
+  UploadBillRatesFile(
+    { dispatch }: StateContext<CandidateStateModel>,
+    { payload }: UploadBillRatesFile
+  ): Observable<ImportResult<ImportedBillRate> | Observable<void>> {
+    return this.billRatesService.uploadBillRatesFile(payload).pipe(
+      tap((payload) => {
+        dispatch(new UploadBillRatesFileSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: any) =>
+        of(
+          dispatch(
+            new ShowToast(
+              MessageTypes.Error,
+              error && error.error ? getAllErrors(error.error) : 'File was not uploaded'
+            )
+          )
+        )
+      )
+    );
+  }
+
+  @Action(SaveBillRatesImportResult)
+  SaveBillRatesImportResult(
+    { dispatch }: StateContext<OrganizationManagementStateModel>,
+    { payload }: SaveBillRatesImportResult
+  ): Observable<ImportResult<ImportedBillRate> | Observable<void>> {
+    return this.billRatesService.saveBillRatesImportResult(payload).pipe(
+      tap((payload) => {
+        dispatch(new SaveBillRatesImportResultSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Bill rates were not imported'))))
     );
   }
 }

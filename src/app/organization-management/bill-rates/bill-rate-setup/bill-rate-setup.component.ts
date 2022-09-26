@@ -37,12 +37,12 @@ import {
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
 import {
   DeleteBillRatesById,
+  ExportBillRateSetup,
   GetBillRateOptions,
   GetBillRates,
   SaveUpdateBillRate,
-  ShowConfirmationPopUp,
   SaveUpdateBillRateSucceed,
-  ExportBillRateSetup,
+  ShowConfirmationPopUp,
 } from '@organization-management/store/bill-rates.actions';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
 import {
@@ -83,6 +83,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   @Input() isActive: boolean = false;
   @Input() export$: Subject<ExportedFileType> | undefined;
   @Input() filteredItems$: Subject<number>;
+  @Input() importDialogEvent: Subject<boolean>;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
@@ -656,6 +657,16 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       })
     );
     this.store.dispatch(new ShowFilterDialog(false));
+  }
+
+  public override updatePage(): void {
+    this.store.dispatch(
+      new GetBillRates({
+        pageNumber: this.currentPage,
+        pageSize: this.pageSize,
+        ...this.filters,
+      })
+    );
   }
 
   private createFormGroups(): void {
