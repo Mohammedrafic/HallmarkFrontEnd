@@ -19,6 +19,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngxs/store';
 import { SetPaymentDetailsForm } from '@agency/store/agency.actions';
+import PriceUtils from '@shared/utils/price.utils';
 
 @Component({
   selector: 'app-electronic-form',
@@ -33,6 +34,7 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
   public paymentDetailsForm: FormGroup;
   public bankCountryStates: string[];
   public accountHolderCountryStates: string[];
+  public priceUtils = PriceUtils;
   public readonly optionFields = OPTION_FIELDS;
   public readonly countries = COUNTRIES;
   public readonly formatInput = FORMAT_INPUT;
@@ -74,7 +76,7 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
       accountHolderState: [''],
       accountHolderCity: [''],
       accountHolderZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
-      fee: ['', [Validators.pattern(/^[0-9]+$/)]],
+      fee: [''],
       swiftCode: ['', [Validators.pattern(/^[0-9]+$/)]],
     });
   }

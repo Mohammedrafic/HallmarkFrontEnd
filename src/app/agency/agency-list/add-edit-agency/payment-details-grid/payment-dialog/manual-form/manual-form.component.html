@@ -59,6 +59,8 @@
             appValidateWithMessage
             placeholder="{{placeholderInput}}"
             formControlName="startDate"
+            [enableMask]="true"
+            [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
           >
           </ejs-datepicker>
         </div>

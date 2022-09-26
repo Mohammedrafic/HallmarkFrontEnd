@@ -87,7 +87,7 @@
       </e-column>
       <e-column field="effectiveDate" headerText="EFFECTIVE DATE" width=180>
         <ng-template #template let-data>
-          <span>{{ data.effectiveDate | date: 'MM/dd/yyyy' }}</span>
+          <span>{{ data.effectiveDate | date: formatDate }}</span>
         </ng-template>
       </e-column>
       <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" width=250 textAlign="Right">
@@ -404,9 +404,10 @@
             <ejs-datepicker
               id="effectiveDate"
               class="datepicker"
-              format="MM/dd/yyyy"
-              placeholder="MM/DD/YYYY"
-              appValidateWithMessage
+              [format]="formatDate"
+              [placeholder]="placeholderDate"
+              [enableMask]="true"
+              [maskPlaceholder]="datepickerMask"
               formControlName="effectiveDate"
             >
             </ejs-datepicker>
@@ -569,7 +570,7 @@
           </div>
         </div>
         <div class="input-container">
-          <label>Skills</label>
+          <label>Skill</label>
           <div class="input-group multiselect">
             <ejs-multiselect mode="CheckBox"
                              formControlName="skillIds"
@@ -641,10 +642,14 @@
           <label for="effectiveDate">Effective Date</label>
           <div class="input-group datepicker">
             <ejs-datepicker
+              id="effectiveDate"
               class="datepicker"
-              format="MM/dd/yyyy"
-              placeholder="MM/DD/YYYY"
-              formControlName="effectiveDate">
+              [format]="formatDate"
+              [placeholder]="placeholderDate"
+              [enableMask]="true"
+              [maskPlaceholder]="datepickerMask"
+              formControlName="effectiveDate"
+            >
             </ejs-datepicker>
           </div>
         </div>

@@ -1,0 +1,69 @@
+<div class="chat-room-container">
+  <div class="chat-room-area" #chatArea>
+    <div class="message-block" *ngIf="currentThread; else noMessages">
+      <ng-container *ngFor="let message of messages; trackBy: trackById">
+        <div class="message" [ngClass]="{ 'right': message.isCurrentUser }">
+          <!-- Commented for future implementation-->
+          <!-- <div>
+            <img class="avatar" src="/assets/default-avatar.svg" alt="avatar" width="34" height="34">
+          </div> -->
+          <div class="content-block">
+            <div *ngIf="!message.isCurrentUser; else rightMessageBlock">
+              <span class="sender">{{ message.sender }}</span>
+              <span class="timestamp">{{ message.timestamp | date: 'HH:mm a'}}</span>
+            </div>
+
+            <ng-template #rightMessageBlock>
+              <div>
+                <i-feather class="read-indicator" name="eye" [ngClass]="{ 'show-ind': message.readIndicator }"></i-feather>
+                <span class="timestamp left-position">{{ message.timestamp | date: 'HH:mm a'}}</span>
+                <span class="sender left-position">{{ message.sender }}</span>
+              </div>
+            </ng-template>
+
+            <div class="text-block" [ngClass]="{ 'right-text': message.isCurrentUser }">
+              <span [innerHtml]="message.message"></span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="typing-indicator" *ngIf="typingEvent">
+        <div class="message indicator-wrapper">
+          <div>
+            <span class="sender">{{typingEvent.senderDisplayName}}</span>
+          </div>
+          <div class="text-block indicators">
+            <div class="indicator-container">
+              <div class="indicator wave1"></div>
+              <div class="indicator wave2"></div>
+              <div class="indicator wave3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <ng-template #noMessages>
+      <div class="empty-room-block">
+        <span class="empty-room-header">You are starting a new conversation</span>
+        <span class="empty-room-text">Type your first message below</span>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="controls-block">
+    <div class="chat-room-controls" (keyup)="trackKeyPress()">
+      <ejs-richtexteditor placeholder="Type your message" #textEditor (actionBegin)="sendByCtrlEnterKeys($event)"
+      ></ejs-richtexteditor>
+      <button
+        class="send-btn"
+        (click)="sendByButton()"
+      >
+        <i-feather name="send" class="icon"></i-feather>
+      </button>
+    </div>
+  </div>
+</div>
+

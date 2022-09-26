@@ -469,8 +469,11 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     const dateAvailable = candidate.closeDate
       ? addDays(candidate.closeDate, 14)?.getTime()! >= new Date().getTime()
       : true;
-    this.isAddExtensionBtnAvailable =
-      this.isOrganization && isOrderFilledOrProgressOrClosed && dateAvailable && isOrderTravelerOrContractToPerm;
+    this.isAddExtensionBtnAvailable = this.isOrganization
+      && isOrderFilledOrProgressOrClosed
+      && dateAvailable
+      && isOrderTravelerOrContractToPerm
+      && this.candidate.statusName !== CandidatStatus[CandidatStatus.Cancelled];
   }
 
   private getTemplate(): void {

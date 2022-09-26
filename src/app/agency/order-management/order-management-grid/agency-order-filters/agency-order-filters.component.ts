@@ -20,6 +20,8 @@ import { CandidatesStatusText, OrderStatusText } from '@shared/enums/status';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { placeholderDate } from '@shared/constants/placeholder-date';
 import { formatDate } from '@shared/constants/format-date';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { datepickerMask } from '@shared/constants/datepicker-mask';
 
 enum RLDLevel {
   Orginization,
@@ -31,6 +33,7 @@ enum RLDLevel {
   selector: 'app-agency-order-filters',
   templateUrl: './agency-order-filters.component.html',
   styleUrls: ['./agency-order-filters.component.scss'],
+  providers: [MaskedDateTimeService],
 })
 export class AgencyOrderFiltersComponent extends DestroyableDirective implements OnInit, AfterViewInit {
   @ViewChild('regionMultiselect') regionMultiselect: MultiSelectComponent;
@@ -53,6 +56,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
 
   public readonly formatDate = formatDate;
   public readonly placeholderDate = placeholderDate;
+  public readonly datepickerMask = datepickerMask;
 
   public optionFields = {
     text: 'name',

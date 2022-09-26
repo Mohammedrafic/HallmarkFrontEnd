@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
@@ -50,6 +50,7 @@ interface IOrganizationAgency {
 export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   public organizationAgencyControl: FormControl = new FormControl();
   public baseUrl: string;
+  @Input() public isDarkTheme: boolean | null; 
 
   public optionFields = {
     text: 'name',

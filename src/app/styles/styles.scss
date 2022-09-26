@@ -199,6 +199,10 @@ body {
         font-weight: 600;
         height: 56px;
         line-height: 56px;
+
+        @media #{$max-mobile} {
+          background-color: transparent;
+        }
       }
 
       .e-menu-item.e-selected {
@@ -376,7 +380,9 @@ body {
     .input-container label,
     .e-switch-wrapper label,
     .dropdown-container label,
-    .alert-panel-footer {
+    .alert-panel-footer,
+    .tab-legend__item,
+    .tab-legend__item span {
       color: $secondary-dark-blue-40 !important;
     }
 

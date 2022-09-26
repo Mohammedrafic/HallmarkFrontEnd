@@ -9,7 +9,7 @@
       popupHeight="402px"
     >
       <ng-template #itemTemplate let-data>
-        <div class="item-container">
+        <div class="item-container" [ngClass]="isDarkTheme?' dark-item-container':''">
           <div class="logo-container">
             <img *ngIf="data.hasLogo; else noLogo"
               [src]="baseUrl + '/api/BusinessUnit/' + data.id + '/logo?lastUpdateTicks=' + data.lastUpdateTicks"

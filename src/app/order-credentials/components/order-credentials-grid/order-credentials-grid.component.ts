@@ -27,6 +27,9 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
   public pageMaxCount:number;
   public gridPageSettings: PageSettingsModel;
   public pageSizes: any;
+  public totalItemCount:number=0;
+  public totalPageCount: number=1;
+  
   constructor(private confirmService: ConfirmService) {
     super();
   }
@@ -38,7 +41,9 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
     });
     this.allowSorting=true;
     this.groupOptions = { columns: ['credentialType'] };
-    this.gridPageSettings = { pageSizes: this.rowsPerPageDropDown, pageSize: this.pageSize};
+     this.gridPageSettings = { pageSizes: this.rowsPerPageDropDown, pageSize: this.pageSize};
+    this.totalItemCount = this.credential.length;
+    this.totalPageCount = this.totalItemCount / this.pageSize;
   }
 
   ngOnDestroy(): void {
@@ -52,6 +57,22 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
 
   public onEdit(event: MouseEvent, data: IOrderCredentialItem): void {
     this.edit.emit(data);
+  }
+
+  public onRowsDropDownChanged(): void {
+    this.pageSize  = parseInt(this.activeRowsPerPageDropDown);
+    this.gridPageSettings = { pageSizes: this.rowsPerPageDropDown, pageSize: this.pageSize};
+    this.credential =[...this.credential];
+    this.totalItemCount = this.credential.length;
+    this.totalPageCount = this.totalItemCount / this.pageSize;
+    this.currentPage =1;
+  }
+
+  public onGoToClick(event: any): void {
+    if (event.currentPage || event.value) {
+      this.grid.pageSettings.currentPage=event.currentPage;
+      this.currentPage = event.currentPage;
+    }
   }
 
   public onRemoveButtonClick(credential: IOrderCredentialItem): void {
