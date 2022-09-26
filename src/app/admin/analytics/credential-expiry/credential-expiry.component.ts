@@ -267,7 +267,6 @@ export class CredentialExpiryComponent implements OnInit {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    this.credentialExpiryForm.reset();
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);

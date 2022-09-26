@@ -267,7 +267,6 @@ export class FillRateComponent implements OnInit {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    this.fillRateForm.reset();
     this.fillRateForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.fillRateForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.fillRateForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);

@@ -268,7 +268,6 @@ export class ClientFinanceAccrualReportComponent implements OnInit {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    this.accrualReportForm.reset();
     this.accrualReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.accrualReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.accrualReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);

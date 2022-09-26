@@ -266,7 +266,6 @@ export class CandidateListComponent implements OnInit {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    this.candidateRegularRateForm.reset();
     this.candidateRegularRateForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.candidateRegularRateForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.candidateRegularRateForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
