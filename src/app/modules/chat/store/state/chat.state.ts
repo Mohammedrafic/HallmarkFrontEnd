@@ -80,7 +80,7 @@ export class ChatState {
 
   @Action(Chat.GetUserChatConfig)
   GetConfiguration(
-    { patchState, dispatch }: StateContext<ChatModel>
+    { patchState, dispatch, getState }: StateContext<ChatModel>
   ): Observable<UserChatConfig> {
     return this.apiService.getChatConfig()
     .pipe(
@@ -94,7 +94,10 @@ export class ChatState {
           dispatch(new Chat.UpdateMessages());
           dispatch(new Chat.SortThreads());
           dispatch(new UnreadMessage());
-          this.chatService.playNotificationSound();
+          
+          if (getState().chatOpen) {
+            this.chatService.playNotificationSound();
+          }
         });
 
         chatClient.on('typingIndicatorReceived', (event: TypingIndicatorReceivedEvent) => {
