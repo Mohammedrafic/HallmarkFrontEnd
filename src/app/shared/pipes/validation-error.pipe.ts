@@ -21,6 +21,8 @@ export class ValidationErrorPipe implements PipeTransform {
         return 'Please enter a valid email address';
       case 'min' in value:
         return `The minimum value should be ${value.min.min}`;
+      case 'duplicateDate' in value:
+        return 'Payee with such date already exists';
       case 'pattern' in value:
         if (!new RegExp(ONLY_LETTERS).test(value.pattern.actualValue)) {
           return 'Only letters are allowed';
