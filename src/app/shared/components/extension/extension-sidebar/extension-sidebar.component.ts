@@ -93,8 +93,7 @@ export class ExtensionSidebarComponent implements OnInit {
     }
     const billRates = this.billRatesComponent?.billRatesControl.value;
     let billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(billRates);
-
-    if (billRateToUpdate?.id !== billRate?.id) {
+    if (billRateToUpdate?.id !== billRate?.id && billRate?.id !== 0) {
       return;
     }
 
