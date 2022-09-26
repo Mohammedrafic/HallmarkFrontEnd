@@ -24,6 +24,7 @@ export interface UserChatConfig {
 export interface EnterChatEvent {
   id: string;
   displayName: string;
+  businessUnitName: string;
 }
 
 export interface MessageRequestMeta {

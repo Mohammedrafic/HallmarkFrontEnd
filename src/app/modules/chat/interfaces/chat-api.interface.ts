@@ -8,10 +8,3 @@ export interface ChatThread {
   lastMessage?: ReceivedChatMessage;
   lasMessageOn: Date;
 }
-
-export interface UserThreadsDto {
-  userId: string;
-  userIdentity: string;
-  accessToken: string;
-  threads: ChatThread[];
-}

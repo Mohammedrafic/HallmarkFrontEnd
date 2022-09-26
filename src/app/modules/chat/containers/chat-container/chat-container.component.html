@@ -89,7 +89,10 @@
           cssClass="e-outline button-back button--no-wrap"
           ejs-button type="submit"
           (click)="back()">Back</button>
-          <span class="chat-title">{{chatTitle}}</span>
+          <div class="chat-title-container">
+            <span class="chat-title">{{chatTitle.mainTitle}}</span>
+            <span class="chat-sub-title">{{chatTitle.subTitle}}</span>
+          </div>
         </div>
         <div class="chat-plot">
           <app-chat-room></app-chat-room>

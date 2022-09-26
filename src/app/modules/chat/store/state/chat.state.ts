@@ -14,6 +14,7 @@ import { ChatThread, UserChatConfig } from '../../interfaces';
 import { ChatApiService } from '../../services';
 import { Chat } from '../actions';
 import { ChatModel } from '../chat.model';
+import { ChatService } from '../../services/chat.service';
 
 @State<ChatModel>({
   name: 'chat',
@@ -23,6 +24,7 @@ import { ChatModel } from '../chat.model';
 export class ChatState {
   constructor(
     private apiService: ChatApiService,
+    private chatService: ChatService,
   ) {}
 
   @Selector([ChatState])
@@ -78,7 +80,7 @@ export class ChatState {
 
   @Action(Chat.GetUserChatConfig)
   GetConfiguration(
-    { patchState, dispatch, getState }: StateContext<ChatModel>
+    { patchState, dispatch }: StateContext<ChatModel>
   ): Observable<UserChatConfig> {
     return this.apiService.getChatConfig()
     .pipe(
@@ -88,10 +90,11 @@ export class ChatState {
 
         await chatClient.startRealtimeNotifications();
 
-        chatClient.on('chatMessageReceived', () => {
+        chatClient.on('chatMessageReceived', () => {  
           dispatch(new Chat.UpdateMessages());
           dispatch(new Chat.SortThreads());
           dispatch(new UnreadMessage());
+          this.chatService.playNotificationSound();
         });
 
         chatClient.on('typingIndicatorReceived', (event: TypingIndicatorReceivedEvent) => {
@@ -109,7 +112,6 @@ export class ChatState {
         });
 
         chatClient.on('readReceiptReceived', (event: any) => {
-          console.log(event)
           dispatch(new Chat.UpdateReceipts());
         });
 

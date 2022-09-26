@@ -2,12 +2,12 @@ import { ChangeDetectorRef, Directive } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
 import { TypingIndicatorReceivedEvent } from '@azure/communication-signaling';
+import { ChatThreadClient } from '@azure/communication-chat';
 import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 import { takeUntil } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
 import { Chat } from '../store/actions';
-import { ChatThreadClient } from '@azure/communication-chat';
 
 @Directive()
 export class ChatMessagesHelper extends Destroyable {

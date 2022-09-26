@@ -30,7 +30,10 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
 
   public title: string = DialogTitles[this.currentChatState];
 
-  public chatTitle: string;
+  public chatTitle: { mainTitle: string, subTitle: string } = {
+    mainTitle: '',
+    subTitle: ''
+  };
 
   @Select(ChatState.chatDialogState)
   public readonly dialogState$: Observable<boolean>;
@@ -73,17 +76,21 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
   }
 
   back(): void {
-    this.chatTitle = '';
+    this.chatTitle.mainTitle = '';
+    this.chatTitle.subTitle = '';
     this.store.dispatch(new Chat.SetCurrentView(ChatDialogState.List));
   }
 
   enterChatRoom(event: EnterChatEvent): void {
-    this.chatTitle = event.displayName;
+    console.log(event)
+    this.chatTitle.mainTitle = event.displayName;
+    this.chatTitle.subTitle = event.businessUnitName;
     this.store.dispatch(new Chat.EnterChatRoom(event.id));
   }
 
   startNewChat(thread: ChatThread): void {
-    this.chatTitle = thread.displayName;
+    this.chatTitle.mainTitle = thread.displayName;
+    this.chatTitle.subTitle = thread.businessUnitName;
     this.store.dispatch(new Chat.StartNewConversation(thread.userId))
   };
 
@@ -102,7 +109,6 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy()),
     )
     .subscribe((value) => {
-      console.log(this.currentChatState, 'current')
       if (this.currentChatState === ChatDialogState.NewChat) {
         this.store.dispatch(new Chat.SearcFor(value, ChatSearchType.Participant));
         this.cd.markForCheck();

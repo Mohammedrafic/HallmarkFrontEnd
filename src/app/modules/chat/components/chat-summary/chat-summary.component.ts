@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output
 
 import { ChatClient, ChatThreadClient } from '@azure/communication-chat';
 import { CommunicationUserKind } from '@azure/communication-signaling';
-import { UnreadMessage } from '@core/actions';
 
 import { ChatMessagesHelper } from '../../helpers';
 import { ChatThread, EnterChatEvent, ReceivedChatMessage } from '../../interfaces';
@@ -34,6 +33,7 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
     this.enterChat.emit({
       id: this.thread.threadId as string,
       displayName: this.thread.displayName,
+      businessUnitName: this.thread.businessUnitName
     });
   }
 

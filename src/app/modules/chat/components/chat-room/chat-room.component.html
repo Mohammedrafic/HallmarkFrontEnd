@@ -54,7 +54,7 @@
   </div>
 
   <div class="controls-block">
-    <div class="chat-room-controls" (keyup)="trackKeyPress()" #cont>
+    <div class="chat-room-controls" (keyup)="trackKeyPress()">
       <ejs-richtexteditor placeholder="Type your message" #textEditor (actionBegin)="sendByCtrlEnterKeys($event)"
       ></ejs-richtexteditor>
       <button

@@ -44,9 +44,19 @@
 }
 
 .chat-title {
-  margin-left: 24px;
   font-size: 14px;
   font-weight: 700;
+}
+
+.chat-sub-title {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.chat-title-container {
+  margin-left: 24px;
+  display: flex;
+  flex-direction: column;
 }
 
 .empty-list {

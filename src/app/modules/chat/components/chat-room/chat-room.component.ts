@@ -6,17 +6,18 @@ import {
 import { ChatClient, ChatThreadClient } from '@azure/communication-chat';
 import { CommunicationUserKind, TypingIndicatorReceivedEvent } from '@azure/communication-signaling';
 import { Select } from '@ngxs/store';
+import {
+  HtmlEditorService, ImageService, LinkService,
+  RichTextEditorComponent
+} from '@syncfusion/ej2-angular-richtexteditor';
 import { debounceTime, Observable, Subject } from 'rxjs';
 import { filter, takeUntil, tap, throttleTime } from 'rxjs/operators';
-import { HtmlEditorService, ImageService, LinkService,
-  RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 
 import { ChatMessagesHelper } from '../../helpers';
 import { ChatThread, MessageRequestMeta, ReceivedChatMessage, SyncFusionActionBeginEvent } from '../../interfaces';
 import { ChatModel } from '../../store';
 import { Chat } from '../../store/actions';
 import { ChatState } from '../../store/state/chat.state';
-import { ofActionDispatched } from '@ngxs/store';
 
 @Component({
   selector: 'app-chat-room',
@@ -29,8 +30,6 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   @ViewChild('chatArea') chatArea: ElementRef;
 
   @ViewChild('textEditor') textEditor: RichTextEditorComponent;
-
-  @ViewChild('cont') cont: ElementRef;
 
   public currentThread: ChatThread | null;
 
@@ -153,8 +152,8 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
     this.typing$
     .pipe(
       filter(Boolean),
-      filter((event) => event.threadId === this.currentThread?.threadId),
-      filter((event) => event.senderDisplayName !== this.userDisplayName),
+      filter((event) => event.threadId === this.currentThread?.threadId
+      && event.senderDisplayName !== this.userDisplayName),
       tap((event) => {
         this.typingEvent = event;
         this.cd.markForCheck();
@@ -171,8 +170,6 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   private setupChatClient(): void {
     const client = (this.store.snapshot().chat as ChatModel).chatClient as ChatClient;
     this.currentThread = (this.store.snapshot().chat as ChatModel).currentChatRoomData;
-
-    
 
     this.chatThreadClient = this.currentThread ? client.getChatThreadClient(this.currentThread?.threadId as string)
     : null;
@@ -199,8 +196,8 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
-      const meta = this.createMessageRequest();
-      (this.chatThreadClient as ChatThreadClient).sendMessage(meta.req, meta.options);
+      const reqMeta = this.createMessageRequest();
+      (this.chatThreadClient as ChatThreadClient).sendMessage(reqMeta.req, reqMeta.options);
       this.textEditor.value = '';
     });
   }
