@@ -386,8 +386,8 @@
 .bell-button {
   display: inline-block;
   position: relative;
-  padding: 2px 5px;
-
+  padding: 10px 15px;
+  color: #4c5673;
   &.left {
     margin-right: 40px;
   }
@@ -398,24 +398,27 @@
 
 .bell-button:hover {
   background:$bell-button-hover-bg;
-  border-radius: 4px !important;
+  border-radius: 10px !important;
+  color: #3e7fff !important;
 }
 
 .bell-button:active {
   background:$bell-button-active-bg;
   color:white;
-  border-radius: 4px !important;
+  border-radius: 10px !important;
 }
 
 .bell-button__badge {
+  border-color: white;
+  border-style: solid;
   background-color: #558eff;
   border-radius: 50%;
   color: white;
-  padding: 1px 5px;
-  font-size: 10px;
+  padding: 2px 6px;
+  font-size: 11px;
   position: absolute;
   top: 0;
-  right: 0;
+  right: 6px;
 
   &.empty-chat {
     height: 10px;
