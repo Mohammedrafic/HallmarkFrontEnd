@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import {
   AgencyOrderManagement,
   Order,
+  OrderCandidateJob,
   OrderManagement,
   OrderManagementChild,
 } from '@shared/models/order-management.model';
@@ -13,7 +14,7 @@ import {
 })
 export class OrderCloseReasonInfoComponent {
   @Input() orderInformation: Order | OrderManagement | AgencyOrderManagement;
-  @Input() candidate: OrderManagementChild;
+  @Input() candidate: OrderManagementChild | OrderCandidateJob;
   @Input() showCloseData: boolean = true;
 
   get closeReason(): string {
