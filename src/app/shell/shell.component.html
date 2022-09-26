@@ -69,7 +69,11 @@
           <ejs-treeview id="template" #treevalidate [fields]="sideBarMenuField" (nodeClicked)='nodeSelect($event)'
                         [fullRowSelect]="true" [loadOnDemand]="false">
             <ng-template #nodeTemplate="" let-data="">
-              <section class="icon-container"
+              <section appAnalyticByClick
+                       [analyticData]="data.route"
+                       [analyticTargetType]="'menu'"
+                       [analyticEventValue]="data.title"
+                       class="icon-container"
                        (click)="onMenuItemClick(data)"
                        (mouseenter)="showContextMenu(data, $event)">
                 <i-feather [name]="data.icon" class="icon"></i-feather>
@@ -79,10 +83,16 @@
             </ng-template>
           </ejs-treeview>
 
-          <ejs-contextmenu id='contextmenu' #contextmenu target='#template'
+          <ejs-contextmenu appAnalyticByClick
+                           [analyticEvent]="'select'"
+                           [analyticTargetType]="'menu'"
+                           id='contextmenu'
+                           #contextmenu
+                           target='#template'
                            (onClose)="onContextMenuClose()"
                            (beforeOpen)="onBeforeContextMenuOpen($event)"
-                           (select)="onSubMenuItemClick($event)"></ejs-contextmenu>
+                           (select)="onSubMenuItemClick($event)"
+          ></ejs-contextmenu>
         </section>
       </section>
     </section>
@@ -128,12 +138,12 @@
 </section>
 
 <app-message-toast></app-message-toast>
-<ejs-sidebar id="alert-sidebar" *ngIf="showAlertSidebar" #alertSidebar 
-  [width]="alertSidebarWidth" [type]="alertSidebarType" [position]="alertSidebarPosition" 
-  showBackdrop="true" style="visibility: hidden" (created)="onAlertSidebarCreated()">    
-  <div class="sidebar-header header-cover">    
+<ejs-sidebar id="alert-sidebar" *ngIf="showAlertSidebar" #alertSidebar
+  [width]="alertSidebarWidth" [type]="alertSidebarType" [position]="alertSidebarPosition"
+  showBackdrop="true" style="visibility: hidden" (created)="onAlertSidebarCreated()">
+  <div class="sidebar-header header-cover">
     <i-feather name="bell"></i-feather>
-    <h5>      
+    <h5>
       <span>Alerts Center</span>
     </h5>
     <div class="closebtn">
@@ -145,7 +155,7 @@
   <div id="listcontainer">
     <div class="card" *ngFor="let item of alerts">
       <div class="card-body">
-        {{item.content}}        
+        {{item.content}}
       </div>
       <div class="card-footer">
         <small>{{item.createdAt | date:'medium'}}</small>

@@ -39,6 +39,7 @@ import { SharedModule } from '../shared/shared.module';
 import { OrganizationAgencySelectorComponent } from './components/organization-agency-selector/organization-agency-selector.component';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
+import { AnalyticByClickModule } from '@shared/directives/analitics/analytics-by-click/analytic-by-click.module';
 
 const sidebarIcons = {
   Sidebar,
@@ -81,7 +82,8 @@ const sidebarIcons = {
     ReactiveFormsModule,
     DropDownButtonModule,
     FormsModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    AnalyticByClickModule
   ],
   providers: [],
 })
