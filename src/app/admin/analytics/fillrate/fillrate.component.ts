@@ -267,12 +267,14 @@ export class FillRateComponent implements OnInit {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
+    let startDate = new Date(Date.now());
+    startDate.setDate(startDate.getDate() - 90);
     this.fillRateForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.fillRateForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.fillRateForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.fillRateForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-    this.fillRateForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(null);
-    this.fillRateForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(null);
+    this.fillRateForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
+    this.fillRateForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.filteredItems = [];
   }
   public onFilterApply(): void {

@@ -267,12 +267,14 @@ export class JobDetailsComponent implements OnInit {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
+    let startDate = new Date(Date.now());
+    startDate.setDate(startDate.getDate() - 90);
     this.jobDetailsForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.jobDetailsForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.jobDetailsForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.jobDetailsForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-    this.jobDetailsForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(null);
-    this.jobDetailsForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(null);
+    this.jobDetailsForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
+    this.jobDetailsForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.filteredItems = [];
   }
   public onFilterApply(): void {

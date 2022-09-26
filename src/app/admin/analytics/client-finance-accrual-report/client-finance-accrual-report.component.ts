@@ -268,12 +268,14 @@ export class ClientFinanceAccrualReportComponent implements OnInit {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
+    let startDate = new Date(Date.now());
+    startDate.setDate(startDate.getDate() - 90);
     this.accrualReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.accrualReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.accrualReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.accrualReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-    this.accrualReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(null);
-    this.accrualReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(null);
+    this.accrualReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
+    this.accrualReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.filteredItems = [];
   }
   public onFilterApply(): void {
