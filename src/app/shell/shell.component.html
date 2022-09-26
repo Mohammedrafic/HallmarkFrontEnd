@@ -77,7 +77,7 @@
       </section>
       <section class="menu">
         <section class="sidebar-menu">
-          <ejs-treeview id="template" #treevalidate [fields]="sideBarMenuField" (nodeClicked)='nodeSelect($event)'
+          <ejs-treeview id="template" #treevalidate [fields]="sideBarMenuField" (nodeClicked)="nodeSelect($event)"
                         [fullRowSelect]="true" [loadOnDemand]="false" >
             <ng-template #nodeTemplate="" let-data="">
               <section appAnalyticByClick
