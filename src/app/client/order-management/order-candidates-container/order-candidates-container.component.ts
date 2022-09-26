@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { GetAgencyOrderCandidatesList } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
@@ -16,7 +16,7 @@ import { OrderStatus } from '@shared/enums/order-management';
   templateUrl: './order-candidates-container.component.html',
   styleUrls: ['./order-candidates-container.component.scss'],
 })
-export class OrderCandidatesContainerComponent extends DestroyableDirective implements OnInit, OnDestroy {
+export class OrderCandidatesContainerComponent extends DestroyableDirective implements OnInit, OnChanges, OnDestroy {
   public order: Order;
   @Input() set currentOrder(value: Order) {
     this.order = value;
@@ -37,14 +37,21 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
     super();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    const order = changes['currentOrder']?.currentValue;
+
+    if (order) {
+      this.orderCandidates = {
+        isClosed: order?.status === OrderStatus.Closed,
+        orderId: order?.id,
+        organizationId: order?.organizationId as number,
+      };
+    }
+  }
+
   ngOnInit(): void {
     this.orderCandidatePage$.pipe(takeUntil(this.destroy$)).subscribe((order) => {
       this.orderCandidatePage = order;
-      this.orderCandidates = {
-        isClosed: this.order?.status === OrderStatus.Closed,
-        orderId: this.order?.id,
-        organizationId: this.order?.organizationId as number,
-      };
     });
   }
 

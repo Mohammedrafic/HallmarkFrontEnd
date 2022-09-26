@@ -86,7 +86,6 @@
                                       [readonly]="readOnlyMode"
                                       [enableMask]="true"
                                       [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                                      [min]="today"
                                       formControlName="availableStartDate">
                       </ejs-datepicker>
                     </div>
@@ -147,4 +146,12 @@
   <section class="bill-rates">
     <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
   </section>
+  <ng-container *ngIf="!readOnlyMode">
+    <div class="mobile-actions">
+      <button *ngIf="!readOnlyMode" ejs-button [isPrimary]="true" [disabled]="isLocked" class="apply-button"
+        (click)="applyOrderApplicants()">
+        Apply
+      </button>
+    </div>
+  </ng-container>
 </section>

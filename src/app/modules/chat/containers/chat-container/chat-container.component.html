@@ -1,0 +1,103 @@
+<ejs-dialog
+  #chatDialog
+  cssClass="dialog filter"
+  [width]="488"
+  [visible]="false"
+  [isModal]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
+  (open)="preventFocus($event)"
+>
+  <ng-template #content>
+    <div class="dialog-header">
+      <h3 class="title">{{ title | titlecase }}</h3>
+      <div class="controls">
+        <button ejs-button type="submit" cssClass="e-flat close-blue-button" (click)="closeChat()" style="outline: none;">
+          <i-feather name="x" class="icon"></i-feather>
+        </button>
+      </div>
+    </div>
+    <ng-container [ngSwitch]="currentChatState">
+
+
+      <ng-template [ngSwitchCase]="chatStates.List">
+        <div class="chat-controls">
+          <div class="bootstrap input-container">
+            <form [formGroup]="searchForm">
+              <div class="input-group">
+                <input
+                  class="e-input"
+                  appValidateWithMessage
+                  placeholder="Search"
+                  type="text"
+                  formControlName="searchCriteria"
+                />
+              </div>
+            </form>
+          </div>
+          <button class="controls-add-btn" (click)="addChat()">+</button>
+        </div>
+        <div class="chat-plot">
+          <ng-container *ngIf="activeThreads$ | async as threads">
+            <ng-container *ngIf="threads.length; else noListItems">
+              <ng-container *ngFor="let thread of activeThreads$ | async; trackBy: trackByStringId">
+                <app-chat-summary [thread]="thread" (enterChat)="enterChatRoom($event)"></app-chat-summary>
+              </ng-container>
+            </ng-container>
+
+          </ng-container>
+
+          <ng-template #noListItems>
+            <div class="empty-list">
+              <span class="no-list-header">You don`t have active chats yet</span>
+              <span class="no-list-text">Start messaging to get started</span>
+            </div>
+          </ng-template>
+
+        </div>
+      </ng-template>
+
+      <ng-template [ngSwitchCase]="chatStates.NewChat">
+        <div class="chat-controls left">
+          <button
+            cssClass="e-outline button-back button--no-wrap"
+            ejs-button type="submit"
+            (click)="back()">Back</button>
+          <div class="bootstrap input-container">
+            <form [formGroup]="searchForm">
+              <div class="input-group">
+                <input
+                  class="e-input"
+                  appValidateWithMessage
+                  placeholder="Search"
+                  type="text"
+                  formControlName="searchCriteria"
+                />
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="chat-plot">
+          <ng-container *ngFor="let participant of avaliableParticipants$ | async; trackBy: trackById">
+            <app-chat-contact [participant]="participant" (contactSelected)="startNewChat($event)"></app-chat-contact>
+          </ng-container>
+        </div>
+      </ng-template>
+
+      <ng-template [ngSwitchCase]="chatStates.Internal">
+        <div class="chat-controls left">
+          <button
+          cssClass="e-outline button-back button--no-wrap"
+          ejs-button type="submit"
+          (click)="back()">Back</button>
+          <div class="chat-title-container">
+            <span class="chat-title">{{chatTitle.mainTitle}}</span>
+            <span class="chat-sub-title">{{chatTitle.subTitle}}</span>
+          </div>
+        </div>
+        <div class="chat-plot">
+          <app-chat-room></app-chat-room>
+        </div>
+      </ng-template>
+    </ng-container>
+  </ng-template>
+</ejs-dialog>

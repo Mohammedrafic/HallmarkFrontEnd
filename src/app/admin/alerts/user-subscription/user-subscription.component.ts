@@ -18,11 +18,12 @@ import { AlertsState } from '@admin/store/alerts.state';
 import { GetAllUsersPage, GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { SetHeaderState, ShowToast } from 'src/app/store/app.actions';
+import { SetHeaderState, ShouldDisableUserDropDown, ShowToast } from 'src/app/store/app.actions';
 import { User, UsersPage } from '@shared/models/user.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_MODIFIED } from '@shared/constants';
+import { RECORD_MODIFIED, GRID_CONFIG } from '@shared/constants';
+import { AppState } from '../../../store/app.state';
 
 @Component({
   selector: 'app-user-subscription',
@@ -42,6 +43,12 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   @Select(AlertsState.UpdateUserSubscription)
   public updateUserSubscription$: Observable<boolean>;
 
+  @Select(AppState.isDarkTheme)
+  isDarkTheme$: Observable<boolean>;
+
+  @Select(AppState.shouldDisableUserDropDown)
+  public shouldDisableUserDropDown$: Observable<boolean>;
+
   @Input() filterForm: FormGroup;
   public businessForm: FormGroup;
   public isEditRole = false;
@@ -56,7 +63,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public export$ = new Subject<ExportedFileType>();
   public defaultColDef: any;
   public autoGroupColumnDef: any;
-  public title: string = "User Subscription";
+  public title: string = "Notification Subscription";
   public userGuid: string = "";
   public unsubscribe$: Subject<void> = new Subject();
   itemList: Array<UserSubscription> | undefined;
@@ -77,7 +84,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   serverSideStoreType: any;
   maxBlocksInCache: any;
   defaultValue:any;
-  userData:User[];
+  userData: User[];
+  public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
   }
@@ -105,7 +113,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
         hide: true
       },
       {
-        headerName: 'Alert Description',
+        headerName: 'Notification Description',
         field: 'alert.alertTitle',
         filter: 'agTextColumnFilter',
         filterParams: {
@@ -176,6 +184,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
 
   }
   ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
     this.isAlive = false;
   }
   public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
@@ -212,13 +222,23 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           this.defaultValue = data[0]?.id;
         }
       });
-      this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => { 
-        if(data!=undefined)
-        {       
-        this.userData=data.items;
-        }
-      });
+    this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+      if (data != undefined) {
+        this.userData = data.items;
+        this.shouldDisableUserDropDown$.pipe(takeUntil(this.unsubscribe$)).subscribe((disable: boolean) => {
+          if (disable != undefined && disable == true) {
+            let user = this.store.selectSnapshot(UserState.user);
+            this.businessForm.controls['user'].setValue(this.userData.find(x=>x.id==user?.id)?.id);
+            this.store.dispatch(new ShouldDisableUserDropDown(false));
+            this.businessForm.controls['user'].disable();
+            this.businessForm.controls['business'].disable();
+            this.businessForm.controls['businessUnit'].disable();
+          }
+        });
+      }
+    });
   }
+  
   public onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;

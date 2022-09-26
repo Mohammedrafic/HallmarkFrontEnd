@@ -45,6 +45,7 @@ export class GridPositionRendererComponent implements ICellRendererAngularComp {
         orderId: this.cellValue.publicId,
         candidateId: this.cellValue.candidateProfileId,
         orderType: this.cellValue.orderType,
+        prefix: this.cellValue.organizationPrefix
       });
     } else {
       this.router.navigate(['/client/order-management']);
@@ -52,6 +53,7 @@ export class GridPositionRendererComponent implements ICellRendererAngularComp {
         orderId: this.cellValue.publicId,
         candidateId: this.cellValue.candidateProfileId,
         orderType: this.cellValue.orderType,
+        prefix: this.cellValue.organizationPrefix
       });
     }
   }

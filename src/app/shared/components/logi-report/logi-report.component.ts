@@ -13,6 +13,7 @@ export class LogiReportComponent implements OnInit {
   private factory: any;
   private reportIframeName: string = "reportIframe";
   private uId: string = "admin";
+  private pwd: string = "admin";
   private jrdPrefer: any;
   private reportUrl: string;
   @Input() paramsData: any | {};
@@ -27,6 +28,10 @@ export class LogiReportComponent implements OnInit {
   ngOnInit(): void {
     this.factory = com.jinfonet.api.AppFactory;
     this.reportUrl = this.appSettings.reportServerUrl + 'jinfonet/tryView.jsp';
+    
+  }
+  public RenderReport():void
+  {
     if (this.reportType == LogiReportTypes.DashBoard) {
       this.showDashBoard(this.reportIframeName);
     }
@@ -35,7 +40,7 @@ export class LogiReportComponent implements OnInit {
     }
   }
 
-  public showDashBoard(entryId: string): void {
+  private showDashBoard(entryId: string): void {
     this.jrdPrefer = {
       // For dashboard
       dashboard: {
@@ -48,25 +53,27 @@ export class LogiReportComponent implements OnInit {
     }
     let server = {
       url: this.reportUrl,
-      authorized_user: this.uId,
+      user: this.uId,
+      pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
-      jrd_dashboard_mode: "edit",
+      jrd_dashboard_mode: "view",
     },
       resExt = {
         reslst: this.resultList,
         active: 1
       };
+      console.log(this.reportUrl);
     let task = this.factory.runDashboard(server, resExt, entryId);
   }
 
-  public ShowReport(entryId: string): void {
+  private ShowReport(entryId: string): void {
     if (this.reportType == LogiReportTypes.PageReport) {
       this.jrdPrefer = {
         // For page report
         pagereport: {
           feature_UserInfoBar: true,
-          feature_ToolBar: true,
-          feature_Toolbox: true,
+          feature_ToolBar: false,
+          feature_Toolbox: false,
           feature_DSOTree: true,
           feature_TOCTree: true,
           feature_PopupMenu: true,
@@ -79,7 +86,7 @@ export class LogiReportComponent implements OnInit {
         // For web report
         webreport: {
           viewMode: {
-            hasToolbar: true,
+            hasToolbar: false,
             hasSideArea: true
           },
           editMode: {
@@ -91,10 +98,12 @@ export class LogiReportComponent implements OnInit {
     }
     let server = {
       url: this.reportUrl,
-      authorized_user: this.uId,
+      user: this.uId,
+      pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
-      jrd_studio_mode: "edit",
-      "jrs.param_page": true
+      jrd_studio_mode: "view",
+      "jrs.param_page": true //,
+      //"jrs.profile": "profilename"
     };
     let prptRes = this.reportName;
     let catRes = this.catelogName;

@@ -21,8 +21,7 @@ import { SpecialProjectCategory, SpecialProjectCategoryPage } from '@shared/mode
 @Component({
   selector: 'app-special-project-category',
   templateUrl: './special-project-categories.component.html',
-  styleUrls: ['./special-project-categories.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./special-project-categories.component.scss']
 })
 
 export class SpecialProjectCategoryComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
@@ -121,10 +120,10 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
     noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
     onFilterChanged: (event: FilterChangedEvent) => {
       if (!event.api.getDisplayedRowCount()) {
-        this.gridApi.showNoRowsOverlay();
+        this.gridApi?.showNoRowsOverlay();
       }
       else {
-        this.gridApi.hideOverlay();
+        this.gridApi?.hideOverlay();
       }
     }
   };
@@ -138,10 +137,10 @@ export class SpecialProjectCategoryComponent extends AbstractGridConfigurationCo
     this.store.dispatch(new GetSpecialProjectCategories());
     this.specialProjectCategoryPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
         if (!data?.items.length) {
-          this.gridApi.showNoRowsOverlay();
+          this.gridApi?.showNoRowsOverlay();
         }
         else {
-          this.gridApi.hideOverlay();
+          this.gridApi?.hideOverlay();
           this.rowData = data.items;
           this.gridApi?.setRowData(this.rowData);
         }

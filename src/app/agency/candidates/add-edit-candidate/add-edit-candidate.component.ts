@@ -54,10 +54,11 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   public readonlyMode = false;
   public isCredentialStep = false;
   public candidateMessage: CandidateMessage | null = null;
+  public fetchedCandidate: Candidate;
 
   private filesDetails: Blob[] = [];
   private unsubscribe$: Subject<void> = new Subject();
-  private fetchedCandidate: Candidate;
+  private isRemoveLogo: boolean = false;
 
   @Select(CandidateState.isCandidateCreated)
   public isCandidateCreated$: Observable<boolean>;
@@ -110,6 +111,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
     this.store.dispatch(new RemoveCandidateFromStore());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.isRemoveLogo = false;
   }
 
   public clearForm(): void {
@@ -164,8 +166,10 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   public onImageSelect(event: Blob | null) {
     if (event) {
       this.filesDetails = [event as Blob];
+      this.isRemoveLogo = false;
     } else {
       this.filesDetails = [];
+      this.isRemoveLogo = true;
     }
   }
 
@@ -215,7 +219,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   private uploadImages(businessUnitId: number): void {
     if (this.filesDetails.length) {
       this.store.dispatch(new UploadCandidatePhoto(this.filesDetails[0] as Blob, businessUnitId));
-    } else if (this.photo) {
+    } else if (this.photo && this.isRemoveLogo) {
       this.store.dispatch(new RemoveCandidatePhoto(businessUnitId));
     }
   }
@@ -287,7 +291,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   }
 
   private pagePermissions(): void {
-    const location = this.location.getState() as { readonly: boolean };
+    const location = this.location.getState() as { readonly: boolean; isRedirectFromOrder: boolean };
 
     this.route.data.subscribe((data) => {
       if (data['readonly']) {
@@ -300,7 +304,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
     if (location.readonly) {
       this.candidateForm.disable();
       this.readonlyMode = true;
-      this.isCredentialStep = false;
+      this.isCredentialStep = location.isRedirectFromOrder ?? false;
     }
   }
 

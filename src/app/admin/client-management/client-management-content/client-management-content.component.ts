@@ -210,7 +210,7 @@ export class ClientManagementContentComponent
         new ExportPayload(
           fileType,
           {
-            ...this.filters,
+            ...this.getFiltersForExport(),
             ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
           },
           options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
@@ -251,5 +251,11 @@ export class ClientManagementContentComponent
     this.currentUserPermissions$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((permissions) => (this.permissions = permissions));
+  }
+
+  private getFiltersForExport(): OrganizationFilter & { organizationNames: string[] } {
+    const { businessUnitNames, ...filtersRest } = this.filters;
+
+    return { ...filtersRest, organizationNames: this.filters.businessUnitNames as string[] };
   }
 }

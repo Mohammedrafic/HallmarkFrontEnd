@@ -10,9 +10,11 @@ export const militaryToStandard = (val: string /** HH:mm:ss */) => {
   return sH + ':' + sM + ' ' + suffix;
 };
 export const toCorrectTimezoneFormat = (value: Date | string): any => {
-  const valueDate = new Date(value);
-  const differentBetweenTimezone = new Date().getTimezoneOffset() * -1;
-  return new Date(valueDate.getTime() + differentBetweenTimezone * 60000);
+  if (value) {
+    const valueDate = new Date(value);
+    const differentBetweenTimezone = new Date().getTimezoneOffset() * -1;
+    return new Date(valueDate.getTime() + differentBetweenTimezone * 60000);
+  }
 };
 
 export const getTimeFromDate = (date: Date): string | null => {

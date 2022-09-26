@@ -6,6 +6,7 @@
     <section>
       <button
         ejs-button
+        appHideBeforeSyncfusionLoad
         id="filterButton"
         cssClass="e-outline button-filter"
         (click)="showFilters()">
@@ -28,6 +29,8 @@
     [resizeSettings]="resizeSettings"
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
+    (dataBound)="gridDataBound(grid)"
+    (actionBegin)="actionBegin($event, grid)"
     class="grid-component"
   >
     <ng-template #detailTemplate let-data>
@@ -48,7 +51,7 @@
                 ejs-button
                 cssClass="e-flat primary-icon-button"
                 (click)="onEditButtonClick(data, child, $event)"
-                [disabled]="!hasAccess"
+                [disabled]="hasPermissions | hasAccess : data : false"
               >
                 <span class="edit-button" ><i-feather name="edit" class="icon"></i-feather></span>
               </button>
@@ -78,12 +81,12 @@
     <e-columns>
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
-          <div class="row-tool-buttons">
+          <div class="row-tool-buttons" [class.hidden]="!isLoaded">
             <button
               ejs-button
               cssClass="e-flat primary-icon-button"
               (click)="onEditButtonClick(data, undefined, $event)"
-              [disabled]="!data.overridableByOrganization || !hasAccess"
+              [disabled]="hasPermissions | hasAccess : data : true"
             >
               <span class="edit-button" ><i-feather name="edit" class="icon"></i-feather></span>
             </button>
@@ -91,7 +94,7 @@
               ejs-button
               cssClass="e-flat default-icon-button"
               (click)="onOverrideButtonClick(data)"
-              [disabled]="(!data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment) || !hasAccess"
+              [disabled]="hasPermissions | hasAccess : data : false"
             >
               <span class="edit-button" ><i-feather name="plus" class="icon"></i-feather></span>
             </button>

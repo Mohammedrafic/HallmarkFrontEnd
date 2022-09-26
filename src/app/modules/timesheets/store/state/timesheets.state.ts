@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap, throttleTime } from 'rxjs';
+import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -425,12 +425,7 @@ export class TimesheetsState {
       organizationId: orgId,
       targetStatus: TimesheetTargetStatus.Submitted,
       reason: null,
-    })
-    .pipe(
-      catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
-      }),
-    );
+    });
   }
 
   @Action(TimesheetDetails.OrganizationApproveTimesheet)

@@ -1,65 +1,64 @@
-import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Store } from '@ngxs/store';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormArray, FormGroup } from '@angular/forms';
+import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-
 import { GridComponent, ValueAccessor } from '@syncfusion/ej2-angular-grids';
-
 import { GRID_CONFIG } from 'src/app/shared/constants/grid-config';
-import { valuesOnly } from 'src/app/shared/utils/enum.utils';
-import { ShowSideDialog } from 'src/app/store/app.actions';
-import { AgencyPaymentDetails } from "@shared/models/agency.model";
-
-enum PaymentDetailMode {
-  Manual,
-  Electronic,
-}
-
-type PaymentDetail = {
-  mode: string;
-  payee: string;
-  address: string;
-  city: string;
-  zip: number;
-  startDate: string;
-};
+import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { filter, Subject, takeWhile } from 'rxjs';
+import { SetPaymentDetailsForm } from '@agency/store/agency.actions';
+import { Country } from '@shared/enums/states';
+import {
+  ElectronicPaymentDetails,
+  PaymentDetails,
+} from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
+import { PaymentDetailMode } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/constant/payment.constant';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_DELETE, RECORD_SAVED } from '@shared/constants';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
   selector: 'app-payment-details-grid',
   templateUrl: './payment-details-grid.component.html',
   styleUrls: ['./payment-details-grid.component.scss'],
 })
-export class PaymentDetailsGridComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit {
-  @Input() paymentsFormArray: FormArray;
+export class PaymentDetailsGridComponent
+  extends AbstractGridConfigurationComponent
+  implements OnInit, OnDestroy, AfterViewInit
+{
   @ViewChild('grid') grid: GridComponent;
 
-  public override gridHeight = '250';
+  @Input() paymentsFormArray: FormArray;
 
+  public openEvent: Subject<boolean> = new Subject<boolean>();
+  public override gridHeight = '250';
   public initialSort = {
     columns: [{ field: 'name', direction: 'Ascending' }],
   };
-  public paymentDetailsForm: FormGroup;
-  public paymentMode = Object.values(PaymentDetailMode)
-    .filter(valuesOnly)
-    .map((text, id) => ({ text, id }));
-  public optionFields = {
-    text: 'text',
-    value: 'id',
+  public editedPaymentsDetails: ElectronicPaymentDetails | PaymentDetails;
+  public countryAccessor: ValueAccessor = (value: string, data: any) => {
+    return Country[data[value]];
   };
-  public modeAccessor: ValueAccessor = (_, data: any) => PaymentDetailMode[data['mode']];
+  public modeAccessor: ValueAccessor = (_, data: any) => PaymentDetailMode[data.mode];
 
-  get data(): PaymentDetail[] {
+  get data(): ElectronicPaymentDetails[] | PaymentDetails[] {
     return this.paymentsFormArray.value;
   }
 
   private isEditMode = false;
+  private selectedForm: number;
+  private isAlive = true;
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {
     super();
   }
 
   ngOnInit(): void {
-    this.paymentDetailsForm = PaymentDetailsGridComponent.generatePaymentForm();
+    this.subscribeOnPaymentDetailsForm();
+  }
+
+  ngOnDestroy(): void {
+    this.isAlive = false;
   }
 
   ngAfterViewInit(): void {
@@ -70,15 +69,26 @@ export class PaymentDetailsGridComponent extends AbstractGridConfigurationCompon
     this.grid.autoFitColumns();
   }
 
-  public onEdit({ index, ...paymentValue }: { index: string } & PaymentDetail): void {
+  public onEdit({ index, ...paymentValue }: { index: number } & (ElectronicPaymentDetails | PaymentDetails)): void {
+    this.selectedForm = index;
     this.isEditMode = true;
-    this.paymentDetailsForm = this.paymentsFormArray.controls[Number(index)] as FormGroup;
+    this.editedPaymentsDetails = { ...paymentValue };
     this.store.dispatch(new ShowSideDialog(true));
   }
 
   public onRemove({ index }: { index: string }): void {
-    this.paymentsFormArray.removeAt(Number(index));
-    this.paymentsFormArray.markAsDirty();
+    this.confirmService
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button',
+      })
+      .pipe(filter((confirm) => !!confirm))
+      .subscribe(() => {
+        this.paymentsFormArray.removeAt(Number(index));
+        this.paymentsFormArray.markAsDirty();
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      });
   }
 
   public onFilter(): void {
@@ -87,36 +97,47 @@ export class PaymentDetailsGridComponent extends AbstractGridConfigurationCompon
 
   public addNew(): void {
     this.isEditMode = false;
-    this.paymentDetailsForm = PaymentDetailsGridComponent.generatePaymentForm();
+    this.openEvent.next(true);
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onPaymentFormSave(): void {
-    this.paymentDetailsForm.markAllAsTouched();
-    if (this.paymentDetailsForm.valid) {
-      if (!this.isEditMode) {
-        const newPayment = PaymentDetailsGridComponent.generatePaymentForm();
-        newPayment.patchValue(this.paymentDetailsForm.value);
-
-        this.paymentsFormArray.push(newPayment);
-      }
-      this.paymentsFormArray.markAsDirty();
-      this.store.dispatch(new ShowSideDialog(false));
-    }
+  public onPaymentFormCancel(event: boolean): void {
+    this.store.dispatch(new ShowSideDialog(event));
   }
 
-  public onPaymentFormCancel(): void {
-    this.store.dispatch(new ShowSideDialog(false));
+  private subscribeOnPaymentDetailsForm(): void {
+    this.actions$
+      .pipe(
+        ofActionDispatched(SetPaymentDetailsForm),
+        takeWhile(() => this.isAlive)
+      )
+      .subscribe((paymentDetails: { form: FormGroup }) => {
+        const hasDuplication = this.hasDuplicationDate(this.paymentsFormArray.value, paymentDetails.form);
+
+        if (hasDuplication) {
+          paymentDetails.form.controls['startDate'].setErrors({ duplicateDate: true });
+          return;
+        }
+
+        if (!this.isEditMode) {
+          this.paymentsFormArray.push(paymentDetails.form);
+        } else {
+          this.paymentsFormArray.controls[this.selectedForm].patchValue({ ...paymentDetails.form.value });
+        }
+        this.paymentsFormArray.markAsDirty();
+        this.store.dispatch(new ShowSideDialog(false));
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
+      });
   }
 
-  static generatePaymentForm(payment?: AgencyPaymentDetails): FormGroup {
-    return new FormGroup({
-      mode: new FormControl( payment ? payment.mode : PaymentDetailMode.Electronic, [Validators.required]),
-      payee: new FormControl(payment ? payment.payee : '', [Validators.required, Validators.maxLength(50)]),
-      address: new FormControl(payment ? payment.address : '', [Validators.maxLength(500)]),
-      city: new FormControl(payment ? payment.city : '', [Validators.maxLength(20)]),
-      zip: new FormControl(payment ? payment.zip : '', [Validators.minLength(5),]),
-      startDate: new FormControl(payment ? payment.startDate : '', [Validators.required]),
-    });
+  private hasDuplicationDate(forms: PaymentDetails[] | ElectronicPaymentDetails[], currentForm: FormGroup): boolean {
+    return [...forms]
+      .map((form: PaymentDetails | ElectronicPaymentDetails) => {
+        if (form.mode === currentForm.value.mode) {
+          return new Date(form.startDate).toLocaleDateString();
+        }
+        return;
+      })
+      .includes(currentForm.value.startDate.toLocaleDateString());
   }
 }

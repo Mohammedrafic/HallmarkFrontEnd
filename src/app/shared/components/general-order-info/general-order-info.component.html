@@ -116,7 +116,7 @@
       <div class="sup-title">Shift</div>
     </div>
     <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
-      <div class="title">${{ orderInformation.joiningBonus }} / ${{ orderInformation.compBonus }}</div>
+      <div class="title">${{ (orderInformation.joiningBonus || 0) | currency: '' : '' }} / ${{ (orderInformation.compBonus || 0) | currency: '' : '' }}</div>
       <div class="sup-title">Start / End Bonus</div>
     </div>
     <div class="column">

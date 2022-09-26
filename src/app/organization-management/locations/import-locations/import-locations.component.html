@@ -1,0 +1,21 @@
+<app-import-dialog-content
+  [importResponse]="importResponse"
+  [dialogEvent]="dialogEvent"
+  [selectErrorsTab]="selectErrorsTab"
+  (downloadErrorsEvent)="downloadErrors($event)"
+  (downloadTemplateEvent)="downloadTemplate()"
+  (saveImportResult)="saveImportResult($event)"
+  (uploadImportFile)="uploadImportFile($event)"
+  [title]="titleImport"
+>
+  <app-locations-grid
+    successful
+    *ngIf="importResponse?.succesfullRecords?.length"
+    [importedLocations]="importResponse?.succesfullRecords || []"
+  ></app-locations-grid>
+  <app-locations-grid
+    errors
+    *ngIf="importResponse?.errorRecords?.length"
+    [importedLocations]="importResponse?.errorRecords || []"
+  ></app-locations-grid>
+</app-import-dialog-content>

@@ -57,6 +57,8 @@ app-grid {
   .ag-root-wrapper {
     border-top-left-radius: var(--grid-border-radius);
     border-top-right-radius: var(--grid-border-radius);
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
   }
 
   .ag-root-wrapper,
@@ -81,5 +83,48 @@ app-grid {
   .ag-header-cell-text {
     text-transform: uppercase;
     font-size: 12px;
+  }
+}
+
+.app-grid-dark {
+
+  .ag-root-wrapper, .ag-header {
+    background-color: $sidebar-background;
+  }
+
+  .ag-row {
+    background-color: $sidebar-background !important;
+    color: $white;
+  }
+
+  .ag-row-hover {
+    background-color: $primary-active-blue-90 !important;
+    color: $black;
+  }
+
+  .ag-root-wrapper, .ag-row, .ag-header {
+    border-color: $grid-border-color !important;
+  }
+
+  .ag-header-icon {
+    color: $white !important;
+  }
+
+  .e-input-group.e-control-wrapper.e-ddl.e-valid-input {
+    &:hover {
+      background: transparent !important;
+    }
+  }
+
+  .ag-header-cell-text {
+    font-weight: 700 !important;
+    color: $secondary-dark-blue-30 !important;
+  }
+
+  .ag-paging-row-summary-panel,
+  .ag-paging-page-summary-panel,
+  .ag-paging-page-summary-panel > .ag-paging-button,
+  .ag-side-buttons {
+    color: $secondary-dark-blue-30 !important;
   }
 }

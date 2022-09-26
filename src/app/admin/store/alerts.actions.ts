@@ -1,6 +1,6 @@
 import { AlertChannel } from "@admin/alerts/alerts.enum";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
-import { AddAlertsTemplateRequest, AlertsTemplateFilters, AlertTriggerDto, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
+import { AddAlertsTemplateRequest, AlertsTemplateFilters, AlertTriggerDto, DismissAlertDto, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
 import { UserSubscriptionFilters, UserSubscriptionRequest } from "@shared/models/user-subscription.model";
 
 export class GetUserSubscriptionPage {
@@ -59,4 +59,14 @@ export class AlertTrigger {
   constructor(
     public alertTriggerDto: AlertTriggerDto
   ) {}
+}
+export class DismissAlert {
+  static readonly type = '[alerts] Dismiss Alert';
+  constructor(
+    public model: DismissAlertDto
+  ){}
+}
+export class DismissAllAlerts {
+  static readonly type = '[alerts] Dismiss All Alerts';
+  constructor(){}
 }

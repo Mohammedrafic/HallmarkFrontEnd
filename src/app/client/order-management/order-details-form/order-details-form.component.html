@@ -67,7 +67,6 @@
                     <ejs-dropdownlist
                       formControlName="locationId"
                       appValidateWithMessage
-                      [enabled]="isLocationsDropDownEnabled"
                       [dataSource]="locations$ | async"
                       [fields]="locationFields"
                       (select)="onLocationDropDownChanged($event)"
@@ -83,7 +82,6 @@
                     <ejs-dropdownlist
                       formControlName="departmentId"
                       appValidateWithMessage
-                      [enabled]="isDepartmentsDropDownEnabled"
                       [dataSource]="departments$ | async"
                       [fields]="departmentFields"
                       (select)="onDepartmentDropDownChanged($event)"
@@ -265,7 +263,6 @@
                         appValidateWithMessage
                         [enableMask]="true"
                         [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                        [min]="today"
                       >
                       </ejs-datepicker>
                     </div>
@@ -719,13 +716,13 @@
             <div class="form-line">
               <!-- Special Project Category -->
               <div class="input-container bootstrap form-line-item-30">
-       
+
                 <label>Special Project Category<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
                     formControlName="projectTypeId"
                     appValidateWithMessage
-                    [dataSource]="(projectSpecialData$ | async)?.specialProjectCategories"
+                    [dataSource]="specialProjectCategories"
                     [fields]="specialProjectCategoriesFields"
                   >
                   </ejs-dropdownlist>
@@ -738,7 +735,7 @@
                   <ejs-dropdownlist
                     formControlName="projectNameId"
                     appValidateWithMessage
-                    [dataSource]="(projectSpecialData$ | async)?.projectNames"
+                    [dataSource]="projectNames"
                     [fields]="projectNameFields"
                   >
                   </ejs-dropdownlist>
@@ -751,7 +748,7 @@
                   <ejs-dropdownlist
                     formControlName="poNumberId"
                     appValidateWithMessage
-                    [dataSource]="(projectSpecialData$ | async)?.poNumbers"
+                    [dataSource]="poNumbers"
                     [fields]="poNumberFields"
                   >
                   </ejs-dropdownlist>

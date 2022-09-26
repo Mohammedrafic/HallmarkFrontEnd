@@ -8,7 +8,7 @@ import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
-import { Department, DepartmentFilter, DepartmentFilterOptions, DepartmentsPage } from '../../shared/models/department.model';
+import { Department, DepartmentFilter, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
 import {
   SaveDepartment,
   GetDepartmentsByLocationId,
@@ -16,7 +16,6 @@ import {
   GetRegions,
   UpdateDepartment,
   GetLocationsByRegionId,
-  SetImportFileDialogState,
   ExportDepartments,
   ClearLocationList,
   ClearDepartmentList,
@@ -113,6 +112,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   public filterColumns: any;
   public orgStructure: OrganizationStructure;
   public regions: OrganizationRegion[] = [];
+  public importDialogEvent: Subject<boolean> = new Subject<boolean>();
 
   private pageSubject = new Subject<number>();
 
@@ -240,7 +240,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
-      options?.fileName || this.defaultFileName
+      options?.fileName || this.defaultFileName,
+      this.selectedItems.length ? 180 : null
     )));
     this.clearSelection(this.grid);
   }
@@ -389,8 +390,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   onImportDataClick(): void {
-    this.store.dispatch(new SetImportFileDialogState(true));
-    // TODO: implement data parse after BE implementation
+    this.importDialogEvent.next(true);
   }
 
   private createDepartmentsForm(): void {

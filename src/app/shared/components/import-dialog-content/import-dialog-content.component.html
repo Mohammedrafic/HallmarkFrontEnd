@@ -1,0 +1,84 @@
+<ejs-dialog
+  #sideDialog
+  cssClass="dialog"
+  [width]="width"
+  [target]="targetElement"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight' }">
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">{{title}}</h3>
+          </div>
+          <div class="e-card-content">
+            <button ejs-button cssClass="e-outline" (click)="onCancel()">Cancel</button>
+            <ng-container *ngIf="!activeErrorTab"><ng-container *ngTemplateOutlet="importBtn"></ng-container></ng-container>
+            <ejs-tooltip *ngIf="activeErrorTab" id="tooltip" content="Invalid data cannot be imported" [showTipPointer]="false" position="BottomCenter">
+              <div><ng-container *ngTemplateOutlet="importBtn"></ng-container></div>
+            </ejs-tooltip>
+          </div>
+        </div>
+      </section>
+      <section class="import-items-container">
+        <section class="file-uploader-container">
+          <div class="section-header">
+            <span class="message">Upload file, then hit import button</span>
+            <span class="action-link-btn" (click)="downloadTemplate()">Download template</span>
+          </div>
+          <div class="file-uploader" #fileUploader>
+            <div id="droparea" class="droparea" (click)="browse()">
+              <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
+            </div>
+            <div class="file-info" [class.selected-file]="selectedFile">
+              <ejs-uploader
+                #previewupload
+                [dropArea]="dropElement"
+                [allowedExtensions]="allowedExtensions"
+                [autoUpload]="false"
+                [multiple]="false"
+                [maxFileSize]="maxFileSize"
+                (removing)="clear()"
+                (selected)="selectFile($event)"
+              >
+              </ejs-uploader>
+              <button *ngIf="selectedFile" ejs-button class="clear-button" cssClass="e-outline" (click)="clear()">Clear</button>
+            </div>
+          </div>
+        </section>
+        <section *ngIf="importResult" class="results" [ngClass]="{'first-active': firstActive}">
+          <span *ngIf="activeErrorTab" class="action-link-btn error-template-button" (click)="downloadErrors()">
+            Download file with Errors
+            <i-feather name="download" class="icon"></i-feather>
+          </span>
+          <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
+            <e-tabitems>
+              <e-tabitem [disabled]="!importResult.succesfullRecords.length">
+                <ng-template #headerText> Successful <span class="tab-badge">{{importResult?.succesfullRecords?.length}}</span></ng-template>
+                <ng-template #content>
+                  <section class="results-grid">
+                    <ng-content select="[successful]"></ng-content>
+                  </section>
+                </ng-template>
+              </e-tabitem>
+              <e-tabitem [disabled]="!importResult.errorRecords.length">
+                <ng-template #headerText> Error <span class="tab-badge">{{importResult?.errorRecords?.length}}</span></ng-template>
+                <ng-template #content>
+                  <section class="results-grid">
+                    <ng-content select="[errors]"></ng-content>
+                  </section>
+                </ng-template>
+              </e-tabitem>
+            </e-tabitems>
+          </ejs-tab>
+        </section>
+      </section>
+    </section>
+  </ng-template>
+</ejs-dialog>
+
+<ng-template #importBtn>
+  <button ejs-button cssClass="e-primary" [disabled]="!enabledImportButton" (click)="onImport()">Import</button>
+</ng-template>

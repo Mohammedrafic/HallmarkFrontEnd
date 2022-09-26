@@ -1,6 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, map, Observable, Subject, takeUntil } from 'rxjs';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
@@ -13,7 +13,7 @@ import {
   OrganizationSettingsGet,
   OrganizationSettingsPost,
   OrganizationSettingValidation,
-  OrganizationSettingValueOptions
+  OrganizationSettingValueOptions,
 } from '@shared/models/organization-settings.model';
 import { OrganizationSettingControlType } from '@shared/enums/organization-setting-control-type';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
@@ -25,7 +25,7 @@ import {
   GetOrganizationSettings,
   GetOrganizationSettingsFilterOptions,
   GetRegions,
-  SaveOrganizationSettings
+  SaveOrganizationSettings,
 } from '../store/organization-management.actions';
 import { ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
@@ -33,8 +33,6 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { OrganizationHierarchy } from '@shared/enums/organization-hierarchy';
 import { OrganizationSettingValidationType } from '@shared/enums/organization-setting-validation-type';
-import { User } from '@shared/models/user.model';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { customEmailValidator } from '@shared/validators/email.validator';
 import { UserState } from '../../store/user.state';
@@ -42,17 +40,21 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { GetCurrentUserPermissions, GetOrganizationStructure } from '../../store/user.actions';
+
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { CurrentUserPermission } from '@shared/models/permission.model';
 
 export enum TextFieldTypeControl {
   Email = 1,
-  Numeric = 2
+  Numeric = 2,
 }
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
-  providers: [DetailRowService, MaskedDateTimeService]
+  providers: [DetailRowService, MaskedDateTimeService],
 })
 export class SettingsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
@@ -63,6 +65,8 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public locationFormGroup: FormGroup;
   public departmentFormGroup: FormGroup;
   public formBuilder: FormBuilder;
+
+  @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<CurrentUserPermission[]>;
 
   @Select(OrganizationManagementState.organizationSettings)
   public settings$: Observable<OrganizationSettingsGet[]>;
@@ -93,7 +97,6 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
 
   public isEdit: boolean;
   public isParentEdit = false;
-  public hasAccess = false;
   public isFormShown = false;
   public organizationSettingControlType = OrganizationSettingControlType;
   public formControlType: number;
@@ -108,6 +111,13 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public textFieldTypeControl = TextFieldTypeControl;
   public organizationId: number;
   public maxFieldLength = 100;
+  public hasPermissions: Record<string, boolean> = {};
+  public settingFields: string[] = [
+    'AllowDocumentUpload',
+    'AllowAgencyToBidOnCandidateBillRateBeyondOrderBillRate',
+    'AutoLockOrder',
+    'IsReOrder',
+  ];
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -123,13 +133,16 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public filterColumns: any;
 
   public optionFields = {
-    text: 'name', value: 'id'
+    text: 'name',
+    value: 'id',
   };
 
-  constructor(private store: Store,
-              @Inject(FormBuilder) private builder: FormBuilder,
-              private confirmService: ConfirmService,
-              private filterService: FilterService) {
+  constructor(
+    private store: Store,
+    @Inject(FormBuilder) private builder: FormBuilder,
+    private confirmService: ConfirmService,
+    private filterService: FilterService
+  ) {
     super();
     this.formBuilder = builder;
     this.createSettingsForm();
@@ -138,42 +151,65 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
 
   ngOnInit(): void {
     this.filterColumns = {
-      regionIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      departmentIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      regionIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      locationIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      departmentIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
       attributes: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-    }
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+    };
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
       if (id) {
         this.organizationId = id;
       } else {
         this.organizationId = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
       }
       this.clearFilters();
-      this.store.dispatch(new GetOrganizationSettingsFilterOptions())
+      this.store.dispatch(new GetOrganizationSettingsFilterOptions());
       this.getSettings();
     });
     this.mapGridData();
-    this.isEditOverrideAccessible();
 
-    this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
-      this.orgStructure = structure;
-      this.orgRegions = structure.regions;
-      this.allRegions = [...this.orgRegions];
-      this.filterColumns.regionIds.dataSource = this.allRegions;
-    });
+    this.organizationStructure$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .subscribe((structure: OrganizationStructure) => {
+        this.orgStructure = structure;
+        this.orgRegions = structure.regions;
+        this.allRegions = [...this.orgRegions];
+        this.filterColumns.regionIds.dataSource = this.allRegions;
+      });
 
-    this.organizationSettingsFilterOptions$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((options: string[]) => {
-      this.filterColumns.attributes.dataSource = options;
-    });
+    this.organizationSettingsFilterOptions$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .subscribe((options: string[]) => {
+        this.filterColumns.attributes.dataSource = options;
+      });
 
     this.SettingsFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = [];
-        val.forEach(id => selectedRegions.push(this.allRegions.find(region => region.id === id) as OrganizationRegion));
+        val.forEach((id) =>
+          selectedRegions.push(this.allRegions.find((region) => region.id === id) as OrganizationRegion)
+        );
         this.filterColumns.locationIds.dataSource = [];
-        selectedRegions.forEach(region => {
-          this.filterColumns.locationIds.dataSource.push(...region.locations as [])
+        selectedRegions.forEach((region) => {
+          this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
         });
       } else {
         this.filterColumns.locationIds.dataSource = [];
@@ -185,10 +221,14 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.SettingsFilterFormGroup.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = [];
-        val.forEach(id => selectedLocations.push(this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)));
+        val.forEach((id) =>
+          selectedLocations.push(
+            this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)
+          )
+        );
         this.filterColumns.departmentIds.dataSource = [];
-        selectedLocations.forEach(location => {
-          this.filterColumns.departmentIds.dataSource.push(...location.departments as [])
+        selectedLocations.forEach((location) => {
+          this.filterColumns.departmentIds.dataSource.push(...(location.departments as []));
         });
       } else {
         this.filterColumns.departmentIds.dataSource = [];
@@ -196,6 +236,8 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
         this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
       }
     });
+
+    this.setPermissionsToManageSettings();
   }
 
   ngOnDestroy(): void {
@@ -230,14 +272,14 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.SettingsFilterFormGroup.reset();
     this.filteredItems = [];
     this.currentPage = 1;
-    this.filters = { };
+    this.filters = {};
   }
 
   public onFilterClearAll(): void {
     this.clearFilters();
     this.getSettings();
   }
-  
+
   public onFilterApply(): void {
     this.filters = this.SettingsFilterFormGroup.getRawValue();
     this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
@@ -260,6 +302,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
 
   public onEditButtonClick(parentRecord: any, childRecord: any, event: any): void {
+    this.store.dispatch(new GetOrganizationStructure());
     this.isFormShown = true;
     this.addActiveCssClass(event);
     this.isEdit = true;
@@ -296,17 +339,20 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
 
   public onFormCancelClick(): void {
-    if (this.organizationSettingsFormGroup.dirty
-      || this.regionFormGroup.dirty
-      || this.regionRequiredFormGroup.dirty
-      || this.locationFormGroup.dirty
-      || this.departmentFormGroup.dirty) {
+    if (
+      this.organizationSettingsFormGroup.dirty ||
+      this.regionFormGroup.dirty ||
+      this.regionRequiredFormGroup.dirty ||
+      this.locationFormGroup.dirty ||
+      this.departmentFormGroup.dirty
+    ) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => !!confirm))
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));
           this.removeActiveCssClass();
@@ -362,17 +408,19 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
 
   public mapGridData(): void {
-    this.settings$.subscribe(data => {
+    this.settings$.subscribe((data) => {
       this.lastAvailablePage = this.getLastPage(data);
-      data.forEach(item => {
-        if(item.controlType === OrganizationSettingControlType.Select
-          || item.controlType === OrganizationSettingControlType.Multiselect) {
+      data.forEach((item) => {
+        if (
+          item.controlType === OrganizationSettingControlType.Select ||
+          item.controlType === OrganizationSettingControlType.Multiselect
+        ) {
           if (typeof item.value === 'string') {
             item.value = this.getDropDownOptionsFromString(item.value, item.valueOptions);
           }
 
           if (item.children && item.children.length > 0) {
-            item.children.forEach(child => {
+            item.children.forEach((child) => {
               if (typeof child.value === 'string') {
                 child.value = this.getDropDownOptionsFromString(child.value, item.valueOptions);
               }
@@ -388,7 +436,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
 
   public rowDataBound(args: any): void {
     // hides expand button if no children
-    if(args.data.children.length === 0) {
+    if (args.data.children.length === 0) {
       args.row.querySelector('td').innerHTML = ' ';
       args.row.querySelector('td').className = 'e-customized-expand-cell';
     }
@@ -400,7 +448,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
 
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.settings$.subscribe(data => {
+      this.settings$.subscribe((data) => {
         this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
         this.currentPagerPage = event.currentPage || event.value;
       });
@@ -414,17 +462,17 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       case OrganizationSettingControlType.Multiselect:
         const options: string[] = [];
         if (this.organizationSettingsFormGroup.controls['value'].value) {
-          this.organizationSettingsFormGroup.controls['value'].value
-            .forEach((item: string) => options.push(item));
+          this.organizationSettingsFormGroup.controls['value'].value.forEach((item: string) => options.push(item));
         }
         dynamicValue = options.join(';');
         break;
       case OrganizationSettingControlType.Checkbox:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value
-          ? this.organizationSettingsFormGroup.controls['value'].value.toString() : 'false';
+          ? this.organizationSettingsFormGroup.controls['value'].value.toString()
+          : 'false';
         break;
       case OrganizationSettingControlType.Text:
-        dynamicValue = this.organizationSettingsFormGroup.controls['value'].value?.toString()
+        dynamicValue = this.organizationSettingsFormGroup.controls['value'].value?.toString();
         break;
       default:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
@@ -436,8 +484,8 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       settingKey: this.organizationSettingsFormGroup.controls['settingKey'].value,
       hierarchyId: this.organizationHierarchyId,
       hierarchyLevel: this.organizationHierarchy,
-      value: dynamicValue
-    }
+      value: dynamicValue,
+    };
 
     this.store.dispatch(new SaveOrganizationSettings(setting));
     this.store.dispatch(new ShowSideDialog(false));
@@ -477,8 +525,10 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
 
   private setFormValuesForOverride(data: any): void {
-    if (this.formControlType === OrganizationSettingControlType.Multiselect
-      || this.formControlType === OrganizationSettingControlType.Select) {
+    if (
+      this.formControlType === OrganizationSettingControlType.Multiselect ||
+      this.formControlType === OrganizationSettingControlType.Select
+    ) {
       this.dropdownDataSource = data.valueOptions;
     }
 
@@ -487,7 +537,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       settingKey: data.settingKey,
       controlType: data.controlType,
       name: data.name,
-      value: null
+      value: null,
     });
   }
 
@@ -498,8 +548,10 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       dynamicValue = this.isParentEdit ? parentData.value === 'true' : childData.value === 'true';
     }
 
-    if (this.formControlType === OrganizationSettingControlType.DateTime
-      || this.formControlType === OrganizationSettingControlType.Text) {
+    if (
+      this.formControlType === OrganizationSettingControlType.DateTime ||
+      this.formControlType === OrganizationSettingControlType.Text
+    ) {
       dynamicValue = this.isParentEdit ? parentData.value : childData.value;
     }
 
@@ -508,13 +560,16 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       if (this.isParentEdit) {
         dynamicValue = this.getDropDownOptionIds(parentData.value);
       } else {
-        dynamicValue = typeof childData.value === 'string' ? childData.value.split(';') : this.getDropDownOptionIds(childData.value);
+        dynamicValue =
+          typeof childData.value === 'string' ? childData.value.split(';') : this.getDropDownOptionIds(childData.value);
       }
     }
 
     if (this.formControlType === OrganizationSettingControlType.Select) {
       this.dropdownDataSource = parentData.valueOptions;
-      dynamicValue = this.isParentEdit ? this.getDropDownOptionIds(parentData.value) : this.getDropDownOptionIds(childData.value);
+      dynamicValue = this.isParentEdit
+        ? this.getDropDownOptionIds(parentData.value)
+        : this.getDropDownOptionIds(childData.value);
       dynamicValue = dynamicValue.length !== 0 ? dynamicValue[0] : '';
     }
 
@@ -524,7 +579,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
         settingKey: parentData.settingKey,
         controlType: parentData.controlType,
         name: parentData.name,
-        value: dynamicValue
+        value: dynamicValue,
       });
     });
   }
@@ -558,12 +613,15 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     }
   }
 
-  private getDropDownOptionsFromString(text: string, valueOptions: OrganizationSettingValueOptions[]): OrganizationSettingsDropDownOption[] {
+  private getDropDownOptionsFromString(
+    text: string,
+    valueOptions: OrganizationSettingValueOptions[]
+  ): OrganizationSettingsDropDownOption[] {
     let options: OrganizationSettingsDropDownOption[] = [];
     if (text) {
       let optionIds = text.split(';');
-      optionIds.forEach(id => {
-        const foundOption = valueOptions.find(option => option.key === id);
+      optionIds.forEach((id) => {
+        const foundOption = valueOptions.find((option) => option.key === id);
         if (foundOption) {
           options.push({ value: foundOption.key, text: foundOption.value });
         }
@@ -601,7 +659,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       settingKey: [null],
       controlType: [null],
       name: [{ value: '', disabled: true }],
-      value: [null]
+      value: [null],
     });
     this.SettingsFilterFormGroup = this.formBuilder.group({
       regionIds: [[]],
@@ -623,22 +681,28 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
 
   private getRowsPerPage(data: object[], currentPage: number): object[] {
-    return data.slice((currentPage * this.getActiveRowsPerPage()) - this.getActiveRowsPerPage(),
-      (currentPage * this.getActiveRowsPerPage()));
+    return data.slice(
+      currentPage * this.getActiveRowsPerPage() - this.getActiveRowsPerPage(),
+      currentPage * this.getActiveRowsPerPage()
+    );
   }
 
   private getLastPage(data: object[]): number {
     return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
   }
 
-  // TODO: remove after permission service implementation
-  private isEditOverrideAccessible(): void {
-    const storedUser = localStorage.getItem('User');
-    if (storedUser) {
-      const user = JSON.parse(storedUser) as User;
-      if ([BusinessUnitType.Hallmark, BusinessUnitType.MSP].includes(user.businessUnitType)) {
-        this.hasAccess = true;
-      }
-    }
+  private setPermissionsToManageSettings(): void {
+    this.store.dispatch(new GetCurrentUserPermissions());
+
+    this.currentUserPermissions$
+      .pipe(
+        filter((permissions) => !!permissions.length),
+        map((permissions) => permissions.map((permission) => permission.permissionId)),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((permissions) => {
+        const hasPermission = permissions.includes(PermissionTypes.ManageOrganizationConfigurations);
+        this.settingFields.forEach((key) => this.hasPermissions[key] = hasPermission);
+      });
   }
 }

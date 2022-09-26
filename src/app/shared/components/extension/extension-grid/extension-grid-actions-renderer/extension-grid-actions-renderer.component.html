@@ -1,4 +1,4 @@
-<i-feather name="message-square" class="icon comment"></i-feather>
+<i-feather name="message-square" class="icon comment" (click)="onOpen()"></i-feather>
 <i-feather
   *ngIf="(isOrganizationAgencyArea$ | async)?.isOrganizationArea"
   name="edit"

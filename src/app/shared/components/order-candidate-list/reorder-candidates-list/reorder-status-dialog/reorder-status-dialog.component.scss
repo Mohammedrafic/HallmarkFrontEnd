@@ -1,4 +1,5 @@
 @import "colors";
+@import 'adaptive-response';
 
 :host {
   overflow-y: auto;
@@ -10,6 +11,13 @@
     .button-container {
       display: flex;
       gap: 12px;
+
+      @media (max-width: $tablet-min) {
+        button:not(.close-button),
+        .dropdown {
+          display: none;
+        }
+      }
     }
   }
 
@@ -55,6 +63,19 @@
     .comments {
       width: 45%;
       background-color: $secondary-dark-blue-50;
+      border-radius: 8px;
+    }
+
+    @media (max-width: $tablet-min) {
+      flex-direction: column;
+      .job-details {
+        width: 100%;
+      }
+
+      .comments {
+        width: 100%;
+        margin-top: 16px;
+      }
     }
   }
 
@@ -73,3 +94,34 @@
   display: flex;
   align-items: center;
 }
+
+.mobile-actions {
+  padding: 12px 16px 8px;
+  display: none;
+
+  .dropdown {
+    width: 100%;
+  }
+
+  button {
+    width: 100%;
+    margin: 0 !important;
+
+    &:not(:first-child) {
+      margin-left: 16px !important;
+    }
+  }
+
+  @media (max-width: $tablet-min) {
+    display: flex;
+  }
+}
+
+.mobile {
+  display: none;
+
+  @media (max-width: $tablet-min) {
+    display: block;
+  }
+}
+

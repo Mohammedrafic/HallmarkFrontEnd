@@ -1,0 +1,100 @@
+<ejs-dialog
+  #candidateCancellationDialog
+  cssClass="candidate-cancellation-dialog"
+  isModal="true"
+  [visible]="false"
+  showCloseIcon="true"
+  width="448"
+  height="402"
+>
+  <ng-template #header>
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title">Cancel Candidate</h3>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template #content>
+    <form [formGroup]="form">
+      <div class="dropdown-container bootstrap">
+        <label>Reason<span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            appValidateWithMessage
+            formControlName="jobCancellationReason"
+            [fields]="optionFields"
+            [dataSource]="reasons"
+          ></ejs-dropdownlist>
+        </div>
+      </div>
+      <div class="dropdown-container bootstrap">
+        <label>Penalty Criteria<span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            appValidateWithMessage
+            formControlName="penaltyCriteria"
+            placeholder="Select Penalty"
+            [fields]="optionFields"
+            [dataSource]="penalties"
+            [enabled]="isReasonSelected"
+          ></ejs-dropdownlist>
+        </div>
+      </div>
+      <div class="d-flex" *ngIf="isPenaltyCriteriaSelected">
+        <div class="input-container bootstrap">
+          <label class="input-group">{{ showPercentage ? '% ' : '' }}Rate<span class="required">*</span></label>
+          <div class="input-group">
+            <ejs-numerictextbox
+              class="numeric-input"
+              appValidateWithMessage
+              formControlName="rate"
+              [showSpinButton]="false"
+              format="#.###"
+              max="999999"
+              value="0"
+              min="0"
+            >
+            </ejs-numerictextbox>
+          </div>
+        </div>
+        <div class="input-container bootstrap" *ngIf="showHoursControl">
+          <label class="input-group">Hours<span class="required">*</span></label>
+          <div class="input-group">
+            <div class="input-group">
+              <ejs-numerictextbox
+                class="numeric-input"
+                appValidateWithMessage
+                formControlName="hours"
+                [showSpinButton]="false"
+                format="#.###"
+                max="999999"
+                value="0"
+                min="0"
+              >
+              </ejs-numerictextbox>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template #footerTemplate>
+    <div class="e-card-content">
+      <button
+        ejs-button
+        cssClass="e-outline"
+        (click)="onCancel()"
+      >Cancel</button>
+      <button
+        ejs-button
+        cssClass="e-danger"
+        class="submit-btn"
+        (click)="onSubmit()"
+      >Submit</button>
+    </div>
+  </ng-template>
+</ejs-dialog>

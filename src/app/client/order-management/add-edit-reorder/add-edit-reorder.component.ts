@@ -1,7 +1,7 @@
 import isNil from 'lodash/fp/isNil';
 import uniq from 'lodash/fp/uniq';
 
-import { filter, first, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { filter, first, map, Observable, switchMap, takeUntil, tap, catchError } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Store } from '@ngxs/store';
 
@@ -21,6 +21,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
+import { ONBOARDED_STATUS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 
 @Component({
   selector: 'app-add-edit-reorder',
@@ -45,6 +46,11 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public billRate$: Observable<number>;
   public commentContainerId: number = 0;
   public comments: Comment[] = [];
+  public initialDates: {
+    shiftStartTime: Date;
+    shiftEndTime: Date;
+    jobStartDate: Date;
+  };
 
   private numberOfAgencies: number;
 
@@ -89,6 +95,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private createReorderForm(): void {
     if (this.isEditMode) {
       this.initForm(this.order);
+      this.setInitialDatesValue();
       this.getComments();
     } else {
       this.initForm();
@@ -124,12 +131,28 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     );
   }
 
+  setInitialDatesValue(): void {
+    const { jobStartDate, shiftStartTime, shiftEndTime } = this.order;
+    this.initialDates = {
+      shiftStartTime,
+      shiftEndTime,
+      jobStartDate,
+    };
+  }
+
   private listenCandidateChanges(): void {
     this.reorderForm
       .get('candidates')
       ?.valueChanges.pipe(
-        tap((candidateIds: number[]) => this.reorderForm.patchValue({ openPosition: candidateIds?.length || 1 })),
-        filter((candidateIds: number[]) => !isNil(candidateIds)),
+        tap((candidateIds: number[]) => {
+          if (!candidateIds.length) {
+            this.reorderForm.patchValue({ openPosition: null, agencies: [] });
+            this.reorderForm.updateValueAndValidity();
+          } else {
+            this.reorderForm.patchValue({ openPosition: candidateIds?.length || 1 });
+          }
+        }),
+        filter((candidateIds: number[]) => !!candidateIds?.length),
         switchMap(() => this.candidates$.pipe(map(this.getAgenciesBelongToCandidates)))
       )
       .subscribe((agencies: number[]) => {
@@ -144,6 +167,47 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     return uniq(agencyIds);
   }
 
+  private hasFilledPositions(): boolean {
+    if (!this.order.candidates?.length) {
+      return false;
+    }
+
+    return this.order.candidates.some((candidate) => candidate.status === ONBOARDED_STATUS);
+  }
+
+  private isWrongOpenPositionCount(payload: ReorderRequestModel): boolean {
+    if (!this.order.candidates?.length) {
+      return false;
+    }
+
+    const onboardedCandidates = this.order.candidates?.filter((candidate) => candidate.status === ONBOARDED_STATUS);
+
+    return onboardedCandidates.length > payload.reorder.openPosition;
+  }
+
+  isDatesChanged(): boolean {
+    const { reorderDate, shiftEndTime, shiftStartTime } = this.reorderForm.getRawValue();
+    const {
+      jobStartDate: reorderDateInitial,
+      shiftEndTime: shiftEndTimeInitial,
+      shiftStartTime: shiftStartTimeInitial,
+    } = this.initialDates;
+
+    return (
+      !this.areDatesEquals(reorderDate, reorderDateInitial) ||
+      !this.areTimesEquals(shiftEndTime, shiftEndTimeInitial) ||
+      !this.areTimesEquals(shiftStartTime, shiftStartTimeInitial)
+    );
+  }
+
+  private areDatesEquals(date1: Date, date2: Date): boolean {
+    return new Date(date1).toLocaleDateString() === new Date(date2).toLocaleDateString();
+  }
+
+  private areTimesEquals(time1: Date, time2: Date): boolean {
+    return new Date(time1).toLocaleTimeString() === new Date(time2).toLocaleTimeString();
+  }
+
   private saveReorder(): void {
     const reorder: ReorderModel = this.reorderForm.getRawValue();
     const agencyIds = this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
@@ -151,11 +215,50 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;
     const payload = { reorder, agencyIds, reOrderId, reOrderFromId };
 
+    if (this.isEditMode) {
+      this.checkPositionsAndSave(<ReorderRequestModel>payload);
+    } else {
+      this.save(<ReorderRequestModel>payload);
+    }
+  }
+
+  private showSaveErrorDateTimeIssue(): void {
+    const message =
+      'Re-order Date, Shift Start Time and Shift End Time CANNOT be edited if there is at least one Filled Position in this order.';
+    this.store.dispatch(new ShowToast(MessageTypes.Error, message));
+  }
+
+  private showSaveErrorPositionsIssue(): void {
+    const message =
+      'Open Positions number CANNOT be less than the number of already Filled positions for this Re-Order';
+    this.store.dispatch(new ShowToast(MessageTypes.Error, message));
+  }
+
+  private checkPositionsAndSave(payload: ReorderRequestModel): void {
+    if (this.isWrongOpenPositionCount(<ReorderRequestModel>payload)) {
+      this.showSaveErrorPositionsIssue();
+      return;
+    }
+
+    if (this.hasFilledPositions()) {
+      if (this.isDatesChanged()) {
+        this.showSaveErrorDateTimeIssue();
+      } else {
+        this.save(<ReorderRequestModel>payload);
+      }
+    } else {
+      this.save(<ReorderRequestModel>payload);
+    }
+  }
+
+  private save(payload: ReorderRequestModel): void {
     this.reorderService
       .saveReorder(<ReorderRequestModel>payload, this.comments)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+      takeUntil(this.destroy$),
+      tap(() => this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED))),
+      catchError((error) => this.store.dispatch(new ShowToast(MessageTypes.Error, error?.error?.errors?.RegularBillRate[0]))))
       .subscribe(() => {
-        this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED));
         this.saveEmitter.emit();
       });
   }

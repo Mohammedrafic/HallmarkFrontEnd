@@ -1,4 +1,5 @@
 @import 'colors';
+@import 'adaptive-response';
 
 .e-grid {
   border-radius: 12px;
@@ -11,7 +12,7 @@
   }
 
   &.e-gridhover tr[role=row]:not(.e-editedrow):hover .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
-    background-color: $primary-active-blue-90 !important;
+    background-color: $primary-active-blue-90;
   }
 
   .e-success-row {
@@ -126,4 +127,27 @@
 
 .delete-template {
   color: $supportive-red;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+
+  @media #{$min-tablet} {
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+
+  .input-container {
+    width: 100%;
+
+    &:nth-child(n+2) {
+      margin-left: 0;
+
+      @media #{$min-tablet} {
+        margin-left: 12px;
+      }
+
+    }
+  }
 }

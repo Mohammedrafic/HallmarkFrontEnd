@@ -1,9 +1,27 @@
-@import '../../styles/variables/colors';
+@import "colors";
+@import "adaptive-response";
 
 .bootstrap .row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 12px;
+  display: flex;
+  flex-wrap: wrap;
+
+  @media #{$min-tablet} {
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+
+  .input-container {
+    width: 100%;
+
+    &:nth-child(n+2) {
+      margin-left: 0;
+
+      @media #{$min-tablet} {
+        margin-left: 12px;
+      }
+
+    }
+  }
 }
 
 .input-container {
@@ -15,9 +33,5 @@
 
   :last-child {
     margin-bottom: 0;
-  }
-
-  label {
-    color: $secondary-dark-blue-15;
   }
 }

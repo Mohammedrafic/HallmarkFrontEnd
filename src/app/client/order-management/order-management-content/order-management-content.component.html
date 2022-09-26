@@ -4,7 +4,7 @@
   </ng-container>
   <ng-container right>
     <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
-    <button ejs-button cssClass="e-outline button-filter" (click)="showFilters()">
+    <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline button-filter" (click)="showFilters()">
       <div class="filter-button-content">
         <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{
           filteredItems.length
@@ -15,14 +15,17 @@
     <button
       *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates"
       ejs-dropdownbutton
+      appHideBeforeSyncfusionLoad
       [items]="exportOptions"
       (select)="exportSelected($event)"
       id="importButton"
       cssClass="e-outline button-export"
     >
-      Export <i-feather name="download" class="icon"></i-feather>
+      <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
     </button>
-    <button ejs-button [isPrimary]="true" (click)="navigateToOrderForm()">Create Order</button>
+    <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToOrderForm()">
+      Create Order
+    </button>
   </ng-container>
 </app-page-toolbar>
 
@@ -51,7 +54,7 @@
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column headerTextAlign="Right" width="165">
         <ng-template #headerTemplate let-data>
-          <div class="controls-header">
+          <div class="controls-header" [class.hidden]="!isLoaded">
             <button
               ejs-button
               cssClass="e-flat icon-button"
@@ -81,7 +84,7 @@
           </div>
         </ng-template>
         <ng-template #template let-data>
-          <div *ngIf="!data?.isTemplate; else templateButtons" class="row-tool-buttons">
+          <div *ngIf="!data?.isTemplate; else templateButtons" [class.hidden]="!isLoaded" class="row-tool-buttons">
             <button
               *ngIf="
                 activeTab !== OrganizationOrderManagementTabs.Incomplete && orderTypes.OpenPerDiem === data.orderType
@@ -99,7 +102,7 @@
             </button>
             <button ejs-button cssClass="e-flat default-icon-button with-badge">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
-              <span *ngIf="data.unreadComments" class="e-badge e-badge-success e-badge-pill right-overflow">{{
+              <span *ngIf="data.unreadComments > 0" class="e-badge e-badge-success e-badge-pill right-overflow">{{
                 data.unreadComments
               }}</span>
             </button>
@@ -119,6 +122,7 @@
             <button
               (click)="$event.stopPropagation()"
               ejs-dropdownbutton
+              [disabled]="data.orderType === orderTypes.ReOrder && data.status === orderStatus.Closed"
               [items]="
                 (data.status === orderStatus.Closed && closedOrderMenu) ||
                 (activeTab === OrganizationOrderManagementTabs.ReOrders && getMenuForReorders(data)) ||
@@ -201,6 +205,13 @@
           </div>
         </ng-template>
       </e-column>
+      <e-column field="orderType" headerText="TYPE" width="180">
+        <ng-template #template let-data>
+          <div class="order-type-column" *ngIf="orderTypes[data.orderType] as orderType">
+            <span class="e-badge e-badge-primary e-badge-circle">{{ orderType[0] }}</span> <span>{{ orderType }}</span>
+          </div>
+        </ng-template>
+      </e-column>
       <e-column field="jobTitle" headerText="JOB TITLE" width="200"></e-column>
       <e-column field="skillName" headerText="SKILL" textAlign="Left" width="200"></e-column>
       <e-column field="regionName" headerText="REGION" textAlign="Left" width="200" [visible]="false"></e-column>
@@ -213,11 +224,6 @@
       </e-column>
       <e-column field="locationName" headerText="LOCATION" textAlign="Left" width="200"></e-column>
       <e-column field="departmentName" headerText="DEPARTMENT" textAlign="Left" width="150"></e-column>
-      <e-column field="orderType" headerText="TYPE" width="100">
-        <ng-template #template let-data>
-          <span>{{ getOrderTypeName(data.orderType) }}</span>
-        </ng-template>
-      </e-column>
       <e-column field="billRate" headerText="BILL RATE" width="150">
         <ng-template #template let-data>
           <ng-container *ngIf="data.orderType !== orderTypes.PermPlacement">
@@ -237,7 +243,7 @@
           </span>
         </ng-template>
         <ng-template #template let-data>
-          <span>{{ data.startDate | date: 'MM/dd/yyyy' }}</span>
+          <span>{{ data.startDate | date: formatDate }}</span>
         </ng-template>
       </e-column>
       <e-column field="shift" headerText="SHIFT" width="150" [visible]="false">
@@ -297,6 +303,16 @@
           <span>{{ data.annualSalaryRangeTo | currency: 'USD':'symbol':'1.0-2' }}</span>
         </ng-template>
       </e-column>
+      <e-column field="creationDate" headerText="Creation Date" width="150">
+        <ng-template #template let-data>
+          <span>{{ data.creationDate | date: formatDate }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="endDate" headerText="End Date" width="150">
+        <ng-template #template let-data>
+          <span>{{ data.endDate | date: formatDate }}</span>
+        </ng-template>
+      </e-column>
     </e-columns>
 
     <ng-template #detailTemplate let-data>
@@ -314,7 +330,7 @@
 
       <ng-template #defaultSubRow>
         <app-grid-subrow-candidate
-          *ngFor="let child of data.children"
+          *ngFor="let child of data.children; index as i"
           [candidat]="child"
           [order]="data"
           [selected]="
@@ -322,7 +338,7 @@
             selectedCandidate?.selected.positionId === child.positionId
           "
           [isAgency]="true"
-          (clickEvent)="onOpenCandidateDialog($event, data)"
+          (clickEvent)="onOpenCandidateDialog($event, data, i)"
         ></app-grid-subrow-candidate>
       </ng-template>
     </ng-template>
@@ -389,18 +405,18 @@
   (applyFilterClicked)="onFilterApply()"
   (closeDialogClicked)="onFilterClose()"
 >
-  <form [formGroup]="OrderFilterFormGroup">
+  <form [formGroup]="OrderFilterFormGroup" *ngIf="showFilterForm">
     <div class="bootstrap">
       <div class="input-container">
         <label for="orderId">{{
           activeTab === OrganizationOrderManagementTabs.ReOrders ? 'Re-Order ID' : 'Order ID'
         }}</label>
         <div class="input-group">
-          <input id="orderId" class="e-input" type="text" maxlength="50" formControlName="orderId" />
+          <input id="orderId" class="e-input" type="text" maxlength="50" formControlName="orderPublicId" />
         </div>
       </div>
     </div>
-    <div class="row bootstrap">
+    <div class="filter-row bootstrap">
       <div class="input-container">
         <label>Region</label>
         <div class="input-group multiselect">
@@ -466,7 +482,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap">
+    <div class="filter-row bootstrap">
       <div class="input-container">
         <label>Skill</label>
         <div class="input-group multiselect">
@@ -505,7 +521,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap">
+    <div class="filter-row bootstrap">
       <div class="input-container">
         <label>Order Status</label>
         <div class="input-group multiselect">
@@ -539,14 +555,62 @@
     </div>
     <div class="bootstrap">
       <div class="input-container">
+        <label>Special Project Category</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            formControlName="projectTypeId"
+            appValidateWithMessage
+            [dataSource]="(projectSpecialData$ | async)?.specialProjectCategories"
+            [fields]="specialProjectCategoriesFields"
+          >
+          </ejs-dropdownlist>
+        </div>
+      </div>
+    </div>
+    <div class="row bootstrap">
+      <div class="input-container">
+        <label>Project Name</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            formControlName="projectNameId"
+            appValidateWithMessage
+            [dataSource]="(projectSpecialData$ | async)?.projectNames"
+            [fields]="projectNameFields"
+          >
+          </ejs-dropdownlist>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>PO #</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            formControlName="poNumberId"
+            appValidateWithMessage
+            [dataSource]="(projectSpecialData$ | async)?.poNumbers"
+            [fields]="poNumberFields"
+          >
+          </ejs-dropdownlist>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
         <label>Job Title</label>
         <div class="input-group">
           <input class="e-input" type="text" maxlength="50" formControlName="jobTitle" />
         </div>
       </div>
     </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Candidate Name</label>
+        <div class="input-group">
+          <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
+        </div>
+      </div>
+    </div>
     <div
-      class="row bootstrap"
+      class="filter-row bootstrap"
       *ngIf="
         activeTab !== OrganizationOrderManagementTabs.PerDiem &&
         activeTab !== OrganizationOrderManagementTabs.PermPlacement
@@ -565,7 +629,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap">
+    <div class="filter-row bootstrap">
       <div class="input-container">
         <label>Candidates Count From</label>
         <div class="input-group">
@@ -579,7 +643,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="activeTab === OrganizationOrderManagementTabs.PermPlacement" class="row bootstrap">
+    <div *ngIf="activeTab === OrganizationOrderManagementTabs.PermPlacement" class="filter-row bootstrap">
       <div class="input-container">
         <label>Annual Salary From</label>
         <div class="input-group">
@@ -601,7 +665,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
+    <div class="filter-row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
       <div class="input-container calendar">
         <label for="jobStartDate">{{
           activeTab !== OrganizationOrderManagementTabs.ReOrders ? 'Job Start Date' : 'Re-Order Date'
@@ -610,8 +674,10 @@
           <ejs-datepicker
             id="jobStartDate"
             class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
             formControlName="jobStartDate"
           >
           </ejs-datepicker>
@@ -629,9 +695,69 @@
           <ejs-datepicker
             id="jobEndDate"
             class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
             formControlName="jobEndDate"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-container calendar">
+        <label>Creation Date From</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            class="datepicker"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
+            formControlName="creationDateFrom"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+      <div class="input-container calendar">
+        <label>Creation Date To</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            class="datepicker"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
+            formControlName="creationDateTo"> </ejs-datepicker>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-container calendar">
+        <label>Distributed On From</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            class="datepicker"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
+            formControlName="distributedOnFrom"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+      <div class="input-container calendar">
+        <label>Distributed On To</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            class="datepicker"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
+            formControlName="distributedOnTo"
           >
           </ejs-datepicker>
         </div>
@@ -666,7 +792,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap">
+    <div class="filter-row bootstrap">
       <div class="input-container">
         <label>Region</label>
         <div class="input-group multiselect">
@@ -747,6 +873,7 @@
   (closeReOrderEmitter)="onAddReorderClose()"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
   (updateOrders)="getOrders()"
+  (reOpenOrderSuccess)="updateOrderDetails($event)"
 ></app-order-details-dialog>
 
 <app-child-order-dialog
@@ -755,6 +882,7 @@
   [openEvent]="openChildDialog"
   [filters]="filters"
   (saveEmitter)="updateGrid()"
+  (reOpenPositionSuccess)="updatePositionDetails($event)"
 ></app-child-order-dialog>
 
 <app-close-order

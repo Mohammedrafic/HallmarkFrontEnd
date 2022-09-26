@@ -25,11 +25,15 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   @Input() set billRates(values: BillRate[]) {
     if (values) {
       this.billRatesControl = new FormArray([]);
-      values.forEach(value => this.billRatesControl.push(this.fromValueToBillRate(value)));
+      values.forEach((value) => this.billRatesControl.push(this.fromValueToBillRate(value)));
     }
   }
 
   @Output() billRatesChanged: EventEmitter<any> = new EventEmitter();
+  @Output() hourlyRateSync: EventEmitter<{ value: string; billRate: BillRate }> = new EventEmitter<{
+    value: string;
+    billRate: BillRate;
+  }>();
 
   public billRateFormHeader: string;
   public billRatesControl: FormArray;
@@ -45,10 +49,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   private editBillRateIndex: string | null;
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(
-    private confirmService: ConfirmService,
-    private store: Store,
-  ) {
+  constructor(private confirmService: ConfirmService, private store: Store) {
     this.billRatesControl = new FormArray([]);
   }
 
@@ -57,14 +58,18 @@ export class BillRatesComponent implements OnInit, OnDestroy {
 
     this.intervalMinField = this.billRateForm.get('intervalMin') as AbstractControl;
     this.intervalMinField.addValidators(intervalMinValidator(this.billRateForm, 'intervalMax'));
-    this.intervalMinField.valueChanges.subscribe(() => this.intervalMaxField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+    this.intervalMinField.valueChanges.subscribe(() =>
+      this.intervalMaxField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
+    );
 
     this.intervalMaxField = this.billRateForm.get('intervalMax') as AbstractControl;
     this.intervalMaxField.addValidators(intervalMaxValidator(this.billRateForm, 'intervalMin'));
-    this.intervalMaxField.valueChanges.subscribe(() => this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+    this.intervalMaxField.valueChanges.subscribe(() =>
+      this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
+    );
 
     this.store.dispatch(new GetBillRateOptions());
-    this.billRatesOptions$.pipe(takeUntil(this.unsubscribe$)).subscribe(options => {
+    this.billRatesOptions$.pipe(takeUntil(this.unsubscribe$)).subscribe((options) => {
       if (options && options.length > 0) {
         this.billRatesOptions = options;
       }
@@ -80,7 +85,14 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     this.editBillRateIndex = null;
     this.billRateForm.reset();
     this.billRateFormHeader = 'Add Bill Rate';
-    this.billRateForm.patchValue({ id: 0, editAllowed: false, isPredefined: false, seventhDayOtEnabled: false, weeklyOtEnabled: false, dailyOtEnabled: false });
+    this.billRateForm.patchValue({
+      id: 0,
+      editAllowed: false,
+      isPredefined: false,
+      seventhDayOtEnabled: false,
+      weeklyOtEnabled: false,
+      dailyOtEnabled: false,
+    });
     this.selectedBillRateUnit = BillRateUnit.Multiplier;
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -89,23 +101,29 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     this.billRateFormHeader = 'Edit Bill Rate';
     this.editBillRateIndex = index;
 
-    const foundBillRateOption = this.billRatesOptions.find(option => option.id === value.billRateConfigId);
-    const rateHour = foundBillRateOption?.unit === BillRateUnit.Hours ? String(value.rateHour) : parseFloat(value.rateHour.toString()).toFixed(2);
-    this.billRateForm.patchValue({
-      billRateConfig: value.billRateConfig,
-      billRateConfigId: value.billRateConfigId,
-      effectiveDate: value.effectiveDate,
-      id: value.id,
-      intervalMax: value.intervalMax && String(value.intervalMax),
-      intervalMin: value.intervalMin && String(value.intervalMin),
-      rateHour: rateHour,
-      billType: value.billType,
-      editAllowed: value.editAllowed || false,
-      isPredefined: value.isPredefined || false,
-      seventhDayOtEnabled: value.seventhDayOtEnabled || false,
-      weeklyOtEnabled: value.weeklyOtEnabled || false,
-      dailyOtEnabled: value.dailyOtEnabled || false
-     }, { emitEvent: false });
+    const foundBillRateOption = this.billRatesOptions.find((option) => option.id === value.billRateConfigId);
+    const rateHour =
+      foundBillRateOption?.unit === BillRateUnit.Hours
+        ? String(value.rateHour)
+        : parseFloat(value.rateHour.toString()).toFixed(2);
+    this.billRateForm.patchValue(
+      {
+        billRateConfig: value.billRateConfig,
+        billRateConfigId: value.billRateConfigId,
+        effectiveDate: value.effectiveDate,
+        id: value.id,
+        intervalMax: value.intervalMax && String(value.intervalMax),
+        intervalMin: value.intervalMin && String(value.intervalMin),
+        rateHour: rateHour,
+        billType: value.billType,
+        editAllowed: value.editAllowed || false,
+        isPredefined: value.isPredefined || false,
+        seventhDayOtEnabled: value.seventhDayOtEnabled || false,
+        weeklyOtEnabled: value.weeklyOtEnabled || false,
+        dailyOtEnabled: value.dailyOtEnabled || false,
+      },
+      { emitEvent: false }
+    );
 
     if (!value.billRateConfig.intervalMin) {
       this.billRateForm.controls['intervalMin'].removeValidators(Validators.required);
@@ -120,12 +138,11 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     }
 
     if (value.isPredefined) {
-      this.billRateForm.get('billRateConfigId')?.disable();
-      this.billRateForm.get('effectiveDate')?.disable();
+      this.billRateForm.get('billRateConfigId')?.disable({ emitEvent: false });
+      this.billRateForm.get('effectiveDate')?.disable({ emitEvent: false });
     }
 
     this.selectedBillRateUnit = foundBillRateOption?.unit as BillRateUnit;
-
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -134,7 +151,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       .confirm('Are you sure you want to delete it?', {
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-        title: 'Delete record'
+        title: 'Delete record',
       })
       .pipe(
         take(1),
@@ -172,6 +189,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     this.billRateForm.markAllAsTouched();
     if (this.billRateForm.valid) {
       const value: BillRate = this.billRateForm.getRawValue();
+      this.syncBillRateHourlyRate(value);
 
       value.id = value.id ? value.id : 0;
 
@@ -182,7 +200,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
             new Date(rate.effectiveDate).getTime() === new Date(value.effectiveDate).getTime()
         );
         if (existingDateAndConfig) {
-          this.billRateForm.get( 'effectiveDate')?.setErrors({});
+          this.billRateForm.get('effectiveDate')?.setErrors({});
           return;
         }
       }
@@ -202,6 +220,14 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     }
   }
 
+  syncBillRateHourlyRate(billRate: BillRate): void {
+    if (billRate.billRateConfig.id !== 1) {
+      return;
+    }
+
+    this.hourlyRateSync.emit({ value: billRate.rateHour.toString(), billRate });
+  }
+
   private fromValueToBillRate(value: BillRate): FormGroup {
     const billRateControl = BillRateFormComponent.createForm();
     const billRateConfig = billRateControl.get('billRateConfig');
@@ -210,4 +236,5 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     billRateControl.patchValue({ ...value, billRateConfig });
     return billRateControl;
   }
+
 }

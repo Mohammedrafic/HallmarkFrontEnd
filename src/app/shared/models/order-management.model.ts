@@ -1,3 +1,4 @@
+import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { PageOfCollections } from '@shared/models/page.model';
 import { Document } from '@shared/models/document.model';
 import { OrderStatus } from '@shared/enums/order-management';
@@ -8,7 +9,6 @@ import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
 import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
 import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
-import { RejectReason } from './reject-reason.model';
 
 export class OrderManagement {
   id: number;
@@ -101,6 +101,8 @@ export type AgencyOrderManagement = {
   orderClosureReason?: string;
   orderClosureReasonId?: string;
   organizationPrefix: string;
+  extensionFromId?: number;
+  candidates?: CandidateModel[];
 };
 
 export type OrderManagementChild = {
@@ -172,7 +174,7 @@ export type AgencyOrderFilters = {
   regionIds?: number[];
   locationIds?: number[];
   departmentsIds?: number[];
-  orderId?: number | null;
+  orderPublicId?: string | null;
   reOrderId?: number;
   skillIds?: number[];
   candidateStatuses?: number[];
@@ -190,6 +192,14 @@ export type AgencyOrderFilters = {
   includeReOrders?: boolean;
   annualSalaryRangeFrom?: string | null;
   annualSalaryRangeTo?: string | null;
+  creationDateFrom?: Date | null;
+  creationDateTo?: Date | null;
+  distributedOnFrom?: Date | null;
+  distributedOnTo?: Date | null;
+  candidateName?: string | null;
+  projectTypeId?: number | null;
+  projectNameId?: number | null;
+  poNumberId?: number | null;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -407,6 +417,7 @@ export type OrderCandidateJob = {
   candidateBillRate: number;
   candidateProfile: CandidateProfile;
   candidateProfileId: number;
+  candidateStatus: CandidateStatus;
   clockId: number;
   expAsTravelers: string;
   guaranteedWorkWeek: string;
@@ -414,6 +425,7 @@ export type OrderCandidateJob = {
   offeredBillRate: number;
   order: Order;
   orderId: number;
+  orderStatus: OrderStatus;
   organizationId: number;
   rejectBy: string;
   rejectDate: string;
@@ -438,6 +450,7 @@ export type OrderCandidateJob = {
   positionClosureReasonId?: number;
   commentContainerId?: number;
   reOrderDate?: string;
+  jobCancellation?: JobCancellation;
 };
 
 export type CandidatesBasicInfo = {
@@ -479,7 +492,7 @@ export class OrderFilter {
   locationIds?: number[];
   departmentsIds?: number[];
   reOrderId?: number;
-  orderId?: number | null;
+  orderPublicId?: string | null;
   skillIds?: number[];
   orderTypes?: number[];
   jobTitle?: string;
@@ -501,6 +514,14 @@ export class OrderFilter {
   templateTitle?: string;
   annualSalaryRangeFrom?: string | null;
   annualSalaryRangeTo?: string | null;
+  creationDateFrom?: Date | null;
+  creationDateTo?: Date | null;
+  distributedOnFrom?: Date | null;
+  distributedOnTo?: Date | null;
+  candidateName?: string | null;
+  projectTypeId?: number | null;
+  projectNameId?: number | null;
+  poNumberId?: number | null;
 }
 
 export class SortModel {

@@ -10,13 +10,7 @@ export enum MoreMenuType {
   'Duplicate',
   'Close',
   'Delete',
-}
-
-export enum OrderTypeName {
-  ContractToPerm = 'ContractToPerm',
-  OpenPerDiem = 'OpenPerDiem',
-  PermPlacement = 'PermPlacement',
-  Traveler = 'Traveler',
+  'Re-Open',
 }
 
 export const allOrdersColumnsToExport: ExportColumn[] = [
@@ -31,21 +25,38 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Candidates', column: 'CandidatesCount' },
   { text: 'Start Date', column: 'JobStartDate' },
+  { text: 'End Date', column: 'EndDate' },
+  { text: 'Creation Date', column: 'CreationDate' },
+  { text: 'Distributed On', column: 'DistributedOn' },
+  { text: 'Distributed To', column: 'DistributedTo' },
+  { text: 'Special Project Category', column: 'SpecialProjectCategory' },
+  { text: 'Special Project Name', column: 'SpecialProjectName' },
+  { text: 'PO #', column: 'PONumber' },
+  { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Agency', column: 'Agency' },
 ];
 
 export const perDiemColumnsToExport: ExportColumn[] = [
-  { text: 'Order ID', column: 'Id' },
-  { text: 'Status', column: 'StatusText' },
+  { text: 'Order ID', column: 'OrderId' },
+  { text: 'Status', column: 'Status' },
   { text: 'Job Title', column: 'JobTitle' },
-  { text: 'Skill', column: 'SkillName' },
-  { text: 'Location', column: 'LocationName' },
-  { text: 'Department', column: 'DepartmentName' },
+  { text: 'Skill', column: 'Skill' },
+  { text: 'Location', column: 'Location' },
+  { text: 'Department', column: 'Department' },
   { text: 'Candidates', column: 'Candidates' },
   { text: '# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days' },
+  { text: 'Creation Date', column: 'CreationDate' },
+  { text: 'Distributed On', column: 'DistributedOn' },
+  { text: 'Distributed To', column: 'DistributedTo' },
+  { text: 'Special Project Category', column: 'SpecialProjectCategory' },
+  { text: 'Special Project Name', column: 'SpecialProjectName' },
+  { text: 'PO #', column: 'PONumber' },
+  { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Agency', column: 'Agency' },
 ];
 
 export const reOrdersColumnsToExport: ExportColumn[] = [
-  { text: 'Re-Order ID', column: 'Id' },
+  { text: 'Re-Order ID', column: 'ReOrderId' },
   { text: 'Status', column: 'Status' },
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Skill', column: 'Skill' },
@@ -57,6 +68,14 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Re-Order Date', column: 'ReOrderDate' },
   { text: 'Shift', column: 'Shift' },
   { text: 'Agency', column: 'Agency' },
+  { text: 'End Date', column: 'EndDate' },
+  { text: 'Creation Date', column: 'CreationDate' },
+  { text: 'Distributed On', column: 'DistributedOn' },
+  { text: 'Distributed To', column: 'DistributedTo' },
+  { text: 'Special Project Category', column: 'SpecialProjectCategory' },
+  { text: 'Special Project Name', column: 'SpecialProjectName' },
+  { text: 'PO #', column: 'PONumber' },
+  { text: 'Offered Date', column: 'OfferedDate' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [
@@ -117,6 +136,10 @@ export const ReOrdersColumnsConfig = [
     visible: true,
   },
   {
+    fieldName: 'endDate',
+    visible: false,
+  },
+  {
     fieldName: 'shiftsNext90Days',
     visible: false,
   },
@@ -151,7 +174,7 @@ export const ReOrdersColumnsConfig = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: false,
-  }
+  },
 ];
 
 export const AllOrdersColumnsConfig = [
@@ -165,6 +188,10 @@ export const AllOrdersColumnsConfig = [
   },
   {
     fieldName: 'startDate',
+    visible: true,
+  },
+  {
+    fieldName: 'endDate',
     visible: true,
   },
   {
@@ -218,7 +245,7 @@ export const AllOrdersColumnsConfig = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: false,
-  }
+  },
 ];
 
 export const PerDiemColumnsConfig = [
@@ -232,6 +259,10 @@ export const PerDiemColumnsConfig = [
   },
   {
     fieldName: 'startDate',
+    visible: false,
+  },
+  {
+    fieldName: 'endDate',
     visible: false,
   },
   {
@@ -281,7 +312,7 @@ export const PerDiemColumnsConfig = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: false,
-  }
+  },
 ];
 
 export const orderTemplateColumnsConfig = [
@@ -300,6 +331,10 @@ export const orderTemplateColumnsConfig = [
   {
     fieldName: 'startDate',
     visible: false,
+  },
+  {
+    fieldName: 'endDate',
+    visible: true,
   },
   {
     fieldName: 'reOrderFromId',
@@ -352,7 +387,7 @@ export const orderTemplateColumnsConfig = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: false,
-  }
+  },
 ];
 
 export const PermPlacementColumnsConfig = [
@@ -367,6 +402,10 @@ export const PermPlacementColumnsConfig = [
   {
     fieldName: 'startDate',
     visible: true,
+  },
+  {
+    fieldName: 'endDate',
+    visible: false,
   },
   {
     fieldName: 'reOrderFromId',
@@ -419,5 +458,5 @@ export const PermPlacementColumnsConfig = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: true,
-  }
+  },
 ];

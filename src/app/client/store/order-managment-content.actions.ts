@@ -1,4 +1,5 @@
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { CandidateCancellation } from "@shared/models/candidate-cancellation.model";
 import {
   AcceptJobDTO,
   CreateOrderDto,
@@ -189,6 +190,16 @@ export class RejectCandidateJob {
   constructor(public payload: RejectReasonPayload) {}
 }
 
+export class CancelOrganizationCandidateJob {
+  static readonly type = '[organizationManagement] Cancel Candidate Job';
+  constructor(public payload: CandidateCancellation) {}
+}
+
+export class CancelOrganizationCandidateJobSuccess {
+  static readonly type = '[organizationManagement] Cancel Candidate Success';
+  constructor() {}
+}
+
 export class ApproveOrder {
   static readonly type = '[order management] Approve Order';
   constructor(public id: number) {}
@@ -242,7 +253,7 @@ export class GetContactDetails {
   constructor(public departmentId: number, public lastSelectedBusinessId?: number) {}
 }
 
-export class GetExtensions {
+export class GetOrganizationExtensions {
   static readonly type = '[order management] Get Extensions';
   constructor(public id: number, public orderId: number) {}
 }
@@ -250,4 +261,8 @@ export class GetExtensions {
 export class SetIsDirtyQuickOrderForm {
   static readonly type = '[order management] Set Quick Order Dirty';
   constructor(public isDirtyQuickOrderForm: boolean) {}
+}
+
+export class ClearOrderCandidatePage {
+  static readonly type = '[order management] Clear Order Candidate Page';
 }

@@ -13,6 +13,7 @@ import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-com
 export class MapComponent extends AbstractSFComponentDirective<MapsComponent> implements OnChanges {
   @Input() public layers: LayerSettingsModel[] | undefined;
   @Input() public legendSettings: LegendSettingsModel;
+  @Input() public isDarkTheme: boolean | false;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['layers']) {

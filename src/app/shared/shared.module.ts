@@ -12,6 +12,8 @@ import {
   DollarSign,
   Download,
   Edit,
+  Eye,
+  EyeOff,
   Folder,
   Mail,
   MapPin,
@@ -21,8 +23,6 @@ import {
   Sliders,
   Trash2,
   User,
-  Eye,
-  EyeOff,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
@@ -54,7 +54,7 @@ import { SideDialogComponent } from './components/side-dialog/side-dialog.compon
 import { SearchComponent } from './components/search/search.component';
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { DropDownButtonAllModule, DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousComponent } from './components/dialog-next-previous/dialog-next-previous.component';
 import { OrderDetailsComponent } from './components/order-details/order-details.component';
@@ -122,7 +122,7 @@ import { CloseOrderSideDialogComponent } from '@shared/components/close-order-si
 import { OrderCloseReasonInfoComponent } from '@shared/components/order-close-reason-info/order-close-reason-info.component';
 import { CommentComponent } from './components/comments/comment/comment.component';
 import { CommentsState } from './components/comments/store/comments.state';
-import { AlwaysOpenFirstAccordition } from './directives/always-open-first-accordition.directive';
+import { OpenFirstAccordionDirective } from './directives/always-open-first-accordition.directive';
 import { CandidateStatusName } from './pipes/candidate-status-name.pipe';
 import { RouterModule } from '@angular/router';
 import { ExtensionCandidateComponent } from '@shared/components/order-candidate-list/order-candidates-list/extension-candidate/extension-candidate.component';
@@ -133,6 +133,13 @@ import { SmsSideDialogComponent } from '@shared/components/sms-side-dialog/sms-s
 import { OnScreenSideDialogComponent } from '@shared/components/on-screen-side-dialog/on-screen-side-dialog.component';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { AlertsState } from '@admin/store/alerts.state';
+import { ImportDialogContentComponent } from './components/import-dialog-content/import-dialog-content.component';
+import { GridErroredCellComponent } from './components/import-dialog-content/grid-errored-cell/grid-errored-cell.component';
+import { HideBeforeSyncfusionLoadDirective } from './directives/hide-before-syncfusion-load.directive';
+import { UnsavedFormDirective } from './directives/unsaved-form.directive';
+import { ClearCacheComponent } from './components/clear-cache/clear-cache.component';
+import { CandidateCancellationDialogComponent } from './components/candidate-cancellation-dialog/candidate-cancellation-dialog.component';
+import { OrderHistoricalEventsComponent } from './components/order-historical-events/order-historical-events.component';
 
 const icons = {
   AlertCircle,
@@ -167,7 +174,8 @@ const COMPONENTS = [
   BillRatePipe,
   ExBillRateNamesPipe,
   ValidateDirective,
-  AlwaysOpenFirstAccordition,
+  HideBeforeSyncfusionLoadDirective,
+  OpenFirstAccordionDirective,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
   ClickOutsideDirective,
@@ -211,11 +219,14 @@ const COMPONENTS = [
   ExtensionCandidateComponent,
   ActionCellRendererComponent,
   CustomIconComponent,
-  ActionCellRendererComponent, 
-  EmailSideDialogComponent,  
+  ActionCellRendererComponent,
+  EmailSideDialogComponent,
   SmsSideDialogComponent,
-  OnScreenSideDialogComponent,  
-  OrderCloseReasonInfoComponent
+  OnScreenSideDialogComponent,
+  OrderCloseReasonInfoComponent,
+  UnsavedFormDirective,
+  ClearCacheComponent,
+  CandidateCancellationDialogComponent,
 ];
 
 @NgModule({
@@ -247,7 +258,8 @@ const COMPONENTS = [
     TextBoxModule,
     MaskedTextBoxAllModule,
     TabAllModule,
-    NgxsModule.forFeature([BillRateState, SecurityState, CommentsState,AlertsState]),
+    DropDownButtonAllModule,
+    NgxsModule.forFeature([BillRateState, SecurityState, CommentsState, AlertsState]),
     PageToolbarModule,
     FilterDialogModule,
     SideMenuModule,
@@ -267,6 +279,7 @@ const COMPONENTS = [
     ErrorMessageComponent,
     CandidateAvatarPipe,
     AcceptFormComponent,
+    ImportDialogContentComponent,
   ],
   declarations: [
     ...COMPONENTS,
@@ -280,6 +293,9 @@ const COMPONENTS = [
     ReorderStatusDialogComponent,
     AcceptFormComponent,
     CustomNoRowsOverlayComponent,
+    GridErroredCellComponent,
+    ImportDialogContentComponent,
+    OrderHistoricalEventsComponent,
   ],
   providers: [
     DatePipe,

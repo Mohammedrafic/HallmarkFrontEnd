@@ -2,6 +2,7 @@
   <button
     *ngIf="isSkillsActive"
     ejs-button
+    appHideBeforeSyncfusionLoad
     id="filterButton"
     cssClass="e-outline button-filter" (click)="showFilters()">
     <div class="filter-button-content">
@@ -11,12 +12,18 @@
   </button>
   <button
     ejs-dropdownbutton
+    appHideBeforeSyncfusionLoad
     [items]="exportOptions"
     (select)="exportSelected($event)"
     id="importButton"
-    cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+    cssClass="e-outline button-export">
+    <div class="button-export-container">
+      Export <i-feather name="download" class="icon"></i-feather>
+    </div>
+  </button>
   <button
     ejs-button
+    appHideBeforeSyncfusionLoad
     id="addDepartmentButton"
     (click)="addSkill()"
     [isPrimary]="true">Add {{ tabs[currentTab] }}</button>

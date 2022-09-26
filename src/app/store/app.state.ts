@@ -11,11 +11,15 @@ import {
   ToggleSidebarState,
   SetIsFirstLoadState,
   SetIsOrganizationAgencyArea,
-  GetAlertsForCurrentUser
+  GetAlertsForCurrentUser,
+  CheckScreen,
+  ShouldDisableUserDropDown
 } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
-import { Observable, tap } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { IS_DARK_THEME } from '@shared/constants';
 
 export interface AppStateModel {
   isMobile: boolean;
@@ -26,13 +30,17 @@ export interface AppStateModel {
   isSidebarOpened: boolean;
   isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
   getAlertsForCurrentUser: GetAlertsForUserStateModel[];
+  isMobileScreen: boolean;
+  isTabletScreen: boolean;
+  isDekstopScreen: boolean;
+  shouldDisableUserDropDown:boolean;
 }
 
 @State<AppStateModel>({
   name: 'app',
   defaults: {
     isMobile: false,
-    isDarkTheme: false,
+    isDarkTheme: JSON.parse(window.localStorage.getItem(IS_DARK_THEME) as string) as boolean || false,
     headerState: null,
     isLoading: false,
     isFirstLoad: true,
@@ -41,7 +49,11 @@ export interface AppStateModel {
       isOrganizationArea: false,
       isAgencyArea: false
     },
-    getAlertsForCurrentUser : []
+    getAlertsForCurrentUser : [],
+    isMobileScreen: false,
+    isTabletScreen: false,
+    isDekstopScreen: false,
+    shouldDisableUserDropDown:false
   },
 })
 @Injectable()
@@ -70,7 +82,22 @@ export class AppState {
   @Selector()
   static getAlertsForCurrentUser(state: AppStateModel): GetAlertsForUserStateModel[] { return state.getAlertsForCurrentUser; }
 
-  constructor(private userService: UserService) {}
+  @Selector()
+  static isMobileScreen(state: AppStateModel): boolean { return state.isMobileScreen; }
+
+  @Selector()
+  static isTabletScreen(state: AppStateModel): boolean { return state.isTabletScreen; }
+
+  @Selector()
+  static isDekstopScreen(state: AppStateModel): boolean { return state.isDekstopScreen; }
+
+  constructor(
+    private userService: UserService,
+    private breakpointObserver: BreakpointObserver
+    ) {}
+  @Selector()
+  static shouldDisableUserDropDown(state: AppStateModel): boolean { return state.shouldDisableUserDropDown; }
+
 
   @Action(ToggleMobileView)
   ToggleMobileView({ patchState }: StateContext<AppStateModel>, { payload }: ToggleMobileView): void {
@@ -80,6 +107,7 @@ export class AppState {
   @Action(ToggleTheme)
   ToggleTheme({ patchState }: StateContext<AppStateModel>, { payload }: ToggleTheme): void {
     patchState({ isDarkTheme: payload });
+    window.localStorage.setItem(IS_DARK_THEME, JSON.stringify(payload));
   }
 
   @Action(SetHeaderState)
@@ -110,5 +138,26 @@ export class AppState {
         return payload;
       })
     );
+  }
+
+  @Action(CheckScreen)
+  checkScreen({ patchState }: StateContext<AppStateModel>): void {
+    this.breakpointObserver.observe('(max-width: 640px)').pipe(map(({matches}) => matches))
+    .subscribe((res) => {
+      patchState({ isMobileScreen: res});
+    });
+    this.breakpointObserver.observe('(min-width: 641px)').pipe(map(({matches}) => matches))
+    .subscribe((res) => {
+      patchState({ isTabletScreen: res});
+    });
+    this.breakpointObserver.observe('(min-width: 1025px)').pipe(map(({matches}) => matches))
+    .subscribe((res) => {
+      patchState({ isDekstopScreen: res});
+    });
+  }
+
+  @Action(ShouldDisableUserDropDown)
+  ShouldDisableUserDropDown({ patchState }: StateContext<AppStateModel>, { payload }: ShouldDisableUserDropDown): void {
+    patchState({ shouldDisableUserDropDown: payload });
   }
 }

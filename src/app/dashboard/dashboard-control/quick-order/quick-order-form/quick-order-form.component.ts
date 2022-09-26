@@ -1,4 +1,4 @@
-import { startTimeValidator, endTimeValidator } from '@shared/validators/date.validator';
+import { endTimeValidator, startTimeValidator } from '@shared/validators/date.validator';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -11,12 +11,24 @@ import {
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ChangeEventArgs, FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { combineLatest, debounceTime, distinctUntilChanged, filter, merge, Observable, of, Subject, take, takeUntil, switchMap } from 'rxjs';
+import {
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  merge,
+  Observable,
+  of,
+  Subject,
+  switchMap,
+  take,
+  takeUntil,
+} from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { OrderType } from '@shared/enums/order-type';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { Organisation, Region, Location, Department } from '@shared/models/visibility-settings.model';
+import { Department, Location, Organisation, Region } from '@shared/models/visibility-settings.model';
 import { Department as ContactDetails } from '@shared/models/department.model';
 import { currencyValidator } from '@shared/validators/currency.validator';
 import { integerValidator } from '@shared/validators/integer.validator';
@@ -53,6 +65,7 @@ import { ORDER_JOB_DISTRIBUTION_LIST } from '@shared/constants/order-job-distrib
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 import { ManualInvoiceReason } from '@shared/models/manual-invoice-reasons.model';
 import { DurationService } from '@shared/services/duration.service';
+import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 
 @Component({
   selector: 'app-quick-order-form',
@@ -80,7 +93,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public isPermPlacementOrder = false;
   public isContactToPermOrder = false;
   public isEditContactTitle = false;
-  public isTravelerOrder = false;
+  public isTravelerOrder = true;
   public isOpenPerDiem = false;
   public isReOrder = false;
   public orderStatus = 'Open';
@@ -119,8 +132,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   public isJobEndDateControlEnabled = false;
 
-  public shiftStartTimeFild: AbstractControl;
-  public shiftEndTimeFild: AbstractControl;
+  public shiftStartTimeField: AbstractControl;
+  public shiftEndTimeField: AbstractControl;
   public defaultMaxTime = new Date();
   public defaultMinTime = new Date();
   public maxTime = this.defaultMaxTime;
@@ -209,21 +222,22 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   public ngOnInit(): void {
     this.handleOrderTypeControlValueChanges();
-    this.orderTypeDeparmnetSkillListener();
+    this.orderTypeDepartmentSkillListener();
     this.handleJobStartDateValueChanges();
     this.handleJobDistributionValueChanges();
     this.handleAgencyValueChanges();
     this.handleDurationControlValueChanges();
     this.populateQuickOrderFormValues();
-    this.populateJobDistributionForm();
     this.populateShiftTimes();
     this.refreshMultiSelectAfterOpenDialog();
+    this.handleOrganizationUserDataStructure();
     this.subscribeForSettings();
     this.getContactDetails();
     this.getDataForOrganizationUser();
     this.cleanUpValidatorsForOrganizationUser();
     this.submitQuickOrder();
     this.detectFormValueChanges();
+    this.populateJobDistributionForm();
     this.setIsFormDirty();
   }
 
@@ -245,38 +259,43 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private initGeneralInformationForm(): void {
-    this.generalInformationForm = this.fb.group({
-      title: [null, [Validators.required, Validators.maxLength(50)]],
-      regionId: [null, Validators.required],
-      locationId: [null, Validators.required],
-      departmentId: [null, Validators.required],
-      skillId: [null, Validators.required],
-      hourlyRate: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
-      openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
-      duration: [null, Validators.required],
-      jobStartDate: [null, Validators.required],
-      jobEndDate: [null, Validators.required],
-      shift: [null, Validators.required],
-      shiftStartTime: [null, Validators.required],
-      shiftEndTime: [null, Validators.required],
-      orderPlacementFee: [null, Validators.required],
-      annualSalaryRangeFrom: [null, Validators.required],
-      annualSalaryRangeTo: [null, Validators.required],
-    });
+    this.generalInformationForm = this.fb.group(
+      {
+        title: [null, [Validators.required, Validators.maxLength(50)]],
+        regionId: [null, Validators.required],
+        locationId: [null, Validators.required],
+        departmentId: [null, Validators.required],
+        skillId: [null, Validators.required],
+        hourlyRate: [null, [Validators.required, Validators.maxLength(10)]],
+        openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
+        duration: [null, Validators.required],
+        jobStartDate: [null, Validators.required],
+        jobEndDate: [null, Validators.required],
+        shift: [null, Validators.required],
+        shiftStartTime: [null, Validators.required],
+        shiftEndTime: [null, Validators.required],
+        orderPlacementFee: [null, Validators.required],
+        annualSalaryRangeFrom: [null, Validators.required],
+        annualSalaryRangeTo: [null, Validators.required],
+      },
+      { validators: greaterThanValidator('annualSalaryRangeFrom', 'annualSalaryRangeTo') }
+    );
 
     this.defaultMaxTime.setHours(23, 59, 59);
     this.defaultMinTime.setHours(0, 0, 0);
 
-    this.shiftStartTimeFild = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
-    this.shiftEndTimeFild = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
-    this.shiftEndTimeFild.valueChanges.subscribe(val => { 
-      this.maxTime = val || this.defaultMaxTime; this.shiftStartTimeFild.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    this.shiftStartTimeField = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
+    this.shiftEndTimeField = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
+    this.shiftEndTimeField.valueChanges.subscribe((val) => {
+      this.maxTime = val || this.defaultMaxTime;
+      this.shiftStartTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
     });
-    this.shiftStartTimeFild.valueChanges.subscribe(val => {
-      this.minTime = val || this.defaultMinTime; this.shiftEndTimeFild.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    this.shiftStartTimeField.valueChanges.subscribe((val) => {
+      this.minTime = val || this.defaultMinTime;
+      this.shiftEndTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
     });
-    this.shiftStartTimeFild.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
-    this.shiftEndTimeFild.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
+    this.shiftStartTimeField.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
+    this.shiftEndTimeField.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
   }
 
   private initJobDistributionDescriptionForm(): void {
@@ -318,6 +337,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.store.dispatch(new GetAssociateAgencies(organizationId));
     this.store.dispatch(new GetProjectSpecialData(organizationId));
     this.store.dispatch(new GetOrderRequisitionByPage(undefined, undefined, undefined, organizationId));
+    this.orderTypeControl.updateValueAndValidity();
   }
 
   public onRegionDropDownSelected(event: ChangeEventArgs): void {
@@ -385,6 +405,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     if (!this.userIsAdmin && this.organizationStructure) {
       this.regionDataSource = this.organizationStructure.regions;
       this.populateRegLocDepSkillFields(this.regionDataSource[0]);
+      this.orderTypeControl.updateValueAndValidity();
+      this.getContactDetails();
     }
   }
 
@@ -418,7 +440,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       if (!(jobStartDate instanceof Date)) {
         return;
       }
-      this.jobStartDateControl.patchValue(jobStartDate);    
+      this.jobStartDateControl.patchValue(jobStartDate);
       this.autoSetupJobEndDateControl(duration, jobStartDate);
     });
   }
@@ -467,7 +489,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     /** Clone Date object to avoid modifying */
     const jobStartDateValue = new Date(jobStartDate.getTime());
     const jobEndDateControl = this.generalInformationForm.get('jobEndDate') as AbstractControl;
-    
+
     const jobEndDate: Date = this.durationService.getEndDate(duration, jobStartDateValue);
     jobEndDateControl.patchValue(jobEndDate);
   }
@@ -507,8 +529,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.populateQuickOrderFormValues();
       this.populateShiftTimes();
       listOfCommonControls.forEach((control) => {
-        if (control === 'hourlyRate' || control === 'openPositions') {
-          this.generalInformationForm.controls[control]?.setValidators([
+        if (control === 'openPositions') {
+          this.generalInformationForm.controls['control']?.setValidators([
             Validators.required,
             Validators.maxLength(10),
             currencyValidator(1),
@@ -554,7 +576,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     });
   }
 
-  private orderTypeDeparmnetSkillListener(): void {
+  private orderTypeDepartmentSkillListener(): void {
     combineLatest([
       this.orderTypeControl.valueChanges,
       this.generalInformationForm.controls['departmentId'].valueChanges,
@@ -602,18 +624,18 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private getContactDetails(): void {
-    this.organizationForm.controls['organization'].valueChanges
-    .pipe(
-      switchMap(() => {
+    this.generalInformationForm.controls['departmentId'].valueChanges
+      .pipe(
+        switchMap(() => {
           return this.contactDetails$;
-      }),
-      filter(Boolean),
-      takeUntil(this.destroy$)
-    )
-    .subscribe((contactDetails) => {
-      const { facilityContact, facilityEmail } = contactDetails;
-      this.populateContactDetailsForm(facilityContact, facilityEmail);
-    });
+        }),
+        filter(Boolean),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((contactDetails) => {
+        const { facilityContact, facilityEmail } = contactDetails;
+        this.populateContactDetailsForm(facilityContact, facilityEmail);
+      });
   }
 
   private populateJobDistributionForm(): void {
@@ -642,7 +664,6 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.openEvent.pipe(takeUntil(this.destroy$), debounceTime(300)).subscribe((isOpen) => {
       if (isOpen) {
         this.multiselect.refresh();
-        this.handleOrganizationUserDataStructure();
       }
     });
   }
@@ -667,7 +688,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
   private handleJobDistributionValueChanges(): void {
     this.jobDistributionControl.valueChanges
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$), debounceTime(300))
       .subscribe((jobDistributionIds: JobDistribution[]) => {
         this.cdr.markForCheck();
         if (jobDistributionIds.includes(JobDistribution.All)) {

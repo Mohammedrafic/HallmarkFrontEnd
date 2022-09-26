@@ -1,8 +1,7 @@
 <ejs-dialog
   id="dialog"
   #sideDialog
-  cssClass="dialog"
-  width="45%"
+  cssClass="dialog candidate-dialog"
   [target]="targetElement"
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
@@ -20,6 +19,7 @@
             <div class="input-group dropdown bootstrap" *ngIf="showDropdown">
               <ejs-dropdownlist
                 [fields]="optionFields"
+                [formControl]="statusesFormControl"
                 [dataSource]="nextApplicantStatuses"
                 placeholder="Select Status"
                 (select)="onDropDownChanged($event)"
@@ -38,7 +38,7 @@
       </section>
       <section class="content-container">
         <div class="candidate-info">
-          <ejs-accordion #accordionElement expandMode="Single" openFirstAccordion>
+          <ejs-accordion #accordionElement expandMode="Single" appOpenFirstAccordion>
             <e-accordionitems>
               <e-accordionitem expanded="true">
                 <ng-template #header>
@@ -78,7 +78,7 @@
                       </div>
                     </div>
                     <!--TODO: create and use ReadOnly Mode for it-->
-                    <div *ngIf="showClockId" class="input-container bootstrap">
+                    <div *ngIf="showClockId && !orderCandidateJob?.hasAllRequiredOnboardedCredentials" class="input-container bootstrap">
                       <ejs-checkbox [disabled]="isAgency || isOnboard" formControlName="allow" label="Allow deploy w/o credentials"
                                     maxlength="50"></ejs-checkbox>
                     </div>
@@ -109,6 +109,21 @@
     </section>
   </ng-template>
   <ng-template #footerTemplate>
+    <ng-container *ngIf="showDropdown || showRejectButton || showWithdrawButton || showApplyButton || showAcceptButton">
+      <div class="mobile-actions">
+        <div class="input-group dropdown bootstrap" *ngIf="showDropdown">
+          <ejs-dropdownlist [fields]="optionFields" [formControl]="statusesFormControl" [dataSource]="nextApplicantStatuses"
+            placeholder="Select Status" (select)="onDropDownChanged($event)"></ejs-dropdownlist>
+        </div>
+        <!--TODO: create and use ReadOnly Mode for it-->
+        <button ejs-button cssClass="e-outline" (click)="onReject()" *ngIf="showRejectButton">Reject</button>
+        <button ejs-button cssClass="e-outline" (click)="onWithdraw()" *ngIf="showWithdrawButton">Withdraw</button>
+        <button ejs-button cssClass="e-primary" (click)="onApply()" [disabled]="isLocked"
+          *ngIf="showApplyButton">Apply</button>
+        <button ejs-button cssClass="e-primary" (click)="onAccept()" *ngIf="showAcceptButton">Accept</button>
+      </div>
+      <hr class="mobile" />
+    </ng-container>
     <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>
   </ng-template>
 </ejs-dialog>
@@ -117,4 +132,5 @@
   [rejectReasonsList]="rejectReasons"
   [openEvent]="openRejectDialog"
   (applyReject)="applyReject($event)"
+  (cancelReject)="cancelRejectCandidate()"
 ></app-reject-reason-dialog>

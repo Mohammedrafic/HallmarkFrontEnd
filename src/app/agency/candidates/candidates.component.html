@@ -10,18 +10,21 @@
         [checked]="true"
       ></ejs-switch>
       <label for="switcher" class="switch-text">Include Deployed Candidates</label>
-      <button ejs-button cssClass="e-outline" (click)="onImport()">
+      <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline" (click)="onImport()">
         Import <span><i-feather name="upload" class="icon"></i-feather></span>
       </button>
       <button
         ejs-dropdownbutton
+        appHideBeforeSyncfusionLoad
         cssClass="e-outline button-export"
         [items]="exportOptions"
         (select)="exportSelected($event)"
       >
-        Export <i-feather name="download" class="icon"></i-feather>
+        <div class="button-export-container">
+          Export <i-feather name="download" class="icon"></i-feather>
+        </div>
       </button>
-      <button ejs-button id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
+      <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
         <div class="filter-button-content">
           <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-circle">{{
             filteredItems
@@ -29,7 +32,7 @@
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
-      <button ejs-button [isPrimary]="true" (click)="navigateToCandidateForm()">Add Candidate</button>
+      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToCandidateForm()">Add Candidate</button>
     </div>
   </ng-container>
 </app-page-toolbar>

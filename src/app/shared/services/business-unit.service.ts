@@ -19,4 +19,11 @@ export class BusinessUnitService {
   public getBusinessByUnitType(type: BusinessUnitType): Observable<BusinessUnit[]> {
     return this.http.get<BusinessUnit[]>(`/api/BusinessUnit/businessUnitType/${type}`);
   }
+   /**
+   * Get the list of available business by unit type
+   * @return Array of business
+   */
+    public getBusinessUnits(): Observable<BusinessUnit[]> {
+      return this.http.get<BusinessUnit[]>(`/api/BusinessUnit/basicInfo`);
+    }
 }

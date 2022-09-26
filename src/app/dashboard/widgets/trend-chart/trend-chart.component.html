@@ -14,6 +14,7 @@
           [primaryXAxis]="primaryXAxis"
           [primaryYAxis]="primaryYAxis"
           style="height: inherit"
+          [background]="isDarkTheme==true ? 'var(--chart-dark-bg)' : 'var(--chart-light-bg)'"
         >
           <e-series-collection>
             <e-series

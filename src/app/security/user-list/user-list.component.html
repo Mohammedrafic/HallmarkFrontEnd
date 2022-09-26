@@ -5,6 +5,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             appValidateWithMessage
+            appHideBeforeSyncfusionLoad
             formControlName="businessUnit"
             [fields]="unitFields"
             [dataSource]="businessUnits"
@@ -16,6 +17,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             appValidateWithMessage
+            appHideBeforeSyncfusionLoad
             formControlName="business"
             [fields]="bussinesDataFields"
             [dataSource]="bussinesUserData$ | async"
@@ -27,13 +29,17 @@
   </ng-container>
   <ng-container right>
     <ng-container>
-     
+
       <button
         ejs-dropdownbutton
         [items]="exportOptions"
         (select)="exportSelected($event)"
         id="importButton"
-        cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+        cssClass="e-outline button-export">
+        <div class="button-export-container">
+          Export <i-feather name="download" class="icon"></i-feather>
+        </div>
+      </button>
       <button ejs-button [isPrimary]="true" (click)="onAddNewUser()">Add User</button>
     </ng-container>
   </ng-container>

@@ -6,10 +6,9 @@
           {{candidate?.lastName}}, {{candidate?.firstName}}
           <i-feather name="briefcase" class="icon deployed-icon" *ngIf="isDeployedCandidate"></i-feather>
         </h3>
-        <ejs-chiplist *ngIf="isTab && candidateJob?.applicantStatus && !isDeployedCandidate">
+        <ejs-chiplist *ngIf="isTab && candidateJob?.applicantStatus && !isDeployedCandidate" [text]="statusText">
           <e-chips>
             <e-chip
-              [text]="statusText"
               [cssClass]="candidatStatus[applicationStatus] | chipsCssClass">
             </e-chip>
           </e-chips>
@@ -19,6 +18,7 @@
         <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isDeployedCandidate && !isReadOnly">
           <ejs-dropdownlist [fields]="optionFields"
                             [dataSource]="nextApplicantStatuses"
+                            [formControl]="statusesFormControl"
                             [itemTemplate]="itemTemplate"
                             placeholder="Select Status"
                             (select)="updateCandidateJob($event)">
@@ -27,6 +27,7 @@
             </ng-template>
           </ejs-dropdownlist>
         </div>
+        <button *ngIf="isDeployedCandidate && !isRejected" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
@@ -36,7 +37,7 @@
   </section>
   <section class="content-container">
     <div class="job-details">
-      <ejs-accordion #accordionElement expandMode="Single" openFirstAccordion>
+      <ejs-accordion #accordionElement expandMode="Single" appOpenFirstAccordion>
         <e-accordionitems>
           <e-accordionitem expanded="true">
             <ng-template #header>
@@ -152,7 +153,6 @@
                       <ejs-datepicker appValidateWithMessage
                                       class="datepicker"
                                       format="MM/dd/yyyy"
-                                      [min]="today"
                                       formControlName="offeredStartDate">
                       </ejs-datepicker>
                     </div>
@@ -192,10 +192,28 @@
                     (billRatesChanged)="onBillRatesChanged()">
     </app-bill-rates>
   </section>
+  <ng-container *ngIf="(!isRejected && !isDeployedCandidate && !isReadOnly) || (isDeployedCandidate && !isRejected)">
+    <div class="mobile-actions">
+      <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isDeployedCandidate && !isReadOnly">
+        <ejs-dropdownlist [fields]="optionFields"
+                          [dataSource]="nextApplicantStatuses"
+                          [formControl]="statusesFormControl"
+                          [itemTemplate]="itemTemplate"
+                          placeholder="Select Status"
+                          (select)="updateCandidateJob($event)">
+          <ng-template #itemTemplate let-data>
+            <span [ngClass]="{'disabled-item': !data.isEnabled}">{{data.statusText}}</span>
+          </ng-template>
+        </ejs-dropdownlist>
+      </div>
+      <button *ngIf="isDeployedCandidate && !isRejected" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
+    </div>
+  </ng-container>
 </section>
 
 <app-reject-reason-dialog
   [rejectReasonsList]="rejectReasons"
   [openEvent]="openRejectDialog"
   (applyReject)="onRejectCandidate($event)"
+  (cancelReject)="cancelRejectCandidate()"
 ></app-reject-reason-dialog>

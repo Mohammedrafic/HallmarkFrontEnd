@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { debounceTime, filter, map, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { debounceTime, filter, map, merge, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -119,7 +119,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.subscribeOnInitialData();
     this.updateCandidates();
     this.candidateFilterSetup();
-    this.onSkillDataLoadHandler();
     this.subscribeOnExportAction();
     this.setFileName();
   }
@@ -166,6 +165,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public dataBound(): void {
     this.grid.hideScroll();
+    this.contentLoadedHandler();
   }
 
   public onRowsDropDownChanged(): void {
@@ -318,27 +318,16 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private subscribeOnInitialData(): void {
     this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
-    if (this.isAgency) {
-      this.lastSelectedAgencyId$
-        .pipe(
-          takeUntil(this.unsubscribe$),
-          filter((value) => !!value)
-        )
-        .subscribe(() => {
-          this.dispatchNewPage();
-          this.clearFilters();
-        });
-    } else {
-      this.lastSelectedOrgId$
-        .pipe(
-          takeUntil(this.unsubscribe$),
-          filter((value) => !!value)
-        )
-        .subscribe(() => {
-          this.dispatchNewPage();
-          this.clearFilters();
-        });
-    }
+    merge(this.lastSelectedAgencyId$, this.lastSelectedOrgId$)
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((value) => !!value)
+      )
+      .subscribe(() => {
+        this.dispatchNewPage();
+        this.clearFilters();
+        this.onSkillDataLoadHandler();
+      });
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.dispatchNewPage();

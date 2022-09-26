@@ -17,6 +17,7 @@ export interface BaseInvoice {
   locationName: string;
 
   orderId: number;
+  formattedOrderIdFull: string;
   organizationId: number;
   organizationName: string;
 

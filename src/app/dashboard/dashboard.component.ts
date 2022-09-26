@@ -35,6 +35,7 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { DashboartFilterDto } from './models/dashboard-filter-dto.model';
 import { User } from '@shared/models/user.model';
 import { AllOrganizationsSkill } from './models/all-organization-skill.model';
+import { AppState } from '../store/app.state';
 
 @Component({
   selector: 'app-dashboard',
@@ -65,6 +66,9 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   @Select(SecurityState.organisations) public readonly allOrganizations$: Observable<UserStateModel['organizations']>;
 
+  @Select(AppState.isDarkTheme)
+  isDarkTheme$: Observable<boolean>;
+
   private panelsAreDragged = false;
   private readonly filterData$: BehaviorSubject<DashboartFilterDto> = new BehaviorSubject<DashboartFilterDto>({organizationFilter: []});
   public readonly userIsAdmin$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -84,7 +88,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   public ngOnInit(): void {
     this.getAdminOrganizationsStructureAll();
-    this.getCurrentUserPermissions();
     this.subscribeOnPermissions();
     this.getDashboardFilterState();
     this.setWidgetsData();
@@ -101,10 +104,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
         this.store.dispatch(new GetOrganizationsStructureAll(user.id));
       }
     });
-  }
-
-  private getCurrentUserPermissions(): void {
-    this.store.dispatch(new GetCurrentUserPermissions());
   }
 
   private subscribeOnPermissions(): void {

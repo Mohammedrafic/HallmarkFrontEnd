@@ -1,7 +1,7 @@
 
 export enum PurchaseOrderTableColumns {
   Id = 'id',
-  OrganizationId ="organizationId",
+  OrganizationId = "organizationId",
   POName = 'poName',
   PONumber = 'poNumber',
   RegionId = 'regionId',
@@ -11,7 +11,7 @@ export enum PurchaseOrderTableColumns {
   DepartmentId = 'departmentId',
   Department = 'departmentName',
   SkillId = 'skillId',
-  SkillName = 'skillName',
+  SkillName = 'skillNames',
   ProjectBudget = 'projectBudget',
   StartDate = 'startDate',
   EndDate = 'endDate',
@@ -22,7 +22,7 @@ export enum PurchaseOrderHeaderText {
   Id = 'Id',
   OrganizationId = 'Organization Id',
   POName = 'PO Name',
-  PONumber = 'PO Number',
+  PONumber = 'PO Description',
   RegionId = 'Region Id',
   Region = 'Region Name',
   LocationId = 'Location Id',
@@ -49,7 +49,7 @@ export enum SpecialProjectTableColumns {
   DepartmentId = 'departmentId',
   Department = 'departmentName',
   SkillId = 'skillId',
-  SkillName = 'skillName',
+  SkillName = 'skillNames',
   ProjectBudget = 'projectBudget',
   StartDate = 'startDate',
   EndDate = 'endDate',
@@ -104,8 +104,8 @@ export enum FormControlNames {
   SpecialProjectCategoryName = 'SpecialProjectCategoryName',
   projectNameMapping = "projectNameMapping",
   projectCategoryMapping = "projectCategoryMapping",
-  PoNamesMapping ="poNamesMapping",
-  PrePopulateInOrders ="PrePopulateInOrders"
+  PoNamesMapping = "poNamesMapping",
+  PrePopulateInOrders = "PrePopulateInOrders"
 }
 
 export enum SpecilaProjectMappingTableColumns {
@@ -118,10 +118,11 @@ export enum SpecilaProjectMappingTableColumns {
   DepartmentId = 'departmentId',
   DepartmentName = 'departmentName',
   Skills = 'skills',
+  SkillNames = 'skillNames',
   OrderProjectName = "orderProjectName",
   OrderSpecialProjectCategoryId = "orderSpecialProjectCategoryId",
   OrderSpecialProjectCategoryName = "orderSpecialProjectCategoryName",
-  OrderSpecialProjectId ="orderSpecialProjectId",
+  OrderSpecialProjectId = "orderSpecialProjectId",
 }
 export enum SpecilaProjectMappingHeaderText {
   Id = 'Id',
@@ -144,9 +145,10 @@ export enum PurchaseOrderMappingTableColumns {
   DepartmentId = 'departmentId',
   DepartmentName = 'departmentName',
   Skills = 'skills',
+  SkillNames = 'skillNames',
   OrderPoName = "orderPoName",
   OrderPoNumberId = "rderPoNumberId",
-  PrePopulateInOrders ="PrePopulateInOrders"
+  PrePopulateInOrders = "PrePopulateInOrders"
 }
 export enum PurchaseOrderMappingHeaderText {
   Id = 'Id',

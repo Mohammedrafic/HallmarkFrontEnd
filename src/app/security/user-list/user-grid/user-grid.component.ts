@@ -27,6 +27,7 @@ import {
   PaginationChangedEvent,
 } from '@ag-grid-enterprise/all-modules';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
+import { AppState } from '../../../store/app.state';
 
 enum Visibility {
   Unassigned,
@@ -53,6 +54,9 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
   @Select(SecurityState.rolesPage)
   public rolesPage$: Observable<RolesPage>;
+
+  @Select(AppState.isDarkTheme)
+  isDarkTheme$: Observable<boolean>;
 
   public userGridData$: Observable<User[]>;
   public hasVisibility = (_: string, { assigned }: User) => {
@@ -94,6 +98,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   serverSideStoreType: any;
   maxBlocksInCache: any;
   filters: RolesFilters;
+  public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
   constructor(private store: Store, private datePipe: DatePipe) {
     super();
@@ -400,6 +405,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     return {
       getRows: function (params: any) {
         setTimeout(() => {
+          self.gridApi.hideOverlay();
           let postData = {
             pageNumber: params.request.endRow / self.paginationPageSize,
             pageSize: self.paginationPageSize,

@@ -1,5 +1,7 @@
 export enum PermissionTypes {
   CanCreateDeleteOrganization = 102,
+  ViewOrganizationConfigurations = 1500,
+  ManageOrganizationConfigurations = 1501,
   CanOrganizationEditOrders = 1801,
   DashboardWidgets = 2000,
   WidgetApplicantsByRegion = 2010,
@@ -11,4 +13,6 @@ export enum PermissionTypes {
   WidgetTasks = 2070,
   WidgetTrendsFilled = 2080,
   WidgetInvoicesStatuses = 2090,
+  CanManageNotificationsForOtherUsers = 3202,
+  CanManageNotificationTemplates = 3203
 }

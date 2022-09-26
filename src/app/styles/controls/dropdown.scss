@@ -1,4 +1,5 @@
-@import "../variables/colors.scss";
+@import "colors.scss";
+@import "adaptive-response.scss";
 
 body.light, body.dark {
   .bootstrap {
@@ -105,17 +106,29 @@ body.light, body.dark {
   }
 }
 
-/** Begin organization-agency-dropdown styles */
 
+/** Begin organization-agency-dropdown styles */
 #organization-agency-dropdown {
   .e-input-group {
     height: 56px;
     border: none;
     background-color: transparent;
     color: $secondary-dark-blue-15;
+
+    @media #{$max-tablet} {
+      color: $white;
+      border-radius: 0;
+      height: 3rem;
+    }
+
     &:hover {
       background-color: $primary-active-blue-70;
       color: $primary-active-blue-10;
+
+      @media #{$max-tablet} {
+        background-color: $secondary-dark-blue-10-1;
+        color: inherit;
+      }
     }
     &:active {
       background-color: $primary-active-blue;
@@ -156,3 +169,22 @@ body.light, body.dark {
 }
 
 /** End organization-agency-dropdown styles */
+
+body.dark {
+  .bootstrap {
+    ejs-dropdownlist.e-control, ejs-multiselect.e-control, ejs-autocomplete.e-control {
+      span.e-input-group, .e-multiselect.e-input-group {
+        .e-input-group-icon {
+          &.e-search-icon {
+            color: $white !important;
+          }
+        }
+
+        &.e-disabled {
+          background-color: $secondary-dark-blue-20 !important;
+         
+        }
+      }
+    }
+  }
+}

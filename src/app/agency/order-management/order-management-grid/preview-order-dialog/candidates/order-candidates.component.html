@@ -10,7 +10,7 @@
   <app-general-order-info *ngSwitchDefault [orderInformation]="orderCandidateInformation"></app-general-order-info>
 </div>
 <div class="line"></div>
-<ng-container *ngIf="orderCandidateInformation?.orderClosureReasonId">
+<ng-container *ngIf="orderCandidateInformation?.orderClosureReason">
   <app-order-close-reason-info [orderInformation]="orderCandidateInformation"></app-order-close-reason-info>
   <div class="line"></div>
 </ng-container>

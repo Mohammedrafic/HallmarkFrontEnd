@@ -11,7 +11,7 @@
           </ejs-chiplist>
         </ng-container>
       </div>
-      <div class="e-card-content button-container">
+      <div class="e-card-content button-container" *ngIf="!isRejected && !isCancelled">
         <div class="input-group dropdown bootstrap">
           <ejs-dropdownlist
             *ngIf="!isAgency"
@@ -22,14 +22,14 @@
             (select)="onDropDownChanged($event)"
           ></ejs-dropdownlist>
         </div>
-        <button ejs-button cssClass="e-outline" [isPrimary]="true" *ngIf="!isAccepted && canAccept" (click)="onReject()">Reject</button>
+        <button ejs-button cssClass="e-outline" [isPrimary]="true" *ngIf="canAccept" (click)="onReject()">Reject</button>
         <button ejs-button [isPrimary]="true" *ngIf="canAccept" (click)="onAccept()">Accept</button>
       </div>
     </div>
   </section>
   <section class="content-container">
     <div class="candidate-info">
-      <ejs-accordion #accordionElement expandMode="Single" openFirstAccordion>
+      <ejs-accordion #accordionElement expandMode="Single" appOpenFirstAccordion>
         <e-accordionitems>
           <e-accordionitem expanded="true">
             <ng-template #header>
@@ -37,7 +37,7 @@
             </ng-template>
             <ng-template #content>
               <form [formGroup]="form">
-                <div class="d-flex">
+                <div class="d-flex form-mobile">
                   <div class="f-grow-2">
                     <div class="input-container bootstrap">
                       <label class="input-group">Job ID</label>
@@ -90,7 +90,7 @@
                   <div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Offered Bill Rate</label>
-                      <div class="input-group">
+                      <div class="input-group" [class.input-readonly]="isOnBoard && !isAgency">
                         <input
                           appValidateWithMessage
                           formControlName="offeredBillRate"
@@ -98,6 +98,7 @@
                           (focus)="priceUtils.setPriceMask(form, 'offeredBillRate', $event)"
                           (blur)="priceUtils.setTwoDecimals(form, 'offeredBillRate', $event)"
                           type="text"
+                          [readonly]="isOnBoard && !isAgency"
                         />
                       </div>
                     </div>
@@ -138,6 +139,7 @@
                           [enableMask]="true"
                           [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                           formControlName="actualStartDate"
+                          (change)="onStartDateChange($event)"
                         >
                         </ejs-datepicker>
                         </div>
@@ -150,8 +152,8 @@
                           class="datepicker"
                           format="MM/dd/yyyy"
                           placeholder="MM/DD/YYYY"
+                          [min]="actualStartDateValue"
                           [enableMask]="true"
-                          [min]="startDate.value"
                           [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                           formControlName="actualEndDate"
                         >
@@ -172,6 +174,40 @@
                       <label>Clock ID</label>
                       <div class="input-group">
                         <input appValidateWithMessage formControlName="clockId" class="e-input" type="text"  maxlength="50"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="input-container bootstrap" *ngIf="isRejected">
+                  <label>Rejection Reason</label>
+                  <div class="input-group">
+                    <input appValidateWithMessage readonly formControlName="rejectReason" class="e-input" type="text"  maxlength="50"/>
+                  </div>
+                </div>
+                <div *ngIf="isCancelled">
+                  <div class="input-container bootstrap">
+                    <label class="input-group">Reason</label>
+                    <div class="input-group input-readonly">
+                      <input appValidateWithMessage formControlName="jobCancellationReason" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                  <div class="input-container bootstrap">
+                    <label class="input-group">Penalty Criteria</label>
+                    <div class="input-group input-readonly">
+                      <input appValidateWithMessage formControlName="penaltyCriteria" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                  <div class="d-flex">
+                    <div class="input-container bootstrap">
+                      <label class="input-group">{{ showPercentage ? '% ' : '' }}Rate</label>
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="rate" class="e-input" type="text" readonly/>
+                      </div>
+                    </div>
+                    <div class="input-container bootstrap" *ngIf="showHoursControl">
+                      <label class="input-group">Hours</label>
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="hours" class="e-input" type="text" readonly/>
                       </div>
                     </div>
                   </div>
@@ -204,7 +240,7 @@
     </div>
   </section>
   <section class="bill-rates">
-    <ng-container [ngTemplateOutlet]="isAgency ? billRates : editBillRates"></ng-container>
+    <ng-container [ngTemplateOutlet]="isAgency || isRejected || isCancelled ? billRates : editBillRates"></ng-container>
     <ng-template #billRates>
       <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
     </ng-template>
@@ -217,11 +253,34 @@
       </app-bill-rates>
     </ng-template>
   </section>
+  <ng-container *ngIf="canAccept || !isAgency">
+    <div class="mobile-actions">
+      <div class="input-group dropdown bootstrap" *ngIf="!isAgency">
+        <ejs-dropdownlist
+          [fields]="optionFields"
+          [dataSource]="applicantStatuses"
+          [formControl]="statusesFormControl"
+          placeholder="Select Status"
+          (select)="onDropDownChanged($event)"
+        ></ejs-dropdownlist>
+      </div>
+      <button ejs-button cssClass="e-outline" [isPrimary]="true" *ngIf="canAccept" (click)="onReject()">Reject</button>
+      <button ejs-button [isPrimary]="true" *ngIf="canAccept" (click)="onAccept()">Accept</button>
+    </div>
+  </ng-container>
 </section>
 
 <app-reject-reason-dialog
-  [rejectReasonsList]="$any(rejectionReasonsList$ | async)"
+  [rejectReasonsList]="$any(rejectReasons$ | async)"
   [openEvent]="openRejectDialog"
   (applyReject)="rejectCandidateJob($event)"
+  (cancelReject)="resetStatusesFormControl()"
 ></app-reject-reason-dialog>
+
+<app-candidate-cancellation-dialog
+  [openEvent]="openCandidateCancellationDialog"
+  [orderType]="candidateJob?.order?.orderType"
+  (submitCandidateCancellation)="cancelCandidate($event)"
+  (cancelCandidateCancellation)="resetStatusesFormControl()"
+></app-candidate-cancellation-dialog>
 

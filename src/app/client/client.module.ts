@@ -51,7 +51,7 @@ import {
   RadioButtonModule,
   SwitchModule,
 } from '@syncfusion/ej2-angular-buttons';
-import { DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { DropDownButtonAllModule, DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
@@ -87,6 +87,7 @@ import { ChildOrderDialogModule } from '@shared/components/child-order-dialog/ch
 import { ExtensionModule } from '@shared/components/extension/extension.module';
 import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
 import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
+import { ReopenOrderModule } from '@client/order-management/reopen-order/reopen-order.module';
 
 const gridIcons = {
   MessageSquare,
@@ -163,11 +164,13 @@ const gridIcons = {
     AddEditReorderModule,
     SaveTemplateDialogModule,
     CloseOrderModule,
+    ReopenOrderModule,
     CandidateListModule,
     SwitchModule,
     CandidateDetailsModule,
     ChildOrderDialogModule,
     AssociateListModule,
+    DropDownButtonAllModule,
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
     ExtensionModule,

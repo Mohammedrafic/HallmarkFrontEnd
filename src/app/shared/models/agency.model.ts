@@ -1,4 +1,8 @@
-import { PageOfCollections } from "./page.model";
+import { PageOfCollections } from './page.model';
+import {
+  ElectronicPaymentDetails,
+  PaymentDetails,
+} from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
 
 export type Agency = {
   createUnder?: AgencyCreateUnder;
@@ -7,7 +11,7 @@ export type Agency = {
   agencyDetails: AgencyDetails;
   agencyBillingDetails: AgencyBillingDetails;
   agencyContactDetails: AgencyContactDetails[];
-  agencyPaymentDetails: AgencyPaymentDetails[];
+  agencyPaymentDetails: PaymentDetails[] | ElectronicPaymentDetails[];
 };
 
 export type AgencyCreateUnder = {
@@ -88,6 +92,18 @@ export type AgencyOrderFilteringOptions = {
   masterSkills: {
     id: number;
     name: string;
+  }[];
+  specialProjectCategories: {
+    id: number;
+    projectType: string;
+  }[];
+  projectNames: {
+    id: number;
+    projectName: string;
+  }[];
+  poNumbers: {
+    id: number;
+    poNumber: string;
   }[];
 };
 

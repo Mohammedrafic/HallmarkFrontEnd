@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
@@ -9,12 +9,10 @@ import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { MessageTypes } from '@shared/enums/message-types';
-import { LocationFilterOptions } from '@shared/models/location.model';
 import { Region, regionFilter } from '@shared/models/region.model';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import {
-  ClearLocationList, DeleteRegionById, ExportLocations, ExportRegions, GetLocationFilterOptions, GetLocationsByRegionId, GetOrganizationById,
-  GetRegionFilterOptions,
+  ClearLocationList, DeleteRegionById, ExportRegions, GetOrganizationById,
   GetRegions, SaveRegion, SetGeneralStatesByCountry, SetImportFileDialogState, UpdateRegion
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
@@ -25,9 +23,7 @@ import {
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
-  RECORD_ADDED,
   RECORD_DELETE,
-  RECORD_MODIFIED
 } from '@shared/constants';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -72,7 +68,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
   organizationStructure$: Observable<OrganizationStructure>;
 
   public regionFormGroup: FormGroup;
-public regionFilterFormGroup:FormGroup;
+  public regionFilterFormGroup:FormGroup;
   formBuilder: FormBuilder;
 
   @Select(OrganizationManagementState.organization)
@@ -93,7 +89,8 @@ public regionFilterFormGroup:FormGroup;
   private pageSubject = new Subject<number>();
 
   selectedRegion: any;
-
+  submited: boolean=false;
+  public customAttributes: object;
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
@@ -131,6 +128,7 @@ public regionFilterFormGroup:FormGroup;
   }
 
   ngOnInit(): void {
+    
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
       this.currentPage = page;
      this.getRegions();
@@ -164,6 +162,7 @@ public regionFilterFormGroup:FormGroup;
       this.regions = structure.regions;
 
     });
+    this.customAttributes = {class: 'grideditcolumn'};
   }
 
   ngOnDestroy(): void {
@@ -363,8 +362,14 @@ public regionFilterFormGroup:FormGroup;
       this.removeActiveCssClass();
     }
   }
-
+  public noWhitespaceValidator(control: FormControl) {
+    const isWhitespace = (control.value || '').trim().length === 0;
+    const isValid = !isWhitespace;
+    var s=isValid ? null : { 'whitespace': true };
+    return isValid ? null : { 'whitespace': true };
+}
   onFormSaveClick(): void {
+    this.submited=true;
          const Region: Region = {
      id: this.editedRegionId,
 
@@ -388,13 +393,11 @@ public regionFilterFormGroup:FormGroup;
 
       if (this.isEdit) {
         this.store.dispatch(new UpdateRegion(Region));
-        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         this.isEdit = false;
         this.editedRegionId = undefined;
         return;
       }
       this.store.dispatch(new SaveRegion(Region));
-      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
 
   }
 
@@ -405,7 +408,7 @@ public regionFilterFormGroup:FormGroup;
   private createLocationForm(): void {
     this.regionFormGroup = this.formBuilder.group({
       id: [''],
-      region: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(20)]],
+      region: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20),this.noWhitespaceValidator]],
 
     });
 

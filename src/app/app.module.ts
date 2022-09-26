@@ -20,7 +20,7 @@ import { LoginGuard, UserGuard } from '@shared/guards';
 import { MsalModule, MsalRedirectComponent } from '@azure/msal-angular';
 import { MSAL_PROVIDERS } from './b2c-auth/b2c-auth.providers';
 import { B2cModule } from './b2c-auth/b2c-auth.module';
-import { RejectReasonState } from "@organization-management/store/reject-reason.state";
+import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { Overlay } from '@angular/cdk/overlay';
 
 @NgModule({
@@ -32,17 +32,14 @@ import { Overlay } from '@angular/cdk/overlay';
     Spinnermodule,
 
     //STORE
-    NgxsModule.forRoot([
-      AppState,
-      UserState,
-      RejectReasonState
-    ]),
+    NgxsModule.forRoot([AppState, UserState, RejectReasonState]),
     NgxsReduxDevtoolsPluginModule.forRoot({
-      disabled: environment.production
+      disabled: environment.production,
     }),
-    NgxsLoggerPluginModule.forRoot({
-      disabled: environment.production
-    }),
+    // In case you don't have Redux DevTools uncomment import below.
+    // NgxsLoggerPluginModule.forRoot({
+    //   disabled: environment.production,
+    // }),
     NgxMaskModule.forRoot(),
 
     // B2C
@@ -53,7 +50,7 @@ import { Overlay } from '@angular/cdk/overlay';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ApiInterceptor,
-      multi: true
+      multi: true,
     },
     LoginGuard,
     UserGuard,

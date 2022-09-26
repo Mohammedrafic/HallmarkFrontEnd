@@ -22,15 +22,14 @@ import { ConfirmService } from '@shared/services/confirm.service';
 @Component({
   selector: 'app-special-projects',
   templateUrl: './special-projects.component.html',
-  styleUrls: ['./special-projects.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./special-projects.component.scss']
 })
 
 export class SpecialProjectsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
   @Output() onEdit = new EventEmitter<SpecialProject>();
 
-  @Select(SpecialProjectState.specialProjectPage)
+  @Select(SpecialProjectState.specialProjectPage) 
   specialProjectPage$: Observable<SpecialProjectPage>;
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -123,10 +122,10 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
     noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
     onFilterChanged: (event: FilterChangedEvent) => {
       if (!event.api.getDisplayedRowCount()) {
-        this.gridApi.showNoRowsOverlay();
+        this.gridApi?.showNoRowsOverlay();
       }
       else {
-        this.gridApi.hideOverlay();
+        this.gridApi?.hideOverlay();
       }
     }
   };
@@ -141,10 +140,10 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new GetSpecialProjects());
     this.specialProjectPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (!data || !data?.items.length) {
-        this.gridApi.showNoRowsOverlay();
+        this.gridApi?.showNoRowsOverlay();
       }
       else {
-        this.gridApi.hideOverlay();
+        this.gridApi?.hideOverlay();
         this.rowData = data.items;
         this.gridApi?.setRowData(this.rowData);
       }

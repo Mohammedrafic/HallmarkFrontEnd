@@ -7,8 +7,19 @@ import { OrderTab } from '@shared/components/candidate-details/models/candidate.
   providedIn: 'root',
 })
 export class OrderManagementService extends DestroyableDirective {
-  public readonly orderPerDiemId$: Subject<number> = new Subject<number>();
-  public readonly orderId$: Subject<number | null> = new Subject<number | null>();
+  public readonly orderPerDiemId$: Subject<{ id: number; prefix: string }> = new Subject<{
+    id: number;
+    prefix: string;
+  }>();
+  public readonly orderId$: Subject<{ id: number; prefix: string } | null> = new Subject<{
+    id: number;
+    prefix: string;
+  } | null>();
+  public readonly reorderId$: Subject<{ id: number; prefix: string } | null> = new Subject<{
+    id: number;
+    prefix: string;
+  } | null>();
+  public readonly selectedTab$: Subject<number> = new Subject<number>();
   public selectedOrderAfterRedirect$: Subject<OrderTab> = new Subject<OrderTab>();
   public excludeDeployed: boolean;
 

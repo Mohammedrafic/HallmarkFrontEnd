@@ -1,22 +1,24 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
-import { Observable, Subject } from 'rxjs';
-
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { Select, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { Order, OrderCandidatesList } from '@shared/models/order-management.model';
+
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { combineLatest, Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { Duration } from '../../../enums/durations';
+import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { AcceptCandidateComponent } from './accept-candidate/accept-candidate.component';
 import { ApplyCandidateComponent } from './apply-candidate/apply-candidate.component';
 import { OfferDeploymentComponent } from './offer-deployment/offer-deployment.component';
 import { OnboardedCandidateComponent } from './onboarded-candidate/onboarded-candidate.component';
-import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
-import { OrderCandidateListViewService } from "@shared/components/order-candidate-list/order-candidate-list-view.service";
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -31,13 +33,18 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   @ViewChild('offerDeployment') offerDeployment: OfferDeploymentComponent;
 
   @Select(OrderManagementState.selectedOrder)
-  public selectedOrder$: Observable<Order>;
+  public selectedAgOrder$: Observable<Order>;
+
+  @Select(OrderManagementContentState.selectedOrder)
+  public selectedOrgOrder$: Observable<Order>;
 
   public templateState: Subject<any> = new Subject();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidate: OrderCandidatesList;
   public applicantStatus = ApplicantStatus;
+  public defaultDuration: Duration = Duration.Other;
+  public selectedOrder: Order;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
@@ -46,9 +53,18 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   constructor(
     protected override store: Store,
     protected override router: Router,
-    private orderCandidateListViewService: OrderCandidateListViewService,
+    private orderCandidateListViewService: OrderCandidateListViewService
   ) {
     super(store, router);
+  }
+
+  override ngOnInit(): void {
+    super.ngOnInit();
+    combineLatest([this.selectedAgOrder$, this.selectedOrgOrder$])
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(([agOrder, orgOrder]) => {
+        this.selectedOrder = agOrder ?? orgOrder;
+      });
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
@@ -69,6 +85,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           ApplicantStatus.Applied,
           ApplicantStatus.Shortlisted,
           ApplicantStatus.OnBoarded,
+          ApplicantStatus.Cancelled,
           ApplicantStatus.PreOfferCustom,
         ];
 
@@ -76,7 +93,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           this.store.dispatch(
             new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId)
           );
-          data.candidateJobId && this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
+          data.candidateJobId &&
+            this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
           this.openDialog(this.apply);
         } else if (allowedAcceptStatuses.includes(this.candidate.status)) {
           this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
@@ -91,7 +109,11 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           ApplicantStatus.PreOfferCustom,
           ApplicantStatus.Offered,
         ];
-        const allowedOnboardedStatuses = [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded];
+        const allowedOnboardedStatuses = [
+          ApplicantStatus.Accepted,
+          ApplicantStatus.OnBoarded,
+          ApplicantStatus.Cancelled,
+        ];
 
         if (allowedOfferDeploymentStatuses.includes(this.candidate.status)) {
           this.store.dispatch(
@@ -102,7 +124,9 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           }
           this.openDialog(this.offerDeployment);
         } else if (allowedOnboardedStatuses.includes(this.candidate.status)) {
-          this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
+          this.store.dispatch(
+            new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId)
+          );
           this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
           this.openDialog(this.onboarded);
         }

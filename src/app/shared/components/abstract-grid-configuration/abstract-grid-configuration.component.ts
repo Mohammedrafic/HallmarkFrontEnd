@@ -8,6 +8,10 @@ import { ResizeSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-mo
 import { GRID_CONFIG } from '@shared/constants';
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { GridColumn } from '@shared/models/grid-column.model';
+import { isArray } from 'lodash';
+import { datepickerMask } from '@shared/constants/datepicker-mask';
+import { formatDate } from '@shared/constants/format-date';
+import { placeholderDate } from '@shared/constants/placeholder-date';
 
 enum ExportType {
   'Excel File',
@@ -68,6 +72,12 @@ export abstract class AbstractGridConfigurationComponent {
   filteredItems: FilteredItem[] = [];
   filteredCount = 0;
 
+  isLoaded = false;
+
+  formatDate = formatDate;
+  placeholderDate = placeholderDate;
+  datepickerMask = datepickerMask;
+
   protected constructor() {}
 
   generateDateTime(datePipe: DatePipe): string {
@@ -84,7 +94,11 @@ export abstract class AbstractGridConfigurationComponent {
     if (event.data?.length === 0) {
       this.selectedItems.push(...grid.dataSource);
     } else {
-      this.selectedItems.push(event.data);
+      if (isArray(event.data)) {
+        this.selectedItems.push(...event.data);
+      } else {
+        this.selectedItems.push(event.data);
+      }
     }
   }
 
@@ -169,6 +183,13 @@ export abstract class AbstractGridConfigurationComponent {
     this.updatePage();
   }
 
+  contentLoadedHandler() {
+    // Syncfusion Support ticket #403476
+    setTimeout(() => {
+      this.isLoaded = true;
+    });
+  }
+
   gridDataBound(grid: any): void {
     if (this.selectedItems.length) {
       const selectedIndexes: number[] = [];
@@ -179,6 +200,7 @@ export abstract class AbstractGridConfigurationComponent {
       });
       grid.selectRows(selectedIndexes);
     }
+    this.contentLoadedHandler();
   }
 
   actionBegin(args: PageEventArgs, grid?: any): void {
@@ -194,6 +216,11 @@ export abstract class AbstractGridConfigurationComponent {
         this.refreshing = false;
       }
     }
+    // Syncfusion Support ticket #403476
+    if ( args.requestType == 'paging' || args.requestType == 'filtering' || args.requestType == 'sorting' || args.requestType == 'refresh') {
+      this.isLoaded = false;
+    }
+
   }
 
   stopPropagation(event: Event): void {

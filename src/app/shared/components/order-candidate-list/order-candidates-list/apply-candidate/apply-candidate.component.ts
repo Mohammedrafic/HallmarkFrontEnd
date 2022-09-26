@@ -84,6 +84,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   applyOrderApplicants(): void {
+    this.formGroup.markAllAsTouched();
     if (this.formGroup.valid) {
       const value = this.formGroup.getRawValue();
       this.store

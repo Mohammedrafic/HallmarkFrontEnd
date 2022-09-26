@@ -24,9 +24,10 @@ import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { RECORD_ADDED, RECORD_MODIFIED, GRID_CONFIG } from '@shared/constants';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
+import { AppState } from '../../../store/app.state';
 @Component({
   selector: 'app-template',
   templateUrl: './alerts-template.component.html',
@@ -69,6 +70,9 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   @Select(AlertsState.SaveTemplateByAlertId)
   public saveTemplateByAlertId$: Observable<EditAlertsTemplate>;
 
+  @Select(AppState.isDarkTheme)
+  isDarkTheme$: Observable<boolean>;
+
   public editAlertTemplateData: EditAlertsTemplate = {
     id: 0,
     alertId: 0,
@@ -96,7 +100,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   private gridColumnApi: any;
   private isAlive = true;
   private filters: AlertsTemplateFilters = {};
-  public title: string = "Alerts Template";
+  public title: string = "Notification Templates";
   public export$ = new Subject<ExportedFileType>();
   defaultValue: any;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
@@ -120,6 +124,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   get businessControl(): AbstractControl {
     return this.businessForm.get('business') as AbstractControl;
   }
+  public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
   constructor(private actions$: Actions,
     private confirmService: ConfirmService,
@@ -142,7 +147,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         hide: true
       },
       {
-        headerName: 'Alert Description',
+        headerName: 'Notfication Description',
         field: 'alertTitle',
         filter: 'agTextColumnFilter',
         filterParams: {

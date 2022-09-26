@@ -3,13 +3,14 @@
 
 @use "root";
 
-@import "./variables/colors.scss";
+@import "colors.scss";
 @import "./fusion";
 @import "./ag-grid-styles";
 
 @import "../../assets/fonts/open-sans.scss";
 @import '@ag-grid-community/core/dist/styles/ag-grid.scss';
 @import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
+@import "adaptive-response.scss";
 
 html {
   height: 100%;
@@ -132,11 +133,11 @@ body {
   .stick-right {
     margin-left: auto !important;
   }
-
   // Default icon size
   i-feather.icon, app-custom-icon.icon {
     width: 16px;
     height: 16px;
+
     &.fill-red {
       stroke: #FF5858
     }
@@ -162,6 +163,70 @@ body {
       color: $secondary-dark-blue-15;
     }
 
+    #sidebar .username .header-item .e-menu-wrapper {
+      background: none;
+      width: calc(100% - 34px);
+
+      & ul.e-menu {
+        width: 100%;
+        color: $white;
+
+        & .e-selected, .e-focused {
+          background-color: transparent;
+        }
+
+        & .e-menu-item {
+          width: 100%;
+          height: 3rem;
+          font-size: 14px;
+          flex-direction: row;
+          align-items: center;
+
+          & .e-caret {
+            width: 18px;
+            color: $white;
+            line-height: 55px;
+          }
+        }
+      }
+    }
+
+    .header-item {
+      .e-menu-wrapper,
+      .e-menu-wrapper .e-menu .e-menu-item {
+        background-color: $background;
+        font-size: 14px !important;
+        font-weight: 600;
+        height: 56px;
+        line-height: 56px;
+
+        @media #{$max-mobile} {
+          background-color: transparent;
+        }
+      }
+
+      .e-menu-item.e-selected {
+        border-radius: 8px;
+        background-color: $primary-active-blue-70 !important;
+        color: $primary-active-blue-10 !important;
+      }
+
+      .e-menu-wrapper .e-menu .e-menu-item .e-caret {
+        display: none;
+      }
+    }
+
+    .e-menu-wrapper .e-ul .e-menu-item {
+      font-size: 14px;
+    }
+
+    .e-menu-wrapper .e-ul .e-menu-item.e-focused,
+    .e-menu-wrapper .e-ul .e-menu-item.e-selected {
+      background-color: $primary-active-blue-10 !important;
+      color: $white !important;
+    }
+
+
     @include meta.load-css("./themes/material_l");
 
     .bootstrap {
@@ -178,25 +243,165 @@ body {
 
   &.dark {
     // Styles not related to syncfusion controls here
-    background-color: #1a1b2e;
+    $background: #1A1B2E;
+    background-color: $background;
     color: #a2a2a2;
 
     .header {
       border-bottom: 1px solid #4c5673;
       color: #fff;
+      background-color: $background;
     }
 
-    //@include meta.load-css("./themes/material_d");
+    .app-maps-chart__text {
+      color: $secondary-dark-blue-30;
+    }
+
+    .header-item {
+      .e-menu-wrapper,
+      .e-menu-wrapper .e-menu .e-menu-item {
+        background-color: $background;
+        font-size: 14px !important;
+        font-weight: 600;
+        height: 56px;
+        line-height: 56px;
+      }
+
+      .e-menu-item.e-selected {
+        border-radius: 8px;
+        background-color: $primary-active-blue-70 !important;
+        color: $primary-active-blue-10 !important;
+      }
+
+      .e-menu-wrapper .e-menu .e-menu-item .e-caret {
+        display: none;
+      }
+    }
+
+    .e-menu-wrapper .e-ul .e-menu-item {
+      font-size: 14px;
+    }
+
+    .e-menu-wrapper .e-ul .e-menu-item.e-focused,
+    .e-menu-wrapper .e-ul .e-menu-item.e-selected {
+      background-color: $primary-active-blue-10 !important;
+      color: $white !important;
+    }
+
+    .week-picker-container .e-input-group.e-control-wrapper {
+      background-color: $background !important;
+    }
+
+    .widget-tooltip {
+      text-align: center;
+      padding: 10px 20px;
+      background-color: var(--tooltip-dark-background);
+      box-shadow: 0 3px 15px rgb(0 0 0 / 0.2);
+      color: var(--tooltip-dark-text);
+
+      &::after {
+        content: "";
+        display: block;
+        width: 15px;
+        height: 15px;
+        position: absolute;
+        left: 40%;
+        background-color: var(--tooltip-dark-background);
+        transform: rotate(45deg);
+      }
+    }
+
+    #organization-agency-dropdown .e-input-group {
+      background: $background !important;
+      color: $white;
+    }
+
+    #organization-agency-dropdown .e-input-group:hover {
+      background: $primary-active-blue-70 !important;
+      color: $primary-active-blue-10;
+    }
+
+    .e-input-group.e-control-wrapper.e-ddl.e-valid-input {
+      &:hover {
+        background: transparent !important;
+      }
+    }
+
+    .e-input-group.e-float-icon-left.search-with-icon {
+      background: $sidebar-background;
+      border: 1px solid $grid-border-color;
+    }
+
+    .bootstrap .e-input-group.e-control-wrapper,
+    app-navigation-panel {
+      background: $sidebar-background !important;
+    }
+
+    .custom-chip,
+    .candidates-additional-info .container-row,
+    .search, .credentials-container,
+    .side-menu,
+    .e-toolbar .e-tbar-btn,
+    .dialog .applied-filters .chips-container .e-chip-list .e-chip,
+    .filter-chips .e-chip-list .e-chip {
+      background: $sidebar-background !important;
+    }
+
+    .container-row,
+    .comments-container.background,
+    .credentials,
+    .credentials .e-accordion, .credentials .e-acrdn-item,
+    .contacts,
+    .tile-dark-blue,
+    .partnership-settings .main-content,
+    .alert-panel,
+    .dialog .applied-filters .chips-container {
+      background: $widget-dark-tooltip !important;
+    }
+
+    .container-row .title, .comments-container .comments-header .title, .comment .comment-header .name,
+    .comment .comment-body, .credentials-title, .contact-title, .contacts .contact-details,
+    .contacts .contact-details i-feather, .general-information .title, .job-distibution .title,
+    .job-description .title, .contact-header .contact-title, .contact-header .title, .work-location-header .title,
+    .special-project .title, .candidates-info .column .cost,
+    .dialog-header .title, .cards-container .card.e-card h4,
+    .tree-lebel label, .section-tittle,
+    .profile-details-header .username, .job-info-container .value,
+    .profile-hours-statistics-container section h3,
+    .partnership-settings .title,
+    .alert-panel .alert-panel-header__title,
+    .ordered-chips__title,
+    .dialog .applied-filters .chips-container .e-chip-list .e-chip,
+    .e-chip-list .e-chip .e-chip-delete.e-dlt-btn,
+    .filter-chips .e-chip-list .e-chip {
+      color: $white !important;
+    }
+
+    .input-container label,
+    .e-switch-wrapper label,
+    .dropdown-container label,
+    .alert-panel-footer,
+    .tab-legend__item,
+    .tab-legend__item span {
+      color: $secondary-dark-blue-40 !important;
+    }
+
+    .comment .icon.visibility,
+    .comment .comment-header .controls .date {
+      color: $secondary-dark-blue-30 !important;
+    }
+
+    @include meta.load-css("./themes/material_d");
 
     .bootstrap {
-      /*@include meta.load-css("../../../node_modules/@syncfusion/ej2-base/styles/bootstrap5-dark.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-base/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-buttons/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-dropdowns/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-inputs/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-popups/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-lists/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-angular-dropdowns/styles/bootstrap5-dark.css");
-      @include meta.load-css("../../../node_modules/@syncfusion/ej2-angular-inputs/styles/bootstrap5-dark.css");*/
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-angular-inputs/styles/bootstrap5-dark.css");
     }
   }
 
@@ -249,6 +454,7 @@ hr {
 @import './controls/pdf-viewer';
 @import './controls/tooltip';
 @import './controls/custom-buttons';
+@import './controls/dropdownbutton.scss';
 @import 'text';
 
 a, a:hover, a:focus, a:active {
@@ -260,6 +466,10 @@ a, a:hover, a:focus, a:active {
 
 .overflow-hide {
   overflow: hidden !important;
+}
+
+.hidden {
+  visibility: hidden;
 }
 
 .widget-tooltip {
@@ -291,6 +501,10 @@ a, a:hover, a:focus, a:active {
   }
 }
 
+.button-export-container {
+  display: flex;
+}
+
 #Active_Positions,
 #Candidates{
   &_SeriesCollection {
@@ -307,10 +521,10 @@ a, a:hover, a:focus, a:active {
 @import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
 
 html, body {
-   height: 100%;
-   width: 100%;
-   box-sizing: border-box;
-   -webkit-overflow-scrolling: touch;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 }
 
 #chart_57723_1_tooltip {
@@ -318,5 +532,19 @@ html, body {
 
   @media screen and (max-width: 1700px) {
     top: 0 !important;
+  }
+}
+
+.hideBtn {
+  display: none;
+}
+
+.order-type-column {
+  display: flex;
+  align-items: center;
+
+  span:first-child {
+    margin-right: 7px;
+    background-color: $secondary-dark-blue-20 !important;
   }
 }

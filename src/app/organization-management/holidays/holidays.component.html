@@ -3,7 +3,7 @@
     <section>
       <h3>Holidays</h3>
     </section>
-    <section>
+    <section [class.hidden]="!isLoaded">
       <button
         ejs-button
         id="filterButton"
@@ -24,7 +24,11 @@
         [items]="exportOptions"
         (select)="exportSelected($event)"
         id="importButton"
-        cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+        cssClass="e-outline button-export">
+        <div class="button-export-container">
+          Export <i-feather name="download" class="icon"></i-feather>
+        </div>
+      </button>
       <button
         ejs-button
         id="addDepartmentButton"
@@ -54,7 +58,7 @@
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column textAlign="Right" width="120">
         <ng-template #template let-data>
-          <div class="row-tool-buttons">
+          <div class="row-tool-buttons" [class.hidden]="!isLoaded">
             <button ejs-button cssClass="e-flat default-icon-button" (click)="copyHoliday(data, $event)">
               <span class="edit-button"><i-feather name="copy" class="icon"></i-feather></span>
             </button>

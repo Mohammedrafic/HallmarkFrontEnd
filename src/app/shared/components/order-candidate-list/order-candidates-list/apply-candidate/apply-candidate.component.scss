@@ -1,17 +1,23 @@
 @import "colors";
+@import 'adaptive-response';
 
 :host {
   overflow-y: auto;
 }
 
 .container {
+  position: relative;
 
   .deployed-icon{
     color: $primary-active-blue;
   }
 
-  .apply-button {
+  .e-card-content .apply-button {
     margin-right: 8px;
+
+    @media (max-width: $tablet-min) {
+      display: none;
+    }
   }
 
   .content-container {
@@ -50,6 +56,18 @@
       background-color: $secondary-dark-blue-50;
       border-radius: 8px;
     }
+
+    @media (max-width: $tablet-min) {
+      flex-direction: column;
+      .job-details {
+        width: 100%;
+      }
+
+      .comments {
+        width: 100%;
+        margin-top: 16px;
+      }
+    }
   }
 
   .bill-rates {
@@ -66,4 +84,25 @@
 .candidat-status {
   display: flex;
   align-items: center;
+}
+
+.mobile-actions {
+  position: fixed;
+  bottom: 73px;
+  left: 0;
+  width: 93%;
+  padding: 24px 16px;
+  background-color: $white;
+  z-index: 1001;
+  display: none;
+  border-top: 1px solid $secondary-dark-blue-45;
+
+  button {
+    width: 100%;
+    margin: 0 !important;
+  }
+
+  @media (max-width: $tablet-min) {
+    display: flex;
+  }
 }

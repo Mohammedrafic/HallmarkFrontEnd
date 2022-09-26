@@ -4,7 +4,7 @@ import { Store } from '@ngxs/store';
 import { takeWhile } from 'rxjs';
 
 import { DropDownListComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { MaskedTextBoxComponent } from "@syncfusion/ej2-angular-inputs";
+import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
 
 import {
   BillRate,
@@ -12,7 +12,7 @@ import {
   BillRateOption,
   BillRateType,
   BillRateTypes,
-  BillRateUnit
+  BillRateUnit,
 } from '@shared/models/bill-rate.model';
 import { GetBillRateOptions } from '@shared/components/bill-rates/store/bill-rate.actions';
 import PriceUtils from '@shared/utils/price.utils';
@@ -89,7 +89,7 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy, 
   ngOnChanges(): void {
     if (this.billRateOptions && this.billRatesData) {
       this.billRateOptionsForSelect = this.billRateOptions.filter((rate) => {
-        return !!this.billRatesData.find((item) => item.billRateConfigId === rate.id)
+        return !!this.billRatesData.find((item) => item.billRateConfigId === rate.id);
       });
     }
   }
@@ -103,7 +103,7 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy, 
   }
 
   setBillTypesAndUpdateControl(types: Array<BillRateType>): void {
-    this.billRateTypes = BillRateTypes.filter(type => types.includes(type.id));
+    this.billRateTypes = BillRateTypes.filter((type) => types.includes(type.id));
     this.billRateForm.get('billType')?.reset();
   }
 

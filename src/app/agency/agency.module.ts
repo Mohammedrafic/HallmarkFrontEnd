@@ -3,7 +3,13 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import { ButtonModule, CheckBoxModule, ChipListModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import {
+  ButtonModule,
+  CheckBoxModule,
+  ChipListModule,
+  RadioButtonModule,
+  SwitchModule,
+} from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import {
   AlertCircle,
@@ -88,9 +94,11 @@ import { GridModule } from '@shared/components/grid/grid.module';
 import { CandidateEducationComponent } from './candidates/import-candidates/candidate-education/candidate-education.component';
 import { CandidateExperienceComponent } from './candidates/import-candidates/candidate-experience/candidate-experience.component';
 import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
-import { GridErroredCellComponent } from './candidates/import-candidates/grid-errored-cell/grid-errored-cell.component';
 import { ExtensionModule } from '@shared/components/extension/extension.module';
 import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
+import { ElectronicFormComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/electronic-form/electronic-form.component';
+import { ManualFormComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/manual-form/manual-form.component';
+import { PaymentDialogComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/payment-dialog.component';
 
 const sidebarIcons = {
   Sliders,
@@ -153,7 +161,9 @@ const sidebarIcons = {
     CandidateProfileComponent,
     CandidateEducationComponent,
     CandidateExperienceComponent,
-    GridErroredCellComponent,
+    ElectronicFormComponent,
+    ManualFormComponent,
+    PaymentDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -187,6 +197,7 @@ const sidebarIcons = {
     CandidateDetailsModule,
     ExtensionModule,
     AssociateListModule,
+    RadioButtonModule,
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),

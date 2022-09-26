@@ -15,12 +15,12 @@ const commonColumn: ColDef = {
   filter: true,
 }
 
-export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererParams, datePipe?:DatePipe): ColumnDefinitionModel[] => {
+export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererParams, datePipe?: DatePipe): ColumnDefinitionModel[] => {
   return [
     {
       field: PurchaseOrderTableColumns.Id,
       headerName: PurchaseOrderHeaderText.Id,
-      hide:true
+      hide: true
     },
     {
       field: PurchaseOrderTableColumns.POName,
@@ -167,7 +167,7 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       filter: 'agDateColumnFilter',
       filterParams: {
         buttons: ['reset'],
-        comparator: (filterLocalDateAtMidnight:Date, cellValue:string) => {
+        comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
           if (cellValue == null) {
             return 0;
           }
@@ -319,29 +319,12 @@ export const SpecialProjectMappingColumnsDefinition = (actionCellParams: ICellRe
       }
     },
     {
-      field: SpecilaProjectMappingTableColumns.Skills,
+      field: SpecilaProjectMappingTableColumns.SkillNames,
       headerName: SpecilaProjectMappingHeaderText.SkillName,
       ...commonColumn,
-      cellRenderer: (params: ICellRendererParams) => {
-        let returnString = '';
-        if (params.value && params.value.length>0) {
-          let arrayValues:any[] = [];
-          arrayValues = params.value;
-          arrayValues.forEach((item: any, index: number) => {
-            returnString += item.name;
-            if (index !== arrayValues.length - 1) {
-              returnString = returnString +", ";
-            }
-          });
-        }
-        else
-          returnString = "All";
-       
-        return returnString;
-      },
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
+        buttons: ['reset'],
       }
     },
     {
@@ -409,29 +392,12 @@ export const PurchaseOrderMappingColumnsDefinition = (actionCellParams: ICellRen
       }
     },
     {
-      field: PurchaseOrderMappingTableColumns.Skills,
+      field: PurchaseOrderMappingTableColumns.SkillNames,
       headerName: PurchaseOrderMappingHeaderText.SkillName,
       ...commonColumn,
-      cellRenderer: (params: ICellRendererParams) => {
-        let returnString = '';
-        if (params.value && params.value.length > 0) {
-          let arrayValues: any[] = [];
-          arrayValues = params.value;
-          arrayValues.forEach((item: any, index: number) => {
-            returnString += item.name;
-            if (index !== arrayValues.length - 1) {
-              returnString = returnString + ", ";
-            }
-          });
-        }
-        else
-          returnString = "All";
-
-        return returnString;
-      },
       filter: 'agTextColumnFilter',
       filterParams: {
-        buttons: ['reset']
+        buttons: ['reset'],
       }
     },
     {
@@ -444,7 +410,7 @@ export const PurchaseOrderMappingColumnsDefinition = (actionCellParams: ICellRen
 }
 
 export const SpecialProjectMessages = {
-  NoRowsMessage:'No Rows To Show'
+  NoRowsMessage: 'No Rows To Show'
 }
 
 

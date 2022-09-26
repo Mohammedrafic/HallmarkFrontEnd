@@ -29,6 +29,7 @@ import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/expor
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
+import { AppState } from '../../../store/app.state';
 
 enum Active {
   No,
@@ -58,6 +59,9 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   @Select(SecurityState.permissionsTree)
   public permissionsTree$: Observable<PermissionsTree>;
 
+  @Select(AppState.isDarkTheme)
+  isDarkTheme$: Observable<boolean>;
+
   public activeValueAccess = (_: string, { isActive }: Role) => {
     return Active[Number(isActive)];
   };
@@ -67,54 +71,54 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   public selIndex: number[] = [];
   public sortOptions = { columns: [{ field: 'businessUnitName', direction: 'Descending' }] };
   public filterColumns = rolesFilterColumns;
-
+  public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
   private filters: RolesFilters = {};
   private isAlive = true;
 
 
   itemList: Array<Role> | undefined;
-  private gridApi : any;
+  private gridApi: any;
   private gridColumnApi: any;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
-  rowModelType:any;
-  serverSideInfiniteScroll:any;
+  rowModelType: any;
+  serverSideInfiniteScroll: any;
   cacheBlockSize: any;
   pagination: boolean;
   paginationPageSize: number;
 
-  defaultColDef:any;
-  autoGroupColumnDef:any;
+  defaultColDef: any;
+  autoGroupColumnDef: any;
   columnDefs: any;
   filterText: string | undefined;
   frameworkComponents: any;
   sideBar: any;
   serverSideStoreType: any;
   maxBlocksInCache: any;
-  
+
   public columnsToExport: ExportColumn[] = [
     { text: 'Business Unit Name', column: 'BusinessUnitName' },
     { text: 'Role Name', column: 'Name' },
-    { text: 'Active', column: 'Active' },    
+    { text: 'Active', column: 'Active' },
   ];
 
   public fileName: string;
   public defaultFileName: string;
 
-  constructor(private actions$: Actions, 
-              private store: Store, 
-              private confirmService: ConfirmService, 
-              private datePipe: DatePipe,
-              private filterService: FilterService) {
+  constructor(private actions$: Actions,
+    private store: Store,
+    private confirmService: ConfirmService,
+    private datePipe: DatePipe,
+    private filterService: FilterService) {
     super();
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
     }
     this.rowModelType = 'serverSide';
     this.serverSideInfiniteScroll = true,
-    this.pagination = true;
+      this.pagination = true;
     this.paginationPageSize = this.pageSize,
-    this.cacheBlockSize = this.pageSize;
+      this.cacheBlockSize = this.pageSize;
     this.serverSideStoreType = 'partial';
     this.maxBlocksInCache = 1;
     this.columnDefs = [
@@ -144,19 +148,19 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
         sortable: false,
         menuTabs: []
       },
-      { 
+      {
         field: 'id',
-        hide: true 
+        hide: true
       },
       {
         field: 'businessUnitName',
         filter: 'agSetColumnFilter',
         filterParams: {
           values: (params: { success: (arg0: any) => void; }) => {
-            setTimeout(() => {                
-                this.bussinesData$.subscribe((data)=>{                  
-                  params.success(data.map(function(item){return item.name}));
-                });
+            setTimeout(() => {
+              this.bussinesData$.subscribe((data) => {
+                params.success(data.map(function (item) { return item.name }));
+              });
             }, 3000)
           },
           buttons: ['reset'],
@@ -175,12 +179,12 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
       {
         header: 'Active',
         field: 'isActive',
-        valueGetter : (params: { data: { isActive: boolean}}) => { return Active[Number(params.data.isActive)] },
+        valueGetter: (params: { data: { isActive: boolean } }) => { return Active[Number(params.data.isActive)] },
         suppressMovable: true,
         filter: false,
         sortable: false,
         menuTabs: []
-      }      
+      }
     ];
 
     this.defaultColDef = {
@@ -232,7 +236,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
           },
         },
       ],
-          };
+    };
   }
 
   public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
@@ -241,8 +245,8 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   };
 
   ngOnInit(): void {
-    this.onDialogClose();    
-    this.filterForm.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => { 
+    this.onDialogClose();
+    this.filterForm.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
       this.dispatchNewPage();
       this.getBusinessByUnitType();
     });
@@ -250,7 +254,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     this.onPermissionsTreeChanged();
   }
 
-  getBusinessByUnitType(){
+  getBusinessByUnitType() {
     const { businessUnit } = this.filterForm.getRawValue();
     this.store.dispatch(new GetBusinessByUnitType(businessUnit))
   }
@@ -263,10 +267,10 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   }
 
   createServerSideDatasource() {
-    let self = this;    
+    let self = this;
     return {
       getRows: function (params: any) {
-        setTimeout(()=> {
+        setTimeout(() => {
           let postData = {
             pageNumber: params.request.endRow / self.paginationPageSize,
             pageSize: self.paginationPageSize,
@@ -322,7 +326,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
       })
       .subscribe((confirm) => {
         if (confirm && data.id) {
-         this.store.dispatch(new RemoveRole(data.id))
+          this.store.dispatch(new RemoveRole(data.id))
         }
       });
   }
@@ -340,12 +344,11 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   }
 
   onPageSizeChanged(event: any) {
-    this.cacheBlockSize=Number(event.value.toLowerCase().replace("rows",""));
-    this.paginationPageSize=Number(event.value.toLowerCase().replace("rows",""));
-    if(this.gridApi!=null)
-    {
-      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows","")));
-      this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows","")));
+    this.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
+    this.paginationPageSize = Number(event.value.toLowerCase().replace("rows", ""));
+    if (this.gridApi != null) {
+      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows", "")));
+      this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows", "")));
       var datasource = this.createServerSideDatasource();
       this.gridApi.setServerSideDatasource(datasource);
     }
@@ -356,7 +359,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     this.store.dispatch(new GetRolesPage(businessUnit, business || null, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
   }
 
-  
+
 
 
 
@@ -370,7 +373,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
       .subscribe(() => {
       });
   }
-  
+
   public closeExport(): void {
     this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
@@ -382,7 +385,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    const { businessUnit, business } = this.filterForm.value;    
+    const { businessUnit, business } = this.filterForm.value;
     this.store.dispatch(
       new ExportRoleList(
         new ExportPayload(
@@ -399,7 +402,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
           options?.fileName || this.defaultFileName
         )
       )
-    );    
+    );
   }
 
   private subscribeOnExportAction(): void {
