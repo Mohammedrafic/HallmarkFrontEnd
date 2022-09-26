@@ -10,8 +10,11 @@
                          placeholder="{{placeholderInput}}"
                          appValidateWithMessage
                          formControlName="startDate"
+                         [enableMask]="true"
+                         [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
          >
          </ejs-datepicker>
+         <span class="error" *ngIf="!startDateControl?.untouched">{{ startDateControl?.errors | validationError }}</span>
        </div>
      </div>
      <div class="input-container">
@@ -23,6 +26,8 @@
                          placeholder="{{placeholderInput}}"
                          appValidateWithMessage
                          formControlName="endDate"
+                         [enableMask]="true"
+                         [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
          >
          </ejs-datepicker>
        </div>
@@ -34,7 +39,15 @@
       <div class="input-container">
         <label for="fee">Fee %</label>
         <div class="input-group">
-          <input id="fee" maxlength="6" class="e-input" type="text" appValidateWithMessage formControlName="fee"/>
+          <input
+            appValidateWithMessage
+            formControlName="fee"
+            class="e-input"
+            type="text"
+            (focus)="priceUtils.setPriceMask(paymentDetailsForm, 'fee', $event)"
+            (blur)="priceUtils.setTwoDecimals(paymentDetailsForm, 'fee', $event)"
+            maxlength="6"
+          />
         </div>
       </div>
     </div>
@@ -69,7 +82,7 @@
       <div class="input-container">
         <label for="routingNumber">Routing Number<span class="required">*</span></label>
         <div class="input-group">
-          <input id="routingNumber" maxlength="50" class="e-input" type="text" appValidateWithMessage formControlName="routingNumber"/>
+          <input id="routingNumber" maxlength="20" class="e-input" type="text" appValidateWithMessage formControlName="routingNumber"/>
         </div>
       </div>
       <div class="input-container">

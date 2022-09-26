@@ -4,7 +4,7 @@ import {
   PaymentDetails,
   PaymentDetailsInterface,
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { SetPaymentDetailsForm } from '@agency/store/agency.actions';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -24,6 +24,10 @@ import {
 export class ManualFormComponent extends DestroyableDirective implements PaymentDetailsInterface, OnInit {
   @Input() public saveEvent: Subject<number> = new Subject<number>();
   @Input() public formValue: PaymentDetails | ElectronicPaymentDetails;
+
+  get startDateControl(): AbstractControl | null {
+    return this.paymentDetailsForm.get('startDate');
+  }
 
   public paymentDetailsForm: FormGroup;
   public readonly formatInput = FORMAT_INPUT;

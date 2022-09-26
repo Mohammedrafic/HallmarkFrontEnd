@@ -59,8 +59,11 @@
             appValidateWithMessage
             placeholder="{{placeholderInput}}"
             formControlName="startDate"
+            [enableMask]="true"
+            [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
           >
           </ejs-datepicker>
+          <span class="error" *ngIf="!startDateControl?.untouched">{{ startDateControl?.errors | validationError }}</span>
         </div>
       </div>
     </div>

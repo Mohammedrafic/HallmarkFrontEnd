@@ -8,7 +8,7 @@
   <app-order-close-reason-info [candidate]="reasonClosure" [showCloseData]="false"></app-order-close-reason-info>
 </ng-container>
 <div class="separator"></div>
-<ng-container *ngIf="order?.orderClosureReasonId">
+<ng-container *ngIf="order?.orderClosureReason">
   <app-order-close-reason-info [orderInformation]="order"></app-order-close-reason-info>
   <div class="separator"></div>
 </ng-container>

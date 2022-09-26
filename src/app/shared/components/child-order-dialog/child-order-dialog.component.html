@@ -73,8 +73,8 @@
                     <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
                   </section>
                   <hr />
-                  <ng-container *ngIf="currentOrder?.orderClosureReasonId || candidate?.positionClosureReasonId">
-                    <app-order-close-reason-info [candidate]="candidate" [orderInformation]="currentOrder">
+                  <ng-container *ngIf="currentOrder?.orderClosureReasonId || candidateJob?.positionClosureReason || candidate?.positionClosureReasonId">
+                    <app-order-close-reason-info [candidate]="candidateJob || candidate" [orderInformation]="currentOrder">
                     </app-order-close-reason-info>
                     <hr />
                   </ng-container>
