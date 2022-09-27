@@ -387,7 +387,7 @@
   display: inline-block;
   position: relative;
   padding: 10px 15px;
-  color: $bell-button-color;
+  color: $secondary-dark-blue-15;
   &.left {
     margin-right: 40px;
   }
@@ -399,19 +399,19 @@
 .bell-button:hover {
   background:$bell-button-hover-bg;
   border-radius: 10px !important;
-  color: $bell-button-hover-color;
+  color: $primary-active-blue-10;
 }
 
 .bell-button:active {
   background:$bell-button-active-bg;
-  color:$bell-button-active-color;
+  color:$white;
   border-radius: 10px !important;
 }
 
 .bell-button__badge {
-  border-color: $bell-button-badge-border-color;
+  border-color: $white;
   border-style: solid;
-  background-color: $bell-button-badge-background-color;
+  background-color: $primary-btn-hover;
   border-radius: 50%;
   color: $bell-button-badge-color;
   padding: 2px 6px;
