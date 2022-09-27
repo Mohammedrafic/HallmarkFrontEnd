@@ -108,7 +108,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public wrapSettings: TextWrapSettingsModel = GRID_CONFIG.wordWrapSettings;
   public allowWrap = GRID_CONFIG.isWordWrappingEnabled;
   public selectionOptions: SelectionSettingsModel = {
-    type: 'Single',
+    type: 'Multiple',
     mode: 'Row',
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,

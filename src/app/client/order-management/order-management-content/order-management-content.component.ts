@@ -223,7 +223,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public openDetails = new Subject<boolean>();
   public orderPositionSelected$ = new Subject<{ state: boolean; index?: number }>();
   public selectionOptions: SelectionSettingsModel = {
-    type: 'Single',
+    type: 'Multiple',
     mode: 'Row',
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
