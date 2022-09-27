@@ -33,7 +33,6 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
-  { text: 'Agency', column: 'Agency' },
   { text: 'Candidate Agency', column: 'CandidateAgency' },
 ];
 
@@ -53,7 +52,6 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
-  { text: 'Agency', column: 'Agency' },
   { text: 'Candidate Agency', column: 'CandidateAgency' },
 ];
 
@@ -69,7 +67,7 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Re-Order Date', column: 'ReOrderDate' },
   { text: 'Shift', column: 'Shift' },
-  { text: 'Agency', column: 'Agency' },
+  { text: 'Candidate Agency', column: 'CandidateAgency' },
   { text: 'End Date', column: 'EndDate' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
@@ -78,7 +76,6 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
-  { text: 'Candidate Agency', column: 'CandidateAgency' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [
@@ -130,7 +127,6 @@ export const permPlacementColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
-  { text: 'Agency', column: 'Agency' },
   { text: 'Candidate Agency', column: 'CandidateAgency' },
   { text: 'Annual Salary From', column: 'AnnualSalaryFrom'},
   { text: 'Annual Salary To', column: 'AnnualSalaryTo'},
