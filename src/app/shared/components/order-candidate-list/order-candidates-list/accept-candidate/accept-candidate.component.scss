@@ -123,6 +123,10 @@
   display: none;
   border-top: 1px solid $secondary-dark-blue-45;
 
+  &.tab{
+    bottom: 0;
+  }
+
   .dropdown {
     width: 100%;
   }

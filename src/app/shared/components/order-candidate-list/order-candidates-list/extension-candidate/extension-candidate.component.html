@@ -254,7 +254,7 @@
     </ng-template>
   </section>
   <ng-container *ngIf="canAccept || !isAgency">
-    <div class="mobile-actions">
+    <div class="mobile-actions" [ngClass]="{'tab': isTab}">
       <div class="input-group dropdown bootstrap" *ngIf="!isAgency">
         <ejs-dropdownlist
           [fields]="optionFields"
