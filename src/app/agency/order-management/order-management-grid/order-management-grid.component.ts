@@ -110,7 +110,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public selectionOptions: SelectionSettingsModel = {
     type: 'Single',
     mode: 'Row',
-    checkboxMode: 'Default',
+    checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
   };
   public selectedOrder: AgencyOrderManagement;
