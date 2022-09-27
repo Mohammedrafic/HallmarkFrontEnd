@@ -225,16 +225,19 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
     this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       if (data != undefined) {
         this.userData = data.items;
-        this.shouldDisableUserDropDown$.pipe(takeUntil(this.unsubscribe$)).subscribe((disable: boolean) => {
-          if (disable != undefined && disable == true) {
-            let user = this.store.selectSnapshot(UserState.user);
-            this.businessForm.controls['user'].setValue(this.userData.find(x=>x.id==user?.id)?.id);
-            this.store.dispatch(new ShouldDisableUserDropDown(false));
-            this.businessForm.controls['user'].disable();
-            this.businessForm.controls['business'].disable();
-            this.businessForm.controls['businessUnit'].disable();
-          }
-        });
+        let value = this.businessForm.controls['user'].value;
+        if (value != this.userData.find(x => x.id == user?.id)?.id) {
+          this.businessForm.controls['user'].setValue(this.userData.find(x => x.id == user?.id)?.id);
+        }
+      }
+    });
+
+    this.shouldDisableUserDropDown$.pipe(takeUntil(this.unsubscribe$)).subscribe((disable: boolean) => {
+      if (disable != undefined && disable == true) {
+        this.store.dispatch(new ShouldDisableUserDropDown(false));
+        this.businessForm.controls['user'].disable();
+        this.businessForm.controls['business'].disable();
+        this.businessForm.controls['businessUnit'].disable();
       }
     });
   }

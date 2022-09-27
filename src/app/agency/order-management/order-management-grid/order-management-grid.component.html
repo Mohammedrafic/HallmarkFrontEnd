@@ -13,6 +13,7 @@
   [allowTextWrap]="allowWrap"
   [selectionSettings]="selectionOptions"
   [textWrapSettings]="wrapSettings"
+  [enableVirtualization]="true"
   (rowDeselected)="onRowDeselect($event, gridWithChildRow)"
   (rowSelected)="onRowClick($event)"
   (dataBound)="onDataBound()"

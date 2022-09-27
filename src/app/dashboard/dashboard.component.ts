@@ -88,6 +88,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   public ngOnInit(): void {
     this.getAdminOrganizationsStructureAll();
+    this.getCurrentUserPermissions();
     this.subscribeOnPermissions();
     this.getDashboardFilterState();
     this.setWidgetsData();
@@ -104,6 +105,10 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
         this.store.dispatch(new GetOrganizationsStructureAll(user.id));
       }
     });
+  }
+
+  private getCurrentUserPermissions(): void {
+    this.store.dispatch(new GetCurrentUserPermissions());
   }
 
   private subscribeOnPermissions(): void {
