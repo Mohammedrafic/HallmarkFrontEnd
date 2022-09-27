@@ -121,10 +121,19 @@
       }
 
     .close-btn {
-      width: 18px;
-      margin-right: 16px;
+      //width: 18px;
+      height: 8px;
+      width: 8px;
+      left: 4px;
+      top: 4px;
+      border-radius: 0px;
+      
+
+      margin-right: 10px;
       position: relative;
       cursor: pointer;
+      color: #3E7FFF;
+      
       
       &::before {
         content: '\2715';
@@ -532,8 +541,22 @@
 
 #alert-sidebar {
   .sidebar-header {
-    background-color: $alert-side-bar-bgcolor;
+    background-color: white;
+    display: flex;
     height: 50px !important;
+    width:156px;
+    height:32px;
+    top:34px;
+    left:24px;
+    right:260;
+    //styleName: H3-Open Sans,Bold;
+font-family: Open Sans;
+font-size: 18px;
+//font-weight: 700;
+line-height: 32px;
+letter-spacing: 0em;
+text-align: justified;
+
 
     i-feather {
       position: absolute;
@@ -545,7 +568,7 @@
     }
 
     h5 {
-      color: white;
+      color: #060715;
       padding: 0.8rem 1.5rem 0rem 1.5rem;
       font-size: 1.5em !important;
       margin: auto;
@@ -557,12 +580,16 @@
 
     .closebtn {
       top: 2px;
-      color: black;
+      color: #3E7FFF;
       position: absolute;
       right: 4px;
       background-color: transparent !important;
       padding: 0.55rem 0.2rem 0rem 0rem;
-
+      font-size: 14px;
+      line-height: 20px;
+      top:10px;
+      right: 50px;
+    
       button {
         padding: 0.3rem 0.5rem !important;
         border-radius: 4px !important;
@@ -574,7 +601,7 @@
       top: 2px;
       line-height: 26px;
       height: 42px;
-      color: black;
+      color: #3E7FFF;
       position: absolute;
       right: 40px;
       background-color: transparent !important;
@@ -595,7 +622,7 @@
       float: right;
       font-weight: bold;
       color: $primary-active-blue-10;
-
+      
       span {
         cursor: pointer;
       }
@@ -608,12 +635,18 @@
     .alert-panel {
       margin-top: 5px;
       padding: 1rem;
-      background: $primary-active-blue-90;
       gap: 17px;
+      height: 140px;
+      width: 390px;
+      left: 0px;
+      top: 0px;
+      border-radius: 8px;
+      background: #F2FAF2;
+
 
       .alert-panel-header {
         display: flex;
-
+        
         &__flex-child {
         }
 
@@ -623,11 +656,38 @@
 
         &__title {
           font-weight: bold;
+          height: 28px;
+        width: 177px;
+        left: 36px;
+        top: 5px;
+        border-radius: nullpx;
+        font-family: Open Sans;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 28px;
+        letter-spacing: 0.015em;
+        text-align: left;
+
+        }
+
+        &__date
+        {
+          height: 32px;
+width: 110px;
+left: 268px;
+top: 12px;
+color: #677089;
+font-family: Open Sans;
+font-size: 12px;
+font-weight: 400;
+line-height: 16px;
+letter-spacing: 0px;
+text-align: right;
         }
       }
 
       .alert-content {
-        color: $primary-active-blue-20;
+        color:  #060715;
         font-weight: 400;
         padding: 5px;
       }
@@ -647,8 +707,16 @@
       }
 
       .badge-info {
-        color: $white;
-        background-color: $primary-active-blue-10;
+        //color: $white;
+        //background-color: $primary-active-blue-10;
+        color: #5AA658;
+        height: 18px;
+        width: 18px;
+        top:13px;
+        left: 2px;
+        top: 1.33px;
+        border-radius: 0px;
+        size: 13px;
       }
 
       .badge-danger {
@@ -664,7 +732,9 @@
       .alert-panel-footer {
         display: flex;
         margin-top: 1rem;
-        color: $secondary-dark-blue-10;
+        color:  #3E7FFF;
+        //top:112px;
+        //left:334px;
 
         &__footer_flex-child {
           flex: 1;
@@ -679,6 +749,7 @@
         .dismiss-text {
           text-align: right;
           cursor: pointer;
+          size: 12px;
         }
       }
     }

@@ -60,7 +60,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   width = SIDEBAR_CONFIG.width;
   dockSize = SIDEBAR_CONFIG.dockSize;
   sideBarType = SIDEBAR_CONFIG.type;
-  alertSidebarWidth = '360px';
+  alertSidebarWidth = '440px';
   alertSidebarType = 'auto';
   alertSidebarPosition = 'Right';
   showAlertSidebar = false;
