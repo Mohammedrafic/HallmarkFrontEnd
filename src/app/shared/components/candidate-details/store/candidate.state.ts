@@ -105,7 +105,7 @@ export class CandidateDetailsState {
 
   constructor(private candidateDetailsService: CandidateDetailsService) {}
 
-  @Action(GetCandidateDetailsPage)
+  @Action(GetCandidateDetailsPage, { cancelUncompleted: true })
   GetCandidateDetailsPage(
     { patchState }: StateContext<CandidateDetailsStateModel>,
     { payload }: GetCandidateDetailsPage
