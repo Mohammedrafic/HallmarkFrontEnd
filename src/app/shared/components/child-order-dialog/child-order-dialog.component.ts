@@ -244,7 +244,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
   setCloseOrderButtonState(): void {
     this.disabledCloseButton =
-      !!this.candidate?.positionClosureReasonId || this.candidate.orderStatus !== OrderStatus.Filled;
+      !!this.candidate?.positionClosureReasonId || this.candidate.orderStatus !== OrderStatus.Filled || !!this.order?.orderCloseDate;
   }
 
   closeOrder(order: MergedOrder): void {
@@ -469,8 +469,11 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     const dateAvailable = candidate.closeDate
       ? addDays(candidate.closeDate, 14)?.getTime()! >= new Date().getTime()
       : true;
-    this.isAddExtensionBtnAvailable =
-      this.isOrganization && isOrderFilledOrProgressOrClosed && dateAvailable && isOrderTravelerOrContractToPerm;
+    this.isAddExtensionBtnAvailable = this.isOrganization
+      && isOrderFilledOrProgressOrClosed
+      && dateAvailable
+      && isOrderTravelerOrContractToPerm
+      && this.candidate.statusName !== CandidatStatus[CandidatStatus.Cancelled];
   }
 
   private getTemplate(): void {

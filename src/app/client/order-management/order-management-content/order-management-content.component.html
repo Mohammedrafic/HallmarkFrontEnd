@@ -12,8 +12,9 @@
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
     </button>
+    <!-- TODO (activeTab !== OrganizationOrderManagementTabs.Incomplete) - temporary solution for hiding button without functionality -->
     <button
-      *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates"
+      *ngIf="(activeTab !== OrganizationOrderManagementTabs.OrderTemplates) && (activeTab !== OrganizationOrderManagementTabs.Incomplete)"
       ejs-dropdownbutton
       appHideBeforeSyncfusionLoad
       [items]="exportOptions"
@@ -21,9 +22,7 @@
       id="importButton"
       cssClass="e-outline button-export"
     >
-      <div class="button-export-container">
-        Export <i-feather name="download" class="icon"></i-feather>
-      </div>
+      <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
     </button>
     <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToOrderForm()">
       Create Order
@@ -207,7 +206,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="type" headerText="TYPE" width="180">
+      <e-column field="orderType" headerText="TYPE" width="180">
         <ng-template #template let-data>
           <div class="order-type-column" *ngIf="orderTypes[data.orderType] as orderType">
             <span class="e-badge e-badge-primary e-badge-circle">{{ orderType[0] }}</span> <span>{{ orderType }}</span>
@@ -678,6 +677,8 @@
             class="datepicker"
             [format]="formatDate"
             [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
             formControlName="jobStartDate"
           >
           </ejs-datepicker>
@@ -697,6 +698,8 @@
             class="datepicker"
             [format]="formatDate"
             [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
             formControlName="jobEndDate"
           >
           </ejs-datepicker>
@@ -711,6 +714,8 @@
             class="datepicker"
             [format]="formatDate"
             [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
             formControlName="creationDateFrom"
           >
           </ejs-datepicker>
@@ -719,7 +724,13 @@
       <div class="input-container calendar">
         <label>Creation Date To</label>
         <div class="input-group datepicker">
-          <ejs-datepicker class="datepicker" formControlName="creationDateTo"> </ejs-datepicker>
+          <ejs-datepicker
+            class="datepicker"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
+            formControlName="creationDateTo"> </ejs-datepicker>
         </div>
       </div>
     </div>
@@ -731,6 +742,8 @@
             class="datepicker"
             [format]="formatDate"
             [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
             formControlName="distributedOnFrom"
           >
           </ejs-datepicker>
@@ -743,6 +756,8 @@
             class="datepicker"
             [format]="formatDate"
             [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
             formControlName="distributedOnTo"
           >
           </ejs-datepicker>

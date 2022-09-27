@@ -1,0 +1,265 @@
+@import 'colors';
+
+.chat-room-controls {
+  width: 406px;
+  border-radius: 8px;
+  border: 1px solid #E4E6E8;
+  padding: 6px 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  i-feather {
+    margin: 0;
+  }
+}
+
+::ng-deep {
+  .chat-room-controls {
+    ejs-richtexteditor {
+      .rte-placeholder {
+        padding: 0!important;
+        overflow: visible;
+        top: 2px!important;
+      }
+    }
+  }
+
+}
+
+.chat-room-container {
+  height: 98%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 10px 24px;
+}
+
+.controls-block {
+  display: flex;
+  justify-content: center;
+}
+
+.chat-input {
+  border: none;
+  resize: none;
+  width: 335px;
+  height: 20px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: 'Open Sans';
+  color: $secondary-dark-blue-15;
+  line-height: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+.send-btn {
+  border: none;
+  margin-top: 5px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 15px;
+
+  &.right {
+    justify-content: flex-end;
+  }
+
+  &.indicator-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.content-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.sender {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 18px;
+  color: #171721;
+  margin-right: 5px;
+
+  &.left-position {
+    margin-right: 0;
+  }
+}
+
+.timestamp {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  color: #8083A3;
+
+  &.left-position {
+    margin-right: 5px;
+  }
+}
+
+.text-block {
+  padding: 10px;
+  max-width: 377px;
+  background: #F5F5FA;
+  border-radius: 0px 18.5px 18.5px 18.5px;
+  line-height: 21px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #171721;
+  word-break: break-all;
+
+  &.right-text {
+    border-radius: 18.5px 0px 18.5px 18.5px;
+    background: #3E7EFF;
+    color: white;
+  }
+  
+  &.indicators {
+    height: auto;
+  }
+}
+
+::ng-deep {
+  .text-block {
+    &.right-text {
+      a {
+        color: white;
+        font-size: 14px;
+        text-decoration: underline;
+      }
+
+      p {
+        margin: 0;
+      }
+    }
+
+    a {
+      color: #3E7EFF;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+.chat-form {
+  margin: 0;
+  padding: 0;
+  width: 335px;
+  height: 20px;
+}
+
+.chat-room-area {
+  overflow: scroll;
+  height: 100%;
+}
+
+.indicator-container {
+  display: flex;
+  align-items: flex-end;
+  height: 20px;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  background: #8083A3;
+  margin-right: 6px;
+  border-radius: 50%;
+
+  &.wave1 {
+    animation: waveBlock .4s ease-in-out infinite alternate;
+  }
+
+  &.wave2 {
+    animation: waveBlock .4s ease-in-out 150ms infinite alternate;
+  }
+
+  &.wave3 {
+    animation: waveBlock .4s ease-in-out 300ms infinite alternate;
+  }
+}
+
+@keyframes waveBlock {
+  from {
+    transform: translateY(0px);
+  }
+
+  to {
+    transform: translateY(-5px);
+  }
+}
+
+.typing-indicator {
+  margin-top: 15px;
+}
+
+.empty-room-block {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: $secondary-dark-blue-20;
+}
+
+.empty-room-header {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.empty-room-text {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+ejs-richtexteditor {
+  border: none!important;
+  resize: none;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: 'Open Sans';
+  color: $secondary-dark-blue-15!important;
+  line-height: 20px!important;
+  width: 85%!important;
+  padding: 0;
+  margin: 0;
+}
+
+::ng-deep {
+  .chat-room-controls {
+    .e-richtexteditor .e-rte-content {
+      max-height: 140px!important;
+      overflow-y: scroll;
+    }
+    .e-richtexteditor .e-rte-content .e-content {
+        padding: 0!important;
+        height: auto!important;
+        min-height: 20px!important;
+    }
+  }
+}
+
+.read-indicator {
+  width: 15px;
+  height: 15px;
+  color: transparent;
+  vertical-align: middle;
+  margin-right: 5px;
+
+  &.show-ind {
+    color: $primary-active-blue-20;
+  }
+}

@@ -1,8 +1,8 @@
-import { ImportResult } from "@shared/models/import.model";
-import { Country } from "src/app/shared/enums/states";
-import { Organization } from "src/app/shared/models/organization.model";
-import { SkillCategory } from "src/app/shared/models/skill-category.model";
-import { Skill, SkillFilters } from "src/app/shared/models/skill.model";
+import { ImportResult } from '@shared/models/import.model';
+import { Country } from 'src/app/shared/enums/states';
+import { Organization } from 'src/app/shared/models/organization.model';
+import { SkillCategory } from 'src/app/shared/models/skill-category.model';
+import { Skill, SkillFilters } from 'src/app/shared/models/skill.model';
 import { Department, DepartmentFilter, ImportedDepartment } from '@shared/models/department.model';
 import { Region, regionFilter } from '@shared/models/region.model';
 import { ImportedLocation, Location, LocationFilter } from '@shared/models/location.model';
@@ -10,261 +10,262 @@ import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialFilter } from '@shared/models/credential.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { OrganizationSettingFilter, OrganizationSettingsPost } from '@shared/models/organization-settings.model';
-import { ExportPayload } from "@shared/models/export.model";
+import { ExportPayload } from '@shared/models/export.model';
+import { ImportedBillRate } from '@shared/models';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[organizationManagement] Set General States By Country';
-  constructor(public payload: Country) { }
+  constructor(public payload: Country) {}
 }
 
 export class SetBillingStatesByCountry {
   static readonly type = '[organizationManagement] Set Billing States By Country';
-  constructor(public payload: Country) { }
+  constructor(public payload: Country) {}
 }
 
 export class SaveOrganization {
   static readonly type = '[organizationManagement] Save Organization';
-  constructor(public payload: Organization) { }
+  constructor(public payload: Organization) {}
 }
 
 export class SaveOrganizationSucceeded {
   static readonly type = '[organizationManagement] Save Organization Succeeded';
-  constructor(public payload: Organization) { }
+  constructor(public payload: Organization) {}
 }
 
 export class UploadOrganizationLogo {
   static readonly type = '[organizationManagement] Upload Organization Logo';
-  constructor(public file: Blob, public businessUnitId: number) { }
+  constructor(public file: Blob, public businessUnitId: number) {}
 }
 
 export class GetOrganizationLogo {
   static readonly type = '[organizationManagement] Get Organization Logo';
-  constructor(public payload: number) { }
+  constructor(public payload: number) {}
 }
 
 export class GetOrganizationLogoSucceeded {
   static readonly type = '[organizationManagement] Get Organization Logo Succeeded';
-  constructor(public payload: Blob) { }
+  constructor(public payload: Blob) {}
 }
 
 export class GetOrganizationById {
   static readonly type = '[organizationManagement] Get Organization by ID';
-  constructor(public payload: number) { }
+  constructor(public payload: number) {}
 }
 
 export class GetOrganizationByIdSucceeded {
   static readonly type = '[organizationManagement] Get Organization by ID Succeeded';
-  constructor(public payload: Organization) { }
+  constructor(public payload: Organization) {}
 }
 
 export class SaveDepartment {
   static readonly type = '[organizationManagement] Create Department';
-  constructor(public payload: Department, public filters?: DepartmentFilter) { }
+  constructor(public payload: Department, public filters?: DepartmentFilter) {}
 }
 
 export class GetDepartmentsByLocationId {
   static readonly type = '[organizationManagement] Get The List Of Departments by locationId';
-  constructor(public locationId?: number, public filters?: DepartmentFilter) { }
+  constructor(public locationId?: number, public filters?: DepartmentFilter) {}
 }
 
 export class UpdateDepartment {
   static readonly type = '[organizationManagement] Update Department';
-  constructor(public department: Department, public filters?: DepartmentFilter) { }
+  constructor(public department: Department, public filters?: DepartmentFilter) {}
 }
 
 export class DeleteDepartmentById {
   static readonly type = '[organizationManagement] Delete Department by id';
-  constructor(public department: Department, public filters?: DepartmentFilter) { }
+  constructor(public department: Department, public filters?: DepartmentFilter) {}
 }
 
 export class GetRegions {
   static readonly type = '[organizationManagement] Get The List Of Regions';
-  constructor(public filter?: regionFilter) { }
+  constructor(public filter?: regionFilter) {}
 }
 
 export class SaveRegion {
   static readonly type = '[organizationManagement] Create Region';
-  constructor(public region: Region) { }
+  constructor(public region: Region) {}
 }
 
 export class UpdateRegion {
   static readonly type = '[organizationManagement] Update Region';
-  constructor(public region: Region) { }
+  constructor(public region: Region) {}
 }
 
 export class DeleteRegionById {
   static readonly type = '[organizationManagement] Delete Region by id';
-  constructor(public regionId: number) { }
+  constructor(public regionId: number) {}
 }
 
 export class GetLocationsByOrganizationId {
   static readonly type = '[organizationManagement] Get The List Of Locations by organizationId';
-  constructor(public organizationId: number) { }
+  constructor(public organizationId: number) {}
 }
 
 export class GetLocationsByRegionId {
   static readonly type = '[organizationManagement] Get The List Of Locations by regionId';
-  constructor(public regionId: number, public filters?: LocationFilter) { }
+  constructor(public regionId: number, public filters?: LocationFilter) {}
 }
 
 export class GetLocationById {
   static readonly type = '[organizationManagement] Get The Location by id';
-  constructor(public locationId: number) { }
+  constructor(public locationId: number) {}
 }
 
 export class SaveLocation {
   static readonly type = '[organizationManagement] Create Location';
-  constructor(public location: Location, public regionId: number, public filters?: LocationFilter) { }
+  constructor(public location: Location, public regionId: number, public filters?: LocationFilter) {}
 }
 
 export class UpdateLocation {
   static readonly type = '[organizationManagement] Update Location';
-  constructor(public location: Location, public regionId: number, public filters?: LocationFilter) { }
+  constructor(public location: Location, public regionId: number, public filters?: LocationFilter) {}
 }
 
 export class DeleteLocationById {
   static readonly type = '[organizationManagement] Delete Location by id';
-  constructor(public locationId: number, public regionId: number, public filters?: LocationFilter) { }
+  constructor(public locationId: number, public regionId: number, public filters?: LocationFilter) {}
 }
 
 export class GetBusinessUnitList {
   static readonly type = '[organizationManagement] Get The List Of Business Units';
-  constructor() { }
+  constructor() {}
 }
 
 export class SetDirtyState {
   static readonly type = '[organizationManagement] Set Dirty State Of The Form';
-  constructor(public payload: boolean) { }
+  constructor(public payload: boolean) {}
 }
 
 export class SetImportFileDialogState {
   static readonly type = '[organizationManagement] Set Import file dialog State';
-  constructor(public payload: boolean) { }
+  constructor(public payload: boolean) {}
 }
 
 export class GetMasterSkillsByPage {
   static readonly type = '[organizationManagement] Get Master Skills by Page';
-  constructor(public pageNumber: number, public pageSize: number) { }
+  constructor(public pageNumber: number, public pageSize: number) {}
 }
 
 export class GetSkillsCategoriesByPage {
   static readonly type = '[organizationManagement] Get Skills Categories by Page';
-  constructor(public pageNumber: number, public pageSize: number) { }
+  constructor(public pageNumber: number, public pageSize: number) {}
 }
 
 export class GetMasterSkillsByOrganization {
   static readonly type = '[organizationManagement] Get Master Skills by Organization';
-  constructor() { }
+  constructor() {}
 }
 
 export class GetAllSkillsCategories {
   static readonly type = '[organizationManagement] Get All Skills Categories';
-  constructor() { }
+  constructor() {}
 }
 
 export class SaveSkillsCategory {
   static readonly type = '[organizationManagement] Save Skills Category';
-  constructor(public payload: SkillCategory) { }
+  constructor(public payload: SkillCategory) {}
 }
 
 export class SaveSkillsCategorySucceeded {
   static readonly type = '[organizationManagement] Save Skills Category Succeeded';
-  constructor(public payload: SkillCategory) { }
+  constructor(public payload: SkillCategory) {}
 }
 
 export class RemoveSkillsCategory {
   static readonly type = '[organizationManagement] Remove Skills Category';
-  constructor(public payload: SkillCategory) { }
+  constructor(public payload: SkillCategory) {}
 }
 
 export class SaveMasterSkill {
   static readonly type = '[organizationManagement] Save Master Skill';
-  constructor(public payload: Skill) { }
+  constructor(public payload: Skill) {}
 }
 
 export class RemoveMasterSkill {
   static readonly type = '[organizationManagement] Remove Master Skill';
-  constructor(public payload: Skill) { }
+  constructor(public payload: Skill) {}
 }
 
 export class SaveMasterSkillSucceeded {
   static readonly type = '[organizationManagement] Save Master Skill Succeeded';
-  constructor(public payload: Skill) { }
+  constructor(public payload: Skill) {}
 }
 
 export class RemoveMasterSkillSucceeded {
   static readonly type = '[organizationManagement] Remove Master Skill by ID Succeeded';
-  constructor() { }
+  constructor() {}
 }
 
 export class RemoveSkillsCategorySucceeded {
   static readonly type = '[organizationManagement] Remove Skill Category by ID Succeeded';
-  constructor() { }
+  constructor() {}
 }
 
 export class GetAssignedSkillsByPage {
   static readonly type = '[organizationManagement] Get Assigned Skills by Page';
-  constructor(public pageNumber: number, public pageSize: number, public filters: SkillFilters) { }
+  constructor(public pageNumber: number, public pageSize: number, public filters: SkillFilters) {}
 }
 
 export class SaveAssignedSkill {
   static readonly type = '[organizationManagement] Save Assigned Skill';
-  constructor(public payload: Skill) { }
+  constructor(public payload: Skill) {}
 }
 
 export class SaveAssignedSkillSucceeded {
   static readonly type = '[organizationManagement] Save Assigned Skill Succeeded';
-  constructor(public payload: Skill) { }
+  constructor(public payload: Skill) {}
 }
 
 export class RemoveAssignedSkill {
   static readonly type = '[organizationManagement] Remove Assigned Skill';
-  constructor(public payload: Skill) { }
+  constructor(public payload: Skill) {}
 }
 
 export class RemoveAssignedSkillSucceeded {
   static readonly type = '[organizationManagement] Remove Assigned Skill by ID Succeeded';
-  constructor() { }
+  constructor() {}
 }
 
 export class GetCredentialTypes {
   static readonly type = '[organizationManagement] Get Credential Types';
-  constructor() { }
+  constructor() {}
 }
 
 export class GetCredentialTypeById {
   static readonly type = '[organizationManagement] Get Credential Type by ID';
-  constructor(public payload: CredentialType) { }
+  constructor(public payload: CredentialType) {}
 }
 
 export class SaveCredentialType {
   static readonly type = '[organizationManagement] Save Credential Type';
-  constructor(public payload: CredentialType) { }
+  constructor(public payload: CredentialType) {}
 }
 
 export class RemoveCredentialType {
   static readonly type = '[organizationManagement] Remove Credential Type by ID';
-  constructor(public payload: CredentialType) { }
+  constructor(public payload: CredentialType) {}
 }
 
 export class UpdateCredentialType {
   static readonly type = '[organizationManagement] Update Credential Type';
-  constructor(public payload: CredentialType) { }
+  constructor(public payload: CredentialType) {}
 }
 
 export class GetCredential {
   static readonly type = '[organizationManagement] Get Credential list';
-  constructor(public payload?: CredentialFilter) { }
+  constructor(public payload?: CredentialFilter) {}
 }
 
 export class GetCredentialById {
   static readonly type = '[organizationManagement] Get Credential by ID';
-  constructor(public payload: Credential) { }
+  constructor(public payload: Credential) {}
 }
 
 export class SaveCredential {
   static readonly type = '[organizationManagement] Save Credential';
-  constructor(public payload: Credential) { }
+  constructor(public payload: Credential) {}
 }
 
 export class SaveCredentialSucceeded {
@@ -274,7 +275,7 @@ export class SaveCredentialSucceeded {
 
 export class RemoveCredential {
   static readonly type = '[organizationManagement] Remove Credential by ID';
-  constructor(public payload: Credential, public filters?: CredentialFilter) { }
+  constructor(public payload: Credential, public filters?: CredentialFilter) {}
 }
 
 export class GetAllSkills {
@@ -289,12 +290,12 @@ export class GetCredentialSkillGroup {
 
 export class SaveUpdateCredentialSkillGroup {
   static readonly type = '[organizationManagement] Save/Update Credential Skill Group';
-  constructor(public payload: CredentialSkillGroup) { }
+  constructor(public payload: CredentialSkillGroup) {}
 }
 
 export class RemoveCredentialSkillGroup {
   static readonly type = '[organizationManagement] Remove Credential Skill Group';
-  constructor(public payload: CredentialSkillGroup) { }
+  constructor(public payload: CredentialSkillGroup) {}
 }
 
 export class GetOrganizationSettings {
@@ -304,155 +305,193 @@ export class GetOrganizationSettings {
 
 export class SaveOrganizationSettings {
   static readonly type = '[organizationManagement] Save Organization Settings';
-  constructor(public organizationSettings: OrganizationSettingsPost) { }
+  constructor(public organizationSettings: OrganizationSettingsPost) {}
 }
 
 export class ClearDepartmentList {
   static readonly type = '[organizationManagement] Clear Department list';
-  constructor() { }
+  constructor() {}
 }
 
 export class ClearLocationList {
   static readonly type = '[organizationManagement] Clear Location list';
-  constructor() { }
+  constructor() {}
 }
 
 export class ExportLocations {
   static readonly type = '[organizationManagement] Export Location list';
-  constructor(public payload: ExportPayload) { }
+  constructor(public payload: ExportPayload) {}
 }
 export class ExportRegions {
   static readonly type = '[organizationManagement] Export Region list';
-  constructor(public payload: ExportPayload) { }
+  constructor(public payload: ExportPayload) {}
 }
 
 export class ExportDepartments {
   static readonly type = '[organizationManagement] Export Department list';
-  constructor(public payload: ExportPayload) { }
+  constructor(public payload: ExportPayload) {}
 }
 
 export class ExportSkills {
   static readonly type = '[organizationManagement] Export Skill list';
-  constructor(public payload: ExportPayload) { }
+  constructor(public payload: ExportPayload) {}
 }
 
 export class GetSkillDataSources {
   static readonly type = '[organizationManagement] Get Skill Data Sources';
-  constructor() { }
+  constructor() {}
 }
 
 export class GetAllOrganizationSkills {
   static readonly type = '[organizationManagement] Get All Organization Skills';
-  constructor() { }
+  constructor() {}
 }
 
 export class GetLocationFilterOptions {
   static readonly type = '[organizationManagement] Get Location Filter Options';
-  constructor(public payload: number) { }
+  constructor(public payload: number) {}
 }
 
 export class GetRegionFilterOptions {
   static readonly type = '[organizationManagement] Get region Filter Options';
-  constructor(public payload: any) { }
+  constructor(public payload: any) {}
 }
 
 export class GetDepartmentFilterOptions {
   static readonly type = '[organizationManagement] Get Department Filter Options';
-  constructor(public payload: number) { }
+  constructor(public payload: number) {}
 }
 
 export class GetOrganizationSettingsFilterOptions {
   static readonly type = '[organizationManagement] Get Organization Settings Filter Options';
-  constructor() { }
-}
-
-export class GetLocationTypes
-{
-  static readonly type ='[organizationManagement] Get Location Types'
   constructor() {}
 }
-export class GetUSCanadaTimeZoneIds
-{
-  static readonly type ='[organizationManagement] Get US Canada TimeZoneIds'
+
+export class GetLocationTypes {
+  static readonly type = '[organizationManagement] Get Location Types';
+  constructor() {}
+}
+export class GetUSCanadaTimeZoneIds {
+  static readonly type = '[organizationManagement] Get US Canada TimeZoneIds';
   constructor() {}
 }
 
 export class GetLocationsImportTemplate {
   static readonly type = '[organizationManagement] Get Locations Import Template';
-  constructor(public payload: ImportedLocation[]) { }
+  constructor(public payload: ImportedLocation[]) {}
 }
 
 export class GetLocationsImportTemplateSucceeded {
   static readonly type = '[organizationManagement] Get Locations Import Template Succeeded';
-  constructor(public payload: Blob) { }
+  constructor(public payload: Blob) {}
 }
 
 export class GetLocationsImportErrors {
   static readonly type = '[organizationManagement] Get Locations Import Errors';
-  constructor(public payload: ImportedLocation[]) { }
+  constructor(public payload: ImportedLocation[]) {}
 }
 
 export class GetLocationsImportErrorsSucceeded {
   static readonly type = '[organizationManagement] Get Locations Import Errors Succeeded';
-  constructor(public payload: Blob) { }
+  constructor(public payload: Blob) {}
 }
 
 export class UploadLocationsFile {
   static readonly type = '[organizationManagement] Upload Locations File';
-  constructor(public payload: Blob) { }
+  constructor(public payload: Blob) {}
 }
 
 export class UploadLocationsFileSucceeded {
   static readonly type = '[organizationManagement] Upload Locations File Succeeded';
-  constructor(public payload: ImportResult<ImportedLocation>) { }
+  constructor(public payload: ImportResult<ImportedLocation>) {}
 }
 
 export class SaveLocationsImportResult {
   static readonly type = '[candidate] Save Locations Import Result';
-  constructor(public payload: ImportedLocation[]) { }
+  constructor(public payload: ImportedLocation[]) {}
 }
 
 export class SaveLocationsImportResultSucceeded {
   static readonly type = '[candidate] Save Locations Import Result Succeeded';
-  constructor(public payload: ImportResult<ImportedLocation>) { }
+  constructor(public payload: ImportResult<ImportedLocation>) {}
 }
 
 export class GetDepartmentsImportTemplate {
   static readonly type = '[organizationManagement] Get Departments Import Template';
-  constructor(public payload: ImportedDepartment[]) { }
+  constructor(public payload: ImportedDepartment[]) {}
 }
 
 export class GetDepartmentsImportTemplateSucceeded {
   static readonly type = '[organizationManagement] Get Departments Import Template Succeeded';
-  constructor(public payload: Blob) { }
+  constructor(public payload: Blob) {}
 }
 
 export class GetDepartmentsImportErrors {
   static readonly type = '[organizationManagement] Get Departments Import Errors';
-  constructor(public payload: ImportedDepartment[]) { }
+  constructor(public payload: ImportedDepartment[]) {}
 }
 
 export class GetDepartmentsImportErrorsSucceeded {
   static readonly type = '[organizationManagement] Get Departments Import Errors Succeeded';
-  constructor(public payload: Blob) { }
+  constructor(public payload: Blob) {}
 }
 
 export class UploadDepartmentsFile {
   static readonly type = '[organizationManagement] Upload Departments File';
-  constructor(public payload: Blob) { }
+  constructor(public payload: Blob) {}
 }
 
 export class UploadDepartmentsFileSucceeded {
   static readonly type = '[organizationManagement] Upload Departments File Succeeded';
-  constructor(public payload: ImportResult<ImportedDepartment>) { }
+  constructor(public payload: ImportResult<ImportedDepartment>) {}
 }
 
 export class SaveDepartmentsImportResult {
   static readonly type = '[candidate] Save Departments Import Result';
-  constructor(public payload: ImportedDepartment[]) { }
+  constructor(public payload: ImportedDepartment[]) {}
 }
 
 export class SaveDepartmentsImportResultSucceeded {
   static readonly type = '[candidate] Save Departments Import Result Succeeded';
-  constructor(public payload: ImportResult<ImportedDepartment>) { }
+  constructor(public payload: ImportResult<ImportedDepartment>) {}
+}
+
+export class GetBillRatesImportTemplate {
+  static readonly type = '[organizationManagement] Get Bill Rates Import Template';
+  constructor(public payload: ImportedBillRate[]) {}
+}
+
+export class GetBillRatesImportTemplateSucceeded {
+  static readonly type = '[organizationManagement] Get Bill Rates Import Template Succeeded';
+  constructor(public payload: Blob) {}
+}
+
+export class GetBillRatesImportErrors {
+  static readonly type = '[organizationManagement] Get Bill Rates Import Errors';
+  constructor(public payload: ImportedBillRate[]) {}
+}
+
+export class GetBillRatesImportErrorsSucceeded {
+  static readonly type = '[organizationManagement] Get Bill Rates Import Errors Succeeded';
+  constructor(public payload: Blob) {}
+}
+
+export class UploadBillRatesFile {
+  static readonly type = '[organizationManagement] Upload Bill Rates File';
+  constructor(public payload: Blob) {}
+}
+
+export class UploadBillRatesFileSucceeded {
+  static readonly type = '[organizationManagement] Upload Bill Rates File Succeeded';
+  constructor(public payload: ImportResult<ImportedBillRate>) {}
+}
+
+export class SaveBillRatesImportResult {
+  static readonly type = '[organizationManagement] Save Bill Rates Import Result';
+  constructor(public payload: ImportedBillRate[]) {}
+}
+
+export class SaveBillRatesImportResultSucceeded {
+  static readonly type = '[organizationManagement] Save Bill Rates Import Result Succeeded';
+  constructor(public payload: ImportResult<ImportedBillRate>) {}
 }

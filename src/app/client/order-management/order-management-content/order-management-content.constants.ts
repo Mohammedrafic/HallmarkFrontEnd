@@ -45,7 +45,6 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Department', column: 'Department' },
   { text: 'Candidates', column: 'Candidates' },
   { text: '# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days' },
-  { text: 'End Date', column: 'EndDate' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
   { text: 'Distributed To', column: 'DistributedTo' },
@@ -137,6 +136,10 @@ export const ReOrdersColumnsConfig = [
     visible: true,
   },
   {
+    fieldName: 'endDate',
+    visible: false,
+  },
+  {
     fieldName: 'shiftsNext90Days',
     visible: false,
   },
@@ -185,6 +188,10 @@ export const AllOrdersColumnsConfig = [
   },
   {
     fieldName: 'startDate',
+    visible: true,
+  },
+  {
+    fieldName: 'endDate',
     visible: true,
   },
   {
@@ -255,6 +262,10 @@ export const PerDiemColumnsConfig = [
     visible: false,
   },
   {
+    fieldName: 'endDate',
+    visible: false,
+  },
+  {
     fieldName: 'reOrderFromId',
     visible: false,
   },
@@ -322,6 +333,10 @@ export const orderTemplateColumnsConfig = [
     visible: false,
   },
   {
+    fieldName: 'endDate',
+    visible: true,
+  },
+  {
     fieldName: 'reOrderFromId',
     visible: false,
   },
@@ -387,6 +402,10 @@ export const PermPlacementColumnsConfig = [
   {
     fieldName: 'startDate',
     visible: true,
+  },
+  {
+    fieldName: 'endDate',
+    visible: false,
   },
   {
     fieldName: 'reOrderFromId',

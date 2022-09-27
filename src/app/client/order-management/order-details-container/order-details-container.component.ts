@@ -1,25 +1,28 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
-import { Order } from '@shared/models/order-management.model';
-import { Subject } from 'rxjs';
-import {OrderType} from "@shared/enums/order-type";
+import { Order, OrderManagementChild } from '@shared/models/order-management.model';
+import { OrderType } from '@shared/enums/order-type';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 @Component({
   selector: 'app-order-details-container',
   templateUrl: './order-details-container.component.html',
-  styleUrls: ['./order-details-container.component.scss']
+  styleUrls: ['./order-details-container.component.scss'],
 })
-export class OrderDetailsContainerComponent implements OnDestroy {
-  private unsubscribe$: Subject<void> = new Subject();
+export class OrderDetailsContainerComponent {
   public orderType = OrderType;
-
+  public readonly reasonClosure = {
+    positionClosureReason: 'Candidate Rejected',
+  } as OrderManagementChild;
   public order: Order;
+  public showReasonInfo: boolean;
+
   @Input() set currentOrder(value: Order) {
     this.order = value;
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.showReasonInfo = !!(
+      this.order?.extensionFromId &&
+      this.order.candidates?.length &&
+      this.order.candidates[0].status === CandidatStatus[CandidatStatus.Rejected]
+    );
   }
 }

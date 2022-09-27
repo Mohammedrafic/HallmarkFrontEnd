@@ -93,6 +93,18 @@ export type AgencyOrderFilteringOptions = {
     id: number;
     name: string;
   }[];
+  specialProjectCategories: {
+    id: number;
+    projectType: string;
+  }[];
+  projectNames: {
+    id: number;
+    projectName: string;
+  }[];
+  poNumbers: {
+    id: number;
+    poNumber: string;
+  }[];
 };
 
 export type AgencyListFilters = {

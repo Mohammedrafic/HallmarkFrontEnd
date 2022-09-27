@@ -9,10 +9,18 @@
 
     <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
       <ng-container *ngIf="isDekstop$ | async">
-        <app-organization-agency-selector></app-organization-agency-selector>
+        <app-organization-agency-selector [isDarkTheme]="isDarkTheme"></app-organization-agency-selector>
       </ng-container>
       <div class="devider" *ngIf="!(isMobile$ | async)"></div>
     </div>
+    <div class="bell-button left" style="cursor: pointer;" (click)="toggleChatDialog()">
+
+      <i-feather name="message-square"></i-feather>
+
+      <span class="bell-button__badge empty-chat" *ngIf="isUnreadMessages"></span>
+
+    </div>
+
     <div class="bell-button" style="cursor: pointer;" (click)="bellIconClicked()">
 
       <i-feather name="bell"></i-feather>
@@ -69,10 +77,14 @@
       </section>
       <section class="menu">
         <section class="sidebar-menu">
-          <ejs-treeview id="template" #treevalidate [fields]="sideBarMenuField" (nodeClicked)='nodeSelect($event)'
+          <ejs-treeview id="template" #treevalidate [fields]="sideBarMenuField" (nodeClicked)="nodeSelect($event)"
                         [fullRowSelect]="true" [loadOnDemand]="false" >
             <ng-template #nodeTemplate="" let-data="">
-              <section class="icon-container"
+              <section appAnalyticByClick
+                       [analyticData]="data.route"
+                       [analyticTargetType]="'menu'"
+                       [analyticEventValue]="data.title"
+                       class="icon-container"
                        (click)="onMenuItemClick(data)"
                        (mouseenter)="showContextMenu(data, $event)" >
                 <i-feather [name]="data.icon" class="icon"></i-feather>
@@ -82,10 +94,16 @@
             </ng-template>
           </ejs-treeview>
 
-          <ejs-contextmenu id='contextmenu' #contextmenu target='#template'
+          <ejs-contextmenu appAnalyticByClick
+                           [analyticEvent]="'select'"
+                           [analyticTargetType]="'menu'"
+                           id='contextmenu'
+                           #contextmenu
+                           target='#template'
                            (onClose)="onContextMenuClose()"
                            (beforeOpen)="onBeforeContextMenuOpen($event)"
-                           (select)="onSubMenuItemClick($event)"></ejs-contextmenu>
+                           (select)="onSubMenuItemClick($event)"
+          ></ejs-contextmenu>
         </section>
       </section>
     </section>
@@ -191,3 +209,5 @@
     </section>
   </div>
 </ejs-sidebar>
+
+<app-chat-container></app-chat-container>

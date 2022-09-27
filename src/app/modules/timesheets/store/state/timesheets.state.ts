@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap, throttleTime } from 'rxjs';
+import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -40,6 +40,7 @@ import {
   FilterColumns,
   TabCountConfig,
   Timesheet,
+  TimesheetDetailsAddDialogState,
   TimesheetDetailsModel,
   TimesheetInvoice,
   TimesheetRecordsDto,
@@ -149,11 +150,12 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static addDialogOpen(state: TimesheetsModel): { state: boolean, type: RecordFields, initDate: string } {
+  static addDialogOpen(state: TimesheetsModel): TimesheetDetailsAddDialogState {
     return {
       state: state.isAddDialogOpen.action,
       type: state.isAddDialogOpen.dialogType,
-      initDate: state.isAddDialogOpen.initTime,
+      startDate: state.isAddDialogOpen.startDate,
+      endDate: state.isAddDialogOpen.endDate,
     };
   }
 
@@ -338,12 +340,13 @@ export class TimesheetsState {
 
   @Action(Timesheets.ToggleTimesheetAddDialog)
   ToggleAddDialog({ patchState }: StateContext<TimesheetsModel>,
-    { action, type, dateTime }: { action: DialogAction, type: RecordFields, dateTime: string}): void {
+    { action, type, startDate, endDate }: Timesheets.ToggleTimesheetAddDialog): void {
     patchState({
       isAddDialogOpen: {
         action: action === DialogAction.Open,
         dialogType: type,
-        initTime: dateTime,
+        startDate: startDate,
+        endDate: endDate,
       },
     });
   }
@@ -422,12 +425,7 @@ export class TimesheetsState {
       organizationId: orgId,
       targetStatus: TimesheetTargetStatus.Submitted,
       reason: null,
-    })
-    .pipe(
-      catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
-      }),
-    );
+    });
   }
 
   @Action(TimesheetDetails.OrganizationApproveTimesheet)
@@ -659,7 +657,6 @@ export class TimesheetsState {
     .pipe(
       tap((organizations: DataSourceItem[]) => patchState({
         organizations,
-        selectedOrganizationId: organizations[0]?.id,
       })),
       catchError((err: HttpErrorResponse) => dispatch(
         new ShowToast(MessageTypes.Error, getAllErrors(err.error))

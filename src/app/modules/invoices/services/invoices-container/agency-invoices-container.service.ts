@@ -8,7 +8,7 @@ import { InvoicesContainerService } from './invoices-container.service';
 import { ManualInvoicesGridHelper } from '../../helpers';
 import { InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
-import { AgencyInvoicesGridTab, InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
+import { AgencyInvoicesGridTab, InvoiceState } from '../../enums';
 import { invoiceDetailsColumnDefs, invoiceInfoItems, invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
 import { AllInvoicesGridHelper } from '../../helpers/grid/all-invoices-grid.helper';
 import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-config.interface';
@@ -50,9 +50,9 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
     }
   }
 
-  public override getGridOptions(tabIndex: OrganizationInvoicesGridTab, orgId: number | null): GridOptions {
+  public override getGridOptions(tabIndex: AgencyInvoicesGridTab, orgId: number | null): GridOptions {
     switch (tabIndex) {
-      case 1:
+      case AgencyInvoicesGridTab.All:
         return AllInvoicesGridHelper.getGridOptions(true);
       default:
         return super.getGridOptions(tabIndex, orgId);

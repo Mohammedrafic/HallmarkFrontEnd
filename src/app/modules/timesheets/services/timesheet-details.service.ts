@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { distinctUntilChanged, filter, Observable, skip, switchMap, take, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, Observable, skip, switchMap, take, tap } from 'rxjs';
 
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -16,6 +16,8 @@ import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
 import { TimesheetStatisticsDetails } from '../interface';
 import { HourOccupationType } from '../enums';
 import { getEmptyHoursOccupationData } from '../helpers';
+import { HttpErrorResponse } from '@angular/common/http';
+import { getAllErrors } from '@shared/utils/error.utils';
 
 
 @Injectable()
@@ -68,7 +70,10 @@ export class TimesheetDetailsService {
             new ShowToast(MessageTypes.Success, successMessage),
             new Timesheets.GetAll(),
           ]);
-        })
+        }),
+        catchError((err: HttpErrorResponse) =>
+          this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        ),
       );
   }
 

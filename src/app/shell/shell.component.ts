@@ -5,7 +5,7 @@ import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-us
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, Select, Store } from '@ngxs/store';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import {
   ContextMenuComponent,
@@ -14,7 +14,7 @@ import {
   SidebarComponent,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { filter, map, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, distinctUntilChanged, debounceTime, map } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '../client/client.config';
@@ -29,6 +29,9 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 import { faBan, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { ToggleChatDialog, UnreadMessage } from '@core/actions';
+import { ofActionDispatched } from '@ngxs/store';
+
 import { AnalyticsMenuId } from '@shared/constants/menu-config';
 
 import { CurrentUserPermission } from '@shared/models/permission.model';
@@ -125,6 +128,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     [profileMenuItem.dark_theme]: "Dark",
     [profileMenuItem.manage_notifications]: "Manage Notifications"
   }
+  public isUnreadMessages = false;
+
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
   profileDatasource: MenuItemModel[] = [];
@@ -151,12 +156,16 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     private store: Store,
     private router: Router,
     private orderManagementService: OrderManagementService,
-    private orderManagementAgencyService: OrderManagementAgencyService
+    private orderManagementAgencyService: OrderManagementAgencyService,
+    private actions$: Actions,
   ) {
     router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((data: any) => {
       if (this.tree) {
         const menuItem = this.tree.getTreeData().find((el) => el['route'] === data['url']);
         if (menuItem) {
+          if (menuItem['id'] == AnalyticsMenuId) {
+            this.toggleClick();
+          }
           this.tree.selectedNodes = [menuItem['title'] as string];
         }
       }
@@ -207,7 +216,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
             ];
           }
         });
-        
+        this.watchForUnreadMessages();
   }
 
   ngOnDestroy(): void {
@@ -398,7 +407,11 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onContextMenuClose(): void {
-    this.contextmenu.items = [];
+    this.isTablet$.pipe(takeUntil(this.unsubscribe$)).subscribe((isTablet) => {
+      if (!isTablet) {
+        this.contextmenu.items = [];
+      }
+    })
   }
 
   logout(): void {
@@ -414,6 +427,11 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       url = 'https://lemon-sea-05b5a7c0f.1.azurestaticapps.net/';
     }
     window.open(url, '_blank');
+  }
+
+  toggleChatDialog(): void {
+    this.store.dispatch(new ToggleChatDialog());
+    this.isUnreadMessages = false;
   }
 
   private setSideBarForFirstLoad(route: string): void {
@@ -526,6 +544,20 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       if (x) {
         this.getAlertsForUser();
       }
+    });
+  }
+
+  private watchForUnreadMessages(): void {
+    this.actions$
+    .pipe(
+      ofActionDispatched(UnreadMessage),
+      filter(() => !this.store.snapshot().chat.chatOpen as boolean),
+      distinctUntilChanged(),
+      debounceTime(1500),
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((value) => {
+      this.isUnreadMessages = true;
     });
   }
 }

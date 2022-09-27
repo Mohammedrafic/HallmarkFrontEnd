@@ -18,6 +18,8 @@ import {
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
 import { FormControl } from '@angular/forms';
 import {
+  ADD_PAYMENT,
+  EDIT_PAYMENT,
   PAYMENT_MODE,
   PaymentDetailMode,
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/constant/payment.constant';
@@ -38,10 +40,12 @@ export class PaymentDialogComponent extends DestroyableDirective implements OnIn
   @Input() dialogEvent: Subject<boolean>;
   @Input() set onEdit(value: PaymentDetails | ElectronicPaymentDetails) {
     if (value) {
+      this.dialogTitle = EDIT_PAYMENT;
       this.editPaymentForm(value);
     }
   }
 
+  public dialogTitle: string = ADD_PAYMENT;
   public paymentModeControl = new FormControl();
   public paymentModeList = PAYMENT_MODE;
 
@@ -121,6 +125,7 @@ export class PaymentDialogComponent extends DestroyableDirective implements OnIn
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
+        this.dialogTitle = ADD_PAYMENT;
         this.paymentModeControl.enable();
         this.paymentModeControl.patchValue(PaymentDetailMode.Electronic);
         this.createComponent(PaymentDetailMode.Electronic);

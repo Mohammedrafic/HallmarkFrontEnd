@@ -1,6 +1,8 @@
 import { valuesOnly } from '@shared/utils/enum.utils';
 import { Country } from '@shared/enums/states';
 
+export const ADD_PAYMENT = 'Add Payment Details';
+export const EDIT_PAYMENT = 'Edit Payment Details';
 export const BANK_COUNTRY = 'bankCountry';
 export const FORMAT_INPUT = 'MM/dd/yyyy';
 export const PLACEHOLDER = 'MM/DD/YYYY';

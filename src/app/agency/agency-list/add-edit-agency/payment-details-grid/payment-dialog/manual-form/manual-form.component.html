@@ -33,20 +33,15 @@
             <input id="bankCity" class="e-input" type="text" appValidateWithMessage formControlName="bankCity" maxlength="20" />
           </div>
         </div>
-        <div class="dropdown-container">
+        <div class="input-container">
           <label for="bankZipCode">Zipcode</label>
-          <div class="input-group dropdown">
-            <div class="input-group">
-              <ejs-maskedtextbox
-                id="bankZipCode"
-                promptChar="_"
-                mask="{{zipCodeMask}}"
-                appValidateWithMessage
-                formControlName="bankZipCode"
-                class="e-input"
-                placeholder=" "
-              ></ejs-maskedtextbox>
-            </div>
+          <div class="input-group">
+            <input appValidateWithMessage
+                   id="bankZipCode"
+                   formControlName="bankZipCode"
+                   mask="{{zipCodeMask}}"
+                   class="e-input"
+                   type="text"/>
           </div>
         </div>
       </div>
@@ -64,8 +59,11 @@
             appValidateWithMessage
             placeholder="{{placeholderInput}}"
             formControlName="startDate"
+            [enableMask]="true"
+            [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
           >
           </ejs-datepicker>
+          <span class="error" *ngIf="!startDateControl?.untouched">{{ startDateControl?.errors | validationError }}</span>
         </div>
       </div>
     </div>

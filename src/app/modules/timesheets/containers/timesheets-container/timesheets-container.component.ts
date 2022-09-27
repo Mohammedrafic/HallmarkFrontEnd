@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, throttleTime } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, throttleTime, of } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction } from '@core/enums';
@@ -239,12 +239,20 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       )),
       takeUntil(this.componentDestroy()),
     ).subscribe(res => {
-      this.organizationControl.setValue(res[0].id, { emitEvent: false });
+      const orgId = this.getOrganizationIdFromState() || res[0].id;
+
+      this.store.dispatch(new Timesheets.SelectOrganization(orgId));
+      this.organizationControl.setValue(orgId, { emitEvent: false });
       this.store.dispatch([
-        new Timesheets.UpdateFiltersState({ organizationId: res[0].id }, this.activeTabIdx !== 0),
+        new Timesheets.UpdateFiltersState({ organizationId: orgId }, this.activeTabIdx !== 0),
         new Timesheets.GetFiltersDataSource()
       ]);
     });
+  }
+
+  private getOrganizationIdFromState(): number | null {
+    const id = (this.location.getState() as { organizationId?: number })?.organizationId;
+    return id ? +id : null;
   }
 
   private calcTabsBadgeAmount(): void {
@@ -281,14 +289,15 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private initOnRedirect(): void {
-    const state = this.location.getState() as { navigationId: number, timesheetId: number };
+    const { timesheetId, organizationId } = this.location.getState() as { navigationId: number, timesheetId: number, organizationId: number };
+    const organizationId$ = organizationId ? of(organizationId) : this.organizationId$;
 
-    if (state?.timesheetId) {
-      const subscription = this.organizationId$
+    if (timesheetId) {
+      const subscription = organizationId$
         .pipe(
-          filter((value) => !!value && !!state.timesheetId),
+          filter((value) => !!value && !!timesheetId),
           switchMap((value) => this.store.dispatch(new Timesheets.GetTimesheetDetails(
-            state.timesheetId, value, this.isAgency))),
+            timesheetId, value, this.isAgency))),
           tap(() => {
             this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Open, undefined));
             subscription.unsubscribe();

@@ -1,0 +1,30 @@
+@import 'colors';
+
+.contact-container {
+  padding: 15px 25px;
+  border-bottom: 1px solid $secondary-dark-blue-45;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.contact-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: $black;
+}
+
+.contact-unit {
+  font-size: 12px;
+  font-weight: 700;
+  color: $secondary-dark-blue-20;
+}
+
+.contact-avatar {
+  margin-right: 16px;
+}

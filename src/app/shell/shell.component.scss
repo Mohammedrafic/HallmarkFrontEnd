@@ -386,8 +386,11 @@
 .bell-button {
   display: inline-block;
   position: relative;
-  padding: 2px 5px;
-
+  padding: 10px 15px;
+  color: $secondary-dark-blue-15;
+  &.left {
+    margin-right: 40px;
+  }
   @media #{$max-mobile} {
     padding-right: 30px;
     }
@@ -395,25 +398,33 @@
 
 .bell-button:hover {
   background:$bell-button-hover-bg;
-  border-radius: 4px !important;
+  border-radius: 10px !important;
+  color: $primary-active-blue-10;
 }
 
 .bell-button:active {
   background:$bell-button-active-bg;
-  color:white;
-  border-radius: 4px !important;
+  color:$white;
+  border-radius: 10px !important;
 }
 
 .bell-button__badge {
-  background-color: #558eff;
+  border-color: $white;
+  border-style: solid;
+  background-color: $primary-btn-hover;
   border-radius: 50%;
-  color: white;
-  padding: 1px 5px;
-  font-size: 10px;
+  color: $secondary-dark-blue-15;
+  padding: 2px 6px;
+  font-size: 11px;
   position: absolute;
   top: 0;
-  right: 0;
+  right: 6px;
 
+  &.empty-chat {
+    height: 10px;
+    width: 3px;
+    // background-color: #E24D4D;
+  }
   @media #{$max-mobile} {
     right: 25px;
     }

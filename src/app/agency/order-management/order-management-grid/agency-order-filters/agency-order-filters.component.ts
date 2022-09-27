@@ -18,10 +18,10 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { CandidatesStatusText, OrderStatusText } from '@shared/enums/status';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
-import { ProjectSpecialData } from '@shared/models/project-special-data.model';
-import { ProjectsService } from '@shared/services/projects.service';
 import { placeholderDate } from '@shared/constants/placeholder-date';
 import { formatDate } from '@shared/constants/format-date';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { datepickerMask } from '@shared/constants/datepicker-mask';
 
 enum RLDLevel {
   Orginization,
@@ -33,6 +33,7 @@ enum RLDLevel {
   selector: 'app-agency-order-filters',
   templateUrl: './agency-order-filters.component.html',
   styleUrls: ['./agency-order-filters.component.scss'],
+  providers: [MaskedDateTimeService],
 })
 export class AgencyOrderFiltersComponent extends DestroyableDirective implements OnInit, AfterViewInit {
   @ViewChild('regionMultiselect') regionMultiselect: MultiSelectComponent;
@@ -49,13 +50,13 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   @Select(OrderManagementState.gridFilterRegions)
   gridFilterRegions$: Observable<OrganizationRegion[]>;
 
-  public projectSpecialData$: Observable<ProjectSpecialData>;
   public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
 
   public readonly formatDate = formatDate;
   public readonly placeholderDate = placeholderDate;
+  public readonly datepickerMask = datepickerMask;
 
   public optionFields = {
     text: 'name',
@@ -78,13 +79,12 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return this.form.get('departmentsIds') as AbstractControl;
   }
 
-  constructor(private store: Store, private actions$: Actions, private projectsService: ProjectsService) {
+  constructor(private store: Store, private actions$: Actions) {
     super();
   }
 
   ngOnInit(): void {
     this.onOrderFilteringOptionsChange();
-    this.getProjectSpecialData();
   }
 
   ngAfterViewInit(): void {
@@ -355,9 +355,5 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         valueId: 'id',
       },
     };
-  }
-
-  private getProjectSpecialData(): void {
-    this.projectSpecialData$ = this.projectsService.getProjectSpecialData();
   }
 }
