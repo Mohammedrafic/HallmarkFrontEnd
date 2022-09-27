@@ -109,13 +109,11 @@ export class ChatState {
         });
 
         chatClient.on('chatThreadCreated', () => {
-          dispatch(new Chat.GetUserThreads());
-          dispatch(new Chat.SortThreads());
+          dispatch(new Chat.GetUserThreads()) 
         });
 
         chatClient.on('participantsAdded', () => {
           dispatch(new Chat.GetUserThreads());
-          dispatch(new Chat.SortThreads());
         });
 
         chatClient.on('readReceiptReceived', (event: any) => {
