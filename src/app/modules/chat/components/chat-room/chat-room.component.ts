@@ -83,6 +83,7 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   }
 
   protected override async updateMessages(): Promise<void> {
+    
     const newMessages: ReceivedChatMessage[] = [];
     const iterableAsync = (this.chatThreadClient as ChatThreadClient).listMessages();
     
@@ -101,10 +102,9 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
     }
     this.typingEvent = null;
     this.messages = newMessages.map((item) => ({ ...item })).reverse();
-
     this.checkForReceipt();
     this.updateReadReceipts();
-    this.cd.markForCheck();
+    this.cd.detectChanges();
 
     if (this.chatArea) {
       this.scrollBottom();
@@ -124,14 +124,14 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   }
 
   private async sendMessage(): Promise<void> {
-    const message = this.textEditor.getHtml();
-
-    if (message && this.chatThreadClient) {
+    const textContent = this.textEditor.getText();
+    
+    if (!!textContent && this.chatThreadClient) {
       const meta = this.createMessageRequest();
   
       this.chatThreadClient.sendMessage(meta.req, meta.options);
       this.textEditor.value = '';
-    } else if (message) {
+    } else if (!!textContent) {
       this.createThreadAndSend();
     }
   }
@@ -167,11 +167,12 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
     });
   }
 
-  private setupChatClient(): void {
+  private setupChatClient(id?: string): void {
     const client = (this.store.snapshot().chat as ChatModel).chatClient as ChatClient;
     this.currentThread = (this.store.snapshot().chat as ChatModel).currentChatRoomData;
 
-    this.chatThreadClient = this.currentThread ? client.getChatThreadClient(this.currentThread?.threadId as string)
+    const threadId = id || this.currentThread?.threadId as string;
+    this.chatThreadClient = threadId ? client.getChatThreadClient(threadId)
     : null;
   }
 
@@ -192,10 +193,20 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
 
     this.store.dispatch(new Chat.CreateChatThread(userId))
     .pipe(
-      tap(() => { this.setupChatClient(); }),
+      tap(() => { this.setupChatClient((this.store.snapshot().chat as ChatModel).startThreadId); }),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
+      if (!this.currentThread) {
+        this.currentThread = {
+          userId: '',
+          threadId: (this.store.snapshot().chat as ChatModel).startThreadId,
+          displayName: '',
+          businessUnitName: '',
+          lasMessageOn: new Date(),
+        };
+        this.cd.markForCheck();
+      }
       const reqMeta = this.createMessageRequest();
       (this.chatThreadClient as ChatThreadClient).sendMessage(reqMeta.req, reqMeta.options);
       this.textEditor.value = '';
@@ -226,7 +237,7 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
     const lastMessage = messagesFrom[messagesFrom.length - 1];
     const receiptsId = await this.getReceiptIds(this.chatThreadClient as ChatThreadClient);
 
-    if (!receiptsId.includes(lastMessage.id)) {
+    if (lastMessage && !receiptsId.includes(lastMessage.id)) {
       this.sendReceipt(lastMessage.id);
     }
   }

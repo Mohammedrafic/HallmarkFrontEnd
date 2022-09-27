@@ -89,6 +89,7 @@ import {
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
   PermPlacementColumnsConfig,
+  permPlacementColumnsToExport,
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
@@ -580,6 +581,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
           : reOrdersColumnsToExport;
         break;
+      case OrganizationOrderManagementTabs.PermPlacement:
+        this.columnsToExport = hasSelectedItemChildren
+          ? [...permPlacementColumnsToExport, ...allOrdersChildColumnsToExport]
+          : permPlacementColumnsToExport;
     }
   }
 
@@ -1017,16 +1022,21 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private onOrganizationChangedHandler(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.getSettings();
-      if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
-        this.clearFilters();
-      }
-      if (!this.previousSelectedOrderId) {
-        this.pageSubject.next(1);
-      }
-      this.store.dispatch(new GetAllOrganizationSkills());
-    });
+    this.organizationId$
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((data) => !!data)
+      )
+      .subscribe(() => {
+        this.getSettings();
+        if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
+          this.clearFilters();
+        }
+        if (!this.previousSelectedOrderId) {
+          this.pageSubject.next(1);
+        }
+        this.store.dispatch(new GetAllOrganizationSkills());
+      });
   }
 
   private onOrdersDataLoadHandler(): void {
@@ -1515,6 +1525,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private getProjectSpecialData(): void {
     this.store.dispatch(new GetProjectSpecialData());
+    this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data) => {
+      const { poNumbers, projectNames, specialProjectCategories } = data;
+      this.filterColumns.projectTypeId.dataSource = specialProjectCategories;
+      this.filterColumns.projectNameId.dataSource = projectNames;
+      this.filterColumns.poNumberId.dataSource = poNumbers;
+    });
   }
 
   private setFullOrderIdData(): void {

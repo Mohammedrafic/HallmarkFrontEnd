@@ -147,7 +147,7 @@
     <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
   </section>
   <ng-container *ngIf="!readOnlyMode">
-    <div class="mobile-actions">
+    <div class="mobile-actions" [ngClass]="{'tab': isTab}">
       <button *ngIf="!readOnlyMode" ejs-button [isPrimary]="true" [disabled]="isLocked" class="apply-button"
         (click)="applyOrderApplicants()">
         Apply

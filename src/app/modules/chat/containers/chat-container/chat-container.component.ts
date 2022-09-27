@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChil
 
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, OpenEventArgs } from '@syncfusion/ej2-angular-popups';
-import { Observable, skip, takeUntil, debounceTime } from 'rxjs';
+import { Observable, skip, takeUntil, debounceTime, tap } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
@@ -82,7 +82,6 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
   }
 
   enterChatRoom(event: EnterChatEvent): void {
-    console.log(event)
     this.chatTitle.mainTitle = event.displayName;
     this.chatTitle.subTitle = event.businessUnitName;
     this.store.dispatch(new Chat.EnterChatRoom(event.id));
@@ -137,6 +136,7 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
   private watchForDialogView(): void {
     this.chatView$
     .pipe(
+      tap(() => { this.resetSearch(); }),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((currentView) => {
@@ -144,5 +144,9 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
       this.title = DialogTitles[this.currentChatState];
       this.cd.markForCheck();
     });
+  }
+
+  private resetSearch(): void {
+    this.searchForm.reset();
   }
 }

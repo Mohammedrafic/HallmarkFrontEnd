@@ -101,7 +101,6 @@ export class ClientManagementContentComponent
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetCurrentUserPermissions());
     this.subscribeOnPermissions();
     this.idFieldName = 'organizationId';
     this.filterColumns = {

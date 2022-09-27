@@ -40,64 +40,66 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="regionName" headerText="REGION" width=150>
+      <e-column field="regionName" headerText="REGION" width="150">
         <ng-template #template let-data>
           <span *ngIf="data.regionId">{{ data.regionName }}</span>
           <span *ngIf="!data.regionId">All</span>
         </ng-template>
       </e-column>
-      <e-column field="locationName" headerText="LOCATION" width=180>
+      <e-column field="locationName" headerText="LOCATION" width="180">
         <ng-template #template let-data>
           <span *ngIf="data.locationId">{{ data.locationName }}</span>
           <span *ngIf="!data.locationId">All</span>
         </ng-template>
       </e-column>
-      <e-column field="departmentName" headerText="DEPARTMENT" width=180>
+      <e-column field="departmentName" headerText="DEPARTMENT" width="180">
         <ng-template #template let-data>
           <span *ngIf="data.departmentId">{{ data.departmentName }}</span>
           <span *ngIf="!data.departmentId">All</span>
         </ng-template>
       </e-column>
-      <e-column field="skills" headerText="SKILL" width=170>
+      <e-column field="skills" headerText="SKILL" width="170">
         <ng-template #template let-data>
-          <span *ngFor="let skill of data.skills; let i = index">{{ skill.name }}
+          <span *ngFor="let skill of data.skills; let i = index"
+            >{{ skill.name }}
             <span *ngIf="i !== data.skills.length - 1">, </span>
           </span>
           <span *ngIf="data.skills.length === 0">All</span>
         </ng-template>
       </e-column>
-      <e-column field="orderTypes" headerText="ORDER TYPE" width=180>
+      <e-column field="orderTypes" headerText="ORDER TYPE" width="180">
         <ng-template #template let-data>
-          <span *ngFor="let orderTypeId of data.orderTypes; let i = index">{{ orderTypeId | orderTypeName }}
+          <span *ngFor="let orderTypeId of data.orderTypes; let i = index"
+            >{{ orderTypeId | orderTypeName }}
             <span *ngIf="i !== data.orderTypes.length - 1">, </span>
           </span>
           <span *ngIf="data.orderTypes.length === 0">All</span>
         </ng-template>
       </e-column>
-      <e-column field="billRateTitle" headerText="BILL RATE TITLE" width=180></e-column>
-      <e-column field="billRateCategory" headerText="BILL RATE CATEGORY" width=200>
+      <e-column field="billRateTitle" headerText="BILL RATE TITLE" width="180"></e-column>
+      <e-column field="billRateCategory" headerText="BILL RATE CATEGORY" width="200">
         <ng-template #template let-data>
           <span>{{ billRateCategory[data.billRateCategory] }}</span>
         </ng-template>
       </e-column>
-      <e-column field="billRateType" headerText="BILL RATE TYPE" width=200>
+      <e-column field="billRateType" headerText="BILL RATE TYPE" width="200">
         <ng-template #template let-data>
           <span>{{ billRateType[data.billType] }}</span>
         </ng-template>
       </e-column>
-      <e-column field="effectiveDate" headerText="EFFECTIVE DATE" width=180>
+      <e-column field="effectiveDate" headerText="EFFECTIVE DATE" width="180">
         <ng-template #template let-data>
           <span>{{ data.effectiveDate | date: formatDate }}</span>
         </ng-template>
       </e-column>
-      <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" width=250 textAlign="Right">
+      <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" width="250" textAlign="Right">
         <ng-template #template let-data>
           <span>{{ data.rateHour | rateHourPipe: data.billRateConfigId:data.billRateType:billRatesOptions }}</span>
         </ng-template>
       </e-column>
-      <e-column field="intervalMin" headerText="INTERVAL MIN" width=180 textAlign="Right"></e-column>
-      <e-column field="intervalMax" headerText="INTERVAL MAX" width=180 textAlign="Right"></e-column>
-      <e-column field="considerForWeeklyOT" headerText="CONSIDER FOR WEEKLY OT" width=230>
+      <e-column field="intervalMin" headerText="INTERVAL MIN" width="180" textAlign="Right"></e-column>
+      <e-column field="intervalMax" headerText="INTERVAL MAX" width="180" textAlign="Right"></e-column>
+      <e-column field="considerForWeeklyOT" headerText="CONSIDER FOR WEEKLY OT" width="230">
         <ng-template #template let-data>
           <div class="checkbox bootstrap" (click)="stopPropagation($event)">
             <ejs-checkbox
@@ -108,7 +110,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="considerForDailyOT" headerText="CONSIDER FOR DAILY OT" width=230>
+      <e-column field="considerForDailyOT" headerText="CONSIDER FOR DAILY OT" width="230">
         <ng-template #template let-data>
           <div class="checkbox bootstrap" (click)="stopPropagation($event)">
             <ejs-checkbox
@@ -119,7 +121,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="considerFor7thDayOT" headerText="CONSIDER FOR 7th DAY OT" width=230>
+      <e-column field="considerFor7thDayOT" headerText="CONSIDER FOR 7th DAY OT" width="230">
         <ng-template #template let-data>
           <div class="checkbox bootstrap" (click)="stopPropagation($event)">
             <ejs-checkbox
@@ -130,7 +132,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="regularLocal" headerText="REGULAR LOCAL" width=180>
+      <e-column field="regularLocal" headerText="REGULAR LOCAL" width="180">
         <ng-template #template let-data>
           <div class="checkbox bootstrap" (click)="stopPropagation($event)">
             <ejs-checkbox
@@ -141,7 +143,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="displayInTimesheet" headerText="DISPLAY IN TIMESHEET" width=200>
+      <e-column field="displayInTimesheet" headerText="DISPLAY IN TIMESHEET" width="200">
         <ng-template #template let-data>
           <div class="checkbox bootstrap" (click)="stopPropagation($event)">
             <ejs-checkbox
@@ -152,13 +154,14 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="displayInJob" headerText="DISPLAY IN JOB" width=200>
+      <e-column field="displayInJob" headerText="DISPLAY IN JOB" width="200">
         <ng-template #template let-data>
           <div class="checkbox bootstrap" (click)="stopPropagation($event)">
             <ejs-checkbox
               [checked]="data.displayInJob"
               [disabled]="isReadOnly"
-              (change)="displayInJobChange(data, $event)"></ejs-checkbox>
+              (change)="displayInJobChange(data, $event)"
+            ></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
@@ -208,7 +211,13 @@
     </ng-template>
   </ejs-grid>
 
-  <app-export-dialog *ngIf="isActive" [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+  <app-export-dialog
+    *ngIf="isActive"
+    [columns]="columnsToExport"
+    [fileName]="fileName"
+    (cancel)="closeExport()"
+    (export)="export($event)"
+  ></app-export-dialog>
 
   <app-side-dialog
     (formCancelClicked)="onFormCancelClick()"
@@ -217,11 +226,7 @@
     [width]="'436px'"
     *ngIf="isActive"
   >
-    <form
-      class="form-container bootstrap"
-      id="addEditRecordForm"
-      [formGroup]="billRatesFormGroup"
-    >
+    <form class="form-container bootstrap" id="addEditRecordForm" [formGroup]="billRatesFormGroup">
       <div class="group">
         <div class="input-container dropdown">
           <label for="region">Region <span class="required">*</span></label>
@@ -257,7 +262,8 @@
               [showSelectAll]="true"
               [allowFiltering]="false"
               [showDropDownIcon]="true"
-              formControlName="locationIds">
+              formControlName="locationIds"
+            >
             </ejs-multiselect>
           </div>
         </div>
@@ -278,7 +284,8 @@
               [showSelectAll]="true"
               [allowFiltering]="false"
               [showDropDownIcon]="true"
-              formControlName="departmentIds">
+              formControlName="departmentIds"
+            >
             </ejs-multiselect>
           </div>
         </div>
@@ -296,7 +303,8 @@
               [showSelectAll]="true"
               [allowFiltering]="false"
               [showDropDownIcon]="true"
-              formControlName="skillIds">
+              formControlName="skillIds"
+            >
             </ejs-multiselect>
           </div>
         </div>
@@ -311,7 +319,8 @@
               appValidateWithMessage
               [dataSource]="billRatesOptions$ | async"
               [fields]="billRateTitleFields"
-              formControlName="billRateTitleId">
+              formControlName="billRateTitleId"
+            >
             </ejs-dropdownlist>
           </div>
         </div>
@@ -329,7 +338,8 @@
               [showSelectAll]="true"
               [allowFiltering]="false"
               [showDropDownIcon]="true"
-              formControlName="orderTypeIds">
+              formControlName="orderTypeIds"
+            >
             </ejs-multiselect>
           </div>
         </div>
@@ -357,7 +367,8 @@
               appValidateWithMessage
               [dataSource]="billRateTypesOptions"
               [fields]="fields"
-              formControlName="billRatesType">
+              formControlName="billRatesType"
+            >
             </ejs-dropdownlist>
           </div>
         </div>
@@ -365,8 +376,12 @@
 
       <div class="group">
         <div class="input-container bootstrap">
-          <label *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier">Multiplier <span class="required">*</span></label>
-          <label *ngIf="selectedBillRateUnit === BillRateUnitList.Currency">Amount <span class="required">*</span></label>
+          <label *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier"
+            >Multiplier <span class="required">*</span></label
+          >
+          <label *ngIf="selectedBillRateUnit === BillRateUnitList.Currency"
+            >Amount <span class="required">*</span></label
+          >
           <label *ngIf="selectedBillRateUnit === BillRateUnitList.Hours">Hours <span class="required">*</span></label>
           <div class="input-group">
             <ejs-numerictextbox
@@ -377,22 +392,25 @@
               maxlength="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              decimals='0'
+              decimals="0"
               format="#"
               formControlName="billRateValueRateTimes"
             >
             </ejs-numerictextbox>
 
             <input
-              *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier || selectedBillRateUnit === BillRateUnitList.Currency"
+              *ngIf="
+                selectedBillRateUnit === BillRateUnitList.Multiplier ||
+                selectedBillRateUnit === BillRateUnitList.Currency
+              "
               class="e-input"
               type="text"
               formControlName="billRateValueRateTimes"
               appValidateWithMessage
               maxlength="11"
-              (keyup)="priceUtils.verifyDigitsAfterDot(billRatesFormGroup,'billRateValueRateTimes')"
+              (keyup)="priceUtils.verifyDigitsAfterDot(billRatesFormGroup, 'billRateValueRateTimes')"
               (keydown)="priceUtils.numbersOnly($event)"
-              (focus)="priceUtils.setPriceMask(billRatesFormGroup,'billRateValueRateTimes', $event)"
+              (focus)="priceUtils.setPriceMask(billRatesFormGroup, 'billRateValueRateTimes', $event)"
               (blur)="priceUtils.setTwoDecimals(billRatesFormGroup, 'billRateValueRateTimes', $event)"
             />
           </div>
@@ -427,7 +445,7 @@
               [maxlength]="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              decimals='0'
+              decimals="0"
               format="#"
               formControlName="intervalMin"
             >
@@ -446,7 +464,7 @@
               [maxlength]="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              decimals='0'
+              decimals="0"
               format="#"
               formControlName="intervalMax"
             >
@@ -488,11 +506,7 @@
 
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox
-              id="regularLocal"
-              label="Regular/Local"
-              formControlName="regularLocal"
-            ></ejs-checkbox>
+            <ejs-checkbox id="regularLocal" label="Regular/Local" formControlName="regularLocal"></ejs-checkbox>
           </div>
         </div>
 
@@ -508,11 +522,7 @@
 
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox
-              id="displayInJob"
-              label="Display in Job"
-              formControlName="displayInJob"
-            ></ejs-checkbox>
+            <ejs-checkbox id="displayInJob" label="Display in Job" formControlName="displayInJob"></ejs-checkbox>
           </div>
         </div>
       </div>
@@ -525,32 +535,37 @@
     (deleteFilter)="onFilterDelete($event)"
     (clearAllFiltersClicked)="onFilterClearAll()"
     (applyFilterClicked)="onFilterApply()"
-    (closeDialogClicked)="onFilterClose()">
+    (closeDialogClicked)="onFilterClose()"
+  >
     <form class="bootstrap" [formGroup]="billRateFilterFormGroup">
       <div class="filter-row">
         <div class="input-container">
           <label>Region</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox"
-                             formControlName="regionIds"
-                             placeholder="All"
-                             [fields]="fields"
-                             [allowFiltering]="true"
-                             [showDropDownIcon]="true"
-                             [dataSource]="filterColumns.regionIds.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="regionIds"
+              placeholder="All"
+              [fields]="fields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.regionIds.dataSource"
+            >
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container">
           <label>Location</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox"
-                             formControlName="locationIds"
-                             placeholder="All"
-                             [fields]="fields"
-                             [allowFiltering]="true"
-                             [showDropDownIcon]="true"
-                             [dataSource]="filterColumns.locationIds.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="locationIds"
+              placeholder="All"
+              [fields]="fields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.locationIds.dataSource"
+            >
             </ejs-multiselect>
           </div>
         </div>
@@ -559,26 +574,30 @@
         <div class="input-container">
           <label>Department</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox"
-                             formControlName="departmentIds"
-                             placeholder="All"
-                             [fields]="fields"
-                             [allowFiltering]="true"
-                             [showDropDownIcon]="true"
-                             [dataSource]="filterColumns.departmentIds.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="departmentIds"
+              placeholder="All"
+              [fields]="fields"
+              [allowFiltering]="true"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.departmentIds.dataSource"
+            >
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container">
           <label>Skill</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox"
-                             formControlName="skillIds"
-                             placeholder="All"
-                             [fields]="skillsFields"
-                             [allowFiltering]="false"
-                             [showDropDownIcon]="true"
-                             [dataSource]="filterColumns.skillIds.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="skillIds"
+              placeholder="All"
+              [fields]="skillsFields"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.skillIds.dataSource"
+            >
             </ejs-multiselect>
           </div>
         </div>
@@ -586,13 +605,15 @@
       <div class="input-container">
         <label>Order Type</label>
         <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="orderTypes"
-                           placeholder="All"
-                           [fields]="orderTypesFields"
-                           [allowFiltering]="false"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.orderTypes.dataSource">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="orderTypes"
+            placeholder="All"
+            [fields]="orderTypesFields"
+            [allowFiltering]="false"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.orderTypes.dataSource"
+          >
           </ejs-multiselect>
         </div>
       </div>
@@ -600,26 +621,30 @@
         <div class="input-container">
           <label>Bill Rate Category</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox"
-                             formControlName="billRateCategories"
-                             placeholder="All"
-                             [fields]="orderTypesFields"
-                             [allowFiltering]="false"
-                             [showDropDownIcon]="true"
-                             [dataSource]="filterColumns.billRateCategories.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="billRateCategories"
+              placeholder="All"
+              [fields]="orderTypesFields"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.billRateCategories.dataSource"
+            >
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container">
           <label>Bill Rate Type</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox"
-                             formControlName="billRateTypes"
-                             placeholder="All"
-                             [fields]="orderTypesFields"
-                             [allowFiltering]="false"
-                             [showDropDownIcon]="true"
-                             [dataSource]="filterColumns.billRateTypes.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="billRateTypes"
+              placeholder="All"
+              [fields]="orderTypesFields"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.billRateTypes.dataSource"
+            >
             </ejs-multiselect>
           </div>
         </div>
@@ -628,13 +653,15 @@
         <div class="input-container">
           <label>Bill Rate Title</label>
           <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox"
-                             formControlName="billRateConfigIds"
-                             placeholder="All"
-                             [fields]="billRateTitleFields"
-                             [allowFiltering]="false"
-                             [showDropDownIcon]="true"
-                             [dataSource]="filterColumns.billRateConfigIds.dataSource">
+            <ejs-multiselect
+              mode="CheckBox"
+              formControlName="billRateConfigIds"
+              placeholder="All"
+              [fields]="billRateTitleFields"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              [dataSource]="filterColumns.billRateConfigIds.dataSource"
+            >
             </ejs-multiselect>
           </div>
         </div>
@@ -664,7 +691,7 @@
               [maxlength]="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              decimals='0'
+              decimals="0"
               format="#"
               formControlName="intervalMin"
             >
@@ -680,7 +707,7 @@
               [maxlength]="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              decimals='0'
+              decimals="0"
               format="#"
               formControlName="intervalMax"
             >
@@ -691,58 +718,42 @@
       <div class="checkbox-container">
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox
-              label="Consider for Weekly OT"
-              formControlName="considerForWeeklyOt"
-            ></ejs-checkbox>
+            <ejs-checkbox label="Consider for Weekly OT" formControlName="considerForWeeklyOt"></ejs-checkbox>
           </div>
         </div>
 
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox
-              label="Consider for Daily OT"
-              formControlName="considerForDailyOt"
-            ></ejs-checkbox>
+            <ejs-checkbox label="Consider for Daily OT" formControlName="considerForDailyOt"></ejs-checkbox>
           </div>
         </div>
 
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox
-              label="Consider for 7th Day OT"
-              formControlName="considerFor7thDayOt"
-            ></ejs-checkbox>
+            <ejs-checkbox label="Consider for 7th Day OT" formControlName="considerFor7thDayOt"></ejs-checkbox>
           </div>
         </div>
 
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox
-              label="Regular/Local"
-              formControlName="regularLocal"
-            ></ejs-checkbox>
+            <ejs-checkbox label="Regular/Local" formControlName="regularLocal"></ejs-checkbox>
           </div>
         </div>
 
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox
-              label="Display in Timesheet"
-              formControlName="displayInTimesheet"
-            ></ejs-checkbox>
+            <ejs-checkbox label="Display in Timesheet" formControlName="displayInTimesheet"></ejs-checkbox>
           </div>
         </div>
 
         <div class="input-container">
           <div class="input-group">
-            <ejs-checkbox
-              label="Display in Job"
-              formControlName="displayInJob"
-            ></ejs-checkbox>
+            <ejs-checkbox label="Display in Job" formControlName="displayInJob"></ejs-checkbox>
           </div>
         </div>
       </div>
     </form>
   </app-filter-dialog>
+
+  <app-import-bill-rates [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-import-bill-rates>
 </section>

@@ -233,7 +233,7 @@
     <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
   </section>
   <ng-container *ngIf="!isCancelled && (showRejectButton || showWithdrawAction || showApplyAction || showAccepteAction)">
-    <div class="mobile-actions">
+    <div class="mobile-actions" [ngClass]="{'tab': isTab}">
       <button *ngIf="showRejectButton" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
       <button *ngIf="showWithdrawAction" ejs-button cssClass="e-outline" (click)="onWithdraw()">Withdraw</button>
       <button ejs-button [isPrimary]="true" *ngIf="showApplyAction" class="apply-button"

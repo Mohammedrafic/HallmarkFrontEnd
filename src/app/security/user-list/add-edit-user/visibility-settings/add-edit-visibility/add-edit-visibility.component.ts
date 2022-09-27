@@ -159,13 +159,8 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
   }
 
   private onOrganizationControlChanges(): void {
-    this.organisationsControl?.valueChanges
-      .pipe(
-        filter((value: number) => !!value),
-        delay(100),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((value: number) => {
+    this.organisationsControl?.valueChanges.pipe(delay(100), takeUntil(this.destroy$)).subscribe((value: number) => {
+      if (value || value === null) {
         this.regionMultiselect.refresh();
         const selectedOrganisation = this.organisations.find(
           (organisation: Organisation) => organisation.organizationId === value
@@ -192,8 +187,12 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
 
         this.regions = [...regionsList];
         this.setControlValue(this.regionsControl as FormControl, this.regions, this.editVisibility?.regionId);
-        this.form.markAsUntouched();
-      });
+      } else {
+        this.regionsControl?.setValue([]);
+        this.regions = [];
+      }
+      this.form.markAsUntouched();
+    });
   }
 
   private onRegionsControlChanges(): void {
@@ -210,6 +209,9 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
         });
         this.locations = [...locations];
         this.setControlValue(this.locationsControl as FormControl, this.locations, this.editVisibility?.locationId);
+      } else {
+        this.locationsControl?.setValue([]);
+        this.locations = [];
       }
       this.form.markAsUntouched();
     });
@@ -233,6 +235,9 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
           this.departments,
           this.editVisibility?.departmentId
         );
+      } else {
+        this.departmentsControl?.setValue([]);
+        this.departments = [];
       }
       this.form.markAsUntouched();
     });

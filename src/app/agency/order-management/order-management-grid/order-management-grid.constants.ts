@@ -51,7 +51,6 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Re-Order Date', column: 'ReOrderDate' },
   { text: 'Shift', column: 'Shift' },
-  { text: 'End Date', column: 'EndDate' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
   { text: 'Special Project Category', column: 'SpecialProjectCategory' },
@@ -111,6 +110,10 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
     visible: true,
   },
   {
+    fieldName: 'endDate',
+    visible: false,
+  },
+  {
     fieldName: 'shift',
     visible: true,
   },
@@ -151,6 +154,10 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
   },
   {
     fieldName: 'jobStartDate',
+    visible: true,
+  },
+  {
+    fieldName: 'endDate',
     visible: true,
   },
   {
@@ -197,6 +204,10 @@ export const PerDiemColumnsConfig = [
     visible: false,
   },
   {
+    fieldName: 'endDate',
+    visible: false,
+  },
+  {
     fieldName: 'reOrderId',
     visible: false,
   },
@@ -238,6 +249,10 @@ export const PermPlacementColumnsConfig = [
   {
     fieldName: 'jobStartDate',
     visible: true,
+  },
+  {
+    fieldName: 'endDate',
+    visible: false,
   },
   {
     fieldName: 'reOrderId',

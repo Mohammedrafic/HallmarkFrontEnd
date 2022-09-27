@@ -20,7 +20,7 @@ import {
   OrderManagementPage,
   SuggestedDetails,
 } from '@shared/models/order-management.model';
-import { CandidateCancellation } from "@shared/models/candidate-cancellation.model";
+import { CandidateCancellation } from '@shared/models/candidate-cancellation.model';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
@@ -31,6 +31,7 @@ import { HistoricalEvent } from '../models/historical-event.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { AgencyOrderManagementTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
+import { DateTimeHelper } from '@core/helpers';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -254,15 +255,16 @@ export class OrderManagementContentService {
       .append('departmentId', departmentId)
       .append('skillId', skillId);
 
-    return this.http.get<BillRate[]>('/api/BillRates/predefined/forOrder', { params })
-    .pipe(
-      map((items) => items.map((rate) => {
-        return ({
-          ...rate,
-          isPredefined: true,
+    return this.http.get<BillRate[]>('/api/BillRates/predefined/forOrder', { params }).pipe(
+      map((items) =>
+        items.map((rate) => {
+          return {
+            ...rate,
+            isPredefined: true,
+          };
         })
-      }))
-    )
+      )
+    );
   }
 
   /**
@@ -280,14 +282,19 @@ export class OrderManagementContentService {
    * @param documents array of attached documents
    * @return saved order
    */
-  public saveOrder(order: CreateOrderDto, documents: Blob[], comments: Comment[] | undefined, lastSelectedBusinessUnitId?: number): Observable<Order> {
-    let headers = {}
+  public saveOrder(
+    order: CreateOrderDto,
+    documents: Blob[],
+    comments: Comment[] | undefined,
+    lastSelectedBusinessUnitId?: number
+  ): Observable<Order> {
+    let headers = {};
 
     if (lastSelectedBusinessUnitId) {
       headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
     }
 
-    return this.http.post<Order>('/api/Orders', order, { headers }).pipe(
+    return this.http.post<Order>('/api/Orders', this.prepareOrderForSaving(order), { headers }).pipe(
       switchMap((createdOrder) => {
         const formData = new FormData();
         if (comments?.length) {
@@ -308,7 +315,7 @@ export class OrderManagementContentService {
    * @return edited order
    */
   public editOrder(order: EditOrderDto, documents: Blob[]): Observable<Order> {
-    return this.http.put<Order>('/api/Orders', order).pipe(
+    return this.http.put<Order>('/api/Orders', this.prepareOrderForSaving(order)).pipe(
       switchMap((editedOrder) => {
         const formData = new FormData();
         documents.forEach((document) => formData.append('documents', document));
@@ -420,12 +427,33 @@ export class OrderManagementContentService {
     return this.http.post<number>(`/api/Orders/${payload}/duplicate`, {});
   }
 
-  public getRegularLocalBillRate(orderType: OrderType, departmentId: number, skillId: number, lastSelectedBusinessUnitId?: number): Observable<BillRate[]> {
+  public getRegularLocalBillRate(
+    orderType: OrderType,
+    departmentId: number,
+    skillId: number,
+    lastSelectedBusinessUnitId?: number
+  ): Observable<BillRate[]> {
     let headers = {};
 
     if (lastSelectedBusinessUnitId) {
       headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
     }
-    return this.http.get<BillRate[]>('/api/billrates/regular/fororder', { headers, params: { orderType, departmentId, skillId } });
+    return this.http.get<BillRate[]>('/api/billrates/regular/fororder', {
+      headers,
+      params: { orderType, departmentId, skillId },
+    });
+  }
+
+  private prepareOrderForSaving(order: CreateOrderDto): Omit<CreateOrderDto, 'shiftStartTime' | 'shiftEndTime'> & {
+    shiftStartTime: Date | null;
+    shiftEndTime: Date | null;
+  } {
+    const { shiftStartTime, shiftEndTime } = order;
+
+    return {
+      ...order,
+      shiftStartTime: shiftStartTime ? new Date(DateTimeHelper.toUtcFormat(order.shiftStartTime)) : null,
+      shiftEndTime: shiftEndTime ? new Date(DateTimeHelper.toUtcFormat(order.shiftEndTime)) : null,
+    };
   }
 }

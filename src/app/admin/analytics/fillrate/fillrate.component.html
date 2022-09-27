@@ -1,62 +1,48 @@
-<Section>
-  <form class="bootstrap" [formGroup]="fillRateForm">
-    <div class="form-line">
-  
-      <!-- Organization -->
-
-      <div class="input-container bootstrap form-line-item-20">
+<section class="flex-column">
+  <section class="toolbar">
+    <section class="toolbar-buttons">
+      <button ejs-button
+              id="filterButton"
+              (click)="showFilters()"
+              cssClass="e-outline button-filter">
+        <div class="filter-button-content">
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
+    </section>
+  </section>
+</section>
+<section class="fill-rate-section">
+  <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName" [reportType]="reportType"></app-logi-report>
+  <router-outlet></router-outlet>
+</section>
+<app-filter-dialog [items]="filteredItems" (deleteFilter)="onFilterDelete($event)"
+                   (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+  <form [formGroup]="fillRateForm" class="filter-form-dialog form-container bootstrap">
+    <div class="form-elemet">
+      <div class="input-container bootstrap">
         <label>Organization Name<span class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox"
-                           formControlName="business"
+                           formControlName="businessIds"
                            placeholder="All"
                            [allowFiltering]="true"
                            [showDropDownIcon]="true"
                            appValidateWithMessage
                            [fields]="bussinesDataFields"
-                           [dataSource]="filterColumns.businessIds.dataSource" 
+                           [dataSource]="filterColumns.businessIds.dataSource"
                            [selectAllText]='allOption'
                            showSelectAll=true [value]="defaultOrganizations">
           </ejs-multiselect>
         </div>
       </div>
-
-      <!-- Start Date -->
-      <div class="input-container bootstrap form-line-item-20">
-        <label>Start Date<span class="required">*</span></label>
-        <div class="input-group datepicker">
-          <ejs-datepicker id="startDate"
-                          class="datepicker"
-                          format="MM/dd/yyyy"
-                          placeholder="MM/DD/YYYY"
-                          appValidateWithMessage
-                          formControlName="startDate">
-          </ejs-datepicker>
-        </div>
-      </div>
-
-      <!-- End Date -->
-      <div class="input-container bootstrap form-line-item-20">
-        <label>End Date<span class="required">*</span></label>
-        <div class="input-group datepicker">
-        <ejs-datepicker id="endDate"
-                        class="datepicker"
-                        format="MM/dd/yyyy"
-                        placeholder="MM/DD/YYYY"
-                        appValidateWithMessage
-                        formControlName="endDate"
-                        [min]="fillRateForm.controls['startDate'].value">
-        </ejs-datepicker>
-      </div>
-      </div>
-
     </div>
-    <div class="form-line">
-      <div class="input-container bootstrap form-line-item-20">
+    <div class="form-elemet">
+      <div class="input-container bootstrap">
         <label>Region<span class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox"
-                           formControlName="regionId"
+                           formControlName="regionIds"
                            appValidateWithMessage
                            placeholder="All"
                            [allowFiltering]="true"
@@ -66,14 +52,15 @@
                            [selectAllText]='allOption'
                            showSelectAll=true [value]="defaultRegions">
           </ejs-multiselect>
-         
         </div>
       </div>
-      <div class="input-container bootstrap form-line-item-20">
+    </div>
+    <div class="form-elemet">
+      <div class="input-container bootstrap">
         <label>Location<span class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox"
-                           formControlName="locationId"
+                           formControlName="locationIds"
                            appValidateWithMessage
                            placeholder="All"
                            [allowFiltering]="true"
@@ -85,11 +72,13 @@
           </ejs-multiselect>
         </div>
       </div>
-      <div class="input-container bootstrap form-line-item-20">
+    </div>
+    <div class="form-elemet">
+      <div class="input-container bootstrap">
         <label>Department<span class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-multiselect mode="CheckBox"
-                           formControlName="departmentId"
+                           formControlName="departmentIds"
                            appValidateWithMessage
                            placeholder="All"
                            [allowFiltering]="true"
@@ -100,17 +89,36 @@
                            showSelectAll=true [value]="defaultDepartments">
           </ejs-multiselect>
         </div>
-      </div>  
-      <div class="input-container form-line-item-20">
-        <button ejs-button type="submit"
-                [isPrimary]="true" (click)="SearchReport()">
-          Get Details
-        </button>
+      </div>
+    </div>
+    <div class="form-elemet">
+      <div class="group">
+        <div class="input-container calendar">
+          <label>Start Date<span class="required">*</span></label>
+          <div class="input-group datepicker">
+            <ejs-datepicker id="startDate"
+                            class="datepicker"
+                            format="MM/dd/yyyy"
+                            placeholder="MM/DD/YYYY"
+                            appValidateWithMessage
+                            formControlName="startDate">
+            </ejs-datepicker>
+          </div>
+        </div>
+        <div class="input-container calendar">
+          <label>End Date<span class="required">*</span></label>
+          <div class="input-group datepicker">
+            <ejs-datepicker id="endDate"
+                            class="datepicker"
+                            format="MM/dd/yyyy"
+                            placeholder="MM/DD/YYYY"
+                            appValidateWithMessage
+                            formControlName="endDate"
+                            [min]="fillRateForm.controls['startDate'].value">
+            </ejs-datepicker>
+          </div>
+        </div>
       </div>
     </div>
   </form>
-</Section>
-<section class="fill-rate-section">
-  <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName" [reportType]="reportType"></app-logi-report>
-  <router-outlet></router-outlet>
-</section>
+</app-filter-dialog>

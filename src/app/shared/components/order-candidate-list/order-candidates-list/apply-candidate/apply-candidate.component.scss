@@ -97,6 +97,10 @@
   display: none;
   border-top: 1px solid $secondary-dark-blue-45;
 
+  &.tab{
+    bottom: 0;
+  }
+
   button {
     width: 100%;
     margin: 0 !important;

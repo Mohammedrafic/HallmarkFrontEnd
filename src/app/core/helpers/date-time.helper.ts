@@ -17,8 +17,7 @@ export class DateTimeHelper {
   public static getFirstDayOfWeekUtc(date: string): Date {
     const start = new Date(date);
     const offset = new Date().getTimezoneOffset() * 60 * 1000;
-    const day = new Date(start.setUTCDate(start.getDate()))
-      .setUTCHours(0, 0, 0, 0) + offset;
+    const day = new Date(start.setUTCDate(start.getDate())).setUTCHours(0, 0, 0, 0) + offset;
 
     return new Date(day);
   }
@@ -34,18 +33,20 @@ export class DateTimeHelper {
   public static toUtcFormat(date: string | Date): string {
     if (typeof date === 'string') {
       const gmt = new Date(this.convertDateToUtc(date));
-      return new Date(Date.UTC(gmt.getFullYear(),
-      gmt.getMonth(), gmt.getDate(), gmt.getHours(), gmt.getMinutes())).toISOString();
+      return new Date(
+        Date.UTC(gmt.getFullYear(), gmt.getMonth(), gmt.getDate(), gmt.getHours(), gmt.getMinutes())
+      ).toISOString();
     }
 
-    return new Date(Date.UTC(date.getFullYear(),
-    date.getMonth(), date.getDate(), date.getHours(), date.getMinutes())).toISOString();
+    return new Date(
+      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes())
+    ).toISOString();
   }
 
   public static setInitHours(data: string): string {
     const date = new Date(this.convertDateToUtc(data));
     date.setHours(0, 0, 0);
-    
+
     return this.toUtcFormat(date);
   }
 

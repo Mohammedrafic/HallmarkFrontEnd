@@ -28,6 +28,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   public contactDetails: ContactDetails;
   public comments: Comment[] = [];
   public events$: Observable<OrderHistoricalEvent[]>;
+  public isJobDescriptionExpended = true;
 
   private unsubscribe$: Subject<void> = new Subject();
 

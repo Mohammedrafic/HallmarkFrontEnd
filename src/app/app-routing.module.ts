@@ -5,7 +5,6 @@ import { BrowserUtils } from '@azure/msal-browser';
 import { ClearCacheComponent } from '@shared/components/clear-cache/clear-cache.component';
 
 import { LoginGuard, UserGuard } from '@shared/guards';
-import { LoginFormComponent } from './b2c-auth/login-form/login-form.component';
 import { LoginPageComponent } from './b2c-auth/login-page/login-page.component';
 
 const routes: Routes = [
@@ -16,10 +15,6 @@ const routes: Routes = [
         path: 'login',
         component: LoginPageComponent,
         canActivate: [ LoginGuard ],
-      },
-      {
-        path: 'login-b2c',
-        component: LoginFormComponent
       },
       {
         path: 'util/clear-cache',
