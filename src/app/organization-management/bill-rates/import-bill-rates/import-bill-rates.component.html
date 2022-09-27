@@ -6,18 +6,17 @@
   (downloadTemplateEvent)="downloadTemplate()"
   (saveImportResult)="saveImportResult($event)"
   (uploadImportFile)="uploadImportFile($event)"
-  [title]="titleImport"
 >
   <app-import-grid
     successful
-    gridName="Departments"
+    gridName="Bill Rates"
     *ngIf="importResponse?.succesfullRecords?.length"
     [importedItems]="importResponse?.succesfullRecords || []"
     [columnDefs]="columnDefs"
   ></app-import-grid>
   <app-import-grid
     errors
-    gridName="Departments"
+    gridName="Bill Rates"
     *ngIf="importResponse?.errorRecords?.length"
     [importedItems]="importResponse?.errorRecords || []"
     [columnDefs]="columnDefs"

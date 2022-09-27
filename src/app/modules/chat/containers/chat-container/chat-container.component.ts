@@ -82,7 +82,6 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
   }
 
   enterChatRoom(event: EnterChatEvent): void {
-    console.log(event)
     this.chatTitle.mainTitle = event.displayName;
     this.chatTitle.subTitle = event.businessUnitName;
     this.store.dispatch(new Chat.EnterChatRoom(event.id));

@@ -124,14 +124,14 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   }
 
   private async sendMessage(): Promise<void> {
-    const message = this.textEditor.getHtml();
-
-    if (message && this.chatThreadClient) {
+    const textContent = this.textEditor.getText();
+    
+    if (!!textContent && this.chatThreadClient) {
       const meta = this.createMessageRequest();
   
       this.chatThreadClient.sendMessage(meta.req, meta.options);
       this.textEditor.value = '';
-    } else if (message) {
+    } else if (!!textContent) {
       this.createThreadAndSend();
     }
   }

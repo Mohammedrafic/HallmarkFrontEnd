@@ -3,11 +3,10 @@ import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../store/
 import { Select, Store } from '@ngxs/store';
 import { UserState } from '../../store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { debounceTime, distinctUntilChanged, filter, Observable, takeUntil } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SearchComponent } from '@shared/components/search/search.component';
 import { map } from 'rxjs/operators';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { Subject } from 'rxjs';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { SecurityState } from '../../security/store/security.state';
 import { RoleTreeField } from '../../security/roles-and-permissions/role-form/role-form.component';
@@ -41,6 +40,7 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
     [BillRateNavigationTabs.ExternalBillRateTypeMapping, new Subject<ExportedFileType>()],
   ]);
   public isReadOnly = false; // TODO: temporary solution, until specific service provided
+  public importDialogEvent: Subject<boolean> = new Subject<boolean>();
 
   addBillRateBtnText: string = 'Add Record';
   selectedTab: BillRateNavigationTabs = BillRateNavigationTabs.BillRateSetup;
@@ -121,6 +121,10 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
 
   public addBillRateSetupRecord(): void {
     this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  public onImportDataClick(): void {
+    this.importDialogEvent.next(true);
   }
 
   private handlePagePermission(): void {

@@ -413,6 +413,12 @@ body {
       }
     }
   }
+
+  .e-close li.e-list-item.e-level-2 {
+    @media #{$max-tablet} {
+      display: none;
+    }
+  }
 }
 
 hr {

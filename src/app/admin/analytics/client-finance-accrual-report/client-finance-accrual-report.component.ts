@@ -91,11 +91,13 @@ export class ClientFinanceAccrualReportComponent implements OnInit {
   }
 
   ngOnInit(): void {
+     let startDate = new Date(Date.now());
+     startDate.setDate(startDate.getDate() -90);
     this.accrualReportForm = this.formBuilder.group(
       {
         business: new FormControl(null,[Validators.required]),
-        startDate:new FormControl(null,[Validators.required]),
-        endDate: new FormControl(null,[Validators.required]),
+        startDate:new FormControl(startDate,[Validators.required]),
+        endDate: new FormControl(new Date(Date.now()),[Validators.required]),
         regionId: new FormControl(null,[Validators.required]),
         locationId: new FormControl(null,[Validators.required]),
         departmentId: new FormControl(null,[Validators.required])

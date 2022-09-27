@@ -403,7 +403,11 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onContextMenuClose(): void {
-    this.contextmenu.items = [];
+    this.isTablet$.pipe(takeUntil(this.unsubscribe$)).subscribe((isTablet) => {
+      if (!isTablet) {
+        this.contextmenu.items = [];
+      }
+    })
   }
 
   logout(): void {
