@@ -33,7 +33,7 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
-  { text: 'Agency', column: 'Agency' },
+  { text: 'Candidate Agency', column: 'CandidateAgency' },
 ];
 
 export const perDiemColumnsToExport: ExportColumn[] = [
@@ -52,7 +52,7 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
-  { text: 'Agency', column: 'Agency' },
+  { text: 'Candidate Agency', column: 'CandidateAgency' },
 ];
 
 export const reOrdersColumnsToExport: ExportColumn[] = [
@@ -67,7 +67,7 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Re-Order Date', column: 'ReOrderDate' },
   { text: 'Shift', column: 'Shift' },
-  { text: 'Agency', column: 'Agency' },
+  { text: 'Candidate Agency', column: 'CandidateAgency' },
   { text: 'End Date', column: 'EndDate' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
@@ -108,6 +108,28 @@ export const perDiemChildColumnsToExport: ExportColumn[] = [
   { text: 'Re-Order Shift Start Time', column: 'ReOrders.ShiftStartTime' },
   { text: 'Re-Order Shift End Time', column: 'ReOrders.ShiftEndTime' },
   { text: 'Candidates', column: 'ReOrders.Candidates' },
+];
+
+export const permPlacementColumnsToExport: ExportColumn[] = [
+  { text: 'Order ID', column: 'OrderId' },
+  { text: 'Status', column: 'Status' },
+  { text: 'Job Title', column: 'JobTitle' },
+  { text: 'Skill', column: 'Skill' },
+  { text: '# of Positions', column: 'NumberOfPositions' },
+  { text: 'Location', column: 'Location' },
+  { text: 'Department', column: 'Department' },
+  { text: 'Candidates', column: 'CandidatesCount' },
+  { text: 'Start Date', column: 'JobStartDate' },
+  { text: 'Creation Date', column: 'CreationDate' },
+  { text: 'Distributed On', column: 'DistributedOn' },
+  { text: 'Distributed To', column: 'DistributedTo' },
+  { text: 'Special Project Category', column: 'SpecialProjectCategory' },
+  { text: 'Special Project Name', column: 'SpecialProjectName' },
+  { text: 'PO #', column: 'PONumber' },
+  { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Candidate Agency', column: 'CandidateAgency' },
+  { text: 'Annual Salary From', column: 'AnnualSalaryFrom'},
+  { text: 'Annual Salary To', column: 'AnnualSalaryTo'},
 ];
 
 export const ReOrdersColumnsConfig = [
