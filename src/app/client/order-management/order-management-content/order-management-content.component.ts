@@ -1022,16 +1022,21 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private onOrganizationChangedHandler(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.getSettings();
-      if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
-        this.clearFilters();
-      }
-      if (!this.previousSelectedOrderId) {
-        this.pageSubject.next(1);
-      }
-      this.store.dispatch(new GetAllOrganizationSkills());
-    });
+    this.organizationId$
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((data) => !!data)
+      )
+      .subscribe(() => {
+        this.getSettings();
+        if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
+          this.clearFilters();
+        }
+        if (!this.previousSelectedOrderId) {
+          this.pageSubject.next(1);
+        }
+        this.store.dispatch(new GetAllOrganizationSkills());
+      });
   }
 
   private onOrdersDataLoadHandler(): void {
