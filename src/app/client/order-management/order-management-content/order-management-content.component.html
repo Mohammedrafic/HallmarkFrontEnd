@@ -304,14 +304,14 @@
           <span>{{ data.annualSalaryRangeTo | currency: 'USD':'symbol':'1.0-2' }}</span>
         </ng-template>
       </e-column>
-      <e-column field="creationDate" headerText="Creation Date" width="150">
-        <ng-template #template let-data>
-          <span>{{ data.creationDate | date: formatDate }}</span>
-        </ng-template>
-      </e-column>
       <e-column field="endDate" headerText="End Date" width="150">
         <ng-template #template let-data>
           <span>{{ data.endDate | date: formatDate }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="creationDate" headerText="Creation Date" width="150">
+        <ng-template #template let-data>
+          <span>{{ data.creationDate | date: formatDate }}</span>
         </ng-template>
       </e-column>
     </e-columns>
@@ -557,40 +557,46 @@
     <div class="bootstrap">
       <div class="input-container">
         <label>Special Project Category</label>
-        <div class="input-group dropdown">
-          <ejs-dropdownlist
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            placeholder="All"
             formControlName="projectTypeId"
-            appValidateWithMessage
-            [dataSource]="(projectSpecialData$ | async)?.specialProjectCategories"
+            [dataSource]="filterColumns.projectTypeId.dataSource"
             [fields]="specialProjectCategoriesFields"
+            [showDropDownIcon]="true"
           >
-          </ejs-dropdownlist>
+          </ejs-multiselect>
         </div>
       </div>
     </div>
     <div class="row bootstrap">
       <div class="input-container">
         <label>Project Name</label>
-        <div class="input-group dropdown">
-          <ejs-dropdownlist
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            placeholder="All"
             formControlName="projectNameId"
-            appValidateWithMessage
-            [dataSource]="(projectSpecialData$ | async)?.projectNames"
+            [dataSource]="filterColumns.projectNameId.dataSource"
             [fields]="projectNameFields"
+            [showDropDownIcon]="true"
           >
-          </ejs-dropdownlist>
+          </ejs-multiselect>
         </div>
       </div>
       <div class="input-container">
         <label>PO #</label>
-        <div class="input-group dropdown">
-          <ejs-dropdownlist
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            placeholder="All"
             formControlName="poNumberId"
-            appValidateWithMessage
-            [dataSource]="(projectSpecialData$ | async)?.poNumbers"
+            [dataSource]="filterColumns.poNumberId.dataSource"
             [fields]="poNumberFields"
+            [showDropDownIcon]="true"
           >
-          </ejs-dropdownlist>
+          </ejs-multiselect>
         </div>
       </div>
     </div>
@@ -706,7 +712,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="filter-row bootstrap">
       <div class="input-container calendar">
         <label>Creation Date From</label>
         <div class="input-group datepicker">
@@ -734,7 +740,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="filter-row bootstrap">
       <div class="input-container calendar">
         <label>Distributed On From</label>
         <div class="input-group datepicker">

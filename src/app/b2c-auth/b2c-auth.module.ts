@@ -8,10 +8,9 @@ import { CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 
 import { LoginPageComponent } from './login-page/login-page.component';
 import { SharedModule } from '@shared/shared.module';
-import { LoginFormComponent } from './login-form/login-form.component';
 
 @NgModule({
-  declarations: [LoginPageComponent, LoginFormComponent],
+  declarations: [LoginPageComponent],
   imports: [CommonModule, SharedModule,  DropDownListModule, ReactiveFormsModule, CheckBoxModule, MsalModule],
 })
 export class B2cModule {}

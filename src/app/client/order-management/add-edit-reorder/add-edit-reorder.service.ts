@@ -13,6 +13,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 import { Comment } from '@shared/models/comment.model';
+import { DateTimeHelper } from '@core/helpers';
 
 @Injectable({
   providedIn: 'root',
@@ -60,28 +61,33 @@ export class AddEditReorderService {
     }
   }
 
-  public saveReorder({ reOrderId, reOrderFromId, agencyIds, reorder }: ReorderRequestModel, comments: Comment[]): Observable<any> {
+  public saveReorder(
+    { reOrderId, reOrderFromId, agencyIds, reorder }: ReorderRequestModel,
+    comments: Comment[]
+  ): Observable<any> {
     const prepareFields = {
       reOrderId,
       reOrderFromId,
       agencyIds,
       candidateProfileIds: reorder.candidates,
       reorderDate: reorder.reorderDate,
-      shiftEndTime: setTimeToDate(getTimeFromDate(reorder.shiftEndTime)),
-      shiftStartTime: setTimeToDate(getTimeFromDate(reorder.shiftStartTime)),
+      shiftEndTime: DateTimeHelper.toUtcFormat(setTimeToDate(getTimeFromDate(reorder.shiftEndTime))!),
+      shiftStartTime: DateTimeHelper.toUtcFormat(setTimeToDate(getTimeFromDate(reorder.shiftStartTime))!),
       billRate: reorder.billRate,
       openPositions: reorder.openPosition,
     };
-    return this.http.put<any>('/api/reorders', prepareFields).pipe(tap((reOrder: any) => {
-      if (!prepareFields.reOrderId && comments?.length) {
-        comments.forEach((comment: Comment) => {
-          comment.commentContainerId = reOrder.commentContainerId as number;
-        });
-        this.http.post('/api/Comments', { comments }).subscribe();
+    return this.http.put<any>('/api/reorders', prepareFields).pipe(
+      tap((reOrder: any) => {
+        if (!prepareFields.reOrderId && comments?.length) {
+          comments.forEach((comment: Comment) => {
+            comment.commentContainerId = reOrder.commentContainerId as number;
+          });
+          this.http.post('/api/Comments', { comments }).subscribe();
+          return reOrder;
+        }
         return reOrder;
-      }
-      return reOrder;
-    }));
+      })
+    );
   }
 
   public getBillRate(departmentId: number, skillId: number): Observable<number> {

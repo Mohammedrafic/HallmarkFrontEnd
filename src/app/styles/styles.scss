@@ -421,6 +421,14 @@ body {
   }
 }
 
+body.light .header-item .e-menu-item.e-selected {
+  @media #{$max-mobile} {
+    border-radius: 0px !important;
+    background-color: transparent !important;
+    color: inherit !important;
+  }
+}
+
 hr {
   background-color: $secondary-dark-blue-45;
   height: 1px;

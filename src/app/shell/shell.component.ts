@@ -162,6 +162,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       if (this.tree) {
         const menuItem = this.tree.getTreeData().find((el) => el['route'] === data['url']);
         if (menuItem) {
+          if (menuItem['id'] == AnalyticsMenuId) {
+            this.toggleClick();
+          }
           this.tree.selectedNodes = [menuItem['title'] as string];
         }
       }
