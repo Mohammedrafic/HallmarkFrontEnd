@@ -1520,6 +1520,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private getProjectSpecialData(): void {
     this.store.dispatch(new GetProjectSpecialData());
+    this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data) => {
+      const { poNumbers, projectNames, specialProjectCategories } = data;
+      this.filterColumns.projectTypeId.dataSource = specialProjectCategories;
+      this.filterColumns.projectNameId.dataSource = projectNames;
+      this.filterColumns.poNumberId.dataSource = poNumbers;
+    });
   }
 
   private setFullOrderIdData(): void {
