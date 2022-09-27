@@ -12,8 +12,9 @@
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
     </button>
+    <!-- TODO (activeTab !== OrganizationOrderManagementTabs.Incomplete) - temporary solution for hiding button without functionality -->
     <button
-      *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates"
+      *ngIf="(activeTab !== OrganizationOrderManagementTabs.OrderTemplates) && (activeTab !== OrganizationOrderManagementTabs.Incomplete)"
       ejs-dropdownbutton
       appHideBeforeSyncfusionLoad
       [items]="exportOptions"
