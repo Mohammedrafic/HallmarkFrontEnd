@@ -225,7 +225,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public selectionOptions: SelectionSettingsModel = {
     type: 'Single',
     mode: 'Row',
-    checkboxMode: 'ResetOnRowClick',
+    checkboxMode: 'Default',
     persistSelection: true,
   };
   public OrderFilterFormGroup: FormGroup;
