@@ -84,6 +84,7 @@ import { ORDER_JOB_DISTRIBUTION_LIST } from '@shared/constants/order-job-distrib
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 import { DurationService } from '@shared/services/duration.service';
 import { UserState } from 'src/app/store/user.state';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-order-details-form',
@@ -941,7 +942,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
     this.orderTypeChanged.emit(order.orderType);
 
-    const hourlyRate = this.isPermPlacementOrder ? null : order.hourlyRate ? parseFloat(order.hourlyRate.toString()).toFixed(2) : '0.00';
+    const hourlyRate = this.isPermPlacementOrder
+      ? null
+      : order.hourlyRate
+      ? parseFloat(order.hourlyRate.toString()).toFixed(2)
+      : '0.00';
     const joiningBonus = order.joiningBonus ? parseFloat(order.joiningBonus.toString()).toFixed(2) : '';
     const compBonus = order.compBonus ? parseFloat(order.compBonus.toString()).toFixed(2) : '';
 
@@ -965,8 +970,12 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.controls['joiningBonus'].patchValue(joiningBonus);
     this.generalInformationForm.controls['compBonus'].patchValue(compBonus);
     this.generalInformationForm.controls['duration'].patchValue(order.duration);
-    this.generalInformationForm.controls['shiftStartTime'].patchValue(order.shiftStartTime);
-    this.generalInformationForm.controls['shiftEndTime'].patchValue(order.shiftEndTime);
+    this.generalInformationForm.controls['shiftStartTime'].patchValue(
+      DateTimeHelper.convertDateToUtc(order.shiftStartTime.toString())
+    );
+    this.generalInformationForm.controls['shiftEndTime'].patchValue(
+      DateTimeHelper.convertDateToUtc(order.shiftEndTime.toString())
+    );
 
     this.populatePermPlacementControls(order);
 

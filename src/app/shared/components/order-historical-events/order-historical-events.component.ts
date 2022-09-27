@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { OrderHistoricalEvent } from '@shared/models';
+import { BusinessUnitModel, businessUnitValues } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-order-historical-events',
@@ -8,4 +9,6 @@ import { OrderHistoricalEvent } from '@shared/models';
 })
 export class OrderHistoricalEventsComponent {
   @Input() public events: OrderHistoricalEvent[] | null;
+
+  public readonly businessUnitValues: BusinessUnitModel = businessUnitValues;
 }
