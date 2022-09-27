@@ -15,4 +15,5 @@ export const DefaultChatState: ChatModel = {
   chatClient: null,
   typingIndicator: null,
   userIdToStart: null,
+  startThreadId: '',
 }

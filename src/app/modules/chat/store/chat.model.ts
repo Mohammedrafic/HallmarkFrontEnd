@@ -17,4 +17,5 @@ export interface ChatModel {
   chatClient: ChatClient | null;
   typingIndicator: TypingIndicatorReceivedEvent | null;
   userIdToStart: string | null;
+  startThreadId: string;
 }

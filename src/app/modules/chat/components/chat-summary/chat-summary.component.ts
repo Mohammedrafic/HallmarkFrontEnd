@@ -59,15 +59,17 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
       }
     }
 
-    this.lastMessage = messages[0];
-    this.thread.lastMessage = messages[0];
-    const html = Parser.parseFromString(
-      this.sanitizer.sanitize(SecurityContext.HTML, this.lastMessage.message) as string,
-      'text/html',
-    ).body;
-
-    this.lastMessage.message = html.textContent as string;
-    this.updateReadReceipts();
+    if (messages.length) {
+      this.lastMessage = messages[0];
+      this.thread.lastMessage = messages[0];
+      const html = Parser.parseFromString(
+        this.sanitizer.sanitize(SecurityContext.HTML, this.lastMessage?.message) as string,
+        'text/html',
+      ).body;
+  
+      this.lastMessage.message = html.textContent as string;
+      this.updateReadReceipts();
+    }
   }
 
   protected override async updateReadReceipts(): Promise<void> {

@@ -165,7 +165,12 @@ export class ChatState {
 
     return this.apiService.createThread(userId)
     .pipe(
-      tap((response) => { threadId = response }),
+      tap((response) => {
+        threadId = response;
+        patchState({
+          startThreadId: response,
+        });
+      }),
       switchMap(() => dispatch(new Chat.GetUserThreads())),
       tap(() => {
         const threads = getState().activeThreads;
