@@ -89,6 +89,7 @@ import {
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
   PermPlacementColumnsConfig,
+  permPlacementColumnsToExport,
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
@@ -580,6 +581,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
           : reOrdersColumnsToExport;
         break;
+      case OrganizationOrderManagementTabs.PermPlacement:
+        this.columnsToExport = hasSelectedItemChildren
+          ? [...permPlacementColumnsToExport, ...allOrdersChildColumnsToExport]
+          : permPlacementColumnsToExport;
     }
   }
 
