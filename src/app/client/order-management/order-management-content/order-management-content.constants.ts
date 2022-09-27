@@ -25,6 +25,7 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Candidates', column: 'CandidatesCount' },
   { text: 'Start Date', column: 'JobStartDate' },
+  { text: 'Agency', column: 'Agency' },
   { text: 'End Date', column: 'EndDate' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
@@ -45,6 +46,7 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Department', column: 'Department' },
   { text: 'Candidates', column: 'Candidates' },
   { text: '# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days' },
+  { text: 'Agency', column: 'Agency' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
   { text: 'Distributed To', column: 'DistributedTo' },
@@ -67,8 +69,7 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Re-Order Date', column: 'ReOrderDate' },
   { text: 'Shift', column: 'Shift' },
-  { text: 'Candidate Agency', column: 'CandidateAgency' },
-  { text: 'End Date', column: 'EndDate' },
+  { text: 'Agency', column: 'Agency' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
   { text: 'Distributed To', column: 'DistributedTo' },
@@ -76,6 +77,7 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Candidate Agency', column: 'CandidateAgency' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [
@@ -127,6 +129,7 @@ export const permPlacementColumnsToExport: ExportColumn[] = [
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
   { text: 'Offered Date', column: 'OfferedDate' },
+  { text: 'Agency', column: 'Agency' },
   { text: 'Candidate Agency', column: 'CandidateAgency' },
   { text: 'Annual Salary From', column: 'AnnualSalaryFrom'},
   { text: 'Annual Salary To', column: 'AnnualSalaryTo'},
