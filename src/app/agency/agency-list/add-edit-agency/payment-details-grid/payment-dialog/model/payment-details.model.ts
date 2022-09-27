@@ -5,6 +5,8 @@ export interface PaymentDetailsInterface {
   paymentDetailsForm: FormGroup;
   formValue: PaymentDetails | ElectronicPaymentDetails;
   saveEvent: Subject<number>;
+  paymentsList: PaymentDetails[] | ElectronicPaymentDetails[];
+  mode: number;
 
   createPaymentDetailsForm(): void;
 }

@@ -14,6 +14,7 @@ import {
   PLACEHOLDER,
   ZIP_CODE_MASK,
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/constant/payment.constant';
+import { startDateDuplicationValidator } from '@shared/validators/start-date-duplication.validator';
 
 @Component({
   selector: 'app-manual-form',
@@ -24,15 +25,17 @@ import {
 export class ManualFormComponent extends DestroyableDirective implements PaymentDetailsInterface, OnInit {
   @Input() public saveEvent: Subject<number> = new Subject<number>();
   @Input() public formValue: PaymentDetails | ElectronicPaymentDetails;
-
-  get startDateControl(): AbstractControl | null {
-    return this.paymentDetailsForm.get('startDate');
-  }
+  @Input() public paymentsList: PaymentDetails[] | ElectronicPaymentDetails[];
+  @Input() public mode: number;
 
   public paymentDetailsForm: FormGroup;
   public readonly formatInput = FORMAT_INPUT;
   public readonly placeholderInput = PLACEHOLDER;
   public readonly zipCodeMask = ZIP_CODE_MASK;
+
+  get startDateControl(): AbstractControl | null {
+    return this.paymentDetailsForm?.get('startDate');
+  }
 
   constructor(private formBuilder: FormBuilder, private changeDetectorRef: ChangeDetectorRef, private store: Store) {
     super();
@@ -45,14 +48,19 @@ export class ManualFormComponent extends DestroyableDirective implements Payment
   }
 
   public createPaymentDetailsForm(): void {
-    this.paymentDetailsForm = this.formBuilder.group({
-      mode: [''],
-      payee: ['', [Validators.required, Validators.maxLength(50)]],
-      bankAddress1: ['', [Validators.maxLength(500), Validators.required]],
-      bankCity: ['', [Validators.maxLength(20)]],
-      bankZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
-      startDate: ['', [Validators.required]],
-    });
+    this.paymentDetailsForm = this.formBuilder.group(
+      {
+        mode: [''],
+        payee: ['', [Validators.required, Validators.maxLength(50)]],
+        bankAddress1: ['', [Validators.maxLength(500), Validators.required]],
+        bankCity: ['', [Validators.maxLength(20)]],
+        bankZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
+        startDate: ['', [Validators.required]],
+      },
+      {
+        validators: startDateDuplicationValidator('startDate', this.paymentsList, this.formValue?.startDate, this.mode),
+      }
+    );
   }
 
   private subscribeOnSaveEvent(): void {

@@ -444,11 +444,16 @@ export class OrderManagementContentService {
     });
   }
 
-  private prepareOrderForSaving(order: CreateOrderDto): CreateOrderDto {
+  private prepareOrderForSaving(order: CreateOrderDto): Omit<CreateOrderDto, 'shiftStartTime' | 'shiftEndTime'> & {
+    shiftStartTime: Date | null;
+    shiftEndTime: Date | null;
+  } {
+    const { shiftStartTime, shiftEndTime } = order;
+
     return {
       ...order,
-      shiftStartTime: new Date(DateTimeHelper.toUtcFormat(order.shiftStartTime)),
-      shiftEndTime: new Date(DateTimeHelper.toUtcFormat(order.shiftEndTime)),
+      shiftStartTime: shiftStartTime ? new Date(DateTimeHelper.toUtcFormat(order.shiftStartTime)) : null,
+      shiftEndTime: shiftEndTime ? new Date(DateTimeHelper.toUtcFormat(order.shiftEndTime)) : null,
     };
   }
 }

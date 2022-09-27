@@ -112,13 +112,6 @@ export class PaymentDetailsGridComponent
         takeWhile(() => this.isAlive)
       )
       .subscribe((paymentDetails: { form: FormGroup }) => {
-        const hasDuplication = this.hasDuplicationDate(this.paymentsFormArray.value, paymentDetails.form);
-
-        if (hasDuplication) {
-          paymentDetails.form.controls['startDate'].setErrors({ duplicateDate: true });
-          return;
-        }
-
         if (!this.isEditMode) {
           this.paymentsFormArray.push(paymentDetails.form);
         } else {
@@ -128,16 +121,5 @@ export class PaymentDetailsGridComponent
         this.store.dispatch(new ShowSideDialog(false));
         this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
       });
-  }
-
-  private hasDuplicationDate(forms: PaymentDetails[] | ElectronicPaymentDetails[], currentForm: FormGroup): boolean {
-    return [...forms]
-      .map((form: PaymentDetails | ElectronicPaymentDetails) => {
-        if (form.mode === currentForm.value.mode) {
-          return new Date(form.startDate).toLocaleDateString();
-        }
-        return;
-      })
-      .includes(currentForm.value.startDate.toLocaleDateString());
   }
 }
