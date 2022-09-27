@@ -8,7 +8,7 @@ import { Region, regionFilter } from '@shared/models/region.model';
 import { Department, DepartmentsByLocationsFilter } from '@shared/models/department.model';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
-import { SetHeaderState } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
 import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
@@ -20,6 +20,9 @@ import { GetDepartmentsByLocations, GetLocationsByRegions, GetRegionsByOrganizat
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
+import { FilteredItem } from '@shared/models/filter.model';
+import { FilterService } from '@shared/services/filter.service';
+import { analyticsConstants } from '../constants/analytics.constant';
 
 @Component({
   selector: 'app-candidate-list',
@@ -79,10 +82,15 @@ export class CandidateListComponent implements OnInit {
   public defaultLocations:(number|undefined)[]=[];
   public defaultDepartments:(number|undefined)[]=[];
   public today = new Date();
+  public filteredItems: FilteredItem[] = [];
+  public isClearAll: boolean = false;
+  public isInitialLoad: boolean = false;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   constructor(private store: Store,
-    private formBuilder: FormBuilder) {
+    private formBuilder: FormBuilder,
+    private filterService: FilterService  ) {
     this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+    this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
@@ -90,57 +98,75 @@ export class CandidateListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isInitialLoad = true;
+    this.orderFilterColumnsSetup();
+    this.onFilterControlValueChangedHandler();
+  }
+
+  private initForm(): void {
     let startDate = new Date(Date.now());
-     startDate.setDate(startDate.getDate() -90);
+    startDate.setDate(startDate.getDate() - 90);
     this.candidateRegularRateForm = this.formBuilder.group(
       {
-        business: new FormControl(null,[Validators.required]),
-        startDate:new FormControl(startDate,[Validators.required]),
-        endDate: new FormControl(new Date(Date.now()),[Validators.required]),
-        regionId: new FormControl(null,[Validators.required]),
-        locationId: new FormControl(null,[Validators.required]),
-        departmentId: new FormControl(null,[Validators.required])
-
+        businessIds: new FormControl(null, [Validators.required]),
+        startDate: new FormControl(startDate, [Validators.required]),
+        endDate: new FormControl(new Date(Date.now()), [Validators.required]),
+        regionIds: new FormControl(null, [Validators.required]),
+        locationIds: new FormControl(null, [Validators.required]),
+        departmentIds: new FormControl(null, [Validators.required])
       }
     );
-    this.orderFilterColumnsSetup();
-    this.bussinessControl = this.candidateRegularRateForm.get('business') as AbstractControl;
+  }
+
+  public onFilterControlValueChangedHandler(): void {
+    this.bussinessControl = this.candidateRegularRateForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
     this.businessData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.organizations = data;
       this.filterColumns.businessIds.dataSource = data;
-      this.defaultOrganizations=data.map((list) => list.id);
+      this.defaultOrganizations = data.map((list) => list.id);
     });
-   
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-
-      this.selectedOrganizations = this.organizations?.filter((x) => data?.includes(x.id));
-      let regionFilter: regionFilter = {
-        ids: data,
-        getAll: true
-      };
-      this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
+      if (!this.isClearAll) {
+        this.selectedOrganizations = this.organizations?.filter((x) => data?.includes(x.id));
+        let regionFilter: regionFilter = {
+          ids: data,
+          getAll: true
+        };
+        this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
+      }
+      else {
+        this.isClearAll = false;
+      }
     });
-    this.regionIdControl = this.candidateRegularRateForm.get('regionId') as AbstractControl;
+    this.regionIdControl = this.candidateRegularRateForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
-      let locationFilter: LocationsByRegionsFilter = {
-        ids: data,
-        getAll: true
-      };
-      this.store.dispatch(new GetLocationsByRegions(locationFilter));
+      if (this.regionIdControl.value.length > 0) {
+        this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
+        let locationFilter: LocationsByRegionsFilter = {
+          ids: data,
+          getAll: true
+        };
+        this.store.dispatch(new GetLocationsByRegions(locationFilter));
+      }
     });
-    this.locationIdControl = this.candidateRegularRateForm.get('locationId') as AbstractControl;
+    this.locationIdControl = this.candidateRegularRateForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
-      let departmentFilter: DepartmentsByLocationsFilter = {
-        ids: data,
-        getAll: true
-      };
-      this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));
+      if (this.locationIdControl.value.length > 0) {
+        this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
+        let departmentFilter: DepartmentsByLocationsFilter = {
+          ids: data,
+          getAll: true
+        };
+        this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));
+      }
     });
-    this.departmentIdControl = this.candidateRegularRateForm.get('departmentId') as AbstractControl;
+    this.departmentIdControl = this.candidateRegularRateForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));    
+      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));
+      if (this.isInitialLoad) {
+        this.isInitialLoad = false;
+        this.SearchReport();
+      }
     });
     this.onOrganizationsChange();
     this.onRegionsChange();
@@ -148,11 +174,6 @@ export class CandidateListComponent implements OnInit {
   }
  
   public SearchReport(): void {
-    this.candidateRegularRateForm.markAllAsTouched();
-    if (this.candidateRegularRateForm?.invalid) {
-      return;
-    }
-   
       let { startDate, endDate } = this.candidateRegularRateForm.getRawValue();
       this.paramsData =
       {
@@ -193,8 +214,8 @@ export class CandidateListComponent implements OnInit {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
+        valueField: 'departmentName',
+        valueId: 'departmentId',
       },
       startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       endDate: { type: ControlTypes.Date, valueType: ValueType.Text }
@@ -235,6 +256,34 @@ export class CandidateListComponent implements OnInit {
           this.defaultDepartments=data.map((list) => list.departmentId);
         }
       });
+  }
+  public showFilters(): void {
+    this.onFilterControlValueChangedHandler();
+    this.store.dispatch(new ShowFilterDialog(true));
+  }
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.candidateRegularRateForm, this.filterColumns);
+  }
+  public onFilterClearAll(): void {
+    this.isClearAll = true;
+    let startDate = new Date(Date.now());
+    startDate.setDate(startDate.getDate() - 90);
+    this.candidateRegularRateForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
+    this.candidateRegularRateForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+    this.candidateRegularRateForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+    this.candidateRegularRateForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.candidateRegularRateForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
+    this.candidateRegularRateForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    this.filteredItems = [];
+  }
+  public onFilterApply(): void {
+    this.candidateRegularRateForm.markAllAsTouched();
+    if (this.candidateRegularRateForm?.invalid) {
+      return;
+    }
+    this.filteredItems = this.filterService.generateChips(this.candidateRegularRateForm, this.filterColumns);
+    this.SearchReport();
+    this.store.dispatch(new ShowFilterDialog(false));
   }
 }
 

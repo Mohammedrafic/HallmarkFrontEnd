@@ -49,6 +49,7 @@ import { MessageHistoryComponent } from './message-history/message-history.compo
 import { OrderCheckComponent } from './order-check/order-check.component';
 import { OverallStatusComponent } from './overall-status/overall-status.component';
 import { OvertimeComponent } from './overtime/overtime.component';
+import { FeatherModule } from 'angular-feather';
 
 @NgModule({
   declarations: [
@@ -100,6 +101,7 @@ import { OvertimeComponent } from './overtime/overtime.component';
     DropDownListModule,
     DatePickerModule,
     ButtonModule,
+    FeatherModule,
     NgxsModule.forFeature([OrganizationManagementState,UserState,SecurityState,LogiReportState])
   ]
 })
