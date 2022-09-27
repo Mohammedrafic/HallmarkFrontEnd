@@ -1,8 +1,8 @@
 <section class="order-content" *ngIf="order">
   <div class="job-description-accordion">
-    <ejs-accordion>
+    <ejs-accordion (expanding)="isJobDescriptionExpended = true">
       <e-accordionitems>
-        <e-accordionitem expanded="true">
+        <e-accordionitem [expanded]="isJobDescriptionExpended">
           <ng-template #header>
             <div>Job Description</div>
           </ng-template>
@@ -33,9 +33,9 @@
         </div>
       </div>
     </div>
-    <ejs-accordion class="historical-events">
+    <ejs-accordion class="historical-events" (expanding)="isJobDescriptionExpended = false">
       <e-accordionitems>
-        <e-accordionitem>
+        <e-accordionitem [expanded]="!isJobDescriptionExpended">
           <ng-template #header>
             <div>Historical Events</div>
           </ng-template>
