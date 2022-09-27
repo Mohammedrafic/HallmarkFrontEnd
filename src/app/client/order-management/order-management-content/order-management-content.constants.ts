@@ -68,7 +68,6 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Re-Order Date', column: 'ReOrderDate' },
   { text: 'Shift', column: 'Shift' },
   { text: 'Candidate Agency', column: 'CandidateAgency' },
-  { text: 'End Date', column: 'EndDate' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
   { text: 'Distributed To', column: 'DistributedTo' },
