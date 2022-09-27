@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { ChatClient, ChatThreadItem, TypingIndicatorReceivedEvent } from '@azure/communication-chat';
-import { AzureCommunicationTokenCredential } from '@azure/communication-common';
+import { ChatClient, ChatMessageReceivedEvent, ChatThreadItem, TypingIndicatorReceivedEvent } from '@azure/communication-chat';
+import { AzureCommunicationTokenCredential, CommunicationUserKind } from '@azure/communication-common';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Observable, tap } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -90,12 +90,14 @@ export class ChatState {
 
         await chatClient.startRealtimeNotifications();
 
-        chatClient.on('chatMessageReceived', () => {  
+        chatClient.on('chatMessageReceived', (event: ChatMessageReceivedEvent) => {
+          const { chatOpen, currentUserIdentity } = getState();
           dispatch(new Chat.UpdateMessages());
           dispatch(new Chat.SortThreads());
           dispatch(new UnreadMessage());
           
-          if (getState().chatOpen) {
+          if (!chatOpen
+          && currentUserIdentity !== (event.sender as CommunicationUserKind).communicationUserId) {
             this.chatService.playNotificationSound();
           }
         });
@@ -107,7 +109,7 @@ export class ChatState {
         });
 
         chatClient.on('chatThreadCreated', () => {
-          dispatch(new Chat.GetUserThreads());
+          dispatch(new Chat.GetUserThreads()) 
         });
 
         chatClient.on('participantsAdded', () => {
