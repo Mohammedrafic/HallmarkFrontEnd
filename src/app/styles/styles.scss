@@ -413,6 +413,20 @@ body {
       }
     }
   }
+
+  .e-close li.e-list-item.e-level-2 {
+    @media #{$max-tablet} {
+      display: none;
+    }
+  }
+}
+
+body.light .header-item .e-menu-item.e-selected {
+  @media #{$max-mobile} {
+    border-radius: 0px !important;
+    background-color: transparent !important;
+    color: inherit !important;
+  }
 }
 
 hr {

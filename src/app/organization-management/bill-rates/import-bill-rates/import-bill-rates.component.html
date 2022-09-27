@@ -1,0 +1,24 @@
+<app-import-dialog-content
+  [importResponse]="importResponse"
+  [dialogEvent]="dialogEvent"
+  [selectErrorsTab]="selectErrorsTab"
+  (downloadErrorsEvent)="downloadErrors($event)"
+  (downloadTemplateEvent)="downloadTemplate()"
+  (saveImportResult)="saveImportResult($event)"
+  (uploadImportFile)="uploadImportFile($event)"
+>
+  <app-import-grid
+    successful
+    gridName="Bill Rates"
+    *ngIf="importResponse?.succesfullRecords?.length"
+    [importedItems]="importResponse?.succesfullRecords || []"
+    [columnDefs]="columnDefs"
+  ></app-import-grid>
+  <app-import-grid
+    errors
+    gridName="Bill Rates"
+    *ngIf="importResponse?.errorRecords?.length"
+    [importedItems]="importResponse?.errorRecords || []"
+    [columnDefs]="columnDefs"
+  ></app-import-grid>
+</app-import-dialog-content>

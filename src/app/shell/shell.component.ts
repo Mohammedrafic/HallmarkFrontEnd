@@ -132,7 +132,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
-  profileDatasource: MenuItemModel[] = []; 
+  profileDatasource: MenuItemModel[] = [];
+  profileData: MenuItemModel[] = []; 
   private routers: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
 
   @Select(AppState.isMobileScreen)
@@ -162,6 +163,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       if (this.tree) {
         const menuItem = this.tree.getTreeData().find((el) => el['route'] === data['url']);
         if (menuItem) {
+          if (menuItem['id'] == AnalyticsMenuId) {
+            this.toggleClick();
+          }
           this.tree.selectedNodes = [menuItem['title'] as string];
         }
       }
@@ -185,7 +189,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe((permissionsIds: number[]) => {
         this.canManageOtherUserNotifications = this.hasPermission(permissionsIds, PermissionTypes.CanManageNotificationsForOtherUsers);
         this.canManageNotificationTemplates = this.hasPermission(permissionsIds, PermissionTypes.CanManageNotificationTemplates);
-
+        this.removeManageNotificationOptionInHeader();
+      });
         this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
           if (user) {
             this.userLogin = user;
@@ -194,7 +199,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
             this.alertStateModel$.subscribe((x) => {
               this.alerts = x;
             });
-            this.profileDatasource = [
+            this.profileData = [
               {
                 text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
                 items: [{ text: this.ProfileMenuItemNames[profileMenuItem.edit_profile], id: profileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },
@@ -211,9 +216,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
             ];
           }
         });
-        this.addManageNotificationOptionInHeader();
         this.watchForUnreadMessages();
-      });
   }
 
   ngOnDestroy(): void {
@@ -224,13 +227,14 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.hideAnalyticsSubMenuItems();
   }
 
-  private addManageNotificationOptionInHeader(): void {
+  private removeManageNotificationOptionInHeader(): void {
     if (this.canManageNotificationTemplates == false || this.canManageOtherUserNotifications == false) {
-        const n = this.profileDatasource[0].items?.findIndex(x=>x.id==profileMenuItem.manage_notifications.toString());
-        if (n == undefined || n > 0){
-          this.profileDatasource[0].items?.splice(n!,1);
+        const n = this.profileData[0].items?.findIndex(x=>x.id==profileMenuItem.manage_notifications.toString());
+        if (n != undefined && n > 0){
+          this.profileData[0].items?.splice(n,1);
         }
     }
+    this.profileDatasource = this.profileData;
   }
 
   private getCurrentUserPermissions(): void {
@@ -403,7 +407,11 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onContextMenuClose(): void {
-    this.contextmenu.items = [];
+    this.isTablet$.pipe(takeUntil(this.unsubscribe$)).subscribe((isTablet) => {
+      if (!isTablet) {
+        this.contextmenu.items = [];
+      }
+    })
   }
 
   logout(): void {

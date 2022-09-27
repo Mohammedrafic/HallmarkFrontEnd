@@ -8,7 +8,7 @@ import { Region, regionFilter } from '@shared/models/region.model';
 import { Department, DepartmentsByLocationsFilter } from '@shared/models/department.model';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
-import { SetHeaderState } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
 import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
@@ -21,6 +21,9 @@ import { LogiReportState } from '@organization-management/store/logi-report.stat
 import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
+import { FilteredItem } from '@shared/models/filter.model';
+import { FilterService } from '@shared/services/filter.service';
+import { analyticsConstants } from '../constants/analytics.constant';
 
 @Component({
   selector: 'app-fillrate',
@@ -80,10 +83,15 @@ export class FillRateComponent implements OnInit {
   public defaultLocations:(number|undefined)[]=[];
   public defaultDepartments:(number|undefined)[]=[];
   public today = new Date();
+  public filteredItems: FilteredItem[] = [];
+  public isClearAll: boolean = false;
+  public isInitialLoad: boolean = false;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   constructor(private store: Store,
-    private formBuilder: FormBuilder) {
+    private formBuilder: FormBuilder,
+    private filterService: FilterService  ) {
     this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+    this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
@@ -91,76 +99,91 @@ export class FillRateComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isInitialLoad = true;
+    this.orderFilterColumnsSetup();
+    this.onFilterControlValueChangedHandler();
+  }
+
+  private initForm(): void {
+    let startDate = new Date(Date.now());
+    startDate.setDate(startDate.getDate() - 90);
     this.fillRateForm = this.formBuilder.group(
       {
-        business: new FormControl(null,[Validators.required]),
-        startDate:new FormControl(null,[Validators.required]),
-        endDate: new FormControl(null,[Validators.required]),
-        regionId: new FormControl(null,[Validators.required]),
-        locationId: new FormControl(null,[Validators.required]),
-        departmentId: new FormControl(null,[Validators.required])
-
+        businessIds: new FormControl(null, [Validators.required]),
+        startDate: new FormControl(startDate, [Validators.required]),
+        endDate: new FormControl(new Date(Date.now()), [Validators.required]),
+        regionIds: new FormControl(null, [Validators.required]),
+        locationIds: new FormControl(null, [Validators.required]),
+        departmentIds: new FormControl(null, [Validators.required])
       }
     );
-    this.orderFilterColumnsSetup();
-    this.bussinessControl = this.fillRateForm.get('business') as AbstractControl;
+  }
+
+  public onFilterControlValueChangedHandler(): void {
+    this.bussinessControl = this.fillRateForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
     this.businessData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.organizations = data;
       this.filterColumns.businessIds.dataSource = data;
-      this.defaultOrganizations=data.map((list) => list.id);
+      this.defaultOrganizations = data.map((list) => list.id);
     });
-   
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-
-      this.selectedOrganizations = this.organizations?.filter((x) => data?.includes(x.id));
-      let regionFilter: regionFilter = {
-        ids: data,
-        getAll: true
-      };
-      this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
+      if (!this.isClearAll) {
+        this.selectedOrganizations = this.organizations?.filter((x) => data?.includes(x.id));
+        let regionFilter: regionFilter = {
+          ids: data,
+          getAll: true
+        };
+        this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
+      }
+      else {
+        this.isClearAll = false;
+      }
     });
-    this.regionIdControl = this.fillRateForm.get('regionId') as AbstractControl;
+    this.regionIdControl = this.fillRateForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
-      let locationFilter: LocationsByRegionsFilter = {
-        ids: data,
-        getAll: true
-      };
-      this.store.dispatch(new GetLocationsByRegions(locationFilter));
+      if (this.regionIdControl.value.length > 0) {
+        this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
+        let locationFilter: LocationsByRegionsFilter = {
+          ids: data,
+          getAll: true
+        };
+        this.store.dispatch(new GetLocationsByRegions(locationFilter));
+      }
     });
-    this.locationIdControl = this.fillRateForm.get('locationId') as AbstractControl;
+    this.locationIdControl = this.fillRateForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
-      let departmentFilter: DepartmentsByLocationsFilter = {
-        ids: data,
-        getAll: true
-      };
-      this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));
+      if (this.locationIdControl.value.length > 0) {
+        this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
+        let departmentFilter: DepartmentsByLocationsFilter = {
+          ids: data,
+          getAll: true
+        };
+        this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));
+      }
     });
-    this.departmentIdControl = this.fillRateForm.get('departmentId') as AbstractControl;
+    this.departmentIdControl = this.fillRateForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));    
+      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));
+      if (this.isInitialLoad) {
+        this.isInitialLoad = false;
+        this.SearchReport();
+      }
     });
     this.onOrganizationsChange();
     this.onRegionsChange();
     this.onLocationsChange();
   }
- 
+
   public SearchReport(): void {
-    this.fillRateForm.markAllAsTouched();
-    if (this.fillRateForm?.invalid) {
-      return;
-    }
-   
       let { startDate, endDate } = this.fillRateForm.getRawValue();
       this.paramsData =
       {
-        "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.name),
-        "StartDateParamACCR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-        "EndDateParamACCR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-        "RegionParamACCR": this.selectedRegions?.map((list) => list.name),
-        "LocationParamACCR": this.selectedLocations?.map((list) => list.name),
-        "DepartmentParamACCR": this.selectedDepartments?.map((list) => list.departmentName)
+        "OrganizationParamFR": this.selectedOrganizations?.map((list) => list.name),
+        "StartDateFR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+        "EndDateFR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+        "RegionFR": this.selectedRegions?.map((list) => list.name),
+        "LocationParamFR": this.selectedLocations?.map((list) => list.name),
+        "DepartmentParamFR": this.selectedDepartments?.map((list) => list.departmentName)
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
@@ -192,8 +215,8 @@ export class FillRateComponent implements OnInit {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
+        valueField: 'departmentName',
+        valueId: 'departmentId',
       },
       startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       endDate: { type: ControlTypes.Date, valueType: ValueType.Text }
@@ -234,7 +257,35 @@ export class FillRateComponent implements OnInit {
           this.defaultDepartments=data.map((list) => list.departmentId);
         }
       });
-  }  
+  }
+  public showFilters(): void {
+    this.onFilterControlValueChangedHandler();
+    this.store.dispatch(new ShowFilterDialog(true));
+  }
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.fillRateForm, this.filterColumns);
+  }
+  public onFilterClearAll(): void {
+    this.isClearAll = true;
+    let startDate = new Date(Date.now());
+    startDate.setDate(startDate.getDate() - 90);
+    this.fillRateForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
+    this.fillRateForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+    this.fillRateForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+    this.fillRateForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.fillRateForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
+    this.fillRateForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    this.filteredItems = [];
+  }
+  public onFilterApply(): void {
+    this.fillRateForm.markAllAsTouched();
+    if (this.fillRateForm?.invalid) {
+      return;
+    }
+    this.filteredItems = this.filterService.generateChips(this.fillRateForm, this.filterColumns);
+    this.SearchReport();
+    this.store.dispatch(new ShowFilterDialog(false));
+  }
 }
 
 
