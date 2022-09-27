@@ -25,7 +25,7 @@ export class ChatService {
   }
 
   private createNotificationSound(): void {
-    this.sound.src = '../../../assets/audio/notification.mp3';
+    this.sound.src = 'assets/audio/notification.mp3';
     this.sound.load();
   }
 }
