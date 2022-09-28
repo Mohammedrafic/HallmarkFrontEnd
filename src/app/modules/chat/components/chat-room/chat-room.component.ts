@@ -83,7 +83,6 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   }
 
   protected override async updateMessages(): Promise<void> {
-    
     const newMessages: ReceivedChatMessage[] = [];
     const iterableAsync = (this.chatThreadClient as ChatThreadClient).listMessages();
     
