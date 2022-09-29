@@ -74,6 +74,7 @@ export class AllInvoicesGridHelper {
         field: 'amount',
         minWidth: 280,
         headerName: 'Amount',
+        type: 'rightAligned',
         cellClass: 'font-weight-bold',
         valueFormatter: numberValueFormatter,
       },

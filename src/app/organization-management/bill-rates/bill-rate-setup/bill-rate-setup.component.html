@@ -92,13 +92,13 @@
           <span>{{ data.effectiveDate | date: formatDate }}</span>
         </ng-template>
       </e-column>
-      <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" width="250" textAlign="Right">
+      <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" textAlign="Right" headerTextAlign="Right" width="250">
         <ng-template #template let-data>
           <span>{{ data.rateHour | rateHourPipe: data.billRateConfigId:data.billRateType:billRatesOptions }}</span>
         </ng-template>
       </e-column>
-      <e-column field="intervalMin" headerText="INTERVAL MIN" width="180" textAlign="Right"></e-column>
-      <e-column field="intervalMax" headerText="INTERVAL MAX" width="180" textAlign="Right"></e-column>
+      <e-column field="intervalMin" headerText="INTERVAL MIN" textAlign="Right" headerTextAlign="Right" width="180"></e-column>
+      <e-column field="intervalMax" headerText="INTERVAL MAX" textAlign="Right" headerTextAlign="Right" width="180"></e-column>
       <e-column field="considerForWeeklyOT" headerText="CONSIDER FOR WEEKLY OT" width="230">
         <ng-template #template let-data>
           <div class="checkbox bootstrap" (click)="stopPropagation($event)">

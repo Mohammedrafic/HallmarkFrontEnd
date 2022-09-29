@@ -126,19 +126,19 @@
     </e-column>
     <e-column field="jobTitle" headerText="JOB TITLE" width="200"></e-column>
     <e-column field="organizationName" headerText="Organization" width="200"></e-column>
-    <e-column field="numberOfPositions" headerText="{{ '# of positions available' | uppercase }}" width="160">
+    <e-column field="numberOfPositions" headerText="{{ '# of positions available' | uppercase }}" headerTextAlign="Right" width="160">
       <ng-template #template let-data>
         <div class="align-right" *ngIf="data.orderType !== orderTypes.OpenPerDiem">
           {{ data.numberOfOpenPositions }}/{{ data.numberOfPositions }}
         </div>
       </ng-template>
     </e-column>
-    <e-column field="candidatesCount" headerText="CANDIDATES" width="150">
+    <e-column field="candidatesCount" headerText="CANDIDATES" headerTextAlign="Right" width="150">
       <ng-template #template let-data>
         <div class="align-right">{{ data.candidatesCount }}</div>
       </ng-template>
     </e-column>
-    <e-column field="billRate" headerText="Bill Rate" width="150">
+    <e-column field="billRate" headerText="Bill Rate" headerTextAlign="Right" width="150">
       <ng-template #template let-data>
         <div class="align-right">{{ data.billRate }}</div>
       </ng-template>
@@ -161,11 +161,19 @@
         <span>{{ data.shiftStartTime | date: 'shortTime' }}-{{ data.shiftEndTime | date: 'shortTime' }}</span>
       </ng-template>
     </e-column>
-    <e-column field="shiftsNext90Days" headerText="# of Shifts Next 90 Days " width="150" [visible]="false"></e-column>
+    <e-column
+      field="shiftsNext90Days"
+      headerText="# of Shifts Next 90 Days"
+      textAlign="Right"
+      headerTextAlign="Right"
+      width="150"
+      [visible]="false"
+    ></e-column>
     <e-column
       field="annualSalaryRangeFrom"
       headerText="Annual Salary From"
-      textAlign="Left"
+      textAlign="Right"
+      headerTextAlign="Right"
       width="200"
       [visible]="false"
     >
@@ -173,7 +181,14 @@
         <span>{{ data.annualSalaryRangeFrom | currency: 'USD':'symbol':'1.0-2' }}</span>
       </ng-template>
     </e-column>
-    <e-column field="annualSalaryRangeTo" headerText="Annual Salary To" textAlign="Left" width="200" [visible]="false">
+    <e-column
+      field="annualSalaryRangeTo"
+      headerText="Annual Salary To"
+      textAlign="Right"
+      headerTextAlign="Right"
+      width="200"
+      [visible]="false"
+    >
       <ng-template #template let-data>
         <span>{{ data.annualSalaryRangeTo | currency: 'USD':'symbol':'1.0-2' }}</span>
       </ng-template>

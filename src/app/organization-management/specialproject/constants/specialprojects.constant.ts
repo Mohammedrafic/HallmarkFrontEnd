@@ -7,7 +7,6 @@ import {
 } from '../enums/specialproject.enum';
 import { ActionCellRendererComponent } from '../../../shared/components/cell-renderer/action-cellrenderer.component';
 import { DatePipe } from '@angular/common';
-import { forEach } from 'lodash/fp';
 
 const commonColumn: ColDef = {
   sortable: true,
@@ -43,6 +42,7 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
     {
       field: PurchaseOrderTableColumns.ProjectBudget,
       headerName: PurchaseOrderHeaderText.ProjectBudget,
+      type: 'rightAligned',
       ...commonColumn,
       filter: 'agNumberColumnFilter',
       filterParams: {
@@ -150,6 +150,7 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
     {
       field: SpecialProjectTableColumns.ProjectBudget,
       headerName: SpecialProjectHeaderText.ProjectBudget,
+      type: 'rightAligned',
       ...commonColumn,
       filter: 'agNumberColumnFilter',
       filterParams: {
@@ -412,5 +413,3 @@ export const PurchaseOrderMappingColumnsDefinition = (actionCellParams: ICellRen
 export const SpecialProjectMessages = {
   NoRowsMessage: 'No Rows To Show'
 }
-
-
