@@ -257,10 +257,6 @@ body {
       color: $secondary-dark-blue-30;
     }
 
-    .alert-date{
-      color: $secondary-dark-blue-40 !important;
-    }
-
     .header-item {
       .e-menu-wrapper,
       .e-menu-wrapper .e-menu .e-menu-item {
@@ -385,7 +381,8 @@ body {
     .e-switch-wrapper label,
     .dropdown-container label,
     .tab-legend__item,
-    .tab-legend__item span {
+    .tab-legend__item span,
+    .alert-date {
       color: $secondary-dark-blue-40 !important;
     }
 
