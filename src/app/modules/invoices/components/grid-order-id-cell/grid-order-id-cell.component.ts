@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { Store } from '@ngxs/store';
 import { Router } from '@angular/router';
@@ -14,6 +14,7 @@ import { ManualInvoiceAdapter } from '../../helpers';
   selector: 'app-grid-order-id-cell',
   templateUrl: './grid-order-id-cell.component.html',
   styleUrls: ['./grid-order-id-cell.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GridOrderIdCellComponent extends GridCellRenderer {
   public data: BaseInvoice;
