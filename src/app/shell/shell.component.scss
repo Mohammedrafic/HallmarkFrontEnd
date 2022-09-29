@@ -15,7 +15,7 @@
   @media #{$max-mobile} {
     width: 100%;
     padding-left: 0;
-    }
+  }
 
   &.expanded {
     width: calc(100% - 259px);
@@ -24,7 +24,7 @@
     @media #{$max-mobile} {
       width: 100%;
       padding-left: 0;
-      }
+    }
   }
 
   .header-item {
@@ -49,7 +49,7 @@
       margin-right: 25px;
       position: relative;
       cursor: pointer;
-      
+
       &::before {
         content: '\2630';
         color: $secondary-dark-blue-30;
@@ -76,7 +76,7 @@
 
     @media #{$max-mobile} {
       margin-left: 0px !important;
-      }
+    }
   }
 
   #sidebar {
@@ -98,7 +98,7 @@
         align-items: center;
         padding-left: 14px;
       }
-  
+
       &__img {
         width: 36px;
         height: 36px;
@@ -118,7 +118,7 @@
 
     @media #{$max-mobile} {
       display: flex;
-      }
+    }
 
     .close-btn {
       //width: 18px;
@@ -127,14 +127,14 @@
       left: 4px;
       top: 4px;
       border-radius: 0px;
-      
+
 
       margin-right: 10px;
       position: relative;
       cursor: pointer;
       color: #3E7FFF;
-      
-      
+
+
       &::before {
         content: '\2715';
         color: $white;
@@ -291,7 +291,7 @@
 
   .sidebar-item {
     border-bottom: 1px solid $secondary-dark-blue-45-1;
-    
+
     &:hover {
       background-color: $secondary-dark-blue-10-1;
     }
@@ -402,7 +402,7 @@
   }
   @media #{$max-mobile} {
     padding-right: 30px;
-    }
+  }
 }
 
 .bell-button:hover {
@@ -436,7 +436,7 @@
   }
   @media #{$max-mobile} {
     right: 25px;
-    }
+  }
 }
 
 .e-dropdown-popup {
@@ -524,7 +524,7 @@
   font-weight: 500;
 }
 .e-menu-wrapper.e-popup.e-menu-popup{
-    border-radius:8px;
+  border-radius:8px;
 }
 
 .search-menu:hover {
@@ -541,7 +541,6 @@
 
 #alert-sidebar {
   .sidebar-header {
-    background-color: white;
     display: flex;
     height: 50px !important;
     width:156px;
@@ -549,26 +548,23 @@
     top:34px;
     left:24px;
     right:260;
-    //styleName: H3-Open Sans,Bold;
-font-family: Open Sans;
-font-size: 18px;
-//font-weight: 700;
-line-height: 32px;
-letter-spacing: 0em;
-text-align: justified;
-
+    font-family: Open Sans;
+    font-size: 18px;
+    line-height: 32px;
+    letter-spacing: 0em;
+    text-align: justified;
 
     i-feather {
       position: absolute;
       top: 0px;
       padding: 1rem 0rem 0rem 0.5rem;
-      color: white;
+      color: $white;
       width: 20px;
       height: 20px;
     }
 
     h5 {
-      color: #060715;
+      color: $black;
       padding: 0.8rem 1.5rem 0rem 1.5rem;
       font-size: 1.5em !important;
       margin: auto;
@@ -580,7 +576,7 @@ text-align: justified;
 
     .closebtn {
       top: 2px;
-      color: #3E7FFF;
+      color: $primary-active-blue-10;
       position: absolute;
       right: 4px;
       background-color: transparent !important;
@@ -589,11 +585,18 @@ text-align: justified;
       line-height: 20px;
       top:10px;
       right: 50px;
-    
+
       button {
         padding: 0.3rem 0.5rem !important;
         border-radius: 4px !important;
         height: auto !important;
+        border-radius: 0px;
+        position: fixed;
+        right: 8px;
+        top: 15px;
+        background-color: transparent !important;
+        cursor: pointer;
+        color: $primary-active-blue-10;
       }
     }
 
@@ -601,7 +604,7 @@ text-align: justified;
       top: 2px;
       line-height: 26px;
       height: 42px;
-      color: #3E7FFF;
+      color: $primary-active-blue-10;
       position: absolute;
       right: 40px;
       background-color: transparent !important;
@@ -622,7 +625,7 @@ text-align: justified;
       float: right;
       font-weight: bold;
       color: $primary-active-blue-10;
-      
+
       span {
         cursor: pointer;
       }
@@ -636,58 +639,55 @@ text-align: justified;
       margin-top: 5px;
       padding: 1rem;
       gap: 17px;
-      height: 140px;
       width: 390px;
       left: 0px;
       top: 0px;
       border-radius: 8px;
-      background: #F2FAF2;
+      background: $supportive-green-50;
 
 
       .alert-panel-header {
         display: flex;
-        
-        &__flex-child {
-        }
+        align-items: center;
+
+        &__flex-child {}
 
         &__flex-child:first-child {
-          margin-right: 15px;
         }
 
         &__title {
           font-weight: bold;
           height: 28px;
-        width: 177px;
-        left: 36px;
-        top: 5px;
-        border-radius: nullpx;
-        font-family: Open Sans;
-        font-size: 18px;
-        font-weight: 700;
-        line-height: 28px;
-        letter-spacing: 0.015em;
-        text-align: left;
+          width: 177px;
+          left: 36px;
+          top: 5px;
+          border-radius: nullpx;
+          font-family: Open Sans;
+          font-size: 18px;
+          font-weight: 700;
+          line-height: 28px;
+          letter-spacing: 0.015em;
+          text-align: left;
 
         }
 
-        &__date
-        {
+        &__date {
           height: 32px;
-width: 110px;
-left: 268px;
-top: 12px;
-color: #677089;
-font-family: Open Sans;
-font-size: 12px;
-font-weight: 400;
-line-height: 16px;
-letter-spacing: 0px;
-text-align: right;
+          width: 200px;
+          left: 275px;
+          top: 12px;
+          color: $secondary-dark-blue-20;
+          font-family: Open Sans;
+          font-size: 12px;
+          font-weight: 400;
+          line-height: 16px;
+          letter-spacing: 0px;
+          text-align: right;
         }
       }
 
       .alert-content {
-        color:  #060715;
+        color: $black;
         font-weight: 400;
         padding: 5px;
       }
@@ -707,12 +707,10 @@ text-align: right;
       }
 
       .badge-info {
-        //color: $white;
-        //background-color: $primary-active-blue-10;
-        color: #5AA658;
+        color: $supportive-green-10;
         height: 18px;
         width: 18px;
-        top:13px;
+        top: 13px;
         left: 2px;
         top: 1.33px;
         border-radius: 0px;
@@ -730,19 +728,21 @@ text-align: right;
       }
 
       .alert-panel-footer {
-        display: flex;
-        margin-top: 1rem;
-        color:  #3E7FFF;
-        //top:112px;
-        //left:334px;
+        
+        right: 15px;
+        align-items: center;
+        margin-bottom: 10px;;
+        color: $primary-active-blue-10;
 
         &__footer_flex-child {
           flex: 1;
+          display: flex;
+          float: right;
         }
 
         .dismiss-icon {
           text-align: right;
-          margin-right: 35px;
+          margin-right: 5px;
           cursor: pointer;
         }
 

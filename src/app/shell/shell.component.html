@@ -171,7 +171,7 @@
     <!-- <i-feather name="bell"></i-feather> -->
     <div>
       
-    <h5>
+    <h5 class="alert-title-header-body-color">
       Notifications
     </h5>
   </div>
@@ -200,13 +200,14 @@
           </div>
           <div class="alert-panel-header__flex-child alert-panel-header__date">
             <div><span>{{item.createdAt | date: 'MM/dd/yyyy'}}</span></div>
-            <div><span>{{item.createdAt | date: 'hh:mm a'}}</span></div>
+            <div><span>{{item.createdAt | date: 'hh:mm:ss a'}}</span></div>
           </div>
         </div>
-        <div class="alert-content" [innerHTML]="item.content"></div>
+        <div class="alert-content alert-title-header-body-color" [innerHTML]="item.content"></div>
         <div class="alert-panel-footer">
+          <div class="alert-panel-footer__footer_flex-child"></div>
           <div class="alert-panel-footer__footer_flex-child" (click)="alertDismiss(item.id)">
-            <div class="dismiss-icon"><span>X</span></div>
+            <i-feather name="check-circle"></i-feather>
             <div class="dismiss-text"><span>Dismiss</span></div>
           </div>
         </div>

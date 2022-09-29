@@ -32,6 +32,7 @@ import {
   AlertCircle,
   Mail,
   MessageSquare,
+  CheckCircle,
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';

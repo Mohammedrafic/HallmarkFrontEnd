@@ -370,7 +370,7 @@ body {
     .profile-hours-statistics-container section h3,
     .partnership-settings .title,
     .alert-panel .alert-panel-header__title,
-    .ordered-chips__title,
+    .ordered-chips__title, .alert-title-header-body-color,
     .dialog .applied-filters .chips-container .e-chip-list .e-chip,
     .e-chip-list .e-chip .e-chip-delete.e-dlt-btn,
     .filter-chips .e-chip-list .e-chip {
@@ -380,7 +380,6 @@ body {
     .input-container label,
     .e-switch-wrapper label,
     .dropdown-container label,
-    .alert-panel-footer,
     .tab-legend__item,
     .tab-legend__item span {
       color: $secondary-dark-blue-40 !important;
