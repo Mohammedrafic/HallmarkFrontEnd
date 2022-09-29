@@ -971,10 +971,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.controls['compBonus'].patchValue(compBonus);
     this.generalInformationForm.controls['duration'].patchValue(order.duration);
     this.generalInformationForm.controls['shiftStartTime'].patchValue(
-      DateTimeHelper.convertDateToUtc(order.shiftStartTime.toString())
+      order.shiftStartTime ? DateTimeHelper.convertDateToUtc(order.shiftStartTime.toString()) : null
     );
     this.generalInformationForm.controls['shiftEndTime'].patchValue(
-      DateTimeHelper.convertDateToUtc(order.shiftEndTime.toString())
+      order.shiftEndTime ? DateTimeHelper.convertDateToUtc(order.shiftEndTime.toString()) : null
     );
 
     this.populatePermPlacementControls(order);
@@ -1004,11 +1004,15 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     }
 
     if (order.jobStartDate) {
-      this.generalInformationForm.controls['jobStartDate'].patchValue(new Date(order.jobStartDate));
+      this.generalInformationForm.controls['jobStartDate'].patchValue(
+        order.jobStartDate ? DateTimeHelper.convertDateToUtc(order.jobStartDate.toString()) : null
+      );
     }
 
     if (order.jobEndDate) {
-      this.generalInformationForm.controls['jobEndDate'].patchValue(new Date(order.jobEndDate));
+      this.generalInformationForm.controls['jobEndDate'].patchValue(
+        order.jobEndDate ? DateTimeHelper.convertDateToUtc(order.jobEndDate.toString()) : null
+      );
     }
 
     const jobDistributionValues = order.jobDistributions

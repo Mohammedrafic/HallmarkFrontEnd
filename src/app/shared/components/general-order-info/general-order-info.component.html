@@ -54,7 +54,7 @@
         <i-feather name="calendar" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{ orderInformation.jobStartDate | date: 'MM/dd/yyy' }}</div>
+        <div class="title">{{ orderInformation.jobStartDate | date: 'MM/dd/yyy':'UTC' }}</div>
         <div class="sup-title">{{ dateFieldName }}</div>
       </div>
     </div>
@@ -63,7 +63,7 @@
         <i-feather name="calendar" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{ orderInformation.jobEndDate | date: 'MM/dd/yyy' }}</div>
+        <div class="title">{{ orderInformation.jobEndDate | date: 'MM/dd/yyy':'UTC' }}</div>
         <div class="sup-title">End Date</div>
       </div>
     </div>

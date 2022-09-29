@@ -153,7 +153,7 @@
         </span>
       </ng-template>
       <ng-template #template let-data>
-        {{ data.jobStartDate | date: 'MM/dd/yyy' }}
+        {{ data.jobStartDate | date: 'MM/dd/yyy':'UTC' }}
       </ng-template>
     </e-column>
     <e-column field="shift" headerText="SHIFT" width="150" [visible]="false">
