@@ -182,7 +182,7 @@ export class CredentialExpiryComponent implements OnInit {
         "EndDateParamCREXP": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
         "RegionParamCREXP": this.selectedRegions?.map((list) => list.name),
         "LocationParamCREXP": this.selectedLocations?.map((list) => list.name),
-        "DepartmentParamCREXP": this.selectedDepartments?.map((list) => list.departmentName)
+        "DepartmentParamCREXP": this.selectedDepartments?.map((list) => list.departmentName.trim())
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();

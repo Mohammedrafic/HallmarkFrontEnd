@@ -183,7 +183,7 @@ export class JobDetailsComponent implements OnInit {
         "EndDateParamJD": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
         "RegionParamJD": this.selectedRegions?.map((list) => list.name),
         "LocationParamJD": this.selectedLocations?.map((list) => list.name),
-        "DepartmentParamJD": this.selectedDepartments?.map((list) => list.departmentName)
+        "DepartmentParamJD": this.selectedDepartments?.map((list) => list.departmentName.trim())
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
