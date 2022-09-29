@@ -106,6 +106,14 @@ import {
   UploadLocationsFile,
   UploadLocationsFileSucceeded,
   UploadOrganizationLogo,
+  GetRegionsImportTemplate,
+  UploadRegionsFile,
+  SaveRegionsImportResult,
+  UploadRegionsFileSucceeded,
+  SaveRegionsImportResultSucceeded,
+  GetRegionsImportTemplateSucceeded,
+  GetRegionsImportErrors,
+  GetRegionsImportErrorsSucceeded,
 } from './organization-management.actions';
 import {
   Department,
@@ -113,7 +121,7 @@ import {
   DepartmentsPage,
   ImportedDepartment,
 } from '@shared/models/department.model';
-import { Region, regionFilter } from '@shared/models/region.model';
+import { ImportedRegion, Region, regionFilter } from '@shared/models/region.model';
 import {
   ImportedLocation,
   Location,
@@ -1501,6 +1509,51 @@ export class OrganizationManagementState {
         return payload;
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Bill rates were not imported'))))
+    );
+  }
+  
+  
+  @Action(GetRegionsImportTemplate)
+  GetRegionsImportTemplate({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: GetRegionsImportTemplate): Observable<any> {
+    return this.regionService.getRegionsImportTemplate(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetRegionsImportTemplateSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(GetRegionsImportErrors)
+  GetRegionsImportErrors({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: GetRegionsImportErrors): Observable<any> {
+    return this.regionService.getRegionsImportTemplate(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetRegionsImportErrorsSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(UploadRegionsFile)
+  UploadRegionsFile({ dispatch }: StateContext<CandidateStateModel>, { payload }: UploadRegionsFile): Observable<ImportResult<ImportedRegion> | Observable<void>> {
+    return this.regionService.uploadRegionsFile(payload).pipe(
+      tap((payload) => {
+        dispatch(new UploadRegionsFileSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : 'File was not uploaded'))))
+    );
+  }
+
+  @Action(SaveRegionsImportResult)
+  SaveRegionsImportResult({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveRegionsImportResult): Observable<ImportResult<ImportedRegion> | Observable<void>> {
+    return this.regionService.saveRegionImportResult(payload).pipe(
+      tap((payload) => {
+        dispatch(new SaveRegionsImportResultSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Regions were not imported'))))
     );
   }
 }

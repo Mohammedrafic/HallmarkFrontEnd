@@ -104,6 +104,8 @@ import { ImportDepartmentsComponent } from './departments/import-departments/imp
 import { ImportBillRatesComponent } from './bill-rates/import-bill-rates/import-bill-rates.component';
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
 import { CanManageSettingPipe } from '@shared/pipes/can-manage-setting.pipe';
+import { ImportRegionsComponent } from './regions/import-regions/import-regions.component';
+import { RegionsGridComponent } from './regions/import-regions/regions-grid/regions-grid.component';
 
 const sidebarIcons = {
   Download,
@@ -164,7 +166,9 @@ const sidebarIcons = {
     ImportLocationsComponent,
     ImportDepartmentsComponent,
     ImportBillRatesComponent,
-    CanManageSettingPipe
+    CanManageSettingPipe,
+    ImportRegionsComponent,
+    RegionsGridComponent
   ],
   imports: [
     CommonModule,
