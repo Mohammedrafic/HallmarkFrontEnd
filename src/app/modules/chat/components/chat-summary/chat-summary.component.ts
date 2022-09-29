@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output,
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output,
   SecurityContext } from '@angular/core';
 
-import { ChatClient, ChatThreadClient } from '@azure/communication-chat';
+import { ChatClient, ChatMessage, ChatThreadClient } from '@azure/communication-chat';
 import { CommunicationUserKind } from '@azure/communication-signaling';
 
 import { ChatMessagesHelper } from '../../helpers';
@@ -13,7 +13,7 @@ import { ChatThread, EnterChatEvent, ReceivedChatMessage } from '../../interface
   styleUrls: ['./chat-summary.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
+export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit, OnChanges {
   @Input() thread: ChatThread;
 
   @Output() enterChat: EventEmitter<EnterChatEvent> = new EventEmitter();
@@ -29,11 +29,17 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
     this.watchForUpdate();
   }
 
+  ngOnChanges(): void {
+    if (this.thread) {
+      this.threadId = this.thread.threadId as string;
+    }
+  }
+
   enter(): void {
     this.enterChat.emit({
       id: this.thread.threadId as string,
       displayName: this.thread.displayName,
-      businessUnitName: this.thread.businessUnitName
+      businessUnitName: this.thread.businessUnitName,
     });
   }
 
@@ -43,33 +49,38 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit {
     const Parser = new DOMParser();
 
     const messages: ReceivedChatMessage[] = [];
-    const iterableAsync = this.chatThreadClient.listMessages();
+    const iterableAsync = this.chatThreadClient.listMessages({ maxPageSize: 2 });
     
-    for await (const message of iterableAsync) {
-      if (message.type === 'text') {
-  
-        const msg: ReceivedChatMessage = {
-          id: message.id,
-          sender: message.senderDisplayName as string,
-          message: message.content?.message as string,
-          timestamp: message.createdOn,
-          isCurrentUser: (message.sender as CommunicationUserKind)?.communicationUserId === this.userIdentity,
-        };
-        messages.push(msg);
-      }
-    }
+    iterableAsync.byPage().next()
+    .then((iteratorResult) => {
+      const result = (iteratorResult.value as ChatMessage[]).filter((message) => message.type === 'text');
 
-    if (messages.length) {
-      this.lastMessage = messages[0];
-      this.thread.lastMessage = messages[0];
-      const html = Parser.parseFromString(
-        this.sanitizer.sanitize(SecurityContext.HTML, this.lastMessage?.message) as string,
-        'text/html',
-      ).body;
+      result.forEach((message) => {
+        if (message.type === 'text') {
   
-      this.lastMessage.message = html.textContent as string;
-      this.updateReadReceipts();
-    }
+          const msg: ReceivedChatMessage = {
+            id: message.id,
+            sender: message.senderDisplayName as string,
+            message: message.content?.message as string,
+            timestamp: message.createdOn,
+            isCurrentUser: (message.sender as CommunicationUserKind)?.communicationUserId === this.userIdentity,
+          };
+          messages.push(msg);
+        }
+      });
+
+      if (messages.length) {
+        this.lastMessage = messages[0];
+        this.thread.lastMessage = messages[0];
+        const html = Parser.parseFromString(
+          this.sanitizer.sanitize(SecurityContext.HTML, this.lastMessage?.message) as string,
+          'text/html',
+        ).body;
+    
+        this.lastMessage.message = html.textContent as string;
+        this.updateReadReceipts();
+      }
+    });
   }
 
   protected override async updateReadReceipts(): Promise<void> {

@@ -16,4 +16,6 @@ export const DefaultChatState: ChatModel = {
   typingIndicator: null,
   userIdToStart: null,
   startThreadId: '',
+  threadIdToUpdate: '',
+  readReceiptEvent: null,
 }

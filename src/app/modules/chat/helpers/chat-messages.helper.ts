@@ -3,8 +3,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 
 import { TypingIndicatorReceivedEvent } from '@azure/communication-signaling';
 import { ChatThreadClient } from '@azure/communication-chat';
-import { Actions, ofActionDispatched, Store } from '@ngxs/store';
-import { takeUntil } from 'rxjs';
+import { Actions, ofActionDispatched, Store, ofActionCompleted } from '@ngxs/store';
+import { filter, Subject, takeUntil, tap } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
 import { Chat } from '../store/actions';
@@ -14,6 +14,12 @@ export class ChatMessagesHelper extends Destroyable {
   public typingEvent: TypingIndicatorReceivedEvent | null = null;
 
   protected userIdentity: string;
+
+  protected threadId: string;
+
+  protected readonly receiptStream$: Subject<void> = new Subject();
+
+  protected readonly checkReceiptsStream$: Subject<void> = new Subject();
 
   constructor(
     protected actions$: Actions,
@@ -27,7 +33,11 @@ export class ChatMessagesHelper extends Destroyable {
   protected watchForUpdate(): void {
     this.actions$
     .pipe(
-      ofActionDispatched(Chat.UpdateMessages),
+      ofActionCompleted(Chat.UpdateMessages),
+      filter(() => {
+        const threadToUpdate = this.store.snapshot().chat.threadIdToUpdate as string;
+        return !!threadToUpdate && !!this.threadId && threadToUpdate === this.threadId
+      }),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
@@ -54,7 +64,7 @@ export class ChatMessagesHelper extends Destroyable {
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
-      this.updateReadReceipts();
+      this.receiptStream$.next();
     });
   }
 
