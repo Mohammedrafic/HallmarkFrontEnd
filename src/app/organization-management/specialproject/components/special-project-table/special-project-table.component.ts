@@ -1,9 +1,8 @@
 import {
-  GridApi,
   GridReadyEvent,
   GridOptions
 } from '@ag-grid-community/core';
-import { Component, OnInit, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { GRID_CONFIG } from '@shared/constants';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { Select } from '@ngxs/store';
