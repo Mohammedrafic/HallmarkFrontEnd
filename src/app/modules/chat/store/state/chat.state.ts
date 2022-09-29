@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { ChatClient, ChatMessageReceivedEvent, ChatThreadItem, ReadReceiptReceivedEvent, TypingIndicatorReceivedEvent } from '@azure/communication-chat';
+import { ChatClient, ChatMessageReceivedEvent, ChatThreadItem, ReadReceiptReceivedEvent,
+  TypingIndicatorReceivedEvent } from '@azure/communication-chat';
 import { AzureCommunicationTokenCredential, CommunicationUserKind } from '@azure/communication-common';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Observable, tap } from 'rxjs';
@@ -38,8 +39,13 @@ export class ChatState {
   }
 
   @Selector([ChatState])
-  static activeThreads(state: ChatModel): ChatThread[] {
+  static activeDisplayedThreads(state: ChatModel): ChatThread[] {
     return state.displayedThreads;
+  }
+
+  @Selector([ChatState])
+  static activeThreads(state: ChatModel): ChatThread[] {
+    return state.activeThreads;
   }
 
   @Selector([ChatState])
