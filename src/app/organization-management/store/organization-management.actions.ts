@@ -4,7 +4,7 @@ import { Organization } from 'src/app/shared/models/organization.model';
 import { SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { Skill, SkillFilters } from 'src/app/shared/models/skill.model';
 import { Department, DepartmentFilter, ImportedDepartment } from '@shared/models/department.model';
-import { Region, regionFilter } from '@shared/models/region.model';
+import { Region, regionFilter,ImportedRegion } from '@shared/models/region.model';
 import { ImportedLocation, Location, LocationFilter } from '@shared/models/location.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialFilter } from '@shared/models/credential.model';
@@ -495,3 +495,44 @@ export class SaveBillRatesImportResultSucceeded {
   static readonly type = '[organizationManagement] Save Bill Rates Import Result Succeeded';
   constructor(public payload: ImportResult<ImportedBillRate>) {}
 }
+
+
+export class GetRegionsImportTemplate {
+  static readonly type = '[organizationManagement] Get Region Import Template';
+  constructor(public payload: ImportedRegion[]) { }
+}
+export class GetRegionsImportTemplateSucceeded {
+  static readonly type = '[organizationManagement] Get Region Import Template Succeeded';
+  constructor(public payload: Blob) { }
+}
+
+export class GetRegionsImportErrors {
+  static readonly type = '[organizationManagement] Get Regions Import Errors';
+  constructor(public payload: ImportedRegion[]) { }
+}
+
+export class GetRegionsImportErrorsSucceeded {
+  static readonly type = '[organizationManagement] Get Regions Import Errors Succeeded';
+  constructor(public payload: Blob) { }
+}
+
+export class UploadRegionsFile {
+  static readonly type = '[organizationManagement] Upload Region File';
+  constructor(public payload: Blob) { }
+}
+
+export class UploadRegionsFileSucceeded {
+  static readonly type = '[organizationManagement] Upload Region File Succeeded';
+  constructor(public payload: ImportResult<ImportedRegion>) { }
+}
+
+export class SaveRegionsImportResult {
+  static readonly type = '[candidate] Save Region Import Result';
+  constructor(public payload: ImportedRegion[]) { }
+}
+
+export class SaveRegionsImportResultSucceeded {
+  static readonly type = '[candidate] Save Regions Import Result Succeeded';
+  constructor(public payload: ImportResult<ImportedRegion>) { }
+}
+
