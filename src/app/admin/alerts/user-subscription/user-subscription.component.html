@@ -16,6 +16,7 @@
                             formControlName="business"
                             [fields]="businessDataFields"
                             [dataSource]="businessData$ | async"
+                            [value]="defaultBusinessValue"
                             placeholder=Business></ejs-dropdownlist>
         </div>
       </div>
@@ -25,6 +26,7 @@
                             formControlName="user"
                             [fields]="userDataFields"
                             [dataSource]="userData"
+                            [value]="defaultUserValue"
                             placeholder=User></ejs-dropdownlist>
         </div>
       </div>
