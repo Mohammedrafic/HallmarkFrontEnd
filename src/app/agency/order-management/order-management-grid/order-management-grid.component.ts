@@ -596,9 +596,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       distributedOnFrom: this.filters.distributedOnFrom || null,
       distributedOnTo: this.filters.distributedOnTo || null,
       candidateName: this.filters.candidateName || null,
-      projectTypeId: this.filters.projectTypeId || null,
-      projectNameId: this.filters.projectNameId || null,
-      poNumberId: this.filters.poNumberId || null
+      projectTypeIds: this.filters.projectTypeIds || null,
+      projectNameIds: this.filters.projectNameIds || null,
+      poNumberIds: this.filters.poNumberIds || null
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.filteredItems$.next(this.filteredItems.length);
