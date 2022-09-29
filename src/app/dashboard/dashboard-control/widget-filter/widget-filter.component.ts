@@ -262,7 +262,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   private setCommonSkillsToFormControl(): void {
     const selectedSkills = this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.value;
-    if(selectedSkills.length) {
+    if(selectedSkills?.length) {
       const commonSkills = selectedSkills.filter((value: number) => this.commonSkillsIds.includes(value));
       this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.setValue([...commonSkills]);
     }
@@ -320,8 +320,16 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   }
 
   private setFormControlValue(): void {
+    this.cdr.markForCheck();
     const formControls = Object.entries(this.widgetFilterFormGroup.controls);
-    formControls.forEach(([field, control]) => control.setValue(this.filters[field as keyof DashboardFiltersModel] || []));
+    formControls.forEach(([field, control]) => {
+      const value = this.filters[field as keyof DashboardFiltersModel];
+      if (value) {
+        control.setValue(value);
+      } else {
+        control.reset(null, { emitEvent: false });
+      }
+    });
   }
 
   public setFilterState(): void {
