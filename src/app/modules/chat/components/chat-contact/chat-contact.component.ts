@@ -24,13 +24,13 @@ export class ChatContactComponent {
 
   public selectContact(): void {
     const threads = this.store.selectSnapshot(ChatState.activeThreads);
-    const threadExis = threads.find((thread) => thread.userId === this.participant.userId);
+    const threadExist = threads.find((thread) => thread.userId === this.participant.userId);
 
-    if (threadExis) {
+    if (threadExist) {
       this.existingThreadSelected.emit({
-        id: threadExis.threadId as string,
-        displayName: threadExis.displayName,
-        businessUnitName: threadExis.businessUnitName,
+        id: threadExist.threadId as string,
+        displayName: threadExist.displayName,
+        businessUnitName: threadExist.businessUnitName,
       });
     } else {
       this.contactSelected.emit(this.participant);
