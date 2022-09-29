@@ -56,7 +56,7 @@
               [isAbleToChange]="isChangesSaved">
             </app-date-week-picker>
 
-            <app-upload-button [disabled]="timesheetDetails.noWorkPerformed"
+            <app-upload-button [disabled]="timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
                     [container]="uploadContainer"
                     (filesSelected)="onFilesSelected($event)"
             ></app-upload-button>

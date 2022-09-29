@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 
 import { ChatClient, ChatThreadClient } from '@azure/communication-chat';
-import { CommunicationUserKind, TypingIndicatorReceivedEvent } from '@azure/communication-signaling';
+import { CommunicationUserKind, ReadReceiptReceivedEvent, TypingIndicatorReceivedEvent } from '@azure/communication-signaling';
 import { Select } from '@ngxs/store';
 import {
   HtmlEditorService, ImageService, LinkService,
@@ -41,18 +41,23 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
 
   private readonly typingStream: Subject<void> = new Subject();
 
+  private readReceipts: string[] = [];
+
   @Select(ChatState.typingIndicator)
   private readonly typing$: Observable<TypingIndicatorReceivedEvent>;
+
+  @Select(ChatState.readEvent)
+  private readonly readEvent$: Observable<ReadReceiptReceivedEvent | null>;
 
   ngOnInit(): void {
     this.userDisplayName = this.store.snapshot().user.user.fullName;
     this.userIdentity = this.store.snapshot().chat.currentUserIdentity;
 
-    this.initMessages();
+    this.initChatRoom();
     this.watchForUpdate();
-    this.watchForInputTyping();
-    this.watchForTypingIndicator();
-    this.watchForReceiptsUpdate();
+    this.watchForUserTyping();
+    this.watchForIncomingTypingEvent();
+    this.watchForReadEvent();
   }
 
   ngAfterViewChecked(): void {
@@ -82,41 +87,74 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
     return item.id;
   }
 
-  protected override async updateMessages(): Promise<void> {
-    
-    const newMessages: ReceivedChatMessage[] = [];
-    const iterableAsync = (this.chatThreadClient as ChatThreadClient).listMessages();
-    
-    for await (const message of iterableAsync) {
-      if (message.type === 'text') {
-        const msg: ReceivedChatMessage = {
-          id: message.id,
-          sender: message.senderDisplayName as string,
-          message: message.content?.message as string,
-          timestamp: message.createdOn,
-          isCurrentUser: (message.sender as CommunicationUserKind)?.communicationUserId === this.userIdentity,
-          readIndicator: false,
-        };
-        newMessages.push(msg);
-      }
-    }
-    this.typingEvent = null;
-    this.messages = newMessages.map((item) => ({ ...item })).reverse();
-    this.checkForReceipt();
-    this.updateReadReceipts();
-    this.cd.detectChanges();
+  private initChatRoom(): void {
+    this.setupChatClient();
 
+    if (this.chatThreadClient) {
+      this.initMessages();
+    }
+  }
+
+  private watchForUserTyping(): void {
+    this.typingStream.asObservable()
+    .pipe(
+      filter(() => !!this.chatThreadClient),
+      throttleTime(5000),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      (this.chatThreadClient as ChatThreadClient).sendTypingNotification({ senderDisplayName: this.userDisplayName });
+    });
+  }
+
+  private watchForIncomingTypingEvent(): void {
+    this.typing$
+    .pipe(
+      filter(Boolean),
+      filter((event) => event.threadId === this.currentThread?.threadId
+      && event.senderDisplayName !== this.userDisplayName),
+      tap((event) => {
+        this.typingEvent = event;
+        this.cd.markForCheck();
+      }),
+      debounceTime(10000),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      this.typingEvent = null;
+      this.cd.markForCheck();
+    });
+  }
+
+  private watchForReadEvent(): void {
+    this.readEvent$
+    .pipe(
+      filter((event) => event?.threadId === this.threadId
+      && (event?.sender as CommunicationUserKind).communicationUserId !== this.userIdentity),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((event) => {
+      this.readReceipts = [event?.chatMessageId as string];
+      this.setReadMessages();
+    });
+  }
+
+  protected override async updateMessages(): Promise<void> {
+    await this.getMessages();
+    this.checkForReceipt();
+
+    this.cd.markForCheck();
     if (this.chatArea) {
       this.scrollBottom();
     }
   }
 
-  private initMessages(): void {
-    this.setupChatClient();
-
-    if (this.chatThreadClient) {
-      this.updateMessages();
-    }
+  private async initMessages(): Promise<void> {
+    await this.getMessages();
+    await this.getReceipts();
+    this.setReadMessages();
+    this.checkForReceipt();
+    this.cd.markForCheck();
   }
 
   private scrollBottom(): void {
@@ -136,41 +174,11 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
     }
   }
 
-  private watchForInputTyping(): void {
-    this.typingStream.asObservable()
-    .pipe(
-      filter(() => !!this.chatThreadClient),
-      throttleTime(4000),
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe(() => {
-      (this.chatThreadClient as ChatThreadClient).sendTypingNotification({ senderDisplayName: this.userDisplayName });
-    });
-  }
-
-  private watchForTypingIndicator(): void {
-    this.typing$
-    .pipe(
-      filter(Boolean),
-      filter((event) => event.threadId === this.currentThread?.threadId
-      && event.senderDisplayName !== this.userDisplayName),
-      tap((event) => {
-        this.typingEvent = event;
-        this.cd.markForCheck();
-      }),
-      debounceTime(10000),
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe(() => {
-      this.typingEvent = null;
-      this.cd.markForCheck();
-    });
-  }
-
   private setupChatClient(id?: string): void {
     const client = (this.store.snapshot().chat as ChatModel).chatClient as ChatClient;
     this.currentThread = (this.store.snapshot().chat as ChatModel).currentChatRoomData;
-
+    this.threadId = this.currentThread?.threadId as string;
+  
     const threadId = id || this.currentThread?.threadId as string;
     this.chatThreadClient = threadId ? client.getChatThreadClient(threadId)
     : null;
@@ -205,6 +213,7 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
           businessUnitName: '',
           lasMessageOn: new Date(),
         };
+        this.threadId = '';
         this.cd.markForCheck();
       }
       const reqMeta = this.createMessageRequest();
@@ -214,35 +223,55 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   }
 
   /**
-   * Update receipts after readReceiptReceived event was held in state or on messages init.
-   */
-  protected override async updateReadReceipts(): Promise<void> {
-    const receiptsId = await this.getReceiptIds(this.chatThreadClient as ChatThreadClient);
-
-    this.messages.forEach((message) => {
-      if (message.isCurrentUser && receiptsId.includes(message.id)) {
-        message.readIndicator = true;
-      } else if (message.isCurrentUser) {
-        message.readIndicator = false;
-      }
-    });
-    this.cd.markForCheck();
-  }
-
-  /**
    * Check If read recipt should be sent. Receipt sent only if last message from was not found in receipts
    */
-  private async checkForReceipt(): Promise<void> {
+  private checkForReceipt(): void {
     const messagesFrom = this.messages.filter((message) => !message.isCurrentUser);
     const lastMessage = messagesFrom[messagesFrom.length - 1];
-    const receiptsId = await this.getReceiptIds(this.chatThreadClient as ChatThreadClient);
 
-    if (lastMessage && !receiptsId.includes(lastMessage.id)) {
+    if (lastMessage && !this.readReceipts.includes(lastMessage.id)) {
       this.sendReceipt(lastMessage.id);
     }
   }
 
   private async sendReceipt(id: string): Promise<void> {
     await (this.chatThreadClient as ChatThreadClient).sendReadReceipt({ chatMessageId: id});
+  }
+
+  private async getReceipts(): Promise<void> {
+    this.readReceipts = await this.getReceiptIds(this.chatThreadClient as ChatThreadClient);
+  }
+
+  private async getMessages(): Promise<void> {
+    const newMessages: ReceivedChatMessage[] = [];
+    const iterableAsync = (this.chatThreadClient as ChatThreadClient).listMessages();
+    
+    for await (const message of iterableAsync) {
+      if (message.type === 'text') {
+        const msg: ReceivedChatMessage = {
+          id: message.id,
+          sender: message.senderDisplayName as string,
+          message: message.content?.message as string,
+          timestamp: message.createdOn,
+          isCurrentUser: (message.sender as CommunicationUserKind)?.communicationUserId === this.userIdentity,
+          readIndicator: false,
+        };
+        newMessages.push(msg);
+      }
+    }
+
+    this.typingEvent = null;
+    this.messages = newMessages.map((item) => ({ ...item })).reverse();
+  }
+
+  private setReadMessages(): void {
+    this.messages.forEach((message) => {
+      if (message.isCurrentUser && this.readReceipts.includes(message.id)) {
+        message.readIndicator = true;
+      } else if (message.isCurrentUser) {
+        message.readIndicator = false;
+      }
+    });
+    this.cd.markForCheck();
   }
 }

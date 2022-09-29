@@ -133,7 +133,12 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
       this.store.dispatch(new GetOrganizationsStructureAll(this.createdUser?.id as string)).subscribe(() => {
         if (data) {
           this.title = 'Edit';
-          this.editVisibility = { ...data };
+          this.editVisibility = {
+            ...data,
+            uniqRegionId: this.getUniqIdForVisibility(data.organizationId, data.regionId),
+            uniqLocationId: this.getUniqIdForVisibility(data.organizationId, data.locationId),
+            uniqDepartmentId: this.getUniqIdForVisibility(data.organizationId, data.departmentId),
+          };
           this.organisationsControl?.setValue(
             this.editVisibility.organizationId === null ? this.allOrganisationId : this.editVisibility.organizationId
           );
@@ -186,7 +191,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
         }
 
         this.regions = [...regionsList];
-        this.setControlValue(this.regionsControl as FormControl, this.regions, this.editVisibility?.regionId);
+        this.setControlValue(this.regionsControl as FormControl, this.regions, this.editVisibility?.uniqRegionId);
       } else {
         this.regionsControl?.setValue([]);
         this.regions = [];
@@ -198,7 +203,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
   private onRegionsControlChanges(): void {
     this.regionsControl?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((values: string[]) => {
       if (values?.length) {
-        const controlValues = this.mapCorrectControlValueIds(values);
+        const controlValues = this.mapCorrectControlValueIds(values) as number[];
 
         let selectedRegions: Region[] = this.getSelectedFilteredValues(this.regions, controlValues) as Region[];
         let locations: Location[] = [];
@@ -208,7 +213,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
           locations = [...locations, ...filteredLocation] as Location[];
         });
         this.locations = [...locations];
-        this.setControlValue(this.locationsControl as FormControl, this.locations, this.editVisibility?.locationId);
+        this.setControlValue(this.locationsControl as FormControl, this.locations, this.editVisibility?.uniqLocationId);
       } else {
         this.locationsControl?.setValue([]);
         this.locations = [];
@@ -220,7 +225,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
   private onLocationControlChanges(): void {
     this.locationsControl?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((values: string[]) => {
       if (values?.length) {
-        const controlValues = this.mapCorrectControlValueIds(values);
+        const controlValues = this.mapCorrectControlValueIds(values) as number[];
         let selectedLocations: Location[] = this.getSelectedFilteredValues(this.locations, controlValues) as Location[];
         let departments: Department[] = [];
 
@@ -233,7 +238,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
         this.setControlValue(
           this.departmentsControl as FormControl,
           this.departments,
-          this.editVisibility?.departmentId
+          this.editVisibility?.uniqDepartmentId
         );
       } else {
         this.departmentsControl?.setValue([]);
@@ -252,8 +257,11 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
     );
   }
 
-  private mapCorrectControlValueIds(values: string[]): number[] {
-    return [...values].map((id: string) => +id.split('-')[1]);
+  private mapCorrectControlValueIds(values: string[]): number[] | string[] {
+    if (typeof values[0] === 'string') {
+      return [...values].map((id: string) => +id.split('-')[1]);
+    }
+    return values;
   }
 
   private getFilteredControlValues(
@@ -274,8 +282,8 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
     }));
   }
 
-  private setControlValue(control: FormControl, controlDataSource: any[], value?: number): void {
-    if (!!value || value === null) {
+  private setControlValue(control: FormControl, controlDataSource: any[], value?: string | null): void {
+    if (value === null) {
       control.setValue(controlDataSource.map((item) => item.uniqId));
       return;
     }
@@ -296,6 +304,10 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
           ? [...organisations]
           : [{ name: 'All', organizationId: this.allOrganisationId, regions: [] }, ...organisations];
     });
+  }
+
+  private getUniqIdForVisibility(organizationId: number | null, uniqId: number): string | null {
+    return organizationId === null ? null : `${organizationId}-${uniqId}`;
   }
 
   private closeDialog(): void {

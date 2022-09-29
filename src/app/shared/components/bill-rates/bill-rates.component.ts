@@ -210,6 +210,11 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         const billRateConfig = editedControl.get('billRateConfig');
         billRateConfig?.patchValue({ ...value.billRateConfig });
         editedControl.patchValue({ ...value, billRateConfig });
+
+        if (editedControl.value.isPredefined) {
+          this.billRateForm.get('billRateConfigId')?.enable({ emitEvent: false });
+          this.billRateForm.get('effectiveDate')?.enable({ emitEvent: false });
+        }
       } else {
         this.billRatesControl.push(this.fromValueToBillRate(value));
       }
@@ -236,5 +241,4 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     billRateControl.patchValue({ ...value, billRateConfig });
     return billRateControl;
   }
-
 }
