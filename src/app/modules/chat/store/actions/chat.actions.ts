@@ -1,3 +1,4 @@
+import { ReadReceiptReceivedEvent } from '@azure/communication-signaling';
 import { ChatActions, ChatDialogState, ChatSearchType } from '../../enums';
 
 export namespace Chat {
@@ -33,6 +34,8 @@ export namespace Chat {
 
   export class UpdateMessages {
     static readonly type = ChatActions.UpdateMessages;
+
+    constructor(public readonly threadId: string) {}
   }
 
   export class GetUserChatConfig {
@@ -64,5 +67,7 @@ export namespace Chat {
 
   export class UpdateReceipts {
     static readonly type = ChatActions.UpdateReceipts;
+
+    constructor(public readonly event: ReadReceiptReceivedEvent) {}
   }
 }
