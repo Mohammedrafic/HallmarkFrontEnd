@@ -41,7 +41,7 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
   @Select(ChatState.chatDialogView)
   private readonly chatView$: Observable<ChatDialogState>;
 
-  @Select(ChatState.activeThreads)
+  @Select(ChatState.activeDisplayedThreads)
   public readonly activeThreads$: Observable<ChatThread[]>;
 
   @Select(ChatState.avaliableParticipants)
