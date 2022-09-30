@@ -357,6 +357,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/alerts/alerts-template',
     },
+    80: {
+      // Document Management
+      icon: 'file',
+      route: '/documents/document-library',
+    }
   },
 
   [BusinessUnitType.MSP]: {
@@ -518,6 +523,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/alerts/alerts-template',
     },
+    80: {
+      // Document Management
+      icon: 'file',
+      route: '/documents/document-library',
+    }
   },
 
   [BusinessUnitType.Organization]: {
@@ -840,6 +850,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/alerts/alerts-template',
     },
+    80: {
+      // Document Management
+      icon: 'file',
+      route: '/documents/document-library',
+    }
   },
 
   [BusinessUnitType.Agency]: {
@@ -1047,6 +1062,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/alerts/alerts-template',
     },
+    80: {
+      // Document Management
+      icon: 'file',
+      route: '/documents/document-library',
+    }
   },
 };
 

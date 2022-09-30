@@ -1,0 +1,14 @@
+<section class="document-side-panel">
+  <ejs-treeview id="documentTemplate" #tree [fields]="sidePanelDocumentField"
+                [fullRowSelect]="true" [loadOnDemand]="false">
+    <ng-template #nodeTemplate="" let-data="">
+      <div>
+        <div class="treeviewdiv">
+          <div style="float:left">
+            <i-feather [name]="data.fileType" class="icon"></i-feather> <span class="treeName" style="margin-left:10px;">{{data.name}}</span>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ejs-treeview>
+</section>

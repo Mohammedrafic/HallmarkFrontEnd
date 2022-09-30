@@ -1,0 +1,9 @@
+@import "colors";
+.document-side-panel {
+  background-color: $white;
+  margin-right: 25px;
+  height: 100%;
+  width: 300px;
+  margin-left: -25px;
+  overflow-y: auto;
+}
