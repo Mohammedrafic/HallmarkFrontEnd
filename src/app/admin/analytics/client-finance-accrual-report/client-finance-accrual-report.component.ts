@@ -184,7 +184,7 @@ export class ClientFinanceAccrualReportComponent implements OnInit {
       "EndDateParamACCR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "RegionParamACCR": this.selectedRegions?.map((list) => list.name),
       "LocationParamACCR": this.selectedLocations?.map((list) => list.name),
-      "DepartmentParamACCR": this.selectedDepartments?.map((list) => list.departmentName)
+      "DepartmentParamACCR": this.selectedDepartments?.map((list) => list.departmentName.trim())
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
