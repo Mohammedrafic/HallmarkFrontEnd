@@ -197,9 +197,9 @@ export type AgencyOrderFilters = {
   distributedOnFrom?: Date | null;
   distributedOnTo?: Date | null;
   candidateName?: string | null;
-  projectTypeId?: number | null;
-  projectNameId?: number | null;
-  poNumberId?: number | null;
+  projectTypeIds?: number | null;
+  projectNameIds?: number | null;
+  poNumberIds?: number | null;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -519,9 +519,9 @@ export class OrderFilter {
   distributedOnFrom?: Date | null;
   distributedOnTo?: Date | null;
   candidateName?: string | null;
-  projectTypeId?: number | null;
-  projectNameId?: number | null;
-  poNumberId?: number | null;
+  projectTypeIds?: number | null;
+  projectNameIds?: number | null;
+  poNumberIds?: number | null;
 }
 
 export class SortModel {
