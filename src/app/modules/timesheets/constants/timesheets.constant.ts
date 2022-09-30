@@ -43,5 +43,6 @@ export const UNIT_ORGANIZATIONS_FIELDS = {
 };
 
 export const ColorsWidgetMap: string[] = [
-  '#3E7FFF', '#518CFF', '#6499FF', '#9EBFFF', '#D8E5FF', '#FFFFFF'
+  '#79B392', '#E48192', '#9B85C6', '#8CB3FF', '#8190B2', '#E0BD82', '#518CFF', '#D1D6E2',
+  '#70B16E', '#FFBBBB', '#6499FF', '#677089', '#D1EACE', '#C2A7F9', '#FCC769'
 ];
