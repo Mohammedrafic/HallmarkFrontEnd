@@ -163,7 +163,7 @@ export class DashboardService {
     filters: DashboartFilterDto
   ): Observable<CandidatesByStateWidgetAggregatedDataModel> {
     return forkJoin({ mapData: this.mapData$, applicantsByRegion: this.getApplicantsByPositions(filters) }).pipe(
-      map((data: ApplicantsByRegionDataModel) => {
+      map((data: ApplicantsByRegionDataModel) => {      
         return this.getFormattedPostionsByStatesWidgetAggregatedData(data);
       })
     );
@@ -205,7 +205,7 @@ export class DashboardService {
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
 
-    const title = "";
+    const title = "Applicants by Region";
     const description = "";
     return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates,title,description };
   }
@@ -221,7 +221,7 @@ export class DashboardService {
     ])(applicantsByRegion);
     const maxCandidatesValue = flow(values, max)(candidatesWithState);
     const unknownStateCandidates = applicantsByRegion['Unknown'];
-    const title = "Open Positions";
+    const title = "Applicants by Positions";
     const description = "Open and in progress Position by  State";
 
     const combinedData = { ...mapData, ...USAMapCandidatesDataLayerSettings };

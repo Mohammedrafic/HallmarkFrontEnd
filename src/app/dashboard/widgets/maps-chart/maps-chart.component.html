@@ -1,6 +1,6 @@
 <app-widget-wrapper [isLoading]="isLoading">
   <ng-template #header>
-    <h3 class="widget-header__title">Applicants by Region</h3>
+    <h3 class="widget-header__title">{{ chartData?.title ?? '' }}</h3>
   </ng-template>
 
   <ng-template #mapChart>
