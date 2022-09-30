@@ -47,8 +47,8 @@ export class AnalyticByClickDirective<T> {
   @HostListener('document:select', ['$event.item'])
   public onSelectSideBarItem(item: { title: string; route: T }): void {
     if (this.analyticEvent === AnalyticEventType.Select) {
-      this.analyticData = item.route;
-      this.analyticEventValue = item.title;
+      this.analyticData = item?.route;
+      this.analyticEventValue = item?.title;
 
       this.makeRequest();
     }
