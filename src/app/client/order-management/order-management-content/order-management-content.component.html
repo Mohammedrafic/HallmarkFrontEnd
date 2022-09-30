@@ -207,7 +207,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="type" headerText="TYPE" textAlign="Center" width="70" minWidth="60" maxWidth="100">
+      <e-column field="orderType" headerText="TYPE" textAlign="Center" width="70" minWidth="60" maxWidth="100">
         <ng-template #template let-data>
           <div class="order-type-column" *ngIf="orderTypes[data.orderType] as orderType">
             <ejs-tooltip id="tooltip" [content]="orderType" position="TopCenter">
