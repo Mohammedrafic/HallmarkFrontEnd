@@ -444,16 +444,23 @@ export class OrderManagementContentService {
     });
   }
 
-  private prepareOrderForSaving(order: CreateOrderDto): Omit<CreateOrderDto, 'shiftStartTime' | 'shiftEndTime'> & {
+  private prepareOrderForSaving(order: CreateOrderDto): Omit<
+    CreateOrderDto,
+    'shiftStartTime' | 'shiftEndTime' | 'jobStartDate' | 'jobEndDate'
+  > & {
     shiftStartTime: Date | null;
     shiftEndTime: Date | null;
+    jobStartDate: Date | null;
+    jobEndDate: Date | null;
   } {
-    const { shiftStartTime, shiftEndTime } = order;
+    const { shiftStartTime, shiftEndTime, jobStartDate, jobEndDate } = order;
 
     return {
       ...order,
-      shiftStartTime: shiftStartTime ? new Date(DateTimeHelper.toUtcFormat(order.shiftStartTime)) : null,
-      shiftEndTime: shiftEndTime ? new Date(DateTimeHelper.toUtcFormat(order.shiftEndTime)) : null,
+      jobStartDate: jobStartDate ? new Date(DateTimeHelper.toUtcFormat(jobStartDate)) : null,
+      jobEndDate: jobEndDate ? new Date(DateTimeHelper.toUtcFormat(jobEndDate)) : null,
+      shiftStartTime: shiftStartTime ? new Date(DateTimeHelper.toUtcFormat(shiftStartTime)) : null,
+      shiftEndTime: shiftEndTime ? new Date(DateTimeHelper.toUtcFormat(shiftEndTime)) : null,
     };
   }
 }

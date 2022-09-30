@@ -70,7 +70,7 @@ export class AddEditReorderService {
       reOrderFromId,
       agencyIds,
       candidateProfileIds: reorder.candidates,
-      reorderDate: reorder.reorderDate,
+      reorderDate: DateTimeHelper.toUtcFormat(setTimeToDate(getTimeFromDate(reorder.reorderDate))!),
       shiftEndTime: DateTimeHelper.toUtcFormat(setTimeToDate(getTimeFromDate(reorder.shiftEndTime))!),
       shiftStartTime: DateTimeHelper.toUtcFormat(setTimeToDate(getTimeFromDate(reorder.shiftStartTime))!),
       billRate: reorder.billRate,

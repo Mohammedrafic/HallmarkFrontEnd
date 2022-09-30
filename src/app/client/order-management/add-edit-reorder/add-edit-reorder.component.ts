@@ -122,7 +122,10 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       {
         candidates: [this.getCandidateIds(candidates!)],
         agencies: [this.getAgencyIds(jobDistributions!), Validators.required],
-        reorderDate: [jobStartDate ?? '', Validators.required],
+        reorderDate: [
+          jobStartDate ? DateTimeHelper.convertDateToUtc(jobStartDate.toString()) : '',
+          Validators.required,
+        ],
         shiftStartTime: [
           shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
           Validators.required,
