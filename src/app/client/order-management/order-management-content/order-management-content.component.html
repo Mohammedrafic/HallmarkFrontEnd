@@ -207,10 +207,12 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="orderType" headerText="TYPE" width="180">
+      <e-column field="orderType" headerText="TYPE" textAlign="Center" width="70" minWidth="60" maxWidth="100">
         <ng-template #template let-data>
           <div class="order-type-column" *ngIf="orderTypes[data.orderType] as orderType">
-            <span class="e-badge e-badge-primary e-badge-circle">{{ orderType[0] }}</span> <span>{{ orderType }}</span>
+            <ejs-tooltip id="tooltip" [content]="orderType" position="TopCenter">
+              <span class="e-badge e-badge-primary e-badge-circle">{{ orderType[0] }}</span>
+            </ejs-tooltip>
           </div>
         </ng-template>
       </e-column>

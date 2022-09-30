@@ -554,11 +554,10 @@ html, body {
 }
 
 .order-type-column {
-  display: flex;
-  align-items: center;
+  display: inline-block;
+  cursor: default;
 
   span:first-child {
-    margin-right: 7px;
     background-color: $secondary-dark-blue-20 !important;
   }
 }
