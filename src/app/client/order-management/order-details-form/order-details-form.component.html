@@ -357,7 +357,7 @@
 
                   <!-- Shift Start Time -->
                   <div class="input-container calendar form-line-item-20">
-                    <label for="startTime">Shift Start Time<span class="required">*</span></label>
+                    <label for="startTime">Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label>
                     <div class="input-group datepicker bootstrap">
                       <ejs-timepicker
                         placeholder="HH:MM"
@@ -375,7 +375,7 @@
 
                   <!-- Shift End Time -->
                   <div class="input-container calendar form-line-item-20">
-                    <label for="startTime">Shift End Time<span class="required">*</span></label>
+                    <label for="startTime">Shift End Time<span class="required"  *ngIf="isShiftTimeRequired">*</span></label>
                     <div class="input-group datepicker bootstrap">
                       <ejs-timepicker
                         placeholder="HH:MM"
