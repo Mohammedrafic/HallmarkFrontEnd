@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
@@ -24,6 +24,7 @@ import { LogiReportComponent } from '@shared/components/logi-report/logi-report.
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { analyticsConstants } from '../constants/analytics.constant';
+import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 
 @Component({
   selector: 'app-aging-details',
@@ -31,17 +32,20 @@ import { analyticsConstants } from '../constants/analytics.constant';
   styleUrls: ['./aging-details.component.scss']
 })
 export class AgingDetailsComponent implements OnInit {
-   public paramsData: any = {
+  public paramsData: any = {
     "OrganizationParamAR": "",
-    "StartDateAR": "",
-    "EndDateAR": "",
+    "StartDateParamAR": "",
+    "EndDateParamAR": "",
     "RegionParamAR": "",
     "LocationParamAR": "",
-    "DepartmentParamAR": ""
+    "DepartmentParamAR": "",
+    "BearerParamAR":"",
+    "BusinessUnitIdParamJD":"",
+    "HostName":""
   };
-  public reportName: LogiReportFileDetails = { name: "/AgingReport/AgingReport.cls" };
-  public catelogName: LogiReportFileDetails = { name: "/AgingReport/Dashbord.cat" };
-  public title: string = "Aging Report";
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AgingReport/AgingReport.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AgingReport/Aging.cat" };
+  public title: string = "Aging Details";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
   @Select(LogiReportState.regions)
@@ -86,11 +90,13 @@ export class AgingDetailsComponent implements OnInit {
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
   public isInitialLoad: boolean = false;
+  public baseUrl:string='';
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
     private formBuilder: FormBuilder,
-    private filterService: FilterService) {
+    private filterService: FilterService,@Inject(APP_SETTINGS) private appSettings: AppSettings) {
+    this.baseUrl = this.appSettings.host.replace("https://","").replace("http://","");
     this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
     this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
@@ -176,16 +182,27 @@ export class AgingDetailsComponent implements OnInit {
   }
 
   public SearchReport(): void {
+    let auth="Bearer ";
+    for(let x=0;x<window.localStorage.length;x++)
+    { 
+      if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
+      {
+        auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
+      }
+    }
     let { startDate, endDate } = this.agingReportForm.getRawValue();
     this.paramsData =
-    {
-      "OrganizationParamAR": this.selectedOrganizations?.map((list) => list.name),
-      "StartDateAR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateAR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamAR": this.selectedRegions?.map((list) => list.name),
-      "LocationParamAR": this.selectedLocations?.map((list) => list.name),
-      "DepartmentParamAR": this.selectedDepartments?.map((list) => list.departmentName.trim())
-    };
+      {
+        "OrganizationParamAR": this.selectedOrganizations?.map((list) => list.id).join(","),
+        "StartDateParamAR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+        "EndDateParamAR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+        "RegionParamAR": this.selectedRegions?.map((list) => list.id).join(","),
+        "LocationParamAR": this.selectedLocations?.map((list) => list.id).join(","),
+        "DepartmentParamAR": this.selectedDepartments?.map((list) => list.departmentId).join(","),
+        "BearerParamAR":auth,
+        "BusinessUnitIdParamJD":"1",
+        "HostName":this.baseUrl
+      };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }
