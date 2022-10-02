@@ -200,7 +200,7 @@ export class AgingDetailsComponent implements OnInit {
         "LocationParamAR": this.selectedLocations?.map((list) => list.id).join(","),
         "DepartmentParamAR": this.selectedDepartments?.map((list) => list.departmentId).join(","),
         "BearerParamAR":auth,
-        "BusinessUnitIdParamJD":"1",
+        "BusinessUnitIdParamJD":window.localStorage.getItem("lastSelectedOrganizationId")==null?"1":window.localStorage.getItem("lastSelectedOrganizationId"),
         "HostName":this.baseUrl
       };
     this.logiReportComponent.paramsData = this.paramsData;
