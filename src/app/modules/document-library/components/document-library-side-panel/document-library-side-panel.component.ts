@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { DocumentItem, DocumentLibrary } from '../../store/model/document-library.model';
+import { DocumentItem, DocumentLibrary, NodeItem } from '../../store/model/document-library.model';
 import { DocumentLibraryState } from '../../store/state/document-library.state';
 import { TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
-import { GetDocumentsTree } from '../../store/actions/document-library.actions';
+import { GetDocumentsSelectedNode, GetDocumentsTree } from '../../store/actions/document-library.actions';
 
 @Component({
   selector: 'app-document-library-side-panel',
@@ -18,7 +18,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
   public sidePanelDocumentItems: DocumentItem[];
   private unsubscribe$: Subject<void> = new Subject();
   sidePanelDocumentField: Object;
-  public selectedNode: number;
+  public selectedNode: NodeItem;
 
   @ViewChild('tree', { static: true })
   public tree: TreeViewComponent;
@@ -35,7 +35,22 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
       if (docTree?.documentItems?.length) {
         this.sidePanelDocumentItems = docTree.documentItems;
         this.sidePanelDocumentField = { dataSource: this.sidePanelDocumentItems, id: 'id', text: 'name', child: 'children' };
+        this.tree.selectedNodes = [(this.sidePanelDocumentItems[0].id).toString()];
+        let nodeData = new NodeItem();
+        nodeData.expanded=false;
+        nodeData.hasChildren=true;
+        nodeData.id = this.sidePanelDocumentItems[0].id;
+        nodeData.isChecked = undefined;
+        nodeData.parentID = undefined;
+        nodeData.selected = true;
+        nodeData.text = this.sidePanelDocumentItems[0].name;
+        this.store.dispatch(new GetDocumentsSelectedNode(nodeData));
       }
     });
+  }
+
+  public nodeSelected(event: any) {
+    this.selectedNode = event.nodeData;
+    this.store.dispatch(new GetDocumentsSelectedNode(this.selectedNode));
   }
 }

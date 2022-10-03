@@ -1,1 +1,51 @@
-<p>document-library works!</p>
+<app-page-toolbar>
+  <ng-container left>
+    <section class="page-title">
+      <h3>Documents</h3>
+    </section>
+  </ng-container>
+  <ng-container right>
+    <div class="button-group">
+      <ejs-switch id="switcher"
+                  [checked]="true"></ejs-switch>
+      <label for="switcher" class="switch-text">Include Shared With Me</label>
+      <app-search #search class="search"></app-search>
+      <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline button-filter">
+        Filters <i-feather name="sliders" class="icon"></i-feather>
+      </button>
+      <button ejs-dropdownbutton
+              appHideBeforeSyncfusionLoad
+              id="importButton"
+              cssClass="e-outline button-export">
+        <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
+      </button>
+      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true">
+        <i-feather name="upload" class="icon"></i-feather>Upload
+      </button>
+    </div>
+  </ng-container>
+</app-page-toolbar>
+<section class="document">
+  <div class="e-gridcustomheader">
+    <div class="title">
+      <h3>{{selectedDocumentNode?selectedDocumentNode.text:'Documents'}}</h3>
+    </div>
+    <div class="row-tool-buttons">
+      <button ejs-button cssClass="e-flat seconadry-dark-icon-button">
+        <span><i-feather name="share-2" class="icon"></i-feather></span>
+      </button>
+      <button ejs-button cssClass="e-flat primary-icon-button">
+        <span><i-feather name="edit" class="icon"></i-feather></span>
+      </button>
+      <button ejs-button cssClass="e-flat secondary-icon-button">
+        <span><i-feather name="trash-2" class="icon"></i-feather></span>
+      </button>
+    </div>
+  </div>
+</section>
+<section>
+  <app-document-library-table [gridOptions]="gridOptions"
+                             (onGridReadyEvent)="onGridReady($event)"
+                             (onGridPageSizeChanged)="onPageSizeChanged($event)"></app-document-library-table>
+</section>
+

@@ -10,7 +10,7 @@ export class DocumentLibraryService {
       {
         id: 1,
         businessUnitId: 22,
-        fileType: 'Folder',
+        fileType: 'folder',
         name: 'My Documents',
         children: [
           {
@@ -46,7 +46,7 @@ export class DocumentLibraryService {
       {
         id: 10,
         businessUnitId: 22,
-        fileType: 'Folder',
+        fileType: 'folder',
         name: 'Shared with Me',
         children: [
           { id: 11, businessUnitId: 22, fileType: 'link', name: 'Invoice Issues from ABC', children: [] },

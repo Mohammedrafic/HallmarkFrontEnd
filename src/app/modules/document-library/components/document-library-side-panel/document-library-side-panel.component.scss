@@ -6,4 +6,22 @@
   width: 300px;
   margin-left: -25px;
   overflow-y: auto;
+
+  .documentTreeview {
+    margin-top: 10px;
+    margin-left: 5px;
+    color: $secondary-dark-blue-10;
+
+    .e-list-item {
+      padding: 3px 0px;
+    }
+
+    .e-level-1, .treeview-folder {
+      font-weight: 600;
+    }
+
+    .treeview-normal {
+      font-weight: normal !important;
+    }
+  }
 }
