@@ -27,9 +27,7 @@
     //margin-right: 12px;
   }
 }
-.switch-text {
-  color: $secondary-dark-blue-30;
-}
+
 .document {
   margin-top: 24px;
 
@@ -37,6 +35,10 @@
     width: unset;
   }
 
+  .switch-text {
+    color: $secondary-dark-blue-30;
+  }
+  
   .row-tool-buttons .primary-icon-button {
     color: $primary-active-blue;
   }
@@ -49,3 +51,4 @@
     color: $secondary-dark-blue-30;
   }
 }
+

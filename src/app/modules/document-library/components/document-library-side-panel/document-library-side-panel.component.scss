@@ -3,14 +3,12 @@
   background-color: $white;
   margin-right: 25px;
   height: 100%;
-  width: 300px;
+  width: 231px;
   margin-left: -25px;
   overflow-y: auto;
 
   .documentTreeview {
-    margin-top: 10px;
-    margin-left: 5px;
-    color: $secondary-dark-blue-10;
+    color: $black;
 
     .e-list-item {
       padding: 3px 0px;
@@ -23,5 +21,22 @@
     .treeview-normal {
       font-weight: normal !important;
     }
+
+    .e-list-item .e-ul {
+      padding: 0px;
+    }
+
+    .e-list-item.e-hover > .e-fullrow {
+      background-color: $primary-active-blue-70;
+    }
+
+    .e-list-item.e-active > .e-text-content .e-list-text {
+      color: $black;
+    }
+
+    .e-list-item.e-active > .e-fullrow {
+      background-color: $primary-active-blue-70;
+    }
   }
 }
+
