@@ -36,6 +36,7 @@ import { AnalyticsMenuId } from '@shared/constants/menu-config';
 
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { AnalyticsApiService } from '@shared/services/analytics-api.service';
 enum THEME {
   light = 'light',
   dark = 'dark',
@@ -158,6 +159,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     private orderManagementService: OrderManagementService,
     private orderManagementAgencyService: OrderManagementAgencyService,
     private actions$: Actions,
+    private analyticsApiService: AnalyticsApiService<string>,
   ) {
     router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((data: any) => {
       if (this.tree) {
@@ -365,6 +367,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     if (event.item) {
       this.setSideBarForFirstLoad(event.item.route);
       this.router.navigate([event.item.route]);
+
+      this.analyticsApiService.predefinedMenuClickAction(event.item.route, event.item.title).subscribe();
     }
   }
 
