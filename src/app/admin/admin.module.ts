@@ -51,6 +51,8 @@ import { RejectReasonMasterState } from "@admin/store/reject-reason-mater.state"
 import { ManualInvoiceReasonsComponent } from '@admin/master-data/manual-invoice-reasons/manual-invoice-reasons.component';
 import { ManualInvoiceReasonsState } from '@admin/store/manual-invoice-reasons.state';
 import { OrganizationProfileComponent } from './organization-profile/organization-profile.component';
+import { MasterCredentialsComponent } from './master-data/master-credentials/master-credentials.component';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 
 const sidebarIcons = {
   Download,
@@ -78,6 +80,7 @@ const sidebarIcons = {
     SkillsCategoriesComponent,
     SkillsGridComponent,
     SkillCategoriesGridComponent,
+    MasterCredentialsComponent,
     MasterCredentialsTypesComponent,
     MasterHolidaysComponent,
     RejectReasonMasterComponent,
@@ -122,6 +125,7 @@ const sidebarIcons = {
       HolidaysState,
       RejectReasonMasterState,
       ManualInvoiceReasonsState,
+      OrganizationManagementState
     ]),
   ],
   providers: [
