@@ -113,6 +113,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     text: 'name', value: 'id'
   };
 
+  public importDialogEvent: Subject<boolean> = new Subject<boolean>();
   public orgStructure: OrganizationStructure;
   constructor(private store: Store,
               @Inject(FormBuilder) private builder: FormBuilder,
@@ -287,8 +288,8 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
 
 
-  onImportDataClick(): void {
-    this.store.dispatch(new SetImportFileDialogState(true));
+ onImportDataClick(): void {
+    this.importDialogEvent.next(true);
   }
 
   onAddDepartmentClick(): void {

@@ -18,3 +18,8 @@ export class regionFilter {
   pageNumber?: number;
   getAll?:boolean;
 }
+
+export type ImportedRegion = {
+  orgName: string;
+  regionName: string;
+}

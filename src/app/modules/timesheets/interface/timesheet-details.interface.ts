@@ -49,12 +49,8 @@ export interface CandidateInfo {
   rejectReason: string | null;
 }
 
-export interface CostCenterOption {
-  id: number;
-  name: string;
-}
-
 export interface TimesheetDetailsModel {
+  agencyAbleSubmitWithoutAttachments: boolean;
   id: number;
   statusText: string;
   status: TimesheetStatus;
@@ -64,6 +60,7 @@ export interface TimesheetDetailsModel {
   canApproveTimesheet: boolean;
   canEditMileage: boolean;
   canEditTimesheet: boolean;
+  canUploadFiles: boolean;
   rejectionReason?: string;
   organizationId: number;
   candidateId: number;

@@ -33,7 +33,7 @@ import { Credential } from "@shared/models/credential.model";
 import { ConfirmService } from "@shared/services/confirm.service";
 import { downloadBlobFile } from "@shared/utils/file.utils";
 import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
-import { FieldSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
+import { ChangeEventArgs, FieldSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
 import { FileInfo, SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
 import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil } from "rxjs";
@@ -108,12 +108,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return !!this.credentialId;
   }
 
-  private get createdOnControl(): AbstractControl | null {
-    return this.addCredentialForm.get('createdOn');
+  get showCompleteDate(): boolean {
+    return this.statusControl?.value === CredentialVerifiedStatus.Completed;
   }
 
-  private get createdUntilControl(): AbstractControl | null {
-    return this.addCredentialForm.get('createdUntil');
+  private get statusControl(): AbstractControl | null {
+    return this.addCredentialForm.get('status');
   }
 
   constructor(private store: Store,
@@ -182,7 +182,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public addNew(): void {
     this.store.dispatch(new GetMasterCredentials('', ''));
-    this.store.dispatch(new ShowSideDialog(true)).subscribe(() => this.setDropElement());
+    this.store.dispatch(new ShowSideDialog(true)).subscribe(() => {
+      this.setDropElement();
+      this.setDefaultStatusValue();
+    });
   }
 
   public onFilter(): void {
@@ -191,6 +194,14 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public dataBound(): void {
     this.grid.hideScroll();
+  }
+
+  public setCompleteDate(event: ChangeEventArgs): void {
+    this.addCredentialForm.get('completedDate')?.setValue(
+      event.value === CredentialVerifiedStatus.Completed
+        ? new Date().toISOString()
+        : null
+    );
   }
 
   public closeDialog(): void {
@@ -250,7 +261,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
                 { status, insitute, createdOn, number, experience, createdUntil, completedDate,
                   masterCredentialId, id, credentialFiles, expireDateApplicable }: CandidateCredential) {
     event.stopPropagation();
-    this.checkCertifiedFields(expireDateApplicable as boolean);
+    this.showCertifiedFields = !!expireDateApplicable;
     this.credentialId = id as number;
     this.masterCredentialId = masterCredentialId;
     this.hasFiles = !!credentialFiles?.length;
@@ -291,7 +302,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public selectMasterCredentialId(event: { data: Credential }): void {
     this.masterCredentialId = event.data.id as number;
-    this.checkCertifiedFields(event.data.expireDateApplicable);
+    this.showCertifiedFields = event.data.expireDateApplicable;
   }
 
   public clearMasterCredentialId(): void {
@@ -403,20 +414,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       });
   }
 
-  private checkCertifiedFields(expireDateApplicable: boolean): void {
-    this.showCertifiedFields = expireDateApplicable;
-
-    if (this.showCertifiedFields) {
-      this.createdOnControl?.setValidators([Validators.required]);
-      this.createdUntilControl?.setValidators([Validators.required]);
-    } else {
-      this.createdOnControl?.setValidators([]);
-      this.createdUntilControl?.setValidators([]);
-      this.createdOnControl?.setValue(null);
-      this.createdUntilControl?.setValue(null)
-    }
-
-    this.createdOnControl?.updateValueAndValidity();
-    this.createdUntilControl?.updateValueAndValidity()
+  private setDefaultStatusValue(): void {
+    this.statusControl?.setValue(CredentialVerifiedStatus.Pending);
   }
 }

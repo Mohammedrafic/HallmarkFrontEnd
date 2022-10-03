@@ -6,7 +6,7 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { GridReadyEvent } from '@ag-grid-community/core';
-import { GetAlertsTemplatePage, GetTemplateByAlertId, SaveTemplateByAlertId, UpdateTemplateByAlertId } from '@admin/store/alerts.actions';
+import { ClearAlertTemplateState, GetAlertsTemplatePage, GetTemplateByAlertId, SaveTemplateByAlertId, UpdateTemplateByAlertId } from '@admin/store/alerts.actions';
 import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from '@shared/models/alerts-template.model';
 import { AlertsState } from '@admin/store/alerts.state';
 import { SetHeaderState, ShowEmailSideDialog, ShowSmsSideDialog, ShowOnScreenSideDialog, ShowToast } from 'src/app/store/app.actions';
@@ -117,6 +117,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   maxBlocksInCache: any;
   defaultColDef: any;
   itemList: Array<AlertsTemplate> | undefined;
+  
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
   }
@@ -209,6 +210,9 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     };
   }
   ngOnDestroy(): void {
+    this.store.dispatch(new ClearAlertTemplateState());
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
     this.isAlive = false;
   }
   public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
@@ -242,7 +246,53 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     this.emailTemplateFormGroup = AlertsEmailTemplateFormComponent.createForm();
     this.smsTemplateFormGroup = AlertsSmsTemplateFromComponent.createForm();
     this.onScreenTemplateFormGroup = AlertsOnScreenTemplateFormComponent.createForm();
-    this.closeDialog();
+    this.editAlertsTemplate$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+      this.templateParamsData = [];
+      if (data != undefined) {
+        data.alertId=this.alertTemplate?.alertId;
+        data.alertChannel=this.alertChannel;
+        this.editAlertTemplateData = data;
+        if (data.parameters != undefined) {
+          data.parameters.forEach((paramter: string) => {
+            this.templateParamsData.push({
+              text: paramter,
+              id: paramter,
+              "htmlAttributes": { draggable: true }
+            })
+          });
+        }   
+        this.UpdateForm(data);
+      }
+    });
+    this.updateTemplateByAlertId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {      
+      if (data != undefined && data!=null) {
+        if (data.alertChannel == AlertChannel.Email) {
+          this.emailTemplateCloseDialog();
+        }
+        else if (data.alertChannel == AlertChannel.SMS) {
+          this.smsTemplateCloseDialog();
+        }
+        else if (data.alertChannel == AlertChannel.OnScreen) {
+          this.onScreenTemplateCloseDialog();
+        }
+
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      }
+    });
+      this.saveTemplateByAlertId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {      
+        if (data != undefined && data!=null) {
+          if (data.alertChannel == AlertChannel.Email) {
+            this.emailTemplateCloseDialog();
+          }
+          else if (data.alertChannel == AlertChannel.SMS) {
+            this.smsTemplateCloseDialog();
+          }
+          else if (data.alertChannel == AlertChannel.OnScreen) {
+            this.onScreenTemplateCloseDialog();
+          }
+          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        }
+      });
   }
   public onEmailTemplateEdit(data: any): void {
     this.alertChannel=AlertChannel.Email;
@@ -358,7 +408,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     if (this.emailTemplateFormGroup.valid && this.emailTemplateFormGroup.errors == null) {
       const formValues = this.emailTemplateFormGroup.getRawValue();
       if (this.editAlertTemplateData.id == 0) {
-        const emailTemplateDto: AddAlertsTemplateRequest = {
+        const emailAddTemplateDto: AddAlertsTemplateRequest = {
           alertId: this.editAlertTemplateData.alertId,
           businessUnitId: this.businessControl.value==0?null:this.businessControl.value,
           alertBody: formValues.alertBody,
@@ -368,7 +418,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
           bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
         };
-        this.store.dispatch(new SaveTemplateByAlertId(emailTemplateDto));       
+        this.store.dispatch(new SaveTemplateByAlertId(emailAddTemplateDto));       
       }
       else {
         const updateEmailTemplateDto: EditAlertsTemplateRequest = {
@@ -390,7 +440,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     if (this.smsTemplateFormGroup.valid && this.smsTemplateFormGroup.errors == null) {
       const formValues = this.smsTemplateFormGroup.getRawValue();
       if (this.editAlertTemplateData.id == 0) {
-        const emailAddTemplateDto: AddAlertsTemplateRequest = {
+        const smsAddTemplateDto: AddAlertsTemplateRequest = {
           alertId: this.editAlertTemplateData.alertId,
           businessUnitId: this.businessControl.value==0?null:this.businessControl.value,
           alertBody: formValues.alertBody?.replace(/<[^>]*>/g, ''),
@@ -400,7 +450,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
           bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
         };
-        this.store.dispatch(new SaveTemplateByAlertId(emailAddTemplateDto));       
+        this.store.dispatch(new SaveTemplateByAlertId(smsAddTemplateDto));       
       }
       else {
         const smsUpdateTemplateDto: EditAlertsTemplateRequest = {
@@ -461,25 +511,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     this.store.dispatch(new ShowOnScreenSideDialog(false));
   }
   private SetEditData(alertId: number, alertChannel: AlertChannel,businessUnitId:number |null): void {
-    this.dispatchEditAlertTemplate(alertId, alertChannel,businessUnitId);
-
-    this.editAlertsTemplate$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
-      this.templateParamsData = [];
-      if (data != undefined) {
-        data.alertId=this.alertTemplate.alertId;
-        data.alertChannel=this.alertChannel;
-        this.editAlertTemplateData = data;
-        if (data.parameters != undefined) {
-          data.parameters.forEach((paramter: string) => {
-            this.templateParamsData.push({
-              text: paramter,
-              id: paramter,
-              "htmlAttributes": { draggable: true }
-            })
-          });
-        }
-      }
-    });
+    this.dispatchEditAlertTemplate(alertId, alertChannel,businessUnitId);    
   }
   private generateBusinessForm(): FormGroup {
     return new FormGroup({
@@ -500,35 +532,21 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         this.dispatchNewPage();
     });
   }
-  private closeDialog(): void {
-    this.updateTemplateByAlertId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
-      if (data != undefined) {
-        if (data.alertChannel == AlertChannel.Email) {
-          this.emailTemplateCloseDialog();
-        }
-        else if (data.alertChannel == AlertChannel.SMS) {
-          this.smsTemplateCloseDialog();
-        }
-        else if (data.alertChannel == AlertChannel.OnScreen) {
-          this.onScreenTemplateCloseDialog();
-        }
+  
+  private UpdateForm(data:any):void
+  {
+    if (this.alertTemplateType === AlertChannel[AlertChannel.Email]) {
+      this.emailTemplateForm.alertBody=data.alertBody;
+      this.emailTemplateForm.alertTitle=data.alertTitle;
+    }
+    else if (this.alertTemplateType === AlertChannel[AlertChannel.SMS]) {
+      this.smsTemplateForm.alertBody=data.alertBody;
+      this.smsTemplateForm.alertTitle=data.alertTitle;
+    }
+    else if (this.alertTemplateType === AlertChannel[AlertChannel.OnScreen]) {
+      this.onScreenTemplateForm.alertBody=data.alertBody;
+      this.onScreenTemplateForm.alertTitle=data.alertTitle;
+    }
 
-        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      }
-      this.saveTemplateByAlertId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
-        if (data != undefined) {
-          if (data.alertChannel == AlertChannel.Email) {
-            this.emailTemplateCloseDialog();
-          }
-          else if (data.alertChannel == AlertChannel.SMS) {
-            this.smsTemplateCloseDialog();
-          }
-          else if (data.alertChannel == AlertChannel.OnScreen) {
-            this.onScreenTemplateCloseDialog();
-          }
-          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-        }
-      });
-    });
   }
 }

@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DepartmentsGridComponent } from './departments-grid.component';
+import { RegionsGridComponent } from './regions-grid.component';
 
-describe('DepartmentsGridComponent', () => {
-  let component: DepartmentsGridComponent;
-  let fixture: ComponentFixture<DepartmentsGridComponent>;
+describe('RegionsGridComponent', () => {
+  let component: RegionsGridComponent;
+  let fixture: ComponentFixture<RegionsGridComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DepartmentsGridComponent ]
+      declarations: [ RegionsGridComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DepartmentsGridComponent);
+    fixture = TestBed.createComponent(RegionsGridComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

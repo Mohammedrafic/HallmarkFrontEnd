@@ -1,0 +1,11 @@
+<div class="grid-container">
+    <div class="grid-title">Region</div>
+    <app-grid
+      (gridReadyEmitter)="gridReady($event)"
+      [suppressRowClickSelection]="true"
+      [columnDefinitions]="columnDefs"
+      [rowData]="importedregions"
+      [totalRecordsCount]="importedregions.length"
+      [paginationPanel]="false"
+    ></app-grid>
+  </div>

@@ -54,7 +54,7 @@
         <i-feather name="calendar" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{ orderInformation.jobStartDate | date: 'MM/dd/yyy' }}</div>
+        <div class="title">{{ orderInformation.jobStartDate | date: 'MM/dd/yyy':'UTC' }}</div>
         <div class="sup-title">{{ dateFieldName }}</div>
       </div>
     </div>
@@ -63,14 +63,16 @@
         <i-feather name="calendar" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{ orderInformation.jobEndDate | date: 'MM/dd/yyy' }}</div>
+        <div class="title">{{ orderInformation.jobEndDate | date: 'MM/dd/yyy':'UTC' }}</div>
         <div class="sup-title">End Date</div>
       </div>
     </div>
     <div class="column"></div>
     <div class="column last-column">
       <div *ngIf="orderInformation?.extensionInitialOrderId" class="accent link" (click)="moveToInitialOrder()">
-        Initial Order ID: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionInitialOrderPublicId }}
+        Initial Order ID: {{ orderInformation.organizationPrefix }}-{{
+          orderInformation?.extensionInitialOrderPublicId
+        }}
       </div>
       <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
         Previous Extension: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionPublicId }}
@@ -111,12 +113,17 @@
     </div>
     <div class="column">
       <div class="title">
-        {{ orderInformation.shiftStartTime | date: 'hh:mm' }} - {{ orderInformation.shiftEndTime | date: 'hh:mm' }}
+        {{ orderInformation.shiftStartTime | date: 'hh:mm':'UTC' }} -
+        {{ orderInformation.shiftEndTime | date: 'hh:mm':'UTC' }}
       </div>
       <div class="sup-title">Shift</div>
     </div>
     <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
-      <div class="title">${{ (orderInformation.joiningBonus || 0) | currency: '' : '' }} / ${{ (orderInformation.compBonus || 0) | currency: '' : '' }}</div>
+      <div class="title">
+        ${{ orderInformation.joiningBonus || 0 | currency: '':'' }} / ${{
+          orderInformation.compBonus || 0 | currency: '':''
+        }}
+      </div>
       <div class="sup-title">Start / End Bonus</div>
     </div>
     <div class="column">

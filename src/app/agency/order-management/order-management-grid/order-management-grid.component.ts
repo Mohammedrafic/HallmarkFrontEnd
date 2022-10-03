@@ -108,7 +108,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public wrapSettings: TextWrapSettingsModel = GRID_CONFIG.wordWrapSettings;
   public allowWrap = GRID_CONFIG.isWordWrappingEnabled;
   public selectionOptions: SelectionSettingsModel = {
-    type: 'Single',
+    type: 'Multiple',
     mode: 'Row',
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
@@ -140,7 +140,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private orderPerDiemId: number | null;
   private prefix: string | null;
   private orderId: number | null;
-  private stateFullOrderId: string | null;
 
   private isAlive = true;
   private selectedIndex: number | null;
@@ -162,9 +161,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onOrderPreviewChange();
     this.onAgencyChange();
     this.onChildDialogChange();
-    const locationState = this.location.getState() as { orderId: number; fullOrderId: string; };
+    const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
-    this.stateFullOrderId = locationState.fullOrderId;
     this.onReloadOrderCandidatesLists();
     this.onExportSelectedSubscribe();
     this.idFieldName = 'orderId';
@@ -359,8 +357,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
             this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
             this.filteredItems$.next(this.filteredItems.length);
           }
-
-          this.setFullOrderIdData();
           this.dispatchNewPage();
         })
       )
@@ -375,8 +371,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.filters.includeReOrders = true;
         this.hasOrderMyAgencyId();
         selectedOrderAfterRedirect?.orderType !== OrderType.ReOrder &&
-          this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters))
-            .subscribe(() => this.handleFullOrderId());
+          this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.PerDiem:
         this.filters.orderTypes = [OrderType.OpenPerDiem];
@@ -596,9 +591,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       distributedOnFrom: this.filters.distributedOnFrom || null,
       distributedOnTo: this.filters.distributedOnTo || null,
       candidateName: this.filters.candidateName || null,
-      projectTypeId: this.filters.projectTypeId || null,
-      projectNameId: this.filters.projectNameId || null,
-      poNumberId: this.filters.poNumberId || null
+      projectTypeIds: this.filters.projectTypeIds || null,
+      projectNameIds: this.filters.projectNameIds || null,
+      poNumberIds: this.filters.poNumberIds || null
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.filteredItems$.next(this.filteredItems.length);
@@ -805,24 +800,5 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.currentPage = page;
       this.dispatchNewPage();
     });
-  }
-
-  private setFullOrderIdData(): void {
-    if (this.stateFullOrderId) {
-      this.filters.orderPublicId = this.stateFullOrderId;
-      this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.filters.orderPublicId);
-    }
-  }
-
-  private handleFullOrderId(): void {
-    if (this.stateFullOrderId) {
-      const [ data ] = this.store.selectSnapshot(OrderManagementState.ordersPage)?.items || [];
-
-      if (data) {
-        this.onRowClick({ data });
-        this.filteredItems$.next(1);
-        this.stateFullOrderId = null;
-      }
-    }
   }
 }

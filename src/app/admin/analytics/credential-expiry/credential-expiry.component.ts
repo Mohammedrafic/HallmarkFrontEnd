@@ -8,7 +8,7 @@ import { Region, regionFilter } from '@shared/models/region.model';
 import { Department, DepartmentsByLocationsFilter } from '@shared/models/department.model';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
-import { SetHeaderState } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
 import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
@@ -21,6 +21,9 @@ import { LogiReportState } from '@organization-management/store/logi-report.stat
 import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
+import { FilteredItem } from '@shared/models/filter.model';
+import { analyticsConstants } from '../constants/analytics.constant';
+import { FilterService } from '@shared/services/filter.service';
 
 @Component({
   selector: 'app-credential-expiry',
@@ -80,10 +83,15 @@ export class CredentialExpiryComponent implements OnInit {
   public defaultLocations:(number|undefined)[]=[];
   public defaultDepartments:(number|undefined)[]=[];
   public today = new Date();
+  public filteredItems: FilteredItem[] = [];
+  public isClearAll: boolean = false;
+  public isInitialLoad: boolean = false;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   constructor(private store: Store,
-    private formBuilder: FormBuilder) {
+    private formBuilder: FormBuilder,
+    private filterService: FilterService  ) {
     this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+    this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
@@ -91,55 +99,74 @@ export class CredentialExpiryComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isInitialLoad = true;
+    this.orderFilterColumnsSetup();
+    this.onFilterControlValueChangedHandler();
+  }
+  private initForm(): void {
+    let startDate = new Date(Date.now());
+    startDate.setDate(startDate.getDate() - 90);
     this.credentialExpiryForm = this.formBuilder.group(
       {
-        business: new FormControl(null,[Validators.required]),
-        startDate:new FormControl(null,[Validators.required]),
-        endDate: new FormControl(null,[Validators.required]),
-        regionId: new FormControl(null,[Validators.required]),
-        locationId: new FormControl(null,[Validators.required]),
-        departmentId: new FormControl(null,[Validators.required])
-
+        businessIds: new FormControl(null, [Validators.required]),
+        startDate: new FormControl(startDate, [Validators.required]),
+        endDate: new FormControl(new Date(Date.now()), [Validators.required]),
+        regionIds: new FormControl(null, [Validators.required]),
+        locationIds: new FormControl(null, [Validators.required]),
+        departmentIds: new FormControl(null, [Validators.required])
       }
     );
-    this.orderFilterColumnsSetup();
-    this.bussinessControl = this.credentialExpiryForm.get('business') as AbstractControl;
+  }
+
+  public onFilterControlValueChangedHandler(): void {
+    this.bussinessControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
     this.businessData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.organizations = data;
       this.filterColumns.businessIds.dataSource = data;
-      this.defaultOrganizations=data.map((list) => list.id);
+      this.defaultOrganizations = data.map((list) => list.id);
     });
-   
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-
-      this.selectedOrganizations = this.organizations?.filter((x) => data?.includes(x.id));
-      let regionFilter: regionFilter = {
-        ids: data,
-        getAll: true
-      };
-      this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
+      if (!this.isClearAll) {
+        this.selectedOrganizations = this.organizations?.filter((x) => data?.includes(x.id));
+        let regionFilter: regionFilter = {
+          ids: data,
+          getAll: true
+        };
+        this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
+      }
+      else {
+        this.isClearAll = false;
+      }
     });
-    this.regionIdControl = this.credentialExpiryForm.get('regionId') as AbstractControl;
+    this.regionIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
-      let locationFilter: LocationsByRegionsFilter = {
-        ids: data,
-        getAll: true
-      };
-      this.store.dispatch(new GetLocationsByRegions(locationFilter));
+      if (this.regionIdControl.value.length > 0) {
+        this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
+        let locationFilter: LocationsByRegionsFilter = {
+          ids: data,
+          getAll: true
+        };
+        this.store.dispatch(new GetLocationsByRegions(locationFilter));
+      }
     });
-    this.locationIdControl = this.credentialExpiryForm.get('locationId') as AbstractControl;
+    this.locationIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
-      let departmentFilter: DepartmentsByLocationsFilter = {
-        ids: data,
-        getAll: true
-      };
-      this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));
+      if (this.locationIdControl.value.length > 0) {
+        this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
+        let departmentFilter: DepartmentsByLocationsFilter = {
+          ids: data,
+          getAll: true
+        };
+        this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));
+      }
     });
-    this.departmentIdControl = this.credentialExpiryForm.get('departmentId') as AbstractControl;
+    this.departmentIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));    
+      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));
+      if (this.isInitialLoad) {
+        this.isInitialLoad = false;
+        this.SearchReport();
+      }
     });
     this.onOrganizationsChange();
     this.onRegionsChange();
@@ -147,11 +174,6 @@ export class CredentialExpiryComponent implements OnInit {
   }
  
   public SearchReport(): void {
-    this.credentialExpiryForm.markAllAsTouched();
-    if (this.credentialExpiryForm?.invalid) {
-      return;
-    }
-   
       let { startDate, endDate } = this.credentialExpiryForm.getRawValue();
       this.paramsData =
       {
@@ -160,7 +182,7 @@ export class CredentialExpiryComponent implements OnInit {
         "EndDateParamCREXP": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
         "RegionParamCREXP": this.selectedRegions?.map((list) => list.name),
         "LocationParamCREXP": this.selectedLocations?.map((list) => list.name),
-        "DepartmentParamCREXP": this.selectedDepartments?.map((list) => list.departmentName)
+        "DepartmentParamCREXP": this.selectedDepartments?.map((list) => list.departmentName.trim())
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
@@ -192,8 +214,8 @@ export class CredentialExpiryComponent implements OnInit {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
+        valueField: 'departmentName',
+        valueId: 'departmentId',
       },
       startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       endDate: { type: ControlTypes.Date, valueType: ValueType.Text }
@@ -234,5 +256,34 @@ export class CredentialExpiryComponent implements OnInit {
           this.defaultDepartments=data.map((list) => list.departmentId);
         }
       });
-  }  
+  }
+
+  public showFilters(): void {
+    this.onFilterControlValueChangedHandler();
+    this.store.dispatch(new ShowFilterDialog(true));
+  }
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.credentialExpiryForm, this.filterColumns);
+  }
+  public onFilterClearAll(): void {
+    this.isClearAll = true;
+    let startDate = new Date(Date.now());
+    startDate.setDate(startDate.getDate() - 90);
+    this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
+    this.credentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+    this.credentialExpiryForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+    this.credentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.credentialExpiryForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
+    this.credentialExpiryForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    this.filteredItems = [];
+  }
+  public onFilterApply(): void {
+    this.credentialExpiryForm.markAllAsTouched();
+    if (this.credentialExpiryForm?.invalid) {
+      return;
+    }
+    this.filteredItems = this.filterService.generateChips(this.credentialExpiryForm, this.filterColumns);
+    this.SearchReport();
+    this.store.dispatch(new ShowFilterDialog(false));
+  }
 }

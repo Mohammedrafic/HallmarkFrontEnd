@@ -45,7 +45,7 @@ export class GetUserSubscriptionPage {
   export class UpdateTemplateByAlertId {
     static readonly type = '[alerts] Update Template By AlertId';
     constructor(
-      public editAlertsTemplateRequest:EditAlertsTemplateRequest
+      public editAlertsTemplateRequest:EditAlertsTemplateRequest 
     ) {}
 }
 export class SaveTemplateByAlertId {
@@ -70,3 +70,7 @@ export class DismissAllAlerts {
   static readonly type = '[alerts] Dismiss All Alerts';
   constructor(){}
 }
+export class ClearAlertTemplateState {
+  static readonly type = '[alerts] Clear Alert Template State';
+  constructor(){}
+} 

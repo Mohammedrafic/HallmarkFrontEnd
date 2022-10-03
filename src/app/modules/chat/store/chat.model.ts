@@ -1,4 +1,4 @@
-import { ChatClient, TypingIndicatorReceivedEvent } from '@azure/communication-chat';
+import { ChatClient, ReadReceiptReceivedEvent, TypingIndicatorReceivedEvent } from '@azure/communication-chat';
 
 import { ChatDialogState } from '../enums';
 import { ChatThread } from '../interfaces';
@@ -17,4 +17,7 @@ export interface ChatModel {
   chatClient: ChatClient | null;
   typingIndicator: TypingIndicatorReceivedEvent | null;
   userIdToStart: string | null;
+  startThreadId: string;
+  threadIdToUpdate: string;
+  readReceiptEvent: ReadReceiptReceivedEvent | null;
 }

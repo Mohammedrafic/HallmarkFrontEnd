@@ -15,7 +15,7 @@
   @media #{$max-mobile} {
     width: 100%;
     padding-left: 0;
-    }
+  }
 
   &.expanded {
     width: calc(100% - 259px);
@@ -24,7 +24,7 @@
     @media #{$max-mobile} {
       width: 100%;
       padding-left: 0;
-      }
+    }
   }
 
   .header-item {
@@ -49,7 +49,7 @@
       margin-right: 25px;
       position: relative;
       cursor: pointer;
-      
+
       &::before {
         content: '\2630';
         color: $secondary-dark-blue-30;
@@ -76,7 +76,7 @@
 
     @media #{$max-mobile} {
       margin-left: 0px !important;
-      }
+    }
   }
 
   #sidebar {
@@ -98,7 +98,7 @@
         align-items: center;
         padding-left: 14px;
       }
-  
+
       &__img {
         width: 36px;
         height: 36px;
@@ -118,14 +118,23 @@
 
     @media #{$max-mobile} {
       display: flex;
-      }
+    }
 
     .close-btn {
-      width: 18px;
-      margin-right: 16px;
+      //width: 18px;
+      height: 8px;
+      width: 8px;
+      left: 4px;
+      top: 4px;
+      border-radius: 0px;
+
+
+      margin-right: 10px;
       position: relative;
       cursor: pointer;
-      
+      color: #3E7FFF;
+
+
       &::before {
         content: '\2715';
         color: $white;
@@ -282,7 +291,7 @@
 
   .sidebar-item {
     border-bottom: 1px solid $secondary-dark-blue-45-1;
-    
+
     &:hover {
       background-color: $secondary-dark-blue-10-1;
     }
@@ -386,36 +395,39 @@
 .bell-button {
   display: inline-block;
   position: relative;
-  padding: 2px 5px;
-
+  padding: 10px 15px;
+  color: $secondary-dark-blue-15;
   &.left {
     margin-right: 40px;
   }
   @media #{$max-mobile} {
     padding-right: 30px;
-    }
+  }
 }
 
 .bell-button:hover {
   background:$bell-button-hover-bg;
-  border-radius: 4px !important;
+  border-radius: 10px !important;
+  color: $primary-active-blue-10;
 }
 
 .bell-button:active {
   background:$bell-button-active-bg;
-  color:white;
-  border-radius: 4px !important;
+  color:$white;
+  border-radius: 10px !important;
 }
 
 .bell-button__badge {
-  background-color: #558eff;
+  border-color: $white;
+  border-style: solid;
+  background-color: $primary-btn-hover;
   border-radius: 50%;
-  color: white;
-  padding: 1px 5px;
-  font-size: 10px;
+  color: $secondary-dark-blue-15;
+  padding: 2px 6px;
+  font-size: 11px;
   position: absolute;
   top: 0;
-  right: 0;
+  right: 6px;
 
   &.empty-chat {
     height: 10px;
@@ -424,7 +436,7 @@
   }
   @media #{$max-mobile} {
     right: 25px;
-    }
+  }
 }
 
 .e-dropdown-popup {
@@ -512,7 +524,7 @@
   font-weight: 500;
 }
 .e-menu-wrapper.e-popup.e-menu-popup{
-    border-radius:8px;
+  border-radius:8px;
 }
 
 .search-menu:hover {
@@ -529,20 +541,30 @@
 
 #alert-sidebar {
   .sidebar-header {
-    background-color: $alert-side-bar-bgcolor;
+    display: flex;
     height: 50px !important;
+    width:156px;
+    height:32px;
+    top:34px;
+    left:24px;
+    right:260;
+    font-family: Open Sans;
+    font-size: 18px;
+    line-height: 32px;
+    letter-spacing: 0em;
+    text-align: justified;
 
     i-feather {
       position: absolute;
       top: 0px;
       padding: 1rem 0rem 0rem 0.5rem;
-      color: white;
+      color: $white;
       width: 20px;
       height: 20px;
     }
 
     h5 {
-      color: white;
+      color: $black;
       padding: 0.8rem 1.5rem 0rem 1.5rem;
       font-size: 1.5em !important;
       margin: auto;
@@ -554,16 +576,28 @@
 
     .closebtn {
       top: 2px;
-      color: black;
+      color: $primary-active-blue-10;
       position: absolute;
       right: 4px;
       background-color: transparent !important;
       padding: 0.55rem 0.2rem 0rem 0rem;
+      font-size: 14px;
+      line-height: 20px;
+      top:10px;
+      right: 50px;
+      display:flex;
 
       button {
         padding: 0.3rem 0.5rem !important;
         border-radius: 4px !important;
         height: auto !important;
+        border-radius: 0px;
+        position: fixed;
+        right: 8px;
+        top: 15px;
+        background-color: transparent !important;
+        cursor: pointer;
+        color: $primary-active-blue-10;
       }
     }
 
@@ -571,7 +605,7 @@
       top: 2px;
       line-height: 26px;
       height: 42px;
-      color: black;
+      color: $primary-active-blue-10;
       position: absolute;
       right: 40px;
       background-color: transparent !important;
@@ -605,26 +639,56 @@
     .alert-panel {
       margin-top: 5px;
       padding: 1rem;
-      background: $primary-active-blue-90;
       gap: 17px;
+      width: 390px;
+      left: 0px;
+      top: 0px;
+      border-radius: 8px;
+      background: $supportive-green-50;
+
 
       .alert-panel-header {
         display: flex;
+        align-items: center;
 
-        &__flex-child {
-        }
+        &__flex-child {}
 
         &__flex-child:first-child {
-          margin-right: 15px;
         }
 
         &__title {
           font-weight: bold;
+          height: 28px;
+          width: 177px;
+          left: 36px;
+          top: 5px;
+          border-radius: nullpx;
+          font-family: Open Sans;
+          font-size: 18px;
+          font-weight: 700;
+          line-height: 28px;
+          letter-spacing: 0.015em;
+          text-align: left;
+
+        }
+
+        &__date {
+          height: 32px;
+          width: 200px;
+          left: 275px;
+          top: 12px;
+          color: $secondary-dark-blue-20;
+          font-family: Open Sans;
+          font-size: 12px;
+          font-weight: 400;
+          line-height: 16px;
+          letter-spacing: 0px;
+          text-align: right;
         }
       }
 
       .alert-content {
-        color: $primary-active-blue-20;
+        color: $black;
         font-weight: 400;
         padding: 5px;
       }
@@ -644,8 +708,14 @@
       }
 
       .badge-info {
-        color: $white;
-        background-color: $primary-active-blue-10;
+        color: $supportive-green-10;
+        height: 18px;
+        width: 18px;
+        top: 13px;
+        left: 2px;
+        top: 1.33px;
+        border-radius: 0px;
+        size: 13px;
       }
 
       .badge-danger {
@@ -659,23 +729,28 @@
       }
 
       .alert-panel-footer {
-        display: flex;
-        margin-top: 1rem;
-        color: $secondary-dark-blue-10;
+        
+        right: 15px;
+        align-items: center;
+        margin-bottom: 10px;;
+        color: $primary-active-blue-10;
 
         &__footer_flex-child {
           flex: 1;
+          display: flex;
+          float: right;
         }
 
         .dismiss-icon {
           text-align: right;
-          margin-right: 35px;
+          margin-right: 5px;
           cursor: pointer;
         }
 
         .dismiss-text {
           text-align: right;
           cursor: pointer;
+          size: 12px;
         }
       }
     }

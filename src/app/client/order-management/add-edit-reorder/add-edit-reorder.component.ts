@@ -1,7 +1,7 @@
 import isNil from 'lodash/fp/isNil';
 import uniq from 'lodash/fp/uniq';
 
-import { filter, first, map, Observable, switchMap, takeUntil, tap, catchError } from 'rxjs';
+import { catchError, filter, first, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Store } from '@ngxs/store';
 
@@ -22,6 +22,7 @@ import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ONBOARDED_STATUS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-add-edit-reorder',
@@ -121,9 +122,18 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       {
         candidates: [this.getCandidateIds(candidates!)],
         agencies: [this.getAgencyIds(jobDistributions!), Validators.required],
-        reorderDate: [jobStartDate ?? '', Validators.required],
-        shiftStartTime: [shiftStartTime ?? '', Validators.required],
-        shiftEndTime: [shiftEndTime ?? '', Validators.required],
+        reorderDate: [
+          jobStartDate ? DateTimeHelper.convertDateToUtc(jobStartDate.toString()) : '',
+          Validators.required,
+        ],
+        shiftStartTime: [
+          shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
+          Validators.required,
+        ],
+        shiftEndTime: [
+          shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
+          Validators.required,
+        ],
         billRate: [hourlyRate ?? '', Validators.required],
         openPosition: [openPositions ?? '', [Validators.required, Validators.min(1)]],
       },
@@ -255,9 +265,14 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.reorderService
       .saveReorder(<ReorderRequestModel>payload, this.comments)
       .pipe(
-      takeUntil(this.destroy$),
-      tap(() => this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED))),
-      catchError((error) => this.store.dispatch(new ShowToast(MessageTypes.Error, error?.error?.errors?.RegularBillRate[0]))))
+        takeUntil(this.destroy$),
+        tap(() =>
+          this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED))
+        ),
+        catchError((error) =>
+          this.store.dispatch(new ShowToast(MessageTypes.Error, error?.error?.errors?.RegularBillRate[0]))
+        )
+      )
       .subscribe(() => {
         this.saveEmitter.emit();
       });

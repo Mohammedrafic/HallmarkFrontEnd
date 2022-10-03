@@ -5,7 +5,8 @@
         <span class="historical-events__span">{{ event?.actionTime | date: 'MM/dd/yyyy, hh:mm:ss' }} </span>
         <span *ngIf="!event?.userId; else name">{{ event?.actionDescription }} by System</span>
         <ng-template #name>
-          {{ event?.actionDescription }} by <span class="hyperlink"> {{ event?.firstName }} {{ event?.lastName }}</span>
+          {{ event?.actionDescription }} by {{ businessUnitValues[event.userType] }} User
+          <span class="hyperlink"> {{ event?.firstName }} {{ event?.lastName }}</span>
         </ng-template>
       </p>
     </ng-container>

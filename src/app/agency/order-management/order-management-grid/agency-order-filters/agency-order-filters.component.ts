@@ -183,7 +183,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         filter((options) => !!options),
         takeUntil(this.destroy$)
       )
-      .subscribe(({ candidateStatuses, masterSkills, orderStatuses, partneredOrganizations }) => {
+      .subscribe(({ candidateStatuses, masterSkills, orderStatuses, partneredOrganizations, poNumbers, projectNames, specialProjectCategories }) => {
         let statuses = [];
         let candidateStatusesData = [];
         const statusesByDefault = [
@@ -224,6 +224,9 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         this.filterColumns.skillIds.dataSource = masterSkills;
         this.filterColumns.candidateStatuses.dataSource = candidateStatusesData;
         this.filterColumns.orderStatuses.dataSource = statuses;
+        this.filterColumns.projectTypeIds.dataSource = specialProjectCategories;
+        this.filterColumns.projectNameIds.dataSource = projectNames;
+        this.filterColumns.poNumberIds.dataSource = poNumbers;
       });
   }
 
@@ -253,9 +256,9 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       distributedOnFrom: new FormControl(null),
       distributedOnTo: new FormControl(null),
       candidateName: new FormControl(null),
-      projectTypeId: new FormControl(null),
-      projectNameId: new FormControl(null),
-      poNumberId: new FormControl(null),
+      projectTypeIds: new FormControl(null),
+      projectNameIds: new FormControl(null),
+      poNumberIds: new FormControl(null),
     });
   }
 
@@ -333,21 +336,21 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       distributedOnFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
       distributedOnTo: { type: ControlTypes.Date, valueType: ValueType.Text },
       candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
-      projectTypeId: {
+      projectTypeIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
         valueField: 'projectType',
         valueId: 'id',
       },
-      projectNameId: {
+      projectNameIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
         valueField: 'projectName',
         valueId: 'id',
       },
-      poNumberId: {
+      poNumberIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],

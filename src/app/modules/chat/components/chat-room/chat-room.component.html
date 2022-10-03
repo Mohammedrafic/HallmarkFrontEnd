@@ -1,5 +1,5 @@
 <div class="chat-room-container">
-  <div class="chat-room-area" #chatArea>
+  <div class="chat-room-area" #chatArea >
     <div class="message-block" *ngIf="currentThread; else noMessages">
       <ng-container *ngFor="let message of messages; trackBy: trackById">
         <div class="message" [ngClass]="{ 'right': message.isCurrentUser }">
@@ -10,13 +10,13 @@
           <div class="content-block">
             <div *ngIf="!message.isCurrentUser; else rightMessageBlock">
               <span class="sender">{{ message.sender }}</span>
-              <span class="timestamp">{{ message.timestamp | date: 'HH:mm a'}}</span>
+              <span class="timestamp">{{ message.timestamp | date: 'hh:mm a'}}</span>
             </div>
 
             <ng-template #rightMessageBlock>
               <div>
                 <i-feather class="read-indicator" name="eye" [ngClass]="{ 'show-ind': message.readIndicator }"></i-feather>
-                <span class="timestamp left-position">{{ message.timestamp | date: 'HH:mm a'}}</span>
+                <span class="timestamp left-position">{{ message.timestamp | date: 'hh:mm a'}}</span>
                 <span class="sender left-position">{{ message.sender }}</span>
               </div>
             </ng-template>
@@ -51,6 +51,15 @@
         <span class="empty-room-text">Type your first message below</span>
       </div>
     </ng-template>
+
+    <div class="scroll-btn" *ngIf="showScrollBtn" (click)="scrollChatBottom()">
+      <div class="icon-wrapper">
+        <i-feather name="arrow-down"></i-feather>
+      </div>
+      <div>
+        <span class="scrl-btn-text">New Messages</span>
+      </div>
+    </div>
   </div>
 
   <div class="controls-block">

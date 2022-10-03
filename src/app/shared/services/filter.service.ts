@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
-import { isDate, isEmpty } from 'lodash';
+import { isBoolean, isDate, isEmpty, isNumber } from 'lodash';
 
 @Injectable({ providedIn: 'root' })
 export class FilterService {
@@ -42,7 +42,10 @@ export class FilterService {
     let chips: any[] = [];
 
     Object.keys(form.controls)
-      .filter((key) => !isEmpty(form.controls[key].value) || isDate(form.controls[key].value))
+      .filter((key) => {
+        const value = form.controls[key].value;
+        return !isEmpty(value) || isDate(value) || isBoolean(value) || isNumber(value);
+      })
       .forEach((key) => {
         const val = form.controls[key].value;
 

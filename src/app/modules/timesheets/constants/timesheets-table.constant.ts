@@ -121,6 +121,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
     {
       field: TimesheetsTableColumns.BillRate,
       headerName: 'BILL RATE $',
+      type: 'rightAligned',
       width: 140,
       minWidth: 140,
     },

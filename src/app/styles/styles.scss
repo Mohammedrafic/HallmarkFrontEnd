@@ -370,7 +370,7 @@ body {
     .profile-hours-statistics-container section h3,
     .partnership-settings .title,
     .alert-panel .alert-panel-header__title,
-    .ordered-chips__title,
+    .ordered-chips__title, .alert-title-header-body-color,
     .dialog .applied-filters .chips-container .e-chip-list .e-chip,
     .e-chip-list .e-chip .e-chip-delete.e-dlt-btn,
     .filter-chips .e-chip-list .e-chip {
@@ -380,9 +380,9 @@ body {
     .input-container label,
     .e-switch-wrapper label,
     .dropdown-container label,
-    .alert-panel-footer,
     .tab-legend__item,
-    .tab-legend__item span {
+    .tab-legend__item span,
+    .alert-date {
       color: $secondary-dark-blue-40 !important;
     }
 
@@ -412,6 +412,20 @@ body {
         font-family: "Open Sans" !important;
       }
     }
+  }
+
+  .e-close li.e-list-item.e-level-2 {
+    @media #{$max-tablet} {
+      display: none;
+    }
+  }
+}
+
+body.light .header-item .e-menu-item.e-selected {
+  @media #{$max-mobile} {
+    border-radius: 0px !important;
+    background-color: transparent !important;
+    color: inherit !important;
   }
 }
 
@@ -498,6 +512,10 @@ a, a:hover, a:focus, a:active {
     margin-right: 8px;
     top: 0;
     padding-right: 1px;
+
+    &.align-text {
+      padding-right: 0;
+    }
   }
 }
 
@@ -540,11 +558,10 @@ html, body {
 }
 
 .order-type-column {
-  display: flex;
-  align-items: center;
+  display: inline-block;
+  cursor: default;
 
   span:first-child {
-    margin-right: 7px;
     background-color: $secondary-dark-blue-20 !important;
   }
 }

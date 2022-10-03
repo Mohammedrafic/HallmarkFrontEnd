@@ -1,46 +1,48 @@
 <section class="container">
   <div class="toolbar-buttons">
-    <app-search
-      [hidden]="isBillRateSetupTabActive"
-      class="search"
-      #search>
-    </app-search>
-    <button
-      *ngIf="isBillRateSetupTabActive"
-      ejs-button
-      cssClass="e-outline button-filter" (click)="filter()">
+    <app-search [hidden]="isBillRateSetupTabActive" class="search" #search> </app-search>
+    <button *ngIf="isBillRateSetupTabActive" ejs-button cssClass="e-outline button-filter" (click)="filter()">
       <div class="filter-button-content">
-        <span *ngIf="((filteredItems$ | async) || 0) as filteredItems" class="e-badge e-badge-success e-badge-circle">{{ filteredItems }}</span>
+        <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-circle align-text">{{
+          filteredItems
+        }}</span>
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
+    </button>
+    <button
+      *ngIf="isBillRateSetupTabActive"
+      [disabled]="isReadOnly"
+      ejs-button
+      id="importButton"
+      cssClass="e-outline button-import"
+      (click)="onImportDataClick()"
+    >
+      Import <i-feather name="upload" class="icon"></i-feather>
     </button>
     <button
       ejs-dropdownbutton
       [items]="exportOptions"
       (select)="exportSelected($event)"
-      cssClass="e-outline button-export">
-      <div class="button-export-container">
-        Export <i-feather name="download" class="icon"></i-feather>
-      </div>
+      cssClass="e-outline button-export"
+    >
+      <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
     </button>
-    <button
-      *ngIf="showButton"
-      ejs-button
-      [isPrimary]="true"
-      (click)="addBillRateSetupRecord()">{{addBillRateBtnText}}</button>
+    <button *ngIf="showButton" ejs-button [isPrimary]="true" (click)="addBillRateSetupRecord()">
+      {{ addBillRateBtnText }}
+    </button>
   </div>
 
-  <ejs-tab
-    id="navigationTabs"
-    (selected)="onTabSelected($event)"
-  >
+  <ejs-tab id="navigationTabs" (selected)="onTabSelected($event)">
     <e-tabitems>
       <e-tabitem>
         <ng-template #headerText><div>Bill Rate Setup</div></ng-template>
         <ng-template #content>
           <app-bill-rate-setup
-            [filteredItems$]="filteredItems$" [export$]="exportMap.get(selectedTab)"
-            [isActive]="isBillRateSetupTabActive">
+            [filteredItems$]="filteredItems$"
+            [export$]="exportMap.get(selectedTab)"
+            [isActive]="isBillRateSetupTabActive"
+            [importDialogEvent]="importDialogEvent"
+          >
           </app-bill-rate-setup>
         </ng-template>
       </e-tabitem>
@@ -51,7 +53,8 @@
           <app-external-bill-rate
             [export$]="exportMap.get(selectedTab)"
             [searchQuery]="searchQuery"
-            [isActive]="isExternalBillRateType">
+            [isActive]="isExternalBillRateType"
+          >
           </app-external-bill-rate>
         </ng-template>
       </e-tabitem>
@@ -62,7 +65,8 @@
           <app-bill-rate-type-mapping
             [export$]="exportMap.get(selectedTab)"
             [searchQuery]="searchQuery"
-            [isActive]="isExternalBillRateTypeMapping">
+            [isActive]="isExternalBillRateTypeMapping"
+          >
           </app-bill-rate-type-mapping>
         </ng-template>
       </e-tabitem>

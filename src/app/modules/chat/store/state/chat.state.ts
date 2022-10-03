@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import { ChatClient, ChatThreadItem, TypingIndicatorReceivedEvent } from '@azure/communication-chat';
-import { AzureCommunicationTokenCredential } from '@azure/communication-common';
+import { ChatClient, ChatMessageReceivedEvent, ChatThreadItem, ReadReceiptReceivedEvent,
+  TypingIndicatorReceivedEvent } from '@azure/communication-chat';
+import { AzureCommunicationTokenCredential, CommunicationUserKind } from '@azure/communication-common';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Observable, tap } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -11,7 +12,7 @@ import { DefaultChatState } from '../../constants';
 import { ChatDialogState, ChatSearchType } from '../../enums';
 import { ChatHelper, ThreadsHelper } from '../../helpers';
 import { ChatThread, UserChatConfig } from '../../interfaces';
-import { ChatApiService } from '../../services';
+import { ChatApiService, ChatMediatorService } from '../../services';
 import { Chat } from '../actions';
 import { ChatModel } from '../chat.model';
 import { ChatService } from '../../services/chat.service';
@@ -25,6 +26,7 @@ export class ChatState {
   constructor(
     private apiService: ChatApiService,
     private chatService: ChatService,
+    private mediatorService: ChatMediatorService,
   ) {}
 
   @Selector([ChatState])
@@ -38,8 +40,13 @@ export class ChatState {
   }
 
   @Selector([ChatState])
-  static activeThreads(state: ChatModel): ChatThread[] {
+  static activeDisplayedThreads(state: ChatModel): ChatThread[] {
     return state.displayedThreads;
+  }
+
+  @Selector([ChatState])
+  static activeThreads(state: ChatModel): ChatThread[] {
+    return state.activeThreads;
   }
 
   @Selector([ChatState])
@@ -55,6 +62,16 @@ export class ChatState {
   @Selector([ChatState])
   static userToStart(state: ChatModel): string | null {
     return state.userIdToStart;
+  }
+
+  @Selector([ChatState])
+  static threadToUpdate(state: ChatModel): string {
+    return state.threadIdToUpdate;
+  }
+
+  @Selector([ChatState])
+  static readEvent(state: ChatModel): ReadReceiptReceivedEvent | null {
+    return state.readReceiptEvent;
   }
 
   @Action(ToggleChatDialog)
@@ -90,12 +107,15 @@ export class ChatState {
 
         await chatClient.startRealtimeNotifications();
 
-        chatClient.on('chatMessageReceived', () => {  
-          dispatch(new Chat.UpdateMessages());
+        chatClient.on('chatMessageReceived', (event: ChatMessageReceivedEvent) => {
+          const { chatOpen, currentUserIdentity } = getState();
+          this.mediatorService.notifyMessageReceived(event);
+
           dispatch(new Chat.SortThreads());
           dispatch(new UnreadMessage());
           
-          if (getState().chatOpen) {
+          if (!chatOpen
+          && currentUserIdentity !== (event.sender as CommunicationUserKind).communicationUserId) {
             this.chatService.playNotificationSound();
           }
         });
@@ -114,8 +134,8 @@ export class ChatState {
           dispatch(new Chat.GetUserThreads());
         });
 
-        chatClient.on('readReceiptReceived', (event: any) => {
-          dispatch(new Chat.UpdateReceipts());
+        chatClient.on('readReceiptReceived', (event: ReadReceiptReceivedEvent) => {
+          dispatch(new Chat.UpdateReceipts(event));
         });
 
         patchState({
@@ -163,7 +183,12 @@ export class ChatState {
 
     return this.apiService.createThread(userId)
     .pipe(
-      tap((response) => { threadId = response }),
+      tap((response) => {
+        threadId = response;
+        patchState({
+          startThreadId: response,
+        });
+      }),
       switchMap(() => dispatch(new Chat.GetUserThreads())),
       tap(() => {
         const threads = getState().activeThreads;
@@ -209,7 +234,14 @@ export class ChatState {
   }
 
   @Action(Chat.UpdateMessages)
-  UpdateAllMessages(): void {}
+  UpdateMessagesInThread(
+    { patchState }: StateContext<ChatModel>,
+    { threadId }: Chat.UpdateMessages
+  ): void {
+    patchState({
+      threadIdToUpdate: threadId,
+    });
+  }
 
   @Action(Chat.StartNewConversation)
   StartNewConversation(
@@ -276,8 +308,24 @@ export class ChatState {
   }
 
   @Action(Chat.UpdateReceipts)
-  UpdateReceipts(): void {}
+  UpdateReceipts(
+    { patchState }: StateContext<ChatModel>,
+    { event }: Chat.UpdateReceipts,
+  ): void {
+    patchState({
+      readReceiptEvent: event,
+    });
+  }
 
   @Action(UnreadMessage)
   UnreadMessage(): void {}
+
+  @Action(Chat.ResetTypingEvent)
+  ResetTyping(
+    { patchState }: StateContext<ChatModel>,
+  ): void {
+    patchState({
+      typingIndicator: null,
+    });
+  }
 }

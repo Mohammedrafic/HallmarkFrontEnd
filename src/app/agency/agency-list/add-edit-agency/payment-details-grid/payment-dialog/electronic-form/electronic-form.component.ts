@@ -20,6 +20,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngxs/store';
 import { SetPaymentDetailsForm } from '@agency/store/agency.actions';
 import PriceUtils from '@shared/utils/price.utils';
+import { startDateDuplicationValidator } from '@shared/validators/start-date-duplication.validator';
 
 @Component({
   selector: 'app-electronic-form',
@@ -30,9 +31,11 @@ import PriceUtils from '@shared/utils/price.utils';
 export class ElectronicFormComponent extends DestroyableDirective implements PaymentDetailsInterface, OnInit {
   @Input() public saveEvent: Subject<number> = new Subject<number>();
   @Input() public formValue: PaymentDetails | ElectronicPaymentDetails;
+  @Input() public paymentsList: PaymentDetails[] | ElectronicPaymentDetails[];
+  @Input() public mode: number;
 
   get startDateControl(): AbstractControl | null {
-    return this.paymentDetailsForm.get('startDate');
+    return this.paymentDetailsForm?.get('startDate');
   }
 
   public paymentDetailsForm: FormGroup;
@@ -59,30 +62,35 @@ export class ElectronicFormComponent extends DestroyableDirective implements Pay
   }
 
   public createPaymentDetailsForm(): void {
-    this.paymentDetailsForm = this.formBuilder.group({
-      mode: [''],
-      startDate: [null, [Validators.required]],
-      endDate: [null],
-      bankName: ['', [Validators.required]],
-      routingNumber: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
-      bankAddress1: ['', [Validators.required]],
-      bankAddress2: [''],
-      bankCountry: ['', [Validators.required]],
-      bankState: [''],
-      bankCity: [''],
-      bankZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
-      accountHolderName: ['', [Validators.required]],
-      accountHolderNumber: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
-      accountHolderPhone: ['', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]],
-      accountHolderAddress1: [''],
-      accountHolderAddress2: [''],
-      accountHolderCountry: ['', [Validators.required]],
-      accountHolderState: [''],
-      accountHolderCity: [''],
-      accountHolderZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
-      fee: [''],
-      swiftCode: ['', [Validators.pattern(/^[0-9]+$/)]],
-    });
+    this.paymentDetailsForm = this.formBuilder.group(
+      {
+        mode: [''],
+        startDate: [null, [Validators.required]],
+        endDate: [null],
+        bankName: ['', [Validators.required]],
+        routingNumber: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
+        bankAddress1: ['', [Validators.required]],
+        bankAddress2: [''],
+        bankCountry: ['', [Validators.required]],
+        bankState: [''],
+        bankCity: [''],
+        bankZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
+        accountHolderName: ['', [Validators.required]],
+        accountHolderNumber: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
+        accountHolderPhone: ['', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]],
+        accountHolderAddress1: [''],
+        accountHolderAddress2: [''],
+        accountHolderCountry: ['', [Validators.required]],
+        accountHolderState: [''],
+        accountHolderCity: [''],
+        accountHolderZipCode: ['', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]],
+        fee: [''],
+        swiftCode: ['', [Validators.pattern(/^[0-9]+$/)]],
+      },
+      {
+        validators: startDateDuplicationValidator('startDate', this.paymentsList, this.formValue?.startDate, this.mode),
+      }
+    );
   }
 
   private onCountryChange(controlName: string): void {

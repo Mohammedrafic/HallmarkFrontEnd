@@ -26,7 +26,6 @@ body.light, body.dark {
 
     .checkbox-header {
       .e-headercelldiv {
-        padding: 0 !important;
         overflow: visible;
       }
     }
@@ -149,6 +148,8 @@ body.light, body.dark {
     .e-stackedheadercelldiv {
       font-size: 12px;
       font-weight: 600;
+      padding: 0 !important;
+      margin: 0 !important;
 
       .controls-header {
         .icon-button {

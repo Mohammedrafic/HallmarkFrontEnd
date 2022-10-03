@@ -55,19 +55,22 @@
     <div class="column">
       <div>
         <div class="title">
-          {{ orderInformation?.shiftStartTime | date: 'hh:mm' }} - {{ orderInformation?.shiftEndTime | date: 'hh:mm' }}
+          {{ orderInformation?.shiftStartTime | date: 'hh:mm':'UTC' }} -
+          {{ orderInformation?.shiftEndTime | date: 'hh:mm':'UTC' }}
         </div>
         <div class="sup-title">Shift</div>
       </div>
     </div>
     <div class="column">
       <div>
-        <div class="title">{{ orderInformation?.jobStartDate | date: 'MM/dd/yyy' }}</div>
+        <div class="title">{{ orderInformation?.jobStartDate | date: 'MM/dd/yyy':'UTC' }}</div>
         <div class="sup-title">Date</div>
       </div>
     </div>
     <div class="column">
-      <div class="accent link" (click)="moveToPerDiem()">Order Per Diem ID: {{ orderInformation?.organizationPrefix }}-{{ orderInformation?.reOrderFrom?.publicId }}</div>
+      <div class="accent link" (click)="moveToPerDiem()">
+        Order Per Diem ID: {{ orderInformation?.organizationPrefix }}-{{ orderInformation?.reOrderFrom?.publicId }}
+      </div>
     </div>
   </div>
 </section>

@@ -7,6 +7,7 @@ import { PendingInvoice } from '../../interfaces/pending-invoice-record.interfac
 import { GridValuesHelper } from '../../../timesheets/helpers';
 import { GridCellLinkParams } from '@shared/components/grid/models';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
+import { GridOrderIdCellComponent } from '../../components/grid-order-id-cell/grid-order-id-cell.component';
 
 type BaseInvoiceColDefsKeys = keyof Pick<BaseInvoice, 'locationName' | 'departmentName' | 'skillName' | 'statusText'>
 type CustomColDefsKeys = 'weekPeriod' | 'attachments' | 'candidateName' | 'orderId' | 'unitName';
@@ -55,18 +56,7 @@ export class InvoicesContainerGridHelper {
         field: 'formattedOrderIdFull',
         headerName: 'ORDER ID',
         width: 120,
-        cellRenderer: GridCellLinkComponent,
-        cellRendererParams: (params: ICellRendererParams): GridCellLinkParams => {
-          const orderId = (params.data as BaseInvoice).formattedOrderIdFull;
-
-          return {
-            ...params,
-            link: agency ? `/agency/order-management` : `/client/order-management`,
-            navigationExtras: {
-              state: { fullOrderId: orderId },
-            }
-          };
-        }
+        cellRenderer: GridOrderIdCellComponent,
       },
       unitName: {
         headerName: agency ? 'ORGANIZATION' : 'AGENCY',

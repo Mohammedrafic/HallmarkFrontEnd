@@ -2,11 +2,11 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } 
 import { filter, Observable, Subject, takeWhile } from 'rxjs';
 import { AssociateOrganizationsAgency, FeeExceptionsPage } from '@shared/models/associate-organizations.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { TabComponent } from '@syncfusion/ej2-angular-navigations';
+import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { Actions, Select, Store } from '@ngxs/store';
 import { FormArray, FormGroup } from '@angular/forms';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, UNSAVED_TABS_TEXT } from '@shared/constants';
 import PriceUtils from '@shared/utils/price.utils';
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
 import { FeeSettingsComponent } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/fee-settings.component';
@@ -19,11 +19,7 @@ import {
   SavePartnershipSettings,
 } from '@shared/components/associate-list/store/associate.actions';
 import { Router } from '@angular/router';
-
-enum Tabs {
-  FeeSettings,
-  JobDistribution,
-}
+import { Tabs } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
 
 @Component({
   selector: 'app-edit-associate-dialog',
@@ -48,7 +44,7 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
   public feeSettingsForm: FormGroup;
   public partnershipForm: FormGroup;
   public firstActive = true;
-  public activeTab: number = 0;
+  public activeTab: number | string = 0;
 
   private isAlive = true;
 
@@ -122,9 +118,13 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
     this.feeSettingsForm.markAsPristine();
   }
 
-  public onTabSelecting(tab: { selectingIndex: number }): void {
-    this.activeTab = tab.selectingIndex;
+  public onTabSelecting(tab: SelectingEventArgs): void {
     this.firstActive = false;
+    this.activeTab = tab.selectingIndex;
+
+    this.editOrgTab.selectedItem === Tabs.JobDistribution
+      ? this.confirmSwitchBetweenTab(this.partnershipForm, tab)
+      : this.confirmSwitchBetweenTab(this.feeSettingsForm, tab);
   }
 
   private onOpenEvent(): void {
@@ -171,6 +171,24 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
       control.patchValue({ ...fee });
       feeExceptionsControl.push(control);
     });
+  }
+
+  private confirmSwitchBetweenTab(tabForm: FormGroup, tab: SelectingEventArgs): void {
+    if (tabForm.dirty) {
+      tab.cancel = true;
+      this.confirmService
+        .confirm(UNSAVED_TABS_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => confirm))
+        .subscribe(() => {
+          tabForm.markAsPristine();
+          this.editOrgTab.select(tab.selectingIndex);
+          this.activeTab = Tabs[tab.selectingIndex];
+        });
+    }
   }
 
   private getDialogWidth(): string {

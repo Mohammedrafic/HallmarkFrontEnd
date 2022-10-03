@@ -89,6 +89,7 @@ import {
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
   PermPlacementColumnsConfig,
+  permPlacementColumnsToExport,
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
@@ -222,7 +223,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public openDetails = new Subject<boolean>();
   public orderPositionSelected$ = new Subject<{ state: boolean; index?: number }>();
   public selectionOptions: SelectionSettingsModel = {
-    type: 'Single',
+    type: 'Multiple',
     mode: 'Row',
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
@@ -261,7 +262,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private prefix: string | null;
   private orderId: number | null;
   private creatingReorder = false;
-  private stateFullOrderId: string | null;
 
   constructor(
     private store: Store,
@@ -314,9 +314,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       distributedOnFrom: new FormControl(null),
       distributedOnTo: new FormControl(null),
       candidateName: new FormControl(null),
-      projectTypeId: new FormControl(null),
-      projectNameId: new FormControl(null),
-      poNumberId: new FormControl(null),
+      projectTypeIds: new FormControl(null),
+      projectNameIds: new FormControl(null),
+      poNumberIds: new FormControl(null),
     });
   }
 
@@ -332,9 +332,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     this.onSelectedOrderDataLoadHandler();
 
-    const locationState = this.location.getState() as { orderId: number; fullOrderId: string };
+    const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
-    this.stateFullOrderId = locationState.fullOrderId;
 
     this.onGridPageChangedHandler();
     this.onOrganizationChangedHandler();
@@ -450,13 +449,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       case OrganizationOrderManagementTabs.AllOrders:
         this.filters.isTemplate = false;
         this.filters.includeReOrders = true;
-
-        this.setFullOrderIdData();
         this.hasOrderAllOrdersId();
-
-        this.store
-          .dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()])
-          .subscribe(() => this.handleFullOrderId());
+        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.PerDiem:
         this.filters.orderTypes = [OrderType.OpenPerDiem];
@@ -524,9 +518,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       distributedOnFrom: this.filters.distributedOnFrom || null,
       distributedOnTo: this.filters.distributedOnTo || null,
       candidateName: this.filters.candidateName || null,
-      projectTypeId: this.filters.projectTypeId || null,
-      projectNameId: this.filters.projectNameId || null,
-      poNumberId: this.filters.poNumberId || null,
+      projectTypeIds: this.filters.projectTypeIds || null,
+      projectNameIds: this.filters.projectNameIds || null,
+      poNumberIds: this.filters.poNumberIds || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }
@@ -580,6 +574,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
           : reOrdersColumnsToExport;
         break;
+      case OrganizationOrderManagementTabs.PermPlacement:
+        this.columnsToExport = hasSelectedItemChildren
+          ? [...permPlacementColumnsToExport, ...allOrdersChildColumnsToExport]
+          : permPlacementColumnsToExport;
     }
   }
 
@@ -1017,16 +1015,21 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private onOrganizationChangedHandler(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.getSettings();
-      if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
-        this.clearFilters();
-      }
-      if (!this.previousSelectedOrderId) {
-        this.pageSubject.next(1);
-      }
-      this.store.dispatch(new GetAllOrganizationSkills());
-    });
+    this.organizationId$
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((data) => !!data)
+      )
+      .subscribe(() => {
+        this.getSettings();
+        if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
+          this.clearFilters();
+        }
+        if (!this.previousSelectedOrderId) {
+          this.pageSubject.next(1);
+        }
+        this.store.dispatch(new GetAllOrganizationSkills());
+      });
   }
 
   private onOrdersDataLoadHandler(): void {
@@ -1139,21 +1142,21 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       distributedOnFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
       distributedOnTo: { type: ControlTypes.Date, valueType: ValueType.Text },
       candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
-      projectTypeId: {
+      projectTypeIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
         valueField: 'projectType',
         valueId: 'id',
       },
-      projectNameId: {
+      projectNameIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
         valueField: 'projectName',
         valueId: 'id',
       },
-      poNumberId: {
+      poNumberIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
@@ -1514,25 +1517,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private getProjectSpecialData(): void {
-    this.store.dispatch(new GetProjectSpecialData());
-  }
-
-  private setFullOrderIdData(): void {
-    if (this.stateFullOrderId) {
-      this.filters.orderPublicId = this.stateFullOrderId;
-      this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.filters.orderPublicId);
-    }
-  }
-
-  private handleFullOrderId(): void {
-    if (this.stateFullOrderId) {
-      const [data] = this.store.selectSnapshot(OrderManagementContentState.ordersPage)?.items || [];
-
-      if (data) {
-        this.onRowClick({ data });
-        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
-        this.stateFullOrderId = null;
-      }
-    }
+    this.organizationId$.pipe(filter(Boolean), take(1)).subscribe(() => {
+      this.store.dispatch(new GetProjectSpecialData());
+      this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data) => {
+        const { poNumbers, projectNames, specialProjectCategories } = data;
+        this.filterColumns.projectTypeIds.dataSource = specialProjectCategories;
+        this.filterColumns.projectNameIds.dataSource = projectNames;
+        this.filterColumns.poNumberIds.dataSource = poNumbers;
+      });
+    });
   }
 }

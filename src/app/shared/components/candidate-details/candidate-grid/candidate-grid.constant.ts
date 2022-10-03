@@ -72,12 +72,14 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
     {
       field: 'initialRate',
       headerName: 'INITIAL RATE',
+      type: 'rightAligned',
       width: 150,
       sortable: true,
     },
     {
       field: 'billRate',
       headerName: 'BILL RATE',
+      type: 'rightAligned',
       width: 140,
       sortable: true,
     },

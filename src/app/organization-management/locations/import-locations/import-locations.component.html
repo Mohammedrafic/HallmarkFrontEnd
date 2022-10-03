@@ -8,14 +8,18 @@
   (uploadImportFile)="uploadImportFile($event)"
   [title]="titleImport"
 >
-  <app-locations-grid
+  <app-import-grid
     successful
+    gridName="Locations"
     *ngIf="importResponse?.succesfullRecords?.length"
-    [importedLocations]="importResponse?.succesfullRecords || []"
-  ></app-locations-grid>
-  <app-locations-grid
+    [importedItems]="importResponse?.succesfullRecords || []"
+    [columnDefs]="columnDefs"
+  ></app-import-grid>
+  <app-import-grid
     errors
+    gridName="Locations"
     *ngIf="importResponse?.errorRecords?.length"
-    [importedLocations]="importResponse?.errorRecords || []"
-  ></app-locations-grid>
+    [importedItems]="importResponse?.errorRecords || []"
+    [columnDefs]="columnDefs"
+  ></app-import-grid>
 </app-import-dialog-content>

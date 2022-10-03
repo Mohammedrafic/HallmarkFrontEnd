@@ -16,7 +16,7 @@ import {
   PaymentDetails,
   PaymentDetailsInterface,
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
-import { FormControl } from '@angular/forms';
+import { FormArray, FormControl } from '@angular/forms';
 import {
   ADD_PAYMENT,
   EDIT_PAYMENT,
@@ -38,6 +38,8 @@ export class PaymentDialogComponent extends DestroyableDirective implements OnIn
 
   @Output() modalClose = new EventEmitter<boolean>();
   @Input() dialogEvent: Subject<boolean>;
+  @Input() paymentsList: FormArray;
+
   @Input() set onEdit(value: PaymentDetails | ElectronicPaymentDetails) {
     if (value) {
       this.dialogTitle = EDIT_PAYMENT;
@@ -104,6 +106,8 @@ export class PaymentDialogComponent extends DestroyableDirective implements OnIn
 
     const componentType = this.getComponentType(mode);
     const component = this.paymentContainer.createComponent(componentType);
+    component.instance.paymentsList = this.paymentsList.value;
+    component.instance.mode = mode;
     this.components.set(mode, component);
   }
 

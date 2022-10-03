@@ -48,7 +48,7 @@
 
           <ng-template #noListItems>
             <div class="empty-list">
-              <span class="no-list-header">You don`t have active chats yet</span>
+              <span class="no-list-header">You don't have active chats yet</span>
               <span class="no-list-text">Start messaging to get started</span>
             </div>
           </ng-template>
@@ -78,7 +78,9 @@
         </div>
         <div class="chat-plot">
           <ng-container *ngFor="let participant of avaliableParticipants$ | async; trackBy: trackById">
-            <app-chat-contact [participant]="participant" (contactSelected)="startNewChat($event)"></app-chat-contact>
+            <app-chat-contact [participant]="participant"
+            (contactSelected)="startNewChat($event)"
+            (existingThreadSelected)="enterChatRoom($event)"></app-chat-contact>
           </ng-container>
         </div>
       </ng-template>

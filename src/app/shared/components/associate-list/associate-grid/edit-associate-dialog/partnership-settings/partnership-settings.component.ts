@@ -17,6 +17,7 @@ import {
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
 import { OPTION_FIELDS } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { Tabs } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
 
 @Component({
   selector: 'app-partnership-settings',
@@ -25,8 +26,8 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 })
 export class PartnershipSettingsComponent extends DestroyableDirective implements OnInit {
   @Input() partnershipForm: FormGroup;
-  @Input() set activeTab(tab: number) {
-    if (tab === 1) {
+  @Input() set activeTab(tab: number | string) {
+    if (tab === Tabs.JobDistribution || tab === Tabs[Tabs.JobDistribution]) {
       this.partnershipForm.reset();
       this.partnershipForm.patchValue({ ...this.partnershipSettings });
     }
@@ -42,7 +43,7 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
     .map((name, id) => ({ name, id }));
   public orderType = Object.values(JobDistributionOrderType)
     .filter(valuesOnly)
-    .map((name) => ({ name, id: JobDistributionOrderType[name as JobDistributionOrderType] }))
+    .map((name) => ({ name, id: JobDistributionOrderType[name as JobDistributionOrderType] }));
   public partnershipStatus = Object.values(PartnershipStatus)
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));
