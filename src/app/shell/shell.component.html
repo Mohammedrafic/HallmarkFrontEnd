@@ -167,21 +167,24 @@
 <ejs-sidebar id="alert-sidebar" *ngIf="showAlertSidebar" #alertSidebar
              [width]="alertSidebarWidth" [type]="alertSidebarType" [position]="alertSidebarPosition"
              showBackdrop="true" style="visibility: hidden" (created)="onAlertSidebarCreated()">
-  <div class="sidebar-header header-cover">
-    <i-feather name="bell"></i-feather>
-    <h5>
-      <span>Alerts Center</span>
+  <div class="sidebar-header">
+    <div>
+    <h5 class="alert-title-header-body-color">
+      Notifications
     </h5>
+  </div>
     <div class="closebtn">
+      <div class="e-row item-clear">
+        <span (click)="alertSideBarClearAllClick()">Clear All</span>
+      </div>
       <button ejs-button id="close" class="e-btn close-btn" title="Close" (click)="alertSideBarCloseClick()">
         <fa-icon [icon]='faTimes'></fa-icon>
       </button>
     </div>
   </div>
+
   <div id="listcontainer">
-    <div class="e-row item-clear">
-      <span (click)="alertSideBarClearAllClick()">Clear All</span>
-    </div>
+    
     <section class="alert-body">
       <section class="alert-panel" *ngFor="let item of alerts">
         <div class="alert-panel-header">
@@ -193,15 +196,16 @@
           <div class="alert-panel-header__flex-child alert-panel-header__title">
             {{item.title}}
           </div>
-        </div>
-        <div class="alert-content" [innerHTML]="item.content"></div>
-        <div class="alert-panel-footer">
-          <div class="alert-panel-footer__footer_flex-child">
-            <div><span>{{item.createdAt | date: 'MM/dd/yyyy hh:mm a'}}</span></div>
-            <div><span>Timestamp</span></div>
+          <div class="alert-panel-header__flex-child alert-panel-header__date  alert-date">
+            <div><span>{{item.createdAt | date: 'MM/dd/yyyy'}}</span></div>
+            <div><span>{{item.createdAt | date: 'hh:mm:ss a'}}</span></div>
           </div>
+        </div>
+        <div class="alert-content alert-title-header-body-color" [innerHTML]="item.content"></div>
+        <div class="alert-panel-footer">
+          <div class="alert-panel-footer__footer_flex-child"></div>
           <div class="alert-panel-footer__footer_flex-child" (click)="alertDismiss(item.id)">
-            <div class="dismiss-icon"><span>X</span></div>
+            <i-feather name="check-circle"></i-feather>
             <div class="dismiss-text"><span>Dismiss</span></div>
           </div>
         </div>
