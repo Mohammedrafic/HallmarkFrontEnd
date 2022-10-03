@@ -132,6 +132,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   public isJobEndDateControlEnabled = false;
 
+  public shiftNameField: AbstractControl;
   public shiftStartTimeField: AbstractControl;
   public shiftEndTimeField: AbstractControl;
   public defaultMaxTime = new Date();
@@ -142,6 +143,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public readonly jobDistributions = ORDER_JOB_DISTRIBUTION_LIST;
   public readonly jobDistributionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public agencyControlEnabled = false;
+  public isShiftTimeRequired: boolean = true;
 
   @Select(OrderManagementContentState.associateAgencies)
   associateAgencies$: Observable<AssociateAgency[]>;
@@ -284,6 +286,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.defaultMaxTime.setHours(23, 59, 59);
     this.defaultMinTime.setHours(0, 0, 0);
 
+    this.shiftNameField = this.generalInformationForm.get('shift') as AbstractControl;
     this.shiftStartTimeField = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
     this.shiftEndTimeField = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
     this.shiftEndTimeField.valueChanges.subscribe((val) => {
@@ -294,8 +297,18 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.minTime = val || this.defaultMinTime;
       this.shiftEndTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
     });
-    this.shiftStartTimeField.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
-    this.shiftEndTimeField.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
+    this.setShiftsValidation();
+
+    this.shiftNameField.valueChanges.subscribe((val) => {
+      if (val === MasterShiftName.Rotating) {
+        this.clearShiftsValidation();
+        this.isShiftTimeRequired = false;
+      } else {
+        this.setShiftsValidation();
+        this.isShiftTimeRequired = true;
+      }
+      this.updateShifts();
+    });
   }
 
   private initJobDistributionDescriptionForm(): void {
@@ -818,5 +831,20 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public onRequisitionChange(event: ChangeEventArgs): void {
     const reasonName = (event.itemData as ManualInvoiceReason).reason;
     this.jobDistributionDescriptionForm.controls['orderRequisitionReasonName'].patchValue(reasonName);
+  }
+
+  setShiftsValidation(): void {
+    this.shiftStartTimeField.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
+    this.shiftEndTimeField.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
+  }
+
+  clearShiftsValidation(): void {
+    this.shiftStartTimeField.clearValidators();
+    this.shiftEndTimeField.clearValidators();
+  }
+
+  updateShifts(): void {
+    this.shiftStartTimeField.updateValueAndValidity();
+    this.shiftEndTimeField.updateValueAndValidity();
   }
 }

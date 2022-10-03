@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { GetDepartmentsByLocationId, GetLocationsByRegionId } from '@organization-management/store/organization-management.actions';
@@ -25,6 +25,7 @@ import { LogiReportComponent } from '@shared/components/logi-report/logi-report.
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { analyticsConstants } from '../constants/analytics.constant';
+import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 @Component({
   selector: 'app-page-report',
   templateUrl: './job-details.component.html',
@@ -37,10 +38,14 @@ export class JobDetailsComponent implements OnInit {
     "EndDateParamJD": "",
     "RegionParamJD": "",
     "LocationParamJD": "",
-    "DepartmentParamJD": ""
+    "DepartmentParamJD": "",
+    "BearerParamJD":"",
+    "BusinessUnitIdParamJD":"",
+    "HostName":""
+
   };
-  public reportName: LogiReportFileDetails = { name: "/JobDetails/JobDetailsPage.cls" };
-  public catelogName: LogiReportFileDetails = { name: "/JobDetails/Dashbord.cat" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/JobDetailsReport/JobDetails.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/JobDetailsReport/JobDetails.cat" };
   public title: string = "Job Details";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption:string="All";
@@ -86,10 +91,12 @@ export class JobDetailsComponent implements OnInit {
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
   public isInitialLoad: boolean = false;
+  public baseUrl:string='';
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   constructor(private store: Store,
     private formBuilder: FormBuilder,
-    private filterService: FilterService  ) {
+    private filterService: FilterService ,@Inject(APP_SETTINGS) private appSettings: AppSettings) {
+      this.baseUrl = this.appSettings.host.replace("https://","").replace("http://","");
     this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
     this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
@@ -175,15 +182,26 @@ export class JobDetailsComponent implements OnInit {
   }
  
   public SearchReport(): void {
+    let auth="Bearer ";
+    for(let x=0;x<window.localStorage.length;x++)
+    { 
+      if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
+      {
+        auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
+      }
+    }
       let { startDate, endDate } = this.jobDetailsForm.getRawValue();
       this.paramsData =
       {
-        "OrganizationParamJD": this.selectedOrganizations?.map((list) => list.name),
-        "StartDateParamJD": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-        "EndDateParamJD": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-        "RegionParamJD": this.selectedRegions?.map((list) => list.name),
-        "LocationParamJD": this.selectedLocations?.map((list) => list.name),
-        "DepartmentParamJD": this.selectedDepartments?.map((list) => list.departmentName)
+        "OrganizationParamJD": this.selectedOrganizations?.map((list) => list.id).join(","),
+      "StartDateParamJD": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "EndDateParamJD": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "RegionParamJD": this.selectedRegions?.map((list) => list.id).join(","),
+      "LocationParamJD": this.selectedLocations?.map((list) => list.id).join(","),
+      "DepartmentParamJD": this.selectedDepartments?.map((list) => list.departmentId).join(","),
+      "BearerParamJD":auth,
+      "BusinessUnitIdParamJD":window.localStorage.getItem("lastSelectedOrganizationId")==null?"1":window.localStorage.getItem("lastSelectedOrganizationId"),
+      "HostName":this.baseUrl
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();

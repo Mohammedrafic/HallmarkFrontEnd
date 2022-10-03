@@ -85,6 +85,7 @@ import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shi
 import { DurationService } from '@shared/services/duration.service';
 import { UserState } from 'src/app/store/user.state';
 import { DateTimeHelper } from '@core/helpers';
+import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 
 @Component({
   selector: 'app-order-details-form',
@@ -243,6 +244,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public orderId: string | null;
 
   public comments: Comment[] = [];
+  public isShiftTimeRequired: boolean = true;
 
   constructor(
     private store: Store,
@@ -372,6 +374,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     const skillIdControl = this.generalInformationForm.get('skillId') as AbstractControl;
     const durationControl = this.generalInformationForm.get('duration') as AbstractControl;
     const jobStartDateControl = this.generalInformationForm.get('jobStartDate') as AbstractControl;
+    const shiftNameControl = this.generalInformationForm.get('shift') as AbstractControl;
     const shiftStartTimeControl = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
     const shiftEndTimeControl = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
     const jobDistributionControl = this.jobDistributionForm.get('jobDistribution') as AbstractControl;
@@ -451,6 +454,17 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     shiftStartTimeControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
       this.minTime = val || this.defaultMinTime;
       shiftEndTimeControl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    });
+
+    shiftNameControl.valueChanges.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((val) => {
+      if (val === MasterShiftName.Rotating) {
+        this.clearShiftsValidation(shiftStartTimeControl, shiftEndTimeControl);
+        this.isShiftTimeRequired = false;
+      } else {
+        this.setShiftsValidation(shiftStartTimeControl, shiftEndTimeControl);
+        this.isShiftTimeRequired = true;
+      }
+      this.updateShifts(shiftStartTimeControl, shiftEndTimeControl);
     });
 
     jobDistributionControl.valueChanges
@@ -534,8 +548,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.hourlyRateSync.emit(value);
     });
 
-    shiftStartTimeControl.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
-    shiftEndTimeControl.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
+    this.setShiftsValidation(shiftStartTimeControl, shiftEndTimeControl);
   }
 
   public ngOnInit(): void {
@@ -1175,5 +1188,20 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         index !== checkedValue ? primaryContact.patchValue(false) : primaryContact.patchValue(true);
       }
     });
+  }
+
+  setShiftsValidation(shiftStart: AbstractControl, shiftEnd: AbstractControl): void {
+    shiftStart.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
+    shiftEnd.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
+  }
+
+  clearShiftsValidation(shiftStart: AbstractControl, shiftEnd: AbstractControl): void {
+    shiftStart.clearValidators();
+    shiftEnd.clearValidators();
+  }
+
+  updateShifts(shiftStart: AbstractControl, shiftEnd: AbstractControl): void {
+    shiftStart.updateValueAndValidity();
+    shiftEnd.updateValueAndValidity();
   }
 }

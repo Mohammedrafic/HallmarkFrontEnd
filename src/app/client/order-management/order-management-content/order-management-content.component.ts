@@ -314,9 +314,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       distributedOnFrom: new FormControl(null),
       distributedOnTo: new FormControl(null),
       candidateName: new FormControl(null),
-      projectTypeId: new FormControl(null),
-      projectNameId: new FormControl(null),
-      poNumberId: new FormControl(null),
+      projectTypeIds: new FormControl(null),
+      projectNameIds: new FormControl(null),
+      poNumberIds: new FormControl(null),
     });
   }
 
@@ -518,9 +518,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       distributedOnFrom: this.filters.distributedOnFrom || null,
       distributedOnTo: this.filters.distributedOnTo || null,
       candidateName: this.filters.candidateName || null,
-      projectTypeId: this.filters.projectTypeId || null,
-      projectNameId: this.filters.projectNameId || null,
-      poNumberId: this.filters.poNumberId || null,
+      projectTypeIds: this.filters.projectTypeIds || null,
+      projectNameIds: this.filters.projectNameIds || null,
+      poNumberIds: this.filters.poNumberIds || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }
@@ -1142,21 +1142,21 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       distributedOnFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
       distributedOnTo: { type: ControlTypes.Date, valueType: ValueType.Text },
       candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
-      projectTypeId: {
+      projectTypeIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
         valueField: 'projectType',
         valueId: 'id',
       },
-      projectNameId: {
+      projectNameIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
         valueField: 'projectName',
         valueId: 'id',
       },
-      poNumberId: {
+      poNumberIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
@@ -1517,12 +1517,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private getProjectSpecialData(): void {
-    this.store.dispatch(new GetProjectSpecialData());
-    this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data) => {
-      const { poNumbers, projectNames, specialProjectCategories } = data;
-      this.filterColumns.projectTypeId.dataSource = specialProjectCategories;
-      this.filterColumns.projectNameId.dataSource = projectNames;
-      this.filterColumns.poNumberId.dataSource = poNumbers;
+    this.organizationId$.pipe(filter(Boolean), take(1)).subscribe(() => {
+      this.store.dispatch(new GetProjectSpecialData());
+      this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data) => {
+        const { poNumbers, projectNames, specialProjectCategories } = data;
+        this.filterColumns.projectTypeIds.dataSource = specialProjectCategories;
+        this.filterColumns.projectNameIds.dataSource = projectNames;
+        this.filterColumns.poNumberIds.dataSource = poNumbers;
+      });
     });
   }
 }
