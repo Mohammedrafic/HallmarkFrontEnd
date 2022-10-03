@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\app",
+    "\\src\\app\\admin",
+    "\\src\\app\\dashboard",
+    "\\src\\app\\modules",
+    "\\src\\app\\modules\\document-library",
+    "\\src\\app\\modules\\document-library\\components",
+    "\\src\\app\\modules\\document-library\\components\\document-management",
+    "\\src\\app\\modules\\document-library\\components\\document-management\\document-library"
+  ],
+  "SelectedNode": "\\src\\app\\modules\\document-library\\services\\document-library.service.ts",
+  "PreviewInSolutionExplorer": false
+}

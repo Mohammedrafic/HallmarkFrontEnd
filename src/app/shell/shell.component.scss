@@ -121,18 +121,15 @@
     }
 
     .close-btn {
-      //width: 18px;
       height: 8px;
       width: 8px;
       left: 4px;
       top: 4px;
       border-radius: 0px;
-
-
       margin-right: 10px;
       position: relative;
       cursor: pointer;
-      color: #3E7FFF;
+      color: $primary-active-blue-10;
 
 
       &::before {
@@ -143,7 +140,6 @@
         top: 0px;
         left: 8px;
       }
-
     }
 
     .logo {
@@ -585,6 +581,7 @@
       line-height: 20px;
       top:10px;
       right: 50px;
+      display:flex;
 
       button {
         padding: 0.3rem 0.5rem !important;
