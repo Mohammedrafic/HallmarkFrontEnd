@@ -168,12 +168,14 @@
              [width]="alertSidebarWidth" [type]="alertSidebarType" [position]="alertSidebarPosition"
              showBackdrop="true" style="visibility: hidden" (created)="onAlertSidebarCreated()">
   <div class="sidebar-header">
+    <!-- <i-feather name="bell"></i-feather> -->
     <div>
+      
     <h5 class="alert-title-header-body-color">
       Notifications
     </h5>
   </div>
-    <div class="closebtn"">
+    <div class="closebtn" style="display:flex">
       <div class="e-row item-clear">
         <span (click)="alertSideBarClearAllClick()">Clear All</span>
       </div>
