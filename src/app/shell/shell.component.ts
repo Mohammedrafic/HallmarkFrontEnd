@@ -36,6 +36,7 @@ import { AnalyticsMenuId } from '@shared/constants/menu-config';
 
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { AnalyticsApiService } from '@shared/services/analytics-api.service';
 enum THEME {
   light = 'light',
   dark = 'dark',
@@ -132,7 +133,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
-  profileDatasource: MenuItemModel[] = []; 
+  profileDatasource: MenuItemModel[] = [];
   private routers: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
 
   @Select(AppState.isMobileScreen)
@@ -150,13 +151,14 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   private permissions: CurrentUserPermission[] = [];
   canManageOtherUserNotifications: boolean;
   canManageNotificationTemplates: boolean;
-  
+
   constructor(
     private store: Store,
     private router: Router,
     private orderManagementService: OrderManagementService,
     private orderManagementAgencyService: OrderManagementAgencyService,
     private actions$: Actions,
+    private analyticsApiService: AnalyticsApiService<string>,
   ) {
     router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((data: any) => {
       if (this.tree) {
@@ -342,7 +344,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   nodeSelect(args: NodeSelectEventArgs): void {
-  
+
     if (args.node.classList.contains('e-level-1') && this.sidebar.isOpen) {
       this.tree.collapseAll();
       this.tree.expandAll([args.node]);
@@ -360,6 +362,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.tree.selectedNodes = [this.activeMenuItemData.anch];
     this.setSideBarForFirstLoad(event.item.route);
     this.router.navigate([event.item.route]);
+
+    this.analyticsApiService.predefinedMenuClickAction(event.item.route, event.item.title).subscribe();
   }
 
   showContextMenu(data: MenuItem, event: any): void {
@@ -443,7 +447,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isSearching = !this.isSearching;
     if (this.isMaximized) {
       this.searchInput?.nativeElement?.focus();
-    } 
+    }
     if (!this.sidebar.isOpen)
       this.isMaximized = false;
     else
@@ -520,7 +524,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.allAlertDismiss();
   }
 
-  alertDismiss(id: any) {    
+  alertDismiss(id: any) {
     var model: DismissAlertDto = {
       Id: id,
     };

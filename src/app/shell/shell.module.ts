@@ -42,7 +42,7 @@ import { OrganizationAgencySelectorComponent } from './components/organization-a
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 import { UserChatModule } from '../modules/chat/chat.module';
-import { AnalyticByClickModule } from '@shared/directives/analitics/analytics-by-click/analytic-by-click.module';
+import { AnalyticByClickModule } from '@shared/directives/analytics/analytics-by-click/analytic-by-click.module';
 
 const sidebarIcons = {
   Sidebar,

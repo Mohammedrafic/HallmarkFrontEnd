@@ -94,10 +94,7 @@
             </ng-template>
           </ejs-treeview>
 
-          <ejs-contextmenu appAnalyticByClick
-                           [analyticEvent]="'select'"
-                           [analyticTargetType]="'menu'"
-                           id='contextmenu'
+          <ejs-contextmenu id='contextmenu'
                            #contextmenu
                            target='#template'
                            (onClose)="onContextMenuClose()"
