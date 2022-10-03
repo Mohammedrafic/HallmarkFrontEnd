@@ -111,8 +111,6 @@ export class ChatState {
           const { chatOpen, currentUserIdentity } = getState();
           this.mediatorService.notifyMessageReceived(event);
 
-
-          // dispatch(new Chat.UpdateMessages(event.threadId));
           dispatch(new Chat.SortThreads());
           dispatch(new UnreadMessage());
           

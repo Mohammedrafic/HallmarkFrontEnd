@@ -191,7 +191,7 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
     : null;
 
     this.iterableAsyncMessages = this.chatThreadClient
-    ? this.chatThreadClient.listMessages({ maxPageSize: 10 }).byPage() as PagedAsyncIterableIterator<ChatMessage[]>
+    ? this.chatThreadClient.listMessages({ maxPageSize: 50 }).byPage() as PagedAsyncIterableIterator<ChatMessage[]>
     : null;
   }
 
