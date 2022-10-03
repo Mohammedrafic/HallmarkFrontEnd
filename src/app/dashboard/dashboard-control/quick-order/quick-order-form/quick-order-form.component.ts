@@ -373,17 +373,6 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.store.dispatch(new GetContactDetails(selectedDepartment.id, selectedDepartment.organizationId));
   }
 
-  private resetRegion(): void {
-    this.cdr.markForCheck();
-    const regionControl = this.generalInformationForm.get('regionId') as AbstractControl;
-    if (regionControl.value) {
-      regionControl.reset(null, { emitValue: false });
-      regionControl.markAsUntouched();
-      this.regionDataSource = [];
-      this.isRegionsDropDownEnabled = false;
-    }
-  }
-
   private resetLocation(): void {
     this.cdr.markForCheck();
     const locationControl = this.generalInformationForm.get('locationId') as AbstractControl;
