@@ -98,7 +98,7 @@ export class PendingApprovalGridHelper {
         minWidth: 280,
         headerName: 'Amount',
         type: 'rightAligned',
-        cellClass: 'font-weight-bold',
+        cellClass: 'font-weight-bold align-right',
         valueFormatter: numberValueFormatter,
       },
       {
@@ -157,7 +157,7 @@ export class PendingApprovalGridHelper {
         minWidth: 280,
         headerName: 'Amount',
         type: 'rightAligned',
-        cellClass: 'font-weight-bold',
+        cellClass: 'font-weight-bold align-right',
         valueFormatter: numberValueFormatter,
       },
       {
@@ -328,7 +328,7 @@ export class PendingApprovalGridHelper {
         minWidth: 280,
         headerName: 'Amount',
         type: 'rightAligned',
-        cellClass: 'font-weight-bold',
+        cellClass: 'font-weight-bold align-right',
         valueFormatter: numberValueFormatter,
       },
       {

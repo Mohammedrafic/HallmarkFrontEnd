@@ -183,7 +183,7 @@ export class FillRateComponent implements OnInit {
         "EndDateFR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
         "RegionFR": this.selectedRegions?.map((list) => list.name),
         "LocationParamFR": this.selectedLocations?.map((list) => list.name),
-        "DepartmentParamFR": this.selectedDepartments?.map((list) => list.departmentName)
+        "DepartmentParamFR": this.selectedDepartments?.map((list) => list.departmentName.trim())
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();

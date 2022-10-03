@@ -133,7 +133,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
   profileDatasource: MenuItemModel[] = [];
-  profileData: MenuItemModel[] = []; 
+  profileData: MenuItemModel[] = [];
   private routers: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
 
   @Select(AppState.isMobileScreen)
@@ -151,7 +151,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   private permissions: CurrentUserPermission[] = [];
   canManageOtherUserNotifications: boolean;
   canManageNotificationTemplates: boolean;
-  
+
   constructor(
     private store: Store,
     private router: Router,
@@ -346,7 +346,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   nodeSelect(args: NodeSelectEventArgs): void {
-  
+
     if (args.node.classList.contains('e-level-1') && this.sidebar.isOpen) {
       this.tree.collapseAll();
       this.tree.expandAll([args.node]);
@@ -361,9 +361,11 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onSubMenuItemClick(event: any): void {
-    this.tree.selectedNodes = [this.activeMenuItemData.anch];
-    this.setSideBarForFirstLoad(event.item.route);
-    this.router.navigate([event.item.route]);
+    this.tree.selectedNodes = [this.activeMenuItemData?.anch];
+    if (event.item) {
+      this.setSideBarForFirstLoad(event.item.route);
+      this.router.navigate([event.item.route]);
+    }
   }
 
   showContextMenu(data: MenuItem, event: any): void {
@@ -451,7 +453,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isSearching = !this.isSearching;
     if (this.isMaximized) {
       this.searchInput?.nativeElement?.focus();
-    } 
+    }
     if (!this.sidebar.isOpen)
       this.isMaximized = false;
     else
@@ -528,7 +530,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.allAlertDismiss();
   }
 
-  alertDismiss(id: any) {    
+  alertDismiss(id: any) {
     var model: DismissAlertDto = {
       Id: id,
     };

@@ -70,4 +70,8 @@ export namespace Chat {
 
     constructor(public readonly event: ReadReceiptReceivedEvent) {}
   }
+
+  export class ResetTypingEvent {
+    static readonly type = ChatActions.ResetTypingEvent;
+  }
 }

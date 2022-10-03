@@ -162,46 +162,52 @@
       </div>
     </div>
   </div>
-<div>
-  <div class="input-container">
-    <label>Special Project Category</label>
-    <div class="input-group dropdown">
-      <ejs-dropdownlist
-        formControlName="projectTypeId"
-        appValidateWithMessage
-        [dataSource]="(orderFilteringOptions$ | async)?.specialProjectCategories"
-        [fields]="specialProjectCategoriesFields"
-      >
-      </ejs-dropdownlist>
+  <div>
+    <div class="input-container">
+      <label>Special Project Category</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect
+          mode="CheckBox"
+          placeholder="All"
+          formControlName="projectTypeIds"
+          [dataSource]="filterColumns.projectTypeIds.dataSource"
+          [fields]="specialProjectCategoriesFields"
+          [showDropDownIcon]="true"
+        >
+        </ejs-multiselect>
+      </div>
     </div>
   </div>
-</div>
-<div class="row">
-  <div class="input-container">
-    <label>Project Name</label>
-    <div class="input-group dropdown">
-      <ejs-dropdownlist
-        formControlName="projectNameId"
-        appValidateWithMessage
-        [dataSource]="(orderFilteringOptions$ | async)?.projectNames"
-        [fields]="projectNameFields"
-      >
-      </ejs-dropdownlist>
+  <div class="row">
+    <div class="input-container">
+      <label>Project Name</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect
+          mode="CheckBox"
+          placeholder="All"
+          formControlName="projectNameIds"
+          [dataSource]="filterColumns.projectNameIds.dataSource"
+          [fields]="projectNameFields"
+          [showDropDownIcon]="true"
+        >
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>PO #</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect
+          mode="CheckBox"
+          placeholder="All"
+          formControlName="poNumberIds"
+          [dataSource]="filterColumns.poNumberIds.dataSource"
+          [fields]="poNumberFields"
+          [showDropDownIcon]="true"
+        >
+        </ejs-multiselect>
+      </div>
     </div>
   </div>
-  <div class="input-container">
-    <label>PO #</label>
-    <div class="input-group dropdown">
-      <ejs-dropdownlist
-        formControlName="poNumberId"
-        appValidateWithMessage
-        [dataSource]="(orderFilteringOptions$ | async)?.poNumbers"
-        [fields]="poNumberFields"
-      >
-      </ejs-dropdownlist>
-    </div>
-  </div>
-</div>
   <div>
     <div class="input-container">
       <label>Job Title</label>

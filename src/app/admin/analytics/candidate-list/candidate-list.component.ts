@@ -182,7 +182,7 @@ export class CandidateListComponent implements OnInit {
         "EndDateParamCRRW": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
         "RegionParamCRRW": this.selectedRegions?.map((list) => list.name),
         "LocationParamCRRW": this.selectedLocations?.map((list) => list.name),
-        "DepartmentParamCRRW": this.selectedDepartments?.map((list) => list.departmentName)
+        "DepartmentParamCRRW": this.selectedDepartments?.map((list) => list.departmentName.trim())
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
