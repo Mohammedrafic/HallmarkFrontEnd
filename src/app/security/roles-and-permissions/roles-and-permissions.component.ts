@@ -36,6 +36,7 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
   public roleFormGroup: FormGroup;
   public isEditRole = false;
   public isBusinessFormDisabled = false;
+  public isBusinessDisabledForNewRole = false;
   public businessUnits = BUSINESS_UNITS_VALUES;
   public optionFields = OPRION_FIELDS;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
@@ -69,9 +70,9 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
 
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
-    if (user?.businessUnitType) {
-      this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
-      this.isBusinessFormDisabled && this.businessForm.disable();
+    if (user?.businessUnitType !== BusinessUnitType.Hallmark) {
+      this.isBusinessDisabledForNewRole = true;
+      this.businessForm.disable();
     }
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       const [Hallmark, ...rest] = this.businessUnits;
@@ -159,7 +160,6 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
     }
 
     this.roleFormGroup.get('businessUnitType')?.disable();
-    this.roleFormGroup.get('businessUnitId')?.disable();
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -176,9 +176,8 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
   }
 
   private disableBussinesUnitForRole(): void {
-    if (this.isBusinessFormDisabled) {
+    if (this.isBusinessDisabledForNewRole) {
       this.roleFormGroup.get('businessUnitType')?.disable();
-      this.roleFormGroup.get('businessUnitId')?.disable();
     }
   }
 
