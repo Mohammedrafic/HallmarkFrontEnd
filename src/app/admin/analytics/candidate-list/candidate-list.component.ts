@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
@@ -23,6 +23,7 @@ import { LogiReportComponent } from '@shared/components/logi-report/logi-report.
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { analyticsConstants } from '../constants/analytics.constant';
+import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 
 @Component({
   selector: 'app-candidate-list',
@@ -31,17 +32,20 @@ import { analyticsConstants } from '../constants/analytics.constant';
 })
 export class CandidateListComponent implements OnInit {
   public paramsData: any = {
-    "OrganizationParamCRRW": "",
-    "StartDateParamCRRW": "",
-    "EndDateParamCRRW": "",
-    "RegionParamCRRW": "",
-    "LocationParamCRRW": "",
-    "DepartmentParamCRRW": ""
+    "OrganizationParamCRR": "",
+    "StartDateParamCRR": "",
+    "EndDateParamCRR": "",
+    "RegionParamCRR": "",
+    "LocationParamCRR": "",
+    "DepartmentParamCRR": "",
+    "BearerParamCRR":"",
+    "BusinessUnitIdParamCRR":"",
+    "HostName":""
   };
-  public reportName: LogiReportFileDetails = { name: "/CandidateRegularRate/CandidateRegularRateWeb.wls" };
-  public catelogName: LogiReportFileDetails = { name: "/CandidateRegularRate/Dashbord.cat" };
-  public title: string = "Candidate Regular Report";
-  public reportType: LogiReportTypes = LogiReportTypes.WebReport;
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateRegularRate/CandidateRegualRate.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateRegularRate/CandidateRegularRate.cat" };
+  public title: string = "Candidate Regular Rate";
+  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption:string="All";
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
@@ -85,11 +89,13 @@ export class CandidateListComponent implements OnInit {
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
   public isInitialLoad: boolean = false;
+  public baseUrl:string='';
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   constructor(private store: Store,
     private formBuilder: FormBuilder,
-    private filterService: FilterService  ) {
-    this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+    private filterService: FilterService  ,@Inject(APP_SETTINGS) private appSettings: AppSettings) {
+      this.baseUrl = this.appSettings.host.replace("https://","").replace("http://","");
+      this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
     this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
@@ -174,16 +180,27 @@ export class CandidateListComponent implements OnInit {
   }
  
   public SearchReport(): void {
-      let { startDate, endDate } = this.candidateRegularRateForm.getRawValue();
-      this.paramsData =
+    let auth="Bearer ";
+    for(let x=0;x<window.localStorage.length;x++)
+    { 
+      if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
       {
-        "OrganizationParamCRRW": this.selectedOrganizations?.map((list) => list.name),
-        "StartDateParamCRRW": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-        "EndDateParamCRRW": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-        "RegionParamCRRW": this.selectedRegions?.map((list) => list.name),
-        "LocationParamCRRW": this.selectedLocations?.map((list) => list.name),
-        "DepartmentParamCRRW": this.selectedDepartments?.map((list) => list.departmentName.trim())
-      };
+        auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
+      }
+    }
+    let { startDate, endDate } = this.candidateRegularRateForm.getRawValue();
+    this.paramsData =
+    {
+      "OrganizationParamCRR": this.selectedOrganizations?.map((list) => list.id),
+      "StartDateParamCRR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "EndDateParamCRR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "RegionParamCRR": this.selectedRegions?.map((list) => list.id),
+      "LocationParamCRR": this.selectedLocations?.map((list) => list.id),
+      "DepartmentParamCRR": this.selectedDepartments?.map((list) => list.departmentId),
+      "BearerParamCRR":auth,
+      "BusinessUnitIdParamCRR":window.localStorage.getItem("lastSelectedOrganizationId")==null?"1":window.localStorage.getItem("lastSelectedOrganizationId"),
+      "HostName":this.baseUrl
+    };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
   }  

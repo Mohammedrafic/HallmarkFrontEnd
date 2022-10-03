@@ -46,7 +46,7 @@ export class ClientFinanceAccrualReportComponent implements OnInit {
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/ClientFinanceAccrualReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/Accrual.cat" };
-  public title: string = "Client Finance Accrual Report";
+  public title: string = "Client Finance Accrual";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
   @Select(LogiReportState.regions)
@@ -98,7 +98,7 @@ export class ClientFinanceAccrualReportComponent implements OnInit {
     private formBuilder: FormBuilder,
     private filterService: FilterService,@Inject(APP_SETTINGS) private appSettings: AppSettings) {
       this.baseUrl = this.appSettings.host.replace("https://","").replace("http://","");
-    this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+      this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
     this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
