@@ -1,13 +1,14 @@
 import { ChangeDetectorRef, Directive } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
-import { TypingIndicatorReceivedEvent } from '@azure/communication-signaling';
+import { ChatMessageReceivedEvent, TypingIndicatorReceivedEvent } from '@azure/communication-signaling';
 import { ChatThreadClient } from '@azure/communication-chat';
-import { Actions, ofActionDispatched, Store, ofActionCompleted } from '@ngxs/store';
-import { filter, Subject, takeUntil, tap } from 'rxjs';
+import { Actions, ofActionDispatched, Store } from '@ngxs/store';
+import { filter, Subject, takeUntil } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
 import { Chat } from '../store/actions';
+import { ChatMediatorService } from '../services';
 
 @Directive()
 export class ChatMessagesHelper extends Destroyable {
@@ -26,26 +27,20 @@ export class ChatMessagesHelper extends Destroyable {
     protected store: Store,
     protected cd: ChangeDetectorRef,
     protected sanitizer: DomSanitizer,
+    private mediatorSevice: ChatMediatorService,
   ) {
     super();
   }
 
   protected watchForUpdate(): void {
-    this.actions$
+    this.mediatorSevice.getMessageMediatorStream()
     .pipe(
-      ofActionCompleted(Chat.UpdateMessages),
-      filter(() => {
-        const threadToUpdate = this.store.snapshot().chat.threadIdToUpdate as string;
-        return !!threadToUpdate && !!this.threadId && threadToUpdate === this.threadId
-      }),
+      filter((event) => !!event && !!this.threadId && event.threadId === this.threadId),
       takeUntil(this.componentDestroy()),
-    )
-    .subscribe(() => {
-      this.updateMessages();
+    ).subscribe((event) => {
+      this.setLastMessage(event);
     });
   }
-
-  protected updateMessages(): void {}
 
   protected async getReceiptIds(chatClient: ChatThreadClient): Promise<string[]> {
     const asyncReceipts = chatClient.listReadReceipts();
@@ -69,4 +64,6 @@ export class ChatMessagesHelper extends Destroyable {
   }
 
   protected updateReadReceipts(): void {}
+
+  protected setLastMessage(messageEvent: ChatMessageReceivedEvent): void {}
 }

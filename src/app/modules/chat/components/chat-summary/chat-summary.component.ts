@@ -25,7 +25,7 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit, 
   ngOnInit(): void {
     this.userIdentity = this.store.snapshot().chat.currentUserIdentity;
 
-    this.updateMessages();
+    this.setLastMessage();
     this.watchForUpdate();
   }
 
@@ -43,7 +43,7 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit, 
     });
   }
 
-  override async updateMessages(): Promise<void> {
+  override async setLastMessage(): Promise<void> {
     const client = this.store.snapshot().chat.chatClient as ChatClient;
     this.chatThreadClient = client.getChatThreadClient(this.thread.threadId as string);
     const Parser = new DOMParser();

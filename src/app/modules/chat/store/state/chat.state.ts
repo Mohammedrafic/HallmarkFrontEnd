@@ -12,7 +12,7 @@ import { DefaultChatState } from '../../constants';
 import { ChatDialogState, ChatSearchType } from '../../enums';
 import { ChatHelper, ThreadsHelper } from '../../helpers';
 import { ChatThread, UserChatConfig } from '../../interfaces';
-import { ChatApiService } from '../../services';
+import { ChatApiService, ChatMediatorService } from '../../services';
 import { Chat } from '../actions';
 import { ChatModel } from '../chat.model';
 import { ChatService } from '../../services/chat.service';
@@ -26,6 +26,7 @@ export class ChatState {
   constructor(
     private apiService: ChatApiService,
     private chatService: ChatService,
+    private mediatorService: ChatMediatorService,
   ) {}
 
   @Selector([ChatState])
@@ -108,7 +109,11 @@ export class ChatState {
 
         chatClient.on('chatMessageReceived', (event: ChatMessageReceivedEvent) => {
           const { chatOpen, currentUserIdentity } = getState();
-          dispatch(new Chat.UpdateMessages(event.threadId));
+          console.log(event, '1111111111')
+          this.mediatorService.notifyMessageReceived(event);
+
+
+          // dispatch(new Chat.UpdateMessages(event.threadId));
           dispatch(new Chat.SortThreads());
           dispatch(new UnreadMessage());
           
@@ -317,4 +322,13 @@ export class ChatState {
 
   @Action(UnreadMessage)
   UnreadMessage(): void {}
+
+  @Action(Chat.ResetTypingEvent)
+  ResetTyping(
+    { patchState }: StateContext<ChatModel>,
+  ): void {
+    patchState({
+      typingIndicator: null,
+    });
+  }
 }
