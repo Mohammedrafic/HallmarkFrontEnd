@@ -1,5 +1,5 @@
 import {
-  AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, Component,
+  AfterViewChecked, ChangeDetectionStrategy, Component,
   ElementRef, OnInit, ViewChild
 } from '@angular/core';
 

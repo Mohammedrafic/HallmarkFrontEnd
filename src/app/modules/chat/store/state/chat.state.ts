@@ -109,7 +109,6 @@ export class ChatState {
 
         chatClient.on('chatMessageReceived', (event: ChatMessageReceivedEvent) => {
           const { chatOpen, currentUserIdentity } = getState();
-          console.log(event, '1111111111')
           this.mediatorService.notifyMessageReceived(event);
 
 
