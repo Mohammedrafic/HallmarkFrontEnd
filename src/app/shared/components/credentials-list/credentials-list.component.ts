@@ -15,10 +15,9 @@ import {
   RemoveCredential,
   SaveCredential,
   SaveCredentialSucceeded,
-} from '../../store/organization-management.actions';
+} from '../../../organization-management/store/organization-management.actions';
 import { Credential, CredentialFilter, CredentialFilterDataSources, CredentialPage } from '@shared/models/credential.model';
-import { OrganizationManagementState } from '../../store/organization-management.state';
-import { CredentialType } from '@shared/models/credential-type.model';
+
 import { ConfirmService } from '@shared/services/confirm.service';
 import { SortSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { UserState } from 'src/app/store/user.state';
@@ -30,6 +29,8 @@ import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
 import { CredentialsState } from '@organization-management/store/credentials.state';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { CredentialType } from '@shared/models/credential-type.model';
 
 @Component({
   selector: 'app-credentials-list',

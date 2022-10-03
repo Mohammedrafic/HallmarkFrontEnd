@@ -9,7 +9,7 @@ import { OrganizationManagementComponent } from './organization-management.compo
 import { SettingsComponent } from './settings/settings.component';
 import { ShiftsComponent } from './shifts/shifts.component';
 import { SkillsComponent } from './skills/skills.component';
-import { CredentialsListComponent } from './credentials/credentials-list/credentials-list.component';
+import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
 import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
 import { JobOrderComponent } from './workflow/job-order/job-order.component';
 import { BillRatesComponent } from './bill-rates/bill-rates.component';
