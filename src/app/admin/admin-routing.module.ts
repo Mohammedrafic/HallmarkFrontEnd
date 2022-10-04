@@ -67,6 +67,7 @@ const routes: Routes = [
               {
                 path: 'list',
                 component: CredentialsListComponent,
+                data: { canEdit: true },
               },
               {
                 path: 'types',
