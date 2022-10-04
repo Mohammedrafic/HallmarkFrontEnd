@@ -222,10 +222,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   public onSaveCredential(): void {
-    if (this.addCredentialForm.valid) {
+    if (this.addCredentialForm.valid && this.masterCredentialId) {
       this.saveCredential(this.addCredentialForm.getRawValue());
     } else {
-      this.addCredentialForm.markAllAsTouched();
+      this.addCredentialForm.markAsDirty();
     }
   }
 
@@ -244,7 +244,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     event.stopPropagation();
     this.disabledCopy = true;
     this.masterCredentialId = data.masterCredentialId;
-    this.saveCredential({ ...data, status: CredentialVerifiedStatus.Pending });
+    this.saveCredential({
+      ...data,
+      status: CredentialVerifiedStatus.Pending,
+      completedDate: null
+    });
   }
 
   public onViewFiles(id: number) {
