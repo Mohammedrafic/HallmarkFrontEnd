@@ -57,10 +57,11 @@ export const STATUS_COLOR_GROUP = {
 };
 
 export enum AgencyStatus {
-  Pending,
+  InProgress,
   Inactive,
   Active,
   Suspended,
+  Terminated,
 }
 
 export enum CandidateStatus {

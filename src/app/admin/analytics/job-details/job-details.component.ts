@@ -97,7 +97,7 @@ export class JobDetailsComponent implements OnInit {
     private formBuilder: FormBuilder,
     private filterService: FilterService ,@Inject(APP_SETTINGS) private appSettings: AppSettings) {
       this.baseUrl = this.appSettings.host.replace("https://","").replace("http://","");
-    this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+      this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
     this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
