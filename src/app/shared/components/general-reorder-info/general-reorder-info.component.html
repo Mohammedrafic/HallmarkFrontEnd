@@ -27,6 +27,28 @@
         <div class="sup-title">Department</div>
       </div>
     </div>
+    <div class="column last-column">
+      <div class="cost">${{ orderInformation.hourlyRate }}</div>
+      <div class="sup-title">Bill Rate</div>
+    </div>
+    <div class="column" *ngIf="(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea">
+      <div class="icon">
+        <i-feather name="briefcase" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title" [title]="agencies?.tooltip">{{ agencies?.name }}</div>
+        <div class="sup-title">Agency</div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="icon">
+        <i-feather name="briefcase" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{ orderInformation.orderRequisitionReasonName || '-' }}</div>
+        <div class="sup-title">Reason for Requisition</div>
+      </div>
+    </div>
     <div class="column">
       <div class="icon">
         <i-feather name="briefcase" class="icon"></i-feather>
@@ -36,16 +58,18 @@
         <div class="sup-title">Skill</div>
       </div>
     </div>
+    <div class="column"></div>
     <div class="column last-column">
-      <div class="cost">${{ orderInformation.hourlyRate }}</div>
-      <div class="sup-title">Bill Rate</div>
-    </div>
-    <div class="column" *ngIf="(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea">
-      <div>
-        <div class="title" [title]="agencies?.tooltip">{{ agencies?.name }}</div>
-        <div class="sup-title">Agency Name</div>
+      <div class="accent link" (click)="moveToPerDiem()">
+        Order Per Diem ID: {{ orderInformation?.organizationPrefix }}-{{ orderInformation?.reOrderFrom?.publicId }}
       </div>
     </div>
+  </div>
+</section>
+
+
+<section class="candidates-additional-info" *ngIf="orderInformation">
+  <div class="container-row justify-content-normal">
     <div class="column">
       <div>
         <div class="title accent">{{ orderInformation?.acceptedPositions }}/{{ orderInformation?.openPositions }}</div>
@@ -67,13 +91,11 @@
         <div class="sup-title">Date</div>
       </div>
     </div>
-    <div class="column">
-      <div class="accent link" (click)="moveToPerDiem()">
-        Order Per Diem ID: {{ orderInformation?.organizationPrefix }}-{{ orderInformation?.reOrderFrom?.publicId }}
-      </div>
-    </div>
   </div>
 </section>
+
+<div class="separator mt-16"></div>
+
 <section class="candidates-additional-info">
   <div class="warning">
     <div class="icon">

@@ -39,6 +39,7 @@ import {
 } from '@shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 import { B2CAuthService } from '../b2c-auth/b2c-auth.service';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 export interface UserStateModel {
   user: User | null;
@@ -133,6 +134,21 @@ export class UserState {
   @Selector()
   static currentUserPermissions(state: UserStateModel): CurrentUserPermission[] {
     return state.permissions;
+  }
+
+  @Selector()
+  static isHallmarkUser(state: UserStateModel): boolean {
+    return state.user?.businessUnitType === BusinessUnitType.Hallmark;
+  }
+
+  @Selector()
+  static isMspUser(state: UserStateModel): boolean {
+    return state.user?.businessUnitType === BusinessUnitType.MSP;
+  }
+
+  @Selector([UserState.isHallmarkUser, UserState.isMspUser])
+  static isHallmarkMspUser(isHalmark: boolean, isMsp: boolean): boolean {
+    return isHalmark || isMsp;
   }
 
   @Action(SetCurrentUser)
@@ -295,3 +311,5 @@ export class UserState {
     );
   }
 }
+
+
