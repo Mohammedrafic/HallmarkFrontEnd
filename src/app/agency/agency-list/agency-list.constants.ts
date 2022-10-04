@@ -5,7 +5,12 @@ import { valuesOnly } from "@shared/utils/enum.utils";
 
 export const agencyStatusOptions = Object.values(AgencyStatus)
   .filter(valuesOnly)
-  .map((text, id) => ({ text, id }));
+  .map((text, id) => {
+    if (text === 'InProgress') {
+      return ({ text: 'In Progress', id });
+    }
+    return ({ text, id });
+  });
 
 export const agencyListFilterColumns: FilterColumnsModel = {
   searchTerm: { type: ControlTypes.Text, valueType: ValueType.Text },
