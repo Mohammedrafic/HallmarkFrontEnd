@@ -200,7 +200,10 @@ export class ClientFinanceReportComponent implements OnInit {
       "LocationParamCFR": this.selectedLocations?.map((list) => list.id),
       "DepartmentParamCFR": this.selectedDepartments?.map((list) => list.departmentId),
       "BearerParamCFR":auth,
-      "BusinessUnitIdParamCFR":window.localStorage.getItem("lastSelectedOrganizationId")==null?"1":window.localStorage.getItem("lastSelectedOrganizationId"),
+      "BusinessUnitIdParamCFR":window.localStorage.getItem("lastSelectedOrganizationId") == null 
+      ?this.organizations!=null &&this.organizations[0]?.id!=null?
+      this.organizations[0].id.toString():"1": 
+      window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName":this.baseUrl
     };
     this.logiReportComponent.paramsData = this.paramsData;
