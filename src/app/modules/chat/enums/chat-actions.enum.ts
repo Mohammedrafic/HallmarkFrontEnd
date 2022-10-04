@@ -12,4 +12,5 @@ export enum ChatActions {
   SearchFor = '[chat] Search for participant or active thread',
   SortThreads = '[chat] Sort threads by last message',
   UpdateReceipts = '[chat] Update read receipts',
+  ResetTypingEvent = '[chat] reset typing event',
 }

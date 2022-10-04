@@ -61,7 +61,6 @@ import { ShiftsComponent } from './shifts/shifts.component';
 import { GroupSetupComponent } from './credentials/credentials-setup/group-setup/group-setup.component';
 import { SettingsComponent } from './settings/settings.component';
 import { CredentialsComponent } from './credentials/credentials.component';
-import { CredentialsListComponent } from './credentials/credentials-list/credentials-list.component';
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
 import { HolidaysState } from './store/holidays.state';
 import { HolidaysComponent } from './holidays/holidays.component';
@@ -132,7 +131,6 @@ const sidebarIcons = {
     LocationsComponent,
     CredentialsSetupComponent,
     CredentialsComponent,
-    CredentialsListComponent,
     SkillsComponent,
     ShiftsComponent,
     GroupSetupComponent,

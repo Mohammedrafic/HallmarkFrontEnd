@@ -140,6 +140,7 @@ import { UnsavedFormDirective } from './directives/unsaved-form.directive';
 import { ClearCacheComponent } from './components/clear-cache/clear-cache.component';
 import { CandidateCancellationDialogComponent } from './components/candidate-cancellation-dialog/candidate-cancellation-dialog.component';
 import { OrderHistoricalEventsComponent } from './components/order-historical-events/order-historical-events.component';
+import { CredentialsListComponent } from './components/credentials-list/credentials-list.component';
 
 const icons = {
   AlertCircle,
@@ -227,6 +228,7 @@ const COMPONENTS = [
   UnsavedFormDirective,
   ClearCacheComponent,
   CandidateCancellationDialogComponent,
+  CredentialsListComponent,
 ];
 
 @NgModule({

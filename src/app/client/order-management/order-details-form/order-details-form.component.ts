@@ -654,11 +654,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       .getRegularLocalBillRate(orderType, departmentId, skillId)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((billRates: BillRate[]) => {
-        if (billRates.length) {
-          this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour.toFixed(2));
-        } else {
-          this.generalInformationForm.controls['hourlyRate'].patchValue('');
-        }
+        const billRateValue = billRates[0]?.rateHour.toFixed(2) || '';
+        this.generalInformationForm.controls['hourlyRate'].patchValue(billRateValue);
       });
   }
 
@@ -1143,9 +1140,28 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.generalInformationForm = disableControls(this.generalInformationForm, ['title', ...controlNames], false);
     }
 
+    if (order.extensionFromId && this.isEditMode) {
+      this.disableExtensionControls();
+    }
+
     Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
       this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
     });
+  }
+
+  private disableExtensionControls(): void {
+    const openPositions = this.generalInformationForm.controls['openPositions'];
+    const jobDistribution = this.jobDistributionForm.controls['jobDistribution'];
+    const agency = this.jobDistributionForm.controls['agency'];
+    const classification = this.jobDescriptionForm.controls['classification'];
+    openPositions.disable();
+    jobDistribution.disable();
+    agency.disable();
+    classification.disable();
+    openPositions.updateValueAndValidity({ onlySelf: false, emitEvent: false });
+    jobDistribution.updateValueAndValidity({ onlySelf: false, emitEvent: false });
+    agency.updateValueAndValidity({ onlySelf: false, emitEvent: false });
+    classification.updateValueAndValidity({ onlySelf: false, emitEvent: false });
   }
 
   private resetLocation(): void {

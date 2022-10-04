@@ -3,17 +3,22 @@ import {
   ElementRef, OnInit, ViewChild
 } from '@angular/core';
 
-import { ChatClient, ChatThreadClient } from '@azure/communication-chat';
-import { CommunicationUserKind, ReadReceiptReceivedEvent, TypingIndicatorReceivedEvent } from '@azure/communication-signaling';
+import { ChatClient, ChatMessage, ChatThreadClient } from '@azure/communication-chat';
+import {
+  ChatMessageReceivedEvent, CommunicationUserKind, ReadReceiptReceivedEvent,
+  TypingIndicatorReceivedEvent
+} from '@azure/communication-signaling';
+import { PagedAsyncIterableIterator } from '@azure/core-paging';
 import { Select } from '@ngxs/store';
 import {
   HtmlEditorService, ImageService, LinkService,
   RichTextEditorComponent
 } from '@syncfusion/ej2-angular-richtexteditor';
-import { debounceTime, Observable, Subject } from 'rxjs';
+import { debounceTime, fromEvent, Observable, Subject } from 'rxjs';
 import { filter, takeUntil, tap, throttleTime } from 'rxjs/operators';
 
-import { ChatMessagesHelper } from '../../helpers';
+import { ChatMessageType } from '../../enums';
+import { ChatHelper, ChatMessagesHelper } from '../../helpers';
 import { ChatThread, MessageRequestMeta, ReceivedChatMessage, SyncFusionActionBeginEvent } from '../../interfaces';
 import { ChatModel } from '../../store';
 import { Chat } from '../../store/actions';
@@ -27,13 +32,15 @@ import { ChatState } from '../../store/state/chat.state';
   providers: [LinkService, ImageService, HtmlEditorService],
 })
 export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, AfterViewChecked {
-  @ViewChild('chatArea') chatArea: ElementRef;
+  @ViewChild('chatArea', { static: true }) chatArea: ElementRef;
 
   @ViewChild('textEditor') textEditor: RichTextEditorComponent;
 
-  public currentThread: ChatThread | null;
+  currentThread: ChatThread | null;
 
-  public messages: ReceivedChatMessage[];
+  messages: ReceivedChatMessage[];
+
+  showScrollBtn = false;
 
   private userDisplayName: string;
 
@@ -42,6 +49,10 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   private readonly typingStream: Subject<void> = new Subject();
 
   private readReceipts: string[] = [];
+
+  private iterableAsyncMessages: PagedAsyncIterableIterator<ChatMessage[]> | null;
+
+  private preventScrollBottom = false;
 
   @Select(ChatState.typingIndicator)
   private readonly typing$: Observable<TypingIndicatorReceivedEvent>;
@@ -58,6 +69,7 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
     this.watchForUserTyping();
     this.watchForIncomingTypingEvent();
     this.watchForReadEvent();
+    this.watchForScroll();
   }
 
   ngAfterViewChecked(): void {
@@ -85,6 +97,10 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
 
   trackById(idx: number, item: ReceivedChatMessage): string {
     return item.id;
+  }
+
+  scrollChatBottom(): void {
+    this.scrollBottom(true);
   }
 
   private initChatRoom(): void {
@@ -121,6 +137,7 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
+      this.store.dispatch(new Chat.ResetTypingEvent());
       this.typingEvent = null;
       this.cd.markForCheck();
     });
@@ -135,30 +152,95 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
     )
     .subscribe((event) => {
       this.readReceipts = [event?.chatMessageId as string];
-      this.setReadMessages();
+      ChatHelper.setReadIndicator(this.messages, this.readReceipts);
+      this.cd.markForCheck();
     });
   }
 
-  protected override async updateMessages(): Promise<void> {
-    await this.getMessages();
-    this.checkForReceipt();
+  private watchForScroll(): void {
+    fromEvent(this.chatArea.nativeElement, 'scroll')
+    .pipe(
+      debounceTime(1000),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      const { scrollTop, scrollHeight, clientHeight } = this.chatArea.nativeElement;
 
-    this.cd.markForCheck();
-    if (this.chatArea) {
-      this.scrollBottom();
-    }
+      if (scrollTop === 0) {
+        this.preventScrollBottom = true;
+        this.getMessagesPage();
+      }
+
+      if (scrollTop + clientHeight === scrollHeight) {
+        this.preventScrollBottom = false;
+        this.showScrollBtn = false;
+      } else {
+        this.preventScrollBottom = true;
+      }
+      this.cd.markForCheck();
+    });
+  }
+
+  private setupChatClient(id?: string): void {
+    const client = (this.store.snapshot().chat as ChatModel).chatClient as ChatClient;
+    this.currentThread = (this.store.snapshot().chat as ChatModel).currentChatRoomData;
+    this.threadId = this.currentThread?.threadId as string;
+  
+    const threadId = id || this.currentThread?.threadId as string;
+    this.chatThreadClient = threadId ? client.getChatThreadClient(threadId)
+    : null;
+
+    this.iterableAsyncMessages = this.chatThreadClient
+    ? this.chatThreadClient.listMessages({ maxPageSize: 50 }).byPage() as PagedAsyncIterableIterator<ChatMessage[]>
+    : null;
   }
 
   private async initMessages(): Promise<void> {
-    await this.getMessages();
+    const messagePage = await this.getAsyncMessagePage();
+    
+    if (messagePage && messagePage.value && messagePage.value.length) {
+      this.setMessages(messagePage as IteratorResult<ChatMessage[]>);
+    }
+    
     await this.getReceipts();
-    this.setReadMessages();
+    ChatHelper.setReadIndicator(this.messages, this.readReceipts);
     this.checkForReceipt();
     this.cd.markForCheck();
   }
 
-  private scrollBottom(): void {
-    this.chatArea.nativeElement.scrollTop = this.chatArea.nativeElement.scrollHeight;
+  private getAsyncMessagePage(): Promise<IteratorResult<ChatMessage[] | void>> {
+    return this.iterableAsyncMessages?.next() as Promise<IteratorResult<ChatMessage[] | void>>;
+  }
+
+  private setMessages(result: IteratorResult<ChatMessage[]>): void {
+    this.messages = this.createMessages(result.value).reverse();
+  }
+
+  private async getReceipts(): Promise<void> {
+    this.readReceipts = await this.getReceiptIds(this.chatThreadClient as ChatThreadClient);
+  }
+
+  /**
+   * Check If read recipt should be sent. Receipt sent only if last message from was not found in receipts
+   */
+  private checkForReceipt(): void {
+    const messagesFrom = this.messages.filter((message) => !message.isCurrentUser);
+    const lastMessage = messagesFrom[messagesFrom.length - 1];
+
+    if (lastMessage && !this.readReceipts.includes(lastMessage.id)) {
+      this.sendReceipt(lastMessage.id);
+    }
+  }
+
+  private async sendReceipt(id: string): Promise<void> {
+    await (this.chatThreadClient as ChatThreadClient).sendReadReceipt({ chatMessageId: id});
+  }
+
+  private scrollBottom(force?: boolean): void {
+    if (force || !this.preventScrollBottom) {
+      this.chatArea.nativeElement.scrollTop = this.chatArea.nativeElement.scrollHeight;
+      this.cd.markForCheck();
+    }
   }
 
   private async sendMessage(): Promise<void> {
@@ -172,16 +254,6 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
     } else if (!!textContent) {
       this.createThreadAndSend();
     }
-  }
-
-  private setupChatClient(id?: string): void {
-    const client = (this.store.snapshot().chat as ChatModel).chatClient as ChatClient;
-    this.currentThread = (this.store.snapshot().chat as ChatModel).currentChatRoomData;
-    this.threadId = this.currentThread?.threadId as string;
-  
-    const threadId = id || this.currentThread?.threadId as string;
-    this.chatThreadClient = threadId ? client.getChatThreadClient(threadId)
-    : null;
   }
 
   private createMessageRequest(): MessageRequestMeta {
@@ -222,56 +294,61 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
     });
   }
 
-  /**
-   * Check If read recipt should be sent. Receipt sent only if last message from was not found in receipts
-   */
-  private checkForReceipt(): void {
-    const messagesFrom = this.messages.filter((message) => !message.isCurrentUser);
-    const lastMessage = messagesFrom[messagesFrom.length - 1];
+  protected override setLastMessage(messageEvent: ChatMessageReceivedEvent): void {
+    if (messageEvent.type.toLowerCase() === ChatMessageType.Text) {
+      const msg: ReceivedChatMessage = {
+        id: messageEvent.id,
+        sender: messageEvent.senderDisplayName as string,
+        message: messageEvent.message as string,
+        timestamp: messageEvent.createdOn,
+        isCurrentUser: (messageEvent.sender as CommunicationUserKind)?.communicationUserId === this.userIdentity,
+        readIndicator: false,
+      };
 
-    if (lastMessage && !this.readReceipts.includes(lastMessage.id)) {
-      this.sendReceipt(lastMessage.id);
+      this.messages.push(msg);
+      this.checkForReceipt();
+      this.checkForScrollPosition();
+      this.typingEvent = null;
+      this.cd.markForCheck();
+      this.scrollBottom();
     }
   }
 
-  private async sendReceipt(id: string): Promise<void> {
-    await (this.chatThreadClient as ChatThreadClient).sendReadReceipt({ chatMessageId: id});
+  private async getMessagesPage(): Promise<void> {
+    const page = await this.getAsyncMessagePage();
+
+    if (page && page.value && page.value.length) {
+      const pageMessages = this.createMessages(page.value).reverse();
+      this.messages = [...pageMessages, ...this.messages];
+      this.cd.markForCheck();
+    }
   }
 
-  private async getReceipts(): Promise<void> {
-    this.readReceipts = await this.getReceiptIds(this.chatThreadClient as ChatThreadClient);
-  }
+  private createMessages(messages:  ChatMessage[]): ReceivedChatMessage[] {
+    const receivedMessages = messages
+    .filter((message) => message.type.toLowerCase() === ChatMessageType.Text);
 
-  private async getMessages(): Promise<void> {
     const newMessages: ReceivedChatMessage[] = [];
-    const iterableAsync = (this.chatThreadClient as ChatThreadClient).listMessages();
-    
-    for await (const message of iterableAsync) {
-      if (message.type === 'text') {
-        const msg: ReceivedChatMessage = {
-          id: message.id,
-          sender: message.senderDisplayName as string,
-          message: message.content?.message as string,
-          timestamp: message.createdOn,
-          isCurrentUser: (message.sender as CommunicationUserKind)?.communicationUserId === this.userIdentity,
-          readIndicator: false,
-        };
-        newMessages.push(msg);
-      }
-    }
 
-    this.typingEvent = null;
-    this.messages = newMessages.map((item) => ({ ...item })).reverse();
+    receivedMessages.forEach((message) => {
+      const msg: ReceivedChatMessage = {
+        id: message.id,
+        sender: message.senderDisplayName as string,
+        message: message.content?.message as string,
+        timestamp: message.createdOn,
+        isCurrentUser: (message.sender as CommunicationUserKind)?.communicationUserId === this.userIdentity,
+      };
+      newMessages.push(msg);
+    });
+
+    return newMessages;
   }
 
-  private setReadMessages(): void {
-    this.messages.forEach((message) => {
-      if (message.isCurrentUser && this.readReceipts.includes(message.id)) {
-        message.readIndicator = true;
-      } else if (message.isCurrentUser) {
-        message.readIndicator = false;
-      }
-    });
-    this.cd.markForCheck();
+  private checkForScrollPosition(): void {
+    const { scrollTop, scrollHeight, clientHeight } = this.chatArea.nativeElement;
+
+    if (scrollTop + clientHeight !== scrollHeight) {
+      this.showScrollBtn = true;
+    }
   }
 }

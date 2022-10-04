@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { AnalyticByClickDirective } from '@shared/directives/analitics/analytics-by-click/analytic-by-click.directive';
+import { AnalyticByClickDirective } from '@shared/directives/analytics/analytics-by-click/analytic-by-click.directive';
 
 @NgModule({
   imports: [CommonModule],
