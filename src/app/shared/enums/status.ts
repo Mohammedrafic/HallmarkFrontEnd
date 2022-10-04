@@ -75,11 +75,12 @@ export enum CreatedCandidateStatus {
   Active,
 }
 
-export enum CredentialVerifiedStatus {
+export enum CredentialStatus {
   Pending,
   Verified,
   Completed,
   Rejected,
+  Reviewed,
 }
 
 export enum CreateUserStatus {
