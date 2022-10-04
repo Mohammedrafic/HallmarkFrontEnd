@@ -27,6 +27,18 @@
         <div class="sup-title">Department</div>
       </div>
     </div>
+
+    <div class="column"></div>
+
+    <div class="column">
+      <div class="icon">
+        <i-feather name="briefcase" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation.orderRequisitionReasonName || '-'}}</div>
+        <div class="sup-title">Reason for Requisition</div>
+      </div>
+    </div>
     <div class="column">
       <div class="icon">
         <i-feather name="briefcase" class="icon"></i-feather>
@@ -36,35 +48,28 @@
         <div class="sup-title">Skill</div>
       </div>
     </div>
+
+    <div class="column"></div>
+  </div>
+</section>
+
+<section class="candidates-additional-info" *ngIf="orderInformation">
+  <div class="container-row justify-content-normal">
     <div class="column">
-      <div>
-        <div class="title">{{orderInformation.orderRequisitionReasonName}}</div>
-        <div class="sup-title">Reason for Requisition</div>
-      </div>
+      <div class="title">{{ orderType[orderInformation.orderType] }}</div>
+      <div class="sup-title">Job Type</div>
     </div>
     <div class="column">
-      <div>
-        <div class="title">{{orderType[orderInformation.orderType]}}</div>
-        <div class="sup-title">Job Type</div>
-      </div>
+      <div class="title">{{activeValue(orderInformation.onCallRequired)}}</div>
+      <div class="sup-title">Oncall</div>
     </div>
     <div class="column">
-      <div>
-        <div class="title">{{activeValue(orderInformation.onCallRequired)}}</div>
-        <div class="sup-title">Oncall</div>
-      </div>
+      <div class="title">{{activeValue(orderInformation.nO_OT)}}</div>
+      <div class="sup-title">Do Not Consider OT</div>
     </div>
     <div class="column">
-      <div>
-        <div class="title">{{activeValue(orderInformation.nO_OT)}}</div>
-        <div class="sup-title">Do Not Consider OT</div>
-      </div>
-    </div>
-    <div class="column">
-      <div>
-        <div class="title">{{orderInformation.orderOpenDate | date: 'MM/dd/yyy'}}</div>
-        <div class="sup-title">Distributed On</div>
-      </div>
+      <div class="title">{{(orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-'}}</div>
+      <div class="sup-title">Distributed On</div>
     </div>
   </div>
 </section>

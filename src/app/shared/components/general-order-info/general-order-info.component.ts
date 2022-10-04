@@ -17,14 +17,10 @@ enum Active {
 export class GeneralOrderInfoComponent {
   @Input() orderInformation: Order;
 
-  public orderType = OrderType;
+  public orderType: typeof OrderType = OrderType;
 
   get hideEndDate(): boolean {
     return [this.orderType.ReOrder, this.orderType.PermPlacement].includes(this.orderInformation.orderType);
-  }
-
-  get dateFieldName(): string {
-    return this.orderInformation.orderType === this.orderType.ReOrder ? 'Date' : 'Start Date';
   }
 
   constructor(
