@@ -38,5 +38,19 @@
       background-color: $primary-active-blue-70;
     }
   }
+
+  .add-folder-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 231px;
+    background: $primary-active-blue-70;
+    border-radius: 5px;
+  }
+
+  .add-folder-button {
+    width: 231px;
+    color: $primary-active-blue;
+  }
 }
 

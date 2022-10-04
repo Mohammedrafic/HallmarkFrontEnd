@@ -1,4 +1,5 @@
 import { PageOfCollections } from '@shared/models/page.model';
+import { Document } from '@shared/models/document.model';
 
 export class DocumentLibrary {
   documentItems:  DocumentItem[];
@@ -31,12 +32,14 @@ export class DocumentsInfo {
   status: string;
   region: string;
   location: string;
+  role: string;
   type: string;
   tags: string;
   startDate: Date;
   endDate: Date;
   sharedWith: string;
   comments: string;
+  documents: Document[] | null;
 }
 
 export type DocumentsLibraryPage = PageOfCollections<DocumentsInfo>;

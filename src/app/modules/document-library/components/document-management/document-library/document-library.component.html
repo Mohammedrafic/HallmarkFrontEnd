@@ -6,7 +6,7 @@
   </ng-container>
   <ng-container right>
     <div class="button-group">
-    
+
       <app-search #search class="search"></app-search>
       <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline button-filter">
         Filters <i-feather name="sliders" class="icon"></i-feather>
@@ -17,7 +17,7 @@
               cssClass="e-outline button-export">
         <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
       </button>
-      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true">
+      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="handleOnUploadBtnClick()">
         <i-feather name="upload" class="icon"></i-feather>Upload
       </button>
     </div>
@@ -35,6 +35,9 @@
       <button ejs-button cssClass="e-flat seconadry-dark-icon-button">
         <span><i-feather name="share-2" class="icon"></i-feather></span>
       </button>
+      <button ejs-button cssClass="e-flat primary-icon-button">
+        <span><i-feather name="edit" class="icon"></i-feather></span>
+      </button>
       <button ejs-button cssClass="e-flat secondary-icon-button">
         <span><i-feather name="trash-2" class="icon"></i-feather></span>
       </button>
@@ -43,7 +46,151 @@
 </section>
 <section>
   <app-document-library-table [gridOptions]="gridOptions"
-                             (onGridReadyEvent)="onGridReady($event)"
-                             (onGridPageSizeChanged)="onPageSizeChanged($event)"></app-document-library-table>
+                              (onGridReadyEvent)="onGridReady($event)"
+                              (onGridPageSizeChanged)="onPageSizeChanged($event)"></app-document-library-table>
 </section>
 
+<app-side-dialog header="{{formDailogTitle}}" (formCancelClicked)="closeDialog()" (formSaveClicked)="handleOnSave()" [width]="dialogWidth">
+  <form [formGroup]="documentLibraryform" class="documentlibrary-addnewfolder-form-dialog form-container bootstrap" id="addnewfolderForm">
+    <section *ngIf="isAddNewFolder">
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Folder Name<span class="required">*</span></label>
+          <div class="input-group">
+            <input class="e-input"
+                   type="text"
+                   appValidateWithMessage
+                   maxlength="100"
+                   formControlName="folderName" />
+          </div>
+        </div>
+      </div>
+      <hr />
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <ejs-switch id="hallmark-switcher"
+                      [checked]="halmarkSwitch"></ejs-switch>
+          <label for="hallmark-switcher" class="switch-text">Hallmark</label>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container agency-switcher-container">
+            <div class="input-group datepicker">
+              <ejs-switch id="agency-switcher"
+                          [checked]="agencySwitch"></ejs-switch>
+              <label for="agency-switcher" class="switch-text">Agencies</label>
+            </div>
+          </div>
+          <div class="input-container calendar">
+            <div class="input-group multiselect">
+              <ejs-multiselect mode="CheckBox"
+                               formControlName="agencies"
+                               placeholder="All"
+                               selectAllText="Select All"
+                               appValidateWithMessage
+                               [fields]="optionFields"
+                               [showSelectAll]="true"
+                               [allowFiltering]="false"
+                               [showDropDownIcon]="true"
+                               [dataSource]="[]">
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container agency-switcher-container">
+            <div class="input-group datepicker">
+              <ejs-switch id="org-switcher"
+                          [checked]="agencySwitch"></ejs-switch>
+              <label for="org-switcher" class="switch-text">Organization</label>
+            </div>
+          </div>
+          <div class="input-container calendar">
+            <div class="input-group multiselect">
+              <ejs-multiselect mode="CheckBox"
+                               formControlName="orgnizations"
+                               placeholder="All"
+                               selectAllText="Select All"
+                               appValidateWithMessage
+                               [fields]="optionFields"
+                               [showSelectAll]="true"
+                               [allowFiltering]="false"
+                               [showDropDownIcon]="true"
+                               [dataSource]="[]">
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section *ngIf="isUpload">
+      <app-document-library-upload></app-document-library-upload>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container calendar">
+            <label for="documentName">Document Name <span class="required">*</span></label>
+            <div class="input-group">
+              <input class="e-input"
+                     id="documentName"
+                     type="text"
+                     appValidateWithMessage
+                     maxlength="50"
+                     formControlName="documentName" />
+            </div>
+          </div>
+          <div class="input-container">
+            <label for="organization">Organization <span class="required">*</span></label>
+            <div class="input-group multiselect">
+              <ejs-multiselect mode="CheckBox"
+                               formControlName="organizationIds"
+                               placeholder="All"
+                               [allowFiltering]="true"
+                               [showDropDownIcon]="true"
+                               appValidateWithMessage
+                               [fields]="optionFields"
+                               [dataSource]="orgStructureData.organizationIds.dataSource"
+                               [selectAllText]='allOption'
+                               showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container calendar">
+            <label for="regionIds">Region <span class="required">*</span></label>
+            <div class="input-group multiselect">
+              <ejs-multiselect id="regionIds" mode="CheckBox"
+                               formControlName="regionIds"
+                               placeholder="All"
+                               [fields]="optionFields"
+                               [allowFiltering]="true"
+                               [showDropDownIcon]="true"
+                               [dataSource]="orgStructureData.regionIds.dataSource"
+                               [showSelectAll]="true">
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div class="input-container">
+            <label for="locationIds">Location <span class="required">*</span></label>
+            <div class="input-group multiselect">
+              <ejs-multiselect id="locationIds" mode="CheckBox"
+                               formControlName="locationIds"
+                               placeholder="All"
+                               [fields]="optionFields"
+                               [allowFiltering]="true"
+                               [showDropDownIcon]="true"
+                               [dataSource]="orgStructureData.locationIds.dataSource"
+                               [showSelectAll]="true">
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </form>
+</app-side-dialog>

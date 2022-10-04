@@ -4,7 +4,7 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 import { DocumentItem, DocumentLibrary, NodeItem } from '../../store/model/document-library.model';
 import { DocumentLibraryState } from '../../store/state/document-library.state';
 import { TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
-import { GetDocumentsSelectedNode, GetDocumentsTree } from '../../store/actions/document-library.actions';
+import { GetDocumentsSelectedNode, GetDocumentsTree, IsAddNewFolder } from '../../store/actions/document-library.actions';
 
 @Component({
   selector: 'app-document-library-side-panel',
@@ -15,6 +15,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
 
   @Select(DocumentLibraryState.documentsTree)
   documents$: Observable<DocumentLibrary>;
+
   public sidePanelDocumentItems: DocumentItem[];
   private unsubscribe$: Subject<void> = new Subject();
   sidePanelDocumentField: Object;
@@ -53,4 +54,9 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
     this.selectedNode = event.nodeData;
     this.store.dispatch(new GetDocumentsSelectedNode(this.selectedNode));
   }
+
+  handleOnAddNewFolder(event:any) {
+    this.store.dispatch(new IsAddNewFolder(true));
+  }
+
 }

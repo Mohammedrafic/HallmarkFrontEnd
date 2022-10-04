@@ -1,7 +1,11 @@
 import { ColDef, ICellRendererParams } from "@ag-grid-community/core";
 import { DatePipe } from '@angular/common';
 import { ColumnDefinitionModel } from "@shared/components/grid/models";
+import { ActionCellrenderComponent } from "../components/cell-render/action-cellrender/action-cellrender.component";
+import { StatusTextCellrenderComponent } from "../components/cell-render/status-text-cellrender/status-text-cellrender.component";
 import { documentsColumnField, documentsColumnHeaderText } from "../enums/documents.enum";
+
+
 
 const commonColumn: ColDef = {
   sortable: true,
@@ -11,6 +15,21 @@ const commonColumn: ColDef = {
 export const DocumentLibraryColumnsDefinition = (actionCellParams: ICellRendererParams, datePipe?: DatePipe): ColumnDefinitionModel[] => {
   return [
     {
+      headerName: '',
+      width: 50,
+      minWidth: 50,
+      headerCheckboxSelection: true,
+      headerCheckboxSelectionFilteredOnly: true,
+      checkboxSelection: true,
+      ...commonColumn,
+    },
+    {
+      field: '',
+      headerName: 'Action',
+      cellRenderer: ActionCellrenderComponent,
+      cellRendererParams: actionCellParams
+    },
+    {
       field: documentsColumnField.Id,
       headerName: documentsColumnHeaderText.Id,
       hide: true
@@ -18,7 +37,9 @@ export const DocumentLibraryColumnsDefinition = (actionCellParams: ICellRenderer
     {
       field: documentsColumnField.DocumentName,
       headerName: documentsColumnHeaderText.DocumentName,
-      ...commonColumn
+      ...commonColumn,
+      cellStyle: { color: '#3e7fff', fontWeight:'600'}
+
     },
     {
       field: documentsColumnField.Organization,
@@ -29,6 +50,7 @@ export const DocumentLibraryColumnsDefinition = (actionCellParams: ICellRenderer
       field: documentsColumnField.Status,
       headerName: documentsColumnHeaderText.Status,
       ...commonColumn,
+      cellRenderer: StatusTextCellrenderComponent,
     },
     {
       field: documentsColumnField.Region,
@@ -38,6 +60,11 @@ export const DocumentLibraryColumnsDefinition = (actionCellParams: ICellRenderer
     {
       field: documentsColumnField.Location,
       headerName: documentsColumnHeaderText.Location,
+      ...commonColumn,
+    },
+    {
+      field: documentsColumnField.Role,
+      headerName: documentsColumnHeaderText.Role,
       ...commonColumn,
     },
     {

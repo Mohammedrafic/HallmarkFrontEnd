@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { DocumentItem, DocumentLibrary } from "../store/model/document-library.model";
+import { DocumentItem, DocumentLibrary, DocumentsInfo, DocumentsLibraryPage } from "../store/model/document-library.model";
 
 @Injectable({ providedIn: 'root' })
 export class DocumentLibraryService {
@@ -57,6 +57,36 @@ export class DocumentLibraryService {
     ];
     let data: DocumentLibrary = {
       documentItems: documentItems
+    };
+    return of(data);
+  }
+
+  public getDocuments(): Observable<DocumentsLibraryPage> {
+    const documentItems: DocumentsInfo[] = [
+      {
+        docId:1,
+        name:'Test.pdf',
+        organization: 'Trinity',
+        status: 'Active',
+        region: 'TestRegion',
+        location: 'TestLocation',
+        role: 'TestRole',
+        type: 'Credentials',
+        tags: 'Testtag',
+        startDate: new Date(),
+        endDate: new Date(),
+        sharedWith: 'HallMark',
+        comments: 'Test',
+        documents:[]
+}
+    ];
+    let data: DocumentsLibraryPage = {
+      items: documentItems,
+      pageNumber: 1,
+      totalPages: 1,
+      totalCount: 1,
+      hasPreviousPage: false,
+      hasNextPage: false,
     };
     return of(data);
   }

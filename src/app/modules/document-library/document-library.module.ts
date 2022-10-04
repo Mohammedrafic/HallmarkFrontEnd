@@ -4,13 +4,12 @@ import { DocumentLibrarySidePanelComponent } from './components/document-library
 import { DocumentManagementComponent } from './components/document-management/document-management.component';
 import { DocumentLibraryRoutingModule } from './document-library-routing.module';
 import { DocumentLibraryComponent } from './components/document-management/document-library/document-library.component';
-import { TreeViewModule } from '@syncfusion/ej2-angular-navigations';
+import { TreeViewModule, TabAllModule, TabModule } from '@syncfusion/ej2-angular-navigations';
 import { NgxsModule } from '@ngxs/store';
 import { DocumentLibraryState } from './store/state/document-library.state';
 import { FeatherModule } from 'angular-feather';
 import { SharedModule } from '../../shared/shared.module';
 import { AgGridModule } from '@ag-grid-community/angular';
-import { GridModule } from '@syncfusion/ej2-angular-grids';
 import {
   ButtonModule,
   CheckBoxModule,
@@ -21,17 +20,31 @@ import {
 import { DropDownButtonAllModule, DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import {
   AutoCompleteModule,
-  DropDownListModule
+  DropDownListModule,
+  MultiSelectModule,
+  MultiSelectAllModule
 } from '@syncfusion/ej2-angular-dropdowns';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   Download,
   Upload,
   Search,
   File,
   Edit,
-  Share2
+  Share2,
+  MoreVertical
 } from 'angular-feather/icons';
 import { DocumentLibraryTableComponent } from './components/document-management/document-library/document-library-table/document-library-table.component';
+import { ActionCellrenderComponent } from './components/cell-render/action-cellrender/action-cellrender.component';
+import { StatusTextCellrenderComponent } from './components/cell-render/status-text-cellrender/status-text-cellrender.component';
+import { DocumentLibraryUploadComponent } from './components/document-management/document-library/document-library-upload/document-library-upload.component';
+import { GridModule } from '@shared/components/grid/grid.module';
+import {
+  MaskedTextBoxModule,
+  NumericTextBoxModule,
+  TextBoxModule,
+  UploaderModule,
+} from '@syncfusion/ej2-angular-inputs';
 
 const sidebarIcons = {
   Download,
@@ -39,7 +52,8 @@ const sidebarIcons = {
   Search,
   File,
   Edit,
-  Share2
+  Share2,
+  MoreVertical
 };
 
 @NgModule({
@@ -47,13 +61,20 @@ const sidebarIcons = {
     DocumentLibrarySidePanelComponent,
     DocumentManagementComponent,
     DocumentLibraryComponent,
-    DocumentLibraryTableComponent
+    DocumentLibraryTableComponent,
+    ActionCellrenderComponent,
+    StatusTextCellrenderComponent,
+    DocumentLibraryUploadComponent,
   ],
   imports: [
     CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     SharedModule,
     DocumentLibraryRoutingModule,
     TreeViewModule,
+    TabAllModule,
+    TabModule,
     FeatherModule.pick(sidebarIcons),
     ButtonModule,
     ChipListModule,
@@ -64,9 +85,15 @@ const sidebarIcons = {
     RadioButtonModule,
     AutoCompleteModule,
     DropDownListModule,
+    MultiSelectModule,
+    MultiSelectAllModule,
     SwitchModule,
     GridModule,
     AgGridModule,
+    MaskedTextBoxModule,
+    NumericTextBoxModule,
+    TextBoxModule,
+    UploaderModule,
     NgxsModule.forFeature([DocumentLibraryState])
   ]
 })
