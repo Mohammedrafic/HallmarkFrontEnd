@@ -48,6 +48,11 @@
                   <app-general-info-group [isAgencyUser]="isAgencyUser" [formGroup]="$any(agencyControl)"></app-general-info-group>
 
                   <div class="e-card-title-wrapper">
+                    <div class="e-card-title">Job Distribution</div>
+                  </div>
+                  <app-job-distribution [formGroup]="$any(distributionControl)"></app-job-distribution>
+
+                  <div class="e-card-title-wrapper">
                     <div class="e-card-title">Billing Details</div>
                   </div>
 

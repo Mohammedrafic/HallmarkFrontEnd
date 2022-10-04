@@ -22,6 +22,20 @@
                 <input appValidateWithMessage formControlName="taxId" class="e-input" type="text" maxlength="12" />
               </div>
             </div>
+            <div class="input-container bootstrap">
+              <label>Standard Base Fee %</label>
+              <div class="input-group">
+                <input
+                  appValidateWithMessage
+                  formControlName="baseFee"
+                  class="e-input"
+                  type="text"
+                  (focus)="priceUtils.setPriceMask(formGroup, 'baseFee', $event)"
+                  (blur)="priceUtils.setTwoDecimals(formGroup, 'baseFee', $event)"
+                  maxlength="5"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

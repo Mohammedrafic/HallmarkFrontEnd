@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -21,14 +21,14 @@ import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/stor
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
-import { FilteredItem } from "@shared/models/filter.model";
-import { FilterService } from "@shared/services/filter.service";
-import { agencyListFilterColumns } from "@agency/agency-list/agency-list.constants";
+import { FilteredItem } from '@shared/models/filter.model';
+import { FilterService } from '@shared/services/filter.service';
+import { agencyListFilterColumns } from '@agency/agency-list/agency-list.constants';
 
 @Component({
   selector: 'app-agency-list',
   templateUrl: './agency-list.component.html',
-  styleUrls: ['./agency-list.component.scss']
+  styleUrls: ['./agency-list.component.scss'],
 })
 export class AgencyListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
@@ -57,7 +57,7 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
   agencies$: Observable<AgencyPage>;
 
   @Select(AgencyState.agencyFilteringOptions)
-  agencyFilteringOptions$: Observable<AgencyFilteringOptions>
+  agencyFilteringOptions$: Observable<AgencyFilteringOptions>;
 
   constructor(
     private store: Store,
@@ -145,7 +145,7 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
           fileType,
           {
             ids: this.selectedItems.length ? this.selectedItems.map((val) => val.createUnder.id) : null,
-            ...this.filters
+            ...this.filters,
           },
           options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
           null,
@@ -198,7 +198,7 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
       businessUnitNames: this.filters.businessUnitNames || [],
       statuses: this.filters.statuses || [],
       cities: this.filters.cities || [],
-      contacts: this.filters.contacts || []
+      contacts: this.filters.contacts || [],
     });
     this.filteredItems = this.filterService.generateChips(this.agencyListFilterFormGroup, this.filterColumns);
     this.filteredItems$.next(this.filteredItems.length);
@@ -220,6 +220,7 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
         agencyBillingDetails: agency.agencyBillingDetails,
         agencyContactDetails: agency.agencyContactDetails,
         agencyPaymentDetails: agency.agencyPaymentDetails,
+        agencyJobDistribution: agency.agencyJobDistribution,
         agencyId: agency.agencyDetails.id,
         parentBusinessUnitId: agency.createUnder.parentUnitId,
       };
@@ -260,7 +261,7 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
   }
 
   private initAgencyListFilterFormGroup(): void {
-  this.agencyListFilterFormGroup = this.formBuilder.group({
+    this.agencyListFilterFormGroup = this.formBuilder.group({
       searchTerm: new FormControl(null),
       businessUnitNames: new FormControl([]),
       statuses: new FormControl([]),
