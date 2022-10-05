@@ -334,7 +334,7 @@ export class CandidateState {
     );
   }
 
-  @Action(GetCandidatesCredentialByPage)
+  @Action(GetCandidatesCredentialByPage, { cancelUncompleted: true })
   GetCandidatesCredentialByPage(
     { patchState, dispatch, getState }: StateContext<CandidateStateModel>,
     { pageNumber, pageSize }: GetCandidatesCredentialByPage
