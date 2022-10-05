@@ -1,62 +1,14 @@
 import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { HttpClient } from '@angular/common/http';
-import { DocumentFolder, DocumentItem, DocumentLibrary, DocumentsInfo, DocumentsLibraryPage } from "../store/model/document-library.model";
+import { DocumentFolder, DocumentItem, DocumentLibrary, DocumentLibraryDto, Documents, DocumentsInfo, DocumentsLibraryPage, DocumentTypeFilter, DocumentTypes } from "../store/model/document-library.model";
 
 @Injectable({ providedIn: 'root' })
 export class DocumentLibraryService {
   constructor(private http: HttpClient) { }
 
   public getDocumentsTree(): Observable<DocumentLibrary> {
-    const documentItems: DocumentItem[] = [
-      {
-        id: 1,
-        businessUnitId: 22,
-        fileType: 'folder',
-        name: 'My Documents',
-        children: [
-          {
-            id: 2, businessUnitId: 22, fileType: 'folder', name: 'Contract Documents', children:
-              [
-                {
-                  id: 9, businessUnitId: 22, fileType: 'file', name: 'Contract with ABC', children: []
-                }
-              ]
-          },
-          {
-            id: 3, businessUnitId: 22, fileType: 'folder', name: 'User Manuals', children:
-              [{
-                id: 5, businessUnitId: 22, fileType: 'folder', name: 'IRP UM', children: [
-                  {
-                    id: 7, businessUnitId: 22, fileType: 'file', name: 'VMS User manual V1.0', children: []
-                  }
-                ]
-              },
-              {
-                id: 6, businessUnitId: 22, fileType: 'folder', name: 'VMS UM', children:
-                  [
-                    {
-                      id: 8, businessUnitId: 22, fileType: 'file', name: 'IRP User Manual V2.1', children: []
-                    }
-                  ]
-              }
-              ]
-          },
-          { id: 4, businessUnitId: 22, fileType: 'folder', name: 'Training Documents', children: [] }
-        ]
-      },
-      {
-        id: 10,
-        businessUnitId: 22,
-        fileType: 'folder',
-        name: 'Shared with Me',
-        children: [
-          { id: 11, businessUnitId: 22, fileType: 'link', name: 'Invoice Issues from ABC', children: [] },
-          { id: 12, businessUnitId: 22, fileType: 'link', name: 'Invoice Issues from XYZ', children: [] },
-          { id: 13, businessUnitId: 22, fileType: 'link', name: 'Invoice Issues from KFG', children: [] }
-        ]
-      }
-    ];
+    const documentItems: DocumentItem[] = [];
     let data: DocumentLibrary = {
       documentItems: documentItems
     };
@@ -94,10 +46,32 @@ export class DocumentLibraryService {
   }
 
   /**
-  * insert or update a document folder record
-  * @return created/updated record
+  * insert a document folder record
+  * @return created record
   */
   public saveDocumentFolder(documentFolder: DocumentFolder): Observable<DocumentFolder> {
     return this.http.post<DocumentFolder>(`/api/DocumentLibrary/CreateFolder/`, documentFolder);
+  }
+
+  /**
+* insert document record
+* @return created record
+*/
+  public saveDocuments(documents: Documents): Observable<DocumentLibraryDto> {
+    return this.http.post<DocumentLibraryDto>(`/api/DocumentLibrary?content=${documents}`, {});
+  }
+
+  /**
+* get document types
+* @return document types
+*/
+  public GetDocumentTypes(filter: DocumentTypeFilter): Observable<DocumentTypes[]> {
+    const { businessUnitType, businessUnitId } = filter;
+    let url = `/api/DocumentLibrary/getTypes?BusinessUnitType=${businessUnitType}`;
+    if (businessUnitId != null) {
+      url = url + `&BusinessUnitId=${businessUnitId}`;
+    }
+    return this.http.get<DocumentTypes[]>(url);
+   
   }
 }

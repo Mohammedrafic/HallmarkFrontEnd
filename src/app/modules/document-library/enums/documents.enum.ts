@@ -9,6 +9,12 @@ export enum MoreMenuType {
   'Delete',
 }
 
+export enum DocType {
+  'Test1'=1,
+  'Test2'=2,
+  'Test3'=3
+}
+
 export enum StatusEnum {
   'Active',
   'In-Active'
@@ -25,7 +31,6 @@ export enum FormControlNames {
   TypeIds = 'typeIds',
   Tags = 'tags',
   StatusIds = 'statusIds',
-  RoleIds = 'roleIds',
   StartDate = 'startDate',
   EndDate = 'endDate',
 }

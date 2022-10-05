@@ -6,6 +6,11 @@
   width: 231px;
   margin-left: -25px;
   overflow-y: auto;
+  margin-top:10px;
+
+  .search {
+    width: 230px;
+  }
 
   .documentTreeview {
     color: $black;

@@ -33,6 +33,46 @@ export class DocumentFolder {
   businessUnitType?:number | null
 }
 
+export class Documents {
+  id: number;
+  businessUnitType: number;
+  businessUnitId?: number | null;
+  regionId: number | null;
+  locationId: number | null;
+  documentName: number | null;
+  folderId: number;
+  startDate?: Date |null;
+  endDate?: Date | null;
+  docTypeId: number;
+  tags: string;
+  comments: string;
+}
+
+export class DocumentLibraryDto {
+  id: number;
+  name: string;
+  folderId?: number | null;
+  folderName: string ;
+  startDate?: Date | null;
+  endDate?: Date | null;
+  docTypeId: number;
+  docTypeName: string;
+  uploadedByName: string;
+  tags: string;
+  comments: string;
+  status: string;
+}
+
+export class DocumentTypes {
+  id: number;
+  name: string;
+}
+
+export class DocumentTypeFilter {
+  businessUnitType: number;
+  businessUnitId?: number | null;
+}
+
 
 export class DocumentsInfo {
   docId: number;

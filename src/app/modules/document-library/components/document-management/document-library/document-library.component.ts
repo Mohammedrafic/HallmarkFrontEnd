@@ -7,11 +7,11 @@ import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SpecialProjectMessages } from '../../../../../organization-management/specialproject/constants/specialprojects.constant';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { SetHeaderState, ShowSideDialog } from '../../../../../store/app.actions';
-import { BUSINESS_UNITS_VALUES, DocumentLibraryColumnsDefinition } from '../../../constants/documents.constant';
-import { DocumentFolder, DocumentsInfo, DocumentsLibraryPage, NodeItem } from '../../../store/model/document-library.model';
+import { DocumentLibraryColumnsDefinition } from '../../../constants/documents.constant';
+import { DocumentFolder, DocumentsInfo, DocumentsLibraryPage, DocumentTypeFilter, DocumentTypes, NodeItem } from '../../../store/model/document-library.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { DocumentLibraryState } from '../../../store/state/document-library.state';
-import { GetDocuments, IsAddNewFolder, SaveDocumentFolder } from '../../../store/actions/document-library.actions';
+import { GetDocuments, GetDocumentTypes, IsAddNewFolder, SaveDocumentFolder } from '../../../store/actions/document-library.actions';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { FormControlNames, FormDailogTitle, MoreMenuType, StatusEnum } from '../../../enums/documents.enum';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -21,14 +21,14 @@ import { SecurityState } from '../../../../../security/store/security.state';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { GetBusinessByUnitType, GetRolePerUser } from '../../../../../security/store/security.actions';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Location, LocationsByRegionsFilter } from '@shared/models/location.model';
 import { Region, regionFilter } from '@shared/models/region.model';
 import { GetLocationsByRegions, GetRegionsByOrganizations } from '../../../../../organization-management/store/logi-report.action';
 import { LogiReportState } from '../../../../../organization-management/store/logi-report.state';
 import { RolesPerUser } from '@shared/models/user-managment-page.model';
 import { datesValidator } from '../../../../../shared/validators/date.validator';
+import { GetBusinessByUnitType } from '../../../../../security/store/security.actions';
+import { BusinessUnitType } from '../../../../../shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-document-library',
@@ -50,6 +50,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   @Select(DocumentLibraryState.documentsPage)
   documentsPage$: Observable<DocumentsLibraryPage>;
 
+  @Select(DocumentLibraryState.documentsTypes)
+  documentsTypes$: Observable<DocumentTypes>;
+
   @Select(SecurityState.bussinesData)
   public businessData$: Observable<BusinessUnit[]>;
   selectedOrganizations: BusinessUnit[];
@@ -62,11 +65,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public locations$: Observable<Location[]>;
   selectedLocations: Location[];
 
-  @Select(SecurityState.rolesPerUsers)
-  rolesPerUsers$: Observable<RolesPerUser>;
-
   selectedDocumentNode: NodeItem | null;
-
 
   public gridApi!: GridApi;
   public rowData: DocumentsInfo[] = [];
@@ -125,14 +124,22 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public endDateField: AbstractControl;
   public today = new Date();
   public startDate: any = new Date();
-  public businessUnits = BUSINESS_UNITS_VALUES;
+  public businessUnitType: number = 0;
+  public businessUnitId: number | null;
+  public agencyData: BusinessUnit[] = [];
 
   constructor(private store: Store, private datePipe: DatePipe,
     private changeDetectorRef: ChangeDetectorRef) {
     super();
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
-      this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
+      this.businessUnitType = user?.businessUnitType;
+      this.businessUnitId = user?.businessUnitId;
+      let documentTypesFilter: DocumentTypeFilter = {
+        businessUnitType: this.businessUnitType,
+        businessUnitId:this.businessUnitId
+      }
+      this.store.dispatch(new GetDocumentTypes(documentTypesFilter));
     }
     this.today.setHours(0, 0, 0);
   }
@@ -192,7 +199,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       if (this.documentLibraryform.contains(FormControlNames.TypeIds)) this.documentLibraryform.removeControl(FormControlNames.TypeIds);
       if (this.documentLibraryform.contains(FormControlNames.Tags)) this.documentLibraryform.removeControl(FormControlNames.Tags);
       if (this.documentLibraryform.contains(FormControlNames.StatusIds)) this.documentLibraryform.removeControl(FormControlNames.StatusIds);
-      if (this.documentLibraryform.contains(FormControlNames.RoleIds)) this.documentLibraryform.removeControl(FormControlNames.RoleIds);
       if (this.documentLibraryform.contains(FormControlNames.StartDate)) this.documentLibraryform.removeControl(FormControlNames.StartDate);
       if (this.documentLibraryform.contains(FormControlNames.EndDate)) this.documentLibraryform.removeControl(FormControlNames.EndDate);
     }
@@ -202,12 +208,11 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.documentLibraryform.addControl(FormControlNames.OrgnizationIds, new FormControl(null, [Validators.required]));
       this.documentLibraryform.addControl(FormControlNames.RegionIds, new FormControl(null, [Validators.required]));
       this.documentLibraryform.addControl(FormControlNames.LocationIds, new FormControl(null, [Validators.required]));
-      this.documentLibraryform.addControl(FormControlNames.TypeIds, new FormControl(null, []));
-      this.documentLibraryform.addControl(FormControlNames.Tags, new FormControl(null, []));
-      this.documentLibraryform.addControl(FormControlNames.StatusIds, new FormControl(null, []));
-      this.documentLibraryform.addControl(FormControlNames.RoleIds, new FormControl(null, []));
-      this.documentLibraryform.addControl(FormControlNames.StartDate, new FormControl(null, []));
-      this.documentLibraryform.addControl(FormControlNames.EndDate, new FormControl(null, []));
+      this.documentLibraryform.addControl(FormControlNames.TypeIds, new FormControl(null, [Validators.required]));
+      this.documentLibraryform.addControl(FormControlNames.Tags, new FormControl(null, [Validators.required]));
+      this.documentLibraryform.addControl(FormControlNames.StatusIds, new FormControl(null, [Validators.required]));
+      this.documentLibraryform.addControl(FormControlNames.StartDate, new FormControl(null, [Validators.required]));
+      this.documentLibraryform.addControl(FormControlNames.EndDate, new FormControl(null, [Validators.required]));
       this.applyDateValidations();
     }
     this.documentLibraryform.addControl(FormControlNames.Agencies, new FormControl(null, []));
@@ -345,7 +350,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.formDailogTitle = FormDailogTitle.Upload;
     this.addRemoveFormcontrols();
     this.orgStructureData.statusIds.dataSource = this.statusItems;
-    this.store.dispatch(new GetRolePerUser(1, []));
     this.documentLibraryform.get(FormControlNames.OrgnizationIds)?.setValue([]);
     this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue([]);
     this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
@@ -361,13 +365,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
 
     if (this.isAddNewFolder) {
-      let businessUnitId = this.businessUnits.filter((x: any) =>  { return x.id == 1 });
       const documentFolder: DocumentFolder = {
           id: 0,
           name: this.documentLibraryform.get(FormControlNames.FolderName)?.value,
-          parentFolderId: null,
-          businessUnitType: businessUnitId[0].id,
-          businessUnitId: null,
+          parentFolderId: this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null,
+          businessUnitType: this.businessUnitType,
+          businessUnitId:  this.businessUnitId,
           status: 0,
           isDeleted: false
       }
@@ -415,42 +418,51 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         valueField: 'name',
         valueId: 'id',
       },
-      roleIds: {
-        type: ControlTypes.Dropdown,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
       startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       endDate: { type: ControlTypes.Date, valueType: ValueType.Text }
     };
   }
   public onHallmarkSwitcher(event: any) {
     this.halmarkSwitch = !this.halmarkSwitch;
+    if (this.halmarkSwitch) {
+      this.agencySwitch = false;
+      this.organizationSwitch = false;
+    }
     this.changeDetectorRef.markForCheck();
   }
   public onAgencySwitcher(event: any) {
     this.agencySwitch = !this.agencySwitch;
+    if (this.agencySwitch) {
+      this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Agency));
+      this.halmarkSwitch = false;
+      this.organizationSwitch = false;
+    }
     this.changeDetectorRef.markForCheck();
   }
   public onOrganizationSwitcher(event: any) {
     this.organizationSwitch = !this.organizationSwitch;
+    if (this.organizationSwitch) {
+      this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
+      this.halmarkSwitch = false;
+      this.agencySwitch = false;
+    }
     this.changeDetectorRef.markForCheck();
   }
   public getOrganizations() {
     this.businessData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.orgStructureData.organizationIds.dataSource = data;
-      this.changeDetectorRef.markForCheck();
-      this.onOrganizationChangeHandler();
-      this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue([]);
-      this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
+      if (this.agencySwitch) {
+        this.agencyData = data;
+      }
+      else {
+        this.orgStructureData.organizationIds.dataSource = data;
+        this.changeDetectorRef.markForCheck();
+        this.onOrganizationChangeHandler();
+        this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue([]);
+        this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
+      }
     });
   }
 
-  public getRoles() {
-    this.rolesPerUsers$.pipe(takeUntil(this.unsubscribe$))
-  }
   public onOrganizationChangeHandler(): void {
     this.organizationControl = this.documentLibraryform.get(FormControlNames.OrgnizationIds) as AbstractControl;
     this.regionIdControl = this.documentLibraryform.get(FormControlNames.RegionIds) as AbstractControl;

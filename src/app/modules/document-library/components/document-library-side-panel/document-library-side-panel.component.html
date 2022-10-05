@@ -1,13 +1,14 @@
 <section class="document-side-panel">
+  <app-search #search class="search"></app-search>
   <ejs-treeview id="documentTemplate" #tree [fields]="sidePanelDocumentField"
                 [fullRowSelect]="true" [loadOnDemand]="false" class="documentTreeview"
-                 (nodeSelected)="nodeSelected($event)">
+                (nodeSelected)="nodeSelected($event)">
     <ng-template #nodeTemplate="" let-data="">
-        <div class="treeview-item">
-          <div>
-            <i-feather [name]="data.fileType" class="icon"></i-feather> <span [ngClass]="(data.fileType=='folder')? 'treeview-folder' : 'treeview-normal'" style="margin-left:10px;">{{data.name}}</span>
-          </div>
+      <div class="treeview-item">
+        <div>
+          <i-feather [name]="data.fileType" class="icon"></i-feather> <span [ngClass]="(data.fileType=='folder')? 'treeview-folder' : 'treeview-normal'" style="margin-left:10px;">{{data.name}}</span>
         </div>
+      </div>
     </ng-template>
   </ejs-treeview>
   <div class="add-folder-fixed">

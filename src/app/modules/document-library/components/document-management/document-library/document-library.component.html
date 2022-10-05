@@ -7,7 +7,6 @@
   <ng-container right>
     <div class="button-group">
 
-      <app-search #search class="search"></app-search>
       <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline button-filter">
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </button>
@@ -53,6 +52,11 @@
 <app-side-dialog header="{{formDailogTitle}}" (formCancelClicked)="closeDialog()" (formSaveClicked)="handleOnSave()" [width]="dialogWidth">
   <form [formGroup]="documentLibraryform" class="documentlibrary-addnewfolder-form-dialog form-container bootstrap" id="addnewfolderForm">
     <section *ngIf="isAddNewFolder">
+      <div class="form-elemet" *ngIf="selectedDocumentNode?.text!=undefined">
+        <div class="input-container bootstrap">
+          <label>Parent Folder Name : {{selectedDocumentNode?.text}}</label>
+        </div>
+      </div>
       <div class="form-elemet">
         <div class="input-container bootstrap">
           <label>Folder Name<span class="required">*</span></label>
@@ -65,8 +69,6 @@
           </div>
         </div>
       </div>
-      <hr />
-
     </section>
     <section *ngIf="isUpload">
       <app-document-library-upload></app-document-library-upload>
@@ -140,20 +142,18 @@
       <div class="form-elemet">
         <div class="group">
           <div class="input-container calendar">
-            <label for="typeIds">Type</label>
+            <label for="typeIds">Type <span class="required">*</span></label>
             <div class="input-group multiselect">
               <div class="input-group dropdown">
-                <ejs-dropdownlist formControlName="typeIds"
-                                  appValidateWithMessage
-                                  [dataSource]=" this.orgStructureData.typeIds.dataSource"
-                                  [fields]="optionFields">
-                </ejs-dropdownlist>
-
+                <ejs-dropdownlist appValidateWithMessage
+                                  formControlName="typeIds"
+                                  [fields]="optionFields"
+                                  [dataSource]="documentsTypes$ | async"></ejs-dropdownlist>
               </div>
             </div>
           </div>
           <div class="input-container">
-            <label for="tags">Tags</label>
+            <label for="tags">Tags <span class="required">*</span></label>
             <div class="input-group">
               <input class="e-input"
                      id="tags"
@@ -168,7 +168,7 @@
       <div class="form-elemet">
         <div class="group">
           <div class="input-container calendar">
-            <label for="statusIds">Status</label>
+            <label for="statusIds">Status <span class="required">*</span></label>
             <div class="input-group multiselect">
               <div class="input-group dropdown">
                 <ejs-dropdownlist formControlName="statusIds"
@@ -180,26 +180,8 @@
               </div>
             </div>
           </div>
-          <div class="input-container">
-            <label for="roleIds">Role</label>
-            <div class="input-group multiselect">
-              <div class="input-group dropdown" style="margin-right:15px;">
-                <ejs-multiselect id="roleIds" mode="CheckBox"
-                                 formControlName="roleIds"
-                                 placeholder="All"
-                                 [fields]="optionFields"
-                                 [allowFiltering]="true"
-                                 [showDropDownIcon]="true"
-                                 appValidateWithMessage
-                                 [dataSource]="rolesPerUsers$ | async"
-                                 [selectAllText]='allOption'
-                                 [showSelectAll]="true">
-                </ejs-multiselect>
-              </div>
-            </div>
-          </div>
           <div class="input-container calendar">
-            <label for="startDate">Start Date</label>
+            <label for="startDate">Start Date <span class="required">*</span></label>
             <div class="input-group multiselect">
               <div class="input-group datepicker">
                 <ejs-datepicker id="startDate"
@@ -208,13 +190,13 @@
                                 placeholder="MM/DD/YYYY"
                                 appValidateWithMessage
                                 formControlName="startDate"
-                                 [min]="startDate || today">
+                                [min]="startDate || today">
                 </ejs-datepicker>
               </div>
             </div>
           </div>
           <div class="input-container calendar">
-            <label for="endDate">End Date</label>
+            <label for="endDate">End Date <span class="required">*</span></label>
             <div class="input-group multiselect">
               <div class="input-group datepicker" style="margin-left:10px;">
                 <ejs-datepicker id="endDate"
@@ -223,7 +205,7 @@
                                 placeholder="MM/DD/YYYY"
                                 appValidateWithMessage
                                 formControlName="endDate"
-                                 [min]="startDate || today">
+                                [min]="startDate || today">
                 </ejs-datepicker>
               </div>
             </div>
@@ -231,75 +213,63 @@
         </div>
       </div>
     </section>
-    <div class="form-elemet">
-      <div class="input-container bootstrap">
-        <span><i-feather name="share-2" class="icon"></i-feather></span>
-        <span class="share-with-text">Share With</span>
-      </div>
-    </div>
-    <div class="form-elemet">
-      <div class="input-container bootstrap">
-        <ejs-switch id="hallmark-switcher"
-                    [checked]="halmarkSwitch"
-                     (change)="onHallmarkSwitcher($event);"></ejs-switch>
-        <label for="hallmark-switcher" class="switch-text">Hallmark</label>
-      </div>
-    </div>
-    <div class="form-elemet">
-      <div class="group">
-        <div class="input-container agency-switcher-container">
-          <div class="input-group datepicker">
-            <ejs-switch id="agency-switcher"
-                        [checked]="agencySwitch"
-                         (change)="onAgencySwitcher($event);"></ejs-switch>
-            <label for="agency-switcher" class="switch-text">Agencies</label>
-          </div>
+    <section *ngIf="isUpload">
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <span><i-feather name="share-2" class="icon"></i-feather></span>
+          <span class="share-with-text">Share With</span>
         </div>
-        <div class="input-container calendar">
-          <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox"
-                             formControlName="agencies"
-                             placeholder="All"
-                             selectAllText="Select All"
-                             appValidateWithMessage
-                             [fields]="optionFields"
-                             [showSelectAll]="true"
-                             [allowFiltering]="false"
-                             [showDropDownIcon]="true"
-                             [dataSource]="[]"
-                             [enabled]="agencySwitch">
-            </ejs-multiselect>
+      </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <ejs-switch id="hallmark-switcher"
+                      [checked]="halmarkSwitch"
+                      (change)="onHallmarkSwitcher($event);"></ejs-switch>
+          <label for="hallmark-switcher" class="switch-text">Hallmark</label>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container agency-switcher-container">
+            <div class="input-group datepicker">
+              <ejs-switch id="agency-switcher"
+                          [checked]="agencySwitch"
+                          (change)="onAgencySwitcher($event);"></ejs-switch>
+              <label for="agency-switcher" class="switch-text">Agencies</label>
+            </div>
+          </div>
+          <div class="input-container calendar">
+            <div class="input-group multiselect">
+              <ejs-dropdownlist formControlName="agencies"
+                                [fields]="optionFields"
+                                [dataSource]="agencyData"
+                                placeholder="Business"
+                                [enabled]="agencySwitch"></ejs-dropdownlist>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="form-elemet">
-      <div class="group">
-        <div class="input-container agency-switcher-container">
-          <div class="input-group datepicker">
-            <ejs-switch id="org-switcher"
-                        [checked]="organizationSwitch"
-                         (change)="onOrganizationSwitcher($event);"></ejs-switch>
-            <label for="org-switcher" class="switch-text">Organization</label>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container agency-switcher-container">
+            <div class="input-group datepicker">
+              <ejs-switch id="org-switcher"
+                          [checked]="organizationSwitch"
+                          (change)="onOrganizationSwitcher($event);"></ejs-switch>
+              <label for="org-switcher" class="switch-text">Organization</label>
+            </div>
           </div>
-        </div>
-        <div class="input-container calendar">
-          <div class="input-group multiselect">
-            <ejs-multiselect mode="CheckBox"
-                             formControlName="orgnizations"
-                             placeholder="All"
-                             selectAllText="Select All"
-                             appValidateWithMessage
-                             [fields]="optionFields"
-                             [showSelectAll]="true"
-                             [allowFiltering]="false"
-                             [showDropDownIcon]="true"
-                             [dataSource]="[]"
-                             [enabled]="organizationSwitch">
-            </ejs-multiselect>
+          <div class="input-container calendar">
+            <div class="input-group multiselect">
+              <ejs-dropdownlist formControlName="orgnizations"
+                                [fields]="optionFields"
+                                [dataSource]="orgStructureData.organizationIds.dataSource"
+                                placeholder="Business"
+                                [enabled]="organizationSwitch"></ejs-dropdownlist>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   </form>
 </app-side-dialog>

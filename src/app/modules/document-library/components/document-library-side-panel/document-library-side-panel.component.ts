@@ -14,7 +14,7 @@ import { GetDocumentsSelectedNode, GetDocumentsTree, IsAddNewFolder } from '../.
 export class DocumentLibrarySidePanelComponent implements OnInit {
 
   @Select(DocumentLibraryState.documentsTree)
-  documents$: Observable<DocumentLibrary>;
+  documentsTree$: Observable<DocumentLibrary>;
 
   public sidePanelDocumentItems: DocumentItem[];
   private unsubscribe$: Subject<void> = new Subject();
@@ -32,7 +32,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
 
   initSidePanelDocs(): void {
     this.store.dispatch(new GetDocumentsTree());
-    this.documents$.pipe(takeUntil(this.unsubscribe$)).subscribe((docTree: DocumentLibrary) => {
+    this.documentsTree$.pipe(takeUntil(this.unsubscribe$)).subscribe((docTree: DocumentLibrary) => {
       if (docTree?.documentItems?.length) {
         this.sidePanelDocumentItems = docTree.documentItems;
         this.sidePanelDocumentField = { dataSource: this.sidePanelDocumentItems, id: 'id', text: 'name', parentID:'id', child: 'children' };

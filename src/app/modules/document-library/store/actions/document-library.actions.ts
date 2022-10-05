@@ -1,4 +1,4 @@
-import { DocumentFolder, NodeItem } from "../model/document-library.model";
+import { DocumentFolder, NodeItem, Documents, DocumentTypeFilter } from "../model/document-library.model";
 
 export class GetDocumentsTree {
   static readonly type = '[documentsLibrary] Get document tree items';
@@ -23,4 +23,14 @@ export class GetDocuments {
 export class SaveDocumentFolder {
   static readonly type = '[documentsLibrary] Save Document Folder';
   constructor(public documentFolder: DocumentFolder) { }
+}
+
+export class SaveDocuments {
+  static readonly type = '[documentsLibrary] Save Document';
+  constructor(public document: Documents) { }
+}
+
+export class GetDocumentTypes {
+  static readonly type = '[documentsLibrary] Get Document Types';
+  constructor(public documentTypeFilter: DocumentTypeFilter) { }
 }
