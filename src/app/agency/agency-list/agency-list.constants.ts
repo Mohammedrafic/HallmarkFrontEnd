@@ -3,6 +3,18 @@ import { AgencyStatus } from "@shared/enums/status";
 import { FilterColumnsModel } from "@shared/models/filter.model";
 import { valuesOnly } from "@shared/utils/enum.utils";
 
+const addAgencyStatuses = ['InProgress', 'Active'];
+
+export const agencyStatusCreationOptions = Object.values(AgencyStatus)
+  .filter(valuesOnly)
+  .filter((value) => { return addAgencyStatuses.includes(value as string) })
+  .map((text, id) => {
+    if (text === 'InProgress') {
+      return ({ text: 'In Progress', id });
+    }
+    return ({ text, id });
+  });
+
 export const agencyStatusOptions = Object.values(AgencyStatus)
   .filter(valuesOnly)
   .map((text, id) => {
