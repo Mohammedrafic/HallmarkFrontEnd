@@ -200,7 +200,10 @@ export class JobDetailsComponent implements OnInit {
       "LocationParamJD": this.selectedLocations?.map((list) => list.id).join(","),
       "DepartmentParamJD": this.selectedDepartments?.map((list) => list.departmentId).join(","),
       "BearerParamJD":auth,
-      "BusinessUnitIdParamJD":window.localStorage.getItem("lastSelectedOrganizationId")==null?"1":window.localStorage.getItem("lastSelectedOrganizationId"),
+      "BusinessUnitIdParamJD":window.localStorage.getItem("lastSelectedOrganizationId") == null 
+      ?this.organizations!=null &&this.organizations[0]?.id!=null?
+      this.organizations[0].id.toString():"1": 
+      window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName":this.baseUrl
       };
       this.logiReportComponent.paramsData = this.paramsData;

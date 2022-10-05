@@ -42,7 +42,6 @@ export class ClientFinanceAccrualReportComponent implements OnInit {
     "BearerParamACCR":"",
     "BusinessUnitIdParamACCR":"",
     "HostName":""
-
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/ClientFinanceAccrualReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/Accrual.cat" };
@@ -201,7 +200,10 @@ export class ClientFinanceAccrualReportComponent implements OnInit {
       "LocationParamACCR": this.selectedLocations?.map((list) => list.id),
       "DepartmentParamACCR": this.selectedDepartments?.map((list) => list.departmentId),
       "BearerParamACCR":auth,
-      "BusinessUnitIdParamACCR":window.localStorage.getItem("lastSelectedOrganizationId")==null?"1":window.localStorage.getItem("lastSelectedOrganizationId"),
+      "BusinessUnitIdParamACCR":window.localStorage.getItem("lastSelectedOrganizationId") == null 
+      ?this.organizations!=null &&this.organizations[0]?.id!=null?
+      this.organizations[0].id.toString():"1": 
+      window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName":this.baseUrl
     };
     this.logiReportComponent.paramsData = this.paramsData;
