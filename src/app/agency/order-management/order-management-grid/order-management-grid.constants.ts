@@ -122,7 +122,7 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
     visible: false,
   },
   {
-    fieldName: 'type',
+    fieldName: 'orderType',
     visible: false,
   },
   {
@@ -149,7 +149,7 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
     visible: true,
   },
   {
-    fieldName: 'type',
+    fieldName: 'orderType',
     visible: true,
   },
   {
@@ -196,7 +196,7 @@ export const PerDiemColumnsConfig = [
     visible: true,
   },
   {
-    fieldName: 'type',
+    fieldName: 'orderType',
     visible: false,
   },
   {
@@ -243,7 +243,7 @@ export const PermPlacementColumnsConfig = [
     visible: true,
   },
   {
-    fieldName: 'type',
+    fieldName: 'orderType',
     visible: false,
   },
   {
