@@ -88,3 +88,14 @@ export class SetCredentialsFilterCount {
   static readonly type = '[credentials] Set The Amount Of Applied Filters';
   constructor(public payload: number) { }
 }
+
+
+export class GetAssignedCredentialTree {
+  static readonly type = '[credentials] Get Assigned Credential Tree';
+  constructor() { }
+}
+
+export class SaveAssignedCredentialValue {
+  static readonly type = '[credentials] Save Assigned Credential Value';
+  constructor(public payload: string[]) { }
+}

@@ -1,82 +1,121 @@
-import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
-import { Subject, takeUntil, tap } from 'rxjs';
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { filter, map, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { Select, Store } from '@ngxs/store';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { DrawNodeEventArgs, FieldsSettingsModel, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
+import { AssignedCredentialTree } from '@shared/models/credential.model';
+import {
+  GetAssignedCredentialTree,
+  SaveAssignedCredentialValue,
+} from '@organization-management/store/credentials.actions';
+import { CredentialsState } from '@organization-management/store/credentials.state';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 
-const stubData = [
-  { id: 1, name: 'India', hasChild: true, expanded: true },
-  { id: 2, pid: 1, name: 'Assam' },
-  { id: 3, pid: 1, name: 'Bihar' },
-  { id: 4, pid: 1, name: 'Tamil Nadu' },
-  { id: 6, pid: 1, name: 'Punjab' },
-  { id: 7, name: 'Brazil', hasChild: true },
-  { id: 8, pid: 7, name: 'Paraná' },
-  { id: 9, pid: 7, name: 'Ceará' },
-  { id: 10, pid: 7, name: 'Acre' },
-  { id: 11, name: 'France', hasChild: true },
-  { id: 12, pid: 11, name: 'Pays de la Loire' },
-  { id: 13, pid: 11, name: 'Aquitaine' },
-  { id: 14, pid: 11, name: 'Brittany' },
-  { id: 15, pid: 11, name: 'Lorraine' },
-  { id: 16, name: 'Australia', hasChild: true },
-  { id: 17, pid: 16, name: 'New South Wales' },
-  { id: 18, pid: 16, name: 'Victoria' },
-  { id: 19, pid: 16, name: 'South Australia' },
-  { id: 20, pid: 16, name: 'Western Australia' },
-  { id: 21, name: 'China', hasChild: true },
-  { id: 22, pid: 21, name: 'Guangzhou' },
-  { id: 23, pid: 21, name: 'Shanghai' },
-  { id: 24, pid: 21, name: 'Beijing' },
-  { id: 25, pid: 21, name: 'Shantou' },
-];
+const TREEVIEW_FIELDS_CONFIG = {
+  id: 'id',
+  text: 'name',
+  parentID: 'pid',
+  hasChildren: 'hasChild',
+};
 
 @Component({
   selector: 'app-assign-credential-side',
   templateUrl: './assign-credential-side.component.html',
   styleUrls: ['./assign-credential-side.component.scss', '../../side-dialog/side-dialog.component.scss'],
 })
-export class AssignCredentialSideComponent extends DestroyableDirective implements AfterViewInit {
+export class AssignCredentialSideComponent extends DestroyableDirective implements OnInit, AfterViewInit {
   @Input() openSidebar: Subject<boolean>;
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('tree') tree: TreeViewComponent;
 
+  @Select(CredentialsState.assignedCredentialTree)
+  public assignedCredentialTree$: Observable<AssignedCredentialTree>;
+
   public targetElement: HTMLElement = document.body;
-  public countries: Object[] = stubData;
-  public field: Object = {
-    dataSource: this.countries,
-    id: 'id',
-    text: 'name',
-    parentID: 'pid',
-    hasChildren: 'hasChild',
-  };
+  public field$: Observable<FieldsSettingsModel>;
 
   private isDirty = false;
+
+  constructor(private store: Store, private confirmService: ConfirmService) {
+    super();
+  }
+
+  ngOnInit(): void {
+    this.field$ = this.assignedCredentialTree$.pipe(map((dataSource) => ({ dataSource, ...TREEVIEW_FIELDS_CONFIG })));
+  }
 
   ngAfterViewInit(): void {
     this.openSidebar
       .pipe(
         takeUntil(this.destroy$),
-        tap((isOpen) => (isOpen ? this.sideDialog.show() : this.sideDialog.hide()))
+        tap((isOpen) => {
+          if (isOpen) {
+            this.store.dispatch(new GetAssignedCredentialTree());
+            this.sideDialog.show();
+          } else {
+            this.sideDialog.hide();
+          }
+        })
       )
       .subscribe();
   }
 
   public onCancel(): void {
-    this.openSidebar.next(false);
+    if (this.isDirty) {
+      this.confirmService
+        .confirm(CANCEL_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => !!confirm))
+        .subscribe(() => {
+          this.clearAndClose();
+        });
+    } else {
+      this.clearAndClose();
+    }
   }
 
-  public onSave(): void {}
+  public onSave(): void {
+    if (this.isDirty) {
+      const checkeNodes = this.tree.getAllCheckedNodes();
+      this.store.dispatch(new SaveAssignedCredentialValue(checkeNodes));
+      this.openSidebar.next(false);
+    }
+  }
 
   public dataBound(): void {
-    this.tree.expandAll();
+    this.tree.checkAll(this.getTreeValue());
   }
 
-  public onSelecting(): void {
-    this.isDirty = true;
+  public onSelecting(event: {node: HTMLElement}): void {
+    if (!event.node.classList.contains('e-level-1')) {
+      this.tree.checkAll([event.node])
+      this.isDirty = true;
+    }
+  }
+
+  public drawNode(args: DrawNodeEventArgs): void {
+    if (!args.nodeData['isAssignable']) {
+      const elem = args.node.querySelector('.e-checkbox-wrapper') as HTMLElement;
+      elem.classList.add('e-checkbox-disabled');
+    }
+  }
+
+  private getTreeValue(): string[] {
+    const value = this.store.selectSnapshot(CredentialsState.assignedCredentialTreeValue);
+    return value.map((number) => number.toString());
+  }
+
+  private clearAndClose(): void {
+    this.isDirty = false;
+    this.openSidebar.next(false);
   }
 }
 
