@@ -18,12 +18,17 @@
             [fields]="optionFields"
             [dataSource]="applicantStatuses"
             [formControl]="statusesFormControl"
+            [disabled]="!actionsAllowed"
             placeholder="Select Status"
             (select)="onDropDownChanged($event)"
           ></ejs-dropdownlist>
         </div>
-        <button ejs-button cssClass="e-outline" [isPrimary]="true" *ngIf="canAccept" (click)="onReject()">Reject</button>
-        <button ejs-button [isPrimary]="true" *ngIf="canAccept" (click)="onAccept()">Accept</button>
+        <button ejs-button cssClass="e-outline" [isPrimary]="true" *ngIf="canAccept"
+          [disabled]="!actionsAllowed"
+          (click)="onReject()">Reject</button>
+        <button ejs-button [isPrimary]="true" *ngIf="canAccept"
+          [disabled]="!actionsAllowed"
+          (click)="onAccept()">Accept</button>
       </div>
     </div>
   </section>

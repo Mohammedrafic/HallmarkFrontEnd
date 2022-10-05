@@ -74,6 +74,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       this.acceptForm?.reset();
     }
   }
+  @Input() actionsAllowed: boolean;
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
 
