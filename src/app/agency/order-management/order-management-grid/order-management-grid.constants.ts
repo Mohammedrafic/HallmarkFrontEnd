@@ -141,6 +141,10 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
     fieldName: 'annualSalaryRangeTo',
     visible: false,
   },
+  {
+    fieldName: 'billRate',
+    visible: true,
+  },
 ];
 
 export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
@@ -187,6 +191,10 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
   {
     fieldName: 'annualSalaryRangeTo',
     visible: false,
+  },
+  {
+    fieldName: 'billRate',
+    visible: true,
   },
 ];
 
