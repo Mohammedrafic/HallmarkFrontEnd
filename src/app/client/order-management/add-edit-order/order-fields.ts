@@ -14,7 +14,8 @@ enum CommonInfo {
   isTemplate,
   isSubmit,
   orderType,
-  id
+  id,
+  isQuickOrder,
 }
 
 enum ContactToPermTravelerGeneralInfo {
