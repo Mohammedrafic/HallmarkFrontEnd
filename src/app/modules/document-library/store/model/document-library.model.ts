@@ -23,6 +23,15 @@ export class NodeItem {
   text: string;
 }
 
+export class DocumentFolder {
+  id: number;
+  name: string;
+  parentFolderId?: number | null;
+  status: number;
+  isDeleted: boolean;
+  businessUnitId?: number | null;
+  businessUnitType?:number | null
+}
 
 
 export class DocumentsInfo {

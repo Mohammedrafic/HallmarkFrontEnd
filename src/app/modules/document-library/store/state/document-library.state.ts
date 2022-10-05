@@ -1,16 +1,21 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
-import { Observable, tap } from "rxjs";
+import { catchError, Observable, tap } from "rxjs";
+import { RECORD_ADDED, RECORD_MODIFIED } from "../../../../shared/constants";
+import { MessageTypes } from "../../../../shared/enums/message-types";
+import { getAllErrors } from "../../../../shared/utils/error.utils";
+import { ShowToast } from "../../../../store/app.actions";
 import { DocumentLibraryService } from "../../services/document-library.service";
-import { GetDocuments, GetDocumentsSelectedNode, GetDocumentsTree, IsAddNewFolder } from "../actions/document-library.actions";
-import { DocumentLibrary, DocumentsLibraryPage, NodeItem } from "../model/document-library.model";
+import { GetDocuments, GetDocumentsSelectedNode, GetDocumentsTree, IsAddNewFolder, SaveDocumentFolder } from "../actions/document-library.actions";
+import { DocumentFolder, DocumentLibrary, DocumentsLibraryPage, NodeItem } from "../model/document-library.model";
 
 
 export interface DocumentLibraryStateModel {
   documentsTree: DocumentLibrary;
   seletedDocNode: NodeItem,
   documentsPage: DocumentsLibraryPage | null,
-  isAddNewFolder:boolean
+  isAddNewFolder: boolean
+  documentFolder: DocumentFolder | null
 }
 
 @State<DocumentLibraryStateModel>({
@@ -19,7 +24,8 @@ export interface DocumentLibraryStateModel {
     documentsTree: { documentItems: [] },
     seletedDocNode: new NodeItem(),
     documentsPage: null,
-    isAddNewFolder:false
+    isAddNewFolder: false,
+    documentFolder:null
   }
 })
 @Injectable()
@@ -68,6 +74,23 @@ export class DocumentLibraryState {
         patchState({ documentsPage: payload });
         return payload;
       })
+    );
+  }
+
+  @Action(SaveDocumentFolder)
+  SaveDocumentFolder(
+    { dispatch }: StateContext<DocumentLibraryStateModel>,
+    { documentFolder }: SaveDocumentFolder
+  ): Observable<DocumentFolder | void> {
+    debugger;
+    return this.documentLibraryService.saveDocumentFolder(documentFolder).pipe(
+      tap((folder) => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, documentFolder.id > 0 ? RECORD_MODIFIED : RECORD_ADDED),
+        ]);
+        return folder;
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
     );
   }
 }

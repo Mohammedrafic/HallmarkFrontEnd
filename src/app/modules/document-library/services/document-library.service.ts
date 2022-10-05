@@ -1,9 +1,11 @@
 import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { DocumentItem, DocumentLibrary, DocumentsInfo, DocumentsLibraryPage } from "../store/model/document-library.model";
+import { HttpClient } from '@angular/common/http';
+import { DocumentFolder, DocumentItem, DocumentLibrary, DocumentsInfo, DocumentsLibraryPage } from "../store/model/document-library.model";
 
 @Injectable({ providedIn: 'root' })
 export class DocumentLibraryService {
+  constructor(private http: HttpClient) { }
 
   public getDocumentsTree(): Observable<DocumentLibrary> {
     const documentItems: DocumentItem[] = [
@@ -89,5 +91,13 @@ export class DocumentLibraryService {
       hasNextPage: false,
     };
     return of(data);
+  }
+
+  /**
+  * insert or update a document folder record
+  * @return created/updated record
+  */
+  public saveDocumentFolder(documentFolder: DocumentFolder): Observable<DocumentFolder> {
+    return this.http.post<DocumentFolder>(`/api/DocumentLibrary/CreateFolder/`, documentFolder);
   }
 }

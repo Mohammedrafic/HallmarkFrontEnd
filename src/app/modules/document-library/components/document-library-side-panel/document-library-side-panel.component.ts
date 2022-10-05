@@ -35,7 +35,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
     this.documents$.pipe(takeUntil(this.unsubscribe$)).subscribe((docTree: DocumentLibrary) => {
       if (docTree?.documentItems?.length) {
         this.sidePanelDocumentItems = docTree.documentItems;
-        this.sidePanelDocumentField = { dataSource: this.sidePanelDocumentItems, id: 'id', text: 'name', child: 'children' };
+        this.sidePanelDocumentField = { dataSource: this.sidePanelDocumentItems, id: 'id', text: 'name', parentID:'id', child: 'children' };
         this.tree.selectedNodes = [(this.sidePanelDocumentItems[0].id).toString()];
         let nodeData = new NodeItem();
         nodeData.expanded=false;

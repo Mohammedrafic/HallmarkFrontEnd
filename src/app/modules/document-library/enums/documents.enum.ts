@@ -9,6 +9,11 @@ export enum MoreMenuType {
   'Delete',
 }
 
+export enum StatusEnum {
+  'Active',
+  'In-Active'
+}
+
 export enum FormControlNames {
   FolderName = 'folderName',
   Agencies = 'agencies',
@@ -16,7 +21,13 @@ export enum FormControlNames {
   OrgnizationIds = 'organizationIds',
   RegionIds = 'regionIds',
   LocationIds = 'locationIds',
-  DocumentName='documentName'
+  DocumentName = 'documentName',
+  TypeIds = 'typeIds',
+  Tags = 'tags',
+  StatusIds = 'statusIds',
+  RoleIds = 'roleIds',
+  StartDate = 'startDate',
+  EndDate = 'endDate',
 }
 
 export enum FormDailogTitle {

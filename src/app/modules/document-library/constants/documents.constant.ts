@@ -4,8 +4,12 @@ import { ColumnDefinitionModel } from "@shared/components/grid/models";
 import { ActionCellrenderComponent } from "../components/cell-render/action-cellrender/action-cellrender.component";
 import { StatusTextCellrenderComponent } from "../components/cell-render/status-text-cellrender/status-text-cellrender.component";
 import { documentsColumnField, documentsColumnHeaderText } from "../enums/documents.enum";
+import { valuesOnly } from "@shared/utils/enum.utils";
+import { BusinessUnitType } from "@shared/enums/business-unit-type";
 
-
+export const BUSINESS_UNITS_VALUES = Object.values(BusinessUnitType)
+  .filter(valuesOnly)
+  .map((text, id) => ({ text, id: id + 1 }));
 
 const commonColumn: ColDef = {
   sortable: true,

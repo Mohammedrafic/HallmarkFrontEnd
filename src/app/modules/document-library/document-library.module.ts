@@ -24,6 +24,7 @@ import {
   MultiSelectModule,
   MultiSelectAllModule
 } from '@syncfusion/ej2-angular-dropdowns';
+import { DatePickerModule, DateTimePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   Download,
@@ -45,6 +46,8 @@ import {
   TextBoxModule,
   UploaderModule,
 } from '@syncfusion/ej2-angular-inputs';
+import { LogiReportState } from '../../organization-management/store/logi-report.state';
+import { SecurityState } from '../../security/store/security.state';
 
 const sidebarIcons = {
   Download,
@@ -94,7 +97,10 @@ const sidebarIcons = {
     NumericTextBoxModule,
     TextBoxModule,
     UploaderModule,
-    NgxsModule.forFeature([DocumentLibraryState])
+    DatePickerModule,
+    DateTimePickerModule,
+    TimePickerModule,
+    NgxsModule.forFeature([SecurityState,DocumentLibraryState, LogiReportState])
   ]
 })
 export class DocumentLibraryModule { }
