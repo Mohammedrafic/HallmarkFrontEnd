@@ -26,10 +26,16 @@
               ></ejs-dropdownlist>
             </div>
             <!--TODO: create and use ReadOnly Mode for it-->
-            <button ejs-button cssClass="e-outline" (click)="onReject()" *ngIf="showRejectButton">Reject</button>
-            <button ejs-button cssClass="e-outline" (click)="onWithdraw()" *ngIf="showWithdrawButton">Withdraw</button>
-            <button ejs-button cssClass="e-primary" (click)="onApply()" [disabled]="isLocked" *ngIf="showApplyButton">Apply</button>
-            <button ejs-button cssClass="e-primary" (click)="onAccept()" *ngIf="showAcceptButton">Accept</button>
+            <button ejs-button cssClass="e-outline"
+              [disabled]="!actionsAllowed"
+              (click)="onReject()" *ngIf="showRejectButton">Reject</button>
+            <button ejs-button cssClass="e-outline"
+              [disabled]="!actionsAllowed"
+              (click)="onWithdraw()" *ngIf="showWithdrawButton">Withdraw</button>
+            <button ejs-button cssClass="e-primary" (click)="onApply()"
+              [disabled]="isLocked || !actionsAllowed" *ngIf="showApplyButton">Apply</button>
+            <button ejs-button cssClass="e-primary" (click)="onAccept()"
+              [disabled]="!actionsAllowed"*ngIf="showAcceptButton">Accept</button>
             <div ejs-button cssClass="e-flat close-button custom-button" (click)="closeDialog()">
               <i-feather name="x" class="icon"></i-feather>
             </div>
@@ -116,11 +122,15 @@
             placeholder="Select Status" (select)="onDropDownChanged($event)"></ejs-dropdownlist>
         </div>
         <!--TODO: create and use ReadOnly Mode for it-->
-        <button ejs-button cssClass="e-outline" (click)="onReject()" *ngIf="showRejectButton">Reject</button>
-        <button ejs-button cssClass="e-outline" (click)="onWithdraw()" *ngIf="showWithdrawButton">Withdraw</button>
-        <button ejs-button cssClass="e-primary" (click)="onApply()" [disabled]="isLocked"
+        <button ejs-button cssClass="e-outline" [disabled]="!actionsAllowed"
+          (click)="onReject()" *ngIf="showRejectButton">Reject</button>
+        <button ejs-button cssClass="e-outline" [disabled]="!actionsAllowed"
+          (click)="onWithdraw()" *ngIf="showWithdrawButton">Withdraw</button>
+        <button ejs-button cssClass="e-primary"
+          (click)="onApply()" [disabled]="isLocked || !actionsAllowed"
           *ngIf="showApplyButton">Apply</button>
-        <button ejs-button cssClass="e-primary" (click)="onAccept()" *ngIf="showAcceptButton">Accept</button>
+        <button ejs-button cssClass="e-primary" [disabled]="!actionsAllowed"
+          (click)="onAccept()" *ngIf="showAcceptButton">Accept</button>
       </div>
       <hr class="mobile" />
     </ng-container>

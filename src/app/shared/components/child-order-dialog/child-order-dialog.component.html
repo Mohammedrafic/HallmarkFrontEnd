@@ -97,6 +97,7 @@
                         appUnsavedForm
                         (closeModalEvent)="onClose()"
                         [orderDuration]="(selectedOrder$ | async)?.duration!"
+                        [actionsAllowed]="agencyActionsAllowed"
                       ></app-onboarded-candidate>
                       <section *ngIf="isReorderType">
                         <ng-container *ngTemplateOutlet="acceptFormSection"></ng-container>
@@ -110,6 +111,7 @@
                         [isTab]="true"
                         (closeModalEvent)="onClose()"
                         [isAgency]="isAgency"
+                        [actionsAllowed]="agencyActionsAllowed"
                       ></app-accept-candidate>
                       <section *ngIf="isReorderType">
                         <ng-container *ngTemplateOutlet="acceptFormSection"></ng-container>
@@ -122,12 +124,16 @@
                         [candidate]="$any(candidate)"
                         [order]="$any(selectedOrder$ | async)"
                         [isTab]="true"
+                        [actionsAllowed]="agencyActionsAllowed"
                       >
                       </app-apply-candidate>
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.offerDeployment">
-                      <app-offer-deployment [candidate]="$any(candidate)" [isTab]="true"></app-offer-deployment>
+                      <app-offer-deployment
+                        [candidate]="$any(candidate)"
+                        [isTab]="true"
+                        [actionsAllowed]="agencyActionsAllowed"></app-offer-deployment>
                     </ng-container>
 
                     <div *ngSwitchDefault></div>
@@ -135,7 +141,11 @@
 
                   <ng-template #extensionCandidate>
                     <section class="container onboarded-candidate-container">
-                      <app-extension-candidate [isTab]="true" appUnsavedForm [dialogEvent]="$any(openEvent)" [currentOrder]="order">
+                      <app-extension-candidate
+                        [isTab]="true" appUnsavedForm
+                        [dialogEvent]="$any(openEvent)"
+                        [actionsAllowed]="agencyActionsAllowed"
+                        [currentOrder]="order">
                       </app-extension-candidate>
                     </section>
                   </ng-template>

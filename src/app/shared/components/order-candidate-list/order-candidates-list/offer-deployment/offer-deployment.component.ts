@@ -58,7 +58,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() candidate: OrderCandidatesList;
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
-
+  @Input() actionsAllowed: boolean;
+  
   public statusesFormControl = new FormControl();
   public openRejectDialog = new Subject<boolean>();
   public billRatesData: BillRate[] = [];

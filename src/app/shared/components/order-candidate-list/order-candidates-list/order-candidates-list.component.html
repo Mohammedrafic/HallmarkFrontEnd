@@ -162,6 +162,7 @@
       [candidate]="candidate"
       [isAgency]="isAgency"
       [orderDuration]="selectedOrder.duration"
+      [actionsAllowed]="agencyActionsAllowed"
     ></app-onboarded-candidate>
   </ng-template>
 
@@ -170,6 +171,7 @@
       (closeModalEvent)="onCloseDialog()"
       [candidate]="candidate"
       [isAgency]="isAgency"
+      [actionsAllowed]="agencyActionsAllowed"
     ></app-accept-candidate>
   </ng-template>
 
@@ -181,6 +183,7 @@
       [isAgency]="isAgency"
       [order]="$any((selectedAgOrder$ | async))"
       [isLocked]="(selectedAgOrder$ | async)?.isLocked"
+      [actionsAllowed]="agencyActionsAllowed"
     >
     </app-apply-candidate>
   </ng-template>
@@ -190,6 +193,7 @@
       (closeDialogEmitter)="onCloseDialog()"
       [candidate]="candidate"
       [isAgency]="isAgency"
+      [actionsAllowed]="agencyActionsAllowed"
     ></app-offer-deployment>
   </ng-template>
   <ng-template #footerTemplate>
