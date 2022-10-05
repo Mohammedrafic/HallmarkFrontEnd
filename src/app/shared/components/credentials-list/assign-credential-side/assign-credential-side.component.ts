@@ -3,7 +3,13 @@ import { filter, map, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { DrawNodeEventArgs, FieldsSettingsModel, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
+import {
+  DrawNodeEventArgs,
+  FieldsSettingsModel,
+  NodeCheckEventArgs,
+  NodeClickEventArgs,
+  TreeViewComponent,
+} from '@syncfusion/ej2-angular-navigations';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { AssignedCredentialTree } from '@shared/models/credential.model';
@@ -22,6 +28,11 @@ const TREEVIEW_FIELDS_CONFIG = {
   hasChildren: 'hasChild',
 };
 
+enum NodeCheckEventArgsAction {
+  check = 'check',
+  uncheck = 'uncheck',
+}
+
 @Component({
   selector: 'app-assign-credential-side',
   templateUrl: './assign-credential-side.component.html',
@@ -39,7 +50,7 @@ export class AssignCredentialSideComponent extends DestroyableDirective implemen
   public targetElement: HTMLElement = document.body;
   public field$: Observable<FieldsSettingsModel>;
 
-  private isDirty = false;
+  private newSelectedNodes = new Set<HTMLElement>();
 
   constructor(private store: Store, private confirmService: ConfirmService) {
     super();
@@ -66,7 +77,7 @@ export class AssignCredentialSideComponent extends DestroyableDirective implemen
   }
 
   public onCancel(): void {
-    if (this.isDirty) {
+    if (!!this.newSelectedNodes.size) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
@@ -83,7 +94,7 @@ export class AssignCredentialSideComponent extends DestroyableDirective implemen
   }
 
   public onSave(): void {
-    if (this.isDirty) {
+    if (!!this.newSelectedNodes.size) {
       const checkeNodes = this.tree.getAllCheckedNodes();
       this.store.dispatch(new SaveAssignedCredentialValue(checkeNodes));
       this.openSidebar.next(false);
@@ -94,10 +105,17 @@ export class AssignCredentialSideComponent extends DestroyableDirective implemen
     this.tree.checkAll(this.getTreeValue());
   }
 
-  public onSelecting(event: {node: HTMLElement}): void {
-    if (!event.node.classList.contains('e-level-1')) {
-      this.tree.checkAll([event.node])
-      this.isDirty = true;
+  public onChecked(event: NodeCheckEventArgs): void {
+    switch (event.action) {
+      case NodeCheckEventArgsAction.check:
+        this.newSelectedNodes.add(event.node);
+        break;
+      case NodeCheckEventArgsAction.uncheck:
+        this.newSelectedNodes.delete(event.node);
+        break;
+
+      default:
+        break;
     }
   }
 
@@ -114,7 +132,7 @@ export class AssignCredentialSideComponent extends DestroyableDirective implemen
   }
 
   private clearAndClose(): void {
-    this.isDirty = false;
+    this.newSelectedNodes.clear();
     this.openSidebar.next(false);
   }
 }
