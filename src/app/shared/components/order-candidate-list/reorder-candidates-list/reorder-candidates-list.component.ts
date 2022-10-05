@@ -8,8 +8,9 @@ import { OrderCandidateListViewService } from '@shared/components/order-candidat
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
-import { filter, merge, Observable, takeUntil, tap } from 'rxjs';
+import { distinctUntilChanged, filter, merge, Observable, takeUntil, tap } from 'rxjs';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
+import { UserState } from 'src/app/store/user.state';
 
 enum ReorderCandidateStatuses {
   BillRatePending = 44,
@@ -29,6 +30,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidateStatuses = ReorderCandidateStatuses;
   public candidateJob: OrderCandidateJob;
+  public agencyActionsAllowed: boolean;
 
   public readonly cancelledStatusName = ReorderCandidateStatuses[ReorderCandidateStatuses.Cancelled];
 
@@ -47,6 +49,10 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     super.ngOnInit();
     this.onChangeCandidateJob().pipe(takeUntil(this.unsubscribe$)).subscribe();
     this.subscribeOnReloadAction();
+
+    if (this.isAgency) {
+      this.checkForAgencyStatus();
+    }
   }
 
   public onEdit(data: OrderCandidatesList & { index: string }, event: MouseEvent): void {
@@ -109,6 +115,17 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   private subscribeOnReloadAction(): void {
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ReloadOrderCandidatesLists)).subscribe(() => {
       this.emitGetCandidatesList();
+    });
+  }
+
+  private checkForAgencyStatus(): void {
+    this.store.select(UserState.agencyActionsAllowed)
+    .pipe(
+      distinctUntilChanged(),
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((value) => {
+      this.agencyActionsAllowed = value;
     });
   }
 }

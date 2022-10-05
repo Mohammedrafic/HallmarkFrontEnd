@@ -2,7 +2,6 @@ import {
   GetCandidatesCredentialByPage,
   GetCredentialFiles,
   GetCredentialFilesSucceeded,
-  GetCredentialStatuses,
   GetCredentialTypes,
   GetGroupedCredentialsFiles,
   GetMasterCredentials,
@@ -20,13 +19,9 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from
 import { ActivatedRoute } from "@angular/router";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
-import {
-  DELETE_CONFIRM_TEXT,
-  DELETE_CONFIRM_TITLE,
-  DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE
-} from "@shared/constants/messages";
-import { CredentialVerifiedStatus, STATUS_COLOR_GROUP } from "@shared/enums/status";
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from "@shared/constants/messages";
+import { BusinessUnitType } from "@shared/enums/business-unit-type";
+import { CredentialStatus, STATUS_COLOR_GROUP } from "@shared/enums/status";
 import { CandidateCredential, CandidateCredentialPage, CredentialFile } from "@shared/models/candidate-credential.model";
 import { CredentialType } from "@shared/models/credential-type.model";
 import { Credential } from "@shared/models/credential.model";
@@ -38,6 +33,14 @@ import { GridComponent } from "@syncfusion/ej2-angular-grids";
 import { FileInfo, SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
 import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil } from "rxjs";
 import { SetHeaderState, ShowSideDialog } from "src/app/store/app.actions";
+import { UserState } from "src/app/store/user.state";
+import {
+  agencySideCredentialStatuses,
+  orgSideCredentialStatuses,
+  orgSideCompletedCredentialStatuses,
+  orgSidePendingCredentialStatuses,
+  orgSideReviewedCredentialStatuses
+} from "./credentials-grid.constants";
 
 @Component({
   selector: 'app-credentials-grid',
@@ -47,11 +50,13 @@ import { SetHeaderState, ShowSideDialog } from "src/app/store/app.actions";
 })
 export class CredentialsGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() readonlyMode = false;
+  @Input() isNavigatedFromOrganizationArea: boolean;
+  @Input() orderId: number | null;
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
 
-  public readonly statusEnum = CredentialVerifiedStatus;
+  public readonly statusEnum = CredentialStatus;
   public readonly allowedExtensions: string = '.pdf, .doc, .docx, .jpg, .jpeg, .png';
   public readonly maxFileSize = 10485760; // 10 mb
   public uploaderErrorMessageElement: HTMLElement;
@@ -65,7 +70,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public today = new Date();
   public optionFields = { text: 'text', value: 'id' };
   public showCertifiedFields: boolean;
-  public credentialStatuses: FieldSettingsModel[] = [];
+  public credentialStatusOptions: FieldSettingsModel[] = [];
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
@@ -81,9 +86,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   @Select(CandidateState.credentialTypes)
   credentialType$: Observable<CredentialType[]>;
-
-  @Select(CandidateState.credentialStatuses)
-  credentialStatuses$: Observable<CredentialVerifiedStatus[]>;
 
   @Select(CandidateState.masterCredentials)
   masterCredentials$: Observable<Credential[]>;
@@ -109,7 +111,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   get showCompleteDate(): boolean {
-    return this.statusControl?.value === CredentialVerifiedStatus.Completed;
+    return this.statusControl?.value === CredentialStatus.Completed;
+  }
+
+  get isOrganization(): boolean {
+    return this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
   }
 
   private get statusControl(): AbstractControl | null {
@@ -128,7 +134,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   ngOnInit(): void {
     this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
     this.store.dispatch(new GetCredentialTypes());
-    this.store.dispatch(new GetCredentialStatuses());
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
@@ -165,7 +170,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.createSearchCredentialForm();
     this.subscribeOnSearchUpdate();
     this.subscribeOnCandidateCredential();
-    this.subscribeOnCredentialStatuses();
   }
 
   ngOnDestroy(): void {
@@ -181,6 +185,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   public addNew(): void {
+    this.setCredentialStatusOptions(
+      this.isOrganization || this.isNavigatedFromOrganizationArea
+        ? orgSideCredentialStatuses
+        : agencySideCredentialStatuses
+    );
     this.store.dispatch(new GetMasterCredentials('', ''));
     this.store.dispatch(new ShowSideDialog(true)).subscribe(() => {
       this.setDropElement();
@@ -198,7 +207,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public setCompleteDate(event: ChangeEventArgs): void {
     this.addCredentialForm.get('completedDate')?.setValue(
-      event.value === CredentialVerifiedStatus.Completed
+      event.value === CredentialStatus.Completed
         ? new Date().toISOString()
         : null
     );
@@ -212,7 +221,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
+        .pipe(filter((confirm) => confirm))
         .subscribe(() => {
           this.closeSideDialog()
         });
@@ -246,7 +255,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.masterCredentialId = data.masterCredentialId;
     this.saveCredential({
       ...data,
-      status: CredentialVerifiedStatus.Pending,
+      status: CredentialStatus.Pending,
       completedDate: null
     });
   }
@@ -265,6 +274,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
                 { status, insitute, createdOn, number, experience, createdUntil, completedDate,
                   masterCredentialId, id, credentialFiles, expireDateApplicable }: CandidateCredential) {
     event.stopPropagation();
+    this.updateCredentialStatusOptions(status as CredentialStatus);
     this.showCertifiedFields = !!expireDateApplicable;
     this.credentialId = id as number;
     this.masterCredentialId = masterCredentialId;
@@ -355,7 +365,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.store.dispatch(new SaveCandidatesCredential({
         status, number, insitute, experience, createdOn, createdUntil, completedDate,
         masterCredentialId: this.masterCredentialId,
-        id: this.credentialId as number
+        id: this.credentialId as number,
+        orderId: this.orderId,
       }));
     }
   }
@@ -405,20 +416,40 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       .subscribe((page: CandidateCredentialPage) => this.candidateCredentialPage = page);
   }
 
-  private subscribeOnCredentialStatuses(): void {
-    this.credentialStatuses$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((statuses: CredentialVerifiedStatus[]) => {
-        this.credentialStatuses = statuses.map(item => {
-          return {
-            text: CredentialVerifiedStatus[item],
-            id: item
-          }
-        })
-      });
+  private setDefaultStatusValue(): void {
+    this.statusControl?.setValue(CredentialStatus.Pending);
   }
 
-  private setDefaultStatusValue(): void {
-    this.statusControl?.setValue(CredentialVerifiedStatus.Pending);
+  private setCredentialStatusOptions(statuses: CredentialStatus[]): void {
+    this.credentialStatusOptions = statuses.map((item: CredentialStatus) => {
+      return {
+        text: CredentialStatus[item],
+        id: item
+      }
+    })
+  }
+
+  private updateCredentialStatusOptions(status: CredentialStatus): void {
+    if (this.isOrganization || this.isNavigatedFromOrganizationArea) {
+      switch (status) {
+        case CredentialStatus.Completed:
+          this.setCredentialStatusOptions(orgSideCompletedCredentialStatuses);
+          break;
+        case CredentialStatus.Pending:
+          this.setCredentialStatusOptions(orgSidePendingCredentialStatuses);
+          break;
+        case CredentialStatus.Reviewed:
+          this.setCredentialStatusOptions(orgSideReviewedCredentialStatuses);
+          break;
+        default:
+          this.setCredentialStatusOptions(orgSideCredentialStatuses);
+      }
+    } else {
+      this.setCredentialStatusOptions(
+        agencySideCredentialStatuses.includes(status)
+          ? agencySideCredentialStatuses
+          : [status, ...agencySideCredentialStatuses]
+      );
+    }
   }
 }

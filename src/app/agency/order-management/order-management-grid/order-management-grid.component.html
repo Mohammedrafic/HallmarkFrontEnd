@@ -111,7 +111,7 @@
         </ng-template>
       </ng-template>
     </e-column>
-    <e-column field="status" headerText="STATUS" width="160" minWidth="120" maxWidth="200">
+    <e-column field="status" headerText="STATUS" width="215" minWidth="120" maxWidth="260">
       <ng-template #template let-data>
         <div class="status-cell" [class.ex-chip]="data?.extensionFromId">
           <ejs-chiplist>
@@ -170,13 +170,7 @@
         <div class="align-right">{{ data.billRate }}</div>
       </ng-template>
     </e-column>
-    <e-column
-      field="jobStartDate"
-      width="120"
-      [width]="selectedTab === AgencyOrderManagementTabs.ReOrders ? 160 : 135"
-      [minWidth]="selectedTab === AgencyOrderManagementTabs.ReOrders ? 140 : 115"
-      maxWidth="200"
-    >
+    <e-column field="jobStartDate" width="155" minWidth="135" maxWidth="200">
       <ng-template #headerTemplate let-data>
         <span class="e-headertext">
           {{ selectedTab !== AgencyOrderManagementTabs.ReOrders ? 'START DATE' : 'RE-ORDER DATE' }}

@@ -19,6 +19,7 @@ import {
   SaveLastSelectedOrganizationAgencyId,
   LastSelectedOrganisationAgency,
   UserOrganizationsAgenciesChanged,
+  SetAgencyActionsAllowed,
 } from 'src/app/store/user.actions';
 
 import { AppState } from 'src/app/store/app.state';
@@ -32,6 +33,7 @@ import {
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
+import { AgencyStatus } from 'src/app/shared/enums/status';
 
 interface IOrganizationAgency {
   id: number;
@@ -39,6 +41,7 @@ interface IOrganizationAgency {
   type: 'Organization' | 'Agency';
   hasLogo?: boolean;
   lastUpdateTicks?: number;
+  status?: AgencyStatus;
 }
 
 @Component({
@@ -151,6 +154,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
           
         }
         if (selectedType === 'Agency') {
+
           this.store.dispatch(new LastSelectedOrganisationAgency(selectedType));
           this.store.dispatch(
             new SaveLastSelectedOrganizationAgencyId(
@@ -224,8 +228,8 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         const organizations = this.userOrganizations.businessUnits;
 
         this.agencies = agencies.map((a: UserAgencyOrganizationBusinessUnit) => {
-          const { id, name, hasLogo, lastUpdateTicks } = a;
-          const agency: IOrganizationAgency = { id, name, type: 'Agency', hasLogo, lastUpdateTicks };
+          const { id, name, hasLogo, lastUpdateTicks, status } = a;
+          const agency: IOrganizationAgency = { id, name, type: 'Agency', hasLogo, lastUpdateTicks, status };
 
           return agency;
         });
@@ -271,9 +275,14 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     let newOrganizationAgencyControlValue: number | null;
 
     if (isAgencyArea && isAgency) {
-      newOrganizationAgencyControlValue = organizationsAgencies.find((i) => i.id === lastSelectedAgencyId)
-        ? lastSelectedAgencyId
-        : organizationsAgencies[0]?.id || null;
+      const currentAgency = organizationsAgencies.find((agency) => agency.id === lastSelectedAgencyId)
+      newOrganizationAgencyControlValue = currentAgency
+      ? lastSelectedAgencyId : organizationsAgencies[0]?.id || null;
+
+      const agencyIsActive = currentAgency?.status !== AgencyStatus.Inactive
+      && currentAgency?.status !== AgencyStatus.Terminated;
+
+      this.store.dispatch(new SetAgencyActionsAllowed(agencyIsActive));
     } else {
       newOrganizationAgencyControlValue = organizationsAgencies.find((i) => i.id === lastSelectedOrganizationId)
         ? lastSelectedOrganizationId

@@ -86,6 +86,7 @@ import { DurationService } from '@shared/services/duration.service';
 import { UserState } from 'src/app/store/user.state';
 import { DateTimeHelper } from '@core/helpers';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
+import isNil from 'lodash/fp/isNil';
 
 @Component({
   selector: 'app-order-details-form',
@@ -456,7 +457,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       shiftEndTimeControl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
     });
 
-    shiftNameControl.valueChanges.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((val) => {
+    shiftNameControl.valueChanges.pipe(
+      filter((value: number) => !isNil(value)),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((val) => {
       if (val === MasterShiftName.Rotating) {
         this.clearShiftsValidation(shiftStartTimeControl, shiftEndTimeControl);
         this.isShiftTimeRequired = false;
@@ -1207,8 +1211,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   setShiftsValidation(shiftStart: AbstractControl, shiftEnd: AbstractControl): void {
-    shiftStart.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
-    shiftEnd.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
+    shiftStart.addValidators([
+      Validators.required,
+      startTimeValidator(this.generalInformationForm, 'shiftEndTime')
+    ]);
+    shiftEnd.addValidators([
+      Validators.required,
+      endTimeValidator(this.generalInformationForm, 'shiftStartTime')
+    ]);
   }
 
   clearShiftsValidation(shiftStart: AbstractControl, shiftEnd: AbstractControl): void {

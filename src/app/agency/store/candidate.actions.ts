@@ -149,11 +149,6 @@ export class GetCredentialTypes {
   constructor() {}
 }
 
-export class GetCredentialStatuses {
-  static readonly type = '[candidate] Get Credential Statuses';
-  constructor() {}
-}
-
 export class UploadCredentialFiles {
   static readonly type = '[candidate] Upload Credential Files';
   constructor(public files: Blob[], public candidateCredentialId: number) {}

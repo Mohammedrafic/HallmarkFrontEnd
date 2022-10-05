@@ -23,7 +23,7 @@ import { SortSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-mode
 import { UserState } from 'src/app/store/user.state';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { ExportCredentialList, GetCredentialsDataSources, SetCredentialsFilterCount, ShowExportCredentialListDialog } from '@organization-management/store/credentials.actions';
+import { ExportCredentialList, GetCredentialsDataSources, SaveAssignedCredentialValue, SetCredentialsFilterCount, ShowExportCredentialListDialog } from '@organization-management/store/credentials.actions';
 import { DatePipe } from '@angular/common';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
@@ -143,6 +143,10 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportCredentialListDialog)).subscribe((event: { payload: ExportedFileType }) => {
       this.defaultFileName = 'Credentials/Credentials List ' + this.generateDateTime(this.datePipe);
       this.defaultExport(event.payload);
+    });
+
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveAssignedCredentialValue)).subscribe(() => {
+        this.getCredentials();
     });
   }
 

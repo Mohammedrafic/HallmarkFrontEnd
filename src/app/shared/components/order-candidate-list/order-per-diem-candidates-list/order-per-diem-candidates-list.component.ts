@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { filter, merge, Subject, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, merge, Subject, takeUntil } from 'rxjs';
 
 import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-order-per-diem-candidates-list',
@@ -18,6 +19,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
   public templateState: Subject<any> = new Subject();
   public candidate: OrderCandidatesList;
   public candidateJob: OrderCandidateJob | null;
+  public agencyActionsAllowed: boolean;
 
   constructor(protected override store: Store, protected override router: Router) {
     super(store, router);
@@ -26,6 +28,10 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
   override ngOnInit(): void {
     super.ngOnInit();
     this.subscribeOnChangeCandidateJob();
+
+    if (this.isAgency) {
+      this.checkForAgencyStatus();
+    }
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
@@ -74,6 +80,17 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
       currentPage: this.currentPage,
       pageSize: this.pageSize,
       excludeDeployed: false,
+    });
+  }
+
+  private checkForAgencyStatus(): void {
+    this.store.select(UserState.agencyActionsAllowed)
+    .pipe(
+      distinctUntilChanged(),
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((value) => {
+      this.agencyActionsAllowed = value;
     });
   }
 }

@@ -70,10 +70,10 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
 
       agencyCategory: new FormControl(),
 
-      regionIds: new FormControl([], [Validators.required]),
-      orderTypes: new FormControl([], [Validators.required]),
+      regionIds: new FormControl([]),
+      orderTypes: new FormControl([]),
       classifications: new FormControl([]),
-      skillCategoryIds: new FormControl([], [Validators.required]),
+      skillCategoryIds: new FormControl([]),
 
       allowOnBoard: new FormControl(false),
       allowDeployCredentials: new FormControl(false),
