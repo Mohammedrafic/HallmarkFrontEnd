@@ -36,7 +36,7 @@ import { SetHeaderState, ShowSideDialog } from "src/app/store/app.actions";
 import { UserState } from "src/app/store/user.state";
 import {
   agencySideCredentialStatuses,
-  allCredentialStatuses,
+  orgSideCredentialStatuses,
   orgSideCompletedCredentialStatuses,
   orgSidePendingCredentialStatuses,
   orgSideReviewedCredentialStatuses
@@ -50,6 +50,8 @@ import {
 })
 export class CredentialsGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() readonlyMode = false;
+  @Input() isNavigatedFromOrganizationArea: boolean;
+  @Input() orderId: number | null;
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
@@ -183,7 +185,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   public addNew(): void {
-    this.setCredentialStatusOptions(this.isOrganization ? allCredentialStatuses : agencySideCredentialStatuses);
+    this.setCredentialStatusOptions(
+      this.isOrganization || this.isNavigatedFromOrganizationArea
+        ? orgSideCredentialStatuses
+        : agencySideCredentialStatuses
+    );
     this.store.dispatch(new GetMasterCredentials('', ''));
     this.store.dispatch(new ShowSideDialog(true)).subscribe(() => {
       this.setDropElement();
@@ -359,7 +365,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.store.dispatch(new SaveCandidatesCredential({
         status, number, insitute, experience, createdOn, createdUntil, completedDate,
         masterCredentialId: this.masterCredentialId,
-        id: this.credentialId as number
+        id: this.credentialId as number,
+        orderId: this.orderId,
       }));
     }
   }
@@ -423,7 +430,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   private updateCredentialStatusOptions(status: CredentialStatus): void {
-    if (this.isOrganization) {
+    if (this.isOrganization || this.isNavigatedFromOrganizationArea) {
       switch (status) {
         case CredentialStatus.Completed:
           this.setCredentialStatusOptions(orgSideCompletedCredentialStatuses);
@@ -435,7 +442,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           this.setCredentialStatusOptions(orgSideReviewedCredentialStatuses);
           break;
         default:
-          this.setCredentialStatusOptions(allCredentialStatuses);
+          this.setCredentialStatusOptions(orgSideCredentialStatuses);
       }
     } else {
       this.setCredentialStatusOptions(

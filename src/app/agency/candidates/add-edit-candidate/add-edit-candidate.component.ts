@@ -55,6 +55,8 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   public isCredentialStep = false;
   public candidateMessage: CandidateMessage | null = null;
   public fetchedCandidate: Candidate;
+  public isNavigatedFromOrganizationArea: boolean;
+  public orderId: number | null = null;
 
   private filesDetails: Blob[] = [];
   private unsubscribe$: Subject<void> = new Subject();
@@ -103,6 +105,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
       this.store.dispatch(new GetCandidatePhoto(parseInt(this.route.snapshot.paramMap.get('id') as string)));
     }
     this.pagePermissions();
+    this.setCredentialParams();
     this.subscribeOnCandidateMessage();
   }
 
@@ -347,5 +350,14 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
     } else {
       return this.getStringSsn(`0${ssn}`);
     }
+  }
+
+  private setCredentialParams(): void {
+    const location = this.location.getState() as {
+      isNavigatedFromOrganizationArea: boolean;
+      orderId: number
+    };
+    this.isNavigatedFromOrganizationArea = location.isNavigatedFromOrganizationArea || false;
+    this.orderId = location.orderId || null;
   }
 }
