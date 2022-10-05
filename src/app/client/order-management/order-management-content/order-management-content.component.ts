@@ -589,6 +589,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public onFilterApply(): void {
     this.filters = this.OrderFilterFormGroup.getRawValue();
+    this.filters.candidateName = this.filters.candidateName || null;
     this.filters.orderPublicId = this.filters.orderPublicId || null;
     this.filters.billRateFrom = this.filters.billRateFrom || null;
     this.filters.billRateTo = this.filters.billRateTo || null;
