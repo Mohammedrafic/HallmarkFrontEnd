@@ -58,6 +58,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     text: 'name',
     value: 'id',
   };
+  defaultBusinessValue: any;
 
   get businessUnitControl(): AbstractControl | null {
     return this.form.get('businessUnitType');
@@ -197,6 +198,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   private onNewRoleBussinesDataFetched(): void {
     this.actions$.pipe(ofActionSuccessful(GetNewRoleBusinessByUnitTypeSucceeded), takeWhile(() => this.isAlive)).subscribe(({ type }) => {
       this.newRoleBussinesData = this.store.selectSnapshot(SecurityState.newRoleBussinesData)(type);
+      this.defaultBusinessValue = this.newRoleBussinesData[0]?.id;
     })
   }
 
