@@ -78,7 +78,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
 
 
   itemList: Array<Role> | undefined;
-  private gridApi: any;
+  public gridApi: any;
   private gridColumnApi: any;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   rowModelType: any;
@@ -317,7 +317,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     this.editRoleEvent.emit(data.rowData);
   }
 
-  public onRemove(data: Role): void {
+  public onRemove(data: any): void {
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
@@ -325,8 +325,10 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
         okButtonClass: 'delete-button',
       })
       .subscribe((confirm) => {
-        if (confirm && data.id) {
-          this.store.dispatch(new RemoveRole(data.id))
+        if (confirm && data.rowData.id) {
+          this.store.dispatch(new RemoveRole(data.rowData.id))
+          var datasource = this.createServerSideDatasource();
+          this.gridApi.setServerSideDatasource(datasource);
         }
       });
   }
@@ -354,14 +356,10 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     }
   }
 
-  private dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
+  public dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
     const { businessUnit, business } = this.filterForm.getRawValue();
     this.store.dispatch(new GetRolesPage(businessUnit, business || null, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
   }
-
-
-
-
 
   private onDialogClose(): void {
     this.actions$

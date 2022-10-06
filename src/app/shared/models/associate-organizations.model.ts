@@ -22,6 +22,7 @@ export type AssociateOrganizationsAgency = {
   partnershipStatus: number;
   partnershipStatusTitle: string;
   businessUnitName: string;
+  agencyStatus: number;
 };
 
 export type AssociateOrganizationsAgencyPage = PageOfCollections<AssociateOrganizationsAgency>;

@@ -16,6 +16,7 @@ import { GetBusinessByUnitType, GetPermissionsTree, SaveRole, SaveRoleSucceeded 
 import { SecurityState } from '../store/security.state';
 import { RoleFormComponent } from './role-form/role-form.component';
 import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS } from './roles-and-permissions.constants';
+import { RolesGridComponent } from './roles-grid/roles-grid.component';
 
 const DEFAULT_DIALOG_TITLE = 'Add Role';
 const EDIT_DIALOG_TITLE = 'Edit Role';
@@ -27,6 +28,7 @@ const EDIT_DIALOG_TITLE = 'Edit Role';
 })
 export class RolesAndPermissionsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('roleForm') roleForm: RoleFormComponent;
+  @ViewChild(RolesGridComponent, { static: false }) childC: RolesGridComponent;
 
   @Select(SecurityState.bussinesData)
   public bussinesData$: Observable<BusinessUnit[]>;
@@ -103,7 +105,7 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
     this.roleFormGroup.enable();
     this.roleFormGroup.patchValue({
       businessUnitType: this.businessUnitControl.value,
-      businessUnitId: this.businessControl.value,
+      businessUnitId: this.roleForm.defaultBusinessValue,
       isActive: true,
     });
     this.disableBussinesUnitForRole();
@@ -137,7 +139,12 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
         businessUnitId: value.businessUnitId || null,
         permissions: value.permissions.map((stringValue: string) => Number(stringValue)),
       };
-      this.store.dispatch(new SaveRole(roleDTO));
+      this.store.dispatch(new SaveRole(roleDTO)).subscribe((data) => {
+        if (this.childC.gridApi) {
+          this.childC.dispatchNewPage();
+        }
+      });
+     
     }
   }
 

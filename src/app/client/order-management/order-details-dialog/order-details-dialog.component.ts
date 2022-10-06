@@ -56,6 +56,8 @@ import { OrderManagementService } from '@client/order-management/order-managemen
 import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
 import { MessageTypes } from '@shared/enums/message-types';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
+import { UserState } from '../../../store/user.state';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 
 enum MobileMenuItems {
   Cancel = 'Cancel',
@@ -107,6 +109,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Select(OrderManagementContentState.extensions) extensions$: Observable<any>;
   public extensions: any[] = [];
 
+  @Select(UserState.currentUserPermissions)
+  public currentUserPermissions$: Observable<any[]>;
+
   public readonly isReOrderDialogOpened$: Observable<boolean> = this.isDialogOpened();
 
   candidateOrderPage: OrderCandidatesListPage;
@@ -120,6 +125,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public candidatesCounter: number;
   public reOrderToEdit: Order | null;
   public reOrderDialogTitle$ = this.addEditReorderService.reOrderDialogTitle$;
+  public canCreateOrder: boolean;
+  public canCloseOrderPermission: boolean;
 
   public disabledCloseButton = true;
   public showCloseButton = false;
@@ -134,6 +141,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     const statuses = [this.orderStatus.Open, this.orderStatus.InProgress, this.orderStatus.Filled];
     return !statuses.includes(this.order?.status);
   }
+
   get canCloseOrder(): boolean {
     const canNotClose = [this.orderStatus.PreOpen, this.orderStatus.Incomplete];
     return this.canReOpen || canNotClose.includes(this.order?.status);
@@ -214,6 +222,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     this.onOpenEvent();
     this.subscribeOnOrderCandidatePage();
     this.subsToTabChange();
+    this.subscribeOnPermissions();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -493,13 +502,13 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           this.extensions = [];
           if (
             selectedOrder?.extensionFromId &&
-            order?.items[isOrderPositionSelected.index ?? 0]?.deployedCandidateInfo?.jobId &&
+            order?.items[isOrderPositionSelected.index ?? 0]?.candidateJobId &&
             (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
           ) {
             this.store.dispatch(
               new GetOrganizationExtensions(
-                order.items[isOrderPositionSelected.index ?? 0].deployedCandidateInfo?.jobId!,
-                selectedOrder.id!
+                order.items[isOrderPositionSelected.index ?? 0].candidateJobId,
+                selectedOrder.id
               )
             );
           }
@@ -507,7 +516,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       );
 
     this.extensions$.pipe(takeUntil(this.unsubscribe$)).subscribe((extensions) => {
-      this.extensions = extensions?.filter((extension: any) => extension.id !== this.order.id);
+      this.extensions = extensions?.filter((extension: any) => extension.id !== this.order?.id);
     });
   }
 
@@ -516,5 +525,18 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       map((payload: ShowSideDialog) => payload.isDialogShown),
       distinctUntilChanged()
     );
+  }
+
+  private subscribeOnPermissions(): void {
+    this.currentUserPermissions$
+      .pipe(
+        filter((permissions) => !!permissions?.length),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((permissions) => {
+        const permissionIds = permissions.map(({ permissionId }) => permissionId);
+        this.canCloseOrderPermission = permissionIds.includes(PermissionTypes.CanCloseOrder);
+        this.canCreateOrder = permissionIds.includes(PermissionTypes.CanCreateOrder);
+      });
   }
 }

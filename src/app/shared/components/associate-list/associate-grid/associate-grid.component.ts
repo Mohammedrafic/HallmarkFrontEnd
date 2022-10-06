@@ -20,6 +20,7 @@ import {
 } from '@shared/components/associate-list/store/associate.actions';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { UserState } from '../../../../store/user.state';
+import { AgencyStatus } from '@shared/enums/status';
 
 @Component({
   selector: 'app-associate-grid',
@@ -29,6 +30,7 @@ import { UserState } from '../../../../store/user.state';
 export class AssociateGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() public associateEvent$: Subject<boolean>;
   @Input() public isAgency: boolean;
+  @Input() areAgencyActionsAllowed: boolean;
 
   @ViewChild('grid') grid: GridComponent;
 
@@ -44,6 +46,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
   }
 
   public priceUtils = PriceUtils;
+  public readonly agencyStatus = AgencyStatus;
   public jobDistributionColumns = JOB_DISTRIBUTION_COLUMNS;
   public openAssociateOrgAgencyDialog = new EventEmitter<boolean>();
   public tierValueAccess = (_: string, { tier }: AssociateOrganizationsAgency) => {

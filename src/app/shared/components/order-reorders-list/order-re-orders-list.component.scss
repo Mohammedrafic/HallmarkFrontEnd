@@ -13,3 +13,20 @@
   font-weight: bold;
   cursor: pointer;
 }
+
+.e-templatecell .row-tool-buttons {
+  .primary-icon-button {
+    &.disable {
+      color: $secondary-dark-blue-30;
+      cursor: default;
+
+      &:hover, &:focus {
+        color: $secondary-dark-blue-30;
+        background: inherit;
+      }
+
+
+    }
+  }
+}
+

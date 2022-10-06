@@ -1,19 +1,6 @@
 <section class="candidates-info" *ngIf="orderInformation">
   <div class="container-row" [class.extension]="orderInformation.extensionFromId"
        [ngSwitch]="orderInformation.orderType">
-    <ng-container *ngSwitchCase="orderType.Traveler">
-      <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
-      <div class="column last-column">
-        <ng-container [ngTemplateOutlet]="billRate"></ng-container>
-      </div>
-      <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
-      <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
-    </ng-container>
-
     <ng-container *ngSwitchCase="orderType.PermPlacement">
       <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
       <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
@@ -23,6 +10,19 @@
       <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
       <ng-container [ngTemplateOutlet]="orderPlacementFee"></ng-container>
       <ng-container [ngTemplateOutlet]="annualSalaryRange"></ng-container>
+      <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
+    </ng-container>
+
+    <ng-container *ngSwitchDefault>
+      <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
+      <div class="column last-column">
+        <ng-container [ngTemplateOutlet]="billRate"></ng-container>
+      </div>
+      <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
       <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
     </ng-container>
   </div>
