@@ -35,6 +35,10 @@
     background-color: $secondary-dark-blue-40;
   }
 
+  ejs-treeview {
+    text-transform: capitalize;
+  }
+
   .tree-lebel {
     label {
       display: inline-block;

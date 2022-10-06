@@ -254,6 +254,7 @@
         [billRates]="billRatesData"
         (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)"
         [isActive]="true"
+        [readOnlyMode]="isReadOnlyBillRates"
       >
       </app-bill-rates>
     </ng-template>

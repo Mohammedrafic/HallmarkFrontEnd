@@ -29,6 +29,7 @@ import {
   GetUsersAssignedToRole,
   GetCurrentUserPermissions,
   GetUserOrganizations,
+  GetOrderPermissions,
   SetAgencyActionsAllowed,
 } from './user.actions';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
@@ -54,6 +55,7 @@ export interface UserStateModel {
   organizationStructure: OrganizationStructure | null;
   usersAssignedToRole: UsersAssignedToRole | null;
   permissions: CurrentUserPermission[];
+  orderPermissions: CurrentUserPermission[];
   agencyActionsAllowed: boolean;
 }
 
@@ -72,6 +74,7 @@ const AGENCY = 'Agency';
     organizationStructure: null,
     usersAssignedToRole: null,
     permissions: [],
+    orderPermissions: [],
     agencyActionsAllowed: true,
   },
 })
@@ -138,6 +141,11 @@ export class UserState {
   @Selector()
   static currentUserPermissions(state: UserStateModel): CurrentUserPermission[] {
     return state.permissions;
+  }
+
+  @Selector()
+  static orderPermissions(state: UserStateModel): CurrentUserPermission[] {
+    return state.orderPermissions;
   }
 
   @Selector()
@@ -255,7 +263,7 @@ export class UserState {
 
   @Action(SaveLastSelectedOrganizationAgencyId)
   SaveLastSelectedOrganizationAgencyId(
-    { dispatch, getState }: StateContext<UserStateModel>,
+    { dispatch }: StateContext<UserStateModel>,
     { payload, isOrganizationId }: SaveLastSelectedOrganizationAgencyId
   ): Observable<LasSelectedOrganizationAgency> {
     return this.userService.saveLastSelectedOrganizationAgencyId(payload).pipe(
@@ -313,7 +321,7 @@ export class UserState {
   }
 
   @Action(GetCurrentUserPermissions)
-  GetCurrentUserPermissions({ patchState, dispatch }: StateContext<UserStateModel>): Observable<any> {
+  GetCurrentUserPermissions({ patchState, dispatch }: StateContext<UserStateModel>): Observable<void | CurrentUserPermission[]> {
     return this.userService.getCurrentUserPermissions().pipe(
       tap((permissions: CurrentUserPermission[]) => patchState({ permissions })),
       catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
@@ -329,6 +337,12 @@ export class UserState {
       agencyActionsAllowed: allowed,
     });
   }
+
+  @Action(GetOrderPermissions)
+  GetOrderPermissions({ patchState, dispatch }: StateContext<UserStateModel>, { payload }: GetOrderPermissions): Observable<void | CurrentUserPermission[]> {
+    return this.userService.getOrderPermissions(payload).pipe(
+      tap((orderPermissions: CurrentUserPermission[]) => patchState({ orderPermissions })),
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
+    );
+  }
 }
-
-
