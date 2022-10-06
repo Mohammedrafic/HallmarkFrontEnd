@@ -64,8 +64,8 @@
       <div class="sup-title">Oncall</div>
     </div>
     <div class="column">
-      <div class="title">{{activeValue(orderInformation.nO_OT)}}</div>
-      <div class="sup-title">Do Not Consider OT</div>
+      <div class="title">{{ orderInformation.criticalOrder ? 'Yes' : 'No'}}</div>
+      <div class="sup-title">Critical Order</div>
     </div>
     <div class="column">
       <div class="title">{{(orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-'}}</div>
