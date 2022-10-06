@@ -493,13 +493,13 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           this.extensions = [];
           if (
             selectedOrder?.extensionFromId &&
-            order?.items[isOrderPositionSelected.index ?? 0]?.deployedCandidateInfo?.jobId &&
+            order?.items[isOrderPositionSelected.index ?? 0]?.candidateJobId &&
             (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
           ) {
             this.store.dispatch(
               new GetOrganizationExtensions(
-                order.items[isOrderPositionSelected.index ?? 0].deployedCandidateInfo?.jobId!,
-                selectedOrder.id!
+                order.items[isOrderPositionSelected.index ?? 0].candidateJobId,
+                selectedOrder.id
               )
             );
           }
@@ -507,7 +507,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       );
 
     this.extensions$.pipe(takeUntil(this.unsubscribe$)).subscribe((extensions) => {
-      this.extensions = extensions?.filter((extension: any) => extension.id !== this.order.id);
+      this.extensions = extensions?.filter((extension: any) => extension.id !== this.order?.id);
     });
   }
 
