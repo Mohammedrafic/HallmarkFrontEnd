@@ -418,7 +418,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         regionId: this.documentLibraryform.get(FormControlNames.RegionIds)?.value[0],
         locationId: this.documentLibraryform.get(FormControlNames.LocationIds)?.value[0],
         documentName: this.documentLibraryform.get(FormControlNames.DocumentName)?.value,
-        folderId: this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : 2,
+        folderId: this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : 1,
         startDate: this.documentLibraryform.get(FormControlNames.StartDate)?.value,
         endDate: this.documentLibraryform.get(FormControlNames.EndDate)?.value,
         docTypeId: this.documentLibraryform.get(FormControlNames.TypeIds)?.value,
