@@ -32,6 +32,9 @@ import { AppState } from '../../../store/app.state';
 import { AlertsEmailTemplateFormComponent } from '../alerts-template/alerts-email-template-form/alerts-email-template-form.component';
 import { AlertsSmsTemplateFromComponent } from '../alerts-template/alerts-sms-template-from/alerts-sms-template-from.component';
 import { SendGroupEmailComponent } from './send-group-email/send-group-email.component';
+import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailFilters } from '@shared/models/group-email.model';
+import { GetGroupMailByBusinessUnitIdPage } from '@admin/store/alerts.actions';
+import { User } from '@shared/models/user.model';
 @Component({
   selector: 'app-group-email',
   templateUrl: './group-email.component.html',
@@ -47,6 +50,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   public alertTemplateType: string;
   public alertChannel:AlertChannel;
   public alertTemplate:AlertsTemplate;
+  public userObj:User |null;
   @Select(SecurityState.bussinesData)
   public businessData$: Observable<BusinessUnit[]>;
   @Select()
@@ -65,8 +69,8 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   public emailTemplateFormGroup: FormGroup;
   public smsTemplateFormGroup: FormGroup;
   public onScreenTemplateFormGroup: FormGroup;
-  @Select(AlertsState.AlertsTemplatePage)
-  public alertsTemplatePage$: Observable<AlertsTemplatePage>;
+  @Select(AlertsState.GroupEmailByBusinessUnitIdPage)
+  public groupEmailPage$: Observable<GroupEmailByBusinessUnitIdPage>;
   @Select(AlertsState.TemplateByAlertId)
   public editAlertsTemplate$: Observable<EditAlertsTemplate>;
   @Select(AlertsState.UpdateTemplateByAlertId)
@@ -98,7 +102,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   private gridApi: any;
   private gridColumnApi: any;
   private isAlive = true;
-  private filters: AlertsTemplateFilters = {};
+  private filters: GroupEmailFilters = {};
   public title: string = "Notification Templates";
   public export$ = new Subject<ExportedFileType>();
   defaultValue: any;
@@ -115,7 +119,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   serverSideStoreType: any;
   maxBlocksInCache: any;
   defaultColDef: any;
-  itemList: Array<AlertsTemplate> | undefined;
+  itemList: Array<GroupEmail> | undefined;
   
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
@@ -143,12 +147,62 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.maxBlocksInCache = 2;
     this.columnDefs = [
       {
-        field: 'alertId',
+        field: 'Id',
         hide: true
       },
       {
-        headerName: 'Notfication Description',
-        field: 'alertTitle',
+        headerName: 'Subject',
+        field: 'subjectMail',
+        filter: 'agTextColumnFilter',
+        filterParams: {
+          buttons: ['reset'],
+          debounceMs: 1000,
+          suppressAndOrCondition: true,
+        }
+      },
+      {
+        headerName: 'Body',
+        field: 'bodyMail',
+        filter: 'agTextColumnFilter',
+        filterParams: {
+          buttons: ['reset'],
+          debounceMs: 1000,
+          suppressAndOrCondition: true,
+        }
+      },
+      {
+        headerName: 'ToList',
+        field: 'toList',
+        filter: 'agTextColumnFilter',
+        filterParams: {
+          buttons: ['reset'],
+          debounceMs: 1000,
+          suppressAndOrCondition: true,
+        }
+      },
+      {
+        headerName: 'CC List',
+        field: 'toList',
+        filter: 'agTextColumnFilter',
+        filterParams: {
+          buttons: ['reset'],
+          debounceMs: 1000,
+          suppressAndOrCondition: true,
+        }
+      },
+      {
+        headerName: 'BCC List',
+        field: 'bccList',
+        filter: 'agTextColumnFilter',
+        filterParams: {
+          buttons: ['reset'],
+          debounceMs: 1000,
+          suppressAndOrCondition: true,
+        }
+      },
+      {
+        headerName: 'From Email',
+        field: 'fromMail',
         filter: 'agTextColumnFilter',
         filterParams: {
           buttons: ['reset'],
@@ -159,7 +213,12 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       {
         headerName: 'Status',
         field: 'status',
-        filter: false
+        filter: 'agTextColumnFilter',
+        filterParams: {
+          buttons: ['reset'],
+          debounceMs: 1000,
+          suppressAndOrCondition: true,
+        }
       },
       {
         headerName: 'Email Template',
@@ -172,31 +231,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
           sortable: false,
           menuTabs: []
         },
-      },
-      {
-        headerName: 'SMS Template',
-        cellRenderer: 'buttonRenderer',
-        cellRendererParams: {
-          onClick: this.onSmsTemplateEdit.bind(this),
-          label: 'Edit',
-          suppressMovable: true,
-          filter: false,
-          sortable: false,
-          menuTabs: []
-        },
-      },
-      {
-        headerName: 'Onscreen Template',
-        cellRenderer: 'buttonRenderer',
-        cellRendererParams: {
-          onClick: this.onScreenTemplateEdit.bind(this),
-          label: 'Edit',
-          suppressMovable: true,
-          filter: false,
-          sortable: false,
-          menuTabs: []
-        },
-      },
+      }
 
     ];
 
@@ -223,6 +258,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.onBusinessUnitValueChanged();
     this.onBusinessValueChanged();
     const user = this.store.selectSnapshot(UserState.user);
+    this.userObj=user;
     this.businessUnitControl.patchValue(user?.businessUnitType);
     if (user?.businessUnitType) {
       this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
@@ -337,7 +373,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
           let sort = postData.sortFields.length > 0 ? postData.sortFields : null;
           self.dispatchNewPage(sort, filter);
 
-          self.alertsTemplatePage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
+          self.groupEmailPage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
             self.itemList = data?.items;
             if (!self.itemList || !self.itemList.length) {
               self.gridApi.showNoRowsOverlay();
@@ -353,7 +389,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     }
   }
   private dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
-    this.store.dispatch(new GetAlertsTemplatePage(this.businessUnitControl.value, this.businessControl.value == 0 ? null : this.businessControl.value, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+    this.store.dispatch(new GetGroupMailByBusinessUnitIdPage(this.userObj == null? null : this.userObj.businessUnitId, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
   }
   private dispatchEditAlertTemplate(alertId: number, alertChannel: AlertChannel,businessUnitId:number|null): void {
     this.store.dispatch(new GetTemplateByAlertId(alertId, alertChannel,businessUnitId));
