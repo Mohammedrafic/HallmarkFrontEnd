@@ -37,6 +37,9 @@ export type BillRateOption = {
   intervalMin: boolean;
   intervalMax: boolean;
   considerForOT: boolean;
+  seventhDayOtEnabled?: boolean;
+  weeklyOtEnabled?: boolean;
+  dailyOtEnabled?: boolean;
 };
 
 export interface BillRate {

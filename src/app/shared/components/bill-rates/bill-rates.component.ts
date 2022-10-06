@@ -7,12 +7,12 @@ import { ConfirmService } from '@shared/services/confirm.service';
 
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { BillRateFormComponent } from './components/bill-rate-form/bill-rate-form.component';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { ADD_CONFIRM_TEXT, DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, EDIT_CONFIRM_TEXT } from '@shared/constants';
 import { BillRate, BillRateOption, BillRateUnit } from '@shared/models/bill-rate.model';
 import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid.component';
 import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
-import { GetBillRateOptions } from '@shared/components/bill-rates/store/bill-rate.actions';
-import { BillRateState } from '@shared/components/bill-rates/store/bill-rate.state';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 @Component({
   selector: 'app-bill-rates',
@@ -20,6 +20,9 @@ import { BillRateState } from '@shared/components/bill-rates/store/bill-rate.sta
   styleUrls: ['./bill-rates.component.scss'],
 })
 export class BillRatesComponent implements OnInit, OnDestroy {
+  @Select(OrderManagementContentState.predefinedBillRatesOptions)
+  billRatesOptions$: Observable<BillRateOption[]>;
+
   @Input() isActive: boolean | null = false;
   @Input() readOnlyMode = false;
   @Input() set billRates(values: BillRate[]) {
@@ -43,9 +46,6 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   public billRatesOptions: BillRateOption[];
   public selectedBillRateUnit: BillRateUnit = BillRateUnit.Multiplier;
 
-  @Select(BillRateState.billRateOptions)
-  billRatesOptions$: Observable<BillRateOption[]>;
-
   private editBillRateIndex: string | null;
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -68,11 +68,11 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
 
-    this.store.dispatch(new GetBillRateOptions());
-    this.billRatesOptions$.pipe(takeUntil(this.unsubscribe$)).subscribe((options) => {
-      if (options && options.length > 0) {
-        this.billRatesOptions = options;
-      }
+    this.billRatesOptions$.pipe(
+      takeUntil(this.unsubscribe$),
+      filter((res) => !!res?.length)
+    ).subscribe((options: BillRateOption[]) => {
+      this.billRatesOptions = options;
     });
   }
 
@@ -118,9 +118,6 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         billType: value.billType,
         editAllowed: value.editAllowed || false,
         isPredefined: value.isPredefined || false,
-        seventhDayOtEnabled: value.seventhDayOtEnabled || false,
-        weeklyOtEnabled: value.weeklyOtEnabled || false,
-        dailyOtEnabled: value.dailyOtEnabled || false,
       },
       { emitEvent: false }
     );
@@ -143,7 +140,11 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     }
 
     this.selectedBillRateUnit = foundBillRateOption?.unit as BillRateUnit;
-    this.store.dispatch(new ShowSideDialog(true));
+    this.store.dispatch(new ShowSideDialog(true)).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.billRateForm.patchValue({ effectiveDate: value.effectiveDate });
+    });
   }
 
   public onRemoveBillRate({ index }: BillRatesGridEvent): void {
@@ -187,6 +188,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
 
   public onDialogOk(): void {
     this.billRateForm.markAllAsTouched();
+
     if (this.billRateForm.valid) {
       const value: BillRate = this.billRateForm.getRawValue();
       this.syncBillRateHourlyRate(value);
@@ -215,13 +217,32 @@ export class BillRatesComponent implements OnInit, OnDestroy {
           this.billRateForm.get('billRateConfigId')?.enable({ emitEvent: false });
           this.billRateForm.get('effectiveDate')?.enable({ emitEvent: false });
         }
-      } else {
-        this.billRatesControl.push(this.fromValueToBillRate(value));
       }
 
-      this.billRatesChanged.emit(this.billRateForm.value);
-      this.billRateForm.reset();
-      this.store.dispatch(new ShowSideDialog(false));
+      const applicantStatus = this.store.selectSnapshot(OrderManagementContentState.candidatesJob)?.applicantStatus.applicantStatus;
+
+      if (applicantStatus === CandidatStatus.OnBoard) {
+        const confirmText = this.editBillRateIndex ? EDIT_CONFIRM_TEXT : ADD_CONFIRM_TEXT;
+
+        this.confirmService
+          .confirm(confirmText, {
+            title: 'Warning',
+            okButtonLabel: 'Yes',
+            okButtonClass: 'ok-button',
+          })
+          .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
+          .subscribe(() => {
+            this.billRatesControl.push(this.fromValueToBillRate(value));
+            this.billRatesChanged.emit(this.billRateForm.value);
+            this.billRateForm.reset();
+            this.store.dispatch(new ShowSideDialog(false));
+          });
+      } else {
+        this.billRatesControl.push(this.fromValueToBillRate(value));
+        this.billRatesChanged.emit(this.billRateForm.value);
+        this.billRateForm.reset();
+        this.store.dispatch(new ShowSideDialog(false));
+      }
     }
   }
 

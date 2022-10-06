@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
@@ -24,6 +24,7 @@ import { LogiReportComponent } from '@shared/components/logi-report/logi-report.
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { analyticsConstants } from '../constants/analytics.constant';
+import { AppSettings, APP_SETTINGS } from '../../../../app.settings';
 
 @Component({
   selector: 'app-overall-status',
@@ -37,12 +38,15 @@ export class OverallStatusComponent implements OnInit {
     "EndDateParamOASR": "",
     "RegionParamOASR": "",
     "LocationParamOASR": "",
-    "DepartmentParamOASR": ""
+    "DepartmentParamOASR": "",
+    "BearerParamOASR": "",
+    "BusinessUnitIdParamOASR": "",
+    "HostName": ""
   };
-  public reportName: LogiReportFileDetails = { name: "/OverAllStatusReport/OverAllStatusReport.wls" };
-  public catelogName: LogiReportFileDetails = { name: "/OverAllStatusReport/Dashbord.cat" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/OverAllStatus/OverAllStatus.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/OverAllStatus/OverAllStatus.cat" };
   public title: string = "Overall Status Report";
-  public reportType: LogiReportTypes = LogiReportTypes.WebReport;
+  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
@@ -86,12 +90,14 @@ export class OverallStatusComponent implements OnInit {
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
   public isInitialLoad: boolean = false;
+  public baseUrl: string = '';
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
     private formBuilder: FormBuilder,
-    private filterService: FilterService) {
-    this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+    private filterService: FilterService, @Inject(APP_SETTINGS) private appSettings: AppSettings) {
+    this.baseUrl = this.appSettings.host.replace("https://", "").replace("http://", "");
+    this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
     this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
@@ -176,15 +182,27 @@ export class OverallStatusComponent implements OnInit {
   }
 
   public SearchReport(): void {
+    let auth = "Bearer ";
+    for (let x = 0; x < window.localStorage.length; x++) {
+      if (window.localStorage.key(x)!.indexOf('accesstoken') > 0) {
+        auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
+      }
+    }
     let { startDate, endDate } = this.overallStatusReportForm.getRawValue();
     this.paramsData =
     {
-      "OrganizationParamOASR": this.selectedOrganizations?.map((list) => list.name),
+      "OrganizationParamOASR": this.selectedOrganizations?.map((list) => list.id),
       "StartDateParamOASR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamOASR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamOASR": this.selectedRegions?.map((list) => list.name),
-      "LocationParamOASR": this.selectedLocations?.map((list) => list.name),
-      "DepartmentParamOASR": this.selectedDepartments?.map((list) => list.departmentName.trim())
+      "RegionParamOASR": this.selectedRegions?.map((list) => list.id),
+      "LocationParamOASR": this.selectedLocations?.map((list) => list.id),
+      "DepartmentParamOASR": this.selectedDepartments?.map((list) => list.departmentId),
+      "BearerParamOASR": auth,
+      "BusinessUnitIdParamOASR": window.localStorage.getItem("lastSelectedOrganizationId") == null 
+                                ?this.organizations!=null &&this.organizations[0]?.id!=null?
+                                this.organizations[0].id.toString():"1": 
+                                window.localStorage.getItem("lastSelectedOrganizationId"),
+      "HostName": this.baseUrl
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
