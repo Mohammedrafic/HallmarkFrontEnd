@@ -105,7 +105,7 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
     this.roleFormGroup.enable();
     this.roleFormGroup.patchValue({
       businessUnitType: this.businessUnitControl.value,
-      businessUnitId: this.businessControl.value,
+      businessUnitId: this.roleForm.defaultBusinessValue,
       isActive: true,
     });
     this.disableBussinesUnitForRole();
@@ -139,10 +139,12 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
         businessUnitId: value.businessUnitId || null,
         permissions: value.permissions.map((stringValue: string) => Number(stringValue)),
       };
-      this.store.dispatch(new SaveRole(roleDTO));
-      if (this.childC.gridApi) {
-        this.childC.dispatchNewPage();
-      }
+      this.store.dispatch(new SaveRole(roleDTO)).subscribe((data) => {
+        if (this.childC.gridApi) {
+          this.childC.dispatchNewPage();
+        }
+      });
+     
     }
   }
 
