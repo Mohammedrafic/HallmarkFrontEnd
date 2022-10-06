@@ -54,7 +54,6 @@ enum JobDescription {
   onCallRequired,
   asapStart,
   criticalOrder,
-  nO_OT,
   jobDescription,
   unitDescription,
   orderRequisitionReasonId,

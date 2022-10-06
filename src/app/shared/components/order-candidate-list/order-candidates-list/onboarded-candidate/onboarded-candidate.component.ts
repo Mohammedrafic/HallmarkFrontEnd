@@ -360,7 +360,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       if (value) {
         this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
-        this.getOrderPermissions(value.orderId);
+        if (!this.isAgency) {
+          this.getOrderPermissions(value.orderId);
+        }
         this.billRatesData = [...value?.billRates];
         this.form.patchValue({
           jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
