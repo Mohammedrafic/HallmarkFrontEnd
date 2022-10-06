@@ -657,7 +657,7 @@ export class OrderManagementContentState {
 
         return order;
       }),
-      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
   }
 
