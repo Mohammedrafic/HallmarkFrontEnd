@@ -65,6 +65,9 @@ enum FieldName {
   'skillId' = 'Skill',
   'hourlyRate' = 'Hourly rate',
   'openPositions' = '# Open Positions',
+  'orderPlacementFee' = 'Order Placement Fee (%)',
+  'annualSalaryRangeFrom' = 'Annual Salary Range From',
+  'annualSalaryRangeTo' = 'Annual Salary Range To',
   'jobStartDate' = 'Job Start Date',
   'jobEndDate' = 'Job End Date',
   'shift' = 'Shift Name',
@@ -308,7 +311,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
-  private collectInvalidFieldsFromForm(controls: any, fields: string[]) {
+  private collectInvalidFieldsFromForm(controls: { [key: string]: AbstractControl }, fields: string[]) {
     for (const name in controls) {
       if (controls[name].invalid) {
         fields.push(` \u2022 ${FieldName[name as keyof typeof FieldName]}`);
@@ -745,7 +748,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private saveAsTemplate(): void {
     const { regionId, locationId, departmentId, skillId } =
       this.orderDetailsFormComponent.generalInformationForm.getRawValue();
-    const requiredFields = [regionId, departmentId, locationId, skillId];
+    const requiredFields = [regionId, locationId, departmentId, skillId];
     const isRequiredFieldsFilled = !some(isNil, requiredFields);
 
     if (isRequiredFieldsFilled) {

@@ -1,6 +1,7 @@
 import { BusinessUnitType } from "../shared/enums/business-unit-type";
 import { LasSelectedOrganizationAgency } from "@shared/models/user-agency-organization.model";
 import { User } from "../shared/models/user.model";
+import { AgencyStatus } from '@shared/enums/status';
 
 export class SetCurrentUser {
   static readonly type = '[user] Set Current User';
@@ -60,4 +61,10 @@ export class GetUsersAssignedToRole {
 export class GetCurrentUserPermissions {
   static readonly type = '[user] Get Current User Permissions';
   constructor() { }
+}
+
+export class SetAgencyActionsAllowed {
+  static readonly type = '[user] Set agency actions allowed';
+
+  constructor(public readonly allowed: boolean) {}
 }

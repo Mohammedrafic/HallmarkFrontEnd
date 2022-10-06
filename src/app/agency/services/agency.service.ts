@@ -2,7 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Agency, AgencyFilteringOptions, AgencyListFilters, AgencyPage } from 'src/app/shared/models/agency.model';
+import {
+  Agency,
+  AgencyFilteringOptions,
+  AgencyListFilters,
+  AgencyPage,
+  AgencyRegionSkills,
+} from 'src/app/shared/models/agency.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({
@@ -74,5 +80,13 @@ export class AgencyService {
 
   public getAgencyFilteringOptions(): Observable<AgencyFilteringOptions> {
     return this.http.get<AgencyFilteringOptions>(`/api/Agency/filteringOptions`);
+  }
+
+  /**
+   * Get the list of regions and skills
+   * @return Object of regions and skills
+   */
+  public getAgencyRegionSkills(): Observable<AgencyRegionSkills> {
+    return this.http.get<AgencyRegionSkills>('/api/AssociateOrganizations/agencyJobDistributionInitialData');
   }
 }

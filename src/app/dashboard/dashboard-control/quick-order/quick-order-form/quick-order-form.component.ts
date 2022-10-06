@@ -823,8 +823,14 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   setShiftsValidation(): void {
-    this.shiftStartTimeField.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
-    this.shiftEndTimeField.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
+    this.shiftStartTimeField.addValidators([
+      Validators.required,
+      startTimeValidator(this.generalInformationForm, 'shiftEndTime')
+    ]);
+    this.shiftEndTimeField.addValidators([
+      Validators.required,
+      endTimeValidator(this.generalInformationForm, 'shiftStartTime')
+    ]);
   }
 
   clearShiftsValidation(): void {

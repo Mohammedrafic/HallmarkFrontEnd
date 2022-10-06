@@ -122,7 +122,7 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
     visible: false,
   },
   {
-    fieldName: 'type',
+    fieldName: 'orderType',
     visible: false,
   },
   {
@@ -141,6 +141,10 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
     fieldName: 'annualSalaryRangeTo',
     visible: false,
   },
+  {
+    fieldName: 'billRate',
+    visible: true,
+  },
 ];
 
 export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
@@ -149,7 +153,7 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
     visible: true,
   },
   {
-    fieldName: 'type',
+    fieldName: 'orderType',
     visible: true,
   },
   {
@@ -188,6 +192,10 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
     fieldName: 'annualSalaryRangeTo',
     visible: false,
   },
+  {
+    fieldName: 'billRate',
+    visible: true,
+  },
 ];
 
 export const PerDiemColumnsConfig = [
@@ -196,7 +204,7 @@ export const PerDiemColumnsConfig = [
     visible: true,
   },
   {
-    fieldName: 'type',
+    fieldName: 'orderType',
     visible: false,
   },
   {
@@ -243,7 +251,7 @@ export const PermPlacementColumnsConfig = [
     visible: true,
   },
   {
-    fieldName: 'type',
+    fieldName: 'orderType',
     visible: false,
   },
   {

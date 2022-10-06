@@ -34,6 +34,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
   @Input() isLocked: boolean | undefined = false;
+  @Input() actionsAllowed: boolean;
 
   public formGroup: FormGroup;
   public readOnlyMode: boolean;

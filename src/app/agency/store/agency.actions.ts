@@ -71,3 +71,8 @@ export class SetPaymentDetailsForm {
   static readonly type = '[agency] Set Payment Details Form';
   constructor(public form: FormGroup) {}
 }
+
+export class GetAgencyRegionsSkills {
+  static readonly type = '[agency] Get Skills/Regions for Agency';
+  constructor() {}
+}

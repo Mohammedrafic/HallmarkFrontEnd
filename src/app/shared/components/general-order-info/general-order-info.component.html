@@ -1,114 +1,40 @@
 <section class="candidates-info" *ngIf="orderInformation">
-  <div class="container-row" [class.extension]="orderInformation.extensionFromId">
-    <div class="column">
-      <div class="icon">
-        <i-feather name="user" class="icon"></i-feather>
+  <div class="container-row" [class.extension]="orderInformation.extensionFromId"
+       [ngSwitch]="orderInformation.orderType">
+    <ng-container *ngSwitchCase="orderType.Traveler">
+      <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
+      <div class="column last-column">
+        <ng-container [ngTemplateOutlet]="billRate"></ng-container>
       </div>
-      <div>
-        <div class="title">{{ orderInformation.title }}</div>
-        <div class="sup-title">Job title</div>
-      </div>
-    </div>
-    <div class="column">
-      <div class="icon">
-        <i-feather name="folder" class="icon"></i-feather>
-      </div>
-      <div>
-        <div class="title">{{ orderInformation.departmentName }}</div>
-        <div class="sup-title">Department</div>
-      </div>
-    </div>
-    <div class="column">
-      <div class="icon">
-        <i-feather name="map-pin" class="icon"></i-feather>
-      </div>
-      <div>
-        <div class="title">{{ orderInformation.locationName }}</div>
-        <div class="sup-title">Location</div>
-      </div>
-    </div>
-    <div class="column" *ngIf="orderInformation.extensionFromId">
-      <div class="icon">
-        <i-feather name="briefcase" class="icon"></i-feather>
-      </div>
-      <div>
-        <div class="title">{{ orderInformation?.skillName }}</div>
-        <div class="sup-title">Skill</div>
-      </div>
-    </div>
-    <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column last-column">
-      <div class="cost">${{ orderInformation.hourlyRate }}</div>
-      <div class="sup-title">Bill Rate</div>
-    </div>
-    <div class="column" *ngIf="orderInformation.extensionFromId">
-      <div class="icon">
-        <i-feather name="briefcase" class="icon"></i-feather>
-      </div>
-      <div>
-        <div class="title">{{ orderInformation.orderRequisitionReasonName }}</div>
-        <div class="sup-title">Reason for Requisition</div>
-      </div>
-    </div>
-    <div class="column">
-      <div class="icon">
-        <i-feather name="calendar" class="icon"></i-feather>
-      </div>
-      <div>
-        <div class="title">{{ orderInformation.jobStartDate | date: 'MM/dd/yyy':'UTC' }}</div>
-        <div class="sup-title">{{ dateFieldName }}</div>
-      </div>
-    </div>
-    <div *ngIf="!hideEndDate" class="column">
-      <div class="icon">
-        <i-feather name="calendar" class="icon"></i-feather>
-      </div>
-      <div>
-        <div class="title">{{ orderInformation.jobEndDate | date: 'MM/dd/yyy':'UTC' }}</div>
-        <div class="sup-title">End Date</div>
-      </div>
-    </div>
-    <div class="column"></div>
-    <div class="column last-column">
-      <div *ngIf="orderInformation?.extensionInitialOrderId" class="accent link" (click)="moveToInitialOrder()">
-        Initial Order ID: {{ orderInformation.organizationPrefix }}-{{
-          orderInformation?.extensionInitialOrderPublicId
-        }}
-      </div>
-      <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
-        Previous Extension: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionPublicId }}
-      </div>
-    </div>
-    <div *ngIf="orderInformation.orderType === orderType.PermPlacement" class="column">
-      <div class="icon">
-        <i-feather name="percent" class="icon"></i-feather>
-      </div>
-      <div>
-        <div class="title">{{ orderInformation?.orderPlacementFee }}%</div>
-        <div class="sup-title">Order Placement Fee</div>
-      </div>
-    </div>
-    <div *ngIf="orderInformation.orderType === orderType.PermPlacement" class="column">
-      <div class="icon">
-        <i-feather name="dollar-sign" class="icon"></i-feather>
-      </div>
-      <div>
-        <div class="title">
-          {{ orderInformation?.annualSalaryRangeFrom | currency }} -
-          {{ orderInformation?.annualSalaryRangeTo | currency }}
-        </div>
-        <div class="sup-title">Annual Salary Range</div>
-      </div>
-    </div>
+      <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="orderType.PermPlacement">
+      <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="locationTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="reasonForRequisitionTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="skillTemplate"></ng-container>
+      <ng-container [ngTemplateOutlet]="orderPlacementFee"></ng-container>
+      <ng-container [ngTemplateOutlet]="annualSalaryRange"></ng-container>
+      <ng-container [ngTemplateOutlet]="orderInfo"></ng-container>
+    </ng-container>
   </div>
 </section>
 <section class="candidates-additional-info" *ngIf="orderInformation">
-  <div class="container-row">
+  <div class="container-row justify-content-space-between">
     <div class="column">
       <div class="title">{{ orderType[orderInformation.orderType] }}</div>
       <div class="sup-title">Job Type</div>
     </div>
     <div class="column" *ngIf="!orderInformation.extensionFromId">
-      <div class="title">{{ orderInformation.acceptedPositions }} / {{ orderInformation.openPositions }}</div>
+      <div class="title accent">{{ orderInformation.acceptedPositions }} / {{ orderInformation.openPositions }}</div>
       <div class="sup-title">Open Positions</div>
     </div>
     <div class="column">
@@ -131,12 +57,146 @@
       <div class="sup-title">Oncall</div>
     </div>
     <div class="column">
-      <div class="title">{{ activeValue(orderInformation.nO_OT) }}</div>
-      <div class="sup-title">Do Not Consider OT</div>
+      <div class="title">{{ orderInformation.asapStart ? 'Yes' : 'No' }}</div>
+      <div class="sup-title">ASAP Start</div>
     </div>
     <div class="column">
-      <div class="title">{{ orderInformation.orderOpenDate | date: 'MM/dd/yyy' }}</div>
+      <div class="title">{{ orderInformation.criticalOrder ? 'Yes' : 'No'}}</div>
+      <div class="sup-title">Critical Order</div>
+    </div>
+    <div class="column">
+      <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-' }}</div>
       <div class="sup-title">Distributed On</div>
     </div>
   </div>
 </section>
+
+<ng-template #jobInfoTemplate>
+  <div class="column">
+    <div class="icon">
+      <i-feather name="user" class="icon"></i-feather>
+    </div>
+    <div>
+      <div class="title">{{ orderInformation.title }}</div>
+      <div class="sup-title">Job title</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #locationTemplate>
+  <div class="column">
+    <div class="icon">
+      <i-feather name="map-pin" class="icon"></i-feather>
+    </div>
+    <div>
+      <div class="title">{{ orderInformation.locationName }}</div>
+      <div class="sup-title">Location</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #departmentTemplate>
+  <div class="column">
+    <div class="icon">
+      <i-feather name="folder" class="icon"></i-feather>
+    </div>
+    <div>
+      <div class="title">{{ orderInformation.departmentName }}</div>
+      <div class="sup-title">Department</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #dateTemplate>
+  <div class="column">
+    <div class="icon">
+      <i-feather name="calendar" class="icon"></i-feather>
+    </div>
+    <div>
+      <div class="title">
+        {{ orderInformation.jobStartDate | date: 'MM/dd/yyy' }}
+        <ng-container *ngIf="!hideEndDate">
+          -&nbsp;{{ orderInformation.jobEndDate | date: 'MM/dd/yyy' }}
+        </ng-container>
+      </div>
+      <div class="sup-title">
+        <ng-container *ngIf="orderInformation.orderType === orderType.ReOrder; else defaultSupTitleTemplate">
+          Date
+        </ng-container>
+
+        <ng-template #defaultSupTitleTemplate>
+          Start<ng-container *ngIf="!hideEndDate">/End</ng-container> Date
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #reasonForRequisitionTemplate>
+  <div class="column">
+    <div class="icon">
+      <i-feather name="briefcase" class="icon"></i-feather>
+    </div>
+    <div>
+      <div class="title">{{ orderInformation.orderRequisitionReasonName || '-'}}</div>
+      <div class="sup-title">Reason for Requisition</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #skillTemplate>
+  <div class="column">
+    <div class="icon">
+      <i-feather name="briefcase" class="icon"></i-feather>
+    </div>
+    <div>
+      <div class="title">{{ orderInformation?.skillName }}</div>
+      <div class="sup-title">Skill</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #orderPlacementFee>
+  <div class="column">
+    <div class="icon">
+      <i-feather name="percent" class="icon"></i-feather>
+    </div>
+    <div>
+      <div class="title">{{ orderInformation?.orderPlacementFee ? orderInformation?.orderPlacementFee + '%' : '-'}}</div>
+      <div class="sup-title">Order Placement Fee</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #annualSalaryRange>
+  <div class="column">
+    <div class="icon">
+      <i-feather name="dollar-sign" class="icon"></i-feather>
+    </div>
+    <div>
+      <div class="title">
+        {{ orderInformation?.annualSalaryRangeFrom | currency }} -
+        {{ orderInformation?.annualSalaryRangeTo | currency }}
+      </div>
+      <div class="sup-title">Annual Salary Range</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #billRate>
+  <div class="cost">${{ orderInformation.hourlyRate | number : '1.2-2'}}</div>
+  <div class="sup-title">Bill Rate</div>
+</ng-template>
+
+<ng-template #orderInfo>
+  <div class="column last-column" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension">
+    <div *ngIf="orderInformation?.extensionInitialOrderId" class="accent link" (click)="moveToInitialOrder()">
+      Initial Order ID: {{ orderInformation.organizationPrefix }}-{{
+      orderInformation?.extensionInitialOrderPublicId
+      }}
+    </div>
+    <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
+      Previous Extension: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionPublicId }}
+    </div>
+  </div>
+</ng-template>
