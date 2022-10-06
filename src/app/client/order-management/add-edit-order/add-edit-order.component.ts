@@ -311,7 +311,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
-  private collectInvalidFieldsFromForm(controls: any, fields: string[]) {
+  private collectInvalidFieldsFromForm(controls: { [key: string]: AbstractControl }, fields: string[]) {
     for (const name in controls) {
       if (controls[name].invalid) {
         fields.push(` \u2022 ${FieldName[name as keyof typeof FieldName]}`);

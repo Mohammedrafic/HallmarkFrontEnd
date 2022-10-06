@@ -1031,7 +1031,7 @@ export class OrganizationManagementState {
         return payloadResponse;
       }),
       catchError((error: any) => {
-        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }

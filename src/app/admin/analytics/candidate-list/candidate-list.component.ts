@@ -198,7 +198,10 @@ export class CandidateListComponent implements OnInit {
       "LocationParamCRR": this.selectedLocations?.map((list) => list.id),
       "DepartmentParamCRR": this.selectedDepartments?.map((list) => list.departmentId),
       "BearerParamCRR":auth,
-      "BusinessUnitIdParamCRR":window.localStorage.getItem("lastSelectedOrganizationId")==null?"1":window.localStorage.getItem("lastSelectedOrganizationId"),
+      "BusinessUnitIdParamCRR":window.localStorage.getItem("lastSelectedOrganizationId") == null 
+      ?this.organizations!=null &&this.organizations[0]?.id!=null?
+      this.organizations[0].id.toString():"1": 
+      window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName":this.baseUrl
     };
       this.logiReportComponent.paramsData = this.paramsData;

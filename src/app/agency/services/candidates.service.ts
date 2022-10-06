@@ -122,17 +122,21 @@ export class CandidateService {
    * Get candidates credential by page number
    * @param pageNumber
    * @param pageSize
+   * @param orderId
    * @param id
    * @return list of candidates credential
    */
   public getCredentialByCandidateId(
     pageNumber: number,
     pageSize: number,
+    orderId: number | null ,
     id: number
   ): Observable<CandidateCredentialPage> {
-    return this.http.get<CandidateCredentialPage>(`/api/CandidateCredentials/candidateProfileId/${id}`, {
-      params: { PageNumber: pageNumber, PageSize: pageSize },
-    });
+    const params: { pageNumber: number; pageSize: number; orderId?: number; } = { pageNumber, pageSize };
+    if (orderId) {
+      params.orderId = orderId;
+    }
+    return this.http.get<CandidateCredentialPage>(`/api/CandidateCredentials/candidateProfileId/${id}`, { params });
   }
 
   /**

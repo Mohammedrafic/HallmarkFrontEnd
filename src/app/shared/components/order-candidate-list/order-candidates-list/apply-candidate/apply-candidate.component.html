@@ -17,7 +17,7 @@
           *ngIf="!readOnlyMode"
           ejs-button
           [isPrimary]="true"
-          [disabled]="isLocked"
+          [disabled]="isLocked || !actionsAllowed"
           class="apply-button"
           (click)="applyOrderApplicants()">
           Apply

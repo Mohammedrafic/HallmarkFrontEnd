@@ -67,10 +67,11 @@ import {
   TabComponent,
 } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { catchError, EMPTY, Observable, Subject, take, takeUntil, takeWhile } from 'rxjs';
+import { catchError, EMPTY, Observable, Subject, take, takeUntil, takeWhile, distinctUntilChanged } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { ShowCloseOrderDialog, ShowToast } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
+import { UserState } from 'src/app/store/user.state';
 
 enum Template {
   accept,
@@ -147,6 +148,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public optionFields = OPTION_FIELDS;
   public openCandidateCancellationDialog = new Subject<void>();
   public jobStatusControl: FormControl;
+  public agencyActionsAllowed = true;
 
   public  readonly nextApplicantStatuses = [
     { applicantStatus: CandidatStatus.Cancelled, statusText: CandidatStatus[CandidatStatus.Cancelled], isEnabled: true }
@@ -202,7 +204,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     private commentsService: CommentsService,
     private confirmService: ConfirmService,
     private orderCandidateListViewService: OrderCandidateListViewService,
-    private reOpenOrderService: ReOpenOrderService
+    private reOpenOrderService: ReOpenOrderService,
   ) {}
 
   ngOnInit(): void {
@@ -222,6 +224,10 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.onOpenEvent();
     this.subscribeOnSelectedOrder();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
+
+    if (this.isAgency) {
+      this.checkForAgencyStatus();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -650,5 +656,17 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
       .subscribe(() => {
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
       });
+  }
+
+  private checkForAgencyStatus(): void {
+    this.store.select(UserState.agencyActionsAllowed)
+    .pipe(
+      distinctUntilChanged(),
+      takeWhile(() => this.isAlive),
+    )
+    .subscribe((value) => {
+      console.log(value, '1')
+      this.agencyActionsAllowed = value;
+    });
   }
 }

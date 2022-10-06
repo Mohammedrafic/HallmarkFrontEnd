@@ -80,6 +80,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
   @Input() orderDuration: Duration;
+  @Input() actionsAllowed: boolean;
 
   public override form: FormGroup;
   public jobStatusControl: FormControl;

@@ -1,9 +1,8 @@
 import { CredentialStatus } from "@shared/enums/status";
 
-export const allCredentialStatuses: CredentialStatus[] = [
+export const orgSideCredentialStatuses: CredentialStatus[] = [
   CredentialStatus.Pending,
   CredentialStatus.Verified,
-  CredentialStatus.Completed,
   CredentialStatus.Rejected,
   CredentialStatus.Reviewed
 ];

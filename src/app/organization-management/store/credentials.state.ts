@@ -13,7 +13,7 @@ import {
   SetCredentialSetupFilter,
   SetNavigationTab,
   UpdateCredentialSetupSucceeded,
-  SaveUpdateCredentialSetupMappingData, SaveUpdateCredentialSetupMappingSucceeded, GetCredentialsDataSources, ClearCredentialSetup
+  SaveUpdateCredentialSetupMappingData, SaveUpdateCredentialSetupMappingSucceeded, GetCredentialsDataSources, ClearCredentialSetup, GetAssignedCredentialTree, SaveAssignedCredentialValue
 } from './credentials.actions';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
@@ -30,7 +30,8 @@ import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { CredentialsService } from '@shared/services/credentials.service';
 import { CredentialSetupFilterGet, CredentialSetupGet, SaveUpdatedCredentialSetupDetailIds } from '@shared/models/credential-setup.model';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { CredentialFilterDataSources } from '@shared/models/credential.model';
+import { AssignedCredentialTree, AssignedCredentialTreeData, CredentialFilterDataSources } from '@shared/models/credential.model';
+import { compact } from 'lodash';
 
 export interface CredentialsStateModel {
   activeTab: number;
@@ -39,6 +40,7 @@ export interface CredentialsStateModel {
   filteredCredentialSetupData: CredentialSetupFilterGet[],
   credentialSetupList: CredentialSetupGet[],
   credentialDataSources: CredentialFilterDataSources | null,
+  assignedCredentialTreeData: AssignedCredentialTreeData | null,
 }
 
 @State<CredentialsStateModel>({
@@ -50,6 +52,7 @@ export interface CredentialsStateModel {
     filteredCredentialSetupData: [],
     credentialSetupList: [],
     credentialDataSources: null,
+    assignedCredentialTreeData: null,
   }
 })
 @Injectable()
@@ -71,6 +74,12 @@ export class CredentialsState {
 
   @Selector()
   static credentialDataSources(state: CredentialsStateModel): CredentialFilterDataSources | null { return state.credentialDataSources; }
+  
+  @Selector()
+  static assignedCredentialTree(state: CredentialsStateModel): AssignedCredentialTree { return state.assignedCredentialTreeData?.treeItems || []; }
+  
+  @Selector()
+  static assignedCredentialTreeValue(state: CredentialsStateModel): string[] { return state.assignedCredentialTreeData?.assignedCredentialIds || []; }
 
   constructor(private skillGroupService: SkillGroupService,
               private credentialService: CredentialsService) {}
@@ -191,5 +200,29 @@ export class CredentialsState {
       patchState({ credentialDataSources: response });
       return response;
     }));
+  }
+
+  @Action(GetAssignedCredentialTree)
+  GetAssignedCredentialTree({ patchState }: StateContext<CredentialsStateModel>): Observable<AssignedCredentialTreeData> {
+    return this.credentialService.getAssignedCredentialTreeData().pipe(tap((response) => {
+      const assignedCredentialIds = response.assignedCredentialIds.map(cid => response.treeItems.find(treeItem => !treeItem.hasChild && treeItem.cid === Number(cid))?.id);
+      const assignedCredentialTreeData = {
+        treeItems: response.treeItems,
+        assignedCredentialIds: compact(assignedCredentialIds)
+      }
+      patchState({ assignedCredentialTreeData });
+      return response;
+    }));
+  }
+
+  @Action(SaveAssignedCredentialValue)
+  SaveAssignedCredentialValue({ dispatch, getState }: StateContext<CredentialsStateModel>, { payload }: SaveAssignedCredentialValue): Observable<number[] | void> {
+    const state = getState();
+    const newValue = (state.assignedCredentialTreeData?.treeItems || []).filter(item => !item.hasChild && payload.includes(item.id)).map(item => item.cid);
+    return this.credentialService.saveAssignedCredentialValue(newValue).pipe(tap((response) => {
+      dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED))
+      return response;
+    }),
+    catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_SAVED))));
   }
 }

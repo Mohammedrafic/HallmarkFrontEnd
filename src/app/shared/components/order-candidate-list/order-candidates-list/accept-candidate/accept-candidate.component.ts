@@ -55,6 +55,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() candidate: OrderCandidatesList;
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
+  @Input() actionsAllowed: boolean;
 
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;

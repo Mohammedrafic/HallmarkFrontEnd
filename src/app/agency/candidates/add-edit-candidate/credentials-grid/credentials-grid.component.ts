@@ -36,7 +36,7 @@ import { SetHeaderState, ShowSideDialog } from "src/app/store/app.actions";
 import { UserState } from "src/app/store/user.state";
 import {
   agencySideCredentialStatuses,
-  allCredentialStatuses,
+  orgSideCredentialStatuses,
   orgSideCompletedCredentialStatuses,
   orgSidePendingCredentialStatuses,
   orgSideReviewedCredentialStatuses
@@ -50,6 +50,8 @@ import {
 })
 export class CredentialsGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() readonlyMode = false;
+  @Input() isNavigatedFromOrganizationArea: boolean;
+  @Input() orderId: number | null;
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
@@ -130,11 +132,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
+    this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
     this.store.dispatch(new GetCredentialTypes());
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
     });
     this.actions$.pipe(ofActionSuccessful(SaveCandidatesCredentialSucceeded)).subscribe((credential: { payload: CandidateCredential }) => {
       this.credentialId = credential.payload.id as number;
@@ -142,7 +144,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.uploadFiles(this.credentialId);
 
       if (!this.removeFiles) {
-        this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
+        this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
         this.addCredentialForm.markAsPristine();
         this.closeDialog();
       }
@@ -151,12 +153,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.disabledCopy = false;
     });
     this.actions$.pipe(ofActionSuccessful(UploadCredentialFilesSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
       this.addCredentialForm.markAsPristine();
       this.closeDialog();
     });
     this.actions$.pipe(ofActionSuccessful(RemoveCandidatesCredentialSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
     });
     this.actions$.pipe(ofActionSuccessful(GetCredentialFilesSucceeded)).subscribe((files: { payload: Blob }) => {
       if (this.file) {
@@ -183,7 +185,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   public addNew(): void {
-    this.setCredentialStatusOptions(this.isOrganization ? allCredentialStatuses : agencySideCredentialStatuses);
+    this.setCredentialStatusOptions(
+      this.isOrganization || this.isNavigatedFromOrganizationArea
+        ? orgSideCredentialStatuses
+        : agencySideCredentialStatuses
+    );
     this.store.dispatch(new GetMasterCredentials('', ''));
     this.store.dispatch(new ShowSideDialog(true)).subscribe(() => {
       this.setDropElement();
@@ -359,7 +365,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.store.dispatch(new SaveCandidatesCredential({
         status, number, insitute, experience, createdOn, createdUntil, completedDate,
         masterCredentialId: this.masterCredentialId,
-        id: this.credentialId as number
+        id: this.credentialId as number,
+        orderId: this.orderId,
       }));
     }
   }
@@ -423,7 +430,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   private updateCredentialStatusOptions(status: CredentialStatus): void {
-    if (this.isOrganization) {
+    if (this.isOrganization || this.isNavigatedFromOrganizationArea) {
       switch (status) {
         case CredentialStatus.Completed:
           this.setCredentialStatusOptions(orgSideCompletedCredentialStatuses);
@@ -435,7 +442,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           this.setCredentialStatusOptions(orgSideReviewedCredentialStatuses);
           break;
         default:
-          this.setCredentialStatusOptions(allCredentialStatuses);
+          this.setCredentialStatusOptions(orgSideCredentialStatuses);
       }
     } else {
       this.setCredentialStatusOptions(

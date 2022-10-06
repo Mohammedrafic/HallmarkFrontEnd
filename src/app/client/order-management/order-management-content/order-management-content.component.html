@@ -59,7 +59,7 @@
         width="50"
         [allowResizing]="false"
       ></e-column>
-      <e-column headerTextAlign="Right" width="140" minWidth="125" maxWidth="200">
+      <e-column headerTextAlign="Right" width="170" minWidth="160" maxWidth="200">
         <ng-template #headerTemplate let-data>
           <div class="controls-header" [class.hidden]="!isLoaded">
             <button
@@ -209,7 +209,7 @@
           </ng-template>
         </ng-template>
       </e-column>
-      <e-column field="statusText" headerText="STATUS" width="160" minWidth="120" maxWidth="200">
+      <e-column field="statusText" headerText="STATUS" width="215" minWidth="120" maxWidth="260">
         <ng-template #template let-data>
           <div class="status-cell" [class.ex-chip]="data?.extensionFromId">
             <ejs-chiplist>
@@ -294,8 +294,8 @@
       </e-column>
       <e-column
         field="startDate"
-        [width]="activeTab === OrganizationOrderManagementTabs.ReOrders ? 160 : 135"
-        [minWidth]="activeTab === OrganizationOrderManagementTabs.ReOrders ? 140 : 115"
+        width="155"
+        minWidth="135"
         maxWidth="200"
       >
         <ng-template #headerTemplate let-data>

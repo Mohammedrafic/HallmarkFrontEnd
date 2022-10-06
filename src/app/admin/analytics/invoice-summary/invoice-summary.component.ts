@@ -92,7 +92,7 @@ export class InvoiceSummaryComponent implements OnInit {
   constructor(private store: Store,
     private formBuilder: FormBuilder,
     private filterService: FilterService) {
-    this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+      this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
     this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {

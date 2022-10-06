@@ -1,11 +1,24 @@
 @import "../../styles/variables/colors";
 
 .flex-column {
-    height:auto;
+  height: auto;
+
   .toolbar {
     justify-content: space-between;
     margin-top: 20px;
     padding-bottom: 10px;
+
+    .toolbar-header {
+      float: left;
+      position: relative;
+      display: flex;
+
+      .toolbar-header-div {
+        font-size: 14px;
+        height: 40px;
+        font-weight: bold;
+      }
+    }
 
     .toolbar-buttons {
       float: right;
@@ -64,4 +77,3 @@
   .form-line-item-60 {
     width: 60%;
   }
-  
