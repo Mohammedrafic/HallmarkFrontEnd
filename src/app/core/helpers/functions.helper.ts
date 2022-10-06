@@ -9,6 +9,18 @@ export const findSelectedItems = <T>(source: number[], arr: T[]): T[] => {
   []);
 }
 
+export const createUniqHashObj = <T, U>(
+  array: T[],
+  keyFn: (arg: T) => string | number,
+  valueFn: ((arg: T) => U)
+): { [key: string]: U } => {
+  return array.reduce((acc: { [key: string]: U }, item: T) => {
+    acc[keyFn(item)] = valueFn(item);
+
+    return acc;
+  }, {});
+};
+
 /**
  * TODO: change to correct type
  */

@@ -5,26 +5,26 @@
     </div>
     <div class="actions">
       <span class="action-link" (click)="onFilter()"><i-feather name="sliders" class="icon"></i-feather> Filters</span>
-      <span *ngIf="!readonlyMode" class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Experience</span>
+      <button ejs-button [disabled]="!areAgencyActionsAllowed" class="action-link" *ngIf="!readonlyMode" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Experience</button>
     </div>
   </div>
   <ejs-grid #grid class="e-gridwithheader"
             [dataSource]="experiences$ | async"
             [rowHeight]="rowHeight"
-            [resizeSettings]="resizeSettings"
             [allowSorting]="allowSorting"
-            [allowResizing]="allowResizing"
             [allowSelection]="false"
             [pageSettings]="pageSettings"
             [height]="gridHeight"
             [enableVirtualization]="true"
+            [resizeSettings]="resizeSettings"
+            [allowResizing]="allowResizing"
             (dataBound)="dataBound()">
     <e-columns>
-      <e-column textAlign="Right" *ngIf="!readonlyMode" width="100">
+      <e-column textAlign="Right" *ngIf="!readonlyMode" maxWidth="50">
         <ng-template #template let-data>
-          <div class="e-grid-tool-buttons">
-            <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>
-            <span class="remove-button" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+          <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat primary-icon-button" [disabled]="!areAgencyActionsAllowed" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></button>
+            <button ejs-button cssClass="e-flat secondary-icon-button enabled-button" [disabled]="!areAgencyActionsAllowed" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></button>
           </div>
         </ng-template>
       </e-column>

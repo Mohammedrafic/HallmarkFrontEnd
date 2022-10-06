@@ -35,7 +35,7 @@ export class ProfileCumulativeHoursComponent {
 
     const chartItems: TimesheetStatisticsDetails[] = this.timesheetDetailsService.createChartItems(statistics);
     this.legendItems = chartItems;
-    
+
     this.weekHoursChartData = chartItems.map(CandidateBarChartHelper.toWeekHoursChartData);
     this.cumulativeHoursChartData = chartItems.map(CandidateBarChartHelper.toCumulativeHoursChartData);
 
@@ -49,10 +49,6 @@ export class ProfileCumulativeHoursComponent {
   constructor(
     private timesheetDetailsService: TimesheetDetailsService,
   ) {}
-
-  public trackByName(_: number, item: TimesheetStatisticsDetails): string {
-    return item.billRateConfigName;
-  }
 
   public onPointRender(event: ChartPointRenderEvent<HourOccupationType>): void {
     event.fill = ColorsWidgetMap[event.point.index];

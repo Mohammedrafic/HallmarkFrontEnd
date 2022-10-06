@@ -456,6 +456,9 @@ body.light, body.dark {
         &:not(:first-child) {
           margin-left: 12px;
         }
+        &[disabled] {
+          color: $bill-rates-grid-hover-shadow;
+        }
         @include linkWithIcon;
       }
     }

@@ -1,5 +1,11 @@
 @import "colors";
 
+.actions {
+  button {
+    background-color: transparent;
+  }
+}
+
 .input-container, .dropdown-container {
   margin-bottom: 15px;
 
