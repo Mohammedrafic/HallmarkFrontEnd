@@ -390,10 +390,10 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
     if (isAgencyArea) {
       this.store.dispatch(
-        new GetAgencyExtensions(this.candidateJob?.jobId, this.selectedOrder?.id!, this.candidateJob?.organizationId!)
+        new GetAgencyExtensions(this.candidateJob.jobId, this.candidateJob.orderId, this.candidateJob?.organizationId)
       );
     } else {
-      this.store.dispatch(new GetOrganizationExtensions(this.candidateJob?.jobId, this.order.id));
+      this.store.dispatch(new GetOrganizationExtensions(this.candidateJob.jobId, this.candidateJob.orderId));
     }
   }
 
@@ -665,7 +665,6 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
       takeWhile(() => this.isAlive),
     )
     .subscribe((value) => {
-      console.log(value, '1')
       this.agencyActionsAllowed = value;
     });
   }
