@@ -51,6 +51,7 @@ import { TimesheetDetailsService } from '../../services';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import { FileForUpload } from '@core/interface';
 import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
+import { AgencyStatus } from '@shared/enums/status';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -129,6 +130,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public isMileageStatusAvailable = true;
 
   public countOfTimesheetUpdates = 0;
+
+  public allowAnyAction = true;
 
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
@@ -448,7 +451,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       filter(Boolean),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId, candidateWorkPeriods, canEditTimesheet, allowDNWInTimesheets }) => {
+    .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId, candidateWorkPeriods, canEditTimesheet, allowDNWInTimesheets, agencyStatus }) => {
       this.organizationId = this.isAgency ? organizationId : null;
       this.jobId = jobId;
       this.weekPeriod = [
@@ -460,6 +463,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
         weekEndDate: new Date(DateTimeHelper.convertDateToUtc(el.weekEndDate)),
       }));
       this.setDNWBtnState(canEditTimesheet, !!allowDNWInTimesheets);
+      this.checkForAllowActions(agencyStatus);
       this.cd.markForCheck();
     });
   }
@@ -478,5 +482,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   private setDNWBtnState(canEditTimesheet: boolean, allowDNWInTimesheets = false): void {
     this.isDNWEnabled = (this.isAgency || canEditTimesheet) && allowDNWInTimesheets;
+  }
+
+  private checkForAllowActions(agencyStatus: AgencyStatus): void {
+    console.log(agencyStatus, 'agencyStatus');
+    const allowResult = agencyStatus === AgencyStatus.Inactive || agencyStatus === AgencyStatus.Terminated;
+    this.allowAnyAction = false;
   }
 }
