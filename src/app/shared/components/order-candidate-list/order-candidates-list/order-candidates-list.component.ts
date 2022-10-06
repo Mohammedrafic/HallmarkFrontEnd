@@ -2,7 +2,9 @@ import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-man
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
+import { GetAvailableSteps, GetOrganisationCandidateJob,
+  GetPredefinedBillRates, SetPredefinedBillRatesData
+} from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Select, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -11,7 +13,7 @@ import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { Order, OrderCandidatesList } from '@shared/models/order-management.model';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { combineLatest, Observable, Subject } from 'rxjs';
+import { combineLatest, Observable, Subject, switchMap } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Duration } from '../../../enums/durations';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
@@ -64,6 +66,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(([agOrder, orgOrder]) => {
         this.selectedOrder = agOrder ?? orgOrder;
+        this.initPredefinedBillRates();
       });
   }
 
@@ -141,5 +144,14 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   private openDialog(template: any): void {
     this.templateState.next(template);
     this.sideDialog.show();
+  }
+
+  private initPredefinedBillRates(): void {
+    const { orderType, departmentId, skillId } = this.selectedOrder;
+
+    this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId)).pipe(
+      takeUntil(this.unsubscribe$),
+      switchMap(() => this.store.dispatch(new GetPredefinedBillRates()))
+    ).subscribe();
   }
 }
