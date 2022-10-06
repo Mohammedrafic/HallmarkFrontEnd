@@ -5,8 +5,8 @@ export enum FileType {
 }
 export enum MoreMenuType {
   'Edit',
-  'Print',
   'Delete',
+  'Share',
 }
 
 export enum DocType {
@@ -33,6 +33,7 @@ export enum FormControlNames {
   StatusIds = 'statusIds',
   StartDate = 'startDate',
   EndDate = 'endDate',
+  Comments ='comments'
 }
 
 export enum FormDailogTitle {
@@ -41,33 +42,41 @@ export enum FormDailogTitle {
 }
 
 export enum documentsColumnField {
-  Id = 'docId',
-  DocumentName = 'name',
-  Organization = 'organization',
-  Status = "status",
-  Region = 'region',
-  Location = 'location',
-  Role='role',
-  Type = 'type',
-  Tags = 'tags',
+  Id = 'id',
+  Name = 'name',
+  FileName = 'fileName',
+  FolderId = 'folderId',
+  FolderName = 'folderName',
   StartDate = 'startDate',
   EndDate = 'endDate',
-  SharedWith = 'sharedWith',
-  Comments='comments'
+  DocType = 'docType',
+  DocTypeName = 'docTypeName',
+  UploadedBy = 'uploadedBy',
+  UploadedByName = 'uploadedByName',
+  Tags = 'tags',
+  Status = "status",
+  Comments ='comments',
+  OrganizationName = 'organization',
+  RegionName = 'region',
+  LocationName = 'location',
 }
 
 export enum documentsColumnHeaderText {
   Id = 'Document Id',
-  DocumentName = 'Document Name',
-  Organization = 'Organization',
-  Status = "Status",
-  Region = 'Region',
-  Location = 'Location',
-  Role = 'Role',
-  Type = 'Type',
-  Tags = 'Tags',
+  Name = 'Document Name',
+  FileName = 'File Name',
+  FolderId = "Folder Id",
+  FolderName = 'Folder Name',
   StartDate = 'Start Date',
   EndDate = 'End Date',
-  SharedWith = 'Shared With',
-  Comments = 'Comments'
+  DocType = 'DocType Id',
+  DocTypeName = 'DocType Name',
+  UploadedBy = 'Uploaded By',
+  UploadedByName = 'Uploaded By Name',
+  Tags = 'Tags',
+  Status = 'Status',
+  Comments = 'Comments',
+  OrganizationName = 'Organization Name',
+  RegionName = 'Region Name',
+  LocationName = 'Location Name'
 }

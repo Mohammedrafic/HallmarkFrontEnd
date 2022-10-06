@@ -6,8 +6,8 @@ import { MessageTypes } from "../../../../shared/enums/message-types";
 import { getAllErrors } from "../../../../shared/utils/error.utils";
 import { ShowToast } from "../../../../store/app.actions";
 import { DocumentLibraryService } from "../../services/document-library.service";
-import { GetDocuments, GetDocumentsSelectedNode, GetDocumentsTree, GetDocumentTypes, IsAddNewFolder, SaveDocumentFolder } from "../actions/document-library.actions";
-import { DocumentFolder, DocumentLibrary, DocumentsLibraryPage, DocumentTypes, NodeItem } from "../model/document-library.model";
+import { GetDocuments, GetDocumentsSelectedNode, GetDocumentsTree, GetDocumentTypes, IsAddNewFolder, SaveDocumentFolder, SaveDocuments, SearchDocumentTags } from "../actions/document-library.actions";
+import { DocumentFolder, DocumentLibrary, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, NodeItem } from "../model/document-library.model";
 
 
 export interface DocumentLibraryStateModel {
@@ -17,6 +17,8 @@ export interface DocumentLibraryStateModel {
   isAddNewFolder: boolean
   documentFolder: DocumentFolder | null
   documentTypes: DocumentTypes[] | null
+  documents: Documents | null,
+  documentTags: DocumentTags[] | null
 }
 
 @State<DocumentLibraryStateModel>({
@@ -27,7 +29,9 @@ export interface DocumentLibraryStateModel {
     documentsPage: null,
     isAddNewFolder: false,
     documentFolder: null,
-    documentTypes:null
+    documentTypes: null,
+    documents: null,
+    documentTags:null
   }
 })
 @Injectable()
@@ -55,6 +59,11 @@ export class DocumentLibraryState {
     return state.documentTypes;
   }
 
+  @Selector()
+  static documentsTags(state: DocumentLibraryStateModel): DocumentTags[] | null {
+    return state.documentTags;
+  }
+
   @Action(GetDocumentsTree)
   GetDocumentsTree({ patchState }: StateContext<DocumentLibraryStateModel>, { }: GetDocumentsTree): Observable<DocumentLibrary> {
     return this.documentLibraryService.getDocumentsTree().pipe(
@@ -75,8 +84,8 @@ export class DocumentLibraryState {
   }
 
   @Action(GetDocuments)
-  GetDocuments({ patchState }: StateContext<DocumentLibraryStateModel>, { }: GetDocuments): Observable<DocumentsLibraryPage> {
-    return this.documentLibraryService.getDocuments().pipe(
+  GetDocuments({ patchState }: StateContext<DocumentLibraryStateModel>, { documentsFilter }: GetDocuments): Observable<DocumentsLibraryPage> {
+    return this.documentLibraryService.GetDocuments(documentsFilter).pipe(
       tap((payload) => {
         patchState({ documentsPage: payload });
         return payload;
@@ -100,11 +109,36 @@ export class DocumentLibraryState {
     );
   }
 
+  @Action(SaveDocuments)
+  SaveDocuments(
+    { dispatch }: StateContext<DocumentLibraryStateModel>,
+    { document }: SaveDocuments
+  ): Observable<DocumentLibraryDto | void> {
+    return this.documentLibraryService.saveDocuments(document).pipe(
+      tap((document) => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, document.id > 0 ? RECORD_MODIFIED : RECORD_ADDED),
+        ]);
+        return document;
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
+    );
+  }
+
   @Action(GetDocumentTypes)
   GetDocumentTypes({ patchState }: StateContext<DocumentLibraryStateModel>, { documentTypeFilter }: GetDocumentTypes): Observable<DocumentTypes[]> {
     return this.documentLibraryService.GetDocumentTypes(documentTypeFilter).pipe(
       tap((payload) => {
         patchState({ documentTypes: payload });
+        return payload;
+      })
+    );
+  }
+  @Action(SearchDocumentTags)
+  SearchDocumentTags({ patchState }: StateContext<DocumentLibraryStateModel>, { documentTagFilter }: SearchDocumentTags): Observable<DocumentTags[]> {
+    return this.documentLibraryService.SearchDocumentTags(documentTagFilter).pipe(
+      tap((payload) => {
+        patchState({ documentTags: payload });
         return payload;
       })
     );

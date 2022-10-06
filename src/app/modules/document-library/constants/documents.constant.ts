@@ -29,55 +29,68 @@ export const DocumentLibraryColumnsDefinition = (actionCellParams: ICellRenderer
       headerCheckboxSelection: true,
       headerCheckboxSelectionFilteredOnly: true,
       checkboxSelection: true,
-      ...commonColumn,
+      sortable: false,
+      resizable: false,
+      filter: false,
     },
     {
       field: '',
       headerName: 'Action',
       cellRenderer: ActionCellrenderComponent,
-      cellRendererParams: actionCellParams
+      cellRendererParams: actionCellParams,
+      sortable: false,
+      resizable: false,
+      filter: false,
     },
     {
       field: documentsColumnField.Id,
       headerName: documentsColumnHeaderText.Id,
-      hide: true
+      hide: true,
+      sortable: true,
+      resizable: false,
+      filter: false,
     },
     {
-      field: documentsColumnField.DocumentName,
-      headerName: documentsColumnHeaderText.DocumentName,
+      field: documentsColumnField.FileName,
+      headerName: documentsColumnHeaderText.FileName,
       ...commonColumn,
-      cellStyle: { color: '#3e7fff', fontWeight:'600'}
-
+      cellStyle: { color: '#3e7fff', fontWeight: '600' }
     },
     {
-      field: documentsColumnField.Organization,
-      headerName: documentsColumnHeaderText.Organization,
+      field: documentsColumnField.Name,
+      headerName: documentsColumnHeaderText.Name,
       ...commonColumn,
     },
     {
       field: documentsColumnField.Status,
       headerName: documentsColumnHeaderText.Status,
       ...commonColumn,
-      cellRenderer: StatusTextCellrenderComponent,
+      cellRenderer: StatusTextCellrenderComponent
+    },
+   
+    {
+      field: documentsColumnField.FolderName,
+      headerName: documentsColumnHeaderText.FolderName,
+      ...commonColumn,
     },
     {
-      field: documentsColumnField.Region,
-      headerName: documentsColumnHeaderText.Region,
+      field: documentsColumnField.OrganizationName,
+      headerName: documentsColumnHeaderText.OrganizationName,
       ...commonColumn
     },
     {
-      field: documentsColumnField.Location,
-      headerName: documentsColumnHeaderText.Location,
+      field: documentsColumnField.RegionName,
+      headerName: documentsColumnHeaderText.RegionName,
       ...commonColumn,
     },
     {
-      field: documentsColumnField.Role,
-      headerName: documentsColumnHeaderText.Role,
+      field: documentsColumnField.LocationName,
+      headerName: documentsColumnHeaderText.LocationName,
       ...commonColumn,
     },
     {
-      field: documentsColumnField.Type,
-      headerName: documentsColumnHeaderText.Type,
+      field: documentsColumnField.DocTypeName,
+      headerName: documentsColumnHeaderText.DocTypeName,
       ...commonColumn,
     },
     {
@@ -88,17 +101,66 @@ export const DocumentLibraryColumnsDefinition = (actionCellParams: ICellRenderer
     {
       field: documentsColumnField.StartDate,
       headerName: documentsColumnHeaderText.StartDate,
+      cellRenderer: (params: ICellRendererParams) => {
+        const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string
+        return str?.length > 0 ? str : "";
+      },
       ...commonColumn,
+      filter: 'agDateColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
+          if (cellValue == null) {
+            return 0;
+          }
+          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateParts = dateAsString.split('/');
+          const year = Number(dateParts[2]);
+          const month = Number(dateParts[0]) - 1;
+          const day = Number(dateParts[1]);
+
+          const cellDate = new Date(year, month, day);
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        },
+        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
+      }
     },
     {
       field: documentsColumnField.EndDate,
       headerName: documentsColumnHeaderText.EndDate,
       ...commonColumn,
-    },
-    {
-      field: documentsColumnField.SharedWith,
-      headerName: documentsColumnHeaderText.SharedWith,
-      ...commonColumn,
+      cellRenderer: (params: ICellRendererParams) => {
+        const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string
+        return str?.length > 0 ? str : "";
+      },
+      filter: 'agDateColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
+          if (cellValue == null) {
+            return 0;
+          }
+          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateParts = dateAsString.split('/');
+          const year = Number(dateParts[2]);
+          const month = Number(dateParts[0]) - 1;
+          const day = Number(dateParts[1]);
+          const cellDate = new Date(year, month, day);
+
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        },
+        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
+      },
     },
     {
       field: documentsColumnField.Comments,

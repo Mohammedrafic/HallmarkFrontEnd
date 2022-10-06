@@ -25,7 +25,7 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
   }
 
   @Output() public saveImportResult: EventEmitter<any[]> = new EventEmitter<any[]>();
-  @Output() public uploadImportFile: EventEmitter<Blob> = new EventEmitter<Blob>();
+  @Output() public uploadToFile: EventEmitter<Blob|null> = new EventEmitter<Blob|null>();
 
   public width = `${window.innerWidth * 0.6}px`;
   public targetElement: HTMLElement = document.body;
@@ -61,11 +61,13 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
     this.uploadObj.clearAll();
     this.selectedFile = null;
     this.importResult = null;
+    this.uploadToFile.next(null);
   }
   public selectFile(event: SelectedEventArgs): void {
     if (event.filesData.length) {
       this.importResult = null;
       this.selectedFile = event.filesData[0];
+      this.uploadToFile.next(this.selectedFile.rawFile as Blob);
     }
   }
 
@@ -94,7 +96,7 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
   private uploadFile(): void {
     if (this.selectedFile?.statusCode === '1') {
       this.importResult = null;
-      this.uploadImportFile.next(this.selectedFile.rawFile as Blob);
+      this.uploadToFile.next(this.selectedFile.rawFile as Blob);
     }
   }
 }

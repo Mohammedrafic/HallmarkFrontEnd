@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { HttpClient } from '@angular/common/http';
-import { DocumentFolder, DocumentItem, DocumentLibrary, DocumentLibraryDto, Documents, DocumentsInfo, DocumentsLibraryPage, DocumentTypeFilter, DocumentTypes } from "../store/model/document-library.model";
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { DocumentFolder, DocumentItem, DocumentLibrary, DocumentLibraryDto, Documents, DocumentsFilter, DocumentsLibraryPage, DocumentTagFilter, DocumentTags, DocumentTypeFilter, DocumentTypes } from "../store/model/document-library.model";
 
 @Injectable({ providedIn: 'root' })
 export class DocumentLibraryService {
@@ -15,34 +15,18 @@ export class DocumentLibraryService {
     return of(data);
   }
 
-  public getDocuments(): Observable<DocumentsLibraryPage> {
-    const documentItems: DocumentsInfo[] = [
-      {
-        docId:1,
-        name:'Test.pdf',
-        organization: 'Trinity',
-        status: 'Active',
-        region: 'TestRegion',
-        location: 'TestLocation',
-        role: 'TestRole',
-        type: 'Credentials',
-        tags: 'Testtag',
-        startDate: new Date(),
-        endDate: new Date(),
-        sharedWith: 'HallMark',
-        comments: 'Test',
-        documents:[]
-}
-    ];
-    let data: DocumentsLibraryPage = {
-      items: documentItems,
-      pageNumber: 1,
-      totalPages: 1,
-      totalCount: 1,
-      hasPreviousPage: false,
-      hasNextPage: false,
-    };
-    return of(data);
+  public GetDocuments(documentsFilter: DocumentsFilter): Observable<DocumentsLibraryPage> {
+    let params = new HttpParams();
+    params = params.append("BusinessUnitType", documentsFilter == undefined ? 1 : documentsFilter.businessUnitType);
+    if (documentsFilter?.businessUnitId && documentsFilter?.businessUnitId != null)
+      params = params.append("BusinessUnitId", documentsFilter.businessUnitId);
+    if (documentsFilter?.regionId && documentsFilter?.regionId != null)
+      params = params.append("RegionId", documentsFilter.regionId);
+    if (documentsFilter?.locationId && documentsFilter?.locationId != null)
+      params = params.append("LocationId", documentsFilter.locationId);
+    if (documentsFilter?.folderId && documentsFilter?.folderId != null)
+      params = params.append("FolderId", documentsFilter.folderId);
+    return this.http.get<DocumentsLibraryPage>(`/api/DocumentLibrary/Filtered`, { params: params });
   }
 
   /**
@@ -57,8 +41,12 @@ export class DocumentLibraryService {
 * insert document record
 * @return created record
 */
-  public saveDocuments(documents: Documents): Observable<DocumentLibraryDto> {
-    return this.http.post<DocumentLibraryDto>(`/api/DocumentLibrary?content=${documents}`, {});
+  public saveDocuments(document: Documents): Observable<DocumentLibraryDto> {
+    const formData = new FormData();
+    formData.append('file', document?.selectedFile != null ? document?.selectedFile : '');
+    delete document.selectedFile;
+    const params = new HttpParams().append('content', JSON.stringify(document));
+    return this.http.post<DocumentLibraryDto>(`/api/DocumentLibrary`, formData, { params: params });
   }
 
   /**
@@ -67,11 +55,27 @@ export class DocumentLibraryService {
 */
   public GetDocumentTypes(filter: DocumentTypeFilter): Observable<DocumentTypes[]> {
     const { businessUnitType, businessUnitId } = filter;
-    let url = `/api/DocumentLibrary/getTypes?BusinessUnitType=${businessUnitType}`;
+    let params = new HttpParams();
+    params = params.append("BusinessUnitType", businessUnitType);
     if (businessUnitId != null) {
-      url = url + `&BusinessUnitId=${businessUnitId}`;
+      params = params.append("BusinessUnitId", businessUnitId);
     }
-    return this.http.get<DocumentTypes[]>(url);
-   
+    let url = `/api/DocumentLibrary/getTypes`;
+    return this.http.get<DocumentTypes[]>(url, {params:params});
+  }
+  /**
+* get document types
+* @return document types
+*/
+  public SearchDocumentTags(filter: DocumentTagFilter): Observable<DocumentTags[]> {
+    const { businessUnitType, businessUnitId, keyword } = filter;
+    let params = new HttpParams();
+    params = params.append("BusinessUnitType", businessUnitType);
+    params = params.append("Keyword", keyword);
+    if (businessUnitId != null) {
+      params = params.append("BusinessUnitId", businessUnitId);
+    }
+    let url = `/api/DocumentLibrary/SearchTags`;
+    return this.http.get<DocumentTypes[]>(url, {params:params});
   }
 }

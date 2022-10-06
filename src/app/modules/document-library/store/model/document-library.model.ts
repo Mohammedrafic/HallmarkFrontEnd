@@ -1,5 +1,4 @@
 import { PageOfCollections } from '@shared/models/page.model';
-import { Document } from '@shared/models/document.model';
 
 export class DocumentLibrary {
   documentItems:  DocumentItem[];
@@ -46,6 +45,7 @@ export class Documents {
   docTypeId: number;
   tags: string;
   comments: string;
+  selectedFile?:Blob | null
 }
 
 export class DocumentLibraryDto {
@@ -61,7 +61,20 @@ export class DocumentLibraryDto {
   tags: string;
   comments: string;
   status: string;
+  organizationName: string | null;
+  regionName: string | null;
+  locationName: string | null;
 }
+
+export class DocumentsFilter {
+  businessUnitType: number;
+  businessUnitId: number | null;
+  regionId: number | null;
+  locationId: number | null;
+  folderId: number | null
+  getAll: boolean | null
+}
+export type DocumentsLibraryPage = PageOfCollections<DocumentLibraryDto>;
 
 export class DocumentTypes {
   id: number;
@@ -73,23 +86,16 @@ export class DocumentTypeFilter {
   businessUnitId?: number | null;
 }
 
-
-export class DocumentsInfo {
-  docId: number;
+export class DocumentTags {
+  id: number;
   name: string;
-  organization: string;
-  status: string;
-  region: string;
-  location: string;
-  role: string;
-  type: string;
-  tags: string;
-  startDate: Date;
-  endDate: Date;
-  sharedWith: string;
-  comments: string;
-  documents: Document[] | null;
 }
 
-export type DocumentsLibraryPage = PageOfCollections<DocumentsInfo>;
+export class DocumentTagFilter {
+  businessUnitType: number;
+  businessUnitId?: number | null;
+  keyword:string
+}
+
+
 

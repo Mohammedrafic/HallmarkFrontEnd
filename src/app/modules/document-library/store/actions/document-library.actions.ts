@@ -1,4 +1,4 @@
-import { DocumentFolder, NodeItem, Documents, DocumentTypeFilter } from "../model/document-library.model";
+import { DocumentFolder, NodeItem, Documents, DocumentTypeFilter, DocumentsFilter, DocumentTagFilter } from "../model/document-library.model";
 
 export class GetDocumentsTree {
   static readonly type = '[documentsLibrary] Get document tree items';
@@ -17,7 +17,7 @@ export class IsAddNewFolder {
 
 export class GetDocuments {
   static readonly type = '[documentsLibrary] Get documents';
-  constructor() { }
+  constructor(public documentsFilter: DocumentsFilter) { }
 }
 
 export class SaveDocumentFolder {
@@ -33,4 +33,9 @@ export class SaveDocuments {
 export class GetDocumentTypes {
   static readonly type = '[documentsLibrary] Get Document Types';
   constructor(public documentTypeFilter: DocumentTypeFilter) { }
+}
+
+export class SearchDocumentTags {
+  static readonly type = '[documentsLibrary] Search Document Tags';
+  constructor(public documentTagFilter: DocumentTagFilter) { }
 }
