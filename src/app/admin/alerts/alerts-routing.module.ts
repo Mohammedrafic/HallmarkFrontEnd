@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AlertsTemplateComponent } from './alerts-template/alerts-template.component';
 import { AlertsComponent } from './alerts.component';
 import { UserSubscriptionComponent } from './user-subscription/user-subscription.component';
+import { GroupEmailComponent } from './group-email/group-email.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -17,6 +18,10 @@ const routes: Routes = [
       {
         path: 'alerts-template',
         component: AlertsTemplateComponent,
+      },
+      {
+        path: 'group-email',
+        component: GroupEmailComponent,
       }
      
     ],

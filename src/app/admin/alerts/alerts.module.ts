@@ -22,6 +22,8 @@ import { AlertsSmsTemplateFromComponent } from './alerts-template/alerts-sms-tem
 import { AlertsOnScreenTemplateFormComponent } from './alerts-template/alerts-on-screen-template-form/alerts-on-screen-template-form.component';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { ToggleSwitchComponent } from './toggle-switch/toggle-switch.component';
+import { GroupEmailComponent } from './group-email/group-email.component';
+import { SendGroupEmailComponent } from './group-email/send-group-email/send-group-email.component';
 
 
 @NgModule({
@@ -32,7 +34,9 @@ import { ToggleSwitchComponent } from './toggle-switch/toggle-switch.component';
     AlertsEmailTemplateFormComponent,
     AlertsSmsTemplateFromComponent,
     AlertsOnScreenTemplateFormComponent, 
-    ToggleSwitchComponent
+    ToggleSwitchComponent, 
+    GroupEmailComponent, 
+    SendGroupEmailComponent
   ],
   imports: [
     CommonModule,
