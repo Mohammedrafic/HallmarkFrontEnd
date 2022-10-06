@@ -1,6 +1,12 @@
 .associate {
   margin-top: 24px;
 
+  .actions {
+    button {
+      background-color: transparent;
+    }
+  }
+
   .e-gridcustomheader {
     width: unset;
   }

@@ -3,6 +3,7 @@ import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject } from 'rxjs';
 import {
+  AssociateOrganizationsAgency,
   FeeExceptions,
   FeeExceptionsPage,
   FeeSettingsClassification,
@@ -17,6 +18,7 @@ import {
   GetFeeSettingByOrganizationId,
   RemoveFeeExceptionsById,
 } from '@shared/components/associate-list/store/associate.actions';
+import { AgencyStatus } from '@shared/enums/status';
 
 @Component({
   selector: 'app-fee-settings',
@@ -24,8 +26,11 @@ import {
   styleUrls: ['./fee-settings.component.scss'],
 })
 export class FeeSettingsComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit {
-  @Input() form: FormGroup;
   @ViewChild('grid') grid: GridComponent;
+
+  @Input() form: FormGroup;
+  @Input() areAgencyActionsAllowed: boolean;
+  @Input() editAgencyOrg: AssociateOrganizationsAgency;
 
   public openAddNewFeeDialog = new Subject<number>();
   public editFeeData = new Subject<FeeExceptions>();
@@ -40,6 +45,7 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
   @Select(AssociateListState.feeExceptionsPage)
   public feeExceptionsPage$: Observable<FeeExceptionsPage>;
   public priceUtils = PriceUtils;
+  public readonly agencyStatus = AgencyStatus;
 
   private organizationAgencyId: number;
 
