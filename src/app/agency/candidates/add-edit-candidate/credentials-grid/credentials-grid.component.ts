@@ -132,11 +132,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
+    this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
     this.store.dispatch(new GetCredentialTypes());
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
     });
     this.actions$.pipe(ofActionSuccessful(SaveCandidatesCredentialSucceeded)).subscribe((credential: { payload: CandidateCredential }) => {
       this.credentialId = credential.payload.id as number;
@@ -144,7 +144,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.uploadFiles(this.credentialId);
 
       if (!this.removeFiles) {
-        this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
+        this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
         this.addCredentialForm.markAsPristine();
         this.closeDialog();
       }
@@ -153,12 +153,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.disabledCopy = false;
     });
     this.actions$.pipe(ofActionSuccessful(UploadCredentialFilesSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
       this.addCredentialForm.markAsPristine();
       this.closeDialog();
     });
     this.actions$.pipe(ofActionSuccessful(RemoveCandidatesCredentialSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
     });
     this.actions$.pipe(ofActionSuccessful(GetCredentialFilesSucceeded)).subscribe((files: { payload: Blob }) => {
       if (this.file) {
