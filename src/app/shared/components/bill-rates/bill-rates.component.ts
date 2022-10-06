@@ -232,13 +232,17 @@ export class BillRatesComponent implements OnInit, OnDestroy {
           })
           .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
           .subscribe(() => {
-            this.billRatesControl.push(this.fromValueToBillRate(value));
+            if (!this.editBillRateIndex) {
+              this.billRatesControl.push(this.fromValueToBillRate(value));
+            }
             this.billRatesChanged.emit(this.billRateForm.value);
             this.billRateForm.reset();
             this.store.dispatch(new ShowSideDialog(false));
           });
       } else {
-        this.billRatesControl.push(this.fromValueToBillRate(value));
+        if (!this.editBillRateIndex) {
+          this.billRatesControl.push(this.fromValueToBillRate(value));
+        }
         this.billRatesChanged.emit(this.billRateForm.value);
         this.billRateForm.reset();
         this.store.dispatch(new ShowSideDialog(false));
