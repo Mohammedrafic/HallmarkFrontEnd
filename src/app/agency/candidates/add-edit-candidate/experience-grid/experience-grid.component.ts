@@ -1,37 +1,38 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
-import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { ChangedEventArgs, DatePickerComponent, MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
-import { GridComponent } from "@syncfusion/ej2-angular-grids";
-import { delay, filter, Observable } from "rxjs";
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { ChangedEventArgs, DatePickerComponent, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { GridComponent } from '@syncfusion/ej2-angular-grids';
+import { delay, filter, Observable } from 'rxjs';
 
 import {
   GetExperienceByCandidateId,
   RemoveExperience,
   RemoveExperienceSucceeded,
   SaveExperience,
-  SaveExperienceSucceeded
-} from "src/app/agency/store/candidate.actions";
-import { CandidateState } from "src/app/agency/store/candidate.state";
-import { AbstractGridConfigurationComponent } from "src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
+  SaveExperienceSucceeded,
+} from 'src/app/agency/store/candidate.actions';
+import { CandidateState } from 'src/app/agency/store/candidate.state';
+import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
   DELETE_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE
-} from "src/app/shared/constants/messages";
-import { Experience } from "src/app/shared/models/experience.model";
-import { ConfirmService } from "src/app/shared/services/confirm.service";
-import { ShowSideDialog } from "src/app/store/app.actions";
+  DELETE_RECORD_TITLE,
+} from 'src/app/shared/constants/messages';
+import { Experience } from 'src/app/shared/models/experience.model';
+import { ConfirmService } from 'src/app/shared/services/confirm.service';
+import { ShowSideDialog } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-experience-grid',
   templateUrl: './experience-grid.component.html',
   styleUrls: ['./experience-grid.component.scss'],
-  providers: [MaskedDateTimeService]
+  providers: [MaskedDateTimeService],
 })
 export class ExperienceGridComponent extends AbstractGridConfigurationComponent implements OnInit {
   @Input() readonlyMode = false;
+  @Input() areAgencyActionsAllowed: boolean;
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('endDate') endDate: DatePickerComponent;
@@ -45,10 +46,12 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
 
   private today = new Date();
 
-  constructor(private store: Store,
-              private fb: FormBuilder,
-              private actions$: Actions,
-              private confirmService: ConfirmService) {
+  constructor(
+    private store: Store,
+    private fb: FormBuilder,
+    private actions$: Actions,
+    private confirmService: ConfirmService
+  ) {
     super();
   }
 
@@ -72,7 +75,6 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
 
   public onStartDateChange(event: ChangedEventArgs): void {
     this.endDate.min = event.value || this.today;
-
   }
 
   public onEndDateChange(event: ChangedEventArgs): void {
@@ -88,7 +90,7 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
       jobTitle: experience.jobTitle,
       startDate: experience.startDate,
       endDate: experience.endDate,
-      comments: experience.comments
+      comments: experience.comments,
     });
     if (this.readonlyMode) {
       this.experienceForm.disable();
@@ -102,7 +104,7 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       })
       .pipe(filter((confirm) => !!confirm))
       .subscribe(() => {
@@ -116,9 +118,7 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onFilter(): void {
-
-  }
+  public onFilter(): void {}
 
   public closeDialog(): void {
     if (this.experienceForm.dirty) {
@@ -130,10 +130,10 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
         })
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
-          this.closeSideDialog()
+          this.closeSideDialog();
         });
     } else {
-      this.closeSideDialog()
+      this.closeSideDialog();
     }
   }
 
@@ -145,7 +145,7 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
     }
   }
 
-  private  createExperienceForm(): void {
+  private createExperienceForm(): void {
     this.experienceForm = this.fb.group({
       id: new FormControl(null),
       candidateProfileId: new FormControl(null),
@@ -153,15 +153,18 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
       jobTitle: new FormControl(null, [Validators.required, Validators.maxLength(20)]),
       startDate: new FormControl(null, [Validators.required]),
       endDate: new FormControl(null, [Validators.required]),
-      comments: new FormControl(null, [Validators.maxLength(500)])
+      comments: new FormControl(null, [Validators.maxLength(500)]),
     });
   }
 
   private closeSideDialog(): void {
-    this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
-      this.experienceForm.reset();
-      this.experienceForm.enable();
-    });
+    this.store
+      .dispatch(new ShowSideDialog(false))
+      .pipe(delay(500))
+      .subscribe(() => {
+        this.experienceForm.reset();
+        this.experienceForm.enable();
+      });
   }
 
   private setDateRanges(start: Date = this.today, end: Date = this.today): void {

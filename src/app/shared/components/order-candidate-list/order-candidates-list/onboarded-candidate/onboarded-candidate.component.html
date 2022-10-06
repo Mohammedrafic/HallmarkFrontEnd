@@ -263,6 +263,7 @@
       <app-bill-rates
         [billRates]="billRatesData"
         [isActive]="isActiveCandidateDialog$ | async"
+        [readOnlyMode]="isReadOnlyBillRates"
         (billRatesChanged)="onBillRatesChanged($event)">
       </app-bill-rates>
     </ng-template>

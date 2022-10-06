@@ -10,7 +10,7 @@
   <ng-container right>
     <ng-container *ngIf="!readonlyMode && showSaveProfileButtons">
       <button ejs-button [disabled]="!candidateForm?.dirty" cssClass="e-outline"  (click)="clearForm()">Clear</button>
-      <button ejs-button [isPrimary]="true" (click)="save()">Save</button>
+      <button ejs-button [isPrimary]="true" (click)="save()" [disabled]="!agencyActionsAllowed">Save</button>
     </ng-container>
   </ng-container>
 </app-page-toolbar>
@@ -56,7 +56,7 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-experience-grid [readonlyMode]="readonlyMode"></app-experience-grid>
+        <app-experience-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="agencyActionsAllowed"></app-experience-grid>
       </ng-template>
     </e-tabitem>
     <e-tabitem>
@@ -67,7 +67,7 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-education-grid [readonlyMode]="readonlyMode"></app-education-grid>
+        <app-education-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="agencyActionsAllowed"></app-education-grid>
       </ng-template>
     </e-tabitem>
     <e-tabitem>
@@ -78,7 +78,7 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-credentials-grid [isNavigatedFromOrganizationArea]="isNavigatedFromOrganizationArea" [orderId]="orderId"></app-credentials-grid>
+        <app-credentials-grid [isNavigatedFromOrganizationArea]="isNavigatedFromOrganizationArea" [orderId]="orderId" [areAgencyActionsAllowed]="agencyActionsAllowed"></app-credentials-grid>
       </ng-template>
     </e-tabitem>
   </e-tabitems>

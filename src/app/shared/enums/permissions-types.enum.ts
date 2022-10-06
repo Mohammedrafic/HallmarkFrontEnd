@@ -3,6 +3,16 @@ export enum PermissionTypes {
   ViewOrganizationConfigurations = 1500,
   ManageOrganizationConfigurations = 1501,
   CanOrganizationEditOrders = 1801,
+
+  // Order
+  CanCreateOrder = 1830,
+  CanShortlistCandidate = 1850,
+  CanInterviewCandidate = 1853,
+  CanOfferCandidate = 1855,
+  CanOnBoardCandidate = 1860,
+  CanRejectCandidate = 1865,
+  CanCloseCandidate = 1870,
+
   DashboardWidgets = 2000,
   WidgetApplicantsByRegion = 2010,
   WidgetCandidatesByStatus = 2020,
