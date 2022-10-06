@@ -6,6 +6,7 @@ export enum PermissionTypes {
 
   // Order
   CanCreateOrder = 1830,
+  CanCloseOrder = 1870,
   CanShortlistCandidate = 1850,
   CanInterviewCandidate = 1853,
   CanOfferCandidate = 1855,
@@ -24,5 +25,5 @@ export enum PermissionTypes {
   WidgetTrendsFilled = 2080,
   WidgetInvoicesStatuses = 2090,
   CanManageNotificationsForOtherUsers = 3400,
-  CanManageNotificationTemplates = 3401
+  CanManageNotificationTemplates = 3401,
 }

@@ -37,22 +37,21 @@
               ejs-button
               cssClass="e-outline"
               *ngIf="showCloseOrder"
-              [disabled]="disabledCloseButton"
+              [disabled]="disabledCloseButton || !canCloseOrder"
               (click)="closeOrder(order)"
             >
               Close Position
             </button>
-            <button
-              ejs-button
-              cssClass="e-outline"
-              *ngIf="canReOpen"
-              (click)="reOpenPosition()"
-            >
-              Re-Open
-            </button>
+            <button ejs-button cssClass="e-outline" *ngIf="canReOpen" (click)="reOpenPosition()">Re-Open</button>
 
-            <button *ngIf="mobileMenu.length" ejs-dropdownbutton [items]="mobileMenu" (select)="onMobileMenuSelect($event)"
-              iconCss="e-icons" cssClass="e-caret-hide primary-icon-button menu-mobile">
+            <button
+              *ngIf="mobileMenu.length"
+              ejs-dropdownbutton
+              [items]="mobileMenu"
+              (select)="onMobileMenuSelect($event)"
+              iconCss="e-icons"
+              cssClass="e-caret-hide primary-icon-button menu-mobile"
+            >
               <i-feather name="more-vertical" class="icon"></i-feather>
             </button>
 
@@ -73,8 +72,17 @@
                     <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
                   </section>
                   <hr />
-                  <ng-container *ngIf="currentOrder?.orderClosureReasonId || candidateJob?.positionClosureReason || candidate?.positionClosureReasonId">
-                    <app-order-close-reason-info [candidate]="candidateJob || candidate" [orderInformation]="currentOrder">
+                  <ng-container
+                    *ngIf="
+                      currentOrder?.orderClosureReasonId ||
+                      candidateJob?.positionClosureReason ||
+                      candidate?.positionClosureReasonId
+                    "
+                  >
+                    <app-order-close-reason-info
+                      [candidate]="candidateJob || candidate"
+                      [orderInformation]="currentOrder"
+                    >
                     </app-order-close-reason-info>
                     <hr />
                   </ng-container>
@@ -133,7 +141,8 @@
                       <app-offer-deployment
                         [candidate]="$any(candidate)"
                         [isTab]="true"
-                        [actionsAllowed]="agencyActionsAllowed"></app-offer-deployment>
+                        [actionsAllowed]="agencyActionsAllowed"
+                      ></app-offer-deployment>
                     </ng-container>
 
                     <div *ngSwitchDefault></div>
@@ -142,10 +151,12 @@
                   <ng-template #extensionCandidate>
                     <section class="container onboarded-candidate-container">
                       <app-extension-candidate
-                        [isTab]="true" appUnsavedForm
+                        [isTab]="true"
+                        appUnsavedForm
                         [dialogEvent]="$any(openEvent)"
                         [actionsAllowed]="agencyActionsAllowed"
-                        [currentOrder]="order">
+                        [currentOrder]="order"
+                      >
                       </app-extension-candidate>
                     </section>
                   </ng-template>
@@ -221,17 +232,10 @@
     <section class="header-container">
       <div class="e-card-header">
         <div class="e-card-header-caption candidate-status">
-          <h3 class="e-card-title candidate-title">
-            {{ candidate?.lastName }}, {{ candidate?.firstName }}
-          </h3>
-          <ejs-chiplist
-            *ngIf="candidate?.candidateStatus"
-            [text]="candidateStatus[candidate.candidateStatus]"
-          >
+          <h3 class="e-card-title candidate-title">{{ candidate?.lastName }}, {{ candidate?.firstName }}</h3>
+          <ejs-chiplist *ngIf="candidate?.candidateStatus" [text]="candidateStatus[candidate.candidateStatus]">
             <e-chips>
-              <e-chip
-                [cssClass]="candidateStatus[candidate.candidateStatus] | chipsCssClass"
-              ></e-chip>
+              <e-chip [cssClass]="candidateStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
             </e-chips>
           </ejs-chiplist>
         </div>
@@ -246,7 +250,7 @@
               (select)="onDropDownChanged($event)"
             >
               <ng-template #itemTemplate let-data>
-                <span [ngClass]="{'disabled-item': !data.isEnabled}">{{data.statusText}}</span>
+                <span [ngClass]="{ 'disabled-item': !data.isEnabled }">{{ data.statusText }}</span>
               </ng-template>
             </ejs-dropdownlist>
           </div>
@@ -302,7 +306,8 @@
         <app-bill-rates
           [billRates]="candidateJob?.billRates || []"
           [isActive]="true"
-          (billRatesChanged)="onBillRatesChanged($event)">
+          (billRatesChanged)="onBillRatesChanged($event)"
+        >
         </app-bill-rates>
       </ng-template>
     </section>

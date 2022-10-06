@@ -127,6 +127,11 @@
 
 .delete-template {
   color: $supportive-red;
+
+  &.disable {
+    color: $secondary-dark-blue-30;
+    cursor: default;
+  }
 }
 
 .filter-row {
