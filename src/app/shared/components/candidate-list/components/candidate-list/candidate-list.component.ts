@@ -60,6 +60,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Input() search$: Subject<string>;
   @Input() includeDeployedCandidates$: Subject<boolean>;
   @Input() isAgency: boolean;
+  @Input() agencyActionsAllowed: boolean;
 
   public filters: CandidateListFilters = {
     profileStatuses: [],

@@ -14,7 +14,8 @@ import { Order, OrderCandidatesList } from '@shared/models/order-management.mode
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { combineLatest, Observable, Subject, switchMap } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { UserState } from 'src/app/store/user.state';
 import { Duration } from '../../../enums/durations';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { AcceptCandidateComponent } from './accept-candidate/accept-candidate.component';
@@ -47,6 +48,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public applicantStatus = ApplicantStatus;
   public defaultDuration: Duration = Duration.Other;
   public selectedOrder: Order;
+  public agencyActionsAllowed = true;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
@@ -68,6 +70,9 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
         this.selectedOrder = agOrder ?? orgOrder;
         this.initPredefinedBillRates();
       });
+    if (this.isAgency) {
+      this.checkForAgencyStatus();
+    }
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
@@ -144,6 +149,17 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   private openDialog(template: any): void {
     this.templateState.next(template);
     this.sideDialog.show();
+  }
+
+  private checkForAgencyStatus(): void {
+    this.store.select(UserState.agencyActionsAllowed)
+    .pipe(
+      distinctUntilChanged(),
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((value) => {
+      this.agencyActionsAllowed = value;
+    });
   }
 
   private initPredefinedBillRates(): void {

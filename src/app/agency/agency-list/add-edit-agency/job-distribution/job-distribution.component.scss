@@ -1,0 +1,18 @@
+.flex-wrapper {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+
+  .flex-50 {
+    width: 50%;
+  }
+
+  .dropdown-container {
+    margin-bottom: 15px;
+
+    label {
+      margin-bottom: 5px !important;
+      display: block;
+    }
+  }
+}

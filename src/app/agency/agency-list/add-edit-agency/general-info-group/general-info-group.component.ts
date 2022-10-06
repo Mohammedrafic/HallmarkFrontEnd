@@ -5,9 +5,10 @@ import { Observable, Subject, takeWhile } from 'rxjs';
 import { AgencyState } from 'src/app/agency/store/agency.state';
 
 import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
-import { AgencyStatus } from "src/app/shared/enums/status";
+import { AgencyStatus } from 'src/app/shared/enums/status';
 
-import { agencyStatusOptions } from "../../agency-list.constants";
+import { agencyStatusCreationOptions, agencyStatusOptions } from '../../agency-list.constants';
+import PriceUtils from '@shared/utils/price.utils';
 
 @Component({
   selector: 'app-general-info-group',
@@ -22,8 +23,9 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
     { id: Country.USA, text: Country[0] },
     { id: Country.Canada, text: Country[1] },
   ];
+  public priceUtils = PriceUtils;
   public states$ = new Subject();
-  public statuses = agencyStatusOptions;
+  public statuses = agencyStatusCreationOptions;
   public optionFields = {
     text: 'text',
     value: 'id',
@@ -37,6 +39,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.onCountryChange();
     this.isAgencyCreatedCahnge();
+    this.setDefultStatus();
   }
 
   ngOnDestroy(): void {
@@ -54,10 +57,15 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   }
 
   public isAgencyCreatedCahnge(): void {
-    this.isAgencyCreated$.pipe(takeWhile(() => this.isAlive))
-      .subscribe((isCreated) => {
-        isCreated && !this.isAgencyUser ? this.formGroup.get('status')?.enable() : this.formGroup.get('status')?.disable();
-      });
+    this.isAgencyCreated$
+    .pipe(takeWhile(() => this.isAlive))
+    .subscribe((isCreated) => {
+      this.statuses = isCreated ? agencyStatusOptions : agencyStatusCreationOptions;
+
+      if (this.isAgencyUser) {
+        this.formGroup.get('status')?.disable();
+      }
+    });
   }
 
   static createFormGroup(): FormGroup {
@@ -65,6 +73,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       externalId: new FormControl('', [Validators.maxLength(10)]),
       taxId: new FormControl('', [Validators.required, Validators.minLength(9), Validators.pattern(/^[0-9\s\-]+$/)]),
+      baseFee: new FormControl(''),
       addressLine1: new FormControl('', [Validators.required, Validators.maxLength(100)]),
       addressLine2: new FormControl('', [Validators.maxLength(100)]),
       country: new FormControl('', [Validators.required]),
@@ -74,8 +83,12 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       phone1Ext: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       phone2Ext: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       fax: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
-      status: new FormControl({ value: AgencyStatus.Active, disabled: true }, [Validators.required]),
+      status: new FormControl(AgencyStatus.InProgress, [Validators.required]),
       website: new FormControl(''),
     });
+  }
+
+  private setDefultStatus(): void {
+    this.formGroup.get('status')?.patchValue(0);
   }
 }

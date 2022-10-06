@@ -99,6 +99,7 @@ import { AssociateListModule } from '@shared/components/associate-list/associate
 import { ElectronicFormComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/electronic-form/electronic-form.component';
 import { ManualFormComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/manual-form/manual-form.component';
 import { PaymentDialogComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/payment-dialog.component';
+import { JobDistributionComponent } from './agency-list/add-edit-agency/job-distribution/job-distribution.component';
 
 const sidebarIcons = {
   Sliders,
@@ -164,6 +165,7 @@ const sidebarIcons = {
     ElectronicFormComponent,
     ManualFormComponent,
     PaymentDialogComponent,
+    JobDistributionComponent,
   ],
   imports: [
     CommonModule,

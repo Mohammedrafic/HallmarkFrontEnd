@@ -23,7 +23,7 @@ import { SortSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-mode
 import { UserState } from 'src/app/store/user.state';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { ExportCredentialList, GetCredentialsDataSources, SetCredentialsFilterCount, ShowExportCredentialListDialog } from '@organization-management/store/credentials.actions';
+import { ExportCredentialList, GetCredentialsDataSources, SaveAssignedCredentialValue, SetCredentialsFilterCount, ShowExportCredentialListDialog } from '@organization-management/store/credentials.actions';
 import { DatePipe } from '@angular/common';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
@@ -31,6 +31,7 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { CredentialsState } from '@organization-management/store/credentials.state';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { CredentialType } from '@shared/models/credential-type.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-credentials-list',
@@ -55,6 +56,9 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   @Select(CredentialsState.credentialDataSources)
   credentialDataSources$: Observable<CredentialFilterDataSources>;
 
+  @Select(UserState.isHallmarkMspUser)
+  isHallmarkMspUser$: Observable<boolean>;
+
   private pageSubject = new Subject<number>();
 
   public credentialsFormGroup: FormGroup;
@@ -62,6 +66,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
   public editedCredentialId?: number;
   public isEdit: boolean;
+  public openAssignSidebarSubject = new Subject<boolean>();
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -94,6 +99,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
               private confirmService: ConfirmService,
               private datePipe: DatePipe,
               private filterService: FilterService,
+              private route: ActivatedRoute,
               @Inject(FormBuilder) private builder: FormBuilder) {
     super();
     this.formBuilder = builder;
@@ -137,6 +143,10 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportCredentialListDialog)).subscribe((event: { payload: ExportedFileType }) => {
       this.defaultFileName = 'Credentials/Credentials List ' + this.generateDateTime(this.datePipe);
       this.defaultExport(event.payload);
+    });
+
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveAssignedCredentialValue)).subscribe(() => {
+        this.getCredentials();
     });
   }
 
@@ -233,6 +243,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       expireDateApplicable: credential.expireDateApplicable,
       comment: credential.comment
     });
+    this.disableFieldOnEdit();
     this.editedCredentialId = credential.id;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
@@ -308,6 +319,10 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     }
   }
 
+  public showAssignSiderbar(): void {
+    this.openAssignSidebarSubject.next(true);
+  }
+
   private mapGridData(): void {
     this.credentials$.pipe(combineLatestWith(this.credentialTypes$), tap(() => this.gridDataSource = []),
       filter(([credentials, credentialTypes]) => credentials?.items?.length > 0 && credentialTypes.length > 0))
@@ -324,11 +339,21 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     });
   }
 
+  private disableFieldOnEdit(): void {
+    const { canEdit } = this.route.snapshot.data;
+    
+    if (!canEdit) {
+      this.credentialsFormGroup.get('credentialTypeId')?.disable();
+      this.credentialsFormGroup.get('name')?.disable();
+    }
+  }
+
   private clearFormDetails(): void {
     this.store.dispatch(new ShowSideDialog(false));
     this.isEdit = false;
     this.editedCredentialId = undefined;
     this.credentialsFormGroup.reset();
+    this.credentialsFormGroup.enable();
     this.removeActiveCssClass();
   }
 

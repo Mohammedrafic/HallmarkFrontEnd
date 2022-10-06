@@ -4,7 +4,7 @@
 section {
   .title {
     font-weight: 700;
-    font-size: 14px;
+    font-size: 12px;
     color: $black;
 
     .accent {
@@ -28,7 +28,7 @@ section {
 
   .sup-title {
     font-weight: 400;
-    font-size: 14px;
+    font-size: 12px;
     margin-top: 3px;
     color: $secondary-dark-blue-30;
   }
@@ -42,14 +42,6 @@ section {
     grid-template-columns: repeat(4, 1fr);
     background-color: $secondary-dark-blue-50;
     gap: 25px 38px;
-
-    &.extension {
-      grid-template-columns: repeat(5, 1fr);
-    }
-
-    &.reorders {
-      grid-template-columns: repeat(5, 1fr);
-    }
   }
 
   .column {
@@ -105,7 +97,12 @@ section {
 
   .container-row {
     display: flex;
-    justify-content: space-between;
+
+    &.justify-content-normal {
+      .column {
+        margin-right: 60px;
+      }
+    }
 
     .column {
       display: flex;
@@ -136,3 +133,34 @@ section {
   }
 }
 
+.separator {
+  height: 1px;
+  background-color: #eaecf2;
+  margin-bottom: 15px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.grid-column-span-2 {
+  grid-column: span 2;
+}
+
+.justify-content {
+  &-end {
+    justify-content: flex-end;
+  }
+
+  &-normal {
+    justify-content: normal;
+  }
+
+  &-space-between {
+    justify-content: space-between;
+  }
+}
+
+.align-items-center {
+  align-items: center;
+}

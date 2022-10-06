@@ -111,7 +111,7 @@ export class GetCandidatePhotoSucceeded {
 
 export class GetCandidatesCredentialByPage {
   static readonly type = '[candidate] Get Candidates Credential by Page';
-  constructor(public pageNumber: number, public pageSize: number) {}
+  constructor(public pageNumber: number, public pageSize: number, public orderId: number | null) {}
 }
 
 export class GetMasterCredentials {
@@ -146,11 +146,6 @@ export class RemoveCandidatesCredentialSucceeded {
 
 export class GetCredentialTypes {
   static readonly type = '[candidate] Get Credential Types';
-  constructor() {}
-}
-
-export class GetCredentialStatuses {
-  static readonly type = '[candidate] Get Credential Statuses';
   constructor() {}
 }
 

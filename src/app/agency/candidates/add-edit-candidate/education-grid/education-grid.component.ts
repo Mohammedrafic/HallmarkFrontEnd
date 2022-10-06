@@ -1,39 +1,40 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
-import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
-import { GridComponent, ValueAccessor } from "@syncfusion/ej2-angular-grids";
-import { delay, filter, Observable } from "rxjs";
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { GridComponent, ValueAccessor } from '@syncfusion/ej2-angular-grids';
+import { delay, filter, Observable } from 'rxjs';
 
 import {
   GetEducationByCandidateId,
   RemoveEducation,
   RemoveEducationSucceeded,
   SaveEducation,
-  SaveEducationSucceeded
-} from "src/app/agency/store/candidate.actions";
-import { CandidateState } from "src/app/agency/store/candidate.state";
-import { AbstractGridConfigurationComponent } from "src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
+  SaveEducationSucceeded,
+} from 'src/app/agency/store/candidate.actions';
+import { CandidateState } from 'src/app/agency/store/candidate.state';
+import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
   DELETE_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE
-} from "src/app/shared/constants/messages";
-import { Degree } from "src/app/shared/enums/degree-types";
-import { Education } from "src/app/shared/models/education.model";
-import { ConfirmService } from "src/app/shared/services/confirm.service";
-import { valuesOnly } from "src/app/shared/utils/enum.utils";
-import { ShowSideDialog } from "src/app/store/app.actions";
+  DELETE_RECORD_TITLE,
+} from 'src/app/shared/constants/messages';
+import { Degree } from 'src/app/shared/enums/degree-types';
+import { Education } from 'src/app/shared/models/education.model';
+import { ConfirmService } from 'src/app/shared/services/confirm.service';
+import { valuesOnly } from 'src/app/shared/utils/enum.utils';
+import { ShowSideDialog } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-education-grid',
   templateUrl: './education-grid.component.html',
   styleUrls: ['./education-grid.component.scss'],
-  providers: [MaskedDateTimeService]
+  providers: [MaskedDateTimeService],
 })
 export class EducationGridComponent extends AbstractGridConfigurationComponent implements OnInit {
   @Input() readonlyMode = false;
+  @Input() areAgencyActionsAllowed: boolean;
 
   @ViewChild('grid') grid: GridComponent;
 
@@ -52,10 +53,12 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
     .filter(valuesOnly)
     .map((text, id) => ({ text, id }));
 
-  constructor(private store: Store,
-              private fb: FormBuilder,
-              private actions$: Actions,
-              private confirmService: ConfirmService) {
+  constructor(
+    private store: Store,
+    private fb: FormBuilder,
+    private actions$: Actions,
+    private confirmService: ConfirmService
+  ) {
     super();
   }
 
@@ -85,7 +88,7 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
       degree: education.degree,
       schoolName: education.schoolName,
       graduationDate: education.graduationDate,
-      fieldOfStudy: education.fieldOfStudy
+      fieldOfStudy: education.fieldOfStudy,
     });
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -95,7 +98,7 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       })
       .pipe(filter((confirm) => !!confirm))
       .subscribe(() => {
@@ -108,9 +111,7 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onFilter(): void {
-
-  }
+  public onFilter(): void {}
 
   public closeDialog(): void {
     if (this.educationForm.dirty) {
@@ -122,10 +123,10 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
         })
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
-          this.closeSideDialog()
+          this.closeSideDialog();
         });
     } else {
-      this.closeSideDialog()
+      this.closeSideDialog();
     }
   }
 
@@ -138,20 +139,23 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
     }
   }
 
-  private  createEducationForm(): void {
+  private createEducationForm(): void {
     this.educationForm = this.fb.group({
       id: new FormControl(null),
       candidateProfileId: new FormControl(null),
       fieldOfStudy: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
       schoolName: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
       degree: new FormControl(null, [Validators.required]),
-      graduationDate: new FormControl(null, [Validators.required])
+      graduationDate: new FormControl(null, [Validators.required]),
     });
   }
 
   private closeSideDialog(): void {
-    this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
-      this.educationForm.reset();
-    });
+    this.store
+      .dispatch(new ShowSideDialog(false))
+      .pipe(delay(500))
+      .subscribe(() => {
+        this.educationForm.reset();
+      });
   }
 }

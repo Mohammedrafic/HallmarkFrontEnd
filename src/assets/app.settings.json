@@ -1,4 +1,4 @@
 {
   "API_BASE_URL": "%%API_ENDPOINT_URL%%",
-  "LOGIREPORT_BASE_URL": "https://dev-bi.einstein2.com/"
+  "LOGIREPORT_BASE_URL": "https://pre-bi.einstein2.com/"
 }

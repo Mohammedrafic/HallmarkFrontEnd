@@ -29,6 +29,7 @@ import {
   GetUsersAssignedToRole,
   GetCurrentUserPermissions,
   GetUserOrganizations,
+  SetAgencyActionsAllowed,
 } from './user.actions';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 import {
@@ -39,6 +40,8 @@ import {
 } from '@shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 import { B2CAuthService } from '../b2c-auth/b2c-auth.service';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { AgencyStatus } from 'src/app/shared/enums/status';
 
 export interface UserStateModel {
   user: User | null;
@@ -51,6 +54,7 @@ export interface UserStateModel {
   organizationStructure: OrganizationStructure | null;
   usersAssignedToRole: UsersAssignedToRole | null;
   permissions: CurrentUserPermission[];
+  agencyActionsAllowed: boolean;
 }
 
 const AGENCY = 'Agency';
@@ -68,6 +72,7 @@ const AGENCY = 'Agency';
     organizationStructure: null,
     usersAssignedToRole: null,
     permissions: [],
+    agencyActionsAllowed: true,
   },
 })
 @Injectable()
@@ -133,6 +138,26 @@ export class UserState {
   @Selector()
   static currentUserPermissions(state: UserStateModel): CurrentUserPermission[] {
     return state.permissions;
+  }
+
+  @Selector()
+  static isHallmarkUser(state: UserStateModel): boolean {
+    return state.user?.businessUnitType === BusinessUnitType.Hallmark;
+  }
+
+  @Selector()
+  static isMspUser(state: UserStateModel): boolean {
+    return state.user?.businessUnitType === BusinessUnitType.MSP;
+  }
+
+  @Selector([UserState.isHallmarkUser, UserState.isMspUser])
+  static isHallmarkMspUser(isHalmark: boolean, isMsp: boolean): boolean {
+    return isHalmark || isMsp;
+  }
+
+  @Selector()
+  static agencyActionsAllowed(state: UserStateModel): boolean {
+    return state.agencyActionsAllowed;
   }
 
   @Action(SetCurrentUser)
@@ -294,4 +319,16 @@ export class UserState {
       catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
   }
+
+  @Action(SetAgencyActionsAllowed)
+  setAgencyStatus(
+    { patchState }: StateContext<UserStateModel>,
+    { allowed }: SetAgencyActionsAllowed,
+  ): void {
+    patchState({
+      agencyActionsAllowed: allowed,
+    });
+  }
 }
+
+

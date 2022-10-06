@@ -13,6 +13,7 @@ import {
   OrderCandidatesListPage,
 } from '@shared/models/order-management.model';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
+import { AppState } from "src/app/store/app.state";
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { AbstractGridConfigurationComponent } from '../abstract-grid-configuration/abstract-grid-configuration.component';
@@ -68,6 +69,7 @@ export abstract class AbstractOrderCandidateListComponent
 
   public onViewNavigation(data: any): void {
     const user = this.store.selectSnapshot(UserState.user);
+    const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const url =
       user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
     if (user?.businessUnitType === BusinessUnitType.Hallmark) {
@@ -80,7 +82,13 @@ export abstract class AbstractOrderCandidateListComponent
     }
     const pageToBack = this.router.url;
     this.router.navigate([url, data.candidateId], {
-      state: { orderId: this.order.orderId, pageToBack, readonly: !this.isAgency, isRedirectFromOrder: true },
+      state: {
+        orderId: this.order.orderId,
+        pageToBack,
+        readonly: !this.isAgency,
+        isRedirectFromOrder: true,
+        isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,
+      },
     });
     disabledBodyOverflow(false);
   }
