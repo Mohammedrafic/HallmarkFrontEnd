@@ -15,6 +15,7 @@ import {
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ImportResult } from '@shared/models/import.model';
+import { UploaderFileStatus } from '@core/enums';
 
 @Component({
   selector: 'app-import-dialog-content',
@@ -59,7 +60,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   }
 
   get enabledImportButton(): boolean {
-    return (this.selectedFile?.statusCode === '1' || !!this.importResult) && !this.activeErrorTab;
+    return this.selectedFile?.statusCode === UploaderFileStatus.ReadyForUpload && (!!this.importResult ? !this.activeErrorTab : true);
   }
 
   constructor(private confirmService: ConfirmService) {
