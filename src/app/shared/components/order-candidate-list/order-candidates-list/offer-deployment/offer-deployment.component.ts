@@ -312,7 +312,9 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
         this.currentApplicantStatus = data.applicantStatus;
         this.billRatesData = [...data.billRates];
         this.setFormValue(data);
-        this.getOrderPermissions(data.orderId);
+        if (!this.isAgency) {
+          this.getOrderPermissions(data.orderId);
+        }
       }
     });
     this.applicantStatuses$

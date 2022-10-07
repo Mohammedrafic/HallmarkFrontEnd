@@ -472,7 +472,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         if (this.candidateJob) {
           this.setCancellationControls(this.candidateJob.jobCancellation?.penaltyCriteria || 0);
           this.getComments();
-          this.getOrderPermissions(value.orderId);
+          if (!this.isAgency) {
+            this.getOrderPermissions(value.orderId);
+          }
           this.billRatesData = this.candidateJob?.billRates ? [...this.candidateJob.billRates] : [];
           this.form.disable();
           this.form.patchValue({

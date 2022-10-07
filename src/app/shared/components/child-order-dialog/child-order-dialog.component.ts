@@ -77,7 +77,7 @@ import { filter } from 'rxjs/operators';
 import { ShowCloseOrderDialog, ShowToast } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
-import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { PermissionService } from '../../../security/services/permission.service';
 
 enum Template {
   accept,
@@ -219,7 +219,8 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     private commentsService: CommentsService,
     private confirmService: ConfirmService,
     private orderCandidateListViewService: OrderCandidateListViewService,
-    private reOpenOrderService: ReOpenOrderService
+    private reOpenOrderService: ReOpenOrderService,
+    private permissionService: PermissionService
   ) {}
 
   ngOnInit(): void {
@@ -695,15 +696,9 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private subscribeOnPermissions(): void {
-    this.currentUserPermissions$
-      .pipe(
-        filter((permissions) => !!permissions?.length),
-        takeWhile(() => this.isAlive)
-      )
-      .subscribe((permissions) => {
-        const permissionIds = permissions.map(({ permissionId }) => permissionId);
-        this.canCreateOrder = permissionIds.includes(PermissionTypes.CanCreateOrder);
-        this.canCloseOrder = permissionIds.includes(PermissionTypes.CanCloseOrder);
-      });
+    this.permissionService.getPermissions().subscribe(({ canCloseOrder, canCreateOrder }) => {
+      this.canCreateOrder = canCreateOrder;
+      this.canCloseOrder = canCloseOrder;
+    });
   }
 }

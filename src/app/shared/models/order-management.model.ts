@@ -278,7 +278,6 @@ export class Order {
   onCallRequired: boolean;
   asapStart: boolean;
   criticalOrder: boolean;
-  nO_OT: boolean;
   jobDescription: string;
   unitDescription: string;
   orderRequisitionReasonId: number;

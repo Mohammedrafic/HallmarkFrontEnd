@@ -320,7 +320,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       onCallRequired: [false],
       asapStart: [false],
       criticalOrder: [false],
-      nO_OT: [false],
       jobDescription: ['', Validators.maxLength(4000)],
       unitDescription: ['', Validators.maxLength(500)],
       orderRequisitionReasonId: [null, Validators.required],
@@ -1041,7 +1040,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.jobDescriptionForm.controls['onCallRequired'].patchValue(order.onCallRequired);
     this.jobDescriptionForm.controls['asapStart'].patchValue(order.asapStart);
     this.jobDescriptionForm.controls['criticalOrder'].patchValue(order.criticalOrder);
-    this.jobDescriptionForm.controls['nO_OT'].patchValue(order.nO_OT);
     this.jobDescriptionForm.controls['jobDescription'].patchValue(order.jobDescription);
     this.jobDescriptionForm.controls['unitDescription'].patchValue(order.unitDescription);
     this.jobDescriptionForm.controls['orderRequisitionReasonId'].patchValue(order.orderRequisitionReasonId);

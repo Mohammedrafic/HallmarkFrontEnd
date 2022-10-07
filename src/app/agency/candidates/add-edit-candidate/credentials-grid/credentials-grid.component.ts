@@ -216,6 +216,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public onFilter(): void {}
 
   public dataBound(): void {
+    this.contentLoadedHandler();
     this.grid.hideScroll();
   }
 

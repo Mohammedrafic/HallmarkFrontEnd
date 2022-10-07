@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { Select, Store } from '@ngxs/store';
-import { debounceTime, first, Observable, Subject } from 'rxjs';
+import { debounceTime, Observable, Subject } from 'rxjs';
 import { AgencyOrderManagement, Order, OrderManagement, ReOrder } from '@shared/models/order-management.model';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
@@ -9,9 +9,8 @@ import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enu
 import { AppState } from 'src/app/store/app.state';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
-import { filter } from 'rxjs/operators';
-import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { UserState } from '../../../store/user.state';
+import { PermissionService } from '../../../security/services/permission.service';
 
 @Component({
   selector: 'app-order-reorders-list',
@@ -43,7 +42,8 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
     private orderManagementService: OrderManagementContentService,
     private addEditReOrderService: AddEditReorderService,
     private orderManagementAgencyService: OrderManagementAgencyService,
-    private orderService: OrderManagementService
+    private orderService: OrderManagementService,
+    private permissionService: PermissionService
   ) {
     super();
   }
@@ -98,14 +98,8 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
   }
 
   private subscribeOnPermissions(): void {
-    this.currentUserPermissions$
-      .pipe(
-        filter((permissions) => !!permissions?.length),
-        first()
-      )
-      .subscribe((permissions) => {
-        const permissionIds = permissions.map(({ permissionId }) => permissionId);
-        this.canCreateOrder = permissionIds.includes(PermissionTypes.CanCreateOrder);
-      });
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder }) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 }
