@@ -7,13 +7,16 @@ import { CandidatesDetailsModel } from '@shared/components/candidate-details/mod
 
 const valueHelper = new GridHelper();
 
-export const CandidatesColumnsDefinition = (isAgency: boolean) => {
+export const CandidatesColumnsDefinition = (isAgency: boolean, areActionsAllowed: boolean) => {
   return [
     {
       field: 'lastName',
       headerName: 'NAME',
       width: 160,
       cellRenderer: GridNameRendererComponent,
+      cellRendererParams: () => ({
+        areActionsAllowed,
+      }),
       sortable: true,
     },
     {
@@ -89,6 +92,9 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
       width: 150,
       cellRenderer: GridPositionRendererComponent,
       sortable: true,
+      cellRendererParams: () => ({
+        areActionsAllowed,
+      }),
     },
     {
       field: 'assignment',
