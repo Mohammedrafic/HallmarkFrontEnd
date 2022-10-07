@@ -555,9 +555,9 @@ export class OrderManagementContentState {
   @Action(SetPredefinedBillRatesData)
   SetPredefinedBillRatesData(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { orderType, departmentId, skillId }: SetPredefinedBillRatesData
+    { orderType, departmentId, skillId, jobStartDate, jobEndDate }: SetPredefinedBillRatesData
   ): void {
-    patchState({ getPredefinedBillRatesData: { orderType, departmentId, skillId } });
+    patchState({ getPredefinedBillRatesData: { orderType, departmentId, skillId, jobStartDate, jobEndDate } });
   }
 
   @Action(GetPredefinedBillRates)
@@ -569,8 +569,8 @@ export class OrderManagementContentState {
     const getPredefinedBillRatesData = state.getPredefinedBillRatesData;
 
     if (getPredefinedBillRatesData) {
-      const { orderType, departmentId, skillId } = getPredefinedBillRatesData;
-      return this.orderManagementService.getPredefinedBillRates(orderType, departmentId, skillId).pipe(
+      const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = getPredefinedBillRatesData;
+      return this.orderManagementService.getPredefinedBillRates(orderType, departmentId, skillId, jobStartDate, jobEndDate).pipe(
         tap((payload) => {
           patchState({ predefinedBillRates: payload });
           return payload;

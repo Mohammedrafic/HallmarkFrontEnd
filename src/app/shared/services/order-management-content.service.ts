@@ -250,11 +250,15 @@ export class OrderManagementContentService {
    * @param skillId
    * @returns list of predefined bill rates
    */
-  public getPredefinedBillRates(orderType: OrderType, departmentId: number, skillId: number): Observable<BillRate[]> {
-    const params = new HttpParams()
+  public getPredefinedBillRates(orderType: OrderType, departmentId: number, skillId: number, jobStartDate?: string, jobEndDate?: string): Observable<BillRate[]> {
+    let params = new HttpParams()
       .append('orderType', orderType)
       .append('departmentId', departmentId)
-      .append('skillId', skillId);
+      .append('skillId', skillId)
+
+    if (jobStartDate && jobEndDate) {
+      params = params.append('jobStartDate', jobStartDate).append('jobEndDate', jobEndDate);
+    }
 
     return this.http.get<BillRate[]>('/api/BillRates/predefined/forOrder', { params }).pipe(
       map((items) =>
