@@ -157,3 +157,21 @@
     }
   }
 }
+
+::ng-deep {
+  .invoices-table-container {
+    .ag-row {
+      .disabled-checkbox {
+        .ag-selection-checkbox {
+          opacity: 0.5;
+          pointer-events: none;
+
+          .ag-checkbox {
+            opacity: 0.5;
+            pointer-events: none;
+          }
+        }
+      }
+    }
+  }
+}

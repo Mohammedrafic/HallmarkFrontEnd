@@ -42,6 +42,7 @@
           <button
             *ngIf="actionBtnText"
             ejs-button
+            [disabled]="!actionAllowed"
             cssClass="e-primary"
             (click)="handleApprove()">
             {{ actionBtnText }}

@@ -163,6 +163,8 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
               false
             )
           );
+
+          this.setAgencyStatus(selectedOrganizationAgency);
         }
       });
   }
@@ -276,10 +278,8 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
       const currentAgency = organizationsAgencies.find((agency) => agency.id === lastSelectedAgencyId);
       newOrganizationAgencyControlValue = currentAgency ? lastSelectedAgencyId : organizationsAgencies[0]?.id || null;
 
-      const agencyIsActive =
-        currentAgency?.status !== AgencyStatus.Inactive && currentAgency?.status !== AgencyStatus.Terminated;
+      this.setAgencyStatus(currentAgency);
 
-      this.store.dispatch(new SetAgencyActionsAllowed(agencyIsActive));
     } else {
       newOrganizationAgencyControlValue = organizationsAgencies.find((i) => i.id === lastSelectedOrganizationId)
         ? lastSelectedOrganizationId
@@ -289,5 +289,12 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     this.organizationAgencyControl.patchValue(newOrganizationAgencyControlValue);
 
     setTimeout(() => this.cd.markForCheck());
+  }
+
+  private setAgencyStatus(agency: IOrganizationAgency | undefined): void {
+    const agencyIsActive = agency?.status !== AgencyStatus.Inactive
+    && agency?.status !== AgencyStatus.Terminated;
+
+    this.store.dispatch(new SetAgencyActionsAllowed(agencyIsActive));
   }
 }
