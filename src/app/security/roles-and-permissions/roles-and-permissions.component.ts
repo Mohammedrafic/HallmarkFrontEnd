@@ -15,7 +15,7 @@ import { UserState } from 'src/app/store/user.state';
 import { GetBusinessByUnitType, GetPermissionsTree, SaveRole, SaveRoleSucceeded } from '../store/security.actions';
 import { SecurityState } from '../store/security.state';
 import { RoleFormComponent } from './role-form/role-form.component';
-import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS } from './roles-and-permissions.constants';
+import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, OPRION_FIELDS } from './roles-and-permissions.constants';
 import { RolesGridComponent } from './roles-grid/roles-grid.component';
 
 const DEFAULT_DIALOG_TITLE = 'Add Role';
@@ -44,6 +44,7 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public roleId: number | null;
   public filteredItems$ = new Subject<number>();
+  public agencyActionsAllowed = false;
 
   get dialogTitle(): string {
     return this.isEditRole ? EDIT_DIALOG_TITLE : DEFAULT_DIALOG_TITLE;
@@ -62,7 +63,7 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
 
   constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {
     super();
-    this.store.dispatch(new SetHeaderState({ title: 'Roles and Permissions', iconName: 'lock' }));    
+    this.store.dispatch(new SetHeaderState({ title: 'Roles and Permissions', iconName: 'lock' }));
   }
 
   ngOnInit(): void {
@@ -81,7 +82,6 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
       this.businessUnits = rest;
     }
     this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
-
 
     this.actions$
       .pipe(
@@ -129,6 +129,10 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
     }
   }
 
+  public onChangeUnitId(event: boolean): void {
+    this.agencyActionsAllowed = event;
+  }
+
   public onSave(): void {
     this.roleFormGroup.markAllAsTouched();
     if (this.roleFormGroup.valid && !this.roleForm.showActiveError) {
@@ -144,11 +148,16 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
           this.childC.dispatchNewPage();
         }
       });
-     
     }
   }
 
-  public onEdit({ index, column, foreignKeyData, id, ...role }: Role & { index: string; column: unknown; foreignKeyData: unknown }): void {
+  public onEdit({
+    index,
+    column,
+    foreignKeyData,
+    id,
+    ...role
+  }: Role & { index: string; column: unknown; foreignKeyData: unknown }): void {
     this.isEditRole = true;
     this.roleId = id as number;
     this.roleFormGroup.reset();
@@ -206,7 +215,7 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
   public override customExport(): void {
     this.store.dispatch(new ShowExportDialog(true));
   }
-  
+
   public override defaultExport(fileType: ExportedFileType): void {
     this.exportRoles$.next(fileType);
   }

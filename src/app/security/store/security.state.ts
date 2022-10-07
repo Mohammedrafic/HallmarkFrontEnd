@@ -188,14 +188,16 @@ export class SecurityState {
   }
 
   @Selector()
-  static timeZones(state: SecurityStateModel): TimeZoneModel[] | null { return state.timeZones; }
+  static timeZones(state: SecurityStateModel): TimeZoneModel[] | null {
+    return state.timeZones;
+  }
 
   constructor(
     private businessUnitService: BusinessUnitService,
     private roleService: RolesService,
     private userService: UsersService,
     private nodatimeService: NodatimeService
-  ) { }
+  ) {}
 
   @Action(GetBusinessByUnitType)
   GetBusinessByUnitType(
@@ -232,12 +234,14 @@ export class SecurityState {
     { patchState }: StateContext<SecurityStateModel>,
     { businessUnitIds, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters }: GetRolesPage
   ): Observable<RolesPage> {
-    return this.roleService.getRolesPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel, filters).pipe(
-      tap((payload) => {
-        patchState({ rolesPage: payload });
-        return payload;
-      })
-    );
+    return this.roleService
+      .getRolesPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel, filters)
+      .pipe(
+        tap((payload) => {
+          patchState({ rolesPage: payload });
+          return payload;
+        })
+      );
   }
 
   @Action(GetRolePerUser)
@@ -258,24 +262,28 @@ export class SecurityState {
     { patchState }: StateContext<SecurityStateModel>,
     { businessUnitIds, businessUnitType, pageNumber, pageSize, sortModel, filterModel }: GetUsersPage
   ): Observable<UsersPage> {
-    return this.userService.getUsersPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel).pipe(
-      tap((payload) => {
-        patchState({ usersPage: payload });
-        return payload;
-      })
-    );
+    return this.userService
+      .getUsersPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel)
+      .pipe(
+        tap((payload) => {
+          patchState({ usersPage: payload });
+          return payload;
+        })
+      );
   }
   @Action(GetAllUsersPage)
   GetAllUsersPage(
     { patchState }: StateContext<SecurityStateModel>,
     { businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel, getAll }: GetAllUsersPage
   ): Observable<UsersPage> {
-    return this.userService.getAllUsersPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel, getAll).pipe(
-      tap((payload) => {
-        patchState({ allUsersPage: payload });
-        return payload;
-      })
-    );
+    return this.userService
+      .getAllUsersPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel, getAll)
+      .pipe(
+        tap((payload) => {
+          patchState({ allUsersPage: payload });
+          return payload;
+        })
+      );
   }
 
   @Action(GetPermissionsTree)
@@ -427,16 +435,13 @@ export class SecurityState {
       tap((payload) => {
         payload.forEach((organization: Organisation) => {
           organization.regions.forEach((region: OrganizationRegion) => {
-
             region['organizationId'] = organization.organizationId;
             region['regionId'] = region.id;
             region.locations?.forEach((location: OrganizationLocation) => {
-
               location['organizationId'] = organization.organizationId;
               location['regionId'] = region.id;
               location['locationId'] = location.id;
               location.departments.forEach((department: OrganizationDepartment) => {
-
                 department['organizationId'] = organization.organizationId;
                 department['regionId'] = region.id;
                 department['locationId'] = location.id;
@@ -451,7 +456,7 @@ export class SecurityState {
   }
 
   @Action(ExportUserList)
-  ExportUserList({ }: StateContext<SecurityStateModel>, { payload }: ExportUserList): Observable<Blob> {
+  ExportUserList({}: StateContext<SecurityStateModel>, { payload }: ExportUserList): Observable<Blob> {
     return this.userService.export(payload).pipe(
       tap((file: Blob) => {
         const url = window.URL.createObjectURL(file);
@@ -461,7 +466,7 @@ export class SecurityState {
   }
 
   @Action(ExportRoleList)
-  ExportRoleList({ }: StateContext<SecurityStateModel>, { payload }: ExportRoleList): Observable<Blob> {
+  ExportRoleList({}: StateContext<SecurityStateModel>, { payload }: ExportRoleList): Observable<Blob> {
     return this.roleService.export(payload).pipe(
       tap((file: Blob) => {
         const url = window.URL.createObjectURL(file);
@@ -470,7 +475,10 @@ export class SecurityState {
     );
   }
   @Action(GetUSCanadaTimeZoneIds)
-  GetUSCanadaTimeZoneIds({ patchState }: StateContext<SecurityStateModel>, { }: GetUSCanadaTimeZoneIds): Observable<TimeZoneModel[]> {
+  GetUSCanadaTimeZoneIds(
+    { patchState }: StateContext<SecurityStateModel>,
+    {}: GetUSCanadaTimeZoneIds
+  ): Observable<TimeZoneModel[]> {
     return this.nodatimeService.getUSCanadaTimeZoneIds().pipe(
       tap((payload) => {
         patchState({ timeZones: payload });
@@ -479,4 +487,3 @@ export class SecurityState {
     );
   }
 }
-

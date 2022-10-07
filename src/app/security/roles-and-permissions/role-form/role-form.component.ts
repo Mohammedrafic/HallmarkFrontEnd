@@ -1,4 +1,14 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { combineLatest, filter, map, Observable, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -6,16 +16,22 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DrawNodeEventArgs, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { UsersAssignedToRole } from "@shared/models/user.model";
+import { UsersAssignedToRole } from '@shared/models/user.model';
 import { PermissionsTree } from '@shared/models/permission.model';
-import { GetUsersAssignedToRole } from "src/app/store/user.actions";
-import { UserState } from "src/app/store/user.state";
+import { GetUsersAssignedToRole } from 'src/app/store/user.actions';
+import { UserState } from 'src/app/store/user.state';
 
-import { GetNewRoleBusinessByUnitType, GetNewRoleBusinessByUnitTypeSucceeded, GetPermissionsTree, GetRolesForCopy } from '../../store/security.actions';
+import {
+  GetNewRoleBusinessByUnitType,
+  GetNewRoleBusinessByUnitTypeSucceeded,
+  GetPermissionsTree,
+  GetRolesForCopy,
+} from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
 import { BUSSINES_DATA_FIELDS, OPRION_FIELDS } from '../roles-and-permissions.constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Role } from '@shared/models/roles.model';
+import { AgencyStatus } from '@shared/enums/status';
 
 export type RoleTreeField = {
   dataSource: PermissionsTree;
@@ -35,8 +51,9 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   @Input() roleId: number | null;
   @Input() businessUnits: { text: string | BusinessUnitType; id: number }[];
 
-  @ViewChild('tree') tree: TreeViewComponent;
+  @Output() changeUnitId = new EventEmitter<boolean>();
 
+  @ViewChild('tree') tree: TreeViewComponent;
 
   public newRoleBussinesData: BusinessUnit[];
 
@@ -68,9 +85,15 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     return this.form.get('permissions');
   }
 
+  get businessUnitIdControl(): AbstractControl | null {
+    return this.form.get('businessUnitId');
+  }
+
   get showActiveError(): boolean {
-    return this.form.get('isActive')?.value === false
-      && (!!this.usersAssignedToRole.userNames.length || this.usersAssignedToRole.hasUsersOutsideVisibility);
+    return (
+      this.form.get('isActive')?.value === false &&
+      (!!this.usersAssignedToRole.userNames.length || this.usersAssignedToRole.hasUsersOutsideVisibility)
+    );
   }
 
   private isAlive = true;
@@ -85,6 +108,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     this.onFormChange();
     this.onNewRoleBussinesDataFetched();
     this.onUsersAssignedToRoleFetched();
+    this.subOnBusinessUnitControlChange();
 
     this.copyRoleData$ = this.store.select(SecurityState.copyRoleData).pipe(
       map((roles) => {
@@ -96,7 +120,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['roleId']?.currentValue) {
-      this.usersAssignedToRole = { userNames:[], hasUsersOutsideVisibility: false };
+      this.usersAssignedToRole = { userNames: [], hasUsersOutsideVisibility: false };
     }
   }
 
@@ -196,15 +220,39 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private onNewRoleBussinesDataFetched(): void {
-    this.actions$.pipe(ofActionSuccessful(GetNewRoleBusinessByUnitTypeSucceeded), takeWhile(() => this.isAlive)).subscribe(({ type }) => {
-      this.newRoleBussinesData = this.store.selectSnapshot(SecurityState.newRoleBussinesData)(type);
-      this.defaultBusinessValue = this.newRoleBussinesData[0]?.id;
-    })
+    this.actions$
+      .pipe(
+        ofActionSuccessful(GetNewRoleBusinessByUnitTypeSucceeded),
+        takeWhile(() => this.isAlive)
+      )
+      .subscribe(({ type }) => {
+        this.newRoleBussinesData = this.store.selectSnapshot(SecurityState.newRoleBussinesData)(type);
+        this.defaultBusinessValue = this.newRoleBussinesData[0]?.id;
+      });
   }
 
   private onUsersAssignedToRoleFetched(): void {
-    this.usersAssignedToRole$.pipe(takeWhile(() => this.isAlive))
-      .subscribe((usersAssignedToRole: UsersAssignedToRole) => this.usersAssignedToRole = usersAssignedToRole);
+    this.usersAssignedToRole$
+      .pipe(takeWhile(() => this.isAlive))
+      .subscribe((usersAssignedToRole: UsersAssignedToRole) => (this.usersAssignedToRole = usersAssignedToRole));
+  }
+
+  private subOnBusinessUnitControlChange(): void {
+    this.businessUnitIdControl?.valueChanges
+      .pipe(
+        filter((value) => !!value),
+        takeWhile(() => this.isAlive)
+      )
+      .subscribe((value: number) => {
+        if (this.businessUnitControl?.value === BusinessUnitType.Agency) {
+          const selectedRole = this.newRoleBussinesData.find((role) => role.id === value);
+          const isAgencyDisable =
+            selectedRole?.agencyStatus === AgencyStatus.Inactive ||
+            selectedRole?.agencyStatus === AgencyStatus.Terminated;
+
+          this.changeUnitId.emit(isAgencyDisable);
+        }
+      });
   }
 
   static createForm(): FormGroup {

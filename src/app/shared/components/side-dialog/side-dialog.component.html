@@ -26,11 +26,11 @@
               id="addFormButton"
               type="submit"
               [isPrimary]="true"
+              [disabled]="disableSaveButton"
               (click)="onFormSaveClick()">Save</button>
           </div>
         </div>
       </section>
-
       <ng-content></ng-content>
     </section>
   </ng-template>
