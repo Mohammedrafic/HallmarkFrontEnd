@@ -143,6 +143,11 @@ export class UserState {
   }
 
   @Selector()
+  static currentUserPermissionsIds(state: UserStateModel): number[] {
+    return state.permissions.map(({ permissionId }) => permissionId);
+  }
+
+  @Selector()
   static orderPermissions(state: UserStateModel): CurrentUserPermission[] {
     return state.orderPermissions;
   }

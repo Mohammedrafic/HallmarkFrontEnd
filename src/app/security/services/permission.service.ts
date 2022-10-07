@@ -11,11 +11,14 @@ export interface PermissionsModel {
   canCloseOrder: boolean;
 }
 
+export type CustomPermissionModel = { [key: string]: PermissionTypes  };
+export type CustomPermissionObject = { [key: string]: boolean  };
+
 @Injectable({
   providedIn: 'root',
 })
 export class PermissionService extends DestroyableDirective {
-  @Select(UserState.currentUserPermissions) private currentUserPermissions$: Observable<CurrentUserPermission[]>;
+  @Select(UserState.currentUserPermissionsIds) private currentUserPermissions$: Observable<number[]>;
 
   constructor() {
     super();
@@ -23,15 +26,25 @@ export class PermissionService extends DestroyableDirective {
 
   public getPermissions(): Observable<PermissionsModel> {
     return this.currentUserPermissions$.pipe(
-      filter((permissions: CurrentUserPermission[]) => !!permissions?.length),
+      filter((permissionIds: number[]) => !!permissionIds?.length),
       takeUntil(this.destroy$),
-      map((permissions: CurrentUserPermission[]) => {
-        const permissionIds = permissions.map(({ permissionId }: CurrentUserPermission) => permissionId);
-
+      map((permissionIds: number[]) => {
         return {
           canCreateOrder: permissionIds.includes(PermissionTypes.CanCreateOrder),
           canCloseOrder: permissionIds.includes(PermissionTypes.CanCloseOrder),
         };
+      })
+    );
+  }
+
+  public checkPermisionFor<T>(model: CustomPermissionModel): Observable<T> {
+    return this.currentUserPermissions$.pipe(
+      filter((permissionIds: number[]) => !!permissionIds?.length),
+      takeUntil(this.destroy$),
+      map((permissionIds: number[]) => {
+        const permissionObject: any = {};
+        Object.entries(model).forEach(([key, permission]) => permissionObject[key] = permissionIds.includes(permission))
+        return permissionObject as T;
       })
     );
   }
