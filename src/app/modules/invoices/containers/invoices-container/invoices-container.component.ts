@@ -120,6 +120,8 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
   public isAgency: boolean;
 
+  public agencyActionsAllowed = true;
+
   constructor(
     private store: Store,
     private cdr: ChangeDetectorRef,
@@ -135,6 +137,10 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
     this.organizationId$ = this.isAgency ? this.organizationControl.valueChanges : this.organizationChangeId$;
+
+    if (this.isAgency) {
+      this.checkActionsAllowed();
+    }
   }
 
   public ngOnInit(): void {
@@ -245,8 +251,11 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
     this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx,
       { organizationId: this.organizationId,
-        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay,
+        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay && this.agencyActionsAllowed,
+        canEdit: this.agencyActionsAllowed,
       });
+
+
     this.tabConfig = this.invoicesContainerService.getTabConfig(tabIdx);
 
     this.cdr.markForCheck();
@@ -432,6 +441,18 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
       takeUntil(this.componentDestroy()),
     ).subscribe(() => {
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.organizationId);
+    });
+  }
+
+  private checkActionsAllowed(): void {
+    this.store.select(UserState.agencyActionsAllowed)
+    .pipe(
+      distinctUntilChanged(),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((value) => {
+      console.log(value, '----------------')
+      this.agencyActionsAllowed = value;
     });
   }
 }
