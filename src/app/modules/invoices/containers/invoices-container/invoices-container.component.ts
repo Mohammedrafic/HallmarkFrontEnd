@@ -451,7 +451,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
       takeUntil(this.componentDestroy()),
     )
     .subscribe((value) => {
-      console.log(value, '----------------')
       this.agencyActionsAllowed = value;
     });
   }
