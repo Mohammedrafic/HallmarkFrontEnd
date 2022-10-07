@@ -4,14 +4,12 @@ import { ICellRendererParams } from '@ag-grid-community/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppState } from '../../../../../store/app.state';
 import { Select } from '@ngxs/store';
-import { first, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
-import { filter } from 'rxjs/operators';
-import { PermissionTypes } from '@shared/enums/permissions-types.enum';
-import { UserState } from '../../../../../store/user.state';
+import { PermissionService } from '../../../../../security/services/permission.service';
 
 @Component({
   selector: 'app-extension-edit-icon',
@@ -22,9 +20,6 @@ export class ExtensionGridActionsRendererComponent implements ICellRendererAngul
   @Select(AppState.isOrganizationAgencyArea)
   public isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
 
-  @Select(UserState.currentUserPermissions)
-  public currentUserPermissions$: Observable<any[]>;
-
   public canCreateOrder: boolean;
 
   private params: ICellRendererParams;
@@ -33,7 +28,8 @@ export class ExtensionGridActionsRendererComponent implements ICellRendererAngul
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private orderManagementService: OrderManagementService,
-    private orderManagementAgencyService: OrderManagementAgencyService
+    private orderManagementAgencyService: OrderManagementAgencyService,
+    private permissionService: PermissionService
   ) {}
 
   public agInit(params: ICellRendererParams): void {
@@ -70,14 +66,8 @@ export class ExtensionGridActionsRendererComponent implements ICellRendererAngul
   }
 
   private subscribeOnPermissions(): void {
-    this.currentUserPermissions$
-      .pipe(
-        filter((permissions) => !!permissions?.length),
-        first()
-      )
-      .subscribe((permissions) => {
-        const permissionIds = permissions.map(({ permissionId }) => permissionId);
-        this.canCreateOrder = permissionIds.includes(PermissionTypes.CanCreateOrder);
-      });
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder }) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 }

@@ -119,7 +119,7 @@ import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { PermissionService } from '../../../security/services/permission.service';
 
 @Component({
   selector: 'app-order-management-content',
@@ -262,7 +262,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     private orderManagementService: OrderManagementService,
     private orderManagementContentService: OrderManagementContentService,
     private addEditReOrderService: AddEditReorderService,
-    private reOpenOrderService: ReOpenOrderService
+    private reOpenOrderService: ReOpenOrderService,
+    private permissionService: PermissionService
   ) {
     super();
     this.isRedirectedFromDashboard =
@@ -349,17 +350,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private subscribeOnPermissions(): void {
-    this.currentUserPermissions$
-      .pipe(
-        filter((permissions) => !!permissions?.length),
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe((permissions) => {
-        const permissionIds = permissions.map(({ permissionId }) => permissionId);
-        this.canCreateOrder = permissionIds.includes(PermissionTypes.CanCreateOrder);
-        this.canCloseOrder = permissionIds.includes(PermissionTypes.CanCloseOrder);
-        this.initMenuItems();
-      });
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder }) => {
+      this.canCreateOrder = canCreateOrder;
+      this.canCloseOrder = canCloseOrder;
+      this.initMenuItems();
+    });
   }
 
   public override customExport(): void {

@@ -57,7 +57,7 @@ import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen
 import { MessageTypes } from '@shared/enums/message-types';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { UserState } from '../../../store/user.state';
-import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { PermissionService } from '../../../security/services/permission.service';
 
 enum MobileMenuItems {
   Cancel = 'Cancel',
@@ -215,7 +215,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     private actions: Actions,
     private addEditReorderService: AddEditReorderService,
     private orderManagementService: OrderManagementService,
-    private reOpenOrderService: ReOpenOrderService
+    private reOpenOrderService: ReOpenOrderService,
+    private permissionService: PermissionService
   ) {}
 
   ngOnInit(): void {
@@ -528,15 +529,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private subscribeOnPermissions(): void {
-    this.currentUserPermissions$
-      .pipe(
-        filter((permissions) => !!permissions?.length),
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe((permissions) => {
-        const permissionIds = permissions.map(({ permissionId }) => permissionId);
-        this.canCloseOrderPermission = permissionIds.includes(PermissionTypes.CanCloseOrder);
-        this.canCreateOrder = permissionIds.includes(PermissionTypes.CanCreateOrder);
-      });
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder }) => {
+      this.canCloseOrderPermission = canCloseOrder;
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 }
