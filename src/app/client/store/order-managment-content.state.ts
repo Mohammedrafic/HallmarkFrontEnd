@@ -77,7 +77,8 @@ import {
   ORDER_WITHOUT_CRED_BILLRATES,
   ORDER_WITHOUT_CREDENTIALS,
   RECORD_ADDED,
-  RECORD_MODIFIED
+  RECORD_MODIFIED,
+  updateCandidateJobMessage
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -95,6 +96,7 @@ import { ExtensionSidebarService } from '@shared/components/extension/extension-
 import { ExtensionGridModel } from '@shared/components/extension/extension-sidebar/models/extension.model';
 import { OrderType } from '@shared/enums/order-type';
 import { createUniqHashObj } from '@core/helpers/functions.helper';
+import { DateTimeHelper } from '@core/helpers';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -459,8 +461,14 @@ export class OrderManagementContentState {
     { payload }: UpdateOrganisationCandidateJob
   ): Observable<any> {
     return this.orderManagementService.updateCandidateJob(payload).pipe(
-      tap(() => {
-        dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'));
+      tap((message: { weekStartDate: string }[]) => {
+        if (message?.length) {
+          const dates = message.map(({ weekStartDate }) => DateTimeHelper.formatDateUTC(weekStartDate, 'MM/dd/YYYY'));
+
+          dispatch(new ShowToast(MessageTypes.Success, updateCandidateJobMessage(dates)));
+        } else {
+          dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'));
+        }
         dispatch(new UpdateOrganisationCandidateJobSucceed());
       }),
       catchError((error: any) => {
