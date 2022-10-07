@@ -39,6 +39,8 @@ export const ORDER_WITHOUT_CRED_BILLRATES =
   'Added order doesn’t contain the Credentials and Bill Rates. Please edit the order to onboard candidates successfully';
 export const UNSAVE_CHANGES_TEXT = 'Do you want to save changes?';
 
+export const updateCandidateJobMessage = (dates: string[]) =>
+  `For this candidate job timesheets will be recalculated for the next start dates: ${dates.join(', ')}`;
 export const usedByOrderErrorMessage = (val: string, entities: string) =>
   `${val} cannot be deleted. This ${val} was used in ${entities}.`;
 export const usedInMappingMessage = (mappingName: string) =>

@@ -156,8 +156,8 @@ export class OrderManagementContentService {
    * Update candidate job
    @param payload
    */
-  public updateCandidateJob(payload: AcceptJobDTO): Observable<void> {
-    return this.http.post<void>(`/api/AppliedCandidates/updateCandidateJob`, payload);
+  public updateCandidateJob(payload: AcceptJobDTO): Observable<{ weekStartDate: string }[]> {
+    return this.http.post<{ weekStartDate: string }[]>(`/api/AppliedCandidates/updateCandidateJob`, payload);
   }
 
   /**
