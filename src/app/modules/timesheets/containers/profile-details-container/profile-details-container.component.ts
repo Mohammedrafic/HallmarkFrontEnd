@@ -131,7 +131,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public countOfTimesheetUpdates = 0;
 
-  public allowAnyAction = true;
+  public disableAnyAction = false;
 
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
@@ -485,8 +485,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   }
 
   private checkForAllowActions(agencyStatus: AgencyStatus): void {
-    console.log(agencyStatus, 'agencyStatus');
     const allowResult = agencyStatus === AgencyStatus.Inactive || agencyStatus === AgencyStatus.Terminated;
-    this.allowAnyAction = false;
+
+    this.disableAnyAction = allowResult;
   }
 }
