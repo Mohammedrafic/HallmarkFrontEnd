@@ -24,7 +24,7 @@ import {
 } from '@syncfusion/ej2-angular-inputs';
 import { SidebarModule, TabAllModule, TabModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, DateTimePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
-import { DialogModule } from '@syncfusion/ej2-angular-popups';
+import { DialogModule, TooltipAllModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
 import {
   AlertCircle,
@@ -200,6 +200,7 @@ const sidebarIcons = {
     MaskedTextBoxModule,
     AgGridModule,
     AppGridModule,
+    TooltipAllModule,
 
     FeatherModule.pick(sidebarIcons),
 

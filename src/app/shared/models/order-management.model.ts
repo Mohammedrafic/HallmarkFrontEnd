@@ -247,6 +247,8 @@ export class GetPredefinedBillRatesData {
   orderType: OrderType;
   departmentId: number;
   skillId: number;
+  jobStartDate?: string;
+  jobEndDate?: string;
 }
 
 export class Order {

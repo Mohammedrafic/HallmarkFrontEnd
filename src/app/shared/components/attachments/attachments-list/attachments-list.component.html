@@ -19,7 +19,8 @@
           name="trash-2"
           class="icon"
           [ngStyle]="{ color: deleteIconColor }"
-          (click)="attachmentsListConfig?.delete(attachment)"
+          [class.disabled]="disableDelete"
+          (click)="!disableDelete ? attachmentsListConfig?.delete(attachment) : null"
         ></i-feather>
     </div>
 </div>

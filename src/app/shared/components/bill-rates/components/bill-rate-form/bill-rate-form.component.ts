@@ -8,6 +8,7 @@ import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
 
 import {
   BillRate,
+  BillRateCalculationType,
   BillRateCategory,
   BillRateOption,
   BillRateType,
@@ -51,11 +52,16 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
 
   public billRateOptionsForSelect: BillRateOption[];
 
-  public isIntervalMinControlRequired = true;
-  public isIntervalMaxControlRequired = true;
+  public isIntervalMinEnabled = true;
+  public isIntervalMaxEnabled = true;
+  public isIntervalMinRequired = true;
+  public isIntervalMaxRequired = true;
   public BillRateUnitList = BillRateUnit;
   public priceUtils = PriceUtils;
   public configOT: { title: string; formKey: string }[] = OtBillRatesConfiguration;
+  public additionalLableForMinMax: string | null = null;
+  public hideFilds = new Set<string>();
+  public isWeeklyOT = false;
 
   get billRateConfigControl(): AbstractControl | null {
     return this.billRateForm.get('billRateConfig');
@@ -87,11 +93,11 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
     const intervalMaxControl = this.billRateForm.controls['intervalMax'];
 
     intervalMinControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
-      this.isIntervalMinControlRequired = intervalMinControl.hasValidator(Validators.required);
+      this.isIntervalMinEnabled = intervalMinControl.hasValidator(Validators.required);
     });
 
     intervalMaxControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
-      this.isIntervalMaxControlRequired = intervalMaxControl.hasValidator(Validators.required);
+      this.isIntervalMaxEnabled = intervalMaxControl.hasValidator(Validators.required);
     });
 
     this.startEffectiveDateWatching();
@@ -154,34 +160,87 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
         });
         const intervalMinControl = this.billRateForm.get('intervalMin');
         const intervalMaxControl = this.billRateForm.get('intervalMax');
-        intervalMaxControl?.enable();
-        intervalMinControl?.enable();
-        intervalMaxControl?.addValidators(Validators.required);
-        intervalMinControl?.addValidators(Validators.required);
-        this.isIntervalMinControlRequired = true;
-        this.isIntervalMaxControlRequired = true;
+        const VALIDATORS = [Validators.required, Validators.minLength(1), Validators.maxLength(10)];
+
+        this.isIntervalMinEnabled = billRateConfig.intervalMin;;
+        this.isIntervalMaxEnabled = billRateConfig.intervalMax;;
+        this.isIntervalMinRequired = billRateConfig.intervalMinRequired;
+        this.isIntervalMaxRequired = billRateConfig.intervalMaxRequired;
+
         if (billRateConfig) {
           this.setBillTypesAndUpdateControl(billRateConfig.billTypes);
           this.selectedBillRateUnit = billRateConfig.unit;
           this.billRateForm.get('rateHour')?.setValue('');
-          if (!billRateConfig.intervalMin) {
-            intervalMinControl?.reset();
-            intervalMinControl?.disable();
-            intervalMinControl?.removeValidators(Validators.required);
-            this.isIntervalMinControlRequired = false;
-          }
-          if (!billRateConfig.intervalMax) {
-            intervalMaxControl?.reset();
-            intervalMaxControl?.disable();
-            intervalMaxControl?.removeValidators(Validators.required);
-            this.isIntervalMaxControlRequired = false;
-          }
+          this.isIntervalMinEnabled = billRateConfig.intervalMin;;
+          this.isIntervalMaxEnabled = billRateConfig.intervalMax;;
+          this.isIntervalMinRequired = billRateConfig.intervalMinRequired;
+          this.isIntervalMaxRequired = billRateConfig.intervalMaxRequired;
         }
+
+        if (this.isIntervalMinRequired) {
+          intervalMinControl?.addValidators(VALIDATORS);
+        } else {
+          intervalMinControl?.removeValidators(VALIDATORS);
+        }
+
+        if (this.isIntervalMaxRequired) {
+          intervalMaxControl?.addValidators(VALIDATORS);
+        } else {
+          intervalMaxControl?.removeValidators(VALIDATORS);
+        }
+
+        if (this.isIntervalMinEnabled) {
+          intervalMinControl?.reset();
+          intervalMinControl?.enable();
+        } else {
+          intervalMinControl?.reset();
+          intervalMinControl?.disable();
+        }
+
+        if (this.isIntervalMaxEnabled) {
+          intervalMaxControl?.reset();
+          intervalMaxControl?.enable();
+        } else {
+          intervalMaxControl?.reset();
+          intervalMaxControl?.disable();
+        }
+
+        if (
+          billRateConfig.id === BillRateCalculationType.Regular ||
+          billRateConfig.id === BillRateCalculationType.RegularLocal
+        ) {
+          intervalMinControl?.setValue(0);
+        }
+
+        this.changeFieldsSettingByType(billRateConfig.id);
+
+
         intervalMaxControl?.updateValueAndValidity();
         intervalMinControl?.updateValueAndValidity();
 
         this.setOTValue();
       });
+  }
+
+  private changeFieldsSettingByType(billRateType: BillRateCalculationType): void {
+    this.hideFilds.clear();
+    switch (billRateType) {
+      case BillRateCalculationType.RegularLocal:
+        this.additionalLableForMinMax = 'Mileage';
+        break;
+      case BillRateCalculationType.GuaranteedHours:
+        this.additionalLableForMinMax = 'Work Week';
+        this.hideFilds.add('intervalMax')
+        this.hideFilds.add('rateHour');
+        break;
+      case BillRateCalculationType.WeeklyOT:
+        this.isWeeklyOT = true;
+        break;
+      default:
+        this.isWeeklyOT = false;
+        this.additionalLableForMinMax = null;
+        break;
+    }
   }
 
   static createForm(billRates?: BillRate[]): FormGroup {
@@ -211,3 +270,4 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
     });
   }
 }
+

@@ -90,6 +90,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   };
   public showForm = true;
   public regions: OrganizationRegion[] = [];
+  public editRegions: OrganizationRegion[] = [];
   public orgStructure: OrganizationStructure;
   public selectedRegions: OrganizationRegion[] = [];
   public locations: OrganizationLocation[] = [];
@@ -154,8 +155,10 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
         if (val !== null) {
           this.selectedRegions.push(this.regions.find((region) => region.id === val) as OrganizationRegion);
           this.selectedRegions.forEach((region) => {
-            region.locations?.forEach((location) => (location.regionName = region.name));
-            this.locations = [...(region.locations as [])];
+            if (region) {
+              region.locations?.forEach((location) => (location.regionName = region.name));
+              this.locations = [...(region.locations as [])];
+            }
           });
         } else {
           this.locations = [];
@@ -256,8 +259,9 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
       .subscribe((structure: OrganizationStructure) => {
         this.orgStructure = structure;
+        this.editRegions = [this.editRegions[0], ...structure.regions];
         this.regions = structure.regions;
-        this.filterColumns.regionIds.dataSource = this.regions;
+        this.filterColumns.regionIds.dataSource = structure.regions;
       });
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
@@ -382,7 +386,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
 
   private populateDropdownWithAll(data: any): void {
     if (data.regionId === null) {
-      this.regions = [
+      this.editRegions = [
         {
           name: 'All',
           id: 0,
@@ -397,7 +401,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
       ];
       this.isAllRegionsSelected = this.isAllLocationsSelected = true;
     } else {
-      this.regions = this.orgStructure.regions;
+      this.editRegions = this.orgStructure.regions;
     }
     if (data.locationId === null) {
       this.locations = [

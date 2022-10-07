@@ -117,7 +117,7 @@ export class GetAssociateAgencies {
 
 export class SetPredefinedBillRatesData {
   static readonly type = '[order management] Set Predefined Bill Rates Data';
-  constructor(public orderType: OrderType, public departmentId: number, public skillId: number) {}
+  constructor(public orderType: OrderType, public departmentId: number, public skillId: number, public jobStartDate?: string, public jobEndDate?: string) {}
 }
 
 export class GetPredefinedBillRates {

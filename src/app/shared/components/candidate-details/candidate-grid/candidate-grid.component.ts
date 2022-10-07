@@ -8,8 +8,6 @@ import { SetPageNumber, SetPageSize } from '@shared/components/candidate-details
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { CandidateDetailsPage } from '@shared/components/candidate-details/models/candidate.model';
 import { ColDef } from '@ag-grid-community/core';
-import { UserState } from '../../../../store/user.state';
-import { distinctUntilChanged, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-candidate-grid',
@@ -31,7 +29,6 @@ export class CandidateGridComponent extends DestroyableDirective implements OnIn
   public isAgency = false;
   public isLoading = false;
   public columnDefinitions: ColDef[];
-  public agencyActionsAllowed = true;
 
   constructor(private router: Router, private store: Store) {
     super();
@@ -39,12 +36,7 @@ export class CandidateGridComponent extends DestroyableDirective implements OnIn
 
   ngOnInit(): void {
     this.isAgency = this.router.url.includes('agency');
-
-    if (this.isAgency) {
-      this.checkForAgencyStatus();
-    }
-
-    this.columnDefinitions = CandidatesColumnsDefinition(this.isAgency, this.agencyActionsAllowed);
+    this.columnDefinitions = CandidatesColumnsDefinition(this.isAgency);
   }
 
   public onRowsDropDownChanged(pageSize: number): void {
@@ -53,14 +45,5 @@ export class CandidateGridComponent extends DestroyableDirective implements OnIn
 
   public onGoToClick(pageNumber: number): void {
     this.store.dispatch(new SetPageNumber(pageNumber));
-  }
-
-  private checkForAgencyStatus(): void {
-    this.store
-      .select(UserState.agencyActionsAllowed)
-      .pipe(distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((value) => {
-        this.agencyActionsAllowed = value;
-      });
   }
 }

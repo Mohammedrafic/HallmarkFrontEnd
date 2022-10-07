@@ -374,6 +374,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     const skillIdControl = this.generalInformationForm.get('skillId') as AbstractControl;
     const durationControl = this.generalInformationForm.get('duration') as AbstractControl;
     const jobStartDateControl = this.generalInformationForm.get('jobStartDate') as AbstractControl;
+    const jobEndDateControl = this.generalInformationForm.get('jobEndDate') as AbstractControl;
     const shiftNameControl = this.generalInformationForm.get('shift') as AbstractControl;
     const shiftStartTimeControl = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
     const shiftEndTimeControl = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
@@ -395,6 +396,15 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.store.dispatch(new GetSuggestedDetails(locationId));
     });
 
+    combineLatest([orderTypeControl.valueChanges, departmentIdControl.valueChanges, skillIdControl.valueChanges, jobStartDateControl.valueChanges, jobEndDateControl.valueChanges])
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe(([orderType, departmentId, skillId, jobStartDate, jobEndDate]) => {
+      if (isNaN(parseInt(orderType)) || !departmentId || !skillId || !jobStartDate || !jobEndDate) {
+        return;
+      }
+      this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId, jobStartDate.toISOString(), jobEndDate.toISOString()));
+    });
+
     combineLatest([orderTypeControl.valueChanges, departmentIdControl.valueChanges, skillIdControl.valueChanges])
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(([orderType, departmentId, skillId]) => {
@@ -404,7 +414,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         if (!this.isEditMode) {
           this.populateHourlyRateField(orderType, departmentId, skillId);
         }
-        this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
       });
 
     combineLatest([departmentIdControl.valueChanges, skillIdControl.valueChanges])

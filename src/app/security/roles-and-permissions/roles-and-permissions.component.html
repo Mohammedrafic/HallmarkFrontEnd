@@ -48,8 +48,8 @@
   <app-roles-grid [filterForm]="businessForm" [export$]="exportRoles$" [filteredItems$]="filteredItems$" (editRoleEvent)="onEdit($event)"></app-roles-grid>
 </section>
 
-<app-side-dialog [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()">
+<app-side-dialog [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()" [disableSaveButton]="agencyActionsAllowed">
   <section>
-    <app-role-form #roleForm [form]="$any(roleFormGroup)" [businessUnits]="businessUnits" [roleId]="roleId"></app-role-form>
+    <app-role-form #roleForm [form]="$any(roleFormGroup)" [businessUnits]="businessUnits" [roleId]="roleId" (changeUnitId)="onChangeUnitId($event)"></app-role-form>
   </section>
 </app-side-dialog>

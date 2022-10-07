@@ -10,6 +10,7 @@ import { TimesheetDetails } from '../../../store/actions/timesheet-details.actio
 import { Timesheets } from '../../../store/actions/timesheets.actions';
 import { ShowToast } from '../../../../../store/app.actions';
 import { approveTimesheetDialogData } from '../../../constants';
+import { AgencyStatus } from '@shared/enums/status';
 
 @Component({
   selector: 'app-timesheet-table-status-cell',
@@ -18,6 +19,8 @@ import { approveTimesheetDialogData } from '../../../constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TimesheetTableApproveCellComponent implements ICellRendererAngularComp {
+  public disableAction = false;
+
   private isAgency = false;
   private params: ICellRendererParams;
 
@@ -31,6 +34,9 @@ export class TimesheetTableApproveCellComponent implements ICellRendererAngularC
   // gets called once before the renderer is used
   agInit(params: ICellRendererParams): void {
     this.params = params;
+    const agencyStatus = this.params.data.agencyStatus;
+
+    this.disableAction = agencyStatus === AgencyStatus.Inactive || agencyStatus === AgencyStatus.Terminated;
   }
 
   // gets called whenever the cell refreshes

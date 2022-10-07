@@ -10,7 +10,13 @@ section {
     .accent {
       color: $primary-active-blue-10;
     }
+
+    &.positions {
+      font-size: 12px;
+      line-height: 17px;
+    }
   }
+
 
   .accent {
     font-weight: 600;

@@ -1,17 +1,8 @@
 @import "colors";
 
-.action-container {
-  .e-btn.link {
-    cursor: pointer;
-    background-color: transparent;
-    color: $primary-active-blue-10;
-    font-weight: 700;
-    font-size: 14px;
-    padding: 0;
-
-    &[disabled] {
-      color: $title-black;
-      font-weight: 400;
-    }
-  }
+.link {
+  cursor: pointer;
+  color: $primary-active-blue-10;
+  font-weight: 700;
+  font-size: 14px;
 }
