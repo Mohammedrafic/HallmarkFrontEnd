@@ -18,6 +18,9 @@ export class AttachmentsListComponent implements AttachmentsListParams {
   @Input()
   public deleteIconColor: '#FF5858' | 'initial' = 'initial';
 
+  @Input()
+  public disableDelete: boolean = false;
+
   public agInit(params: AttachmentsListParams): void {
     this.attachments = params.attachments;
     this.attachmentsListConfig = params.attachmentsListConfig;

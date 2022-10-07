@@ -4,14 +4,15 @@
     ejs-button
     cssClass="e-flat secondary-icon-button"
     (click)="uploadAttachments()"
+    [disabled]="disableAction"
   >
     <span class="upload-button"><i-feather name="upload" class="icon"></i-feather></span>
   </button>
   <button
     *ngIf="editable"
     ejs-button
-    [disabled]="isDeletable"
-    [class.disabled]="isDeletable"
+    [disabled]="disableAction || isDeletable"
+    [class.disabled]="disableAction || isDeletable"
     cssClass="e-flat secondary-icon-button custom-btn"
     (click)="deleteRecord()"
   >

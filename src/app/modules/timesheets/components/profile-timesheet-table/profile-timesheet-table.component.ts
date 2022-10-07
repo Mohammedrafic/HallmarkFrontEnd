@@ -54,6 +54,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Input() actionsDisabled: boolean = false;
 
+  @Input() disableAnyAction: boolean = false;
+
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
   @Output() readonly uploadSideDialog: EventEmitter<TimesheetAttachments> = new EventEmitter<TimesheetAttachments>();
@@ -387,7 +389,11 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     const { organizationId } = this.store.snapshot().timesheets.timesheetDetails;
     this.currentTab = this.timesheetRecordsService.getCurrentTabName(idx);
     this.checkForStatusCol();
-    this.timesheetColDef = this.timesheetDetailsTableService.getTableRecordsConfig()[this.currentTab](this.isStatusColAvaliable, organizationId);
+    this.timesheetColDef = this.timesheetDetailsTableService.getTableRecordsConfig()[this.currentTab](
+      this.isStatusColAvaliable,
+      organizationId,
+      this.disableAnyAction
+    );
     this.cd.markForCheck();
   }
 
@@ -457,7 +463,11 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       this.isStatusColAvaliable = false;
     }
 
-    this.timesheetColDef = this.timesheetDetailsTableService.getTableRecordsConfig()[this.currentTab](this.isStatusColAvaliable, organizationId);
+    this.timesheetColDef = this.timesheetDetailsTableService.getTableRecordsConfig()[this.currentTab](
+      this.isStatusColAvaliable,
+      organizationId,
+      this.disableAnyAction
+    );
   }
 
   private saveRecords(): void {

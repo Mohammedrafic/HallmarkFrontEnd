@@ -20,6 +20,8 @@ export class ActionsCellComponent implements ICellRendererAngularComp {
 
   public isDeletable = true;
 
+  public disableAction = false;
+
   private recordId: number;
 
   private uploadRecordId: number;
@@ -48,6 +50,7 @@ export class ActionsCellComponent implements ICellRendererAngularComp {
     this.uploadAllowed =
       (params.colDef as ColDef).cellRendererParams.isUploadAllowed
       && params.data.state !== TimesheetDetailRecordStatuses.Deleted;
+    this.disableAction = (params.colDef as ColDef).cellRendererParams.disableAction;
     this.recordId = params.value;
     this.uploadRecordId = params.data.timesheetRecordId;
     this.recordAttachments = params.data.attachments;
