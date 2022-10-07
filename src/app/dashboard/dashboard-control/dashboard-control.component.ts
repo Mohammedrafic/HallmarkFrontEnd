@@ -32,6 +32,7 @@ export class DashboardControlComponent extends DestroyableDirective implements O
   @Input() public hasWidgetPermission: boolean;
   @Input() public allOrganizations: Organisation[];
   @Input() public userIsAdmin: boolean;
+  @Input() public isMobile: boolean;
   @Input() public skills: AllOrganizationsSkill[];
 
   @Output() public widgetToggleEmitter: EventEmitter<WidgetToggleModel> = new EventEmitter();

@@ -69,7 +69,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Input() candidateOrder: OrderCandidatesListPage;
   @Input() dialogEvent: Subject<boolean>;
   @Input() isTab: boolean = false;
-  @Input() actionsAllowed: boolean;
+  @Input() actionsAllowed: boolean = true;
 
   candidate$: Observable<OrderCandidatesList>;
 

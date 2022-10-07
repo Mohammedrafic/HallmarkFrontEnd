@@ -26,4 +26,7 @@ export enum PermissionTypes {
   WidgetInvoicesStatuses = 2090,
   CanManageNotificationsForOtherUsers = 3400,
   CanManageNotificationTemplates = 3401,
+
+  // Credentials
+  ManuallyAddCredential = 402
 }

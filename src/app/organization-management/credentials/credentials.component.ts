@@ -18,6 +18,12 @@ import { GetOrganizationStructure } from '../../store/user.actions';
 import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
 import { UserState } from 'src/app/store/user.state';
 import { User } from '@shared/models/user.model';
+import { PermissionService } from 'src/app/security/services/permission.service';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+
+type CredentialsPermision = {
+  canAddManual: boolean;
+}
 
 @Component({
   selector: 'app-credentials',
@@ -38,14 +44,19 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
   isHallmarkMspUser$: Observable<boolean>;
 
   public isCredentialListToolButtonsShown = true;
+  public isCredentialListActive = true;
+  public filteredItemsCount = 0;
+  public permission$: Observable<CredentialsPermision>;
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  public isCredentialListActive = true;
-
-  public filteredItemsCount = 0;
-
-  constructor(private router: Router, private route: ActivatedRoute, private store: Store, private actions$: Actions) {
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private store: Store,
+    private actions$: Actions,
+    private permissionService: PermissionService
+  ) {
     super();
     actions$
       .pipe(ofActionDispatched(SetCredentialsFilterCount))
@@ -54,6 +65,7 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
 
   ngOnInit(): void {
     this.store.dispatch(new GetOrganizationStructure());
+    this.permission$ = this.permissionService.checkPermisionFor<CredentialsPermision>({canAddManual: PermissionTypes.ManuallyAddCredential});
   }
 
   ngOnDestroy(): void {
@@ -110,3 +122,4 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
     credentialListComponent.showAssignSiderbar();
   }
 }
+

@@ -390,7 +390,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   hideAnalyticsSubMenuItems() {
-    let element = this.tree.element.querySelector('[data-uid="Analytics"]');
+    let element = this.tree?.element.querySelector('[data-uid="Analytics"]');
     element?.querySelectorAll('ul li').forEach((el: any) => { el.style.display = 'none' });
     element?.querySelectorAll('.e-text-content .e-icons').forEach((el: any) => { el.style.display = 'none' });
   }

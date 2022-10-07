@@ -2,6 +2,7 @@
   (deleteFilter)="onFilterDelete($event)"
   (clearAllFiltersClicked)="onFilterClearAll()"
   (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
 >
   <form [formGroup]="widgetFilterFormGroup">
     <div class="bootstrap">
@@ -17,6 +18,7 @@
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.organizationIds?.dataSource"
             [showSelectAll]="true"
+            [changeOnBlur]="!isMobile"
           >
           </ejs-multiselect>
           <span *ngIf="selectedOrganizations" class="e-badge e-badge-success e-badge-circle">{{ selectedOrganizations }}</span>
@@ -35,6 +37,7 @@
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.regionIds.dataSource"
             [showSelectAll]="true"
+            [changeOnBlur]="!isMobile"
           >
           </ejs-multiselect>
           <span *ngIf="selectedRegions" class="e-badge e-badge-success e-badge-circle">{{ selectedRegions }}</span>
@@ -53,6 +56,7 @@
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.locationIds.dataSource"
             [showSelectAll]="true"
+            [changeOnBlur]="!isMobile"
           >
           </ejs-multiselect>
           <span *ngIf="selectedLocations" class="e-badge e-badge-success e-badge-circle">{{ selectedLocations }}</span>
@@ -71,6 +75,7 @@
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.departmentsIds.dataSource"
             [showSelectAll]="true"
+            [changeOnBlur]="!isMobile"
           >
           </ejs-multiselect>
           <span *ngIf="selectedDepartments" class="e-badge e-badge-success e-badge-circle">{{ selectedDepartments }}</span>
@@ -89,6 +94,7 @@
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.skillIds.dataSource"
             [showSelectAll]="true"
+            [changeOnBlur]="!isMobile"
           >
           </ejs-multiselect>
           <span *ngIf="selectedSkills" class="e-badge e-badge-success e-badge-circle">{{ selectedSkills }}</span>

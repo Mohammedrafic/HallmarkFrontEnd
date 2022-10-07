@@ -32,6 +32,7 @@ import { isEqual } from 'lodash';
 export class WidgetFilterComponent extends DestroyableDirective implements OnInit, OnChanges {
   @Input() public allOrganizations: Organisation[];
   @Input() public userIsAdmin: boolean;
+  @Input() public isMobile: boolean;
   @Input() public savedFilterItems: FilteredItem[];
   @Input() public dashboardFilterState: DashboardFiltersModel;
   @Input() public organizationStructure: OrganizationStructure;
@@ -48,6 +49,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   private regions: OrganizationRegion[] = [];
   private sortedSkillsByOrgId: Record<string, AllOrganizationsSkill[]> = {};
   private commonSkillsIds: number[] = [];
+  private filterIsApplied: boolean = false;
 
   public widgetFilterFormGroup: FormGroup;
   public filterColumns: IFilterColumnsDataModel = {} as IFilterColumnsDataModel;
@@ -158,6 +160,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     this.filters = this.widgetFilterFormGroup.getRawValue();
     this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
     this.saveFilteredItems(this.filteredItems);
+    this.filterIsApplied = true;
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
@@ -356,5 +359,19 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
       this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
       this.saveFilteredItems(this.filteredItems);
     });
+  }
+
+  public onFilterClose(): void {
+    if(this.filterIsApplied) {
+      this.filterIsApplied = false;
+      return;
+    }
+    this.widgetFilterFormGroup.setValue({
+      ...(this.userIsAdmin && { organizationIds: this.filters.organizationIds || [] }),
+      regionIds: this.filters.regionIds || [],
+      locationIds: this.filters.locationIds || [],
+      departmentsIds: this.filters.departmentsIds || [],
+      skillIds: this.filters.skillIds || [],
+    });  
   }
 }
