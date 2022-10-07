@@ -17,7 +17,7 @@
           </div>
           <div class="e-card-content">
             <button ejs-button cssClass="e-outline button-cancel" id="cancelFormButton" (click)="onCancel()">Cancel</button>
-            <button ejs-button id="addFormButton" type="submit" [isPrimary]="true" (click)="onSave()">
+            <button ejs-button [disabled]="!agencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated" id="addFormButton" type="submit" [isPrimary]="true" (click)="onSave()">
               Save
             </button>
           </div>
@@ -30,7 +30,7 @@
             <e-tabitem>
               <ng-template #headerText> Fee Settings </ng-template>
               <ng-template #content>
-                <app-fee-settings [form]="$any(feeSettingsForm)"></app-fee-settings>
+                <app-fee-settings [editAgencyOrg]="editAgencyOrg" [areAgencyActionsAllowed]="agencyActionsAllowed" [form]="$any(feeSettingsForm)"></app-fee-settings>
               </ng-template>
             </e-tabitem>
 

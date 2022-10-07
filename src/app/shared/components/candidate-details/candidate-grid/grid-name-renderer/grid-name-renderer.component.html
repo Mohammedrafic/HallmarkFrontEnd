@@ -1,3 +1,5 @@
-<div class="link" (click)="onViewNavigation()">
-  {{cellValue.lastName}}, {{cellValue.firstName}} {{valueHelper.formatEmptyValue(cellValue.middleName)}}
+<div class="action-container">
+  <button ejs-button [disabled]="cellValue.areActionsAllowed || cellValue.agencyStatus === agencyStatus.Inactive || cellValue.agencyStatus === agencyStatus.Terminated" class="link" (click)="onViewNavigation()">
+    {{cellValue.lastName}}, {{cellValue.firstName}} {{valueHelper.formatEmptyValue(cellValue.middleName)}}
+  </button>
 </div>

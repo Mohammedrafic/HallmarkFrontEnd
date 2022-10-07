@@ -1,5 +1,26 @@
+@import "colors";
+
 form {
   margin-top: 20px;
+}
+
+.ot-label {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+
+  &__title, &__value {
+    margin: 0;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 20px;
+    color: $secondary-dark-blue-15;
+  }
+
+  &__value {
+    margin-left: 10px;
+    font-weight: 700;
+  }
 }
 
 .form-line {

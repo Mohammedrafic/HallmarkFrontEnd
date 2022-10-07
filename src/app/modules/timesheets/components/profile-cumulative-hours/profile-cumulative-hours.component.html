@@ -73,7 +73,7 @@
           <th class="week-title">Week</th>
           <th class="total-title" colspan="2">Cumulative</th>
         </tr>
-        <tr *ngFor="let legendItem of legendItems; let i = index; trackBy: trackByName">
+        <tr *ngFor="let legendItem of legendItems; let i = index">
           <td>
             <div class="marker" [style.backgroundColor]="chartColorsMap[i]"></div>
           </td>

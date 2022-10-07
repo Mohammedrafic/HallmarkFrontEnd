@@ -119,6 +119,7 @@ import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 
 @Component({
   selector: 'app-order-management-content',
@@ -153,6 +154,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @Select(OrganizationManagementState.organizationSettings)
   organizationSettings$: Observable<OrganizationSettingsGet[]>;
 
+  @Select(UserState.currentUserPermissions)
+  currentUserPermissions$: Observable<any[]>;
+
   @Select(OrderManagementContentState.candidatesJob)
   private readonly candidatesJob$: Observable<OrderCandidateJob | null>;
 
@@ -171,34 +175,13 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
   public showFilterForm = false;
   public isLockMenuButtonsShown = true;
-  public moreMenuWithDeleteButton: ItemModel[] = [
-    { text: MoreMenuType[0], id: '0' },
-    { text: MoreMenuType[1], id: '1' },
-    { text: MoreMenuType[3], id: '3' },
-  ];
-  public moreMenuWithCloseButton: ItemModel[] = [
-    { text: MoreMenuType[0], id: '0' },
-    { text: MoreMenuType[1], id: '1' },
-    { text: MoreMenuType[2], id: '2' },
-  ];
 
-  public moreMenuWithReOpenButton: ItemModel[] = [
-    { text: MoreMenuType[0], id: '0' },
-    { text: MoreMenuType[1], id: '1' },
-    { text: MoreMenuType[4], id: '4' },
-  ];
-
-  public moreMenu: ItemModel[] = [
-    { text: MoreMenuType[0], id: '0' },
-    { text: MoreMenuType[1], id: '1' },
-  ];
-
-  public reOrdersMenu: ItemModel[] = [
-    { text: MoreMenuType[0], id: '0' },
-    { text: MoreMenuType[2], id: '2' },
-  ];
-
-  public closedOrderMenu: ItemModel[] = [{ text: MoreMenuType[1], id: '1' }];
+  public moreMenuWithDeleteButton: ItemModel[];
+  public moreMenuWithCloseButton: ItemModel[];
+  public moreMenuWithReOpenButton: ItemModel[];
+  public moreMenu: ItemModel[];
+  public reOrdersMenu: ItemModel[];
+  public closedOrderMenu: ItemModel[];
 
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
@@ -243,6 +226,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public orderStatus = OrderStatus;
   public reOrderCount$ = new Subject<number>();
   public orderTypes = OrderType;
+  public canCreateOrder: boolean;
+  public canCloseOrder: boolean;
 
   private selectedCandidateMeta: { order: number; positionId: number } | null;
   private selectedIndex: number | null;
@@ -353,6 +338,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.handleRedirectFromQuickOrderToast();
     this.showFilterFormAfterOpenDialog();
     this.getProjectSpecialData();
+    this.subscribeOnPermissions();
   }
 
   ngOnDestroy(): void {
@@ -360,6 +346,20 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.store.dispatch(new ClearSelectedOrder());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private subscribeOnPermissions(): void {
+    this.currentUserPermissions$
+      .pipe(
+        filter((permissions) => !!permissions?.length),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((permissions) => {
+        const permissionIds = permissions.map(({ permissionId }) => permissionId);
+        this.canCreateOrder = permissionIds.includes(PermissionTypes.CanCreateOrder);
+        this.canCloseOrder = permissionIds.includes(PermissionTypes.CanCloseOrder);
+        this.initMenuItems();
+      });
   }
 
   public override customExport(): void {
@@ -698,6 +698,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     if (!event.isInteracted) {
       if (event.data?.isTemplate) {
+        if (!this.canCreateOrder) {
+          return;
+        }
         this.navigateToOrderTemplateForm();
         this.store.dispatch(new GetSelectedOrderById(event.data.id));
       } else {
@@ -904,6 +907,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public deleteOrder(id: number): void {
+    if (!this.canCreateOrder) {
+      return;
+    }
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
@@ -1527,5 +1533,37 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.filterColumns.poNumberIds.dataSource = poNumbers;
       });
     });
+  }
+
+  private initMenuItems(): void {
+    this.moreMenuWithDeleteButton = [
+      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[3], id: '3', disabled: !this.canCreateOrder },
+    ];
+
+    this.moreMenuWithCloseButton = [
+      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[2], id: '2', disabled: !this.canCloseOrder },
+    ];
+
+    this.moreMenuWithReOpenButton = [
+      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[4], id: '4', disabled: !this.canCreateOrder },
+    ];
+
+    this.moreMenu = [
+      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder },
+    ];
+
+    this.reOrdersMenu = [
+      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[2], id: '2', disabled: !this.canCloseOrder },
+    ];
+
+    this.closedOrderMenu = [{ text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder }];
   }
 }

@@ -129,3 +129,36 @@
     }
   }
 }
+
+
+::ng-deep {
+  .organization-agency-dropdown-popup {
+    &.e-ddl.e-popup.e-control.e-popup-open .e-dropdownbase {
+      border-radius: 0 0 8px 8px;
+    }
+
+    .e-filter-parent {
+      padding: 17px !important;
+
+      .e-input-group.e-control-wrapper {
+        border: 1px solid $secondary-dark-blue-40 !important;
+        border-radius: 8px;
+
+        input.e-input-filter.e-input {
+          height: 24px;
+          font-size: 14px;
+          color: $secondary-dark-blue-15;
+        }
+
+        &::before {
+          display: none;
+        }
+
+        &::after {
+          display: none;
+        }
+      }
+    }
+  }
+}
+    

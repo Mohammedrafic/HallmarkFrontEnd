@@ -83,7 +83,11 @@ export class UserService {
    * Get Alerts for Current User
    * @returns list of alerts
    */
-   public getAlertsForUser(): Observable<AlertsModel[]> {
+  public getAlertsForUser(): Observable<AlertsModel[]> {
     return this.http.get<AlertsModel[]>('/api/Alerts/GetAlertsForUser');
+  }
+
+  public getOrderPermissions(orderId: number): Observable<CurrentUserPermission[]> {
+    return this.http.get<CurrentUserPermission[]>('/api/Permissions/orderscope/' + orderId);
   }
 }
