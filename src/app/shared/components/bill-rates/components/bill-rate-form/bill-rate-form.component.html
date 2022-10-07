@@ -60,7 +60,7 @@
       </div>
     </div>
 
-    <div class="input-container bootstrap">
+    <div class="input-container bootstrap" *ngIf="!hideFilds.has('rateHour')">
       <label *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier">Multiplier <span class="required">*</span></label>
       <label *ngIf="selectedBillRateUnit === BillRateUnitList.Currency">Amount <span class="required">*</span></label>
       <label *ngIf="selectedBillRateUnit === BillRateUnitList.Hours">Hours <span class="required">*</span></label>
@@ -100,11 +100,12 @@
     <!-- Internal Min -->
     <div class="input-container bootstrap">
       <label>
-        Interval Min
-        <span *ngIf="isIntervalMinControlRequired" class="required">*</span>
+        {{additionalLableForMinMax ?? 'Interval'}} Min
+        <span *ngIf="isIntervalMinRequired" class="required">*</span>
       </label>
       <div class="input-group">
         <ejs-numerictextbox
+          *ngIf="!isWeeklyOT; else intervalMinWithTooltip"
           id="intervalMin"
           class="e-input"
           appValidateWithMessage
@@ -116,14 +117,33 @@
           format="#"
           formControlName="intervalMin"
         ></ejs-numerictextbox>
+
+        <ng-template #intervalMinWithTooltip>
+          <ejs-tooltip target='.e-info' 
+            content="Weekly OT rate will be paid after total hours worked per week exceed the set number"
+          >
+            <ejs-numerictextbox
+              id="intervalMin"
+              class="e-input e-info"
+              appValidateWithMessage
+              min="0"
+              maxlength="10"
+              [validateDecimalOnType]="true"
+              [showSpinButton]="false"
+              decimals='0'
+              format="#"
+              formControlName="intervalMin"
+            ></ejs-numerictextbox>
+          </ejs-tooltip>
+        </ng-template>
       </div>
     </div>
 
     <!-- Internal Max -->
-    <div class="input-container bootstrap">
+    <div class="input-container bootstrap" *ngIf="!hideFilds.has('intervalMax')">
       <label>
-        Interval Max
-        <span *ngIf="isIntervalMaxControlRequired" class="required">*</span>
+        {{additionalLableForMinMax ?? 'Interval'}} Max
+        <span *ngIf="isIntervalMaxRequired" class="required">*</span>
       </label>
       <div class="input-group">
         <ejs-numerictextbox

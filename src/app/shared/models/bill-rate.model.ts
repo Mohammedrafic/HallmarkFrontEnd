@@ -28,6 +28,25 @@ export enum BillRateUnit
   Multiplier = 3
 }
 
+export enum BillRateCalculationType
+{
+    Regular = 1,
+    RegularLocal,
+    GuaranteedHours,
+    Callback,
+    Charge,
+    Holiday,
+    Oncall,
+    Orientation = 9,
+    Preceptor,
+    Mileage,
+    DailyOT,
+    DailyPremiumOT,
+    WeeklyOT,
+    SevenDayOT,
+    SevenDayPremiumOT,
+}
+
 export type BillRateOption = {
   id: number;
   category: BillRateCategory;
@@ -40,6 +59,11 @@ export type BillRateOption = {
   seventhDayOtEnabled?: boolean;
   weeklyOtEnabled?: boolean;
   dailyOtEnabled?: boolean;
+  disableFixed: boolean;
+  intervalMinRequired: boolean;
+  intervalMaxRequired: boolean;
+  disableMultiplier: boolean;
+  disableAdditional: boolean;
 };
 
 export interface BillRate {
@@ -154,8 +178,6 @@ export class BillRateSetupPost {
   considerForWeeklyOT: boolean;
   considerForDailyOT: boolean;
   considerFor7thDayOT: boolean;
-  regularLocal: boolean;
-  displayInTimesheet: boolean;
   displayInJob: boolean;
   forceUpsert?: boolean;
   billType: number;
