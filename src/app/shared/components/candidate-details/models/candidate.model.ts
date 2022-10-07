@@ -25,8 +25,6 @@ export interface CandidatesDetailsModel extends CandidatesBasicInfo {
   status: number;
   publicId: number;
   orderType: number;
-  areActionsAllowed: boolean;
-  agencyStatus: number;
 }
 
 export type CandidateDetailsPage = PageOfCollections<CandidatesDetailsModel>;

@@ -11,7 +11,7 @@ import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions'
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { CandidatesDetailsModel } from '@shared/components/candidate-details/models/candidate.model';
 import { SetCandidateMessage } from '@shared/components/candidate-details/store/candidate.actions';
-import { AgencyStatus, CandidatesStatusText } from '@shared/enums/status';
+import { CandidatesStatusText } from '@shared/enums/status';
 
 @Component({
   selector: 'app-grid-name-renderer',
@@ -21,7 +21,6 @@ import { AgencyStatus, CandidatesStatusText } from '@shared/enums/status';
 export class GridNameRendererComponent implements ICellRendererAngularComp {
   public cellValue: CandidatesDetailsModel;
   public valueHelper = new GridHelper();
-  public readonly agencyStatus = AgencyStatus;
 
   constructor(private store: Store, private router: Router) {}
 

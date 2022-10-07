@@ -10,7 +10,6 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { SetLastSelectedOrganizationAgencyId } from '../../../../../store/user.actions';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { CandidatesDetailsModel } from '@shared/components/candidate-details/models/candidate.model';
-import { AgencyStatus } from '@shared/enums/status';
 
 @Component({
   selector: 'app-grid-position-renderer',
@@ -19,7 +18,6 @@ import { AgencyStatus } from '@shared/enums/status';
 })
 export class GridPositionRendererComponent implements ICellRendererAngularComp {
   public cellValue: CandidatesDetailsModel;
-  public readonly agencyStatus = AgencyStatus;
 
   constructor(
     private store: Store,
