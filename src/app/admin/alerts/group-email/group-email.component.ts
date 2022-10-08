@@ -45,7 +45,6 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   @Output() editEmailTemplateEvent = new EventEmitter();
   public tools = toolsRichTextEditor;
   targetElement: HTMLElement = document.body;
-  public groupEmailData: GroupEmail;
   public userObj: User | null;
   @Select(SecurityState.bussinesData)
   public businessData$: Observable<BusinessUnit[]>;
@@ -72,20 +71,21 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
 
   @Select(AppState.isDarkTheme)
   isDarkTheme$: Observable<boolean>;
+  public isSend:boolean=true;
 
   public viewGroupEmailData: GroupEmail = {
     id: 0,
-    subjectMail: '',
-    bodyMail: '',
-    toList: '',
-    cCList: '',
-    bCCList: '',
+    subjectMail: "",
+    bodyMail: "",
+    toList: "",
+    cCList: "",
+    bCCList: "",
     status: null,
-    fromMail: '',
+    fromMail: "",
     businessUnitId: null,
-    sentBy: '',
-    sentOn: '',
-    statusString: ''
+    sentBy: "",
+    sentOn: "",
+    statusString: ""
   };
   public unsubscribe$: Subject<void> = new Subject();
   get templateEmailTitle(): string {
@@ -121,7 +121,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     private confirmService: ConfirmService,
     private store: Store) {
     super();
-    store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+    store.dispatch(new SetHeaderState({ title: this.title, iconName: "" }));
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
     }
@@ -159,7 +159,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       },
       {
         headerName: 'CC',
-        field: 'toList',
+        field: 'cCList',
         filter: 'agTextColumnFilter',
         filterParams: {
           buttons: ['reset'],
@@ -221,22 +221,24 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     noRowsMessageFunc: () => 'No Rows To Show',
   };
   ngOnInit(): void {
-    this.businessForm = this.generateBusinessForm();
     const user = this.store.selectSnapshot(UserState.user);
     this.userObj = user;
     this.sendGroupEmailFormGroup = SendGroupEmailComponent.createForm();
 
     this.viewGroupEmail$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
       
-      if (data != undefined) {
-        this.viewGroupEmailData = data;         
-        this.UpdateForm(data);        
+      if (data != undefined) {        
+        this.groupEmailTemplateForm.rteCreated();
+        this.viewGroupEmailData = data;
+        this.UpdateForm(data);           
+            
         this.store.dispatch(new ShowGroupEmailSideDialog(true));
       }
     });
     
     this.sendGroupEmail$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
-      if (data != undefined && data != null) {        
+      if (data != undefined && data != null) {
+        this.dispatchNewPage();       
           this.groupEmailCloseDialog(); 
         this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
       }
@@ -307,11 +309,14 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     }
   }
   public onView({ index, column, foreignKeyData, id, ...groupEMail }: GroupEmail & { index: string; column: unknown; foreignKeyData: unknown }): void {
-
-    this.groupEmailTemplateForm.groupEmailTemplateForm.reset();
-    this.groupEmailData = { id, ...groupEMail };
-    this.dispatchViewGroupEmail(this.groupEmailData.id);
+   this.ResetForm();
+    this.groupEmailTemplateForm.isSend=false;
     this.groupEmailTemplateForm.rteCreated();
+    this.viewGroupEmailData ={id,...groupEMail};
+    this.UpdateForm(this.viewGroupEmailData);           
+        
+    this.store.dispatch(new ShowGroupEmailSideDialog(true));
+    //this.dispatchViewGroupEmail(id);
   }
   public onGroupEmailAddCancel(): void {
     this.groupEmailCloseDialog();
@@ -322,20 +327,21 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     if (this.groupEmailTemplateForm.groupEmailTemplateForm.valid && this.groupEmailTemplateForm.groupEmailTemplateForm.errors == null) {
       const formValues = this.groupEmailTemplateForm.groupEmailTemplateForm.getRawValue();
       const sendGroupEmailDto: SendGroupEmailRequest = {
-        businessUnitId: formValues.business,
+        businessUnitId: formValues.business==0?null:formValues.business,
         bodyMail: formValues.emailBody,
         subjectMail: formValues.emailSubject,
-        toList: formValues.emailTo == undefined ? '' : formValues.emailTo,
-        cCList: formValues.emailCc == undefined ? '' : formValues.emailCc,
-        bCCList: '',
+        toList: formValues.emailTo == undefined ? "" : formValues.emailTo,
+        cCList: formValues.emailCc == undefined ? "" : formValues.emailCc,
+        bCCList: "",
         status: GroupMailStatus.Pending,
-        fromMail: this.userObj?.email==undefined?'':this.userObj?.email
+        fromMail: this.userObj?.email==undefined?"":this.userObj?.email
       };
       this.store.dispatch(new SendGroupEmail(sendGroupEmailDto));
 
     }
   }
   public onGroupEmailFormSendClick():void{
+    this.groupEmailTemplateForm.isSend=true;
     this.ResetForm();
      this.groupEmailTemplateForm.rteCreated();
     this.store.dispatch(new ShowGroupEmailSideDialog(true));
@@ -344,17 +350,12 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   private groupEmailCloseDialog(): void {
     this.store.dispatch(new ShowGroupEmailSideDialog(false));
   }
-  private generateBusinessForm(): FormGroup {
-    return new FormGroup({
-      businessUnit: new FormControl(),
-      business: new FormControl(0),
-    });
-  }
-  private UpdateForm(data: GroupEmail): void {
+  
+  private UpdateForm(data: any): void {
     this.groupEmailTemplateForm.emailBody = data.bodyMail;
     this.groupEmailTemplateForm.emailSubject = data.subjectMail;
     this.groupEmailTemplateForm.emailTo=data.toList==null?"":data.toList;
-    this.groupEmailTemplateForm.emailCc=data.cCList==null?"":data.cCList;
+    this.groupEmailTemplateForm.emailCc=data.ccList==null?"":data.ccList;
 
   }
   private ResetForm(): void {

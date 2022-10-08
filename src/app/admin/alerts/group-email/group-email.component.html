@@ -1,6 +1,6 @@
 <app-page-toolbar>
     <ng-container right>
-      <div class="bootstrap business-dropdowns" [formGroup]="businessForm">
+      <div class="bootstrap business-dropdowns">
         <div class="dropdown-container">
           <button
           ejs-button
@@ -53,7 +53,8 @@
     <section>
       <app-send-group-email #emailTemplateForm [groupEmailTemplateForm]="$any(sendGroupEmailFormGroup)" [title]="templateEmailTitle"
                                       [emailSubject]="viewGroupEmailData.subjectMail" [emailBody]="viewGroupEmailData.bodyMail"
-                                      [emailTo]="viewGroupEmailData.toList" [emailCc]="viewGroupEmailData.cCList">
+                                      [emailTo]="viewGroupEmailData.toList" [emailCc]="viewGroupEmailData.cCList"
+                                      [isSend]="isSend">
      </app-send-group-email>
     </section>
   </app-send-email-side-dialog>

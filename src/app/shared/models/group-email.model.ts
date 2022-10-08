@@ -28,7 +28,7 @@ export type GroupEmail = {
     toList:string |null,
     cCList:string | null,
     bCCList:string | null,
-    status:number |null,
+    status:GroupMailStatus |null,
     fromMail:string | null,
     businessUnitId:number |null
   };

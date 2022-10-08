@@ -37,8 +37,9 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   @Input() title: string;
   @Input() emailSubject: string;
   @Input() emailBody: string;
-  @Input() emailTo: string|null;
-  @Input() emailCc: string|null;
+  @Input() emailTo: string | null;
+  @Input() emailCc: string | null;
+  @Input() isSend: boolean = true;
   override selectedItems: any;
 
   @Output() formCancelClicked = new EventEmitter();
@@ -98,7 +99,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   }
   private dispatchNewPage(user: any, sortModel: any = null, filterModel: any = null): void {
     const { businessUnit } = this.groupEmailTemplateForm?.getRawValue();
-    if (user != 0) {
+    if (user != 0 &&businessUnit!=null) {
       this.userGuid = user;
       this.store.dispatch(new GetUserSubscriptionPage(businessUnit || null, user, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
     }
@@ -109,8 +110,6 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
 
   }
   ngOnInit(): void {
-
-    this.groupEmailTemplateForm = this.generateBusinessForm()
     this.onBusinessUnitValueChanged();
     this.onBusinessValueChanged();
     this.onUserValueChanged();
@@ -153,51 +152,46 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
 
   }
   private dispatchUserPage(businessUnitIds: number[]) {
+    if(this.businessUnitControl.value!=null)
+    {
     this.store.dispatch(new GetAllUsersPage(this.businessUnitControl.value, businessUnitIds, this.currentPage, this.pageSize, null, null, true));
+    }  
   }
-
-  public generateBusinessForm(): FormGroup {
-    return new FormGroup({
-      businessUnit: new FormControl(),
-      business: new FormControl(0),
-      user: new FormControl(0),
-      emailCc: new FormControl(''),
-      emailTo: new FormControl(''),
-      emailSubject: new FormControl(''),
-      emailBody: new FormControl('')
-    });
-  }
+  
   private onBusinessUnitValueChanged(): void {
 
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      this.userData = [];
-      this.dispatchNewPage(null);
-      console.log("value", value);
+      if (this.isSend == true&&value!=null) {
+        this.userData = [];
+        this.dispatchNewPage(null);
+        console.log("value", value);
 
-      this.store.dispatch(new GetBusinessByUnitType(value));
-      if (value == 1) {
-        this.dispatchUserPage([]);
-      }
-      else {
-        this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-          if (!this.isBusinessFormDisabled && data.length > 0) {
-            if (this.groupEmailTemplateForm.controls['business'].value != data[0].id) {
-              this.groupEmailTemplateForm.controls['business'].setValue(data[0].id);
+        this.store.dispatch(new GetBusinessByUnitType(value));
+        if (value == 1) {
+          this.dispatchUserPage([]);
+        }
+        else {
+          this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+            if (!this.isBusinessFormDisabled && data.length > 0) {
+              if (this.groupEmailTemplateForm.controls['business'].value != data[0].id) {
+                this.groupEmailTemplateForm.controls['business'].setValue(data[0].id);
+              }
             }
-          }
-        });
+          });
 
-        this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-          if (data != undefined && this.userData.length > 0) {
-            if (this.groupEmailTemplateForm.controls['user'].value != this.userData[0].id)
-              this.groupEmailTemplateForm.controls['user'].setValue(this.userData[0].id);
-          }
-        });
+          this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+            if (data != undefined && this.userData.length > 0) {
+              if (this.groupEmailTemplateForm.controls['user'].value != this.userData[0].id)
+                this.groupEmailTemplateForm.controls['user'].setValue(this.userData[0].id);
+            }
+          });
+        }
       }
     });
   }
   private onBusinessValueChanged(): void {
     this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      if (this.isSend == true) {
       this.userData = [];
       this.dispatchNewPage(null);
       let businessUnitIds = [];
@@ -205,20 +199,22 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
         businessUnitIds.push(this.businessControl.value);
       }
       this.dispatchUserPage(businessUnitIds);
+    }
 
     });
   }
   private onUserValueChanged(): void {
     console.log("change")
     this.usersControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      if (this.isSend == true) {
       console.log("user value", value)
       this.dispatchNewPage(value);
-
+      }
     });
   }
 
   rteCreated(): void {
-   this.rteObj.toolbarSettings.type = ToolbarType.Scrollable;
+    this.rteObj.toolbarSettings.type = ToolbarType.Scrollable;
     this.rteObj.toolbarSettings.enableFloating = true;
     this.rteObj.height = '300px';
   }
@@ -237,11 +233,11 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
       emailBody: new FormControl('', [Validators.required])
     });
   }
-  
+
   onFormCancelClick(): void {
     this.formCancelClicked.emit();
   }
-  
+
   public async onChange(args: any) {
     console.log('Change event', args);
     let checkedItems: any[] = []
@@ -253,17 +249,17 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
 
     let results: any = []
     results = this.userData.filter(({ id: id1 }) => checkedItems.some(({ id: id2 }) => id2 === id1));
-    
+
     var data = results.map((t: {
       email: any; "": any;
     }) => t.email);
     var str = data.join(", ");
     this.emailTo = str;
-    
+
   }
 
   onFormSaveClick(): void {
-   
+
     this.formSaveClicked.emit();
   }
 
