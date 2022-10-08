@@ -1,6 +1,6 @@
 <ejs-dialog
-  id="emailSideDialog"
-  #emailSideDialog
+  id="groupEmailSideDialog"
+  #groupEmailSideDialog
   cssClass="dialog"
   [width]="width"
   [target]="targetElement"
@@ -19,14 +19,14 @@
             <button
               ejs-button
               cssClass="e-outline button-cancel"
-              id="cancelEmailFormButton"
-              (click)="onemailFormCancelClick()">Cancel</button>
+              id="cancelGroupEmailFormButton"
+              (click)="onGroupEmailFormCancelClick()">Cancel</button>
             <button
               ejs-button
-              id="addEmailFormButton"
+              id="sendGroupEmailFormButton"
               type="submit"
               [isPrimary]="true"
-              (click)="onemailFormSaveClick()">Send</button>
+              (click)="onGroupEmailFormSendClick()">Send</button>
        
           <!-- <button
           ejs-button

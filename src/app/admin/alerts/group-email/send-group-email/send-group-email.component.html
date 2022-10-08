@@ -1,116 +1,62 @@
-<div [formGroup]="addEditEmailTemplateForm" id="addEditEmailTemplateForm" class="email-template-form">
+<div [formGroup]="groupEmailTemplateForm" id="groupEmailTemplateForm" class="email-template-form">
     <div class="section-container">
-        <div class="bootstrap business-dropdowns" >    
-        <div class="dropdown-container">
-            <div class="input-group dropdown">
-              <ejs-dropdownlist appValidateWithMessage
-                                formControlName="businessUnit"
-                                [fields]="optionFields"
-                                [dataSource]="businessUnits"
-                                placeholder="Business Unit"></ejs-dropdownlist>
-            </div>
-          </div>
-          <div class="dropdown-container">
-            <div class="input-group dropdown">
-              <ejs-dropdownlist appValidateWithMessage
-                                formControlName="business"
-                                [fields]="businessDataFields"
-                                [dataSource]="businessData$ | async"
-                                [value]="defaultBusinessValue"
-                                placeholder=Business></ejs-dropdownlist>
-            </div>
-          </div>
 
-          <div class="dropdown-container">
-            <div class="input-group dropdown">
-              <!-- <ejs-dropdownlist appValidateWithMessage
-                                formControlName="user"
-                                [fields]="userDataFields"
-                                [dataSource]="userData"
-                                [value]="defaultUserValue"
-                                placeholder=User></ejs-dropdownlist> -->
-                                <!-- <app-multiselect-dropdown
-
-                                mode="CheckBox"
-                                formControlName="user"
-                                [fields]="userDataFields"
-                
-                                [dataSource]="userData"
-                                [showSelectAll]="true"
-                                controlName="user"
-                                placeholder="Business"
-                                selectAllText="All"
-               
-
-
-                              ></app-multiselect-dropdown>   -->
-                              
-                               <ejs-multiselect
-                              id="localData"
-                              #local
-                              [dataSource]="userData"                    
-                              [fields]="userDataFields"                
-                              placeholder="Business"                  
-                              (change)="onChange($event)"                  
-                              mode="CheckBox"                  
-                              selectAllText="All"                  
-                             showSelectAll="true"                                                 
-                            ></ejs-multiselect> 
-                              <!-- <ejs-multiselect mode="CheckBox"
-                              formControlName="user"
-                              placeholder="All"
-                              selectAllText="Select All"                 
-                              [fields]="userDataFields"
-                              [showSelectAll]="true"
-                              [allowFiltering]="false"
-                              [showDropDownIcon]="true"
-                              [dataSource]="userData"> -->
-             <!-- </ejs-multiselect>        -->
-            </div>
-          </div>
-        </div>
         <div class="left-section">
-        
-          <div class="input-container bootstrap top-container">
-        
-            <label>To<span class="required">*</span></label>
-            <div class="input-group">
-                <input appValidateWithMessage formControlName="toAddress" class="e-input" type="text"[(ngModel)]="toEmail"/>
+            <div class="bootstrap business-dropdowns">
+                <div class="dropdown-container">
+                    <div class="input-group dropdown">
+                        <ejs-dropdownlist appValidateWithMessage formControlName="businessUnit" [fields]="optionFields"
+                            [dataSource]="businessUnits" placeholder="Business Unit"></ejs-dropdownlist>
+                    </div>
+                </div>
+                <div class="dropdown-container">
+                    <div class="input-group dropdown">
+                        <ejs-dropdownlist appValidateWithMessage formControlName="business"
+                            [fields]="businessDataFields" [dataSource]="businessData$ | async"
+                            [value]="defaultBusinessValue" placeholder="Business">
+                        </ejs-dropdownlist>
+                    </div>
+                </div>
+
+                <div class="dropdown-container">
+                    <div class="input-group dropdown">
+                        <ejs-multiselect id="localData" #local [dataSource]="userData" [fields]="userDataFields"
+                            placeholder="User" (change)="onChange($event)" mode="CheckBox" selectAllText="All"
+                            showSelectAll="true" [allowFiltering]="true" [showDropDownIcon]="true"></ejs-multiselect>
+                    </div>
+                </div>
             </div>
-            <label>CC<span class="required">*</span></label>
-            <div class="input-group">
-                <input appValidateWithMessage formControlName="ccMail" class="e-input" type="text"  />
+            <div class="input-container bootstrap top-container">
+
+                <label>To<span class="required">*</span></label>
+                <div class="input-group">
+                    <input appValidateWithMessage formControlName="emailTo" class="e-input" type="text"
+                        [(ngModel)]="emailTo" />
+                </div>
+            </div>
+            <div class="input-container bootstrap top-container">
+                <label>CC<span class="required">*</span></label>
+                <div class="input-group">
+                    <input appValidateWithMessage formControlName="emailCc" class="e-input" type="text"
+                        [(ngModel)]="emailCc" />
+                </div>
             </div>
             <div class="input-container bootstrap top-container">
                 <label>Subject<span class="required">*</span></label>
                 <div class="input-group">
-                    <input appValidateWithMessage formControlName="subjectMail" class="e-input" type="text"  />
+                    <input appValidateWithMessage formControlName="emailSubject" class="e-input" type="text"
+                        [(ngModel)]="emailSubject" />
                 </div>
             </div>
             <div class="rich-text-container">
                 <label>Mail Body<span class="required">*</span></label>
                 <div class="input-group">
-                    <ejs-richtexteditor #RTE id='defaultRTE' appValidateWithMessage formControlName="BodyMail"
-                        [toolbarSettings]='tools' [(ngModel)]='alertBody' [(value)]='alertBody'>
+                    <ejs-richtexteditor #RTEGroupEmail id='defaultGroupEmailRTE' appValidateWithMessage
+                        formControlName="emailBody" [toolbarSettings]='tools' [(ngModel)]='emailBody'
+                        [(value)]='emailBody'>
                     </ejs-richtexteditor>
                 </div>
             </div>
-        </div>
-        <div class="right-section">
 
-            <!-- <div class="input-container bootstrap top-container">
-                <div class="input-group">
-                </div>
-            </div>
-
-            <div class="input-container bootstrap">
-                <label>Attributes</label>
-                <div>
-                    <ejs-listview id="listbox" [dataSource]='templateParamsData'>
-                    </ejs-listview>
-                </div>
-            </div> -->
         </div>
     </div>
-</div>
-</div>

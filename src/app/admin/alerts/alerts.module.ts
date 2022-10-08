@@ -4,8 +4,8 @@ import { AlertsRoutingModule } from './alerts-routing.module';
 import { UserSubscriptionComponent } from './user-subscription/user-subscription.component';
 import { AlertsComponent } from './alerts.component';
 import { PageToolbarModule } from '@shared/components/page-toolbar/page-toolbar.module';
-import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
-import {SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import { DropDownListModule,MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
+import {SwitchModule ,ButtonModule} from '@syncfusion/ej2-angular-buttons';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MultiselectDropdownModule } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module';
 import {FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -26,6 +26,7 @@ import { GroupEmailComponent } from './group-email/group-email.component';
 import { SendGroupEmailComponent } from './group-email/send-group-email/send-group-email.component';
 
 
+
 @NgModule({
   declarations: [
     AlertsComponent,
@@ -43,6 +44,7 @@ import { SendGroupEmailComponent } from './group-email/send-group-email/send-gro
     AlertsRoutingModule,
     PageToolbarModule,
     DropDownListModule,
+    MultiSelectAllModule,
     AgGridModule,
     MultiselectDropdownModule,    
     ReactiveFormsModule,
@@ -51,6 +53,7 @@ import { SendGroupEmailComponent } from './group-email/send-group-email/send-gro
     ListBoxAllModule,
     ListViewAllModule,
     SwitchModule,
+    ButtonModule,
     SharedModule,
     DialogModule,
     TextBoxModule,

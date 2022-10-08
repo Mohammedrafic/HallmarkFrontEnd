@@ -7,10 +7,10 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { GridReadyEvent } from '@ag-grid-community/core';
-import { ClearAlertTemplateState, GetAlertsTemplatePage, GetTemplateByAlertId, SaveTemplateByAlertId, UpdateTemplateByAlertId } from '@admin/store/alerts.actions';
+import { ClearAlertTemplateState, GetAlertsTemplatePage, GetGroupEmailById, GetTemplateByAlertId, SaveTemplateByAlertId, SendGroupEmail, UpdateTemplateByAlertId } from '@admin/store/alerts.actions';
 import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from '@shared/models/alerts-template.model';
 import { AlertsState } from '@admin/store/alerts.state';
-import { SetHeaderState, ShowEmailSideDialog, ShowSmsSideDialog, ShowOnScreenSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowGroupEmailSideDialog, ShowSmsSideDialog, ShowOnScreenSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 
@@ -25,32 +25,28 @@ import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { RECORD_ADDED, RECORD_MODIFIED, GRID_CONFIG } from '@shared/constants';
+import { RECORD_ADDED, RECORD_MODIFIED, GRID_CONFIG, SEND_EMAIL } from '@shared/constants';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AppState } from '../../../store/app.state';
 import { AlertsEmailTemplateFormComponent } from '../alerts-template/alerts-email-template-form/alerts-email-template-form.component';
 import { AlertsSmsTemplateFromComponent } from '../alerts-template/alerts-sms-template-from/alerts-sms-template-from.component';
 import { SendGroupEmailComponent } from './send-group-email/send-group-email.component';
-import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailFilters } from '@shared/models/group-email.model';
+import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailFilters, GroupEmailRequest, SendGroupEmailRequest } from '@shared/models/group-email.model';
 import { GetGroupMailByBusinessUnitIdPage } from '@admin/store/alerts.actions';
 import { User } from '@shared/models/user.model';
+import { GroupMailStatus } from '../group-email.enum';
 @Component({
   selector: 'app-group-email',
   templateUrl: './group-email.component.html',
   styleUrls: ['./group-email.component.scss']
 })
-export class GroupEmailComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy
- {
+export class GroupEmailComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Output() editEmailTemplateEvent = new EventEmitter();
-  @Output() editSmsTemplateEvent = new EventEmitter();
-  @Output() editOnScreenTemplateEvent = new EventEmitter();
   public tools = toolsRichTextEditor;
   targetElement: HTMLElement = document.body;
-  public alertTemplateType: string;
-  public alertChannel:AlertChannel;
-  public alertTemplate:AlertsTemplate;
-  public userObj:User |null;
+  public groupEmailData: GroupEmail;
+  public userObj: User | null;
   @Select(SecurityState.bussinesData)
   public businessData$: Observable<BusinessUnit[]>;
   @Select()
@@ -63,47 +59,44 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
   @ViewChild('RTE')
   public rteEle: RichTextEditorComponent;
-  @ViewChild(SendGroupEmailComponent, { static: true }) emailTemplateForm: SendGroupEmailComponent;
+  @ViewChild(SendGroupEmailComponent, { static: true }) groupEmailTemplateForm: SendGroupEmailComponent;
 
   private subTitle: string;
-  public emailTemplateFormGroup: FormGroup;
-  public smsTemplateFormGroup: FormGroup;
-  public onScreenTemplateFormGroup: FormGroup;
+  public sendGroupEmailFormGroup: FormGroup;
   @Select(AlertsState.GroupEmailByBusinessUnitIdPage)
   public groupEmailPage$: Observable<GroupEmailByBusinessUnitIdPage>;
-  @Select(AlertsState.TemplateByAlertId)
-  public editAlertsTemplate$: Observable<EditAlertsTemplate>;
-  @Select(AlertsState.UpdateTemplateByAlertId)
-  public updateTemplateByAlertId$: Observable<EditAlertsTemplate>;
-  @Select(AlertsState.SaveTemplateByAlertId)
-  public saveTemplateByAlertId$: Observable<EditAlertsTemplate>;
+  @Select(AlertsState.GetGroupEmailById)
+  public viewGroupEmail$: Observable<GroupEmail>;
+  @Select(AlertsState.SendGroupEmail)
+  public sendGroupEmail$: Observable<GroupEmail>;
 
   @Select(AppState.isDarkTheme)
   isDarkTheme$: Observable<boolean>;
 
-  public editAlertTemplateData: EditAlertsTemplate = {
+  public viewGroupEmailData: GroupEmail = {
     id: 0,
-    alertId: 0,
-    alertChannel: AlertChannel.Email,
-    businessUnitId: BusinessUnitType.Hallmark,
-    alertTitle: '',
-    alertBody: '',
+    subjectMail: '',
+    bodyMail: '',
     toList: '',
     cCList: '',
     bCCList: '',
-    parameters: []
+    status: null,
+    fromMail: '',
+    businessUnitId: null,
+    sentBy: '',
+    sentOn: '',
+    statusString: ''
   };
-  public templateParamsData: { [key: string]: Object }[] = [];
   public unsubscribe$: Subject<void> = new Subject();
   get templateEmailTitle(): string {
-    return "Send Bulk Email" ;
+    return "Send Bulk Email";
   }
- 
+
   private gridApi: any;
   private gridColumnApi: any;
   private isAlive = true;
   private filters: GroupEmailFilters = {};
-  public title: string = "Notification Templates";
+  public title: string = "Group Email";
   public export$ = new Subject<ExportedFileType>();
   defaultValue: any;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
@@ -120,14 +113,8 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   maxBlocksInCache: any;
   defaultColDef: any;
   itemList: Array<GroupEmail> | undefined;
-  
-  get businessUnitControl(): AbstractControl {
-    return this.businessForm.get('businessUnit') as AbstractControl;
-  }
 
-  get businessControl(): AbstractControl {
-    return this.businessForm.get('business') as AbstractControl;
-  }
+ 
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
   constructor(private actions$: Actions,
@@ -161,17 +148,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         }
       },
       {
-        headerName: 'Body',
-        field: 'bodyMail',
-        filter: 'agTextColumnFilter',
-        filterParams: {
-          buttons: ['reset'],
-          debounceMs: 1000,
-          suppressAndOrCondition: true,
-        }
-      },
-      {
-        headerName: 'ToList',
+        headerName: 'TO',
         field: 'toList',
         filter: 'agTextColumnFilter',
         filterParams: {
@@ -181,7 +158,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         }
       },
       {
-        headerName: 'CC List',
+        headerName: 'CC',
         field: 'toList',
         filter: 'agTextColumnFilter',
         filterParams: {
@@ -191,8 +168,8 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         }
       },
       {
-        headerName: 'BCC List',
-        field: 'bccList',
+        headerName: 'Sent On',
+        field: 'sentOn',
         filter: 'agTextColumnFilter',
         filterParams: {
           buttons: ['reset'],
@@ -201,8 +178,8 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         }
       },
       {
-        headerName: 'From Email',
-        field: 'fromMail',
+        headerName: 'Sent By',
+        field: 'sentBy',
         filter: 'agTextColumnFilter',
         filterParams: {
           buttons: ['reset'],
@@ -211,21 +188,11 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         }
       },
       {
-        headerName: 'Status',
-        field: 'status',
-        filter: 'agTextColumnFilter',
-        filterParams: {
-          buttons: ['reset'],
-          debounceMs: 1000,
-          suppressAndOrCondition: true,
-        }
-      },
-      {
-        headerName: 'Email Template',
+        headerName: 'View Mail',
         cellRenderer: 'buttonRenderer',
         cellRendererParams: {
-          onClick: this.onEmailTemplateEdit.bind(this),
-          label: 'Edit',
+          onClick: this.onViewGroupEmail.bind(this),
+          label: 'View',
           suppressMovable: true,
           filter: false,
           sortable: false,
@@ -255,95 +222,30 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   };
   ngOnInit(): void {
     this.businessForm = this.generateBusinessForm();
-    this.onBusinessUnitValueChanged();
-    this.onBusinessValueChanged();
     const user = this.store.selectSnapshot(UserState.user);
-    this.userObj=user;
-    this.businessUnitControl.patchValue(user?.businessUnitType);
-    if (user?.businessUnitType) {
-      this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
-      this.isBusinessFormDisabled && this.businessForm.disable();
-    }
-    if (user?.businessUnitType === BusinessUnitType.MSP) {
-      const [Hallmark, ...rest] = this.businessUnits;
-      this.businessUnits = rest;
-    }
-    this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
-    this.actions$
-      .pipe(
-        takeWhile(() => this.isAlive)
-      );
-    this.businessData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-      if (!this.isBusinessFormDisabled) {
-        this.defaultValue = data[0]?.id;
-      }
-    });
-    this.emailTemplateFormGroup = AlertsEmailTemplateFormComponent.createForm();
-    this.smsTemplateFormGroup = AlertsSmsTemplateFromComponent.createForm();
+    this.userObj = user;
+    this.sendGroupEmailFormGroup = SendGroupEmailComponent.createForm();
 
-    this.editAlertsTemplate$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
-      this.templateParamsData = [];
+    this.viewGroupEmail$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+      
       if (data != undefined) {
-        data.alertId=this.alertTemplate?.alertId;
-        data.alertChannel=this.alertChannel;
-        this.editAlertTemplateData = data;
-        if (data.parameters != undefined) {
-          data.parameters.forEach((paramter: string) => {
-            this.templateParamsData.push({
-              text: paramter,
-              id: paramter,
-              "htmlAttributes": { draggable: true }
-            })
-          });
-        }   
-        this.UpdateForm(data);
+        this.viewGroupEmailData = data;         
+        this.UpdateForm(data);        
+        this.store.dispatch(new ShowGroupEmailSideDialog(true));
       }
     });
-    this.updateTemplateByAlertId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {      
-      if (data != undefined && data!=null) {
-        if (data.alertChannel == AlertChannel.Email) {
-          this.emailTemplateCloseDialog();
-        }
-        else if (data.alertChannel == AlertChannel.SMS) {
-          this.smsTemplateCloseDialog();
-        }
-        else if (data.alertChannel == AlertChannel.OnScreen) {
-          this.onScreenTemplateCloseDialog();
-        }
+    
+    this.sendGroupEmail$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+      if (data != undefined && data != null) {        
+          this.groupEmailCloseDialog(); 
+        this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
+      }
+    });
+  }
+  public onViewGroupEmail(data: any): void {
+    this.onView(data.rowData);
+  }
 
-        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      }
-    });
-      this.saveTemplateByAlertId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {      
-        if (data != undefined && data!=null) {
-          if (data.alertChannel == AlertChannel.Email) {
-            this.emailTemplateCloseDialog();
-          }
-          else if (data.alertChannel == AlertChannel.SMS) {
-            this.smsTemplateCloseDialog();
-          }
-          else if (data.alertChannel == AlertChannel.OnScreen) {
-            this.onScreenTemplateCloseDialog();
-          }
-          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-        }
-      });
-  }
-  public onEmailTemplateEdit(data: any): void {
-    this.alertChannel=AlertChannel.Email;
-    this.alertTemplateType = AlertChannel[AlertChannel.Email];
-    this.onEdit(data.rowData);
-  }
-  public onSmsTemplateEdit(data: any): void {
-    this.alertChannel=AlertChannel.SMS;
-    this.alertTemplateType = AlertChannel[AlertChannel.SMS];
-    this.onEdit(data.rowData);
-  }
-  public onScreenTemplateEdit(data: any): void {
-    this.alertChannel=AlertChannel.OnScreen;
-    this.alertTemplateType = AlertChannel[AlertChannel.OnScreen];
-    this.onEdit(data.rowData);
-  }
 
   public onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;
@@ -389,10 +291,10 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     }
   }
   private dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
-    this.store.dispatch(new GetGroupMailByBusinessUnitIdPage(this.userObj == null? null : this.userObj.businessUnitId, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+    this.store.dispatch(new GetGroupMailByBusinessUnitIdPage(this.userObj == null ? null : this.userObj.businessUnitId, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
   }
-  private dispatchEditAlertTemplate(alertId: number, alertChannel: AlertChannel,businessUnitId:number|null): void {
-    this.store.dispatch(new GetTemplateByAlertId(alertId, alertChannel,businessUnitId));
+  private dispatchViewGroupEmail(id: number): void {
+    this.store.dispatch(new GetGroupEmailById(id));
   }
   onPageSizeChanged(event: any) {
     this.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
@@ -404,138 +306,43 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       this.gridApi.setServerSideDatasource(datasource);
     }
   }
-  public onEdit({ index, column, foreignKeyData, alertId, ...alertsTemplate }: AlertsTemplate & { index: string; column: unknown; foreignKeyData: unknown }): void {
-    this.subTitle = alertsTemplate.alertTitle;
-    this.alertTemplate={alertId, ...alertsTemplate };
-    let businessUnitId=this.businessControl.value==0?null:this.businessControl.value;
-    if (this.alertTemplateType === AlertChannel[AlertChannel.Email]) {
-      this.emailTemplateForm.addEditEmailTemplateForm.reset();
-      this.SetEditData(alertId, AlertChannel.Email,businessUnitId);
-      this.emailTemplateForm.rteCreated();
-      this.store.dispatch(new ShowEmailSideDialog(true));
-    }
+  public onView({ index, column, foreignKeyData, id, ...groupEMail }: GroupEmail & { index: string; column: unknown; foreignKeyData: unknown }): void {
 
-
+    this.groupEmailTemplateForm.groupEmailTemplateForm.reset();
+    this.groupEmailData = { id, ...groupEMail };
+    this.dispatchViewGroupEmail(this.groupEmailData.id);
+    this.groupEmailTemplateForm.rteCreated();
   }
-  public onEmailTemplateAddCancel(): void {
-    this.emailTemplateCloseDialog();
-  }
-  public onSmsTemplateAddCancel(): void {
-    this.smsTemplateCloseDialog();
-  }
-  public onScreenTemplateAddCancel(): void {
-    this.onScreenTemplateCloseDialog();
+  public onGroupEmailAddCancel(): void {
+    this.groupEmailCloseDialog();
   }
 
-  public onEmailTemplateSave(): void {
-    this.emailTemplateFormGroup.markAllAsTouched();
-    if (this.emailTemplateFormGroup.valid && this.emailTemplateFormGroup.errors == null) {
-      const formValues = this.emailTemplateFormGroup.getRawValue();
-      if (this.editAlertTemplateData.id == 0) {
-        const emailAddTemplateDto: AddAlertsTemplateRequest = {
-          alertId: this.editAlertTemplateData.alertId,
-          businessUnitId: this.businessControl.value==0?null:this.businessControl.value,
-          alertBody: formValues.alertBody,
-          alertChannel: this.editAlertTemplateData.alertChannel,
-          alertTitle: formValues.alertTitle,
-          toList: this.editAlertTemplateData.toList == undefined ? '' : this.editAlertTemplateData.toList,
-          cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
-          bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
-        };
-        this.store.dispatch(new SaveTemplateByAlertId(emailAddTemplateDto));       
-      }
-      else {
-        const updateEmailTemplateDto: EditAlertsTemplateRequest = {
-          id: this.editAlertTemplateData.id,
-          alertBody: formValues.alertBody,
-          alertChannel: this.editAlertTemplateData.alertChannel,
-          alertTitle: formValues.alertTitle,
-          toList: this.editAlertTemplateData.toList == undefined ? '' : this.editAlertTemplateData.toList,
-          cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
-          bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
-        };
-        this.store.dispatch(new UpdateTemplateByAlertId(updateEmailTemplateDto));        
-      }
+  public onGroupEmailSend(): void {
+    this.groupEmailTemplateForm.groupEmailTemplateForm.markAllAsTouched();
+    if (this.groupEmailTemplateForm.groupEmailTemplateForm.valid && this.groupEmailTemplateForm.groupEmailTemplateForm.errors == null) {
+      const formValues = this.groupEmailTemplateForm.groupEmailTemplateForm.getRawValue();
+      const sendGroupEmailDto: SendGroupEmailRequest = {
+        businessUnitId: formValues.business,
+        bodyMail: formValues.emailBody,
+        subjectMail: formValues.emailSubject,
+        toList: formValues.emailTo == undefined ? '' : formValues.emailTo,
+        cCList: formValues.emailCc == undefined ? '' : formValues.emailCc,
+        bCCList: '',
+        status: GroupMailStatus.Pending,
+        fromMail: this.userObj?.email==undefined?'':this.userObj?.email
+      };
+      this.store.dispatch(new SendGroupEmail(sendGroupEmailDto));
+
     }
   }
-
-  public onSmsTemplateSave(): void {
-    this.smsTemplateFormGroup.markAllAsTouched();
-    if (this.smsTemplateFormGroup.valid && this.smsTemplateFormGroup.errors == null) {
-      const formValues = this.smsTemplateFormGroup.getRawValue();
-      if (this.editAlertTemplateData.id == 0) {
-        const smsAddTemplateDto: AddAlertsTemplateRequest = {
-          alertId: this.editAlertTemplateData.alertId,
-          businessUnitId: this.businessControl.value==0?null:this.businessControl.value,
-          alertBody: formValues.alertBody?.replace(/<[^>]*>/g, ''),
-          alertChannel: this.editAlertTemplateData.alertChannel,
-          alertTitle: this.editAlertTemplateData.alertTitle == undefined?"":this.editAlertTemplateData.alertTitle,
-          toList: this.editAlertTemplateData.toList == undefined ? '' : this.editAlertTemplateData.toList,
-          cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
-          bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
-        };
-        this.store.dispatch(new SaveTemplateByAlertId(smsAddTemplateDto));       
-      }
-      else {
-        const smsUpdateTemplateDto: EditAlertsTemplateRequest = {
-          id: this.editAlertTemplateData.id,
-          alertBody: formValues.alertBody?.replace(/<[^>]*>/g, ''),
-          alertChannel: this.editAlertTemplateData.alertChannel,
-          alertTitle: this.editAlertTemplateData.alertTitle == undefined?"":this.editAlertTemplateData.alertTitle,
-          toList: this.editAlertTemplateData.toList == undefined ? '' : this.editAlertTemplateData.toList,
-          cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
-          bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
-        };
-        this.store.dispatch(new UpdateTemplateByAlertId(smsUpdateTemplateDto));       
-      }
-    }
+  public onGroupEmailFormSendClick():void{
+    this.ResetForm();
+     this.groupEmailTemplateForm.rteCreated();
+    this.store.dispatch(new ShowGroupEmailSideDialog(true));
 
   }
-
-  public onScreenTemplateSave(): void {
-    this.onScreenTemplateFormGroup.markAllAsTouched();
-    if (this.onScreenTemplateFormGroup.valid && this.onScreenTemplateFormGroup.errors == null) {
-      const formValues = this.onScreenTemplateFormGroup.getRawValue();
-      if (this.editAlertTemplateData.id == 0) {
-        const onScreenAddTemplateDto: AddAlertsTemplateRequest = {
-          alertId: this.editAlertTemplateData.alertId,
-          businessUnitId: this.businessControl.value==0?null:this.businessControl.value,
-          alertBody: formValues.alertBody,
-          alertChannel: this.editAlertTemplateData.alertChannel,
-          alertTitle: formValues.alertTitle,
-          toList: this.editAlertTemplateData.toList == undefined ? '' : this.editAlertTemplateData.toList,
-          cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
-          bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
-        };
-        this.store.dispatch(new SaveTemplateByAlertId(onScreenAddTemplateDto));
-      }
-      else {
-        const onScreenUpdateTemplateDto: EditAlertsTemplateRequest = {
-          id: this.editAlertTemplateData.id,
-          alertBody: formValues.alertBody,
-          alertChannel: this.editAlertTemplateData.alertChannel,
-          alertTitle: formValues.alertTitle,
-          toList: this.editAlertTemplateData.toList == undefined ? '' : this.editAlertTemplateData.toList,
-          cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
-          bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
-        };
-        this.store.dispatch(new UpdateTemplateByAlertId(onScreenUpdateTemplateDto));
-       }
-    }
-
-  }
-
-  private emailTemplateCloseDialog(): void {
-    this.store.dispatch(new ShowEmailSideDialog(false));
-  }
-  private smsTemplateCloseDialog(): void {
-    this.store.dispatch(new ShowSmsSideDialog(false));
-  }
-  private onScreenTemplateCloseDialog(): void {
-    this.store.dispatch(new ShowOnScreenSideDialog(false));
-  }
-  private SetEditData(alertId: number, alertChannel: AlertChannel,businessUnitId:number |null): void {
-    this.dispatchEditAlertTemplate(alertId, alertChannel,businessUnitId);    
+  private groupEmailCloseDialog(): void {
+    this.store.dispatch(new ShowGroupEmailSideDialog(false));
   }
   private generateBusinessForm(): FormGroup {
     return new FormGroup({
@@ -543,27 +350,19 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       business: new FormControl(0),
     });
   }
-  private onBusinessUnitValueChanged(): void {
-    this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      this.store.dispatch(new GetBusinessByUnitType(value));
-      if (value == 1) {
-        this.dispatchNewPage();
-      }
-    });
-  }
-  private onBusinessValueChanged(): void {
-    this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {     
-        this.dispatchNewPage();
-    });
-  }
-  
-  private UpdateForm(data:any):void
-  {
-    if (this.alertTemplateType === AlertChannel[AlertChannel.Email]) {
-      this.emailTemplateForm.alertBody=data.alertBody;
-      this.emailTemplateForm.alertTitle=data.alertTitle;
-    }
+  private UpdateForm(data: GroupEmail): void {
+    this.groupEmailTemplateForm.emailBody = data.bodyMail;
+    this.groupEmailTemplateForm.emailSubject = data.subjectMail;
+    this.groupEmailTemplateForm.emailTo=data.toList==null?"":data.toList;
+    this.groupEmailTemplateForm.emailCc=data.cCList==null?"":data.cCList;
 
   }
-   
+  private ResetForm(): void {
+    this.groupEmailTemplateForm.emailBody = "";
+    this.groupEmailTemplateForm.emailSubject = "";
+    this.groupEmailTemplateForm.emailTo="";
+    this.groupEmailTemplateForm.emailCc="";
+
   }
+
+}

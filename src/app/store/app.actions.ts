@@ -93,3 +93,7 @@ export class ShouldDisableUserDropDown {
   static readonly type = '[app] Disable user dropdown';
   constructor(public payload: boolean) { }
 }
+export class ShowGroupEmailSideDialog {
+  static readonly type = '[app] Set Email Side Dialog Showing state';
+  constructor(public isDialogShown: boolean) { }
+}

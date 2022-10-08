@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { GroupEmailByBusinessUnitIdPage, GroupEmailFilters } from "@shared/models/group-email.model";
+import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailFilters, GroupEmailRequest } from "@shared/models/group-email.model";
 import { Observable } from "rxjs";
 
 @Injectable({
@@ -11,9 +11,8 @@ import { Observable } from "rxjs";
     constructor(private http: HttpClient) { }
 
      /**
-   * Get the list of Group Email by BusinessUnitId
-   * @param BusinessUnitType
-   * @param BusinessUnitIds
+   * Get the list of Group Email by BusinessUnitId  
+   * @param BusinessUnitId
    * @param PageNumber
    * @param PageSize
    * @param Filters
@@ -35,4 +34,26 @@ import { Observable } from "rxjs";
     }
     return this.http.get<GroupEmailByBusinessUnitIdPage>(`/api/GroupMail/getgroupmail?BusinessUnitId=`+BusinessUnitId,{params: { pageNumber:PageNumber,pageSize: PageSize }});
   }
+   /**
+   * Send Group Email 
+   * @param groupEmailRequest   
+   *
+   * @return GroupEmail
+   */
+    public SendGroupEmail(
+      groupEmailRequest:GroupEmailRequest    
+    ): Observable<GroupEmail> {  
+       return this.http.post<GroupEmail>(`/api/GroupMail/creategroupmail`,groupEmailRequest);
+    }
+    /**
+   * Get Group Email By Id
+   * @param id   
+   *
+   * @return GroupEmail
+   */
+     public GetGroupEmailById(
+      id:number    
+    ): Observable<GroupEmail> {  
+       return this.http.get<GroupEmail>(`/api/GroupMail/getgroupmailbyid?Id=`+id);
+    }
   }

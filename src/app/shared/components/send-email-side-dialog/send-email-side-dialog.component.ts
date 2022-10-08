@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Actions, ofActionDispatched } from '@ngxs/store';
 
-import { ShowEmailSideDialog } from '../../../store/app.actions';
+import { ShowEmailSideDialog, ShowGroupEmailSideDialog } from '../../../store/app.actions';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { takeUntil } from 'rxjs';
 
@@ -13,35 +13,35 @@ import { takeUntil } from 'rxjs';
   styleUrls: ['./send-email-side-dialog.component.scss']
 })
 export class SendEmailSideDialogComponent extends DestroyableDirective implements OnInit {
-  @ViewChild('emailSideDialog') emailSideDialog: DialogComponent;
+  @ViewChild('groupEmailSideDialog') groupEmailSideDialog: DialogComponent;
   targetElement: HTMLElement = document.body;
 
   @Input() header: string | null;
   @Input() width: string = '434px';
 
-  @Output() emailFormCancelClicked = new EventEmitter();
-  @Output() emailFormSaveClicked = new EventEmitter();
+  @Output() groupEmailFormCancelClicked = new EventEmitter();
+  @Output() groupEmailFormSendClicked = new EventEmitter();
 
   constructor(private action$: Actions) {
     super();
   }
 
   ngOnInit(): void {
-    this.action$.pipe(ofActionDispatched(ShowEmailSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
+    this.action$.pipe(ofActionDispatched(ShowGroupEmailSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
-        this.emailSideDialog.show();
+        this.groupEmailSideDialog.show();
       } else {
-        this.emailSideDialog.hide();
+        this.groupEmailSideDialog.hide();
       }
     });
   }
 
-  onemailFormCancelClick(): void {
-    this.emailFormCancelClicked.emit();
+  onGroupEmailFormCancelClick(): void {
+    this.groupEmailFormCancelClicked.emit();
   }
 
-  onemailFormSaveClick(): void {
-    this.emailFormSaveClicked.emit();
+  onGroupEmailFormSendClick(): void {
+    this.groupEmailFormSendClicked.emit();
   }
 }
 
