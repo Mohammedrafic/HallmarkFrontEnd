@@ -97,7 +97,7 @@ export class AssignCredentialSideComponent extends DestroyableDirective implemen
     if (!!this.newSelectedNodes.size) {
       const checkeNodes = this.tree.getAllCheckedNodes();
       this.store.dispatch(new SaveAssignedCredentialValue(checkeNodes));
-      this.openSidebar.next(false);
+      this.clearAndClose();
     }
   }
 

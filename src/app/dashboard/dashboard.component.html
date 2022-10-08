@@ -10,7 +10,8 @@
     allOrganizations: allOrganizations$ | async,
     skills: allOrganizationsSkills$ | async,
     userIsAdmin: userIsAdmin$ | async,
-    isDarkTheme: isDarkTheme$ | async
+    isDarkTheme: isDarkTheme$ | async,
+    isMobile: isMobile$ | async
   }"
 ></ng-container>
 
@@ -26,6 +27,7 @@
   let-skills="skills"
   let-userIsAdmin="userIsAdmin"
   let-isDarkTheme="isDarkTheme"
+  let-isMobile="isMobile"
 >
   <app-dashboard-control
     (widgetToggleEmitter)="handleWidgetToggleEvent($event)"
@@ -37,6 +39,7 @@
     [allOrganizations]="allOrganizations"
     [userIsAdmin]="userIsAdmin"
     [skills]="skills"
+    [isMobile]="isMobile"
   ></app-dashboard-control>
 
   <ng-container [ngTemplateOutlet]="widgetsTemplate" #outlet></ng-container>
