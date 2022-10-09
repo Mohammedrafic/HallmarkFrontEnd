@@ -18,6 +18,7 @@ export class SendEmailSideDialogComponent extends DestroyableDirective implement
 
   @Input() header: string | null;
   @Input() width: string = '434px';
+  @Input() isSend:boolean=true;
 
   @Output() groupEmailFormCancelClicked = new EventEmitter();
   @Output() groupEmailFormSendClicked = new EventEmitter();

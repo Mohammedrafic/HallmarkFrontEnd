@@ -73,6 +73,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   public optionFields = OPRION_FIELDS;
   public businessDataFields = BUSINESS_DATA_FIELDS;
   public userDataFields = User_DATA_FIELDS;
+  public allOption:string="All";
   private isAlive: boolean = true;
   defaultBusinessValue: any;
   defaultUserValue: any;
@@ -96,6 +97,10 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   get usersControl(): AbstractControl {
 
     return this.groupEmailTemplateForm.get('user') as AbstractControl;
+  }
+  get richTextControl(): AbstractControl {
+
+    return this.groupEmailTemplateForm.get('emailBody') as AbstractControl;
   }
   private dispatchNewPage(user: any, sortModel: any = null, filterModel: any = null): void {
     const { businessUnit } = this.groupEmailTemplateForm?.getRawValue();
@@ -144,9 +149,10 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
         this.userData = data.items;
         this.defaultUserValue = data.items[0]?.id;
         let value = this.groupEmailTemplateForm.controls['user'].value;
-        if (value != this.userData.find((x: any) => x.id == user?.id)?.id) {
-          this.groupEmailTemplateForm.controls['user'].setValue(this.userData.find((x: any) => x.id == user?.id)?.id);
-        }
+        console.log(this.userData.find((x: any) => x.id == user?.id));
+        // if (value != this.userData.find((x: any) => x.id == user?.id)?.id) {
+        //   this.groupEmailTemplateForm.controls['user'].setValue(this.userData.find((x: any) => x.id == user?.id)?.id);
+        // }
       }
     });
 
@@ -206,9 +212,8 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   private onUserValueChanged(): void {
     console.log("change")
     this.usersControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      if (this.isSend == true) {
-      console.log("user value", value)
-      this.dispatchNewPage(value);
+      if (this.isSend == true && value!=null && value!=undefined) {
+      this.emailTo=this.userData?.filter(item => value.indexOf(item.id) !== -1)?.map(item=>item.email)?.join(", ")
       }
     });
   }
@@ -217,6 +222,31 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     this.rteObj.toolbarSettings.type = ToolbarType.Scrollable;
     this.rteObj.toolbarSettings.enableFloating = true;
     this.rteObj.height = '300px';
+  }
+  disableControls(isSend:boolean):void
+  {
+    let ele=document.getElementById("richTextEditorDiv") as HTMLElement;
+    if(isSend)
+    {
+      this.businessControl?.enable();
+      this.businessUnitControl?.enable();
+      this.groupEmailTemplateForm.controls['emailTo'].enable();
+      this.groupEmailTemplateForm.controls['emailCc'].enable();
+      this.groupEmailTemplateForm.controls['emailSubject'].enable();
+      this.groupEmailTemplateForm.controls['user'].enable();
+      this.rteObj.enabled=true;      
+      ele.className="rich-text-container-edit";
+    }
+    else{
+    this.businessControl?.disable();
+    this.businessUnitControl?.disable();
+    this.groupEmailTemplateForm.controls['emailTo'].disable();
+      this.groupEmailTemplateForm.controls['emailCc'].disable();
+      this.groupEmailTemplateForm.controls['emailSubject'].disable();
+      this.groupEmailTemplateForm.controls['user'].disable();
+    this.rteObj.enabled=false;    
+    ele.className="rich-text-container-disable";
+    }
   }
   ngAfterViewInit() {
     this.rteObj.refreshUI();

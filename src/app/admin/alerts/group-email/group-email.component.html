@@ -49,7 +49,7 @@
       </div>
     </div>
   </section>
-  <app-send-email-side-dialog [header]="templateEmailTitle" (groupEmailFormCancelClicked)="onGroupEmailAddCancel()" (groupEmailFormSendClicked)="onGroupEmailSend()" [width]="'1000px'">
+  <app-send-email-side-dialog [header]="templateEmailTitle" [isSend]="isSend" (groupEmailFormCancelClicked)="onGroupEmailAddCancel()" (groupEmailFormSendClicked)="onGroupEmailSend()" [width]="'1000px'">
     <section>
       <app-send-group-email #emailTemplateForm [groupEmailTemplateForm]="$any(sendGroupEmailFormGroup)" [title]="templateEmailTitle"
                                       [emailSubject]="viewGroupEmailData.subjectMail" [emailBody]="viewGroupEmailData.bodyMail"

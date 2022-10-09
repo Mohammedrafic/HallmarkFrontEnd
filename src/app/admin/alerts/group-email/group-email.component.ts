@@ -159,7 +159,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       },
       {
         headerName: 'CC',
-        field: 'cCList',
+        field: 'ccList',
         filter: 'agTextColumnFilter',
         filterParams: {
           buttons: ['reset'],
@@ -310,10 +310,12 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   }
   public onView({ index, column, foreignKeyData, id, ...groupEMail }: GroupEmail & { index: string; column: unknown; foreignKeyData: unknown }): void {
    this.ResetForm();
+   this.isSend=false;
     this.groupEmailTemplateForm.isSend=false;
     this.groupEmailTemplateForm.rteCreated();
-    this.viewGroupEmailData ={id,...groupEMail};
-    this.UpdateForm(this.viewGroupEmailData);           
+    this.groupEmailTemplateForm.disableControls(false);
+    let data ={id,...groupEMail};
+    this.UpdateForm(data);           
         
     this.store.dispatch(new ShowGroupEmailSideDialog(true));
     //this.dispatchViewGroupEmail(id);
@@ -341,9 +343,11 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     }
   }
   public onGroupEmailFormSendClick():void{
+    this.ResetForm(); 
+    this.isSend=true;
     this.groupEmailTemplateForm.isSend=true;
-    this.ResetForm();
-     this.groupEmailTemplateForm.rteCreated();
+    this.groupEmailTemplateForm.rteCreated();
+    this.groupEmailTemplateForm.disableControls(true);
     this.store.dispatch(new ShowGroupEmailSideDialog(true));
 
   }
@@ -363,6 +367,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailTemplateForm.emailSubject = "";
     this.groupEmailTemplateForm.emailTo="";
     this.groupEmailTemplateForm.emailCc="";
+    this.groupEmailTemplateForm.groupEmailTemplateForm.controls['user'].setValue('');
 
   }
 

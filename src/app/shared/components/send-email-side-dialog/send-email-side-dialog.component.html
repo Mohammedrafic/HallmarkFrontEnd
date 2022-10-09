@@ -26,7 +26,7 @@
               id="sendGroupEmailFormButton"
               type="submit"
               [isPrimary]="true"
-              (click)="onGroupEmailFormSendClick()">Send</button>
+              (click)="onGroupEmailFormSendClick()" [disabled]="!isSend">Send</button>
        
           <!-- <button
           ejs-button
