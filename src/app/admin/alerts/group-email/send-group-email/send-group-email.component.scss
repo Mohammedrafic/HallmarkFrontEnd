@@ -1,6 +1,6 @@
  @import "../../../../styles/variables/colors.scss";
 
-    .email-template-form {
+    .group-email-template-form {
         padding-top: 24px;
         .section-container{
             display: flex;
@@ -49,7 +49,7 @@
             height:70px;
         }
         
-        #defaultRTE_toolbar_wrapper  {
+        #defaultGroupEmailRTE_toolbar  {
             height:43px !important;
         }
        
@@ -76,6 +76,9 @@
         }
         .rich-text-container-disable{
           background-color:#f7f8fc;
+        }
+        .e-rte-content{
+          height: 258px !important;
         }
     
     }

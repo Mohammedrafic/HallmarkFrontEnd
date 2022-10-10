@@ -1,4 +1,4 @@
-<div [formGroup]="groupEmailTemplateForm" id="groupEmailTemplateForm" class="email-template-form">
+<div [formGroup]="groupEmailTemplateForm" id="groupEmailTemplateForm" class="group-email-template-form">
     <div class="section-container">
 
         <div class="left-section">
@@ -20,11 +20,7 @@
 
                 <div class="dropdown-container">
                     <div class="input-group dropdown">
-                        <!-- <ejs-multiselect [dataSource]="userData" [fields]="userDataFields"
-                            placeholder="User" 
-                            mode="CheckBox" selectAllText="All"
-                            showSelectAll="true" [allowFiltering]="true" [showDropDownIcon]="true" 
-                            formControlName="user"></ejs-multiselect> -->
+                       
                             <ejs-multiselect mode="CheckBox"
                              formControlName="user"
                              placeholder="All"
@@ -48,9 +44,9 @@
                 </div>
             </div>
             <div class="input-container bootstrap top-container">
-                <label>CC<span class="required">*</span></label>
+                <label>CC</label>
                 <div class="input-group">
-                    <input appValidateWithMessage formControlName="emailCc" class="e-input" type="text"
+                    <input formControlName="emailCc" class="e-input" type="text"
                     [(ngModel)]="emailCc"/>
                 </div>
             </div>

@@ -1,10 +1,8 @@
-// import { Component, OnInit } from '@angular/core';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { HtmlEditorService, ImageService, LinkService, RichTextEditorComponent, TableService, ToolbarService, ToolbarType } from '@syncfusion/ej2-angular-richtexteditor';
 import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-//import { toolsRichTextEditor } from '../../alerts.constants';
 import { BUSINESS_UNITS_VALUES, BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor, User_DATA_FIELDS } from '../../alerts.constants';
 import { Actions, Select, Store } from '@ngxs/store';
 import { GetBusinessByUnitType, GetAllUsersPage } from 'src/app/security/store/security.actions';
@@ -20,9 +18,6 @@ import { ShouldDisableUserDropDown } from 'src/app/store/app.actions';
 import { AlertsState } from '@admin/store/alerts.state';
 import { UserSubscriptionFilters, UserSubscriptionPage } from '@shared/models/user-subscription.model';
 import { FilterService } from '@shared/services/filter.service';
-import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-
-//import { GetAllUsersPage, GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 @Component({
   selector: 'app-send-group-email',
   templateUrl: './send-group-email.component.html',
@@ -111,7 +106,6 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   }
 
   receivedData(data: any) {
-    console.log("da", data);
 
   }
   ngOnInit(): void {
@@ -147,12 +141,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       if (data != undefined) {
         this.userData = data.items;
-        this.defaultUserValue = data.items[0]?.id;
-        let value = this.groupEmailTemplateForm.controls['user'].value;
-        console.log(this.userData.find((x: any) => x.id == user?.id));
-        // if (value != this.userData.find((x: any) => x.id == user?.id)?.id) {
-        //   this.groupEmailTemplateForm.controls['user'].setValue(this.userData.find((x: any) => x.id == user?.id)?.id);
-        // }
+     
       }
     });
 
@@ -170,7 +159,6 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
       if (this.isSend == true&&value!=null) {
         this.userData = [];
         this.dispatchNewPage(null);
-        console.log("value", value);
 
         this.store.dispatch(new GetBusinessByUnitType(value));
         if (value == 1) {
@@ -186,10 +174,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
           });
 
           this.userData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
-            if (data != undefined && this.userData.length > 0) {
-              if (this.groupEmailTemplateForm.controls['user'].value != this.userData[0].id)
-                this.groupEmailTemplateForm.controls['user'].setValue(this.userData[0].id);
-            }
+           
           });
         }
       }
@@ -199,6 +184,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       if (this.isSend == true) {
       this.userData = [];
+      this.ResetForm();
       this.dispatchNewPage(null);
       let businessUnitIds = [];
       if (value != 0 && value != null) {
@@ -210,7 +196,6 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     });
   }
   private onUserValueChanged(): void {
-    console.log("change")
     this.usersControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       if (this.isSend == true && value!=null && value!=undefined) {
       this.emailTo=this.userData?.filter(item => value.indexOf(item.id) !== -1)?.map(item=>item.email)?.join(", ")
@@ -256,8 +241,8 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     return new FormGroup({
       businessUnit: new FormControl(),
       business: new FormControl(0),
-      user: new FormControl(0),
-      emailCc: new FormControl('', [Validators.required]),
+      user: new FormControl([]),
+      emailCc: new FormControl(''),
       emailTo: new FormControl('', [Validators.required]),
       emailSubject: new FormControl('', [Validators.required]),
       emailBody: new FormControl('', [Validators.required])
@@ -267,31 +252,17 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   onFormCancelClick(): void {
     this.formCancelClicked.emit();
   }
-
-  public async onChange(args: any) {
-    console.log('Change event', args);
-    let checkedItems: any[] = []
-    let values: any[] = []
-    values = args?.value;
-    await values.forEach(element => {
-      checkedItems.push({ id: element })
-    });
-
-    let results: any = []
-    results = this.userData.filter(({ id: id1 }) => checkedItems.some(({ id: id2 }) => id2 === id1));
-
-    var data = results.map((t: {
-      email: any; "": any;
-    }) => t.email);
-    var str = data.join(", ");
-    this.emailTo = str;
-
-  }
-
   onFormSaveClick(): void {
 
     this.formSaveClicked.emit();
   }
+  private ResetForm(): void {
+    this.groupEmailTemplateForm.controls['emailTo'].setValue('');
+      this.groupEmailTemplateForm.controls['emailCc'].setValue('');
+      this.groupEmailTemplateForm.controls['emailSubject'].setValue('');  
+      this.groupEmailTemplateForm.controls['emailBody'].setValue('');  
+    this.groupEmailTemplateForm.controls['user'].setValue([]);
 
+  }
 
 }

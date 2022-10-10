@@ -136,6 +136,18 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       {
         field: 'Id',
         hide: true
+      },      
+      {
+        headerName: 'View Mail',
+        cellRenderer: 'buttonRenderer',
+        cellRendererParams: {
+          onClick: this.onViewGroupEmail.bind(this),
+          label: 'View',
+          suppressMovable: true,
+          filter: false,
+          sortable: false,
+          menuTabs: []
+        },
       },
       {
         headerName: 'Subject',
@@ -186,18 +198,6 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
           debounceMs: 1000,
           suppressAndOrCondition: true,
         }
-      },
-      {
-        headerName: 'View Mail',
-        cellRenderer: 'buttonRenderer',
-        cellRendererParams: {
-          onClick: this.onViewGroupEmail.bind(this),
-          label: 'View',
-          suppressMovable: true,
-          filter: false,
-          sortable: false,
-          menuTabs: []
-        },
       }
 
     ];
@@ -318,14 +318,15 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.UpdateForm(data);           
         
     this.store.dispatch(new ShowGroupEmailSideDialog(true));
-    //this.dispatchViewGroupEmail(id);
   }
   public onGroupEmailAddCancel(): void {
     this.groupEmailCloseDialog();
   }
 
   public onGroupEmailSend(): void {
-    this.groupEmailTemplateForm.groupEmailTemplateForm.markAllAsTouched();
+    
+    this.sendGroupEmailFormGroup.markAllAsTouched();
+   // this.groupEmailTemplateForm.groupEmailTemplateForm.markAllAsTouched();
     if (this.groupEmailTemplateForm.groupEmailTemplateForm.valid && this.groupEmailTemplateForm.groupEmailTemplateForm.errors == null) {
       const formValues = this.groupEmailTemplateForm.groupEmailTemplateForm.getRawValue();
       const sendGroupEmailDto: SendGroupEmailRequest = {
@@ -367,7 +368,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailTemplateForm.emailSubject = "";
     this.groupEmailTemplateForm.emailTo="";
     this.groupEmailTemplateForm.emailCc="";
-    this.groupEmailTemplateForm.groupEmailTemplateForm.controls['user'].setValue('');
+    this.groupEmailTemplateForm.groupEmailTemplateForm.controls['user'].setValue([]);
 
   }
 
