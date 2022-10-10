@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
+import { isEmpty } from 'lodash';
 
 import { ConfirmService } from '@shared/services/confirm.service';
 
@@ -112,8 +113,8 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         billRateConfigId: value.billRateConfigId,
         effectiveDate: value.effectiveDate,
         id: value.id,
-        intervalMax: value.intervalMax && String(value.intervalMax),
-        intervalMin: value.intervalMin && String(value.intervalMin),
+        intervalMax: !isEmpty(value.intervalMax) && String(value.intervalMax),
+        intervalMin: !isEmpty(value.intervalMin) && String(value.intervalMin),
         rateHour: rateHour,
         billType: value.billType,
         editAllowed: value.editAllowed || false,

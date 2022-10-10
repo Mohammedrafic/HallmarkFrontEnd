@@ -180,13 +180,13 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
         if (this.isIntervalMinRequired) {
           intervalMinControl?.addValidators(VALIDATORS);
         } else {
-          intervalMinControl?.removeValidators(VALIDATORS);
+          intervalMinControl?.clearValidators();
         }
 
         if (this.isIntervalMaxRequired) {
           intervalMaxControl?.addValidators(VALIDATORS);
         } else {
-          intervalMaxControl?.removeValidators(VALIDATORS);
+          intervalMaxControl?.clearValidators();
         }
 
         if (this.isIntervalMinEnabled) {
