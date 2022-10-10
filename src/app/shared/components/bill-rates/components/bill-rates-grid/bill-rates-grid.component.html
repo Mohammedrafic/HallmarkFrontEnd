@@ -3,7 +3,7 @@
     <div class="title">
       <h3>Bill Rates</h3>
     </div>
-    <div *ngIf="!readOnlyMode" class="actions">
+    <div *ngIf="!readOnly" class="actions">
       <span class="action-link" (click)="addNew()">
         <i-feather name="plus" class="icon"></i-feather>
         Add Bill Rate
@@ -22,7 +22,7 @@
             [pageSettings]="pageSettings"
             (dataBound)="dataBound()">
     <e-columns>
-      <e-column [visible]="!readOnlyMode" textAlign="Right" width="120">
+      <e-column [visible]="!readOnly" textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit($event, data)">
