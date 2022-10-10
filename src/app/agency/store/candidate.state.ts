@@ -1,3 +1,5 @@
+import { SaveRejectMasterReasonsError } from "@admin/store/reject-reason-mater.action";
+import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from '@angular/core';
 import { Action, State, StateContext, Selector } from '@ngxs/store';
 import { catchError, Observable, of, tap } from 'rxjs';
@@ -397,7 +399,9 @@ export class CandidateState {
         dispatch(new RemoveCandidatesCredentialSucceeded());
         return payload;
       }),
-      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Credential cannot be deleted'))))
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
     );
   }
 

@@ -91,6 +91,7 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
   }
 
   public dataBound(): void {
+    this.contentLoadedHandler();
     this.grid.hideScroll();
   }
 

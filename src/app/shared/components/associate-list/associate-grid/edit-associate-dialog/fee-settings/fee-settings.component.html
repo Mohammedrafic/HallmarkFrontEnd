@@ -35,12 +35,14 @@
     [allowPaging]="allowPaging"
     [pageSettings]="pageSettings"
     [height]="gridHeight"
+    (dataBound)="gridDataBound($event)"
+    (actionBegin)="actionBegin($event)"
     class="e-gridwithheader"
   >
     <e-columns>
       <e-column textAlign="Right" width="120">
         <ng-template #template let-data>
-          <div class="row-tool-buttons">
+          <div class="row-tool-buttons" [class.hidden]=!isLoaded>
             <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated" cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
