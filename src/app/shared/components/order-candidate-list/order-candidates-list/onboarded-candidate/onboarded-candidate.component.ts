@@ -480,6 +480,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.canClose = this.canClose || permission.permissionId === PermissionTypes.CanCloseCandidate;
     });
     this.disableControlsBasedOnPermissions();
+    this.changeDetectorRef.detectChanges();
   }
 
   private disableControlsBasedOnPermissions(): void {
