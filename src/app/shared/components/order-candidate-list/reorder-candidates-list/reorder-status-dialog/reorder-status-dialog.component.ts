@@ -220,6 +220,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   private disableControlsBasedOnPermissions(): void {
     if (!this.canReject && !this.canOffer && !this.canOnboard) {
       this.hourlyRate?.disable();
+    } else {
+      this.hourlyRate?.enable();
     }
   }
 
