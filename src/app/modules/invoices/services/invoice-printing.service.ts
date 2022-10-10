@@ -28,6 +28,7 @@ export class InvoicePrintingService {
   }
 
   public printAgencyInvoice(data: PrintInvoiceData[]): void {
+    console.log(data)
     const doc = this.createDoc();
     const logo = this.createImage();
 
@@ -37,7 +38,7 @@ export class InvoicePrintingService {
         doc.addPage();
       };
 
-      this.addInvoiceHeader(doc, invoice.meta);
+      this.addAgencyInvoiceHeader(doc, invoice.meta);
       this.addAgencyInvoiceBody(doc, invoice, logo);
     });
     
@@ -107,6 +108,83 @@ Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
         [
           {
             content: metaData.unitAddress,
+            styles: {
+              fontSize: 10,
+              halign: 'left',
+              fontStyle: 'normal',
+              cellWidth: 'wrap',
+              overflow: 'linebreak',
+              cellPadding: { left: 10, top: 5, right: 15 },
+            }, 
+          }
+        ]
+      ],
+      theme: 'plain',
+    });
+  }
+
+  private addAgencyInvoiceHeader(doc: jsPDF, metaData: PrintInvoiceMeta): void {
+    autoTable(doc, {
+      margin: { top: 45, left: 20, right: 20, bottom: 0 },
+      body: [
+        [
+          {
+            content: `${metaData.unitName}
+${metaData.unitAddress}`,
+            styles: {
+              fontSize: 10,
+              halign: 'left',
+              fontStyle: 'bold',
+              cellWidth: 300,
+            },
+          }, 
+          {
+            content: `Invoice No: ${metaData.formattedInvoiceNumber}
+Invoice Date: ${GridValuesHelper.formatDate(metaData.invoiceDate, 'MM/dd/yyyy')}
+Net Payment Terms: ${metaData.paymentTerms}
+Due Date: ${GridValuesHelper.formatDate(metaData.dueDate, 'MM/dd/yyyy')}`,
+            styles: {
+              fontSize: 10,
+              halign: 'right',
+              fontStyle: 'bold',
+              cellWidth: 'auto'
+            },
+          }
+        ]
+      ],
+      theme: 'plain',
+    });
+
+    autoTable(doc, {
+      margin: { top: 5, left: 50, right: 4 },
+      body: [
+        [
+          {
+            content: 'To,',
+            styles: {
+              fontSize: 10,
+              halign: 'left',
+              fontStyle: 'bold',
+              overflow: 'linebreak'
+            },
+          }
+        ],
+        [
+          {
+            content: `Hallmark Healthcare Solutions, Inc`,
+            styles: {
+              fontSize: 10,
+              halign: 'left',
+              fontStyle: 'bold',
+              overflow: 'linebreak',
+              cellPadding: { left: 10 },
+            },
+          }
+        ],
+        [
+          {
+            content: `200 Motor Parkway, Suite D#26
+Hauppauge, NY 11788`,
             styles: {
               fontSize: 10,
               halign: 'left',
