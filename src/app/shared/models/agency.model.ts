@@ -20,6 +20,7 @@ export type AgencyCreateUnder = {
   businessUnitType: 1;
   name: string;
   parentUnitId: number;
+  agencyStatus: number;
 };
 
 export type AgencyDetails = {

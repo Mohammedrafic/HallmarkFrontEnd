@@ -43,6 +43,7 @@ import {
   PaymentDetails,
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
 import { JobDistributionComponent } from '@agency/agency-list/add-edit-agency/job-distribution/job-distribution.component';
+import { AgencyStatus } from '@shared/enums/status';
 
 type AgencyFormValue = {
   parentBusinessUnitId: number;
@@ -67,6 +68,8 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   public createUnderFields = OPRION_FIELDS;
   public title = 'Add';
   public isAgencyUser = false;
+  public readonly agencyStatus = AgencyStatus;
+  public fetchedAgency: Agency;
 
   get contacts(): FormArray {
     return this.agencyForm.get('agencyContactDetails') as FormArray;
@@ -107,7 +110,6 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   private populatedSubscription: Subscription | undefined;
   private isAlive = true;
   private filesDetails: Blob[] = [];
-  private fetchedAgency: Agency;
   private agencyId: number | null = null;
   private isRemoveLogo: boolean = false;
 
