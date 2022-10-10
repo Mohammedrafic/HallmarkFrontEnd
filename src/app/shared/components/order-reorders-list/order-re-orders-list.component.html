@@ -25,7 +25,13 @@
             <button ejs-button cssClass="e-flat default-icon-button">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat primary-icon-button" *ngIf="!isAgency" (click)="edit(data)">
+            <button
+              ejs-button
+              cssClass="e-flat primary-icon-button"
+              [class.disable]="!canCreateOrder"
+              *ngIf="!isAgency"
+              (click)="edit(data)"
+            >
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
           </div>
@@ -33,9 +39,7 @@
       </e-column>
       <e-column field="id" headerText="re-order id" textAlign="Left" width="100">
         <ng-template #template let-data>
-          <div class="link" (click)="onViewNavigation(data)">
-            {{ data.organizationPrefix }}-{{ data.publicId }}
-          </div>
+          <div class="link" (click)="onViewNavigation(data)">{{ data.organizationPrefix }}-{{ data.publicId }}</div>
         </ng-template>
       </e-column>
       <e-column field="statusText" headerText="Status" textAlign="Left" width="160">
@@ -51,7 +55,7 @@
       </e-column>
       <e-column field="agencies" headerText="Agency" textAlign="Left" width="200" *ngIf="!isAgency">
         <ng-template #template let-data>
-          {{data.agencies?.length ? data.agencies.join(', ') : ""}}
+          {{ data.agencies?.length ? data.agencies.join(', ') : '' }}
         </ng-template>
       </e-column>
       <e-column field="billRate" headerText="BILL RATE $" textAlign="Left" width="120">
@@ -61,7 +65,7 @@
       </e-column>
       <e-column field="startDate" headerText="date" textAlign="Right" width="100">
         <ng-template #template let-data>
-          <div class="align-right">{{ data.startDate | date:'MM/dd/yyyy' }}</div>
+          <div class="align-right">{{ data.startDate | date: 'MM/dd/yyyy' }}</div>
         </ng-template>
       </e-column>
       <e-column field="shift" textAlign="Right" headerText="SHIFT" width="150">

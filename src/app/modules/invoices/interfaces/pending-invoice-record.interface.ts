@@ -4,13 +4,14 @@ import { InvoiceType } from '../enums/invoice-type.enum';
 import { BaseInvoice } from './base-invoice.interface';
 import { InvoiceRecordType } from '../enums';
 import { InvoiceAttachment } from './invoice-attachment.interface';
+import { AgencyStatus } from '@shared/enums/status';
 
 export type PendingInvoicesData = PageOfCollections<PendingInvoice>;
 
 export interface PendingInvoice extends BaseInvoice {
   timesheetType: InvoiceType;
   timesheetTypeText: string;
-
+  agencyStatus: AgencyStatus;
   weekStartDate: string;
   weekEndDate: string;
   weekNumber: number;

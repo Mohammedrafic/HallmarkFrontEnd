@@ -1,8 +1,10 @@
-<div *ngIf="!isAgencyOrOrganization; else agencyOrOrganization" class="dropdown-container bootstrap">
+<div *ngIf="!isAgencyOrOrganization; else agencyOrOrganization" class="dropdown-container bootstrap org-agency-selector">
   <div class="input-group dropdown">
     <ejs-dropdownlist
       id="organization-agency-dropdown"
       cssClass="organization-agency-dropdown-popup"
+      [allowFiltering]="true"
+      filterBarPlaceholder="Search"
       [fields]="optionFields"
       [dataSource]="organizationsAgencies$ | async"
       [formControl]="organizationAgencyControl"
@@ -17,7 +19,7 @@
             />
           </div>
           <div class="details">
-            <p class="name">{{ data.name }}</p>
+            <p class="name" [ngClass]="{inactive: data.status === agencyStatuses.Inactive || data.status === agencyStatuses.Terminated}">{{ data.name }}</p>
           </div>
         </div>
       </ng-template>
@@ -31,7 +33,7 @@
             />
           </div>
 
-          <p class="title">{{ data.name }}</p>
+          <p class="title" [ngClass]="{inactive: data.status === agencyStatuses.Inactive || data.status === agencyStatuses.Terminated}">{{ data.name }}</p>
         </div>
       </ng-template>
     </ejs-dropdownlist>

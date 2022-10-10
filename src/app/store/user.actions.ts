@@ -1,7 +1,6 @@
 import { BusinessUnitType } from "../shared/enums/business-unit-type";
 import { LasSelectedOrganizationAgency } from "@shared/models/user-agency-organization.model";
 import { User } from "../shared/models/user.model";
-import { AgencyStatus } from '@shared/enums/status';
 
 export class SetCurrentUser {
   static readonly type = '[user] Set Current User';

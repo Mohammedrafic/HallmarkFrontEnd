@@ -47,7 +47,7 @@ export class GetAllUsersPage {
     public pageSize: number,
     public sortModel: any,
     public filterModel: any,
-    public getAll:boolean
+    public getAll: boolean
   ) {}
 }
 
@@ -98,7 +98,7 @@ export class GetRolesForCopy {
 
 export class GetUserVisibilitySettingsPage {
   static readonly type = '[security] Get User Visibility Settings Page';
-  constructor(public filters: UserVisibilityFilter) { }
+  constructor(public filters: UserVisibilityFilter) {}
 }
 
 export class SaveUserVisibilitySettings {
@@ -135,8 +135,12 @@ export class ExportRoleList {
   static readonly type = '[security] Export Role List';
   constructor(public payload: ExportPayload) {}
 }
-export class GetUSCanadaTimeZoneIds
-{
-  static readonly type ='[security] Get US Canada TimeZoneIds'
+export class GetUSCanadaTimeZoneIds {
+  static readonly type = '[security] Get US Canada TimeZoneIds';
   constructor() {}
+}
+
+export class ChangeBusinessUnit {
+  static readonly type = '[security] Change Business Unit';
+  constructor(public isChangeUnit: boolean) {}
 }

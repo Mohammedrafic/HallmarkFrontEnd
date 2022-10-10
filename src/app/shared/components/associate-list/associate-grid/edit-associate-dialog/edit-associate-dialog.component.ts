@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { filter, Observable, Subject, takeWhile } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { AssociateOrganizationsAgency, FeeExceptionsPage } from '@shared/models/associate-organizations.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -20,6 +20,8 @@ import {
 } from '@shared/components/associate-list/store/associate.actions';
 import { Router } from '@angular/router';
 import { Tabs } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
+import { UserState } from '../../../../../store/user.state';
+import { AgencyStatus } from '@shared/enums/status';
 
 @Component({
   selector: 'app-edit-associate-dialog',
@@ -45,8 +47,11 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
   public partnershipForm: FormGroup;
   public firstActive = true;
   public activeTab: number | string = 0;
+  public agencyActionsAllowed = true;
+  public readonly agencyStatus = AgencyStatus;
 
   private isAlive = true;
+  private isAgency: boolean;
 
   constructor(
     private store: Store,
@@ -56,6 +61,7 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.isAgency = this.router.url.includes('agency');
     this.onOpenEvent();
     this.width = this.getDialogWidth();
     this.feeSettingsForm = FeeSettingsComponent.createFormGroup();
@@ -63,6 +69,10 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
     this.onFeeExceptionsPageChanged();
 
     this.partnershipForm = PartnershipSettingsComponent.createForm();
+
+    if (this.isAgency) {
+      this.checkForAgencyStatus();
+    }
   }
 
   ngOnDestroy(): void {
@@ -194,5 +204,17 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
   private getDialogWidth(): string {
     const thirdPart = window.innerWidth / 3;
     return `${thirdPart * 2}px`;
+  }
+
+  private checkForAgencyStatus(): void {
+    this.store
+      .select(UserState.agencyActionsAllowed)
+      .pipe(
+        distinctUntilChanged(),
+        takeWhile(() => this.isAlive)
+      )
+      .subscribe((value) => {
+        this.agencyActionsAllowed = value;
+      });
   }
 }

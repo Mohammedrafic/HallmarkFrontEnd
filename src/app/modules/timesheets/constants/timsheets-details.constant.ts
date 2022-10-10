@@ -70,7 +70,7 @@ export const amountColdef = (headerText: string): ColDef => (
   }
 );
 
-export const actionCol = (isUploadAllowed = false): ColDef => (
+export const actionCol = (isUploadAllowed = false, disableAction = false): ColDef => (
   {
     field: 'id',
     headerName: '',
@@ -85,6 +85,7 @@ export const actionCol = (isUploadAllowed = false): ColDef => (
       editMode: true,
       isEditable: false,
       isUploadAllowed,
+      disableAction,
     }
   }
 );

@@ -1,4 +1,6 @@
-import { ICellRendererParams } from '@ag-grid-community/core';
+import { ICellRendererParams, CheckboxSelectionCallbackParams } from '@ag-grid-community/core';
+
+import { AgencyStatus } from '@shared/enums/status';
 import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
 import { Attachment, AttachmentsListParams } from '@shared/components/attachments';
 import { TypedColDef } from '../../interfaces/typed-col-def.interface';
@@ -33,7 +35,10 @@ export class PendingInvoicesGridHelper {
         headerName: 'TYPE',
         headerCheckboxSelection: true,
         headerCheckboxSelectionFilteredOnly: true,
-        checkboxSelection: true,
+        checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
+          const { agencyStatus } = params.data as PendingInvoice;
+          return agencyStatus !== AgencyStatus.Terminated
+        },
         minWidth: 240,
         headerComponent: ToggleRowExpansionHeaderCellComponent,
         cellRenderer: 'agGroupCellRenderer',

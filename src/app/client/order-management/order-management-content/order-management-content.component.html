@@ -14,7 +14,10 @@
     </button>
     <!-- TODO (activeTab !== OrganizationOrderManagementTabs.Incomplete) - temporary solution for hiding button without functionality -->
     <button
-      *ngIf="(activeTab !== OrganizationOrderManagementTabs.OrderTemplates) && (activeTab !== OrganizationOrderManagementTabs.Incomplete)"
+      *ngIf="
+        activeTab !== OrganizationOrderManagementTabs.OrderTemplates &&
+        activeTab !== OrganizationOrderManagementTabs.Incomplete
+      "
       ejs-dropdownbutton
       appHideBeforeSyncfusionLoad
       [items]="exportOptions"
@@ -24,7 +27,13 @@
     >
       <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
     </button>
-    <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToOrderForm()">
+    <button
+      [disabled]="!canCreateOrder"
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      [isPrimary]="true"
+      (click)="navigateToOrderForm()"
+    >
       Create Order
     </button>
   </ng-container>
@@ -100,6 +109,7 @@
               ejs-button
               cssClass="e-flat default-icon-button"
               [disabled]="
+                !canCreateOrder ||
                 data.status === orderStatus.PreOpen ||
                 data.status === orderStatus.Closed ||
                 !settings[SettingsKeys.IsReOrder]?.value
@@ -117,7 +127,7 @@
               ejs-button
               cssClass="e-flat secondary-icon-button"
               [class.green-background]="!data.isLocked"
-              [disabled]="disabledLock(data.status) || data?.extensionFromId"
+              [disabled]="!canCreateOrder || disabledLock(data.status) || data?.extensionFromId"
               (click)="lockOrder(data); $event.stopPropagation()"
               *ngIf="isLockMenuButtonsShown"
             >
@@ -144,7 +154,12 @@
 
           <ng-template #templateButtons>
             <div class="row-tool-buttons" (click)="stopPropagation($event)">
-              <i-feather name="trash-2" class="icon delete-template" (click)="deleteOrder(data?.id)"></i-feather>
+              <i-feather
+                name="trash-2"
+                class="icon delete-template"
+                [class.disable]="!canCreateOrder"
+                (click)="deleteOrder(data?.id)"
+              ></i-feather>
             </div>
           </ng-template>
         </ng-template>
@@ -292,12 +307,7 @@
           </ng-container>
         </ng-template>
       </e-column>
-      <e-column
-        field="startDate"
-        width="155"
-        minWidth="135"
-        maxWidth="200"
-      >
+      <e-column field="startDate" width="155" minWidth="135" maxWidth="200">
         <ng-template #headerTemplate let-data>
           <span class="e-headertext">
             {{ activeTab !== OrganizationOrderManagementTabs.ReOrders ? 'START DATE' : 'RE-ORDER DATE' }}

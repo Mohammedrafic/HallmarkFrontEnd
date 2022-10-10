@@ -1,25 +1,23 @@
-import { GetBusinessByUnitType, ExportRoleList } from './../../store/security.actions';
-import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { GetBusinessByUnitType, ExportRoleList } from '../../store/security.actions';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { filter, Observable, Subject, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
-import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
+import { RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { GRID_CONFIG } from '@shared/constants/grid-config';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants/messages';
 import { Role, RolesFilters, RolesPage } from '@shared/models/roles.model';
-import { FilteredItem } from "@shared/models/filter.model";
-import { FilterService } from "@shared/services/filter.service";
-import { PermissionsTree } from "@shared/models/permission.model";
-import { rolesFilterColumns } from "src/app/security/roles-and-permissions/roles-and-permissions.constants";
+import { FilterService } from '@shared/services/filter.service';
+import { PermissionsTree } from '@shared/models/permission.model';
+import { rolesFilterColumns } from 'src/app/security/roles-and-permissions/roles-and-permissions.constants';
 
-import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { GetRolesPage, RemoveRole } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
-
 
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
@@ -39,7 +37,7 @@ enum Active {
 @Component({
   selector: 'app-roles-grid',
   templateUrl: './roles-grid.component.html',
-  styleUrls: ['./roles-grid.component.scss']
+  styleUrls: ['./roles-grid.component.scss'],
 })
 export class RolesGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() filterForm: FormGroup;
@@ -66,7 +64,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     return Active[Number(isActive)];
   };
   public businessValueAccess = (_: string, { businessUnitName }: Role) => {
-    return businessUnitName || "All";
+    return businessUnitName || 'All';
   };
   public selIndex: number[] = [];
   public sortOptions = { columns: [{ field: 'businessUnitName', direction: 'Descending' }] };
@@ -76,9 +74,8 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   private filters: RolesFilters = {};
   private isAlive = true;
 
-
   itemList: Array<Role> | undefined;
-  private gridApi: any;
+  public gridApi: any;
   private gridColumnApi: any;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   rowModelType: any;
@@ -105,20 +102,20 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   public fileName: string;
   public defaultFileName: string;
 
-  constructor(private actions$: Actions,
+  constructor(
+    private actions$: Actions,
     private store: Store,
     private confirmService: ConfirmService,
     private datePipe: DatePipe,
-    private filterService: FilterService) {
+    private filterService: FilterService
+  ) {
     super();
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
-    }
+    };
     this.rowModelType = 'serverSide';
-    this.serverSideInfiniteScroll = true,
-      this.pagination = true;
-    this.paginationPageSize = this.pageSize,
-      this.cacheBlockSize = this.pageSize;
+    (this.serverSideInfiniteScroll = true), (this.pagination = true);
+    (this.paginationPageSize = this.pageSize), (this.cacheBlockSize = this.pageSize);
     this.serverSideStoreType = 'partial';
     this.maxBlocksInCache = 1;
     this.columnDefs = [
@@ -127,45 +124,49 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
         cellRenderer: 'buttonRenderer',
         cellRendererParams: {
           onClick: this.onEdit.bind(this),
-          label: 'Edit'
+          label: 'Edit',
         },
         pinned: 'left',
         suppressMovable: true,
         filter: false,
         sortable: false,
-        menuTabs: []
+        menuTabs: [],
       },
       {
         headerName: '',
         cellRenderer: 'buttonRenderer',
         cellRendererParams: {
           onClick: this.onRemove.bind(this),
-          label: 'Delete'
+          label: 'Delete',
         },
         pinned: 'left',
         suppressMovable: true,
         filter: false,
         sortable: false,
-        menuTabs: []
+        menuTabs: [],
       },
       {
         field: 'id',
-        hide: true
+        hide: true,
       },
       {
         field: 'businessUnitName',
         filter: 'agSetColumnFilter',
         filterParams: {
-          values: (params: { success: (arg0: any) => void; }) => {
+          values: (params: { success: (arg0: any) => void }) => {
             setTimeout(() => {
               this.bussinesData$.subscribe((data) => {
-                params.success(data.map(function (item) { return item.name }));
+                params.success(
+                  data.map(function (item) {
+                    return item.name;
+                  })
+                );
               });
-            }, 3000)
+            }, 3000);
           },
           buttons: ['reset'],
           refreshValuesOnOpen: true,
-        }
+        },
       },
       {
         field: 'name',
@@ -174,17 +175,19 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
           buttons: ['reset'],
           debounceMs: 1000,
           suppressAndOrCondition: true,
-        }
+        },
       },
       {
         header: 'Active',
         field: 'isActive',
-        valueGetter: (params: { data: { isActive: boolean } }) => { return Active[Number(params.data.isActive)] },
+        valueGetter: (params: { data: { isActive: boolean } }) => {
+          return Active[Number(params.data.isActive)];
+        },
         suppressMovable: true,
         filter: false,
         sortable: false,
-        menuTabs: []
-      }
+        menuTabs: [],
+      },
     ];
 
     this.defaultColDef = {
@@ -192,7 +195,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
       minWidth: 120,
       resizable: true,
       sortable: true,
-      filter: false
+      filter: false,
     };
 
     this.autoGroupColumnDef = {
@@ -256,7 +259,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
 
   getBusinessByUnitType() {
     const { businessUnit } = this.filterForm.getRawValue();
-    this.store.dispatch(new GetBusinessByUnitType(businessUnit))
+    this.store.dispatch(new GetBusinessByUnitType(businessUnit));
   }
 
   onGridReady(params: any) {
@@ -275,15 +278,14 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
             pageNumber: params.request.endRow / self.paginationPageSize,
             pageSize: self.paginationPageSize,
             sortFields: params.request.sortModel,
-            filterModels: params.request.filterModel
+            filterModels: params.request.filterModel,
           };
           var filter: any;
           let jsonString = JSON.stringify(params.request.filterModel);
-          if (jsonString != "{}") {
-            var updatedJson = jsonString.replace("operator", "logicalOperator");
+          if (jsonString != '{}') {
+            var updatedJson = jsonString.replace('operator', 'logicalOperator');
             filter = JSON.parse(updatedJson);
-          }
-          else filter = null;
+          } else filter = null;
 
           var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
           self.dispatchNewPage(sort, filter);
@@ -291,15 +293,14 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
             self.itemList = data?.items;
             if (!self.itemList || !self.itemList.length) {
               self.gridApi.showNoRowsOverlay();
-            }
-            else {
+            } else {
               self.gridApi.hideOverlay();
             }
             params.successCallback(self.itemList, data?.totalCount || 1);
           });
         }, 500);
-      }
-    }
+      },
+    };
   }
 
   public rowDataBound(args: RowDataBoundEventArgs): void {
@@ -317,7 +318,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     this.editRoleEvent.emit(data.rowData);
   }
 
-  public onRemove(data: Role): void {
+  public onRemove(data: any): void {
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
@@ -325,8 +326,10 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
         okButtonClass: 'delete-button',
       })
       .subscribe((confirm) => {
-        if (confirm && data.id) {
-          this.store.dispatch(new RemoveRole(data.id))
+        if (confirm && data.rowData.id) {
+          this.store.dispatch(new RemoveRole(data.rowData.id));
+          var datasource = this.createServerSideDatasource();
+          this.gridApi.setServerSideDatasource(datasource);
         }
       });
   }
@@ -344,24 +347,33 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   }
 
   onPageSizeChanged(event: any) {
-    this.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
-    this.paginationPageSize = Number(event.value.toLowerCase().replace("rows", ""));
+    this.cacheBlockSize = Number(event.value.toLowerCase().replace('rows', ''));
+    this.paginationPageSize = Number(event.value.toLowerCase().replace('rows', ''));
     if (this.gridApi != null) {
-      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows", "")));
-      this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows", "")));
+      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace('rows', '')));
+      this.gridApi.gridOptionsWrapper.setProperty(
+        'cacheBlockSize',
+        Number(event.value.toLowerCase().replace('rows', ''))
+      );
       var datasource = this.createServerSideDatasource();
       this.gridApi.setServerSideDatasource(datasource);
     }
   }
 
-  private dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
+  public dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
     const { businessUnit, business } = this.filterForm.getRawValue();
-    this.store.dispatch(new GetRolesPage(businessUnit, business || null, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+    this.store.dispatch(
+      new GetRolesPage(
+        businessUnit,
+        business || null,
+        this.currentPage,
+        this.pageSize,
+        sortModel,
+        filterModel,
+        this.filters
+      )
+    );
   }
-
-
-
-
 
   private onDialogClose(): void {
     this.actions$
@@ -370,8 +382,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
         takeWhile(() => this.isAlive),
         filter(({ isDialogShown }) => !!!isDialogShown)
       )
-      .subscribe(() => {
-      });
+      .subscribe(() => {});
   }
 
   public closeExport(): void {

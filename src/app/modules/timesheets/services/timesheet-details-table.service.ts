@@ -18,7 +18,7 @@ export class TimesheetDetailsTableService {
   }
 
   public getTableRecordsConfig():
-    Record<string, ((isStatusAvaliable: boolean, organizationId?: number | null) => ColDef[])> {
+    Record<string, ((isStatusAvaliable: boolean, organizationId?: number | null, disableActions?: boolean) => ColDef[])> {
     return {
       [RecordFields.Time]: TimesheetRecordsColdef,
       [RecordFields.Miles]: this.milesRecordsColDef.bind(this),
@@ -26,7 +26,7 @@ export class TimesheetDetailsTableService {
     }
   }
 
-  public milesRecordsColDef(isStatusAvaliable = false, organizationId: number | null = null): ColDef[] {
+  public milesRecordsColDef(isStatusAvaliable = false, organizationId: number | null = null, disableActions: boolean = false): ColDef[] {
     return [
       dayColDef,
       ...(isStatusAvaliable ? [recordStatusCell] : []),
@@ -77,7 +77,7 @@ export class TimesheetDetailsTableService {
         ...totalCol,
         width: 200,
       },
-      actionCol(true),
+      actionCol(true, disableActions),
     ];
   }
 }

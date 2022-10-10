@@ -1,0 +1,7 @@
+@import "colors";
+
+button {
+  &[disabled] {
+    color: $bill-rates-grid-hover-shadow !important;
+  }
+}

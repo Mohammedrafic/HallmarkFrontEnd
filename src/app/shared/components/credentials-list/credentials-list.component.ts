@@ -108,7 +108,6 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
   ngOnInit(): void {
     this.filterColumns = {
-      searchTerm: { type: ControlTypes.Text, valueType: ValueType.Text },
       credentialIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       credentialTypeIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       expireDateApplicable: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Expiry Date Applicable'},
@@ -168,7 +167,6 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
   public onFilterClose() {
     this.CredentialsFilterFormGroup.setValue({
-      searchTerm: this.filters.searchTerm || '',
       credentialIds: this.filters.credentialIds || null,
       credentialTypeIds: this.filters.credentialTypeIds || [],
       expireDateApplicable: this.filters.expireDateApplicable || null,
@@ -365,7 +363,6 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       comment: ['', Validators.maxLength(500)]
     });
     this.CredentialsFilterFormGroup = this.formBuilder.group({
-      searchTerm: [''],
       credentialIds: [[]],
       credentialTypeIds: [[]],
       expireDateApplicable: [false],

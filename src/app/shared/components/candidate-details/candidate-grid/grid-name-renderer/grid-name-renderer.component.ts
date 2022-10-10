@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { GridHelper } from '@shared/helpers/grid.helper';
-import { AppState } from "src/app/store/app.state";
+import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { Store } from '@ngxs/store';
 import { Router } from '@angular/router';

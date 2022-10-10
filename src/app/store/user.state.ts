@@ -42,7 +42,6 @@ import {
 import { OrganizationService } from '@shared/services/organization.service';
 import { B2CAuthService } from '../b2c-auth/b2c-auth.service';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { AgencyStatus } from 'src/app/shared/enums/status';
 
 export interface UserStateModel {
   user: User | null;
@@ -141,6 +140,11 @@ export class UserState {
   @Selector()
   static currentUserPermissions(state: UserStateModel): CurrentUserPermission[] {
     return state.permissions;
+  }
+
+  @Selector()
+  static currentUserPermissionsIds(state: UserStateModel): number[] {
+    return state.permissions.map(({ permissionId }) => permissionId);
   }
 
   @Selector()
@@ -329,7 +333,7 @@ export class UserState {
   }
 
   @Action(SetAgencyActionsAllowed)
-  setAgencyStatus(
+  SetAgencyStatus(
     { patchState }: StateContext<UserStateModel>,
     { allowed }: SetAgencyActionsAllowed,
   ): void {

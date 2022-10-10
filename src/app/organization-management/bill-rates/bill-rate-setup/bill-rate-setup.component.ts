@@ -46,6 +46,7 @@ import {
 } from '@organization-management/store/bill-rates.actions';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
 import {
+  BillRateCalculationType,
   BillRateCategory,
   BillRateFilters,
   BillRateOption,
@@ -121,6 +122,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public BillRateUnitList = BillRateUnit;
   public isIntervalMinEnabled = true;
   public isIntervalMaxEnabled = true;
+  public isIntervalMaxRequired = true;
+  public isIntervalMinRequired = true;
   public billRatesFormGroup: FormGroup;
   public billRateFilterFormGroup: FormGroup;
   public intervalMinField: AbstractControl;
@@ -132,6 +135,9 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public filterColumns: any;
   public billRateToPost?: BillRateSetupPost;
   public isReadOnly = false; // TODO: temporary solution, until specific service provided
+  public additionalLableForMinMax: string | null = null;
+  public hideFilds = new Set<string>();
+  public isWeeklyOT = false;
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add New';
@@ -506,12 +512,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         considerFor7thDayOT: this.billRatesFormGroup.controls['considerFor7thDayOt'].value
           ? this.billRatesFormGroup.controls['considerFor7thDayOt'].value
           : false,
-        regularLocal: this.billRatesFormGroup.controls['regularLocal'].value
-          ? this.billRatesFormGroup.controls['regularLocal'].value
-          : false,
-        displayInTimesheet: this.billRatesFormGroup.controls['displayInTimesheet'].value
-          ? this.billRatesFormGroup.controls['displayInTimesheet'].value
-          : false,
         displayInJob: this.billRatesFormGroup.controls['displayInJob'].value
           ? this.billRatesFormGroup.controls['displayInJob'].value
           : false,
@@ -564,14 +564,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public considerFor7thDayOtChange(data: any, event: any): void {
     this.onClickedCheckboxHandler(data, 'considerFor7thDayOt', event.checked);
-  }
-
-  public regularLocalChange(data: any, event: any): void {
-    this.onClickedCheckboxHandler(data, 'regularLocal', event.checked);
-  }
-
-  public displayInTimeSheetChange(data: any, event: any): void {
-    this.onClickedCheckboxHandler(data, 'displayInTimesheet', event.checked);
   }
 
   public displayInJobChange(data: any, event: any): void {
@@ -628,8 +620,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       considerForWeeklyOt: this.filters.considerForWeeklyOt || null,
       considerForDailyOt: this.filters.considerForDailyOt || null,
       considerFor7thDayOt: this.filters.considerFor7thDayOt || null,
-      regularLocal: this.filters.regularLocal || null,
-      displayInTimesheet: this.filters.displayInTimesheet || null,
       displayInJob: this.filters.displayInJob || null,
     });
     this.filteredItems = this.filterService.generateChips(
@@ -686,8 +676,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       considerForWeeklyOt: [null],
       considerForDailyOt: [null],
       considerFor7thDayOt: [null],
-      regularLocal: [null],
-      displayInTimesheet: [null],
       displayInJob: [null],
     });
 
@@ -706,8 +694,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       considerForWeeklyOt: [null],
       considerForDailyOt: [null],
       considerFor7thDayOt: [null],
-      regularLocal: [null],
-      displayInTimesheet: [null],
       displayInJob: [null],
     });
   }
@@ -773,45 +759,81 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       ?.valueChanges.pipe(takeUntil(this.unsubscribe$))
       .subscribe((typeId: number) => {
         const foundBillRateOption = this.billRatesOptions.find((option) => option.id === typeId);
+
         if (foundBillRateOption) {
           this.setBillRateTypes(foundBillRateOption);
           this.selectedBillRateUnit = foundBillRateOption.unit;
           this.isIntervalMinEnabled = foundBillRateOption.intervalMin;
           this.isIntervalMaxEnabled = foundBillRateOption.intervalMax;
+          this.isIntervalMinRequired = foundBillRateOption.intervalMinRequired;
+          this.isIntervalMaxRequired = foundBillRateOption.intervalMaxRequired;
           this.billRatesFormGroup.get('billRateValueRateTimes')?.setValue('');
           this.updateAmountValidators();
           this.billRatesFormGroup.get('billRatesCategory')?.setValue(BillRateCategory[foundBillRateOption.category]);
         }
 
-        if (this.isIntervalMinEnabled) {
-          this.billRatesFormGroup.get('intervalMin')?.reset();
-          this.billRatesFormGroup.get('intervalMin')?.enable();
-          this.billRatesFormGroup
-            .get('intervalMin')
-            ?.addValidators([Validators.required, Validators.minLength(1), Validators.maxLength(10)]);
+        const VALIDATORS = [Validators.required, Validators.minLength(1), Validators.maxLength(10)];
+        const intervalMinControl = this.billRatesFormGroup.get('intervalMin');
+        const intervalMaxControl = this.billRatesFormGroup.get('intervalMax');
+
+        if (this.isIntervalMinRequired) {
+          intervalMinControl?.addValidators(VALIDATORS);
         } else {
-          this.billRatesFormGroup.get('intervalMin')?.reset();
-          this.billRatesFormGroup.get('intervalMin')?.disable();
-          this.billRatesFormGroup
-            .get('intervalMin')
-            ?.removeValidators([Validators.required, Validators.minLength(1), Validators.maxLength(10)]);
+          intervalMinControl?.removeValidators(VALIDATORS);
+        }
+
+        if (this.isIntervalMaxRequired) {
+          intervalMaxControl?.addValidators(VALIDATORS);
+        } else {
+          intervalMaxControl?.removeValidators(VALIDATORS);
+        }
+
+        if (this.isIntervalMinEnabled) {
+          intervalMinControl?.reset();
+          intervalMinControl?.enable();
+        } else {
+          intervalMinControl?.reset();
+          intervalMinControl?.disable();
         }
 
         if (this.isIntervalMaxEnabled) {
-          this.billRatesFormGroup.get('intervalMax')?.reset();
-          this.billRatesFormGroup.get('intervalMax')?.enable();
-          this.billRatesFormGroup
-            .get('intervalMax')
-            ?.addValidators([Validators.required, Validators.minLength(1), Validators.maxLength(10)]);
+          intervalMaxControl?.reset();
+          intervalMaxControl?.enable();
         } else {
-          this.billRatesFormGroup.get('intervalMax')?.reset();
-          this.billRatesFormGroup.get('intervalMax')?.disable();
-          this.billRatesFormGroup
-            .get('intervalMax')
-            ?.removeValidators([Validators.required, Validators.minLength(1), Validators.maxLength(10)]);
+          intervalMaxControl?.reset();
+          intervalMaxControl?.disable();
         }
+
+        if (typeId === BillRateCalculationType.Regular || typeId === BillRateCalculationType.RegularLocal) {
+          intervalMinControl?.setValue(0);
+        }
+
+        this.changeFieldsSettingByType(typeId);
+
+        this.billRatesFormGroup.updateValueAndValidity();
         this.cd.markForCheck();
       });
+  }
+
+  private changeFieldsSettingByType(billRateType: BillRateCalculationType): void {
+    this.hideFilds.clear();
+    switch (billRateType) {
+      case BillRateCalculationType.RegularLocal:
+        this.additionalLableForMinMax = 'Mileage';
+        break;
+      case BillRateCalculationType.GuaranteedHours:
+        this.additionalLableForMinMax = 'Work Week';
+        this.hideFilds.add('intervalMax')
+        this.hideFilds.add('billRateValueRateTimes');
+        break;
+      case BillRateCalculationType.WeeklyOT:
+        this.isWeeklyOT = true;
+        break;
+      default:
+        this.isWeeklyOT = false;
+        this.additionalLableForMinMax = null;
+        break;
+    }
   }
 
   setBillRateTypes(billRateOption: BillRateOption): void {
@@ -888,8 +910,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRatesFormGroup.controls['considerForWeeklyOt'].setValue(data.considerForWeeklyOT);
     this.billRatesFormGroup.controls['considerForDailyOt'].setValue(data.considerForDailyOT);
     this.billRatesFormGroup.controls['considerFor7thDayOt'].setValue(data.considerFor7thDayOT);
-    this.billRatesFormGroup.controls['regularLocal'].setValue(data.regularLocal);
-    this.billRatesFormGroup.controls['displayInTimesheet'].setValue(data.displayInTimesheet);
     this.billRatesFormGroup.controls['displayInJob'].setValue(data.displayInJob);
     this.billRatesFormGroup.controls['billRatesType'].setValue(data.billType);
   }
@@ -900,3 +920,4 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.isReadOnly = user?.businessUnitType === BusinessUnitType.Organization;
   }
 }
+

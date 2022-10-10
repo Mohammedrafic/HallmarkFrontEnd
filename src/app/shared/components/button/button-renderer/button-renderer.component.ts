@@ -2,15 +2,17 @@ import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { Component } from '@angular/core';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { AgencyStatus } from '@shared/enums/status';
 
 @Component({
   selector: 'app-button-renderer',
   templateUrl: './button-renderer.component.html',
-  styleUrls: ['./button-renderer.component.scss']
+  styleUrls: ['./button-renderer.component.scss'],
 })
 export class ButtonRendererComponent implements ICellRendererAngularComp {
+  public readonly agencyStatus = AgencyStatus;
 
-  constructor() { }
+  constructor() {}
   faEdit = faEdit as IconProp;
   faTrash = faTrash as IconProp;
   params: any;
@@ -29,10 +31,9 @@ export class ButtonRendererComponent implements ICellRendererAngularComp {
     if (this.params.onClick instanceof Function) {
       const params = {
         event: $event,
-        rowData: this.params.node.data        
-      }
+        rowData: this.params.node.data,
+      };
       this.params.onClick(params);
-
     }
   }
 }

@@ -19,8 +19,8 @@
       <h3>Fee Exception</h3>
     </div>
     <div class="actions">
-      <span class="action-link" (click)="addNew()"
-      ><i-feather name="plus" class="icon"></i-feather> Add Fee Exception</span
+      <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated" class="action-link" (click)="addNew()"
+      ><i-feather name="plus" class="icon"></i-feather> Add Fee Exception</button
       >
     </div>
   </div>
@@ -41,10 +41,10 @@
       <e-column textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
+            <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated" cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
+            <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated" cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
