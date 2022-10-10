@@ -28,5 +28,6 @@ export enum PermissionTypes {
   CanManageNotificationTemplates = 3401,
 
   // Credentials
-  ManuallyAddCredential = 402
+  ManageOrganizationCredential= 401,
+  ManuallyAddCredential = 402,
 }

@@ -52,8 +52,7 @@ export const amountColDef: TypedColDef<ManualInvoice> = {
   field: 'amount',
   headerName: 'AMOUNT',
   width: 110,
-  type: 'rightAligned',
-  cellClass: 'font-weight-bold align-right',
+  cellClass: 'font-weight-bold',
   valueFormatter: numberValueFormatter,
 };
 

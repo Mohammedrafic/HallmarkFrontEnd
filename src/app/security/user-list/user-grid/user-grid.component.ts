@@ -1,4 +1,14 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
 import { FormGroup } from '@angular/forms';
 import { Role, RolesFilters, RolesPage } from '@shared/models/roles.model';
@@ -37,7 +47,7 @@ enum Visibility {
 @Component({
   selector: 'app-user-grid',
   templateUrl: './user-grid.component.html',
-  styleUrls: ['./user-grid.component.scss']
+  styleUrls: ['./user-grid.component.scss'],
 })
 export class UserGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() filterForm: FormGroup;
@@ -104,15 +114,12 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     super();
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
-    }
+    };
     var self = this;
     this.rowModelType = 'serverSide';
     this.serverSideStoreType = 'partial';
-    this.serverSideInfiniteScroll = true,
-      this.serverSideFilterOnServer = true,
-      this.pagination = true;
-    this.paginationPageSize = this.pageSize,
-      this.cacheBlockSize = this.pageSize;
+    (this.serverSideInfiniteScroll = true), (this.serverSideFilterOnServer = true), (this.pagination = true);
+    (this.paginationPageSize = this.pageSize), (this.cacheBlockSize = this.pageSize);
     this.maxBlocksInCache = 1;
     this.columnDefs = [
       {
@@ -120,19 +127,19 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         cellRenderer: 'buttonRenderer',
         cellRendererParams: {
           onClick: this.onEdit.bind(this),
-          label: 'Edit'
+          label: 'Edit',
         },
         width: 50,
         pinned: 'left',
         suppressMovable: true,
         filter: false,
         sortable: false,
-        menuTabs: []
+        menuTabs: [],
       },
       {
         field: 'id',
         hide: true,
-        filter: false
+        filter: false,
       },
       {
         field: 'firstName',
@@ -143,7 +150,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
           buttons: ['reset'],
           debounceMs: 1000,
           suppressAndOrCondition: true,
-        }
+        },
       },
       {
         field: 'lastName',
@@ -154,7 +161,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
           buttons: ['reset'],
           debounceMs: 1000,
           suppressAndOrCondition: true,
-        }
+        },
       },
       {
         headerName: 'Status',
@@ -166,7 +173,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         pinned: 'left',
         suppressMovable: true,
         filter: false,
-        sortable: false
+        sortable: false,
       },
       {
         field: 'email',
@@ -175,7 +182,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
           buttons: ['reset'],
           debounceMs: 1000,
           suppressAndOrCondition: true,
-        }
+        },
       },
       {
         headerName: 'Roles',
@@ -183,21 +190,25 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         sortable: false,
         filter: 'agSetColumnFilter',
         filterParams: {
-          values: (params: { success: (arg0: any) => void; }) => {
-            setTimeout(() => {                
-                this.rolesPage$.subscribe((data)=>{                  
-                  params.success(data.items.map(function(item){return item.name}));
-                });
-            }, 3000)
+          values: (params: { success: (arg0: any) => void }) => {
+            setTimeout(() => {
+              this.rolesPage$.subscribe((data) => {
+                params.success(
+                  data.items.map(function (item) {
+                    return item.name;
+                  })
+                );
+              });
+            }, 3000);
           },
           buttons: ['reset'],
           refreshValuesOnOpen: true,
-        }
+        },
       },
       {
         field: 'organization',
-        valueGetter: function (params: { data: { businessUnitName: string }; }) {
-          return params.data.businessUnitName || "All";
+        valueGetter: function (params: { data: { businessUnitName: string } }) {
+          return params.data.businessUnitName || 'All';
         },
         filter: false,
       },
@@ -206,11 +217,11 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         field: 'hasVisibility',
         hide: this.isAgencyUser,
         valueGetter: function (params: { data: { hasVisibility: boolean } }) {
-          return self.visibilityEnum[params.data.hasVisibility ? 0 : 1]
+          return self.visibilityEnum[params.data.hasVisibility ? 0 : 1];
         },
         filter: false,
-        sortable: false
-      }
+        sortable: false,
+      },
     ];
 
     this.defaultColDef = {
@@ -218,7 +229,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
       minWidth: 120,
       resizable: true,
       sortable: true,
-      filter: true
+      filter: true,
     };
 
     this.autoGroupColumnDef = {
@@ -262,7 +273,6 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
           },
         },
       ],
-      
     };
   }
 
@@ -325,9 +335,9 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
           fileType,
           {
             businessUnitType: businessUnit,
-            businessUnitId: business ? business : null,
+            businessUnitIds: [business ? business : null],
             ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
-            ...this.filters
+            ...this.filters,
           },
           options
             ? options.columns.map((val: ExportColumn) => val.column)
@@ -347,12 +357,14 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   }
 
   onPageSizeChanged(event: any) {
-    this.cacheBlockSize=Number(event.value.toLowerCase().replace("rows",""));
-    this.paginationPageSize=Number(event.value.toLowerCase().replace("rows",""));
-    if(this.gridApi!=null)
-    {
-      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows","")));
-      this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows","")));
+    this.cacheBlockSize = Number(event.value.toLowerCase().replace('rows', ''));
+    this.paginationPageSize = Number(event.value.toLowerCase().replace('rows', ''));
+    if (this.gridApi != null) {
+      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace('rows', '')));
+      this.gridApi.gridOptionsWrapper.setProperty(
+        'cacheBlockSize',
+        Number(event.value.toLowerCase().replace('rows', ''))
+      );
       var datasource = this.createServerSideDatasource();
       this.gridApi.setServerSideDatasource(datasource);
     }
@@ -380,12 +392,16 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   }
 
   private subscribeForFilterFormChange(): void {
-    this.filterForm.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {this.dispatchNewPage(), this.loadRoles()});
+    this.filterForm.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
+      this.dispatchNewPage(), this.loadRoles();
+    });
   }
 
   private dispatchNewPage(): void {
     const { businessUnit, business } = this.filterForm.getRawValue();
-    this.store.dispatch(new GetUsersPage(businessUnit, business != 0 ? [business] : null, this.currentPage, this.pageSize, null, null));
+    this.store.dispatch(
+      new GetUsersPage(businessUnit, business != 0 ? [business] : null, this.currentPage, this.pageSize, null, null)
+    );
   }
 
   private checkAgencyUser(): void {
@@ -410,32 +426,39 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
             pageNumber: params.request.endRow / self.paginationPageSize,
             pageSize: self.paginationPageSize,
             sortFields: params.request.sortModel,
-            filterModels: params.request.filterModel
+            filterModels: params.request.filterModel,
           };
           var filter: any;
           let jsonString = JSON.stringify(params.request.filterModel);
-          if (jsonString != "{}") {
-            var updatedJson = jsonString.replace("operator", "logicalOperator");
+          if (jsonString != '{}') {
+            var updatedJson = jsonString.replace('operator', 'logicalOperator');
             filter = JSON.parse(updatedJson);
-          }
-          else filter = null;
+          } else filter = null;
 
           var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
           const { businessUnit, business } = self.filterForm.getRawValue();
-          self.store.dispatch(new GetUsersPage(businessUnit, business != 0 ? [business] : null, isNaN(postData.pageNumber) ? self.currentPage : postData.pageNumber, postData.pageSize, sort, filter));
+          self.store.dispatch(
+            new GetUsersPage(
+              businessUnit,
+              business != 0 ? [business] : null,
+              isNaN(postData.pageNumber) ? self.currentPage : postData.pageNumber,
+              postData.pageSize,
+              sort,
+              filter
+            )
+          );
           self.usersPage$.pipe().subscribe((data: any) => {
             self.itemList = data?.items;
             if (!self.itemList || !self.itemList.length) {
               self.gridApi.showNoRowsOverlay();
-            }
-            else {
+            } else {
               self.gridApi.hideOverlay();
             }
             params.successCallback(self.itemList, data?.totalCount || 1);
           });
         }, 500);
-      }
-    }
+      },
+    };
   }
 
   loadRoles() {
