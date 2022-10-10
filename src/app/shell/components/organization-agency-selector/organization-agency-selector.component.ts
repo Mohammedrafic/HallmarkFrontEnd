@@ -19,6 +19,7 @@ import {
   SaveLastSelectedOrganizationAgencyId,
   LastSelectedOrganisationAgency,
   UserOrganizationsAgenciesChanged,
+  SetAgencyActionsAllowed,
 } from 'src/app/store/user.actions';
 
 import { AppState } from 'src/app/store/app.state';
@@ -32,6 +33,7 @@ import {
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
+import { AgencyStatus } from 'src/app/shared/enums/status';
 
 interface IOrganizationAgency {
   id: number;
@@ -39,6 +41,7 @@ interface IOrganizationAgency {
   type: 'Organization' | 'Agency';
   hasLogo?: boolean;
   lastUpdateTicks?: number;
+  status?: AgencyStatus;
 }
 
 @Component({
@@ -50,7 +53,8 @@ interface IOrganizationAgency {
 export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   public organizationAgencyControl: FormControl = new FormControl();
   public baseUrl: string;
-  @Input() public isDarkTheme: boolean | null; 
+  public agencyStatuses = AgencyStatus;
+  @Input() public isDarkTheme: boolean | null;
 
   public optionFields = {
     text: 'name',
@@ -148,7 +152,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
               true
             )
           );
-          
         }
         if (selectedType === 'Agency') {
           this.store.dispatch(new LastSelectedOrganisationAgency(selectedType));
@@ -161,6 +164,8 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
               false
             )
           );
+
+          this.setAgencyStatus(selectedOrganizationAgency);
         }
       });
   }
@@ -224,8 +229,8 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
         const organizations = this.userOrganizations.businessUnits;
 
         this.agencies = agencies.map((a: UserAgencyOrganizationBusinessUnit) => {
-          const { id, name, hasLogo, lastUpdateTicks } = a;
-          const agency: IOrganizationAgency = { id, name, type: 'Agency', hasLogo, lastUpdateTicks };
+          const { id, name, hasLogo, lastUpdateTicks, status } = a;
+          const agency: IOrganizationAgency = { id, name, type: 'Agency', hasLogo, lastUpdateTicks, status };
 
           return agency;
         });
@@ -261,7 +266,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     if (this.isAgencyOrOrganization) {
       this.organizationAgency = this.organizations[0] || this.agencies[0];
     } else {
-      this.organizationsAgencies$.next(organizationsAgencies);
+      this.organizationsAgencies$.next(organizationsAgencies.sort((a, b) => a.name.localeCompare(b.name)));
     }
 
     const lastSelectedOrganizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
@@ -271,9 +276,10 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     let newOrganizationAgencyControlValue: number | null;
 
     if (isAgencyArea && isAgency) {
-      newOrganizationAgencyControlValue = organizationsAgencies.find((i) => i.id === lastSelectedAgencyId)
-        ? lastSelectedAgencyId
-        : organizationsAgencies[0]?.id || null;
+      const currentAgency = organizationsAgencies.find((agency) => agency.id === lastSelectedAgencyId);
+      newOrganizationAgencyControlValue = currentAgency ? lastSelectedAgencyId : organizationsAgencies[0]?.id || null;
+
+      this.setAgencyStatus(currentAgency);
     } else {
       newOrganizationAgencyControlValue = organizationsAgencies.find((i) => i.id === lastSelectedOrganizationId)
         ? lastSelectedOrganizationId
@@ -283,5 +289,11 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     this.organizationAgencyControl.patchValue(newOrganizationAgencyControlValue);
 
     setTimeout(() => this.cd.markForCheck());
+  }
+
+  private setAgencyStatus(agency: IOrganizationAgency | undefined): void {
+    const agencyIsActive = agency?.status !== AgencyStatus.Inactive && agency?.status !== AgencyStatus.Terminated;
+
+    this.store.dispatch(new SetAgencyActionsAllowed(agencyIsActive));
   }
 }

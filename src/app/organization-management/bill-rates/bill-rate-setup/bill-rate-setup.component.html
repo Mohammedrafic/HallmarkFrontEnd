@@ -92,13 +92,13 @@
           <span>{{ data.effectiveDate | date: formatDate }}</span>
         </ng-template>
       </e-column>
-      <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" width="250" textAlign="Right">
+      <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" textAlign="Right" headerTextAlign="Right" width="250">
         <ng-template #template let-data>
           <span>{{ data.rateHour | rateHourPipe: data.billRateConfigId:data.billRateType:billRatesOptions }}</span>
         </ng-template>
       </e-column>
-      <e-column field="intervalMin" headerText="INTERVAL MIN" width="180" textAlign="Right"></e-column>
-      <e-column field="intervalMax" headerText="INTERVAL MAX" width="180" textAlign="Right"></e-column>
+      <e-column field="intervalMin" headerText="INTERVAL MIN" textAlign="Right" headerTextAlign="Right" width="180"></e-column>
+      <e-column field="intervalMax" headerText="INTERVAL MAX" textAlign="Right" headerTextAlign="Right" width="180"></e-column>
       <e-column field="considerForWeeklyOT" headerText="CONSIDER FOR WEEKLY OT" width="230">
         <ng-template #template let-data>
           <div class="checkbox bootstrap" (click)="stopPropagation($event)">
@@ -128,28 +128,6 @@
               [checked]="data.considerFor7thDayOT"
               [disabled]="isReadOnly"
               (change)="considerFor7thDayOtChange(data, $event)"
-            ></ejs-checkbox>
-          </div>
-        </ng-template>
-      </e-column>
-      <e-column field="regularLocal" headerText="REGULAR LOCAL" width="180">
-        <ng-template #template let-data>
-          <div class="checkbox bootstrap" (click)="stopPropagation($event)">
-            <ejs-checkbox
-              [checked]="data.regularLocal"
-              [disabled]="isReadOnly"
-              (change)="regularLocalChange(data, $event)"
-            ></ejs-checkbox>
-          </div>
-        </ng-template>
-      </e-column>
-      <e-column field="displayInTimesheet" headerText="DISPLAY IN TIMESHEET" width="200">
-        <ng-template #template let-data>
-          <div class="checkbox bootstrap" (click)="stopPropagation($event)">
-            <ejs-checkbox
-              [checked]="data.displayInTimesheet"
-              [disabled]="isReadOnly"
-              (change)="displayInTimeSheetChange(data, $event)"
             ></ejs-checkbox>
           </div>
         </ng-template>
@@ -375,7 +353,7 @@
       </div>
 
       <div class="group">
-        <div class="input-container bootstrap">
+        <div class="input-container bootstrap" *ngIf="!hideFilds.has('billRateValueRateTimes')">
           <label *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier"
             >Multiplier <span class="required">*</span></label
           >
@@ -435,11 +413,12 @@
 
       <div class="group">
         <div class="input-container bootstrap">
-          <label for="intervalMin">Interval Min <span class="required" *ngIf="isIntervalMinEnabled">*</span></label>
+          <label for="intervalMin">{{additionalLableForMinMax ?? 'Interval'}} Min <span class="required" *ngIf="isIntervalMinRequired">*</span></label>
           <div class="input-group">
             <ejs-numerictextbox
+              *ngIf="!isWeeklyOT; else intervalMinWithTooltip"
               id="intervalMin"
-              class="numeric-input"
+              class="numeric-input e-info"
               appValidateWithMessage
               min="0"
               [maxlength]="10"
@@ -447,14 +426,34 @@
               [showSpinButton]="false"
               decimals="0"
               format="#"
-              formControlName="intervalMin"
-            >
+              formControlName="intervalMin">
             </ejs-numerictextbox>
+            
+            <ng-template #intervalMinWithTooltip>
+              <ejs-tooltip target='.e-info' 
+              content="Weekly OT rate will be paid after total hours worked per week exceed the set number"
+              
+              >
+                <ejs-numerictextbox
+                  id="intervalMin"
+                  class="numeric-input e-info"
+                  appValidateWithMessage
+                  min="0"
+                  [maxlength]="10"
+                  [validateDecimalOnType]="true"
+                  [showSpinButton]="false"
+                  decimals="0"
+                  format="#"
+                  formControlName="intervalMin"
+                >
+                </ejs-numerictextbox>
+              </ejs-tooltip>
+            </ng-template>
           </div>
         </div>
 
-        <div class="input-container bootstrap">
-          <label for="intervalMax">Interval Max <span class="required" *ngIf="isIntervalMaxEnabled">*</span></label>
+        <div class="input-container bootstrap" *ngIf="!hideFilds.has('intervalMax')">
+          <label for="intervalMax">{{additionalLableForMinMax ?? 'Interval'}} Max <span class="required" *ngIf="isIntervalMaxRequired">*</span></label>
           <div class="input-group">
             <ejs-numerictextbox
               id="intervalMax"
@@ -500,22 +499,6 @@
               id="considerFor7thDayOt"
               label="Consider for 7th Day OT"
               formControlName="considerFor7thDayOt"
-            ></ejs-checkbox>
-          </div>
-        </div>
-
-        <div class="input-container">
-          <div class="input-group">
-            <ejs-checkbox id="regularLocal" label="Regular/Local" formControlName="regularLocal"></ejs-checkbox>
-          </div>
-        </div>
-
-        <div class="input-container">
-          <div class="input-group">
-            <ejs-checkbox
-              id="displayInTimesheet"
-              label="Display in Timesheet"
-              formControlName="displayInTimesheet"
             ></ejs-checkbox>
           </div>
         </div>

@@ -103,7 +103,6 @@ export class AllInvoicesGridHelper {
         field: 'dueDate',
         minWidth: 200,
         headerName: 'Due Date',
-        type: 'rightAligned',
         valueFormatter: monthDayYearDateFormatter,
       },
     ];

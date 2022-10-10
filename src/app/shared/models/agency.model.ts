@@ -12,6 +12,7 @@ export type Agency = {
   agencyBillingDetails: AgencyBillingDetails;
   agencyContactDetails: AgencyContactDetails[];
   agencyPaymentDetails: PaymentDetails[] | ElectronicPaymentDetails[];
+  agencyJobDistribution: AgencyRegionSkills;
 };
 
 export type AgencyCreateUnder = {
@@ -19,6 +20,7 @@ export type AgencyCreateUnder = {
   businessUnitType: 1;
   name: string;
   parentUnitId: number;
+  agencyStatus: number;
 };
 
 export type AgencyDetails = {
@@ -121,3 +123,12 @@ export class AgencyFilteringOptions {
   cities: string[];
   contacts: string[];
 }
+
+export type AgencyRegionSkills = {
+  regionNames: Array<string>;
+  regions: string[];
+  skillCategories: Array<{
+    id: number;
+    name: string;
+  }>;
+};

@@ -58,7 +58,7 @@ import { DropDownButtonAllModule, DropDownButtonModule } from '@syncfusion/ej2-a
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousComponent } from './components/dialog-next-previous/dialog-next-previous.component';
 import { OrderDetailsComponent } from './components/order-details/order-details.component';
-import { AccordionModule, SidebarModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
+import { AccordionModule, SidebarModule, TabAllModule, TreeViewAllModule } from '@syncfusion/ej2-angular-navigations';
 import { OrderTypeName } from '@shared/pipes/order-type-name.pipe';
 import { GeneralOrderInfoComponent } from './components/general-order-info/general-order-info.component';
 import {
@@ -140,6 +140,8 @@ import { UnsavedFormDirective } from './directives/unsaved-form.directive';
 import { ClearCacheComponent } from './components/clear-cache/clear-cache.component';
 import { CandidateCancellationDialogComponent } from './components/candidate-cancellation-dialog/candidate-cancellation-dialog.component';
 import { OrderHistoricalEventsComponent } from './components/order-historical-events/order-historical-events.component';
+import { CredentialsListComponent } from './components/credentials-list/credentials-list.component';
+import { AssignCredentialSideComponent } from './components/credentials-list/assign-credential-side/assign-credential-side.component';
 
 const icons = {
   AlertCircle,
@@ -227,6 +229,8 @@ const COMPONENTS = [
   UnsavedFormDirective,
   ClearCacheComponent,
   CandidateCancellationDialogComponent,
+  CredentialsListComponent,
+  AssignCredentialSideComponent,
 ];
 
 @NgModule({
@@ -268,6 +272,7 @@ const COMPONENTS = [
     NgxMaskModule.forChild(),
     SidebarModule,
     RouterModule,
+    TreeViewAllModule
   ],
   exports: [
     ...COMPONENTS,

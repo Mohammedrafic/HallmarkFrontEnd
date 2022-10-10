@@ -1,27 +1,30 @@
-import { InvoicesModel } from './../../store/invoices.model';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
+  Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 
 import { map, Observable, takeUntil, throttleTime } from 'rxjs';
 import { filter } from 'rxjs/operators';
-
-import { Destroyable } from '@core/helpers';
-import { DialogAction } from '@core/enums';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { ColDef, GridOptions } from '@ag-grid-community/core';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+
+import { DialogAction } from '@core/enums';
+import { Destroyable } from '@core/helpers';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportPayload } from '@shared/models/export.model';
-import { ColDef, GridOptions } from '@ag-grid-community/core';
-
-import { InvoicesState } from '../../store/state/invoices.state';
+import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import {
+  ActionBtnOnStatus, AgencyActionBtnOnStatus,
+  NewStatusDependsOnAction
+} from '../../constants/invoice-detail.constant';
+import { InvoiceState, INVOICES_STATUSES } from '../../enums';
 import { InvoiceDetail, InvoiceDialogActionPayload, InvoiceUpdateEmmit, PrintingPostDto } from '../../interfaces';
-import { Invoices } from '../../store/actions/invoices.actions';
-import { INVOICES_STATUSES, InvoiceState } from '../../enums';
-import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { InvoicePrintingService } from '../../services';
-import { ActionBtnOnStatus, AgencyActionBtnOnStatus, NewStatusDependsOnAction } from '../../constants/invoice-detail.constant';
+import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
+import { Invoices } from '../../store/actions/invoices.actions';
+import { InvoicesState } from '../../store/state/invoices.state';
+import { InvoicesModel } from './../../store/invoices.model';
 
 interface ExportOption extends ItemModel {
   ext: string | null;
@@ -42,6 +45,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
 
   @Input() currentSelectedRowIndex: number | null = null;
   @Input() maxRowIndex: number = 30;
+  @Input() actionAllowed = true;
 
   @Output() updateTable: EventEmitter<InvoiceUpdateEmmit> = new EventEmitter<InvoiceUpdateEmmit>();
 

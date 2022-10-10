@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
@@ -24,6 +24,7 @@ import { LogiReportComponent } from '@shared/components/logi-report/logi-report.
 import { FilteredItem } from '@shared/models/filter.model';
 import { analyticsConstants } from '../constants/analytics.constant';
 import { FilterService } from '@shared/services/filter.service';
+import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 
 @Component({
   selector: 'app-credential-expiry',
@@ -37,12 +38,15 @@ export class CredentialExpiryComponent implements OnInit {
     "EndDateParamCREXP": "",
     "RegionParamCREXP": "",
     "LocationParamCREXP": "",
-    "DepartmentParamCREXP": ""
+    "DepartmentParamCREXP": "",
+    "BearerParamCREXP":"",
+    "BusinessUnitIdParamCREXP":"",
+    "HostName":""
   };
-  public reportName: LogiReportFileDetails = { name: "/CredentialExpiry/CredentialExpiry.wls" };
-  public catelogName: LogiReportFileDetails = { name: "/CredentialExpiry/Dashbord.cat" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialExpiry/CredentialExpiry.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialExpiry/CredentialExpiry.cat" };
   public title: string = "Credential Expiry";
-  public reportType: LogiReportTypes = LogiReportTypes.WebReport;
+  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption:string="All";
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
@@ -86,11 +90,13 @@ export class CredentialExpiryComponent implements OnInit {
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
   public isInitialLoad: boolean = false;
+  public baseUrl:string;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   constructor(private store: Store,
     private formBuilder: FormBuilder,
-    private filterService: FilterService  ) {
-    this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+    private filterService: FilterService  ,@Inject(APP_SETTINGS) private appSettings: AppSettings) {
+      this.baseUrl = this.appSettings.host.replace("https://","").replace("http://","");
+      this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
     this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
@@ -174,15 +180,29 @@ export class CredentialExpiryComponent implements OnInit {
   }
  
   public SearchReport(): void {
+    let auth="Bearer ";
+    for(let x=0;x<window.localStorage.length;x++)
+    { 
+      if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
+      {
+        auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
+      }
+    }
       let { startDate, endDate } = this.credentialExpiryForm.getRawValue();
       this.paramsData =
       {
-        "OrganizationParamCREXP": this.selectedOrganizations?.map((list) => list.name),
-        "StartDateParamCREXP": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-        "EndDateParamCREXP": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-        "RegionParamCREXP": this.selectedRegions?.map((list) => list.name),
-        "LocationParamCREXP": this.selectedLocations?.map((list) => list.name),
-        "DepartmentParamCREXP": this.selectedDepartments?.map((list) => list.departmentName)
+        "OrganizationParamCREXP": this.selectedOrganizations?.map((list) => list.id).join(","),
+      "StartDateParamCREXP": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "EndDateParamCREXP": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "RegionParamCREXP": this.selectedRegions?.map((list) => list.id).join(","),
+      "LocationParamCREXP": this.selectedLocations?.map((list) => list.id).join(","),
+      "DepartmentParamCREXP": this.selectedDepartments?.map((list) => list.departmentId).join(","),
+      "BearerParamCREXP":auth,
+      "BusinessUnitIdParamCREXP":window.localStorage.getItem("lastSelectedOrganizationId") == null 
+      ?this.organizations!=null &&this.organizations[0]?.id!=null?
+      this.organizations[0].id.toString():"1": 
+      window.localStorage.getItem("lastSelectedOrganizationId"),
+      "HostName":this.baseUrl
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();

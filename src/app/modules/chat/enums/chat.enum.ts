@@ -13,3 +13,7 @@ export enum ChatSearchType {
   Participant = 'participant',
   ActiveThread = 'activeThread',
 }
+
+export enum ChatMessageType {
+  Text = 'text',
+}

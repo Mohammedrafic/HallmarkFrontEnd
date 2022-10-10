@@ -11,7 +11,12 @@
 }
 
 .edit-action {
-  color: $primary-active-blue-10
+  color: $primary-active-blue-10;
+
+  &.disable {
+    color: $secondary-dark-blue-30;
+    cursor: default;
+  }
 }
 
 .comment {

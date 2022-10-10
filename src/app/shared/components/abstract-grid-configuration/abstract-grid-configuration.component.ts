@@ -19,6 +19,12 @@ enum ExportType {
   'Custom',
 }
 
+export const EXPORT_OPTIONS = [
+  { text: ExportType[0], id: 0 },
+  { text: ExportType[1], id: 1 },
+  { text: ExportType[2], id: 2 },
+];
+
 export abstract class AbstractGridConfigurationComponent {
   gridWithChildRow: GridComponent;
   // grid
@@ -57,11 +63,7 @@ export abstract class AbstractGridConfigurationComponent {
   // Subrow
   subrowsState = new Set<number>();
 
-  exportOptions = [
-    { text: ExportType[0], id: 0 },
-    { text: ExportType[1], id: 1 },
-    { text: ExportType[2], id: 2 },
-  ];
+  exportOptions = EXPORT_OPTIONS;
 
   selectionSettings: SelectionSettingsModel = {
     persistSelection: true,

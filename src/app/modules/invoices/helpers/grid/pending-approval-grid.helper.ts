@@ -121,7 +121,6 @@ export class PendingApprovalGridHelper {
         field: 'dueDate',
         minWidth: 200,
         headerName: 'Due Date',
-        type: 'rightAligned',
         valueFormatter: monthDayYearDateFormatter,
       },
     ];
@@ -184,7 +183,6 @@ export class PendingApprovalGridHelper {
         field: 'dueDate',
         minWidth: 200,
         headerName: 'Due Date',
-        type: 'rightAligned',
         valueFormatter: monthDayYearDateFormatter,
       },
     ];
@@ -354,7 +352,6 @@ export class PendingApprovalGridHelper {
         field: 'dueDate',
         minWidth: 200,
         headerName: 'Due Date',
-        type: 'rightAligned',
         valueFormatter: monthDayYearDateFormatter,
       },
     ];

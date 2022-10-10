@@ -1,27 +1,30 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { Observable, Subject } from 'rxjs';
+import { distinctUntilChanged, Observable, Subject, takeWhile } from 'rxjs';
 import { ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CandidateListComponent } from "@shared/components/candidate-list/components/candidate-list/candidate-list.component";
+import { CandidateListComponent } from '@shared/components/candidate-list/components/candidate-list/candidate-list.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { UserState } from '../../store/user.state';
 
 @Component({
   selector: 'app-candidates',
   templateUrl: './candidates.component.html',
   styleUrls: ['./candidates.component.scss'],
 })
-export class CandidatesComponent extends AbstractGridConfigurationComponent implements OnDestroy {
+export class CandidatesComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('candidateList') candidateList: CandidateListComponent;
 
   public includeDeployedCandidates$: Subject<boolean> = new Subject<boolean>();
   public filteredItems$ = new Subject<number>();
   public search$ = new Subject<string>();
   public exportUsers$ = new Subject<ExportedFileType>();
+  public agencyActionsAllowed = true;
 
-  private unsubscribe$: Subject<void> = new Subject();
   private openImportDialog: Subject<void> = new Subject<void>();
+  private isAlive = true;
+  private isAgency: boolean;
 
   public openImportDialog$: Observable<void> = this.openImportDialog.asObservable();
 
@@ -29,9 +32,16 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
     super();
   }
 
+  ngOnInit(): void {
+    this.isAgency = this.router.url.includes('agency');
+
+    if (this.isAgency) {
+      this.checkForAgencyStatus();
+    }
+  }
+
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.isAlive = false;
   }
 
   public reloadCandidatesList(): void {
@@ -60,5 +70,17 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
 
   public override defaultExport(fileType: ExportedFileType): void {
     this.exportUsers$.next(fileType);
+  }
+
+  private checkForAgencyStatus(): void {
+    this.store
+      .select(UserState.agencyActionsAllowed)
+      .pipe(
+        distinctUntilChanged(),
+        takeWhile(() => this.isAlive)
+      )
+      .subscribe((value) => {
+        this.agencyActionsAllowed = value;
+      });
   }
 }

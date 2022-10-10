@@ -2,7 +2,9 @@ import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-man
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
+import { GetAvailableSteps, GetOrganisationCandidateJob,
+  GetPredefinedBillRates, SetPredefinedBillRatesData
+} from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Select, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -11,8 +13,9 @@ import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { Order, OrderCandidatesList } from '@shared/models/order-management.model';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { combineLatest, Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { combineLatest, Observable, Subject, switchMap } from 'rxjs';
+import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { UserState } from 'src/app/store/user.state';
 import { Duration } from '../../../enums/durations';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { AcceptCandidateComponent } from './accept-candidate/accept-candidate.component';
@@ -45,6 +48,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public applicantStatus = ApplicantStatus;
   public defaultDuration: Duration = Duration.Other;
   public selectedOrder: Order;
+  public agencyActionsAllowed = true;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
@@ -64,7 +68,11 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(([agOrder, orgOrder]) => {
         this.selectedOrder = agOrder ?? orgOrder;
+        this.initPredefinedBillRates();
       });
+    if (this.isAgency) {
+      this.checkForAgencyStatus();
+    }
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
@@ -141,5 +149,25 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   private openDialog(template: any): void {
     this.templateState.next(template);
     this.sideDialog.show();
+  }
+
+  private checkForAgencyStatus(): void {
+    this.store.select(UserState.agencyActionsAllowed)
+    .pipe(
+      distinctUntilChanged(),
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((value) => {
+      this.agencyActionsAllowed = value;
+    });
+  }
+
+  private initPredefinedBillRates(): void {
+    const { orderType, departmentId, skillId } = this.selectedOrder;
+
+    this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId)).pipe(
+      takeUntil(this.unsubscribe$),
+      switchMap(() => this.store.dispatch(new GetPredefinedBillRates()))
+    ).subscribe();
   }
 }

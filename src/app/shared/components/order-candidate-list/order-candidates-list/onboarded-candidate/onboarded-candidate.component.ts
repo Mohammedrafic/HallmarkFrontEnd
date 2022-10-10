@@ -54,6 +54,10 @@ import { OrderCandidateListViewService } from '@shared/components/order-candidat
 import { Duration } from '@shared/enums/durations';
 import { DurationService } from '@shared/services/duration.service';
 import { UnsavedFormComponentRef, UNSAVED_FORM_PROVIDERS } from '@shared/directives/unsaved-form.directive';
+import { UserState } from 'src/app/store/user.state';
+import { CurrentUserPermission } from '@shared/models/permission.model';
+import { GetOrderPermissions } from 'src/app/store/user.actions';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -74,12 +78,16 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Select(OrderManagementContentState.applicantStatuses)
   applicantStatuses$: Observable<ApplicantStatus[]>;
 
+  @Select(UserState.orderPermissions)
+  orderPermissions$: Observable<CurrentUserPermission[]>;
+
   @Output() closeModalEvent = new EventEmitter<never>();
 
   @Input() candidate: OrderCandidatesList;
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
   @Input() orderDuration: Duration;
+  @Input() actionsAllowed: boolean;
 
   public override form: FormGroup;
   public jobStatusControl: FormControl;
@@ -97,6 +105,13 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public isActiveCandidateDialog$: Observable<boolean>;
   public showHoursControl: boolean = false;
   public showPercentage: boolean = false;
+  public orderPermissions: CurrentUserPermission[];
+  public canShortlist = false;
+  public canInterview = false;
+  public canReject = false;
+  public canOffer = false;
+  public canOnboard = false;
+  public canClose = false;
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
@@ -120,6 +135,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   get isDeployedCandidate(): boolean {
     return !!this.candidate?.deployedCandidateInfo && !this.isOnBoarded;
+  }
+
+  get isReadOnlyBillRates(): boolean {
+    return (
+      !this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard
+    );
   }
 
   get candidateStatus(): ApplicantStatusEnum {
@@ -339,6 +360,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       if (value) {
         this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
+        if (!this.isAgency) {
+          this.getOrderPermissions(value.orderId);
+        }
         this.billRatesData = [...value?.billRates];
         this.form.patchValue({
           jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
@@ -424,8 +448,58 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private subscribeOnGetStatus(): void {
     this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ApplicantStatus[]) => {
       this.nextApplicantStatuses = data;
+      if (!data.length) {
+        this.jobStatusControl.disable();
+      } else {
+        this.jobStatusControl.enable();
+      }
       this.changeDetectorRef.markForCheck();
     });
+    this.orderPermissions$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data: CurrentUserPermission[]) => (this.orderPermissions = data) && this.mapPermissions());
+  }
+
+  private getOrderPermissions(orderId: number): void {
+    this.store.dispatch(new GetOrderPermissions(orderId));
+  }
+
+  private mapPermissions(): void {
+    this.canShortlist = false;
+    this.canInterview = false;
+    this.canReject = false;
+    this.canOffer = false;
+    this.canOnboard = false;
+    this.canClose = false;
+    this.orderPermissions.forEach(permission => {
+      this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
+      this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
+      this.canReject = this.canReject || permission.permissionId === PermissionTypes.CanRejectCandidate;
+      this.canOffer = this.canOffer || permission.permissionId === PermissionTypes.CanOfferCandidate;
+      this.canOnboard = this.canOnboard || permission.permissionId === PermissionTypes.CanOnBoardCandidate;
+      this.canClose = this.canClose || permission.permissionId === PermissionTypes.CanCloseCandidate;
+    });
+    this.disableControlsBasedOnPermissions();
+  }
+
+  private disableControlsBasedOnPermissions(): void {
+    if (!this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard) {
+      this.form.controls['workWeek'].disable();
+    }
+    if (!this.canReject && !this.canOffer && !this.canOnboard) {
+      this.form.controls['offeredBillRate'].disable();
+    }
+    if (!this.canReject && !this.canOffer) {
+      this.form.controls['offeredStartDate'].disable();
+    }
+    if (!this.canReject && !this.canOnboard) {
+      this.form.controls['startDate'].disable();
+      this.form.controls['endDate'].disable();
+      this.form.controls['clockId'].disable();
+    }
+    if (!this.canOnboard) {
+      this.form.controls['allow'].disable();
+    }
   }
 
   private handleOnboardedCandidate(event: { itemData: { applicantStatus: ApplicantStatus } }): void {
@@ -468,6 +542,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private closeDialog() {
+    this.form.markAsPristine();
     this.closeModalEvent.emit();
     this.candidateJob = null;
     this.jobStatusControl.reset();
@@ -475,7 +550,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.isRejected = false;
     this.nextApplicantStatuses = [];
     this.orderCandidateListViewService.setIsCandidateOpened(false);
-    this.form.markAsPristine();
     this.changeDetectorRef.markForCheck();
   }
 

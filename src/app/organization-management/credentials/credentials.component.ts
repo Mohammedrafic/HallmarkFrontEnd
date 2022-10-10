@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { CredentialsState } from '../store/credentials.state';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
@@ -15,6 +15,18 @@ import {
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { GetOrganizationStructure } from '../../store/user.actions';
+import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
+import { UserState } from 'src/app/store/user.state';
+import { PermissionService } from 'src/app/security/services/permission.service';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+
+type ComponentPermissionTitle = 'canAddManual' | 'canManageOrganizationCredential';
+type Permisions = Record<ComponentPermissionTitle, boolean>;
+
+const COMPONENT_PERMISSIONS: Record<ComponentPermissionTitle, PermissionTypes> = {
+  canAddManual: PermissionTypes.ManuallyAddCredential,
+  canManageOrganizationCredential: PermissionTypes.ManageOrganizationCredential
+};
 
 @Component({
   selector: 'app-credentials',
@@ -23,6 +35,7 @@ import { GetOrganizationStructure } from '../../store/user.actions';
 })
 export class CredentialsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('navigationTabs') navigationTabs: TabComponent;
+  @ViewChild(RouterOutlet) outlet: RouterOutlet;
 
   @Select(CredentialsState.activeTab)
   activeTab$: Observable<number>;
@@ -30,15 +43,23 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
   @Select(CredentialsState.setupFilter)
   setupFilter$: Observable<CredentialSetupFilter>;
 
+  @Select(UserState.isHallmarkMspUser)
+  isHallmarkMspUser$: Observable<boolean>;
+
   public isCredentialListToolButtonsShown = true;
+  public isCredentialListActive = true;
+  public filteredItemsCount = 0;
+  public permissions$: Observable<Permisions>;
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  public isCredentialListActive = true;
-
-  public filteredItemsCount = 0;
-
-  constructor(private router: Router, private route: ActivatedRoute, private store: Store, private actions$: Actions) {
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private store: Store,
+    private actions$: Actions,
+    private permissionService: PermissionService
+  ) {
     super();
     actions$
       .pipe(ofActionDispatched(SetCredentialsFilterCount))
@@ -47,6 +68,7 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
 
   ngOnInit(): void {
     this.store.dispatch(new GetOrganizationStructure());
+    this.permissions$ = this.permissionService.checkPermisionFor<Permisions>(COMPONENT_PERMISSIONS);
   }
 
   ngOnDestroy(): void {
@@ -97,4 +119,10 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
   public onGroupsSetupClick(): void {
     this.router.navigateByUrl('admin/organization-management/credentials/groups-setup');
   }
+
+  public onAssignCredentialClick(): void {
+    const credentialListComponent = this.outlet.component as CredentialsListComponent;
+    credentialListComponent.showAssignSiderbar();
+  }
 }
+

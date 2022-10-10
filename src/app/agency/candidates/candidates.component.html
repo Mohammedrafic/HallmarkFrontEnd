@@ -10,7 +10,7 @@
         [checked]="true"
       ></ejs-switch>
       <label for="switcher" class="switch-text">Include Deployed Candidates</label>
-      <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline" (click)="onImport()">
+      <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline" (click)="onImport()" [disabled]="!agencyActionsAllowed">
         Import <span><i-feather name="upload" class="icon"></i-feather></span>
       </button>
       <button
@@ -32,7 +32,7 @@
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
-      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToCandidateForm()">Add Candidate</button>
+      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToCandidateForm()" [disabled]="!agencyActionsAllowed">Add Candidate</button>
     </div>
   </ng-container>
 </app-page-toolbar>
@@ -45,6 +45,7 @@
     [search$]="search$"
     [includeDeployedCandidates$]="includeDeployedCandidates$"
     [isAgency]="true"
+    [agencyActionsAllowed]="agencyActionsAllowed"
   ></app-candidate-list>
 </section>
 

@@ -49,7 +49,7 @@ import {
   SetLock,
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob,
-  UpdateOrganisationCandidateJobSucceed,
+  UpdateOrganisationCandidateJobSucceed
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -62,7 +62,7 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementPage,
-  SuggestedDetails,
+  SuggestedDetails
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -78,9 +78,10 @@ import {
   ORDER_WITHOUT_CREDENTIALS,
   RECORD_ADDED,
   RECORD_MODIFIED,
+  updateCandidateJobMessage
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
-import { BillRate } from '@shared/models/bill-rate.model';
+import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
 import { OrderManagementModel } from '@agency/store/order-management.state';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { RejectReasonService } from '@shared/services/reject-reason.service';
@@ -94,6 +95,8 @@ import { Department } from '@shared/models/department.model';
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
 import { ExtensionGridModel } from '@shared/components/extension/extension-sidebar/models/extension.model';
 import { OrderType } from '@shared/enums/order-type';
+import { createUniqHashObj } from '@core/helpers/functions.helper';
+import { DateTimeHelper } from '@core/helpers';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -226,6 +229,17 @@ export class OrderManagementContentState {
   @Selector()
   static predefinedBillRates(state: OrderManagementContentStateModel): BillRate[] {
     return state.predefinedBillRates;
+  }
+
+  @Selector()
+  static predefinedBillRatesOptions(state: OrderManagementContentStateModel): BillRateOption[] {
+    const uniqBillRatesHashObj = createUniqHashObj(
+      state.predefinedBillRates,
+      (el: BillRate) => el.billRateConfigId,
+      (el: BillRate) => el.billRateConfig
+    );
+
+    return Object.values(uniqBillRatesHashObj).map((el: BillRateOption) => el);
   }
 
   @Selector()
@@ -447,8 +461,14 @@ export class OrderManagementContentState {
     { payload }: UpdateOrganisationCandidateJob
   ): Observable<any> {
     return this.orderManagementService.updateCandidateJob(payload).pipe(
-      tap(() => {
-        dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'));
+      tap((message: { weekStartDate: string }[]) => {
+        if (message?.length) {
+          const dates = message.map(({ weekStartDate }) => DateTimeHelper.formatDateUTC(weekStartDate, 'MM/dd/YYYY'));
+
+          dispatch(new ShowToast(MessageTypes.Success, updateCandidateJobMessage(dates)));
+        } else {
+          dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'));
+        }
         dispatch(new UpdateOrganisationCandidateJobSucceed());
       }),
       catchError((error: any) => {
@@ -535,9 +555,9 @@ export class OrderManagementContentState {
   @Action(SetPredefinedBillRatesData)
   SetPredefinedBillRatesData(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { orderType, departmentId, skillId }: SetPredefinedBillRatesData
+    { orderType, departmentId, skillId, jobStartDate, jobEndDate }: SetPredefinedBillRatesData
   ): void {
-    patchState({ getPredefinedBillRatesData: { orderType, departmentId, skillId } });
+    patchState({ getPredefinedBillRatesData: { orderType, departmentId, skillId, jobStartDate, jobEndDate } });
   }
 
   @Action(GetPredefinedBillRates)
@@ -549,8 +569,8 @@ export class OrderManagementContentState {
     const getPredefinedBillRatesData = state.getPredefinedBillRatesData;
 
     if (getPredefinedBillRatesData) {
-      const { orderType, departmentId, skillId } = getPredefinedBillRatesData;
-      return this.orderManagementService.getPredefinedBillRates(orderType, departmentId, skillId).pipe(
+      const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = getPredefinedBillRatesData;
+      return this.orderManagementService.getPredefinedBillRates(orderType, departmentId, skillId, jobStartDate, jobEndDate).pipe(
         tap((payload) => {
           patchState({ predefinedBillRates: payload });
           return payload;
@@ -626,7 +646,7 @@ export class OrderManagementContentState {
 
         return payload;
       }),
-      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
   }
 
@@ -645,7 +665,7 @@ export class OrderManagementContentState {
 
         return order;
       }),
-      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
   }
 

@@ -32,6 +32,7 @@ import { ExportPayload } from '@shared/models/export.model';
 import { AgencyOrderManagementTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { DateTimeHelper } from '@core/helpers';
+import { orderFieldsConfig } from '@client/order-management/add-edit-order/order-fields';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -155,8 +156,8 @@ export class OrderManagementContentService {
    * Update candidate job
    @param payload
    */
-  public updateCandidateJob(payload: AcceptJobDTO): Observable<void> {
-    return this.http.post<void>(`/api/AppliedCandidates/updateCandidateJob`, payload);
+  public updateCandidateJob(payload: AcceptJobDTO): Observable<{ weekStartDate: string }[]> {
+    return this.http.post<{ weekStartDate: string }[]>(`/api/AppliedCandidates/updateCandidateJob`, payload);
   }
 
   /**
@@ -249,11 +250,15 @@ export class OrderManagementContentService {
    * @param skillId
    * @returns list of predefined bill rates
    */
-  public getPredefinedBillRates(orderType: OrderType, departmentId: number, skillId: number): Observable<BillRate[]> {
-    const params = new HttpParams()
+  public getPredefinedBillRates(orderType: OrderType, departmentId: number, skillId: number, jobStartDate?: string, jobEndDate?: string): Observable<BillRate[]> {
+    let params = new HttpParams()
       .append('orderType', orderType)
       .append('departmentId', departmentId)
-      .append('skillId', skillId);
+      .append('skillId', skillId)
+
+    if (jobStartDate && jobEndDate) {
+      params = params.append('jobStartDate', jobStartDate).append('jobEndDate', jobEndDate);
+    }
 
     return this.http.get<BillRate[]>('/api/BillRates/predefined/forOrder', { params }).pipe(
       map((items) =>
@@ -294,19 +299,21 @@ export class OrderManagementContentService {
       headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
     }
 
-    return this.http.post<Order>('/api/Orders', this.prepareOrderForSaving(order), { headers }).pipe(
-      switchMap((createdOrder) => {
-        const formData = new FormData();
-        if (comments?.length) {
-          comments.forEach((comment: Comment) => {
-            comment.commentContainerId = createdOrder.commentContainerId as number;
-          });
-          this.http.post('/api/Comments', { comments }).subscribe();
-        }
-        documents.forEach((document) => formData.append('documents', document));
-        return this.http.post(`/api/Orders/${createdOrder.id}/documents`, formData).pipe(map(() => createdOrder));
-      })
-    );
+    return this.http
+      .post<Order>('/api/Orders', this.changeDateToUtc(this.prepareFieldsByOrderType(order)), { headers })
+      .pipe(
+        switchMap((createdOrder) => {
+          const formData = new FormData();
+          if (comments?.length) {
+            comments.forEach((comment: Comment) => {
+              comment.commentContainerId = createdOrder.commentContainerId as number;
+            });
+            this.http.post('/api/Comments', { comments }).subscribe();
+          }
+          documents.forEach((document) => formData.append('documents', document));
+          return this.http.post(`/api/Orders/${createdOrder.id}/documents`, formData).pipe(map(() => createdOrder));
+        })
+      );
   }
 
   /**
@@ -315,7 +322,7 @@ export class OrderManagementContentService {
    * @return edited order
    */
   public editOrder(order: EditOrderDto, documents: Blob[]): Observable<Order> {
-    return this.http.put<Order>('/api/Orders', this.prepareOrderForSaving(order)).pipe(
+    return this.http.put<Order>('/api/Orders', this.changeDateToUtc(this.prepareFieldsByOrderType(order))).pipe(
       switchMap((editedOrder) => {
         const formData = new FormData();
         documents.forEach((document) => formData.append('documents', document));
@@ -444,16 +451,24 @@ export class OrderManagementContentService {
     });
   }
 
-  private prepareOrderForSaving(order: CreateOrderDto): Omit<CreateOrderDto, 'shiftStartTime' | 'shiftEndTime'> & {
-    shiftStartTime: Date | null;
-    shiftEndTime: Date | null;
-  } {
-    const { shiftStartTime, shiftEndTime } = order;
+  private changeDateToUtc(order: Partial<CreateOrderDto>): CreateOrderDto {
+    const { shiftStartTime, shiftEndTime, jobStartDate, jobEndDate } = order;
 
-    return {
+    return <CreateOrderDto>{
       ...order,
-      shiftStartTime: shiftStartTime ? new Date(DateTimeHelper.toUtcFormat(order.shiftStartTime)) : null,
-      shiftEndTime: shiftEndTime ? new Date(DateTimeHelper.toUtcFormat(order.shiftEndTime)) : null,
+      jobStartDate: jobStartDate ? new Date(DateTimeHelper.toUtcFormat(jobStartDate)) : null,
+      jobEndDate: jobEndDate ? new Date(DateTimeHelper.toUtcFormat(jobEndDate)) : null,
+      shiftStartTime: shiftStartTime ? new Date(DateTimeHelper.toUtcFormat(shiftStartTime)) : null,
+      shiftEndTime: shiftEndTime ? new Date(DateTimeHelper.toUtcFormat(shiftEndTime)) : null,
     };
+  }
+
+  private prepareFieldsByOrderType(order: CreateOrderDto): Partial<CreateOrderDto> {
+    return Object.fromEntries(
+      Object.entries(order).map(([key, value]: [string, string | number]) => [
+        key,
+        orderFieldsConfig[order.orderType].includes(key) ? value : null,
+      ])
+    );
   }
 }

@@ -57,10 +57,11 @@ export const STATUS_COLOR_GROUP = {
 };
 
 export enum AgencyStatus {
-  Pending,
+  InProgress,
   Inactive,
   Active,
   Suspended,
+  Terminated,
 }
 
 export enum CandidateStatus {
@@ -74,11 +75,12 @@ export enum CreatedCandidateStatus {
   Active,
 }
 
-export enum CredentialVerifiedStatus {
+export enum CredentialStatus {
   Pending,
   Verified,
   Completed,
   Rejected,
+  Reviewed,
 }
 
 export enum CreateUserStatus {

@@ -14,10 +14,18 @@
       </div>
       <div class="e-card-content">
         <div *ngIf="!isCancelled" class="status-actions">
-          <button *ngIf="showRejectButton" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
-          <button *ngIf="showWithdrawAction" ejs-button cssClass="e-outline" (click)="onWithdraw()">Withdraw</button>
-          <button ejs-button [isPrimary]="true" *ngIf="showApplyAction" class="apply-button" (click)="onApply()">Apply</button>
-          <button ejs-button [isPrimary]="true" *ngIf="showAccepteAction" class="apply-button" (click)="onAccept()">Accept</button>
+          <button *ngIf="showRejectButton" ejs-button cssClass="e-outline"
+            [disabled]="!actionsAllowed"
+            (click)="onReject()">Reject</button>
+          <button *ngIf="showWithdrawAction" ejs-button cssClass="e-outline"
+            [disabled]="!actionsAllowed"
+            (click)="onWithdraw()">Withdraw</button>
+          <button ejs-button [isPrimary]="true" *ngIf="showApplyAction" class="apply-button"
+            [disabled]="!actionsAllowed"
+            (click)="onApply()">Apply</button>
+          <button ejs-button [isPrimary]="true" *ngIf="showAccepteAction" class="apply-button"
+            [disabled]="!actionsAllowed"
+            (click)="onAccept()">Accept</button>
         </div>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
@@ -237,8 +245,10 @@
       <button *ngIf="showRejectButton" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
       <button *ngIf="showWithdrawAction" ejs-button cssClass="e-outline" (click)="onWithdraw()">Withdraw</button>
       <button ejs-button [isPrimary]="true" *ngIf="showApplyAction" class="apply-button"
+        [disabled]="!actionsAllowed"
         (click)="onApply()">Apply</button>
       <button ejs-button [isPrimary]="true" *ngIf="showAccepteAction" class="apply-button"
+        [disabled]="!actionsAllowed"
         (click)="onAccept()">Accept</button>
     </div>
   </ng-container>

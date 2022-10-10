@@ -15,8 +15,12 @@ import {
   SubmissionPercentageOverrideRestriction,
 } from '@shared/enums/partnership-settings';
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
-import { OPTION_FIELDS } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
+import {
+  OPTION_FIELDS,
+  REGION_OPTION,
+} from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { Tabs } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
 
 @Component({
   selector: 'app-partnership-settings',
@@ -25,8 +29,8 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 })
 export class PartnershipSettingsComponent extends DestroyableDirective implements OnInit {
   @Input() partnershipForm: FormGroup;
-  @Input() set activeTab(tab: number) {
-    if (tab === 1) {
+  @Input() set activeTab(tab: number | string) {
+    if (tab === Tabs.JobDistribution || tab === Tabs[Tabs.JobDistribution]) {
       this.partnershipForm.reset();
       this.partnershipForm.patchValue({ ...this.partnershipSettings });
     }
@@ -37,12 +41,13 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
   @Select(AssociateListState.jobDistributionInitialData)
   public jobDistributionInitialData$: Observable<JobDistributionInitialData>;
   public optionFields = OPTION_FIELDS;
+  public optionRegions = REGION_OPTION;
   public classification = Object.values(FeeSettingsClassification)
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));
   public orderType = Object.values(JobDistributionOrderType)
     .filter(valuesOnly)
-    .map((name) => ({ name, id: JobDistributionOrderType[name as JobDistributionOrderType] }))
+    .map((name) => ({ name, id: JobDistributionOrderType[name as JobDistributionOrderType] }));
   public partnershipStatus = Object.values(PartnershipStatus)
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));
@@ -69,10 +74,10 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
 
       agencyCategory: new FormControl(),
 
-      regionIds: new FormControl([], [Validators.required]),
-      orderTypes: new FormControl([], [Validators.required]),
+      regionNames: new FormControl([]),
+      orderTypes: new FormControl([]),
       classifications: new FormControl([]),
-      skillCategoryIds: new FormControl([], [Validators.required]),
+      skillCategoryIds: new FormControl([]),
 
       allowOnBoard: new FormControl(false),
       allowDeployCredentials: new FormControl(false),
@@ -90,6 +95,7 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
     this.partnershipSettings$.pipe(takeUntil(this.destroy$), delay(300)).subscribe((settings: PartnershipSettings) => {
       this.partnershipSettings = settings;
       this.partnershipForm.reset();
+      console.log(settings, 'settings');
       this.partnershipForm.patchValue({ ...settings });
     });
   }

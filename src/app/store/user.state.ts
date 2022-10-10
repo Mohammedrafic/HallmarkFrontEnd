@@ -29,6 +29,8 @@ import {
   GetUsersAssignedToRole,
   GetCurrentUserPermissions,
   GetUserOrganizations,
+  GetOrderPermissions,
+  SetAgencyActionsAllowed,
 } from './user.actions';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 import {
@@ -39,6 +41,7 @@ import {
 } from '@shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 import { B2CAuthService } from '../b2c-auth/b2c-auth.service';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 export interface UserStateModel {
   user: User | null;
@@ -51,6 +54,8 @@ export interface UserStateModel {
   organizationStructure: OrganizationStructure | null;
   usersAssignedToRole: UsersAssignedToRole | null;
   permissions: CurrentUserPermission[];
+  orderPermissions: CurrentUserPermission[];
+  agencyActionsAllowed: boolean;
 }
 
 const AGENCY = 'Agency';
@@ -68,6 +73,8 @@ const AGENCY = 'Agency';
     organizationStructure: null,
     usersAssignedToRole: null,
     permissions: [],
+    orderPermissions: [],
+    agencyActionsAllowed: true,
   },
 })
 @Injectable()
@@ -133,6 +140,36 @@ export class UserState {
   @Selector()
   static currentUserPermissions(state: UserStateModel): CurrentUserPermission[] {
     return state.permissions;
+  }
+
+  @Selector()
+  static currentUserPermissionsIds(state: UserStateModel): number[] {
+    return state.permissions.map(({ permissionId }) => permissionId);
+  }
+
+  @Selector()
+  static orderPermissions(state: UserStateModel): CurrentUserPermission[] {
+    return state.orderPermissions;
+  }
+
+  @Selector()
+  static isHallmarkUser(state: UserStateModel): boolean {
+    return state.user?.businessUnitType === BusinessUnitType.Hallmark;
+  }
+
+  @Selector()
+  static isMspUser(state: UserStateModel): boolean {
+    return state.user?.businessUnitType === BusinessUnitType.MSP;
+  }
+
+  @Selector([UserState.isHallmarkUser, UserState.isMspUser])
+  static isHallmarkMspUser(state: UserState, isHalmark: boolean, isMsp: boolean): boolean {
+    return isHalmark || isMsp;
+  }
+
+  @Selector()
+  static agencyActionsAllowed(state: UserStateModel): boolean {
+    return state.agencyActionsAllowed;
   }
 
   @Action(SetCurrentUser)
@@ -230,7 +267,7 @@ export class UserState {
 
   @Action(SaveLastSelectedOrganizationAgencyId)
   SaveLastSelectedOrganizationAgencyId(
-    { dispatch, getState }: StateContext<UserStateModel>,
+    { dispatch }: StateContext<UserStateModel>,
     { payload, isOrganizationId }: SaveLastSelectedOrganizationAgencyId
   ): Observable<LasSelectedOrganizationAgency> {
     return this.userService.saveLastSelectedOrganizationAgencyId(payload).pipe(
@@ -288,9 +325,27 @@ export class UserState {
   }
 
   @Action(GetCurrentUserPermissions)
-  GetCurrentUserPermissions({ patchState, dispatch }: StateContext<UserStateModel>): Observable<any> {
+  GetCurrentUserPermissions({ patchState, dispatch }: StateContext<UserStateModel>): Observable<void | CurrentUserPermission[]> {
     return this.userService.getCurrentUserPermissions().pipe(
       tap((permissions: CurrentUserPermission[]) => patchState({ permissions })),
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
+    );
+  }
+
+  @Action(SetAgencyActionsAllowed)
+  SetAgencyStatus(
+    { patchState }: StateContext<UserStateModel>,
+    { allowed }: SetAgencyActionsAllowed,
+  ): void {
+    patchState({
+      agencyActionsAllowed: allowed,
+    });
+  }
+
+  @Action(GetOrderPermissions)
+  GetOrderPermissions({ patchState, dispatch }: StateContext<UserStateModel>, { payload }: GetOrderPermissions): Observable<void | CurrentUserPermission[]> {
+    return this.userService.getOrderPermissions(payload).pipe(
+      tap((orderPermissions: CurrentUserPermission[]) => patchState({ orderPermissions })),
       catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
   }

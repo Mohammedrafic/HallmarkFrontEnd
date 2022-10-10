@@ -119,6 +119,7 @@ import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { PermissionService } from '../../../security/services/permission.service';
 
 @Component({
   selector: 'app-order-management-content',
@@ -153,6 +154,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @Select(OrganizationManagementState.organizationSettings)
   organizationSettings$: Observable<OrganizationSettingsGet[]>;
 
+  @Select(UserState.currentUserPermissions)
+  currentUserPermissions$: Observable<any[]>;
+
   @Select(OrderManagementContentState.candidatesJob)
   private readonly candidatesJob$: Observable<OrderCandidateJob | null>;
 
@@ -171,34 +175,13 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
   public showFilterForm = false;
   public isLockMenuButtonsShown = true;
-  public moreMenuWithDeleteButton: ItemModel[] = [
-    { text: MoreMenuType[0], id: '0' },
-    { text: MoreMenuType[1], id: '1' },
-    { text: MoreMenuType[3], id: '3' },
-  ];
-  public moreMenuWithCloseButton: ItemModel[] = [
-    { text: MoreMenuType[0], id: '0' },
-    { text: MoreMenuType[1], id: '1' },
-    { text: MoreMenuType[2], id: '2' },
-  ];
 
-  public moreMenuWithReOpenButton: ItemModel[] = [
-    { text: MoreMenuType[0], id: '0' },
-    { text: MoreMenuType[1], id: '1' },
-    { text: MoreMenuType[4], id: '4' },
-  ];
-
-  public moreMenu: ItemModel[] = [
-    { text: MoreMenuType[0], id: '0' },
-    { text: MoreMenuType[1], id: '1' },
-  ];
-
-  public reOrdersMenu: ItemModel[] = [
-    { text: MoreMenuType[0], id: '0' },
-    { text: MoreMenuType[2], id: '2' },
-  ];
-
-  public closedOrderMenu: ItemModel[] = [{ text: MoreMenuType[1], id: '1' }];
+  public moreMenuWithDeleteButton: ItemModel[];
+  public moreMenuWithCloseButton: ItemModel[];
+  public moreMenuWithReOpenButton: ItemModel[];
+  public moreMenu: ItemModel[];
+  public reOrdersMenu: ItemModel[];
+  public closedOrderMenu: ItemModel[];
 
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
@@ -223,7 +206,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public openDetails = new Subject<boolean>();
   public orderPositionSelected$ = new Subject<{ state: boolean; index?: number }>();
   public selectionOptions: SelectionSettingsModel = {
-    type: 'Single',
+    type: 'Multiple',
     mode: 'Row',
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
@@ -243,6 +226,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public orderStatus = OrderStatus;
   public reOrderCount$ = new Subject<number>();
   public orderTypes = OrderType;
+  public canCreateOrder: boolean;
+  public canCloseOrder: boolean;
 
   private selectedCandidateMeta: { order: number; positionId: number } | null;
   private selectedIndex: number | null;
@@ -262,7 +247,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private prefix: string | null;
   private orderId: number | null;
   private creatingReorder = false;
-  private stateFullOrderId: string | null;
 
   constructor(
     private store: Store,
@@ -278,7 +262,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     private orderManagementService: OrderManagementService,
     private orderManagementContentService: OrderManagementContentService,
     private addEditReOrderService: AddEditReorderService,
-    private reOpenOrderService: ReOpenOrderService
+    private reOpenOrderService: ReOpenOrderService,
+    private permissionService: PermissionService
   ) {
     super();
     this.isRedirectedFromDashboard =
@@ -315,9 +300,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       distributedOnFrom: new FormControl(null),
       distributedOnTo: new FormControl(null),
       candidateName: new FormControl(null),
-      projectTypeId: new FormControl(null),
-      projectNameId: new FormControl(null),
-      poNumberId: new FormControl(null),
+      projectTypeIds: new FormControl(null),
+      projectNameIds: new FormControl(null),
+      poNumberIds: new FormControl(null),
     });
   }
 
@@ -333,9 +318,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     this.onSelectedOrderDataLoadHandler();
 
-    const locationState = this.location.getState() as { orderId: number; fullOrderId: string };
+    const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
-    this.stateFullOrderId = locationState.fullOrderId;
 
     this.onGridPageChangedHandler();
     this.onOrganizationChangedHandler();
@@ -355,6 +339,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.handleRedirectFromQuickOrderToast();
     this.showFilterFormAfterOpenDialog();
     this.getProjectSpecialData();
+    this.subscribeOnPermissions();
   }
 
   ngOnDestroy(): void {
@@ -362,6 +347,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.store.dispatch(new ClearSelectedOrder());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder }) => {
+      this.canCreateOrder = canCreateOrder;
+      this.canCloseOrder = canCloseOrder;
+      this.initMenuItems();
+    });
   }
 
   public override customExport(): void {
@@ -451,13 +444,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       case OrganizationOrderManagementTabs.AllOrders:
         this.filters.isTemplate = false;
         this.filters.includeReOrders = true;
-
-        this.setFullOrderIdData();
         this.hasOrderAllOrdersId();
-
-        this.store
-          .dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()])
-          .subscribe(() => this.handleFullOrderId());
+        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.PerDiem:
         this.filters.orderTypes = [OrderType.OpenPerDiem];
@@ -525,9 +513,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       distributedOnFrom: this.filters.distributedOnFrom || null,
       distributedOnTo: this.filters.distributedOnTo || null,
       candidateName: this.filters.candidateName || null,
-      projectTypeId: this.filters.projectTypeId || null,
-      projectNameId: this.filters.projectNameId || null,
-      poNumberId: this.filters.poNumberId || null,
+      projectTypeIds: this.filters.projectTypeIds || null,
+      projectNameIds: this.filters.projectNameIds || null,
+      poNumberIds: this.filters.poNumberIds || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }
@@ -596,6 +584,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public onFilterApply(): void {
     this.filters = this.OrderFilterFormGroup.getRawValue();
+    this.filters.candidateName = this.filters.candidateName || null;
     this.filters.orderPublicId = this.filters.orderPublicId || null;
     this.filters.billRateFrom = this.filters.billRateFrom || null;
     this.filters.billRateTo = this.filters.billRateTo || null;
@@ -704,6 +693,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     if (!event.isInteracted) {
       if (event.data?.isTemplate) {
+        if (!this.canCreateOrder) {
+          return;
+        }
         this.navigateToOrderTemplateForm();
         this.store.dispatch(new GetSelectedOrderById(event.data.id));
       } else {
@@ -910,6 +902,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public deleteOrder(id: number): void {
+    if (!this.canCreateOrder) {
+      return;
+    }
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
@@ -1149,21 +1144,21 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       distributedOnFrom: { type: ControlTypes.Date, valueType: ValueType.Text },
       distributedOnTo: { type: ControlTypes.Date, valueType: ValueType.Text },
       candidateName: { type: ControlTypes.Text, valueType: ValueType.Text },
-      projectTypeId: {
+      projectTypeIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
         valueField: 'projectType',
         valueId: 'id',
       },
-      projectNameId: {
+      projectNameIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
         valueField: 'projectName',
         valueId: 'id',
       },
-      poNumberId: {
+      poNumberIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
@@ -1524,31 +1519,46 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private getProjectSpecialData(): void {
-    this.store.dispatch(new GetProjectSpecialData());
-    this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data) => {
-      const { poNumbers, projectNames, specialProjectCategories } = data;
-      this.filterColumns.projectTypeId.dataSource = specialProjectCategories;
-      this.filterColumns.projectNameId.dataSource = projectNames;
-      this.filterColumns.poNumberId.dataSource = poNumbers;
+    this.organizationId$.pipe(filter(Boolean), take(1)).subscribe(() => {
+      this.store.dispatch(new GetProjectSpecialData());
+      this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data) => {
+        const { poNumbers, projectNames, specialProjectCategories } = data;
+        this.filterColumns.projectTypeIds.dataSource = specialProjectCategories;
+        this.filterColumns.projectNameIds.dataSource = projectNames;
+        this.filterColumns.poNumberIds.dataSource = poNumbers;
+      });
     });
   }
 
-  private setFullOrderIdData(): void {
-    if (this.stateFullOrderId) {
-      this.filters.orderPublicId = this.stateFullOrderId;
-      this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.filters.orderPublicId);
-    }
-  }
+  private initMenuItems(): void {
+    this.moreMenuWithDeleteButton = [
+      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[3], id: '3', disabled: !this.canCreateOrder },
+    ];
 
-  private handleFullOrderId(): void {
-    if (this.stateFullOrderId) {
-      const [data] = this.store.selectSnapshot(OrderManagementContentState.ordersPage)?.items || [];
+    this.moreMenuWithCloseButton = [
+      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[2], id: '2', disabled: !this.canCloseOrder },
+    ];
 
-      if (data) {
-        this.onRowClick({ data });
-        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
-        this.stateFullOrderId = null;
-      }
-    }
+    this.moreMenuWithReOpenButton = [
+      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[4], id: '4', disabled: !this.canCreateOrder },
+    ];
+
+    this.moreMenu = [
+      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder },
+    ];
+
+    this.reOrdersMenu = [
+      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
+      { text: MoreMenuType[2], id: '2', disabled: !this.canCloseOrder },
+    ];
+
+    this.closedOrderMenu = [{ text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder }];
   }
 }

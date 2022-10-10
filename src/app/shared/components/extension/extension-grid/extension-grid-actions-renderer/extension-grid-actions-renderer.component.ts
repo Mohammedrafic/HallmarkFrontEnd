@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,15 +9,18 @@ import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organizati
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
+import { PermissionService } from '../../../../../security/services/permission.service';
 
 @Component({
   selector: 'app-extension-edit-icon',
   templateUrl: './extension-grid-actions-renderer.component.html',
   styleUrls: ['./extension-grid-actions-renderer.component.scss'],
 })
-export class ExtensionGridActionsRendererComponent implements ICellRendererAngularComp {
+export class ExtensionGridActionsRendererComponent implements ICellRendererAngularComp, OnInit {
   @Select(AppState.isOrganizationAgencyArea)
   public isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
+
+  public canCreateOrder: boolean;
 
   private params: ICellRendererParams;
 
@@ -25,7 +28,8 @@ export class ExtensionGridActionsRendererComponent implements ICellRendererAngul
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private orderManagementService: OrderManagementService,
-    private orderManagementAgencyService: OrderManagementAgencyService
+    private orderManagementAgencyService: OrderManagementAgencyService,
+    private permissionService: PermissionService
   ) {}
 
   public agInit(params: ICellRendererParams): void {
@@ -36,7 +40,14 @@ export class ExtensionGridActionsRendererComponent implements ICellRendererAngul
     return false;
   }
 
+  public ngOnInit(): void {
+    this.subscribeOnPermissions();
+  }
+
   public onEdit(): void {
+    if (!this.canCreateOrder) {
+      return;
+    }
     disabledBodyOverflow(false);
     this.router.navigate(['./edit', this.params.data.id], { relativeTo: this.activatedRoute });
   }
@@ -52,5 +63,11 @@ export class ExtensionGridActionsRendererComponent implements ICellRendererAngul
     });
 
     this.orderManagementService.selectedTab$.next(0);
+  }
+
+  private subscribeOnPermissions(): void {
+    this.permissionService.getPermissions().subscribe(({ canCreateOrder }) => {
+      this.canCreateOrder = canCreateOrder;
+    });
   }
 }

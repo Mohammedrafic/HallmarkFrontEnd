@@ -31,10 +31,7 @@
             </div>
           </div>
           <div class="e-card-content dialog-controls">
-            <div
-              class="order-actions"
-              *ngIf="showApproveAndCancel"
-            >
+            <div class="order-actions" *ngIf="showApproveAndCancel">
               <button ejs-button cssClass="e-outline" (click)="cancelOrder(order.id)">Cancel</button>
               <button ejs-button cssClass="e-primary" (click)="approveOrder(order.id)">Approve</button>
               <div class="vertical-divider"></div>
@@ -43,7 +40,7 @@
             <button
               ejs-button
               cssClass="e-outline edit-button"
-              [disabled]="disableEdit"
+              [disabled]="disableEdit || !canCreateOrder"
               (click)="editOrder(order)"
             >
               <i-feather name="edit" class="icon"></i-feather>
@@ -52,7 +49,7 @@
               ejs-button
               cssClass="e-outline"
               *ngIf="!canCloseOrder"
-              [disabled]="disableCloseOrder"
+              [disabled]="disableCloseOrder || !canCloseOrderPermission"
               (click)="closeOrder(order)"
             >
               Close Order
@@ -61,6 +58,7 @@
               ejs-button
               cssClass="e-outline"
               *ngIf="canReOpen"
+              [disabled]="!canCloseOrderPermission"
               (click)="reOpenOrder(order)"
             >
               Re-Open
@@ -70,13 +68,14 @@
               cssClass="e-outline"
               *ngIf="showCreateReOrder"
               (click)="createReOrder()"
-              [disabled]="disableCreateReOrder"
+              [disabled]="disableCreateReOrder || !canCreateOrder"
             >
               Create Re-Order
             </button>
             <button
               ejs-button
               cssClass="e-primary delete-button"
+              [disabled]="!canCreateOrder"
               (click)="deleteOrder(order.id)"
               *ngIf="!showCloseButton"
             >
@@ -88,15 +87,22 @@
               *ngIf="showLockOrder"
               [isPrimary]="true"
               (click)="lockOrder()"
-              [disabled]="disabledLock"
+              [disabled]="disabledLock || !canCreateOrder"
             >
               {{ order?.isLocked ? 'Unlock' : 'Lock' }}
               <i-feather *ngIf="!order?.isLocked" name="lock" class="icon"></i-feather>
               <app-custom-icon *ngIf="order?.isLocked" name="unlock" class="icon"></app-custom-icon>
             </button>
 
-            <button *ngIf="mobileMenu.length" ejs-dropdownbutton [items]="mobileMenu" (select)="onMobileMenuSelect($event)" iconCss="e-icons"
-              cssClass="e-caret-hide primary-icon-button menu-mobile">
+            <button
+              *ngIf="mobileMenu.length"
+              ejs-dropdownbutton
+              [items]="mobileMenu"
+              [disabled]="!canCreateOrder"
+              (select)="onMobileMenuSelect($event)"
+              iconCss="e-icons"
+              cssClass="e-caret-hide primary-icon-button menu-mobile"
+            >
               <i-feather name="more-vertical" class="icon"></i-feather>
             </button>
 
@@ -112,7 +118,7 @@
             <e-tabitem>
               <ng-template #headerText>{{ isReOrder ? 'Re-Order' : 'Order' }} Details</ng-template>
               <ng-template #content>
-               <app-order-details-container [currentOrder]="order"></app-order-details-container>
+                <app-order-details-container [currentOrder]="order"></app-order-details-container>
               </ng-template>
             </e-tabitem>
             <e-tabitem>

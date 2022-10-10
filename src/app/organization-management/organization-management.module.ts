@@ -24,7 +24,7 @@ import {
 } from '@syncfusion/ej2-angular-inputs';
 import { SidebarModule, TabAllModule, TabModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, DateTimePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
-import { DialogModule } from '@syncfusion/ej2-angular-popups';
+import { DialogModule, TooltipAllModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
 import {
   AlertCircle,
@@ -61,7 +61,6 @@ import { ShiftsComponent } from './shifts/shifts.component';
 import { GroupSetupComponent } from './credentials/credentials-setup/group-setup/group-setup.component';
 import { SettingsComponent } from './settings/settings.component';
 import { CredentialsComponent } from './credentials/credentials.component';
-import { CredentialsListComponent } from './credentials/credentials-list/credentials-list.component';
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
 import { HolidaysState } from './store/holidays.state';
 import { HolidaysComponent } from './holidays/holidays.component';
@@ -104,6 +103,8 @@ import { ImportDepartmentsComponent } from './departments/import-departments/imp
 import { ImportBillRatesComponent } from './bill-rates/import-bill-rates/import-bill-rates.component';
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
 import { CanManageSettingPipe } from '@shared/pipes/can-manage-setting.pipe';
+import { ImportRegionsComponent } from './regions/import-regions/import-regions.component';
+import { RegionsGridComponent } from './regions/import-regions/regions-grid/regions-grid.component';
 
 const sidebarIcons = {
   Download,
@@ -130,7 +131,6 @@ const sidebarIcons = {
     LocationsComponent,
     CredentialsSetupComponent,
     CredentialsComponent,
-    CredentialsListComponent,
     SkillsComponent,
     ShiftsComponent,
     GroupSetupComponent,
@@ -164,7 +164,9 @@ const sidebarIcons = {
     ImportLocationsComponent,
     ImportDepartmentsComponent,
     ImportBillRatesComponent,
-    CanManageSettingPipe
+    CanManageSettingPipe,
+    ImportRegionsComponent,
+    RegionsGridComponent
   ],
   imports: [
     CommonModule,
@@ -198,6 +200,7 @@ const sidebarIcons = {
     MaskedTextBoxModule,
     AgGridModule,
     AppGridModule,
+    TooltipAllModule,
 
     FeatherModule.pick(sidebarIcons),
 

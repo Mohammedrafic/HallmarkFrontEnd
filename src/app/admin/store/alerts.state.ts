@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { UserSubscriptionPage, UserSubscriptionRequest } from "@shared/models/user-subscription.model";
 import { Action, Selector, StateContext} from '@ngxs/store';
-import { AlertTrigger, DismissAlert, DismissAllAlerts, GetAlertsTemplatePage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
+import { AlertTrigger, ClearAlertTemplateState, DismissAlert, DismissAllAlerts, GetAlertsTemplatePage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
 import { Observable ,tap} from "rxjs";
 import { AlertsService } from "@shared/services/alerts.service";
 import { BusinessUnitService } from "@shared/services/business-unit.service";
@@ -151,5 +151,11 @@ export class AlertsState {
     { patchState }: StateContext<AlertsStateModel>
   ): Observable<any> {
     return this.alertsService.dismissAllAlerts();
+  }
+  @Action(ClearAlertTemplateState)
+  ClearAlertTemplateState(
+    { patchState }: StateContext<AlertsStateModel>
+  ):void{
+    patchState({ updateAlertsTemplate: null,saveAlertsTemplate:null });
   }
 }

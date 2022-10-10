@@ -18,6 +18,7 @@ export class SideDialogComponent extends DestroyableDirective implements OnInit 
 
   @Input() header: string | null;
   @Input() width: string = '434px';
+  @Input() disableSaveButton: boolean = false;
 
   @Output() formCancelClicked = new EventEmitter();
   @Output() formSaveClicked = new EventEmitter();

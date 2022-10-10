@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { merge, Observable, Subject, takeUntil } from 'rxjs';
@@ -52,6 +52,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   @Input() openEvent: Subject<boolean>;
   @Input() isAgency: boolean = false;
   @Input() isLocked: boolean | undefined = false;
+  @Input() actionsAllowed: boolean;
 
   @Input() set candidateJob(orderCandidateJob: OrderCandidateJob | null) {
     this.orderCandidateJob = orderCandidateJob;

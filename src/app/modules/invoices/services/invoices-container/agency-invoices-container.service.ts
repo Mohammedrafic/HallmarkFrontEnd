@@ -18,7 +18,7 @@ import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoic
 export class AgencyInvoicesContainerService extends InvoicesContainerService {
   public getColDefsByTab(
     tab: AgencyInvoicesGridTab,
-    { organizationId, canPay }: { organizationId: number, canPay: boolean },
+    { organizationId, canPay, canEdit }: { organizationId: number, canPay: boolean, canEdit: boolean },
     ): ColDef[] {
     switch (tab) {
       case 0:
@@ -36,6 +36,7 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
           downloadAttachment: (attachment) => this.store.dispatch(
             new Invoices.DownloadAttachment(organizationId, attachment),
           ),
+          canEdit,
         });
       case 1:
         return AllInvoicesGridHelper.getColDefs(

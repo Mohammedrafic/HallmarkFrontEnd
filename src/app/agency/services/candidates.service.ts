@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { CredentialVerifiedStatus } from "@shared/enums/status";
 import { CandidateCredential, CandidateCredentialPage, CredentialGroupedFiles } from "@shared/models/candidate-credential.model";
 import { CandidateImportRecord, CandidateImportResult } from "@shared/models/candidate-profile-import.model";
 import { CredentialType } from "@shared/models/credential-type.model";
@@ -123,17 +122,21 @@ export class CandidateService {
    * Get candidates credential by page number
    * @param pageNumber
    * @param pageSize
+   * @param orderId
    * @param id
    * @return list of candidates credential
    */
   public getCredentialByCandidateId(
     pageNumber: number,
     pageSize: number,
+    orderId: number | null ,
     id: number
   ): Observable<CandidateCredentialPage> {
-    return this.http.get<CandidateCredentialPage>(`/api/CandidateCredentials/candidateProfileId/${id}`, {
-      params: { PageNumber: pageNumber, PageSize: pageSize },
-    });
+    const params: { pageNumber: number; pageSize: number; orderId?: number; } = { pageNumber, pageSize };
+    if (orderId) {
+      params.orderId = orderId;
+    }
+    return this.http.get<CandidateCredentialPage>(`/api/CandidateCredentials/candidateProfileId/${id}`, { params });
   }
 
   /**
@@ -173,14 +176,6 @@ export class CandidateService {
    */
   public getCredentialTypes(): Observable<CredentialType[]> {
     return this.http.get<CredentialType[]>(`/api/CredentialTypes/all`);
-  }
-
-  /**
-   * Get credential statuses
-   * @return list of credential statuses
-   */
-  public getCredentialStatuses(): Observable<CredentialVerifiedStatus[]> {
-    return this.http.get<CredentialVerifiedStatus[]>(`/api/CandidateCredentials/credentialStatuses`);
   }
 
   /**

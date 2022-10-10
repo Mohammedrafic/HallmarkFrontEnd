@@ -197,9 +197,9 @@ export type AgencyOrderFilters = {
   distributedOnFrom?: Date | null;
   distributedOnTo?: Date | null;
   candidateName?: string | null;
-  projectTypeId?: number | null;
-  projectNameId?: number | null;
-  poNumberId?: number | null;
+  projectTypeIds?: number | null;
+  projectNameIds?: number | null;
+  poNumberIds?: number | null;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -247,6 +247,8 @@ export class GetPredefinedBillRatesData {
   orderType: OrderType;
   departmentId: number;
   skillId: number;
+  jobStartDate?: string;
+  jobEndDate?: string;
 }
 
 export class Order {
@@ -278,7 +280,6 @@ export class Order {
   onCallRequired: boolean;
   asapStart: boolean;
   criticalOrder: boolean;
-  nO_OT: boolean;
   jobDescription: string;
   unitDescription: string;
   orderRequisitionReasonId: number;
@@ -519,9 +520,9 @@ export class OrderFilter {
   distributedOnFrom?: Date | null;
   distributedOnTo?: Date | null;
   candidateName?: string | null;
-  projectTypeId?: number | null;
-  projectNameId?: number | null;
-  poNumberId?: number | null;
+  projectTypeIds?: number | null;
+  projectNameIds?: number | null;
+  poNumberIds?: number | null;
 }
 
 export class SortModel {

@@ -14,6 +14,7 @@ export type CandidateCredential = {
   createdUntil: string;
   credentialFiles?: CredentialFile[];
   expireDateApplicable?: boolean;
+  orderId: number | null;
 }
 
 export type CredentialFile = {

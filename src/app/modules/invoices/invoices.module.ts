@@ -76,6 +76,7 @@ import { TableStatusCellModule } from '@shared/components/table-status-cell/tabl
 import { AllInvoicesActionCellComponent } from './components/all-invoices-action-cell/all-invoices-action-cell.component';
 import { NumericalConverterModule } from '@shared/pipes/numerical-converter/numerical-converter.module';
 import { InvoiceAgencyResolver } from './resolvers/invoice-agency.resolver';
+import { GridOrderIdCellComponent } from './components/grid-order-id-cell/grid-order-id-cell.component';
 
 @NgModule({
   declarations: [
@@ -90,6 +91,7 @@ import { InvoiceAgencyResolver } from './resolvers/invoice-agency.resolver';
     InvoicesFiltersDialogComponent,
     InvoicesTableTabsComponent,
     AllInvoicesActionCellComponent,
+    GridOrderIdCellComponent,
   ],
   imports: [
     CommonModule,

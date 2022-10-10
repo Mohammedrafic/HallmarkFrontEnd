@@ -66,6 +66,7 @@
   align-items: center;
   justify-content: flex-start;
   margin-bottom: 15px;
+  padding: 0 5px;
 
   &.right {
     justify-content: flex-end;
@@ -262,4 +263,22 @@ ejs-richtexteditor {
   &.show-ind {
     color: $primary-active-blue-20;
   }
+}
+
+.scroll-btn {
+  position: fixed;
+  bottom: 66px;
+  right: 35px;
+  background: $primary-active-blue-20;
+  color: white;
+  border-radius: 8px;
+  padding: 6px 8px 6px 16px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.scrl-btn-text {
+  margin-left: 7px;
+  font-size: 16px;
 }

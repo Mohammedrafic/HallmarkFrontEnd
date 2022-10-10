@@ -6,7 +6,7 @@
   <ng-container right>
     <ng-container *ngIf="!isSeccondStepActive">
       <button [disabled]="!agencyForm?.dirty" ejs-button cssClass="e-outline" (click)="onClear()">Clear</button>
-      <button ejs-button [isPrimary]="true" (click)="onSave()">Save</button>
+      <button ejs-button [disabled]="fetchedAgency?.createUnder?.agencyStatus === agencyStatus.Inactive || fetchedAgency?.createUnder?.agencyStatus === agencyStatus.Terminated" [isPrimary]="true" (click)="onSave()">Save</button>
     </ng-container>
   </ng-container>
 </app-page-toolbar>
@@ -46,6 +46,11 @@
 
                 <div class="e-card-content">
                   <app-general-info-group [isAgencyUser]="isAgencyUser" [formGroup]="$any(agencyControl)"></app-general-info-group>
+
+                  <div class="e-card-title-wrapper">
+                    <div class="e-card-title">Job Distribution</div>
+                  </div>
+                  <app-job-distribution [formGroup]="$any(distributionControl)"></app-job-distribution>
 
                   <div class="e-card-title-wrapper">
                     <div class="e-card-title">Billing Details</div>

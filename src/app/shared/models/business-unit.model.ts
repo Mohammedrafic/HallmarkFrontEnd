@@ -3,4 +3,5 @@ export class BusinessUnit {
   businessUnitType: number;
   name: string;
   parentUnitId: number;
+  agencyStatus: number;
 }

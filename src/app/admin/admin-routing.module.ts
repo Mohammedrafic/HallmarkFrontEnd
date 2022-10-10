@@ -16,6 +16,9 @@ import { ManualInvoiceReasonsComponent } from '@admin/master-data/manual-invoice
 import { OrganizationProfileComponent } from './organization-profile/organization-profile.component';
 
 import { AlertsComponent } from './alerts/alerts.component';
+import { MasterCredentialsComponent } from './master-data/master-credentials/master-credentials.component';
+import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
+
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
@@ -58,8 +61,19 @@ const routes: Routes = [
             component: SkillsCategoriesComponent
           },
           {
-            path: 'credential-types',
-            component: MasterCredentialsTypesComponent
+            path: 'credentials',
+            component: MasterCredentialsComponent,
+            children: [
+              {
+                path: 'list',
+                component: CredentialsListComponent,
+                data: { canEdit: true },
+              },
+              {
+                path: 'types',
+                component: MasterCredentialsTypesComponent
+              }
+            ]
           },
           {
             path: 'holidays',

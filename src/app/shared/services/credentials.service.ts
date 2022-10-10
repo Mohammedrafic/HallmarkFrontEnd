@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 
 import { CredentialType } from '@shared/models/credential-type.model';
-import { Credential, CredentialFilter, CredentialFilterDataSources, CredentialPage } from '@shared/models/credential.model';
+import { AssignedCredentialTreeData, Credential, CredentialFilter, CredentialFilterDataSources, CredentialPage } from '@shared/models/credential.model';
 import {
   CredentialSetupFilterDto,
   CredentialSetupFilterGet,
@@ -183,4 +183,22 @@ export class CredentialsService {
         optional: credential.isActive
       })))));
   }
+
+    /**
+   * Get assigned credential tree data
+   * @return treeItems: list of tree item;
+   * assignedCredentialIds: array of selected items
+   */
+  public getAssignedCredentialTreeData(): Observable<AssignedCredentialTreeData> {
+    return this.http.get<AssignedCredentialTreeData>(`/api/MasterCredentials/assignedCredentialsTree`);
+  }
+
+    /**
+   * Save/Update assign credential
+   * @param treeValue array of numbers
+   * @return Save/Updated assignedCredentialsIds
+   */
+     public saveAssignedCredentialValue(treeValue: number[]): Observable<number[]> {
+      return this.http.put<number[]>(`/api/MasterCredentials/assignCredentials`, treeValue);
+    }
 }

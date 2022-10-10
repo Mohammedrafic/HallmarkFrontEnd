@@ -7,7 +7,13 @@ import { filter, Observable, Subscription, takeWhile } from 'rxjs';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { DELETE_RECORD_TEXT } from '@shared/constants/messages';
-import { Agency, AgencyBillingDetails, AgencyContactDetails, AgencyDetails } from 'src/app/shared/models/agency.model';
+import {
+  Agency,
+  AgencyBillingDetails,
+  AgencyContactDetails,
+  AgencyDetails,
+  AgencyRegionSkills,
+} from 'src/app/shared/models/agency.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import {
@@ -15,6 +21,7 @@ import {
   GetAgencyByIdSucceeded,
   GetAgencyLogo,
   GetAgencyLogoSucceeded,
+  GetAgencyRegionsSkills,
   GetBusinessUnitList,
   RemoveAgencyLogo,
   SaveAgency,
@@ -35,6 +42,8 @@ import {
   ElectronicPaymentDetails,
   PaymentDetails,
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
+import { JobDistributionComponent } from '@agency/agency-list/add-edit-agency/job-distribution/job-distribution.component';
+import { AgencyStatus } from '@shared/enums/status';
 
 type AgencyFormValue = {
   parentBusinessUnitId: number;
@@ -43,6 +52,7 @@ type AgencyFormValue = {
   agencyBillingDetails: Omit<AgencyBillingDetails, 'sameAsAgency'>;
   agencyContactDetails: AgencyContactDetails[];
   agencyPaymentDetails: PaymentDetails[] | ElectronicPaymentDetails[];
+  agencyJobDistribution: AgencyRegionSkills;
 };
 
 @Component({
@@ -58,6 +68,8 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   public createUnderFields = OPRION_FIELDS;
   public title = 'Add';
   public isAgencyUser = false;
+  public readonly agencyStatus = AgencyStatus;
+  public fetchedAgency: Agency;
 
   get contacts(): FormArray {
     return this.agencyForm.get('agencyContactDetails') as FormArray;
@@ -79,6 +91,10 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
     return this.agencyForm.get('agencyBillingDetails');
   }
 
+  get distributionControl(): AbstractControl | null {
+    return this.agencyForm.get('agencyJobDistribution');
+  }
+
   get isSeccondStepActive(): boolean {
     return this.tab?.selectedItem === 1;
   }
@@ -94,7 +110,6 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   private populatedSubscription: Subscription | undefined;
   private isAlive = true;
   private filesDetails: Blob[] = [];
-  private fetchedAgency: Agency;
   private agencyId: number | null = null;
   private isRemoveLogo: boolean = false;
 
@@ -115,6 +130,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
     this.checkAgencyUser();
     this.onBillingPopulatedChange();
     this.enableCreateUnderControl();
+    this.getAgencyRegionsSkills();
 
     this.actions$
       .pipe(
@@ -282,6 +298,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
       agencyBillingDetails: BillingDetailsGroupComponent.createFormGroup(),
       agencyContactDetails: this.fb.array([ContactDetailsGroupComponent.createFormGroup()]),
       agencyPaymentDetails: this.fb.array([]),
+      agencyJobDistribution: JobDistributionComponent.createFormGroup(),
     });
   }
 
@@ -302,6 +319,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
         sameAsAgency: agencyFormValue.isBillingPopulated,
         id,
       },
+      agencyJobDistribution: { ...agencyFormValue.agencyJobDistribution },
       agencyContactDetails,
       agencyPaymentDetails,
       agencyId: id,
@@ -314,12 +332,14 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
     agencyBillingDetails,
     agencyContactDetails,
     agencyPaymentDetails,
+    agencyJobDistribution,
     createUnder,
   }: Agency) {
     const paymentDetailsForms = this.createPaymentDetails(agencyPaymentDetails);
 
     this.agencyForm.get('parentBusinessUnitId')?.patchValue(createUnder?.parentUnitId || 0);
     this.agencyForm.get('isBillingPopulated')?.patchValue(agencyBillingDetails.sameAsAgency);
+    this.distributionControl?.patchValue({ ...agencyJobDistribution });
     this.agencyControl?.patchValue({ ...agencyDetails });
     this.billingControl?.patchValue({ ...agencyBillingDetails });
     paymentDetailsForms.forEach((form: FormGroup) => this.paymentDetailsControl?.push(form));
@@ -348,5 +368,9 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
 
       return new FormGroup(controls);
     });
+  }
+
+  private getAgencyRegionsSkills(): void {
+    this.store.dispatch(new GetAgencyRegionsSkills());
   }
 }

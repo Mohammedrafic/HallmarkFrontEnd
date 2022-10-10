@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { GridHelper } from '@shared/helpers/grid.helper';
-import { UserState } from '../../../../../store/user.state';
+import { AppState } from 'src/app/store/app.state';
+import { UserState } from 'src/app/store/user.state';
 import { Store } from '@ngxs/store';
 import { Router } from '@angular/router';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { SetLastSelectedOrganizationAgencyId } from '../../../../../store/user.actions';
+import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { CandidatesDetailsModel } from '@shared/components/candidate-details/models/candidate.model';
 import { SetCandidateMessage } from '@shared/components/candidate-details/store/candidate.actions';
@@ -34,6 +35,7 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
 
   public onViewNavigation(): void {
     const user = this.store.selectSnapshot(UserState.user);
+    const isOrganizationAgencyArea = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const url =
       user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
     const pageToBack = this.router.url;
@@ -58,7 +60,13 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
     }
 
     this.router.navigate([url, this.cellValue.candidateProfileId], {
-      state: { orderId: this.cellValue.orderId, pageToBack, isNavigateFromCandidateDetails: true, readonly },
+      state: {
+        orderId: this.cellValue.orderId,
+        pageToBack,
+        isNavigateFromCandidateDetails: true,
+        isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,
+        readonly,
+      },
     });
     disabledBodyOverflow(false);
   }

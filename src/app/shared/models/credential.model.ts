@@ -8,6 +8,7 @@ export class Credential {
   name: string;
   expireDateApplicable: boolean;
   comment?: string;
+  isMasterCredential?: boolean;
 
   constructor(credential: Credential) {
     if (credential.id) {
@@ -43,3 +44,20 @@ export class CredentialFilterDataSources {
   credentialTypes: CredentialType;
   credentials: CredentialDataSource[];
 }
+
+export type AssignedCredentialTreeItem = {
+  id: string;
+  pid: string;
+  cid: number;
+  name: string;
+  isAssignable: boolean;
+  hasChild: boolean;
+};
+
+export type AssignedCredentialTree = AssignedCredentialTreeItem[];
+
+export type AssignedCredentialTreeData = {
+  treeItems: AssignedCredentialTree;
+  assignedCredentialIds: string[];
+};
+

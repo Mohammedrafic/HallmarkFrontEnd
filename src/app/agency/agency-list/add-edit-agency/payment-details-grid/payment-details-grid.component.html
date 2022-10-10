@@ -86,4 +86,9 @@
   </ng-template>
 </ejs-grid>
 
-<app-payment-dialog (modalClose)="onPaymentFormCancel($event)" [dialogEvent]="$any(openEvent)" [onEdit]="editedPaymentsDetails"></app-payment-dialog>
+<app-payment-dialog
+  (modalClose)="onPaymentFormCancel($event)"
+  [dialogEvent]="$any(openEvent)"
+  [onEdit]="editedPaymentsDetails"
+  [paymentsList]="paymentsFormArray"
+></app-payment-dialog>

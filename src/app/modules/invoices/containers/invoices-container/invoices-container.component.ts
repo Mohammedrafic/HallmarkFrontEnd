@@ -1,7 +1,6 @@
-import { ActivatedRoute } from '@angular/router';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit,
   ViewChild } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
@@ -15,7 +14,7 @@ import { DialogAction } from '@core/enums';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import {
   BaseInvoice, InvoicesFilterState, InvoiceUpdateEmmit, ManualInvoice, ManualInvoicesData,
-  PrintingPostDto, SelectedInvoiceRow
+  PrintingPostDto, SelectedInvoiceRow, GridContainerTabConfig
 } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicePrintingService, InvoicesService } from '../../services';
@@ -34,12 +33,11 @@ import { InvoicesContainerService } from '../../services/invoices-container/invo
 import {
   RejectReasonInputDialogComponent
 } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
-import { AgencyInvoicesGridTab, InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
+import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
 import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions } from '../../constants';
 import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { UserState } from 'src/app/store/user.state';
 import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
-import { GridContainerTabConfig } from '../../interfaces';
 import { InvoicesModel } from '../../store/invoices.model';
 
 @Component({
@@ -122,15 +120,15 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
   public isAgency: boolean;
 
+  public agencyActionsAllowed = true;
+
   constructor(
     private store: Store,
-    private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private invoicesService: InvoicesService,
     private actions$: Actions,
     private invoicesContainerService: InvoicesContainerService,
     private printingService: InvoicePrintingService,
-    private route: ActivatedRoute,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
   ) {
     super();
@@ -139,6 +137,10 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
     this.organizationId$ = this.isAgency ? this.organizationControl.valueChanges : this.organizationChangeId$;
+
+    if (this.isAgency) {
+      this.checkActionsAllowed();
+    }
   }
 
   public ngOnInit(): void {
@@ -249,8 +251,11 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
     this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx,
       { organizationId: this.organizationId,
-        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay,
+        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay && this.agencyActionsAllowed,
+        canEdit: this.agencyActionsAllowed,
       });
+
+
     this.tabConfig = this.invoicesContainerService.getTabConfig(tabIdx);
 
     this.cdr.markForCheck();
@@ -436,6 +441,17 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
       takeUntil(this.componentDestroy()),
     ).subscribe(() => {
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.organizationId);
+    });
+  }
+
+  private checkActionsAllowed(): void {
+    this.store.select(UserState.agencyActionsAllowed)
+    .pipe(
+      distinctUntilChanged(),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((value) => {
+      this.agencyActionsAllowed = value;
     });
   }
 }

@@ -59,8 +59,8 @@
   .group {
     display: flex;
 
-    .input-container:first-child {
-      padding-right: 13px;
+    .input-container + .input-container {
+      padding-left: 13px;
     }
 
     .input-container {

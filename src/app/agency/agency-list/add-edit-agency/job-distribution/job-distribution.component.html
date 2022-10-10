@@ -1,0 +1,63 @@
+<form [formGroup]="formGroup">
+  <div class="flex-wrapper bootstrap">
+    <div class="flex-50">
+      <div class="dropdown-container">
+        <label>Region</label>
+        <div class="input-group dropdown">
+          <ejs-multiselect
+            mode="CheckBox"
+            appValidateWithMessage
+            formControlName="regionNames"
+            [allowFiltering]="true"
+            [showSelectAll]="true"
+            [fields]="regionOption"
+            [dataSource]="(regionsSkillsList$ | async)?.regions"
+          ></ejs-multiselect>
+        </div>
+      </div>
+      <div class="dropdown-container">
+        <label>Order Type</label>
+        <div class="input-group dropdown">
+          <ejs-multiselect
+            mode="CheckBox"
+            appValidateWithMessage
+            formControlName="orderTypes"
+            [allowFiltering]="true"
+            [showSelectAll]="true"
+            [fields]="optionFields"
+            [dataSource]="orderType"
+          ></ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="flex-50">
+      <div class="dropdown-container">
+        <label>Classification</label>
+        <div class="input-group dropdown">
+          <ejs-multiselect
+            mode="CheckBox"
+            [allowFiltering]="true"
+            [showSelectAll]="true"
+            formControlName="classifications"
+            [fields]="optionFields"
+            [dataSource]="classification"
+          ></ejs-multiselect>
+        </div>
+      </div>
+      <div class="dropdown-container">
+        <label>Skill Category</label>
+        <div class="input-group dropdown">
+          <ejs-multiselect
+            mode="CheckBox"
+            appValidateWithMessage
+            [allowFiltering]="true"
+            [showSelectAll]="true"
+            formControlName="skillCategoryIds"
+            [fields]="optionFields"
+            [dataSource]="(regionsSkillsList$ | async)?.skillCategories"
+          ></ejs-multiselect>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

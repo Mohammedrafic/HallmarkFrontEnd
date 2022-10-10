@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { CreatedCandidateStatus } from '@shared/enums/status';
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 
 import { CandidateGeneralInfoComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
 import { CandidateProfessionalSummaryComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
@@ -55,6 +55,9 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   public isCredentialStep = false;
   public candidateMessage: CandidateMessage | null = null;
   public fetchedCandidate: Candidate;
+  public isNavigatedFromOrganizationArea: boolean;
+  public orderId: number | null = null;
+  public agencyActionsAllowed = true;
 
   private filesDetails: Blob[] = [];
   private unsubscribe$: Subject<void> = new Subject();
@@ -77,6 +80,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.generateCandidateForm();
+    this.checkForAgencyStatus();
 
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveCandidateSucceeded))
@@ -103,6 +107,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
       this.store.dispatch(new GetCandidatePhoto(parseInt(this.route.snapshot.paramMap.get('id') as string)));
     }
     this.pagePermissions();
+    this.setCredentialParams();
     this.subscribeOnCandidateMessage();
   }
 
@@ -347,5 +352,23 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
     } else {
       return this.getStringSsn(`0${ssn}`);
     }
+  }
+
+  private setCredentialParams(): void {
+    const location = this.location.getState() as {
+      isNavigatedFromOrganizationArea: boolean;
+      orderId: number;
+    };
+    this.isNavigatedFromOrganizationArea = location.isNavigatedFromOrganizationArea || false;
+    this.orderId = location.orderId || null;
+  }
+
+  private checkForAgencyStatus(): void {
+    this.store
+      .select(UserState.agencyActionsAllowed)
+      .pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$))
+      .subscribe((value) => {
+        this.agencyActionsAllowed = value;
+      });
   }
 }

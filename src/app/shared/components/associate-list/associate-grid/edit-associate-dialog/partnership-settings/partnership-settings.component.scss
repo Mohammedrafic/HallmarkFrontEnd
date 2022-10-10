@@ -55,6 +55,18 @@
 
   .dropdown-container {
     margin-bottom: 12px;
+
+    .input-group.input-readonly {
+      .e-input[readonly], ejs-multiselect .e-input-group {
+        background-color: $secondary-dark-blue-50;
+        color: $secondary-dark-blue-10;
+
+        &:hover,
+        &:focus {
+          border: 1px solid $secondary-dark-blue-40 !important;
+        }
+      }
+    }
   }
 
   .submission {

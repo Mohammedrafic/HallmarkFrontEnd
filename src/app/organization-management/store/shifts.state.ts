@@ -10,6 +10,7 @@ import { ShowToast } from "src/app/store/app.actions";
 import { ShiftsService } from '@shared/services/shift.service';
 import { DeleteShift, DeleteShiftSucceeded, ExportShifts, GetShiftsByPage, SaveShift, SaveShiftSucceeded } from './shifts.actions';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
+import { getAllErrors } from '@shared/utils/error.utils';
 
 export interface ShiftsStateModel {
   isShiftLoading: boolean;
@@ -64,7 +65,7 @@ export class ShiftsState {
         return payloadResponse;
       }),
       catchError((error: any) => {
-        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))
       })
     );
   }

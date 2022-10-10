@@ -22,6 +22,7 @@
             class="add-action spaced"
             cssClass="e-action-button"
             ejs-button
+            [disabled]="disableAnyAction"
             (click)="openAddDialog()"
           >
             <i-feather name="plus" class="icon"></i-feather> Add Record
@@ -31,6 +32,7 @@
             <button
               *ngIf="!isEditOn; else editHandlers"
               (click)="editTimesheets()"
+              [disabled]="disableAnyAction"
               ejs-button
               cssClass="e-action-button"
               class="add-action">
@@ -56,7 +58,7 @@
           <button
             *ngIf="isRejectBtnEnabled && !actionsDisabled"
             ejs-button
-            [disabled]="actionButtonDisabled"
+            [disabled]="disableAnyAction || actionButtonDisabled"
             cssClass="e-outline privilege"
             (click)="onRejectButtonClick()"
           >
@@ -66,7 +68,7 @@
             *ngIf="isApproveBtnEnabled"
             ejs-button
             [isPrimary]="true"
-            [disabled]="actionButtonDisabled"
+            [disabled]="disableAnyAction || actionButtonDisabled"
             class="spinner-btn privilege"
             (click)="handleApprove()"
           >

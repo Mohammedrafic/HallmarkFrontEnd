@@ -3,5 +3,6 @@
   *ngIf="(isOrganizationAgencyArea$ | async)?.isOrganizationArea"
   name="edit"
   class="icon edit-action"
+  [class.disable]="!canCreateOrder"
   (click)="onEdit()"
 ></i-feather>

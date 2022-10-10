@@ -7,6 +7,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn } from '@shared/models/export.model';
 import { TimesheetStatus } from '../enums/timesheet-status.enum';
 import { FileForUpload } from '@core/interface';
+import { AgencyStatus } from '@shared/enums/status';
 
 export interface DetailsColumnConfig {
   align: TableColumnAlign;
@@ -49,12 +50,8 @@ export interface CandidateInfo {
   rejectReason: string | null;
 }
 
-export interface CostCenterOption {
-  id: number;
-  name: string;
-}
-
 export interface TimesheetDetailsModel {
+  agencyAbleSubmitWithoutAttachments: boolean;
   id: number;
   statusText: string;
   status: TimesheetStatus;
@@ -64,6 +61,7 @@ export interface TimesheetDetailsModel {
   canApproveTimesheet: boolean;
   canEditMileage: boolean;
   canEditTimesheet: boolean;
+  canUploadFiles: boolean;
   rejectionReason?: string;
   organizationId: number;
   candidateId: number;
@@ -94,6 +92,7 @@ export interface TimesheetDetailsModel {
   isNotExist?: boolean;
   allowDNWInTimesheets?: boolean;
   mileageTimesheetId: number;
+  agencyStatus: AgencyStatus;
 }
 
 export interface WorkWeek<T> {

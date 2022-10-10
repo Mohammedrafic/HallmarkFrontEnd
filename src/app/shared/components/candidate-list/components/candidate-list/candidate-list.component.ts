@@ -60,6 +60,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Input() search$: Subject<string>;
   @Input() includeDeployedCandidates$: Subject<boolean>;
   @Input() isAgency: boolean;
+  @Input() agencyActionsAllowed: boolean;
 
   public filters: CandidateListFilters = {
     profileStatuses: [],
@@ -346,7 +347,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private onSkillDataLoadHandler(): void {
     this.store.dispatch(new GetAllSkills());
     this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe((skills) => {
-      if (skills && skills.length > 0) {
+      if (skills?.length > 0 && this.filterColumns) {
         this.filterColumns.skillsIds.dataSource = skills;
       }
     });

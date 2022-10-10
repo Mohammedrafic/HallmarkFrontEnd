@@ -1,3 +1,34 @@
+@import "../../styles/variables/colors";
+
+.flex-column {
+    height:auto;
+  .toolbar {
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-bottom: 10px;
+    .toolbar-header {
+      float: left;
+      position: relative;
+      display: flex;
+      .toolbar-header-div{
+      font-size: 14px;
+      height: 40px;
+      font-weight:bold;
+      }
+    }
+    .toolbar-buttons {
+      float: right;
+      position: relative;
+      z-index: 99;
+      display: flex;
+
+      .button-filter {
+        margin-left: 12px;
+        margin-right: 6px;
+      }
+    }
+  }
+}
 .aging-report-section {
     display: flex;
     height: 65%;

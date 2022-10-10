@@ -5,7 +5,7 @@ import { catchError, Observable, of, tap } from 'rxjs';
 import { AGENCY_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 
-import { Agency, AgencyFilteringOptions, AgencyPage } from 'src/app/shared/models/agency.model';
+import { Agency, AgencyFilteringOptions, AgencyPage, AgencyRegionSkills } from 'src/app/shared/models/agency.model';
 import { OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
 import { ShowToast } from 'src/app/store/app.actions';
@@ -24,6 +24,7 @@ import {
   RemoveAgencyLogo,
   ExportAgencyList,
   GetAgencyFilteringOptions,
+  GetAgencyRegionsSkills,
 } from './agency.actions';
 import { AdminStateModel } from '@admin/store/admin.state';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
@@ -37,6 +38,7 @@ export interface AgencyStateModel {
   agencyPage: AgencyPage | null;
   businessUnits: BusinessUnit[];
   agencyFilteringOptions: AgencyFilteringOptions | null;
+  regionsSkills: AgencyRegionSkills | null;
 }
 
 @State<AgencyStateModel>({
@@ -49,6 +51,7 @@ export interface AgencyStateModel {
     organizations: null,
     businessUnits: [],
     agencyFilteringOptions: null,
+    regionsSkills: null,
   },
 })
 @Injectable()
@@ -72,7 +75,7 @@ export class AgencyState {
   static agencies(state: AgencyStateModel): AgencyPage | null {
     return state.agencyPage;
   }
-  
+
   @Selector()
   static agency(state: AgencyStateModel): Agency | null {
     return state.agency;
@@ -81,6 +84,11 @@ export class AgencyState {
   @Selector()
   static agencyFilteringOptions(state: AgencyStateModel): AgencyFilteringOptions | null {
     return state.agencyFilteringOptions;
+  }
+
+  @Selector()
+  static getRegionsSkills(state: AgencyStateModel): AgencyRegionSkills | null {
+    return state.regionsSkills;
   }
 
   constructor(private agencyService: AgencyService, private organizationService: OrganizationService) {}
@@ -199,6 +207,15 @@ export class AgencyState {
     return this.agencyService.getAgencyFilteringOptions().pipe(
       tap((data) => {
         patchState({ agencyFilteringOptions: data });
+      })
+    );
+  }
+
+  @Action(GetAgencyRegionsSkills)
+  GetAgencyRegionsSkills({ patchState }: StateContext<AgencyStateModel>): Observable<GetAgencyRegionsSkills> {
+    return this.agencyService.getAgencyRegionSkills().pipe(
+      tap((regionsSkills: AgencyRegionSkills) => {
+        patchState({ regionsSkills });
       })
     );
   }

@@ -227,6 +227,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
           new Timesheets.SelectOrganization(organizationId),
         ]
       )),
+      switchMap(() => this.store.dispatch(new Timesheets.GetFiltersDataSource())),
       takeUntil(this.componentDestroy()),
     ).subscribe();
   }

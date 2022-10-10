@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
@@ -24,6 +24,7 @@ import { LogiReportComponent } from '@shared/components/logi-report/logi-report.
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { analyticsConstants } from '../constants/analytics.constant';
+import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 
 @Component({
   selector: 'app-client-finance-accrual-report',
@@ -37,12 +38,15 @@ export class ClientFinanceAccrualReportComponent implements OnInit {
     "EndDateParamACCR": "",
     "RegionParamACCR": "",
     "LocationParamACCR": "",
-    "DepartmentParamACCR": ""
+    "DepartmentParamACCR": "",
+    "BearerParamACCR":"",
+    "BusinessUnitIdParamACCR":"",
+    "HostName":""
   };
-  public reportName: LogiReportFileDetails = { name: "/AccrualReport/AccrualReportWeb.wls" };
-  public catelogName: LogiReportFileDetails = { name: "/AccrualReport/Dashbord.cat" };
-  public title: string = "Client Finance Accrual Report";
-  public reportType: LogiReportTypes = LogiReportTypes.WebReport;
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/ClientFinanceAccrualReport.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/Accrual.cat" };
+  public title: string = "Client Finance Accrual";
+  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
@@ -85,13 +89,15 @@ export class ClientFinanceAccrualReportComponent implements OnInit {
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
-  public isInitialLoad: boolean = false;
+  public isInitialLoad: boolean = false;  
+  public baseUrl:string='';
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
     private formBuilder: FormBuilder,
-    private filterService: FilterService) {
-    this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+    private filterService: FilterService,@Inject(APP_SETTINGS) private appSettings: AppSettings) {
+      this.baseUrl = this.appSettings.host.replace("https://","").replace("http://","");
+      this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
     this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
@@ -176,15 +182,29 @@ export class ClientFinanceAccrualReportComponent implements OnInit {
   }
 
   public SearchReport(): void {
+    let auth="Bearer ";
+    for(let x=0;x<window.localStorage.length;x++)
+    { 
+      if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
+      {
+        auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
+      }
+    }
     let { startDate, endDate } = this.accrualReportForm.getRawValue();
     this.paramsData =
     {
-      "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.name),
+      "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.id),
       "StartDateParamACCR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamACCR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamACCR": this.selectedRegions?.map((list) => list.name),
-      "LocationParamACCR": this.selectedLocations?.map((list) => list.name),
-      "DepartmentParamACCR": this.selectedDepartments?.map((list) => list.departmentName)
+      "RegionParamACCR": this.selectedRegions?.map((list) => list.id),
+      "LocationParamACCR": this.selectedLocations?.map((list) => list.id),
+      "DepartmentParamACCR": this.selectedDepartments?.map((list) => list.departmentId),
+      "BearerParamACCR":auth,
+      "BusinessUnitIdParamACCR":window.localStorage.getItem("lastSelectedOrganizationId") == null 
+      ?this.organizations!=null &&this.organizations[0]?.id!=null?
+      this.organizations[0].id.toString():"1": 
+      window.localStorage.getItem("lastSelectedOrganizationId"),
+      "HostName":this.baseUrl
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

@@ -61,3 +61,13 @@ export class GetCurrentUserPermissions {
   static readonly type = '[user] Get Current User Permissions';
   constructor() { }
 }
+
+export class GetOrderPermissions {
+  static readonly type = '[user] Get Order Permissions';
+  constructor(public payload: number) { }
+}
+
+export class SetAgencyActionsAllowed {
+  static readonly type = '[user] Set agency actions allowed';
+  constructor(public readonly allowed: boolean) {}
+}

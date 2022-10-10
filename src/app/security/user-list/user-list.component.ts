@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AddEditUserComponent } from "src/app/security/user-list/add-edit-user/add-edit-user.component";
+import { AddEditUserComponent } from 'src/app/security/user-list/add-edit-user/add-edit-user.component';
 import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, UNIT_FIELDS, DISABLED_GROUP } from './user-list.constants';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { SecurityState } from '../store/security.state';
@@ -7,14 +7,20 @@ import { filter, map, Observable, Subject, takeWhile } from 'rxjs';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { SetHeaderState, ShowExportDialog, ShowSideDialog } from '../../store/app.actions';
-import { GetBusinessByUnitType, GetRolePerUser, SaveUser, SaveUserSucceeded } from '../store/security.actions';
+import {
+  ChangeBusinessUnit,
+  GetBusinessByUnitType,
+  GetRolePerUser,
+  SaveUser,
+  SaveUserSucceeded,
+} from '../store/security.actions';
 import { UserState } from '../../store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { UserSettingsComponent } from './add-edit-user/user-settings/user-settings.component';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { UserDTO, User } from '@shared/models/user-managment-page.model';
-import { take, takeUntil } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 
@@ -44,6 +50,7 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public isBusinessFormDisabled = false;
   public createdUser: User | null;
+  public agencyActionsAllowed = false;
 
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
@@ -74,6 +81,7 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
     this.businessUnitControl.patchValue(user?.businessUnitType);
     this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
     this.subscribeOnSucceededUserCreation();
+    this.subOnChangeUnit();
   }
 
   ngOnDestroy(): void {
@@ -168,7 +176,7 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
     this.store.dispatch(new ShowExportDialog(true));
   }
 
-  public override defaultExport(fileType: ExportedFileType): void {    
+  public override defaultExport(fileType: ExportedFileType): void {
     this.exportUsers$.next(fileType);
   }
 
@@ -188,6 +196,17 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
       const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;
     }
+  }
+
+  private subOnChangeUnit(): void {
+    this.actions$
+      .pipe(
+        ofActionSuccessful(ChangeBusinessUnit),
+        takeWhile(() => this.isAlive)
+      )
+      .subscribe((value: { isChangeUnit: boolean }) => {
+        this.agencyActionsAllowed = value.isChangeUnit;
+      });
   }
 
   private disableBussinesUnitForRole(): void {
@@ -222,11 +241,14 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
         this.userSettingForm.get('businessUnitId')?.setValue(user.businessUnitId);
       });
     }
-      
+
     this.store
       .dispatch(
-        new GetRolePerUser(user.businessUnitType ? user.businessUnitType:0 , user.businessUnitId ? [user.businessUnitId] : [])
-    )
+        new GetRolePerUser(
+          user.businessUnitType ? user.businessUnitType : 0,
+          user.businessUnitId ? [user.businessUnitId] : []
+        )
+      )
       .subscribe(() => {
         this.userSettingForm.get('roles')?.setValue(user.roles?.map((role: any) => role.id));
       });

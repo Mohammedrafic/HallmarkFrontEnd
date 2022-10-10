@@ -36,22 +36,23 @@
       <div class="flex-wrapper">
         <div class="flex-50">
           <div class="dropdown-container">
-            <label>Region<span class="required">*</span></label>
-            <div class="input-group dropdown">
+            <label>Region</label>
+            <div class="input-group dropdown input-readonly">
               <ejs-multiselect
                 mode="CheckBox"
                 appValidateWithMessage
-                formControlName="regionIds"
+                formControlName="regionNames"
                 [allowFiltering]="true"
                 [showSelectAll]="true"
-                [fields]="optionFields"
+                [fields]="optionRegions"
+                [readonly]="true"
                 [dataSource]="jobDistributionInitialData.regions"
               ></ejs-multiselect>
             </div>
           </div>
           <div class="dropdown-container">
-            <label>Order Type<span class="required">*</span></label>
-            <div class="input-group dropdown">
+            <label>Order Type</label>
+            <div class="input-group dropdown input-readonly">
               <ejs-multiselect
                 mode="CheckBox"
                 appValidateWithMessage
@@ -59,6 +60,7 @@
                 [allowFiltering]="true"
                 [showSelectAll]="true"
                 [fields]="optionFields"
+                [readonly]="true"
                 [dataSource]="orderType"
               ></ejs-multiselect>
             </div>
@@ -68,25 +70,27 @@
         <div class="flex-50">
           <div class="dropdown-container">
             <label>Classification</label>
-            <div class="input-group dropdown">
+            <div class="input-group dropdown input-readonly">
               <ejs-multiselect
                 mode="CheckBox"
                 [allowFiltering]="true"
                 [showSelectAll]="true"
                 formControlName="classifications"
                 [fields]="optionFields"
+                [readonly]="true"
                 [dataSource]="classification"
               ></ejs-multiselect>
             </div>
           </div>
           <div class="dropdown-container">
-            <label>Skill Category<span class="required">*</span></label>
-            <div class="input-group dropdown">
+            <label>Skill Category</label>
+            <div class="input-group dropdown input-readonly">
               <ejs-multiselect
                 mode="CheckBox"
                 appValidateWithMessage
                 [allowFiltering]="true"
                 [showSelectAll]="true"
+                [readonly]="true"
                 formControlName="skillCategoryIds"
                 [fields]="optionFields"
                 [dataSource]="jobDistributionInitialData.skillCategories"

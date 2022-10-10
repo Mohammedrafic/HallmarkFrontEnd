@@ -2,6 +2,7 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { DataSourceItem } from '@core/interface';
 
 import { FilteringOptionsFields, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
+import { AgencyStatus } from '@shared/enums/status';
 
 export interface Timesheet {
   id: number;
@@ -28,6 +29,7 @@ export interface Timesheet {
   status: TIMETHEETS_STATUSES;
   mileageStatusText: TIMETHEETS_STATUSES;
   workWeek: string;
+  agencyStatus: AgencyStatus;
 }
 
 export interface TimesheetsFilterState {

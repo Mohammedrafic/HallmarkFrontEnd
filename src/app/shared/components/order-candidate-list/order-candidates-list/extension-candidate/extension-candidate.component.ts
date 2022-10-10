@@ -50,6 +50,10 @@ import { DurationService } from '@shared/services/duration.service';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { UnsavedFormComponentRef, UNSAVED_FORM_PROVIDERS } from '@shared/directives/unsaved-form.directive';
+import { UserState } from 'src/app/store/user.state';
+import { CurrentUserPermission } from '@shared/models/permission.model';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { GetOrderPermissions } from 'src/app/store/user.actions';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> {}
 
@@ -65,6 +69,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Input() candidateOrder: OrderCandidatesListPage;
   @Input() dialogEvent: Subject<boolean>;
   @Input() isTab: boolean = false;
+  @Input() actionsAllowed: boolean = true;
 
   candidate$: Observable<OrderCandidatesList>;
 
@@ -76,6 +81,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
+
+  @Select(UserState.orderPermissions)
+  orderPermissions$: Observable<CurrentUserPermission[]>;
 
   public rejectReasons$: Observable<RejectReason[]>;
   public form: FormGroup;
@@ -95,7 +103,15 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public isAgency: boolean = false;
   public showHoursControl: boolean = false;
   public showPercentage: boolean = false;
+  public candidate: OrderCandidatesList | undefined;
   public comments: Comment[] = [];
+  public orderPermissions: CurrentUserPermission[];
+  public canShortlist = false;
+  public canInterview = false;
+  public canReject = false;
+  public canOffer = false;
+  public canOnboard = false;
+  public canClose = false;
 
   get isAccepted(): boolean {
     return this.candidateJob?.applicantStatus?.applicantStatus === this.candidatStatus.Accepted;
@@ -119,6 +135,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   get actualStartDateValue(): Date {
     return this.form.get('startDate')?.value;
+  }
+
+  get isReadOnlyBillRates(): boolean {
+    return (
+      !this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard
+    );
   }
 
   constructor(
@@ -272,7 +294,22 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   private setAllowedStatuses(candidate: OrderCandidatesList): void {
-    this.applicantStatuses =
+    const statuses = [];
+
+    if (candidate.status === ApplicantStatusEnum.Accepted) {
+      this.canOnboard && statuses.push({ applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' });
+      this.canReject && statuses.push({ applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' });
+    } else if (candidate.status === ApplicantStatusEnum.OnBoarded) {
+      statuses.push(
+        { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
+        { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled' }
+      );
+    } else {
+      statuses.push({ applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) });
+      this.canReject && statuses.push({ applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' });
+    }
+
+    this.applicantStatuses = statuses;
       candidate.status === ApplicantStatusEnum.Accepted
         ? [
             { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
@@ -287,6 +324,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
             { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
           ];
+    if (!this.applicantStatuses.length) {
+      this.statusesFormControl.disable();
+    }
   }
 
   private subsToCandidate(): void {
@@ -295,13 +335,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       map((res) => {
         const items = res?.items || this.candidateOrder?.items;
         const candidate = items?.find((candidate) => candidate.candidateJobId);
+        this.candidate = candidate;
         if (candidate) {
           this.statusesFormControl.reset();
           this.createForm();
           this.patchForm(candidate.candidateJobId);
-          if (!this.isAgency) {
-            this.setAllowedStatuses(candidate);
-          }
           this.store.dispatch(
             new GetCandidateJob(this.currentOrder.organizationId as number, candidate?.candidateJobId as number)
           );
@@ -311,6 +349,55 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         }
       })
     ) as Observable<OrderCandidatesList>;
+    this.orderPermissions$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data: CurrentUserPermission[]) => (this.orderPermissions = data) && this.mapPermissions());
+  }
+
+  private getOrderPermissions(orderId: number): void {
+    this.store.dispatch(new GetOrderPermissions(orderId));
+  }
+
+  private mapPermissions(): void {
+    this.canShortlist = false;
+    this.canInterview = false;
+    this.canReject = false;
+    this.canOffer = false;
+    this.canOnboard = false;
+    this.canClose = false;
+    this.orderPermissions.forEach(permission => {
+      this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
+      this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
+      this.canReject = this.canReject || permission.permissionId === PermissionTypes.CanRejectCandidate;
+      this.canOffer = this.canOffer || permission.permissionId === PermissionTypes.CanOfferCandidate;
+      this.canOnboard = this.canOnboard || permission.permissionId === PermissionTypes.CanOnBoardCandidate;
+      this.canClose = this.canClose || permission.permissionId === PermissionTypes.CanCloseCandidate;
+    });
+    this.disableControlsBasedOnPermissions();
+    if (!this.isAgency && this.candidate) {
+      this.setAllowedStatuses(this.candidate);
+    }
+    this.changeDetectorRef.markForCheck();
+  }
+
+  private disableControlsBasedOnPermissions(): void {
+    if (!this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard) {
+      this.form?.controls['guaranteedWorkWeek']?.disable();
+    }
+    if (!this.canReject && !this.canOffer && !this.canOnboard) {
+      this.form?.controls['offeredBillRate']?.disable();
+    }
+    if (!this.canReject && !this.canOffer) {
+      this.form?.controls['offeredStartDate']?.disable();
+    }
+    if (!this.canReject && !this.canOnboard) {
+      this.form?.controls['actualStartDate']?.disable();
+      this.form?.controls['actualEndDate']?.disable();
+      this.form?.controls['clockId']?.disable();
+    }
+    if (!this.canOnboard) {
+      this.form?.controls['allowDeployCredentials']?.disable();
+    }
   }
 
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
@@ -391,6 +478,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         if (this.candidateJob) {
           this.setCancellationControls(this.candidateJob.jobCancellation?.penaltyCriteria || 0);
           this.getComments();
+          if (!this.isAgency) {
+            this.getOrderPermissions(value.orderId);
+          }
           this.billRatesData = this.candidateJob?.billRates ? [...this.candidateJob.billRates] : [];
           this.form.disable();
           this.form.patchValue({

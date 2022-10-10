@@ -39,6 +39,10 @@ import PriceUtils from '@shared/utils/price.utils';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
+import { GetOrderPermissions } from 'src/app/store/user.actions';
+import { UserState } from 'src/app/store/user.state';
+import { CurrentUserPermission } from '@shared/models/permission.model';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -50,6 +54,9 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Select(OrderManagementContentState.rejectionReasonsList)
   rejectionReasonsList$: Observable<RejectReason[]>;
 
+  @Select(UserState.orderPermissions)
+  orderPermissions$: Observable<CurrentUserPermission[]>;
+
   @ViewChild('billRates') billRatesComponent: BillRatesComponent;
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
 
@@ -58,12 +65,14 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() candidate: OrderCandidatesList;
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
-
+  @Input() actionsAllowed: boolean;
+  
   public statusesFormControl = new FormControl();
   public openRejectDialog = new Subject<boolean>();
   public billRatesData: BillRate[] = [];
   public formGroup: FormGroup;
   public nextApplicantStatuses: ApplicantStatus[];
+  public orderPermissions: CurrentUserPermission[];
   public optionFields = { text: 'statusText', value: 'statusText' };
   public rejectReasons: RejectReason[] = [];
   public isRejected = false;
@@ -94,7 +103,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get isReadOnlyBillRates(): boolean {
-    return this.candidate.status === ApplicantStatusEnum.Withdraw || this.isRejected;
+    return (
+      this.candidate.status === ApplicantStatusEnum.Withdraw ||
+      this.isRejected || (!this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard)
+    );
   }
 
   get isDeployedCandidate(): boolean {
@@ -119,6 +131,13 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private readOnlyMode: boolean;
 
   public comments: Comment[] = [];
+
+  public canShortlist = false;
+  public canInterview = false;
+  public canReject = false;
+  public canOffer = false;
+  public canOnboard = false;
+  public canClose = false;
 
   constructor(
     private store: Store,
@@ -293,11 +312,58 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
         this.currentApplicantStatus = data.applicantStatus;
         this.billRatesData = [...data.billRates];
         this.setFormValue(data);
+        if (!this.isAgency) {
+          this.getOrderPermissions(data.orderId);
+        }
       }
     });
     this.applicantStatuses$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: ApplicantStatus[]) => (this.nextApplicantStatuses = data));
+      .subscribe((data: ApplicantStatus[]) => {
+        this.nextApplicantStatuses = data;
+        if (!data.length) {
+          this.statusesFormControl.disable();
+        } else {
+          this.statusesFormControl.enable();
+        }
+      });
+    this.orderPermissions$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data: CurrentUserPermission[]) => (this.orderPermissions = data) && this.mapPermissions());
+  }
+
+  private getOrderPermissions(orderId: number): void {
+    this.store.dispatch(new GetOrderPermissions(orderId));
+  }
+
+  private mapPermissions(): void {
+    this.canShortlist = false;
+    this.canInterview = false;
+    this.canReject = false;
+    this.canOffer = false;
+    this.canOnboard = false;
+    this.canClose = false;
+    this.orderPermissions.forEach(permission => {
+      this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
+      this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
+      this.canReject = this.canReject || permission.permissionId === PermissionTypes.CanRejectCandidate;
+      this.canOffer = this.canOffer || permission.permissionId === PermissionTypes.CanOfferCandidate;
+      this.canOnboard = this.canOnboard || permission.permissionId === PermissionTypes.CanOnBoardCandidate;
+      this.canClose = this.canClose || permission.permissionId === PermissionTypes.CanCloseCandidate;
+    });
+    this.disableControlsBasedOnPermissions();
+  }
+
+  private disableControlsBasedOnPermissions(): void {
+    if (!this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard) {
+      this.formGroup.controls['guaranteedWorkWeek'].disable();
+    }
+    if (!this.canReject && !this.canOffer && !this.canOnboard) {
+      this.formGroup.controls['offeredBillRate'].disable();
+    }
+    if (!this.canReject && !this.canOffer) {
+      this.formGroup.controls['offeredStartDate'].disable();
+    }
   }
 
   private subscribeOnSuccessRejection(): void {

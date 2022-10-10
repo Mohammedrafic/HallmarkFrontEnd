@@ -90,7 +90,7 @@ export class FillRateComponent implements OnInit {
   constructor(private store: Store,
     private formBuilder: FormBuilder,
     private filterService: FilterService  ) {
-    this.store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+      this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
     this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
@@ -183,7 +183,7 @@ export class FillRateComponent implements OnInit {
         "EndDateFR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
         "RegionFR": this.selectedRegions?.map((list) => list.name),
         "LocationParamFR": this.selectedLocations?.map((list) => list.name),
-        "DepartmentParamFR": this.selectedDepartments?.map((list) => list.departmentName)
+        "DepartmentParamFR": this.selectedDepartments?.map((list) => list.departmentName.trim())
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();

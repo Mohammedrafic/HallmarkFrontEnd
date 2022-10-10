@@ -20,6 +20,7 @@
               <ejs-dropdownlist
                 [fields]="optionFields"
                 [formControl]="jobStatusControl"
+                [disabled]="!actionsAllowed"
                 [dataSource]="jobStatus$ | async"
                 [itemTemplate]="itemTemplate"
                 placeholder="Select Status"
@@ -30,8 +31,10 @@
                 </ng-template>
               </ejs-dropdownlist>
             </div>
-            <button ejs-button class="e-outline" (click)="onReject()" *ngIf="isOfferedBillRate">Reject</button>
-            <button ejs-button [isPrimary]="true" class="apply-button" (click)="onAccept()" *ngIf="showAccept">Accept</button>
+            <button ejs-button class="e-outline" [disabled]="!actionsAllowed"
+              (click)="onReject()" *ngIf="isOfferedBillRate">Reject</button>
+            <button ejs-button [isPrimary]="true" class="apply-button"
+              [disabled]="!actionsAllowed" (click)="onAccept()" *ngIf="showAccept">Accept</button>
             <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
               <i-feather name="x" class="icon"></i-feather>
             </button>
@@ -83,7 +86,7 @@
             *ngIf="!isAgency"
             [billRates]="orderCandidateJob?.billRates || []"
             [isActive]="isActiveCandidateDialog$ | async"
-            [readOnlyMode]="isRejectCandidate"
+            [readOnlyMode]="isRejectCandidate || (!canShortlist && !canInterview && !canReject && !canOffer && !canOnboard)"
             (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)">
           </app-bill-rates>
         </ng-template>
@@ -101,6 +104,7 @@
             [dataSource]="jobStatus$ | async"
             [itemTemplate]="itemTemplate"
             placeholder="Select Status"
+            [disabled]="!actionsAllowed"
             (change)="onJobStatusChange($event)"
           >
             <ng-template #itemTemplate let-data>
@@ -108,8 +112,10 @@
             </ng-template>
           </ejs-dropdownlist>
         </div>
-        <button ejs-button class="e-outline" (click)="onReject()" *ngIf="isOfferedBillRate">Reject</button>
-        <button ejs-button [isPrimary]="true" class="apply-button" (click)="onAccept()" *ngIf="showAccept">Accept</button>
+        <button ejs-button class="e-outline"
+          [disabled]="!actionsAllowed" (click)="onReject()" *ngIf="isOfferedBillRate">Reject</button>
+        <button ejs-button [isPrimary]="true" class="apply-button"
+          [disabled]="!actionsAllowed" (click)="onAccept()" *ngIf="showAccept">Accept</button>
       </div>
       <hr class="mobile" />
     </ng-container>
