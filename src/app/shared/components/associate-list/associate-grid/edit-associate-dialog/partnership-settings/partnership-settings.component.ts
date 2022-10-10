@@ -15,7 +15,10 @@ import {
   SubmissionPercentageOverrideRestriction,
 } from '@shared/enums/partnership-settings';
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
-import { OPTION_FIELDS } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
+import {
+  OPTION_FIELDS,
+  REGION_OPTION,
+} from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { Tabs } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
 
@@ -38,6 +41,7 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
   @Select(AssociateListState.jobDistributionInitialData)
   public jobDistributionInitialData$: Observable<JobDistributionInitialData>;
   public optionFields = OPTION_FIELDS;
+  public optionRegions = REGION_OPTION;
   public classification = Object.values(FeeSettingsClassification)
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));
@@ -70,7 +74,7 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
 
       agencyCategory: new FormControl(),
 
-      regionIds: new FormControl([]),
+      regionNames: new FormControl([]),
       orderTypes: new FormControl([]),
       classifications: new FormControl([]),
       skillCategoryIds: new FormControl([]),
@@ -91,6 +95,7 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
     this.partnershipSettings$.pipe(takeUntil(this.destroy$), delay(300)).subscribe((settings: PartnershipSettings) => {
       this.partnershipSettings = settings;
       this.partnershipForm.reset();
+      console.log(settings, 'settings');
       this.partnershipForm.patchValue({ ...settings });
     });
   }

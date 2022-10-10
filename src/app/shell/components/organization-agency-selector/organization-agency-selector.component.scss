@@ -43,6 +43,7 @@
 
 .details {
   overflow: hidden;
+  width: 100%;
   p {
     margin: 0;
     font-size: 14px;
@@ -51,6 +52,11 @@
     &.name {
       font-weight: 700;
       color: $secondary-dark-blue-15;
+    }
+
+    &.inactive {
+      color: $secondary-dark-blue-30;
+      font-style: italic;
     }
 
     &.type {
@@ -77,6 +83,11 @@
     font-size: 14px;
     font-weight: 700;
     @include with-ellipsis;
+
+    &.inactive {
+      color: $secondary-dark-blue-30;
+      font-style: italic;
+    }
 
     @media #{$max-tablet} {
       font-weight: 400;
@@ -161,4 +172,4 @@
     }
   }
 }
-    
+

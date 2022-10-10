@@ -53,6 +53,7 @@ interface IOrganizationAgency {
 export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   public organizationAgencyControl: FormControl = new FormControl();
   public baseUrl: string;
+  public agencyStatuses = AgencyStatus;
   @Input() public isDarkTheme: boolean | null;
 
   public optionFields = {
@@ -279,7 +280,6 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
       newOrganizationAgencyControlValue = currentAgency ? lastSelectedAgencyId : organizationsAgencies[0]?.id || null;
 
       this.setAgencyStatus(currentAgency);
-
     } else {
       newOrganizationAgencyControlValue = organizationsAgencies.find((i) => i.id === lastSelectedOrganizationId)
         ? lastSelectedOrganizationId
@@ -292,8 +292,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   }
 
   private setAgencyStatus(agency: IOrganizationAgency | undefined): void {
-    const agencyIsActive = agency?.status !== AgencyStatus.Inactive
-    && agency?.status !== AgencyStatus.Terminated;
+    const agencyIsActive = agency?.status !== AgencyStatus.Inactive && agency?.status !== AgencyStatus.Terminated;
 
     this.store.dispatch(new SetAgencyActionsAllowed(agencyIsActive));
   }

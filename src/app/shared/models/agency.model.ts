@@ -124,6 +124,7 @@ export class AgencyFilteringOptions {
 }
 
 export type AgencyRegionSkills = {
+  regionNames: Array<string>;
   regions: string[];
   skillCategories: Array<{
     id: number;

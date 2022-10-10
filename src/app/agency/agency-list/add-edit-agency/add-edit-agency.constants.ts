@@ -7,6 +7,11 @@ export const OPRION_FIELDS = {
   value: 'id',
 };
 
+export const REGION_OPTION = {
+  text: 'name',
+  value: 'name',
+};
+
 export const ORDER_TYPE = Object.values(JobDistributionOrderType)
   .filter(valuesOnly)
   .map((name) => ({ name, id: JobDistributionOrderType[name as JobDistributionOrderType] }));

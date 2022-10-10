@@ -19,7 +19,7 @@
             />
           </div>
           <div class="details">
-            <p class="name">{{ data.name }}</p>
+            <p class="name" [ngClass]="{inactive: data.status === agencyStatuses.Inactive || data.status === agencyStatuses.Terminated}">{{ data.name }}</p>
           </div>
         </div>
       </ng-template>
@@ -33,7 +33,7 @@
             />
           </div>
 
-          <p class="title">{{ data.name }}</p>
+          <p class="title" [ngClass]="{inactive: data.status === agencyStatuses.Inactive || data.status === agencyStatuses.Terminated}">{{ data.name }}</p>
         </div>
       </ng-template>
     </ejs-dropdownlist>
