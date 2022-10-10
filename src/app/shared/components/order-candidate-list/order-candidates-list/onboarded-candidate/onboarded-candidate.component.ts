@@ -536,6 +536,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private closeDialog() {
+    this.form.markAsPristine();
     this.closeModalEvent.emit();
     this.candidateJob = null;
     this.jobStatusControl.reset();
@@ -543,7 +544,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.isRejected = false;
     this.nextApplicantStatuses = [];
     this.orderCandidateListViewService.setIsCandidateOpened(false);
-    this.form.markAsPristine();
     this.changeDetectorRef.markForCheck();
   }
 
