@@ -1,0 +1,44 @@
+<ejs-dialog
+  id="groupEmailSideDialog"
+  #groupEmailSideDialog
+  cssClass="dialog"
+  [width]="width"
+  [target]="targetElement"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">{{header}}</h3>
+          </div>
+          <div  class="e-card-content">
+            <button
+              ejs-button
+              cssClass="e-outline button-cancel"
+              id="cancelGroupEmailFormButton"
+              (click)="onGroupEmailFormCancelClick()">Cancel</button>
+            <button
+              ejs-button
+              id="sendGroupEmailFormButton"
+              type="submit"
+              [isPrimary]="true"
+              (click)="onGroupEmailFormSendClick()" [disabled]="!isSend">Send</button>
+       
+          <!-- <button
+          ejs-button
+          id="SendEmailFormButton"
+          type="submit"
+          [isPrimary]="true"
+          (click)="onemailFormSendClick()">Send</button> -->
+      </div>
+        </div>
+      </section>
+
+      <ng-content></ng-content>
+    </section>
+  </ng-template>
+</ejs-dialog>

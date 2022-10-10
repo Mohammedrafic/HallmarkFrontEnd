@@ -4,8 +4,8 @@ import { AlertsRoutingModule } from './alerts-routing.module';
 import { UserSubscriptionComponent } from './user-subscription/user-subscription.component';
 import { AlertsComponent } from './alerts.component';
 import { PageToolbarModule } from '@shared/components/page-toolbar/page-toolbar.module';
-import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
-import {SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import { DropDownListModule,MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
+import {SwitchModule ,ButtonModule} from '@syncfusion/ej2-angular-buttons';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { MultiselectDropdownModule } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module';
 import {FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -22,6 +22,9 @@ import { AlertsSmsTemplateFromComponent } from './alerts-template/alerts-sms-tem
 import { AlertsOnScreenTemplateFormComponent } from './alerts-template/alerts-on-screen-template-form/alerts-on-screen-template-form.component';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { ToggleSwitchComponent } from './toggle-switch/toggle-switch.component';
+import { GroupEmailComponent } from './group-email/group-email.component';
+import { SendGroupEmailComponent } from './group-email/send-group-email/send-group-email.component';
+
 
 
 @NgModule({
@@ -32,13 +35,16 @@ import { ToggleSwitchComponent } from './toggle-switch/toggle-switch.component';
     AlertsEmailTemplateFormComponent,
     AlertsSmsTemplateFromComponent,
     AlertsOnScreenTemplateFormComponent, 
-    ToggleSwitchComponent
+    ToggleSwitchComponent, 
+    GroupEmailComponent, 
+    SendGroupEmailComponent
   ],
   imports: [
     CommonModule,
     AlertsRoutingModule,
     PageToolbarModule,
     DropDownListModule,
+    MultiSelectAllModule,
     AgGridModule,
     MultiselectDropdownModule,    
     ReactiveFormsModule,
@@ -47,6 +53,7 @@ import { ToggleSwitchComponent } from './toggle-switch/toggle-switch.component';
     ListBoxAllModule,
     ListViewAllModule,
     SwitchModule,
+    ButtonModule,
     SharedModule,
     DialogModule,
     TextBoxModule,
