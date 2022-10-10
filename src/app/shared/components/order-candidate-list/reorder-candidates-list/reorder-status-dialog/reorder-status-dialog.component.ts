@@ -33,16 +33,20 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { MessageTypes } from '@shared/enums/message-types';
 import { OrderType } from '@shared/enums/order-type';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { CandidatesStatusText } from '@shared/enums/status';
 import { BillRate } from '@shared/models';
 import { JobCancellation } from "@shared/models/candidate-cancellation.model";
 import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { CurrentUserPermission } from '@shared/models/permission.model';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { BehaviorSubject, combineLatest, filter, merge, mergeMap, Observable, of, Subject, takeUntil, tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
+import { GetOrderPermissions } from 'src/app/store/user.actions';
+import { UserState } from 'src/app/store/user.state';
 import { AcceptFormComponent } from './accept-form/accept-form.component';
 
 @Component({
@@ -70,6 +74,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       this.orderCandidateJob = orderCandidateJob;
       this.currentCandidateApplicantStatus = orderCandidateJob.applicantStatus.applicantStatus;
       this.setValueForm(orderCandidateJob);
+      this.getOrderPermissions(orderCandidateJob.orderId);
     } else {
       this.acceptForm?.reset();
     }
@@ -84,6 +89,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   @Select(OrderManagementState.selectedOrder)
   public selectedOrder$: Observable<Order>;
+
+  @Select(UserState.orderPermissions)
+  public orderPermissions$: Observable<CurrentUserPermission[]>;
 
   get isBillRatePending(): boolean {
     return (
@@ -138,6 +146,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public openRejectDialog = new Subject<boolean>();
   public openCandidateCancellationDialog = new Subject<void>();
   public isActiveCandidateDialog$: Observable<boolean>;
+  public canShortlist = false;
+  public canInterview = false;
+  public canReject = false;
+  public canOffer = false;
+  public canOnboard = false;
+  public canClose = false;
+  public orderPermissions: CurrentUserPermission[];
 
   private defaultApplicantStatuses: ApplicantStatus[];
 
@@ -152,6 +167,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   ngOnInit(): void {
     this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
     this.createJobStatusControl();
+    this.subscribeForOrderPermissions();
+    this.subscribeForJobStatus();
     combineLatest([
       this.onOpenEvent(),
       this.onUpdateSuccess(),
@@ -164,6 +181,46 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     ])
       .pipe(takeUntil(this.destroy$))
       .subscribe();
+  }
+
+  private subscribeForJobStatus(): void {
+    this.jobStatus$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data) => (!data.length ? this.jobStatusControl.disable() : this.jobStatusControl.enable()));
+  }
+
+  private subscribeForOrderPermissions(): void {
+    this.orderPermissions$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data: CurrentUserPermission[]) => (this.orderPermissions = data) && this.mapPermissions());
+  }
+
+  private getOrderPermissions(orderId: number): void {
+    this.store.dispatch(new GetOrderPermissions(orderId));
+  }
+
+  private mapPermissions(): void {
+    this.canShortlist = false;
+    this.canInterview = false;
+    this.canReject = false;
+    this.canOffer = false;
+    this.canOnboard = false;
+    this.canClose = false;
+    this.orderPermissions.forEach(permission => {
+      this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
+      this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
+      this.canReject = this.canReject || permission.permissionId === PermissionTypes.CanRejectCandidate;
+      this.canOffer = this.canOffer || permission.permissionId === PermissionTypes.CanOfferCandidate;
+      this.canOnboard = this.canOnboard || permission.permissionId === PermissionTypes.CanOnBoardCandidate;
+      this.canClose = this.canClose || permission.permissionId === PermissionTypes.CanCloseCandidate;
+    });
+    this.disableControlsBasedOnPermissions();
+  }
+
+  private disableControlsBasedOnPermissions(): void {
+    if (!this.canReject && !this.canOffer && !this.canOnboard) {
+      this.hourlyRate?.disable();
+    }
   }
 
   public onAccept(): void {
@@ -463,7 +520,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     }
     switch (this.currentCandidateApplicantStatus) {
       case !this.isAgency && CandidatStatus.BillRatePending:
-        this.acceptForm.get('hourlyRate')?.enable();
+        this.canReject && this.canOffer && this.canOnboard && this.acceptForm.get('hourlyRate')?.enable();
         this.acceptForm.get('candidateBillRate')?.disable();
         break;
       case CandidatStatus.OfferedBR:
