@@ -9,9 +9,9 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
   CancellationReasonsMap,
-  PenaltiesMap
-} from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
-import { PenaltyCriteria } from "@shared/enums/candidate-cancellation";
+  PenaltiesMap,
+} from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
+import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import {
   ApplicantStatus,
   Order,
@@ -37,14 +37,15 @@ import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { Router } from '@angular/router';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
-  CancelOrganizationCandidateJob, CancelOrganizationCandidateJobSuccess,
+  CancelOrganizationCandidateJob,
+  CancelOrganizationCandidateJobSuccess,
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
-import { JobCancellation } from "@shared/models/candidate-cancellation.model";
+import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { capitalize } from 'lodash';
 import { DurationService } from '@shared/services/duration.service';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -138,9 +139,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   get isReadOnlyBillRates(): boolean {
-    return (
-      !this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard
-    );
+    return !this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard;
   }
 
   constructor(
@@ -242,11 +241,13 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   public cancelCandidate(jobCancellationDto: JobCancellation): void {
     if (this.candidateJob) {
-      this.store.dispatch(new CancelOrganizationCandidateJob({
-        organizationId: this.candidateJob.organizationId,
-        jobId: this.candidateJob.jobId,
-        jobCancellationDto,
-      }));
+      this.store.dispatch(
+        new CancelOrganizationCandidateJob({
+          organizationId: this.candidateJob.organizationId,
+          jobId: this.candidateJob.jobId,
+          jobCancellationDto,
+        })
+      );
       this.dialogEvent.next(false);
     }
   }
@@ -310,20 +311,20 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
 
     this.applicantStatuses = statuses;
-      candidate.status === ApplicantStatusEnum.Accepted
-        ? [
-            { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
-            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
-          ]
-        : candidate.status === ApplicantStatusEnum.OnBoarded
-        ? [
-            { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-            { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled' },
-          ]
-        : [
-            { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
-          ];
+    candidate.status === ApplicantStatusEnum.Accepted
+      ? [
+          { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
+          { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
+        ]
+      : candidate.status === ApplicantStatusEnum.OnBoarded
+      ? [
+          { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
+          { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled' },
+        ]
+      : [
+          { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
+          { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
+        ];
     if (!this.applicantStatuses.length) {
       this.statusesFormControl.disable();
     }
@@ -365,7 +366,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.canOffer = false;
     this.canOnboard = false;
     this.canClose = false;
-    this.orderPermissions.forEach(permission => {
+    this.orderPermissions.forEach((permission) => {
       this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
       this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
       this.canReject = this.canReject || permission.permissionId === PermissionTypes.CanRejectCandidate;
@@ -497,7 +498,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             clockId: this.candidateJob.clockId,
             allowDeployCredentials: this.candidateJob.allowDeployCredentials,
             rejectReason: this.candidateJob.rejectReason,
-            jobCancellationReason: CancellationReasonsMap[this.candidateJob.jobCancellation?.jobCancellationReason || 0],
+            jobCancellationReason:
+              CancellationReasonsMap[this.candidateJob.jobCancellation?.jobCancellationReason || 0],
             penaltyCriteria: PenaltiesMap[this.candidateJob.jobCancellation?.penaltyCriteria || 0],
             rate: this.candidateJob.jobCancellation?.rate,
             hours: this.candidateJob.jobCancellation?.hours,
