@@ -14,7 +14,7 @@
   </fa-icon>
 </button>
 
-<button *ngIf="label=='Delete'" 
+<button *ngIf="label=='Delete' && (params.data?.isDefault!=undefined && !params.data?.isDefault)" 
   style='color:#dc3545; background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;' 
   [attr.title]="label"
   (click)="onClick($event)">

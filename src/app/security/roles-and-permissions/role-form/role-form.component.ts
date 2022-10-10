@@ -198,7 +198,10 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   private onNewRoleBussinesDataFetched(): void {
     this.actions$.pipe(ofActionSuccessful(GetNewRoleBusinessByUnitTypeSucceeded), takeWhile(() => this.isAlive)).subscribe(({ type }) => {
       this.newRoleBussinesData = this.store.selectSnapshot(SecurityState.newRoleBussinesData)(type);
-      this.defaultBusinessValue = this.newRoleBussinesData[0]?.id;
+      const user = this.store.selectSnapshot(UserState.user);
+      if (user?.businessUnitType !== BusinessUnitType.Hallmark) {
+        this.defaultBusinessValue = this.newRoleBussinesData[0]?.id;
+      }
     })
   }
 
