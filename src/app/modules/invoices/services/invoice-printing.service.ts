@@ -28,7 +28,6 @@ export class InvoicePrintingService {
   }
 
   public printAgencyInvoice(data: PrintInvoiceData[]): void {
-    console.log(data)
     const doc = this.createDoc();
     const logo = this.createImage();
 
