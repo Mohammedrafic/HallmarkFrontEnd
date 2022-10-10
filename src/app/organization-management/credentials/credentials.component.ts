@@ -16,7 +16,6 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
-import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 
@@ -42,9 +41,6 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
 
   @Select(CredentialsState.setupFilter)
   setupFilter$: Observable<CredentialSetupFilter>;
-
-  @Select(UserState.isHallmarkMspUser)
-  isHallmarkMspUser$: Observable<boolean>;
 
   public isCredentialListToolButtonsShown = true;
   public isCredentialListActive = true;
