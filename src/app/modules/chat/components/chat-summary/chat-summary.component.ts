@@ -56,28 +56,20 @@ export class ChatSummaryComponent extends ChatMessagesHelper implements OnInit, 
       const result = (iteratorResult.value as ChatMessage[]).filter((message) => message.type === 'text');
 
       result.forEach((message) => {
-        if (message.type === 'text') {
-  
-          const msg: ReceivedChatMessage = {
-            id: message.id,
-            sender: message.senderDisplayName as string,
-            message: message.content?.message as string,
-            timestamp: message.createdOn,
-            isCurrentUser: (message.sender as CommunicationUserKind)?.communicationUserId === this.userIdentity,
-          };
-          messages.push(msg);
-        }
+        const msg: ReceivedChatMessage = {
+          id: message.id,
+          sender: message.senderDisplayName as string,
+          message: message.content?.message as string,
+          timestamp: message.createdOn,
+          isCurrentUser: (message.sender as CommunicationUserKind)?.communicationUserId === this.userIdentity,
+        };
+        
+        messages.push(msg);
       });
 
       if (messages.length) {
         this.lastMessage = messages[0];
         this.thread.lastMessage = messages[0];
-        const html = Parser.parseFromString(
-          this.sanitizer.sanitize(SecurityContext.HTML, this.lastMessage?.message) as string,
-          'text/html',
-        ).body;
-    
-        this.lastMessage.message = html.textContent as string;
         this.updateReadReceipts();
       }
     });

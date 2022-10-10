@@ -19,4 +19,8 @@ export class ChatHelper {
       });
     }
   }
+
+  static removeEmptyLines(inputHtml: string): string {
+    return inputHtml.replace(/<p><br><\/p>/gi, '');
+  }
 }
