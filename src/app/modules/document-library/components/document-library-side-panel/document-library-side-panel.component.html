@@ -6,7 +6,7 @@
     <ng-template #nodeTemplate="" let-data="">
       <div class="treeview-item">
         <div>
-          <i-feather [name]="data.fileType" class="icon"></i-feather> <span [ngClass]="(data.fileType=='folder')? 'treeview-folder' : 'treeview-normal'" style="margin-left:10px;">{{data.name}}</span>
+          <i-feather name="Folder" class="icon"></i-feather> <span [ngClass]="'treeview-folder'" style="margin-left:10px;">{{data.name}}</span>
         </div>
       </div>
     </ng-template>

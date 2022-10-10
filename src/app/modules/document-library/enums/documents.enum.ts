@@ -38,7 +38,9 @@ export enum FormControlNames {
 
 export enum FormDailogTitle {
   AddNewFolder = 'Add New Folder',
-  Upload = 'Upload'
+  Upload = 'Upload',
+  EditDocument = 'Edit Document',
+  Share='Share'
 }
 
 export enum documentsColumnField {
@@ -56,9 +58,9 @@ export enum documentsColumnField {
   Tags = 'tags',
   Status = "status",
   Comments ='comments',
-  OrganizationName = 'organization',
-  RegionName = 'region',
-  LocationName = 'location',
+  OrganizationName = 'businessUnitName',
+  RegionName = 'regionName',
+  LocationName = 'locationName',
 }
 
 export enum documentsColumnHeaderText {

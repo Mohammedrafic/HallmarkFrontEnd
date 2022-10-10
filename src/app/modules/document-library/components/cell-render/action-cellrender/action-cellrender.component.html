@@ -1,8 +1,8 @@
 <div class="action-cell">
-  <button ejs-button cssClass="e-flat download-icon">
+  <button ejs-button cssClass="e-flat download-icon" (click)="documentDownload($event);">
     <span><i-feather name="download" class="icon"></i-feather></span>
   </button>
-  <button ejs-dropdownbutton cssClass="e-flat ellipsis-icon" [items]="params.editMenuITems">
+  <button ejs-dropdownbutton cssClass="e-flat ellipsis-icon" [items]="params.editMenuITems" (select)="menuOptionSelected($event)">
     <span><i-feather name="more-vertical" class="icon"></i-feather></span>
   </button>
 </div>

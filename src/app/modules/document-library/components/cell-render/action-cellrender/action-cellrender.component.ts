@@ -13,6 +13,19 @@ export class ActionCellrenderComponent implements ICellRendererAngularComp {
     this.params = params;
   }
 
+  documentDownload(event: MouseEvent) {
+    event.stopImmediatePropagation();
+    this.params.handleOnDownLoad(this.params.data);
+  }
+
+  menuOptionSelected(event:any) {
+    this.params.select(event,this.params.data)
+  }
+
+  deleteDocument(event: any) {
+    this.params.handleOnDownLoad(this.params.data);
+  }
+
   refresh() {
     return true;
   }

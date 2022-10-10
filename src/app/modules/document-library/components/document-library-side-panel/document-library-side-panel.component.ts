@@ -1,24 +1,25 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { DocumentItem, DocumentLibrary, NodeItem } from '../../store/model/document-library.model';
+import { FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
 import { DocumentLibraryState } from '../../store/state/document-library.state';
 import { TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
-import { GetDocumentsSelectedNode, GetDocumentsTree, IsAddNewFolder } from '../../store/actions/document-library.actions';
+import { GetDocumentsSelectedNode, GetFoldersTree, IsAddNewFolder } from '../../store/actions/document-library.actions';
+import { UserState } from '../../../../store/user.state';
 
 @Component({
   selector: 'app-document-library-side-panel',
   templateUrl: './document-library-side-panel.component.html',
   styleUrls: ['./document-library-side-panel.component.scss']
 })
-export class DocumentLibrarySidePanelComponent implements OnInit {
+export class DocumentLibrarySidePanelComponent implements OnInit, AfterViewInit {
 
-  @Select(DocumentLibraryState.documentsTree)
-  documentsTree$: Observable<DocumentLibrary>;
+  @Select(DocumentLibraryState.foldersTree)
+  foldersTree$: Observable<FolderTreeItem[]>;
 
-  public sidePanelDocumentItems: DocumentItem[];
+  public sidePanelFolderItems: FolderTreeItem[];
   private unsubscribe$: Subject<void> = new Subject();
-  sidePanelDocumentField: Object;
+  sidePanelDocumentField: any;
   public selectedNode: NodeItem;
 
   @ViewChild('tree', { static: true })
@@ -28,26 +29,35 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
 
   ngOnInit(): void {
     this.initSidePanelDocs();
+    this.tree.selectedNodes = ['2'];
   }
 
   initSidePanelDocs(): void {
-    this.store.dispatch(new GetDocumentsTree());
-    this.documentsTree$.pipe(takeUntil(this.unsubscribe$)).subscribe((docTree: DocumentLibrary) => {
-      if (docTree?.documentItems?.length) {
-        this.sidePanelDocumentItems = docTree.documentItems;
-        this.sidePanelDocumentField = { dataSource: this.sidePanelDocumentItems, id: 'id', text: 'name', parentID:'id', child: 'children' };
-        this.tree.selectedNodes = [(this.sidePanelDocumentItems[0].id).toString()];
-        let nodeData = new NodeItem();
-        nodeData.expanded=false;
-        nodeData.hasChildren=true;
-        nodeData.id = this.sidePanelDocumentItems[0].id;
-        nodeData.isChecked = undefined;
-        nodeData.parentID = undefined;
-        nodeData.selected = true;
-        nodeData.text = this.sidePanelDocumentItems[0].name;
-        this.store.dispatch(new GetDocumentsSelectedNode(nodeData));
+    const user = this.store.selectSnapshot(UserState.user);
+    if (user?.businessUnitType != null) {
+      this.store.dispatch(new GetFoldersTree({ businessUnitType: user?.businessUnitType, businessUnitId: user?.businessUnitId }));
+      this.foldersTree$.pipe(takeUntil(this.unsubscribe$)).subscribe((folderTree: FolderTreeItem[]) => {
+        if (folderTree?.length) {
+          this.sidePanelFolderItems = folderTree;
+          this.sidePanelDocumentField = { dataSource: this.sidePanelFolderItems, id: 'id', text: 'name', parentID: 'parentFolderId', child: 'subFolders' };
+          this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
+            let nodeData = new NodeItem();
+            nodeData.expanded = false;
+            nodeData.hasChildren = this.sidePanelDocumentField.dataSource[0].subFolders?.length > 0 ? true : false;
+            nodeData.id = this.sidePanelDocumentField.dataSource[0].id;
+            nodeData.isChecked = undefined;
+            nodeData.parentID = this.sidePanelDocumentField.dataSource[0].parentFolderId;
+            nodeData.selected = true;
+            nodeData.text = this.sidePanelDocumentField.dataSource[0].name;
+            this.store.dispatch(new GetDocumentsSelectedNode(nodeData));
+          }
+        });
       }
-    });
+   
+  }
+
+  ngAfterViewInit(): void {
+   
   }
 
   public nodeSelected(event: any) {

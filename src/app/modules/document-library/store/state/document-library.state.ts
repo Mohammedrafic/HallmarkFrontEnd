@@ -1,37 +1,39 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
-import { catchError, Observable, tap } from "rxjs";
+import { catchError, Observable, of, tap } from "rxjs";
 import { RECORD_ADDED, RECORD_MODIFIED } from "../../../../shared/constants";
 import { MessageTypes } from "../../../../shared/enums/message-types";
 import { getAllErrors } from "../../../../shared/utils/error.utils";
 import { ShowToast } from "../../../../store/app.actions";
 import { DocumentLibraryService } from "../../services/document-library.service";
-import { GetDocuments, GetDocumentsSelectedNode, GetDocumentsTree, GetDocumentTypes, IsAddNewFolder, SaveDocumentFolder, SaveDocuments, SearchDocumentTags } from "../actions/document-library.actions";
-import { DocumentFolder, DocumentLibrary, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, NodeItem } from "../model/document-library.model";
+import { DeletDocuments, DeletDocumentsSucceeded, GetDocumentDownloadDeatils, GetDocumentDownloadDeatilsSucceeded, GetDocuments, GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, IsAddNewFolder, SaveDocumentFolder, SaveDocuments, SearchDocumentTags } from "../actions/document-library.actions";
+import { DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, NodeItem, FolderTreeItem, DownloadDocumentDetail } from "../model/document-library.model";
 
 
 export interface DocumentLibraryStateModel {
-  documentsTree: DocumentLibrary;
+  foldersTree: FolderTreeItem[] | null;
   seletedDocNode: NodeItem,
   documentsPage: DocumentsLibraryPage | null,
   isAddNewFolder: boolean
   documentFolder: DocumentFolder | null
   documentTypes: DocumentTypes[] | null
   documents: Documents | null,
-  documentTags: DocumentTags[] | null
+  documentTags: DocumentTags[] | null,
+  documentDownloadDetail: DownloadDocumentDetail | null
 }
 
 @State<DocumentLibraryStateModel>({
   name: 'documentLibrary',
   defaults: {
-    documentsTree: { documentItems: [] },
+    foldersTree: null,
     seletedDocNode: new NodeItem(),
     documentsPage: null,
     isAddNewFolder: false,
     documentFolder: null,
     documentTypes: null,
     documents: null,
-    documentTags:null
+    documentTags: null,
+    documentDownloadDetail:null
   }
 })
 @Injectable()
@@ -39,8 +41,8 @@ export class DocumentLibraryState {
   constructor(private documentLibraryService: DocumentLibraryService) { }
 
   @Selector()
-  static documentsTree(state: DocumentLibraryStateModel): DocumentLibrary {
-    return state.documentsTree;
+  static foldersTree(state: DocumentLibraryStateModel): FolderTreeItem[] | null {
+    return state.foldersTree;
   }
 
   @Selector()
@@ -64,11 +66,16 @@ export class DocumentLibraryState {
     return state.documentTags;
   }
 
-  @Action(GetDocumentsTree)
-  GetDocumentsTree({ patchState }: StateContext<DocumentLibraryStateModel>, { }: GetDocumentsTree): Observable<DocumentLibrary> {
-    return this.documentLibraryService.getDocumentsTree().pipe(
-      tap((documents: DocumentLibrary) => {
-        return patchState({ documentsTree: documents });
+  @Selector()
+  static documentDownloadDetail(state: DocumentLibraryStateModel): DownloadDocumentDetail | null {
+    return state.documentDownloadDetail;
+  }
+
+  @Action(GetFoldersTree)
+  GetFoldersTree({ patchState }: StateContext<DocumentLibraryStateModel>, { folderTreeFilter }: GetFoldersTree): Observable<FolderTreeItem[]> {
+    return this.documentLibraryService.getFoldersTree(folderTreeFilter).pipe(
+      tap((foldersTree: FolderTreeItem[]) => {
+        return patchState({ foldersTree: foldersTree });
       })
     );
   }
@@ -141,6 +148,29 @@ export class DocumentLibraryState {
         patchState({ documentTags: payload });
         return payload;
       })
+    );
+  }
+
+  @Action(GetDocumentDownloadDeatils)
+  GetDocumentDownloadDeatils({ patchState,dispatch }: StateContext<DocumentLibraryStateModel>, { documentDowloadDetailFilter }: GetDocumentDownloadDeatils): Observable<DownloadDocumentDetail> {
+    return this.documentLibraryService.GetDocumentDownloadDetails(documentDowloadDetailFilter).pipe(
+      tap((payload) => {
+        patchState({ documentDownloadDetail: payload });
+        dispatch(new GetDocumentDownloadDeatilsSucceeded(payload));
+        return payload;
+      })
+    );
+  }
+
+  @Action(DeletDocuments)
+  DeletDocuments({ dispatch }: StateContext<DocumentLibraryStateModel>, { deleteDocumentsFilter }: DeletDocuments): Observable<any> {
+    return this.documentLibraryService.deleteDocumets(deleteDocumentsFilter).pipe(
+      tap(() => {
+        const message = 'Documents deleted successfully';
+        const actions = [new DeletDocumentsSucceeded(), new ShowToast(MessageTypes.Success, message)];
+        dispatch([...actions, new DeletDocumentsSucceeded()]);
+      }),
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Documents cannot be deleted due to error'))))
     );
   }
 }

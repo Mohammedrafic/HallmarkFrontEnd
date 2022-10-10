@@ -1,15 +1,16 @@
 import { PageOfCollections } from '@shared/models/page.model';
 
-export class DocumentLibrary {
-  documentItems:  DocumentItem[];
+export class FolderTreeItem {
+  id: number;
+  name: string;
+  parentFolderId: number | null;
+  createdDate: Date | null;
+  subFolders: FolderTreeItem[];
 }
 
-export class DocumentItem {
-  children: DocumentItem[];
-  id: number;
-  businessUnitId: number;
-  fileType: string;
-  name: string;
+export class FolderTreeFilter {
+  businessUnitType: number;
+  businessUnitId?: number | null;
 }
 
 export class NodeItem {
@@ -45,25 +46,29 @@ export class Documents {
   docTypeId: number;
   tags: string;
   comments: string;
-  selectedFile?:Blob | null
+  selectedFile?: Blob | null
+  isEdit?:boolean | false
 }
 
 export class DocumentLibraryDto {
   id: number;
   name: string;
+  fileName: string;
   folderId?: number | null;
   folderName: string ;
   startDate?: Date | null;
   endDate?: Date | null;
-  docTypeId: number;
+  docType: number;
   docTypeName: string;
+  uploadedBy: string;
   uploadedByName: string;
   tags: string;
   comments: string;
   status: string;
-  organizationName: string | null;
+  businessUnitName: string | null;
   regionName: string | null;
   locationName: string | null;
+  documentVisibilities: any | null;
 }
 
 export class DocumentsFilter {
@@ -96,6 +101,32 @@ export class DocumentTagFilter {
   businessUnitId?: number | null;
   keyword:string
 }
+
+export class DownloadDocumentDetail {
+  id: number;
+  name: string;
+  fileName: string;
+  extension: string;
+  fileAsBase64: string;
+  contentType: string;
+  metadata: any;
+  folderId: number | null;
+  active: boolean;
+  createdAt: Date;
+}
+
+export class DownloadDocumentDetailFilter {
+  documentId: number;
+  businessUnitType: number;
+  businessUnitId: number | null;
+}
+
+export class DeleteDocumentsFilter {
+  documentIds: number[];
+  businessUnitType: number;
+  businessUnitId: number | null;
+}
+
 
 
 
