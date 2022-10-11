@@ -71,7 +71,7 @@ export class GetFeeExceptionsInitialData {
 }
 export class GetJobDistributionInitialData {
   static readonly type = '[associate] Get Job Distribution Initial Data';
-  constructor(public organizationId: number | null) {}
+  constructor() {}
 }
 
 export class RemoveFeeExceptionsById {

@@ -12,7 +12,10 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 export class ExtensionGridIdRendererComponent implements ICellRendererAngularComp {
   public params: ICellRendererParams;
 
-  public constructor(private orderManagementService: OrderManagementService, private orderManagementAgencyService: OrderManagementAgencyService) {}
+  public constructor(
+    private orderManagementService: OrderManagementService,
+    private orderManagementAgencyService: OrderManagementAgencyService
+  ) {}
 
   public agInit(params: ICellRendererParams): void {
     this.params = params;
@@ -23,7 +26,8 @@ export class ExtensionGridIdRendererComponent implements ICellRendererAngularCom
   }
 
   public redirectAndSelectExtension(): void {
-    this.orderManagementService.orderId$.next({id: this.params.data?.publicId, prefix: this.params.data?.organizationPrefix});
-    this.orderManagementAgencyService.orderId$.next({id: this.params.data?.publicId, prefix: this.params.data?.organizationPrefix});
+    const orderData = { id: this.params.data?.publicId, prefix: this.params.data?.organizationPrefix };
+    this.orderManagementService.orderId$.next(orderData);
+    this.orderManagementAgencyService.orderId$.next(orderData);
   }
 }

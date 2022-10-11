@@ -216,11 +216,10 @@ export class AssociateListState {
   }
 
   @Action(GetJobDistributionInitialData)
-  GetJobDistributionInitialData(
-    { patchState }: StateContext<AssociateStateModel>,
-    { organizationId }: GetJobDistributionInitialData
-  ): Observable<JobDistributionInitialData> {
-    return this.associateService.getJobDistributionInitialData(organizationId).pipe(
+  GetJobDistributionInitialData({
+    patchState,
+  }: StateContext<AssociateStateModel>): Observable<JobDistributionInitialData> {
+    return this.associateService.getJobDistributionInitialData().pipe(
       tap((payload) => {
         patchState({ jobDistributionInitialData: payload });
       })

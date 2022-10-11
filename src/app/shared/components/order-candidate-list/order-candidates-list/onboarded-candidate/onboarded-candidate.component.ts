@@ -19,7 +19,7 @@ import { PenaltyCriteria } from "@shared/enums/candidate-cancellation";
 import { JobCancellation } from "@shared/models/candidate-cancellation.model";
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, merge, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, merge, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -35,11 +35,13 @@ import {
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
+  GetPredefinedBillRates,
   GetRejectReasonsForOrganisation,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   SetIsDirtyOrderForm,
-  UpdateOrganisationCandidateJob,
+  SetPredefinedBillRatesData,
+  UpdateOrganisationCandidateJob
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ShowToast } from 'src/app/store/app.actions';
@@ -182,6 +184,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.subscribeOnUpdateOrganisationCandidateJobError();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeOnGetStatus();
+    this.initPredefinedBillRates();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -570,5 +573,13 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public onReject(): void {
     this.store.dispatch(new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
+  }
+
+  private initPredefinedBillRates(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(SetPredefinedBillRatesData),
+      switchMap(() => this.store.dispatch(new GetPredefinedBillRates())),
+      takeUntil(this.unsubscribe$)
+    ).subscribe();
   }
 }

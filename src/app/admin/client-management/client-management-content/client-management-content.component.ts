@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
@@ -21,7 +21,6 @@ import {
   OrganizationPage,
 } from 'src/app/shared/models/organization.model';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
-import { GetCurrentUserPermissions } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ExportOrganizations, GetOrganizationDataSources, GetOrganizationsByPage } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
