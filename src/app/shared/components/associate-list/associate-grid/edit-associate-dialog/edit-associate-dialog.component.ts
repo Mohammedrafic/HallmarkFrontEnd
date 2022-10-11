@@ -152,9 +152,7 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
               baseFee: PriceUtils.formatNumbers(associateOrganizationsAgency.baseFee),
             });
             this.store.dispatch(new GetFeeExceptionsInitialData(associateOrganizationsAgency.organizationId));
-            this.store.dispatch(
-              new GetJobDistributionInitialData(isAgency ? associateOrganizationsAgency.organizationId : null)
-            );
+            this.store.dispatch(new GetJobDistributionInitialData());
             this.store.dispatch(new GetPartnershipSettings(associateOrganizationsAgency.id));
           }
         }
