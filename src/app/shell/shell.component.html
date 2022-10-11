@@ -211,13 +211,8 @@
   </div>
 </ejs-sidebar>
 
-<app-chat-container></app-chat-container>
-<div *ngIf="isContactOpen">
-  <app-side-dialog header="Contact Support" 
-  (formCancelClicked)="closeDialog()" 
-  (formSaveClicked)="handleOnSave()" [width]="dialogWidth">
-    <app-contactus></app-contactus>
+  <app-chat-container></app-chat-container>
+  <app-side-dialog header="Contact Support" [width]="dialogWidth">
+  <app-contactus></app-contactus>
   </app-side-dialog>
- 
-</div>
 

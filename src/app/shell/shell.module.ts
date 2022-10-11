@@ -48,6 +48,7 @@ import { ContactusComponent } from './components/contactus/contactus.component';
 import { UploaderModule  } from '@syncfusion/ej2-angular-inputs';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 
+
 const sidebarIcons = {
   Sidebar,
   BookOpen,

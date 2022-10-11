@@ -585,21 +585,6 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   contactUs()
   {
-    this.isContactOpen=true;
-    this.toggleDialog(true);
-  }
-
-  public toggleDialog(isDialogShown: boolean): void {
-    this.store.dispatch(new ShowSideDialog(isDialogShown));
-    }
-  public closeDialog()
-  {
-    this.isContactOpen=false;
-    this.store.dispatch(new ShowSideDialog(false));
-  }
-
-  public handleOnSave()
-  {
-
+    this.store.dispatch(new ShowSideDialog(true));
   }
 }

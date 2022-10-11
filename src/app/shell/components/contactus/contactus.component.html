@@ -3,7 +3,8 @@
       <div class="input-container bootstrap">
         <label>Name<span class="required"></span></label>
         <div class="input-group">
-            <input formControlName="name" class="e-input" type="text" [disabled]="true"/>
+            <input formControlName="name" class="e-input" type="text"/>
+            <ejs-maskedtextbox class="contact-input" formControlName="name" placeholder=" " ></ejs-maskedtextbox>
         </div>
       </div>
     </div>
@@ -42,7 +43,6 @@
                                 [autoUpload]="false"
                                 (selected)="onFileSelected($event)">
                   </ejs-uploader>
-                  <button [disabled]="disableClearButton" ejs-button class="clear-files-button" cssClass="e-outline" (click)="clearFiles()">Clear</button>
                 </div>
                 <label>Attached file size should not exceed 2MB<span class="e-input"></span></label>
               </div>
@@ -55,4 +55,21 @@
             <ejs-textbox name="message"  formControlName="message" [multiline]="true" maxlength="100"></ejs-textbox>
           </div>
         </div>
+
     </form>
+      <section class="header-container">
+          <div  class="e-card-content">
+            <button
+              ejs-button
+              cssClass="e-outline button-cancel"
+              id="cancelFormButton"
+              (click)="cancelContactUsForm()">Cancel</button>
+            <button
+              ejs-button
+              id="addFormButton"
+              type="submit"
+              [isPrimary]="true"
+              [disabled]="disableSaveButton"
+              (click)="saveContactUsForm()">Save</button>
+          </div>
+       </section>
