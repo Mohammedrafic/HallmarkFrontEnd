@@ -29,6 +29,7 @@ export class DashboardControlComponent extends DestroyableDirective implements O
   @Input() public selectedWidgets: WidgetTypeEnum[] | null;
   @Input() public widgets: WidgetOptionModel[];
   @Input() public hasOrderManagePermission: boolean;
+  @Input() public hasOrderCreatePermission: boolean;
   @Input() public hasWidgetPermission: boolean;
   @Input() public allOrganizations: Organisation[];
   @Input() public userIsAdmin: boolean;
