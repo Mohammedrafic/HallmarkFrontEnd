@@ -1,6 +1,7 @@
 import { AlertChannel } from "@admin/alerts/alerts.enum";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
 import { AddAlertsTemplateRequest, AlertsTemplateFilters, AlertTriggerDto, DismissAlertDto, EditAlertsTemplateRequest } from "@shared/models/alerts-template.model";
+import { GroupEmailFilters, SendGroupEmailRequest } from "@shared/models/group-email.model";
 import { UserSubscriptionFilters, UserSubscriptionRequest } from "@shared/models/user-subscription.model";
 
 export class GetUserSubscriptionPage {
@@ -73,4 +74,23 @@ export class DismissAllAlerts {
 export class ClearAlertTemplateState {
   static readonly type = '[alerts] Clear Alert Template State';
   constructor(){}
-} 
+}
+export class GetGroupMailByBusinessUnitIdPage {
+  static readonly type = '[groupemail] GetGroupMailByBusinessUnitId';
+  constructor(
+    public businessUnitId: number|null,
+    public getAll:boolean
+  ) {}
+}
+export class SendGroupEmail {
+  static readonly type = '[groupemail] Send Group Email';
+  constructor(
+    public sendGroupEmailRequest: SendGroupEmailRequest
+  ) { }
+}
+export class GetGroupEmailById {
+  static readonly type = '[groupemail] Get Group Email By Id';
+  constructor(
+    public id: number
+  ) { }
+}

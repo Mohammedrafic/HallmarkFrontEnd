@@ -1,0 +1,32 @@
+<app-page-toolbar>
+    <ng-container right>
+      <div class="bootstrap business-dropdowns">
+        <div class="dropdown-container">
+          <button
+          ejs-button
+          id="sendGroupEmailButton"
+          type="submit"
+          [isPrimary]="true"
+          (click)="onGroupEmailFormSendClick()">Send Group Email</button>
+        </div>
+        
+      </div>
+    </ng-container>
+  
+  </app-page-toolbar>
+  <section>
+    <app-group-email-table [gridOptions]="gridOptions"
+                               (onGridReadyEvent)="onGridReady($event)"
+                               (onGridPageSizeChanged)="onPageSizeChanged($event)"></app-group-email-table>
+    </section>
+ 
+  <app-send-email-side-dialog [header]="templateEmailTitle" [isSend]="isSend" (groupEmailFormCancelClicked)="onGroupEmailAddCancel()" (groupEmailFormSendClicked)="onGroupEmailSend()" [width]="'1000px'">
+    <section>
+      <app-send-group-email #emailTemplateForm [groupEmailTemplateForm]="$any(sendGroupEmailFormGroup)" [title]="templateEmailTitle"
+                                      [emailSubject]="viewGroupEmailData.subjectMail" [emailBody]="viewGroupEmailData.bodyMail"
+                                      [emailTo]="viewGroupEmailData.toList" [emailCc]="viewGroupEmailData.cCList"
+                                      [isSend]="isSend">
+     </app-send-group-email>
+    </section>
+  </app-send-email-side-dialog>
+  

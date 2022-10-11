@@ -1,0 +1,71 @@
+<div [formGroup]="groupEmailTemplateForm" id="groupEmailTemplateForm" class="group-email-template-form">
+    <div class="section-container">
+
+        <div class="left-section">
+            <div class="bootstrap business-dropdowns">
+                <div class="dropdown-container">
+                    <div class="input-group dropdown">
+                        <ejs-dropdownlist appValidateWithMessage formControlName="businessUnit" [fields]="optionFields"
+                            [dataSource]="businessUnits" placeholder="Business Unit"></ejs-dropdownlist>
+                    </div>
+                </div>
+                <div class="dropdown-container">
+                    <div class="input-group dropdown">
+                        <ejs-dropdownlist appValidateWithMessage formControlName="business"
+                            [fields]="businessDataFields" [dataSource]="businessData$ | async"
+                            [value]="defaultBusinessValue" placeholder="Business">
+                        </ejs-dropdownlist>
+                    </div>
+                </div>
+
+                <div class="dropdown-container">
+                    <div class="input-group dropdown">
+                       
+                            <ejs-multiselect mode="CheckBox"
+                             formControlName="user"
+                             [placeholder]='placeholderValue'
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             appValidateWithMessage
+                             [fields]="userDataFields"
+                             [dataSource]="userData"
+                             [selectAllText]='allOption'
+                             showSelectAll=true>
+            </ejs-multiselect>
+                    </div>
+                </div>
+            </div>
+            <div class="input-container bootstrap top-container">
+
+                <label>To<span class="required">*</span></label>
+                <div class="input-group">
+                    <input appValidateWithMessage formControlName="emailTo" class="e-input" type="text"
+                        [(ngModel)]="emailTo" />
+                </div>
+            </div>
+            <div class="input-container bootstrap top-container">
+                <label>CC</label>
+                <div class="input-group">
+                    <input formControlName="emailCc" class="e-input" type="text"
+                    [(ngModel)]="emailCc"/>
+                </div>
+            </div>
+            <div class="input-container bootstrap top-container">
+                <label>Subject<span class="required">*</span></label>
+                <div class="input-group">
+                    <input appValidateWithMessage formControlName="emailSubject" class="e-input" type="text"
+                        [(ngModel)]="emailSubject"/>
+                </div>
+            </div>
+            <div class="rich-text-container">
+                <label>Mail Body<span class="required">*</span></label>
+                <div class="input-group" id="richTextEditorDiv">
+                    <ejs-richtexteditor #RTEGroupEmail id='defaultGroupEmailRTE' appValidateWithMessage
+                        formControlName="emailBody" [toolbarSettings]='tools' [(ngModel)]='emailBody'
+                        [(value)]='emailBody'>
+                    </ejs-richtexteditor>
+                </div>
+            </div>
+
+        </div>
+    </div>

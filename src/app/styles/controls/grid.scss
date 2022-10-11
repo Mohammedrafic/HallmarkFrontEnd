@@ -406,6 +406,10 @@ body.light, body.dark {
       .e-detail-intent {
         width: 0 !important;
       }
+
+      .e-virtualtable {
+        transform: translate(0px, 0px) !important;
+      }
     }
 
     .subrow-toggle {

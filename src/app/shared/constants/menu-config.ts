@@ -352,6 +352,12 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/alerts/user-subscription',
     },
+    80:
+    {
+        // group-email
+        icon: '',
+        route: '/alerts/group-email',
+    },
     47: {
       // Alerts Template
       icon: '',
@@ -512,6 +518,12 @@ export const MENU_CONFIG: any = {
       // User Subscription
       icon: '',
       route: '/alerts/user-subscription',
+    },
+    80:
+    {
+        // group-email
+        icon: '',
+        route: '/alerts/group-email',
     },
     47: {
       // Alerts Template
@@ -835,6 +847,12 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/alerts/user-subscription',
     },
+    80:
+    {
+        // group-email
+        icon: '',
+        route: '/alerts/group-email',
+    },
     47: {
       // Alerts Template
       icon: '',
@@ -1042,6 +1060,13 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/alerts/user-subscription',
     },
+    80:
+    {
+        // group-email
+        icon: '',
+        route: '/alerts/group-email',
+    },
+  
     47: {
       // Alerts Template
       icon: '',

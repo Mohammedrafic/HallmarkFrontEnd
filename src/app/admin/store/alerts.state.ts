@@ -1,11 +1,13 @@
 import { Injectable } from "@angular/core";
 import { UserSubscriptionPage, UserSubscriptionRequest } from "@shared/models/user-subscription.model";
 import { Action, Selector, StateContext} from '@ngxs/store';
-import { AlertTrigger, ClearAlertTemplateState, DismissAlert, DismissAllAlerts, GetAlertsTemplatePage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
+import { AlertTrigger, ClearAlertTemplateState, DismissAlert, DismissAllAlerts, GetAlertsTemplatePage, GetGroupEmailById, GetGroupMailByBusinessUnitIdPage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, SendGroupEmail, UpdateTemplateByAlertId, UpdateUserSubscription } from "./alerts.actions";
 import { Observable ,tap} from "rxjs";
 import { AlertsService } from "@shared/services/alerts.service";
 import { BusinessUnitService } from "@shared/services/business-unit.service";
 import { AlertsTemplate, AlertsTemplatePage, AlertTriggerDto, DismissAlertDto, EditAlertsTemplate } from "@shared/models/alerts-template.model";
+import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailRequest } from "@shared/models/group-email.model";
+import { GroupEmailService } from "@shared/services/group-email.service";
 
 interface AlertsStateModel {
   userSubscriptionPage: UserSubscriptionPage | null;
@@ -15,6 +17,9 @@ interface AlertsStateModel {
     saveAlertsTemplate: EditAlertsTemplate | null;
     updateAlertsTemplate: EditAlertsTemplate | null;
     alertTriggerDetails:number[];
+    groupEmailByBusinessUnitIdPage: GroupEmailByBusinessUnitIdPage ;
+    sendGroupEmail:GroupEmail;
+    groupEmailData:GroupEmail;
 }
 
 @Injectable()
@@ -45,10 +50,26 @@ export class AlertsState {
   static UpdateTemplateByAlertId(state: AlertsStateModel): EditAlertsTemplate | null {
     return state.updateAlertsTemplate;
   }
+  @Selector()
+  static GroupEmailByBusinessUnitIdPage(state: AlertsStateModel): GroupEmailByBusinessUnitIdPage {
+    return state.groupEmailByBusinessUnitIdPage;
+  }
+  @Selector()
+  static SendGroupEmail(state:AlertsStateModel):GroupEmail{
+    return state.sendGroupEmail;
+  }
+  @Selector()
+  static GetGroupEmailById(state:AlertsStateModel):GroupEmail{
+    return state.groupEmailData;
+  }
+
+ 
   constructor(
     private businessUnitService: BusinessUnitService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private groupEmailService: GroupEmailService
   ) {}
+  
   
   @Action(GetUserSubscriptionPage)
   GetUserSubscriptionPage(
@@ -157,5 +178,41 @@ export class AlertsState {
     { patchState }: StateContext<AlertsStateModel>
   ):void{
     patchState({ updateAlertsTemplate: null,saveAlertsTemplate:null });
+  }
+  @Action(GetGroupMailByBusinessUnitIdPage)
+  GetGroupMailByBusinessUnitIdPage(
+    { patchState }: StateContext<AlertsStateModel>,
+    { businessUnitId,getAll}: GetGroupMailByBusinessUnitIdPage
+  ): Observable<GroupEmailByBusinessUnitIdPage> {
+    return this.groupEmailService.getGroupMailByBusinessUnitIdPage(businessUnitId,getAll).pipe(
+      tap((payload) => {
+        patchState({ groupEmailByBusinessUnitIdPage: payload });
+        return payload;
+      })
+    );
+  }
+  @Action(SendGroupEmail)
+  SendGroupEmail(
+    { patchState }: StateContext<AlertsStateModel>,
+    { sendGroupEmailRequest }: SendGroupEmail
+  ): Observable<GroupEmail> {
+    return this.groupEmailService.SendGroupEmail(sendGroupEmailRequest).pipe(
+      tap((payload) => {
+        patchState({ sendGroupEmail: payload });
+        return payload;
+      })
+    );
+  }
+  @Action(GetGroupEmailById)
+  GetGroupEmailById(
+    { patchState }: StateContext<AlertsStateModel>,
+    { id }: GetGroupEmailById
+  ): Observable<GroupEmail> {
+    return this.groupEmailService.GetGroupEmailById(id).pipe(
+      tap((payload) => {
+        patchState({ groupEmailData: payload });
+        return payload;
+      })
+    );
   }
 }

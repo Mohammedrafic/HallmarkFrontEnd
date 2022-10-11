@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { FormArray, FormControl, FormGroup } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject } from 'rxjs';
 import {

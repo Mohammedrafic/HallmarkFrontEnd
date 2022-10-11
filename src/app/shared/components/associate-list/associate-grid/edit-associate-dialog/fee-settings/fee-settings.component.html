@@ -6,7 +6,7 @@
         appValidateWithMessage
         formControlName="baseFee"
         class="e-input"
-        type="text"
+        type="number"
         (focus)="priceUtils.setPriceMask(form, 'baseFee', $event)"
         (blur)="priceUtils.setTwoDecimals(form, 'baseFee', $event)"
         maxlength="5"

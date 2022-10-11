@@ -162,17 +162,12 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
         const intervalMaxControl = this.billRateForm.get('intervalMax');
         const VALIDATORS = [Validators.required, Validators.minLength(1), Validators.maxLength(10)];
 
-        this.isIntervalMinEnabled = billRateConfig.intervalMin;;
-        this.isIntervalMaxEnabled = billRateConfig.intervalMax;;
-        this.isIntervalMinRequired = billRateConfig.intervalMinRequired;
-        this.isIntervalMaxRequired = billRateConfig.intervalMaxRequired;
-
         if (billRateConfig) {
           this.setBillTypesAndUpdateControl(billRateConfig.billTypes);
           this.selectedBillRateUnit = billRateConfig.unit;
           this.billRateForm.get('rateHour')?.setValue('');
-          this.isIntervalMinEnabled = billRateConfig.intervalMin;;
-          this.isIntervalMaxEnabled = billRateConfig.intervalMax;;
+          this.isIntervalMinEnabled = billRateConfig.intervalMin;
+          this.isIntervalMaxEnabled = billRateConfig.intervalMax;
           this.isIntervalMinRequired = billRateConfig.intervalMinRequired;
           this.isIntervalMaxRequired = billRateConfig.intervalMaxRequired;
         }
@@ -180,13 +175,13 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
         if (this.isIntervalMinRequired) {
           intervalMinControl?.addValidators(VALIDATORS);
         } else {
-          intervalMinControl?.removeValidators(VALIDATORS);
+          intervalMinControl?.clearValidators();
         }
 
         if (this.isIntervalMaxRequired) {
           intervalMaxControl?.addValidators(VALIDATORS);
         } else {
-          intervalMaxControl?.removeValidators(VALIDATORS);
+          intervalMaxControl?.clearValidators();
         }
 
         if (this.isIntervalMinEnabled) {
@@ -206,13 +201,15 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
         }
 
         if (
-          billRateConfig.id === BillRateCalculationType.Regular ||
-          billRateConfig.id === BillRateCalculationType.RegularLocal
+          billRateConfig?.id === BillRateCalculationType.Regular ||
+          billRateConfig?.id === BillRateCalculationType.RegularLocal
         ) {
           intervalMinControl?.setValue(0);
         }
 
-        this.changeFieldsSettingByType(billRateConfig.id);
+        if (billRateConfig) {
+          this.changeFieldsSettingByType(billRateConfig.id);
+        }
 
 
         intervalMaxControl?.updateValueAndValidity();

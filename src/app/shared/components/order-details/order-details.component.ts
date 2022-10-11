@@ -18,6 +18,7 @@ type ContactDetails = Partial<OrderContactDetails> & Partial<OrderWorkLocation>;
 })
 export class OrderDetailsComponent implements OnChanges, OnDestroy {
   @Input() isPosition: boolean = false;
+  @Input() jobId: number;
   @Input() set currentOrder(value: Order) {
     this.order = value;
     this.getContactDetails();
@@ -56,7 +57,7 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   private getHistoricalEvents(): void {
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const organizationId = isAgencyArea ? this.order.organizationId : null;
-    this.events$ = this.historicalEventsService.getEvents(this.order.id, organizationId);
+    this.events$ = this.historicalEventsService.getEvents(this.order.id, organizationId, this.jobId);
   }
 
   private getComments(): void {
