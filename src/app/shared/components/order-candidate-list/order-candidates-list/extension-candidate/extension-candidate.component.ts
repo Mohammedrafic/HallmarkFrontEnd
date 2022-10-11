@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } 
 
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { EMPTY, map, merge, mergeMap, Observable, Subject, takeUntil } from 'rxjs';
+import { EMPTY, merge, Observable, Subject, map, mergeMap, takeUntil, distinctUntilChanged } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
@@ -46,7 +46,7 @@ import {
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
-import { capitalize } from 'lodash';
+import { capitalize, isEqual } from 'lodash';
 import { DurationService } from '@shared/services/duration.service';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
@@ -336,7 +336,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   private subsToCandidate(): void {
     const state$ = this.isAgency ? this.orderCandidatePage$ : this.clientOrderCandidatePage$;
     this.candidate$ = state$.pipe(
-      map((res) => {
+      distinctUntilChanged((previous, current) => isEqual(previous.items, current.items)),
+      map((res) => {   
         const items = res?.items || this.candidateOrder?.items;
         const candidate = items?.find((candidate) => candidate.candidateJobId);
         this.candidate = candidate;
