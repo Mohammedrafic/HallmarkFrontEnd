@@ -501,8 +501,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
             : this.billRatesFormGroup.controls['orderTypeIds'].value,
         rateHour: this.billRatesFormGroup.controls['billRateValueRateTimes'].value,
         effectiveDate: this.billRatesFormGroup.controls['effectiveDate'].value,
-        intervalMin: this.isIntervalMinEnabled ? this.billRatesFormGroup.controls['intervalMin'].value : null,
-        intervalMax: this.isIntervalMaxEnabled ? this.billRatesFormGroup.controls['intervalMax'].value : null,
+        intervalMin: this.billRatesFormGroup.controls['intervalMin'].value,
+        intervalMax: this.billRatesFormGroup.controls['intervalMax'].value,
         considerForWeeklyOT: this.billRatesFormGroup.controls['considerForWeeklyOt'].value
           ? this.billRatesFormGroup.controls['considerForWeeklyOt'].value
           : false,
@@ -779,13 +779,13 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         if (this.isIntervalMinRequired) {
           intervalMinControl?.addValidators(VALIDATORS);
         } else {
-          intervalMinControl?.removeValidators(VALIDATORS);
+          intervalMinControl?.clearValidators();
         }
 
         if (this.isIntervalMaxRequired) {
           intervalMaxControl?.addValidators(VALIDATORS);
         } else {
-          intervalMaxControl?.removeValidators(VALIDATORS);
+          intervalMaxControl?.clearValidators();
         }
 
         if (this.isIntervalMinEnabled) {

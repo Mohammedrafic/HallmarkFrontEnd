@@ -465,6 +465,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private mapPermissions(): void {
+    this.canShortlist = false;
+    this.canInterview = false;
+    this.canReject = false;
+    this.canOffer = false;
+    this.canOnboard = false;
+    this.canClose = false;
     this.orderPermissions.forEach(permission => {
       this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
       this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
@@ -474,6 +480,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       this.canClose = this.canClose || permission.permissionId === PermissionTypes.CanCloseCandidate;
     });
     this.disableControlsBasedOnPermissions();
+    this.changeDetectorRef.detectChanges();
   }
 
   private disableControlsBasedOnPermissions(): void {
@@ -536,6 +543,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private closeDialog() {
+    this.form.markAsPristine();
     this.closeModalEvent.emit();
     this.candidateJob = null;
     this.jobStatusControl.reset();
@@ -543,7 +551,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.isRejected = false;
     this.nextApplicantStatuses = [];
     this.orderCandidateListViewService.setIsCandidateOpened(false);
-    this.form.markAsPristine();
     this.changeDetectorRef.markForCheck();
   }
 

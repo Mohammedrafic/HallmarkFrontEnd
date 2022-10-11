@@ -314,7 +314,14 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   private subscribeOnGetStatus(): void {
     this.applicantStatuses$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: ApplicantStatus[]) => (this.nextApplicantStatuses = data));
+      .subscribe((data: ApplicantStatus[]) => {
+        this.nextApplicantStatuses = data;
+        if (data.length) {
+          this.statusesFormControl.enable();
+        } else {
+          this.statusesFormControl.disable();
+        }
+      });
   }
 
   private subscribeOnInitialData(): void {

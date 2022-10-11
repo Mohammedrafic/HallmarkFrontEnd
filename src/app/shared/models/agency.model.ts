@@ -20,6 +20,7 @@ export type AgencyCreateUnder = {
   businessUnitType: 1;
   name: string;
   parentUnitId: number;
+  agencyStatus: number;
 };
 
 export type AgencyDetails = {
@@ -124,6 +125,7 @@ export class AgencyFilteringOptions {
 }
 
 export type AgencyRegionSkills = {
+  regionNames: Array<string>;
   regions: string[];
   skillCategories: Array<{
     id: number;

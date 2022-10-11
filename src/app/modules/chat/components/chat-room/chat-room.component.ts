@@ -100,6 +100,7 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   }
 
   scrollChatBottom(): void {
+    this.showScrollBtn = false;
     this.scrollBottom(true);
   }
 
@@ -248,7 +249,6 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
     
     if (!!textContent && this.chatThreadClient) {
       const meta = this.createMessageRequest();
-  
       this.chatThreadClient.sendMessage(meta.req, meta.options);
       this.textEditor.value = '';
     } else if (!!textContent) {
@@ -257,13 +257,14 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
   }
 
   private createMessageRequest(): MessageRequestMeta {
+    const messageContent = ChatHelper.removeEmptyLines(this.textEditor.getHtml());
     return {
       options: {
         senderDisplayName: this.userDisplayName,
         type: 'text',
       },
       req: {
-        content: this.textEditor.getHtml(),
+        content: messageContent,
       },
     };
   }
@@ -296,18 +297,22 @@ export class ChatRoomComponent extends ChatMessagesHelper implements OnInit, Aft
 
   protected override setLastMessage(messageEvent: ChatMessageReceivedEvent): void {
     if (messageEvent.type.toLowerCase() === ChatMessageType.Text) {
+      const isCurrentuser = (messageEvent.sender as CommunicationUserKind)?.communicationUserId === this.userIdentity;
+
       const msg: ReceivedChatMessage = {
         id: messageEvent.id,
         sender: messageEvent.senderDisplayName as string,
         message: messageEvent.message as string,
         timestamp: messageEvent.createdOn,
-        isCurrentUser: (messageEvent.sender as CommunicationUserKind)?.communicationUserId === this.userIdentity,
+        isCurrentUser: isCurrentuser,
         readIndicator: false,
       };
 
       this.messages.push(msg);
       this.checkForReceipt();
-      this.checkForScrollPosition();
+      if (!isCurrentuser) {
+        this.checkForScrollPosition();
+      }
       this.typingEvent = null;
       this.cd.markForCheck();
       this.scrollBottom();

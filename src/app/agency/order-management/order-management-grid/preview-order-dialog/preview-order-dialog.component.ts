@@ -11,7 +11,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { filter, Observable, Subject, takeUntil, takeWhile, zip } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, Subject, takeUntil, takeWhile, zip } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -28,6 +28,7 @@ import isNil from 'lodash/fp/isNil';
 import { GetAgencyExtensions } from '@agency/store/order-management.actions';
 import { OrderStatus } from '@shared/enums/order-management';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { UserState } from '../../../../store/user.state';
 
 @Component({
   selector: 'app-preview-order-dialog',
@@ -69,6 +70,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
+  public agencyActionsAllowed = true;
   public readonly reasonClosure = {
     orderClosureReason: 'Candidate Rejected',
   } as Order;
@@ -108,6 +110,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
     this.onOpenEvent();
     this.subsToSelectedOrder();
     this.subscribeOnOrderCandidatePage();
+    this.checkForAgencyStatus();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -144,11 +147,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
           (selectedOrder.orderType === OrderType.ContractToPerm || selectedOrder.orderType === OrderType.Traveler)
         ) {
           this.store.dispatch(
-            new GetAgencyExtensions(
-              order.items[0].candidateJobId,
-              selectedOrder.id!,
-              selectedOrder.organizationId!
-            )
+            new GetAgencyExtensions(order.items[0].candidateJobId, selectedOrder.id!, selectedOrder.organizationId!)
           );
         }
         this.cd.markForCheck();
@@ -201,6 +200,18 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
     this.compareEvent.emit();
     // TODO temp solution for opening add reorder dialog
     // this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  private checkForAgencyStatus(): void {
+    this.store
+      .select(UserState.agencyActionsAllowed)
+      .pipe(
+        distinctUntilChanged(),
+        takeWhile(() => this.isAlive)
+      )
+      .subscribe((value) => {
+        this.agencyActionsAllowed = value;
+      });
   }
 
   private onOpenEvent(): void {

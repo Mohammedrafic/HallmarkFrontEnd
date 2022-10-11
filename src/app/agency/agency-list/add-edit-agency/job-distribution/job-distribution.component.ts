@@ -9,6 +9,7 @@ import { AgencyState } from '@agency/store/agency.state';
 import { Observable } from 'rxjs';
 import { Select } from '@ngxs/store';
 import { AgencyRegionSkills } from '@shared/models/agency.model';
+import { REGION_OPTION } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
 
 @Component({
   selector: 'app-job-distribution',
@@ -20,8 +21,8 @@ export class JobDistributionComponent {
 
   @Select(AgencyState.getRegionsSkills)
   public readonly regionsSkillsList$: Observable<AgencyRegionSkills>;
-
   public readonly optionFields = OPRION_FIELDS;
+  public readonly regionOption = REGION_OPTION;
   public readonly orderType = ORDER_TYPE;
   public readonly classification = CLASSIFICATION;
 
@@ -29,7 +30,7 @@ export class JobDistributionComponent {
 
   static createFormGroup(): FormGroup {
     return new FormGroup({
-      regionIds: new FormControl(null),
+      regionNames: new FormControl(null),
       orderTypes: new FormControl(null),
       classifications: new FormControl(null),
       skillCategoryIds: new FormControl(null),

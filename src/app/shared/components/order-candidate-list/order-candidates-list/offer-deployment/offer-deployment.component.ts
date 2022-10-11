@@ -337,6 +337,12 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private mapPermissions(): void {
+    this.canShortlist = false;
+    this.canInterview = false;
+    this.canReject = false;
+    this.canOffer = false;
+    this.canOnboard = false;
+    this.canClose = false;
     this.orderPermissions.forEach(permission => {
       this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
       this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;

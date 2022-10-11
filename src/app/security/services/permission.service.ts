@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Select } from '@ngxs/store';
-import { UserState } from '../../store/user.state';
+import { Select, Store } from '@ngxs/store';
 import { filter, map, Observable, takeUntil } from 'rxjs';
-import { CurrentUserPermission } from '@shared/models/permission.model';
+
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { UserState } from '../../store/user.state';
 
 export interface PermissionsModel {
   canCreateOrder: boolean;
@@ -20,7 +20,7 @@ export type CustomPermissionObject = { [key: string]: boolean  };
 export class PermissionService extends DestroyableDirective {
   @Select(UserState.currentUserPermissionsIds) private currentUserPermissions$: Observable<number[]>;
 
-  constructor() {
+  constructor(private store: Store) {
     super();
   }
 
@@ -47,5 +47,10 @@ export class PermissionService extends DestroyableDirective {
         return permissionObject as T;
       })
     );
+  }
+
+  public checkPermisionSnapshot(typeId: PermissionTypes): boolean {
+    const permissionIds = this.store.selectSnapshot(UserState.currentUserPermissionsIds);
+    return !!permissionIds.find((perm) => perm === typeId);
   }
 }

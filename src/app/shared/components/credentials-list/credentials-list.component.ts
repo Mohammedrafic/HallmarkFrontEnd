@@ -32,6 +32,8 @@ import { CredentialsState } from '@organization-management/store/credentials.sta
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { ActivatedRoute } from '@angular/router';
+import { PermissionService } from 'src/app/security/services/permission.service';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 
 @Component({
   selector: 'app-credentials-list',
@@ -100,6 +102,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
               private datePipe: DatePipe,
               private filterService: FilterService,
               private route: ActivatedRoute,
+              private permissionService: PermissionService,
               @Inject(FormBuilder) private builder: FormBuilder) {
     super();
     this.formBuilder = builder;
@@ -241,7 +244,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       expireDateApplicable: credential.expireDateApplicable,
       comment: credential.comment
     });
-    this.disableFieldOnEdit();
+    this.disableFieldOnEdit(!!credential.isMasterCredential);
     this.editedCredentialId = credential.id;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
@@ -337,12 +340,16 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     });
   }
 
-  private disableFieldOnEdit(): void {
+  private disableFieldOnEdit(isMasterCredential: boolean): void {
     const { canEdit } = this.route.snapshot.data;
-    
+
     if (!canEdit) {
-      this.credentialsFormGroup.get('credentialTypeId')?.disable();
-      this.credentialsFormGroup.get('name')?.disable();
+      const havePermission = !isMasterCredential && this.permissionService.checkPermisionSnapshot(PermissionTypes.ManuallyAddCredential);
+      
+      if (!havePermission) {
+        this.credentialsFormGroup.get('credentialTypeId')?.disable();
+        this.credentialsFormGroup.get('name')?.disable();
+      }
     }
   }
 

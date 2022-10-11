@@ -142,6 +142,7 @@ import { CandidateCancellationDialogComponent } from './components/candidate-can
 import { OrderHistoricalEventsComponent } from './components/order-historical-events/order-historical-events.component';
 import { CredentialsListComponent } from './components/credentials-list/credentials-list.component';
 import { AssignCredentialSideComponent } from './components/credentials-list/assign-credential-side/assign-credential-side.component';
+import { SendEmailSideDialogComponent } from './components/send-email-side-dialog/send-email-side-dialog.component';
 
 const icons = {
   AlertCircle,
@@ -231,6 +232,7 @@ const COMPONENTS = [
   CandidateCancellationDialogComponent,
   CredentialsListComponent,
   AssignCredentialSideComponent,
+  SendEmailSideDialogComponent
 ];
 
 @NgModule({
@@ -284,7 +286,9 @@ const COMPONENTS = [
     ErrorMessageComponent,
     CandidateAvatarPipe,
     AcceptFormComponent,
+    
     ImportDialogContentComponent,
+    MultiSelectModule
   ],
   declarations: [
     ...COMPONENTS,
@@ -301,6 +305,8 @@ const COMPONENTS = [
     GridErroredCellComponent,
     ImportDialogContentComponent,
     OrderHistoricalEventsComponent,
+    SendEmailSideDialogComponent,
+    
   ],
   providers: [
     DatePipe,

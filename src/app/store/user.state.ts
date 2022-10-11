@@ -163,7 +163,7 @@ export class UserState {
   }
 
   @Selector([UserState.isHallmarkUser, UserState.isMspUser])
-  static isHallmarkMspUser(isHalmark: boolean, isMsp: boolean): boolean {
+  static isHallmarkMspUser(state: UserState, isHalmark: boolean, isMsp: boolean): boolean {
     return isHalmark || isMsp;
   }
 
