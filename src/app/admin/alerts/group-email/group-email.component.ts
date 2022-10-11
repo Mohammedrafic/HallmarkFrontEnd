@@ -6,7 +6,7 @@ import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
-import { GridReadyEvent } from '@ag-grid-community/core';
+import { FilterChangedEvent, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { ClearAlertTemplateState, GetAlertsTemplatePage, GetGroupEmailById, GetTemplateByAlertId, SaveTemplateByAlertId, SendGroupEmail, UpdateTemplateByAlertId } from '@admin/store/alerts.actions';
 import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from '@shared/models/alerts-template.model';
 import { AlertsState } from '@admin/store/alerts.state';
@@ -36,6 +36,8 @@ import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailFilters, GroupEma
 import { GetGroupMailByBusinessUnitIdPage } from '@admin/store/alerts.actions';
 import { User } from '@shared/models/user.model';
 import { GroupMailStatus } from '../group-email.enum';
+import { ColumnDefinitionModel } from '@shared/components/grid/models';
+import { GroupEmailColumnsDefinition } from './group-email.constant';
 @Component({
   selector: 'app-group-email',
   templateUrl: './group-email.component.html',
@@ -92,7 +94,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     return "Send Bulk Email";
   }
 
-  private gridApi: any;
+  private gridApi: GridApi;
   private gridColumnApi: any;
   private isAlive = true;
   private filters: GroupEmailFilters = {};
@@ -105,15 +107,24 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   cacheBlockSize: any;
   pagination: boolean;
   paginationPageSize: number;
-  columnDefs: any;
+  
   filterText: string | undefined;
   frameworkComponents: any;
-  sideBar: any;
   serverSideStoreType: any;
   maxBlocksInCache: any;
   defaultColDef: any;
   itemList: Array<GroupEmail> | undefined;
-
+  public rowData: GroupEmail[]=[];
+  public rowSelection: 'single' | 'multiple' = 'single';
+  public actionCellrenderParams: any = {
+    onClick: this.onViewGroupEmail.bind(this),
+    label: 'View',
+    suppressMovable: true,
+    filter: false,
+    sortable: false,
+    menuTabs: []
+  };
+  public readonly columnDefs: ColumnDefinitionModel[] = GroupEmailColumnsDefinition(this.actionCellrenderParams);
  
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
@@ -132,76 +143,7 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       this.cacheBlockSize = this.pageSize;
     this.serverSideStoreType = 'partial';
     this.maxBlocksInCache = 2;
-    this.columnDefs = [
-      {
-        field: 'Id',
-        hide: true
-      },      
-      {
-        headerName: 'View Mail',
-        cellRenderer: 'buttonRenderer',
-        cellRendererParams: {
-          onClick: this.onViewGroupEmail.bind(this),
-          label: 'View',
-          suppressMovable: true,
-          filter: false,
-          sortable: false,
-          menuTabs: []
-        },
-      },
-      {
-        headerName: 'Subject',
-        field: 'subjectMail',
-        filter: 'agTextColumnFilter',
-        filterParams: {
-          buttons: ['reset'],
-          debounceMs: 1000,
-          suppressAndOrCondition: true,
-        }
-      },
-      {
-        headerName: 'TO',
-        field: 'toList',
-        filter: 'agTextColumnFilter',
-        filterParams: {
-          buttons: ['reset'],
-          debounceMs: 1000,
-          suppressAndOrCondition: true,
-        }
-      },
-      {
-        headerName: 'CC',
-        field: 'ccList',
-        filter: 'agTextColumnFilter',
-        filterParams: {
-          buttons: ['reset'],
-          debounceMs: 1000,
-          suppressAndOrCondition: true,
-        }
-      },
-      {
-        headerName: 'Sent On',
-        field: 'sentOn',
-        filter: 'agTextColumnFilter',
-        filterParams: {
-          buttons: ['reset'],
-          debounceMs: 1000,
-          suppressAndOrCondition: true,
-        }
-      },
-      {
-        headerName: 'Sent By',
-        field: 'sentBy',
-        filter: 'agTextColumnFilter',
-        filterParams: {
-          buttons: ['reset'],
-          debounceMs: 1000,
-          suppressAndOrCondition: true,
-        }
-      }
-
-    ];
-
+   
     this.defaultColDef = {
       flex: 1,
       minWidth: 120,
@@ -243,69 +185,44 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         this.store.dispatch(new ShowToast(MessageTypes.Success, SEND_EMAIL));
       }
     });
+    this.getGroupEmails();
   }
   public onViewGroupEmail(data: any): void {
     this.onView(data.rowData);
   }
 
 
-  public onGridReady(params: GridReadyEvent): void {
+  onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-    this.gridApi.showLoadingOverlay();
-    let datasource = this.createServerSideDatasource();
-    params.api.setServerSideDatasource(datasource);
+    this.gridApi.setRowData(this.rowData);
   }
-  createServerSideDatasource() {
-    let self = this;
-    return {
-      getRows: function (params: any) {
-        setTimeout(() => {
-          let postData = {
-            pageNumber: params.request.endRow / self.paginationPageSize,
-            pageSize: self.paginationPageSize,
-            sortFields: params.request.sortModel
-          };
-          let filter: any;
-          let jsonString = JSON.stringify(params.request.filterModel);
-          if (jsonString != "{}") {
-            let updatedJson = jsonString.replace("operator", "logicalOperator");
-            filter = JSON.parse(updatedJson);
-          }
-          else filter = null;
-
-          let sort = postData.sortFields.length > 0 ? postData.sortFields : null;
-          self.dispatchNewPage(sort, filter);
-
-          self.groupEmailPage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
-            self.itemList = data?.items;
-            if (!self.itemList || !self.itemList.length) {
-              self.gridApi.showNoRowsOverlay();
-            }
-            else {
-              self.gridApi.hideOverlay();
-            }
-            params.successCallback(self.itemList, data?.totalCount || 1);
-
-          });
-        }, 500);
+  
+  public getGroupEmails(): void {
+    this.dispatchNewPage();
+    this.groupEmailPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (!data || !data?.items.length) {
+        this.gridApi?.showNoRowsOverlay();
       }
-    }
+      else {
+        this.gridApi?.hideOverlay();
+        this.rowData = data.items;
+        this.gridApi?.setRowData(this.rowData);
+      }
+    });
+  
   }
-  private dispatchNewPage(sortModel: any = null, filterModel: any = null): void {
-    this.store.dispatch(new GetGroupMailByBusinessUnitIdPage(this.userObj == null ? null : this.userObj.businessUnitId, this.currentPage, this.pageSize, sortModel, filterModel, this.filters));
+  private dispatchNewPage(): void {
+    this.store.dispatch(new GetGroupMailByBusinessUnitIdPage(this.userObj == null ? null : this.userObj.businessUnitId,true));
   }
   private dispatchViewGroupEmail(id: number): void {
     this.store.dispatch(new GetGroupEmailById(id));
   }
   onPageSizeChanged(event: any) {
-    this.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
-    this.paginationPageSize = Number(event.value.toLowerCase().replace("rows", ""));
+    this.gridOptions.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
+    this.gridOptions.paginationPageSize = Number(event.value.toLowerCase().replace("rows", ""));
     if (this.gridApi != null) {
       this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows", "")));
-      this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows", "")));
-      let datasource = this.createServerSideDatasource();
-      this.gridApi.setServerSideDatasource(datasource);
+      this.gridApi.setRowData(this.rowData);
     }
   }
   public onView({ index, column, foreignKeyData, id, ...groupEMail }: GroupEmail & { index: string; column: unknown; foreignKeyData: unknown }): void {
@@ -323,10 +240,8 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailCloseDialog();
   }
 
-  public onGroupEmailSend(): void {
-    
+  public onGroupEmailSend(): void {    
     this.sendGroupEmailFormGroup.markAllAsTouched();
-   // this.groupEmailTemplateForm.groupEmailTemplateForm.markAllAsTouched();
     if (this.groupEmailTemplateForm.groupEmailTemplateForm.valid && this.groupEmailTemplateForm.groupEmailTemplateForm.errors == null) {
       const formValues = this.groupEmailTemplateForm.groupEmailTemplateForm.getRawValue();
       const sendGroupEmailDto: SendGroupEmailRequest = {
@@ -343,6 +258,60 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
 
     }
   }
+  public sideBar = {
+    toolPanels: [
+      {
+        id: 'columns',
+        labelDefault: 'Columns',
+        labelKey: 'columns',
+        iconKey: 'columns',
+        toolPanel: 'agColumnsToolPanel',
+        toolPanelParams: {
+          suppressRowGroups: true,
+          suppressValues: true,
+          suppressPivots: true,
+          suppressPivotMode: true,
+          suppressColumnFilter: true,
+          suppressColumnSelectAll: true,
+          suppressColumnExpandAll: true,
+        },
+      },
+      {
+        id: 'filters',
+        labelDefault: 'Filters',
+        labelKey: 'filters',
+        iconKey: 'filters',
+        toolPanel: 'agFiltersToolPanel',
+        toolPanelParams: {
+          suppressRowGroups: true,
+          suppressValues: true,
+          suppressPivots: true,
+          suppressPivotMode: true,
+          suppressColumnFilter: true,
+          suppressColumnSelectAll: true,
+          suppressColumnExpandAll: true,
+        },
+      },
+    ],
+  };
+  public gridOptions: GridOptions = {
+    pagination: true,
+    cacheBlockSize: this.pageSize,
+    paginationPageSize: this.pageSize,
+    columnDefs: this.columnDefs,
+    rowData: this.rowData,
+    sideBar: this.sideBar,
+    noRowsOverlayComponent: CustomNoRowsOverlayComponent,
+    noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
+    onFilterChanged: (event: FilterChangedEvent) => {
+      if (!event.api.getDisplayedRowCount()) {
+        this.gridApi?.showNoRowsOverlay();
+      }
+      else {
+        this.gridApi?.hideOverlay();
+      }
+    }
+  };
   public onGroupEmailFormSendClick():void{
     this.ResetForm(); 
     this.isSend=true;
