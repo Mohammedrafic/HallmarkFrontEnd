@@ -29,6 +29,8 @@ import {
 import { AdminStateModel } from '@admin/store/admin.state';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { UserOrganizationsAgenciesChanged } from 'src/app/store/user.actions';
+import { getAllErrors } from '@shared/utils/error.utils';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export interface AgencyStateModel {
   isAgencyLoading: boolean;
@@ -94,7 +96,10 @@ export class AgencyState {
   constructor(private agencyService: AgencyService, private organizationService: OrganizationService) {}
 
   @Action(SaveAgency)
-  SaveAgency({ patchState, dispatch }: StateContext<AgencyStateModel>, { payload }: SaveAgency): Observable<Agency> {
+  SaveAgency(
+    { patchState, dispatch }: StateContext<AgencyStateModel>,
+    { payload }: SaveAgency
+  ): Observable<Agency | Observable<void>> {
     patchState({ isAgencyLoading: true });
     return this.agencyService.saveAgency(payload).pipe(
       tap((agency) => {
@@ -106,6 +111,9 @@ export class AgencyState {
           dispatch(new ShowToast(MessageTypes.Success, AGENCY_ADDED));
         }
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return of(dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))));
       })
     );
   }
