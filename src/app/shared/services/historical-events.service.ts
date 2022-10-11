@@ -9,16 +9,22 @@ import { OrderHistoricalEvent } from '@shared/models';
 export class HistoricalEventsService {
   constructor(private http: HttpClient) {}
 
-  public getEvents(orderId: number, organizationId?: number | null): Observable<OrderHistoricalEvent[]> {
+  public getEvents(
+    orderId: number,
+    organizationId?: number | null,
+    positionId?: number
+  ): Observable<OrderHistoricalEvent[]> {
     if (organizationId) {
+      const params = positionId ? { params: { organizationId, positionId } } : { organizationId };
       return this.http
-        .get<OrderHistoricalEvent[]>(`/api/historicaldata/order/${orderId}`, {
-          params: { organizationId },
-        })
+        .get<OrderHistoricalEvent[]>(`/api/historicaldata/order/${orderId}`, params)
         .pipe(catchError(() => of([])));
     } else {
       return this.http
-        .get<OrderHistoricalEvent[]>(`/api/historicaldata/order/${orderId}`)
+        .get<OrderHistoricalEvent[]>(
+          `/api/historicaldata/order/${orderId}`,
+          positionId ? { params: { positionId } } : {}
+        )
         .pipe(catchError(() => of([])));
     }
   }

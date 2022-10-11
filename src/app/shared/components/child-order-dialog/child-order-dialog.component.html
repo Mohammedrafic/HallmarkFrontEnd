@@ -86,7 +86,11 @@
                     </app-order-close-reason-info>
                     <hr />
                   </ng-container>
-                  <app-order-details [isPosition]="true" [currentOrder]="currentOrder"></app-order-details>
+                  <app-order-details
+                    [isPosition]="true"
+                    [currentOrder]="currentOrder"
+                    [jobId]="candidateJob?.jobId!"
+                  ></app-order-details>
                 </section>
               </ng-template>
             </e-tabitem>
