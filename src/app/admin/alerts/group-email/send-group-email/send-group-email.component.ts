@@ -69,6 +69,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   public businessDataFields = BUSINESS_DATA_FIELDS;
   public userDataFields = User_DATA_FIELDS;
   public allOption:string="All";
+  public placeholderValue:string="Select User";
   private isAlive: boolean = true;
   defaultBusinessValue: any;
   defaultUserValue: any;

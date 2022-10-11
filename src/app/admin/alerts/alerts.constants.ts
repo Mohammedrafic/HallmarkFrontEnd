@@ -31,5 +31,5 @@ export const toolsRichTextEditor: object = {
       'Bold', 'Italic', 'Underline', '|',
       'FontName', 'FontSize',  '|','LowerCase', 'UpperCase', '|', 'Undo', 'Redo', '|',
       'Formats', 'Alignments', '|', 'CreateLink',
-      'Image', '|', 'SourceCode']
+      'Image', '|']
 };
