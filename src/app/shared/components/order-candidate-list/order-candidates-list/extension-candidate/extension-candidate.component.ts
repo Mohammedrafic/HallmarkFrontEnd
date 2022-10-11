@@ -45,7 +45,7 @@ import {
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
-import { JobCancellation } from "@shared/models/candidate-cancellation.model";
+import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { capitalize, isEqual } from 'lodash';
 import { DurationService } from '@shared/services/duration.service';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
