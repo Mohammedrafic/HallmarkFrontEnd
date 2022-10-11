@@ -57,9 +57,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   }
 
   public isAgencyCreatedCahnge(): void {
-    this.isAgencyCreated$
-    .pipe(takeWhile(() => this.isAlive))
-    .subscribe((isCreated) => {
+    this.isAgencyCreated$.pipe(takeWhile(() => this.isAlive)).subscribe((isCreated) => {
       this.statuses = isCreated ? agencyStatusOptions : agencyStatusCreationOptions;
 
       if (this.isAgencyUser) {
@@ -73,7 +71,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       externalId: new FormControl('', [Validators.maxLength(10)]),
       taxId: new FormControl('', [Validators.required, Validators.minLength(9), Validators.pattern(/^[0-9\s\-]+$/)]),
-      baseFee: new FormControl(''),
+      baseFee: new FormControl('', [Validators.pattern(/^[0-9]*\.?[0-9]*$/)]),
       addressLine1: new FormControl('', [Validators.required, Validators.maxLength(100)]),
       addressLine2: new FormControl('', [Validators.maxLength(100)]),
       country: new FormControl('', [Validators.required]),
