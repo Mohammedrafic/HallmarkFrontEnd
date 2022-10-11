@@ -804,10 +804,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           intervalMaxControl?.disable();
         }
 
-        if (typeId === BillRateCalculationType.Regular || typeId === BillRateCalculationType.RegularLocal) {
-          intervalMinControl?.setValue(0);
-        }
-
         this.changeFieldsSettingByType(typeId);
 
         this.billRatesFormGroup.updateValueAndValidity();
@@ -817,14 +813,22 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   private changeFieldsSettingByType(billRateType: BillRateCalculationType): void {
     this.hideFilds.clear();
+    const intervalMinControl = this.billRatesFormGroup.get('intervalMin');
+    const billRateValueRateTimesControl = this.billRatesFormGroup.get('billRateValueRateTimes');
+    billRateValueRateTimesControl?.enable();
     switch (billRateType) {
+      case BillRateCalculationType.Regular:
+        intervalMinControl?.setValue(0);
+        break;
       case BillRateCalculationType.RegularLocal:
         this.additionalLableForMinMax = 'Mileage';
+        intervalMinControl?.setValue(0);
         break;
       case BillRateCalculationType.GuaranteedHours:
         this.additionalLableForMinMax = 'Work Week';
         this.hideFilds.add('intervalMax')
         this.hideFilds.add('billRateValueRateTimes');
+        billRateValueRateTimesControl?.disable();
         break;
       case BillRateCalculationType.WeeklyOT:
         this.isWeeklyOT = true;
