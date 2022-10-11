@@ -3,10 +3,8 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { FileInfo } from '@syncfusion/ej2-inputs/src/uploader/uploader';
-import { filter, Subject, takeUntil } from 'rxjs';
-import { ConfirmService } from '@shared/services/confirm.service';
+import { Subject, takeUntil } from 'rxjs';
 import { ImportResult } from '@shared/models/import.model';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 
 @Component({
   selector: 'app-document-library-upload',
@@ -25,7 +23,7 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
   }
 
   @Output() public saveImportResult: EventEmitter<any[]> = new EventEmitter<any[]>();
-  @Output() public uploadToFile: EventEmitter<Blob|null> = new EventEmitter<Blob|null>();
+  @Output() public uploadToFile: EventEmitter<Blob | null> = new EventEmitter<Blob | null>();
 
   public width = `${window.innerWidth * 0.6}px`;
   public targetElement: HTMLElement = document.body;
@@ -49,7 +47,7 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
     return (this.selectedFile?.statusCode === '1' || !!this.importResult) && !this.activeErrorTab;
   }
 
-  constructor(private confirmService: ConfirmService) { super(); }
+  constructor() { super(); }
 
   ngOnInit(): void {
   }
@@ -81,22 +79,5 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
     this.tab.selected.pipe(takeUntil(this.destroy$)).subscribe((event: SelectEventArgs) => {
       this.firstActive = event.selectedIndex === 0;
     });
-  }
-
-  private setDropElement(): void {
-    this.dropElement = document.getElementById('droparea') as HTMLElement;
-  }
-
-  private closeDialog(): void {
-    this.importResult = null;
-    this.selectedFile = null;
-    this.uploadObj.clearAll();
-  }
-
-  private uploadFile(): void {
-    if (this.selectedFile?.statusCode === '1') {
-      this.importResult = null;
-      this.uploadToFile.next(this.selectedFile.rawFile as Blob);
-    }
   }
 }

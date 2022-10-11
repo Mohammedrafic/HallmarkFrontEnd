@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { DocumentFolder, FolderTreeItem, DocumentLibraryDto, Documents, DocumentsFilter, DocumentsLibraryPage, DocumentTagFilter, DocumentTags, DocumentTypeFilter, DocumentTypes, FolderTreeFilter, DownloadDocumentDetail, DownloadDocumentDetailFilter, DeleteDocumentsFilter } from "../store/model/document-library.model";
+import { DocumentFolder, FolderTreeItem, DocumentLibraryDto, Documents, DocumentsFilter, DocumentsLibraryPage, DocumentTagFilter, DocumentTags, DocumentTypeFilter, DocumentTypes, FolderTreeFilter, DownloadDocumentDetail, DownloadDocumentDetailFilter, DeleteDocumentsFilter, ShareDocumentsFilter, SharedDocumentPostDto } from "../store/model/document-library.model";
 
 @Injectable({ providedIn: 'root' })
 export class DocumentLibraryService {
@@ -20,7 +20,7 @@ export class DocumentLibraryService {
 
   public GetDocuments(documentsFilter: DocumentsFilter): Observable<DocumentsLibraryPage> {
     let params = new HttpParams();
-    params = params.append("BusinessUnitType", documentsFilter == undefined ? 0 : documentsFilter.businessUnitType);
+    params = params.append("BusinessUnitType", documentsFilter == undefined ? 1 : documentsFilter.businessUnitType);
     if (documentsFilter?.businessUnitId && documentsFilter?.businessUnitId != null)
       params = params.append("BusinessUnitId", documentsFilter.businessUnitId);
     if (documentsFilter?.regionId && documentsFilter?.regionId != null)
@@ -103,7 +103,15 @@ export class DocumentLibraryService {
    * Remove documents by id's
    * @param id
    */
-  public deleteDocumets(deleteDocumentsFilter: DeleteDocumentsFilter): Observable<any> {
+  public DeleteDocumets(deleteDocumentsFilter: DeleteDocumentsFilter): Observable<any> {
     return this.http.delete<DocumentLibraryDto>(`/api/DocumentLibrary/DeleteDocuments`, { body: deleteDocumentsFilter } );
+  }
+
+  /**
+   * Remove documents by id's
+   * @param id
+   */
+  public ShareDocumets(shareDocumentsFilter: ShareDocumentsFilter): Observable<SharedDocumentPostDto[]> {
+    return this.http.post<SharedDocumentPostDto[]>(`/api/DocumentLibrary/ShareDocuments`, shareDocumentsFilter);
   }
 }

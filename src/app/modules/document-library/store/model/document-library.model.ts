@@ -19,7 +19,7 @@ export class NodeItem {
   id: number;
   isChecked?: boolean;
   parentID?: number;
-  selected:boolean
+  selected: boolean
   text: string;
 }
 
@@ -30,7 +30,7 @@ export class DocumentFolder {
   status: number;
   isDeleted: boolean;
   businessUnitId?: number | null;
-  businessUnitType?:number | null
+  businessUnitType?: number | null
 }
 
 export class Documents {
@@ -41,13 +41,13 @@ export class Documents {
   locationId: number | null;
   documentName: number | null;
   folderId: number;
-  startDate?: Date |null;
+  startDate?: Date | null;
   endDate?: Date | null;
   docTypeId: number;
   tags: string;
   comments: string;
   selectedFile?: Blob | null
-  isEdit?:boolean | false
+  isEdit?: boolean | false
 }
 
 export class DocumentLibraryDto {
@@ -55,7 +55,7 @@ export class DocumentLibraryDto {
   name: string;
   fileName: string;
   folderId?: number | null;
-  folderName: string ;
+  folderName: string;
   startDate?: Date | null;
   endDate?: Date | null;
   docType: number;
@@ -65,13 +65,17 @@ export class DocumentLibraryDto {
   tags: string;
   comments: string;
   status: string;
+  businessUnitId: number | null;
   businessUnitName: string | null;
+  regionId: number | null;
   regionName: string | null;
+  locationId: number | null;
   locationName: string | null;
   documentVisibilities: any | null;
 }
 
 export class DocumentsFilter {
+  documentId: number | null;
   businessUnitType: number;
   businessUnitId: number | null;
   regionId: number | null;
@@ -99,7 +103,7 @@ export class DocumentTags {
 export class DocumentTagFilter {
   businessUnitType: number;
   businessUnitId?: number | null;
-  keyword:string
+  keyword: string
 }
 
 export class DownloadDocumentDetail {
@@ -125,6 +129,17 @@ export class DeleteDocumentsFilter {
   documentIds: number[];
   businessUnitType: number;
   businessUnitId: number | null;
+}
+
+export class SharedDocumentPostDto {
+  documentId: number;
+  sharedDocumentIds: number[];
+}
+export class ShareDocumentsFilter {
+  documentIds: number[];
+  businessUnitType: number;
+  businessUnitId: number | null;
+  regionLocationMappings: { [id: number]: number[]; } | null
 }
 
 

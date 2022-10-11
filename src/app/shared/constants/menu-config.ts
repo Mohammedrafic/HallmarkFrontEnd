@@ -363,7 +363,7 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/alerts/alerts-template',
     },
-    80: {
+    81: {
       // Document Management
       icon: 'file',
       route: '/documents/document-library',
@@ -535,7 +535,7 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/alerts/alerts-template',
     },
-    80: {
+    81: {
       // Document Management
       icon: 'file',
       route: '/documents/document-library',
@@ -868,7 +868,7 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/alerts/alerts-template',
     },
-    80: {
+    81: {
       // Document Management
       icon: 'file',
       route: '/documents/document-library',
@@ -1087,7 +1087,7 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/alerts/alerts-template',
     },
-    80: {
+    81: {
       // Document Management
       icon: 'file',
       route: '/documents/document-library',

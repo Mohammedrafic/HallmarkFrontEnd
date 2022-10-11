@@ -6,8 +6,8 @@ import { MessageTypes } from "../../../../shared/enums/message-types";
 import { getAllErrors } from "../../../../shared/utils/error.utils";
 import { ShowToast } from "../../../../store/app.actions";
 import { DocumentLibraryService } from "../../services/document-library.service";
-import { DeletDocuments, DeletDocumentsSucceeded, GetDocumentDownloadDeatils, GetDocumentDownloadDeatilsSucceeded, GetDocuments, GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, IsAddNewFolder, SaveDocumentFolder, SaveDocuments, SearchDocumentTags } from "../actions/document-library.actions";
-import { DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, NodeItem, FolderTreeItem, DownloadDocumentDetail } from "../model/document-library.model";
+import { DeletDocuments, DeletDocumentsSucceeded, GetDocumentDownloadDeatils, GetDocumentDownloadDeatilsSucceeded, GetDocuments, GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, IsAddNewFolder, SaveDocumentFolder, SaveDocuments, SearchDocumentTags, ShareDocuments, ShareDocumentsSucceeded } from "../actions/document-library.actions";
+import { DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, NodeItem, FolderTreeItem, DownloadDocumentDetail, SharedDocumentPostDto } from "../model/document-library.model";
 
 
 export interface DocumentLibraryStateModel {
@@ -19,7 +19,8 @@ export interface DocumentLibraryStateModel {
   documentTypes: DocumentTypes[] | null
   documents: Documents | null,
   documentTags: DocumentTags[] | null,
-  documentDownloadDetail: DownloadDocumentDetail | null
+  documentDownloadDetail: DownloadDocumentDetail | null,
+  sharedDocumentPostDetails: SharedDocumentPostDto[] | null
 }
 
 @State<DocumentLibraryStateModel>({
@@ -33,7 +34,8 @@ export interface DocumentLibraryStateModel {
     documentTypes: null,
     documents: null,
     documentTags: null,
-    documentDownloadDetail:null
+    documentDownloadDetail: null,
+    sharedDocumentPostDetails: null
   }
 })
 @Injectable()
@@ -69,6 +71,11 @@ export class DocumentLibraryState {
   @Selector()
   static documentDownloadDetail(state: DocumentLibraryStateModel): DownloadDocumentDetail | null {
     return state.documentDownloadDetail;
+  }
+
+  @Selector()
+  static sharedDocumentPostDetails(state: DocumentLibraryStateModel): SharedDocumentPostDto[] | null {
+    return state.sharedDocumentPostDetails;
   }
 
   @Action(GetFoldersTree)
@@ -152,7 +159,7 @@ export class DocumentLibraryState {
   }
 
   @Action(GetDocumentDownloadDeatils)
-  GetDocumentDownloadDeatils({ patchState,dispatch }: StateContext<DocumentLibraryStateModel>, { documentDowloadDetailFilter }: GetDocumentDownloadDeatils): Observable<DownloadDocumentDetail> {
+  GetDocumentDownloadDeatils({ patchState, dispatch }: StateContext<DocumentLibraryStateModel>, { documentDowloadDetailFilter }: GetDocumentDownloadDeatils): Observable<DownloadDocumentDetail> {
     return this.documentLibraryService.GetDocumentDownloadDetails(documentDowloadDetailFilter).pipe(
       tap((payload) => {
         patchState({ documentDownloadDetail: payload });
@@ -164,13 +171,30 @@ export class DocumentLibraryState {
 
   @Action(DeletDocuments)
   DeletDocuments({ dispatch }: StateContext<DocumentLibraryStateModel>, { deleteDocumentsFilter }: DeletDocuments): Observable<any> {
-    return this.documentLibraryService.deleteDocumets(deleteDocumentsFilter).pipe(
+    return this.documentLibraryService.DeleteDocumets(deleteDocumentsFilter).pipe(
       tap(() => {
         const message = 'Documents deleted successfully';
         const actions = [new DeletDocumentsSucceeded(), new ShowToast(MessageTypes.Success, message)];
         dispatch([...actions, new DeletDocumentsSucceeded()]);
       }),
       catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Documents cannot be deleted due to error'))))
+    );
+  }
+
+  @Action(ShareDocuments)
+  ShareDocuments(
+    { patchState, dispatch }: StateContext<DocumentLibraryStateModel>,
+    { shareDocumentsFilter }: ShareDocuments
+  ): Observable<SharedDocumentPostDto[] | void> {
+    return this.documentLibraryService.ShareDocumets(shareDocumentsFilter).pipe(
+      tap((sharedocuments) => {
+        patchState({ sharedDocumentPostDetails: sharedocuments });
+        const message = 'Documents shared successfully';
+        const actions = [new ShareDocumentsSucceeded(), new ShowToast(MessageTypes.Success, message)];
+        dispatch([...actions, new ShareDocumentsSucceeded()]);
+        return sharedocuments;
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
     );
   }
 }

@@ -54,7 +54,7 @@ export const DocumentLibraryColumnsDefinition = (actionCellParams: ICellRenderer
       field: documentsColumnField.FileName,
       headerName: documentsColumnHeaderText.FileName,
       ...commonColumn,
-      cellStyle: { color: '#3e7fff', fontWeight: '600' }
+      cellStyle: { color: '#3e7fff', fontWeight: '600', cursor:'pointer' }
     },
     {
       field: documentsColumnField.Name,

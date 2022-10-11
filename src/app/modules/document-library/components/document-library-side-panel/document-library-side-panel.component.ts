@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
@@ -12,7 +12,7 @@ import { UserState } from '../../../../store/user.state';
   templateUrl: './document-library-side-panel.component.html',
   styleUrls: ['./document-library-side-panel.component.scss']
 })
-export class DocumentLibrarySidePanelComponent implements OnInit, AfterViewInit {
+export class DocumentLibrarySidePanelComponent implements OnInit {
 
   @Select(DocumentLibraryState.foldersTree)
   foldersTree$: Observable<FolderTreeItem[]>;
@@ -41,23 +41,19 @@ export class DocumentLibrarySidePanelComponent implements OnInit, AfterViewInit 
           this.sidePanelFolderItems = folderTree;
           this.sidePanelDocumentField = { dataSource: this.sidePanelFolderItems, id: 'id', text: 'name', parentID: 'parentFolderId', child: 'subFolders' };
           this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
-            let nodeData = new NodeItem();
-            nodeData.expanded = false;
-            nodeData.hasChildren = this.sidePanelDocumentField.dataSource[0].subFolders?.length > 0 ? true : false;
-            nodeData.id = this.sidePanelDocumentField.dataSource[0].id;
-            nodeData.isChecked = undefined;
-            nodeData.parentID = this.sidePanelDocumentField.dataSource[0].parentFolderId;
-            nodeData.selected = true;
-            nodeData.text = this.sidePanelDocumentField.dataSource[0].name;
-            this.store.dispatch(new GetDocumentsSelectedNode(nodeData));
-          }
-        });
-      }
-   
-  }
+          let nodeData = new NodeItem();
+          nodeData.expanded = false;
+          nodeData.hasChildren = this.sidePanelDocumentField.dataSource[0].subFolders?.length > 0 ? true : false;
+          nodeData.id = this.sidePanelDocumentField.dataSource[0].id;
+          nodeData.isChecked = undefined;
+          nodeData.parentID = this.sidePanelDocumentField.dataSource[0].parentFolderId;
+          nodeData.selected = true;
+          nodeData.text = this.sidePanelDocumentField.dataSource[0].name;
+          this.store.dispatch(new GetDocumentsSelectedNode(nodeData));
+        }
+      });
+    }
 
-  ngAfterViewInit(): void {
-   
   }
 
   public nodeSelected(event: any) {
@@ -65,7 +61,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit, AfterViewInit 
     this.store.dispatch(new GetDocumentsSelectedNode(this.selectedNode));
   }
 
-  handleOnAddNewFolder(event:any) {
+  handleOnAddNewFolder(event: any) {
     this.store.dispatch(new IsAddNewFolder(true));
   }
 

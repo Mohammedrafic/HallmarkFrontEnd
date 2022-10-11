@@ -1,4 +1,4 @@
-import { DocumentFolder, NodeItem, Documents, DocumentTypeFilter, DocumentsFilter, DocumentTagFilter, FolderTreeFilter, DownloadDocumentDetailFilter, DownloadDocumentDetail, DeleteDocumentsFilter } from "../model/document-library.model";
+import { DocumentFolder, NodeItem, Documents, DocumentTypeFilter, DocumentsFilter, DocumentTagFilter, FolderTreeFilter, DownloadDocumentDetailFilter, DownloadDocumentDetail, DeleteDocumentsFilter, ShareDocumentsFilter } from "../model/document-library.model";
 
 export class GetFoldersTree {
   static readonly type = '[documentsLibrary] Get folders tree items';
@@ -56,6 +56,16 @@ export class DeletDocuments {
 }
 
 export class DeletDocumentsSucceeded {
-  static readonly type = '[SpecialProject] Delete documents succeeded';
+  static readonly type = '[documentsLibrary] Delete documents succeeded';
+  constructor() { }
+}
+
+export class ShareDocuments {
+  static readonly type = '[documentsLibrary] Share documents';
+  constructor(public shareDocumentsFilter: ShareDocumentsFilter) { }
+}
+
+export class ShareDocumentsSucceeded {
+  static readonly type = '[documentsLibrary] Share documents succeeded';
   constructor() { }
 }

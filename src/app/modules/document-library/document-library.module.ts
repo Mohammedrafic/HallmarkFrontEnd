@@ -26,6 +26,7 @@ import {
 } from '@syncfusion/ej2-angular-dropdowns';
 import { DatePickerModule, DateTimePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import {
   Download,
   Upload,
@@ -67,8 +68,8 @@ const sidebarIcons = {
     DocumentLibraryTableComponent,
     ActionCellrenderComponent,
     StatusTextCellrenderComponent,
-    DocumentLibraryUploadComponent,
-  ],
+    DocumentLibraryUploadComponent
+   ],
   imports: [
     CommonModule,
     FormsModule,
@@ -100,7 +101,8 @@ const sidebarIcons = {
     DatePickerModule,
     DateTimePickerModule,
     TimePickerModule,
-    NgxsModule.forFeature([SecurityState,DocumentLibraryState, LogiReportState])
+    DialogModule,
+    NgxsModule.forFeature([SecurityState, DocumentLibraryState, LogiReportState])
   ]
 })
 export class DocumentLibraryModule { }

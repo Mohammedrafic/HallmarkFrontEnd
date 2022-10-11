@@ -1,7 +1,7 @@
 export enum FileType {
-  Folder='folder',
-  File='file',
-  Link='link'
+  Folder = 'folder',
+  File = 'file',
+  Link = 'link'
 }
 export enum MoreMenuType {
   'Edit',
@@ -10,9 +10,9 @@ export enum MoreMenuType {
 }
 
 export enum DocType {
-  'Test1'=1,
-  'Test2'=2,
-  'Test3'=3
+  'Test1' = 1,
+  'Test2' = 2,
+  'Test3' = 3
 }
 
 export enum StatusEnum {
@@ -33,14 +33,15 @@ export enum FormControlNames {
   StatusIds = 'statusIds',
   StartDate = 'startDate',
   EndDate = 'endDate',
-  Comments ='comments'
+  Comments = 'comments',
+  MSP = 'msp'
 }
 
 export enum FormDailogTitle {
   AddNewFolder = 'Add New Folder',
   Upload = 'Upload',
   EditDocument = 'Edit Document',
-  Share='Share'
+  Share = 'Share'
 }
 
 export enum documentsColumnField {
@@ -57,7 +58,7 @@ export enum documentsColumnField {
   UploadedByName = 'uploadedByName',
   Tags = 'tags',
   Status = "status",
-  Comments ='comments',
+  Comments = 'comments',
   OrganizationName = 'businessUnitName',
   RegionName = 'regionName',
   LocationName = 'locationName',
