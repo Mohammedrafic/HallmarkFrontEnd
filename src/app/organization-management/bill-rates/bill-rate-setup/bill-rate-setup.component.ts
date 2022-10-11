@@ -828,6 +828,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         this.additionalLableForMinMax = 'Work Week';
         this.hideFilds.add('intervalMax')
         this.hideFilds.add('billRateValueRateTimes');
+        billRateValueRateTimesControl?.setValue(0);
         billRateValueRateTimesControl?.disable();
         break;
       case BillRateCalculationType.WeeklyOT:
