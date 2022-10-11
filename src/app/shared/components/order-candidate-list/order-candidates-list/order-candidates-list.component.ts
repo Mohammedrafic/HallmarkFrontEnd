@@ -163,11 +163,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   }
 
   private initPredefinedBillRates(): void {
-    const { orderType, departmentId, skillId } = this.selectedOrder;
-
-    this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId)).pipe(
-      takeUntil(this.unsubscribe$),
-      switchMap(() => this.store.dispatch(new GetPredefinedBillRates()))
-    ).subscribe();
+    this.store.dispatch(new GetPredefinedBillRates());
   }
 }

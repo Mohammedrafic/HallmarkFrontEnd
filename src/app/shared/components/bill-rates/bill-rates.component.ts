@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
-import { isEmpty } from 'lodash';
 
 import { ConfirmService } from '@shared/services/confirm.service';
 
@@ -71,7 +70,6 @@ export class BillRatesComponent implements OnInit, OnDestroy {
 
     this.billRatesOptions$.pipe(
       takeUntil(this.unsubscribe$),
-      filter((res) => !!res?.length)
     ).subscribe((options: BillRateOption[]) => {
       this.billRatesOptions = options;
     });
@@ -107,20 +105,20 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       foundBillRateOption?.unit === BillRateUnit.Hours
         ? String(value.rateHour)
         : parseFloat(value.rateHour.toString()).toFixed(2);
+
     this.billRateForm.patchValue(
       {
         billRateConfig: value.billRateConfig,
         billRateConfigId: value.billRateConfigId,
         effectiveDate: value.effectiveDate,
         id: value.id,
-        intervalMax: !isEmpty(value.intervalMax) && String(value.intervalMax),
-        intervalMin: !isEmpty(value.intervalMin) && String(value.intervalMin),
+        intervalMax: value.intervalMax && String(value.intervalMax),
+        intervalMin: value.intervalMin && String(value.intervalMin),
         rateHour: rateHour,
         billType: value.billType,
         editAllowed: value.editAllowed || false,
         isPredefined: value.isPredefined || false,
-      },
-      { emitEvent: false }
+      }
     );
 
     if (!value.billRateConfig.intervalMin) {
