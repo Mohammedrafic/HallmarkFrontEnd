@@ -21,18 +21,14 @@ import { Observable } from "rxjs";
    */
   public getGroupMailByBusinessUnitIdPage(
     BusinessUnitId: number | null,
-    PageNumber: number,
-    PageSize: number,
-    SortModel: any,
-    FilterModel: any,
-    Filters: GroupEmailFilters
+    GetAll: boolean,
   ): Observable<GroupEmailByBusinessUnitIdPage> {
     if(BusinessUnitId==null)
     {
-    return this.http.get<GroupEmailByBusinessUnitIdPage>(`/api/GroupMail/getgroupmail`,{params: { pageNumber:PageNumber,pageSize: PageSize }}); 
+    return this.http.get<GroupEmailByBusinessUnitIdPage>(`/api/GroupMail/getgroupmail?GetAll=`+GetAll); 
     
     }
-    return this.http.get<GroupEmailByBusinessUnitIdPage>(`/api/GroupMail/getgroupmail?BusinessUnitId=`+BusinessUnitId,{params: { pageNumber:PageNumber,pageSize: PageSize }});
+    return this.http.get<GroupEmailByBusinessUnitIdPage>(`/api/GroupMail/getgroupmail?BusinessUnitId=`+BusinessUnitId+`&GetAll=`+GetAll);
   }
    /**
    * Send Group Email 

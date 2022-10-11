@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { HtmlEditorService, ImageService, LinkService, RichTextEditorComponent, TableService, ToolbarService, ToolbarType } from '@syncfusion/ej2-angular-richtexteditor';
 import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
@@ -25,7 +25,7 @@ import { FilterService } from '@shared/services/filter.service';
   providers: [ToolbarService, LinkService, ImageService, HtmlEditorService, TableService]
 
 })
-export class SendGroupEmailComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class SendGroupEmailComponent extends AbstractGridConfigurationComponent implements OnInit , OnDestroy {
   public tools = toolsRichTextEditor;
   public form: FormGroup;
   @Input() groupEmailTemplateForm: FormGroup;
@@ -145,6 +145,11 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
       }
     });
 
+  }
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+    this.isAlive = false;
   }
   private dispatchUserPage(businessUnitIds: number[]) {
     if(this.businessUnitControl.value!=null)

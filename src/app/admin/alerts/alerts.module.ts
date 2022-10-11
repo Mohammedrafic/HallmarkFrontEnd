@@ -24,6 +24,7 @@ import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { ToggleSwitchComponent } from './toggle-switch/toggle-switch.component';
 import { GroupEmailComponent } from './group-email/group-email.component';
 import { SendGroupEmailComponent } from './group-email/send-group-email/send-group-email.component';
+import { GroupEmailTableComponent } from './group-email/group-email-table/group-email-table.component';
 
 
 
@@ -37,7 +38,7 @@ import { SendGroupEmailComponent } from './group-email/send-group-email/send-gro
     AlertsOnScreenTemplateFormComponent, 
     ToggleSwitchComponent, 
     GroupEmailComponent, 
-    SendGroupEmailComponent
+    SendGroupEmailComponent, GroupEmailTableComponent
   ],
   imports: [
     CommonModule,
