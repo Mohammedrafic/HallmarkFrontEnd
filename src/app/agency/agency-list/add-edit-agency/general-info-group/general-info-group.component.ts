@@ -71,7 +71,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       externalId: new FormControl('', [Validators.maxLength(10)]),
       taxId: new FormControl('', [Validators.required, Validators.minLength(9), Validators.pattern(/^[0-9\s\-]+$/)]),
-      baseFee: new FormControl('', [Validators.pattern(/^[0-9]*\.?[0-9]*$/)]),
+      baseFee: new FormControl(''),
       addressLine1: new FormControl('', [Validators.required, Validators.maxLength(100)]),
       addressLine2: new FormControl('', [Validators.maxLength(100)]),
       country: new FormControl('', [Validators.required]),
