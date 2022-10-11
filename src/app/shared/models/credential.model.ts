@@ -8,6 +8,7 @@ export class Credential {
   name: string;
   expireDateApplicable: boolean;
   comment?: string;
+  isMasterCredential?: boolean;
 
   constructor(credential: Credential) {
     if (credential.id) {

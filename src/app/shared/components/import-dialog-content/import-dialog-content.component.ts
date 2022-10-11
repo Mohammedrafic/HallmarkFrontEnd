@@ -56,11 +56,11 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   public importResult: ImportResult<any> | null;
 
   get activeErrorTab(): boolean {
-    return this.tab?.selectedItem === 1; // errors tab index
+    return this.tab?.selectedItem === 1 && !!this.importResult; // errors tab index
   }
 
   get enabledImportButton(): boolean {
-    return this.selectedFile?.statusCode === UploaderFileStatus.ReadyForUpload && (!!this.importResult ? !this.activeErrorTab : true);
+    return this.selectedFile?.statusCode === UploaderFileStatus.ReadyForUpload && !this.activeErrorTab;
   }
 
   constructor(private confirmService: ConfirmService) {

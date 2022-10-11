@@ -70,7 +70,6 @@ export class BillRatesComponent implements OnInit, OnDestroy {
 
     this.billRatesOptions$.pipe(
       takeUntil(this.unsubscribe$),
-      filter((res) => !!res?.length)
     ).subscribe((options: BillRateOption[]) => {
       this.billRatesOptions = options;
     });
@@ -106,6 +105,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       foundBillRateOption?.unit === BillRateUnit.Hours
         ? String(value.rateHour)
         : parseFloat(value.rateHour.toString()).toFixed(2);
+
     this.billRateForm.patchValue(
       {
         billRateConfig: value.billRateConfig,
@@ -118,8 +118,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         billType: value.billType,
         editAllowed: value.editAllowed || false,
         isPredefined: value.isPredefined || false,
-      },
-      { emitEvent: false }
+      }
     );
 
     if (!value.billRateConfig.intervalMin) {

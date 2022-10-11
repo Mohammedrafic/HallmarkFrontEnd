@@ -12,6 +12,7 @@ enum CommonInfo {
   credentials,
   canApprove,
   isTemplate,
+  templateTitle,
   isSubmit,
   orderType,
   id,

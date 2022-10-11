@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -9,9 +9,9 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
   CancellationReasonsMap,
-  PenaltiesMap
-} from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
-import { PenaltyCriteria } from "@shared/enums/candidate-cancellation";
+  PenaltiesMap,
+} from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
+import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import {
   ApplicantStatus,
   Order,
@@ -23,10 +23,10 @@ import { BillRate } from '@shared/models/bill-rate.model';
 import {
   GetCandidateJob,
   GetRejectReasonsForAgency,
+  RejectCandidateForAgencySuccess,
+  RejectCandidateJob as RejectCandidateJobAgency,
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
-  RejectCandidateJob as RejectCandidateJobAgency,
-  RejectCandidateForAgencySuccess,
 } from '@agency/store/order-management.actions';
 import { DatePipe } from '@angular/common';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
@@ -37,7 +37,8 @@ import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { Router } from '@angular/router';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
-  CancelOrganizationCandidateJob, CancelOrganizationCandidateJobSuccess,
+  CancelOrganizationCandidateJob,
+  CancelOrganizationCandidateJobSuccess,
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
@@ -49,7 +50,7 @@ import { capitalize, isEqual } from 'lodash';
 import { DurationService } from '@shared/services/duration.service';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
-import { UnsavedFormComponentRef, UNSAVED_FORM_PROVIDERS } from '@shared/directives/unsaved-form.directive';
+import { UNSAVED_FORM_PROVIDERS, UnsavedFormComponentRef } from '@shared/directives/unsaved-form.directive';
 import { UserState } from 'src/app/store/user.state';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
@@ -96,7 +97,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public openRejectDialog = new Subject<boolean>();
   public openCandidateCancellationDialog = new Subject<void>();
   public priceUtils = PriceUtils;
-  public optionFields = { text: 'statusText', value: 'applicantStatus' };
+  public optionFields = { text: 'statusText', value: 'applicantStatus', htmlAttributes: 'disabled' };
   public applicantStatuses: ApplicantStatus[] = [
     { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Reject' },
   ];
@@ -112,6 +113,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public canOffer = false;
   public canOnboard = false;
   public canClose = false;
+  public canCreateOrder = false;
+
+  public applicantStatusEnum = ApplicantStatusEnum;
 
   get isAccepted(): boolean {
     return this.candidateJob?.applicantStatus?.applicantStatus === this.candidatStatus.Accepted;
@@ -138,9 +142,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   get isReadOnlyBillRates(): boolean {
-    return (
-      !this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard
-    );
+    return !this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard;
   }
 
   constructor(
@@ -242,11 +244,13 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   public cancelCandidate(jobCancellationDto: JobCancellation): void {
     if (this.candidateJob) {
-      this.store.dispatch(new CancelOrganizationCandidateJob({
-        organizationId: this.candidateJob.organizationId,
-        jobId: this.candidateJob.jobId,
-        jobCancellationDto,
-      }));
+      this.store.dispatch(
+        new CancelOrganizationCandidateJob({
+          organizationId: this.candidateJob.organizationId,
+          jobId: this.candidateJob.jobId,
+          jobCancellationDto,
+        })
+      );
       this.dialogEvent.next(false);
     }
   }
@@ -302,7 +306,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     } else if (candidate.status === ApplicantStatusEnum.OnBoarded) {
       statuses.push(
         { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-        { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled' }
+        { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled', disabled: !this.canCreateOrder }
       );
     } else {
       statuses.push({ applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) });
@@ -310,20 +314,20 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
 
     this.applicantStatuses = statuses;
-      candidate.status === ApplicantStatusEnum.Accepted
-        ? [
-            { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
-            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
-          ]
-        : candidate.status === ApplicantStatusEnum.OnBoarded
-        ? [
-            { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-            { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled' },
-          ]
-        : [
-            { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-            { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
-          ];
+    candidate.status === ApplicantStatusEnum.Accepted
+      ? [
+          { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
+          { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
+        ]
+      : candidate.status === ApplicantStatusEnum.OnBoarded
+      ? [
+          { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
+          { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled', disabled: !this.canCreateOrder },
+        ]
+      : [
+          { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
+          { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
+        ];
     if (!this.applicantStatuses.length) {
       this.statusesFormControl.disable();
     }
@@ -360,13 +364,21 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   private mapPermissions(): void {
-    this.orderPermissions.forEach(permission => {
+    this.canShortlist = false;
+    this.canInterview = false;
+    this.canReject = false;
+    this.canOffer = false;
+    this.canOnboard = false;
+    this.canClose = false;
+    this.canCreateOrder = false;
+    this.orderPermissions.forEach((permission) => {
       this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
       this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
       this.canReject = this.canReject || permission.permissionId === PermissionTypes.CanRejectCandidate;
       this.canOffer = this.canOffer || permission.permissionId === PermissionTypes.CanOfferCandidate;
       this.canOnboard = this.canOnboard || permission.permissionId === PermissionTypes.CanOnBoardCandidate;
       this.canClose = this.canClose || permission.permissionId === PermissionTypes.CanCloseCandidate;
+      this.canCreateOrder = this.canCreateOrder || permission.permissionId === PermissionTypes.CanCreateOrder;
     });
     this.disableControlsBasedOnPermissions();
     if (!this.isAgency && this.candidate) {
@@ -492,7 +504,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
             clockId: this.candidateJob.clockId,
             allowDeployCredentials: this.candidateJob.allowDeployCredentials,
             rejectReason: this.candidateJob.rejectReason,
-            jobCancellationReason: CancellationReasonsMap[this.candidateJob.jobCancellation?.jobCancellationReason || 0],
+            jobCancellationReason:
+              CancellationReasonsMap[this.candidateJob.jobCancellation?.jobCancellationReason || 0],
             penaltyCriteria: PenaltiesMap[this.candidateJob.jobCancellation?.penaltyCriteria || 0],
             rate: this.candidateJob.jobCancellation?.rate,
             hours: this.candidateJob.jobCancellation?.hours,

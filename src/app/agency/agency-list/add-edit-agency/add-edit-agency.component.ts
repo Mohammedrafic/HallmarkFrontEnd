@@ -43,6 +43,7 @@ import {
   PaymentDetails,
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
 import { JobDistributionComponent } from '@agency/agency-list/add-edit-agency/job-distribution/job-distribution.component';
+import { AgencyStatus } from '@shared/enums/status';
 
 type AgencyFormValue = {
   parentBusinessUnitId: number;
@@ -67,6 +68,9 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   public createUnderFields = OPRION_FIELDS;
   public title = 'Add';
   public isAgencyUser = false;
+  public readonly agencyStatus = AgencyStatus;
+  public activeUser: User;
+  public readonly businessUnitType = BusinessUnitType;
 
   get contacts(): FormArray {
     return this.agencyForm.get('agencyContactDetails') as FormArray;
@@ -102,14 +106,17 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   @Select(AgencyState.businessUnits)
   businessUnits$: Observable<BusinessUnit[]>;
 
+  @Select(UserState.user)
+  public currentUser$: Observable<User>;
+
   public logo: Blob | null = null;
 
   private populatedSubscription: Subscription | undefined;
   private isAlive = true;
   private filesDetails: Blob[] = [];
-  private fetchedAgency: Agency;
   private agencyId: number | null = null;
   private isRemoveLogo: boolean = false;
+  private fetchedAgency: Agency;
 
   constructor(
     private store: Store,
@@ -129,6 +136,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
     this.onBillingPopulatedChange();
     this.enableCreateUnderControl();
     this.getAgencyRegionsSkills();
+    this.getActiveUser();
 
     this.actions$
       .pipe(
@@ -366,6 +374,10 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
 
       return new FormGroup(controls);
     });
+  }
+
+  private getActiveUser(): void {
+    this.currentUser$.pipe(takeWhile(() => this.isAlive)).subscribe((user: User) => (this.activeUser = user));
   }
 
   private getAgencyRegionsSkills(): void {

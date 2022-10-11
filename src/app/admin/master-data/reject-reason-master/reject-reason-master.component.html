@@ -35,11 +35,13 @@
     [enableVirtualization]="true"
     [pageSettings]="pageSettings"
     [rowHeight]="rowHeight"
+    (dataBound)="gridDataBound($event)"
+    (actionBegin)="actionBegin($event)"
   >
     <e-columns>
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
-          <div class="row-tool-buttons">
+          <div class="row-tool-buttons" [class.hidden]=!isLoaded>
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>

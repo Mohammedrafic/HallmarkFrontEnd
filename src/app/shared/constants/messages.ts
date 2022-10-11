@@ -45,3 +45,4 @@ export const usedByOrderErrorMessage = (val: string, entities: string) =>
   `${val} cannot be deleted. This ${val} was used in ${entities}.`;
 export const usedInMappingMessage = (mappingName: string) =>
   `This change has been affected ${mappingName} Mapping, please update it on the ${mappingName} Mapping tab`;
+  export const SEND_EMAIL = 'Sent email';

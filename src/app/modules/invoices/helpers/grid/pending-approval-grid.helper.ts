@@ -97,8 +97,7 @@ export class PendingApprovalGridHelper {
         field: 'amount',
         minWidth: 280,
         headerName: 'Amount',
-        type: 'rightAligned',
-        cellClass: 'font-weight-bold align-right',
+        cellClass: 'font-weight-bold',
         valueFormatter: numberValueFormatter,
       },
       {
@@ -122,7 +121,6 @@ export class PendingApprovalGridHelper {
         field: 'dueDate',
         minWidth: 200,
         headerName: 'Due Date',
-        type: 'rightAligned',
         valueFormatter: monthDayYearDateFormatter,
       },
     ];
@@ -156,8 +154,7 @@ export class PendingApprovalGridHelper {
         field: 'amount',
         minWidth: 280,
         headerName: 'Amount',
-        type: 'rightAligned',
-        cellClass: 'font-weight-bold align-right',
+        cellClass: 'font-weight-bold',
         valueFormatter: numberValueFormatter,
       },
       {
@@ -186,7 +183,6 @@ export class PendingApprovalGridHelper {
         field: 'dueDate',
         minWidth: 200,
         headerName: 'Due Date',
-        type: 'rightAligned',
         valueFormatter: monthDayYearDateFormatter,
       },
     ];
@@ -327,8 +323,7 @@ export class PendingApprovalGridHelper {
         field: 'amount',
         minWidth: 280,
         headerName: 'Amount',
-        type: 'rightAligned',
-        cellClass: 'font-weight-bold align-right',
+        cellClass: 'font-weight-bold',
         valueFormatter: numberValueFormatter,
       },
       {
@@ -357,7 +352,6 @@ export class PendingApprovalGridHelper {
         field: 'dueDate',
         minWidth: 200,
         headerName: 'Due Date',
-        type: 'rightAligned',
         valueFormatter: monthDayYearDateFormatter,
       },
     ];

@@ -266,7 +266,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     if (this.isAgencyOrOrganization) {
       this.organizationAgency = this.organizations[0] || this.agencies[0];
     } else {
-      this.organizationsAgencies$.next(organizationsAgencies);
+      this.organizationsAgencies$.next(organizationsAgencies.sort((a, b) => a.name.localeCompare(b.name)));
     }
 
     const lastSelectedOrganizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
