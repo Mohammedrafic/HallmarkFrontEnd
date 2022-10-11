@@ -109,7 +109,7 @@
           </ejs-accordion>
         </div>
         <div class="comments">
-          <app-comments [disabled]="showApplyButton"></app-comments>
+          <app-comments [disabled]="showApplyButton" [comments]="comments" [commentContainerId]="orderCandidateJob?.commentContainerId || 0"></app-comments>
         </div>
       </section>
     </section>
