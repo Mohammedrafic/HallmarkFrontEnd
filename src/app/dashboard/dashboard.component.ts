@@ -74,6 +74,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   public readonly userIsAdmin$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public hasWidgetPermission: boolean = true;
   public hasOrderManagePermission: boolean = true;
+  public hasOrderCreatePermission: boolean = true;
 
   public widgetsData$: Observable<WidgetsDataModel>;
 
@@ -121,6 +122,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
       .subscribe((permissionsIds: number[]) => {
         this.hasWidgetPermission = WIDGET_PERMISSION_TYPES.map((id) => this.hasPermission(permissionsIds, id)).includes(true);
         this.hasOrderManagePermission = this.hasPermission(permissionsIds, PermissionTypes.CanOrganizationEditOrders);
+        this.hasOrderCreatePermission = this.hasPermission(permissionsIds, PermissionTypes.CanCreateOrder);
       });
   }
 
