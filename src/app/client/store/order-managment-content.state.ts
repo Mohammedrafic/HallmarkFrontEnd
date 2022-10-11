@@ -360,8 +360,15 @@ export class OrderManagementContentState {
         payload.groupedCredentials = groupedCredentials;
         patchState({ selectedOrder: payload });
 
-        const { orderType, departmentId, skillId } = payload;
-        dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
+        const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = payload;
+
+        dispatch(new SetPredefinedBillRatesData(
+          orderType,
+          departmentId,
+          skillId,
+          DateTimeHelper.toUtcFormat(jobStartDate),
+          DateTimeHelper.toUtcFormat(jobEndDate)
+        ));
 
         return payload;
       })
@@ -411,8 +418,14 @@ export class OrderManagementContentState {
     return this.orderManagementService.getOrderById(payload).pipe(
       tap((payload) => {
         patchState({ selectedOrder: payload });
-        const { orderType, departmentId, skillId } = payload;
-        dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
+        const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = payload;
+        dispatch(new SetPredefinedBillRatesData(
+          orderType,
+          departmentId,
+          skillId,
+          DateTimeHelper.toUtcFormat(jobStartDate),
+          DateTimeHelper.toUtcFormat(jobEndDate)
+        ));
 
         return payload;
       })
@@ -584,7 +597,7 @@ export class OrderManagementContentState {
     if (getPredefinedBillRatesData) {
       const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = getPredefinedBillRatesData;
 
-      if (orderType && departmentId && skillId) {
+      if (!isNaN(orderType) && !isNaN(departmentId) && !isNaN(skillId)) {
         return this.orderManagementService.getPredefinedBillRates(orderType, departmentId, skillId, jobStartDate, jobEndDate).pipe(
           tap((payload) => {
             patchState({ predefinedBillRates: payload });

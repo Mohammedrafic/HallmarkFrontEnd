@@ -71,7 +71,6 @@ export class BillRatesComponent implements OnInit, OnDestroy {
 
     this.billRatesOptions$.pipe(
       takeUntil(this.unsubscribe$),
-      filter((res) => !!res?.length)
     ).subscribe((options: BillRateOption[]) => {
       this.billRatesOptions = options;
     });
