@@ -1,0 +1,49 @@
+@import "../../styles/variables/colors";
+.flex-column {
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    h3 {
+      color: $title-black;
+      margin: 8px;
+    }
+
+    button {
+      margin-left: 18px;
+    }
+  }
+
+  .grid-component {
+    margin-top: 25px;
+    overflow-y: auto;
+  }
+}
+
+.grid {
+  margin-top: 20px;
+}
+
+.input-group {
+  margin-top: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+.form-container {
+    margin-top: 20px;
+  }
+
+  .inactive-date-container {
+    width: 198px;
+  }
+
+
+ejs-textbox {
+  textarea.e-textbox.e-input {
+    height: 100px !important;
+  }
+}

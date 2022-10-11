@@ -212,3 +212,12 @@
 </ejs-sidebar>
 
 <app-chat-container></app-chat-container>
+<div *ngIf="isContactOpen">
+  <app-side-dialog header="Contact Support" 
+  (formCancelClicked)="closeDialog()" 
+  (formSaveClicked)="handleOnSave()" [width]="dialogWidth">
+    <app-contactus></app-contactus>
+  </app-side-dialog>
+ 
+</div>
+

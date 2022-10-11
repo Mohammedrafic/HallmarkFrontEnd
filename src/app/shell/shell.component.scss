@@ -469,6 +469,10 @@
   font-size: 15px;
 }
 
+.e-contactus::before {
+  content: "\e703";
+  font-size: 15px;
+}
 .e-dashboard::before {
   content: "\e704";
 }
