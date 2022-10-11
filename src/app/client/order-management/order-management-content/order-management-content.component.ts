@@ -1429,6 +1429,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.orderManagementService.orderId$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean), debounceTime(300))
       .subscribe((data: { id: number; prefix: string }) => {
+        this.currentPage = 1;
         this.orderId = data.id;
         this.prefix = data.prefix;
         this.filters.orderPublicId = this.prefix + '-' + this.orderId;

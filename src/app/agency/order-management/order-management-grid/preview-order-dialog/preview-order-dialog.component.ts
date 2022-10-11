@@ -137,7 +137,6 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
     ])
       .pipe(takeWhile(() => this.isAlive))
       .subscribe(([order, selectedOrder, isOrderPositionSelected]: [OrderCandidatesListPage, Order, boolean]) => {
-        this.extensions = [];
         if (
           order?.items[0]?.candidateJobId &&
           isOrderPositionSelected &&
