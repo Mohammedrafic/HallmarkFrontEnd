@@ -59,18 +59,10 @@ export class AssociateService {
 
   /**
    * Get Job Distribution Initial Data By Organization / Agency Id
-   * @param organizationAgencyId
    * @return Initial Data for Job Distribution
    */
-  public getJobDistributionInitialData(organizationAgencyId: number | null): Observable<JobDistributionInitialData> {
-    return this.http.get<JobDistributionInitialData>(
-      `/api/AssociateOrganizations/jobDistributionInitialData`,
-      organizationAgencyId
-        ? {
-            params: { OrganizationId: organizationAgencyId },
-          }
-        : {}
-    );
+  public getJobDistributionInitialData(): Observable<JobDistributionInitialData> {
+    return this.http.get<JobDistributionInitialData>(`/api/AssociateOrganizations/agencyJobDistributionInitialData`);
   }
 
   /**

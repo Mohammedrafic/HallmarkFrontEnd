@@ -79,11 +79,7 @@ export class GetGroupMailByBusinessUnitIdPage {
   static readonly type = '[groupemail] GetGroupMailByBusinessUnitId';
   constructor(
     public businessUnitId: number|null,
-    public pageNumber: number,
-    public pageSize: number,
-    public sortModel: any,
-    public filterModel: any,
-    public filters: GroupEmailFilters
+    public getAll:boolean
   ) {}
 }
 export class SendGroupEmail {

@@ -40,6 +40,7 @@ import {
 } from '@shared/models/bill-rate.model';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
+import { DateTimeHelper } from '@core/helpers';
 
 export interface BillRatesStateModel {
   billRatesPage: BillRateSetupPage | null,
@@ -112,7 +113,8 @@ export class BillRatesState {
   }
 
   @Action(SaveUpdateBillRate)
-  SaveUpdateBillRate({ patchState, dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: SaveUpdateBillRate): Observable<BillRateSetup[] | void> {
+  SaveUpdateBillRate({ dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: SaveUpdateBillRate): Observable<BillRateSetup[] | void> {
+    payload.effectiveDate = DateTimeHelper.toUtcFormat(payload.effectiveDate);
     return this.billRatesService.saveUpdateBillRate(payload)
       .pipe(tap((payloadResponse) => {
           if (payload.billRateSettingId) {

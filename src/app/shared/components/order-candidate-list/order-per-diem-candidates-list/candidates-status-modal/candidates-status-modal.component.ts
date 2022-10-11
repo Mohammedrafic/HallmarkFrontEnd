@@ -29,6 +29,8 @@ import {
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
+import { CommentsService } from '@shared/services/comments.service';
+import { Comment } from '@shared/models/comment.model';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -120,11 +122,12 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   public optionFields = { text: 'statusText', value: 'applicantStatus' };
   public nextApplicantStatuses: ApplicantStatus[];
   public orderCandidateJob: OrderCandidateJob | null;
+  public comments: Comment[] = [];
 
   private unsubscribe$: Subject<void> = new Subject();
   private orderApplicantsInitialData: OrderApplicantsInitialData | null;
 
-  constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions) {}
+  constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions, private commentsService: CommentsService) {}
 
   ngOnInit(): void {
     this.subscribeOnGetStatus();
@@ -146,6 +149,14 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     this.sideDialog.hide();
     this.openEvent.next(false);
     this.nextApplicantStatuses = [];
+  }
+
+  private getComments(): void {
+    this.commentsService
+      .getComments(this.orderCandidateJob?.commentContainerId as number, null)
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+      });
   }
 
   public onReject(): void {
@@ -294,6 +305,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   private setValueForm(orderCandidateJob: OrderCandidateJob): void {
+    this.getComments();
     this.form?.patchValue({
       jobId: `${orderCandidateJob.organizationPrefix}-${orderCandidateJob.orderPublicId}`,
       locationName: orderCandidateJob.order.locationName,

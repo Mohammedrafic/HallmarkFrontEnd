@@ -416,6 +416,7 @@ export class OrderManagementContentService {
     switch (tab) {
       case AgencyOrderManagementTabs.ReOrders:
         return this.http.post(`/api/Agency/ReOrders/export`, payload, { responseType: 'blob' }); // TODO: modification pending after BE implementation
+      case AgencyOrderManagementTabs.PermPlacement:
       case AgencyOrderManagementTabs.MyAgency:
         return this.http.post(`/api/agency/orders/export`, payload, { responseType: 'blob' });
       case AgencyOrderManagementTabs.PerDiem:
