@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } 
 
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { EMPTY, merge, Observable, Subject, map, mergeMap, takeUntil, distinctUntilChanged } from 'rxjs';
+import { distinctUntilChanged, EMPTY, map, merge, mergeMap, Observable, Subject, takeUntil } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
@@ -83,7 +83,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
 
-  @Select(UserState.orderPermissions)
+  @Select(UserState.currentUserPermissions)
   orderPermissions$: Observable<CurrentUserPermission[]>;
 
   public rejectReasons$: Observable<RejectReason[]>;
@@ -113,7 +113,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public canOffer = false;
   public canOnboard = false;
   public canClose = false;
-  public canCreateOrder = false;
 
   public applicantStatusEnum = ApplicantStatusEnum;
 
@@ -306,7 +305,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     } else if (candidate.status === ApplicantStatusEnum.OnBoarded) {
       statuses.push(
         { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-        { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled', disabled: !this.canCreateOrder }
+        {
+          applicantStatus: ApplicantStatusEnum.Cancelled,
+          statusText: 'Cancelled',
+          disabled: !(this.canOnboard || this.canReject),
+        }
       );
     } else {
       statuses.push({ applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) });
@@ -322,7 +325,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       : candidate.status === ApplicantStatusEnum.OnBoarded
       ? [
           { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-          { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled', disabled: !this.canCreateOrder },
+          {
+            applicantStatus: ApplicantStatusEnum.Cancelled,
+            statusText: 'Cancelled',
+            disabled: !(this.canOnboard && this.canReject),
+          },
         ]
       : [
           { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
@@ -337,7 +344,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     const state$ = this.isAgency ? this.orderCandidatePage$ : this.clientOrderCandidatePage$;
     this.candidate$ = state$.pipe(
       distinctUntilChanged((previous, current) => isEqual(previous.items, current.items)),
-      map((res) => {   
+      map((res) => {
         const items = res?.items || this.candidateOrder?.items;
         const candidate = items?.find((candidate) => candidate.candidateJobId);
         this.candidate = candidate;
@@ -370,7 +377,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.canOffer = false;
     this.canOnboard = false;
     this.canClose = false;
-    this.canCreateOrder = false;
     this.orderPermissions.forEach((permission) => {
       this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
       this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
@@ -378,7 +384,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       this.canOffer = this.canOffer || permission.permissionId === PermissionTypes.CanOfferCandidate;
       this.canOnboard = this.canOnboard || permission.permissionId === PermissionTypes.CanOnBoardCandidate;
       this.canClose = this.canClose || permission.permissionId === PermissionTypes.CanCloseCandidate;
-      this.canCreateOrder = this.canCreateOrder || permission.permissionId === PermissionTypes.CanCreateOrder;
     });
     this.disableControlsBasedOnPermissions();
     if (!this.isAgency && this.candidate) {
