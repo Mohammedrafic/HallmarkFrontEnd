@@ -50,6 +50,11 @@ const shellRoutes: Routes = [
         //     canLoad: [ AdminGuard ],
         //     canActivate: [ AdminGuard ]
       },
+      {
+        path: 'documents',
+        loadChildren: () =>
+          import('../modules/document-library/document-library.module').then((m) => m.DocumentLibraryModule)
+      }
     ],
   },
 ];
