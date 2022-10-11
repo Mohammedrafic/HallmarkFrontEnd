@@ -77,6 +77,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   sideBarMenuField: Object;
   activeMenuItemData: MenuItem;
   public userLogin: { firstName: string; lastName: string };
+  public addFormButton: HTMLElement;
+  public cancelFormButton: HTMLElement;
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -585,6 +587,11 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   contactUs()
   {
+    this.addFormButton = document.getElementById('addFormButton') as HTMLElement;
+    this.cancelFormButton = document.getElementById('cancelFormButton') as HTMLElement;
+    this.addFormButton.style.display="none";
+    this.cancelFormButton.style.display="none";
+
     this.store.dispatch(new ShowSideDialog(true));
   }
 }
