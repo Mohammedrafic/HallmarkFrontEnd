@@ -144,7 +144,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public isShare: boolean = false;
   public shaeDocumentIds: number[] = [];
   public downloadedFileName: string = '';
-  public previewUrl: SafeResourceUrl;
+  public previewUrl: SafeResourceUrl | null;
   public previewTitle: string = "Document Preview";
 
 
@@ -715,6 +715,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   public downloadDocuemt(docItem: DocumentLibraryDto) {
+    this.previewUrl = null;
     const downloadFilter: DownloadDocumentDetailFilter = {
       documentId: docItem.id,
       businessUnitType: this.businessUnitType,
@@ -730,6 +731,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           }
         }
       });
+    this.changeDetectorRef.markForCheck();
   }
   createLinkToDownload(base64String: string, fileName: string, contentType: string) {
     if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
@@ -979,6 +981,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   public onClosePreview(): void {
+    this.previewUrl = null;
+    this.downloadedFileName = '';
+    this.changeDetectorRef.markForCheck();
     this.store.dispatch(new ShowDocPreviewSideDialog(false));
   }
 }
