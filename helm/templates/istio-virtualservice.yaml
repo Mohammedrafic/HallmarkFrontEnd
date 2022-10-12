@@ -6,7 +6,11 @@ spec:
   hosts:
   - "{{ .Values.istio.domain }}"
   gateways:
-  - "{{ .Values.istio.backendgateway }}"
+    {{- if .Values.backendgateway.enabled }}
+    - "{{ .Values.istio.backendgateway }}"
+    {{ else }}
+    - {{ include "einsteinui.fullname" . }}
+    {{- end }}
   http:
   - match:
     - uri:
