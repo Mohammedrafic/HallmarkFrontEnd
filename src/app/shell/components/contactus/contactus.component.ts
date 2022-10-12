@@ -10,7 +10,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { ContactUs } from '../../../shared/models/contact-us.model';
 import { SaveContactUsForm } from 'src/app/store/contact-us.actions';
 import { ContactusState } from 'src/app/store/contact-us.state';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowCustomSideDialog } from 'src/app/store/app.actions';
 
 
 @Component({
@@ -123,12 +123,12 @@ contact$: Observable<ContactUs>;
       this.contact$.pipe(takeUntil(this.unsubscribe$)).subscribe((contactUs: ContactUs) => {
           this.ContactFormGroup.controls['message'].setValue('');
           this.ContactFormGroup.controls['topic'].setValue(null);
-          this.store.dispatch(new ShowSideDialog(false)); 
+        this.store.dispatch(new ShowCustomSideDialog(false));
     });
   }
 
   public cancelContactUsForm()
   {
-    this.store.dispatch(new ShowSideDialog(false));
+    this.store.dispatch(new ShowCustomSideDialog(false));
   }
 }

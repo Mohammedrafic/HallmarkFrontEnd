@@ -1,6 +1,6 @@
 import { DismissAlertDto } from './../shared/models/alerts-template.model';
 import { DismissAlert, DismissAllAlerts } from './../admin/store/alerts.actions';
-import { GetAlertsForCurrentUser, ShouldDisableUserDropDown } from './../store/app.actions';
+import { GetAlertsForCurrentUser, ShouldDisableUserDropDown, ShowCustomSideDialog } from './../store/app.actions';
 import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
@@ -163,6 +163,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   isDialogOpen: boolean =false;
   public dialogWidth: string;
+  public contactHeaderTitle = 'Contact Support';
 
   constructor(
     private store: Store,
@@ -587,11 +588,6 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   contactUs()
   {
-    this.addFormButton = document.getElementById('addFormButton') as HTMLElement;
-    this.cancelFormButton = document.getElementById('cancelFormButton') as HTMLElement;
-    this.addFormButton.style.display="none";
-    this.cancelFormButton.style.display="none";
-
-    this.store.dispatch(new ShowSideDialog(true));
+    this.store.dispatch(new ShowCustomSideDialog(true));
   }
 }

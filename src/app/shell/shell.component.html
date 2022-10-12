@@ -212,7 +212,7 @@
 </ejs-sidebar>
 
   <app-chat-container></app-chat-container>
-  <app-side-dialog header="Contact Support" [width]="dialogWidth">
-  <app-contactus></app-contactus>
-  </app-side-dialog>
+  <app-custom-side-dialog [header]="contactHeaderTitle" [width]="dialogWidth">
+    <app-contactus></app-contactus>
+  </app-custom-side-dialog>
 
