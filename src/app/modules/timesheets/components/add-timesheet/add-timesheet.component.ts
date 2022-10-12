@@ -8,12 +8,14 @@ import { DialogAction } from '@core/enums';
 import { AddDialogHelper } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { AddTimsheetForm, TimesheetDetailsAddDialogState } from '../../interface';
+import { AddRecordBillRate, AddTimsheetForm, TimesheetDetailsAddDialogState } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { RecordAddDialogConfig, TimesheetConfirmMessages } from '../../constants';
 import { RecordFields } from '../../enums';
 import { RecordsAdapter } from '../../helpers';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
   selector: 'app-add-timesheet',
@@ -41,6 +43,10 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
       const { organizationId, id } = this.store.snapshot().timesheets.timesheetDetails;
       const body = RecordsAdapter.adaptRecordAddDto(this.form.value, organizationId, id, this.formType);
 
+      if (!this.checkBillRateDate(body.timeIn, body.billRateConfigId)) {
+        this.store.dispatch(new ShowToast(MessageTypes.Error, 'Bill rate is not effective for this date'));
+        return;
+      }
       this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
       this.closeDialog();
     } else {
@@ -99,5 +105,16 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
 
   private watchForDayChange(): Observable<Date> {
     return this.form?.controls['day']?.valueChanges as Observable<Date>;
+  }
+
+  private checkBillRateDate(timeIn: string, billRateId: number): boolean {
+    const billRate = (this.store.snapshot().timesheets['billRateTypes'] as AddRecordBillRate[])
+    .find((rate) => rate.value === billRateId);
+ 
+    if (billRate && billRate.efectiveDate > timeIn) {
+      return false
+    }
+
+    return true;
   }
 }

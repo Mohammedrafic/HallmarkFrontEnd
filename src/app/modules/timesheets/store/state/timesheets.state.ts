@@ -17,7 +17,6 @@ import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import {
   FilteringOptionsFields,
-  RecordFields,
   TimesheetsTableFiltersColumns,
   TimesheetTargetStatus,
 } from '../../enums';
