@@ -221,7 +221,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     {
       this.businessControl?.enable();
       this.businessUnitControl?.enable();
-      this.groupEmailTemplateForm.controls['emailTo'].enable();
+      this.groupEmailTemplateForm.controls['emailTo'].disable();
       this.groupEmailTemplateForm.controls['emailCc'].enable();
       this.groupEmailTemplateForm.controls['emailSubject'].enable();
       this.groupEmailTemplateForm.controls['user'].enable();
