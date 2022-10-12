@@ -1,0 +1,21 @@
+<ejs-dialog id="customSideDialog"
+            #customSideDialog
+            cssClass="dialog"
+            [width]="width"
+            [target]="targetElement"
+            [visible]="false"
+            [isModal]="true"
+            [animationSettings]="{ effect: 'SlideRight' }">
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">{{header}}</h3>
+          </div>
+        </div>
+      </section>
+      <ng-content></ng-content>
+    </section>
+  </ng-template>
+</ejs-dialog>

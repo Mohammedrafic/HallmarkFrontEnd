@@ -1,6 +1,6 @@
 import { DismissAlertDto } from './../shared/models/alerts-template.model';
 import { DismissAlert, DismissAllAlerts } from './../admin/store/alerts.actions';
-import { GetAlertsForCurrentUser, ShouldDisableUserDropDown } from './../store/app.actions';
+import { GetAlertsForCurrentUser, ShouldDisableUserDropDown, ShowCustomSideDialog } from './../store/app.actions';
 import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
@@ -37,6 +37,8 @@ import { AnalyticsMenuId } from '@shared/constants/menu-config';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { AnalyticsApiService } from '@shared/services/analytics-api.service';
+import {  ShowSideDialog } from 'src/app/store/app.actions';
+
 enum THEME {
   light = 'light',
   dark = 'dark',
@@ -48,7 +50,8 @@ enum profileMenuItem {
   log_out = 3,
   light_theme = 4,
   dark_theme=5,
-  manage_notifications = 6
+  manage_notifications = 6,
+  contact_us =7
 }
 
 @Component({
@@ -74,6 +77,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   sideBarMenuField: Object;
   activeMenuItemData: MenuItem;
   public userLogin: { firstName: string; lastName: string };
+  public addFormButton: HTMLElement;
+  public cancelFormButton: HTMLElement;
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -127,9 +132,12 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     [profileMenuItem.log_out]: 'LogOut',
     [profileMenuItem.light_theme]: "Light",
     [profileMenuItem.dark_theme]: "Dark",
-    [profileMenuItem.manage_notifications]: "Manage Notifications"
+    [profileMenuItem.manage_notifications]: "Manage Notifications",
+    [profileMenuItem.contact_us]: "Contact Us"
+
   }
   public isUnreadMessages = false;
+  public isContactOpen : boolean  =false;
 
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
@@ -153,6 +161,10 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   canManageOtherUserNotifications: boolean;
   canManageNotificationTemplates: boolean;
 
+  isDialogOpen: boolean =false;
+  public dialogWidth: string;
+  public contactHeaderTitle = 'Contact Support';
+
   constructor(
     private store: Store,
     private router: Router,
@@ -175,6 +187,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.dialogWidth ="800px";
     this.subsToOrderAgencyIds();
     this.isDarkTheme$.pipe(takeUntil(this.unsubscribe$)).subscribe((isDark) => {
       this.isDarkTheme = isDark;
@@ -213,13 +226,16 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
                   ]
                 },
                 { text: this.ProfileMenuItemNames[profileMenuItem.help], id: profileMenuItem.help.toString(), iconCss: 'e-circle-info e-icons' },
-                { text: this.ProfileMenuItemNames[profileMenuItem.log_out], id: profileMenuItem.log_out.toString(), iconCss: 'e-ddb-icons e-logout' }]
+                { text: this.ProfileMenuItemNames[profileMenuItem.contact_us], id: profileMenuItem.contact_us.toString(), iconCss: 'e-ddb-icons e-contactus' },
+                { text: this.ProfileMenuItemNames[profileMenuItem.log_out], id: profileMenuItem.log_out.toString(), iconCss: 'e-ddb-icons e-logout' }
+                
+              ]
               },
             ];
           }
         });
         this.watchForUnreadMessages();
-  }
+      }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
@@ -276,6 +292,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
         break;
       case profileMenuItem.log_out:
         this.logout();
+        break;
+        case profileMenuItem.contact_us:
+        this.contactUs();
         break;
     }
   }
@@ -565,5 +584,10 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     .subscribe((value) => {
       this.isUnreadMessages = true;
     });
+  }
+
+  contactUs()
+  {
+    this.store.dispatch(new ShowCustomSideDialog(true));
   }
 }
