@@ -4,8 +4,7 @@ import { ButtonRendererComponent } from "@shared/components/button/button-render
 import { ColumnDefinitionModel } from "@shared/components/grid/models";
 const commonColumn: ColDef = {
   sortable: true,
-  resizable: true,
-  filter: true,
+  resizable: true
 }
 export const GroupEmailColumnsDefinition = (actionCellParams: ICellRendererParams, datePipe?: DatePipe): ColumnDefinitionModel[] => [
     {
