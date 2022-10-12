@@ -29,7 +29,6 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
 
   ngOnInit(): void {
     this.initSidePanelDocs();
-    this.tree.selectedNodes = ['2'];
   }
 
   initSidePanelDocs(): void {
@@ -40,7 +39,9 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
         if (folderTree?.length) {
           this.sidePanelFolderItems = folderTree;
           this.sidePanelDocumentField = { dataSource: this.sidePanelFolderItems, id: 'id', text: 'name', parentID: 'parentId', child: 'children' };
-          this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
+          setTimeout(() => {
+            this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
+          }, 1000);
           let nodeData = new NodeItem();
           nodeData.expanded = false;
           nodeData.hasChildren = this.sidePanelDocumentField.dataSource[0].Children?.length > 0 ? true : false;
@@ -58,6 +59,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
 
   public nodeSelected(event: any) {
     this.selectedNode = event.nodeData;
+    debugger;
     this.store.dispatch(new GetDocumentsSelectedNode(this.selectedNode));
   }
 

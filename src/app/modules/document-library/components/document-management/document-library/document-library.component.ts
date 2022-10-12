@@ -785,23 +785,25 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.businessData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
         this.orgStructureData.organizationIds.dataSource = data;
         this.onOrganizationChangeHandler();
-        this.documentLibraryform.setValue({
-          documentName: docItem.name,
-          organizationIds: [docItem.businessUnitId],
-          regionIds: [docItem.regionId],
-          locationIds: [docItem.locationId],
-          typeIds: docItem.docType,
-          tags: docItem.tags,
-          statusIds: status?.id,
-          startDate: docItem.startDate != null ? new Date(docItem.startDate.toString()) : this.startDate,
-          endDate: docItem.endDate != null ? new Date(docItem.endDate.toString()) : null,
-          comments: docItem.comments,
-          agencies: null,
-          orgnizations: null,
-          msp: null
-        });
-        this.store.dispatch(new ShowSideDialog(true));
-        this.changeDetectorRef.markForCheck();
+        setTimeout(() => {
+          this.documentLibraryform.setValue({
+            documentName: docItem.name,
+            organizationIds: [docItem.businessUnitId],
+            regionIds: [docItem.regionId],
+            locationIds: [docItem.locationId],
+            typeIds: docItem.docType,
+            tags: docItem.tags,
+            statusIds: status?.id,
+            startDate: docItem.startDate != null ? new Date(docItem.startDate.toString()) : this.startDate,
+            endDate: docItem.endDate != null ? new Date(docItem.endDate.toString()) : null,
+            comments: docItem.comments,
+            agencies: null,
+            orgnizations: null,
+            msp: null
+          });
+          this.store.dispatch(new ShowSideDialog(true));
+          this.changeDetectorRef.markForCheck();
+        }, 1000);
       });
     }
   }
@@ -866,6 +868,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   private ShareDocumewnt(data: DocumentLibraryDto) {
     if (data) {
+      this.formDailogTitle = "";
       this.isAddNewFolder = false;
       this.isUpload = false;
       this.isEditDocument = false;
@@ -903,6 +906,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   public shareSelectedDocuments(event: any) {
+    this.formDailogTitle = "";
     let selectedRows: any;
     selectedRows = this.gridApi.getSelectedRows();
     if (selectedRows.length > 0) {
