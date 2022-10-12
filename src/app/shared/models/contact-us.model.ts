@@ -1,6 +1,6 @@
 
 export class ContactUs {
-  fromEmail:string;
+  fromMail:string;
   name: string;
   status? :number |null;
   businessUnitId?: number | null;

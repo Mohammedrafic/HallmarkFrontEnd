@@ -114,7 +114,7 @@ contact$: Observable<ContactUs>;
   public saveContactUsForm() {
     let contactUs: ContactUs =
     {
-      fromEmail : this.ContactFormGroup.controls['email'].value,
+      fromMail : this.ContactFormGroup.controls['email'].value,
       subjectMail : this.ContactFormGroup.controls['topic'].value,
       name : this.ContactFormGroup.controls['name'].value,
       bodyMail : this.ContactFormGroup.controls['message'].value,
