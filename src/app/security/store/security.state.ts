@@ -327,7 +327,9 @@ export class SecurityState {
         dispatch(new SaveRoleSucceeded(payload));
         return payload;
       }),
-      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
     );
   }
 
