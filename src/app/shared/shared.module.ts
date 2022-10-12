@@ -144,6 +144,7 @@ import { CredentialsListComponent } from './components/credentials-list/credenti
 import { AssignCredentialSideComponent } from './components/credentials-list/assign-credential-side/assign-credential-side.component';
 import { SendEmailSideDialogComponent } from './components/send-email-side-dialog/send-email-side-dialog.component';
 import { DocumentPreviewSideDialogComponent } from './components/document-preview-side-dialog/document-preview-side-dialog.component';
+import { CustomSideDialogComponent } from './components/custom-side-dialog/custom-side-dialog.component';
 
 const icons = {
   AlertCircle,
@@ -234,7 +235,8 @@ const COMPONENTS = [
   CredentialsListComponent,
   AssignCredentialSideComponent,
   SendEmailSideDialogComponent,
-  DocumentPreviewSideDialogComponent
+  DocumentPreviewSideDialogComponent,
+  CustomSideDialogComponent
 ];
 
 @NgModule({
@@ -309,6 +311,7 @@ const COMPONENTS = [
     OrderHistoricalEventsComponent,
     SendEmailSideDialogComponent,
     DocumentPreviewSideDialogComponent,
+    CustomSideDialogComponent,
     
   ],
   providers: [

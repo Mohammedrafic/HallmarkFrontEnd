@@ -22,6 +22,7 @@ import { MSAL_PROVIDERS } from './b2c-auth/b2c-auth.providers';
 import { B2cModule } from './b2c-auth/b2c-auth.module';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { Overlay } from '@angular/cdk/overlay';
+import { ContactusState } from './store/contact-us.state';
 
 @NgModule({
   declarations: [AppComponent],
@@ -32,7 +33,7 @@ import { Overlay } from '@angular/cdk/overlay';
     Spinnermodule,
 
     //STORE
-    NgxsModule.forRoot([AppState, UserState, RejectReasonState]),
+    NgxsModule.forRoot([AppState, UserState, RejectReasonState,ContactusState]),
     NgxsReduxDevtoolsPluginModule.forRoot({
       disabled: environment.production,
     }),
