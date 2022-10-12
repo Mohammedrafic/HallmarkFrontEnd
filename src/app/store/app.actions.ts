@@ -98,6 +98,11 @@ export class ShowGroupEmailSideDialog {
   constructor(public isDialogShown: boolean) { }
 }
 
+export class ShowDocPreviewSideDialog {
+  static readonly type = '[app] Set Email Side Dialog Showing state';
+  constructor(public isDocPreviewDialogShown: boolean) { }
+}
+
 export class ShowCustomSideDialog {
   static readonly type = '[app] Set Email Side Dialog Showing state';
   constructor(public isCustomDialogShown: boolean) { }

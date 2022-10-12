@@ -1,0 +1,61 @@
+@import "colors";
+.document-side-panel {
+  background-color: $white;
+  margin-right: 25px;
+  height: 100%;
+  width: 231px;
+  margin-left: -25px;
+  overflow-y: auto;
+  margin-top:10px;
+
+  .search {
+    width: 230px;
+  }
+
+  .documentTreeview {
+    color: $black;
+
+    .e-list-item {
+      padding: 3px 0px;
+    }
+
+    .e-level-1, .treeview-folder {
+      font-weight: 600;
+    }
+
+    .treeview-normal {
+      font-weight: normal !important;
+    }
+
+    .e-list-item .e-ul {
+      padding: 0px;
+    }
+
+    .e-list-item.e-hover > .e-fullrow {
+      background-color: $primary-active-blue-70;
+    }
+
+    .e-list-item.e-active > .e-text-content .e-list-text {
+      color: $black;
+    }
+
+    .e-list-item.e-active > .e-fullrow {
+      background-color: $primary-active-blue-70;
+    }
+  }
+
+  .add-folder-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 231px;
+    background: $primary-active-blue-70;
+    border-radius: 5px;
+  }
+
+  .add-folder-button {
+    width: 231px;
+    color: $primary-active-blue;
+  }
+}
+
