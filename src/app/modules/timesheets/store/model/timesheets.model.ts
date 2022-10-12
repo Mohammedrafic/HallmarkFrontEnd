@@ -2,6 +2,7 @@ import { DataSourceItem, DropdownOption } from '@core/interface';
 import { PageOfCollections } from '@shared/models/page.model';
 import { RecordFields } from '../../enums';
 import {
+  AddRecordBillRate,
   Attachment,
   CandidateHoursAndMilesData, CandidateInfo, FilterColumns,
   TabCountConfig, Timesheet, TimesheetAttachments, TimesheetDetailsModel, TimesheetInvoice,
@@ -21,7 +22,7 @@ export interface TimesheetsModel {
   candidateInvoices: TimesheetInvoice[];
   timeSheetRecords: TimesheetRecordsDto;
   costCenterOptions: DropdownOption[];
-  billRateTypes: DropdownOption[];
+  billRateTypes: AddRecordBillRate[];
   isTimeSheetOpen: boolean;
   selectedTimeSheet: Timesheet | null;
   isAddDialogOpen: {

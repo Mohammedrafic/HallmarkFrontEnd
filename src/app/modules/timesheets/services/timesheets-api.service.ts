@@ -8,7 +8,7 @@ import { DataSourceItem, DropdownOption } from '@core/interface';
 
 import {
   TimesheetsFilterState, TimesheetRecordsDto, CostCentersDto,
-  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, TabCountConfig, RawTimsheetRecordsDto
+  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, TabCountConfig, RawTimsheetRecordsDto, AddRecordBillRate
 } from '../interface';
 import { CostCenterAdapter } from '../helpers';
 import { RecordsAdapter } from '../helpers';
@@ -103,7 +103,7 @@ export class TimesheetsApiService {
     jobId: number,
     orgId: number,
     isAgency: boolean,
-    ): Observable<DropdownOption[]> {
+    ): Observable<AddRecordBillRate[]> {
     const endpoint = isAgency ?
     `/api/Jobs/${jobId}/billrates/${orgId}` : `/api/Jobs/${jobId}/billrates`;
     return this.http.get<BillRate[]>(endpoint)
@@ -112,6 +112,7 @@ export class TimesheetsApiService {
         return {
           text: item.billRateConfig.title,
           value: item.billRateConfig.id,
+          efectiveDate: item.effectiveDate,
         }
       })),
     );
