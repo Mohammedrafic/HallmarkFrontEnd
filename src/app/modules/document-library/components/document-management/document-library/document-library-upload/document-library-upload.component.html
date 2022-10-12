@@ -1,0 +1,46 @@
+<section class="import-items-container">
+  <section class="file-uploader-container">
+    <div class="section-header">
+      <span class="message">Upload file</span>
+    </div>
+    <div class="file-uploader" #fileUploader>
+      <div id="droparea" class="droparea" (click)="browse()">
+        <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
+      </div>
+      <div class="file-info" [class.selected-file]="selectedFile">
+        <ejs-uploader #previewupload
+                      [dropArea]="dropElement"
+                      [allowedExtensions]="allowedExtensions"
+                      [autoUpload]="false"
+                      [multiple]="false"
+                      [maxFileSize]="maxFileSize"
+                      (removing)="clear()"
+                      (selected)="selectFile($event)">
+        </ejs-uploader>
+        <button *ngIf="selectedFile" ejs-button class="clear-button" cssClass="e-outline" (click)="clear()">Clear</button>
+      </div>
+    </div>
+  </section>
+  <section *ngIf="importResult" class="results" [ngClass]="{'first-active': firstActive}">
+    <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
+      <e-tabitems>
+        <e-tabitem [disabled]="!importResult.succesfullRecords.length">
+          <ng-template #headerText> Successful <span class="tab-badge">{{importResult?.succesfullRecords?.length}}</span></ng-template>
+          <ng-template #content>
+            <section class="results-grid">
+              <ng-content select="[successful]"></ng-content>
+            </section>
+          </ng-template>
+        </e-tabitem>
+        <e-tabitem [disabled]="!importResult.errorRecords.length">
+          <ng-template #headerText> Error <span class="tab-badge">{{importResult?.errorRecords?.length}}</span></ng-template>
+          <ng-template #content>
+            <section class="results-grid">
+              <ng-content select="[errors]"></ng-content>
+            </section>
+          </ng-template>
+        </e-tabitem>
+      </e-tabitems>
+    </ejs-tab>
+  </section>
+</section>

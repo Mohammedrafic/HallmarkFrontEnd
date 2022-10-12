@@ -57,9 +57,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   }
 
   public isAgencyCreatedCahnge(): void {
-    this.isAgencyCreated$
-    .pipe(takeWhile(() => this.isAlive))
-    .subscribe((isCreated) => {
+    this.isAgencyCreated$.pipe(takeWhile(() => this.isAlive)).subscribe((isCreated) => {
       this.statuses = isCreated ? agencyStatusOptions : agencyStatusCreationOptions;
 
       if (this.isAgencyUser) {

@@ -69,7 +69,8 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   public title = 'Add';
   public isAgencyUser = false;
   public readonly agencyStatus = AgencyStatus;
-  public fetchedAgency: Agency;
+  public activeUser: User;
+  public readonly businessUnitType = BusinessUnitType;
 
   get contacts(): FormArray {
     return this.agencyForm.get('agencyContactDetails') as FormArray;
@@ -105,6 +106,9 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   @Select(AgencyState.businessUnits)
   businessUnits$: Observable<BusinessUnit[]>;
 
+  @Select(UserState.user)
+  public currentUser$: Observable<User>;
+
   public logo: Blob | null = null;
 
   private populatedSubscription: Subscription | undefined;
@@ -112,6 +116,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   private filesDetails: Blob[] = [];
   private agencyId: number | null = null;
   private isRemoveLogo: boolean = false;
+  private fetchedAgency: Agency;
 
   constructor(
     private store: Store,
@@ -131,6 +136,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
     this.onBillingPopulatedChange();
     this.enableCreateUnderControl();
     this.getAgencyRegionsSkills();
+    this.getActiveUser();
 
     this.actions$
       .pipe(
@@ -368,6 +374,10 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
 
       return new FormGroup(controls);
     });
+  }
+
+  private getActiveUser(): void {
+    this.currentUser$.pipe(takeWhile(() => this.isAlive)).subscribe((user: User) => (this.activeUser = user));
   }
 
   private getAgencyRegionsSkills(): void {

@@ -1,0 +1,119 @@
+@import "colors.scss";
+
+.import-items-container {
+  .file-uploader-container {
+    height: 100%;
+    width: 100%;
+    margin: 0 -24px;
+    padding: 24px;
+    background-color: $secondary-dark-blue-50;
+
+    .section-header {
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+
+      .message {
+        color: $secondary-dark-blue-20;
+        font-size: 14px;
+      }
+    }
+
+    .file-uploader {
+      display: flex;
+
+      #droparea {
+        height: 127px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: $primary-active-blue-10;
+        font-size: 12px;
+        cursor: pointer;
+
+        .browse-link {
+          text-decoration: underline;
+          font-weight: 700;
+        }
+      }
+
+      .file-info {
+        .clear-button {
+          width: 100%;
+        }
+
+        .e-file-select-wrap, .e-upload-actions {
+          display: none;
+        }
+
+        .e-upload-files {
+          border: unset;
+
+          .e-file-container {
+            margin-left: unset;
+
+            .e-file-name, .e-file-type {
+              padding: unset;
+            }
+
+            .e-file-name::before {
+              content: none;
+            }
+          }
+
+          .e-file-remove-btn {
+            padding: unset;
+            margin: -16px 0 0;
+          }
+        }
+      }
+
+      .selected-file {
+        width: 100%;
+        margin-left: 24px;
+      }
+    }
+  }
+
+  .results {
+    margin-top: 24px;
+    position: relative;
+
+    &.first-active {
+      .e-tab .e-tab-header:not(.e-vertical) .e-indicator {
+        left: 0 !important;
+        right: 98px !important;
+      }
+    }
+
+    .error-template-button {
+      position: absolute;
+      z-index: 2;
+      right: 0;
+      top: 12px;
+
+      i-feather {
+        margin-left: 4px;
+      }
+    }
+
+    .tab-badge {
+      background-color: $primary-active-blue-10;
+      border-radius: 50%;
+      color: white;
+      padding: 1px 5px;
+      font-size: 10px;
+    }
+
+    span {
+      margin-left: 12px;
+    }
+
+    .results-grid {
+      height: 100%;
+      border-top: 1px solid $secondary-dark-blue-45;
+      margin: 1px -24px 0;
+    }
+  }
+}
