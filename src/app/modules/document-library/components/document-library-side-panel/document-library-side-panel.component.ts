@@ -39,14 +39,14 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
       this.foldersTree$.pipe(takeUntil(this.unsubscribe$)).subscribe((folderTree: FolderTreeItem[]) => {
         if (folderTree?.length) {
           this.sidePanelFolderItems = folderTree;
-          this.sidePanelDocumentField = { dataSource: this.sidePanelFolderItems, id: 'id', text: 'name', parentID: 'parentFolderId', child: 'subFolders' };
+          this.sidePanelDocumentField = { dataSource: this.sidePanelFolderItems, id: 'id', text: 'name', parentID: 'parentId', child: 'children' };
           this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
           let nodeData = new NodeItem();
           nodeData.expanded = false;
-          nodeData.hasChildren = this.sidePanelDocumentField.dataSource[0].subFolders?.length > 0 ? true : false;
+          nodeData.hasChildren = this.sidePanelDocumentField.dataSource[0].Children?.length > 0 ? true : false;
           nodeData.id = this.sidePanelDocumentField.dataSource[0].id;
           nodeData.isChecked = undefined;
-          nodeData.parentID = this.sidePanelDocumentField.dataSource[0].parentFolderId;
+          nodeData.parentID = this.sidePanelDocumentField.dataSource[0].parentId;
           nodeData.selected = true;
           nodeData.text = this.sidePanelDocumentField.dataSource[0].name;
           this.store.dispatch(new GetDocumentsSelectedNode(nodeData));

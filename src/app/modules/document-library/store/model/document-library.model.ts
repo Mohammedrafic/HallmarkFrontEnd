@@ -3,9 +3,10 @@ import { PageOfCollections } from '@shared/models/page.model';
 export class FolderTreeItem {
   id: number;
   name: string;
-  parentFolderId: number | null;
-  createdDate: Date | null;
-  subFolders: FolderTreeItem[];
+  businessUnitId: number | null;
+  fileType: string;
+  parentId: number | null;
+  Children: FolderTreeItem[];
 }
 
 export class FolderTreeFilter {
