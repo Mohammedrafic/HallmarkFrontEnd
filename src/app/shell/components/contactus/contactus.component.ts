@@ -11,6 +11,7 @@ import { ContactUs } from '../../../shared/models/contact-us.model';
 import { SaveContactUsForm } from 'src/app/store/contact-us.actions';
 import { ContactusState } from 'src/app/store/contact-us.state';
 import { ShowCustomSideDialog } from 'src/app/store/app.actions';
+import { ContactUsStatus } from '@shared/enums/contact-us-status';
 
 
 @Component({
@@ -118,6 +119,7 @@ contact$: Observable<ContactUs>;
       subjectMail : this.ContactFormGroup.controls['topic'].value,
       name : this.ContactFormGroup.controls['name'].value,
       bodyMail : this.ContactFormGroup.controls['message'].value,
+      status : ContactUsStatus.Pending
     };
     this.store.dispatch(new SaveContactUsForm(contactUs));
       this.contact$.pipe(takeUntil(this.unsubscribe$)).subscribe((contactUs: ContactUs) => {

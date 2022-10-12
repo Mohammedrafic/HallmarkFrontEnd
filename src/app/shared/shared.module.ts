@@ -235,8 +235,7 @@ const COMPONENTS = [
   CredentialsListComponent,
   AssignCredentialSideComponent,
   SendEmailSideDialogComponent,
-  DocumentPreviewSideDialogComponent
-  SendEmailSideDialogComponent,
+  DocumentPreviewSideDialogComponent,
   CustomSideDialogComponent
 ];
 
