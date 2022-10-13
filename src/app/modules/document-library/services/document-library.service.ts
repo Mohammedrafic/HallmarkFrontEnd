@@ -114,4 +114,8 @@ export class DocumentLibraryService {
   public ShareDocumets(shareDocumentsFilter: ShareDocumentsFilter): Observable<SharedDocumentPostDto[]> {
     return this.http.post<SharedDocumentPostDto[]>(`/api/DocumentLibrary/ShareDocuments`, shareDocumentsFilter);
   }
+
+  public GetDocumentById(Id: number): Observable<DocumentLibraryDto> {
+    return this.http.get<DocumentLibraryDto>(`/api/DocumentLibrary/GetById/${Id}`);
+  }
 }

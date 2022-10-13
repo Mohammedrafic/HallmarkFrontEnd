@@ -69,3 +69,8 @@ export class ShareDocumentsSucceeded {
   static readonly type = '[documentsLibrary] Share documents succeeded';
   constructor() { }
 }
+
+export class GetDocumentById {
+  static readonly type = '[documentsLibrary] Get document by id';
+  constructor(public documentId: number) { }
+}

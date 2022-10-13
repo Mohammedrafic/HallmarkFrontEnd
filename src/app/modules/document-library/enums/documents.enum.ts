@@ -17,7 +17,7 @@ export enum DocType {
 
 export enum StatusEnum {
   'Active',
-  'In-Active'
+  'Inactive'
 }
 
 export enum FormControlNames {

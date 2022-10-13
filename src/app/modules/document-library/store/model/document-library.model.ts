@@ -22,6 +22,7 @@ export class NodeItem {
   parentID?: number;
   selected: boolean
   text: string;
+  fileType:string
 }
 
 export class DocumentFolder {
@@ -38,8 +39,7 @@ export class Documents {
   id: number;
   businessUnitType: number;
   businessUnitId?: number | null;
-  regionId: number | null;
-  locationId: number | null;
+  regionLocationMappings: { [id: number]: number[]; } | null;
   documentName: number | null;
   folderId: number;
   startDate?: Date | null;
@@ -140,7 +140,7 @@ export class ShareDocumentsFilter {
   documentIds: number[];
   businessUnitType: number;
   businessUnitId: number | null;
-  regionLocationMappings: { [id: number]: number[]; } | null
+  regionLocationMappings: { [id: number]: number[]; } | null;
 }
 
 

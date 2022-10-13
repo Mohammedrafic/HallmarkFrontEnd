@@ -25,7 +25,7 @@
 <section class="document">
   <div class="e-gridcustomheader">
     <div class="title">
-      <h3>{{selectedDocumentNode?selectedDocumentNode.text:'Documents'}}</h3>
+      <h3>{{selectedNodeText}}</h3>
     </div>
     <div class="row-tool-buttons">
       <ejs-switch id="switcher"
@@ -118,7 +118,7 @@
                                  [allowFiltering]="true"
                                  [showDropDownIcon]="true"
                                  appValidateWithMessage
-                                 [dataSource]="orgStructureData.regionIds.dataSource"
+                                 [dataSource]="regions$ | async"
                                  [selectAllText]='allOption'
                                  [showSelectAll]="true">
                 </ejs-multiselect>
@@ -134,7 +134,7 @@
                                  [allowFiltering]="true"
                                  [showDropDownIcon]="true"
                                  appValidateWithMessage
-                                 [dataSource]="orgStructureData.locationIds.dataSource"
+                                 [dataSource]="locations$ | async"
                                  [selectAllText]='allOption'
                                  [showSelectAll]="true">
                 </ejs-multiselect>

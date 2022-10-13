@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
@@ -6,13 +6,16 @@ import { DocumentLibraryState } from '../../store/state/document-library.state';
 import { TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
 import { GetDocumentsSelectedNode, GetFoldersTree, IsAddNewFolder } from '../../store/actions/document-library.actions';
 import { UserState } from '../../../../store/user.state';
+import { ShowToast } from '../../../../store/app.actions';
+import { MessageTypes } from '../../../../shared/enums/message-types';
+import { FileType } from '../../enums/documents.enum';
 
 @Component({
   selector: 'app-document-library-side-panel',
   templateUrl: './document-library-side-panel.component.html',
   styleUrls: ['./document-library-side-panel.component.scss']
 })
-export class DocumentLibrarySidePanelComponent implements OnInit {
+export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
 
   @Select(DocumentLibraryState.foldersTree)
   foldersTree$: Observable<FolderTreeItem[]>;
@@ -30,6 +33,10 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
   ngOnInit(): void {
     this.initSidePanelDocs();
   }
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
 
   initSidePanelDocs(): void {
     const user = this.store.selectSnapshot(UserState.user);
@@ -42,15 +49,6 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
           setTimeout(() => {
             this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
           }, 1000);
-          let nodeData = new NodeItem();
-          nodeData.expanded = false;
-          nodeData.hasChildren = this.sidePanelDocumentField.dataSource[0].Children?.length > 0 ? true : false;
-          nodeData.id = this.sidePanelDocumentField.dataSource[0].id;
-          nodeData.isChecked = undefined;
-          nodeData.parentID = this.sidePanelDocumentField.dataSource[0].parentId;
-          nodeData.selected = true;
-          nodeData.text = this.sidePanelDocumentField.dataSource[0].name;
-          this.store.dispatch(new GetDocumentsSelectedNode(nodeData));
         }
       });
     }
@@ -59,12 +57,37 @@ export class DocumentLibrarySidePanelComponent implements OnInit {
 
   public nodeSelected(event: any) {
     this.selectedNode = event.nodeData;
-    debugger;
+    const selectedFolderTreeNode = this.checkSelectedNodeFolderOrDocument(this.sidePanelFolderItems, this.selectedNode.id);
+    if (selectedFolderTreeNode && selectedFolderTreeNode.length>0) {
+      this.selectedNode.fileType = selectedFolderTreeNode[0].fileType;
+    }
     this.store.dispatch(new GetDocumentsSelectedNode(this.selectedNode));
   }
 
+  checkSelectedNodeFolderOrDocument(data: any, id: number) {
+    const arr: any = [];
+
+    if (data && Array.isArray(data)) {
+      for (let i = 0; i < data.length; i++) {
+        const ele = data[i];
+
+        ele && ele.id==id
+          ? arr.push(ele)
+          : arr.push(...this.checkSelectedNodeFolderOrDocument(ele.children, id));
+      }
+    }
+
+    return arr;
+  }
+
   handleOnAddNewFolder(event: any) {
-    this.store.dispatch(new IsAddNewFolder(true));
+      if (this.selectedNode !=undefined && this.selectedNode?.fileType != FileType.Folder) {
+      this.store.dispatch([
+        new ShowToast(MessageTypes.Warning, "Please select folder."),
+      ]);
+    }
+    else
+      this.store.dispatch(new IsAddNewFolder(true));
   }
 
 }
