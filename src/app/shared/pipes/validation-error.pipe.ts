@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ONLY_LETTERS, ONLY_NUMBER } from '@shared/constants';
+import { ONLY_LETTERS, ONLY_NUMBER, CHARS_NUMBERS_SYMBOLS } from '@shared/constants';
 
 @Pipe({
   name: 'validationError',
@@ -24,14 +24,22 @@ export class ValidationErrorPipe implements PipeTransform {
       case 'duplicateDate' in value:
         return 'Payee with such date already exists';
       case 'pattern' in value:
-        if (!new RegExp(ONLY_LETTERS).test(value.pattern.actualValue)) {
+        if (this.isWrongValue(ONLY_LETTERS, value)) {
           return 'Only letters are allowed';
-        } else if (!new RegExp(ONLY_NUMBER).test(value.pattern.actualValue)) {
+        }
+        if (this.isWrongValue(ONLY_NUMBER, value)) {
           return 'Only numbers are allowed';
+        }
+        if (this.isWrongValue(CHARS_NUMBERS_SYMBOLS, value)) {
+          return 'Only letters, numbers and symbols !@#$%^&*()/|".:;[]{}~ are allowed';
         }
         return '';
       default:
         return '';
     }
+  }
+
+  private isWrongValue(regex: RegExp, value: any): boolean {
+    return value.pattern.requiredPattern === regex.toString() && !new RegExp(regex).test(value.pattern.actualValue);
   }
 }
