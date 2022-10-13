@@ -69,6 +69,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   public businessDataFields = BUSINESS_DATA_FIELDS;
   public userDataFields = User_DATA_FIELDS;
   public allOption:string="All";
+  public placeholderValue:string="Select User";
   private isAlive: boolean = true;
   defaultBusinessValue: any;
   defaultUserValue: any;
@@ -220,7 +221,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     {
       this.businessControl?.enable();
       this.businessUnitControl?.enable();
-      this.groupEmailTemplateForm.controls['emailTo'].enable();
+      this.groupEmailTemplateForm.controls['emailTo'].disable();
       this.groupEmailTemplateForm.controls['emailCc'].enable();
       this.groupEmailTemplateForm.controls['emailSubject'].enable();
       this.groupEmailTemplateForm.controls['user'].enable();

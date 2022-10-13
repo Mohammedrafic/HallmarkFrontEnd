@@ -33,6 +33,7 @@ import {
   Mail,
   MessageSquare,
   CheckCircle,
+  File
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -44,6 +45,10 @@ import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
 import { UserChatModule } from '../modules/chat/chat.module';
 import { AnalyticByClickModule } from '@shared/directives/analytics/analytics-by-click/analytic-by-click.module';
+import { ContactusComponent } from './components/contactus/contactus.component';
+import { UploaderModule  } from '@syncfusion/ej2-angular-inputs';
+import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
+
 
 const sidebarIcons = {
   Sidebar,
@@ -68,11 +73,14 @@ const sidebarIcons = {
   AlertCircle,
   Mail,
   MessageSquare,
+  File
 };
 
 @NgModule({
-  declarations: [OrganizationAgencySelectorComponent, ShellPageComponent, SearchMenuComponent],
+  declarations: [OrganizationAgencySelectorComponent, ShellPageComponent, SearchMenuComponent, ContactusComponent],
   imports: [
+    TextBoxModule,
+    UploaderModule,
     CommonModule,
     ShellRoutingModule,
     ButtonModule,

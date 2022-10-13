@@ -211,4 +211,8 @@
   </div>
 </ejs-sidebar>
 
-<app-chat-container></app-chat-container>
+  <app-chat-container></app-chat-container>
+  <app-custom-side-dialog [header]="contactHeaderTitle" [width]="dialogWidth">
+    <app-contactus></app-contactus>
+  </app-custom-side-dialog>
+

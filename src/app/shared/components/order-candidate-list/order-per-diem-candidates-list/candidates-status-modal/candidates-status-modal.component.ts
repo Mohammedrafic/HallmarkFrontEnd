@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { merge, Observable, Subject, takeUntil } from 'rxjs';
@@ -36,6 +36,7 @@ import { Comment } from '@shared/models/comment.model';
   selector: 'app-candidates-status-modal',
   templateUrl: './candidates-status-modal.component.html',
   styleUrls: ['./candidates-status-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.rejectionReasonsList)
@@ -50,7 +51,11 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
 
-  @Input() candidate: OrderCandidatesList;
+  @Input() set candidate(value: OrderCandidatesList) {
+    this.orderCandidate = value;
+    this.comments = [];
+  };
+  public orderCandidate: OrderCandidatesList;
   @Input() openEvent: Subject<boolean>;
   @Input() isAgency: boolean = false;
   @Input() isLocked: boolean | undefined = false;
@@ -67,14 +72,14 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
 
   get showRejectButton(): boolean {
     return (
-      this.isAgency && [ApplicantStatusEnum.Offered, ApplicantStatusEnum.Accepted].includes(this.candidate?.status)
+      this.isAgency && [ApplicantStatusEnum.Offered, ApplicantStatusEnum.Accepted].includes(this.orderCandidate?.status)
     );
   }
 
   get showWithdrawButton(): boolean {
     return (
       this.isAgency &&
-      [ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom].includes(this.candidate?.status)
+      [ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom].includes(this.orderCandidate?.status)
     );
   }
 
@@ -83,31 +88,31 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   get isRejected(): boolean {
-    return [ApplicantStatusEnum.Rejected].includes(this.candidate?.status);
+    return [ApplicantStatusEnum.Rejected].includes(this.orderCandidate?.status);
   }
 
   get isWithdraw(): boolean {
-    return [ApplicantStatusEnum.Withdraw].includes(this.candidate?.status);
+    return [ApplicantStatusEnum.Withdraw].includes(this.orderCandidate?.status);
   }
 
   get showAcceptButton(): boolean {
-    return this.isAgency && [ApplicantStatusEnum.Offered].includes(this.candidate?.status);
+    return this.isAgency && [ApplicantStatusEnum.Offered].includes(this.orderCandidate?.status);
   }
 
   get showApplyButton(): boolean {
     return (
-      this.isAgency && [ApplicantStatusEnum.NotApplied, ApplicantStatusEnum.Withdraw].includes(this.candidate?.status)
+      this.isAgency && [ApplicantStatusEnum.NotApplied, ApplicantStatusEnum.Withdraw].includes(this.orderCandidate?.status)
     );
   }
 
   get showClockId(): boolean {
     return (
-      [ApplicantStatusEnum.Accepted, ApplicantStatusEnum.OnBoarded].includes(this.candidate?.status)
+      [ApplicantStatusEnum.Accepted, ApplicantStatusEnum.OnBoarded].includes(this.orderCandidate?.status)
     );
   }
 
   get isOnboard(): boolean {
-    return [ApplicantStatusEnum.OnBoarded].includes(this.candidate?.status);
+    return [ApplicantStatusEnum.OnBoarded].includes(this.orderCandidate?.status);
   }
 
   @Select(OrderManagementState.orderApplicantsInitialData)
@@ -127,7 +132,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<void> = new Subject();
   private orderApplicantsInitialData: OrderApplicantsInitialData | null;
 
-  constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions, private commentsService: CommentsService) {}
+  constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions, private commentsService: CommentsService, private cd: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.subscribeOnGetStatus();
@@ -149,6 +154,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     this.sideDialog.hide();
     this.openEvent.next(false);
     this.nextApplicantStatuses = [];
+    this.cd.detectChanges();
   }
 
   private getComments(): void {
@@ -156,6 +162,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
       .getComments(this.orderCandidateJob?.commentContainerId as number, null)
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
+        this.cd.detectChanges();
       });
   }
 
@@ -315,6 +322,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
       allow: orderCandidateJob.allowDeployCredentials,
       rejectReason: orderCandidateJob.rejectReason,
     });
+    this.cd.detectChanges();
   }
 
   private subscribeOnUpdateCandidateJobSucceed(): void {
@@ -328,11 +336,12 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: ApplicantStatus[]) => {
         this.nextApplicantStatuses = data;
-        if (data.length) {
+        if (data?.length) {
           this.statusesFormControl.enable();
         } else {
           this.statusesFormControl.disable();
         }
+        this.cd.detectChanges();
       });
   }
 
@@ -349,6 +358,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
             skill: data.skill,
           });
         }
+        this.cd.detectChanges();
       });
   }
 }

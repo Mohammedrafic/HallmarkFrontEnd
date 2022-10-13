@@ -108,3 +108,5 @@ export interface CostCenter {
 export interface CostCentersDto {
   [key: string]: CostCenter | CostCenter[];
 }
+
+export type AddRecordBillRate = DropdownOption & { efectiveDate: string };

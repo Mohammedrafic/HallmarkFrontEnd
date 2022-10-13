@@ -25,7 +25,7 @@ import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { RECORD_ADDED, RECORD_MODIFIED, GRID_CONFIG, SEND_EMAIL } from '@shared/constants';
+import { RECORD_ADDED, RECORD_MODIFIED, GRID_CONFIG, SEND_EMAIL, SEND_EMAIL_REQUIRED } from '@shared/constants';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AppState } from '../../../store/app.state';
@@ -256,6 +256,29 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       };
       this.store.dispatch(new SendGroupEmail(sendGroupEmailDto));
 
+    }
+    else{
+      let controlNames="";
+      let isAre=" is ";
+      let field="Field ";
+      if(this.groupEmailTemplateForm.groupEmailTemplateForm.controls['emailTo'].invalid)
+      {
+        controlNames="Email To";
+      }
+      if(this.groupEmailTemplateForm.groupEmailTemplateForm.controls['emailSubject'].invalid)
+      {
+        controlNames=controlNames==""?"Email Subject":controlNames+",Email Subject";
+      }
+      if(this.groupEmailTemplateForm.groupEmailTemplateForm.controls['emailBody'].invalid)
+      {
+        controlNames=controlNames==""?"Email Body":controlNames+",Email Body";
+      }
+      if(controlNames.indexOf(",")>0)
+      {
+        isAre=" are "
+        field="Fields "
+      }
+      this.store.dispatch(new ShowToast(MessageTypes.Error,field+controlNames+isAre+ SEND_EMAIL_REQUIRED));
     }
   }
   public sideBar = {

@@ -1,0 +1,137 @@
+@import "../../styles/variables/colors";
+.flex-column {
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    h3 {
+      color: $title-black;
+      margin: 8px;
+    }
+
+    button {
+      margin-left: 18px;
+    }
+  }
+
+  .grid-component {
+    margin-top: 25px;
+    overflow-y: auto;
+  }
+}
+
+.grid {
+  margin-top: 20px;
+}
+
+.input-group {
+  margin-top: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+.form-container {
+    margin-top: 20px;
+  }
+
+  .inactive-date-container {
+    width: 198px;
+  }
+
+
+ejs-textbox {
+  textarea.e-textbox.e-input {
+    height: 100px !important;
+  }
+}
+.contact-input {
+  span.e-input-group {
+    padding: 0;
+
+    input.e-input.e-maskedtextbox {
+      padding: 0 15px;
+    }
+  }
+}
+
+
+
+.droparea {
+  border: 1px dashed #3e7fff;
+  border-radius: 4px;
+  background-color: #ecf2ff;
+  height: 118px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #3e7fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.e-file-select-wrap{
+display: none!important;
+}
+
+.e-outline.button-cancel
+{
+  margin-right:10px;
+}
+
+
+
+
+  .e-dlg-content {
+    padding: 0;
+  }
+
+  .container {
+    padding: 24px;
+  }
+
+  
+  .header-container {
+    text-align: right !important;
+    .e-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .e-card-title {
+        color: $black;
+        font-size: 23px;
+        font-weight: 600;
+      }
+
+      .e-card-content {
+        display: flex;
+        
+        .button-cancel {
+          margin-right: 7px;
+        }
+      }
+    }
+  }
+
+    .form-container {
+      .input-container {
+        padding-top: 20px;
+
+        label {
+          margin-bottom: 12px;
+        }
+
+        &.facility-phone {
+          width: 207px;
+        }
+
+        &.calendar {
+          width: 198px;
+        }
+      }
+    }
+  
+

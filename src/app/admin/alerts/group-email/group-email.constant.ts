@@ -1,8 +1,11 @@
-import { ICellRendererParams } from "@ag-grid-community/core";
+import { ColDef, ICellRendererParams } from "@ag-grid-community/core";
 import { DatePipe } from "@angular/common";
 import { ButtonRendererComponent } from "@shared/components/button/button-renderer/button-renderer.component";
 import { ColumnDefinitionModel } from "@shared/components/grid/models";
-
+const commonColumn: ColDef = {
+  sortable: true,
+  resizable: true
+}
 export const GroupEmailColumnsDefinition = (actionCellParams: ICellRendererParams, datePipe?: DatePipe): ColumnDefinitionModel[] => [
     {
       field: 'Id',
@@ -21,7 +24,8 @@ export const GroupEmailColumnsDefinition = (actionCellParams: ICellRendererParam
         buttons: ['reset'],
         debounceMs: 1000,
         suppressAndOrCondition: true,
-      }
+      },
+      ...commonColumn
     },
     {
       headerName: 'TO',
@@ -31,7 +35,8 @@ export const GroupEmailColumnsDefinition = (actionCellParams: ICellRendererParam
         buttons: ['reset'],
         debounceMs: 1000,
         suppressAndOrCondition: true,
-      }
+      },
+      ...commonColumn
     },
     {
       headerName: 'CC',
@@ -41,7 +46,8 @@ export const GroupEmailColumnsDefinition = (actionCellParams: ICellRendererParam
         buttons: ['reset'],
         debounceMs: 1000,
         suppressAndOrCondition: true,
-      }
+      },
+      ...commonColumn
     },
     {
       headerName: 'Sent On',
@@ -51,7 +57,8 @@ export const GroupEmailColumnsDefinition = (actionCellParams: ICellRendererParam
         buttons: ['reset'],
         debounceMs: 1000,
         suppressAndOrCondition: true,
-      }
+      },
+      ...commonColumn
     },
     {
       headerName: 'Sent By',
@@ -61,7 +68,8 @@ export const GroupEmailColumnsDefinition = (actionCellParams: ICellRendererParam
         buttons: ['reset'],
         debounceMs: 1000,
         suppressAndOrCondition: true,
-      }
+      },
+      ...commonColumn
     }
 
   ];

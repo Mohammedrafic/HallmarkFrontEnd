@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild,OnDestroy } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
@@ -30,7 +30,7 @@ import { AppSettings, APP_SETTINGS } from 'src/app.settings';
   templateUrl: './candidate-list.component.html',
   styleUrls: ['./candidate-list.component.scss']
 })
-export class CandidateListComponent implements OnInit {
+export class CandidateListComponent implements OnInit ,OnDestroy {
   public paramsData: any = {
     "OrganizationParamCRR": "",
     "StartDateParamCRR": "",
@@ -69,6 +69,10 @@ export class CandidateListComponent implements OnInit {
   public businessData$: Observable<BusinessUnit[]>;
   selectedOrganizations: BusinessUnit[];
 
+  @Select(UserState.lastSelectedOrganizationId)
+  private organizationId$: Observable<number>;
+  private agencyOrganizationId:number;
+
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
   private unsubscribe$: Subject<void> = new Subject();
   public filterColumns: any;
@@ -104,9 +108,12 @@ export class CandidateListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.isInitialLoad = true;
-    this.orderFilterColumnsSetup();
-    this.onFilterControlValueChangedHandler();
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => {   
+      this.agencyOrganizationId=data;   
+      this.isInitialLoad = true;
+      this.orderFilterColumnsSetup();
+      this.onFilterControlValueChangedHandler();
+    });
   }
 
   private initForm(): void {
@@ -114,22 +121,25 @@ export class CandidateListComponent implements OnInit {
     startDate.setDate(startDate.getDate() - 90);
     this.candidateRegularRateForm = this.formBuilder.group(
       {
-        businessIds: new FormControl(null, [Validators.required]),
+        businessIds: new FormControl({value:[],disabled:true}, [Validators.required]),
         startDate: new FormControl(startDate, [Validators.required]),
         endDate: new FormControl(new Date(Date.now()), [Validators.required]),
-        regionIds: new FormControl(null, [Validators.required]),
-        locationIds: new FormControl(null, [Validators.required]),
-        departmentIds: new FormControl(null, [Validators.required])
+        regionIds: new FormControl([], [Validators.required]),
+        locationIds: new FormControl([], [Validators.required]),
+        departmentIds: new FormControl([], [Validators.required])
       }
     );
   }
-
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.candidateRegularRateForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
     this.businessData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.organizations = data;
       this.filterColumns.businessIds.dataSource = data;
-      this.defaultOrganizations = data.map((list) => list.id);
+      this.defaultOrganizations = data.map((list) => list.id).filter(i=>i==this.agencyOrganizationId);
     });
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (!this.isClearAll) {
