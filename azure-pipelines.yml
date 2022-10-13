@@ -16,7 +16,7 @@ pool:
   # vmImage: ubuntu-latest
   name: prduse2
   demands:
-    - agent.name -equals LinuxAgentforBuildE2
+    - agent.name -equals LinuxAgentforBuildE2-2
 
 resources: 
 - repo: self
