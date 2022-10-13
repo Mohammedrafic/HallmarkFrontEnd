@@ -23,7 +23,7 @@ import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { analyticsConstants } from '../constants/analytics.constant';
+import { accrualReportTypesList, analyticsConstants } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 
 @Component({
@@ -63,6 +63,8 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
   public departments$: Observable<Department[]>;
   isDepartmentsDropDownEnabled: boolean = false;
   departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
+
+  accrualReportTypeFields:FieldSettingsModel = { text: 'name', value: 'id' };
   selectedDepartments: Department[];
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
@@ -107,10 +109,11 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
   }
 
   ngOnInit(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => {   
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => {     
       this.agencyOrganizationId=data;   
       this.isInitialLoad = true;
       this.orderFilterColumnsSetup();
+      this.accrualReportForm.get(analyticsConstants.formControlNames.accrualReportTypes)?.setValue(0);
       this.onFilterControlValueChangedHandler();
     });
   }
@@ -125,7 +128,8 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
         endDate: new FormControl(new Date(Date.now()), [Validators.required]),
         regionIds: new FormControl([], [Validators.required]),
         locationIds: new FormControl([], [Validators.required]),
-        departmentIds: new FormControl([], [Validators.required])
+        departmentIds: new FormControl([], [Validators.required]),
+        accrualReportTypes:new FormControl(null)
       }
     );
   }
@@ -211,7 +215,8 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
       ?this.organizations!=null &&this.organizations[0]?.id!=null?
       this.organizations[0].id.toString():"1": 
       window.localStorage.getItem("lastSelectedOrganizationId"),
-      "HostName":this.baseUrl
+      "HostName":this.baseUrl,
+      "AccrualReportFilterACCR":this.accrualReportForm.controls['accrualReportTypes'].value.toString()
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -247,7 +252,14 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
         valueId: 'departmentId',
       },
       startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      endDate: { type: ControlTypes.Date, valueType: ValueType.Text }
+      endDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      accrualReportTypes:{
+        type:ControlTypes.Dropdown,
+        valueType: ValueType.Id,
+        dataSource:  accrualReportTypesList  ,
+        valueField: 'name',
+        valueId: 'id',
+      }
     }
   }
   private onOrganizationsChange(): void {
@@ -303,6 +315,7 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
     this.accrualReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
     this.accrualReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.accrualReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    this.accrualReportForm.get(analyticsConstants.formControlNames.accrualReportTypes)?.setValue(0);
     this.filteredItems = [];
   }
   public onFilterApply(): void {
