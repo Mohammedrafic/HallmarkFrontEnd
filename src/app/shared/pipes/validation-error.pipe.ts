@@ -31,7 +31,7 @@ export class ValidationErrorPipe implements PipeTransform {
           return 'Only numbers are allowed';
         }
         if (this.isWrongValue(CHARS_NUMBERS_SYMBOLS, value)) {
-          return 'Only letters, numbers and symbols !@#$%^&*()/|".:;[]{}~ are allowed';
+          return 'At least 3 letters, any numbers, and symbols !@#$%^&*()/\|?",.:;[]{}~-_<> are allowed';
         }
         return '';
       default:
