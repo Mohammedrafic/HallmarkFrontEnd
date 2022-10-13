@@ -114,6 +114,7 @@ import {
   GetRegionsImportTemplateSucceeded,
   GetRegionsImportErrors,
   GetRegionsImportErrorsSucceeded,
+  GetMasterRegions
 } from './organization-management.actions';
 import {
   Department,
@@ -184,6 +185,7 @@ export interface OrganizationManagementStateModel {
   isLocationLoading: boolean;
   departments: Department[] | DepartmentsPage;
   regions: Region[];
+  masterRegions: Region[];
   locations: Location[] | LocationsPage;
   location: Location | null;
   organization: Organization | null;
@@ -239,6 +241,7 @@ export interface OrganizationManagementStateModel {
     isLocationLoading: false,
     departments: [],
     regions: [],
+    masterRegions: [],
     locations: [],
     location: null,
     masterSkills: null,
@@ -328,6 +331,10 @@ export class OrganizationManagementState {
     return state.regions;
   }
 
+  @Selector()
+  static GetMasterRegions(state: OrganizationManagementStateModel): Region[] {
+    return state.masterRegions;
+  }
   @Selector()
   static locationsByRegionId(state: OrganizationManagementStateModel): Location[] | LocationsPage {
     return state.locations;
@@ -1259,6 +1266,18 @@ export class OrganizationManagementState {
     return this.regionService.getRegionFilterOptions(payload).pipe(
       tap((options) => {
         patchState({ regionFilterOptions: options });
+        return options;
+      })
+    );
+  }
+
+  @Action(GetMasterRegions)
+  GetMasterRegions(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+  ): Observable<Region[]> {
+    return this.regionService.getMasterRegions().pipe(
+      tap((options) => {
+        patchState({ masterRegions: options });
         return options;
       })
     );
