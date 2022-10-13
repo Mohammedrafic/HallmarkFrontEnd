@@ -185,6 +185,7 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
         label: key,
         value: ((currentValue.value - previousValue.value) / coefficient) * 100,
         color: paletteColor,
+        totalCount:  value.reduce((count, current) => {return count + current.value;}, 0)
       };
     });
   }
