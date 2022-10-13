@@ -158,6 +158,14 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
             if (region) {
               region.locations?.forEach((location) => (location.regionName = region.name));
               this.locations = [...(region.locations as [])];
+            } else {
+              this.locations = [
+                {
+                  name: 'All',
+                  id: 0,
+                  departments: [],
+                },
+              ];
             }
           });
         } else {

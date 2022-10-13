@@ -1,4 +1,4 @@
-<div class="header" [class.expanded]="sidebar?.isOpen">
+<div class="header" [class.expanded]="sidebar?.isOpen || false">
   <div class="header-item">
     <div class="header-item__sidebar-menu" *ngIf="isMobile$ | async" (click)="toggleMobileSidebar()"></div>
     <i-feather *ngIf="(headerState$ | async)?.iconName" name="{{ (headerState$ | async)?.iconName }}" class="icon"></i-feather>
