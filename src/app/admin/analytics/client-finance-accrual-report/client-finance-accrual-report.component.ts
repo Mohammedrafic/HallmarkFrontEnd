@@ -41,7 +41,8 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
     "DepartmentParamACCR": "",
     "BearerParamACCR":"",
     "BusinessUnitIdParamACCR":"",
-    "HostName":""
+    "HostName":"",
+    "AccrualReportFilterACCR":""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/ClientFinanceAccrualReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/Accrual.cat" };
@@ -129,7 +130,7 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
         regionIds: new FormControl([], [Validators.required]),
         locationIds: new FormControl([], [Validators.required]),
         departmentIds: new FormControl([], [Validators.required]),
-        accrualReportTypes:new FormControl(null)
+        accrualReportTypes:new FormControl(null,[Validators.required])
       }
     );
   }
