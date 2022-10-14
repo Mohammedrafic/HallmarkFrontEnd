@@ -177,7 +177,7 @@ export class AlertsState {
   ClearAlertTemplateState(
     { patchState }: StateContext<AlertsStateModel>
   ):void{
-    patchState({ updateAlertsTemplate: null,saveAlertsTemplate:null });
+    patchState({ updateAlertsTemplate: null,saveAlertsTemplate:null,sendGroupEmail:undefined });
   }
   @Action(GetGroupMailByBusinessUnitIdPage)
   GetGroupMailByBusinessUnitIdPage(
