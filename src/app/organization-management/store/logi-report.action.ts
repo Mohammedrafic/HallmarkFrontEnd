@@ -14,3 +14,6 @@ export class GetDepartmentsByLocations {
   static readonly type = '[LogiReport] Get The List Of Departments By Locations';
   constructor(public filter?: DepartmentsByLocationsFilter) { }
 }
+export class GetLogiReportUrl {static readonly type = '[LogiReport] Get Base Url';
+constructor() { }
+}

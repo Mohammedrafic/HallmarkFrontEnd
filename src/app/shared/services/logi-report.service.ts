@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { ConfigurationDto } from "@shared/models/analytics.model";
 import { DepartmentsPage } from "@shared/models/department.model";
 import { LocationsPage } from "@shared/models/location.model";
 import { regionsPage } from "@shared/models/region.model";
@@ -32,5 +33,12 @@ export class LogiReportService {
    */
  public getDepartmentsByOrganizationId(filter:any): Observable<DepartmentsPage> {
   return this.http.post<DepartmentsPage>(`/api/LogiReport/department/filter`, filter);
+}
+/**
+   * Get the list of Configurations
+   * @return ConfigurationDto
+   */
+public getLogiReportUrl(): Observable<ConfigurationDto[]> {
+  return this.http.get<ConfigurationDto[]>(`/config/ReportServer:BaseUrl`);
 }
 }
