@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { catchError, Observable, of, tap } from "rxjs";
@@ -129,7 +130,9 @@ export class DocumentLibraryState {
         ]);
         return document;
       }),
-      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
     );
   }
 
@@ -171,7 +174,9 @@ export class DocumentLibraryState {
         const actions = [new DeletDocumentsSucceeded(), new ShowToast(MessageTypes.Success, message)];
         dispatch([...actions, new DeletDocumentsSucceeded()]);
       }),
-      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Documents cannot be deleted due to error'))))
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
     );
   }
 
@@ -188,7 +193,9 @@ export class DocumentLibraryState {
         dispatch([...actions, new ShareDocumentsSucceeded()]);
         return sharedocuments;
       }),
-      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
     );
   }
 

@@ -161,6 +161,19 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
       this.businessUnitType = user?.businessUnitType;
+      switch (user?.businessUnitType) {
+        case BusinessUnitType.Hallmark:
+          this.halmarkSwitch = true;
+          break;
+        case BusinessUnitType.Agency:
+          this.agencySwitch = true;
+          break;
+        case BusinessUnitType.Organization:
+          this.organizationSwitch = true;
+          break;
+        default:
+          break;
+      }
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
       let documentTypesFilter: DocumentTypeFilter = {
         businessUnitType: this.businessUnitType,
@@ -170,7 +183,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
     this.today.setHours(0, 0, 0);
   }
-  public readonly columnDefinitions: ColumnDefinitionModel[] = DocumentLibraryColumnsDefinition(this.actionCellrenderParams, this.datePipe);
+  public columnDefinitions: ColumnDefinitionModel[] = DocumentLibraryColumnsDefinition(this.actionCellrenderParams, this.datePipe);
 
   ngOnInit(): void {
     this.startDate = null;
@@ -208,8 +221,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           setTimeout(() => {
             if (this.selectedDocumentNode?.id != -1)
               this.getDocuments();
-            else if (this.selectedDocumentNode?.id == -1)
+            else if (this.selectedDocumentNode?.id == -1) {
               this.getSharedDocuments();
+            }
           }, 1000);
         }
         else {
@@ -241,7 +255,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   public addRemoveFormcontrols() {
     if (this.isAddNewFolder) {
-      this.documentLibraryform.addControl(FormControlNames.FolderName, new FormControl(null, [Validators.required]));
+      this.documentLibraryform.addControl(FormControlNames.FolderName, new FormControl(null, [Validators.required, Validators.maxLength(216), Validators.minLength(3)]));
       if (this.documentLibraryform.contains(FormControlNames.DocumentName)) this.documentLibraryform.removeControl(FormControlNames.DocumentName);
       if (this.documentLibraryform.contains(FormControlNames.OrgnizationIds)) this.documentLibraryform.removeControl(FormControlNames.OrgnizationIds);
       if (this.documentLibraryform.contains(FormControlNames.RegionIds)) this.documentLibraryform.removeControl(FormControlNames.RegionIds);
@@ -255,7 +269,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
     else if (this.isUpload || this.isEditDocument) {
       if (this.documentLibraryform.contains(FormControlNames.FolderName)) this.documentLibraryform.removeControl(FormControlNames.FolderName);
-      this.documentLibraryform.addControl(FormControlNames.DocumentName, new FormControl(null, [Validators.required]));
+      this.documentLibraryform.addControl(FormControlNames.DocumentName, new FormControl(null, [Validators.required, Validators.maxLength(216), Validators.minLength(3)]));
       this.documentLibraryform.addControl(FormControlNames.OrgnizationIds, new FormControl(null, [Validators.required]));
       this.documentLibraryform.addControl(FormControlNames.RegionIds, new FormControl(null, [Validators.required]));
       this.documentLibraryform.addControl(FormControlNames.LocationIds, new FormControl(null, [Validators.required]));
@@ -300,6 +314,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   public uploadToFile(file: Blob | null) {
     this.selectedFile = file;
+    const fileData: any = file;
+    this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(fileData?.name.split('.').slice(0, -1).join('.'));
   }
 
   onPageSizeChanged(event: any) {
@@ -397,7 +413,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public getDocuments(): void {
     this.store.dispatch(new GetDocuments(this.getDocumentFilter()));
     this.documentsPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-
       this.gridApi?.setRowData([]);
       if (!data || !data?.items.length) {
         this.gridApi?.showNoRowsOverlay();
@@ -448,14 +463,15 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.editRegionIds = [];
     this.editLocationIds = [];
     this.documentLibraryform.reset();
+    this.isAddNewFolder = false;
+    this.isUpload = false;
+    this.isEditDocument = false;
+    this.selectedFile = null;
+    this.isShare = false;
     if (this.isAddNewFolder) {
       this.store.dispatch(new IsAddNewFolder(false));
     }
     else {
-      this.isAddNewFolder = false;
-      this.isUpload = false;
-      this.isEditDocument = false;
-      this.isShare = false;
       this.halmarkSwitch = false;
       this.agencySwitch = false;
       this.organizationSwitch = false;
@@ -506,6 +522,11 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         status: 1,
         isDeleted: false
       }
+      if (this.documentLibraryform.get(FormControlNames.FolderName)?.value.trim() == '') {
+        this.documentLibraryform.get(FormControlNames.FolderName)?.setValue(this.documentLibraryform.get(FormControlNames.FolderName)?.value.trim());
+        this.documentLibraryform.markAllAsTouched();
+        return;
+      }
       this.store.dispatch(new SaveDocumentFolder(documentFolder)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
         this.documentLibraryform.reset();
         this.closeDialog();
@@ -527,6 +548,11 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         comments: this.documentLibraryform.get(FormControlNames.Comments)?.value,
         selectedFile: this.selectedFile,
         isEdit: this.isEditDocument
+      }
+      if (this.documentLibraryform.get(FormControlNames.DocumentName)?.value.trim() == '') {
+        this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(this.documentLibraryform.get(FormControlNames.DocumentName)?.value.trim());
+        this.documentLibraryform.markAllAsTouched();
+        return;
       }
       this.store.dispatch(new SaveDocuments(document)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
         this.documentLibraryform.reset();

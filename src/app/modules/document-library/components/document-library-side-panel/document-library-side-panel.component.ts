@@ -50,12 +50,13 @@ export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetFoldersTree({ businessUnitType: user?.businessUnitType, businessUnitId: this.businessUnitId }));
       this.foldersTree$.pipe(takeUntil(this.unsubscribe$)).subscribe((folderTree: FolderTreeItem[]) => {
-        if (folderTree!=null) {
+        if (folderTree != null) {
           this.sidePanelFolderItems = folderTree;
           this.sidePanelDocumentField = { dataSource: this.sidePanelFolderItems, id: 'id', text: 'name', parentID: 'parentId', child: 'children' };
           setTimeout(() => {
             if (this.sidePanelDocumentField.dataSource.length) {
               this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
+              this.tree.expandedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
             }
             else {
               this.tree.selectedNodes = ['0'];
