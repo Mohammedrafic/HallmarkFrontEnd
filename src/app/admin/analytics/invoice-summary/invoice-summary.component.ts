@@ -16,7 +16,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetLocationsByRegions, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportUrl, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
@@ -62,6 +62,9 @@ export class InvoiceSummaryComponent implements OnInit,OnDestroy {
   departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   selectedDepartments: Department[];
 
+  @Select(LogiReportState.logiReportUrl)
+  public logiReportUrl$: Observable<string>;
+
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
   private agencyOrganizationId:number;
@@ -100,11 +103,15 @@ export class InvoiceSummaryComponent implements OnInit,OnDestroy {
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
-    }
+    }this.SetReportUrl();  
   }
 
   ngOnInit(): void {
-     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => {   
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => {  
+      this.SetReportUrl();
+      this.logiReportUrl$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:string)=>{
+        this.logiReportComponent.SetReportUrl(data);
+     });  
       this.agencyOrganizationId=data;   
       this.isInitialLoad = true;
       this.orderFilterColumnsSetup();
@@ -199,6 +206,16 @@ export class InvoiceSummaryComponent implements OnInit,OnDestroy {
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
+  }
+  private SetReportUrl(){
+    const logiReportUrl = this.store.selectSnapshot(LogiReportState.logiReportUrl);
+      if(logiReportUrl=='')
+      {
+        this.store.dispatch(new GetLogiReportUrl());
+      }
+      else{
+        this.logiReportComponent?.SetReportUrl(logiReportUrl);
+      }
   }
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
