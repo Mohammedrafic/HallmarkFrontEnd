@@ -11,12 +11,13 @@ trigger:
 - task*
 - strory*
 - demo*
+- releases/*
 
 pool:
   # vmImage: ubuntu-latest
   name: prduse2
   demands:
-    - agent.name -equals LinuxAgentforBuildE2
+    - agent.name -equals LinuxAgentforBuildE2-2
 
 resources: 
 - repo: self
@@ -28,7 +29,7 @@ variables:
   majorVersion: '1'
   minorVersion: '0'
   patchVersion: $[counter(format('{0}.{1}', variables['majorVersion'], variables['minorVersion']), 0)]
-  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release.') }}: 
+  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release') }}: 
    packageVersionIdentifier: ''
    imageVersionIdentifier: ''
   ${{ elseif startsWith(variables['Build.SourceBranch'], 'refs/heads/qa') }}:

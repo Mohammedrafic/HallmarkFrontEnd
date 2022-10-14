@@ -117,7 +117,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     this.businessUnitControl.patchValue(user?.businessUnitType);
     if (user?.businessUnitType) {
       this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
-      this.isBusinessFormDisabled && this.groupEmailTemplateForm.disable();
+     // this.isBusinessFormDisabled && this.groupEmailTemplateForm.disable();
     }
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       const [Hallmark, ...rest] = this.businessUnits;
