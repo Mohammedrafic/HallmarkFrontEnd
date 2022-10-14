@@ -87,6 +87,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
   isEdit: boolean;
   editedRegionId?: number;
   public masterRegion: Region[] = [];
+  defaultMasterRegionValue: any;
 
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
@@ -289,6 +290,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
   }
 
   onAddRegionClick(): void {
+      this.regionFormGroup.controls["region"].setValue('');
       this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -320,12 +322,8 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
   onEditButtonClick(region: Region, event: any): void {
     this.addActiveCssClass(event);
-    this.regionFormGroup.setValue({
-      id: region?.id,
-      region: region?.name,
-
-
-    });
+   
+    this.regionFormGroup.controls["region"].setValue(this.masterRegion.filter(i => i.name == region?.name)[0].id)
     this.editedRegionId = region?.id;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
@@ -380,7 +378,8 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     return isValid ? null : { 'whitespace': true };
 }
   onFormSaveClick(): void {
-    this.submited=true;
+    this.submited = true;
+    
          const Region: Region = {
      id: this.editedRegionId,
 
