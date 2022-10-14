@@ -208,7 +208,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           setTimeout(() => {
             if (this.selectedDocumentNode?.id != -1)
               this.getDocuments();
-            else
+            else if (this.selectedDocumentNode?.id == -1)
               this.getSharedDocuments();
           }, 1000);
         }

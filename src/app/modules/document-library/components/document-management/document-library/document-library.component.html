@@ -315,6 +315,6 @@
 
 <app-document-preview-side-dialog [header]="previewTitle" (previewCloseClick)="onClosePreview()" [width]="dialogWidth">
   <section *ngIf="previewUrl!=null">
-    <iframe [src]="previewUrl" style="width:100%;height:600px;"></iframe>
+    <iframe [src]="previewUrl" style="width:100%;height:auto;overflow-y:auto;"></iframe>
   </section>
 </app-document-preview-side-dialog>
