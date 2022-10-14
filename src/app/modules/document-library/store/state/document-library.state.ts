@@ -6,8 +6,8 @@ import { MessageTypes } from "../../../../shared/enums/message-types";
 import { getAllErrors } from "../../../../shared/utils/error.utils";
 import { ShowToast } from "../../../../store/app.actions";
 import { DocumentLibraryService } from "../../services/document-library.service";
-import { DeletDocuments, DeletDocumentsSucceeded, GetDocumentById, GetDocumentDownloadDeatils, GetDocumentDownloadDeatilsSucceeded, GetDocuments, GetDocumentTypes, GetFoldersTree, SaveDocumentFolder, SaveDocuments, SearchDocumentTags, ShareDocuments, ShareDocumentsSucceeded } from "../actions/document-library.actions";
-import { DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, FolderTreeItem, DownloadDocumentDetail, SharedDocumentPostDto } from "../model/document-library.model";
+import { DeletDocuments, DeletDocumentsSucceeded, GetDocumentById, GetDocumentDownloadDeatils, GetDocumentDownloadDeatilsSucceeded, GetDocuments, GetDocumentTypes, GetFoldersTree, GetSharedDocuments, SaveDocumentFolder, SaveDocuments, SearchDocumentTags, ShareDocuments, ShareDocumentsSucceeded } from "../actions/document-library.actions";
+import { DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, FolderTreeItem, DownloadDocumentDetail, SharedDocumentPostDto, ShareDocumentInfoPage } from "../model/document-library.model";
 
 
 export interface DocumentLibraryStateModel {
@@ -19,7 +19,8 @@ export interface DocumentLibraryStateModel {
   documentTags: DocumentTags[] | null,
   documentDownloadDetail: DownloadDocumentDetail | null,
   sharedDocumentPostDetails: SharedDocumentPostDto[] | null,
-  documentLibraryDto: DocumentLibraryDto | null
+  documentLibraryDto: DocumentLibraryDto | null,
+  shareDocumentInfoPage: ShareDocumentInfoPage | null
 }
 
 @State<DocumentLibraryStateModel>({
@@ -33,7 +34,8 @@ export interface DocumentLibraryStateModel {
     documentTags: null,
     documentDownloadDetail: null,
     sharedDocumentPostDetails: null,
-    documentLibraryDto:null
+    documentLibraryDto: null,
+    shareDocumentInfoPage:null
   }
 })
 @Injectable()
@@ -48,6 +50,11 @@ export class DocumentLibraryState {
   @Selector()
   static documentsPage(state: DocumentLibraryStateModel): DocumentsLibraryPage | null {
     return state.documentsPage;
+  }
+
+  @Selector()
+  static shareDocumentInfoPage(state: DocumentLibraryStateModel): ShareDocumentInfoPage | null {
+    return state.shareDocumentInfoPage;
   }
 
   @Selector()
@@ -190,6 +197,16 @@ export class DocumentLibraryState {
     return this.documentLibraryService.GetDocumentById(documentId).pipe(
       tap((payload) => {
         patchState({ documentLibraryDto: payload });
+      })
+    );
+  }
+
+  @Action(GetSharedDocuments)
+  GetSharedDocuments({ patchState }: StateContext<DocumentLibraryStateModel>, { documentsFilter }: GetSharedDocuments): Observable<ShareDocumentInfoPage> {
+    return this.documentLibraryService.GetSharedDocuments(documentsFilter).pipe(
+      tap((payload) => {
+        patchState({ shareDocumentInfoPage: payload });
+        return payload;
       })
     );
   }

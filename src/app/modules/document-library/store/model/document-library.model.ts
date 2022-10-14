@@ -22,7 +22,8 @@ export class NodeItem {
   parentID?: number;
   selected: boolean
   text: string;
-  fileType:string
+  fileType: string;
+  businessUnitId?: number | null;
 }
 
 export class DocumentFolder {
@@ -113,6 +114,7 @@ export class DownloadDocumentDetail {
   fileName: string;
   extension: string;
   fileAsBase64: string;
+  sasUrl: string;
   contentType: string;
   metadata: any;
   folderId: number | null;
@@ -142,6 +144,29 @@ export class ShareDocumentsFilter {
   businessUnitId: number | null;
   regionLocationMappings: { [id: number]: number[]; } | null;
 }
+
+export class ShareDocumentDto {
+  id: number;
+  documentId: number;
+  businessUnitType: number;
+  businessUnitId: number | null;
+  regionId: number | null;
+  locationId: number | null;
+  document : DocumentLibraryDto
+}
+
+export class ShareDocumentInfoFilter {
+  documentId: number | null;
+  businessUnitType: number;
+  businessUnitId: number | null;
+  regionId: number | null;
+  locationId: number | null;
+  folderId: number | null
+  getAll: boolean | null
+}
+export type ShareDocumentInfoPage = PageOfCollections<ShareDocumentDto>;
+
+
 
 
 

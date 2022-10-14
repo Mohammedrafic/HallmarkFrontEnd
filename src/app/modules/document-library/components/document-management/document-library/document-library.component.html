@@ -184,7 +184,7 @@
               </div>
             </div>
             <div class="input-container calendar">
-              <label for="startDate">Start Date <span class="required">*</span></label>
+              <label for="startDate">Start Date</label>
               <div class="input-group multiselect">
                 <div class="input-group datepicker">
                   <ejs-datepicker id="startDate"
@@ -192,14 +192,13 @@
                                   format="MM/dd/yyyy"
                                   placeholder="MM/DD/YYYY"
                                   appValidateWithMessage
-                                  formControlName="startDate"
-                                  [min]="startDate || today">
+                                  formControlName="startDate">
                   </ejs-datepicker>
                 </div>
               </div>
             </div>
             <div class="input-container calendar">
-              <label for="endDate">End Date <span class="required">*</span></label>
+              <label for="endDate">End Date</label>
               <div class="input-group multiselect">
                 <div class="input-group datepicker" style="margin-left:10px;">
                   <ejs-datepicker id="endDate"
@@ -208,7 +207,7 @@
                                   placeholder="MM/DD/YYYY"
                                   appValidateWithMessage
                                   formControlName="endDate"
-                                  [min]="startDate || today">
+                                  [min]="startDate">
                   </ejs-datepicker>
                 </div>
               </div>
@@ -306,42 +305,6 @@
                                 [dataSource]="orgStructureData.organizationIds.dataSource"
                                 placeholder="Business"
                                 [enabled]="organizationSwitch"></ejs-dropdownlist>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="form-elemet">
-        <div class="group">
-          <div class="input-container calendar">
-            <label for="regionIds">Region</label>
-            <div class="input-group multiselect">
-              <ejs-multiselect id="regionIds" mode="CheckBox"
-                               formControlName="regionIds"
-                               placeholder="All"
-                               [fields]="optionFields"
-                               [allowFiltering]="true"
-                               [showDropDownIcon]="true"
-                               appValidateWithMessage
-                               [dataSource]="orgStructureData.regionIds.dataSource"
-                               [selectAllText]='allOption'
-                               [showSelectAll]="true">
-              </ejs-multiselect>
-            </div>
-          </div>
-          <div class="input-container">
-            <label for="locationIds">Location</label>
-            <div class="input-group multiselect">
-              <ejs-multiselect id="locationIds" mode="CheckBox"
-                               formControlName="locationIds"
-                               placeholder="All"
-                               [fields]="optionFields"
-                               [allowFiltering]="true"
-                               [showDropDownIcon]="true"
-                               appValidateWithMessage
-                               [dataSource]="orgStructureData.locationIds.dataSource"
-                               [selectAllText]='allOption'
-                               [showSelectAll]="true">
-              </ejs-multiselect>
             </div>
           </div>
         </div>
