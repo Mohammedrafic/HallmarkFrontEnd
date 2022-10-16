@@ -125,7 +125,7 @@ import { PermissionService } from '../../../security/services/permission.service
   selector: 'app-order-management-content',
   templateUrl: './order-management-content.component.html',
   styleUrls: ['./order-management-content.component.scss'],
-  providers: [VirtualScrollService, DetailRowService, MaskedDateTimeService],
+  providers: [VirtualScrollService, DetailRowService, MaskedDateTimeService], 
 })
 export class OrderManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') override gridWithChildRow: GridComponent;
@@ -240,6 +240,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public selectedRowRef: any;
 
   private isRedirectedFromDashboard: boolean;
+  private orderStaus: number;
+  private numberArr : number[] =[];
+
   private isRedirectedFromToast: boolean;
   private quickOrderId: number;
   private dashboardFilterSubscription: Subscription;
@@ -268,6 +271,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     super();
     this.isRedirectedFromDashboard =
       this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromDashboard'] || false;
+    this.orderStaus = this.router.getCurrentNavigation()?.extras?.state?.['orderStatus'] || 0;
+
     this.isRedirectedFromToast = this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromToast'] || false;
     this.quickOrderId = this.router.getCurrentNavigation()?.extras?.state?.['publicId'];
     this.prefix = this.router.getCurrentNavigation()?.extras?.state?.['prefix'];
@@ -1390,6 +1395,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private applyDashboardFilters(): void {
+    this.orderStaus >0 ? this.numberArr.push(this.orderStaus) : [];
+    this.filters.orderStatuses = this.numberArr;
+   
     combineLatest([this.organizationId$, this.filteredItems$])
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(([organizationId, items]) => {
