@@ -17,15 +17,16 @@ export const toCorrectTimezoneFormat = (value: Date | string): any => {
   }
 };
 
-export const getTimeFromDate = (date: Date): string | null => {
+export const getTimeFromDate = (date: Date, isUTC?: boolean): string | null => {
   if (!date) {
     return null;
   }
 
-  return new Date(date).toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const params = isUTC
+    ? ({ hour: '2-digit', minute: '2-digit', timeZone: 'UTC' } as const)
+    : ({ hour: '2-digit', minute: '2-digit' } as const);
+
+  return new Date(date).toLocaleTimeString('en-US', { ...params });
 };
 
 export const setTimeToDate = (time: string | null): Date | null => {

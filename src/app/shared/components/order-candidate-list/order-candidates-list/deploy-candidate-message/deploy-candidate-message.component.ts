@@ -1,4 +1,13 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import { CandidatesBasicInfo, OrderCandidatesList } from '../../../../models/order-management.model';
 import { Select, Store } from '@ngxs/store';
 import { GetCandidatesBasicInfo } from '@agency/store/order-management.actions';
@@ -9,46 +18,52 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 @Component({
   selector: 'app-deploy-candidate-message',
   templateUrl: './deploy-candidate-message.component.html',
-  styleUrls: ['./deploy-candidate-message.component.scss']
+  styleUrls: ['./deploy-candidate-message.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DeployCandidateMessageComponent implements OnChanges, OnInit, OnDestroy {
-  @Input() candidate: OrderCandidatesList
-  @Input() isAgency: boolean
+  @Input() candidate: OrderCandidatesList;
+  @Input() isAgency: boolean;
 
   @Select(OrderManagementState.candidateBasicInfo)
-  candidateBasicInfoStateAg$: Observable<CandidatesBasicInfo>
+  candidateBasicInfoStateAg$: Observable<CandidatesBasicInfo>;
   @Select(OrderManagementContentState.candidateBasicInfo)
-  candidateBasicInfoStateOrg$: Observable<CandidatesBasicInfo>
+  candidateBasicInfoStateOrg$: Observable<CandidatesBasicInfo>;
 
-  public candidateBasicInfo: CandidatesBasicInfo
+  public candidateBasicInfo: CandidatesBasicInfo;
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store) { }
-
+  constructor(private store: Store, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.subscribeOnInitialObs()
+    this.subscribeOnInitialObs();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const deployedCandidate = this.candidate.deployedCandidateInfo
+    const deployedCandidate = this.candidate.deployedCandidateInfo;
 
     if (deployedCandidate) {
-      this.store.dispatch(new GetCandidatesBasicInfo(this.candidate.deployedCandidateInfo!.organizationId, this.candidate.deployedCandidateInfo!.jobId))
+      this.store.dispatch(
+        new GetCandidatesBasicInfo(
+          this.candidate.deployedCandidateInfo!.organizationId,
+          this.candidate.deployedCandidateInfo!.jobId
+        )
+      );
     }
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next()
-    this.unsubscribe$.complete()
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
-
   private subscribeOnInitialObs() {
-    combineLatest([this.candidateBasicInfoStateAg$, this.candidateBasicInfoStateOrg$]).pipe(takeUntil(this.unsubscribe$))
+    combineLatest([this.candidateBasicInfoStateAg$, this.candidateBasicInfoStateOrg$])
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe(([dataAg, dataOrg]) => {
-      this.candidateBasicInfo = dataAg ?? dataOrg
-    })
+        this.candidateBasicInfo = dataAg ?? dataOrg;
+        this.cdr.markForCheck();
+      });
   }
 }

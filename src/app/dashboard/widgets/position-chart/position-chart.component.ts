@@ -26,7 +26,7 @@ export class PositionChartComponent {
 
   public toSourceContent(event: MouseEvent): void {
     if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
-      this.dashboardService.redirectToUrl('client/order-management');
+      this.dashboardService.redirectToUrl('client/order-management/', this.chartData === undefined ? 0 : this.chartData.orderStatus);
     }
   }
 }
