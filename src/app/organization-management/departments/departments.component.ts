@@ -91,9 +91,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     { text:'Ext Department ID', column: 'ExtDepartmentId'},
     { text:'Invoice Department ID', column: 'InvoiceDepartmentId'},
     { text:'Department Name', column: 'DepartmentName'},
-    { text:'Department Email', column: 'DepartmentEmail'},
-    { text:'Department Contact', column: 'DepartmentContact'},
-    { text:'Department Phone NO', column: 'DepartmentPhoneNo'},
+    { text:'Department Email', column: 'FacilityEmail'},
+    { text:'Department Contact', column: 'FacilityContact'},
+    { text:'Department Phone NO', column: 'FacilityPhoneNo'},
     { text:'Inactivate Date', column: 'InactiveDate'}
   ];
   public fileName: string;
@@ -398,9 +398,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       extDepartmentId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       invoiceDepartmentId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       departmentName: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      facilityContact: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      facilityEmail: ['', [Validators.required, Validators.email]],
-      facilityPhoneNo: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(10), Validators.pattern(/^\d+$/i)]],
+      facilityContact: ['', [Validators.minLength(1), Validators.maxLength(50)]],
+      facilityEmail: ['', [Validators.email]],
+      facilityPhoneNo: ['', [Validators.minLength(1), Validators.maxLength(10), Validators.pattern(/^\d+$/i)]],
       inactiveDate: [null]
     });
     this.DepartmentFilterFormGroup = this.formBuilder.group({
