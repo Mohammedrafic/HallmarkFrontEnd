@@ -91,10 +91,6 @@ export class PaymentDetailsGridComponent
       });
   }
 
-  public onFilter(): void {
-    // TBI
-  }
-
   public addNew(): void {
     this.isEditMode = false;
     this.openEvent.next(true);

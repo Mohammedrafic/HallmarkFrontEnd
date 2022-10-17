@@ -231,9 +231,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
-  public onExportOptionSelect(event: unknown): void {
-  }
-
   public handleChangeTab(tabIdx: number): void {
     this.selectedTabIdx = tabIdx;
     this.store.dispatch([
