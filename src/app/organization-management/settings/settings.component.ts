@@ -67,9 +67,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public considerPushDaysFormGroup: FormGroup;
   public formBuilder: FormBuilder;
 
-  @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<
-    CurrentUserPermission[]
-  >;
+  @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<CurrentUserPermission[]>;
 
   @Select(OrganizationManagementState.organizationSettings)
   public settings$: Observable<OrganizationSettingsGet[]>;
@@ -710,7 +708,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       )
       .subscribe((permissions) => {
         const hasPermission = permissions.includes(PermissionTypes.ManageOrganizationConfigurations);
-        this.settingFields.forEach((key) => (this.hasPermissions[key] = hasPermission));
+        this.settingFields.forEach((key) => this.hasPermissions[key] = hasPermission);
       });
   }
 }
