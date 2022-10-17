@@ -201,14 +201,17 @@ export class SecurityState {
 
   @Action(GetBusinessByUnitType)
   GetBusinessByUnitType(
-    { patchState }: StateContext<SecurityStateModel>,
+    { dispatch,patchState }: StateContext<SecurityStateModel>,
     { type }: GetBusinessByUnitType
-  ): Observable<BusinessUnit[]> {
+  ): Observable<BusinessUnit[] | void> {
     return this.businessUnitService.getBusinessByUnitType(type).pipe(
       tap((payload) => {
         patchState({ newRoleBussinesData: payload });
         patchState({ bussinesData: payload });
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
   }
@@ -217,7 +220,7 @@ export class SecurityState {
   GetNewRoleBusinessByUnitType(
     { patchState, dispatch }: StateContext<SecurityStateModel>,
     { type }: GetNewRoleBusinessByUnitType
-  ): Observable<BusinessUnit[]> {
+  ): Observable<BusinessUnit[] | void> {
     patchState({ isNewRoleDataLoading: true });
     return this.businessUnitService.getBusinessByUnitType(type).pipe(
       tap((payload) => {
@@ -225,78 +228,96 @@ export class SecurityState {
         patchState({ newRoleBussinesData: payload });
         dispatch(new GetNewRoleBusinessByUnitTypeSucceeded(type));
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
   }
 
   @Action(GetRolesPage)
   GetRolesPage(
-    { patchState }: StateContext<SecurityStateModel>,
+    { dispatch,patchState }: StateContext<SecurityStateModel>,
     { businessUnitIds, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters }: GetRolesPage
-  ): Observable<RolesPage> {
+  ): Observable<RolesPage | void> {
     return this.roleService
       .getRolesPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel, filters)
       .pipe(
         tap((payload) => {
           patchState({ rolesPage: payload });
           return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
         })
       );
   }
 
   @Action(GetRolePerUser)
   GetRolesPerPage(
-    { patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     { businessUnitType, businessUnitIds }: GetRolePerUser
-  ): Observable<RolesPerUser[]> {
+  ): Observable<RolesPerUser[] | void> {
     return this.userService.getRolesPerUser(businessUnitType, businessUnitIds).pipe(
       tap((payload) => {
         patchState({ rolesPerUsers: payload });
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
   }
 
   @Action(GetUsersPage)
   GetUsersPage(
-    { patchState }: StateContext<SecurityStateModel>,
+    { dispatch,patchState }: StateContext<SecurityStateModel>,
     { businessUnitIds, businessUnitType, pageNumber, pageSize, sortModel, filterModel }: GetUsersPage
-  ): Observable<UsersPage> {
+  ): Observable<UsersPage | void> {
     return this.userService
       .getUsersPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel)
       .pipe(
         tap((payload) => {
           patchState({ usersPage: payload });
           return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
         })
       );
   }
   @Action(GetAllUsersPage)
   GetAllUsersPage(
-    { patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     { businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel, getAll }: GetAllUsersPage
-  ): Observable<UsersPage> {
+  ): Observable<UsersPage | void> {
     return this.userService
       .getAllUsersPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel, getAll)
       .pipe(
         tap((payload) => {
           patchState({ allUsersPage: payload });
           return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
         })
       );
   }
 
   @Action(GetPermissionsTree)
   GetPermissionsTree(
-    { patchState }: StateContext<SecurityStateModel>,
+    { dispatch,patchState }: StateContext<SecurityStateModel>,
     { type }: GetPermissionsTree
-  ): Observable<PermissionsTree> {
+  ): Observable<PermissionsTree | void> {
     patchState({ isNewRoleDataLoading: true });
     return this.roleService.getPermissionsTree(type).pipe(
       tap((payload) => {
         patchState({ permissionsTree: payload });
         patchState({ isNewRoleDataLoading: false });
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
   }
@@ -359,12 +380,14 @@ export class SecurityState {
         dispatch(new SaveUserSucceeded(payload));
         return payload;
       }),
-      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
     );
   }
 
   @Action(RemoveRole)
-  RemoveRole({ patchState, getState }: StateContext<SecurityStateModel>, { id }: RemoveRole): Observable<RolesPage> {
+  RemoveRole({ dispatch,patchState, getState }: StateContext<SecurityStateModel>, { id }: RemoveRole): Observable<RolesPage | void> {
     const state = getState();
     return this.roleService.removeRoles(id).pipe(
       tap(() => {
@@ -373,6 +396,9 @@ export class SecurityState {
           const rolesPage = { ...state.rolesPage, items };
           patchState({ rolesPage });
         }
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
   }
@@ -407,12 +433,15 @@ export class SecurityState {
   SaveUserVisibilitySettings(
     { dispatch }: StateContext<SecurityStateModel>,
     { payload }: SaveUserVisibilitySettings
-  ): Observable<UserVisibilitySettingsPage> {
+  ): Observable<UserVisibilitySettingsPage | void> {
     return this.userService.saveUserVisibilitySettings(payload).pipe(
       tap((payload) => {
         dispatch(new SaveUserVisibilitySettingsSucceeded());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
   }
@@ -424,15 +453,17 @@ export class SecurityState {
   ): Observable<void> {
     return this.userService.removeUserVisibilitySettings(id, userId).pipe(
       tap(() => dispatch(new RemoveUserVisibilitySettingSucceeded())),
-      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
     );
   }
 
   @Action(GetOrganizationsStructureAll)
   GetOrganizationsStructureAll(
-    { patchState }: StateContext<SecurityStateModel>,
+    { dispatch,patchState }: StateContext<SecurityStateModel>,
     { userId }: GetOrganizationsStructureAll
-  ): Observable<Organisation[]> {
+  ): Observable<Organisation[] |void> {
     return this.userService.getUserVisibilitySettingsOrganisation(userId).pipe(
       tap((payload) => {
         payload.forEach((organization: Organisation) => {
@@ -453,6 +484,9 @@ export class SecurityState {
         });
         patchState({ organizations: payload });
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
   }
@@ -478,13 +512,16 @@ export class SecurityState {
   }
   @Action(GetUSCanadaTimeZoneIds)
   GetUSCanadaTimeZoneIds(
-    { patchState }: StateContext<SecurityStateModel>,
+    { dispatch,patchState }: StateContext<SecurityStateModel>,
     {}: GetUSCanadaTimeZoneIds
-  ): Observable<TimeZoneModel[]> {
+  ): Observable<TimeZoneModel[] | void> {
     return this.nodatimeService.getUSCanadaTimeZoneIds().pipe(
       tap((payload) => {
         patchState({ timeZones: payload });
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
   }

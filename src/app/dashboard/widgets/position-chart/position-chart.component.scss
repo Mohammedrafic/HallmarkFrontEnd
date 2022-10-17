@@ -7,9 +7,11 @@
   height: 100%;
 
   &__title {
+    padding-bottom: 4%;
     font-size: 24px;
     font-weight: 700;
-    padding-bottom: 2%;
+    line-height: 24px;
+    align-items: center;
 
     @media screen and (max-width: 600px) {
       padding-bottom: 3px;
@@ -19,7 +21,11 @@
   &__type {
     font-size: 14px;
     color: $secondary-dark-blue-20;
-    margin-right: -16px;
+    margin-right: -12px;
     cursor: default;
   }
+}
+.app-widget-wrapper_1x1 {
+  padding-top: 38% !important;
+  padding-right: 30%!important;
 }

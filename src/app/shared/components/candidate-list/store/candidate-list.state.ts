@@ -4,7 +4,7 @@ import { Action, State, StateContext, Selector } from '@ngxs/store';
 import { catchError, Observable, tap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ShowToast } from '../../../../store/app.actions';
-import { MessageTypes } from '../../../enums/message-types';
+import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateListService } from '../services/candidate-list.service';
 import {
   ChangeCandidateProfileStatus,
@@ -12,8 +12,8 @@ import {
   GetAllSkills,
   GetCandidatesByPage,
 } from './candidate-list.actions';
-import { ListOfSkills } from '../../../models/skill.model';
-import { saveSpreadSheetDocument } from '../../../utils/file.utils';
+import { ListOfSkills } from '@shared/models/skill.model';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 export interface CandidateListStateModel {
   isCandidateLoading: boolean;
@@ -42,7 +42,7 @@ export class CandidateListState {
   }
   constructor(private candidateListService: CandidateListService) {}
 
-  @Action(GetCandidatesByPage)
+  @Action(GetCandidatesByPage, { cancelUncompleted: true })
   GetCandidatesByPage(
     { patchState, dispatch }: StateContext<CandidateListStateModel>,
     { payload }: GetCandidatesByPage

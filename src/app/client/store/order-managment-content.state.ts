@@ -797,6 +797,10 @@ export class OrderManagementContentState {
       tap((payload) => {
         patchState({ candidatesBasicInfo: payload });
         return payload;
+      }),
+      catchError(() => {
+        patchState({ candidatesBasicInfo: null });
+        return of();
       })
     );
   }
