@@ -228,7 +228,77 @@
             </div>
           </div>
         </div>
+        <section *ngIf="!isEditDocument">
+          <div class="form-elemet">
+            <div class="input-container bootstrap">
+              <span><i-feather name="share-2" class="icon"></i-feather></span>
+              <span class="share-with-text">Share With</span>
+            </div>
+          </div>
+          <div class="form-elemet">
+            <div class="input-container bootstrap">
+              <ejs-switch id="hallmark-switcher"
+                          [checked]="halmarkSwitch"
+                          (change)="onHallmarkSwitcher($event);"></ejs-switch>
+              <label for="hallmark-switcher" class="switch-text">Hallmark</label>
+            </div>
+          </div>
+          <div class="form-elemet">
+            <div class="group">
+              <div class="input-container agency-switcher-container">
+                <div class="input-group datepicker">
+                  <ejs-switch id="agency-switcher"
+                              [checked]="agencySwitch"
+                              (change)="onAgencySwitcher($event);"></ejs-switch>
+                  <label for="agency-switcher" class="switch-text">Agencies</label>
+                </div>
+              </div>
+              <div class="input-container calendar">
+                <div class="input-group multiselect">
 
+                  <ejs-multiselect mode="CheckBox"
+                                   formControlName="agencies"
+                                   placeholder="All"
+                                   [allowFiltering]="true"
+                                   [showDropDownIcon]="true"
+                                   [fields]="optionFields"
+                                   [dataSource]="agencyData"
+                                   [selectAllText]='allOption'
+                                   showSelectAll=true
+                                   [enabled]="agencySwitch">
+                  </ejs-multiselect>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-elemet">
+            <div class="group">
+              <div class="input-container agency-switcher-container">
+                <div class="input-group datepicker">
+                  <ejs-switch id="org-switcher"
+                              [checked]="organizationSwitch"
+                              (change)="onOrganizationSwitcher($event);"></ejs-switch>
+                  <label for="org-switcher" class="switch-text">Organization</label>
+                </div>
+              </div>
+              <div class="input-container calendar">
+                <div class="input-group multiselect">
+                  <ejs-multiselect mode="CheckBox"
+                                   formControlName="orgnizations"
+                                   placeholder="All"
+                                   [allowFiltering]="true"
+                                   [showDropDownIcon]="true"
+                                   [fields]="optionFields"
+                                   [dataSource]="orgStructureData.organizationIds.dataSource"
+                                   [selectAllText]='allOption'
+                                   showSelectAll=true
+                                   [enabled]="organizationSwitch">
+                  </ejs-multiselect>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </section>
     </section>
     <section *ngIf="isShare">
@@ -246,27 +316,6 @@
           <label for="hallmark-switcher" class="switch-text">Hallmark</label>
         </div>
       </div>
-      <div class="form-elemet" hidden>
-        <div class="group">
-          <div class="input-container agency-switcher-container">
-            <div class="input-group datepicker">
-              <ejs-switch id="msp-switcher"
-                          [checked]="mspSwitch"
-                          (change)="onMspSwitcher($event);"></ejs-switch>
-              <label for="agency-switcher" class="switch-text">MSP</label>
-            </div>
-          </div>
-          <div class="input-container calendar">
-            <div class="input-group multiselect">
-              <ejs-dropdownlist formControlName="msp"
-                                [fields]="optionFields"
-                                [dataSource]="mspData"
-                                placeholder="Business"
-                                [enabled]="mspSwitch"></ejs-dropdownlist>
-            </div>
-          </div>
-        </div>
-      </div>
       <div class="form-elemet">
         <div class="group">
           <div class="input-container agency-switcher-container">
@@ -279,11 +328,18 @@
           </div>
           <div class="input-container calendar">
             <div class="input-group multiselect">
-              <ejs-dropdownlist formControlName="agencies"
-                                [fields]="optionFields"
-                                [dataSource]="agencyData"
-                                placeholder="Business"
-                                [enabled]="agencySwitch"></ejs-dropdownlist>
+             
+              <ejs-multiselect mode="CheckBox"
+                               formControlName="agencies"
+                               placeholder="All"
+                               [allowFiltering]="true"
+                               [showDropDownIcon]="true"
+                               [fields]="optionFields"
+                               [dataSource]="agencyData"
+                               [selectAllText]='allOption'
+                               showSelectAll=true
+                               [enabled]="agencySwitch">
+              </ejs-multiselect>
             </div>
           </div>
         </div>
@@ -300,11 +356,17 @@
           </div>
           <div class="input-container calendar">
             <div class="input-group multiselect">
-              <ejs-dropdownlist formControlName="orgnizations"
-                                [fields]="optionFields"
-                                [dataSource]="orgStructureData.organizationIds.dataSource"
-                                placeholder="Business"
-                                [enabled]="organizationSwitch"></ejs-dropdownlist>
+              <ejs-multiselect mode="CheckBox"
+                               formControlName="orgnizations"
+                               placeholder="All"
+                               [allowFiltering]="true"
+                               [showDropDownIcon]="true"
+                               [fields]="optionFields"
+                               [dataSource]="orgStructureData.organizationIds.dataSource"
+                               [selectAllText]='allOption'
+                               showSelectAll=true
+                               [enabled]="organizationSwitch">
+              </ejs-multiselect>
             </div>
           </div>
         </div>
@@ -315,6 +377,6 @@
 
 <app-document-preview-side-dialog [header]="previewTitle" (previewCloseClick)="onClosePreview()" [width]="dialogWidth">
   <section *ngIf="previewUrl!=null">
-    <iframe [src]="previewUrl" style="width:100%;height:auto;overflow-y:auto;"></iframe>
+    <object [data]="previewUrl" width="100%" height="650px">Preview not available</object>
   </section>
 </app-document-preview-side-dialog>

@@ -16,12 +16,12 @@ export interface DocumentLibraryStateModel {
   documentsPage: DocumentsLibraryPage | null,
   documentFolder: DocumentFolder | null
   documentTypes: DocumentTypes[] | null
-  documents: Documents | null,
+  savedDocumentLibraryDto: DocumentLibraryDto | null,
   documentTags: DocumentTags[] | null,
   documentDownloadDetail: DownloadDocumentDetail | null,
   sharedDocumentPostDetails: SharedDocumentPostDto[] | null,
   documentLibraryDto: DocumentLibraryDto | null,
-  shareDocumentInfoPage: ShareDocumentInfoPage | null
+  shareDocumentInfoPage: ShareDocumentInfoPage | null,
 }
 
 @State<DocumentLibraryStateModel>({
@@ -31,7 +31,7 @@ export interface DocumentLibraryStateModel {
     documentsPage: null,
     documentFolder: null,
     documentTypes: null,
-    documents: null,
+    savedDocumentLibraryDto: null,
     documentTags: null,
     documentDownloadDetail: null,
     sharedDocumentPostDetails: null,
@@ -83,6 +83,11 @@ export class DocumentLibraryState {
     return state.documentLibraryDto;
   }
 
+  @Selector()
+  static savedDocumentLibraryDto(state: DocumentLibraryStateModel): DocumentLibraryDto | null {
+    return state.savedDocumentLibraryDto;
+  }
+
   @Action(GetFoldersTree)
   GetFoldersTree({ patchState }: StateContext<DocumentLibraryStateModel>, { folderTreeFilter }: GetFoldersTree): Observable<FolderTreeItem[]> {
     return this.documentLibraryService.getFoldersTree(folderTreeFilter).pipe(
@@ -131,11 +136,12 @@ export class DocumentLibraryState {
 
   @Action(SaveDocuments)
   SaveDocuments(
-    { dispatch }: StateContext<DocumentLibraryStateModel>,
+    { dispatch, patchState }: StateContext<DocumentLibraryStateModel>,
     { document }: SaveDocuments
   ): Observable<DocumentLibraryDto | void> {
     return this.documentLibraryService.saveDocuments(document).pipe(
       tap((document) => {
+        patchState({ savedDocumentLibraryDto: document });
         dispatch([
           new ShowToast(MessageTypes.Success, document.id > 0 ? RECORD_MODIFIED : RECORD_ADDED),
         ]);
