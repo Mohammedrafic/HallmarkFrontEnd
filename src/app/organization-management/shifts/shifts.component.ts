@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
@@ -13,7 +13,6 @@ import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_R
 import { Shift } from 'src/app/shared/models/shift.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
-import { endTimeValidator, startTimeValidator } from '@shared/validators/date.validator';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { DatePipe } from '@angular/common';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
@@ -44,13 +43,7 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
     text: 'name', value: 'id'
   };
   public title = '';
-  public startTimeField: AbstractControl;
-  public endTimeField: AbstractControl;
   public showForm = true;
-  public defaultMaxTime = new Date();
-  public defaultMinTime = new Date();
-  public maxTime = this.defaultMaxTime;
-  public minTime = this.defaultMinTime;
   public maskPlaceholderValue: Object = { hour: 'HH', minute: 'MM' };
   public columnsToExport: ExportColumn[] = [
     { text:'Shift Name', column: 'Name'},
@@ -67,8 +60,6 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
     super();
-    this.defaultMaxTime.setHours(23, 59, 59);
-    this.defaultMinTime.setHours(0, 0, 0);
     this.ShiftFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
       name: new FormControl(null, [ Validators.required ]),
@@ -76,17 +67,6 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
       startTime: new FormControl(null, [ Validators.required ]),
       endTime: new FormControl(null, [ Validators.required ]),
     });
-
-    this.startTimeField = this.ShiftFormGroup.get('startTime') as AbstractControl;
-    this.endTimeField = this.ShiftFormGroup.get('endTime') as AbstractControl;
-    this.endTimeField.valueChanges.subscribe(val => { 
-      this.maxTime = val || this.defaultMaxTime; this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false }); 
-    });
-    this.startTimeField.valueChanges.subscribe(val => {
-      this.minTime = val || this.defaultMinTime; this.endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-    });
-    this.startTimeField.addValidators(startTimeValidator(this.ShiftFormGroup, 'endTime'));
-    this.endTimeField.addValidators(endTimeValidator(this.ShiftFormGroup, 'startTime'));
   }
 
   ngOnInit() {

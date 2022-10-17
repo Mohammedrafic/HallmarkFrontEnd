@@ -53,8 +53,6 @@ import { OrderType } from '@shared/enums/order-type';
 import { Duration } from '@shared/enums/durations';
 import { JobDistribution } from '@shared/enums/job-distibution';
 import { JobClassification } from '@shared/enums/job-classification';
-
-import { endTimeValidator, startTimeValidator } from '@shared/validators/date.validator';
 import { integerValidator } from '@shared/validators/integer.validator';
 import { currencyValidator } from '@shared/validators/currency.validator';
 
@@ -124,13 +122,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   public orderStatus = 'Incomplete';
   public order: Order | null;
-
-  public today = new Date();
-  public defaultMaxTime = new Date();
-  public defaultMinTime = new Date();
-
-  public maxTime = this.defaultMaxTime;
-  public minTime = this.defaultMinTime;
 
   public documents: Blob[] = [];
   public deleteDocumentsGuids: string[] = [];
@@ -450,19 +441,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       }
 
       this.autoSetupJobEndDateControl(duration, jobStartDate);
-    });
-
-    this.defaultMaxTime.setHours(23, 59, 59);
-    this.defaultMinTime.setHours(0, 0, 0);
-
-    shiftEndTimeControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
-      this.maxTime = val || this.defaultMaxTime;
-      shiftStartTimeControl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-    });
-
-    shiftStartTimeControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
-      this.minTime = val || this.defaultMinTime;
-      shiftEndTimeControl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
     });
 
     shiftNameControl.valueChanges.pipe(
@@ -1225,11 +1203,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   setShiftsValidation(shiftStart: AbstractControl, shiftEnd: AbstractControl): void {
     shiftStart.addValidators([
       Validators.required,
-      startTimeValidator(this.generalInformationForm, 'shiftEndTime')
     ]);
     shiftEnd.addValidators([
       Validators.required,
-      endTimeValidator(this.generalInformationForm, 'shiftStartTime')
     ]);
   }
 
