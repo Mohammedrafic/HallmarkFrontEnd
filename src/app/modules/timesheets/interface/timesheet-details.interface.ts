@@ -93,6 +93,7 @@ export interface TimesheetDetailsModel {
   allowDNWInTimesheets?: boolean;
   mileageTimesheetId: number;
   agencyStatus: AgencyStatus;
+  isEmpty: boolean;
 }
 
 export interface WorkWeek<T> {

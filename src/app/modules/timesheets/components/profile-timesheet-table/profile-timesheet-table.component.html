@@ -77,6 +77,19 @@
               <span>{{ submitText }}</span>
             </ng-template>
           </button>
+          <button
+            *ngIf="!isApproveBtnEnabled && isOrgSubmitBtnEnabled"
+            ejs-button
+            [isPrimary]="true"
+            [disabled]="disableAnyAction || actionButtonDisabled"
+            class="spinner-btn privilege"
+            (click)="orgSubmit()"
+          >
+            <div #spinner class="spinner-container" *ngIf="loading; else submittext"></div>
+            <ng-template #submittext>
+              <span>Submit</span>
+            </ng-template>
+          </button>
         </div>
     </div>
 

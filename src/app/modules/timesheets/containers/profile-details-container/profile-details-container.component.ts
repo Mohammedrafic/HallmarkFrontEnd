@@ -289,15 +289,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public handleApprove(isTimesheetOrMileagesUpdate: boolean): void {
     const { timesheetId, mileageTimesheetId, organizationId } = this;
+    const updateId = isTimesheetOrMileagesUpdate ? timesheetId : mileageTimesheetId;
 
     (organizationId ?
-      this.timesheetDetailsService.submitTimesheet(
-        isTimesheetOrMileagesUpdate ? timesheetId : mileageTimesheetId,
-        organizationId, isTimesheetOrMileagesUpdate) :
-      this.timesheetDetailsService.approveTimesheet(
-        isTimesheetOrMileagesUpdate ? timesheetId : mileageTimesheetId,
-        isTimesheetOrMileagesUpdate
-      )
+      this.timesheetDetailsService.submitTimesheet(updateId, organizationId, isTimesheetOrMileagesUpdate)
+        : this.timesheetDetailsService.approveTimesheet(updateId, isTimesheetOrMileagesUpdate)
     )
       .pipe(
         takeUntil(this.componentDestroy())
@@ -306,6 +302,25 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
         this.handleProfileClose();
         this.store.dispatch(new Timesheets.GetAll());
       });
+  }
+
+  public orgSubmit(): void {
+    const timesheetDetails = this.store.selectSnapshot(TimesheetsState.timesheetDetails);
+
+    if (timesheetDetails?.isEmpty) {
+      this.timesheetDetailsService.orgSubmitEmptyTimesheet().pipe(take(1), takeUntil(this.componentDestroy())).subscribe();
+    } else {
+      this.timesheetDetailsService.submitTimesheet(
+        this.timesheetId,
+        timesheetDetails?.organizationId as number,
+        true
+      ).pipe(
+        takeUntil(this.componentDestroy())
+      ).subscribe(() => {
+        this.handleProfileClose();
+        this.store.dispatch(new Timesheets.GetAll());
+      });
+    }
   }
 
   private startSelectedTimesheetWatching(): void {

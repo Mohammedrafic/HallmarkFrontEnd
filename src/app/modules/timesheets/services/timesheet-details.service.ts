@@ -6,7 +6,11 @@ import { catchError, distinctUntilChanged, filter, Observable, skip, switchMap, 
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MessageTypes } from '@shared/enums/message-types';
 import { DateWeekService } from '@core/services';
-import { approveTimesheetDialogData, submitTimesheetDialogData } from '../constants';
+import {
+  approveTimesheetDialogData,
+  orgSubmitEmptyTimesheetDialogData,
+  submitTimesheetDialogData
+} from '../constants';
 import { TimesheetDetails } from '../store/actions/timesheet-details.actions';
 import { ShowToast } from '../../../store/app.actions';
 import { Timesheets } from '../store/actions/timesheets.actions';
@@ -75,6 +79,16 @@ export class TimesheetDetailsService {
           this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
         ),
       );
+  }
+
+  public orgSubmitEmptyTimesheet(): Observable<boolean> {
+    const { title, submitButtonText, confirmMessage } = orgSubmitEmptyTimesheetDialogData();
+
+    return this.confirmService.confirm(confirmMessage, {
+      title,
+      okButtonLabel: submitButtonText,
+      okButtonClass: ''
+    });
   }
 
   public getAttachmentsListConfig(

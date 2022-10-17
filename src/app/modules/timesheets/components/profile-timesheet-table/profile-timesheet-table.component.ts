@@ -1,6 +1,16 @@
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef,
-  EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { combineLatest, Observable, takeUntil } from 'rxjs';
@@ -14,7 +24,7 @@ import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.const
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
-import { RecordFields, RecordsMode, SubmitBtnText, TIMETHEETS_STATUSES, RecordStatus } from '../../enums';
+import { RecordFields, RecordsMode, RecordStatus, SubmitBtnText, TIMETHEETS_STATUSES } from '../../enums';
 import { RecordsTabConfig, TimesheetConfirmMessages, TimesheetRecordsColdef } from '../../constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
@@ -66,6 +76,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Output() readonly approveEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
+  @Output() readonly orgSubmitting: EventEmitter<void> = new EventEmitter<void>();
+
   @Select(TimesheetsState.tmesheetRecords)
   public readonly timesheetRecords$: Observable<TimesheetRecordsDto>;
 
@@ -107,6 +119,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   public isEditEnabled = false;
 
   public isApproveBtnEnabled = false;
+
+  public isOrgSubmitBtnEnabled = false;
 
   public isRejectBtnEnabled = false;
 
@@ -289,6 +303,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.approveEvent.emit(this.currentTab === RecordFields.Time);
   }
 
+  public orgSubmit(): void {
+    this.orgSubmitting.emit();
+  }
+
   public uploadAttachments(id: number, attachments: Attachment[]): void {
     this.uploadSideDialog.emit({ id, attachments });
   }
@@ -429,6 +447,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
     this.isApproveBtnEnabled = !!currentTabMapping.get(this.currentTab);
     this.isRejectBtnEnabled = !this.isAgency && !!currentTabMapping.get(this.currentTab);
+    this.isOrgSubmitBtnEnabled = this.orgCanSubmit(this.currentTab);
   }
 
   private setActionBtnState(): void {
@@ -511,5 +530,13 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private checkTabStatusApproved(): boolean {
     return (this.currentTab === RecordFields.Time && this.timesheetDetails.status === TimesheetStatus.Approved);
+  }
+
+  private orgCanSubmit(currentTab: RecordFields): boolean {
+    const isOrgAndTimesheetTab = !this.isAgency && currentTab === RecordFields.Time;
+    const isStatusPass = this.timesheetDetails.status === TimesheetStatus.Missing
+      || this.timesheetDetails.status === TimesheetStatus.Incomplete;
+
+    return isOrgAndTimesheetTab && this.timesheetDetails.canEditTimesheet && isStatusPass;
   }
 }

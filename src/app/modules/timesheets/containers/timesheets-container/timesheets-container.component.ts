@@ -12,14 +12,11 @@ import { DialogAction } from '@core/enums';
 import { Destroyable } from '@core/helpers';
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
-import { MessageTypes } from '@shared/enums/message-types';
 import { DataSourceItem } from '@core/interface';
-import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { TabConfig, TabCountConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
-import {
-  TimesheetExportOptions, TAB_ADMIN_TIMESHEETS, UNIT_ORGANIZATIONS_FIELDS,
-  BulkApproveSuccessMessage } from '../../constants';
+import { TimesheetExportOptions, TAB_ADMIN_TIMESHEETS, UNIT_ORGANIZATIONS_FIELDS } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { ExportType } from '../../enums';
@@ -182,16 +179,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public bulkApprove(data: RowNode[]): void {
-    const timesheetIds = data.map((el: RowNode) => el.data.id);
-
-    this.store.dispatch(new Timesheets.BulkApprove(timesheetIds)).pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.store.dispatch([
-        new ShowToast(MessageTypes.Success, BulkApproveSuccessMessage.successMessage),
-        new Timesheets.GetAll()
-      ]);
-    });
+    this.store.dispatch(new Timesheets.BulkApprove(data));
   }
 
   public bulkExport(data: RowNode[]): void {
