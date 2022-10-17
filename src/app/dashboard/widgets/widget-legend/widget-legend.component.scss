@@ -82,18 +82,18 @@
    align-items: center; 
 }
 
-.left{
+.widget_left{
   width: 45% !important;
-  display: flex;
   align-items: center;
+  display: flex;
 }
-.center{
+.widget_center{
   width: 20% !important;
-  display: flex;
   align-items: center;
+  display: flex;
 }
-.right{
+.widget_right{
   width: 35% !important;
   align-items: right;
   display: flex;
-}
+ }

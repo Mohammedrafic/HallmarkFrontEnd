@@ -79,6 +79,7 @@
 
   <ng-template #legend>
     <app-widget-legend
+      [isPositionTrend]="true"
       [legendData]="chartLegend"
       (changeCheckbox)="onClickLegend($event)"
       (onClickLegend)="redirectToSourceContent()"
