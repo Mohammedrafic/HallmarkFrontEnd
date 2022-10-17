@@ -165,8 +165,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     { text: 'Consider For Weekly OT', column: 'ConsiderForWeeklyOT' },
     { text: 'Consider For Daily OT', column: 'ConsiderForDailyOT' },
     { text: 'Consider For 7th Day OT', column: 'ConsiderFor7thDayOT' },
-    { text: 'Regular Local', column: 'RegularLocal' },
-    { text: 'Display In Timesheet', column: 'DisplayInTimesheet' },
     { text: 'Display In Job', column: 'DisplayInJob' },
   ];
   public fileName: string;
@@ -279,12 +277,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         type: ControlTypes.Checkbox,
         valueType: ValueType.Text,
         checkBoxTitle: 'Consider for 7th Day OT',
-      },
-      regularLocal: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Regular/Local' },
-      displayInTimesheet: {
-        type: ControlTypes.Checkbox,
-        valueType: ValueType.Text,
-        checkBoxTitle: 'Display in Timesheet',
       },
       displayInJob: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Display in Job' },
     };

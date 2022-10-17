@@ -13,12 +13,6 @@
         ></ejs-dropdownlist>
       </div>
       <button
-        ejs-button
-        id="importButton"
-        cssClass="e-outline button-import"
-        (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather>
-      </button>
-      <button
         ejs-dropdownbutton
         [items]="exportOptions"
         (select)="exportSelected($event)"
