@@ -126,14 +126,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
           jobStartDate ? DateTimeHelper.convertDateToUtc(jobStartDate.toString()) : '',
           Validators.required,
         ],
-        shiftStartTime: [
-          shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
-          Validators.required,
-        ],
-        shiftEndTime: [
-          shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
-          Validators.required,
-        ],
+        shiftStartTime: [shiftStartTime ?? '', Validators.required],
+        shiftEndTime: [shiftEndTime ?? '', Validators.required],
         billRate: [hourlyRate ?? '', Validators.required],
         openPosition: [openPositions ?? '', [Validators.required, Validators.min(1)]],
       }
@@ -219,6 +213,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
 
   private saveReorder(): void {
     const reorder: ReorderModel = this.reorderForm.getRawValue();
+    reorder.shiftStartTime = DateTimeHelper.convertDateToUtc(reorder.shiftStartTime.toString());
+    reorder.shiftEndTime = DateTimeHelper.convertDateToUtc(reorder.shiftEndTime.toString());
     const agencyIds = this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
     const reOrderId = this.isEditMode ? this.order.id : 0;
     const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;
