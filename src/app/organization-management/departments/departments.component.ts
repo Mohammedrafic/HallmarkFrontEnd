@@ -91,9 +91,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     { text:'Ext Department ID', column: 'ExtDepartmentId'},
     { text:'Invoice Department ID', column: 'InvoiceDepartmentId'},
     { text:'Department Name', column: 'DepartmentName'},
-    { text:'Facility Email', column: 'FacilityEmail'},
-    { text:'Facility Contact', column: 'FacilityContact'},
-    { text:'Facility Phone NO', column: 'FacilityPhoneNo'},
+    { text:'Department Email', column: 'DepartmentEmail'},
+    { text:'Department Contact', column: 'DepartmentContact'},
+    { text:'Department Phone NO', column: 'DepartmentPhoneNo'},
     { text:'Inactivate Date', column: 'InactiveDate'}
   ];
   public fileName: string;

@@ -89,9 +89,9 @@
       <e-column field="extDepartmentId" headerText="EXT DEPARTMENT ID" width=200></e-column>
       <e-column field="invoiceDepartmentId" headerText="INVOICE DEPARTMENT ID" width=200></e-column>
       <e-column field="departmentName" headerText="DEPARTMENT NAME" width=200></e-column>
-      <e-column field="facilityContact" headerText="FACILITY CONTACT" width=200></e-column>
-      <e-column field="facilityEmail" headerText="FACILITY EMAIL" width=200></e-column>
-      <e-column field="facilityPhoneNo" headerText="FACILITY PHONE NO" [valueAccessor]="formatPhoneNumber" width=200></e-column>
+      <e-column field="facilityContact" headerText="DEPARTMENT CONTACT" width=200></e-column>
+      <e-column field="facilityEmail" headerText="DEPARTMENT EMAIL" width=200></e-column>
+      <e-column field="facilityPhoneNo" headerText="DEPARTMENT PHONE NO" [valueAccessor]="formatPhoneNumber" width=200></e-column>
       <e-column field="inactiveDate" headerText="INACTIVE DATE" type="date" format="MM/dd/yyyy" width=200></e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
@@ -182,7 +182,7 @@
       </div>
     </div>
     <div class="input-container">
-      <label>Facility Contact</label>
+      <label>Department Contact</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
                          formControlName="facilityContacts"
@@ -194,7 +194,7 @@
       </div>
     </div>
     <div class="input-container">
-      <label>Facility Email</label>
+      <label>Department Email</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
                          formControlName="facilityEmails"
@@ -276,7 +276,7 @@
 
     <div>
       <div class="input-container">
-        <label for="facilityContact">Facility Contact <span class="required">*</span></label>
+        <label for="facilityContact">Department Contact</label>
         <div class="input-group">
           <input
             id="facilityContact"
@@ -292,7 +292,7 @@
 
     <div>
       <div class="input-container">
-        <label for="facilityEmail">Facility Email <span class="required">*</span></label>
+        <label for="facilityEmail">Department Email</label>
         <div class="input-group">
           <input
             id="facilityEmail"
@@ -307,7 +307,7 @@
 
     <div>
       <div class="input-container facility-phone">
-        <label for="facilityPhoneNumber">Facility Phone No <span class="required">*</span></label>
+        <label for="facilityPhoneNumber">Department Phone No</label>
         <div class="input-group">
           <input
             id="facilityPhoneNumber"
