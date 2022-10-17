@@ -20,6 +20,7 @@ import {
   LastSelectedOrganisationAgency,
   UserOrganizationsAgenciesChanged,
   SetAgencyActionsAllowed,
+  SetAgencyInvoicesActionsAllowed,
 } from 'src/app/store/user.actions';
 
 import { AppState } from 'src/app/store/app.state';
@@ -34,6 +35,7 @@ import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { AgencyStatus } from 'src/app/shared/enums/status';
+import { UserStateModel } from '../../../store/user.state';
 
 interface IOrganizationAgency {
   id: number;
@@ -293,7 +295,19 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
   private setAgencyStatus(agency: IOrganizationAgency | undefined): void {
     const agencyIsActive = agency?.status !== AgencyStatus.Inactive && agency?.status !== AgencyStatus.Terminated;
+    const userUnit = (this.store.snapshot(). user as UserStateModel).user?.businessUnitName;
 
+    let invoiceActionsActive: boolean;
+
+    if (agency?.status === AgencyStatus.Inactive) {
+      invoiceActionsActive = userUnit === 'Hallmark'
+    } else if (agency?.status === AgencyStatus.Terminated) {
+      invoiceActionsActive = false;
+    } else {
+      invoiceActionsActive = true;
+    }
+    
     this.store.dispatch(new SetAgencyActionsAllowed(agencyIsActive));
+    this.store.dispatch(new SetAgencyInvoicesActionsAllowed(invoiceActionsActive));
   }
 }
