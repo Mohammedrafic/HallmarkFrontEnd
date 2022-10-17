@@ -4,7 +4,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
-import { ExportSkills, GetAllSkillsCategories, GetAssignedSkillsByPage, GetSkillDataSources, RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded, SetDirtyState, SetImportFileDialogState } from '../store/organization-management.actions';
+import { ExportSkills, GetAllSkillsCategories, GetAssignedSkillsByPage, GetSkillDataSources, RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded, SetDirtyState } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
@@ -217,11 +217,6 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     this.filteredItems = this.filterService.generateChips(this.SkillFilterFormGroup, this.filterColumns);
     this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
     this.store.dispatch(new ShowFilterDialog(false));
-  }
-
-  public onImportDataClick(): void {
-    this.store.dispatch(new SetImportFileDialogState(true));
-    // TODO: implement data parse after BE implementation
   }
 
   public addSkill(): void {
