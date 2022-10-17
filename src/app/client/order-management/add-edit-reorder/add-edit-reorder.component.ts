@@ -22,6 +22,7 @@ import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ONBOARDED_STATUS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { DateTimeHelper } from '@core/helpers';
+import { getTimeFromDate } from '@shared/utils/date-time.utils';
 
 @Component({
   selector: 'app-add-edit-reorder',
@@ -207,7 +208,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private areTimesEquals(time1: Date, time2: Date): boolean {
-    return new Date(time1).toLocaleTimeString() === new Date(time2).toLocaleTimeString();
+    return getTimeFromDate(time1) === getTimeFromDate(time2, true);
   }
 
   private saveReorder(): void {
