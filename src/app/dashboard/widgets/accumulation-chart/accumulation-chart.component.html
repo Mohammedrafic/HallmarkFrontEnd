@@ -35,6 +35,7 @@
 
   <ng-template #legend>
     <app-widget-legend
+      [isPositionTrend]="false"
       [legendData]="legendData"
       [legendPosition]="legendPosition"
       (changeCheckbox)="onClickLegend($event)"
