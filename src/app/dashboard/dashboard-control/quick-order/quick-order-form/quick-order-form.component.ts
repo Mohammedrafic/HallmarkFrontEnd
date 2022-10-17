@@ -1,4 +1,3 @@
-import { endTimeValidator, startTimeValidator } from '@shared/validators/date.validator';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -135,10 +134,6 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public shiftNameField: AbstractControl;
   public shiftStartTimeField: AbstractControl;
   public shiftEndTimeField: AbstractControl;
-  public defaultMaxTime = new Date();
-  public defaultMinTime = new Date();
-  public maxTime = this.defaultMaxTime;
-  public minTime = this.defaultMinTime;
 
   public readonly jobDistributions = ORDER_JOB_DISTRIBUTION_LIST;
   public readonly jobDistributionFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -283,20 +278,9 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       { validators: greaterThanValidator('annualSalaryRangeFrom', 'annualSalaryRangeTo') }
     );
 
-    this.defaultMaxTime.setHours(23, 59, 59);
-    this.defaultMinTime.setHours(0, 0, 0);
-
     this.shiftNameField = this.generalInformationForm.get('shift') as AbstractControl;
     this.shiftStartTimeField = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
     this.shiftEndTimeField = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
-    this.shiftEndTimeField.valueChanges.subscribe((val) => {
-      this.maxTime = val || this.defaultMaxTime;
-      this.shiftStartTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-    });
-    this.shiftStartTimeField.valueChanges.subscribe((val) => {
-      this.minTime = val || this.defaultMinTime;
-      this.shiftEndTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-    });
     this.setShiftsValidation();
 
     this.shiftNameField.valueChanges.subscribe((val) => {
@@ -824,12 +808,10 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   setShiftsValidation(): void {
     this.shiftStartTimeField.addValidators([
-      Validators.required,
-      startTimeValidator(this.generalInformationForm, 'shiftEndTime')
+      Validators.required
     ]);
     this.shiftEndTimeField.addValidators([
-      Validators.required,
-      endTimeValidator(this.generalInformationForm, 'shiftStartTime')
+      Validators.required
     ]);
   }
 
