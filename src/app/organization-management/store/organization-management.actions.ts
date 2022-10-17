@@ -83,6 +83,11 @@ export class GetRegions {
   constructor(public filter?: regionFilter) {}
 }
 
+export class GetMasterRegions {
+  static readonly type = '[organizationManagement] Get The List Of Regions';
+  constructor() {}
+}
+
 export class SaveRegion {
   static readonly type = '[organizationManagement] Create Region';
   constructor(public region: Region) {}

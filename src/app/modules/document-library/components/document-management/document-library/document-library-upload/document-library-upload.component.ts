@@ -50,6 +50,7 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
   constructor() { super(); }
 
   ngOnInit(): void {
+    this.setDropElement();
   }
 
   public browse(): void {
@@ -79,5 +80,9 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
     this.tab.selected.pipe(takeUntil(this.destroy$)).subscribe((event: SelectEventArgs) => {
       this.firstActive = event.selectedIndex === 0;
     });
+  }
+
+  private setDropElement(): void {
+    this.dropElement = document.getElementById('droparea') as HTMLElement;
   }
 }

@@ -56,6 +56,7 @@
   &__percentage-ratio {
     font-size: 16px;
     line-height: 24px;
+    float:right;
   }
 }
 
@@ -71,4 +72,28 @@
       line-height: 8px;
     }
   }
+}
+
+.widget-item-count
+{
+  font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+   align-items: center; 
+}
+
+.left{
+  width: 45% !important;
+  display: flex;
+  align-items: center;
+}
+.center{
+  width: 20% !important;
+  display: flex;
+  align-items: center;
+}
+.right{
+  width: 35% !important;
+  align-items: right;
+  display: flex;
 }

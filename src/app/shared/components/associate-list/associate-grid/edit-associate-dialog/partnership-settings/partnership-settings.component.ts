@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Select } from '@ngxs/store';
 import { delay, Observable, takeUntil } from 'rxjs';
 import {

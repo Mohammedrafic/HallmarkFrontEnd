@@ -11,7 +11,7 @@ import { Holiday } from '@shared/models/holiday.model';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
-import { SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/admin.actions';
+import { SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
@@ -151,11 +151,6 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
   public yearChanged(event: { value: number }): void {
     this.yearFilter = event.value;
     this.store.dispatch(new SetYearFilter(event.value));
-  }
-
-  public onImportDataClick(): void {
-    this.store.dispatch(new SetImportFileDialogState(true));
-    // TODO: implement data parse after BE implementation
   }
 
   public addHoliday(): void {

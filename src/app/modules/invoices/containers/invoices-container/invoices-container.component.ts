@@ -231,9 +231,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
-  public onExportOptionSelect(event: unknown): void {
-  }
-
   public handleChangeTab(tabIdx: number): void {
     this.selectedTabIdx = tabIdx;
     this.store.dispatch([
@@ -445,7 +442,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   }
 
   private checkActionsAllowed(): void {
-    this.store.select(UserState.agencyActionsAllowed)
+    this.store.select(UserState.agencyInvoicesActionsAllowed)
     .pipe(
       distinctUntilChanged(),
       takeUntil(this.componentDestroy()),

@@ -111,8 +111,6 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onFilter(): void {}
-
   public closeDialog(): void {
     if (this.educationForm.dirty) {
       this.confirmService

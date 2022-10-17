@@ -118,6 +118,7 @@
 }
 
 .search {
+  display: none; //TODO: temporary solution to hide the search field
   width: 400px;
 }
 
@@ -152,7 +153,6 @@
       @media #{$min-tablet} {
         margin-left: 12px;
       }
-
     }
   }
 }

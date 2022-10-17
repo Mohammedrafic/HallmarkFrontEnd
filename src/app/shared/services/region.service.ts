@@ -58,6 +58,15 @@ export class RegionService {
     
     return this.http.post<regionFilter>(`/api/Regions/filter`, regionId);
   }
+
+  /**
+  * Get Master Regions
+  */
+  public getMasterRegions(): Observable<Region[]> {
+
+    return this.http.get<Region[]>(`/api/MasterRegions`);
+  }
+
   
   /**
    * Get Region import template

@@ -26,9 +26,11 @@ export class LogiReportComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.factory = com.jinfonet.api.AppFactory;
-    this.reportUrl = this.appSettings.reportServerUrl + 'jinfonet/tryView.jsp';
+    this.factory = com.jinfonet.api.AppFactory;    
     
+  }
+  public SetReportUrl(url:string):void{
+    this.reportUrl=url+ 'jinfonet/tryView.jsp';
   }
   public RenderReport():void
   {

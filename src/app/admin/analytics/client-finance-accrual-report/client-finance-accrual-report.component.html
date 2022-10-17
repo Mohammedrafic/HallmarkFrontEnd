@@ -124,5 +124,18 @@
         </div>
       </div>
     </div>
+    <div class="form-elemet">
+      <div class="input-container bootstrap">
+        <label>Report Type<span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist appValidateWithMessage
+          formControlName="accrualReportTypes"
+          [fields]="accrualReportTypeFields"
+          [dataSource]="filterColumns.accrualReportTypes.dataSource"
+          placeholder=""></ejs-dropdownlist>
+        </div>
+      </div>
+    </div>
+    
   </form>
 </app-filter-dialog>

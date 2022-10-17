@@ -47,18 +47,6 @@
           <app-position-chart *ngSwitchCase="widgetTypeEnum.FILLED_POSITIONS"
                               [chartData]="widgetsData?.[widgetTypeEnum.FILLED_POSITIONS]"
                               [isLoading]="isLoading"></app-position-chart>
-          <app-tasks *ngSwitchCase="widgetTypeEnum.TASKS"
-                     [tasks]="widgetsData?.[widgetTypeEnum.TASKS]"></app-tasks>
-          <app-trend-chart *ngSwitchCase="widgetTypeEnum.FILLED_POSITIONS_TREND"
-                           [widget]="widgetsData?.[widgetTypeEnum.FILLED_POSITIONS_TREND]" [isDarkTheme]="isDarkTheme"></app-trend-chart>
-          <app-trend-chart *ngSwitchCase="widgetTypeEnum.OPEN_POSITIONS_TREND"
-                           [widget]="widgetsData?.[widgetTypeEnum.OPEN_POSITIONS_TREND]" [isDarkTheme]="isDarkTheme"></app-trend-chart>
-          <app-trend-chart *ngSwitchCase="widgetTypeEnum.IN_PROGRESS_POSITIONS_TREND"
-                           [widget]="widgetsData?.[widgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]" [isDarkTheme]="isDarkTheme"></app-trend-chart>
-          <app-chat *ngSwitchCase="widgetTypeEnum.CHAT"
-                    [chatData]="widgetsData?.[widgetTypeEnum.CHAT]"></app-chat>
-          <app-invoices-chart *ngSwitchCase="widgetTypeEnum.INVOICES"
-                              [chartData]="widgetsData?.[widgetTypeEnum.INVOICES]"></app-invoices-chart>
         </ng-template>
       </e-panel>
     </e-panels>

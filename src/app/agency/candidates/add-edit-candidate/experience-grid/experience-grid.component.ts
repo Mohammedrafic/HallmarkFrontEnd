@@ -118,7 +118,6 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onFilter(): void {}
 
   public closeDialog(): void {
     if (this.experienceForm.dirty) {

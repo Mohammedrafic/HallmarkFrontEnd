@@ -45,6 +45,7 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
   public roleId: number | null;
   public filteredItems$ = new Subject<number>();
   public agencyActionsAllowed = false;
+  public userbusinessUnitId: number | null;
 
   get dialogTitle(): string {
     return this.isEditRole ? EDIT_DIALOG_TITLE : DEFAULT_DIALOG_TITLE;
@@ -69,19 +70,19 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
   ngOnInit(): void {
     this.businessForm = this.generateBusinessForm();
     this.roleFormGroup = RoleFormComponent.createForm();
-    this.onBusinessUnitValueChanged();
-
     const user = this.store.selectSnapshot(UserState.user);
+    this.userbusinessUnitId = user?.businessUnitId != null ? user?.businessUnitId : 0;
+    this.onBusinessUnitValueChanged();
     this.businessUnitControl.patchValue(user?.businessUnitType);
     if (user?.businessUnitType !== BusinessUnitType.Hallmark) {
       this.isBusinessDisabledForNewRole = true;
       this.businessForm.disable();
     }
+    
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;
     }
-    this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
 
     this.actions$
       .pipe(
@@ -199,11 +200,11 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
 
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      this.store.dispatch(new GetBusinessByUnitType(value));
-
-      if (!this.isBusinessFormDisabled) {
-        this.businessControl.patchValue(0);
-      }
+      this.store.dispatch(new GetBusinessByUnitType(value)).subscribe(() => {
+        if (this.isBusinessDisabledForNewRole) {
+          this.businessControl.patchValue([this.userbusinessUnitId]);
+        }
+      });
     });
   }
 

@@ -14,7 +14,6 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { Order } from '@shared/models/order-management.model';
 import { ReorderModel, ReorderRequestModel } from '@client/order-management/add-edit-reorder/models/reorder.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
-import { startEndTimeValidator } from '@shared/validators/time.validator';
 import { shareReplay } from 'rxjs/operators';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -136,8 +135,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
         ],
         billRate: [hourlyRate ?? '', Validators.required],
         openPosition: [openPositions ?? '', [Validators.required, Validators.min(1)]],
-      },
-      { validators: startEndTimeValidator('shiftStartTime', 'shiftEndTime') }
+      }
     );
   }
 
