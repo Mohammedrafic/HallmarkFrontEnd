@@ -71,3 +71,8 @@ export class SetAgencyActionsAllowed {
   static readonly type = '[user] Set agency actions allowed';
   constructor(public readonly allowed: boolean) {}
 }
+
+export class SetAgencyInvoicesActionsAllowed {
+  static readonly type = '[user] Set agency invoices actions allowed';
+  constructor(public readonly allowed: boolean) {}
+}
