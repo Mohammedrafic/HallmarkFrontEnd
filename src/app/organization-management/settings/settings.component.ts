@@ -64,9 +64,12 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public regionRequiredFormGroup: FormGroup;
   public locationFormGroup: FormGroup;
   public departmentFormGroup: FormGroup;
+  public considerPushDaysFormGroup: FormGroup;
   public formBuilder: FormBuilder;
 
-  @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<CurrentUserPermission[]>;
+  @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<
+    CurrentUserPermission[]
+  >;
 
   @Select(OrganizationManagementState.organizationSettings)
   public settings$: Observable<OrganizationSettingsGet[]>;
@@ -344,7 +347,8 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       this.regionFormGroup.dirty ||
       this.regionRequiredFormGroup.dirty ||
       this.locationFormGroup.dirty ||
-      this.departmentFormGroup.dirty
+      this.departmentFormGroup.dirty ||
+      this.considerPushDaysFormGroup
     ) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
@@ -674,6 +678,10 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.regionRequiredFormGroup = this.formBuilder.group({ regionId: [null, Validators.required] });
     this.locationFormGroup = this.formBuilder.group({ locationId: [null] });
     this.departmentFormGroup = this.formBuilder.group({ departmentId: [null] });
+    this.considerPushDaysFormGroup = this.formBuilder.group({
+      daysToConsider: [null, Validators.required],
+      daysToPush: [null, Validators.required],
+    });
   }
 
   private getActiveRowsPerPage(): number {
@@ -702,7 +710,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       )
       .subscribe((permissions) => {
         const hasPermission = permissions.includes(PermissionTypes.ManageOrganizationConfigurations);
-        this.settingFields.forEach((key) => this.hasPermissions[key] = hasPermission);
+        this.settingFields.forEach((key) => (this.hasPermissions[key] = hasPermission));
       });
   }
 }

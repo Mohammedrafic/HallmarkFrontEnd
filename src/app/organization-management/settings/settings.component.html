@@ -306,15 +306,53 @@
       </div>
     </form>
 
+    <form [formGroup]="considerPushDaysFormGroup" *ngIf="formControlType === organizationSettingControlType. FixedKeyDictionary">
+      <div class="row">
+        <div class="input-container bootstrap">
+          <label>Days to Consider<span class="required">*</span></label>
+          <div class="input-group">
+            <ejs-numerictextbox
+              class="numeric-input"
+              appValidateWithMessage
+              min="0"
+              maxlength="3"
+              format="0"
+              formControlName="daysToConsider"
+              [showSpinButton]="false"
+            >
+            </ejs-numerictextbox>
+          </div>
+        </div>
+
+        <div class="input-container bootstrap">
+          <label for="daysToPush">Days to Push<span class="required">*</span></label>
+          <div class="input-group">
+            <ejs-numerictextbox
+              id="daysToPush"
+              class="numeric-input"
+              appValidateWithMessage
+              min="0"
+              maxlength="3"
+              format="0"
+              formControlName="daysToPush"
+              [showSpinButton]="false"
+            >
+            </ejs-numerictextbox>
+          </div>
+        </div>
+      </div>
+    </form>
+
     <div [ngSwitch]="formControlType">
-      <div class="input-container" *ngSwitchCase="organizationSettingControlType.Checkbox">
+      <div
+        class="input-container"
+        *ngSwitchCase="
+          organizationSettingControlType.Checkbox ||
+          formControlType === organizationSettingControlType.FixedKeyDictionary"
+      >
         <div class="input-group switch">
-          <ejs-switch
-            id="switcher"
-            class="switch"
-            formControlName="value"
-          ></ejs-switch>
-          <label class="switch-label">Turned {{switcherValue}}</label>
+          <ejs-switch id="switcher" class="switch" formControlName="value"></ejs-switch>
+          <label class="switch-label">Turned {{ switcherValue }}</label>
         </div>
       </div>
 
