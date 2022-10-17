@@ -459,6 +459,7 @@ export type CandidatesBasicInfo = {
   organizationId: number;
   organizationName: string;
   orderId: number;
+  orderPublicId: string;
   candidateProfileId: number;
   positionId: number;
   billRatesGroupId: number;
