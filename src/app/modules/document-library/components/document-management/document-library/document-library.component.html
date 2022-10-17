@@ -29,7 +29,7 @@
     </div>
     <div class="row-tool-buttons"  *ngIf="this.selectedDocumentNode?.id!=-1">
       <ejs-switch id="switcher"
-                  [checked]="false"></ejs-switch>
+                  [checked]="isIncludeSharedWithMe" (change)="onIncludeSharedWithMe($event);"></ejs-switch>
       <label for="switcher" class="switch-text">Include Shared With Me</label>
       <button ejs-button cssClass="e-flat seconadry-dark-icon-button" (click)="shareSelectedDocuments($event)">
         <span><i-feather name="share-2" class="icon"></i-feather></span>

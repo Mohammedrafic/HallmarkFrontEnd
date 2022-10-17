@@ -150,6 +150,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public editOrganizationIds: number[] = [];
   public editRegionIds: number[] = [];
   public editLocationIds: number[] = [];
+  public isIncludeSharedWithMe: boolean = false;
 
 
   constructor(private store: Store, private datePipe: DatePipe,
@@ -406,7 +407,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       regionId: null,
       locationId: null,
       folderId: this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null,
-      getAll: true
+      includeSharedWithMe:this.isIncludeSharedWithMe,
+      showAllPages: true
     }
     return documentFilter;
   }
@@ -670,6 +672,11 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.documentLibraryform.get(FormControlNames.Agencies)?.setValue(parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string) || null);
     }
     this.changeDetectorRef.markForCheck();
+  }
+  public onIncludeSharedWithMe(event: any) {
+    this.isIncludeSharedWithMe = !this.isIncludeSharedWithMe;
+    this.changeDetectorRef.markForCheck();
+    this.getDocuments();
   }
   public onOrganizationSwitcher(event: any) {
     this.organizationSwitch = !this.organizationSwitch;

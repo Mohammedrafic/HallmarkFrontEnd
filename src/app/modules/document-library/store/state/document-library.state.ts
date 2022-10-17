@@ -94,7 +94,18 @@ export class DocumentLibraryState {
 
   @Action(GetDocuments)
   GetDocuments({ patchState }: StateContext<DocumentLibraryStateModel>, { documentsFilter }: GetDocuments): Observable<DocumentsLibraryPage> {
-    return this.documentLibraryService.GetDocuments(documentsFilter).pipe(
+    if (documentsFilter == undefined) {
+      let data: DocumentsLibraryPage = {
+        items: [],
+        pageNumber: 1,
+        totalPages: 0,
+        totalCount: 0,
+        hasPreviousPage: false,
+        hasNextPage: false,
+      };
+      return of(data);
+    }
+    return this.documentLibraryService.GetDocumentLibraryInfo(documentsFilter).pipe(
       tap((payload) => {
         patchState({ documentsPage: payload });
         return payload;

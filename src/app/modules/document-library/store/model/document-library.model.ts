@@ -82,8 +82,9 @@ export class DocumentsFilter {
   businessUnitId: number | null;
   regionId: number | null;
   locationId: number | null;
-  folderId: number | null
-  getAll: boolean | null
+  folderId: number | null;
+  includeSharedWithMe: boolean;
+  showAllPages: boolean;
 }
 export type DocumentsLibraryPage = PageOfCollections<DocumentLibraryDto>;
 
