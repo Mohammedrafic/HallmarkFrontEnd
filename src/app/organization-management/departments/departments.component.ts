@@ -275,7 +275,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   formatPhoneNumber(field: string, department: Department): string {
     // @ts-ignore
-    return department[field].toString().length === 10 ? department[field].replace(/^(\d{3})(\d{3})(\d{4}).*/, '$1-$2-$3') : department[field];
+    return department[field]?.toString().length === 10 ? department[field].replace(/^(\d{3})(\d{3})(\d{4}).*/, '$1-$2-$3') : department[field];
   }
 
   onRowsDropDownChanged(): void {
