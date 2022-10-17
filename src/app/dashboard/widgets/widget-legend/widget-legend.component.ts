@@ -13,6 +13,7 @@ export class WidgetLegendComponent {
   @Input() public legendData: WidgetLegengDataModel[];
   @Input() public showPercentRatio: boolean = false;
   @Input() public legendPosition: LegendPositionEnum = LegendPositionEnum.Bottom;
+  @Input() public description: string;
 
   @Output() onClickLegend: EventEmitter<void> = new EventEmitter();
   @Output() changeCheckbox: EventEmitter<string> = new EventEmitter();

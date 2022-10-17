@@ -67,7 +67,7 @@ $headerHeight: 19px;
     height: 100%;
     padding-left: 0px;
     margin-left: -10%;
-    margin-top: 25%;
+    margin-top: 10%;
   }
 
   &__legend {
@@ -105,4 +105,17 @@ $headerHeight: 19px;
       }
     }
   }
+}
+.tooltip {
+  text-align: right;
+}
+.app-custom-icon {
+  width: 20px !important;
+  height: 20px !important;
+  cursor: pointer;
+  color:#4c5673;
+}
+.e-tooltip-wrap .e-tip-content {
+  font-size: 12px;
+  line-height: 20px;
 }
