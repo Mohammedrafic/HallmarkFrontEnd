@@ -42,19 +42,19 @@ export const departmentsColumns: ColDef[] = [
   {
     field: 'facilityContact',
     width: 150,
-    headerName: 'Facility Contact',
+    headerName: 'Department Contact',
     cellRenderer: GridErroredCellComponent,
   },
   {
     field: 'facilityEmail',
     width: 150,
-    headerName: 'Facility Email',
+    headerName: 'Department Email',
     cellRenderer: GridErroredCellComponent,
   },
   {
     field: 'facilityPhoneNo',
     width: 200,
-    headerName: 'Facility Phone Number',
+    headerName: 'Department Phone Number',
     cellRenderer: GridErroredCellComponent,
   },
   {
