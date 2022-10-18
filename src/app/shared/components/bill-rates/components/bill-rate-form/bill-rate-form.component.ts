@@ -67,6 +67,10 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
     return this.billRateForm.get('billRateConfig');
   }
 
+  get isInternalsEnabled(): boolean {
+    return this.billRateForm.get('billRateConfigId')?.value !== 11;
+  }
+
   get categoryValue(): string {
     return BillRateCategory[this.billRateConfigControl?.value.category] || '';
   }
@@ -227,7 +231,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
         break;
       case BillRateCalculationType.GuaranteedHours:
         this.additionalLableForMinMax = 'Work Week';
-        this.hideFilds.add('intervalMax')
+        this.hideFilds.add('intervalMax');
         this.hideFilds.add('rateHour');
         break;
       case BillRateCalculationType.WeeklyOT:
