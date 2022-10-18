@@ -84,8 +84,9 @@ contact$: Observable<ContactUs>;
     }
     else
     {
-    	this.files = [];
-			this.files.push(this.file.rawFile);
+      this.files = [];
+      this.file = event.filesData[0];
+	  this.files.push(this.file.rawFile);
 		}
   }
 
@@ -106,6 +107,7 @@ contact$: Observable<ContactUs>;
     this.hasFiles = false;
     this.filesDetails = [];
     this.uploadObj.clearAll();
+    this.file = null;
   }
 
   get disableClearButton(): boolean {
@@ -113,13 +115,15 @@ contact$: Observable<ContactUs>;
   }
 
   public saveContactUsForm() {
+    
     let contactUs: ContactUs =
     {
       fromMail : this.ContactFormGroup.controls['email'].value,
       subjectMail : this.ContactFormGroup.controls['topic'].value,
       name : this.ContactFormGroup.controls['name'].value,
       bodyMail : this.ContactFormGroup.controls['message'].value,
-      status : ContactUsStatus.Pending
+      status: ContactUsStatus.Pending,
+      selectedFile:this.files[0]
     };
     this.store.dispatch(new SaveContactUsForm(contactUs));
       this.contact$.pipe(takeUntil(this.unsubscribe$)).subscribe((contactUs: ContactUs) => {
