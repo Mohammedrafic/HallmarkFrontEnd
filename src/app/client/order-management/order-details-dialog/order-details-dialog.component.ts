@@ -244,26 +244,13 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       //For Future Reference
       // var url = location.origin + '/ui/client/order-management/edit/' + data?.order?.id;
       params['@' + AlertParameterEnum[AlertParameterEnum.ClickbackURL]] = "";
-      let alertTriggerDto: AlertTriggerDto = {
-        BusinessUnitId: null,
-        AlertId: 0,
-        Parameters: null
-      };
-      if (data?.order?.status == OrderStatus.Open) {
-        alertTriggerDto = {
+           
+       let alertTriggerDto = {
           BusinessUnitId: data?.order?.organizationId,
           AlertId: AlertIdEnum['Order Status Update: Custom'],
           Parameters: params,
         };
-      }
-      else
-      {
-        alertTriggerDto = {
-          BusinessUnitId: data?.order?.organizationId,
-          AlertId: AlertIdEnum['Order Status Update: Custom'],
-          Parameters: params,
-        };
-      }
+      
       if (alertTriggerDto.AlertId > 0) {
         this.store.dispatch(new AlertTrigger(alertTriggerDto));
       }
