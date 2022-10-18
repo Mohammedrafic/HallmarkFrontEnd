@@ -1,6 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { filter, map, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
@@ -40,10 +40,8 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { GetCurrentUserPermissions, GetOrganizationStructure } from '../../store/user.actions';
-
-import { PermissionTypes } from '@shared/enums/permissions-types.enum';
-import { CurrentUserPermission } from '@shared/models/permission.model';
+import { GetOrganizationStructure } from '../../store/user.actions';
+import { PermissionService } from 'src/app/security/services/permission.service';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -66,8 +64,6 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public departmentFormGroup: FormGroup;
   public considerPushDaysFormGroup: FormGroup;
   public formBuilder: FormBuilder;
-
-  @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<CurrentUserPermission[]>;
 
   @Select(OrganizationManagementState.organizationSettings)
   public settings$: Observable<OrganizationSettingsGet[]>;
@@ -142,7 +138,8 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     private store: Store,
     @Inject(FormBuilder) private builder: FormBuilder,
     private confirmService: ConfirmService,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private permissionService: PermissionService
   ) {
     super();
     this.formBuilder = builder;
@@ -346,7 +343,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       this.regionRequiredFormGroup.dirty ||
       this.locationFormGroup.dirty ||
       this.departmentFormGroup.dirty ||
-      this.considerPushDaysFormGroup
+      this.considerPushDaysFormGroup.dirty
     ) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
@@ -476,6 +473,16 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       case OrganizationSettingControlType.Text:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value?.toString();
         break;
+
+      case OrganizationSettingControlType.FixedKeyDictionary:
+        const pushStartDate = {
+          isEnabled: this.organizationSettingsFormGroup.controls['value'].value,
+          daysToPush: this.considerPushDaysFormGroup.controls['daysToPush'].value,
+          daysToConsider: this.considerPushDaysFormGroup.controls['daysToConsider'].value,
+        };
+        dynamicValue = JSON.stringify(pushStartDate);
+        break;
+
       default:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
         break;
@@ -575,14 +582,25 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       dynamicValue = dynamicValue.length !== 0 ? dynamicValue[0] : '';
     }
 
+    if (this.formControlType === OrganizationSettingControlType.FixedKeyDictionary) {
+      const valueOptions = this.isParentEdit ? parentData.value : childData.value;
+      dynamicValue = { ...JSON.parse(valueOptions), isDictionary: true };
+    }
+
     setTimeout(() => {
       this.organizationSettingsFormGroup.setValue({
         settingValueId: this.isParentEdit ? null : childData.settingValueId,
         settingKey: parentData.settingKey,
         controlType: parentData.controlType,
         name: parentData.name,
-        value: dynamicValue,
+        value: dynamicValue?.isDictionary ? dynamicValue.isEnabled : dynamicValue,
       });
+
+      dynamicValue?.isDictionary &&
+        this.considerPushDaysFormGroup.setValue({
+          daysToPush: dynamicValue.daysToPush,
+          daysToConsider: dynamicValue.daysToConsider,
+        });
     });
   }
 
@@ -650,6 +668,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.regionRequiredFormGroup.reset();
     this.locationFormGroup.reset();
     this.departmentFormGroup.reset();
+    this.considerPushDaysFormGroup.reset();
     this.isEdit = false;
     this.isParentEdit = false;
     this.dropdownDataSource = [];
@@ -698,17 +717,10 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
 
   private setPermissionsToManageSettings(): void {
-    this.store.dispatch(new GetCurrentUserPermissions());
-
-    this.currentUserPermissions$
-      .pipe(
-        filter((permissions) => !!permissions.length),
-        map((permissions) => permissions.map((permission) => permission.permissionId)),
+    this.permissionService.getPermissions().pipe(
         takeUntil(this.unsubscribe$)
-      )
-      .subscribe((permissions) => {
-        const hasPermission = permissions.includes(PermissionTypes.ManageOrganizationConfigurations);
-        this.settingFields.forEach((key) => this.hasPermissions[key] = hasPermission);
+      ).subscribe(({canManageOrganizationConfigurations}) => {
+        this.settingFields.forEach((key) => this.hasPermissions[key] = canManageOrganizationConfigurations);
       });
   }
 }
