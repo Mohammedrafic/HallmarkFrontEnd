@@ -12,6 +12,8 @@ export class PositionChartComponent {
   @Input() public isLoading: boolean;
   @Input() public chartData: CandidatesPositionDataModel | undefined;
   @Input() public description: string;
+  @Input() public isDarkTheme: boolean;
+  
 
   private mousePosition = {
     x: 0,
