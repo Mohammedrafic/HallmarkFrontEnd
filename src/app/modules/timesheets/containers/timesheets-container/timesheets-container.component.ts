@@ -22,7 +22,6 @@ import {
   BulkApproveSuccessMessage } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
-import { ExportType } from '../../enums';
 import { TimesheetsService } from '../../services';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ProfileDetailsContainerComponent } from '../profile-details-container/profile-details-container.component';
