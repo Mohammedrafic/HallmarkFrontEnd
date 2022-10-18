@@ -63,12 +63,14 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
   public hideFilds = new Set<string>();
   public isWeeklyOT = false;
 
+  private mileageBillRateId = 11;
+
   get billRateConfigControl(): AbstractControl | null {
     return this.billRateForm.get('billRateConfig');
   }
 
   get isInternalsEnabled(): boolean {
-    return this.billRateForm.get('billRateConfigId')?.value !== 11;
+    return this.billRateForm.get('billRateConfigId')?.value !== this.mileageBillRateId;
   }
 
   get categoryValue(): string {
