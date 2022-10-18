@@ -68,7 +68,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewIn
   private isRemoveLogo: boolean = false;
 
   public get isCandidateAssigned(): boolean {
-    return !!this.orderId && !!this.candidateStatus && this.candidateStatus !== ApplicantStatus.NotApplied;
+    return !!this.orderId && !!this.candidateStatus;
   }
 
   @Select(CandidateState.isCandidateCreated)
@@ -341,7 +341,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewIn
       case location.orderId && !location.isNavigateFromCandidateDetails:
         this.router.navigate([location.pageToBack], { state: { orderId: location.orderId } });
         const selectedNavigation = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
-        this.store.dispatch(new SelectNavigationTab(selectedNavigation.current));
+        this.store.dispatch(new SelectNavigationTab(selectedNavigation?.current));
         break;
       case location.orderId && location.isNavigateFromCandidateDetails:
         this.router.navigate([location.pageToBack]);
