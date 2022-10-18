@@ -47,6 +47,8 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
 
   private readonly datesMath = DatesMath;
 
+  private startDate: Date;
+
   constructor(
     private weekService: DateWeekService,
     private confirmService: ConfirmService,
@@ -62,6 +64,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
 
   ngOnChanges(): void {
     this.setInitDate();
+    
   }
 
   public renderCell(args: RenderDayCellEventArgs): void {
@@ -78,7 +81,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
 
   public prevWeek(): void {
     const weekStart = new Date(new Date(this.startDateValue).getTime() - this.datesMath);
-    const dateRange = DateTimeHelper.getRange(weekStart);
+    const dateRange = DateTimeHelper.getRange(weekStart, this.startDate);
 
     // this.startDateValue = weekStart.toDateString();
     this.changeRange(dateRange, weekStart);
@@ -86,7 +89,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
 
   public nextWeek(): void {
     const weekStart = new Date(new Date(this.startDateValue).getTime() + this.datesMath);
-    const dateRange = DateTimeHelper.getRange(weekStart);
+    const dateRange = DateTimeHelper.getRange(weekStart, this.startDate);
 
     // this.startDateValue = DateTimeHelper.getWeekStartEnd(dateRange)[0].toDateString();
     this.changeRange(dateRange, dateRange);
@@ -132,16 +135,19 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     }
 
     if (this.initDates) {
+      console.log(this.initDates, '-------------------')
       this.startDateValue = this.initDates[0].toDateString();
+      this.startDate = this.initDates[0];
       this.dateControl.patchValue(
-        DateTimeHelper.getRange(this.initDates[0]),
+        DateTimeHelper.getRange(this.initDates[0], this.startDate),
         { emitEvent: false });
+        console.log(this.startDateValue, 'startDateValuestartDateValuestartDateValue')
     }
     this.compareDates();
   }
 
   private setControlValue(value: string): void {
-    const dateRange = DateTimeHelper.getRange(value);
+    const dateRange = DateTimeHelper.getRange(value, this.startDate);
 
     this.startDateValue = value;
 
