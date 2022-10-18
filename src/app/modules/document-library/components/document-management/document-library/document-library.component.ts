@@ -85,7 +85,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public editMenuItems: ItemModel[] = [
     { text: MoreMenuType[0], id: '0' },
     { text: MoreMenuType[1], id: '1' },
-    { text: MoreMenuType[2], id: '2' },
+    { text: MoreMenuType[2], id: '2' }
   ];
 
   public statusItems: ItemModel[] = [
