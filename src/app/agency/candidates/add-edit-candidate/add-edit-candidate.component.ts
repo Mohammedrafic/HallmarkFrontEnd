@@ -1,18 +1,30 @@
+import { positionIdStatuses } from "@agency/candidates/add-edit-candidate/add-edit-candidate.constants";
 import { CandidateAgencyComponent } from '@agency/candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Location } from '@angular/common';
+import { AfterViewInit, Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { OutsideZone } from "@core/decorators";
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { SelectNavigation } from '@shared/components/candidate-details/store/candidate.actions';
+import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
+import { getCandidatePositionId } from "@shared/components/order-candidate-list/order-candidate-list.utils";
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 import { CreatedCandidateStatus } from '@shared/enums/status';
+import { CandidateCredentialResponse } from "@shared/models/candidate-credential.model";
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { distinctUntilChanged, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
-
+import { distinctUntilChanged, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { CandidateGeneralInfoComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
 import { CandidateProfessionalSummaryComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
+import { Candidate } from 'src/app/shared/models/candidate.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { CandidateContactDetailsComponent } from './candidate-contact-details/candidate-contact-details.component';
 import { SetHeaderState } from 'src/app/store/app.actions';
+import { UserState } from 'src/app/store/user.state';
 import {
   GetCandidateById,
   GetCandidateByIdSucceeded,
@@ -24,25 +36,14 @@ import {
   SaveCandidateSucceeded,
   UploadCandidatePhoto,
 } from '../../store/candidate.actions';
-import { Candidate } from 'src/app/shared/models/candidate.model';
-import { ActivatedRoute, Router } from '@angular/router';
-import { UserState } from 'src/app/store/user.state';
-import { Location } from '@angular/common';
-import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
-import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
-import { SelectNavigation, SetCandidateMessage } from '@shared/components/candidate-details/store/candidate.actions';
-import { CandidateMessage } from '@shared/components/candidate-details/models/candidate.model';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { CandidateContactDetailsComponent } from './candidate-contact-details/candidate-contact-details.component';
 
 @Component({
   selector: 'app-add-edit-candidate',
   templateUrl: './add-edit-candidate.component.html',
   styleUrls: ['./add-edit-candidate.component.scss'],
 })
-export class AddEditCandidateComponent implements OnInit, OnDestroy {
-  @Select(CandidateDetailsState.candidateMessage)
-  public candidateMessage$: Observable<CandidateMessage>;
+export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('stepper') tab: TabComponent;
 
@@ -53,18 +54,28 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   // Used for disabling form and remove creation actions
   public readonlyMode = false;
   public isCredentialStep = false;
-  public candidateMessage: CandidateMessage | null = null;
   public fetchedCandidate: Candidate;
   public isNavigatedFromOrganizationArea: boolean;
   public orderId: number | null = null;
   public agencyActionsAllowed = true;
+  public candidateStatus: ApplicantStatus;
+  public candidateJob: string;
+  public orderOrPositionTitle: string;
+  public orderOrPositionId: string;
 
   private filesDetails: Blob[] = [];
   private unsubscribe$: Subject<void> = new Subject();
   private isRemoveLogo: boolean = false;
 
+  public get isCandidateAssigned(): boolean {
+    return !!this.orderId && !!this.candidateStatus && this.candidateStatus !== ApplicantStatus.NotApplied;
+  }
+
   @Select(CandidateState.isCandidateCreated)
   public isCandidateCreated$: Observable<boolean>;
+
+  @Select(CandidateState.candidateCredential)
+  private candidateCredentialResponse$: Observable<CandidateCredentialResponse>;
 
   constructor(
     private store: Store,
@@ -73,7 +84,8 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private confirmService: ConfirmService,
-    private location: Location
+    private location: Location,
+    private readonly ngZone: NgZone,
   ) {
     store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
   }
@@ -108,11 +120,16 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
     }
     this.pagePermissions();
     this.setCredentialParams();
-    this.subscribeOnCandidateMessage();
+    this.subscribeOnCandidateCredentialResponse();
+  }
+
+  ngAfterViewInit(): void {
+    if (this.isCandidateAssigned) {
+      this.selectCredentialsTab();
+    }
   }
 
   ngOnDestroy(): void {
-    this.store.dispatch(new SetCandidateMessage(null, null));
     this.store.dispatch(new RemoveCandidateFromStore());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -336,15 +353,6 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
     }
   }
 
-  private subscribeOnCandidateMessage(): void {
-    this.candidateMessage$
-      .pipe(
-        filter((message: CandidateMessage) => !!message),
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe((message: CandidateMessage) => (this.candidateMessage = message));
-  }
-
   private getStringSsn(ssn: any): string {
     const stringSsn = String(ssn);
     if (stringSsn.length >= 9) {
@@ -357,9 +365,11 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   private setCredentialParams(): void {
     const location = this.location.getState() as {
       isNavigatedFromOrganizationArea: boolean;
+      candidateStatus: ApplicantStatus;
       orderId: number;
     };
     this.isNavigatedFromOrganizationArea = location.isNavigatedFromOrganizationArea || false;
+    this.candidateStatus = location.candidateStatus;
     this.orderId = location.orderId || null;
   }
 
@@ -369,6 +379,31 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
       .pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$))
       .subscribe((value) => {
         this.agencyActionsAllowed = value;
+      });
+  }
+
+  @OutsideZone
+  private selectCredentialsTab(): void {
+    const credentialTabIndex = 3;
+    setTimeout(() => this.tab.select(credentialTabIndex));
+  }
+
+  private subscribeOnCandidateCredentialResponse(): void {
+    this.candidateCredentialResponse$
+      .pipe(
+        filter(response => !!response && this.isCandidateAssigned),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((response: CandidateCredentialResponse) => {
+        this.candidateJob = response.jobTitle;
+
+        if (positionIdStatuses.includes(this.candidateStatus)) {
+          this.orderOrPositionId = getCandidatePositionId(response.organizationPrefix, response.publicId, response.positionId);
+          this.orderOrPositionTitle = 'Position';
+        } else {
+          this.orderOrPositionId = String(this.orderId);
+          this.orderOrPositionTitle = 'Order';
+        }
       });
   }
 }

@@ -84,6 +84,7 @@ export abstract class AbstractOrderCandidateListComponent
     this.router.navigate([url, data.candidateId], {
       state: {
         orderId: this.order.orderId,
+        candidateStatus: data.status,
         pageToBack,
         readonly: !this.isAgency,
         isRedirectFromOrder: true,

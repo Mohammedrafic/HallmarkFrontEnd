@@ -1,7 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { CandidateCredential, CandidateCredentialPage, CredentialGroupedFiles } from "@shared/models/candidate-credential.model";
+import {
+  CandidateCredential,
+  CandidateCredentialResponse,
+  CredentialGroupedFiles
+} from "@shared/models/candidate-credential.model";
 import { CandidateImportRecord, CandidateImportResult } from "@shared/models/candidate-profile-import.model";
 import { CredentialType } from "@shared/models/credential-type.model";
 import { Credential } from "@shared/models/credential.model";
@@ -131,12 +135,12 @@ export class CandidateService {
     pageSize: number,
     orderId: number | null ,
     id: number
-  ): Observable<CandidateCredentialPage> {
+  ): Observable<CandidateCredentialResponse> {
     const params: { pageNumber: number; pageSize: number; orderId?: number; } = { pageNumber, pageSize };
     if (orderId) {
       params.orderId = orderId;
     }
-    return this.http.get<CandidateCredentialPage>(`/api/CandidateCredentials/candidateProfileId/${id}`, { params });
+    return this.http.get<CandidateCredentialResponse>(`/api/CandidateCredentials/candidateProfileId/${id}`, { params });
   }
 
   /**
