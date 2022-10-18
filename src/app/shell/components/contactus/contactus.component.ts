@@ -107,6 +107,7 @@ contact$: Observable<ContactUs>;
     this.hasFiles = false;
     this.filesDetails = [];
     this.uploadObj.clearAll();
+    this.file = null;
   }
 
   get disableClearButton(): boolean {
@@ -114,7 +115,7 @@ contact$: Observable<ContactUs>;
   }
 
   public saveContactUsForm() {
-    debugger;
+    
     let contactUs: ContactUs =
     {
       fromMail : this.ContactFormGroup.controls['email'].value,

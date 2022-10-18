@@ -12,7 +12,6 @@ export class ContactUsService {
    * @param payload
    */
   public saveContactUs(contactUs: ContactUs): Observable<any> {
-    debugger;
     const formData = new FormData();
     formData.append('file', contactUs?.selectedFile != null ? contactUs?.selectedFile : '');
     delete contactUs.selectedFile;
