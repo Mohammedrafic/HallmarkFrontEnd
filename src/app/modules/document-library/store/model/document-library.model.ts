@@ -73,6 +73,7 @@ export class DocumentLibraryDto {
   regionName: string | null;
   locationId: number | null;
   locationName: string | null;
+  isSharedWithMe: boolean;
   documentVisibilities: any | null;
 }
 
@@ -82,8 +83,9 @@ export class DocumentsFilter {
   businessUnitId: number | null;
   regionId: number | null;
   locationId: number | null;
-  folderId: number | null
-  getAll: boolean | null
+  folderId: number | null;
+  includeSharedWithMe: boolean;
+  showAllPages: boolean;
 }
 export type DocumentsLibraryPage = PageOfCollections<DocumentLibraryDto>;
 

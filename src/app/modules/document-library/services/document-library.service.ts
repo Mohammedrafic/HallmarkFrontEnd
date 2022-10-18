@@ -23,7 +23,7 @@ export class DocumentLibraryService {
     return this.http.get<FolderTreeItem[]>(url, { params: params });
   }
 
-  public GetDocuments(documentsFilter: DocumentsFilter): Observable<DocumentsLibraryPage> {
+  public GetDocumentLibraryInfo(documentsFilter: DocumentsFilter): Observable<DocumentsLibraryPage> {
     let params = new HttpParams();
     params = params.append("BusinessUnitType", documentsFilter == undefined ? 1 : documentsFilter.businessUnitType);
     if (documentsFilter?.businessUnitId && documentsFilter?.businessUnitId != null)
@@ -36,6 +36,9 @@ export class DocumentLibraryService {
       params = params.append("FolderId", documentsFilter.folderId);
     if (documentsFilter?.documentId && documentsFilter?.documentId != null)
       params = params.append("DocumentId", documentsFilter.documentId);
+
+    params = params.append("IncludeSharedWithMe", documentsFilter.includeSharedWithMe);
+    params = params.append("ShowAllPages", documentsFilter.showAllPages);
     return this.http.get<DocumentsLibraryPage>(`/api/DocumentLibrary/Filtered`, { params: params });
   }
 
