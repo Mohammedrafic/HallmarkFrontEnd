@@ -1,8 +1,8 @@
-import { filter, Observable, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store, ofActionDispatched } from '@ngxs/store';
 
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -21,13 +21,19 @@ import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { UserState } from 'src/app/store/user.state';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
+import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
+import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
+import { AlertTriggerDto } from '@shared/models/alerts-template.model';
+import { SaveCloseOrderSucceeded } from '@client/store/order-managment-content.actions';
+import { OrderStatus } from '@shared/enums/order-management';
+import { AlertTrigger } from '@admin/store/alerts.actions';
 
 @Component({
   selector: 'app-close-order',
   templateUrl: './close-order.component.html',
   styleUrls: ['./close-order.component.scss'],
 })
-export class CloseOrderComponent extends DestroyableDirective implements OnChanges, OnInit {
+export class CloseOrderComponent extends DestroyableDirective implements OnChanges, OnInit,OnDestroy {
   @Input() public order: Order | OrderManagement;
   @Input() candidate: OrderManagementChild;
   @Output() private closeOrderSuccess: EventEmitter<Order | OrderManagement> = new EventEmitter<
@@ -50,6 +56,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public closeForm: FormGroup;
   public commentContainerId: number = 0;
   public comments: Comment[] = [];
+  private unsubscribe$: Subject<void> = new Subject();
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -57,7 +64,8 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     private actions: Actions,
     private closeOrderService: CloseOrderService,
     private confirmService: ConfirmService,
-    private commentsService: CommentsService
+    private commentsService: CommentsService,
+    private actions$: Actions
   ) {
     super();
   }
@@ -73,8 +81,37 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     this.onOrganizationChangedClosureReasons();
     this.initForm();
     this.subscribeOnCloseSideBar();
-  }
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveCloseOrderSucceeded)).subscribe((data) => {
+      const userAgencyOrganization = this.store.selectSnapshot(UserState.organizations) as UserAgencyOrganization;
+      let orgName = userAgencyOrganization?.businessUnits?.find(i => i.id == data?.order?.organizationId)?.name;
+      let params: any = {};
+      params['@' + AlertParameterEnum[AlertParameterEnum.Organization]] = orgName == null || orgName == undefined ? "" : orgName;
+      params['@' + AlertParameterEnum[AlertParameterEnum.OrderID]] =
+        data?.order?.organizationPrefix == null
+          ? data?.order?.publicId + ''
+          : data?.order?.organizationPrefix + '-' + data?.order?.publicId;
+      params['@' + AlertParameterEnum[AlertParameterEnum.Location]] = data?.order?.locationName;
+      params['@' + AlertParameterEnum[AlertParameterEnum.Skill]] = data?.order?.skillName == null ? "" : data?.order?.skillName;
+      //For Future Reference
+      // var url = location.origin + '/ui/client/order-management/edit/' + data?.order?.id;
+      params['@' + AlertParameterEnum[AlertParameterEnum.ClickbackURL]] = "";
+      
+      let  alertTriggerDto : AlertTriggerDto = {
+          BusinessUnitId: data?.order?.organizationId,
+          AlertId: AlertIdEnum['Order Status Update: Closed'],
+          Parameters: params,
+        };
+      
+      if (alertTriggerDto.AlertId > 0) {
+        this.store.dispatch(new AlertTrigger(alertTriggerDto));
+      }
 
+    });
+  }
+  public override ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
   public onCancel(): void {
     if (this.closeForm.dirty) {
       this.confirmService
@@ -160,6 +197,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   private closeOrder(formData: Omit<CloseOrderPayload, 'orderId'>): void {
     this.closeOrderService.closeOrder({ ...formData, orderId: this.order.id }).subscribe(() => {
+      this.store.dispatch(new SaveCloseOrderSucceeded(this.order));
       this.closeOrderSuccess.emit(this.order);
       this.closeDialog();
     });

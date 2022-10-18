@@ -6,6 +6,7 @@ import {
   EditOrderDto,
   Order,
   OrderFilter,
+  OrderManagement,
   OrderManagementFilter,
 } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
@@ -154,6 +155,10 @@ export class SaveOrder {
 export class SaveOrderSucceeded {
   static readonly type = '[order management] Save Order Succeeded';
   constructor(public order: Order) {}
+}
+export class SaveCloseOrderSucceeded {
+  static readonly type = '[order management] Save Close Order Succeeded';
+  constructor(public order: Order| OrderManagement) {}
 }
 
 export class EditOrder {

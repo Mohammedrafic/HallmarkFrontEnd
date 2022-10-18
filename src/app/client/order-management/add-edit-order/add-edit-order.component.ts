@@ -43,6 +43,7 @@ import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
 import { ToastUtility } from '@syncfusion/ej2-notifications';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
+import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 
 enum SelectedTab {
   OrderDetails,
@@ -188,25 +189,42 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       });
     }
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe((data) => {
-      const user = this.store.selectSnapshot(UserState.user) as User;
-      const agency = this.store.selectSnapshot(AgencyState.agency) as Agency;
+      const userAgencyOrganization = this.store.selectSnapshot(UserState.organizations) as UserAgencyOrganization;
+      let orgName = userAgencyOrganization?.businessUnits?.find(i => i.id == data?.order?.organizationId)?.name;
       let params: any = {};
-      params['@' + AlertParameterEnum[AlertParameterEnum.MyOrganization]] = user?.businessUnitName;
-      params['@' + AlertParameterEnum[AlertParameterEnum.Agency]] = agency?.agencyDetails?.name;
-      params['@' + AlertParameterEnum[AlertParameterEnum.OrderId]] =
+      params['@' + AlertParameterEnum[AlertParameterEnum.Organization]] = orgName == null || orgName == undefined ? "" : orgName;
+      params['@' + AlertParameterEnum[AlertParameterEnum.OrderID]] =
         data?.order?.organizationPrefix == null
           ? data?.order?.publicId + ''
           : data?.order?.organizationPrefix + '-' + data?.order?.publicId;
-      params['@' + AlertParameterEnum[AlertParameterEnum.JobTitle]] = data?.order?.title;
-      var url = location.origin + '/ui/client/order-management/edit/' + data?.order?.id;
-      params['@' + AlertParameterEnum[AlertParameterEnum.ClickbackURL]] = url;
-
+      params['@' + AlertParameterEnum[AlertParameterEnum.Location]] = data?.order?.locationName;
+      params['@' + AlertParameterEnum[AlertParameterEnum.Skill]] = data?.order?.skillName == null ? "" : data?.order?.skillName;
+      //For Future Reference
+      // var url = location.origin + '/ui/client/order-management/edit/' + data?.order?.id;
+      params['@' + AlertParameterEnum[AlertParameterEnum.ClickbackURL]] = "";
       let alertTriggerDto: AlertTriggerDto = {
-        BusinessUnitId: user?.businessUnitId,
-        AlertId: this.orderId > 0 ? AlertIdEnum.OrderUpdated : AlertIdEnum.OrderCreated,
-        Parameters: params,
+        BusinessUnitId: null,
+        AlertId: 0,
+        Parameters: null
       };
-      this.store.dispatch(new AlertTrigger(alertTriggerDto));
+      if (data?.order?.status == OrderStatus.Open) {
+        alertTriggerDto = {
+          BusinessUnitId: data?.order?.organizationId,
+          AlertId: AlertIdEnum['Order Status Update: Open'],
+          Parameters: params,
+        };
+      }
+      else
+      {
+        alertTriggerDto = {
+          BusinessUnitId: data?.order?.organizationId,
+          AlertId: AlertIdEnum['Order Status Update: Custom'],
+          Parameters: params,
+        };
+      }
+      if (alertTriggerDto.AlertId > 0) {
+        this.store.dispatch(new AlertTrigger(alertTriggerDto));
+      }
       this.router.navigate(['/client/order-management']);
     });
 
