@@ -13,7 +13,7 @@ export class RecordsAdapter {
       organizationId: orgId,
       type: MapedRecordsType[type],
       deleteIds: delIds,
-      records: diffs.map((item) => this.adaptRecordsToPut(item)),
+      records: diffs.map((item) => this.adaptRecordToPut(item)),
     }
   }
   
@@ -24,6 +24,7 @@ export class RecordsAdapter {
     type: RecordFields,
     ): AddRecordDto {
     data.timeIn = DateTimeHelper.toUtcFormat(data.timeIn);
+
     if (data.timeOut) {
       data.timeOut = RecordsAdapter.checkTimeOutDate(data.timeIn, data.timeOut);
     }
@@ -32,12 +33,18 @@ export class RecordsAdapter {
       data.timeIn = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(data.timeIn));
     }
 
-    return {
+    if (type === RecordFields.Time) {
+      data.hadLunchBreak = !data.hadLunchBreak;
+    }
+
+    const dto: AddRecordDto = {
       timesheetId: sheetId,
       organizationId: orgId,
       type: MapedRecordsType[type],
       ...data,
-    }
+    };
+  
+    return dto;
   }
 
   static adaptRecordsDto(data: RawTimsheetRecordsDto): TimesheetRecordsDto {
@@ -100,7 +107,7 @@ export class RecordsAdapter {
     }).filter((record) => !deleteIds.includes(record.id));
   }
 
-  private static adaptRecordsToPut(record: RecordValue): PutRecord {
+  private static adaptRecordToPut(record: RecordValue): PutRecord {
     return {
       id: record.id,
       timeIn: DateTimeHelper.toUtcFormat(record.timeIn),
@@ -111,6 +118,7 @@ export class RecordsAdapter {
       ...record.timeOut ? { timeOut: 
         RecordsAdapter.checkTimeOutDate(record.timeIn, record.timeOut)  } : { timeOut: new Date().toISOString()},
       ...record.description ? { description: record.description } : {},
+      ...record.hasOwnProperty('hadLunchBreak') ? { hadLunchBreak: record.hadLunchBreak } : {},
     }; 
   }
 

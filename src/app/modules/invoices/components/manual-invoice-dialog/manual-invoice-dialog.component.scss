@@ -73,9 +73,6 @@
 ::ng-deep {
   .input-container.long {
     .e-switch-wrapper, body.light .bootstrap .e-css.e-switch-wrapper {
-      // TODO: decide what to do with switch
-      // height: 12px!important;
-      // width: 34px!important;
       margin-right: 0!important;
     }
     .e-switch-on {

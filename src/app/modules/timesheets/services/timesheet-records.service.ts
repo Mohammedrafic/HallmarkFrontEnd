@@ -7,14 +7,13 @@ import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { DropdownOption } from '@core/interface';
 import { TimesheetRecordsDto, RecordValue } from './../interface';
-import { TimesheetsApiService } from './timesheets-api.service';
 import { RecordFields, RecordsMode, RecordStatus } from '../enums';
+import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor/dropdown-editor.component';
 
 @Injectable()
 export class TimesheetRecordsService {
   constructor(
     private fb: FormBuilder,
-    private apiService: TimesheetsApiService,
   ) {}
 
   public setCostOptions(defs: ColDef[], options: DropdownOption[]): void {
@@ -42,7 +41,7 @@ export class TimesheetRecordsService {
         const field = column.field as keyof RecordValue;
         const value = record[field];
 
-        controls[field] = [value as string | number, Validators.required];
+        controls[field] = [value as string | number | boolean, Validators.required];
       });
 
       controls['billRateConfigId'] = [record['billRateConfigId'], Validators.required]
@@ -120,6 +119,54 @@ export class TimesheetRecordsService {
   public checkForStatus(data: RecordValue[]): boolean {
     return data.some((record) => {
       return record.stateText === RecordStatus.Deleted || record.stateText === RecordStatus.New;
+    });
+  }
+
+  public creaEditColDef(
+    editOn: boolean,
+    currentTab: RecordFields,
+    formControls: Record<string, FormGroup>,
+    colDefs: ColDef[]): ColDef[] {
+
+
+    return colDefs.map((def) => {
+      if (editOn && def.field === 'hadLunchBreak') {
+        def.hide = false;
+      } else if (def.field === 'hadLunchBreak') {
+        def.hide = true;
+      }
+
+      if (editOn && def.field === 'billRateConfigName'
+      && currentTab === RecordFields.Time) {
+        const editData = {
+          cellRenderer: DropdownEditorComponent,
+          cellRendererParams: {
+            editMode: true,
+            isEditable: true,
+            options: [],
+            storeField: 'billRateTypes',
+          }
+        }
+        def.field = 'billRateConfigId';
+        def = {
+          ...def,
+          ...editData,
+        };
+      } else if (!editOn && def.field === 'billRateConfigId' && currentTab === RecordFields.Time) {
+        def.field = 'billRateConfigName';
+        delete def.cellRenderer;
+        delete def.cellRendererParams;
+      }
+
+      if ((def.field === 'billRate' || def.field === 'total') && currentTab !== RecordFields.Expenses) {
+        def.hide = editOn;
+      }
+
+      if (def.cellRendererParams && def.cellRendererParams.editMode) {
+        def.cellRendererParams.isEditable = editOn;
+        def.cellRendererParams.formGroup = formControls;
+      }
+      return def;
     });
   }
 }

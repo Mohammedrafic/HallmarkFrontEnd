@@ -1,11 +1,11 @@
 import { Validators } from '@angular/forms';
 
-import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
-import { GridValuesHelper } from '@core/helpers/grid-values.helper';
-import { EditFieldTypes } from '@core/enums';
-import { Attachment, AttachmentsListComponent, AttachmentsListParams } from '@shared/components/attachments';
+import { ColDef } from '@ag-grid-community/core';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
+import { GridValuesHelper } from '@core/helpers/grid-values.helper';
+import { EditFieldTypes } from '@core/enums';
+import { AttachmentsListComponent } from '@shared/components/attachments';
 import { RecordFields } from '../enums';
 import { TabConfig } from '../interface';
 import { ActionsCellComponent } from '../components/cell-editors/actions-cell/actions-cell.component';
@@ -14,6 +14,7 @@ import { GridDateEditorComponent } from '../components/cell-editors/grid-date-ed
 import { GridDayComponent } from '../components/cell-editors/grid-day/grid-day.component';
 import { InputEditorComponent } from '../components/cell-editors/input-editor/input-editor.component';
 import { RecordStatusCellComponent } from '../components/cell-editors/record-status-cell/record-status-cell.component';
+import { SwitchEditorComponent } from '../components/cell-editors/switch-editor/switch-editor.component';
 
 const commonColumn: ColDef = {
   filter: true,
@@ -156,6 +157,18 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
       editMode: true,
       isEditable: false,
       type: EditFieldTypes.DateTime,
+    },
+  },
+  {
+    field: 'hadLunchBreak',
+    headerName: 'No Lunch Break',
+    width: 125,
+    cellRenderer: SwitchEditorComponent,
+    ...commonColumn,
+    hide: true,
+    cellRendererParams: {
+      editMode: true,
+      storeField: 'billRateTypes',
     },
   },
   editableCostCenterDef,

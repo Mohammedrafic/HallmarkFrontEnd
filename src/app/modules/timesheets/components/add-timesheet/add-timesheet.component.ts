@@ -7,6 +7,7 @@ import { switchMap, tap } from 'rxjs/operators';
 import { DialogAction } from '@core/enums';
 import { AddDialogHelper } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
+import { MessageTypes } from '@shared/enums/message-types';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { AddRecordBillRate, AddTimsheetForm, TimesheetDetailsAddDialogState } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
@@ -15,7 +16,6 @@ import { RecordFields } from '../../enums';
 import { RecordsAdapter } from '../../helpers';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { ShowToast } from 'src/app/store/app.actions';
-import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
   selector: 'app-add-timesheet',
@@ -29,6 +29,8 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
   public readonly dialogConfig = RecordAddDialogConfig;
 
   public formType: RecordFields = RecordFields.Time;
+
+  public onCallId: number;
 
   @Select(TimesheetsState.addDialogOpen)
   public readonly dialogState$: Observable<TimesheetDetailsAddDialogState>
@@ -72,6 +74,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
         this.cd.detectChanges();
       }),
       filter((value) => value.type === RecordFields.Time),
+      switchMap(() => this.watchForBillRate()),
       switchMap(() => this.watchForDayChange()),
       filter((day) => !!day),
       takeUntil(this.componentDestroy()),
@@ -79,6 +82,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
     .subscribe((day) => {
       this.form?.controls['timeIn'].patchValue(new Date(day.setHours(0, 0, 0)));
       this.form?.controls['timeOut'].patchValue(new Date(day.setHours(0, 0, 0)));
+      this.cd.markForCheck();
     });
   }
 
@@ -98,7 +102,9 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
 
         item.options = item.options?.filter((option) => {
           return !ratesNotForSelect.includes(option.text);
-        })
+        });
+        
+        this.onCallId = item.options?.find((rate) => rate.text.toLowerCase() === 'oncall')?.value as number;
       }
     });
   }
@@ -116,5 +122,12 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
     }
 
     return true;
+  }
+
+  private watchForBillRate(): Observable<number> {
+    return this.form?.get('billRateConfigId')?.valueChanges
+    .pipe(
+      tap(() => this.cd.markForCheck()),
+    ) as Observable<number>
   }
 }
