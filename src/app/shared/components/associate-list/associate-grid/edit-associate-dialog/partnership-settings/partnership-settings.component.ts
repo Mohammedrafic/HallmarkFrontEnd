@@ -95,7 +95,6 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
     this.partnershipSettings$.pipe(takeUntil(this.destroy$), delay(300)).subscribe((settings: PartnershipSettings) => {
       this.partnershipSettings = settings;
       this.partnershipForm.reset();
-      console.log(settings, 'settings');
       this.partnershipForm.patchValue({ ...settings });
     });
   }
