@@ -69,6 +69,7 @@ export interface RecordValue {
   state: number;
   stateText: RecordStatus;
   timesheetRecordId?: number;
+  hadLunchBreak?: boolean;
 }
 
 export interface TimesheetAttachments {

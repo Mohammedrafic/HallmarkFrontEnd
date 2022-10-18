@@ -1,4 +1,4 @@
-<app-widget-wrapper [isLoading]="isLoading">
+<app-widget-wrapper [isLoading]="isLoading" [description]="description">
   <ng-template #header>
     <div class="widget-header">
       <h3 class="widget-header__title">{{ 'Positions Trend' }}</h3>
@@ -79,6 +79,7 @@
 
   <ng-template #legend>
     <app-widget-legend
+      [isPositionTrend]="true"
       [legendData]="chartLegend"
       (changeCheckbox)="onClickLegend($event)"
       (onClickLegend)="redirectToSourceContent()"

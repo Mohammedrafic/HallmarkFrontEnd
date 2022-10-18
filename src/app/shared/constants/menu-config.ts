@@ -426,12 +426,12 @@ export const MENU_CONFIG: any = {
     15: {
       // Timesheets
       icon: 'clock',
-      route: '',
+      route: 'client/timesheets',
     },
     16: {
       // Invoices
       icon: 'dollar-sign',
-      route: '',
+      route: 'client/invoices',
     },
     17: reportsMenuItemConfiguration,
     18: {
@@ -461,12 +461,12 @@ export const MENU_CONFIG: any = {
     24: {
       // Timesheets
       icon: 'clock',
-      route: '',
+      route: 'agency/timesheets',
     },
     25: {
       // Invoices
       icon: 'dollar-sign',
-      route: '',
+      route: 'agency/invoices',
     },
     26: reportsMenuItemConfiguration,
     27: {
@@ -1081,7 +1081,7 @@ export const MENU_CONFIG: any = {
         icon: '',
         route: '/alerts/group-email',
     },
-  
+
     47: {
       // Alerts Template
       icon: '',

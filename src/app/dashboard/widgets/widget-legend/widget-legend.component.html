@@ -1,25 +1,41 @@
-<div class="widget-legend">
+<div class="widget-legend" *ngIf="!isPositionTrend">
   <div *ngFor="let legend of legendData; trackBy: trackByHandler">
     <div class="widget-legend__item-content">
-      <div id="left" class="left">
-            <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onChangeCheckbox(legend.label)"></ejs-checkbox>
-            <div class="widget-legend__row-container" (click)="onClickLegendRow($event)" (mousedown)="defineMousePosition($event)">
-              <div class="widget-legend__row">
-                <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"></div>
-                <div [ngClass]="['widget-legend__legend-text', legendPosition]">{{ legend.label }}</div>
-              </div>
-           </div>
-       </div>
-      <div id="center" class="center">
-            <div class="widget-item-count"><span>{{ legend.totalCount}}</span></div>
-      </div>
-      <div id="right" class="right">
+      <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onChangeCheckbox(legend.label)"></ejs-checkbox>
+      <div class="widget-legend__row-container" (click)="onClickLegendRow($event)" (mousedown)="defineMousePosition($event)">
+        <div class="widget-legend__row">
+          <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"></div>
+          <div [ngClass]="['widget-legend__legend-text', legendPosition]">{{ legend.label }}</div>
+      
         <div *ngIf="!showPercentRatio" class="widget-legend__score">{{ legend.value }}</div>
-        <app-percentage-ratio-indicator
-          *ngIf="showPercentRatio"
-          [percentageRatio]="legend.value"
-          class="widget-legend__percentage-ratio"
-        ></app-percentage-ratio-indicator>
+        <app-percentage-ratio-indicator *ngIf="showPercentRatio"
+                                        [percentageRatio]="legend.value"
+                                        class="widget-legend__percentage-ratio"></app-percentage-ratio-indicator>
+                                      </div>
+                                      </div>
+    </div>
+  </div>
+</div>
+<div class="widget-legend" *ngIf="isPositionTrend">
+  <div *ngFor="let legend of legendData; trackBy: trackByHandler">
+    <div class="widget-legend__item-content">
+      <div id="widget_left" class="widget_left">
+        <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onChangeCheckbox(legend.label)"></ejs-checkbox>
+        <div class="widget-legend__row-container" (click)="onClickLegendRow($event)" (mousedown)="defineMousePosition($event)">
+          <div class="widget-legend__row">
+            <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"></div>
+            <div [ngClass]="['widget-legend__legend-text', legendPosition]">{{ legend.label }}</div>
+          </div>
+        </div>
+      </div>
+      <div id="center" class="widget_center">
+        <div class="widget-item-count"><span>{{ legend.totalCount}}</span></div>
+      </div>
+      <div id="right" class="widget_right">
+        <div *ngIf="!showPercentRatio" class="widget-legend__score">{{ legend.value }}</div>
+        <app-percentage-ratio-indicator *ngIf="showPercentRatio"
+                                        [percentageRatio]="legend.value"
+                                        class="widget-legend__percentage-ratio"></app-percentage-ratio-indicator>
       </div>
     </div>
   </div>

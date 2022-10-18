@@ -61,7 +61,9 @@
                     (filesSelected)="onFilesSelected($event)"
             ></app-upload-button>
 
+            <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
             <app-export-button
+                    style="display: none;" 
                     (csvExport)="exportProfileDetails(exportedFileType.csv)"
                     (excelExport)="exportProfileDetails(exportedFileType.excel)"
                     (customExport)="showCustomExportDialog()"

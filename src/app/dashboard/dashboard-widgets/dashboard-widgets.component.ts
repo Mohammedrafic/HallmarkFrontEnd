@@ -6,6 +6,7 @@ import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import type { WidgetsDataModel } from '../models/widgets-data.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
+import { WidgetDescriptionEnum } from '../enums/widget-description.enum';
 
 @Component({
   selector: 'app-dashboard-widgets',
@@ -19,6 +20,7 @@ export class DashboardWidgetsComponent extends AbstractSFComponentDirective<Dash
   @Input() public widgetsData: WidgetsDataModel | null;
   @Input() public timeSelection: TimeSelectionEnum;
   @Input() public isDarkTheme: boolean;
+  @Input() public description: string;
   
   @Output() public dashboardCreatedEmitter: EventEmitter<void> = new EventEmitter();
   @Output() public dragStopEmitter: EventEmitter<void> = new EventEmitter();
@@ -26,6 +28,7 @@ export class DashboardWidgetsComponent extends AbstractSFComponentDirective<Dash
   public readonly cellSpacing = [24, 24];
   public readonly columns = 12;
   public readonly widgetTypeEnum: typeof WidgetTypeEnum = WidgetTypeEnum;
+  public readonly widgetDescriptionEnum: typeof WidgetDescriptionEnum = WidgetDescriptionEnum;
 
   public trackByHandler(_: number, panel: PanelModel): string {
     return panel.id ?? '';
