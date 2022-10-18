@@ -86,6 +86,32 @@ export class DateTimeHelper {
     return new Date(isStart ? first : last);
   }
 
+  public static getDynamicWeekDate(date: string | Date, isStart = false, weekStartDay: Date): Date {
+    const curr = new Date(date);
+    const startDayNum = weekStartDay.getDay();
+    const currDayNum = curr.getDay();
+    let dayDiff: number;
+
+    if (currDayNum >= startDayNum) {
+      dayDiff = currDayNum - startDayNum;
+    } else {
+      dayDiff = 7 - startDayNum + currDayNum;
+    }
+
+    const firstDay = curr.getTime() - dayDiff * 24 * 60 * 60 * 1000;
+
+    const lastDay = firstDay + 6 * 24 * 60 * 60 * 1000;
+    let last = new Date(lastDay).getTime();
+    let first = firstDay;
+
+    if (lastDay > new Date().getTime()) {
+      last = new Date().getTime();
+      first = last - new Date(last).getDay() * 24 * 60 * 60 * 1000;
+    }
+
+    return new Date(isStart ? first : last);
+  }
+
   public static getWeekStartEnd(date: string): [Date, Date] {
     const splitValue = date.split(' - ');
     const from = new Date(splitValue[0]);
@@ -94,10 +120,10 @@ export class DateTimeHelper {
     return [from, to];
   }
 
-  public static getRange(date: string | Date): string {
+  public static getRange(date: string | Date, startDate: Date): string {
     let startWeekDay, endWeekDay;
-    startWeekDay = formatDate(DateTimeHelper.getWeekDate(date, true), 'MM/dd/YYYY', 'en-US');
-    endWeekDay = formatDate(DateTimeHelper.getWeekDate(date), 'MM/dd/YYYY', 'en-US');
+    startWeekDay = formatDate(DateTimeHelper.getDynamicWeekDate(date, true, startDate), 'MM/dd/YYYY', 'en-US');
+    endWeekDay = formatDate(DateTimeHelper.getDynamicWeekDate(date, false, startDate), 'MM/dd/YYYY', 'en-US');
 
     return `${startWeekDay} - ${endWeekDay}`;
   }

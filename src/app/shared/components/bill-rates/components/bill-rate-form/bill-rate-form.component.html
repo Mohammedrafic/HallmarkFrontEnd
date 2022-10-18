@@ -96,7 +96,7 @@
     </div>
   </div>
 
-  <div class="form-line">
+  <div *ngIf="isInternalsEnabled" class="form-line">
     <!-- Internal Min -->
     <div class="input-container bootstrap">
       <label>
@@ -119,7 +119,7 @@
         ></ejs-numerictextbox>
 
         <ng-template #intervalMinWithTooltip>
-          <ejs-tooltip target='.e-info' 
+          <ejs-tooltip target='.e-info'
             content="Weekly OT rate will be paid after total hours worked per week exceed the set number"
           >
             <ejs-numerictextbox

@@ -10,8 +10,6 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { CandidatesDetailsModel } from '@shared/components/candidate-details/models/candidate.model';
-import { SetCandidateMessage } from '@shared/components/candidate-details/store/candidate.actions';
-import { CandidatesStatusText } from '@shared/enums/status';
 
 @Component({
   selector: 'app-grid-name-renderer',
@@ -50,18 +48,10 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
       );
     }
 
-    if (this.cellValue.status === CandidatesStatusText.Onboard) {
-      this.store.dispatch(
-        new SetCandidateMessage(
-          this.cellValue.jobTitle,
-          `${this.cellValue.organizationPrefix}-${this.cellValue.publicId}-${this.cellValue.positionId}`
-        )
-      );
-    }
-
     this.router.navigate([url, this.cellValue.candidateProfileId], {
       state: {
         orderId: this.cellValue.orderId,
+        candidateStatus: this.cellValue.status,
         pageToBack,
         isNavigateFromCandidateDetails: true,
         isNavigatedFromOrganizationArea: isOrganizationAgencyArea.isOrganizationArea,

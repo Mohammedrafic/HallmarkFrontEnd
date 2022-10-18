@@ -2,9 +2,9 @@
   <ng-container left>
     <button ejs-button cssClass="e-outline" (click)="navigateBack()">Back</button>
     <h3>{{title}} Candidate</h3>
-    <div class="candidate-message" *ngIf="candidateMessage?.title">
-      <div class="candidate-message__itm"><span>Job title:</span> {{candidateMessage?.title}}</div>
-      <div class="candidate-message__itm"><span>Position ID:</span> {{candidateMessage?.position}}</div>
+    <div class="candidate-message" *ngIf="isCandidateAssigned">
+      <div class="candidate-message__itm" *ngIf="candidateJob"><span>Job title:</span> {{candidateJob}}</div>
+      <div class="candidate-message__itm"><span>{{orderOrPositionTitle}} ID:</span> {{orderOrPositionId}}</div>
     </div>
   </ng-container>
   <ng-container right>

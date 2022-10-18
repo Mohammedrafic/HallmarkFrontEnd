@@ -1,4 +1,3 @@
-import { SaveRejectMasterReasonsError } from "@admin/store/reject-reason-mater.action";
 import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from '@angular/core';
 import { Action, State, StateContext, Selector } from '@ngxs/store';
@@ -6,7 +5,7 @@ import { catchError, Observable, of, tap } from 'rxjs';
 
 import {
   CandidateCredential,
-  CandidateCredentialPage,
+  CandidateCredentialResponse,
   CredentialGroupedFiles,
 } from '@shared/models/candidate-credential.model';
 import { CredentialType } from '@shared/models/credential-type.model';
@@ -75,7 +74,7 @@ export interface CandidateStateModel {
   experiences: Experience[];
   educations: Education[];
   candidatePage: CandidatePage | null;
-  candidateCredentialPage: CandidateCredentialPage | null;
+  candidateCredentialResponse: CandidateCredentialResponse | null;
   credentialTypes: CredentialType[];
   masterCredentials: Credential[];
   groupedCandidateCredentialsFiles: CredentialGroupedFiles[];
@@ -90,7 +89,7 @@ export interface CandidateStateModel {
     skills: [],
     experiences: [],
     educations: [],
-    candidateCredentialPage: null,
+    candidateCredentialResponse: null,
     credentialTypes: [],
     masterCredentials: [],
     groupedCandidateCredentialsFiles: [],
@@ -124,8 +123,8 @@ export class CandidateState {
   }
 
   @Selector()
-  static candidateCredential(state: CandidateStateModel): CandidateCredentialPage | null {
-    return state.candidateCredentialPage;
+  static candidateCredential(state: CandidateStateModel): CandidateCredentialResponse | null {
+    return state.candidateCredentialResponse;
   }
 
   @Selector()
@@ -338,14 +337,13 @@ export class CandidateState {
 
   @Action(GetCandidatesCredentialByPage, { cancelUncompleted: true })
   GetCandidatesCredentialByPage(
-    { patchState, dispatch, getState }: StateContext<CandidateStateModel>,
-    { pageNumber, pageSize, orderId }: GetCandidatesCredentialByPage
-  ): Observable<CandidateCredentialPage> {
+    { patchState, dispatch }: StateContext<CandidateStateModel>,
+    { pageNumber, pageSize, orderId, candidateProfileId }: GetCandidatesCredentialByPage
+  ): Observable<CandidateCredentialResponse> {
     patchState({ isCandidateLoading: true });
-    const id = getState().candidate?.id as number;
-    return this.candidateService.getCredentialByCandidateId(pageNumber, pageSize, orderId, id).pipe(
+    return this.candidateService.getCredentialByCandidateId(pageNumber, pageSize, orderId, candidateProfileId).pipe(
       tap((payload) => {
-        patchState({ isCandidateLoading: false, candidateCredentialPage: payload });
+        patchState({ isCandidateLoading: false, candidateCredentialResponse: payload });
         return payload;
       })
     );
