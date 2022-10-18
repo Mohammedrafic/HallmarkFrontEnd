@@ -13,6 +13,7 @@ export class MapsChartComponent {
   @Input() public chartData: CandidatesByStateWidgetAggregatedDataModel | undefined;
   @Input() public isLoading: boolean;
   @Input() public isDarkTheme: boolean | false;
+  @Input() public description: string;
 
   constructor(private readonly dashboardService: DashboardService) {}
 

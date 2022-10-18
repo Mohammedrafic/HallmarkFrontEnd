@@ -11,7 +11,7 @@ $headerHeight: 19px;
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 24px;
+  padding: 4%;
   box-sizing: border-box;
   --chartHeight: 100%;
 
@@ -65,7 +65,9 @@ $headerHeight: 19px;
 
   &__position-chart {
     height: 100%;
-    margin-right: -16px;
+    padding-left: 0px;
+    margin-left: -10%;
+    margin-top: 10%;
   }
 
   &__legend {
@@ -103,4 +105,17 @@ $headerHeight: 19px;
       }
     }
   }
+}
+.tooltip {
+  text-align: right;
+}
+.app-custom-icon {
+  width: 20px !important;
+  height: 20px !important;
+  cursor: pointer;
+  color:#4c5673;
+}
+.e-tooltip-wrap .e-tip-content {
+  font-size: 12px;
+  line-height: 20px;
 }

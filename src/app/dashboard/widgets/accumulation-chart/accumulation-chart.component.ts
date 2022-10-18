@@ -30,6 +30,7 @@ export class AccumulationChartComponent
   @Input() public chartData: ChartAccumulation | undefined;
   @Input() public isLoading: boolean;
   @Input() public isDarkTheme: boolean;
+  @Input() public description: string;
 
   public toggleLegend: number[] = [];
   public filteredChartData$: Observable<DonutChartData[]>;

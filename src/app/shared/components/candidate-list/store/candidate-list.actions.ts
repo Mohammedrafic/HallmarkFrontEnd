@@ -1,6 +1,5 @@
 import { CandidateListExport, CandidateListRequest } from '../types/candidate-list.model';
-import { CandidateStatus } from '../../../enums/status';
-import { ExportPayload } from '../../../models/export.model';
+import { CandidateStatus } from '@shared/enums/status';
 
 export class GetCandidatesByPage {
   static readonly type = '[candidate-list] Get Candidates List';

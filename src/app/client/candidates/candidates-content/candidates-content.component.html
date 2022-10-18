@@ -32,7 +32,12 @@
     </div>
   </ng-container>
 </app-page-toolbar>
-
+<section class="tabs">
+<app-tabs-list
+  [tabConfig]="tabConfig"
+  (changeTab)="handleChangeTab($event)"
+></app-tabs-list>
+</section>
 <section>
   <app-candidate-list
     [filteredItems$]="filteredItems$"
@@ -40,5 +45,6 @@
     [search$]="search$"
     [includeDeployedCandidates$]="includeDeployedCandidates$"
     [isAgency]="false"
+    [tab]="activeTabIndex"
   ></app-candidate-list>
 </section>
