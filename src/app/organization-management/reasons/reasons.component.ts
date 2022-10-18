@@ -15,7 +15,7 @@ import {
   SaveOrderRequisitionError
 } from '@organization-management/store/reject-reason.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE, CHARS_NUMBERS_SYMBOLS } from '@shared/constants';
+import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE, ALPHANUMERICS_AND_SYMBOLS } from '@shared/constants';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { delay, filter, takeWhile } from 'rxjs';
@@ -62,7 +62,7 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
   private createForm(): void {
     this.form = new FormGroup({
       id: new FormControl(null),
-      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(CHARS_NUMBERS_SYMBOLS)])
+      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)])
     })
   }
 
