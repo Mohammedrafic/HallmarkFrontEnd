@@ -38,7 +38,10 @@
           cssClass="e-primary">
           Approve
         </button>
+
+        <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
         <button
+          style="display: none"
           (click)="exportEmitter.emit()"
           ejs-button
           cssClass="e-primary button-export button--no-wrap">
