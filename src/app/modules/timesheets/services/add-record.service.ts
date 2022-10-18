@@ -19,6 +19,7 @@ export class AddRecordService {
           timeOut: [null, [Validators.required]],
           departmentId: [null, Validators.required],
           billRateConfigId: [null, Validators.required],
+          hadLunchBreak: [true],
         }) as CustomFormGroup<AddTimsheetForm>;
     }
 

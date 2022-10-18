@@ -1,4 +1,3 @@
-import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef,
   EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
@@ -10,13 +9,14 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
 import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
-import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
+import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
 import { RecordFields, RecordsMode, SubmitBtnText, TIMETHEETS_STATUSES, RecordStatus } from '../../enums';
 import { RecordsTabConfig, TimesheetConfirmMessages, TimesheetRecordsColdef } from '../../constants';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import {
   Attachment,
   DialogActionPayload,
@@ -30,7 +30,6 @@ import { TimesheetDetailsTableService, TimesheetRecordsService } from '../../ser
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { RecordsAdapter } from '../../helpers';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
-import { DropdownEditorComponent } from '../cell-editors/dropdown-editor/dropdown-editor.component';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -348,39 +347,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private setEditModeColDef(): void {
     this.checkForStatusCol();
-    this.timesheetColDef = this.timesheetColDef.map((def) => {
-      if (this.isEditOn && def.field === 'billRateConfigName'
-      && this.currentTab === RecordFields.Time) {
-        const editData = {
-          cellRenderer: DropdownEditorComponent,
-          cellRendererParams: {
-            editMode: true,
-            isEditable: true,
-            options: [],
-            storeField: 'billRateTypes',
-          }
-        }
-        def.field = 'billRateConfigId';
-        def = {
-          ...def,
-          ...editData,
-        };
-      } else if (!this.isEditOn && def.field === 'billRateConfigId' && this.currentTab === RecordFields.Time) {
-        def.field = 'billRateConfigName';
-        delete def.cellRenderer;
-        delete def.cellRendererParams;
-      }
-
-      if ((def.field === 'billRate' || def.field === 'total') && this.currentTab !== RecordFields.Expenses) {
-        def.hide = this.isEditOn;
-      }
-
-      if (def.cellRendererParams && def.cellRendererParams.editMode) {
-        def.cellRendererParams.isEditable = this.isEditOn;
-        def.cellRendererParams.formGroup = this.formControls;
-      }
-      return def;
-    });
+    this.timesheetColDef = this.timesheetRecordsService.createEditColDef(this.isEditOn,
+      this.currentTab, this.formControls, this.timesheetColDef);
 
     this.gridApi.setColumnDefs(this.timesheetColDef);
   }
