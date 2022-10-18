@@ -61,6 +61,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   @Select(DocumentLibraryState.documentLibraryDto)
   documentLibraryDto$: Observable<DocumentLibraryDto>;
 
+  @Select(DocumentLibraryState.savedDocumentLibraryDto)
+  savedDocumentLibraryDto$: Observable<DocumentLibraryDto>;
+
   @Select(SecurityState.bussinesData)
   public businessData$: Observable<BusinessUnit[]>;
   selectedOrganizations: BusinessUnit[];
@@ -82,7 +85,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public editMenuItems: ItemModel[] = [
     { text: MoreMenuType[0], id: '0' },
     { text: MoreMenuType[1], id: '1' },
-    { text: MoreMenuType[2], id: '2' },
+    { text: MoreMenuType[2], id: '2' }
   ];
 
   public statusItems: ItemModel[] = [
@@ -150,6 +153,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public editOrganizationIds: number[] = [];
   public editRegionIds: number[] = [];
   public editLocationIds: number[] = [];
+  public isIncludeSharedWithMe: boolean = false;
 
 
   constructor(private store: Store, private datePipe: DatePipe,
@@ -175,11 +179,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           break;
       }
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
-      let documentTypesFilter: DocumentTypeFilter = {
-        businessUnitType: this.businessUnitType,
-        businessUnitId: this.businessUnitId
-      }
-      this.store.dispatch(new GetDocumentTypes(documentTypesFilter));
     }
     this.today.setHours(0, 0, 0);
   }
@@ -299,7 +298,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.startDateField.valueChanges.subscribe(() => {
       if (this.endDateField?.value != null) {
         this.startDate = new Date(this.startDateField?.value?.toString());
-        this.changeDetectorRef.markForCheck();
         this.endDateField.addValidators(datesValidator(this.documentLibraryform, FormControlNames.StartDate, FormControlNames.EndDate));
         this.endDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
       }
@@ -310,6 +308,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         this.startDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
       }
     });
+    this.changeDetectorRef.markForCheck();
   }
 
   public uploadToFile(file: Blob | null) {
@@ -406,7 +405,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       regionId: null,
       locationId: null,
       folderId: this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null,
-      getAll: true
+      includeSharedWithMe:this.isIncludeSharedWithMe,
+      showAllPages: true
     }
     return documentFilter;
   }
@@ -493,6 +493,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.isUpload = true;
     this.documentId = 0;
     this.isEditDocument = false;
+    this.halmarkSwitch = false;
     this.dialogWidth = '800px';
     this.addRemoveFormcontrols();
     this.formDailogTitle = FormDailogTitle.Upload;
@@ -554,37 +555,47 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         this.documentLibraryform.markAllAsTouched();
         return;
       }
-      this.store.dispatch(new SaveDocuments(document)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
-        this.documentLibraryform.reset();
-        this.closeDialog();
-        this.getDocuments();
+      this.store.dispatch(new SaveDocuments(document));
+      this.savedDocumentLibraryDto$.pipe(takeUntil(this.unsubscribe$)).subscribe((retrunDocument) => {
+        if (retrunDocument) {
+          this.shaeDocumentIds = [retrunDocument.id];
+          this.shareDocument();
+          this.documentLibraryform.reset();
+          this.closeDialog();
+          this.store.dispatch(new GetFoldersTree({ businessUnitType: this.businessUnitType, businessUnitId: this.businessUnitId }));
+        }
       });
     }
     else if (this.isShare) {
-      let unitType = BusinessUnitType.Hallmark;
-      let unitId: number | null = null;
-      if (this.mspSwitch) {
-        unitType = BusinessUnitType.MSP;
-        unitId = this.documentLibraryform.get(FormControlNames.MSP)?.value;
-      }
-      else if (this.agencySwitch) {
-        unitType = BusinessUnitType.Agency;
-        unitId = this.documentLibraryform.get(FormControlNames.Agencies)?.value;
-      }
-      else if (this.organizationSwitch) {
-        unitType = BusinessUnitType.Organization;
-        unitId = this.documentLibraryform.get(FormControlNames.Orgnizations)?.value;
-      }
-      let mapping: { [id: number]: number[]; } = {};
+      this.shareDocument();
+    }
+  }
+
+  public shareDocument() {
+    let unitType: number = 0;
+    let unitIds: number[] = [];
+    if (this.halmarkSwitch) {
+      unitType = BusinessUnitType.Hallmark;
+      unitIds = [parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string)];
+    }
+    else if (this.agencySwitch) {
+      unitType = BusinessUnitType.Agency;
+      unitIds = this.documentLibraryform.get(FormControlNames.Agencies)?.value;
+    }
+    else if (this.organizationSwitch) {
+      unitType = BusinessUnitType.Organization;
+      unitIds = this.documentLibraryform.get(FormControlNames.Orgnizations)?.value;
+    }
+    let mapping: { [id: number]: number[]; } = {};
+    if (unitType != 0 && unitIds.length > 0) {
       const shareDocumentsFilter: ShareDocumentsFilter = {
         documentIds: this.shaeDocumentIds,
         businessUnitType: unitType,
-        businessUnitId: unitId,
+        businessUnitId: unitIds[0],
         regionLocationMappings: mapping
       }
       this.store.dispatch(new ShareDocuments(shareDocumentsFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
         this.closeDialog();
-        this.getDocuments();
       });
     }
   }
@@ -635,10 +646,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     if (this.halmarkSwitch) {
       this.agencySwitch = false;
       this.organizationSwitch = false;
-      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue(null);
-      this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue([]);
-      this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
-      this.documentLibraryform.get(FormControlNames.Agencies)?.setValue(null);
+      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
+      this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([]);
     }
     this.changeDetectorRef.markForCheck();
   }
@@ -649,10 +658,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.halmarkSwitch = false;
       this.organizationSwitch = false;
       this.agencySwitch = false;
-      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue(null);
-      this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue([]);
-      this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
-      this.documentLibraryform.get(FormControlNames.Agencies)?.setValue(null);
+      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
+      this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([]);
       this.documentLibraryform.get(FormControlNames.MSP)?.setValue(null);
     }
     this.changeDetectorRef.markForCheck();
@@ -663,21 +670,21 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Agency));
       this.halmarkSwitch = false;
       this.organizationSwitch = false;
-      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue(null);
-      this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue([]);
-      this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
-      this.documentLibraryform.get(FormControlNames.Agencies)?.setValue(null);
-      this.documentLibraryform.get(FormControlNames.Agencies)?.setValue(parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string) || null);
+      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
+      this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string) || null]);
     }
     this.changeDetectorRef.markForCheck();
+  }
+  public onIncludeSharedWithMe(event: any) {
+    this.isIncludeSharedWithMe = !this.isIncludeSharedWithMe;
+    this.changeDetectorRef.markForCheck();
+    this.getDocuments();
   }
   public onOrganizationSwitcher(event: any) {
     this.organizationSwitch = !this.organizationSwitch;
     if (this.organizationSwitch) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
-      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue(parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string));
-      this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue([]);
-      this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
+      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string)]);
       this.halmarkSwitch = false;
       this.agencySwitch = false;
     }
@@ -708,37 +715,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.organizationControl = this.documentLibraryform.get(FormControlNames.OrgnizationIds) as AbstractControl;
     this.regionIdControl = this.documentLibraryform.get(FormControlNames.RegionIds) as AbstractControl;
     this.locationIdControl = this.documentLibraryform.get(FormControlNames.LocationIds) as AbstractControl;
-    if (this.isShare) {
-      this.shareOrganizationControl = this.documentLibraryform.get(FormControlNames.Orgnizations) as AbstractControl;
-      this.shareAgencyControl = this.documentLibraryform.get(FormControlNames.Agencies) as AbstractControl;
-      this.shareOrganizationControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val: number) => {
-        this.regionIdControl?.setValue([]);
-        this.orgStructureData.regionIds.dataSource = []
-        if (this.shareOrganizationControl?.value > 0) {
-          this.selectedOrganizations = this.orgStructureData.organizationIds.dataSource.filter((x: any) => val == x.id);
-          let regionFilter: regionFilter = {
-            ids: [val],
-            getAll: true
-          };
-          this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
-          this.changeDetectorRef.markForCheck();
-        }
-      });
-
-      this.shareAgencyControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val: number) => {
-        this.regionIdControl?.setValue([]);
-        this.orgStructureData.regionIds.dataSource = []
-        if (this.shareAgencyControl?.value > 0) {
-          this.selectedOrganizations = this.agencyData.filter((x: any) => val == x.id);
-          let regionFilter: regionFilter = {
-            ids: [val],
-            getAll: true
-          };
-          this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
-          this.changeDetectorRef.markForCheck();
-        }
-      });
-    }
+    if (this.isShare) {}
     else {
       this.organizationControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val: number[]) => {
         if (!this.isEditDocument) {
@@ -952,26 +929,51 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   public setDictionaryRegionMappings() {
     let mapping: { [id: number]: number[]; } = {};
-    const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
-    if (selectedRegions.length > 0) {
-      selectedRegions.forEach((regionItem: any) => {
-        let mappingLocItems: number[] = [];
-        const selectedLoactions = this.documentLibraryform.get(FormControlNames.LocationIds)?.value;
-        let x = this.locations$.subscribe((data: any) => {
-          if (selectedLoactions.length > 0) {
-            selectedLoactions.forEach((selLocItem: any) => {
-              let selectedLocation = data.filter((locItem: any) => { return locItem.id == selLocItem && locItem.regionId == regionItem });
-              if (selectedLocation.length > 0)
-                mappingLocItems.push(selectedLocation[0].id);
-            });
-            mapping[regionItem] = mappingLocItems;
-          }
-          else {
-            mapping[regionItem] = [];
-          }
-        });
-       
+    let isAllRegions: boolean = false;
+    let isAllLocations: boolean = false;
+    let regionsData: Region[] = [];
+    let locationsData: Region[] = [];
+    this.regions$.subscribe((data) => {
+      regionsData = data;
+      this.locations$.subscribe((locData: any) => {
+        locationsData = locData;
       });
+    });
+    isAllRegions = this.documentLibraryform.controls[FormControlNames.RegionIds].value.length === regionsData.length;
+    isAllLocations = this.documentLibraryform.controls[FormControlNames.LocationIds].value.length === locationsData.length;
+
+    if (isAllRegions && !isAllLocations) {
+      mapping[-1] = this.documentLibraryform.controls[FormControlNames.LocationIds].value;
+    }
+    else if (!isAllRegions && isAllLocations) {
+      const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
+      selectedRegions.forEach((regionItem: any) => {
+        mapping[regionItem] = [-1];
+      });
+    }
+    else
+    {
+      const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
+      if (selectedRegions.length > 0) {
+        selectedRegions.forEach((regionItem: any) => {
+          let mappingLocItems: number[] = [];
+          const selectedLoactions = this.documentLibraryform.get(FormControlNames.LocationIds)?.value;
+          let x = this.locations$.subscribe((data: any) => {
+            if (selectedLoactions.length > 0) {
+              selectedLoactions.forEach((selLocItem: any) => {
+                let selectedLocation = data.filter((locItem: any) => { return locItem.id == selLocItem && locItem.regionId == regionItem });
+                if (selectedLocation.length > 0)
+                  mappingLocItems.push(selectedLocation[0].id);
+              });
+              mapping[regionItem] = mappingLocItems;
+            }
+            else {
+              mapping[regionItem] = [];
+            }
+          });
+
+        });
+      }
     }
     return mapping;
   }

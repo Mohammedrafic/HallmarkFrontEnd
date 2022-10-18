@@ -1,10 +1,10 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
+import { DocumentTypeFilter, FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
 import { DocumentLibraryState } from '../../store/state/document-library.state';
 import { TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
-import { GetDocumentsSelectedNode, GetFoldersTree, IsAddNewFolder } from '../../store/actions/document-library.actions';
+import { GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, IsAddNewFolder } from '../../store/actions/document-library.actions';
 import { UserState } from '../../../../store/user.state';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -48,6 +48,12 @@ export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
   initSidePanelDocs(): void {
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
+      let documentTypesFilter: DocumentTypeFilter = {
+        businessUnitType: user?.businessUnitType,
+        businessUnitId: this.businessUnitId
+      }
+      this.store.dispatch(new GetDocumentTypes(documentTypesFilter));
+
       this.store.dispatch(new GetFoldersTree({ businessUnitType: user?.businessUnitType, businessUnitId: this.businessUnitId }));
       this.foldersTree$.pipe(takeUntil(this.unsubscribe$)).subscribe((folderTree: FolderTreeItem[]) => {
         if (folderTree != null) {
@@ -56,6 +62,17 @@ export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
           setTimeout(() => {
             if (this.sidePanelDocumentField.dataSource.length) {
               this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
+              const targetNodeId: string = this.tree.selectedNodes[0];
+              const element = this.tree?.element.querySelector('[data-uid="' + targetNodeId + '"]');
+              const liElements = element?.querySelectorAll('ul li');
+              let nodes = [];
+              if (liElements!=undefined && liElements.length > 0) {
+                for (let i = 0; i < liElements?.length; i++) {
+                  const nodeData:any = this.tree?.getNode(liElements[i]);
+                  nodes.push(nodeData.id);
+                }
+                this.tree.expandAll(nodes);
+              }
               this.tree.expandedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
             }
             else {
@@ -74,6 +91,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
         this.selectedNode = new NodeItem();
         this.businessUnitId = data;
         this.initSidePanelDocs();
+       
         this.changeDetectorRef.markForCheck();
       }
     });

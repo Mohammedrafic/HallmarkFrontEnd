@@ -7,6 +7,7 @@ export enum MoreMenuType {
   'Edit',
   'Delete',
   'Share',
+  'Un-Share'
 }
 
 export enum DocType {
