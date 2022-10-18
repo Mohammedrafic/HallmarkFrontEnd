@@ -347,7 +347,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private setEditModeColDef(): void {
     this.checkForStatusCol();
-    this.timesheetColDef = this.timesheetRecordsService.creaEditColDef(this.isEditOn,
+    this.timesheetColDef = this.timesheetRecordsService.createEditColDef(this.isEditOn,
       this.currentTab, this.formControls, this.timesheetColDef);
 
     this.gridApi.setColumnDefs(this.timesheetColDef);

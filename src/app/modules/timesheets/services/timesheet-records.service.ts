@@ -122,7 +122,7 @@ export class TimesheetRecordsService {
     });
   }
 
-  public creaEditColDef(
+  public createEditColDef(
     editOn: boolean,
     currentTab: RecordFields,
     formControls: Record<string, FormGroup>,
@@ -131,9 +131,9 @@ export class TimesheetRecordsService {
 
     return colDefs.map((def) => {
       if (editOn && def.field === 'hadLunchBreak') {
-        def.hide = false;
+        def.cellRendererParams.disabled = false;
       } else if (def.field === 'hadLunchBreak') {
-        def.hide = true;
+        def.cellRendererParams.disabled = true;
       }
 
       if (editOn && def.field === 'billRateConfigName'

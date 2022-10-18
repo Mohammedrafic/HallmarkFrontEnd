@@ -9,6 +9,7 @@ import { Subscription, takeUntil } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
 import { AddRecordBillRate } from '../../../interface';
+import { RecordValue } from '../../../interface/common.interface';
 
 @Component({
   selector: 'app-switch-editor',
@@ -20,6 +21,8 @@ export class SwitchEditorComponent extends Destroyable implements ICellRendererA
   value: boolean;
 
   showControl = true;
+
+  controlDisabled = true;
 
   private control: AbstractControl;
 
@@ -53,6 +56,22 @@ export class SwitchEditorComponent extends Destroyable implements ICellRendererA
     this.control.patchValue(!event.checked);
   }
 
+  private setData(params: ICellRendererParams): void {
+    const colDef = (params.colDef as ColDef);
+    const storeField = colDef.cellRendererParams.storeField as string;
+    this.controlDisabled = colDef.cellRendererParams.disabled as boolean;
+
+    this.onCallId = (this.store.snapshot().timesheets[storeField] as AddRecordBillRate[])
+    .find((rate) => rate.text.toLowerCase() === 'oncall')?.value as number;
+
+    this.value = !params.value;
+    this.showControl = (params.data as RecordValue).billRateConfigId !== this.onCallId;
+    
+    if (!this.controlDisabled) {
+      this.setFormControl(params);  
+    }
+  }
+
   private setFormControl(params: ICellRendererParams): void {
     if (params.colDef?.cellRendererParams.formGroup?.[params.data.id]) {
       this.group = params.colDef?.cellRendererParams.formGroup[params.data.id] as FormGroup;
@@ -60,17 +79,6 @@ export class SwitchEditorComponent extends Destroyable implements ICellRendererA
 
       this.watchForBillRateControl();
     }
-  }
-
-  private setData(params: ICellRendererParams): void {
-    const colDef = (params.colDef as ColDef);
-    const storeField = colDef.cellRendererParams.storeField as string;
-
-    this.onCallId = (this.store.snapshot().timesheets[storeField] as AddRecordBillRate[])
-    .find((rate) => rate.text.toLowerCase() === 'oncall')?.value as number;
-
-    this.value = !params.value;
-    this.setFormControl(params);   
   }
 
   private watchForBillRateControl(): void {

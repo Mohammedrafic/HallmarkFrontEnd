@@ -165,10 +165,10 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     width: 125,
     cellRenderer: SwitchEditorComponent,
     ...commonColumn,
-    hide: true,
     cellRendererParams: {
       editMode: true,
       storeField: 'billRateTypes',
+      disabled: true,
     },
   },
   editableCostCenterDef,
