@@ -135,13 +135,11 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     }
 
     if (this.initDates) {
-      console.log(this.initDates, '-------------------')
       this.startDateValue = this.initDates[0].toDateString();
       this.startDate = this.initDates[0];
       this.dateControl.patchValue(
         DateTimeHelper.getRange(this.initDates[0], this.startDate),
         { emitEvent: false });
-        console.log(this.startDateValue, 'startDateValuestartDateValuestartDateValue')
     }
     this.compareDates();
   }
