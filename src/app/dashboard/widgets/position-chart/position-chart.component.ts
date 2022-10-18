@@ -11,6 +11,7 @@ import { DashboardService } from '../../services/dashboard.service';
 export class PositionChartComponent {
   @Input() public isLoading: boolean;
   @Input() public chartData: CandidatesPositionDataModel | undefined;
+  @Input() public description: string;
 
   private mousePosition = {
     x: 0,
