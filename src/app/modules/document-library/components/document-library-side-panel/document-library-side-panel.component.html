@@ -1,5 +1,5 @@
 <section class="document-side-panel">
-  <app-search #search class="search"></app-search>
+  <app-search #search class="search" (inputKeyUpEnter)="handleOnSearchTree($event)"></app-search>
   <ejs-treeview id="documentTemplate" #tree [fields]="sidePanelDocumentField"
                 [fullRowSelect]="true" [loadOnDemand]="false" class="documentTreeview"
                 (nodeSelected)="nodeSelected($event)">
@@ -11,9 +11,10 @@
       </div>
     </ng-template>
   </ejs-treeview>
-  <div class="add-folder-fixed">
-    <button ejs-button cssClass="e-flat add-folder-button" (click)="handleOnAddNewFolder($event)">
-      <span><i-feather name="plus" class="icon"></i-feather> Add New Folder</span>
-    </button>
-  </div>
+
 </section>
+<div class="add-folder-fixed">
+  <button ejs-button cssClass="e-flat add-folder-button" (click)="handleOnAddNewFolder($event)">
+    <span><i-feather name="plus" class="icon"></i-feather> Add New Folder</span>
+  </button>
+</div>

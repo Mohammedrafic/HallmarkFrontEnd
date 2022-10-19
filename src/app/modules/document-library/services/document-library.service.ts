@@ -5,7 +5,7 @@ import {
   DocumentFolder, FolderTreeItem, DocumentLibraryDto, Documents, DocumentsFilter,
   DocumentsLibraryPage, DocumentTagFilter, DocumentTags, DocumentTypeFilter, DocumentTypes,
   FolderTreeFilter, DownloadDocumentDetail, DownloadDocumentDetailFilter, DeleteDocumentsFilter, ShareDocumentsFilter, SharedDocumentPostDto,
-  ShareDocumentInfoPage, ShareDocumentInfoFilter
+  ShareDocumentInfoPage, ShareDocumentInfoFilter, UnShareDocumentsFilter
 } from "../store/model/document-library.model";
 
 @Injectable({ providedIn: 'root' })
@@ -144,4 +144,13 @@ export class DocumentLibraryService {
       params = params.append("DocumentId", documentsFilter.documentId);
     return this.http.get<ShareDocumentInfoPage>(`/api/DocumentLibrary/GetSharedDocuments`, { params: params });
   }
+
+  /**
+ * UnShare documents by id's
+ * @param id
+ */
+  public UnShareDocumets(unShareDocumentsFilter: UnShareDocumentsFilter): Observable<any> {
+    return this.http.delete<DocumentLibraryDto>(`/api/DocumentLibrary/UnshareDocuments`, { body: unShareDocumentsFilter });
+  }
+
 }

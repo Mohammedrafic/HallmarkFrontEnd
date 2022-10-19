@@ -1,4 +1,4 @@
-import { DocumentFolder, NodeItem, Documents, DocumentTypeFilter, DocumentsFilter, DocumentTagFilter, FolderTreeFilter, DownloadDocumentDetailFilter, DownloadDocumentDetail, DeleteDocumentsFilter, ShareDocumentsFilter, ShareDocumentInfoFilter } from "../model/document-library.model";
+import { DocumentFolder, NodeItem, Documents, DocumentTypeFilter, DocumentsFilter, DocumentTagFilter, FolderTreeFilter, DownloadDocumentDetailFilter, DownloadDocumentDetail, DeleteDocumentsFilter, ShareDocumentsFilter, ShareDocumentInfoFilter, UnShareDocumentsFilter } from "../model/document-library.model";
 
 export class GetFoldersTree {
   static readonly type = '[documentsLibrary] Get folders tree items';
@@ -78,4 +78,14 @@ export class GetDocumentById {
 export class GetSharedDocuments {
   static readonly type = '[documentsLibrary] Get Shared Documents';
   constructor(public documentsFilter: ShareDocumentInfoFilter) { }
+}
+
+export class UnShareDocuments {
+  static readonly type = '[documentsLibrary] UnShare documents';
+  constructor(public unShareDocumentsFilter: UnShareDocumentsFilter) { }
+}
+
+export class UnShareDocumentsSucceeded {
+  static readonly type = '[documentsLibrary] UnShare documents succeeded';
+  constructor() { }
 }

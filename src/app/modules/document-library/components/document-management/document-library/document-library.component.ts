@@ -8,10 +8,10 @@ import { SpecialProjectMessages } from '../../../../../organization-management/s
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { SetHeaderState, ShowDocPreviewSideDialog, ShowSideDialog, ShowToast } from '../../../../../store/app.actions';
 import { DocumentLibraryColumnsDefinition } from '../../../constants/documents.constant';
-import { DeleteDocumentsFilter, DocumentFolder, DocumentLibraryDto, Documents, DocumentsFilter, DocumentsLibraryPage, DocumentTags, DocumentTypeFilter, DocumentTypes, DownloadDocumentDetail, DownloadDocumentDetailFilter, NodeItem, ShareDocumentDto, ShareDocumentInfoFilter, ShareDocumentInfoPage, ShareDocumentsFilter } from '../../../store/model/document-library.model';
+import { DeleteDocumentsFilter, DocumentFolder, DocumentLibraryDto, Documents, DocumentsFilter, DocumentsLibraryPage, DocumentTags, DocumentTypeFilter, DocumentTypes, DownloadDocumentDetail, DownloadDocumentDetailFilter, NodeItem, ShareDocumentDto, ShareDocumentInfoFilter, ShareDocumentInfoPage, ShareDocumentsFilter, UnShareDocumentsFilter } from '../../../store/model/document-library.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { DocumentLibraryState } from '../../../store/state/document-library.state';
-import { DeletDocuments, GetDocumentById, GetDocumentDownloadDeatils, GetDocuments, GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, GetSharedDocuments, IsAddNewFolder, SaveDocumentFolder, SaveDocuments, ShareDocuments } from '../../../store/actions/document-library.actions';
+import { DeletDocuments, GetDocumentById, GetDocumentDownloadDeatils, GetDocuments, GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, GetSharedDocuments, IsAddNewFolder, SaveDocumentFolder, SaveDocuments, ShareDocuments, UnShareDocuments } from '../../../store/actions/document-library.actions';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { documentsColumnField, FileType, FormControlNames, FormDailogTitle, MoreMenuType, StatusEnum } from '../../../enums/documents.enum';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -80,7 +80,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   public gridApi!: GridApi;
   public rowData: DocumentLibraryDto[] = [];
-  public rowSelection: 'single' | 'multiple' = 'single';
+  public rowSelection: 'single' | 'multiple' = 'multiple';
 
   public editMenuItems: ItemModel[] = [
     { text: MoreMenuType[0], id: '0' },
@@ -154,6 +154,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public editRegionIds: number[] = [];
   public editLocationIds: number[] = [];
   public isIncludeSharedWithMe: boolean = false;
+  public businessUnitTypes = BusinessUnitType;
 
 
   constructor(private store: Store, private datePipe: DatePipe,
@@ -374,6 +375,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     columnDefs: this.columnDefinitions,
     rowData: this.rowData,
     sideBar: this.sideBar,
+    rowSelection: this.rowSelection,
     noRowsOverlayComponent: CustomNoRowsOverlayComponent,
     noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
     onFilterChanged: (event: FilterChangedEvent) => {
@@ -591,7 +593,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       const shareDocumentsFilter: ShareDocumentsFilter = {
         documentIds: this.shaeDocumentIds,
         businessUnitType: unitType,
-        businessUnitId: unitIds[0],
+        businessUnitIds: unitIds,
         regionLocationMappings: mapping
       }
       this.store.dispatch(new ShareDocuments(shareDocumentsFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
@@ -730,7 +732,14 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           };
           this.store.dispatch(new GetRegionsByOrganizations(regionFilter)).subscribe(() => {
             if (this.isEditDocument) {
-              this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(this.editRegionIds);
+              if (this.editRegionIds[0] == -1) {
+                this.regions$.subscribe((data) => {
+                  const allRegionsIds = data.map(region => region.id);
+                  this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(allRegionsIds);
+                });
+              } else {
+                this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(this.editRegionIds);
+              }
             }
           });
           this.changeDetectorRef.markForCheck();
@@ -751,7 +760,14 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
         this.store.dispatch(new GetLocationsByRegions(locationFilter)).subscribe(() => {
           if (this.isEditDocument) {
-            this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(this.editLocationIds);
+            if (this.editLocationIds[0] == -1) {
+              this.locations$.subscribe((data) => {
+                const allLocIds = data.map(loc => loc.id);
+                this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(allLocIds);
+              });
+            } else {
+              this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(this.editLocationIds);
+            }
           }
         });
         this.changeDetectorRef.markForCheck();
@@ -805,6 +821,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         break;
       case MoreMenuType['Share']:
         this.ShareDocumewnt(data);
+        break;
+      case MoreMenuType['UnShare']:
+        this.UnShareDocumewnt(data);
         break;
     }
   }
@@ -923,6 +942,14 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.getOrganizations();
       this.shaeDocumentIds = [data.id];
       this.store.dispatch(new ShowSideDialog(true));
+    }
+
+  }
+
+  private UnShareDocumewnt(data: DocumentLibraryDto) {
+    if (data) {
+      let unShareDocumentsFilter: UnShareDocumentsFilter = { documentIds: [data.id] };
+      this.store.dispatch(new UnShareDocuments(unShareDocumentsFilter));
     }
 
   }
