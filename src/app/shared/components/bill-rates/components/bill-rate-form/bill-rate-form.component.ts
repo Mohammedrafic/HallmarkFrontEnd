@@ -235,6 +235,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
         this.additionalLableForMinMax = 'Work Week';
         this.hideFilds.add('intervalMax');
         this.hideFilds.add('rateHour');
+        this.billRateForm.get('rateHour')?.setErrors(null);
         break;
       case BillRateCalculationType.WeeklyOT:
         this.isWeeklyOT = true;
