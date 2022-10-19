@@ -30,6 +30,11 @@ export class GetOrderById {
   constructor(public id: number, public organizationId: number, public options?: DialogNextPreviousOption) {}
 }
 
+export class GetOrderByIdSucceeded {
+  static readonly type = '[order management] Get Order By Id Succeeded';
+  constructor() {}
+}
+
 export class SetLock {
   static readonly type = '[order management] Set Lock';
   constructor(
