@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
 import { Select } from '@ngxs/store';
-import { filter, takeUntil, Observable } from 'rxjs';
+import { filter, takeUntil, Observable, merge } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 
 import { DialogAction } from '@core/enums';
@@ -74,16 +74,13 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
         this.cd.detectChanges();
       }),
       filter((value) => value.type === RecordFields.Time),
-      switchMap(() => this.watchForBillRate()),
-      switchMap(() => this.watchForDayChange()),
-      filter((day) => !!day),
+      switchMap(() => merge(
+        this.watchForBillRate(),
+        this.watchForDayChange(),
+      )),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe((day) => {
-      this.form?.controls['timeIn'].patchValue(new Date(day.setHours(0, 0, 0)));
-      this.form?.controls['timeOut'].patchValue(new Date(day.setHours(0, 0, 0)));
-      this.cd.markForCheck();
-    });
+    .subscribe();
   }
 
   public override closeDialog(): void {
@@ -110,7 +107,15 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
   }
 
   private watchForDayChange(): Observable<Date> {
-    return this.form?.controls['day']?.valueChanges as Observable<Date>;
+    return this.form?.controls['day']?.valueChanges
+    .pipe(
+      filter((day) => !!day),
+      tap((day) => {
+        this.form?.controls['timeIn'].patchValue(new Date(day.setHours(0, 0, 0)));
+        this.form?.controls['timeOut'].patchValue(new Date(day.setHours(0, 0, 0)));
+        this.cd.markForCheck();
+      }),
+    ) as Observable<Date>;
   }
 
   private checkBillRateDate(timeIn: string, billRateId: number): boolean {
