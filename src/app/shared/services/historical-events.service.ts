@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError, Observable, of } from 'rxjs';
 import { OrderHistoricalEvent } from '@shared/models';
 
@@ -15,9 +15,11 @@ export class HistoricalEventsService {
     positionId?: number
   ): Observable<OrderHistoricalEvent[]> {
     if (organizationId) {
-      const params = positionId ? { params: { organizationId, positionId } } : { organizationId };
+      const params = positionId ? 
+        new HttpParams().append('organizationId', organizationId).append('positionId', positionId) :
+        new HttpParams().append('organizationId', organizationId);
       return this.http
-        .get<OrderHistoricalEvent[]>(`/api/historicaldata/order/${orderId}`, params)
+        .get<OrderHistoricalEvent[]>(`/api/historicaldata/order/${orderId}`, { params: params })
         .pipe(catchError(() => of([])));
     } else {
       return this.http

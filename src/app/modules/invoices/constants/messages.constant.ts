@@ -6,7 +6,8 @@ export const InvoiceConfirmMessages: CommonDialogConformMessages = {
   confirmAddFormCancel: 'Are you sure you want to exit without saving changes?',
   confirmRecordDelete: 'Are you sure you want to delete this record?',
   confirmOrderChange: 'Are you sure you want to change invoice without saving changes?',
-  confirmEdit: 'Are you sure you want to change the timesheet? This will lead to recalculating values and generating new invoice records.'
+  confirmEdit: 'Are you sure you want to change the timesheet? This will lead to recalculating values and generating new invoice records.',
+  confirmBulkApprove: '',
 }
 
 export const ManualInvoiceMessages = {

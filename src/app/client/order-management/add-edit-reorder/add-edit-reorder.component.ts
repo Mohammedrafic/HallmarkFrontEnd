@@ -72,6 +72,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.initAgenciesAndCandidates();
     this.createReorderForm();
     this.listenCandidateChanges();
+    this.listenAginciesChanges();
     this.commentContainerId = this.order.commentContainerId as number;
   }
 
@@ -118,20 +119,15 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private initForm(reorder?: Order): void {
     const { candidates, jobStartDate, shiftStartTime, shiftEndTime, hourlyRate, openPositions, jobDistributions } =
       reorder || {};
-    this.reorderForm = this.formBuilder.group(
-      {
-        candidates: [this.getCandidateIds(candidates!)],
-        agencies: [this.getAgencyIds(jobDistributions!), Validators.required],
-        reorderDate: [
-          jobStartDate ? DateTimeHelper.convertDateToUtc(jobStartDate.toString()) : '',
-          Validators.required,
-        ],
-        shiftStartTime: [shiftStartTime ?? '', Validators.required],
-        shiftEndTime: [shiftEndTime ?? '', Validators.required],
-        billRate: [hourlyRate ?? '', Validators.required],
-        openPosition: [openPositions ?? '', [Validators.required, Validators.min(1)]],
-      }
-    );
+    this.reorderForm = this.formBuilder.group({
+      candidates: [this.getCandidateIds(candidates!)],
+      agencies: [this.getAgencyIds(jobDistributions!), Validators.required],
+      reorderDate: [jobStartDate ? DateTimeHelper.convertDateToUtc(jobStartDate.toString()) : '', Validators.required],
+      shiftStartTime: [shiftStartTime ?? '', Validators.required],
+      shiftEndTime: [shiftEndTime ?? '', Validators.required],
+      billRate: [hourlyRate ?? '', Validators.required],
+      openPosition: [openPositions ?? '', [Validators.required, Validators.min(1)]],
+    });
   }
 
   setInitialDatesValue(): void {
@@ -141,6 +137,19 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       shiftEndTime,
       jobStartDate,
     };
+  }
+
+  private listenAginciesChanges(): void {
+    this.reorderForm.get('agencies')?.valueChanges.pipe(
+      tap((agenciesIds: number[]) => {
+        const candidates = this.reorderForm.get('candidates')?.value;
+        if (!agenciesIds.length && candidates.length) {
+          this.reorderForm.patchValue({ openPosition: null, candidates: [] });
+          this.reorderForm.updateValueAndValidity();
+        }
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe();
   }
 
   private listenCandidateChanges(): void {
@@ -156,11 +165,18 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
           }
         }),
         filter((candidateIds: number[]) => !!candidateIds?.length),
-        switchMap(() => this.candidates$.pipe(map(this.getAgenciesBelongToCandidates)))
+        switchMap((candidateIds: number[]) => {
+          return this.candidates$.pipe(
+            map((candidates: CandidateModel[]) => {
+              return candidates.filter((candidate: CandidateModel) => candidateIds.includes(candidate.candidateId))
+            }),
+            map(this.getAgenciesBelongToCandidates)
+            )
+        }),
+        takeUntil(this.destroy$)
       )
       .subscribe((agencies: number[]) => {
-        const selectedAgencies = this.reorderForm.get('agencies')?.value ?? [];
-        const uniqueAgencies = uniq([...selectedAgencies, ...agencies]);
+        const uniqueAgencies = uniq(agencies);
         this.reorderForm?.patchValue({ agencies: uniqueAgencies });
       });
   }
@@ -208,7 +224,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private areTimesEquals(time1: Date, time2: Date): boolean {
-    return getTimeFromDate(time1) === getTimeFromDate(time2, true);
+    return getTimeFromDate(time1) === getTimeFromDate(time2);
   }
 
   private saveReorder(): void {

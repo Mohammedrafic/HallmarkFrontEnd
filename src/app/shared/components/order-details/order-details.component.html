@@ -33,14 +33,14 @@
         </div>
       </div>
     </div>
-    <ejs-accordion class="historical-events" (expanding)="isJobDescriptionExpended = false">
+    <ejs-accordion class="historical-events" (expanding)="isJobDescriptionExpended = false" (expanded)="onExpanded($event)">
       <e-accordionitems>
         <e-accordionitem [expanded]="!isJobDescriptionExpended">
           <ng-template #header>
             <div>Historical Events</div>
           </ng-template>
           <ng-template #content>
-            <app-order-historical-events [events]="events$ | async"></app-order-historical-events>
+            <app-order-historical-events [events]="events"></app-order-historical-events>
           </ng-template>
         </e-accordionitem>
       </e-accordionitems>

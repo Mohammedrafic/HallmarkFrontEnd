@@ -20,4 +20,5 @@ export interface CommonDialogConformMessages {
   confirmRecordDelete: string;
   confirmOrderChange: string;
   confirmEdit: string;
+  confirmBulkApprove: string;
 }
