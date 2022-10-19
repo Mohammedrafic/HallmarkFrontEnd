@@ -60,9 +60,9 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
         if (folderTree != null) {
           this.sidePanelFolderItems = folderTree;
           this.sidePanelDocumentField = { dataSource: this.sidePanelFolderItems, id: 'id', text: 'name', parentID: 'parentId', child: 'children' };
-          if (this.sidePanelDocumentField.dataSource[0].id != -1) {
-            setTimeout(() => {
-              if (this.sidePanelDocumentField.dataSource.length) {
+          setTimeout(() => {
+            if (this.sidePanelDocumentField.dataSource.length) {
+              if (this.sidePanelDocumentField.dataSource[0].id != -1) {
                 this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
                 const targetNodeId: string = this.tree.selectedNodes[0];
                 const element = this.tree?.element.querySelector('[data-uid="' + targetNodeId + '"]');
@@ -79,10 +79,17 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
               }
               else {
                 this.tree.selectedNodes = ['0'];
+                this.selectedNode = new NodeItem();
                 this.store.dispatch(new GetDocumentsSelectedNode(this.selectedNode));
               }
-            }, 1000);
-          }
+            }
+            else {
+              this.tree.selectedNodes = ['0'];
+              this.selectedNode = new NodeItem();
+              this.store.dispatch(new GetDocumentsSelectedNode(this.selectedNode));
+            }
+          }, 1000);
+
         }
       });
     }
@@ -126,7 +133,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
   }
 
   handleOnAddNewFolder(event: any) {
-    if (this.selectedNode != undefined && this.selectedNode?.fileType != undefined && this.selectedNode?.fileType != FileType.Folder && this.selectedNode?.id==-1) {
+    if (this.selectedNode != undefined && this.selectedNode?.fileType != undefined && this.selectedNode?.fileType != FileType.Folder && this.selectedNode?.id == -1) {
       this.store.dispatch([
         new ShowToast(MessageTypes.Warning, "Please select folder."),
       ]);

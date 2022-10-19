@@ -1,6 +1,6 @@
 import { CellClickedEvent, FilterChangedEvent, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { DatePipe } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -31,14 +31,24 @@ import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, ORG_ID_STORAGE_KEY } from '@sh
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MessageTypes } from '@shared/enums/message-types';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  MagnificationService,
+  NavigationService,
+  PdfViewerComponent,
+  TextSelectionService,
+  ToolbarService } from '@syncfusion/ej2-angular-pdfviewer';
 
 @Component({
   selector: 'app-document-library',
   templateUrl: './document-library.component.html',
   styleUrls: ['./document-library.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [ToolbarService, NavigationService, TextSelectionService, MagnificationService]
 })
 export class DocumentLibraryComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy, AfterViewInit {
+
+  @ViewChild('pdfViewer', { static: true })
+  public pdfViewer: PdfViewerComponent;
 
   public title: string = "Documents";
   private unsubscribe$: Subject<void> = new Subject();
@@ -155,6 +165,10 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public editLocationIds: number[] = [];
   public isIncludeSharedWithMe: boolean = false;
   public businessUnitTypes = BusinessUnitType;
+  public isPdf: boolean = true;
+  public service: string =
+    'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
+  public document: string = 'PDF_Succinctly.pdf';
 
 
   constructor(private store: Store, private datePipe: DatePipe,
@@ -503,8 +517,11 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue([]);
     this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
     this.getOrganizations();
-    if (this.selectedDocumentNode?.id != -1)
+    if (this.selectedDocumentNode != undefined && this.selectedDocumentNode != null && this.selectedDocumentNode?.id!=undefined && this.selectedDocumentNode?.id != -1)
       this.store.dispatch(new ShowSideDialog(true));
+    else
+      this.store.dispatch([new ShowToast(MessageTypes.Warning, "Please select folder.")]);
+
   }
 
   public handleOnSave() {
@@ -1054,30 +1071,37 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         }
       });
   }
+  load(url:string) {
+    this.pdfViewer?.load(url,'');
+  }
   getPreviewUrl(x: any) {
+    
     let extension = (x != null) ? x.extension : null;
     switch (extension) {
       case '.pdf':
-        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          `data:application/pdf;base64,${x.fileAsBase64}`
-        );
+        this.isPdf = true;
+        this.load(`data:application/pdf;base64,${x.fileAsBase64}`);
         break;
       case '.jpg':
+        this.isPdf = false;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
           `data:image/jpg;base64,${x.fileAsBase64}`
         );
         break;
       case '.png':
+        this.isPdf = false;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
           `data:image/png;base64,${x.fileAsBase64}`
         );
         break;
       case '.docx':
+        this.isPdf = false;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
           `https://view.officeapps.live.com/op/embed.aspx?src=${x.sasUrl}`
         );
         break;
       case '.xlsx':
+        this.isPdf = false;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
           `https://view.officeapps.live.com/op/embed.aspx?src=${x.sasUrl}`
         );
@@ -1085,6 +1109,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       default:
 
     }
+    this.changeDetectorRef.markForCheck();
   }
 
   public onClosePreview(): void {
