@@ -146,7 +146,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
 
   private listenAginciesChanges(): void {
     this.reorderForm.get('agencies')?.valueChanges.pipe(
-      takeUntil(this.destroy$),
       tap((agenciesIds: number[]) => {
         const candidates = this.reorderForm.get('candidates')?.value;
         if (!agenciesIds.length && candidates.length) {
@@ -154,6 +153,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
           this.reorderForm.updateValueAndValidity();
         }
       }),
+      takeUntil(this.destroy$)
     ).subscribe();
   }
 
@@ -161,7 +161,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.reorderForm
       .get('candidates')
       ?.valueChanges.pipe(
-        takeUntil(this.destroy$),
         tap((candidateIds: number[]) => {
           if (!candidateIds.length) {
             this.reorderForm.patchValue({ openPosition: null, agencies: [] });
@@ -178,7 +177,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
             }),
             map(this.getAgenciesBelongToCandidates)
             )
-        })
+        }),
+        takeUntil(this.destroy$)
       )
       .subscribe((agencies: number[]) => {
         const uniqueAgencies = uniq(agencies);
