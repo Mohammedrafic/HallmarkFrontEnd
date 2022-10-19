@@ -60,27 +60,29 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
         if (folderTree != null) {
           this.sidePanelFolderItems = folderTree;
           this.sidePanelDocumentField = { dataSource: this.sidePanelFolderItems, id: 'id', text: 'name', parentID: 'parentId', child: 'children' };
-          setTimeout(() => {
-            if (this.sidePanelDocumentField.dataSource.length) {
-              this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
-              const targetNodeId: string = this.tree.selectedNodes[0];
-              const element = this.tree?.element.querySelector('[data-uid="' + targetNodeId + '"]');
-              const liElements = element?.querySelectorAll('ul li');
-              let nodes = [];
-              if (liElements != undefined && liElements.length > 0) {
-                for (let i = 0; i < liElements?.length; i++) {
-                  const nodeData: any = this.tree?.getNode(liElements[i]);
-                  nodes.push(nodeData.id);
+          if (this.sidePanelDocumentField.dataSource[0].id != -1) {
+            setTimeout(() => {
+              if (this.sidePanelDocumentField.dataSource.length) {
+                this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
+                const targetNodeId: string = this.tree.selectedNodes[0];
+                const element = this.tree?.element.querySelector('[data-uid="' + targetNodeId + '"]');
+                const liElements = element?.querySelectorAll('ul li');
+                let nodes = [];
+                if (liElements != undefined && liElements.length > 0) {
+                  for (let i = 0; i < liElements?.length; i++) {
+                    const nodeData: any = this.tree?.getNode(liElements[i]);
+                    nodes.push(nodeData.id);
+                  }
+                  this.tree.expandAll(nodes);
                 }
-                this.tree.expandAll(nodes);
+                this.tree.expandedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
               }
-              this.tree.expandedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
-            }
-            else {
-              this.tree.selectedNodes = ['0'];
-              this.store.dispatch(new GetDocumentsSelectedNode(this.selectedNode));
-            }
-          }, 1000);
+              else {
+                this.tree.selectedNodes = ['0'];
+                this.store.dispatch(new GetDocumentsSelectedNode(this.selectedNode));
+              }
+            }, 1000);
+          }
         }
       });
     }
@@ -124,7 +126,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
   }
 
   handleOnAddNewFolder(event: any) {
-    if (this.selectedNode != undefined && this.selectedNode?.fileType != undefined && this.selectedNode?.fileType != FileType.Folder) {
+    if (this.selectedNode != undefined && this.selectedNode?.fileType != undefined && this.selectedNode?.fileType != FileType.Folder && this.selectedNode?.id==-1) {
       this.store.dispatch([
         new ShowToast(MessageTypes.Warning, "Please select folder."),
       ]);
