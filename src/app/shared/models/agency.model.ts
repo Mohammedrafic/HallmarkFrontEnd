@@ -3,6 +3,7 @@ import {
   ElectronicPaymentDetails,
   PaymentDetails,
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
+import { AgencyStatus } from "@shared/enums/status";
 
 export type Agency = {
   createUnder?: AgencyCreateUnder;
@@ -132,3 +133,8 @@ export type AgencyRegionSkills = {
     name: string;
   }>;
 };
+
+export interface AgencyStatusesModel {
+  text: string | AgencyStatus;
+  id: number;
+}

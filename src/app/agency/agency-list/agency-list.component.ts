@@ -23,7 +23,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { agencyListFilterColumns } from '@agency/agency-list/agency-list.constants';
+import { agencyListFilterColumns, agencyStatusMapper } from '@agency/agency-list/agency-list.constants';
 
 @Component({
   selector: 'app-agency-list',
@@ -34,6 +34,7 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
   @ViewChild('grid') grid: GridComponent;
 
   public readonly statusEnum = AgencyStatus;
+  public readonly statusMapper = agencyStatusMapper;
   public initialSort = {
     columns: [{ field: 'agencyDetails.name', direction: 'Ascending' }],
   };

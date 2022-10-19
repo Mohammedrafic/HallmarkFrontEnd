@@ -9,6 +9,7 @@ import { AgencyStatus } from 'src/app/shared/enums/status';
 
 import { agencyStatusCreationOptions, agencyStatusOptions } from '../../agency-list.constants';
 import PriceUtils from '@shared/utils/price.utils';
+import { AgencyStatusesModel } from "@shared/models/agency.model";
 
 @Component({
   selector: 'app-general-info-group',
@@ -25,7 +26,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   ];
   public priceUtils = PriceUtils;
   public states$ = new Subject();
-  public statuses = agencyStatusCreationOptions;
+  public statuses: AgencyStatusesModel[] = agencyStatusCreationOptions;
   public optionFields = {
     text: 'text',
     value: 'id',
