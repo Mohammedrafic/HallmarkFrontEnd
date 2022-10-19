@@ -78,7 +78,12 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-credentials-grid [isNavigatedFromOrganizationArea]="isNavigatedFromOrganizationArea" [orderId]="orderId" [areAgencyActionsAllowed]="agencyActionsAllowed"></app-credentials-grid>
+        <app-credentials-grid
+          [isNavigatedFromOrganizationArea]="isNavigatedFromOrganizationArea"
+          [areAgencyActionsAllowed]="agencyActionsAllowed"
+          [isCandidateAssigned]="isCandidateAssigned"
+          [orderId]="orderId"
+        ></app-credentials-grid>
       </ng-template>
     </e-tabitem>
   </e-tabitems>

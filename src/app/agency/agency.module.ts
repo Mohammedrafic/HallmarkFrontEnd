@@ -15,6 +15,7 @@ import {
   AlertCircle,
   AlertTriangle,
   AlignJustify,
+  CheckCircle,
   ChevronDown,
   ChevronRight,
   Copy,
@@ -100,6 +101,7 @@ import { ElectronicFormComponent } from './agency-list/add-edit-agency/payment-d
 import { ManualFormComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/manual-form/manual-form.component';
 import { PaymentDialogComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/payment-dialog.component';
 import { JobDistributionComponent } from './agency-list/add-edit-agency/job-distribution/job-distribution.component';
+import { OrderMatchColumnComponent } from './candidates/add-edit-candidate/credentials-grid/order-match-column/order-match-column.component';
 
 const sidebarIcons = {
   Sliders,
@@ -127,6 +129,7 @@ const sidebarIcons = {
   Upload,
   XCircle,
   Slash,
+  CheckCircle,
 };
 
 @NgModule({
@@ -166,6 +169,7 @@ const sidebarIcons = {
     ManualFormComponent,
     PaymentDialogComponent,
     JobDistributionComponent,
+    OrderMatchColumnComponent,
   ],
   imports: [
     CommonModule,

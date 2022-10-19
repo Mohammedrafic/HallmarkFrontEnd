@@ -1,0 +1,21 @@
+@import "colors";
+
+.order-match-column {
+  i-feather {
+    margin-right: 10px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.red {
+  color: $supportive-red;
+}
+
+.green {
+  color: $supportive-green-10;
+}
+
+.yellow {
+  color: $supportive-orange;
+}
