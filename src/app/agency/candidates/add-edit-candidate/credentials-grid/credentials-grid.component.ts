@@ -62,6 +62,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Input() isNavigatedFromOrganizationArea: boolean;
   @Input() orderId: number | null;
   @Input() areAgencyActionsAllowed: boolean;
+  @Input() isCandidateAssigned = false;
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('filesUploader') uploadObj: UploaderComponent;

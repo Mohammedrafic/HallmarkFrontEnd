@@ -20,46 +20,44 @@ import { ContactUsStatus } from '@shared/enums/contact-us-status';
   styleUrls: ['./contactus.component.scss']
 })
 export class ContactusComponent implements OnInit {
-  
-public topics=Topics;
-public uploaderErrorMessageElement: HTMLElement;
-private filesDetails: Blob[] = [];
-private hasFiles = false;
-private removeFiles = false;
-public readonly maxFileSize = 2000000; // 2 mb
-public dropElement: HTMLElement;
-public readonly allowedExtensions: string = '.pdf, .doc, .docx, .jpg, .jpeg, .png';
-public disableSaveButton:boolean=false;
-public ContactFormGroup: FormGroup;
-private unsubscribe$: Subject<void> = new Subject();
-file: any;
-files: File[] = [];
 
-@ViewChild('filesUploader') uploadObj: UploaderComponent;
+  public topics = Topics;
+  public uploaderErrorMessageElement: HTMLElement;
+  private hasFiles = false;
+  public readonly maxFileSize = 2000000; // 2 mb
+  public dropElement: HTMLElement;
+  public readonly allowedExtensions: string = '.pdf, .doc, .docx, .jpg, .jpeg, .png';
+  public disableSaveButton: boolean = false;
+  public ContactFormGroup: FormGroup;
+  private unsubscribe$: Subject<void> = new Subject();
+  file: any;
+  files: File[] = [];
 
-@Select(UserState.user)
-user$: Observable<User>;
+  @ViewChild('filesUploader') uploadObj: UploaderComponent;
 
-@Select(ContactusState.contactSupportEntity)
-contact$: Observable<ContactUs>;
+  @Select(UserState.user)
+  user$: Observable<User>;
 
-  constructor(private store: Store,private fb: FormBuilder) {
+  @Select(ContactusState.contactSupportEntity)
+  contact$: Observable<ContactUs>;
+
+  constructor(private store: Store, private fb: FormBuilder) {
     this.ContactFormGroup = this.fb.group({
       name: new FormControl(''),
       email: new FormControl(''),
-      topic: new FormControl(null),
+      topic: new FormControl(null, Validators.required),
       message: new FormControl(''),
       file: new FormControl(null),
     });
-   }
+  }
 
   ngOnInit(): void {
     this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
       if (user) {
         this.ContactFormGroup = this.fb.group({
-          name: new FormControl(user.firstName+' '+ user.lastName),
+          name: new FormControl(user.firstName + ' ' + user.lastName),
           email: new FormControl(user.email),
-          topic: new FormControl(null),
+          topic: new FormControl(null, Validators.required),
           message: new FormControl(''),
           file: new FormControl(null),
         });
@@ -69,7 +67,7 @@ contact$: Observable<ContactUs>;
       }
     });
   }
-  
+
   public browse(): void {
     document
       .getElementById('contact-attachment-files')
@@ -82,12 +80,11 @@ contact$: Observable<ContactUs>;
     if (event.filesData[0].statusCode !== '1') {
       this.addFilesValidationMessage(event.filesData[0]);
     }
-    else
-    {
+    else {
       this.files = [];
       this.file = event.filesData[0];
-	  this.files.push(this.file.rawFile);
-		}
+      this.files.push(this.file.rawFile);
+    }
   }
 
   private addFilesValidationMessage(file: FileInfo) {
@@ -103,38 +100,40 @@ contact$: Observable<ContactUs>;
   }
 
   public clearFiles(): void {
-    this.removeFiles = true;
     this.hasFiles = false;
-    this.filesDetails = [];
     this.uploadObj.clearAll();
     this.file = null;
-  }
-
-  get disableClearButton(): boolean {
-    return !this.uploadObj?.filesData.length && !this.hasFiles;
+    this.files = [];
   }
 
   public saveContactUsForm() {
-    
-    let contactUs: ContactUs =
-    {
-      fromMail : this.ContactFormGroup.controls['email'].value,
-      subjectMail : this.ContactFormGroup.controls['topic'].value,
-      name : this.ContactFormGroup.controls['name'].value,
-      bodyMail : this.ContactFormGroup.controls['message'].value,
-      status: ContactUsStatus.Pending,
-      selectedFile:this.files[0]
-    };
-    this.store.dispatch(new SaveContactUsForm(contactUs));
+    if (this.ContactFormGroup.controls['topic'].valid) {
+      let contactUs: ContactUs =
+      {
+        fromMail: this.ContactFormGroup.controls['email'].value,
+        subjectMail: this.ContactFormGroup.controls['topic'].value,
+        name: this.ContactFormGroup.controls['name'].value,
+        bodyMail: this.ContactFormGroup.controls['message'].value,
+        status: ContactUsStatus.Pending,
+        selectedFile: this.files[0]
+      };
+      this.store.dispatch(new SaveContactUsForm(contactUs));
       this.contact$.pipe(takeUntil(this.unsubscribe$)).subscribe((contactUs: ContactUs) => {
-          this.ContactFormGroup.controls['message'].setValue('');
-          this.ContactFormGroup.controls['topic'].setValue(null);
+        this.resetForm();
         this.store.dispatch(new ShowCustomSideDialog(false));
-    });
+      });
+    }
   }
 
-  public cancelContactUsForm()
-  {
+  public cancelContactUsForm() {
+    this.resetForm();
     this.store.dispatch(new ShowCustomSideDialog(false));
+  }
+
+  private resetForm() {
+    this.ContactFormGroup.controls['message'].setValue('');
+    this.ContactFormGroup.controls['topic'].setValue(null);
+    this.ContactFormGroup.controls['file'].setValue(null);
+    this.clearFiles();
   }
 }

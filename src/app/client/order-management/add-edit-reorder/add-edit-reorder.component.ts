@@ -1,9 +1,9 @@
 import isNil from 'lodash/fp/isNil';
 import uniq from 'lodash/fp/uniq';
 
-import { catchError, filter, first, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, filter, first, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -23,6 +23,13 @@ import { CommentsService } from '@shared/services/comments.service';
 import { ONBOARDED_STATUS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { DateTimeHelper } from '@core/helpers';
 import { getTimeFromDate } from '@shared/utils/date-time.utils';
+import { SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
+import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
+import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
+import { UserState } from 'src/app/store/user.state';
+import { AlertTriggerDto } from '@shared/models/alerts-template.model';
+import { OrderStatus } from '@shared/enums/order-management';
+import { AlertTrigger } from '@admin/store/alerts.actions';
 
 @Component({
   selector: 'app-add-edit-reorder',
@@ -52,14 +59,15 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     shiftEndTime: Date;
     jobStartDate: Date;
   };
-
+  private unsubscribe$: Subject<void> = new Subject();
   private numberOfAgencies: number;
 
   public constructor(
     private formBuilder: FormBuilder,
     private store: Store,
     private reorderService: AddEditReorderService,
-    private commentsService: CommentsService
+    private commentsService: CommentsService,
+    private actions$: Actions
   ) {
     super();
   }
@@ -74,6 +82,37 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.listenCandidateChanges();
     this.listenAginciesChanges();
     this.commentContainerId = this.order.commentContainerId as number;
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe((data) => {
+      const userAgencyOrganization = this.store.selectSnapshot(UserState.organizations) as UserAgencyOrganization;
+      let orgName = userAgencyOrganization?.businessUnits?.find(i => i.id == data?.order?.organizationId)?.name;
+      let params: any = {};
+      params['@' + AlertParameterEnum[AlertParameterEnum.Organization]] = orgName == null || orgName == undefined ? "" : orgName;
+      params['@' + AlertParameterEnum[AlertParameterEnum.OrderID]] =
+        data?.order?.organizationPrefix == null
+          ? data?.order?.publicId + ''
+          : data?.order?.organizationPrefix + '-' + data?.order?.publicId;
+      params['@' + AlertParameterEnum[AlertParameterEnum.Location]] = data?.order?.locationName;
+      params['@' + AlertParameterEnum[AlertParameterEnum.Skill]] = data?.order?.skillName == null ? "" : data?.order?.skillName;
+      //For Future Reference
+      // var url = location.origin + '/ui/client/order-management/edit/' + data?.order?.id;
+      params['@' + AlertParameterEnum[AlertParameterEnum.ClickbackURL]] = "";
+      let alertTriggerDto: AlertTriggerDto = {
+        BusinessUnitId: null,
+        AlertId: 0,
+        Parameters: null
+      };
+      if (data?.order?.status == OrderStatus.Open) {
+        alertTriggerDto = {
+          BusinessUnitId: data?.order?.organizationId,
+          AlertId: AlertIdEnum['Order Status Update: Open'],
+          Parameters: params,
+        };
+      }
+      if (alertTriggerDto.AlertId > 0) {
+        this.store.dispatch(new AlertTrigger(alertTriggerDto));
+      }
+
+    });
   }
 
   public override ngOnDestroy(): void {
@@ -277,8 +316,10 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       .saveReorder(<ReorderRequestModel>payload, this.comments)
       .pipe(
         takeUntil(this.destroy$),
-        tap(() =>
-          this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED))
+        tap((data) => {
+          this.store.dispatch(new SaveOrderSucceeded(data));
+          this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED));
+        }
         ),
         catchError((error) =>
           this.store.dispatch(new ShowToast(MessageTypes.Error, error?.error?.errors?.RegularBillRate[0]))
@@ -312,4 +353,5 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private getCandidateIds(candidate: CandidateModel[]): number[] {
     return candidate?.map(({ id }: CandidateModel) => id);
   }
+
 }

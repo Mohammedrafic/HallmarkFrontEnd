@@ -15,6 +15,10 @@ export type CandidateCredential = {
   credentialFiles?: CredentialFile[];
   expireDateApplicable?: boolean;
   orderId: number | null;
+  orderMatch?: string;
+  reqForOnboard?: boolean;
+  reqForSubmission?: boolean;
+  comment?: string;
 }
 
 export type CredentialFile = {

@@ -25,6 +25,7 @@ import {
   GetContactDetails,
   GetHistoricalData,
   GetOrderById,
+  GetOrderByIdSucceeded,
   GetOrderFilterDataSources,
   GetOrders,
   GetOrganisationCandidateJob,
@@ -371,7 +372,8 @@ export class OrderManagementContentState {
             jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
           )
         );
-
+        
+        dispatch(new GetOrderByIdSucceeded());
         return payload;
       })
     );

@@ -14,6 +14,7 @@ import {
   GetAgencyOrderCandidatesList,
   GetAvailableSteps,
   GetOrderById,
+  GetOrderByIdSucceeded,
   GetOrderFilterDataSources,
   GetOrders,
   GetOrganisationCandidateJob,
@@ -983,7 +984,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private openReOrderDialog(orderId: number, organizationId: number): void {
     this.store.dispatch(new GetOrderById(orderId, organizationId, {} as any));
     this.actions$
-      .pipe(first(), ofActionCompleted(GetOrderById))
+      .pipe(ofActionDispatched(GetOrderByIdSucceeded), take(1))
       .subscribe(() => this.store.dispatch(new ShowSideDialog(true)));
   }
 
