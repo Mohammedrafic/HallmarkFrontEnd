@@ -62,7 +62,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public regionRequiredFormGroup: FormGroup;
   public locationFormGroup: FormGroup;
   public departmentFormGroup: FormGroup;
-  public considerPushDaysFormGroup: FormGroup;
+  public pushStartDateFormGroup: FormGroup;
   public formBuilder: FormBuilder;
 
   @Select(OrganizationManagementState.organizationSettings)
@@ -343,7 +343,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       this.regionRequiredFormGroup.dirty ||
       this.locationFormGroup.dirty ||
       this.departmentFormGroup.dirty ||
-      this.considerPushDaysFormGroup.dirty
+      this.pushStartDateFormGroup.dirty
     ) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
@@ -369,6 +369,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public onFormSaveClick(): void {
     if (this.isEdit) {
       if (this.organizationSettingsFormGroup.valid) {
+        if (this.validatePushStartDateForm()) return;
         this.sendForm();
       } else {
         this.organizationSettingsFormGroup.markAllAsTouched();
@@ -376,6 +377,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     } else {
       if (this.regionRequiredFormGroup.valid) {
         if (this.organizationSettingsFormGroup.valid) {
+          if (this.validatePushStartDateForm()) return;
           this.sendForm();
         } else {
           this.organizationSettingsFormGroup.markAllAsTouched();
@@ -384,6 +386,14 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
         this.regionRequiredFormGroup.markAllAsTouched();
       }
     }
+  }
+
+  private validatePushStartDateForm(): boolean {
+    if(this.formControlType === OrganizationSettingControlType.FixedKeyDictionary && this.pushStartDateFormGroup.invalid) {
+      this.pushStartDateFormGroup.markAllAsTouched();
+      return true;
+    }
+    return false;
   }
 
   public onRegionChange(event: any): void {
@@ -477,8 +487,8 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       case OrganizationSettingControlType.FixedKeyDictionary:
         const pushStartDate = {
           isEnabled: this.organizationSettingsFormGroup.controls['value'].value,
-          daysToPush: this.considerPushDaysFormGroup.controls['daysToPush'].value,
-          daysToConsider: this.considerPushDaysFormGroup.controls['daysToConsider'].value,
+          daysToPush: this.pushStartDateFormGroup.controls['daysToPush'].value,
+          daysToConsider: this.pushStartDateFormGroup.controls['daysToConsider'].value,
         };
         dynamicValue = JSON.stringify(pushStartDate);
         break;
@@ -597,7 +607,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       });
 
       dynamicValue?.isDictionary &&
-        this.considerPushDaysFormGroup.setValue({
+        this.pushStartDateFormGroup.setValue({
           daysToPush: dynamicValue.daysToPush,
           daysToConsider: dynamicValue.daysToConsider,
         });
@@ -668,7 +678,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.regionRequiredFormGroup.reset();
     this.locationFormGroup.reset();
     this.departmentFormGroup.reset();
-    this.considerPushDaysFormGroup.reset();
+    this.pushStartDateFormGroup.reset();
     this.isEdit = false;
     this.isParentEdit = false;
     this.dropdownDataSource = [];
@@ -695,7 +705,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.regionRequiredFormGroup = this.formBuilder.group({ regionId: [null, Validators.required] });
     this.locationFormGroup = this.formBuilder.group({ locationId: [null] });
     this.departmentFormGroup = this.formBuilder.group({ departmentId: [null] });
-    this.considerPushDaysFormGroup = this.formBuilder.group({
+    this.pushStartDateFormGroup = this.formBuilder.group({
       daysToConsider: [null, Validators.required],
       daysToPush: [null, Validators.required],
     });
