@@ -1,75 +1,77 @@
-<form id="contactForm" [formGroup]="ContactFormGroup" class="bootstrap" >
-    <div>
-      <div class="input-container bootstrap">
-        <label>Name<span class="required"></span></label>
-        <div class="input-group">
-            <input formControlName="name" class="e-input" type="text"/>
-            <ejs-maskedtextbox class="contact-input" formControlName="name" placeholder=" " ></ejs-maskedtextbox>
-        </div>
+<form id="contactForm" [formGroup]="ContactFormGroup" class="bootstrap">
+  <div>
+    <div class="input-container bootstrap">
+      <label>Name<span class="required"></span></label>
+      <div class="input-group">
+        <input formControlName="name" class="e-input" type="text" />
+        <ejs-maskedtextbox class="contact-input" formControlName="name" placeholder=" "></ejs-maskedtextbox>
       </div>
     </div>
-    <div>
-      <div class="id-container">
-        <div class="input-container bootstrap">
-          <label>Email</label>
-          <input formControlName="email" class="e-input" type="text" [disabled]="true"/>
-          <label>You will receive replies at this address<span class="italics"></span></label>
-        </div>
-       </div>
-      </div> 
-
-      <div>
-       <div class="id-container">
-              <div class="dropdown-container bootstrap">
-                <label>Topic</label>
-                <ejs-dropdownlist formControlName="topic" [dataSource]="topics"></ejs-dropdownlist>
-              </div>
-       </div>
+  </div>
+  <div>
+    <div class="id-container">
+      <div class="input-container bootstrap">
+        <label>Email</label>
+        <input formControlName="email" class="e-input" type="text" [disabled]="true" />
+        <label>You will receive replies at this address<span class="italics"></span></label>
       </div>
-        <br />
-           <div>
-            <div class="id-container">
-              <div class="input-container bootstrap">
-                <label>Attachment</label>
-                <div id="contact-attachment-files">
-                  <div id="files-droparea" class="droparea" (click)="browse()">
-                    <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
-                  </div>
-                  <ejs-uploader #filesUploader
-                                [dropArea]="dropElement"
-                                [allowedExtensions]="allowedExtensions"
-                                [multiple]="false"
-                                [maxFileSize]="maxFileSize"
-                                [autoUpload]="false"
-                                (selected)="onFileSelected($event)">
-                  </ejs-uploader>
-                </div>
-                <label>Attached file size should not exceed 2MB<span class="e-input"></span></label>
-              </div>
-            </div>
-          </div>
+    </div>
+  </div>
 
-        <div class="input-container bootstrap">
-          <label>Message</label>
-          <div class="input-group">
-            <ejs-textbox name="message"  formControlName="message" [multiline]="true" maxlength="100"></ejs-textbox>
+  <div>
+    <div class="id-container">
+      <div class="dropdown-container bootstrap">
+        <label>Topic<span class="required">*</span></label>
+        <ejs-dropdownlist formControlName="topic" [dataSource]="topics"></ejs-dropdownlist>
+      </div>
+    </div>
+  </div>
+  <br />
+  <div>
+    <div class="id-container">
+      <div class="input-container bootstrap">
+        <label>Attachment</label>
+        <div id="contact-attachment-files">
+          <div id="files-droparea" class="droparea" (click)="browse()">
+            <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
           </div>
+          <ejs-uploader #filesUploader
+                        [dropArea]="dropElement"
+                        [allowedExtensions]="allowedExtensions"
+                        [multiple]="false"
+                        [maxFileSize]="maxFileSize"
+                        [autoUpload]="false"
+                        (selected)="onFileSelected($event)">
+          </ejs-uploader>
         </div>
+        <label>Attached file size should not exceed 2MB<span class="e-input"></span></label>
+      </div>
+    </div>
+  </div>
 
-    </form>
-      <section class="header-container">
-          <div  class="e-card-content">
-            <button
-              ejs-button
-              cssClass="e-outline button-cancel"
-              id="cancelContactFormButton"
-              (click)="cancelContactUsForm()">Cancel</button>
-            <button
-              ejs-button
-              id="addContactFormButton"
-              type="submit"
-              [isPrimary]="true"
-              [disabled]="disableSaveButton"
-              (click)="saveContactUsForm()">Save</button>
-          </div>
-       </section>
+  <div class="input-container bootstrap">
+    <label>Message</label>
+    <div class="input-group">
+      <ejs-textbox name="message" formControlName="message" [multiline]="true" maxlength="100"></ejs-textbox>
+    </div>
+  </div>
+
+</form>
+<section class="header-container">
+  <div class="e-card-content">
+    <button ejs-button
+            cssClass="e-outline button-cancel"
+            id="cancelContactFormButton"
+            (click)="cancelContactUsForm()">
+      Cancel
+    </button>
+    <button ejs-button
+            id="addContactFormButton"
+            type="submit"
+            [isPrimary]="true"
+            [disabled]="disableSaveButton"
+            (click)="saveContactUsForm()">
+      Save
+    </button>
+  </div>
+</section>
