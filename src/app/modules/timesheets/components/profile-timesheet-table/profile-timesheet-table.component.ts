@@ -447,7 +447,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
     this.isApproveBtnEnabled = !!currentTabMapping.get(this.currentTab);
     this.isRejectBtnEnabled = !this.isAgency && !!currentTabMapping.get(this.currentTab);
-    this.isOrgSubmitBtnEnabled = this.orgCanSubmit(this.currentTab);
+    this.isOrgSubmitBtnEnabled = this.orgCanSubmitTimesheet();
   }
 
   private setActionBtnState(): void {
@@ -532,8 +532,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     return (this.currentTab === RecordFields.Time && this.timesheetDetails.status === TimesheetStatus.Approved);
   }
 
-  private orgCanSubmit(currentTab: RecordFields): boolean {
-    const isOrgAndTimesheetTab = !this.isAgency && currentTab === RecordFields.Time;
+  private orgCanSubmitTimesheet(): boolean {
+    const isOrgAndTimesheetTab = !this.isAgency && this.currentTab === RecordFields.Time;
     const isStatusPass = this.timesheetDetails.status === TimesheetStatus.Missing
       || this.timesheetDetails.status === TimesheetStatus.Incomplete;
 

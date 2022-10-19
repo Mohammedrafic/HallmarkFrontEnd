@@ -307,7 +307,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public orgSubmit(): void {
     const timesheetDetails = this.store.selectSnapshot(TimesheetsState.timesheetDetails);
 
-    if (timesheetDetails?.isEmpty) {
+    if (timesheetDetails?.isEmpty && !timesheetDetails?.noWorkPerformed) {
       this.timesheetDetailsService.orgSubmitEmptyTimesheet().pipe(take(1), takeUntil(this.componentDestroy())).subscribe();
     } else {
       this.timesheetDetailsService.submitTimesheet(
