@@ -503,7 +503,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue([]);
     this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
     this.getOrganizations();
-    this.store.dispatch(new ShowSideDialog(true));
+    if (this.selectedDocumentNode?.id != -1)
+      this.store.dispatch(new ShowSideDialog(true));
   }
 
   public handleOnSave() {
