@@ -5,10 +5,15 @@ import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
+import { RowNode } from '@ag-grid-community/core';
 import { downloadBlobFile } from '@shared/utils/file.utils';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { getAllErrors } from '@shared/utils/error.utils';
+import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
 import { DialogAction } from '@core/enums';
+import { reduceFiltersState } from '@core/helpers/functions.helper';
 import { DataSourceItem, DropdownOption } from '@core/interface';
 
 import { TimesheetsModel, TimeSheetsPage } from '../model/timesheets.model';
@@ -21,14 +26,8 @@ import {
   TimesheetTargetStatus,
 } from '../../enums';
 import {
-  AddSuccessMessage,
-  DefaultFiltersState,
-  DefaultTimesheetCollection,
-  DefaultTimesheetState,
-  filteringOptionsMapping,
-  GetBydateErrMessage,
-  PutSuccess,
-  SavedFiltersParams
+  AddSuccessMessage, BulkApproveSuccessMessage, DefaultFiltersState, DefaultTimesheetCollection, DefaultTimesheetState,
+  filteringOptionsMapping, GetBydateErrMessage, PutSuccess, SavedFiltersParams, TimesheetConfirmMessages
 } from '../../constants';
 import {
   AddMileageDto,
@@ -49,9 +48,8 @@ import {
   UploadDialogState
 } from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
-import { getAllErrors } from '@shared/utils/error.utils';
-import { reduceFiltersState } from '@core/helpers/functions.helper';
-import { FileViewer } from '@shared/modules/file-viewer/file-viewer.actions';
+import { TimesheetStatus } from '../../enums/timesheet-status.enum';
+import { filter } from 'rxjs/operators';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -63,6 +61,7 @@ export class TimesheetsState {
     private timesheetsApiService: TimesheetsApiService,
     private timesheetDetailsApiService: TimesheetDetailsApiService,
     private store: Store,
+    private confirmService: ConfirmService
   ) {}
 
   @Selector([TimesheetsState])
@@ -679,10 +678,29 @@ export class TimesheetsState {
   @Action(Timesheets.BulkApprove)
   BulkApprove(
     { dispatch }: StateContext<TimesheetsModel>,
-    { timesheetIds }: Timesheets.BulkApprove
+    { selectedTimesheets }: Timesheets.BulkApprove
   ): Observable<void> {
-    return this.timesheetsApiService.postBulkApprove(timesheetIds)
-    .pipe(
+    const timesheetIds = selectedTimesheets.map((el: RowNode) => el.data.id);
+    const showWarning = selectedTimesheets.some((el: RowNode) =>
+      el.data.status !== TimesheetStatus.PendingApproval
+      && el.data.status !== TimesheetStatus.PendingApprovalAsterix
+    );
+
+    const stream = showWarning ? this.confirmService.confirm(TimesheetConfirmMessages.confirmBulkApprove, {
+      title: 'Timesheets Approval',
+      okButtonLabel: 'Yes',
+      okButtonClass: ''
+    }) : of(true);
+
+    return stream.pipe(
+      filter(Boolean),
+      switchMap(() => this.timesheetsApiService.postBulkApprove(timesheetIds)),
+      tap(() => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, BulkApproveSuccessMessage.successMessage),
+          new Timesheets.GetAll()
+        ]);
+      }),
       catchError((err: HttpErrorResponse) => dispatch(
         new ShowToast(MessageTypes.Error, getAllErrors(err.error))
       )),

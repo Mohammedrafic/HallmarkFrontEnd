@@ -309,3 +309,9 @@ export const submitTimesheetDialogData = (timesheetOrMiles: boolean = true) => (
   confirmMessage: `Are you sure you want to submit this ${timesheetOrMiles ? 'timesheet' : 'mileages'}?`,
   successMessage: `Success. ${timesheetOrMiles ? 'Timesheet' : 'Mileages'} Submitted`,
 });
+
+export const orgSubmitEmptyTimesheetDialogData = () => ({
+  title: 'Submit Timesheet',
+  submitButtonText: 'Ok',
+  confirmMessage: 'If the candidate did not work this week, check the DNW switch.',
+});

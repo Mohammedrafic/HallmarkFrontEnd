@@ -4,6 +4,7 @@ import { DataSourceItem, FileForUpload } from '@core/interface';
 
 import { RecordFields, TIMESHEETS_ACTIONS, TimesheetsTableFiltersColumns } from '../../enums';
 import { Attachment, Timesheet, TimesheetAttachments, TimesheetsFilterState } from '../../interface';
+import { RowNode } from '@ag-grid-community/core';
 
 export namespace Timesheets {
   export class GetAll {
@@ -184,7 +185,7 @@ export namespace Timesheets {
   export class BulkApprove {
     static readonly type = TIMESHEETS_ACTIONS.BULK_APPROVE;
 
-    constructor(public readonly timesheetIds: number[]) {
+    constructor(public readonly selectedTimesheets: RowNode[]) {
     }
   }
 }
