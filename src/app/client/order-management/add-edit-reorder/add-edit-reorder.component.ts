@@ -72,6 +72,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.initAgenciesAndCandidates();
     this.createReorderForm();
     this.listenCandidateChanges();
+    this.listenAginciesChanges();
     this.commentContainerId = this.order.commentContainerId as number;
   }
 
@@ -143,10 +144,24 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     };
   }
 
+  private listenAginciesChanges(): void {
+    this.reorderForm.get('agencies')?.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      tap((agenciesIds: number[]) => {
+        const candidates = this.reorderForm.get('candidates')?.value;
+        if (!agenciesIds.length && candidates.length) {
+          this.reorderForm.patchValue({ openPosition: null, candidates: [] });
+          this.reorderForm.updateValueAndValidity();
+        }
+      }),
+    ).subscribe();
+  }
+
   private listenCandidateChanges(): void {
     this.reorderForm
       .get('candidates')
       ?.valueChanges.pipe(
+        takeUntil(this.destroy$),
         tap((candidateIds: number[]) => {
           if (!candidateIds.length) {
             this.reorderForm.patchValue({ openPosition: null, agencies: [] });
@@ -156,11 +171,17 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
           }
         }),
         filter((candidateIds: number[]) => !!candidateIds?.length),
-        switchMap(() => this.candidates$.pipe(map(this.getAgenciesBelongToCandidates)))
+        switchMap((candidateIds: number[]) => {
+          return this.candidates$.pipe(
+            map((candidates: CandidateModel[]) => {
+              return candidates.filter((candidate: CandidateModel) => candidateIds.includes(candidate.candidateId))
+            }),
+            map(this.getAgenciesBelongToCandidates)
+            )
+        })
       )
       .subscribe((agencies: number[]) => {
-        const selectedAgencies = this.reorderForm.get('agencies')?.value ?? [];
-        const uniqueAgencies = uniq([...selectedAgencies, ...agencies]);
+        const uniqueAgencies = uniq(agencies);
         this.reorderForm?.patchValue({ agencies: uniqueAgencies });
       });
   }
