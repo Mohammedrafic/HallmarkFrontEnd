@@ -2,18 +2,16 @@ import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { HistoricalEvent } from '../../models/historical-event.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
-  ClearAgencyHistoricalData,
   GetAgencyHistoricalData,
   GetAgencyOrderCandidatesList,
   GetOrderApplicantsData,
   GetOrderById,
   ReloadOrderCandidatesLists,
 } from '@agency/store/order-management.actions';
-import { combineLatest, merge, Observable, of, Subject, takeUntil } from 'rxjs';
+import { merge, Observable, takeUntil } from 'rxjs';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
-  ClearHistoricalData,
   GetHistoricalData,
   GetOrderById as GetOrgOrderById,
   RejectCandidateJob,
