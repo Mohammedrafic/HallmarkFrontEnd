@@ -5,6 +5,8 @@ export interface AddTimsheetForm {
   billRateConfigId: number;
   amount: number;
   description: string;
+  hadLunchBreak: boolean;
+  day?: Date;
 }
 
 export interface TimsheetForm {

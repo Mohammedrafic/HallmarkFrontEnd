@@ -111,7 +111,10 @@ export class GetCandidatePhotoSucceeded {
 
 export class GetCandidatesCredentialByPage {
   static readonly type = '[candidate] Get Candidates Credential by Page';
-  constructor(public pageNumber: number, public pageSize: number, public orderId: number | null) {}
+  constructor(public pageNumber: number,
+              public pageSize: number,
+              public orderId: number | null,
+              public candidateProfileId: number) {}
 }
 
 export class GetMasterCredentials {

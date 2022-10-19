@@ -1,7 +1,12 @@
 import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { DocumentFolder, FolderTreeItem, DocumentLibraryDto, Documents, DocumentsFilter, DocumentsLibraryPage, DocumentTagFilter, DocumentTags, DocumentTypeFilter, DocumentTypes, FolderTreeFilter, DownloadDocumentDetail, DownloadDocumentDetailFilter, DeleteDocumentsFilter, ShareDocumentsFilter, SharedDocumentPostDto } from "../store/model/document-library.model";
+import {
+  DocumentFolder, FolderTreeItem, DocumentLibraryDto, Documents, DocumentsFilter,
+  DocumentsLibraryPage, DocumentTagFilter, DocumentTags, DocumentTypeFilter, DocumentTypes,
+  FolderTreeFilter, DownloadDocumentDetail, DownloadDocumentDetailFilter, DeleteDocumentsFilter, ShareDocumentsFilter, SharedDocumentPostDto,
+  ShareDocumentInfoPage, ShareDocumentInfoFilter
+} from "../store/model/document-library.model";
 
 @Injectable({ providedIn: 'root' })
 export class DocumentLibraryService {
@@ -18,7 +23,7 @@ export class DocumentLibraryService {
     return this.http.get<FolderTreeItem[]>(url, { params: params });
   }
 
-  public GetDocuments(documentsFilter: DocumentsFilter): Observable<DocumentsLibraryPage> {
+  public GetDocumentLibraryInfo(documentsFilter: DocumentsFilter): Observable<DocumentsLibraryPage> {
     let params = new HttpParams();
     params = params.append("BusinessUnitType", documentsFilter == undefined ? 1 : documentsFilter.businessUnitType);
     if (documentsFilter?.businessUnitId && documentsFilter?.businessUnitId != null)
@@ -29,6 +34,11 @@ export class DocumentLibraryService {
       params = params.append("LocationId", documentsFilter.locationId);
     if (documentsFilter?.folderId && documentsFilter?.folderId != null)
       params = params.append("FolderId", documentsFilter.folderId);
+    if (documentsFilter?.documentId && documentsFilter?.documentId != null)
+      params = params.append("DocumentId", documentsFilter.documentId);
+
+    params = params.append("IncludeSharedWithMe", documentsFilter.includeSharedWithMe);
+    params = params.append("ShowAllPages", documentsFilter.showAllPages);
     return this.http.get<DocumentsLibraryPage>(`/api/DocumentLibrary/Filtered`, { params: params });
   }
 
@@ -113,5 +123,25 @@ export class DocumentLibraryService {
    */
   public ShareDocumets(shareDocumentsFilter: ShareDocumentsFilter): Observable<SharedDocumentPostDto[]> {
     return this.http.post<SharedDocumentPostDto[]>(`/api/DocumentLibrary/ShareDocuments`, shareDocumentsFilter);
+  }
+
+  public GetDocumentById(Id: number): Observable<DocumentLibraryDto> {
+    return this.http.get<DocumentLibraryDto>(`/api/DocumentLibrary/GetById/${Id}`);
+  }
+
+  public GetSharedDocuments(documentsFilter: ShareDocumentInfoFilter): Observable<ShareDocumentInfoPage> {
+    let params = new HttpParams();
+    params = params.append("BusinessUnitType", documentsFilter == undefined ? 1 : documentsFilter.businessUnitType);
+    if (documentsFilter?.businessUnitId && documentsFilter?.businessUnitId != null)
+      params = params.append("BusinessUnitId", documentsFilter.businessUnitId);
+    if (documentsFilter?.regionId && documentsFilter?.regionId != null)
+      params = params.append("RegionId", documentsFilter.regionId);
+    if (documentsFilter?.locationId && documentsFilter?.locationId != null)
+      params = params.append("LocationId", documentsFilter.locationId);
+    if (documentsFilter?.folderId && documentsFilter?.folderId != null)
+      params = params.append("FolderId", documentsFilter.folderId);
+    if (documentsFilter?.documentId && documentsFilter?.documentId != null)
+      params = params.append("DocumentId", documentsFilter.documentId);
+    return this.http.get<ShareDocumentInfoPage>(`/api/DocumentLibrary/GetSharedDocuments`, { params: params });
   }
 }

@@ -8,7 +8,6 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
-import { SetImportFileDialogState } from '@admin/store/admin.actions';
 import {
   ClearPredefinedBillRates,
   EditOrder,
@@ -246,11 +245,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public navigateBack(): void {
     this.router.navigate(['/client/order-management']);
-  }
-
-  public onImportDataClick(): void {
-    this.store.dispatch(new SetImportFileDialogState(true));
-    // TODO: implement data parse after BE implementation
   }
 
   public onStepperCreated(): void {

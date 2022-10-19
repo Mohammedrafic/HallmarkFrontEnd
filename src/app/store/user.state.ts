@@ -31,6 +31,7 @@ import {
   GetUserOrganizations,
   GetOrderPermissions,
   SetAgencyActionsAllowed,
+  SetAgencyInvoicesActionsAllowed,
 } from './user.actions';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 import {
@@ -56,6 +57,7 @@ export interface UserStateModel {
   permissions: CurrentUserPermission[];
   orderPermissions: CurrentUserPermission[];
   agencyActionsAllowed: boolean;
+  agencyInvoicesActionsAllowed: boolean;
 }
 
 const AGENCY = 'Agency';
@@ -75,6 +77,7 @@ const AGENCY = 'Agency';
     permissions: [],
     orderPermissions: [],
     agencyActionsAllowed: true,
+    agencyInvoicesActionsAllowed: true,
   },
 })
 @Injectable()
@@ -170,6 +173,11 @@ export class UserState {
   @Selector()
   static agencyActionsAllowed(state: UserStateModel): boolean {
     return state.agencyActionsAllowed;
+  }
+
+  @Selector()
+  static agencyInvoicesActionsAllowed(state: UserStateModel): boolean {
+    return state.agencyInvoicesActionsAllowed;
   }
 
   @Action(SetCurrentUser)
@@ -348,5 +356,15 @@ export class UserState {
       tap((orderPermissions: CurrentUserPermission[]) => patchState({ orderPermissions })),
       catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
+  }
+
+  @Action(SetAgencyInvoicesActionsAllowed)
+  SetInvoicesActionsAllowed(
+    { patchState }: StateContext<UserStateModel>,
+    { allowed }: SetAgencyInvoicesActionsAllowed,
+  ): void {
+    patchState({
+      agencyInvoicesActionsAllowed: allowed,
+    });
   }
 }

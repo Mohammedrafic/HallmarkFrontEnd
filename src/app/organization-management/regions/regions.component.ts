@@ -12,7 +12,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { Region, regionFilter } from '@shared/models/region.model';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import {
-  ClearLocationList, DeleteRegionById, ExportRegions, GetOrganizationById,
+  ClearLocationList, DeleteRegionById, ExportRegions, GetMasterRegions, GetOrganizationById,
   GetRegions, SaveRegion, SetGeneralStatesByCountry, SetImportFileDialogState, UpdateRegion
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
@@ -62,7 +62,9 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
   @Select(OrganizationManagementState.regions)
   regions$: Observable<Region[]>;
 
-  
+
+  @Select(OrganizationManagementState.GetMasterRegions)
+  masterRegions$: Observable<Region[]>;
 
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
@@ -84,6 +86,8 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
   public regions: OrganizationRegion[] = [];
   isEdit: boolean;
   editedRegionId?: number;
+  public masterRegion: Region[] = [];
+  defaultMasterRegionValue: any;
 
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
@@ -133,6 +137,13 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
       this.currentPage = page;
      this.getRegions();
+
+    });
+
+    this.store.dispatch(new GetMasterRegions());
+    this.masterRegions$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.masterRegion = data;
+   ;
 
     });
     this.filterColumns = {
@@ -279,6 +290,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
   }
 
   onAddRegionClick(): void {
+      this.regionFormGroup.controls["region"].setValue('');
       this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -310,12 +322,8 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
   onEditButtonClick(region: Region, event: any): void {
     this.addActiveCssClass(event);
-    this.regionFormGroup.setValue({
-      id: region?.id,
-      region: region?.name,
-
-
-    });
+   
+    this.regionFormGroup.controls["region"].setValue(this.masterRegion.filter(i => i.name == region?.name)[0].id)
     this.editedRegionId = region?.id;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
@@ -370,12 +378,12 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     return isValid ? null : { 'whitespace': true };
 }
   onFormSaveClick(): void {
-    this.submited=true;
+    this.submited = true;
+    
          const Region: Region = {
      id: this.editedRegionId,
 
-        name: this.regionFormGroup.controls['region'].value,
-
+           name: this.masterRegion.filter(i=>i.id==this.regionFormGroup.controls['region'].value)[0].name
       }
       if(this.regionFormGroup.valid){
         
@@ -409,7 +417,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
   private createLocationForm(): void {
     this.regionFormGroup = this.formBuilder.group({
       id: [''],
-      region: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20),this.noWhitespaceValidator]],
+      region: ['', [Validators.required]],
 
     });
 

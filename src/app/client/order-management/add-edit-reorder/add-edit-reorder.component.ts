@@ -14,7 +14,6 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { Order } from '@shared/models/order-management.model';
 import { ReorderModel, ReorderRequestModel } from '@client/order-management/add-edit-reorder/models/reorder.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
-import { startEndTimeValidator } from '@shared/validators/time.validator';
 import { shareReplay } from 'rxjs/operators';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -23,6 +22,7 @@ import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ONBOARDED_STATUS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { DateTimeHelper } from '@core/helpers';
+import { getTimeFromDate } from '@shared/utils/date-time.utils';
 
 @Component({
   selector: 'app-add-edit-reorder',
@@ -72,6 +72,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.initAgenciesAndCandidates();
     this.createReorderForm();
     this.listenCandidateChanges();
+    this.listenAginciesChanges();
     this.commentContainerId = this.order.commentContainerId as number;
   }
 
@@ -126,18 +127,11 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
           jobStartDate ? DateTimeHelper.convertDateToUtc(jobStartDate.toString()) : '',
           Validators.required,
         ],
-        shiftStartTime: [
-          shiftStartTime ? DateTimeHelper.convertDateToUtc(shiftStartTime.toString()) : '',
-          Validators.required,
-        ],
-        shiftEndTime: [
-          shiftEndTime ? DateTimeHelper.convertDateToUtc(shiftEndTime.toString()) : '',
-          Validators.required,
-        ],
+        shiftStartTime: [shiftStartTime ?? '', Validators.required],
+        shiftEndTime: [shiftEndTime ?? '', Validators.required],
         billRate: [hourlyRate ?? '', Validators.required],
         openPosition: [openPositions ?? '', [Validators.required, Validators.min(1)]],
-      },
-      { validators: startEndTimeValidator('shiftStartTime', 'shiftEndTime') }
+      }
     );
   }
 
@@ -148,6 +142,19 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       shiftEndTime,
       jobStartDate,
     };
+  }
+
+  private listenAginciesChanges(): void {
+    this.reorderForm.get('agencies')?.valueChanges.pipe(
+      tap((agenciesIds: number[]) => {
+        const candidates = this.reorderForm.get('candidates')?.value;
+        if (!agenciesIds.length && candidates.length) {
+          this.reorderForm.patchValue({ openPosition: null, candidates: [] });
+          this.reorderForm.updateValueAndValidity();
+        }
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe();
   }
 
   private listenCandidateChanges(): void {
@@ -163,11 +170,18 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
           }
         }),
         filter((candidateIds: number[]) => !!candidateIds?.length),
-        switchMap(() => this.candidates$.pipe(map(this.getAgenciesBelongToCandidates)))
+        switchMap((candidateIds: number[]) => {
+          return this.candidates$.pipe(
+            map((candidates: CandidateModel[]) => {
+              return candidates.filter((candidate: CandidateModel) => candidateIds.includes(candidate.candidateId))
+            }),
+            map(this.getAgenciesBelongToCandidates)
+            )
+        }),
+        takeUntil(this.destroy$)
       )
       .subscribe((agencies: number[]) => {
-        const selectedAgencies = this.reorderForm.get('agencies')?.value ?? [];
-        const uniqueAgencies = uniq([...selectedAgencies, ...agencies]);
+        const uniqueAgencies = uniq(agencies);
         this.reorderForm?.patchValue({ agencies: uniqueAgencies });
       });
   }
@@ -215,11 +229,13 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private areTimesEquals(time1: Date, time2: Date): boolean {
-    return new Date(time1).toLocaleTimeString() === new Date(time2).toLocaleTimeString();
+    return getTimeFromDate(time1) === getTimeFromDate(time2, true);
   }
 
   private saveReorder(): void {
     const reorder: ReorderModel = this.reorderForm.getRawValue();
+    reorder.shiftStartTime = DateTimeHelper.convertDateToUtc(reorder.shiftStartTime.toString());
+    reorder.shiftEndTime = DateTimeHelper.convertDateToUtc(reorder.shiftEndTime.toString());
     const agencyIds = this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
     const reOrderId = this.isEditMode ? this.order.id : 0;
     const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;

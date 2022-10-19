@@ -5,7 +5,7 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { GridComponent, PageEventArgs, SelectionSettingsModel } from '@syncfusion/ej2-angular-grids';
 import { ResizeSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
-import { GRID_CONFIG } from '@shared/constants';
+import { GRID_CONFIG, ONLY_LETTERS } from '@shared/constants';
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { GridColumn } from '@shared/models/grid-column.model';
 import { isArray } from 'lodash';
@@ -79,6 +79,8 @@ export abstract class AbstractGridConfigurationComponent {
   formatDate = formatDate;
   placeholderDate = placeholderDate;
   datepickerMask = datepickerMask;
+
+  public readonly onlyLetters: RegExp = ONLY_LETTERS;
 
   protected constructor() {}
 

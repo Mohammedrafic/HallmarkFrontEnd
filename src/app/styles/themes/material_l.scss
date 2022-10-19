@@ -73832,3 +73832,12 @@ $schedule-tree-content-color: $shadow;
   }
 }
 
+@include export-module('dashboard') {
+  .app-custom-icon-light {
+    width: 20px !important;
+    height: 20px !important;
+    cursor: pointer;
+    color: #4c5673;
+  }
+}
+

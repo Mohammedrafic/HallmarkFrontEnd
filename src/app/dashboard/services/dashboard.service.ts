@@ -205,7 +205,7 @@ export class DashboardService {
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
 
-    const title = "Applicants by Region";
+    const title = "Applicant’s Home State";
     const description = "";
     return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates,title,description };
   }
@@ -221,7 +221,7 @@ export class DashboardService {
     ])(applicantsByRegion);
     const maxCandidatesValue = flow(values, max)(candidatesWithState);
     const unknownStateCandidates = applicantsByRegion['Unknown'];
-    const title = "Applicants by Positions";
+    const title = "Active Positions - LTA";
     const description = "Open and in progress Position by  State";
 
     const combinedData = { ...mapData, ...USAMapCandidatesDataLayerSettings };
@@ -335,8 +335,8 @@ export class DashboardService {
     );
   }
 
-  public redirectToUrl(url: string): void {
-    this.router.navigate([url], { state: { redirectedFromDashboard: true } });
+  public redirectToUrl(url: string,orderStatus? :number): void {
+    this.router.navigate([url], { state: { redirectedFromDashboard: true , orderStatus: orderStatus} });
   }
 
   private getTasksWidgetData(): Observable<string> {

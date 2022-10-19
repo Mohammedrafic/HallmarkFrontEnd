@@ -14,7 +14,7 @@ import { FilterService } from '@shared/services/filter.service';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
-import { SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/admin.actions';
+import { SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
   CANCEL_CONFIRM_TEXT,
@@ -158,6 +158,14 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
             if (region) {
               region.locations?.forEach((location) => (location.regionName = region.name));
               this.locations = [...(region.locations as [])];
+            } else {
+              this.locations = [
+                {
+                  name: 'All',
+                  id: 0,
+                  departments: [],
+                },
+              ];
             }
           });
         } else {
@@ -365,11 +373,6 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.filteredItems = this.filterService.generateChips(this.HolidayFilterFormGroup, this.filterColumns);
     this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
     this.store.dispatch(new ShowFilterDialog(false));
-  }
-
-  public onImportDataClick(): void {
-    this.store.dispatch(new SetImportFileDialogState(true));
-    // TODO: implement data parse after BE implementation
   }
 
   public addHoliday(): void {

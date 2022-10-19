@@ -19,14 +19,13 @@ import { TabConfig, TabCountConfig, TimesheetsFilterState, TimesheetsSelectedRow
 import { TimesheetExportOptions, TAB_ADMIN_TIMESHEETS, UNIT_ORGANIZATIONS_FIELDS } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
-import { ExportType } from '../../enums';
 import { TimesheetsService } from '../../services';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ProfileDetailsContainerComponent } from '../profile-details-container/profile-details-container.component';
 import { AppState } from '../../../../store/app.state';
 
 @Component({
-  selector: 'app-timesheets-container.ts',
+  selector: 'app-timesheets-container',
   templateUrl: './timesheets-container.component.html',
   styleUrls: ['./timesheets-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -122,13 +121,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       false,
       true
     ));
-  }
-
-  public exportSelected(event: any): void {
-    if (event.item.properties.text === ExportType.Excel_file) {
-    } else if (event.item.properties.text === ExportType.CSV_file) {
-    } else if (event.item.properties.text === ExportType.Custom) {
-    }
   }
 
   public showFilters(): void {

@@ -242,7 +242,8 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
 
   public onGroupEmailSend(): void {    
     this.sendGroupEmailFormGroup.markAllAsTouched();
-    if (this.groupEmailTemplateForm.groupEmailTemplateForm.valid && this.groupEmailTemplateForm.groupEmailTemplateForm.errors == null) {
+
+    if (this.groupEmailTemplateForm.emailBody!=''&&this.groupEmailTemplateForm.emailTo!=''&&this.groupEmailTemplateForm.emailSubject!='') {
       const formValues = this.groupEmailTemplateForm.groupEmailTemplateForm.getRawValue();
       const sendGroupEmailDto: SendGroupEmailRequest = {
         businessUnitId: formValues.business==0?null:formValues.business,
@@ -261,15 +262,15 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
       let controlNames="";
       let isAre=" is ";
       let field="Field ";
-      if(this.groupEmailTemplateForm.groupEmailTemplateForm.controls['emailTo'].invalid)
+      if(this.groupEmailTemplateForm.emailTo=='')
       {
         controlNames="Email To";
       }
-      if(this.groupEmailTemplateForm.groupEmailTemplateForm.controls['emailSubject'].invalid)
+      if(this.groupEmailTemplateForm.emailSubject=='')
       {
         controlNames=controlNames==""?"Email Subject":controlNames+",Email Subject";
       }
-      if(this.groupEmailTemplateForm.groupEmailTemplateForm.controls['emailBody'].invalid)
+      if(this.groupEmailTemplateForm.emailBody=='')
       {
         controlNames=controlNames==""?"Email Body":controlNames+",Email Body";
       }

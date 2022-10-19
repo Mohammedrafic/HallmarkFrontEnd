@@ -24,41 +24,48 @@
         <ng-template #content [ngSwitch]="panel.id">
           <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.CANDIDATES"
                                   [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
-                                  [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"></app-accumulation-chart>
+                                  [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
+                                  [description]="widgetDescriptionEnum.CANDIDATES"
+                                  ></app-accumulation-chart>
           <app-accumulation-chart *ngSwitchCase="widgetTypeEnum.ACTIVE_POSITIONS"
                                   [chartData]="widgetsData?.[widgetTypeEnum.ACTIVE_POSITIONS]"
-                                  [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"></app-accumulation-chart>
+                                  [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
+                                  [description]="widgetDescriptionEnum.ACTIVE_POSITIONS"
+                                  ></app-accumulation-chart>
           <app-maps-chart *ngSwitchCase="widgetTypeEnum.APPLICANTS_BY_REGION"
                           [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_REGION]"
-                          [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"></app-maps-chart>
+                          [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
+                          [description]="widgetDescriptionEnum.APPLICANTS_BY_REGION"
+                          ></app-maps-chart>
           <app-maps-chart *ngSwitchCase="widgetTypeEnum.APPLICANTS_BY_POSITIONS"
                           [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_POSITIONS]"
-                          [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"></app-maps-chart>
+                          [isLoading]="isLoading" [isDarkTheme]="isDarkTheme"
+                          [description]="widgetDescriptionEnum.APPLICANTS_BY_POSITIONS"
+                          ></app-maps-chart>
           <app-line-chart *ngSwitchCase="widgetTypeEnum.POSITIONS_BY_TYPES"
                           [chartData]="widgetsData?.[widgetTypeEnum.POSITIONS_BY_TYPES]"
                           [isLoading]="isLoading"
-                          [timeSelection]="timeSelection" [isDarkTheme]="isDarkTheme"></app-line-chart>
+                          [timeSelection]="timeSelection" [isDarkTheme]="isDarkTheme"
+                          [description]="widgetDescriptionEnum.POSITIONS_BY_TYPES"
+                          ></app-line-chart>
           <app-position-chart *ngSwitchCase="widgetTypeEnum.IN_PROGRESS_POSITIONS"
                               [chartData]="widgetsData?.[widgetTypeEnum.IN_PROGRESS_POSITIONS]"
-                              [isLoading]="isLoading"></app-position-chart>
+                              [isLoading]="isLoading"
+                              [description]="widgetDescriptionEnum.IN_PROGRESS_POSITIONS"
+                              [isDarkTheme]="isDarkTheme"
+                              ></app-position-chart>
           <app-position-chart *ngSwitchCase="widgetTypeEnum.OPEN_POSITIONS"
                               [chartData]="widgetsData?.[widgetTypeEnum.OPEN_POSITIONS]"
-                              [isLoading]="isLoading"></app-position-chart>
+                              [isLoading]="isLoading"
+                              [description]="widgetDescriptionEnum.OPEN_POSITIONS"
+                              [isDarkTheme]="isDarkTheme"
+                              ></app-position-chart>
           <app-position-chart *ngSwitchCase="widgetTypeEnum.FILLED_POSITIONS"
                               [chartData]="widgetsData?.[widgetTypeEnum.FILLED_POSITIONS]"
-                              [isLoading]="isLoading"></app-position-chart>
-          <app-tasks *ngSwitchCase="widgetTypeEnum.TASKS"
-                     [tasks]="widgetsData?.[widgetTypeEnum.TASKS]"></app-tasks>
-          <app-trend-chart *ngSwitchCase="widgetTypeEnum.FILLED_POSITIONS_TREND"
-                           [widget]="widgetsData?.[widgetTypeEnum.FILLED_POSITIONS_TREND]" [isDarkTheme]="isDarkTheme"></app-trend-chart>
-          <app-trend-chart *ngSwitchCase="widgetTypeEnum.OPEN_POSITIONS_TREND"
-                           [widget]="widgetsData?.[widgetTypeEnum.OPEN_POSITIONS_TREND]" [isDarkTheme]="isDarkTheme"></app-trend-chart>
-          <app-trend-chart *ngSwitchCase="widgetTypeEnum.IN_PROGRESS_POSITIONS_TREND"
-                           [widget]="widgetsData?.[widgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]" [isDarkTheme]="isDarkTheme"></app-trend-chart>
-          <app-chat *ngSwitchCase="widgetTypeEnum.CHAT"
-                    [chatData]="widgetsData?.[widgetTypeEnum.CHAT]"></app-chat>
-          <app-invoices-chart *ngSwitchCase="widgetTypeEnum.INVOICES"
-                              [chartData]="widgetsData?.[widgetTypeEnum.INVOICES]"></app-invoices-chart>
+                              [isLoading]="isLoading"
+                              [description]="widgetDescriptionEnum.FILLED_POSITIONS"
+                              [isDarkTheme]="isDarkTheme"
+                              ></app-position-chart>
         </ng-template>
       </e-panel>
     </e-panels>

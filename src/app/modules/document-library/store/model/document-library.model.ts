@@ -3,9 +3,10 @@ import { PageOfCollections } from '@shared/models/page.model';
 export class FolderTreeItem {
   id: number;
   name: string;
-  parentFolderId: number | null;
-  createdDate: Date | null;
-  subFolders: FolderTreeItem[];
+  businessUnitId: number | null;
+  fileType: string;
+  parentId: number | null;
+  Children: FolderTreeItem[];
 }
 
 export class FolderTreeFilter {
@@ -21,6 +22,8 @@ export class NodeItem {
   parentID?: number;
   selected: boolean
   text: string;
+  fileType: string;
+  businessUnitId?: number | null;
 }
 
 export class DocumentFolder {
@@ -37,8 +40,7 @@ export class Documents {
   id: number;
   businessUnitType: number;
   businessUnitId?: number | null;
-  regionId: number | null;
-  locationId: number | null;
+  regionLocationMappings: { [id: number]: number[]; } | null;
   documentName: number | null;
   folderId: number;
   startDate?: Date | null;
@@ -71,6 +73,7 @@ export class DocumentLibraryDto {
   regionName: string | null;
   locationId: number | null;
   locationName: string | null;
+  isSharedWithMe: boolean;
   documentVisibilities: any | null;
 }
 
@@ -80,8 +83,9 @@ export class DocumentsFilter {
   businessUnitId: number | null;
   regionId: number | null;
   locationId: number | null;
-  folderId: number | null
-  getAll: boolean | null
+  folderId: number | null;
+  includeSharedWithMe: boolean;
+  showAllPages: boolean;
 }
 export type DocumentsLibraryPage = PageOfCollections<DocumentLibraryDto>;
 
@@ -112,6 +116,7 @@ export class DownloadDocumentDetail {
   fileName: string;
   extension: string;
   fileAsBase64: string;
+  sasUrl: string;
   contentType: string;
   metadata: any;
   folderId: number | null;
@@ -139,8 +144,31 @@ export class ShareDocumentsFilter {
   documentIds: number[];
   businessUnitType: number;
   businessUnitId: number | null;
-  regionLocationMappings: { [id: number]: number[]; } | null
+  regionLocationMappings: { [id: number]: number[]; } | null;
 }
+
+export class ShareDocumentDto {
+  id: number;
+  documentId: number;
+  businessUnitType: number;
+  businessUnitId: number | null;
+  regionId: number | null;
+  locationId: number | null;
+  document : DocumentLibraryDto
+}
+
+export class ShareDocumentInfoFilter {
+  documentId: number | null;
+  businessUnitType: number;
+  businessUnitId: number | null;
+  regionId: number | null;
+  locationId: number | null;
+  folderId: number | null
+  getAll: boolean | null
+}
+export type ShareDocumentInfoPage = PageOfCollections<ShareDocumentDto>;
+
+
 
 
 

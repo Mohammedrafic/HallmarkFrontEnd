@@ -30,7 +30,8 @@
         <div class="spacer"></div>
 
         <div class="header-controls">
-          <app-export-button (optionSelected)="export($event)"></app-export-button>
+          <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
+          <app-export-button style="display: none" (optionSelected)="export($event)"></app-export-button>
           <button
             ejs-button
             cssClass="e-outline print-btn"

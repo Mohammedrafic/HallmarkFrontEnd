@@ -11,7 +11,7 @@ $headerHeight: 19px;
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 24px;
+  padding: 4%;
   box-sizing: border-box;
   --chartHeight: 100%;
 
@@ -65,7 +65,9 @@ $headerHeight: 19px;
 
   &__position-chart {
     height: 100%;
-    margin-right: -16px;
+    padding-left: 0px;
+    margin-left: -10%;
+    margin-top: 10%;
   }
 
   &__legend {
@@ -103,4 +105,21 @@ $headerHeight: 19px;
       }
     }
   }
+}
+.tooltip {
+  text-align: right;
+}
+
+.e-tooltip-wrap .e-tip-content {
+  font-size: 12px;
+  line-height: 20px;
+  background-color:#4e5461;
+  color:#f8f5f5;
+  border-radius: 4px;
+  font-family: "Open Sans", "Roboto", "Segoe UI", "GeezaPro", "DejaVu Serif", "sans-serif", "-apple-system", "BlinkMacSystemFont";
+}
+
+.e-tooltip-wrap.e-popup {
+  background-color: #fff;
+  border: 2px solid #000;
 }

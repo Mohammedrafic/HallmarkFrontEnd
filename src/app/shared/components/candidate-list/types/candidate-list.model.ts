@@ -23,6 +23,7 @@ export interface CandidateListRequest {
   profileStatuses: CandidateStatus[];
   skillsIds: number[];
   regionsIds: number[];
+  tab: number;
   includeDeployedCandidates: boolean;
 }
 
@@ -30,6 +31,7 @@ export type CandidateListFilters = {
   profileStatuses?: CandidateStatus[];
   skillsIds?: number[];
   regionsIds?: number[];
+  tab?: number;
 };
 
 export interface FilterColumn {

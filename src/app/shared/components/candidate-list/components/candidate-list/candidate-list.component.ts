@@ -3,17 +3,17 @@ import { debounceTime, filter, map, merge, Observable, Subject, takeUntil, takeW
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { CandidateStatus, CandidateStatusOptions, STATUS_COLOR_GROUP } from '../../../../enums/status';
+import { CandidateStatus, CandidateStatusOptions, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserState } from '../../../../../store/user.state';
 import { SaveCandidateSucceeded } from '@agency/store/candidate.actions';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmService } from '../../../../services/confirm.service';
-import { FilterService } from '../../../../services/filter.service';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { FilterService } from '@shared/services/filter.service';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from '../../../../../store/app.actions';
-import { FilteredItem } from '../../../../models/filter.model';
+import { FilteredItem } from '@shared/models/filter.model';
 import { SelectionSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
-import { ApplicantStatus } from '../../../../enums/applicant-status.enum';
+import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { CandidateListState } from '../../store/candidate-list.state';
 import {
   CandidateList,
@@ -22,18 +22,19 @@ import {
   CandidateListRequest,
   CandidateRow,
 } from '../../types/candidate-list.model';
-import { Candidate } from '../../../../models/candidate.model';
+import { Candidate } from '@shared/models/candidate.model';
 import {
   ChangeCandidateProfileStatus,
   ExportCandidateList,
   GetAllSkills,
   GetCandidatesByPage,
 } from '../../store/candidate-list.actions';
-import { ControlTypes, ValueType } from '../../../../enums/control-types.enum';
-import { ListOfSkills } from '../../../../models/skill.model';
-import { ExportColumn, ExportOptions } from '../../../../models/export.model';
-import { ExportedFileType } from '../../../../enums/exported-file-type';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { ListOfSkills } from '@shared/models/skill.model';
+import { ExportColumn, ExportOptions } from '@shared/models/export.model';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
+import { isNil } from 'lodash';
 
 @Component({
   selector: 'app-candidate-list',
@@ -61,11 +62,18 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Input() includeDeployedCandidates$: Subject<boolean>;
   @Input() isAgency: boolean;
   @Input() agencyActionsAllowed: boolean;
+  @Input() set tab(tabIndex: number) {
+    if (!isNil(tabIndex)) {
+      this.activeTab = tabIndex;
+      this.dispatchNewPage();
+    }
+  }
 
   public filters: CandidateListFilters = {
     profileStatuses: [],
     regionsIds: [],
     skillsIds: [],
+    tab: 0,
   };
   public CandidateFilterFormGroup: FormGroup;
   public filterColumns: CandidateListFiltersColumn;
@@ -97,6 +105,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   private includeDeployedCandidates: boolean = true;
   private unsubscribe$: Subject<void> = new Subject();
   private isAlive = true;
+  private activeTab: number;
 
   constructor(
     private store: Store,
@@ -244,6 +253,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       profileStatuses: this.filters.profileStatuses!,
       skillsIds: this.filters.skillsIds!,
       regionsIds: this.filters.regionsIds!,
+      tab: this.activeTab ?? 0,
       includeDeployedCandidates: this.includeDeployedCandidates,
     };
     this.store.dispatch(new GetCandidatesByPage(candidateListRequest));

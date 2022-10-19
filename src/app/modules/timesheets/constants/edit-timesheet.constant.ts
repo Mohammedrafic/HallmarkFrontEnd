@@ -50,6 +50,14 @@ export const RecordAddDialogConfig: DialogConfig = {
         optionsStateKey: 'billRateTypes',
         options: [],
       },
+      {
+        title: 'No Lunch Break',
+        field: 'hadLunchBreak',
+        type: FieldType.Toggle,
+        disabled: false,
+        required: true,
+        widthStyle: FieldWidthStyle.Long,
+      },
     ],
   },
   miles: {

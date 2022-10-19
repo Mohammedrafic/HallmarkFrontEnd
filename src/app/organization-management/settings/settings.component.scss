@@ -10,6 +10,14 @@
   }
 }
 
+.row {
+  display: flex;
+
+  .input-container:first-child{
+    margin-right: 12px;
+  }
+}
+
 .input-group {
   margin-top: 5px;
 }

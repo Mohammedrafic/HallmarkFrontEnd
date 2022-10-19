@@ -138,6 +138,7 @@ export interface AddRecordDto {
   departmentId: number;
   description?: string,
   value?: number;
+  hadLunchBreak?: boolean;
 }
 
 export interface PutRecord {

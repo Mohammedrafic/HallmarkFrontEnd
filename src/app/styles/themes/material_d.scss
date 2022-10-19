@@ -74100,6 +74100,7 @@ $schedule-tree-content-color: #fff !default;
     background: $grey-dark;
     border: none;
   }
+
   .widget .widget-data .widget-value .widget-value-number,
   .app-widget-wrapper__header h3,
   .widget-legend__legend-text,
@@ -74107,13 +74108,22 @@ $schedule-tree-content-color: #fff !default;
   .app-accumulation-chart__legend-Total-score {
     color: $grey-white !important;
   }
+
   .widget {
     &__type {
       color: $secondary-dark-blue-30 !important;
     }
   }
+
   .e-maps > svg > rect {
     fill: $grey-dark;
+  }
+
+  .app-custom-icon-dark {
+    width: 20px !important;
+    height: 20px !important;
+    cursor: pointer;
+    color: #e5e6ec;
   }
 }
 

@@ -72,6 +72,7 @@ import { RecordStatusCellComponent } from './components/cell-editors/record-stat
 import { TableStatusCellModule } from '@shared/components/table-status-cell/table-status-cell.module';
 import { UploadDocumentsComponent } from './components/upload-documents/upload-documents.component';
 import { TimesheetDetailsTableService } from './services';
+import { SwitchEditorComponent } from './components/cell-editors/switch-editor/switch-editor.component';
 
 const gridIcons = {
   MessageSquare,
@@ -124,6 +125,7 @@ const gridIcons = {
     UploadButtonComponent,
     RecordStatusCellComponent,
     UploadDocumentsComponent,
+    SwitchEditorComponent,
   ],
   imports: [
     CommonModule,

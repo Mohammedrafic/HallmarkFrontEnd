@@ -7,6 +7,7 @@ export enum MoreMenuType {
   'Edit',
   'Delete',
   'Share',
+  'Un-Share'
 }
 
 export enum DocType {
@@ -17,7 +18,7 @@ export enum DocType {
 
 export enum StatusEnum {
   'Active',
-  'In-Active'
+  'Inactive'
 }
 
 export enum FormControlNames {
