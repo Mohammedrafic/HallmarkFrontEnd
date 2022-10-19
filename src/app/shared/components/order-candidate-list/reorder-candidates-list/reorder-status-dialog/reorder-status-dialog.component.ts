@@ -484,7 +484,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     return this.applicantStatuses$.pipe(
       filter((statuses: ApplicantStatus[]) => !!statuses),
       tap((statuses: ApplicantStatus[]) => {
-        this.defaultApplicantStatuses = statuses.filter(status => status.applicantStatus !== CandidatStatus.OnBoard);
+        this.defaultApplicantStatuses = this.candidate?.status !== CandidatStatus.OnBoard ?
+          statuses : statuses.filter(status => status.applicantStatus !== CandidatStatus.OnBoard);
         this.jobStatus$.next(this.excludeSelectedStatus(CandidatStatus.OfferedBR));
       })
     );
