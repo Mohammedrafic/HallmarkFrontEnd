@@ -56,7 +56,7 @@
 
         <div *ngIf="currentTab !== tableTypes.Expenses && !isEditOn" class="btn-group">
           <button
-            *ngIf="isRejectBtnEnabled"
+            *ngIf="isRejectBtnEnabled && !actionsDisabled"
             ejs-button
             [disabled]="disableAnyAction || actionButtonDisabled"
             cssClass="e-outline privilege"
