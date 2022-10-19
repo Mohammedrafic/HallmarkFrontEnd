@@ -308,19 +308,27 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     const timesheetDetails = this.store.selectSnapshot(TimesheetsState.timesheetDetails);
 
     if (timesheetDetails?.isEmpty && !timesheetDetails?.noWorkPerformed) {
-      this.timesheetDetailsService.orgSubmitEmptyTimesheet().pipe(take(1), takeUntil(this.componentDestroy())).subscribe();
+      this.orgSubmitEmptyTimesheetWarning();
     } else {
-      this.timesheetDetailsService.submitTimesheet(
-        this.timesheetId,
-        timesheetDetails?.organizationId as number,
-        true
-      ).pipe(
-        takeUntil(this.componentDestroy())
-      ).subscribe(() => {
-        this.handleProfileClose();
-        this.store.dispatch(new Timesheets.GetAll());
-      });
+      this.orgSubmitTimesheet(timesheetDetails);
     }
+  }
+
+  private orgSubmitEmptyTimesheetWarning(): void {
+    this.timesheetDetailsService.orgSubmitEmptyTimesheet().pipe(take(1), takeUntil(this.componentDestroy())).subscribe();
+  }
+
+  private orgSubmitTimesheet(timesheetDetails: TimesheetDetailsModel | null): void {
+    this.timesheetDetailsService.submitTimesheet(
+      this.timesheetId,
+      timesheetDetails?.organizationId as number,
+      true
+    ).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.handleProfileClose();
+      this.store.dispatch(new Timesheets.GetAll());
+    });
   }
 
   private startSelectedTimesheetWatching(): void {
