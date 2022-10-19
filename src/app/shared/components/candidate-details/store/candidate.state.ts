@@ -5,7 +5,6 @@ import {
   GetCandidateRegions,
   GetCandidateSkills,
   SelectNavigation,
-  SetCandidateMessage,
   SetNavigation,
   SetPageFilters,
   SetPageNumber,
@@ -16,7 +15,6 @@ import { CandidateDetailsService } from '@shared/components/candidate-details/se
 import { CandidateDetailsTabs } from '@shared/enums/candidate-tabs.enum';
 import {
   CandidateDetailsPage,
-  CandidateMessage,
   CandidatesDetailsRegions,
   FiltersModal,
   NavigationTabModel,
@@ -32,7 +30,6 @@ interface CandidateDetailsStateModel {
   filters: FiltersModal | null;
   candidateRegions: CandidatesDetailsRegions | null;
   isNavigate: boolean | null;
-  message: CandidateMessage;
 }
 
 @State<CandidateDetailsStateModel>({
@@ -50,10 +47,6 @@ interface CandidateDetailsStateModel {
     filters: null,
     candidateRegions: null,
     isNavigate: null,
-    message: {
-      title: null,
-      position: null,
-    },
   },
 })
 @Injectable()
@@ -66,11 +59,6 @@ export class CandidateDetailsState {
   @Selector()
   static candidateDetails(state: CandidateDetailsStateModel): CandidateDetailsPage | null {
     return state.candidateDetailsPage;
-  }
-
-  @Selector()
-  static candidateMessage(state: CandidateDetailsStateModel): CandidateMessage {
-    return state.message;
   }
 
   @Selector()
@@ -165,13 +153,5 @@ export class CandidateDetailsState {
         return payload;
       })
     );
-  }
-
-  @Action(SetCandidateMessage)
-  SetCandidateMessage(
-    { patchState }: StateContext<CandidateDetailsStateModel>,
-    { title, position }: SetCandidateMessage
-  ): void {
-    patchState({ message: { title, position } });
   }
 }

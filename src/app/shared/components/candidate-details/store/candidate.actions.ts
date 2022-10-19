@@ -35,11 +35,6 @@ export class SetNavigation {
   constructor(public isNavigate: boolean) {}
 }
 
-export class SetCandidateMessage {
-  static readonly type = '[candidate details] Set Candidate Message';
-  constructor(public title: string | null, public position: string | null) {}
-}
-
 export class GetCandidateSkills {
   static readonly type = '[candidate details] Get Candidate Skills';
   constructor() {}

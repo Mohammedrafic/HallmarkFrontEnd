@@ -13,7 +13,9 @@
   <div class="container tooltip" *ngIf="description.length>0">
     <ejs-tooltip [content]="description" position='TopCenter'>
     <span class="mytooltip">
-      <i-feather name="info" id="info" class="app-custom-icon"></i-feather>
+      <i-feather name="info" id="info" 
+      [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"
+      ></i-feather>
     </span>
   </ejs-tooltip>
   </div>

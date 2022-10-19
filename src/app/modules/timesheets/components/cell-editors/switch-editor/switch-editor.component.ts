@@ -28,7 +28,7 @@ export class SwitchEditorComponent extends Destroyable implements ICellRendererA
 
   private group: FormGroup;
 
-  private onCallId: number;
+  private notApplicableRateIds: number[];
 
   private rateSubscription: Subscription;
 
@@ -61,11 +61,11 @@ export class SwitchEditorComponent extends Destroyable implements ICellRendererA
     const storeField = colDef.cellRendererParams.storeField as string;
     this.controlDisabled = colDef.cellRendererParams.disabled as boolean;
 
-    this.onCallId = (this.store.snapshot().timesheets[storeField] as AddRecordBillRate[])
-    .find((rate) => rate.text.toLowerCase() === 'oncall')?.value as number;
-
+    this.notApplicableRateIds = this.findDisabledRateIds(storeField);
     this.value = !params.value;
-    this.showControl = (params.data as RecordValue).billRateConfigId !== this.onCallId;
+    
+    this.showControl = !this.notApplicableRateIds.includes((params.data as RecordValue).billRateConfigId)
+    && !(params.data as RecordValue).billRateConfigName.toLowerCase().includes('ot');
     
     if (!this.controlDisabled) {
       this.setFormControl(params);  
@@ -90,10 +90,16 @@ export class SwitchEditorComponent extends Destroyable implements ICellRendererA
         takeUntil(this.componentDestroy()),
       )
       .subscribe((value: number) => {
-        this.showControl = value !== this.onCallId;
+        this.showControl = !this.notApplicableRateIds.includes(value);
         this.cd.markForCheck();
       }) as Subscription;
       
     }
+  }
+
+  private findDisabledRateIds(field: string): number[] {
+    return (this.store.snapshot().timesheets[field] as AddRecordBillRate[])
+    .filter((rate) => rate.text.toLowerCase() === 'oncall' || rate.text.includes('OT'))
+    .map((rate) => rate.value) as number[];
   }
 }

@@ -63,8 +63,3 @@ export type NavigationTabModel = {
   pending: number | null;
   isRedirect: boolean;
 };
-
-export type CandidateMessage = {
-  title: string | null;
-  position: string | null;
-};

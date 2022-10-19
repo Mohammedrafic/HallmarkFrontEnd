@@ -29,7 +29,7 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { CredentialStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import {
   CandidateCredential,
-  CandidateCredentialPage,
+  CandidateCredentialResponse,
   CredentialFile,
 } from '@shared/models/candidate-credential.model';
 import { CredentialType } from '@shared/models/credential-type.model';
@@ -74,7 +74,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public addCredentialForm: FormGroup;
   public searchCredentialForm: FormGroup;
   public disabledCopy = false;
-  public candidateCredentialPage: CandidateCredentialPage;
+  public candidateCredentialResponse: CandidateCredentialResponse;
   public openFileViewerDialog = new EventEmitter<number>();
   public credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public today = new Date();
@@ -90,9 +90,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private hasFiles = false;
   private removeFiles = false;
   private file: CredentialFile | null;
+  private readonly candidateProfileId: number;
 
   @Select(CandidateState.candidateCredential)
-  candidateCredential$: Observable<CandidateCredentialPage>;
+  candidateCredential$: Observable<CandidateCredentialResponse>;
 
   @Select(CandidateState.credentialTypes)
   credentialType$: Observable<CredentialType[]>;
@@ -141,14 +142,15 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   ) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
+    this.candidateProfileId = Number(this.route.snapshot.paramMap.get('id'));
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
+    this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
     this.store.dispatch(new GetCredentialTypes());
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
     });
     this.actions$
       .pipe(ofActionSuccessful(SaveCandidatesCredentialSucceeded))
@@ -158,7 +160,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         this.uploadFiles(this.credentialId);
 
         if (!this.removeFiles) {
-          this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
+          this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
           this.addCredentialForm.markAsPristine();
           this.closeDialog();
         }
@@ -167,12 +169,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.disabledCopy = false;
     });
     this.actions$.pipe(ofActionSuccessful(UploadCredentialFilesSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
       this.addCredentialForm.markAsPristine();
       this.closeDialog();
     });
     this.actions$.pipe(ofActionSuccessful(RemoveCandidatesCredentialSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId));
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
     });
     this.actions$.pipe(ofActionSuccessful(GetCredentialFilesSucceeded)).subscribe((files: { payload: Blob }) => {
       if (this.file) {
@@ -461,7 +463,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private subscribeOnCandidateCredential(): void {
     this.candidateCredential$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((page: CandidateCredentialPage) => (this.candidateCredentialPage = page));
+      .subscribe((response: CandidateCredentialResponse) => {
+        this.candidateCredentialResponse = response;
+      });
   }
 
   private setDefaultStatusValue(): void {

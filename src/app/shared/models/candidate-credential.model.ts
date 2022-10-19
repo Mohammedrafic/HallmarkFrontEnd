@@ -30,3 +30,11 @@ export type CredentialGroupedFiles = {
 }
 
 export type CandidateCredentialPage = PageOfCollections<CandidateCredential>;
+
+export type CandidateCredentialResponse = {
+  jobTitle: string;
+  publicId: number;
+  organizationPrefix: string;
+  positionId: number;
+  credentials: CandidateCredentialPage
+}
