@@ -7,8 +7,8 @@ import { MessageTypes } from "../../../../shared/enums/message-types";
 import { getAllErrors } from "../../../../shared/utils/error.utils";
 import { ShowToast } from "../../../../store/app.actions";
 import { DocumentLibraryService } from "../../services/document-library.service";
-import { DeletDocuments, DeletDocumentsSucceeded, GetDocumentById, GetDocumentDownloadDeatils, GetDocumentDownloadDeatilsSucceeded, GetDocuments, GetDocumentTypes, GetFoldersTree, GetSharedDocuments, SaveDocumentFolder, SaveDocuments, SearchDocumentTags, ShareDocuments, ShareDocumentsSucceeded } from "../actions/document-library.actions";
-import { DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, FolderTreeItem, DownloadDocumentDetail, SharedDocumentPostDto, ShareDocumentInfoPage } from "../model/document-library.model";
+import { DeletDocuments, DeletDocumentsSucceeded, GetDocumentById, GetDocumentDownloadDeatils, GetDocumentDownloadDeatilsSucceeded, GetDocuments, GetDocumentTypes, GetFoldersTree, GetSharedDocuments, SaveDocumentFolder, SaveDocuments, SearchDocumentTags, ShareDocuments, ShareDocumentsSucceeded, UnShareDocuments, UnShareDocumentsSucceeded } from "../actions/document-library.actions";
+import { DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, FolderTreeItem, DownloadDocumentDetail, SharedDocumentPostDto, ShareDocumentInfoPage, UnShareDocumentsFilter } from "../model/document-library.model";
 
 
 export interface DocumentLibraryStateModel {
@@ -231,6 +231,23 @@ export class DocumentLibraryState {
       tap((payload) => {
         patchState({ shareDocumentInfoPage: payload });
         return payload;
+      })
+    );
+  }
+
+  @Action(UnShareDocuments)
+  UnShareDocuments(
+    { dispatch }: StateContext<DocumentLibraryStateModel>,
+    { unShareDocumentsFilter }: UnShareDocuments
+  ): Observable<SharedDocumentPostDto[] | void> {
+    return this.documentLibraryService.UnShareDocumets(unShareDocumentsFilter).pipe(
+      tap(() => {
+        const message = 'Documents UnShared successfully';
+        const actions = [new UnShareDocumentsSucceeded(), new ShowToast(MessageTypes.Success, message)];
+        dispatch([...actions, new UnShareDocumentsSucceeded()]);
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
   }

@@ -10,13 +10,14 @@ import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { FileType } from '../../enums/documents.enum';
 import { ORG_ID_STORAGE_KEY } from '@shared/constants';
+import { BusinessUnitType } from '../../../../shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-document-library-side-panel',
   templateUrl: './document-library-side-panel.component.html',
   styleUrls: ['./document-library-side-panel.component.scss']
 })
-export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
+export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
 
   @Select(DocumentLibraryState.foldersTree)
   foldersTree$: Observable<FolderTreeItem[]>;
@@ -34,11 +35,11 @@ export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
   public tree: TreeViewComponent;
 
   constructor(private store: Store,
-    private changeDetectorRef: ChangeDetectorRef  ) { }
+    private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.onOrganizationChangedHandler();
-   
+
   }
   ngOnDestroy(): void {
     this.unsubscribe$.next();
@@ -50,7 +51,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
     if (user?.businessUnitType != null) {
       let documentTypesFilter: DocumentTypeFilter = {
         businessUnitType: user?.businessUnitType,
-        businessUnitId: this.businessUnitId
+        businessUnitId: user?.businessUnitType == BusinessUnitType.Hallmark ? null : this.businessUnitId
       }
       this.store.dispatch(new GetDocumentTypes(documentTypesFilter));
 
@@ -66,9 +67,9 @@ export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
               const element = this.tree?.element.querySelector('[data-uid="' + targetNodeId + '"]');
               const liElements = element?.querySelectorAll('ul li');
               let nodes = [];
-              if (liElements!=undefined && liElements.length > 0) {
+              if (liElements != undefined && liElements.length > 0) {
                 for (let i = 0; i < liElements?.length; i++) {
-                  const nodeData:any = this.tree?.getNode(liElements[i]);
+                  const nodeData: any = this.tree?.getNode(liElements[i]);
                   nodes.push(nodeData.id);
                 }
                 this.tree.expandAll(nodes);
@@ -91,7 +92,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
         this.selectedNode = new NodeItem();
         this.businessUnitId = data;
         this.initSidePanelDocs();
-       
+
         this.changeDetectorRef.markForCheck();
       }
     });
@@ -99,7 +100,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
   public nodeSelected(event: any) {
     this.selectedNode = event.nodeData;
     const selectedFolderTreeNode = this.checkSelectedNodeFolderOrDocument(this.sidePanelFolderItems, this.selectedNode.id);
-    if (selectedFolderTreeNode && selectedFolderTreeNode.length>0) {
+    if (selectedFolderTreeNode && selectedFolderTreeNode.length > 0) {
       this.selectedNode.fileType = selectedFolderTreeNode[0].fileType;
       this.selectedNode.businessUnitId = selectedFolderTreeNode[0].businessUnitId;
     }
@@ -113,7 +114,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
       for (let i = 0; i < data.length; i++) {
         const ele = data[i];
 
-        ele && ele.id==id
+        ele && ele.id == id
           ? arr.push(ele)
           : arr.push(...this.checkSelectedNodeFolderOrDocument(ele.children, id));
       }
@@ -123,7 +124,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
   }
 
   handleOnAddNewFolder(event: any) {
-    if (this.selectedNode != undefined && this.selectedNode?.fileType !=undefined && this.selectedNode?.fileType != FileType.Folder) {
+    if (this.selectedNode != undefined && this.selectedNode?.fileType != undefined && this.selectedNode?.fileType != FileType.Folder) {
       this.store.dispatch([
         new ShowToast(MessageTypes.Warning, "Please select folder."),
       ]);
@@ -131,5 +132,37 @@ export class DocumentLibrarySidePanelComponent implements OnInit,OnDestroy {
     else
       this.store.dispatch(new IsAddNewFolder(true));
   }
+
+  private searchFolderTree(items: FolderTreeItem[], term: string): any[] {
+    return items.reduce((acc: FolderTreeItem[], item: FolderTreeItem) => {
+      if (this.contains(item.name, term)) {
+        acc.push(item);
+      } else if (item.children && item.children.length > 0) {
+        let newItems = this.searchFolderTree(item.children, term);
+        if (newItems.length > 0) {
+          acc.push({ ...item, children: newItems });
+        }
+      }
+      return acc;
+    }, []);
+  }
+
+  private contains(text: string, term: string): boolean {
+    return text.toLowerCase().indexOf(term.toLowerCase()) >= 0;
+  }
+
+  public handleOnSearchTree(event: any) {
+    const searchString = event.target.value;
+    if (searchString.trim() != '') {
+      const searchFolderTree = this.searchFolderTree(this.sidePanelFolderItems, searchString);
+      this.sidePanelDocumentField = { dataSource: searchFolderTree, id: 'id', text: 'name', parentID: 'parentId', child: 'children' };
+
+    }
+    else {
+      this.sidePanelDocumentField = { dataSource: this.sidePanelFolderItems, id: 'id', text: 'name', parentID: 'parentId', child: 'children' };
+    }
+    this.changeDetectorRef.markForCheck();
+  }
+
 
 }

@@ -6,7 +6,7 @@ export class FolderTreeItem {
   businessUnitId: number | null;
   fileType: string;
   parentId: number | null;
-  Children: FolderTreeItem[];
+  children: FolderTreeItem[];
 }
 
 export class FolderTreeFilter {
@@ -143,7 +143,7 @@ export class SharedDocumentPostDto {
 export class ShareDocumentsFilter {
   documentIds: number[];
   businessUnitType: number;
-  businessUnitId: number | null;
+  businessUnitIds: number[] | null;
   regionLocationMappings: { [id: number]: number[]; } | null;
 }
 
@@ -167,6 +167,10 @@ export class ShareDocumentInfoFilter {
   getAll: boolean | null
 }
 export type ShareDocumentInfoPage = PageOfCollections<ShareDocumentDto>;
+
+export class UnShareDocumentsFilter {
+  documentIds: number[];
+}
 
 
 
