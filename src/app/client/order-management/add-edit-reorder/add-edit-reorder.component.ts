@@ -119,20 +119,15 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private initForm(reorder?: Order): void {
     const { candidates, jobStartDate, shiftStartTime, shiftEndTime, hourlyRate, openPositions, jobDistributions } =
       reorder || {};
-    this.reorderForm = this.formBuilder.group(
-      {
-        candidates: [this.getCandidateIds(candidates!)],
-        agencies: [this.getAgencyIds(jobDistributions!), Validators.required],
-        reorderDate: [
-          jobStartDate ? DateTimeHelper.convertDateToUtc(jobStartDate.toString()) : '',
-          Validators.required,
-        ],
-        shiftStartTime: [shiftStartTime ?? '', Validators.required],
-        shiftEndTime: [shiftEndTime ?? '', Validators.required],
-        billRate: [hourlyRate ?? '', Validators.required],
-        openPosition: [openPositions ?? '', [Validators.required, Validators.min(1)]],
-      }
-    );
+    this.reorderForm = this.formBuilder.group({
+      candidates: [this.getCandidateIds(candidates!)],
+      agencies: [this.getAgencyIds(jobDistributions!), Validators.required],
+      reorderDate: [jobStartDate ? DateTimeHelper.convertDateToUtc(jobStartDate.toString()) : '', Validators.required],
+      shiftStartTime: [shiftStartTime ?? '', Validators.required],
+      shiftEndTime: [shiftEndTime ?? '', Validators.required],
+      billRate: [hourlyRate ?? '', Validators.required],
+      openPosition: [openPositions ?? '', [Validators.required, Validators.min(1)]],
+    });
   }
 
   setInitialDatesValue(): void {
@@ -229,7 +224,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private areTimesEquals(time1: Date, time2: Date): boolean {
-    return getTimeFromDate(time1) === getTimeFromDate(time2, true);
+    return getTimeFromDate(time1) === getTimeFromDate(time2);
   }
 
   private saveReorder(): void {
