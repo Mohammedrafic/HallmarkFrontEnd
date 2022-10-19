@@ -260,7 +260,7 @@ export class Order {
   locationId: number;
   departmentId: number;
   skillId: number;
-  skillName?: number;
+  skillName?: string;
   orderType: OrderType;
   poNumberId: number | null;
   projectTypeId: number | null;

@@ -65,6 +65,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Output() readonly approveEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
+  @Output() readonly orgSubmitting: EventEmitter<void> = new EventEmitter<void>();
+
   @Select(TimesheetsState.tmesheetRecords)
   public readonly timesheetRecords$: Observable<TimesheetRecordsDto>;
 
@@ -106,6 +108,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   public isEditEnabled = false;
 
   public isApproveBtnEnabled = false;
+
+  public isOrgSubmitBtnEnabled = false;
 
   public isRejectBtnEnabled = false;
 
@@ -288,6 +292,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.approveEvent.emit(this.currentTab === RecordFields.Time);
   }
 
+  public orgSubmit(): void {
+    this.orgSubmitting.emit();
+  }
+
   public uploadAttachments(id: number, attachments: Attachment[]): void {
     this.uploadSideDialog.emit({ id, attachments });
   }
@@ -397,6 +405,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
     this.isApproveBtnEnabled = !!currentTabMapping.get(this.currentTab);
     this.isRejectBtnEnabled = !this.isAgency && !!currentTabMapping.get(this.currentTab);
+    this.isOrgSubmitBtnEnabled = this.orgCanSubmitTimesheet();
   }
 
   private setActionBtnState(): void {
@@ -479,5 +488,13 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private checkTabStatusApproved(): boolean {
     return (this.currentTab === RecordFields.Time && this.timesheetDetails.status === TimesheetStatus.Approved);
+  }
+
+  private orgCanSubmitTimesheet(): boolean {
+    const isOrgAndTimesheetTab = !this.isAgency && this.currentTab === RecordFields.Time;
+    const isStatusPass = this.timesheetDetails.status === TimesheetStatus.Missing
+      || this.timesheetDetails.status === TimesheetStatus.Incomplete;
+
+    return isOrgAndTimesheetTab && this.timesheetDetails.canEditTimesheet && isStatusPass;
   }
 }

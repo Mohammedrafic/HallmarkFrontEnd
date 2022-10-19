@@ -28,7 +28,12 @@ export const DocumentLibraryColumnsDefinition = (actionCellParams: ICellRenderer
       minWidth: 50,
       headerCheckboxSelection: true,
       headerCheckboxSelectionFilteredOnly: true,
-      checkboxSelection: true,
+      checkboxSelection: function (params: any) {
+        if (params.data.isSharedWithMe) {
+          return false;
+        }
+        return true;
+      },
       sortable: false,
       resizable: false,
       filter: false,

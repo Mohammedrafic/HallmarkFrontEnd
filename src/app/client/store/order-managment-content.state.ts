@@ -25,6 +25,7 @@ import {
   GetContactDetails,
   GetHistoricalData,
   GetOrderById,
+  GetOrderByIdSucceeded,
   GetOrderFilterDataSources,
   GetOrders,
   GetOrganisationCandidateJob,
@@ -49,7 +50,7 @@ import {
   SetLock,
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob,
-  UpdateOrganisationCandidateJobSucceed
+  UpdateOrganisationCandidateJobSucceed,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -62,7 +63,7 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementPage,
-  SuggestedDetails
+  SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -78,7 +79,7 @@ import {
   ORDER_WITHOUT_CREDENTIALS,
   RECORD_ADDED,
   RECORD_MODIFIED,
-  updateCandidateJobMessage
+  updateCandidateJobMessage,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -362,14 +363,17 @@ export class OrderManagementContentState {
 
         const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = payload;
 
-        dispatch(new SetPredefinedBillRatesData(
-          orderType,
-          departmentId,
-          skillId,
-          DateTimeHelper.toUtcFormat(jobStartDate),
-          DateTimeHelper.toUtcFormat(jobEndDate)
-        ));
-
+        dispatch(
+          new SetPredefinedBillRatesData(
+            orderType,
+            departmentId,
+            skillId,
+            jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
+            jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
+          )
+        );
+        
+        dispatch(new GetOrderByIdSucceeded());
         return payload;
       })
     );
@@ -419,13 +423,15 @@ export class OrderManagementContentState {
       tap((payload) => {
         patchState({ selectedOrder: payload });
         const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = payload;
-        dispatch(new SetPredefinedBillRatesData(
-          orderType,
-          departmentId,
-          skillId,
-          DateTimeHelper.toUtcFormat(jobStartDate),
-          DateTimeHelper.toUtcFormat(jobEndDate)
-        ));
+        dispatch(
+          new SetPredefinedBillRatesData(
+            orderType,
+            departmentId,
+            skillId,
+            jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
+            jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
+          )
+        );
 
         return payload;
       })
@@ -582,7 +588,8 @@ export class OrderManagementContentState {
     return of(null).pipe(
       debounceTime(100),
       tap(() =>
-        patchState({ getPredefinedBillRatesData: { orderType, departmentId, skillId, jobStartDate, jobEndDate } }))
+        patchState({ getPredefinedBillRatesData: { orderType, departmentId, skillId, jobStartDate, jobEndDate } })
+      )
     );
   }
 
@@ -598,12 +605,14 @@ export class OrderManagementContentState {
       const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = getPredefinedBillRatesData;
 
       if (!isNaN(orderType) && !isNaN(departmentId) && !isNaN(skillId)) {
-        return this.orderManagementService.getPredefinedBillRates(orderType, departmentId, skillId, jobStartDate, jobEndDate).pipe(
-          tap((payload) => {
-            patchState({ predefinedBillRates: payload });
-            return payload;
-          })
-        );
+        return this.orderManagementService
+          .getPredefinedBillRates(orderType, departmentId, skillId, jobStartDate, jobEndDate)
+          .pipe(
+            tap((payload) => {
+              patchState({ predefinedBillRates: payload });
+              return payload;
+            })
+          );
       }
     }
 
