@@ -533,8 +533,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.addRemoveFormcontrols();
     this.formDailogTitle = FormDailogTitle.Upload;
     this.orgStructureData.statusIds.dataSource = this.statusItems;
-    this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue([]);
-    this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
     this.getOrganizations();
     if (this.selectedDocumentNode != undefined && this.selectedDocumentNode != null && this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode?.id != -1)
       this.store.dispatch(new ShowSideDialog(true));
