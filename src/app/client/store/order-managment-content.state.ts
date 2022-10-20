@@ -98,6 +98,7 @@ import { ExtensionGridModel } from '@shared/components/extension/extension-sideb
 import { OrderType } from '@shared/enums/order-type';
 import { createUniqHashObj } from '@core/helpers/functions.helper';
 import { DateTimeHelper } from '@core/helpers';
+import { ApplicantStatus as ApplicantStatusEnum} from '@shared/enums/applicant-status.enum'
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -310,6 +311,18 @@ export class OrderManagementContentState {
   @Selector()
   static isDirtyQuickOrderForm(state: OrderManagementContentStateModel): boolean {
     return state.isDirtyQuickOrderForm;
+  }
+
+  @Selector()
+  static orderCandidatesLength(state: OrderManagementContentStateModel): number {
+    return (
+      state.orderCandidatesListPage?.items.filter(
+        (candidate) =>
+          candidate.status !== ApplicantStatusEnum.Rejected &&
+          candidate.status !== ApplicantStatusEnum.NotApplied &&
+          candidate.status !== ApplicantStatusEnum.Withdraw
+      ).length || 0
+    );
   }
 
   constructor(

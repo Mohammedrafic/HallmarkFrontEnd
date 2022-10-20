@@ -110,6 +110,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Select(OrderManagementContentState.extensions) extensions$: Observable<any>;
   public extensions: any[] = [];
 
+  @Select(OrderManagementContentState.orderCandidatesLength)
+  public orderCandidatesLength$: Observable<number>
+
   @Select(UserState.currentUserPermissions)
   public currentUserPermissions$: Observable<any[]>;
 
@@ -123,7 +126,6 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
   public orderStatus = OrderStatus;
-  public candidatesCounter: number;
   public reOrderToEdit: Order | null;
   public reOrderDialogTitle$ = this.addEditReorderService.reOrderDialogTitle$;
   public canCreateOrder: boolean;
@@ -499,12 +501,6 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           { state: boolean; index?: number }
         ]) => {
           this.candidateOrderPage = order;
-          this.candidatesCounter =
-            order &&
-            order.items?.filter(
-              (candidate) =>
-                candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
-            ).length;
           this.extensions = [];
           if (
             selectedOrder?.extensionFromId &&
