@@ -113,7 +113,7 @@ export class BillRatesState {
   }
 
   @Action(SaveUpdateBillRate)
-  SaveUpdateBillRate({ dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: SaveUpdateBillRate): Observable<BillRateSetup[] | void> {
+  SaveUpdateBillRate({ dispatch }: StateContext<BillRatesStateModel>, { payload, filters }: SaveUpdateBillRate): Observable<BillRateSetup[] | void> {
     payload.effectiveDate = DateTimeHelper.toUtcFormat(payload.effectiveDate);
     return this.billRatesService.saveUpdateBillRate(payload)
       .pipe(tap((payloadResponse) => {
@@ -122,7 +122,7 @@ export class BillRatesState {
           } else {
             dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
           }
-          dispatch(new GetBillRates({ pageNumber: pageNumber, pageSize: pageSize }));
+          dispatch(new GetBillRates(filters));
           dispatch(new SaveUpdateBillRateSucceed());
           return payloadResponse;
         }),
@@ -205,16 +205,16 @@ export class BillRatesState {
   }
 
   @Action(DeleteBillRatesById)
-  DeleteBillRatesById({ patchState, dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: DeleteBillRatesById): Observable<void> {
+  DeleteBillRatesById({ dispatch }: StateContext<BillRatesStateModel>, { payload, filters }: DeleteBillRatesById): Observable<void> {
     return this.billRatesService.removeBillRateById(payload).pipe(tap(() => {
-        dispatch(new GetBillRates({ pageNumber: pageNumber, pageSize: pageSize }));
+        dispatch(new GetBillRates(filters));
         return payload;
       }),
       catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_DELETED))));
   }
 
   @Action(DeleteBillRatesTypeById)
-  DeleteBillRatesTypeById({ patchState, dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: DeleteBillRatesById): Observable<void> {
+  DeleteBillRatesTypeById({ dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: DeleteBillRatesTypeById): Observable<void> {
     return this.billRatesService.removeExternalBillRateById(payload).pipe(tap(() => {
         dispatch(new GetExternalBillRateType({ pageNumber: pageNumber, pageSize: pageSize }));
         return payload;
@@ -223,7 +223,7 @@ export class BillRatesState {
   }
 
   @Action(DeleteBillRatesMappingById)
-  DeleteBillRatesMappingById({ patchState, dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: DeleteBillRatesById): Observable<void> {
+  DeleteBillRatesMappingById({ dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: DeleteBillRatesMappingById): Observable<void> {
     return this.billRatesService.removeExternalBillRateMappingById(payload).pipe(tap(() => {
         dispatch(new GetExternalBillRateMapping({ pageNumber: pageNumber, pageSize: pageSize }));
         return payload;
