@@ -1,6 +1,6 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailFilters, GroupEmailRequest } from "@shared/models/group-email.model";
+import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailFilters, GroupEmailRequest, SendGroupEmailRequest } from "@shared/models/group-email.model";
 import { Observable } from "rxjs";
 
 @Injectable({
@@ -37,9 +37,14 @@ import { Observable } from "rxjs";
    * @return GroupEmail
    */
     public SendGroupEmail(
-      groupEmailRequest:GroupEmailRequest    
-    ): Observable<GroupEmail> {  
-       return this.http.post<GroupEmail>(`/api/GroupMail/creategroupmail`,groupEmailRequest);
+      groupEmailRequest: SendGroupEmailRequest    
+    ): Observable<GroupEmail> {
+      const formData = new FormData();
+      formData.append('file', groupEmailRequest?.selectedFile != null ? groupEmailRequest?.selectedFile : '');
+      delete groupEmailRequest.selectedFile;
+      const params = new HttpParams().append('content', JSON.stringify(groupEmailRequest));
+      return this.http.post<GroupEmail>(`/api/GroupMail/creategroupmail`, formData, { params: params });
+   
     }
     /**
    * Get Group Email By Id

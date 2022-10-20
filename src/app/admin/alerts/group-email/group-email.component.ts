@@ -253,8 +253,10 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
         cCList: formValues.emailCc == undefined ? "" : formValues.emailCc,
         bCCList: "",
         status: GroupMailStatus.Pending,
-        fromMail: this.userObj?.email==undefined?"":this.userObj?.email
+        fromMail: this.userObj?.email == undefined ? "" : this.userObj?.email,
+        selectedFile: formValues.fileUpload
       };
+      debugger;
       this.store.dispatch(new SendGroupEmail(sendGroupEmailDto));
 
     }
