@@ -10,6 +10,7 @@ import { ClearAlertTemplateState, GetAlertsTemplatePage, GetTemplateByAlertId, G
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from '@shared/models/alerts-template.model';
 import { UserState } from 'src/app/store/user.state';
+import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { User, UsersPage } from '@shared/models/user.model';
@@ -18,6 +19,7 @@ import { ShouldDisableUserDropDown } from 'src/app/store/app.actions';
 import { AlertsState } from '@admin/store/alerts.state';
 import { UserSubscriptionFilters, UserSubscriptionPage } from '@shared/models/user-subscription.model';
 import { FilterService } from '@shared/services/filter.service';
+
 @Component({
   selector: 'app-send-group-email',
   templateUrl: './send-group-email.component.html',
@@ -69,7 +71,8 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   public businessDataFields = BUSINESS_DATA_FIELDS;
   public userDataFields = User_DATA_FIELDS;
   public allOption:string="All";
-  public placeholderValue:string="Select User";
+  public placeholderValue: string = "Select User";
+  public readonly maxFileSize = 2000000; // 2 mb
   private isAlive: boolean = true;
   defaultBusinessValue: any;
   defaultUserValue: any;
@@ -78,6 +81,13 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   private filters: UserSubscriptionFilters = {};
   public unsubscribe$: Subject<void> = new Subject();
   public orgStructureData: any;
+  public dropElement: HTMLElement;
+  public readonly allowedExtensions: string = '.pdf, .doc, .docx, .jpg, .jpeg, .png';
+  public uploaderErrorMessageElement: HTMLElement;
+  public file: any;
+  public files: File[] = [];
+  @ViewChild('filesUploader') uploadObj: UploaderComponent;
+
   constructor(private actions$: Actions,
     private store: Store, private fb: FormBuilder) {
 
@@ -110,6 +120,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
 
   }
   ngOnInit(): void {
+    this.setDropElement();
     this.onBusinessUnitValueChanged();
     this.onBusinessValueChanged();
     this.onUserValueChanged();
@@ -157,6 +168,38 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     {
     this.store.dispatch(new GetAllUsersPage(this.businessUnitControl.value, businessUnitIds, this.currentPage, this.pageSize, null, null, true));
     }  
+  }
+
+  public onFileSelectedGroup(event: SelectedEventArgs): void {
+    if (event.filesData[0].statusCode !== '1') {
+      this.addFilesValidationMessage(event.filesData[0]);
+    }
+    else {
+      this.files = [];
+      this.file = event.filesData[0];
+      this.files.push(this.file.rawFile);
+      this.groupEmailTemplateForm.controls['fileUpload'].setValue(this.file.rawFile);
+    }
+  }
+
+  public browseGroupEmail(): void {
+    document
+      .getElementById('group-attachment-files')
+      ?.getElementsByClassName('e-file-select-wrap')[0]
+      ?.querySelector('button')
+      ?.click();
+  }
+
+  private addFilesValidationMessage(file: FileInfo) {
+    requestAnimationFrame(() => {
+      this.uploaderErrorMessageElement = document.getElementsByClassName('e-validation-fails')[0] as HTMLElement;
+      if (this.uploaderErrorMessageElement) {
+        this.uploaderErrorMessageElement.innerText =
+          file.size > this.maxFileSize
+            ? 'The file exceeds the limitation, max allowed 2 MB.'
+            : 'The file should be in pdf, doc, docx, jpg, jpeg, png format.';
+      }
+    });
   }
   
   private onBusinessUnitValueChanged(): void {
@@ -251,7 +294,8 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
       emailCc: new FormControl(''),
       emailTo: new FormControl('', [Validators.required]),
       emailSubject: new FormControl('', [Validators.required]),
-      emailBody: new FormControl('', [Validators.required])
+      emailBody: new FormControl('', [Validators.required]),
+      fileUpload: new FormControl(null),
     });
   }
 
@@ -269,6 +313,9 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
       this.groupEmailTemplateForm.controls['emailBody'].setValue('');  
     this.groupEmailTemplateForm.controls['user'].setValue([]);
 
+  }
+  private setDropElement(): void {
+    this.dropElement = document.getElementById('droparea') as HTMLElement;
   }
 
 }
