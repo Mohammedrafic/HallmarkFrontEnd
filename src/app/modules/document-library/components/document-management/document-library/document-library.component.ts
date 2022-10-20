@@ -174,6 +174,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public service: string =
     'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
   public document: string = 'PDF_Succinctly.pdf';
+  public previousFolderId: number  = -2;
 
 
   constructor(private store: Store, private datePipe: DatePipe,
@@ -234,23 +235,26 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.action$.pipe(ofActionDispatched(GetDocumentsSelectedNode), takeUntil(this.unsubscribe$)).subscribe((payload) => {
       this.selectedNodeText = '';
       if (payload.payload) {
-        this.selectedDocumentNode = payload.payload;
-        this.gridApi?.setRowData([]);
-        if (this.selectedDocumentNode?.text != undefined) {
-          this.selectedNodeText = (this.selectedDocumentNode?.fileType != undefined && this.selectedDocumentNode?.fileType == 'folder') ? this.selectedDocumentNode?.text : '';
-          setTimeout(() => {
-            if (this.selectedDocumentNode?.id != -1)
-              this.getDocuments();
-            else if (this.selectedDocumentNode?.id == -1) {
-              this.getSharedDocuments();
-            }
-          }, 1000);
+        if (this.previousFolderId != payload.payload.id) {
+          this.previousFolderId = payload.payload.id;
+          this.selectedDocumentNode = payload.payload;
+          this.gridApi?.setRowData([]);
+          if (this.selectedDocumentNode?.text != undefined) {
+            this.selectedNodeText = (this.selectedDocumentNode?.fileType != undefined && this.selectedDocumentNode?.fileType == 'folder') ? this.selectedDocumentNode?.text : '';
+            setTimeout(() => {
+              if (this.selectedDocumentNode?.id != -1)
+                this.getDocuments();
+              else if (this.selectedDocumentNode?.id == -1) {
+                this.getSharedDocuments();
+              }
+            }, 1000);
+          }
+          else {
+            this.selectedNodeText = '';
+          }
         }
-        else {
-          this.selectedNodeText = '';
-        }
+        this.changeDetectorRef.markForCheck();
       }
-      this.changeDetectorRef.markForCheck();
     });
 
   }
@@ -264,6 +268,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnDestroy(): void {
+    this.previousFolderId = -2;
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
