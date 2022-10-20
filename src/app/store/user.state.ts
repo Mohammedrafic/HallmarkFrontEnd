@@ -94,6 +94,11 @@ export class UserState {
   }
 
   @Selector()
+  static userChatConfig(state: UserStateModel): boolean {
+    return !!state.user?.isChatEnabled;
+  }
+
+  @Selector()
   static businessUnitName(state: UserStateModel): string {
     return state.lastSelectedOrganisationAgency === AGENCY
       ? state.agencies?.businessUnits.find((item) => item.id === state.lastSelectedAgencyId)?.name || ''
