@@ -388,8 +388,13 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
           if (this.billRateToPost) {
+            const filters = {
+              pageNumber: this.currentPage,
+              pageSize: this.pageSize,
+              ...this.filters,
+            };
             this.billRateToPost.forceUpsert = true; // set force override flag for BE
-            this.store.dispatch(new SaveUpdateBillRate(this.billRateToPost, this.currentPage, this.pageSize));
+            this.store.dispatch(new SaveUpdateBillRate(this.billRateToPost, filters));
           } else {
             this.store.dispatch(new ShowSideDialog(false));
             this.clearFormDetails();
@@ -510,7 +515,12 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       };
 
       this.billRateToPost = billRate;
-      this.store.dispatch(new SaveUpdateBillRate(billRate, this.currentPage, this.pageSize));
+      const filters = {
+        pageNumber: this.currentPage,
+        pageSize: this.pageSize,
+        ...this.filters,
+      };
+      this.store.dispatch(new SaveUpdateBillRate(billRate, filters));
     } else {
       this.billRatesFormGroup.markAllAsTouched();
     }
@@ -539,7 +549,12 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         })
         .subscribe((confirm) => {
           if (confirm) {
-            this.store.dispatch(new DeleteBillRatesById(data.billRateSettingId, this.currentPage, this.pageSize));
+            const filters = {
+              pageNumber: this.currentPage,
+              pageSize: this.pageSize,
+              ...this.filters,
+            };
+            this.store.dispatch(new DeleteBillRatesById(data.billRateSettingId, filters));
           }
           this.removeActiveCssClass();
         });
@@ -818,7 +833,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         break;
       case BillRateCalculationType.GuaranteedHours:
         this.additionalLableForMinMax = 'Work Week';
-        this.hideFilds.add('intervalMax')
+        this.hideFilds.add('intervalMax');
         this.hideFilds.add('billRateValueRateTimes');
         billRateValueRateTimesControl?.setValue(0);
         billRateValueRateTimesControl?.disable();
@@ -917,4 +932,3 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.isReadOnly = user?.businessUnitType === BusinessUnitType.Organization;
   }
 }
-
