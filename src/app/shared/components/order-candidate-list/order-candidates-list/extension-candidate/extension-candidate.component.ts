@@ -364,7 +364,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
     zip(this.orderPermissions$, this.candidate$)
       .pipe(takeUntil(this.destroy$))
-      .subscribe(([data, _]: [CurrentUserPermission[], OrderCandidatesList]) => (this.orderPermissions = data) && this.mapPermissions());
+      .subscribe(([data, candidate]: [CurrentUserPermission[], OrderCandidatesList]) => (this.orderPermissions = data) && this.mapPermissions());
   }
 
   private getOrderPermissions(orderId: number): void {
