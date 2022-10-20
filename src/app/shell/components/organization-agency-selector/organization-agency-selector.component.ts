@@ -295,12 +295,12 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
   private setAgencyStatus(agency: IOrganizationAgency | undefined): void {
     const agencyIsActive = agency?.status !== AgencyStatus.Inactive && agency?.status !== AgencyStatus.Terminated;
-    const userUnit = (this.store.snapshot(). user as UserStateModel).user?.businessUnitName;
+    const userUnit = (this.store.snapshot(). user as UserStateModel).user?.businessUnitType;
 
     let invoiceActionsActive: boolean;
 
     if (agency?.status === AgencyStatus.Inactive) {
-      invoiceActionsActive = userUnit === 'Hallmark'
+      invoiceActionsActive = userUnit !== BusinessUnitType.Agency;
     } else if (agency?.status === AgencyStatus.Terminated) {
       invoiceActionsActive = false;
     } else {
