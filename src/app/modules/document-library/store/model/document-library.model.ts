@@ -69,9 +69,9 @@ export class DocumentLibraryDto {
   status: string;
   businessUnitId: number | null;
   businessUnitName: string | null;
-  regionId: number | null;
+  regionId: string | null;
   regionName: string | null;
-  locationId: number | null;
+  locationId: string | null;
   locationName: string | null;
   isSharedWithMe: boolean;
   documentVisibilities: any | null;

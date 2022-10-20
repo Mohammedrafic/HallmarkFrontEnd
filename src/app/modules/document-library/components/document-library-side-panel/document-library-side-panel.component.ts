@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, take, takeUntil } from 'rxjs';
 import { DocumentTypeFilter, FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
 import { DocumentLibraryState } from '../../store/state/document-library.state';
 import { TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
