@@ -52,6 +52,7 @@ export class ContactusComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.setDropElement();
     this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
       if (user) {
         this.ContactFormGroup = this.fb.group({
@@ -66,7 +67,9 @@ export class ContactusComponent implements OnInit {
 
       }
     });
+   
   }
+
 
   public browse(): void {
     document
@@ -135,5 +138,9 @@ export class ContactusComponent implements OnInit {
     this.ContactFormGroup.controls['topic'].setValue(null);
     this.ContactFormGroup.controls['file'].setValue(null);
     this.clearFiles();
+  }
+
+  private setDropElement(): void {
+    this.dropElement = document.getElementById('droparea') as HTMLElement;
   }
 }

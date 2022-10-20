@@ -30,5 +30,6 @@ export type GroupEmail = {
     bCCList:string | null,
     status:GroupMailStatus |null,
     fromMail:string | null,
-    businessUnitId:number |null
+    businessUnitId: number | null
+    selectedFile?: Blob | null
   };

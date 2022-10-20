@@ -59,10 +59,6 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { UserState } from '../../../store/user.state';
 import { PermissionService } from '../../../security/services/permission.service';
-import { AlertTrigger } from '@admin/store/alerts.actions';
-import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
-import { AlertTriggerDto } from '@shared/models/alerts-template.model';
-import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 
 enum MobileMenuItems {
   Cancel = 'Cancel',
@@ -114,6 +110,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Select(OrderManagementContentState.extensions) extensions$: Observable<any>;
   public extensions: any[] = [];
 
+  @Select(OrderManagementContentState.orderCandidatesLength)
+  public orderCandidatesLength$: Observable<number>
+
   @Select(UserState.currentUserPermissions)
   public currentUserPermissions$: Observable<any[]>;
 
@@ -127,7 +126,6 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
   public orderStatus = OrderStatus;
-  public candidatesCounter: number;
   public reOrderToEdit: Order | null;
   public reOrderDialogTitle$ = this.addEditReorderService.reOrderDialogTitle$;
   public canCreateOrder: boolean;
@@ -230,32 +228,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     this.subscribeOnOrderCandidatePage();
     this.subsToTabChange();
     this.subscribeOnPermissions();
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe((data) => {
-      const userAgencyOrganization = this.store.selectSnapshot(UserState.organizations) as UserAgencyOrganization;
-      let orgName = userAgencyOrganization?.businessUnits?.find(i => i.id == data?.order?.organizationId)?.name;
-      let params: any = {};
-      params['@' + AlertParameterEnum[AlertParameterEnum.Organization]] = orgName == null || orgName == undefined ? "" : orgName;
-      params['@' + AlertParameterEnum[AlertParameterEnum.OrderID]] =
-        data?.order?.organizationPrefix == null
-          ? data?.order?.publicId + ''
-          : data?.order?.organizationPrefix + '-' + data?.order?.publicId;
-      params['@' + AlertParameterEnum[AlertParameterEnum.Location]] = data?.order?.locationName;
-      params['@' + AlertParameterEnum[AlertParameterEnum.Skill]] = data?.order?.skillName == null ? "" : data?.order?.skillName;
-      //For Future Reference
-      // var url = location.origin + '/ui/client/order-management/edit/' + data?.order?.id;
-      params['@' + AlertParameterEnum[AlertParameterEnum.ClickbackURL]] = "";
-           
-       let alertTriggerDto = {
-          BusinessUnitId: data?.order?.organizationId,
-          AlertId: AlertIdEnum['Order Status Update: Custom'],
-          Parameters: params,
-        };
-      
-      if (alertTriggerDto.AlertId > 0) {
-        this.store.dispatch(new AlertTrigger(alertTriggerDto));
-      }
-      this.router.navigate(['/client/order-management']);
-    });
+   
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -418,8 +391,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         }),
         take(1)
       )
-      .subscribe(() => {
-        this.store.dispatch(new SaveOrderSucceeded(this.order));
+      .subscribe(() => {      
         this.reOpenOrderSuccess.emit(this.order);
       });
   }
@@ -529,12 +501,6 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           { state: boolean; index?: number }
         ]) => {
           this.candidateOrderPage = order;
-          this.candidatesCounter =
-            order &&
-            order.items?.filter(
-              (candidate) =>
-                candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
-            ).length;
           this.extensions = [];
           if (
             selectedOrder?.extensionFromId &&

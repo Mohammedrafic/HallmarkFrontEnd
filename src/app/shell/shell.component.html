@@ -13,15 +13,18 @@
       </ng-container>
       <div class="devider" *ngIf="!(isMobile$ | async)"></div>
     </div>
-    <div class="bell-button left" style="cursor: pointer;" (click)="toggleChatDialog()">
-
-      <i-feather name="message-square"></i-feather>
+    <div
+      [class.disabled]="!(userChatConfig$ | async)"
+      class="bell-button left"
+      (click)="toggleChatDialog()"
+    >
+      <i-feather name="message-square" class="bell-button__icon"></i-feather>
 
       <span class="bell-button__badge empty-chat" *ngIf="isUnreadMessages"></span>
 
     </div>
 
-    <div class="bell-button" style="cursor: pointer;" (click)="bellIconClicked()">
+    <div *ngIf="userChatConfig$ | async" class="bell-button" (click)="bellIconClicked()">
 
       <i-feather name="bell"></i-feather>
 
@@ -181,7 +184,7 @@
   </div>
 
   <div id="listcontainer">
-    
+
     <section class="alert-body">
       <section class="alert-panel" *ngFor="let item of alerts">
         <div class="alert-panel-header">
@@ -211,7 +214,7 @@
   </div>
 </ejs-sidebar>
 
-  <app-chat-container></app-chat-container>
+  <app-chat-container *ngIf="userChatConfig$ | async"></app-chat-container>
   <app-custom-side-dialog [header]="contactHeaderTitle" [width]="dialogWidth">
     <app-contactus></app-contactus>
   </app-custom-side-dialog>

@@ -1,4 +1,4 @@
-import {BillRateFilters, BillRateSetupPost, ExternalBillRateSave, ExternalBillRateType} from '@shared/models/bill-rate.model';
+import {BillRateFilters, BillRateSetupPost, ExternalBillRateSave } from '@shared/models/bill-rate.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 export class GetBillRates {
@@ -23,7 +23,7 @@ export class GetExternalBillRateMappingById {
 
 export class SaveUpdateBillRate {
   static readonly type = '[billrates] Save/Update Bill Rate';
-  constructor(public payload: BillRateSetupPost, public pageNumber: number, public pageSize: number) {}
+  constructor(public payload: BillRateSetupPost, public filters: BillRateFilters) {}
 }
 
 export class SaveBillRateType {
@@ -53,7 +53,7 @@ export class ShowConfirmationPopUp {
 
 export class DeleteBillRatesById {
   static readonly type = '[billrates] Delete Bill Rate By Id';
-  constructor(public payload: number, public pageNumber: number, public pageSize: number) {}
+  constructor(public payload: number, public filters: BillRateFilters) {}
 }
 
 export class DeleteBillRatesTypeById {

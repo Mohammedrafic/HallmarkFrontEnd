@@ -20,11 +20,12 @@ import{ListViewAllModule} from '@syncfusion/ej2-angular-lists';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { AlertsSmsTemplateFromComponent } from './alerts-template/alerts-sms-template-from/alerts-sms-template-from.component';
 import { AlertsOnScreenTemplateFormComponent } from './alerts-template/alerts-on-screen-template-form/alerts-on-screen-template-form.component';
-import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import { TextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
 import { ToggleSwitchComponent } from './toggle-switch/toggle-switch.component';
 import { GroupEmailComponent } from './group-email/group-email.component';
 import { SendGroupEmailComponent } from './group-email/send-group-email/send-group-email.component';
 import { GroupEmailTableComponent } from './group-email/group-email-table/group-email-table.component';
+
 
 
 
@@ -58,6 +59,7 @@ import { GroupEmailTableComponent } from './group-email/group-email-table/group-
     SharedModule,
     DialogModule,
     TextBoxModule,
+    UploaderModule,
     NgxsModule.forFeature([AlertsState]),
   ]
 })
