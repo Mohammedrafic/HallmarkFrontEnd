@@ -13,3 +13,9 @@ export enum CandidateJobStatus {
   Onboard = 1,
   Rejected = 2,
 }
+
+export enum OrderMatch {
+  Unassigned = "Unassigned",
+  Assigned = "Assigned",
+  NotRequired = "Not Required",
+}
