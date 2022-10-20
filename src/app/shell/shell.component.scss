@@ -397,6 +397,16 @@
   position: relative;
   padding: 10px 15px;
   color: $secondary-dark-blue-15;
+  cursor: pointer;
+
+  &.disabled {
+    pointer-events: none;
+
+    & .bell-button__icon {
+      color: $secondary-dark-blue-30;
+    }
+  }
+
   &.left {
     margin-right: 40px;
   }

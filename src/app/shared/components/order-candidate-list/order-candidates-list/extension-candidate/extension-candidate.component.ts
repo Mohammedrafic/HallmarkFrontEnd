@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } 
 
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { distinctUntilChanged, EMPTY, map, merge, mergeMap, Observable, Subject, takeUntil } from 'rxjs';
+import { EMPTY, map, merge, mergeMap, Observable, Subject, takeUntil, filter, zip } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
@@ -343,7 +343,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   private subsToCandidate(): void {
     const state$ = this.isAgency ? this.orderCandidatePage$ : this.clientOrderCandidatePage$;
     this.candidate$ = state$.pipe(
-      distinctUntilChanged((previous, current) => isEqual(previous.items, current.items)),
+      filter(Boolean),
       map((res) => {
         const items = res?.items || this.candidateOrder?.items;
         const candidate = items?.find((candidate) => candidate.candidateJobId);
@@ -361,9 +361,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         }
       })
     ) as Observable<OrderCandidatesList>;
-    this.orderPermissions$
+
+    zip(this.orderPermissions$, this.candidate$)
       .pipe(takeUntil(this.destroy$))
-      .subscribe((data: CurrentUserPermission[]) => (this.orderPermissions = data) && this.mapPermissions());
+      .subscribe(([data, candidate]: [CurrentUserPermission[], OrderCandidatesList]) => (this.orderPermissions = data) && this.mapPermissions());
   }
 
   private getOrderPermissions(orderId: number): void {

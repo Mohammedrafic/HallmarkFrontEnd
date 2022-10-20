@@ -117,7 +117,10 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   alertStateModel$: Observable<GetAlertsForUserStateModel[]>;
 
   @Select(UserState.currentUserPermissions)
-  currentUserPermissions$: Observable<CurrentUserPermission[]>
+  currentUserPermissions$: Observable<CurrentUserPermission[]>;
+
+  @Select(UserState.userChatConfig)
+  userChatConfig$: Observable<boolean>;
 
   public searchString: string = '';
   public isClosingSearch: boolean = false;
@@ -228,7 +231,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
                 { text: this.ProfileMenuItemNames[profileMenuItem.help], id: profileMenuItem.help.toString(), iconCss: 'e-circle-info e-icons' },
                 { text: this.ProfileMenuItemNames[profileMenuItem.contact_us], id: profileMenuItem.contact_us.toString(), iconCss: 'e-ddb-icons e-contactus' },
                 { text: this.ProfileMenuItemNames[profileMenuItem.log_out], id: profileMenuItem.log_out.toString(), iconCss: 'e-ddb-icons e-logout' }
-                
+
               ]
               },
             ];

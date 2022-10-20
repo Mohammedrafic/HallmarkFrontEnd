@@ -9,6 +9,7 @@ export class User {
   businessUnitType: BusinessUnitType;
   businessUnitName: string;
   agencyStatus?: number;
+  isChatEnabled?: boolean;
 }
 
 export class UsersPage {
