@@ -27,7 +27,7 @@
     <div class="title">
       <h3>{{selectedNodeText}}</h3>
     </div>
-    <div class="row-tool-buttons"  *ngIf="this.selectedDocumentNode?.id!=-1">
+    <div class="row-tool-buttons" *ngIf="this.selectedDocumentNode?.id!=-1">
       <ejs-switch id="switcher"
                   [checked]="isIncludeSharedWithMe" (change)="onIncludeSharedWithMe($event);"></ejs-switch>
       <label for="switcher" class="switch-text">Include Shared With Me</label>
@@ -328,7 +328,7 @@
           </div>
           <div class="input-container calendar">
             <div class="input-group multiselect">
-             
+
               <ejs-multiselect mode="CheckBox"
                                formControlName="agencies"
                                placeholder="All"
@@ -376,7 +376,8 @@
 </app-side-dialog>
 
 <app-document-preview-side-dialog [header]="previewTitle" (previewCloseClick)="onClosePreview()" [width]="dialogWidth">
-  <section *ngIf="previewUrl!=null">
+  <ejs-pdfviewer id="pdfViewer" #pdfViewer [serviceUrl]='service' [documentPath]='document' style="height:650px;" [style.display]="isPdf? 'block' : 'none'">></ejs-pdfviewer>
+  <section *ngIf="previewUrl!=null && !isPdf">
     <object [data]="previewUrl" width="100%" height="650px">Preview not available</object>
   </section>
 </app-document-preview-side-dialog>

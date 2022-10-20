@@ -49,6 +49,7 @@ import {
 } from '@syncfusion/ej2-angular-inputs';
 import { LogiReportState } from '../../organization-management/store/logi-report.state';
 import { SecurityState } from '../../security/store/security.state';
+import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
 
 const sidebarIcons = {
   Download,
@@ -102,6 +103,7 @@ const sidebarIcons = {
     DateTimePickerModule,
     TimePickerModule,
     DialogModule,
+    PdfViewerModule,
     NgxsModule.forFeature([SecurityState, DocumentLibraryState, LogiReportState])
   ]
 })
