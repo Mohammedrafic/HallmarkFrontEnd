@@ -493,7 +493,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private orgCanSubmitTimesheet(): boolean {
     const isOrgAndTimesheetTab = !this.isAgency && this.currentTab === RecordFields.Time;
     const isStatusPass = this.timesheetDetails.status === TimesheetStatus.Missing
-      || this.timesheetDetails.status === TimesheetStatus.Incomplete;
+      || this.timesheetDetails.status === TimesheetStatus.Incomplete
+      || this.timesheetDetails.status === TimesheetStatus.Rejected;
 
     return isOrgAndTimesheetTab && this.timesheetDetails.canEditTimesheet && isStatusPass;
   }
