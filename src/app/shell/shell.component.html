@@ -24,7 +24,7 @@
 
     </div>
 
-    <div class="bell-button" (click)="bellIconClicked()">
+    <div *ngIf="userChatConfig$ | async" class="bell-button" (click)="bellIconClicked()">
 
       <i-feather name="bell"></i-feather>
 
@@ -214,7 +214,7 @@
   </div>
 </ejs-sidebar>
 
-  <app-chat-container></app-chat-container>
+  <app-chat-container *ngIf="userChatConfig$ | async"></app-chat-container>
   <app-custom-side-dialog [header]="contactHeaderTitle" [width]="dialogWidth">
     <app-contactus></app-contactus>
   </app-custom-side-dialog>
