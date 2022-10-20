@@ -906,7 +906,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             businessUnitId: data.businessUnitId
           }
           this.store.dispatch(new DeletDocuments(deletedocumentFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
-            this.getDocuments();
+            this.store.dispatch(new GetFoldersTree({ businessUnitType: this.businessUnitType, businessUnitId: this.businessUnitId }));
           });
         }
         this.removeActiveCssClass();
@@ -935,7 +935,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             }
             this.store.dispatch(new DeletDocuments(deletedocumentFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
               this.closeDialog();
-              this.getDocuments();
+              this.store.dispatch(new GetFoldersTree({ businessUnitType: this.businessUnitType, businessUnitId: this.businessUnitId }));
             });
           }
           this.removeActiveCssClass();
@@ -967,7 +967,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   private UnShareDocumewnt(data: DocumentLibraryDto) {
     if (data) {
       let unShareDocumentsFilter: UnShareDocumentsFilter = { documentIds: [data.id] };
-      this.store.dispatch(new UnShareDocuments(unShareDocumentsFilter));
+      this.store.dispatch(new UnShareDocuments(unShareDocumentsFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+        this.getDocuments();
+      });
     }
 
   }
