@@ -301,7 +301,7 @@
         </section>
       </section>
     </section>
-    <section *ngIf="isShare">
+    <section *ngIf="isShare && !isEditDocument && !isUpload">
       <div class="form-elemet">
         <div class="input-container bootstrap">
           <span><i-feather name="share-2" class="icon"></i-feather></span>
@@ -376,8 +376,8 @@
 </app-side-dialog>
 
 <app-document-preview-side-dialog [header]="previewTitle" (previewCloseClick)="onClosePreview()" [width]="dialogWidth">
-  <ejs-pdfviewer id="pdfViewer" #pdfViewer [serviceUrl]='service' [documentPath]='document' style="height:650px;" [style.display]="isPdf? 'block' : 'none'">></ejs-pdfviewer>
+  <ejs-pdfviewer id="pdfViewer" #pdfViewer [serviceUrl]='service' [documentPath]='document' style="height:600px;" [style.display]="isPdf? 'block' : 'none'">></ejs-pdfviewer>
   <section *ngIf="previewUrl!=null && !isPdf">
-    <object [data]="previewUrl" width="100%" height="650px">Preview not available</object>
+    <iframe [src]="previewUrl" width="100%" height="600px">Preview not available</iframe>
   </section>
 </app-document-preview-side-dialog>

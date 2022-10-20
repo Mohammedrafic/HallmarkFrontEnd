@@ -484,6 +484,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.isEditDocument = false;
     this.selectedFile = null;
     this.isShare = false;
+    this.organizationSwitch = false;
+    this.halmarkSwitch = false;
+    this.agencySwitch = false;
     if (this.isAddNewFolder) {
       this.store.dispatch(new IsAddNewFolder(false));
     }
@@ -687,10 +690,10 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public onAgencySwitcher(event: any) {
     this.agencySwitch = !this.agencySwitch;
     if (this.agencySwitch) {
-      this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Agency));
+      this.isShare = true;
       this.halmarkSwitch = false;
       this.organizationSwitch = false;
-      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
+      this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Agency));
       this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string) || null]);
     }
     this.changeDetectorRef.markForCheck();
@@ -703,10 +706,11 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public onOrganizationSwitcher(event: any) {
     this.organizationSwitch = !this.organizationSwitch;
     if (this.organizationSwitch) {
-      this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
-      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string)]);
+      this.isShare = true;
       this.halmarkSwitch = false;
       this.agencySwitch = false;
+      this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
+      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string)]);
     }
     this.changeDetectorRef.markForCheck();
   }
@@ -722,11 +726,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         this.orgStructureData.organizationIds.dataSource = data;
       }
       this.onOrganizationChangeHandler();
-      if (!this.isShare) {
+      if (!this.isShare && !this.organizationSwitch) {
         this.documentLibraryform.get(FormControlNames.OrgnizationIds)?.setValue([parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string) || []]);
       }
-      this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue([]);
-      this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
       this.changeDetectorRef.markForCheck();
     });
   }
@@ -1055,7 +1057,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     const downloadFilter: DownloadDocumentDetailFilter = {
       documentId: docItem.id,
       businessUnitType: this.businessUnitType,
-      businessUnitId: docItem.businessUnitId
+      businessUnitId: this.businessUnitId
     }
     this.store.dispatch(new GetDocumentDownloadDeatils(downloadFilter));
     this.documentDownloadDetail$.pipe(takeUntil(this.unsubscribe$))

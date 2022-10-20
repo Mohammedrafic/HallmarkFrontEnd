@@ -25,7 +25,7 @@ export class DocumentLibraryService {
 
   public GetDocumentLibraryInfo(documentsFilter: DocumentsFilter): Observable<DocumentsLibraryPage> {
     let params = new HttpParams();
-    params = params.append("BusinessUnitType", documentsFilter == undefined ? 1 : documentsFilter.businessUnitType);
+    params = params.append("BusinessUnitType", documentsFilter.businessUnitType);
     if (documentsFilter?.businessUnitId && documentsFilter?.businessUnitId != null)
       params = params.append("BusinessUnitId", documentsFilter.businessUnitId);
     if (documentsFilter?.regionId && documentsFilter?.regionId != null)
