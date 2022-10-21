@@ -1,7 +1,7 @@
 import { Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { combineLatest, filter, first, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
@@ -26,12 +26,14 @@ import {
   SaveWorkflowMappingSucceed,
 } from '../../store/workflow.actions';
 import { UserState } from '../../../store/user.state';
-import { RolesPerUser, User } from '@shared/models/user-managment-page.model';
+import { User } from '@shared/models/user-managment-page.model';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import {
+  RolesByPermission,
   RoleWithUser,
   StepMapping,
   StepRoleUser,
+  UsersByPermission,
   WorkflowMappingPage,
   WorkflowMappingPost,
 } from '@shared/models/workflow-mapping.model';
@@ -47,6 +49,9 @@ import {
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { isEmpty } from 'lodash';
+
+type RoleWithUserModel = { [key: number]: RoleWithUser[] };
 
 @Component({
   selector: 'app-workflow-mapping',
@@ -95,11 +100,11 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   workflowMappings$: Observable<WorkflowMappingPage>;
 
   @Select(WorkflowState.rolesPerUsers)
-  rolesPerUsers$: Observable<RolesPerUser[]>;
-  public rolesWithUsers: RoleWithUser[] = [];
+  rolesPerUsers$: Observable<RolesByPermission[]>;
+  public rolesWithUsers: RoleWithUserModel;
 
   @Select(WorkflowState.users)
-  users$: Observable<User[]>;
+  users$: Observable<UsersByPermission[]>;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
@@ -216,21 +221,66 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     });
 
     combineLatest([this.users$, this.rolesPerUsers$])
-      .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
+      .pipe(
+        filter(([usersP, rolesP]) => !isEmpty(usersP) && !isEmpty(rolesP)),
+        first(),
+        takeUntil(this.unsubscribe$)
+      )
       .subscribe((response) => {
-        let [users, roles] = response;
-        this.rolesWithUsers = [];
+        const [usersP, rolesP] = response;
 
-        if (users && users.length > 0) {
-          users.forEach((user) => {
-            this.rolesWithUsers.push({ id: user.id, name: user.firstName + ' ' + user.lastName });
-          });
+        if (usersP && usersP.length > 0) {
+          this.rolesWithUsers = usersP
+            .filter(({ users }: UsersByPermission) => users)
+            .reduce((acc, { workflowStepId, users }: UsersByPermission) => {
+              if (!isEmpty(this.rolesWithUsers?.[workflowStepId])) {
+                return {
+                  ...acc,
+                  [workflowStepId]: [
+                    ...this.rolesWithUsers[workflowStepId],
+                    ...users.map(({ id, firstName, lastName }: User) => ({
+                      id,
+                      name: `${firstName} ${lastName}`,
+                    })),
+                  ],
+                };
+              } else {
+                return {
+                  ...acc,
+                  [workflowStepId]: users.map(({ id, firstName, lastName }: User) => ({
+                    id,
+                    name: `${firstName} ${lastName}`,
+                  })),
+                };
+              }
+            }, {});
         }
 
-        if (roles && roles.length > 0) {
-          roles.forEach((role) => {
-            this.rolesWithUsers.push({ id: role.id.toString(), name: role.name });
-          });
+        if (rolesP && rolesP.length > 0) {
+          this.rolesWithUsers = rolesP
+            .filter(({ roles }: RolesByPermission) => roles)
+            .reduce((acc, { workflowStepId, roles }: RolesByPermission) => {
+              if (!isEmpty(this.rolesWithUsers?.[workflowStepId])) {
+                return {
+                  ...acc,
+                  [workflowStepId]: [
+                    ...this.rolesWithUsers[workflowStepId],
+                    ...roles.map(({ id, name }: RoleWithUser) => ({
+                      id: id!.toString(),
+                      name,
+                    })),
+                  ],
+                };
+              } else {
+                return {
+                  ...acc,
+                  [workflowStepId]: roles.map(({ id, name }: RoleWithUser) => ({
+                    id: id!.toString(),
+                    name,
+                  })),
+                };
+              }
+            }, {});
         }
       });
 
@@ -358,13 +408,17 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
       if (this.orderWorkflowSteps.length > 0) {
         this.orderWorkflowSteps.forEach(() => {
-          this.orderRoleUserFormArray.push(this.formBuilder.control(null, Validators.required));
+          this.orderRoleUserFormArray.push(
+            this.formBuilder.group({ roleUserList: [null, Validators.required], isPermissionBased: [false] })
+          );
         });
       }
 
       if (this.applicationWorkflowSteps.length > 0) {
         this.applicationWorkflowSteps.forEach(() => {
-          this.applicationRoleUserFormArray.push(this.formBuilder.control(null, Validators.required));
+          this.applicationRoleUserFormArray.push(
+            this.formBuilder.group({ roleUserList: [null, Validators.required], isPermissionBased: [false] })
+          );
         });
       }
 
@@ -569,6 +623,14 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     }
   }
 
+  public disableRoleUserList(index: number, isDisable: boolean, formArray: FormArray): void {
+    if (isDisable) {
+      formArray.at(index).get('roleUserList')?.disable();
+    } else {
+      formArray.at(index).get('roleUserList')?.enable();
+    }
+  }
+
   public getStepDetails(stepMappings: StepMapping[], workflowName: string, workflowType: WorkflowType): StepRoleUser[] {
     const foundWorkflow = this.workflows.find((flow) => flow.name === workflowName);
     const stepDetails: StepRoleUser[] = [];
@@ -582,10 +644,11 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
           const foundStep = foundWorkflow.workflows[workflowIndex - 1].steps.find(
             (st) => st.id === stepMap.workflowStepId
           );
-          const foundUserRole = this.rolesWithUsers.find(
-            (r) => r.id === stepMap.userId || r.id === stepMap.roleId?.toString()
-          );
-          if (foundStep && foundUserRole) stepDetails.push({ step: foundStep, roleUser: foundUserRole });
+          // @ts-ignore
+          const foundUserRole = this.rolesWithUsers[stepMap.workflowStepId];
+          if (foundStep && foundUserRole) {
+            stepDetails.push({ step: foundStep, roleUser: foundUserRole });
+          }
         }
       });
     }
@@ -612,14 +675,17 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
       if (foundMatchedSteps.length) {
         foundMatchedSteps.forEach((foundMatchedStep: StepMapping) => {
-          const foundUserRole = this.rolesWithUsers.find(
-            (r) => r.id === foundMatchedStep?.userId || r.id === foundMatchedStep?.roleId?.toString()
-          );
-          if (foundUserRole) {
-            const value = formArray.controls[i].value
-              ? [...formArray.controls[i].value, foundUserRole.id]
-              : [foundUserRole.id];
-            formArray.controls[i].setValue(value);
+          if (foundMatchedStep.workflowStepId) {
+            const foundUserRole = this.rolesWithUsers[foundMatchedStep.workflowStepId].find(
+              (r: RoleWithUser) => r.id === foundMatchedStep?.userId || r.id === foundMatchedStep?.roleId?.toString()
+            );
+            if (foundUserRole) {
+              const value = formArray.controls[i].value.roleUserList
+                ? [...formArray.controls[i].value.roleUserList, foundUserRole.id]
+                : [foundUserRole.id];
+              formArray.controls[i].get('roleUserList')!.setValue(value);
+              formArray.controls[i].get('isPermissionBased')!.setValue(foundMatchedStep.isPermissionBased);
+            }
           }
         });
       }
@@ -630,29 +696,49 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     const mappings: StepMapping[] = [];
 
     this.orderWorkflowSteps.forEach((step, i) => {
-      this.orderRoleUserFormArray.controls[i].value.forEach((roleUserId: string) => {
-        if (roleUserId.includes('-')) {
-          // define if roleUserId is GUID and then assign it to userId instead of roleId
-          const stepMapping: StepMapping = { workflowStepId: step.id, userId: roleUserId };
-          mappings.push(stepMapping);
-        } else {
-          const stepMapping: StepMapping = { workflowStepId: step.id, roleId: parseInt(roleUserId) };
-          mappings.push(stepMapping);
-        }
-      });
+      (this.orderRoleUserFormArray.controls[i] as FormGroup)
+        .getRawValue()
+        .roleUserList.forEach((roleUserId: string) => {
+          if (roleUserId.includes('-')) {
+            // define if roleUserId is GUID and then assign it to userId instead of roleId
+            const stepMapping: StepMapping = {
+              workflowStepId: step.id,
+              userId: roleUserId,
+              isPermissionBased: this.orderRoleUserFormArray.controls[i].value.isPermissionBased,
+            };
+            mappings.push(stepMapping);
+          } else {
+            const stepMapping: StepMapping = {
+              workflowStepId: step.id,
+              roleId: parseInt(roleUserId),
+              isPermissionBased: this.orderRoleUserFormArray.controls[i].value.isPermissionBased,
+            };
+            mappings.push(stepMapping);
+          }
+        });
     });
 
     this.applicationWorkflowSteps.forEach((step, i) => {
-      this.applicationRoleUserFormArray.controls[i].value.forEach((roleUserId: string) => {
-        if (roleUserId.includes('-')) {
-          // define if roleUserId is GUID and then assign it to userId instead of roleId
-          const stepMapping: StepMapping = { workflowStepId: step.id, userId: roleUserId };
-          mappings.push(stepMapping);
-        } else {
-          const stepMapping: StepMapping = { workflowStepId: step.id, roleId: parseInt(roleUserId) };
-          mappings.push(stepMapping);
-        }
-      });
+      (this.applicationRoleUserFormArray.controls[i] as FormGroup)
+        .getRawValue()
+        .roleUserList.forEach((roleUserId: string) => {
+          if (roleUserId.includes('-')) {
+            // define if roleUserId is GUID and then assign it to userId instead of roleId
+            const stepMapping: StepMapping = {
+              workflowStepId: step.id,
+              userId: roleUserId,
+              isPermissionBased: this.applicationRoleUserFormArray.controls[i].value.isPermissionBased,
+            };
+            mappings.push(stepMapping);
+          } else {
+            const stepMapping: StepMapping = {
+              workflowStepId: step.id,
+              roleId: parseInt(roleUserId),
+              isPermissionBased: this.applicationRoleUserFormArray.controls[i].value.isPermissionBased,
+            };
+            mappings.push(stepMapping);
+          }
+        });
     });
 
     return mappings;
@@ -666,8 +752,18 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       skills: ['', Validators.required],
       workflowType: ['', Validators.required],
       workflowName: ['', Validators.required],
-      orderRoleUserFormArray: this.formBuilder.array([]),
-      applicationRoleUserFormArray: this.formBuilder.array([]),
+      orderRoleUserFormArray: this.formBuilder.array([
+        this.formBuilder.group({
+          roleUserList: [],
+          isPermissionBased: [],
+        }),
+      ]),
+      applicationRoleUserFormArray: this.formBuilder.array([
+        this.formBuilder.group({
+          roleUserList: [],
+          isPermissionBased: [],
+        }),
+      ]),
     });
   }
 

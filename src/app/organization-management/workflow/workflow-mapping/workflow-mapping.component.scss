@@ -38,8 +38,15 @@
       width: 184px;
     }
 
+    &.permissions {
+      width: 70px;
+      align-self: center;
+      margin-top: 19px;
+      margin-left: 10px;
+    }
+
     .input-group.input-readonly {
-      width: 327px;
+      width: 210px;
 
       .e-input[readonly] {
         background-color: $secondary-dark-blue-50;

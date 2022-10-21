@@ -385,7 +385,7 @@ export class OrderManagementContentState {
             jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
           )
         );
-        
+
         dispatch(new GetOrderByIdSucceeded());
         return payload;
       })
