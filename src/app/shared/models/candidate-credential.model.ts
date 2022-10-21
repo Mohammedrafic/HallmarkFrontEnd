@@ -1,3 +1,4 @@
+import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 import { PageOfCollections } from "@shared/models/page.model";
 
 export type CandidateCredential = {
@@ -41,4 +42,10 @@ export type CandidateCredentialResponse = {
   organizationPrefix: string;
   positionId: number;
   credentials: CandidateCredentialPage
+}
+
+export type CredentialParams = {
+  isNavigatedFromOrganizationArea: boolean;
+  candidateStatus: ApplicantStatus;
+  orderId: number;
 }
