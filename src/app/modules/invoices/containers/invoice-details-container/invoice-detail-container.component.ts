@@ -81,7 +81,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     let result: string;
 
     if (this.isAgency) {
-      const permission = (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay;
+      const permission = (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay || this.actionAllowed;
       result = permission ? AgencyActionBtnOnStatus.get(status) as string : '';
 
     } else {

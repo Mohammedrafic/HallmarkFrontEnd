@@ -248,7 +248,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
     this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx,
       { organizationId: this.organizationId,
-        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay && this.agencyActionsAllowed,
+        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay || this.agencyActionsAllowed,
         canEdit: this.agencyActionsAllowed,
       });
 
