@@ -110,7 +110,6 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   filters: RolesFilters;
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
-
   constructor(private store: Store, private datePipe: DatePipe) {
     super();
     this.frameworkComponents = {
