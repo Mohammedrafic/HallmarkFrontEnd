@@ -222,10 +222,19 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           this.store.dispatch(new ShowSideDialog(true));
         }
         else {
-          this.isUpload = false;
+          this.editOrganizationIds = [];
+          this.editRegionIds = [];
+          this.editLocationIds = [];
+          this.documentLibraryform.reset();
           this.isAddNewFolder = false;
+          this.isUpload = false;
           this.isEditDocument = false;
+          this.selectedFile = null;
           this.isShare = false;
+          this.organizationSwitch = false;
+          this.halmarkSwitch = false;
+          this.agencySwitch = false;
+          this.previousFolderId = -2;
           this.changeDetectorRef.markForCheck();
           this.store.dispatch(new ShowSideDialog(false));
         }
@@ -508,6 +517,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.organizationSwitch = false;
     this.halmarkSwitch = false;
     this.agencySwitch = false;
+    this.previousFolderId = -2;
     if (this.isAddNewFolder) {
       this.store.dispatch(new IsAddNewFolder(false));
     }
