@@ -463,7 +463,11 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
   loadRoles() {
     const { businessUnit, business } = this.filterForm.getRawValue();
-    this.store.dispatch(new GetRolesPage(businessUnit, business || null, 1, 1000, null, null, this.filters));
+    let businessUnitIds = [];
+    if (business != null) {
+      businessUnitIds.push(business);
+    }
+    this.store.dispatch(new GetRolesPage(businessUnit, businessUnitIds, 1, 1000, null, null, this.filters));
   }
 
   private setFileName(): void {
