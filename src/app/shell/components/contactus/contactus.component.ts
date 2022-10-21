@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { Topics } from '@shared/enums/contact-topics';
@@ -19,7 +19,7 @@ import { ContactUsStatus } from '@shared/enums/contact-us-status';
   templateUrl: './contactus.component.html',
   styleUrls: ['./contactus.component.scss']
 })
-export class ContactusComponent implements OnInit {
+export class ContactusComponent implements OnInit,AfterViewInit {
 
   public topics = Topics;
   public uploaderErrorMessageElement: HTMLElement;
@@ -52,7 +52,6 @@ export class ContactusComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.setDropElement();
     this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
       if (user) {
         this.ContactFormGroup = this.fb.group({
@@ -67,9 +66,7 @@ export class ContactusComponent implements OnInit {
 
       }
     });
-   
   }
-
 
   public browse(): void {
     document
@@ -140,7 +137,9 @@ export class ContactusComponent implements OnInit {
     this.clearFiles();
   }
 
-  private setDropElement(): void {
-    this.dropElement = document.getElementById('droparea') as HTMLElement;
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.dropElement = document.getElementById('files-droparea') as HTMLElement;
+		}, 3000);
   }
 }
