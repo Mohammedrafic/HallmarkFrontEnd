@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { HtmlEditorService, ImageService, LinkService, RichTextEditorComponent, TableService, ToolbarService, ToolbarType } from '@syncfusion/ej2-angular-richtexteditor';
 import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
@@ -27,7 +27,7 @@ import { FilterService } from '@shared/services/filter.service';
   providers: [ToolbarService, LinkService, ImageService, HtmlEditorService, TableService]
 
 })
-export class SendGroupEmailComponent extends AbstractGridConfigurationComponent implements OnInit , OnDestroy {
+export class SendGroupEmailComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
   public tools = toolsRichTextEditor;
   public form: FormGroup;
   @Input() groupEmailTemplateForm: FormGroup;
@@ -120,7 +120,6 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
 
   }
   ngOnInit(): void {
-    this.setDropElement();
     this.onBusinessUnitValueChanged();
     this.onBusinessValueChanged();
     this.onUserValueChanged();
@@ -282,10 +281,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     ele.className="rich-text-container-disable";
     }
   }
-  ngAfterViewInit() {
-    this.rteObj.refreshUI();
-  }
-
+  
   static createForm(): FormGroup {
     return new FormGroup({
       businessUnit: new FormControl(),
@@ -314,8 +310,11 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
     this.groupEmailTemplateForm.controls['user'].setValue([]);
 
   }
-  private setDropElement(): void {
-    this.dropElement = document.getElementById('droparea') as HTMLElement;
+  
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.dropElement = document.getElementById('files-droparea') as HTMLElement;
+    }, 3000);
+    this.rteObj.refreshUI();
   }
-
 }
