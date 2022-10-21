@@ -20,6 +20,8 @@ export type CandidateCredential = {
   reqForOnboard?: boolean;
   reqForSubmission?: boolean;
   comment?: string;
+  credentialTypeId?: number;
+  credentialTypeName?: string
 }
 
 export type CredentialFile = {
