@@ -7,6 +7,7 @@ import { UserState } from '../../../store/user.state';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { Penalty, PenaltyPage } from '@shared/models/penalty.model';
 
 @Directive()
 export abstract class ReasonsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
@@ -14,14 +15,14 @@ export abstract class ReasonsComponent extends AbstractGridConfigurationComponen
   public form: FormGroup;
 
   @Output()
-  public readonly editReason: EventEmitter<RejectReason> = new EventEmitter<RejectReason>();
+  public readonly editReason: EventEmitter<RejectReason | Penalty> = new EventEmitter<RejectReason | Penalty>();
 
   @Select(UserState.lastSelectedOrganizationId)
   public readonly organizationId$: Observable<number>;
 
   protected isAlive = true;
 
-  protected abstract readonly reasons$: Observable<RejectReasonPage>;
+  protected abstract readonly reasons$: Observable<RejectReasonPage | PenaltyPage>;
 
   private readonly pageSubject = new Subject<number>();
 

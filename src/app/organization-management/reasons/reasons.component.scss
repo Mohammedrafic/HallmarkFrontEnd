@@ -15,6 +15,65 @@
   margin-top: 5px;
 }
 
-.reason-form {
+.input-container {
+  margin-top: 12px;
+}
+
+.reason-form, .penalties-form {
   margin-top: 24px;
+}
+
+.penalties-rate-container {
+  display: flex;
+
+  .rate {
+    width: 85%;
+
+    &>div {
+      display: flex;
+
+      .left {
+        width: 60%;
+        margin-right: 12px;
+      }
+
+      .right {
+        width: 35%;
+      }
+    }
+  }
+
+  .primary-selector {
+    width: 15%;
+
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      label {
+        text-align: center;
+      }
+
+      .radio {
+        width: 18px;
+        height: 71px;
+      }
+    }
+  }
+}
+
+.location-option-container {
+  display: inline-block;
+  position: relative;
+  height: 60px;
+  text-indent: 0;
+
+  .region-name {
+    font-size: 12px;
+    color: $secondary-dark-blue-20;
+    position: absolute;
+    left: 0;
+    top: 20px;
+  }
 }

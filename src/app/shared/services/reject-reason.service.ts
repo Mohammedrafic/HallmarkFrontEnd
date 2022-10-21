@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
+import { Penalty, PenaltyPage, PenaltyPayload } from "@shared/models/penalty.model";
 
 @Injectable({ providedIn: 'root' })
 export class RejectReasonService {
@@ -151,5 +152,31 @@ export class RejectReasonService {
       return this.http.put<RejectReason>('/api/OrderRequisition', payload);
     }
     return this.http.post<RejectReason>('/api/OrderRequisition', payload);
+  }
+
+
+  /**
+   * Get penalties by page number
+   * @param pageNumber
+   * @param pageSize
+   */
+   public getPenaltiesByPage(pageNumber: number, pageSize: number): Observable<PenaltyPage> {
+    return this.http.post<PenaltyPage>(`/api/CandidateCancellationSettings/setup/getFiltered`, { pageNumber, pageSize });
+  }
+
+  /**
+   * Save penalty
+   * @param payload
+   */
+  public savePenalty(payload: PenaltyPayload): Observable<Penalty[]> {
+    return this.http.post<Penalty[]>('/api/CandidateCancellationSettings/setup', payload);
+  }
+
+  /**
+   * Remove reason
+   * @param id
+   */
+  public removePenalty(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/CandidateCancellationSettings/setup/${id}`);
   }
 }
