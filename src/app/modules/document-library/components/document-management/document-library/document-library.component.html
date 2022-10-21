@@ -377,7 +377,10 @@
 
 <app-document-preview-side-dialog [header]="previewTitle" (previewCloseClick)="onClosePreview()" [width]="dialogWidth">
   <ejs-pdfviewer id="pdfViewer" #pdfViewer [serviceUrl]='service' [documentPath]='document' style="height:600px;" [style.display]="isPdf? 'block' : 'none'">></ejs-pdfviewer>
-  <section *ngIf="previewUrl!=null && !isPdf">
-    <iframe [src]="previewUrl" width="100%" height="600px">Preview not available</iframe>
-  </section>
+  <div>
+    <ejs-documenteditor [enableSelection]=true
+                        [enableSearch]=true [enableEditor]=true
+                        #documentPreview style="width:500px;height:600px;" [style.display]="!isPdf? 'block' : 'none'"></ejs-documenteditor>
+
+  </div>
 </app-document-preview-side-dialog>

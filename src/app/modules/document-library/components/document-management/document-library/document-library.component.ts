@@ -38,19 +38,27 @@ import {
   TextSelectionService,
   ToolbarService
 } from '@syncfusion/ej2-angular-pdfviewer';
-import { set } from 'lodash/fp';
+import {
+  DocumentEditorComponent,
+  EditorHistoryService,
+  EditorService,
+  SearchService
+} from '@syncfusion/ej2-angular-documenteditor';
 
 @Component({
   selector: 'app-document-library',
   templateUrl: './document-library.component.html',
   styleUrls: ['./document-library.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [ToolbarService, NavigationService, TextSelectionService, MagnificationService]
+  providers: [ToolbarService, NavigationService, TextSelectionService, MagnificationService, EditorHistoryService, EditorService, SearchService ]
 })
 export class DocumentLibraryComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('pdfViewer', { static: true })
   public pdfViewer: PdfViewerComponent;
+
+  @ViewChild('documentPreview')
+  public documentEditor: DocumentEditorComponent;
 
   public title: string = "Documents";
   private unsubscribe$: Subject<void> = new Subject();
@@ -174,7 +182,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public service: string =
     'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
   public document: string = 'PDF_Succinctly.pdf';
-  public previousFolderId: number  = -2;
+  public previousFolderId: number = -2;
+
+  public documentEditorserviceUrl = "https://ej2services.syncfusion.com/production/web-services/api/documenteditor/"
 
 
   constructor(private store: Store, private datePipe: DatePipe,
@@ -1123,9 +1133,10 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         break;
       case '.docx':
         this.isPdf = false;
-        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          `https://view.officeapps.live.com/op/embed.aspx?src=${x.sasUrl}`
-        );
+        this.loadDocument(x.fileAsBase64);
+        //this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+        //  `https://view.officeapps.live.com/op/embed.aspx?src=${x.sasUrl}`
+        //);
         break;
       case '.xlsx':
         this.isPdf = false;
@@ -1138,11 +1149,22 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
     this.changeDetectorRef.markForCheck();
   }
+  loadDocument(fileAsBase64:string) {
+    this.documentEditor.height = window.innerHeight * 0.7 + 'px';
+    this.documentEditor.isReadOnly = true;
+    this.documentEditor.pageOutline = '#d3d3d3';
+    this.documentEditor.open(decodeURIComponent(escape(atob(fileAsBase64))));
+   
+  }
 
   public onClosePreview(): void {
     this.previewUrl = null;
     this.downloadedFileName = '';
     this.changeDetectorRef.markForCheck();
     this.store.dispatch(new ShowDocPreviewSideDialog(false));
+
+  }
+
+  public onEditorCreated() {
   }
 }
