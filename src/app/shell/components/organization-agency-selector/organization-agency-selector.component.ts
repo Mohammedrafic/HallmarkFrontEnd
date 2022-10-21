@@ -300,7 +300,7 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
     let invoiceActionsActive: boolean;
 
     if (agency?.status === AgencyStatus.Inactive) {
-      invoiceActionsActive = userUnit !== BusinessUnitType.Agency;
+      invoiceActionsActive = userUnit === BusinessUnitType.Hallmark;
     } else if (agency?.status === AgencyStatus.Terminated) {
       invoiceActionsActive = false;
     } else {

@@ -46,7 +46,7 @@ import {
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
-import { capitalize, isEqual } from 'lodash';
+import { capitalize } from 'lodash';
 import { DurationService } from '@shared/services/duration.service';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
