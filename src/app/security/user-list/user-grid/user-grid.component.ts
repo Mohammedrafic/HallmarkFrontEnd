@@ -398,6 +398,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   }
 
   private dispatchNewPage(): void {
+    debugger;
     const { businessUnit, business } = this.filterForm.getRawValue();
     this.store.dispatch(
       new GetUsersPage(businessUnit, business != 0 ? [business] : null, this.currentPage, this.pageSize, null, null)
@@ -463,7 +464,11 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
   loadRoles() {
     const { businessUnit, business } = this.filterForm.getRawValue();
-    this.store.dispatch(new GetRolesPage(businessUnit, business || null, 1, 1000, null, null, this.filters));
+    let businessUnitIds = [];
+    if (business != null) {
+      businessUnitIds.push(business);
+    }
+    this.store.dispatch(new GetRolesPage(businessUnit, businessUnitIds, 1, 1000, null, null, this.filters));
   }
 
   private setFileName(): void {
