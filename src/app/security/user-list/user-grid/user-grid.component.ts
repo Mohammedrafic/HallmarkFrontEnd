@@ -110,6 +110,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   filters: RolesFilters;
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
+
   constructor(private store: Store, private datePipe: DatePipe) {
     super();
     this.frameworkComponents = {
@@ -398,7 +399,6 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   }
 
   private dispatchNewPage(): void {
-    debugger;
     const { businessUnit, business } = this.filterForm.getRawValue();
     this.store.dispatch(
       new GetUsersPage(businessUnit, business != 0 ? [business] : null, this.currentPage, this.pageSize, null, null)
