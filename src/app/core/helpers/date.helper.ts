@@ -13,11 +13,11 @@ export class TimesheetDateHelper extends Destroyable {
   }
 
   protected setDateBounds(startDate: string, endDate: string): void {
-    this.dateSettings.timeIn.min = DateTimeHelper.getFirstDayOfWeekUtc(startDate);
-    this.dateSettings.timeIn.max = DateTimeHelper.getFirstDayOfWeekUtc(endDate);
+    this.dateSettings.timeIn.min = DateTimeHelper.convertDateToUtc(startDate);
+    this.dateSettings.timeIn.max = DateTimeHelper.convertDateToUtc(endDate);
 
-    this.dateSettings.timeOut.min = DateTimeHelper.getFirstDayOfWeekUtc(startDate);
-    this.dateSettings.timeOut.max = DateTimeHelper.getFirstDayOfWeekUtc(endDate);
+    this.dateSettings.timeOut.min = DateTimeHelper.convertDateToUtc(startDate);
+    this.dateSettings.timeOut.max = DateTimeHelper.convertDateToUtc(endDate);
   }
 
   protected setdateBoundsForDay(initValue: string): void {
