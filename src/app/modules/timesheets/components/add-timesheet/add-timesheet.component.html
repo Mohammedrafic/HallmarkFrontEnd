@@ -92,6 +92,22 @@ cssClass="dialog short"
                 </div>
               </ng-template>
 
+              <ng-template [ngSwitchCase]="FieldTypes.Number">
+                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  </label>
+                  <div class="input-group">
+                    <input
+                      class="e-input"
+                      [name]="field.field"
+                      type="number"
+                      appValidateWithMessage
+                      [formControlName]="field.field"
+                    />
+                  </div>
+                </div>
+              </ng-template>
+
               <ng-template [ngSwitchCase]="FieldTypes.Date">
                 <div class="input-container" [ngClass]="field.widthStyle || ''">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
@@ -115,7 +131,7 @@ cssClass="dialog short"
                 <div
                   *ngIf="form.get('billRateConfigId')?.value !== onCallId"
                   class="input-container flexed"
-                  [ngClass]="field.widthStyle || ''" 
+                  [ngClass]="field.widthStyle || ''"
                   >
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>

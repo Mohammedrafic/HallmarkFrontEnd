@@ -84,7 +84,7 @@ export const RecordAddDialogConfig: DialogConfig = {
       {
         title: 'Miles',
         field: 'value',
-        type: FieldType.Input,
+        type: FieldType.Number,
         disabled: false,
         required: true,
         widthStyle: FieldWidthStyle.Short,
