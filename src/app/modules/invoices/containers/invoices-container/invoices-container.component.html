@@ -163,7 +163,7 @@
 <app-invoice-detail-container
   [currentSelectedRowIndex]="currentSelectedTableRowIndex | async"
   [maxRowIndex]="0"
-  [actionAllowed]="agencyActionsAllowed"
+  [actionAllowed]="invoicePayAllowed"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
   (updateTable)="handleUpdateTable($event)"
 ></app-invoice-detail-container>
