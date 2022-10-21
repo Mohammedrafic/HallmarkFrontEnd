@@ -97,13 +97,15 @@ cssClass="dialog short"
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="input-group">
-                    <input
-                      class="e-input"
-                      [name]="field.field"
-                      type="number"
+                    <ejs-numerictextbox
+                      class="numeric-input"
                       appValidateWithMessage
+                      min="0"
+                      format="0"
                       [formControlName]="field.field"
-                    />
+                      [showSpinButton]="false"
+                    >
+                    </ejs-numerictextbox>
                   </div>
                 </div>
               </ng-template>
