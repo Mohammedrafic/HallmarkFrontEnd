@@ -172,6 +172,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public readonly orderStatus = OrderStatus;
 
   private isAlive = true;
+  private isLastExtension: boolean = false;
 
   get isReorderType(): boolean {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
@@ -186,7 +187,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   get showAddExtension(): boolean {
-    return this.isAddExtensionBtnAvailable && !this.extensions?.length;
+    return this.isAddExtensionBtnAvailable && this.isLastExtension;
   }
 
   get disableAddExtension(): boolean {
@@ -235,6 +236,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
       )
       .subscribe((extensions) => {
         this.extensions = extensions.filter((extension: Order) => extension.id !== this.order?.id);
+        this.isLastExtension = !this.extensions.map((ex) => ex.extensionFromId).includes(this.order?.id);
       });
     this.subscribeOnCandidateJob();
     this.onOpenEvent();
