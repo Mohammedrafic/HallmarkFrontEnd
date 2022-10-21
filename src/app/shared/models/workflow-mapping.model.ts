@@ -1,5 +1,6 @@
 import { PageOfCollections } from '@shared/models/page.model';
 import { Step } from '@shared/models/workflow.model';
+import { User } from '@shared/models/user-managment-page.model';
 
 export class WorkflowMappingGet {
   mappingId: number;
@@ -26,6 +27,7 @@ export class StepMapping {
   workflowType?: number;
   roleId?: number;
   userId?: string;
+  isPermissionBased?: boolean;
 }
 
 export class WorkflowMappingPost {
@@ -43,7 +45,6 @@ export class RoleWithUser {
   name: string;
 }
 
-
 export class StepRoleUser {
   step: Step;
   roleUser?: RoleWithUser;
@@ -52,6 +53,16 @@ export class StepRoleUser {
 export class WorkflowByDepartmentAndSkill {
   workflowGroupId: number;
   workflowGroupName: string;
+}
+
+export interface RolesByPermission {
+  workflowStepId: number;
+  roles: RoleWithUser[];
+}
+
+export interface UsersByPermission {
+  workflowStepId: number;
+  users: User[];
 }
 
 export type WorkflowMappingPage = PageOfCollections<WorkflowMappingGet>;

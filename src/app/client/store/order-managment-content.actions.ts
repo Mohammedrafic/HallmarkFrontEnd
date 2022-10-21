@@ -1,5 +1,5 @@
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { CandidateCancellation } from "@shared/models/candidate-cancellation.model";
+import { CandidateCancellation } from '@shared/models/candidate-cancellation.model';
 import {
   AcceptJobDTO,
   CreateOrderDto,
@@ -128,7 +128,7 @@ export class SetPredefinedBillRatesData {
     public departmentId: number,
     public skillId: number,
     public jobStartDate: string,
-    public jobEndDate: string
+    public jobEndDate?: string
   ) {}
 }
 
