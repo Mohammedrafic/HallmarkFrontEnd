@@ -11,10 +11,7 @@ const routes: Routes = [
     children: [
       {
         path: 'document-library',
-        component: DocumentLibraryComponent,
-        data: {
-          isOrganizationArea: true,
-        }
+        component: DocumentLibraryComponent
       }
     ],
   },

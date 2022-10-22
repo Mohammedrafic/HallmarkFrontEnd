@@ -3,11 +3,11 @@ import { DatePipe } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { Observable, Subject, take, takeUntil } from 'rxjs';
+import { map, Observable, Subject, take, takeUntil, takeWhile } from 'rxjs';
 import { SpecialProjectMessages } from '../../../../../organization-management/specialproject/constants/specialprojects.constant';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { SetHeaderState, ShowDocPreviewSideDialog, ShowSideDialog, ShowToast } from '../../../../../store/app.actions';
-import { DocumentLibraryColumnsDefinition } from '../../../constants/documents.constant';
+import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, DISABLED_GROUP, DocumentLibraryColumnsDefinition, UNIT_FIELDS } from '../../../constants/documents.constant';
 import { DeleteDocumentsFilter, DocumentFolder, DocumentLibraryDto, Documents, DocumentsFilter, DocumentsLibraryPage, DocumentTags, DocumentTypeFilter, DocumentTypes, DownloadDocumentDetail, DownloadDocumentDetailFilter, NodeItem, ShareDocumentDto, ShareDocumentInfoFilter, ShareDocumentInfoPage, ShareDocumentsFilter, UnShareDocumentsFilter } from '../../../store/model/document-library.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { DocumentLibraryState } from '../../../store/state/document-library.state';
@@ -44,6 +44,7 @@ import {
   EditorService,
   SearchService
 } from '@syncfusion/ej2-angular-documenteditor';
+import { User } from '../../../../../shared/models/user-managment-page.model';
 
 @Component({
   selector: 'app-document-library',
@@ -54,138 +55,24 @@ import {
 })
 export class DocumentLibraryComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy, AfterViewInit {
 
-  @ViewChild('pdfViewer', { static: true })
-  public pdfViewer: PdfViewerComponent;
-
-  @ViewChild('documentPreview')
-  public documentEditor: DocumentEditorComponent;
-
-  public title: string = "Documents";
-  private unsubscribe$: Subject<void> = new Subject();
-
-  @Select(DocumentLibraryState.documentsPage)
-  documentsPage$: Observable<DocumentsLibraryPage>;
-
-  @Select(DocumentLibraryState.shareDocumentInfoPage)
-  shareDocumentInfoPage$: Observable<ShareDocumentInfoPage>;
-
-  @Select(DocumentLibraryState.documentsTypes)
-  documentsTypes$: Observable<DocumentTypes[]>;
-
-  @Select(DocumentLibraryState.documentsTags)
-  documentsTags$: Observable<DocumentTags[]>;
-
-  @Select(DocumentLibraryState.documentDownloadDetail)
-  documentDownloadDetail$: Observable<DownloadDocumentDetail>;
-
-  @Select(DocumentLibraryState.documentLibraryDto)
-  documentLibraryDto$: Observable<DocumentLibraryDto>;
-
-  @Select(DocumentLibraryState.savedDocumentLibraryDto)
-  savedDocumentLibraryDto$: Observable<DocumentLibraryDto>;
-
-  @Select(UserState.lastSelectedOrganizationId)
-  organizationId$: Observable<number>;
-
-  @Select(SecurityState.bussinesData)
-  public businessData$: Observable<BusinessUnit[]>;
-  selectedOrganizations: BusinessUnit[];
-
-  @Select(LogiReportState.regions)
-  public regions$: Observable<Region[]>;
-  selectedRegions: Region[];
-
-  @Select(LogiReportState.locations)
-  public locations$: Observable<Location[]>;
-  selectedLocations: Location[];
-
-  selectedDocumentNode: NodeItem | null;
-
-  public gridApi!: GridApi;
-  public rowData: DocumentLibraryDto[] = [];
-  public rowSelection: 'single' | 'multiple' = 'multiple';
-
-  public editMenuItems: ItemModel[] = [
-    { text: MoreMenuType[0], id: '0' },
-    { text: MoreMenuType[1], id: '1' },
-    { text: MoreMenuType[2], id: '2' }
-  ];
-
-  public statusItems: ItemModel[] = [
-    { text: StatusEnum[0], id: '0' },
-    { text: StatusEnum[1], id: '1' }
-  ];
-
-  public actionCellrenderParams: any = {
-    editMenuITems: this.editMenuItems,
-    select: (event: any, params: DocumentLibraryDto) => {
-      this.menuOptionSelected(event, params)
-    },
-    handleOnDownLoad: (params: DocumentLibraryDto) => {
-      this.downloadDocuemt(params);
-    }
+  public businessFilterForm: FormGroup;
+  public user: User;
+  get filterBusinessUnitControl(): AbstractControl {
+    return this.businessFilterForm.get('filterBusinessUnit') as AbstractControl;
   }
-  public allOption: string = "All";
-  public optionFields = {
-    text: 'name',
-    value: 'id',
-  };
-  public statusFields = {
-    text: 'text',
-    value: 'id',
-  };
-  public orgsFields = {
-    text: 'name',
-    value: 'organizationId',
-  };
-  public halmarkSwitch: boolean = true;
-  public agencySwitch: boolean = false;
-  public organizationSwitch: boolean = false;
-  public mspSwitch: boolean = false;
-  public documentLibraryform: FormGroup;
-  public isAddNewFolder: boolean = false;
-  public isUpload: boolean = false;
-  public formDailogTitle: string = '';
+  get filterBbusinessControl(): AbstractControl {
+    return this.businessFilterForm.get('filterBusiness') as AbstractControl;
+  }
+  public unitFields = UNIT_FIELDS;
+  public businessUnits = BUSINESS_UNITS_VALUES;
+  public bussinesDataFields = BUSSINES_DATA_FIELDS;
+  private isAlive = true;
+  public isBusinessFormDisabled = false;
+  public title: string = "Documents";
+  public isHalmarkSelected: boolean = false;;
 
-  public documents: Blob[] = [];
-  public deleteDocumentsGuids: string[] = [];
-  public dialogWidth: string = '434px';
-  public orgStructureData: any;
-  public organizationControl: AbstractControl;
-  public regionIdControl: AbstractControl;
-  public locationIdControl: AbstractControl;
-  public shareOrganizationControl: AbstractControl;
-  public shareAgencyControl: AbstractControl;
-  public startDateField: AbstractControl;
-  public endDateField: AbstractControl;
-  public today = new Date();
-  public startDate: any = new Date();
-  public businessUnitType: number = 0;
-  public businessUnitId: number = parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string);
-  public agencyData: BusinessUnit[] = [];
-  public mspData: BusinessUnit[] = [];
-  public selectedFile: Blob | null;
-  public isEditDocument: boolean = false;
-  public documentId: number = 0;
-  public isShare: boolean = false;
-  public shaeDocumentIds: number[] = [];
-  public downloadedFileName: string = '';
-  public previewUrl: SafeResourceUrl | null;
-  public previewTitle: string = "Document Preview";
-  public selectedNodeText: string = '';
-  public editOrganizationIds: number[] = [];
-  public editRegionIds: number[] = [];
-  public editLocationIds: number[] = [];
-  public isIncludeSharedWithMe: boolean = false;
-  public businessUnitTypes = BusinessUnitType;
-  public isPdf: boolean = true;
-  public service: string =
-    'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
-  public document: string = 'PDF_Succinctly.pdf';
-  public previousFolderId: number = -2;
-
-  public documentEditorserviceUrl = "https://ej2services.syncfusion.com/production/web-services/api/documenteditor/"
-
+  @Select(SecurityState.businessUserData)
+  public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
 
   constructor(private store: Store, private datePipe: DatePipe,
     private changeDetectorRef: ChangeDetectorRef,
@@ -193,978 +80,79 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     private sanitizer: DomSanitizer,
     private action$: Actions) {
     super();
-    const user = this.store.selectSnapshot(UserState.user);
-    if (user?.businessUnitType != null) {
-      this.businessUnitType = user?.businessUnitType;
-      switch (user?.businessUnitType) {
-        case BusinessUnitType.Hallmark:
-          this.halmarkSwitch = true;
-          break;
-        case BusinessUnitType.Agency:
-          this.agencySwitch = true;
-          break;
-        case BusinessUnitType.Organization:
-          this.organizationSwitch = true;
-          break;
-        default:
-          break;
-      }
-      this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
-    }
-    this.onOrganizationChangedHandler();
-    this.today.setHours(0, 0, 0);
+    
   }
-  public columnDefinitions: ColumnDefinitionModel[] = DocumentLibraryColumnsDefinition(this.actionCellrenderParams, this.datePipe);
 
   ngOnInit(): void {
-    this.startDate = null;
     this.store.dispatch(new SetHeaderState({ title: 'Documents', iconName: 'folder' }));
-    this.orgStructureDataSetup();
-    this.createForm();
-    this.action$.pipe(ofActionDispatched(IsAddNewFolder), takeUntil(this.unsubscribe$)).subscribe((payload) => {
-      if (payload.payload != undefined) {
-        this.isAddNewFolder = payload.payload;
-        if (this.isAddNewFolder) {
-          this.addRemoveFormcontrols();
-          this.dialogWidth = '434px';
-          this.formDailogTitle = FormDailogTitle.AddNewFolder;
-          this.changeDetectorRef.markForCheck();
-          this.store.dispatch(new ShowSideDialog(true));
-        }
-        else {
-          this.editOrganizationIds = [];
-          this.editRegionIds = [];
-          this.editLocationIds = [];
-          this.documentLibraryform.reset();
-          this.isAddNewFolder = false;
-          this.isUpload = false;
-          this.isEditDocument = false;
-          this.selectedFile = null;
-          this.isShare = false;
-          this.organizationSwitch = false;
-          this.halmarkSwitch = false;
-          this.agencySwitch = false;
-          this.previousFolderId = -2;
-          this.changeDetectorRef.markForCheck();
-          this.store.dispatch(new ShowSideDialog(false));
-        }
-      }
-    });
-
-    this.action$.pipe(ofActionDispatched(GetDocumentsSelectedNode), takeUntil(this.unsubscribe$)).subscribe((payload) => {
-      this.selectedNodeText = '';
-      if (payload.payload) {
-        if (this.previousFolderId != payload.payload.id) {
-          this.previousFolderId = payload.payload.id;
-          this.selectedDocumentNode = payload.payload;
-          this.gridApi?.setRowData([]);
-          if (this.selectedDocumentNode?.text != undefined) {
-            this.selectedNodeText = (this.selectedDocumentNode?.fileType != undefined && this.selectedDocumentNode?.fileType == 'folder') ? this.selectedDocumentNode?.text : '';
-            setTimeout(() => {
-              if (this.selectedDocumentNode?.id != -1)
-                this.getDocuments();
-              else if (this.selectedDocumentNode?.id == -1) {
-                this.getSharedDocuments();
-              }
-            }, 1000);
-          }
-          else {
-            this.selectedNodeText = '';
-          }
-        }
-        this.changeDetectorRef.markForCheck();
-      }
-    });
-
+    this.businessFilterForm = this.generateFilterBusinessForm();
+    this.onFilterBusinessUnitValueChanged();
+    this.user = this.store.selectSnapshot(UserState.user) as User;
+    if (this.user?.businessUnitType == BusinessUnitType.Hallmark) {
+      this.isHalmarkSelected = true;
+    }
+    this.disableFilterBusinessControls(this.user);
+    this.filterBusinessUnitControl.patchValue(this.user?.businessUnitType);
+    this.filterBbusinessControl.patchValue(this.isBusinessFormDisabled ? this.user?.businessUnitId : 0);
   }
+
   ngAfterViewInit(): void {
-    this.orgStructureData.organizationIds.dataSource = [];
-    this.orgStructureData.regionIds.dataSource = [];
-    this.orgStructureData.locationIds.dataSource = [];
-    this.documentLibraryform.get(FormControlNames.OrgnizationIds)?.setValue([]);
-    this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue([]);
-    this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue([]);
+    
   }
 
   ngOnDestroy(): void {
-    this.previousFolderId = -2;
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.isAlive = false;
   }
 
+  get bussinesUserData$(): Observable<BusinessUnit[]> {
+    return this.businessUserData$.pipe(map((fn) => fn(this.filterBbusinessControl?.value)));
+  }
 
-  public onOrganizationChangedHandler() {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (data) {
-        this.businessUnitId = data;
-        this.changeDetectorRef.markForCheck();
-      }
+  private generateFilterBusinessForm(): FormGroup {
+    return new FormGroup({
+      filterBusinessUnit: new FormControl(),
+      filterBusiness: new FormControl(0),
     });
   }
-
-  public createForm(): void {
-    this.documentLibraryform = new FormGroup({})
-    this.addRemoveFormcontrols();
-  }
-
-  public addRemoveFormcontrols() {
-    if (this.isAddNewFolder) {
-      this.documentLibraryform.addControl(FormControlNames.FolderName, new FormControl(null, [Validators.required, Validators.maxLength(216), Validators.minLength(3)]));
-      if (this.documentLibraryform.contains(FormControlNames.DocumentName)) this.documentLibraryform.removeControl(FormControlNames.DocumentName);
-      if (this.documentLibraryform.contains(FormControlNames.OrgnizationIds)) this.documentLibraryform.removeControl(FormControlNames.OrgnizationIds);
-      if (this.documentLibraryform.contains(FormControlNames.RegionIds)) this.documentLibraryform.removeControl(FormControlNames.RegionIds);
-      if (this.documentLibraryform.contains(FormControlNames.LocationIds)) this.documentLibraryform.removeControl(FormControlNames.LocationIds);
-      if (this.documentLibraryform.contains(FormControlNames.TypeIds)) this.documentLibraryform.removeControl(FormControlNames.TypeIds);
-      if (this.documentLibraryform.contains(FormControlNames.Tags)) this.documentLibraryform.removeControl(FormControlNames.Tags);
-      if (this.documentLibraryform.contains(FormControlNames.StatusIds)) this.documentLibraryform.removeControl(FormControlNames.StatusIds);
-      if (this.documentLibraryform.contains(FormControlNames.StartDate)) this.documentLibraryform.removeControl(FormControlNames.StartDate);
-      if (this.documentLibraryform.contains(FormControlNames.EndDate)) this.documentLibraryform.removeControl(FormControlNames.EndDate);
-      if (this.documentLibraryform.contains(FormControlNames.Comments)) this.documentLibraryform.removeControl(FormControlNames.Comments);
-    }
-    else if (this.isUpload || this.isEditDocument) {
-      if (this.documentLibraryform.contains(FormControlNames.FolderName)) this.documentLibraryform.removeControl(FormControlNames.FolderName);
-      this.documentLibraryform.addControl(FormControlNames.DocumentName, new FormControl(null, [Validators.required, Validators.maxLength(216), Validators.minLength(3)]));
-      this.documentLibraryform.addControl(FormControlNames.OrgnizationIds, new FormControl(null, [Validators.required]));
-      this.documentLibraryform.addControl(FormControlNames.RegionIds, new FormControl(null, [Validators.required]));
-      this.documentLibraryform.addControl(FormControlNames.LocationIds, new FormControl(null, [Validators.required]));
-      this.documentLibraryform.addControl(FormControlNames.TypeIds, new FormControl(null, [Validators.required]));
-      this.documentLibraryform.addControl(FormControlNames.Tags, new FormControl('', []));
-      this.documentLibraryform.addControl(FormControlNames.StatusIds, new FormControl(null, [Validators.required]));
-      this.documentLibraryform.addControl(FormControlNames.StartDate, new FormControl(null, []));
-      this.documentLibraryform.addControl(FormControlNames.EndDate, new FormControl(null, []));
-      this.documentLibraryform.addControl(FormControlNames.Comments, new FormControl('', []));
-      this.applyDateValidations();
-    }
-    else if (this.isShare) {
-      if (this.documentLibraryform.contains(FormControlNames.RegionIds)) this.documentLibraryform.removeControl(FormControlNames.RegionIds);
-      if (this.documentLibraryform.contains(FormControlNames.LocationIds)) this.documentLibraryform.removeControl(FormControlNames.LocationIds);
-      this.documentLibraryform.addControl(FormControlNames.RegionIds, new FormControl(null, []));
-      this.documentLibraryform.addControl(FormControlNames.LocationIds, new FormControl(null, []));
-
-    }
-    this.documentLibraryform.addControl(FormControlNames.Agencies, new FormControl(null, []));
-    this.documentLibraryform.addControl(FormControlNames.Orgnizations, new FormControl(null, []));
-    this.documentLibraryform.addControl(FormControlNames.MSP, new FormControl(null, []));
-  }
-
-  private applyDateValidations() {
-    this.startDateField = this.documentLibraryform.get(FormControlNames.StartDate) as AbstractControl;
-    this.endDateField = this.documentLibraryform.get(FormControlNames.EndDate) as AbstractControl;
-    this.startDateField.valueChanges.subscribe(() => {
-      if (this.endDateField?.value != null) {
-        this.startDate = new Date(this.startDateField?.value?.toString());
-        this.endDateField.addValidators(datesValidator(this.documentLibraryform, FormControlNames.StartDate, FormControlNames.EndDate));
-        this.endDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-      }
-    });
-    this.endDateField.valueChanges.subscribe(() => {
-      if (this.startDateField?.value != null) {
-        this.startDateField.addValidators(datesValidator(this.documentLibraryform, FormControlNames.StartDate, FormControlNames.EndDate));
-        this.startDateField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-      }
-    });
-    this.changeDetectorRef.markForCheck();
-  }
-
-  public uploadToFile(file: Blob | null) {
-    this.selectedFile = file;
-    const fileData: any = file;
-    this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(fileData?.name.split('.').slice(0, -1).join('.'));
-  }
-
-  onPageSizeChanged(event: any) {
-    this.gridOptions.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
-    this.gridOptions.paginationPageSize = Number(event.value.toLowerCase().replace("rows", ""));
-    if (this.gridApi != null) {
-      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows", "")));
-      this.gridApi.setRowData(this.rowData);
-    }
-  }
-
-  public noRowsOverlayComponentParams: any = {
-    noRowsMessageFunc: () => SpecialProjectMessages.NoRowsMessage,
-  };
-
-  public sideBar = {
-    toolPanels: [
-      {
-        id: 'columns',
-        labelDefault: 'Columns',
-        labelKey: 'columns',
-        iconKey: 'columns',
-        toolPanel: 'agColumnsToolPanel',
-        toolPanelParams: {
-          suppressRowGroups: true,
-          suppressValues: true,
-          suppressPivots: true,
-          suppressPivotMode: true,
-          suppressColumnFilter: true,
-          suppressColumnSelectAll: true,
-          suppressColumnExpandAll: true,
-        },
-      },
-      {
-        id: 'filters',
-        labelDefault: 'Filters',
-        labelKey: 'filters',
-        iconKey: 'filters',
-        toolPanel: 'agFiltersToolPanel',
-        toolPanelParams: {
-          suppressRowGroups: true,
-          suppressValues: true,
-          suppressPivots: true,
-          suppressPivotMode: true,
-          suppressColumnFilter: true,
-          suppressColumnSelectAll: true,
-          suppressColumnExpandAll: true,
-        },
-      },
-    ],
-  };
-
-  gridOptions: GridOptions = {
-    pagination: true,
-    cacheBlockSize: this.pageSize,
-    paginationPageSize: this.pageSize,
-    columnDefs: this.columnDefinitions,
-    rowData: this.rowData,
-    sideBar: this.sideBar,
-    rowSelection: this.rowSelection,
-    noRowsOverlayComponent: CustomNoRowsOverlayComponent,
-    noRowsOverlayComponentParams: this.noRowsOverlayComponentParams,
-    onFilterChanged: (event: FilterChangedEvent) => {
-      if (!event.api.getDisplayedRowCount()) {
-        this.gridApi?.showNoRowsOverlay();
+  private onFilterBusinessUnitValueChanged(): void {
+    this.filterBusinessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      value && this.store.dispatch(new GetBusinessByUnitType(value));
+      if (value != BusinessUnitType.Hallmark) {
+        this.isHalmarkSelected = false;
       }
       else {
-        this.gridApi?.hideOverlay();
+        this.isHalmarkSelected = true;
       }
-    },
-    suppressRowClickSelection: true,
-    onCellClicked: (e: CellClickedEvent) => {
-      const column: any = e.column;
-      if (column?.colId == documentsColumnField.FileName) {
-        this.documentPreview(e.data);
+      if (!this.isBusinessFormDisabled) {
+        this.filterBbusinessControl.patchValue(0);
       }
-    }
-  };
-
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-    this.gridApi.setRowData(this.rowData);
-  }
-  private getDocumentFilter() {
-    const documentFilter: DocumentsFilter = {
-      documentId: this.selectedDocumentNode?.fileType == FileType.File ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null,
-      businessUnitType: this.businessUnitType,
-      businessUnitId: this.businessUnitId,
-      regionId: null,
-      locationId: null,
-      folderId: this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null,
-      includeSharedWithMe: this.isIncludeSharedWithMe,
-      showAllPages: true
-    }
-    return documentFilter;
-  }
-  public getDocuments(): void {
-    this.store.dispatch(new GetDocuments(this.getDocumentFilter()));
-    this.documentsPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.gridApi?.setRowData([]);
-      if (!data || !data?.items.length) {
-        this.gridApi?.showNoRowsOverlay();
-      }
-      else {
-        this.gridApi?.hideOverlay();
-        this.rowData = data.items;
-        this.gridApi?.setRowData(this.rowData);
+    });
+    this.filterBbusinessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      if (value) {
+        this.getDocumentTypes(value);
+        this.getFolderTree(value);
       }
     });
   }
-
-  private getShareDocumentInfoFilter() {
-    const documentFilter: ShareDocumentInfoFilter = {
-      documentId: this.selectedDocumentNode?.fileType == FileType.File ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null,
-      businessUnitType: this.businessUnitType,
-      businessUnitId: this.selectedDocumentNode?.businessUnitId != undefined ? this.selectedDocumentNode?.businessUnitId : null,
-      regionId: null,
-      locationId: null,
-      folderId: this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null,
-      getAll: true
+  private disableFilterBusinessControls(user: User) {
+    if (user?.businessUnitType) {
+      this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
+      this.isBusinessFormDisabled && this.businessFilterForm.disable();
     }
-    return documentFilter;
-  }
-
-  public getSharedDocuments(): void {
-    this.store.dispatch(new GetSharedDocuments(this.getShareDocumentInfoFilter()));
-    this.shareDocumentInfoPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.gridApi?.setRowData([]);
-      if (!data || !data?.items.length) {
-        this.gridApi?.showNoRowsOverlay();
-      }
-      else {
-        this.gridApi?.hideOverlay();
-        const documentData = [...new Set(data.items.map((item: ShareDocumentDto) => item.document))]
-        this.rowData = documentData;
-        this.gridApi?.setRowData(this.rowData);
-      }
-    });
-  }
-
-  public closeDialog() {
-    this.orgStructureData.organizationIds.dataSource = [];
-    this.orgStructureData.regionIds.dataSource = [];
-    this.orgStructureData.locationIds.dataSource = [];
-    this.orgStructureData.statusIds.dataSource = [];
-    this.editOrganizationIds = [];
-    this.editRegionIds = [];
-    this.editLocationIds = [];
-    this.documentLibraryform.reset();
-    this.isAddNewFolder = false;
-    this.isUpload = false;
-    this.isEditDocument = false;
-    this.selectedFile = null;
-    this.isShare = false;
-    this.organizationSwitch = false;
-    this.halmarkSwitch = false;
-    this.agencySwitch = false;
-    this.previousFolderId = -2;
-    if (this.isAddNewFolder) {
-      this.store.dispatch(new IsAddNewFolder(false));
-    }
-    else {
-      this.halmarkSwitch = false;
-      this.agencySwitch = false;
-      this.organizationSwitch = false;
-      this.mspSwitch = false;
-      this.store.dispatch(new ShowSideDialog(false));
+    if (user?.businessUnitType === BusinessUnitType.MSP) {
+      const [Hallmark, ...rest] = this.businessUnits;
+      this.businessUnits = rest;
     }
   }
-
-  public onDocumentsSelected(documents: Blob[]): void {
-    this.documents = documents;
-  }
-
-  public onDocumentDeleted(document: Document): void {
-    this.deleteDocumentsGuids.push(document.documentId);
-  }
-
-  public handleOnUploadBtnClick() {
-    this.isAddNewFolder = false;
-    this.isUpload = true;
-    this.documentId = 0;
-    this.isEditDocument = false;
-    this.halmarkSwitch = false;
-    this.dialogWidth = '800px';
-    this.addRemoveFormcontrols();
-    this.formDailogTitle = FormDailogTitle.Upload;
-    this.orgStructureData.statusIds.dataSource = this.statusItems;
-    this.getOrganizations();
-    if (this.selectedDocumentNode != undefined && this.selectedDocumentNode != null && this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode?.id != -1)
-      this.store.dispatch(new ShowSideDialog(true));
-    else
-      this.store.dispatch([new ShowToast(MessageTypes.Warning, "Please select folder.")]);
-
-  }
-
-  public handleOnSave() {
-    this.documentLibraryform.markAllAsTouched();
-    if (this.documentLibraryform.invalid) {
-      return;
+  private getDocumentTypes(selectedBusinessUnitId:number | null) {
+    let documentTypesFilter: DocumentTypeFilter = {
+      businessUnitType: this.user?.businessUnitType != undefined ? this.user?.businessUnitType : 0,
+      businessUnitId: selectedBusinessUnitId
     }
-    this.SaveFolderOrDocument();
+    this.store.dispatch(new GetDocumentTypes(documentTypesFilter));
   }
+  private getFolderTree(selectedBusinessUnitId: number | null) {
+    this.store.dispatch(new GetFoldersTree({ businessUnitType: this.user?.businessUnitType != undefined ? this.user?.businessUnitType:0, businessUnitId: selectedBusinessUnitId }));
 
-  public SaveFolderOrDocument() {
-    if (this.isAddNewFolder) {
-      const documentFolder: DocumentFolder = {
-        id: 0,
-        name: this.documentLibraryform.get(FormControlNames.FolderName)?.value,
-        parentFolderId: this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null,
-        businessUnitType: this.businessUnitType,
-        businessUnitId: this.businessUnitId,
-        status: 1,
-        isDeleted: false
-      }
-      if (this.documentLibraryform.get(FormControlNames.FolderName)?.value.trim() == '') {
-        this.documentLibraryform.get(FormControlNames.FolderName)?.setValue(this.documentLibraryform.get(FormControlNames.FolderName)?.value.trim());
-        this.documentLibraryform.markAllAsTouched();
-        return;
-      }
-      this.store.dispatch(new SaveDocumentFolder(documentFolder)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
-        this.documentLibraryform.reset();
-        this.closeDialog();
-        this.store.dispatch(new GetFoldersTree({ businessUnitType: this.businessUnitType, businessUnitId: this.businessUnitId }));
-      });
-    }
-    else if (this.isUpload || this.isEditDocument) {
-      const document: Documents = {
-        id: this.documentId,
-        businessUnitType: this.businessUnitType,
-        businessUnitId: this.documentLibraryform.get(FormControlNames.OrgnizationIds)?.value[0],
-        regionLocationMappings: this.setDictionaryRegionMappings(),
-        documentName: this.documentLibraryform.get(FormControlNames.DocumentName)?.value,
-        folderId: this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : 1,
-        startDate: this.documentLibraryform.get(FormControlNames.StartDate)?.value,
-        endDate: this.documentLibraryform.get(FormControlNames.EndDate)?.value,
-        docTypeId: this.documentLibraryform.get(FormControlNames.TypeIds)?.value,
-        tags: this.documentLibraryform.get(FormControlNames.Tags)?.value,
-        comments: this.documentLibraryform.get(FormControlNames.Comments)?.value,
-        selectedFile: this.selectedFile,
-        isEdit: this.isEditDocument
-      }
-      if (this.documentLibraryform.get(FormControlNames.DocumentName)?.value.trim() == '') {
-        this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(this.documentLibraryform.get(FormControlNames.DocumentName)?.value.trim());
-        this.documentLibraryform.markAllAsTouched();
-        return;
-      }
-      this.store.dispatch(new SaveDocuments(document));
-      this.savedDocumentLibraryDto$.pipe(takeUntil(this.unsubscribe$)).subscribe((retrunDocument) => {
-        if (retrunDocument) {
-          this.shaeDocumentIds = [retrunDocument.id];
-          this.shareDocument();
-          this.documentLibraryform.reset();
-          this.closeDialog();
-          this.store.dispatch(new GetFoldersTree({ businessUnitType: this.businessUnitType, businessUnitId: this.businessUnitId }));
-        }
-      });
-    }
-    else if (this.isShare) {
-      this.shareDocument();
-    }
-  }
-
-  public shareDocument() {
-    let unitType: number = 0;
-    let unitIds: number[] = [];
-    if (this.halmarkSwitch) {
-      unitType = BusinessUnitType.Hallmark;
-      unitIds = [this.businessUnitId];
-    }
-    else if (this.agencySwitch) {
-      unitType = BusinessUnitType.Agency;
-      unitIds = this.documentLibraryform.get(FormControlNames.Agencies)?.value;
-    }
-    else if (this.organizationSwitch) {
-      unitType = BusinessUnitType.Organization;
-      unitIds = this.documentLibraryform.get(FormControlNames.Orgnizations)?.value;
-    }
-    let mapping: { [id: number]: number[]; } = {};
-    if (unitType != 0 && unitIds.length > 0) {
-      const shareDocumentsFilter: ShareDocumentsFilter = {
-        documentIds: this.shaeDocumentIds,
-        businessUnitType: unitType,
-        businessUnitIds: unitIds,
-        regionLocationMappings: mapping
-      }
-      this.store.dispatch(new ShareDocuments(shareDocumentsFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
-        this.closeDialog();
-      });
-    }
-  }
-
-  private orgStructureDataSetup(): void {
-    this.orgStructureData = {
-      organizationIds: {
-        type: ControlTypes.Dropdown,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      regionIds: {
-        type: ControlTypes.Dropdown,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      locationIds: {
-        type: ControlTypes.Dropdown,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      typeIds: {
-        type: ControlTypes.Dropdown,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      statusIds: {
-        type: ControlTypes.Dropdown,
-        valueType: ValueType.Id,
-        dataSource: [{ id: 1, name: 'Active' }],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      endDate: { type: ControlTypes.Date, valueType: ValueType.Text }
-    };
-  }
-  public onHallmarkSwitcher(event: any) {
-    this.halmarkSwitch = !this.halmarkSwitch;
-    if (this.halmarkSwitch) {
-      this.agencySwitch = false;
-      this.organizationSwitch = false;
-      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
-      this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([]);
-    }
-    this.changeDetectorRef.markForCheck();
-  }
-  public onMspSwitcher(event: any) {
-    this.mspSwitch = !this.mspSwitch;
-    if (this.mspSwitch) {
-      this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.MSP));
-      this.halmarkSwitch = false;
-      this.organizationSwitch = false;
-      this.agencySwitch = false;
-      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([]);
-      this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([]);
-      this.documentLibraryform.get(FormControlNames.MSP)?.setValue(null);
-    }
-    this.changeDetectorRef.markForCheck();
-  }
-  public onAgencySwitcher(event: any) {
-    this.agencySwitch = !this.agencySwitch;
-    if (this.agencySwitch) {
-      this.isShare = true;
-      this.halmarkSwitch = false;
-      this.organizationSwitch = false;
-      this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Agency));
-      this.documentLibraryform.get(FormControlNames.Agencies)?.setValue([this.businessUnitId]);
-    }
-    this.changeDetectorRef.markForCheck();
-  }
-  public onIncludeSharedWithMe(event: any) {
-    this.isIncludeSharedWithMe = !this.isIncludeSharedWithMe;
-    this.changeDetectorRef.markForCheck();
-    this.getDocuments();
-  }
-  public onOrganizationSwitcher(event: any) {
-    this.organizationSwitch = !this.organizationSwitch;
-    if (this.organizationSwitch) {
-      this.isShare = true;
-      this.halmarkSwitch = false;
-      this.agencySwitch = false;
-      this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
-      this.documentLibraryform.get(FormControlNames.Orgnizations)?.setValue([this.businessUnitId]);
-    }
-    this.changeDetectorRef.markForCheck();
-  }
-  public getOrganizations() {
-    this.businessData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (this.agencySwitch) {
-        this.agencyData = data;
-      }
-      else if (this.mspSwitch) {
-        this.mspData = data;
-      }
-      else {
-        this.orgStructureData.organizationIds.dataSource = data;
-      }
-      this.onOrganizationChangeHandler();
-      if (!this.isShare && !this.organizationSwitch) {
-        this.documentLibraryform.get(FormControlNames.OrgnizationIds)?.setValue([this.businessUnitId]);
-      }
-      this.changeDetectorRef.markForCheck();
-    });
-  }
-
-  public onOrganizationChangeHandler(): void {
-    this.organizationControl = this.documentLibraryform.get(FormControlNames.OrgnizationIds) as AbstractControl;
-    this.regionIdControl = this.documentLibraryform.get(FormControlNames.RegionIds) as AbstractControl;
-    this.locationIdControl = this.documentLibraryform.get(FormControlNames.LocationIds) as AbstractControl;
-    if (this.isShare) { }
-    else {
-      this.organizationControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val: number[]) => {
-        if (!this.isEditDocument) {
-          this.regionIdControl?.setValue([]);
-          this.orgStructureData.regionIds.dataSource = []
-        }
-        if (this.organizationControl?.value?.length > 0) {
-          this.selectedOrganizations = this.orgStructureData.organizationIds.dataSource.filter((x: any) => val?.includes(x.id));
-          let regionFilter: regionFilter = {
-            ids: val,
-            getAll: true
-          };
-          this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
-          this.changeDetectorRef.markForCheck();
-        }
-      });
-    }
-    this.regionIdControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
-      if (!this.isEditDocument) {
-        this.locationIdControl?.setValue([]);
-        this.orgStructureData.locationIds.dataSource = [];
-      }
-      if (this.regionIdControl?.value?.length > 0) {
-        this.selectedRegions = this.orgStructureData.regionIds.dataSource?.filter((object: any) => data?.includes(object.id));
-        let locationFilter: LocationsByRegionsFilter = {
-          ids: data,
-          getAll: true
-        };
-
-        this.store.dispatch(new GetLocationsByRegions(locationFilter));
-        this.changeDetectorRef.markForCheck();
-      }
-    });
-  }
-
-  public setRegionsOnEdit() {
-
-    if (this.editRegionIds.length > 0 && this.editRegionIds[0] == -1) {
-      this.regions$.subscribe((data) => {
-        const allRegionsIds = data.map(region => region.id);
-        this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(allRegionsIds);
-      });
-    } else {
-      this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(this.editRegionIds);
-    }
-  }
-
-  public setLocationsOnEdit() {
-    if (this.editLocationIds.length > 0 && this.editLocationIds[0] == -1) {
-      this.locations$.subscribe((data) => {
-        const allLocIds = data.map(loc => loc.id);
-        this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(allLocIds);
-      });
-    } else {
-      this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(this.editLocationIds);
-    }
-  }
-
-  public downloadDocuemt(docItem: DocumentLibraryDto) {
-    const downloadFilter: DownloadDocumentDetailFilter = {
-      documentId: docItem.id,
-      businessUnitType: this.businessUnitType,
-      businessUnitId: docItem.businessUnitId
-    }
-    this.store.dispatch(new GetDocumentDownloadDeatils(downloadFilter));
-    this.documentDownloadDetail$.pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: DownloadDocumentDetail) => {
-        if (data) {
-          if (this.downloadedFileName != data.fileName) {
-            this.downloadedFileName = data.fileName;
-            this.createLinkToDownload(data.fileAsBase64, data.fileName, data.contentType);
-          }
-        }
-      });
-    this.changeDetectorRef.markForCheck();
-  }
-  createLinkToDownload(base64String: string, fileName: string, contentType: string) {
-    if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
-      const byteChar = atob(base64String);
-      const byteArray = new Array(byteChar.length);
-      for (let i = 0; i < byteChar.length; i++) {
-        byteArray[i] = byteChar.charCodeAt(i);
-      }
-      const uIntArray = new Uint8Array(byteArray);
-      const blob = new Blob([uIntArray], { type: contentType });
-      (window.navigator as any).msSaveOrOpenBlob(blob, `${fileName}`);
-    } else {
-      const source = `data:${contentType};base64,${base64String}`;
-      const link = document.createElement('a');
-      link.href = source;
-      link.download = `${fileName}`;
-      link.click();
-    }
-  }
-  public menuOptionSelected(event: any, data: DocumentLibraryDto): void {
-    switch (Number(event.item.properties.id)) {
-      case MoreMenuType['Edit']:
-        this.editDocument(data);
-        break;
-      case MoreMenuType['Delete']:
-        this.deleteDocument(data);
-        break;
-      case MoreMenuType['Share']:
-        this.ShareDocumewnt(data);
-        break;
-      case MoreMenuType['UnShare']:
-        this.UnShareDocumewnt(data);
-        break;
-    }
-  }
-
-  private editDocument(docItem: DocumentLibraryDto) {
-    if (docItem) {
-      this.isEditDocument = true;
-      this.formDailogTitle = FormDailogTitle.EditDocument;
-      this.documentId = docItem.id;
-      this.isAddNewFolder = false;
-      this.isShare = false;
-      this.isUpload = true;
-      this.dialogWidth = '800px';
-      this.createForm();
-      this.documentLibraryform.reset();
-      this.getOrganizations();
-      let status = this.statusItems.find((x) => x.text == docItem.status);
-      this.orgStructureData.statusIds.dataSource = this.statusItems;
-      this.startDate = docItem.startDate != null ? new Date(docItem.startDate.toString()) : this.startDate;
-      this.store.dispatch(new GetDocumentById(docItem.id));
-      this.documentLibraryDto$.pipe(takeUntil(this.unsubscribe$))
-        .subscribe((data: DocumentLibraryDto) => {
-          if (data) {
-            this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue([data.businessUnitId]);
-            this.editRegionIds = data?.regionId?.split(',').map(Number) != undefined ? data?.regionId?.split(',').map(Number) : [];
-            this.setRegionsOnEdit();
-            this.editLocationIds = data?.locationId?.split(',').map(Number) != undefined ? data?.locationId?.split(',').map(Number) : [];
-            this.setLocationsOnEdit();
-            this.changeDetectorRef.markForCheck();
-            this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(data.name);
-            this.documentLibraryform.get(FormControlNames.TypeIds)?.setValue(data.docType);
-            this.documentLibraryform.get(FormControlNames.Tags)?.setValue(data.tags);
-            this.documentLibraryform.get(FormControlNames.StatusIds)?.setValue(status?.id);
-            this.documentLibraryform.get(FormControlNames.StartDate)?.setValue(data.startDate != null ? new Date(data.startDate.toString()) : this.startDate);
-            this.documentLibraryform.get(FormControlNames.EndDate)?.setValue(data.endDate != null ? new Date(data.endDate.toString()) : null);
-            this.documentLibraryform.get(FormControlNames.Comments)?.setValue(data.comments);
-            this.store.dispatch(new ShowSideDialog(true));
-          }
-        });
-    }
-  }
-
-  private deleteDocument(data: DocumentLibraryDto): void {
-    this.addActiveCssClass(event);
-    this.confirmService
-      .confirm(DELETE_RECORD_TEXT, {
-        title: DELETE_RECORD_TITLE,
-        okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
-        if (confirm && data.id) {
-          const deletedocumentFilter: DeleteDocumentsFilter = {
-            documentIds: [data.id],
-            businessUnitType: this.businessUnitType,
-            businessUnitId: data.businessUnitId
-          }
-          this.store.dispatch(new DeletDocuments(deletedocumentFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
-            this.store.dispatch(new GetFoldersTree({ businessUnitType: this.businessUnitType, businessUnitId: this.businessUnitId }));
-          });
-        }
-        this.removeActiveCssClass();
-      });
-  }
-  public deleteSelectedDocuments(event: any) {
-    let selectedRows: any;
-    selectedRows = this.gridApi.getSelectedRows();
-    if (selectedRows.length > 0) {
-      this.addActiveCssClass(event);
-      this.confirmService
-        .confirm(DELETE_RECORD_TEXT, {
-          title: DELETE_RECORD_TITLE,
-          okButtonLabel: 'Delete',
-          okButtonClass: 'delete-button'
-        })
-        .subscribe((confirm) => {
-          if (confirm) {
-            let selectedIds = selectedRows.map((item: any) => {
-              return item.id;
-            })
-            const deletedocumentFilter: DeleteDocumentsFilter = {
-              documentIds: selectedIds,
-              businessUnitType: this.businessUnitType,
-              businessUnitId: this.businessUnitId
-            }
-            this.store.dispatch(new DeletDocuments(deletedocumentFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
-              this.closeDialog();
-              this.store.dispatch(new GetFoldersTree({ businessUnitType: this.businessUnitType, businessUnitId: this.businessUnitId }));
-            });
-          }
-          this.removeActiveCssClass();
-        });
-    }
-    else {
-      this.store.dispatch([
-        new ShowToast(MessageTypes.Warning, "Please select atleast one document."),
-      ]);
-    }
-  }
-
-  private ShareDocumewnt(data: DocumentLibraryDto) {
-    if (data) {
-      this.formDailogTitle = "";
-      this.isAddNewFolder = false;
-      this.isUpload = false;
-      this.isEditDocument = false;
-      this.isShare = true;
-      this.dialogWidth = '600px'
-      this.createForm();
-      this.getOrganizations();
-      this.shaeDocumentIds = [data.id];
-      this.store.dispatch(new ShowSideDialog(true));
-    }
-
-  }
-
-  private UnShareDocumewnt(data: DocumentLibraryDto) {
-    if (data) {
-      let unShareDocumentsFilter: UnShareDocumentsFilter = { documentIds: [data.id] };
-      this.store.dispatch(new UnShareDocuments(unShareDocumentsFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-        this.getDocuments();
-      });
-    }
-
-  }
-
-  public setDictionaryRegionMappings() {
-    let mapping: { [id: number]: number[]; } = {};
-    let isAllRegions: boolean = false;
-    let isAllLocations: boolean = false;
-    let regionsData: Region[] = [];
-    let locationsData: Region[] = [];
-    this.regions$.subscribe((data) => {
-      regionsData = data;
-      this.locations$.subscribe((locData: any) => {
-        locationsData = locData;
-      });
-    });
-    isAllRegions = this.documentLibraryform.controls[FormControlNames.RegionIds].value.length === regionsData.length;
-    isAllLocations = this.documentLibraryform.controls[FormControlNames.LocationIds].value.length === locationsData.length;
-
-    if (isAllRegions && !isAllLocations) {
-      mapping[-1] = this.documentLibraryform.controls[FormControlNames.LocationIds].value;
-    }
-    else if (!isAllRegions && isAllLocations) {
-      const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
-      selectedRegions.forEach((regionItem: any) => {
-        mapping[regionItem] = [-1];
-      });
-    }
-    else {
-      const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
-      if (selectedRegions.length > 0) {
-        selectedRegions.forEach((regionItem: any) => {
-          let mappingLocItems: number[] = [];
-          const selectedLoactions = this.documentLibraryform.get(FormControlNames.LocationIds)?.value;
-          let x = this.locations$.subscribe((data: any) => {
-            if (selectedLoactions.length > 0) {
-              selectedLoactions.forEach((selLocItem: any) => {
-                let selectedLocation = data.filter((locItem: any) => { return locItem.id == selLocItem && locItem.regionId == regionItem });
-                if (selectedLocation.length > 0)
-                  mappingLocItems.push(selectedLocation[0].id);
-              });
-              mapping[regionItem] = mappingLocItems;
-            }
-            else {
-              mapping[regionItem] = [];
-            }
-          });
-
-        });
-      }
-    }
-    return mapping;
-  }
-
-  public shareSelectedDocuments(event: any) {
-    this.formDailogTitle = "";
-    let selectedRows: any;
-    selectedRows = this.gridApi.getSelectedRows();
-    if (selectedRows.length > 0) {
-      let selectedIds = selectedRows.map((item: any) => {
-        return item.id;
-      })
-      this.isAddNewFolder = false;
-      this.isUpload = false;
-      this.isEditDocument = false;
-      this.isShare = true;
-      this.dialogWidth = '600px'
-      this.createForm();
-      this.getOrganizations();
-      this.shaeDocumentIds = selectedIds;
-      this.store.dispatch(new ShowSideDialog(true));
-    }
-    else {
-      this.store.dispatch([
-        new ShowToast(MessageTypes.Warning, "Please select atleast one document."),
-      ]);
-    }
-  }
-
-  public documentPreview(docItem: any) {
-    this.downloadedFileName = '';
-    const downloadFilter: DownloadDocumentDetailFilter = {
-      documentId: docItem.id,
-      businessUnitType: this.businessUnitType,
-      businessUnitId: this.businessUnitId
-    }
-    this.store.dispatch(new GetDocumentDownloadDeatils(downloadFilter));
-    this.documentDownloadDetail$.pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: DownloadDocumentDetail) => {
-        if (data) {
-          if (this.downloadedFileName != data.fileName) {
-            this.downloadedFileName = data.fileName;
-            if (data.fileAsBase64 && data.fileAsBase64 != '') {
-              this.getPreviewUrl(data);
-              this.dialogWidth = "1000px";
-              this.store.dispatch(new ShowDocPreviewSideDialog(true));
-            }
-            this.changeDetectorRef.markForCheck();
-          }
-        }
-      });
-  }
-  load(url: string) {
-    this.pdfViewer?.load(url, '');
-  }
-  getPreviewUrl(x: any) {
-
-    let extension = (x != null) ? x.extension : null;
-    switch (extension) {
-      case '.pdf':
-        this.isPdf = true;
-        this.load(`data:application/pdf;base64,${x.fileAsBase64}`);
-        break;
-      case '.jpg':
-        this.isPdf = false;
-        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          `data:image/jpg;base64,${x.fileAsBase64}`
-        );
-        break;
-      case '.png':
-        this.isPdf = false;
-        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          `data:image/png;base64,${x.fileAsBase64}`
-        );
-        break;
-      case '.docx':
-        this.isPdf = false;
-        this.loadDocument(x.fileAsBase64);
-        //this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        //  `https://view.officeapps.live.com/op/embed.aspx?src=${x.sasUrl}`
-        //);
-        break;
-      case '.xlsx':
-        this.isPdf = false;
-        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          `https://view.officeapps.live.com/op/embed.aspx?src=${x.sasUrl}`
-        );
-        break;
-      default:
-
-    }
-    this.changeDetectorRef.markForCheck();
-  }
-  loadDocument(fileAsBase64:string) {
-    this.documentEditor.height = window.innerHeight * 0.7 + 'px';
-    this.documentEditor.isReadOnly = true;
-    this.documentEditor.pageOutline = '#d3d3d3';
-    this.documentEditor.open(decodeURIComponent(escape(atob(fileAsBase64))));
-   
-  }
-
-  public onClosePreview(): void {
-    this.previewUrl = null;
-    this.downloadedFileName = '';
-    this.changeDetectorRef.markForCheck();
-    this.store.dispatch(new ShowDocPreviewSideDialog(false));
-
-  }
-
-  public onEditorCreated() {
   }
 }
