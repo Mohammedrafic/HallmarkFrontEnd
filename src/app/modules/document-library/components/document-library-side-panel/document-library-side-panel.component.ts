@@ -84,6 +84,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
       this.selectedNode.fileType = selectedFolderTreeNode[0].fileType;
       this.selectedNode.businessUnitId = selectedFolderTreeNode[0].businessUnitId;
     }
+    this.store.dispatch(new GetDocumentsSelectedNode(this.selectedNode));
   }
 
   private checkSelectedNodeFolderOrDocument(data: any, id: number) {

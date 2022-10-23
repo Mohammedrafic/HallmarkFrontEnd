@@ -1,40 +1,104 @@
-  <app-page-toolbar>
-    <ng-container left>
-      <div class="bootstrap business-dropdowns" [formGroup]="businessFilterForm">
-        <div class="dropdown-container">
-          <div class="input-group dropdown">
-            <ejs-dropdownlist appHideBeforeSyncfusionLoad
-                              formControlName="filterBusinessUnit"
-                              [fields]="unitFields"
-                              [dataSource]="businessUnits"
-                              placeholder="Business Unit"></ejs-dropdownlist>
-          </div>
+<app-page-toolbar>
+  <ng-container left>
+    <div class="bootstrap business-dropdowns" [formGroup]="businessFilterForm">
+      <div class="dropdown-container">
+        <div class="input-group dropdown">
+          <ejs-dropdownlist appHideBeforeSyncfusionLoad
+                            formControlName="filterBusinessUnit"
+                            [fields]="unitFields"
+                            [dataSource]="businessUnits"
+                            placeholder="Business Unit"></ejs-dropdownlist>
         </div>
-        <div class="dropdown-container">
-          <div class="input-group dropdown">
-            <ejs-dropdownlist appHideBeforeSyncfusionLoad
-                              formControlName="filterBusiness"
-                              [fields]="bussinesDataFields"
-                              [dataSource]="bussinesUserData$ | async"
-                              placeholder="Business"></ejs-dropdownlist>
+      </div>
+      <div class="dropdown-container">
+        <div class="input-group dropdown">
+          <ejs-dropdownlist appHideBeforeSyncfusionLoad
+                            formControlName="filterBusiness"
+                            [fields]="bussinesDataFields"
+                            [dataSource]="bussinesUserData$ | async"
+                            placeholder="Business"></ejs-dropdownlist>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container right *ngIf="!isHalmarkSelected">
+    <div class="button-group">
+      <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline button-filter" style="display:none;">
+        Filters <i-feather name="sliders" class="icon"></i-feather>
+      </button>
+      <button ejs-dropdownbutton
+              appHideBeforeSyncfusionLoad
+              id="importButton"
+              cssClass="e-outline button-export">
+        <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
+      </button>
+      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true">
+        <i-feather name="upload" class="icon"></i-feather>Upload
+      </button>
+    </div>
+  </ng-container>
+</app-page-toolbar>
+<section class="document">
+  <div class="e-gridcustomheader">
+    <div class="title">
+      <h3>{{selectedNodeText}}</h3>
+    </div>
+    <div class="row-tool-buttons" *ngIf="this.selectedDocumentNode?.id!=-1">
+      <ejs-switch id="switcher"
+                  [checked]="isIncludeSharedWithMe" (change)="onIncludeSharedWithMe($event);"></ejs-switch>
+      <label for="switcher" class="switch-text">Include Shared With Me</label>
+      <button ejs-button cssClass="e-flat seconadry-dark-icon-button" (click)="shareSelectedDocuments($event)">
+        <span><i-feather name="share-2" class="icon"></i-feather></span>
+      </button>
+      <button ejs-button cssClass="e-flat primary-icon-button" style="display:none;">
+        <span><i-feather name="edit" class="icon"></i-feather></span>
+      </button>
+      <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteSelectedDocuments($event)">
+        <span><i-feather name="trash-2" class="icon"></i-feather></span>
+      </button>
+    </div>
+  </div>
+</section>
+<section>
+  <app-document-library-table [gridOptions]="gridOptions"
+                              (onGridReadyEvent)="onGridReady($event)"
+                              (onGridPageSizeChanged)="onPageSizeChanged($event)"></app-document-library-table>
+</section>
+
+<app-document-preview-side-dialog [header]="previewTitle" (previewCloseClick)="onClosePreview()" [width]="dialogWidth">
+  <ejs-pdfviewer id="pdfViewer" #pdfViewer [serviceUrl]='service' [documentPath]='document' style="height:600px;" [style.display]="isPdf? 'block' : 'none'">></ejs-pdfviewer>
+  <div>
+    <ejs-documenteditor [enableSelection]=true
+                        [enableSearch]=true [enableEditor]=true
+                        #documentPreview style="width:500px;height:600px;" [style.display]="!isPdf? 'block' : 'none'"></ejs-documenteditor>
+
+  </div>
+</app-document-preview-side-dialog>
+<app-side-dialog header="{{formDailogTitle}}" (formCancelClicked)="closeDialog()" (formSaveClicked)="handleOnSave()" [width]="dialogWidth">
+  <form [formGroup]="documentLibraryform" class="documentlibrary-addnewfolder-form-dialog form-container bootstrap" id="dclForm">
+    <section *ngIf="isAddNewFolder">
+      <div class="form-elemet" *ngIf="selectedDocumentNode?.text!=undefined">
+        <div class="input-container bootstrap">
+          <label>Parent Folder Name : {{selectedDocumentNode?.text}}</label>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Folder Name<span class="required">*</span></label>
+          <div class="input-group">
+            <input class="e-input"
+                   type="text"
+                   appValidateWithMessage
+                   maxlength="100"
+                   formControlName="folderName" />
           </div>
         </div>
       </div>
-    </ng-container>
-    <ng-container right *ngIf="!isHalmarkSelected">
-      <div class="button-group">
-        <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline button-filter" style="display:none;">
-          Filters <i-feather name="sliders" class="icon"></i-feather>
-        </button>
-        <button ejs-dropdownbutton
-                appHideBeforeSyncfusionLoad
-                id="importButton"
-                cssClass="e-outline button-export">
-          <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
-        </button>
-        <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true">
-          <i-feather name="upload" class="icon"></i-feather>Upload
-        </button>
-      </div>
-    </ng-container>
-  </app-page-toolbar>
+    </section>
+    <section *ngIf="isUpload">
+      <app-document-library-upload (uploadToFile)="uploadToFile($event)"></app-document-library-upload>
+      <section *ngIf="selectedFile!=null || isEditDocument">
+      </section>
+    </section>
+  </form>
+</app-side-dialog>
