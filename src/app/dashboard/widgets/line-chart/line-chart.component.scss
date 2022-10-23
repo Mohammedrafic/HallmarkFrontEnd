@@ -2,14 +2,20 @@
   &__component {
     aspect-ratio: 2.2;
   }
-}
 
-.widget-header {
-  display: flex;
-  justify-content: space-between;
+  &__title {
+    width: 50%;
+  }
+
+  &__tooltip {
+    text-align: right;
+    width: 10%;
+    margin-left:15px;
+  }
 
   &__actions {
     display: flex;
+    width: 40%;
 
     & button {
       height: 28px;
@@ -23,4 +29,11 @@
       }
     }
   }
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  width:100%;
+
 }

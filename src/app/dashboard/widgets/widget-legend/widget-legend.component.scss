@@ -12,12 +12,15 @@
     font-size: 16px;
     font-weight: 700;
     line-height: 24px;
+    width: 100%;
+    text-align: right
   }
 
   &__row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    width: 100%;
+    padding-right: 10px;
   }
 
   &__row-container {
@@ -36,17 +39,24 @@
   &__legend-text {
     font-size: 14px;
     line-height: 17px;
-    text-overflow:ellipsis;
+    text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     color: $secondary-dark-blue-15;
 
     &.right {
-      width: 100px;
+      width: 100%;
     }
   }
 
   &__point {
+    width: 32px;
+    height: 16px;
+    border-radius: 50%;
+    margin-right: 12px;
+  }
+
+  &__pointPositionTrend {
     width: 16px;
     height: 16px;
     border-radius: 50%;
@@ -56,7 +66,7 @@
   &__percentage-ratio {
     font-size: 16px;
     line-height: 24px;
-    float:right;
+    float: right;
   }
 }
 
@@ -79,7 +89,10 @@
   font-size: 16px;
     font-weight: 700;
     line-height: 24px;
-   align-items: center; 
+   align-items: center;
+   width:100%;
+   text-align:right;
+   
 }
 
 .widget_left{
