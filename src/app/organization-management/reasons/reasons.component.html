@@ -5,7 +5,7 @@
       appHideBeforeSyncfusionLoad
       [isPrimary]="true"
       (click)="addReason()"
-      >Add Reason</button>
+      >Add {{ reasonsNavigationTabs.Penalties === selectedTab ? 'Penalties' : 'Reason' }}</button>
   </div>
 
   <ejs-tab
@@ -16,6 +16,13 @@
         <ng-template #headerText><div>Candidate Rejection</div></ng-template>
         <ng-template #content>
           <app-candidate-reject-reason (editReason)="onEdit($event)" [form]="form"></app-candidate-reject-reason>
+        </ng-template>
+      </e-tabitem>
+
+      <e-tabitem>
+        <ng-template #headerText><div>Candidate Cancellation (Penalties)</div></ng-template>
+        <ng-template #content>
+          <app-penalties (editReason)="onEdit($event)" [form]="penaltiesForm"></app-penalties>
         </ng-template>
       </e-tabitem>
 
@@ -44,11 +51,12 @@
 </section>
 
 <app-side-dialog
-  header="{{ title }} Reason"
+  header="{{ title }} {{ reasonsNavigationTabs.Penalties === selectedTab ? 'Penalties' : 'Reason' }}"
   (formSaveClicked)="saveReason()"
   (formCancelClicked)="closeDialog()"
+  [width]="reasonsNavigationTabs.Penalties === selectedTab ? '572px' : '434px'"
 >
-  <form [formGroup]="form" class="reason-form">
+  <form [formGroup]="form" class="reason-form" *ngIf="reasonsNavigationTabs.Penalties !== selectedTab">
     <div class="input-container bootstrap">
       <label>Reason<span class="required">*</span></label>
       <div class="input-group">
@@ -58,6 +66,177 @@
                placeholder="Reason"
                maxlength="100"
                formControlName="reason"/>
+      </div>
+    </div>
+  </form>
+
+  <form *ngIf="reasonsNavigationTabs.Penalties === selectedTab" [formGroup]="penaltiesForm" class="penalties-form">
+    <div>
+      <div class="input-container bootstrap">
+        <label for="reason">Reason <span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            appValidateWithMessage
+            [dataSource]="cancellationReasons"
+            [fields]="optionFields"
+            formControlName="reason">
+          </ejs-dropdownlist>
+        </div>
+      </div>
+
+      <div class="input-container bootstrap">
+        <label>Regions <span class="required">*</span></label>
+        <div class="input-group multiselect">
+          <ejs-multiselect appValidateWithMessage
+                            mode="CheckBox"
+                            formControlName="regionIds"
+                            selectAllText="Select All"
+                            [fields]="optionFields"
+                            [showSelectAll]="true"
+                            [allowFiltering]="false"
+                            [showDropDownIcon]="true"
+                            [dataSource]="regions">
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="input-container bootstrap">
+        <label>Locations <span class="required">*</span></label>
+        <div class="input-group multiselect">
+          <ejs-multiselect appValidateWithMessage
+                            mode="CheckBox"
+                            formControlName="locationIds"
+                            selectAllText="Select All"
+                            [fields]="optionFields"
+                            [showSelectAll]="true"
+                            [allowFiltering]="false"
+                            [showDropDownIcon]="true"
+                            [dataSource]="locations">
+            <ng-template #itemTemplate="" let-data="">
+                <div *ngIf="data.id" class="location-option-container">
+                  <span class="location-name">{{data.name}}</span>
+                  <span class="region-name">{{data.regionName}}</span>
+                </div>
+                <ng-container *ngIf="!data.id">
+                  <span class="location-name">{{data.name}}</span>
+                </ng-container>
+            </ng-template>
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+
+    <div class="penalties-rate-container">
+      <div class="rate">
+        <div>
+          <div class="input-container bootstrap left">
+            <label for="billRatesCategory">Flat Rate<span class="required">*</span></label>
+            <div class="input-group">
+              <ejs-numerictextbox
+                class="numeric-input"
+                appValidateWithMessage
+                min="0"
+                maxlength="10"
+                format="###.00"
+                formControlName="flatRate"
+                [showSpinButton]="false"
+                [validateDecimalOnType]="validateDecimalOnType"
+                [decimals]="2"
+              >
+              </ejs-numerictextbox>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="input-container bootstrap left">
+            <label for="billRatesCategory">Bill Rate</label>
+            <div class="input-group">
+              <input
+                class="e-input e-disabled"
+                [disabled]="true"
+                type="text"
+                value="Regular/Local Amount" />
+            </div>
+          </div>
+          <div class="input-container bootstrap right">
+            <label for="billRatesCategory">Hours <span class="required">*</span></label>
+            <div class="input-group">
+                <ejs-numerictextbox
+                class="numeric-input"
+                appValidateWithMessage
+                min="0"
+                format="#"
+                formControlName="rateOfHours"
+                [showSpinButton]="false"
+                [validateDecimalOnType]="validateDecimalOnType"
+                [decimals]="decimals"
+              >
+              </ejs-numerictextbox>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="input-container bootstrap left">
+            <label for="billRatesCategory">% Rate <span class="required">*</span></label>
+            <div class="input-group">
+                <ejs-numerictextbox
+                class="numeric-input"
+                appValidateWithMessage
+                min="0"
+                format="###.00"
+                formControlName="flatRateOfHoursPercentage"
+                [showSpinButton]="false"
+                [validateDecimalOnType]="validateDecimalOnType"
+                [decimals]="2"
+              >
+              </ejs-numerictextbox>
+              </div>
+          </div>
+          <div class="input-container bootstrap right">
+            <label for="billRatesCategory">Hours <span class="required">*</span></label>
+            <div class="input-group">
+                <ejs-numerictextbox
+                class="numeric-input"
+                appValidateWithMessage
+                min="0"
+                format="0"
+                formControlName="flatRateOfHours"
+                [showSpinButton]="false"
+                [validateDecimalOnType]="validateDecimalOnType"
+                [decimals]="decimals"
+              >
+              </ejs-numerictextbox>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="primary-selector">
+        <div class="input-container">
+          <label>Primary</label>
+          <div class="input-group radio">
+            <ejs-radiobutton
+              formControlName="penaltyCriteria"
+              name="penaltyCriteria"
+              [value]="0"></ejs-radiobutton>
+          </div>
+          <div class="input-group radio">
+            <ejs-radiobutton
+              formControlName="penaltyCriteria"
+              name="penaltyCriteria"
+              [value]="1"></ejs-radiobutton>
+          </div>
+          <div class="input-group radio">
+            <ejs-radiobutton
+              formControlName="penaltyCriteria"
+              name="penaltyCriteria"
+              [value]="2"></ejs-radiobutton>
+          </div>
+        </div>
       </div>
     </div>
   </form>

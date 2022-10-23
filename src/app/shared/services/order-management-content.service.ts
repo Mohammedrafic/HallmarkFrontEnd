@@ -33,6 +33,8 @@ import { AgencyOrderManagementTabs, OrganizationOrderManagementTabs } from '@sha
 import { Comment } from '@shared/models/comment.model';
 import { DateTimeHelper } from '@core/helpers';
 import { orderFieldsConfig } from '@client/order-management/add-edit-order/order-fields';
+import { Penalty } from '@shared/models/penalty.model';
+import { JobCancellationReason } from '@shared/enums/candidate-cancellation';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -151,6 +153,19 @@ export class OrderManagementContentService {
       `/api/AppliedCandidates/candidateJob?OrganizationId=${organizationId}&JobId=${jobId}`
     );
   }
+
+ /**
+  * Update candidate job
+  * @param payload
+  */
+  public getPredefinedPenalties(payload: OrderCandidateJob, reason: JobCancellationReason): Observable<Penalty> {
+    return this.http.post<Penalty>(`/api/CandidateCancellationSettings/predefined`, {
+      organizationId: payload.organizationId,
+      jobId: payload.jobId,
+      locationId: payload.order.locationId,
+      reason: reason
+    });
+  }  
 
   /**
    * Update candidate job

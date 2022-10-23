@@ -27,3 +27,12 @@
     cursor: default;
   }
 }
+
+.app-widget-wrapper {
+  &__tooltip {
+    text-align: right;
+    float: right;
+    width:100%
+  }
+}
+

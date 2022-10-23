@@ -1,3 +1,4 @@
+import { PenaltyPayload } from "@shared/models/penalty.model";
 import { RejectReason } from "@shared/models/reject-reason.model";
 
 export class GetRejectReasonsByPage {
@@ -112,4 +113,37 @@ export class SaveOrderRequisition {
 
 export class SaveOrderRequisitionError {
   static readonly type = '[reject reason] Save Order Requisition Error';
+}
+
+export class GetPenaltiesByPage {
+  static readonly type = '[reject reason] Get Reject Penalties by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
+
+export class SavePenalty {
+  static readonly type = '[reject reason] Save Penalty';
+  constructor(public payload: PenaltyPayload){}
+}
+
+export class RemovePenalty {
+  static readonly type = '[reject reason] Remove Penalty';
+  constructor(public id: number){}
+}
+
+export class UpdatePenalty {
+  static readonly type = '[reject reason] Update Penalty';
+  constructor(public payload: PenaltyPayload) {
+  }
+}
+
+export class SavePenaltyError {
+  static readonly type = '[reject reason] Save Penalty Error';
+}
+
+export class SavePenaltySuccess {
+  static readonly type = '[reject reason] Save Penalty Success';
+}
+
+export class ShowOverridePenaltyDialog {
+  static readonly type = '[reject reason] Show Override Penalty Dialog';
 }

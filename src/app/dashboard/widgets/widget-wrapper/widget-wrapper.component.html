@@ -10,15 +10,7 @@
 </ng-template>
 
 <ng-template #regularWidgetTemplate>
-  <div class="container tooltip" *ngIf="description.length>0">
-    <ejs-tooltip [content]="description" position='TopCenter'>
-    <span class="mytooltip">
-      <i-feather name="info" id="info" 
-      [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"
-      ></i-feather>
-    </span>
-  </ejs-tooltip>
-  </div>
+
     
   <div class="app-widget-wrapper__projection-wrapper">
     <div *ngIf="header" class="app-widget-wrapper__header">

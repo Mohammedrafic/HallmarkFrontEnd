@@ -10,7 +10,7 @@ import {
   SaveClosureReasonsError, CreateManualInvoiceRejectReason, SaveManualInvoiceRejectReasonError,
   SaveRejectReasons, SaveRejectReasonsError, SaveRejectReasonsSuccess,
   UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReason, UpdateManualInvoiceRejectReasonSuccess,
-  UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess, GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError
+  UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess, GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError, GetPenaltiesByPage, SavePenalty, SavePenaltySuccess, SavePenaltyError, RemovePenalty, UpdatePenalty, ShowOverridePenaltyDialog
 } from "@organization-management/store/reject-reason.actions";
 import { catchError, Observable, tap } from "rxjs";
 import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
@@ -19,12 +19,14 @@ import { ShowToast } from "../../store/app.actions";
 import { MessageTypes } from "@shared/enums/message-types";
 import { getAllErrors } from "@shared/utils/error.utils";
 import { RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from "@shared/constants";
+import { Penalty, PenaltyPage } from "@shared/models/penalty.model";
 
 export interface RejectReasonStateModel {
   rejectReasonsPage: RejectReasonPage | null;
   closureReasonsPage: RejectReasonPage | null;
   manualInvoicesReasonsPage: RejectReasonPage | null;
   orderRequisition: RejectReasonPage | null;
+  penalties: PenaltyPage | null;
   isReasonLoading: boolean
 }
 
@@ -35,6 +37,7 @@ export interface RejectReasonStateModel {
     closureReasonsPage: null,
     manualInvoicesReasonsPage: null,
     orderRequisition: null,
+    penalties: null,
     isReasonLoading: false,
   }
 })
@@ -58,6 +61,11 @@ export class RejectReasonState {
   @Selector()
   static orderRequisition(state: RejectReasonStateModel): RejectReasonPage | null {
     return state.orderRequisition;
+  }
+
+  @Selector()
+  static penalties(state: RejectReasonStateModel): PenaltyPage | null {
+    return state.penalties;
   }
 
   constructor(private rejectReasonService:RejectReasonService) {}
@@ -296,6 +304,75 @@ export class RejectReasonState {
       }),
       catchError((error: HttpErrorResponse) => {
         dispatch(new SaveOrderRequisitionError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(GetPenaltiesByPage)
+  GetPenaltiesByPage(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    { pageNumber, pageSize }: GetPenaltiesByPage
+  ): Observable<PenaltyPage> {
+    return this.rejectReasonService.getPenaltiesByPage(pageNumber, pageSize).pipe(
+      tap((payload) => {
+        patchState({penalties: payload});
+        return payload;
+      })
+    );
+  }
+
+  @Action(SavePenalty)
+  SavePenalty(
+    { getState, dispatch}: StateContext<RejectReasonStateModel>,
+    { payload }: SavePenalty
+  ): Observable<Penalty[] | void> {
+    const state = getState();
+
+    return this.rejectReasonService.savePenalty(payload).pipe(
+      tap(payload => {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        dispatch(new SavePenaltySuccess());
+
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        console.log(error);
+        if (error.error?.errors?.ForceUpsert) {
+          return dispatch(new ShowOverridePenaltyDialog());
+        } else {
+          dispatch(new SavePenaltyError());
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+        }
+      })
+    );
+  }
+
+  @Action(RemovePenalty)
+  RemovePenalty(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { id }: RemovePenalty
+  ): Observable<void> {
+    return this.rejectReasonService.removePenalty(id).pipe(
+      tap(() => {
+        dispatch(new SavePenaltySuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      })
+    );
+  }
+
+  @Action(UpdatePenalty)
+  UpdatePenalty(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { payload }: UpdatePenalty
+  ): Observable<Penalty[] | void> {
+    return this.rejectReasonService.savePenalty(payload).pipe(
+      tap(() => {
+        dispatch(new SavePenaltySuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SavePenaltyError());
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );

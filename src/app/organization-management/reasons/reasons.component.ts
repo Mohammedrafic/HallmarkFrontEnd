@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
   SaveClosureReasons,
   SaveClosureReasonsError,
@@ -12,18 +12,28 @@ import {
   UpdateRejectReasons,
   SaveOrderRequisition,
   UpdateOrderRequisitionSuccess,
-  SaveOrderRequisitionError
+  SaveOrderRequisitionError,
+  SavePenalty,
+  SavePenaltyError,
+  SavePenaltySuccess,
+  ShowOverridePenaltyDialog
 } from '@organization-management/store/reject-reason.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE, ALPHANUMERICS_AND_SYMBOLS } from '@shared/constants';
+import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE, ALPHANUMERICS_AND_SYMBOLS, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE } from '@shared/constants';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { delay, filter, takeWhile } from 'rxjs';
+import { delay, filter, takeWhile, Observable } from 'rxjs';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
+import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { CancellationReasonsMap } from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
+import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
+import { UserState } from 'src/app/store/user.state';
+import { Penalty } from '@shared/models/penalty.model';
 
 export enum ReasonsNavigationTabs {
   Rejection,
+  Penalties,
   Requisition,
   Closure,
   ManualInvoice,
@@ -36,19 +46,42 @@ export enum ReasonsNavigationTabs {
 })
 export class ReasonsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   public selectedTab: ReasonsNavigationTabs = ReasonsNavigationTabs.Rejection;
+  public reasonsNavigationTabs = ReasonsNavigationTabs;
   public form: FormGroup;
+  public penaltiesForm: FormGroup;
   private isEdit = false;
   public title: string = '';
   private isAlive = true;
   private isSaving = false;
+  public cancellationReasons: { id: number; name: string; }[] = [];
+  public regions: OrganizationRegion[] = [];
+  public orgStructure: OrganizationStructure;
+  public selectedRegions: OrganizationRegion[] = [];
+  public locations: OrganizationLocation[] = [];
+  private isAllRegionsSelected = false;
+  private isAllLocationsSelected = false;
+
+  @Select(UserState.organizationStructure)
+  organizationStructure$: Observable<OrganizationStructure>;
+
+  public optionFields = {
+    text: 'name',
+    value: 'id',
+  };
 
   constructor(private store: Store, private confirmService: ConfirmService, private actions$: Actions) {
     super();
+    for(const [key, val] of Object.entries(CancellationReasonsMap)) {
+      this.cancellationReasons.push({
+        id: +key, name: val
+      });
+    }
   }
 
   ngOnInit(): void {
     this.createForm();
     this.subscribeOnSaveReasonSuccess();
+    this.penaltiesSubscriptionHandler();
   }
 
   ngOnDestroy(): void {
@@ -59,28 +92,99 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
     this.selectedTab = selectedTab.selectedIndex;
   }
 
+  private penaltiesSubscriptionHandler(): void {
+    this.organizationStructure$
+      .pipe(takeWhile(() => this.isAlive), filter(Boolean))
+      .subscribe((structure: OrganizationStructure) => {
+        this.orgStructure = structure;
+        this.regions = structure.regions;
+      });
+    this.penaltiesForm.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
+      this.selectedRegions = [];
+      if (val) {
+        val.forEach((id) =>
+          this.selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
+        );
+        this.locations = [];
+        this.isAllRegionsSelected = val.length === this.regions.length;
+        this.selectedRegions.forEach((region) => {
+          region.locations?.forEach((location) => (location.regionName = region.name));
+          this.locations.push(...(region.locations as []));
+        });
+      } else {
+        this.locations = [];
+        this.isAllRegionsSelected = false;
+      }
+      this.penaltiesForm.get('locationIds')?.setValue(null);
+    });
+    this.penaltiesForm.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
+      if (val && val.length === this.locations.length) {
+        this.isAllLocationsSelected = true;
+      } else {
+        this.isAllLocationsSelected = false;
+      }
+    });
+    this.actions$.pipe(
+      ofActionDispatched(ShowOverridePenaltyDialog),
+      takeWhile(() => this.isAlive)
+    ).subscribe(() => {
+      this.isSaving = false
+      this.confirmService
+        .confirm(DATA_OVERRIDE_TEXT, {
+          title: DATA_OVERRIDE_TITLE,
+          okButtonLabel: 'Confirm',
+          okButtonClass: '',
+        })
+        .pipe(
+          filter((confirm) => !!confirm),
+          takeWhile(() => this.isAlive)
+        )
+        .subscribe(() => {
+          this.saveReason(true);
+        });
+      });
+  }
+
   private createForm(): void {
     this.form = new FormGroup({
       id: new FormControl(null),
       reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ALPHANUMERICS_AND_SYMBOLS)])
-    })
+    });
+    this.penaltiesForm = new FormGroup({
+      candidateCancellationSettingId: new FormControl(null),
+      reason: new FormControl(null, [Validators.required]),
+      regionIds: new FormControl([], [Validators.required]),
+      locationIds: new FormControl([], [Validators.required]),
+      penaltyCriteria: new FormControl(PenaltyCriteria.RateOfHours, [Validators.required]), // TODO: add bill rate validation
+      flatRate: new FormControl(null, [Validators.required]),
+      rateOfHours: new FormControl(null, [Validators.required]),
+      flatRateOfHoursPercentage: new FormControl(null, [Validators.required]),
+      flatRateOfHours: new FormControl(null, [Validators.required]),
+    });
   }
 
   private subscribeOnSaveReasonSuccess(): void {
     this.actions$.pipe(
-      ofActionSuccessful(SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReasonSuccess, UpdateOrderRequisitionSuccess),
+      ofActionSuccessful(SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReasonSuccess, UpdateOrderRequisitionSuccess, SavePenaltySuccess),
       takeWhile(() => this.isAlive)
     ).subscribe(() =>this.closeSideDialog());
     this.actions$.pipe(
-      ofActionSuccessful(SaveRejectReasonsError, SaveClosureReasonsError, SaveManualInvoiceRejectReasonError, SaveOrderRequisitionError),
+      ofActionSuccessful(SaveRejectReasonsError, SaveClosureReasonsError, SaveManualInvoiceRejectReasonError, SaveOrderRequisitionError, SavePenaltyError),
       takeWhile(() => this.isAlive)
     ).subscribe(() => this.isSaving = false);
   }
 
-  public saveReason(): void {
-    this.form.markAllAsTouched();
-    if(this.form.invalid) {
-      return;
+  public saveReason(forceUpsert?: boolean): void {
+    if (this.selectedTab === ReasonsNavigationTabs.Penalties) {
+      this.penaltiesForm.markAllAsTouched();
+      if(this.penaltiesForm.invalid) {
+        return;
+      }
+    } else {
+      this.form.markAllAsTouched();
+      if(this.form.invalid) {
+        return;
+      }
     }
 
     if (!this.isSaving) {
@@ -95,7 +199,7 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
               reason: this.form.value.reason
             }
       
-            this.store.dispatch( new UpdateRejectReasons(payload));
+            this.store.dispatch(new UpdateRejectReasons(payload));
           }
           break;
         case ReasonsNavigationTabs.Requisition:
@@ -121,6 +225,19 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
             this.isEdit ? new UpdateManualInvoiceRejectReason(data) : new CreateManualInvoiceRejectReason(data)
           );
           break;
+        case ReasonsNavigationTabs.Penalties:
+          const penaltyValue = this.penaltiesForm.getRawValue();
+          if (this.isAllRegionsSelected) {
+            penaltyValue.regionIds = [];
+          }
+          if (this.isAllLocationsSelected) {
+            penaltyValue.locationIds = [];
+          }
+          if (forceUpsert) {
+            penaltyValue.forceUpsert = true;
+          }
+          this.store.dispatch(new SavePenalty(penaltyValue));
+          break;
       }
     }
   }
@@ -132,13 +249,47 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
     this.isSaving = false;
   }
 
-  public onEdit(data: {reason: string, id: number}): void {
+  public onEdit(data: RejectReason | Penalty): void {
     this.isEdit = true;
     this.title = DialogMode.Edit;
-    this.form.patchValue({
-      id: data.id,
-      reason: data.reason
-    });
+    if (this.selectedTab === ReasonsNavigationTabs.Penalties) {
+      this.isAllLocationsSelected = (data as Penalty).locationId === null;
+      let regions: number[];
+      let locations: number[];
+      if ((data as Penalty).regionId === null) {
+        regions = this.regions.map((region => region.id)) as number[];
+      } else {
+        regions = [(data as Penalty).regionId];
+      }
+      if ((data as Penalty).locationId === null) {
+        locations = [];
+        this.selectedRegions = [];
+        regions.forEach((id) =>
+          this.selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
+        );
+        this.selectedRegions.forEach((region) => region.locations?.forEach((location) => locations.push(location.id)));
+      } else {
+        locations = [(data as Penalty).locationId];
+      }
+
+      this.penaltiesForm.patchValue({
+        candidateCancellationSettingId: (data as Penalty).candidateCancellationSettingId,
+        reason: data.reason,
+        regionIds: regions,
+        locationIds: locations,
+        flatRate: (data as Penalty).flatRate,
+        flatRateOfHours: (data as Penalty).flatRateOfHours,
+        flatRateOfHoursPercentage: (data as Penalty).flatRateOfHoursPercentage,
+        rateOfHours: (data as Penalty).rateOfHours,
+        penaltyCriteria: (data as Penalty).penaltyCriteria
+      });
+    } else {
+      this.form.patchValue({
+        id: (data as RejectReason).id,
+        reason: data.reason
+      });
+    }
+
     this.store.dispatch(new ShowSideDialog(true));
     this.isSaving = false;
   }
@@ -146,11 +297,19 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
   private closeSideDialog(): void {
     this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
       this.form.reset();
+      this.penaltiesForm.reset();
+      this.penaltiesForm.controls['penaltyCriteria'].setValue(PenaltyCriteria.RateOfHours);
     });
   }
 
   public closeDialog(): void {
-    if (this.form.dirty) {
+    let isDirty = false;
+    if (this.selectedTab === ReasonsNavigationTabs.Penalties) {
+      isDirty = this.penaltiesForm.dirty;
+    } else {
+      isDirty = this.form.dirty;
+    }
+    if (isDirty) {
       this.confirmService
         .confirm(CANCEL_REJECTION_REASON, {
           title: DELETE_CONFIRM_TITLE,

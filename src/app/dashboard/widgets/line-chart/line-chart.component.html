@@ -1,24 +1,30 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
   <ng-template #header>
     <div class="widget-header">
-      <h3 class="widget-header__title">{{ 'Positions Trend' }}</h3>
-      <div class="widget-header__actions">
-        <button
-                ejs-button
+      <div class="app-line-chart__title">
+        <h3 class="widget-header__title">{{ 'Positions Trend' }}</h3>
+      </div>
+      <div class="app-line-chart__actions">
+        <button ejs-button
                 [isPrimary]="monthMode"
                 [cssClass]="monthMode ? 'e-small' : 'e-outline e-small'"
-                (click)="onSwicthTo(monthlySelection)"
-                >
+                (click)="onSwicthTo(monthlySelection)">
           Monthly
         </button>
-        <button
-                ejs-button
+        <button ejs-button
                 [isPrimary]="!monthMode"
                 [cssClass]="!monthMode ? 'e-small' : 'e-outline e-small'"
-                (click)="onSwicthTo(weeklySelection)"
-                >
+                (click)="onSwicthTo(weeklySelection)">
           Weekly
         </button>
+      </div>
+      <div class="app-line-chart__tooltip" *ngIf="description.length>0">
+        <ejs-tooltip [content]="description" position='TopCenter'>
+          <span class="mytooltip">
+            <i-feather name="info" id="info"
+                       [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
+          </span>
+        </ejs-tooltip>
       </div>
     </div>
   </ng-template>

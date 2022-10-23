@@ -1,12 +1,21 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
+  <ng-template #header>
+      <div class="app-widget-wrapper__tooltip" *ngIf="description.length>0">
+        <ejs-tooltip [content]="description" position='TopCenter'>
+          <span class="mytooltip">
+            <i-feather name="info" id="info"
+                       [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
+          </span>
+        </ejs-tooltip>
+      </div>
+    
+  </ng-template>
   <ng-template #positionChat>
     <div class="widget">
       <span class="widget__title">{{ chartData?.count }}</span>
-      <span
-        class="widget__type"
-        (mousedown)="defineMousePosition($event)"
-        (click)="toSourceContent($event)"
-        >{{ chartData?.statusName | titlecase }} Positions</span>
+      <span class="widget__type"
+            (mousedown)="defineMousePosition($event)"
+            (click)="toSourceContent($event)">{{ chartData?.statusName | titlecase }} Positions</span>
     </div>
   </ng-template>
 </app-widget-wrapper>

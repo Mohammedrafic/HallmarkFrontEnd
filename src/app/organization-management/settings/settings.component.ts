@@ -109,11 +109,20 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public organizationId: number;
   public maxFieldLength = 100;
   public hasPermissions: Record<string, boolean> = {};
-  public settingFields: string[] = [
+  public settingKeys: string[] = [
     'AllowDocumentUpload',
     'AllowAgencyToBidOnCandidateBillRateBeyondOrderBillRate',
     'AutoLockOrder',
     'IsReOrder',
+    'OrganizationCanEditTimesheet',
+    'AllowDNWInTimesheets',
+    'NoOfDaysAllowedForTimesheetEdit',
+    'AgencyCanEditApprovedTimesheet',
+    'AllowAutoApprovalProcessOfTimesheets',
+    'AgencyAbleSubmitWithoutAttachments',
+    'OrderPushStartDate',
+    'MandatorySpecialProjectDetails',
+    'NetPaymentTerms'
   ];
 
   get dialogHeader(): string {
@@ -730,7 +739,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.permissionService.getPermissions().pipe(
         takeUntil(this.unsubscribe$)
       ).subscribe(({canManageOrganizationConfigurations}) => {
-        this.settingFields.forEach((key) => this.hasPermissions[key] = canManageOrganizationConfigurations);
+        this.settingKeys.forEach((key) => this.hasPermissions[key] = canManageOrganizationConfigurations);
       });
   }
 }
