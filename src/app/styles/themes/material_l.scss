@@ -73834,10 +73834,11 @@ $schedule-tree-content-color: $shadow;
 
 @include export-module('dashboard') {
   .app-custom-icon-light {
-    width: 20px !important;
-    height: 20px !important;
+    width: 12px !important;
+    height: 12px !important;
     cursor: pointer;
-    color: #4c5673;
+    color: gray;
+    margin-top: 2px;
   }
 }
 

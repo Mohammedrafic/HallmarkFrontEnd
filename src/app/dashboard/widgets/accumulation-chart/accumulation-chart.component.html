@@ -1,6 +1,16 @@
 <app-widget-wrapper [isLoading]="isLoading" [description]="description" [isDarkTheme]="isDarkTheme">
   <ng-template #header>
+    <div class="app-accumulation-chart__title">
       <h3 class="widget-header__title">{{ chartData?.title ?? '' }}</h3>
+    </div>
+    <div class="app-accumulation-chart__tooltip" *ngIf="description.length>0">
+      <ejs-tooltip [content]="description" position='TopCenter'>
+        <span class="mytooltip">
+          <i-feather name="info" id="info"
+                     [ngClass]="{'app-custom-icon-dark': isDarkTheme, 'app-custom-icon-light': !isDarkTheme}"></i-feather>
+        </span>
+      </ejs-tooltip>
+    </div>
   </ng-template>
   <ng-template #chart>
     <ejs-accumulationchart #sfComponent

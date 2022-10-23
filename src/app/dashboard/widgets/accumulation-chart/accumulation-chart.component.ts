@@ -70,12 +70,19 @@ export class AccumulationChartComponent
   }
 
   public onClickLegend(label: string): void {
+   
     const currentValue = this.selectedEntries$.value;
     const nextValue = includes(label, currentValue)
       ? lodashFilter((currentValueLabel: string) => currentValueLabel !== label, currentValue)
       : [...(currentValue ?? []), label];
 
     this.selectedEntries$.next(nextValue);
+    this.totalScore = 0;
+    this.chartData?.chartData.forEach(obj => {
+      if (includes(obj.label, this.selectedEntries$.value)) {
+        this.totalScore += obj.value;
+      }
+    });
   }
 
   public trackByHandler(_: number, donutChartData: DonutChartData): string {

@@ -16,13 +16,7 @@ $headerHeight: 19px;
   --chartHeight: 100%;
 
   &.with-legend {
-    --chartHeight: 60%;
-
-    .app-widget-wrapper__chart {
-      float: left;
-      width: 50%;
-    }
-
+    --chartHeight: 50%;
     .app-widget-wrapper__map-chart,
     .app-widget-wrapper__line-chart {
       border-bottom: 1px solid rgba($secondary-dark-blue-40, 0.32);
@@ -51,7 +45,6 @@ $headerHeight: 19px;
 
   &__chart {
     height: var(--chartHeight);
-    padding-top: 10%;
   }
 
   &__line-chart {
@@ -67,13 +60,12 @@ $headerHeight: 19px;
     height: 100%;
     padding-left: 0px;
     margin-left: -10%;
-    margin-top: 10%;
   }
 
   &__legend {
-    height: 80%;
+    height: 45%;
     overflow: auto;
-    padding-top: 25px;
+    padding-top: 5px;
     cursor: default;
     box-sizing: border-box;
   }
@@ -104,22 +96,23 @@ $headerHeight: 19px;
         color: #1a1b2e;
       }
     }
+
+    display: flex;
   }
-}
-.tooltip {
-  text-align: right;
-}
 
-.e-tooltip-wrap .e-tip-content {
-  font-size: 12px;
-  line-height: 20px;
-  background-color:#4e5461;
-  color:#f8f5f5;
-  border-radius: 4px;
-  font-family: "Open Sans", "Roboto", "Segoe UI", "GeezaPro", "DejaVu Serif", "sans-serif", "-apple-system", "BlinkMacSystemFont";
-}
+ 
 
-.e-tooltip-wrap.e-popup {
-  background-color: #fff;
-  border: 2px solid #000;
+  .e-tooltip-wrap .e-tip-content {
+    font-size: 12px;
+    line-height: 20px;
+    background-color: #4e5461;
+    color: #f8f5f5;
+    border-radius: 4px;
+    font-family: "Open Sans", "Roboto", "Segoe UI", "GeezaPro", "DejaVu Serif", "sans-serif", "-apple-system", "BlinkMacSystemFont";
+  }
+
+  .e-tooltip-wrap.e-popup {
+    background-color: #fff;
+    border: 2px solid #000;
+  }
 }

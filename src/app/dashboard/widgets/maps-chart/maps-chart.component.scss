@@ -4,6 +4,7 @@
   &__map {
     aspect-ratio: 5/2.6;
     display: block;
+    padding-top:20px
   }
 
   &__legend {
@@ -44,5 +45,14 @@
 
   &__dark-number {
     color: $white;
+  }
+
+  &__title {
+    width: 95%;
+  }
+
+  &__tooltip {
+    text-align: right;
+    width: 5%;
   }
 }
