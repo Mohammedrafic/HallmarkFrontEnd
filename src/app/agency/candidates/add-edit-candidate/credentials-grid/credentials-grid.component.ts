@@ -82,6 +82,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public optionFields = { text: 'text', value: 'id' };
   public showCertifiedFields: boolean;
   public credentialStatusOptions: FieldSettingsModel[] = [];
+  public readonly orderCredentialId = 0;
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
