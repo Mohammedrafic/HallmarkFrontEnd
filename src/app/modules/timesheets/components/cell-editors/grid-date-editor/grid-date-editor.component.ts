@@ -43,8 +43,10 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
   }
 
   public handleTimeChange(event: ChangeEventArgs): void {
+    const dateStr = event.value && DateTimeHelper.toUtcFormat(event.value as string);
+
     this.control.markAsTouched();
-    this.control.patchValue(event.value);
+    this.control.patchValue(dateStr);
   }
 
   private setFormControl(params: ICellRendererParams): void {

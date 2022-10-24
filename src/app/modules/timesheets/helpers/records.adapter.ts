@@ -123,12 +123,16 @@ export class RecordsAdapter {
 
   private static checkTimeOutDate(timeIn: string, timeOut: string): string {
     const dtaIn = DateTimeHelper.toUtcFormat(timeIn);
+    const splitDateIn = dtaIn.split('T')[0];
+    const splitTimeOut = timeOut.split('T')[1];
+    timeOut = `${splitDateIn}T${splitTimeOut}`;
     const dateOut = DateTimeHelper.toUtcFormat(timeOut);
 
     if (dtaIn > dateOut) {
       return new Date(new Date(dateOut).setDate(new Date(dateOut).getDate() + 1)).toISOString();
+    }
 
-    } else if ((Math.abs(new Date(dateOut).getTime() - new Date(dtaIn).getTime()) / 3600000) >= 24) {
+    if ((Math.abs(new Date(dateOut).getTime() - new Date(dtaIn).getTime()) / 3600000) >= 24) {
       return new Date(new Date(dateOut).setDate(new Date(dateOut).getDate() - 1)).toISOString();
     }
 
