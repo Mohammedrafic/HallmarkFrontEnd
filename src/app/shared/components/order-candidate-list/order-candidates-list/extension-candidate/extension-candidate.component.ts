@@ -312,7 +312,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       (this.canOnboard && this.canReject) && statuses.push(
           this.applicantStatusTypes.Onboard,
           this.applicantStatusTypes.Canceled,
-          this.applicantStatusTypes.Rejected,
         );
 
       (!this.canOnboard && this.canReject) &&
