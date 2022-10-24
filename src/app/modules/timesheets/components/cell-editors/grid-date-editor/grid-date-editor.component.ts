@@ -1,11 +1,11 @@
 import { AbstractControl, FormGroup } from '@angular/forms';
-import { ChangeDetectionStrategy, Component, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
-import { ICellRendererParams, ColDef } from '@ag-grid-community/core';
+import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
-import { TimesheetDateHelper, DateTimeHelper } from '@core/helpers';
+import { DateTimeHelper, TimesheetDateHelper } from '@core/helpers';
 import { EditFieldTypes } from '@core/enums';
 
 @Component({
@@ -15,9 +15,9 @@ import { EditFieldTypes } from '@core/enums';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GridDateEditorComponent extends TimesheetDateHelper implements ICellRendererAngularComp {
-  public value: string;
+  public value: string | null;
 
-  public dateValue: Date;
+  public dateValue: Date | null;
 
   public editable = false;
 
@@ -32,7 +32,8 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
   }
 
   public agInit(params: ICellRendererParams): void {
-    this.setData(params)
+    this.setData(params);
+    this.cd.markForCheck();
   }
 
   public refresh(params: ICellRendererParams): boolean {
@@ -54,7 +55,7 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
   }
 
   private setData(params: ICellRendererParams): void {
-    this.dateValue = new Date(DateTimeHelper.convertDateToUtc(params.value));
+    this.dateValue = params.value && new Date(DateTimeHelper.convertDateToUtc(params.value));
     this.value = params.value;
 
     this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;

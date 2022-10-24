@@ -448,41 +448,45 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   private saveRecords(): void {
-    const diffs = this.timesheetRecordsService.findDiffs(
-      this.records[this.currentTab][this,this.currentMode], this.formControls, this.timesheetColDef);
+    const isFormsHasError = Object.values(this.formControls).some(form => form.invalid);
 
-    const recordsToUpdate = RecordsAdapter.adaptRecordsDiffs(
-      this.records[this.currentTab][this,this.currentMode], diffs, this.idsToDelete);
+    if (!isFormsHasError) {
+      const diffs = this.timesheetRecordsService.findDiffs(
+        this.records[this.currentTab][this,this.currentMode], this.formControls, this.timesheetColDef);
 
-    if (diffs.length || this.idsToDelete.length) {
-      this.loading = true;
-      this.cd.detectChanges();
-      createSpinner({
-        target: this.spinner.nativeElement,
-      });
-      showSpinner(this.spinner.nativeElement);
+      const recordsToUpdate = RecordsAdapter.adaptRecordsDiffs(
+        this.records[this.currentTab][this,this.currentMode], diffs, this.idsToDelete);
 
-      const { organizationId, id, mileageTimesheetId } = this.store.snapshot().timesheets.timesheetDetails;
-      const dto = RecordsAdapter.adaptRecordPutDto(
-        recordsToUpdate,
-        organizationId,
-        this.currentTab === RecordFields.Time ? id : mileageTimesheetId,
-        this.currentTab,
-        this.idsToDelete,
-      );
-
-      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
-      .pipe(
-        takeUntil(this.componentDestroy()),
-      )
-      .subscribe(() => {
-        this.loading = false;
-        this.changesSaved.emit(true);
-        this.isChangesSaved = true;
-        this.idsToDelete = [];
-        this.setInitialTableState();
+      if (diffs.length || this.idsToDelete.length) {
+        this.loading = true;
         this.cd.detectChanges();
-      });
+        createSpinner({
+          target: this.spinner.nativeElement,
+        });
+        showSpinner(this.spinner.nativeElement);
+
+        const { organizationId, id, mileageTimesheetId } = this.store.snapshot().timesheets.timesheetDetails;
+        const dto = RecordsAdapter.adaptRecordPutDto(
+          recordsToUpdate,
+          organizationId,
+          this.currentTab === RecordFields.Time ? id : mileageTimesheetId,
+          this.currentTab,
+          this.idsToDelete,
+        );
+
+          this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
+          .pipe(
+            takeUntil(this.componentDestroy()),
+          )
+          .subscribe(() => {
+            this.loading = false;
+            this.changesSaved.emit(true);
+            this.isChangesSaved = true;
+            this.idsToDelete = [];
+            this.setInitialTableState();
+            this.cd.detectChanges();
+          });
+      }
     }
   }
 

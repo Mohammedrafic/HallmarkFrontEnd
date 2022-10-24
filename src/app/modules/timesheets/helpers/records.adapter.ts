@@ -16,7 +16,7 @@ export class RecordsAdapter {
       records: diffs.map((item) => this.adaptRecordToPut(item)),
     }
   }
-  
+
   static adaptRecordAddDto(
     data: AddTimsheetForm,
     orgId: number,
@@ -43,7 +43,7 @@ export class RecordsAdapter {
       type: MapedRecordsType[type],
       ...data,
     };
-  
+
     return dto;
   }
 
@@ -98,7 +98,7 @@ export class RecordsAdapter {
   static adaptRecordsDiffs(records: RecordValue[], diffs: RecordValue[], deleteIds: number[]): RecordValue[] {
     return records.map((record) => {
       const updatedItem = diffs.find((item) => item.id === record.id);
-    
+
       if (updatedItem) {
         return updatedItem
       }
@@ -115,11 +115,10 @@ export class RecordsAdapter {
       departmentId: record.departmentId,
       value: record.value,
       description: record.description,
-      ...record.timeOut ? { timeOut: 
-        RecordsAdapter.checkTimeOutDate(record.timeIn, record.timeOut)  } : { timeOut: new Date().toISOString()},
-      ...record.description ? { description: record.description } : {},
-      ...record.hasOwnProperty('hadLunchBreak') ? { hadLunchBreak: record.hadLunchBreak } : {},
-    }; 
+      timeOut: record.timeOut ? RecordsAdapter.checkTimeOutDate(record.timeIn, record.timeOut) : null,
+      ...record.description && { description: record.description },
+      ...record.hasOwnProperty('hadLunchBreak') && { hadLunchBreak: record.hadLunchBreak },
+    };
   }
 
   private static checkTimeOutDate(timeIn: string, timeOut: string): string {
@@ -132,7 +131,7 @@ export class RecordsAdapter {
     } else if ((Math.abs(new Date(dateOut).getTime() - new Date(dtaIn).getTime()) / 3600000) >= 24) {
       return new Date(new Date(dateOut).setDate(new Date(dateOut).getDate() - 1)).toISOString();
     }
-    
+
     return DateTimeHelper.toUtcFormat(timeOut);
   }
 }
