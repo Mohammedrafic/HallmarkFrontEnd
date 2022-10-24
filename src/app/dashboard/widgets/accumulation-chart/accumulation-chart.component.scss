@@ -2,7 +2,8 @@
 
 .app-accumulation-chart {
   &__component {
-    aspect-ratio: 1.1;
+      height:100%;
+      width:100%;
   }
 
   &__legend-score {
@@ -15,9 +16,18 @@
     font-size: 25px;
     font-weight: bold;
     line-height: 24px;
-    width: 45%;
-    top: 41%;
+    width: 90%;
+    top: 30%;
     position: absolute;
     text-align: center;
+  }
+
+  &__title {
+    width: 95%;
+  }
+
+  &__tooltip {
+    text-align: right;
+    width: 5%;
   }
 }

@@ -82,6 +82,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public optionFields = { text: 'text', value: 'id' };
   public showCertifiedFields: boolean;
   public credentialStatusOptions: FieldSettingsModel[] = [];
+  public readonly orderCredentialId = 0;
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
@@ -298,6 +299,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       id,
       credentialFiles,
       expireDateApplicable,
+      credentialTypeName,
+      masterName,
     }: CandidateCredential
   ) {
     event.stopPropagation();
@@ -306,8 +309,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.credentialId = id as number;
     this.masterCredentialId = masterCredentialId;
     this.hasFiles = !!credentialFiles?.length;
-    this.store.dispatch(new GetMasterCredentials('', ''));
     this.store.dispatch(new ShowSideDialog(true)).subscribe(() => this.setDropElement());
+    this.searchCredentialForm.patchValue({
+      searchTerm: masterName,
+      credentialTypeId: credentialTypeName,
+    });
     this.addCredentialForm.patchValue({
       status,
       insitute,
@@ -340,7 +346,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter((confirm) => !!confirm))
+      .pipe(filter((confirm: boolean) => confirm), takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.store.dispatch(new RemoveCandidatesCredential(data));
       });
@@ -427,7 +433,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       (this.searchTermControl as AbstractControl).valueChanges,
       (this.credentialTypeIdControl as AbstractControl).valueChanges
     )
-      .pipe(takeUntil(this.unsubscribe$), debounceTime(300))
+      .pipe(
+        filter(() => !this.isEdit),
+        debounceTime(300),
+        takeUntil(this.unsubscribe$)
+      )
       .subscribe(() => {
         this.store.dispatch(
           new GetMasterCredentials(this.searchTermControl?.value || '', this.credentialTypeIdControl?.value || '')

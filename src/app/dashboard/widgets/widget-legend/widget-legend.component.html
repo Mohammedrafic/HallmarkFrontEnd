@@ -23,7 +23,7 @@
         <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onChangeCheckbox(legend.label)"></ejs-checkbox>
         <div class="widget-legend__row-container" (click)="onClickLegendRow($event)" (mousedown)="defineMousePosition($event)">
           <div class="widget-legend__row">
-            <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"></div>
+            <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__pointPositionTrend"></div>
             <div [ngClass]="['widget-legend__legend-text', legendPosition]">{{ legend.label }}</div>
           </div>
         </div>

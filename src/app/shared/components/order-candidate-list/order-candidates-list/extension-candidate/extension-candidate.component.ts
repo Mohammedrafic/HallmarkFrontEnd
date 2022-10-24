@@ -46,7 +46,7 @@ import {
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
-import { capitalize, isEqual } from 'lodash';
+import { capitalize } from 'lodash';
 import { DurationService } from '@shared/services/duration.service';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
@@ -115,6 +115,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public canClose = false;
 
   public applicantStatusEnum = ApplicantStatusEnum;
+
+  private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled', ApplicantStatus> = {
+    Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
+    Rejected: { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
+    Canceled: { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled' },
+  };
 
   get isAccepted(): boolean {
     return this.candidateJob?.applicantStatus?.applicantStatus === this.candidatStatus.Accepted;
@@ -300,41 +306,29 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     const statuses = [];
 
     if (candidate.status === ApplicantStatusEnum.Accepted) {
-      this.canOnboard && statuses.push({ applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' });
-      this.canReject && statuses.push({ applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' });
+      this.canOnboard && statuses.push(this.applicantStatusTypes.Onboard);
+      this.canReject && statuses.push(this.applicantStatusTypes.Rejected);
     } else if (candidate.status === ApplicantStatusEnum.OnBoarded) {
-      statuses.push(
-        { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-        {
-          applicantStatus: ApplicantStatusEnum.Cancelled,
-          statusText: 'Cancelled',
-          disabled: !(this.canOnboard || this.canReject),
-        }
-      );
+      (this.canOnboard && this.canReject) && statuses.push(
+          this.applicantStatusTypes.Onboard,
+          this.applicantStatusTypes.Canceled,
+          this.applicantStatusTypes.Rejected,
+        );
+
+      (!this.canOnboard && this.canReject) &&
+        statuses.push(this.applicantStatusTypes.Canceled, this.applicantStatusTypes.Rejected);
+
+      (this.canOnboard && !this.canReject) &&
+        statuses.push(this.applicantStatusTypes.Onboard, this.applicantStatusTypes.Canceled);
+
+      !(this.canOnboard || this.canReject) && this.statusesFormControl.disable();
     } else {
       statuses.push({ applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) });
-      this.canReject && statuses.push({ applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' });
+      this.canReject && statuses.push(this.applicantStatusTypes.Rejected);
     }
 
     this.applicantStatuses = statuses;
-    candidate.status === ApplicantStatusEnum.Accepted
-      ? [
-          { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
-          { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
-        ]
-      : candidate.status === ApplicantStatusEnum.OnBoarded
-      ? [
-          { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-          {
-            applicantStatus: ApplicantStatusEnum.Cancelled,
-            statusText: 'Cancelled',
-            disabled: !(this.canOnboard && this.canReject),
-          },
-        ]
-      : [
-          { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-          { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
-        ];
+
     if (!this.applicantStatuses.length) {
       this.statusesFormControl.disable();
     }
@@ -478,14 +472,17 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   private getComments(): void {
     this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
+      .pipe(takeUntil(this.destroy$))
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
+        this.changeDetectorRef.markForCheck();
       });
   }
 
   private patchForm(candidateJobId: number): void {
     this.orderManagementContentService
       .getCandidateJob(this.currentOrder.organizationId as number, candidateJobId)
+      .pipe(takeUntil(this.destroy$))
       .subscribe((value) => {
         this.candidateJob = value;
         if (this.candidateJob) {

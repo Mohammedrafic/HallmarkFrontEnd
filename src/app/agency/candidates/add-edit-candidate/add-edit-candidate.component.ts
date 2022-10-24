@@ -15,6 +15,7 @@ import { getCandidatePositionId } from "@shared/components/order-candidate-list/
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 import { CreatedCandidateStatus } from '@shared/enums/status';
+import { CredentialStorageFacadeService } from "@agency/services/credential-storage-facade.service";
 import { CandidateCredentialResponse } from "@shared/models/candidate-credential.model";
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { distinctUntilChanged, filter, Observable, Subject, takeUntil } from 'rxjs';
@@ -84,6 +85,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewIn
     private router: Router,
     private route: ActivatedRoute,
     private confirmService: ConfirmService,
+    private credentialStorage: CredentialStorageFacadeService,
     private location: Location,
     private readonly ngZone: NgZone,
   ) {
@@ -131,6 +133,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewIn
 
   ngOnDestroy(): void {
     this.store.dispatch(new RemoveCandidateFromStore());
+    this.credentialStorage.removeCredentialParams();
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.isRemoveLogo = false;
@@ -363,14 +366,11 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   private setCredentialParams(): void {
-    const location = this.location.getState() as {
-      isNavigatedFromOrganizationArea: boolean;
-      candidateStatus: ApplicantStatus;
-      orderId: number;
-    };
-    this.isNavigatedFromOrganizationArea = location.isNavigatedFromOrganizationArea || false;
-    this.candidateStatus = location.candidateStatus;
-    this.orderId = location.orderId || null;
+    const { isNavigatedFromOrganizationArea, candidateStatus, orderId } = this.credentialStorage.getCredentialParams();
+
+    this.isNavigatedFromOrganizationArea = isNavigatedFromOrganizationArea;
+    this.candidateStatus = candidateStatus;
+    this.orderId = orderId;
   }
 
   private checkForAgencyStatus(): void {

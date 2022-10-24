@@ -4,6 +4,7 @@ import { FormControl } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
+  combineLatest,
   combineLatestWith, debounceTime, distinctUntilChanged, filter, map, Observable,
   switchMap, takeUntil, tap,
 } from 'rxjs';
@@ -121,6 +122,8 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   public isAgency: boolean;
 
   public agencyActionsAllowed = true;
+
+  public invoicePayAllowed = true;
 
   constructor(
     private store: Store,
@@ -248,7 +251,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
     this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx,
       { organizationId: this.organizationId,
-        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay && this.agencyActionsAllowed,
+        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay || this.invoicePayAllowed,
         canEdit: this.agencyActionsAllowed,
       });
 
@@ -442,13 +445,17 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   }
 
   private checkActionsAllowed(): void {
-    this.store.select(UserState.agencyInvoicesActionsAllowed)
+    combineLatest([
+      this.store.select(UserState.agencyActionsAllowed),
+      this.store.select(UserState.agencyInvoicesActionsAllowed),
+    ])
     .pipe(
       distinctUntilChanged(),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe((value) => {
-      this.agencyActionsAllowed = value;
+    .subscribe(([agencyActive, payAllowed]) => {
+      this.agencyActionsAllowed = agencyActive;
+      this.invoicePayAllowed = payAllowed;
     });
   }
 }

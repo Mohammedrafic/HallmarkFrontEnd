@@ -3,7 +3,7 @@
 .widget {
   display: flex;
   flex-direction: column;
-  padding-left:10px;
+  padding-left: 10px;
   height: 100%;
   text-align: center;
 
@@ -25,5 +25,18 @@
     margin-right: -12px;
     margin-right: 4px;
     cursor: default;
+
+    @media screen and (max-width: 1550px) {
+      font-size: 12px;
+    }
   }
 }
+
+  .app-widget-wrapper {
+    &__tooltip {
+      text-align: right;
+      float: right;
+      width: 100%
+    }
+  }
+
