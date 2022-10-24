@@ -225,10 +225,10 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           if (this.selectedDocumentNode?.text != undefined) {
             this.selectedNodeText = (this.selectedDocumentNode?.fileType != undefined && this.selectedDocumentNode?.fileType == 'folder') ? this.selectedDocumentNode?.text : '';
             setTimeout(() => {
-              if (this.selectedDocumentNode?.id != -1)
+              if (this.selectedDocumentNode?.id != -1 && this.selectedDocumentNode?.parentID!=-1)
                 this.getDocuments(this.filterSelectedBusinesUnitId);
-              else if (this.selectedDocumentNode?.id == -1) {
-                this.getSharedDocuments();
+              else if (this.selectedDocumentNode?.id == -1 || this.selectedDocumentNode.parentID==-1) {
+                this.getSharedDocuments(this.filterSelectedBusinesUnitId);
               }
             }, 1000);
           }
@@ -499,11 +499,11 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     return documentFilter;
   }
 
-  private getShareDocumentInfoFilter() {
+  private getShareDocumentInfoFilter(selectedBusinessUnitId: number | null) {
     const documentFilter: ShareDocumentInfoFilter = {
       documentId: this.selectedDocumentNode?.fileType == FileType.File ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null,
       businessUnitType: this.filterSelecetdBusinesType,
-      businessUnitId: this.selectedDocumentNode?.businessUnitId != undefined ? this.selectedDocumentNode?.businessUnitId : null,
+      businessUnitId: this.selectedDocumentNode?.businessUnitId != undefined ? this.selectedDocumentNode?.businessUnitId : selectedBusinessUnitId,
       regionId: null,
       locationId: null,
       folderId: this.selectedDocumentNode?.fileType == FileType.Folder ? (this.selectedDocumentNode?.id != undefined ? this.selectedDocumentNode?.id : null) : null,
@@ -519,8 +519,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.getDocuments(this.filterSelectedBusinesUnitId);
   }
 
-  public getSharedDocuments(): void {
-    this.store.dispatch(new GetSharedDocuments(this.getShareDocumentInfoFilter()));
+  public getSharedDocuments(selectedBusinessUnitId: number | null): void {
+    this.store.dispatch(new GetSharedDocuments(this.getShareDocumentInfoFilter(selectedBusinessUnitId)));
     this.shareDocumentInfoPage$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       this.gridApi?.setRowData([]);
       if (!data || !data?.items.length) {
