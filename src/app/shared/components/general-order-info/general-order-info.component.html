@@ -114,9 +114,9 @@
     </div>
     <div>
       <div class="title">
-        {{ orderInformation.jobStartDate | date: 'MM/dd/yyy' }}
+        {{ orderInformation.jobStartDate | date: 'MM/dd/yyy' : 'UTC' }}
         <ng-container *ngIf="!hideEndDate">
-          -&nbsp;{{ orderInformation.jobEndDate | date: 'MM/dd/yyy' }}
+          -&nbsp;{{ orderInformation.jobEndDate | date: 'MM/dd/yyy' : 'UTC'  }}
         </ng-container>
       </div>
       <div class="sup-title">

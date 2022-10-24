@@ -30,7 +30,7 @@
     <div class="title">Bill Rate $</div>
   </div>
   <div class="info general-info">
-    <div class="data">{{reOrder.jobStartDate || reOrder.startDate | date: 'MM/dd/yyy'}}</div>
+    <div class="data">{{reOrder.jobStartDate || reOrder.startDate | date: 'MM/dd/yyy' : 'UTC' }}</div>
     <div class="title">Re-Order Date</div>
   </div>
   <div class="info general-info">
