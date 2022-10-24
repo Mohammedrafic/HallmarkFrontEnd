@@ -202,6 +202,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private getComments(): void {
     this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
         this.changeDetectorRef.markForCheck();

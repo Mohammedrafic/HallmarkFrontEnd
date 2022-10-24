@@ -478,14 +478,17 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   private getComments(): void {
     this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
+      .pipe(takeUntil(this.destroy$))
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
+        this.changeDetectorRef.markForCheck();
       });
   }
 
   private patchForm(candidateJobId: number): void {
     this.orderManagementContentService
       .getCandidateJob(this.currentOrder.organizationId as number, candidateJobId)
+      .pipe(takeUntil(this.destroy$))
       .subscribe((value) => {
         this.candidateJob = value;
         if (this.candidateJob) {

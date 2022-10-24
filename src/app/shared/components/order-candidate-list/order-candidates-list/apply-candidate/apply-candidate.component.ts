@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
@@ -61,7 +61,11 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     return !!this.candidate.deployedCandidateInfo && this.candidate.candidateStatus !== ApplicantStatus.OnBoarded;
   }
 
-  constructor(private store: Store, private commentsService: CommentsService) {}
+  constructor(
+    private store: Store,
+    private commentsService: CommentsService,
+    private changeDetectorRef: ChangeDetectorRef
+    ) {}
 
   ngOnChanges(): void {
     this.readOnlyMode = !!this.isDeployedCandidate && this.isAgency;
@@ -138,8 +142,10 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private getComments(): void {
     this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
+        this.changeDetectorRef.markForCheck();
       });
   }
 

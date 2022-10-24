@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -143,7 +144,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     private store: Store,
     private actions$: Actions,
     private confirmService: ConfirmService,
-    private commentsService: CommentsService
+    private commentsService: CommentsService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -298,8 +300,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private getComments(): void {
     this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
+        this.changeDetectorRef.markForCheck();
       });
   }
 
