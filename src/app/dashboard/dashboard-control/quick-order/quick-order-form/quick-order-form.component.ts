@@ -127,8 +127,6 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public readonly durations = ORDER_DURATION_LIST;
   public readonly durationFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public today = new Date();
-
   public isJobEndDateControlEnabled = false;
 
   public shiftNameField: AbstractControl;
