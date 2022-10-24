@@ -56,12 +56,12 @@ export class WorkflowByDepartmentAndSkill {
 }
 
 export interface RolesByPermission {
-  workflowStepId: number;
+  type: number;
   roles: RoleWithUser[];
 }
 
 export interface UsersByPermission {
-  workflowStepId: number;
+  type: number;
   users: User[];
 }
 
