@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Actions, ofActionDispatched } from '@ngxs/store';
 
-import { ShowSideDialog } from '../../../store/app.actions';
+import { ShowSideDialog } from 'src/app/store/app.actions';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { takeUntil } from 'rxjs';
 
@@ -14,7 +14,7 @@ import { takeUntil } from 'rxjs';
 })
 export class SideDialogComponent extends DestroyableDirective implements OnInit {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
-  targetElement: HTMLElement = document.body;
+  public targetElement: HTMLElement | null = document.body.querySelector('#main');
 
   @Input() header: string | null;
   @Input() width: string = '434px';
