@@ -240,6 +240,16 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       }
 
     });
+
+    if (this.user?.businessUnitType === BusinessUnitType.MSP) {
+      const [Hallmark, ...rest] = this.businessUnits;
+      this.businessUnits = rest;
+    }
+
+    if (this.user?.businessUnitType === BusinessUnitType.Organization || this.user?.businessUnitType === BusinessUnitType.Agency) {
+      this.businessFilterForm.disable();
+      this.filterBbusinessControl.patchValue(this.user?.businessUnitId);
+    }
   }
 
   ngAfterViewInit(): void {
