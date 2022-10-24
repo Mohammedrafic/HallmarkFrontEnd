@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -72,7 +73,7 @@ import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.util
 
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { catchError, distinctUntilChanged, EMPTY, Observable, Subject, take, takeWhile } from 'rxjs';
+import { catchError, distinctUntilChanged, EMPTY, Observable, Subject, take, takeWhile, takeUntil } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { ShowCloseOrderDialog, ShowToast } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
@@ -173,6 +174,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
   private isAlive = true;
   private isLastExtension: boolean = false;
+  private unsubscribe$: Subject<void> = new Subject();
 
   get isReorderType(): boolean {
     return this.candidateJob?.order.orderType === OrderType.ReOrder;
@@ -221,7 +223,8 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     private confirmService: ConfirmService,
     private orderCandidateListViewService: OrderCandidateListViewService,
     private reOpenOrderService: ReOpenOrderService,
-    private permissionService: PermissionService
+    private permissionService: PermissionService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -265,6 +268,8 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.isAlive = false;
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   setCloseOrderButtonState(): void {
@@ -577,8 +582,10 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   private getComments(): void {
     this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
+        this.changeDetectorRef.markForCheck();
       });
   }
 
