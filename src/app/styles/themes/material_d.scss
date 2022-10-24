@@ -74124,7 +74124,15 @@ $schedule-tree-content-color: #fff !default;
     height: 12px !important;
     cursor: pointer;
     color: #e5e6ec;
-    margin-top:2px;
+    margin-top: 2px;
+  }
+
+  .e-tip-content {
+    color: white !important;
+  }
+
+  .e-tooltip-wrap.e-popup.e-lib.e-control.e-popup-open{
+      border-radius:0px!important;
   }
 }
 
