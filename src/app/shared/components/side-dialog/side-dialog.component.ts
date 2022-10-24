@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { DOCUMENT } from "@angular/common";
+import { Component, EventEmitter, Inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Actions, ofActionDispatched } from '@ngxs/store';
@@ -14,7 +15,7 @@ import { takeUntil } from 'rxjs';
 })
 export class SideDialogComponent extends DestroyableDirective implements OnInit {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
-  public targetElement: HTMLElement | null = document.body.querySelector('#main');
+  public targetElement: HTMLElement | null = this.document.body.querySelector('#main');
 
   @Input() header: string | null;
   @Input() width: string = '434px';
@@ -23,7 +24,8 @@ export class SideDialogComponent extends DestroyableDirective implements OnInit 
   @Output() formCancelClicked = new EventEmitter();
   @Output() formSaveClicked = new EventEmitter();
 
-  constructor(private action$: Actions) {
+  constructor(@Inject(DOCUMENT) private document: Document,
+              private action$: Actions) {
     super();
   }
 
