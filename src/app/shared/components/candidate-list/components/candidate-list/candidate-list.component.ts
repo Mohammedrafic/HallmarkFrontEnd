@@ -3,7 +3,7 @@ import { debounceTime, filter, map, merge, Observable, Subject, takeUntil, takeW
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { CandidateStatus, CandidateStatusOptions, STATUS_COLOR_GROUP } from '@shared/enums/status';
+import { CandidatesStatusText, CandidateStatus, CandidateStatusOptions, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserState } from '../../../../../store/user.state';
 import { SaveCandidateSucceeded } from '@agency/store/candidate.actions';
@@ -78,6 +78,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public CandidateFilterFormGroup: FormGroup;
   public filterColumns: CandidateListFiltersColumn;
   public readonly statusEnum = CandidateStatus;
+  public readonly candidateStatus = CandidatesStatusText;
   public candidates$: Observable<CandidateList>;
   public columnsToExport: ExportColumn[] = [
     { text: 'Name', column: 'Name' },

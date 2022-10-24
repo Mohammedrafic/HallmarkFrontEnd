@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -72,12 +73,13 @@ import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.util
 
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { catchError, distinctUntilChanged, EMPTY, Observable, Subject, take, takeWhile } from 'rxjs';
+import { catchError, distinctUntilChanged, EMPTY, Observable, Subject, take, takeWhile, takeUntil } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { ShowCloseOrderDialog, ShowToast } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from '../../../security/services/permission.service';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 enum Template {
   accept,
@@ -99,7 +101,7 @@ enum MobileMenuItems {
   templateUrl: './child-order-dialog.component.html',
   styleUrls: ['./child-order-dialog.component.scss'],
 })
-export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
+export class ChildOrderDialogComponent extends DestroyableDirective implements OnInit, OnChanges, OnDestroy {
   @Input() order: MergedOrder;
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild] | null>;
   @Input() candidate: OrderManagementChild;
@@ -221,8 +223,9 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     private confirmService: ConfirmService,
     private orderCandidateListViewService: OrderCandidateListViewService,
     private reOpenOrderService: ReOpenOrderService,
-    private permissionService: PermissionService
-  ) {}
+    private permissionService: PermissionService,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {super();}
 
   ngOnInit(): void {
     this.isAgency = this.router.url.includes('agency');
@@ -263,7 +266,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
+  public override ngOnDestroy(): void {
     this.isAlive = false;
   }
 
@@ -577,8 +580,10 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   private getComments(): void {
     this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
+      .pipe(takeUntil(this.destroy$))
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
+        this.changeDetectorRef.markForCheck();
       });
   }
 
@@ -669,7 +674,8 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private subscribeOnSelectedOrder() {
-    this.selectedOrder$.subscribe((data) => {
+    this.selectedOrder$.pipe(takeUntil(this.destroy$))
+    .subscribe((data) => {
       this.selectedOrder = data;
     });
   }
@@ -698,7 +704,9 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private subscribeOnPermissions(): void {
-    this.permissionService.getPermissions().subscribe(({ canCloseOrder, canCreateOrder }) => {
+    this.permissionService.getPermissions()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(({ canCloseOrder, canCreateOrder }) => {
       this.canCreateOrder = canCreateOrder;
       this.canCloseOrder = canCloseOrder;
     });

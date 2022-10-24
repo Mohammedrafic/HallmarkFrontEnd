@@ -282,6 +282,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private getComments(): void {
     this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
         this.changeDetectionRef.markForCheck();
