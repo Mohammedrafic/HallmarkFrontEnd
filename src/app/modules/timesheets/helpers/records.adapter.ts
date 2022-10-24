@@ -115,7 +115,7 @@ export class RecordsAdapter {
       departmentId: record.departmentId,
       value: record.value,
       description: record.description,
-      timeOut: record.timeOut ? RecordsAdapter.checkTimeOutDate(record.timeIn, record.timeOut) : null,
+      timeOut: record.timeOut && RecordsAdapter.checkTimeOutDate(record.timeIn, record.timeOut),
       ...record.description && { description: record.description },
       ...record.hasOwnProperty('hadLunchBreak') && { hadLunchBreak: record.hadLunchBreak },
     };
