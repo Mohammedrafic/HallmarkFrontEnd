@@ -122,7 +122,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     'AgencyAbleSubmitWithoutAttachments',
     'OrderPushStartDate',
     'MandatorySpecialProjectDetails',
-    'NetPaymentTerms'
+    'NetPaymentTerms',
   ];
 
   get dialogHeader(): string {
@@ -377,32 +377,35 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
 
   public onFormSaveClick(): void {
     if (this.isEdit) {
-      if (this.organizationSettingsFormGroup.valid) {
-        if (this.validatePushStartDateForm()) return;
+      if (this.organizationSettingsFormGroup.valid && this.isPushStartDateValid()) {
         this.sendForm();
       } else {
         this.organizationSettingsFormGroup.markAllAsTouched();
+        this.validatePushStartDateForm()
       }
     } else {
-      if (this.regionRequiredFormGroup.valid) {
+      if (this.regionRequiredFormGroup.valid && this.isPushStartDateValid()) {
         if (this.organizationSettingsFormGroup.valid) {
-          if (this.validatePushStartDateForm()) return;
           this.sendForm();
         } else {
           this.organizationSettingsFormGroup.markAllAsTouched();
+          this.validatePushStartDateForm();
         }
       } else {
         this.regionRequiredFormGroup.markAllAsTouched();
+        this.validatePushStartDateForm()
       }
     }
   }
 
-  private validatePushStartDateForm(): boolean {
+  private isPushStartDateValid(): boolean {
+    return this.formControlType !== OrganizationSettingControlType.FixedKeyDictionary || this.pushStartDateFormGroup.valid;
+  }
+
+  private validatePushStartDateForm(): void {
     if(this.formControlType === OrganizationSettingControlType.FixedKeyDictionary && this.pushStartDateFormGroup.invalid) {
       this.pushStartDateFormGroup.markAllAsTouched();
-      return true;
     }
-    return false;
   }
 
   public onRegionChange(event: any): void {
@@ -612,13 +615,13 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
         settingKey: parentData.settingKey,
         controlType: parentData.controlType,
         name: parentData.name,
-        value: dynamicValue?.isDictionary ? dynamicValue.isEnabled : dynamicValue,
+        value: dynamicValue?.isDictionary ? !!dynamicValue.isEnabled : dynamicValue,
       });
 
       dynamicValue?.isDictionary &&
         this.pushStartDateFormGroup.setValue({
-          daysToPush: dynamicValue.daysToPush,
-          daysToConsider: dynamicValue.daysToConsider,
+          daysToPush: dynamicValue.daysToPush || null,
+          daysToConsider: dynamicValue.daysToConsider || null,
         });
     });
   }
@@ -738,7 +741,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   private setPermissionsToManageSettings(): void {
     this.permissionService.getPermissions().pipe(
         takeUntil(this.unsubscribe$)
-      ).subscribe(({canManageOrganizationConfigurations}) => {
+      ).subscribe(({ canManageOrganizationConfigurations }) => {
         this.settingKeys.forEach((key) => this.hasPermissions[key] = canManageOrganizationConfigurations);
       });
   }
