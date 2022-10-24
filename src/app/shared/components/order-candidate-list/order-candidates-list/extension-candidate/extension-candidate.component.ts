@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } 
 
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { EMPTY, map, merge, mergeMap, Observable, Subject, takeUntil, filter, zip } from 'rxjs';
+import { EMPTY, map, merge, mergeMap, Observable, Subject, takeUntil, filter, combineLatest } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
@@ -312,11 +312,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       (this.canOnboard && this.canReject) && statuses.push(
           this.applicantStatusTypes.Onboard,
           this.applicantStatusTypes.Canceled,
-          this.applicantStatusTypes.Rejected,
         );
 
       (!this.canOnboard && this.canReject) &&
-        statuses.push(this.applicantStatusTypes.Canceled, this.applicantStatusTypes.Rejected);
+        statuses.push(this.applicantStatusTypes.Canceled);
 
       (this.canOnboard && !this.canReject) &&
         statuses.push(this.applicantStatusTypes.Onboard, this.applicantStatusTypes.Canceled);
@@ -328,6 +327,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
 
     this.applicantStatuses = statuses;
+    this.changeDetectorRef.markForCheck();
 
     if (!this.applicantStatuses.length) {
       this.statusesFormControl.disable();
@@ -356,8 +356,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       })
     ) as Observable<OrderCandidatesList>;
 
-    zip(this.orderPermissions$, this.candidate$)
-      .pipe(takeUntil(this.destroy$))
+    combineLatest([this.orderPermissions$, this.candidate$])
+      .pipe(
+        filter(([permission, candidate]) => !!permission && !!candidate),
+        takeUntil(this.destroy$)
+      )
       .subscribe(([data, candidate]: [CurrentUserPermission[], OrderCandidatesList]) => (this.orderPermissions = data) && this.mapPermissions());
   }
 

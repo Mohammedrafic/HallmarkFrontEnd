@@ -684,8 +684,8 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
                 ? [...formArray.controls[i].value.roleUserList, foundUserRole.id]
                 : [foundUserRole.id];
               formArray.controls[i].get('roleUserList')!.setValue(value);
-              formArray.controls[i].get('isPermissionBased')!.setValue(foundMatchedStep.isPermissionBased);
             }
+            formArray.controls[i].get('isPermissionBased')!.setValue(foundMatchedStep.isPermissionBased);
           }
         });
       }

@@ -4,9 +4,9 @@
       <div class="e-card-header-caption candidat-status">
         <h3 class="e-card-title candidate-title">{{ candidate?.lastName }}, {{ candidate?.firstName }}</h3>
         <ng-container *ngIf="candidate.workflowStepType">
-          <ejs-chiplist [text]="candidate.workflowStepType.status">
+          <ejs-chiplist [text]="candidate.statusName">
             <e-chips>
-              <e-chip [cssClass]="workflowStepType[candidate.workflowStepType.type] | chipsCssClass"></e-chip>
+              <e-chip [cssClass]="candidatStatus[candidate.status] | chipsCssClass"></e-chip>
             </e-chips>
           </ejs-chiplist>
         </ng-container>
