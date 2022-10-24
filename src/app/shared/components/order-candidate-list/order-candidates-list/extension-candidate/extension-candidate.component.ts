@@ -116,6 +116,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   public applicantStatusEnum = ApplicantStatusEnum;
 
+  private readonly applicantStatusTypes: Record<'onboard' | 'rejected' | 'canceled', ApplicantStatus> = {
+    onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
+    rejected: { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
+    canceled: { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled' },
+  };
+
   get isAccepted(): boolean {
     return this.candidateJob?.applicantStatus?.applicantStatus === this.candidatStatus.Accepted;
   }
@@ -300,41 +306,29 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     const statuses = [];
 
     if (candidate.status === ApplicantStatusEnum.Accepted) {
-      this.canOnboard && statuses.push({ applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' });
-      this.canReject && statuses.push({ applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' });
+      this.canOnboard && statuses.push(this.applicantStatusTypes.onboard);
+      this.canReject && statuses.push(this.applicantStatusTypes.rejected);
     } else if (candidate.status === ApplicantStatusEnum.OnBoarded) {
-      statuses.push(
-        { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-        {
-          applicantStatus: ApplicantStatusEnum.Cancelled,
-          statusText: 'Cancelled',
-          disabled: !(this.canOnboard || this.canReject),
-        }
-      );
+      (this.canOnboard && this.canReject) && statuses.push(
+          this.applicantStatusTypes.onboard,
+          this.applicantStatusTypes.canceled,
+          this.applicantStatusTypes.rejected,
+        );
+
+      (!this.canOnboard && this.canReject) &&
+        statuses.push(this.applicantStatusTypes.canceled, this.applicantStatusTypes.rejected);
+
+      (this.canOnboard && !this.canReject) &&
+        statuses.push(this.applicantStatusTypes.onboard, this.applicantStatusTypes.canceled);
+
+      !(this.canOnboard || this.canReject) && this.statusesFormControl.disable();
     } else {
       statuses.push({ applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) });
-      this.canReject && statuses.push({ applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' });
+      this.canReject && statuses.push(this.applicantStatusTypes.rejected);
     }
 
     this.applicantStatuses = statuses;
-    candidate.status === ApplicantStatusEnum.Accepted
-      ? [
-          { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
-          { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
-        ]
-      : candidate.status === ApplicantStatusEnum.OnBoarded
-      ? [
-          { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-          {
-            applicantStatus: ApplicantStatusEnum.Cancelled,
-            statusText: 'Cancelled',
-            disabled: !(this.canOnboard && this.canReject),
-          },
-        ]
-      : [
-          { applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) },
-          { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
-        ];
+
     if (!this.applicantStatuses.length) {
       this.statusesFormControl.disable();
     }
