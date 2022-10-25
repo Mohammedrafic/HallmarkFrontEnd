@@ -250,7 +250,7 @@
             id="region"
             [dataSource]="regions$ | async"
             [fields]="regionLocationFields"
-            (change)="onRegionChange($event)"
+            (select)="onRegionChange($event)"
             [enabled]="!isParentEdit"
             formControlName="regionId">
           </ejs-dropdownlist>
@@ -267,7 +267,7 @@
             appValidateWithMessage
             [dataSource]="regions$ | async"
             [fields]="regionLocationFields"
-            (change)="onRegionChange($event)"
+            (select)="onRegionChange($event)"
             formControlName="regionId">
           </ejs-dropdownlist>
         </div>
@@ -282,7 +282,7 @@
             id="location"
             [dataSource]="locations$ | async"
             [fields]="regionLocationFields"
-            (change)="onLocationChange($event)"
+            (select)="onLocationChange($event)"
             [enabled]="!isParentEdit"
             formControlName="locationId">
           </ejs-dropdownlist>
@@ -298,7 +298,7 @@
             id="department"
             [dataSource]="departments$ | async"
             [fields]="departmentFields"
-            (change)="onDepartmentChange($event)"
+            (select)="onDepartmentChange($event)"
             [enabled]="!isParentEdit"
             formControlName="departmentId">
           </ejs-dropdownlist>
