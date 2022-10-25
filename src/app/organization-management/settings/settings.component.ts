@@ -114,15 +114,6 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     'AllowAgencyToBidOnCandidateBillRateBeyondOrderBillRate',
     'AutoLockOrder',
     'IsReOrder',
-    'OrganizationCanEditTimesheet',
-    'AllowDNWInTimesheets',
-    'NoOfDaysAllowedForTimesheetEdit',
-    'AgencyCanEditApprovedTimesheet',
-    'AllowAutoApprovalProcessOfTimesheets',
-    'AgencyAbleSubmitWithoutAttachments',
-    'OrderPushStartDate',
-    'MandatorySpecialProjectDetails',
-    'NetPaymentTerms',
   ];
 
   get dialogHeader(): string {
