@@ -64,11 +64,12 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
     this.setFormControl(params);
   }
 
-  private calculateDateValue(date: string): string {
-    const splitStartDate = this.value?.split('T')[0];
+  private calculateDateValue(date: string): string | null {
+    const today = new Date().toISOString();
+    const splitStartDate = (this.value || today).split('T')[0];
     const dateStr = date && DateTimeHelper.toUtcFormat(date as string);
     const splitValue = (dateStr as string)?.split('T')[1];
 
-    return dateStr && `${splitStartDate}T${splitValue}`;
+    return dateStr && splitStartDate ? `${splitStartDate}T${splitValue}` : null;
   }
 }
