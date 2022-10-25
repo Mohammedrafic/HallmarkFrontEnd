@@ -100,7 +100,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
         item.options = item.options?.filter((option) => {
           return !ratesNotForSelect.includes(option.text);
         });
-        
+
         this.onCallId = item.options?.find((rate) => rate.text.toLowerCase() === 'oncall')?.value as number;
       }
     });
@@ -121,7 +121,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
   private checkBillRateDate(timeIn: string, billRateId: number): boolean {
     const billRate = (this.store.snapshot().timesheets['billRateTypes'] as AddRecordBillRate[])
     .find((rate) => rate.value === billRateId);
- 
+
     if (billRate && billRate.efectiveDate > timeIn) {
       return false
     }
