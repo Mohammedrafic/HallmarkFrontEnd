@@ -3,7 +3,11 @@
   <ng-template [ngSwitchCase]="false">
     <div class="init-value-wrapper">
       <span class="value-block">
-        <span class="value">{{ value | date:'H:mm': 'UTC'}}</span>
+        <span *ngIf="value; else timePlaceholder" class="value">{{ value | date:'H:mm': 'UTC'}}</span>
+
+        <ng-template #timePlaceholder>
+          <span class="value">HH:MM</span>
+        </ng-template>
       </span>
     </div>
   </ng-template>
@@ -20,9 +24,10 @@
             [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
             [enableMask]="true"
             [step]="15"
+            [ngClass]="control.invalid ? ['ng-invalid', 'ng-touched'] : []"
             maskPlaceholder="HH:MM"
             (change)="handleTimeChange($event)">
-        </ejs-timepicker>
+          </ejs-timepicker>
         </ng-template>
 
         <ng-template ngSwitchCase="dateTime">

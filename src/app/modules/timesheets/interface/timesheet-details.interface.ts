@@ -144,7 +144,7 @@ export interface AddRecordDto {
 export interface PutRecord {
   id: number;
   timeIn: string;
-  timeOut?: string;
+  timeOut?: string | null;
   billRateConfigId: number;
   departmentId: number;
   value: number;
