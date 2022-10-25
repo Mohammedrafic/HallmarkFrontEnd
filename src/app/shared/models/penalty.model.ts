@@ -13,6 +13,7 @@ export type Penalty = {
   flatRateOfHoursPercentage: number;
   flatRateOfHours: number;
   penaltyCriteria?: boolean;
+  billRate?: number;
 }
 
 export type PenaltyPayload = {

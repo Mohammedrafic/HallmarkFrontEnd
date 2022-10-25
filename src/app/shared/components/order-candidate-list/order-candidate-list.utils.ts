@@ -5,3 +5,7 @@ export const getCandidatePositionId = (organizationPrefix: string, publicId: num
     return `${publicId}-${positionId}`;
   }
 };
+
+export const getOrderPublicId = (organizationPrefix: string, publicId: number): string => {
+  return `${organizationPrefix}-${publicId}`;
+};
