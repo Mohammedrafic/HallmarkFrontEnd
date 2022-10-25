@@ -64,7 +64,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   public reasons: DataSourceObject<JobCancellationReason>[];
   public readonly penalties: DataSourceObject<PenaltyCriteria>[] = penaltiesDataSource;
 
-  private predefinedPenalties: Penalty;
+  private predefinedPenalties: Penalty | null;
 
   constructor(private formBuilder: FormBuilder,
               private cd: ChangeDetectorRef,
@@ -116,6 +116,8 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     this.form?.get('jobCancellationReason')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value: JobCancellationReason) =>  {
       this.isReasonSelected = !!(value || value === JobCancellationReason.TravelCancellationOnBehalfOfOrganization);
       if (this.isReasonSelected && this.candidateJob) {
+        this.form?.get('penaltyCriteria')?.setValue(null);
+        this.predefinedPenalties = null;
         this.orderService.getPredefinedPenalties(this.candidateJob, value).subscribe((data) => {
           this.predefinedPenalties = data;
           this.form?.get('penaltyCriteria')?.setValue(data.penaltyCriteria);
@@ -138,16 +140,16 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
   private setDefaultValues(value: PenaltyCriteria): void {
     switch(value) {
       case PenaltyCriteria.FlatRate:
-        this.form?.get('rate')?.setValue(this.predefinedPenalties.flatRate || 0);
+        this.form?.get('rate')?.setValue(this.predefinedPenalties?.flatRate || 0);
         this.form?.get('hours')?.setValue(0);
         break;
       case PenaltyCriteria.RateOfHours:
-        this.form?.get('rate')?.setValue(this.predefinedPenalties.flatRateOfHoursPercentage || 0);
-        this.form?.get('hours')?.setValue(this.predefinedPenalties.flatRateOfHours || 0);
+        this.form?.get('rate')?.setValue(this.predefinedPenalties?.flatRateOfHoursPercentage || 0);
+        this.form?.get('hours')?.setValue(this.predefinedPenalties?.flatRateOfHours || 0);
         break;
       case PenaltyCriteria.FlatRateOfHours:
-        this.form?.get('rate')?.setValue(this.predefinedPenalties.billRate || 0);
-        this.form?.get('hours')?.setValue(this.predefinedPenalties.rateOfHours || 0);
+        this.form?.get('rate')?.setValue(this.predefinedPenalties?.billRate || 0);
+        this.form?.get('hours')?.setValue(this.predefinedPenalties?.rateOfHours || 0);
         break;
     }
   }
