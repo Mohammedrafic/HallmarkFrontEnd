@@ -11,7 +11,7 @@ import { OutsideZone } from "@core/decorators";
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { SelectNavigation } from '@shared/components/candidate-details/store/candidate.actions';
 import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
-import { getCandidatePositionId } from "@shared/components/order-candidate-list/order-candidate-list.utils";
+import { getCandidatePositionId, getOrderPublicId } from "@shared/components/order-candidate-list/order-candidate-list.utils";
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 import { CreatedCandidateStatus } from '@shared/enums/status';
@@ -401,7 +401,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewIn
           this.orderOrPositionId = getCandidatePositionId(response.organizationPrefix, response.publicId, response.positionId);
           this.orderOrPositionTitle = 'Position';
         } else {
-          this.orderOrPositionId = String(this.orderId);
+          this.orderOrPositionId = getOrderPublicId(response.organizationPrefix, response.publicId);
           this.orderOrPositionTitle = 'Order';
         }
       });
