@@ -116,10 +116,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
   public applicantStatusEnum = ApplicantStatusEnum;
 
-  private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled', ApplicantStatus> = {
+  private readonly applicantStatusTypes: Record<'Onboard' | 'Rejected' | 'Canceled' | 'Offered', ApplicantStatus> = {
     Onboard: { applicantStatus: ApplicantStatusEnum.OnBoarded, statusText: 'Onboard' },
     Rejected: { applicantStatus: ApplicantStatusEnum.Rejected, statusText: 'Rejected' },
     Canceled: { applicantStatus: ApplicantStatusEnum.Cancelled, statusText: 'Cancelled' },
+    Offered: { applicantStatus: ApplicantStatusEnum.Offered, statusText: 'Offered' },
   };
 
   get isAccepted(): boolean {
@@ -308,19 +309,15 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     if (candidate.status === ApplicantStatusEnum.Accepted) {
       this.canOnboard && statuses.push(this.applicantStatusTypes.Onboard);
       this.canReject && statuses.push(this.applicantStatusTypes.Rejected);
+    } else if (candidate.status === ApplicantStatusEnum.Offered) {
+      this.canOffer && statuses.push(this.applicantStatusTypes.Offered);
+      this.canReject && statuses.push(this.applicantStatusTypes.Rejected);
     } else if (candidate.status === ApplicantStatusEnum.OnBoarded) {
-      (this.canOnboard && this.canReject) && statuses.push(
-          this.applicantStatusTypes.Onboard,
-          this.applicantStatusTypes.Canceled,
-        );
-
-      (!this.canOnboard && this.canReject) &&
-        statuses.push(this.applicantStatusTypes.Canceled);
-
-      (this.canOnboard && !this.canReject) &&
+      if (this.canOnboard) {
         statuses.push(this.applicantStatusTypes.Onboard, this.applicantStatusTypes.Canceled);
-
-      !(this.canOnboard || this.canReject) && this.statusesFormControl.disable();
+      } else if (this.canReject) {
+        statuses.push(this.applicantStatusTypes.Rejected);
+      }
     } else {
       statuses.push({ applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) });
       this.canReject && statuses.push(this.applicantStatusTypes.Rejected);
