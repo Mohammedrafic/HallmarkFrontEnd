@@ -130,7 +130,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
       this.isPenaltyCriteriaSelected = !!(value || value === PenaltyCriteria.FlatRate);
       this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
       this.showPercentage = value === PenaltyCriteria.RateOfHours;
-      if (this.isPenaltyCriteriaSelected && this.predefinedPenalties) {
+      if (this.isPenaltyCriteriaSelected) {
         setTimeout(() => this.setDefaultValues(value));
       }
       this.cd.markForCheck();
