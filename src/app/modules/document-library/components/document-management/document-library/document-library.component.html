@@ -43,10 +43,10 @@
     <div class="title">
       <h3>{{selectedNodeText}}</h3>
     </div>
-    <div class="row-tool-buttons" *ngIf="this.selectedDocumentNode?.id!=-1">
-      <ejs-switch id="switcher"
+    <div class="row-tool-buttons" *ngIf="this.selectedDocumentNode?.id!=-1 || this.selectedDocumentNode?.parentID!=-1">
+       <ejs-switch id="switcher"
                   [checked]="isIncludeSharedWithMe" (change)="onIncludeSharedWithMe($event);"></ejs-switch>
-      <label for="switcher" class="switch-text">Include Shared With Me</label>
+      <label for="switcher" class="switch-text">Include Shared With Me</label> 
       <button ejs-button cssClass="e-flat seconadry-dark-icon-button" (click)="shareSelectedDocuments($event)">
         <span><i-feather name="share-2" class="icon"></i-feather></span>
       </button>
@@ -70,7 +70,7 @@
   <div>
     <ejs-documenteditor [enableSelection]=true
                         [enableSearch]=true [enableEditor]=true
-                        #documentPreview style="width:500px;height:600px;" [style.display]="!isPdf? 'block' : 'none'"></ejs-documenteditor>
+                        #documentPreview style="width:500px;height:600px;" [style.display]="isWordDoc? 'block' : 'none'"></ejs-documenteditor>
 
   </div>
 </app-document-preview-side-dialog>

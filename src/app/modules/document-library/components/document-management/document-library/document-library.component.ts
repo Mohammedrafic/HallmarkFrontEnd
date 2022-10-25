@@ -11,7 +11,12 @@ import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, DISABLED_GROUP, DocumentLi
 import { DeleteDocumentsFilter, DocumentFolder, DocumentLibraryDto, Documents, DocumentsFilter, DocumentsLibraryPage, DocumentTags, DocumentTypeFilter, DocumentTypes, DownloadDocumentDetail, DownloadDocumentDetailFilter, NodeItem, ShareDocumentDto, ShareDocumentInfoFilter, ShareDocumentInfoPage, ShareDocumentsFilter, UnShareDocumentsFilter } from '../../../store/model/document-library.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { DocumentLibraryState } from '../../../store/state/document-library.state';
-import { DeletDocuments, GetDocumentById, GetDocumentDownloadDeatils, GetDocuments, GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, GetSharedDocuments, IsAddNewFolder, SaveDocumentFolder, SaveDocuments, ShareDocuments, UnShareDocuments } from '../../../store/actions/document-library.actions';
+import {
+  DeletDocuments, GetDocumentById, GetDocumentDownloadDeatils, GetDocuments,
+  GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, GetSharedDocuments,
+  IsAddNewFolder, SaveDocumentFolder, SaveDocuments, ShareDocuments, UnShareDocuments,
+  GetLocationsByRegions, GetRegionsByOrganizations
+} from '../../../store/actions/document-library.actions';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { documentsColumnField, FileType, FormControlNames, FormDailogTitle, MoreMenuType, StatusEnum } from '../../../enums/documents.enum';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -20,10 +25,8 @@ import { UserState } from '../../../../../store/user.state';
 import { SecurityState } from '../../../../../security/store/security.state';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { Location, LocationsByRegionsFilter } from '@shared/models/location.model';
-import { Region, regionFilter } from '@shared/models/region.model';
-import { GetLocationsByRegions, GetRegionsByOrganizations } from '../../../../../organization-management/store/logi-report.action';
-import { LogiReportState } from '../../../../../organization-management/store/logi-report.state';
+import { Location } from '@shared/models/location.model';
+import { Region } from '@shared/models/region.model';
 import { datesValidator } from '@shared/validators/date.validator';
 import { GetBusinessByUnitType } from '../../../../../security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
@@ -45,6 +48,9 @@ import {
   SearchService
 } from '@syncfusion/ej2-angular-documenteditor';
 import { User } from '../../../../../shared/models/user-managment-page.model';
+import { regionFilter } from '../../../store/model/document-library.model';
+import { LocationsByRegionsFilter } from '../../../store/model/document-library.model';
+
 
 @Component({
   selector: 'app-document-library',
@@ -100,7 +106,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public endDateField: AbstractControl;
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
-
+  public isWordDoc:boolean=false;
 
 
   public gridApi!: GridApi;
@@ -160,10 +166,10 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   documentDownloadDetail$: Observable<DownloadDocumentDetail>;
   @Select(DocumentLibraryState.documentLibraryDto)
   documentLibraryDto$: Observable<DocumentLibraryDto>;
-  @Select(LogiReportState.regions)
+  @Select(DocumentLibraryState.regions)
   public regions$: Observable<Region[]>;
   selectedRegions: Region[];
-  @Select(LogiReportState.locations)
+  @Select(DocumentLibraryState.locations)
   public locations$: Observable<Location[]>;
   selectedLocations: Location[];
   @Select(DocumentLibraryState.savedDocumentLibraryDto)
@@ -181,7 +187,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   ngOnInit(): void {
     this.store.dispatch(new SetHeaderState({ title: 'Documents', iconName: 'folder' }));
-    this.createForm();
     this.businessFilterForm = this.generateFilterBusinessForm();
     this.onFilterBusinessUnitValueChanged();
     this.user = this.store.selectSnapshot(UserState.user) as User;
@@ -219,6 +224,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.selectedNodeText = '';
       if (payload.payload) {
         if (this.previousFolderId != payload.payload.id) {
+          this.selectedNodeText = '';
           this.previousFolderId = payload.payload.id;
           this.selectedDocumentNode = payload.payload;
           this.gridApi?.setRowData([]);
@@ -233,7 +239,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             }, 1000);
           }
           else {
-            this.selectedNodeText = '';
+            if(payload.payload.id=0)
+            this.selectedNodeText = 'Documents';
           }
         }
         this.changeDetectorRef.markForCheck();
@@ -277,6 +284,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     });
   }
   private onFilterBusinessUnitValueChanged(): void {
+    //ToDo: This is not triggered on inital BU select for hallmark user
     this.filterBusinessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       value && this.store.dispatch(new GetBusinessByUnitType(value));
       if (value) {
@@ -295,7 +303,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.filterBbusinessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       if (value) {
         this.filterSelectedBusinesUnitId = value;
-        this.changeDetectorRef.markForCheck();
         this.onLoadRegionsLocationsOnUnitChange(value);
         this.getDocumentTypes(value);
         this.getFolderTree(value);
@@ -304,18 +311,24 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   public onLoadRegionsLocationsOnUnitChange(selectedBusinessUnitId: number) {
+    this.isUpload = true;
+    this.createForm();
     this.regionIdControl = this.documentLibraryform.get(FormControlNames.RegionIds) as AbstractControl;
     if (selectedBusinessUnitId == BusinessUnitType.Organization || selectedBusinessUnitId == BusinessUnitType.Agency) {
       let regionFilter: regionFilter = {
-        ids: [selectedBusinessUnitId],
-        getAll: true
+        businessUnitId:selectedBusinessUnitId,
+        getAll: true,
+        ids: [selectedBusinessUnitId]
       };
       this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
+      this.changeDetectorRef.markForCheck();
+
       this.regionIdControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
         if (this.regionIdControl?.value?.length > 0) {
           let locationFilter: LocationsByRegionsFilter = {
             ids: data,
-            getAll: true
+            getAll: true,
+            businessUnitId: selectedBusinessUnitId
           };
           this.store.dispatch(new GetLocationsByRegions(locationFilter));
           this.changeDetectorRef.markForCheck();
@@ -383,8 +396,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.documentLibraryform.addControl(FormControlNames.LocationIds, new FormControl(null, []));
 
     }
-    //this.documentLibraryform.addControl(FormControlNames.Agencies, new FormControl(null, []));
-    //this.documentLibraryform.addControl(FormControlNames.Orgnizations, new FormControl(null, []));
+    this.documentLibraryform.addControl(FormControlNames.Agencies, new FormControl(null, []));
+    this.documentLibraryform.addControl(FormControlNames.Orgnizations, new FormControl(null, []));
   }
 
   private applyDateValidations() {
@@ -625,25 +638,26 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         break;
       case '.jpg':
         this.isPdf = false;
+        this.isWordDoc=false;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
           `data:image/jpg;base64,${file.fileAsBase64}`
         );
         break;
       case '.png':
         this.isPdf = false;
+        this.isWordDoc=false;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
           `data:image/png;base64,${file.fileAsBase64}`
         );
         break;
       case '.docx':
         this.isPdf = false;
+        this.isWordDoc=true;
         this.loadDocument(file.fileAsBase64);
-        //this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        //  `https://view.officeapps.live.com/op/embed.aspx?src=${x.sasUrl}`
-        //);
         break;
       case '.xlsx':
         this.isPdf = false;
+        this.isWordDoc=false;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
           `https://view.officeapps.live.com/op/embed.aspx?src=${file.sasUrl}`
         );
@@ -730,7 +744,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.dialogWidth = '800px';
     this.addRemoveFormcontrols();
     this.formDailogTitle = FormDailogTitle.Upload;
-    if (this.selectedDocumentNode != undefined && this.selectedDocumentNode != null && this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode?.id != -1)
+    if (
+      this.selectedNodeText='Documents'||
+      this.selectedDocumentNode != null 
+      && this.selectedDocumentNode?.id != undefined 
+      && this.selectedDocumentNode?.id != -1
+      && this.selectedDocumentNode?.parentID != -1)
       this.store.dispatch(new ShowSideDialog(true));
     else
       this.store.dispatch([new ShowToast(MessageTypes.Warning, "Please select BusinessUnit and select folder.")]);

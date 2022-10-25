@@ -172,6 +172,24 @@ export class UnShareDocumentsFilter {
   documentIds: number[];
 }
 
+export class regionFilter {
+  ids?: number[];
+  name?: string[];
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+  getAll?: boolean;
+  businessUnitId: number;
+}
+
+export class LocationsByRegionsFilter {
+  ids?: number[];
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+  getAll?: boolean;
+  businessUnitId: number;
+}
 
 
 

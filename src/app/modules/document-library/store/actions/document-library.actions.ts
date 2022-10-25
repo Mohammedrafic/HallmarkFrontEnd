@@ -1,4 +1,6 @@
 import { DocumentFolder, NodeItem, Documents, DocumentTypeFilter, DocumentsFilter, DocumentTagFilter, FolderTreeFilter, DownloadDocumentDetailFilter, DownloadDocumentDetail, DeleteDocumentsFilter, ShareDocumentsFilter, ShareDocumentInfoFilter, UnShareDocumentsFilter } from "../model/document-library.model";
+import { regionFilter } from '../model/document-library.model';
+import { LocationsByRegionsFilter } from "../model/document-library.model";
 
 export class GetFoldersTree {
   static readonly type = '[documentsLibrary] Get folders tree items';
@@ -88,4 +90,14 @@ export class UnShareDocuments {
 export class UnShareDocumentsSucceeded {
   static readonly type = '[documentsLibrary] UnShare documents succeeded';
   constructor() { }
+}
+
+export class GetRegionsByOrganizations {
+  static readonly type = '[documentsLibrary] Get The List Of Regions By Organizations';
+  constructor(public filter?: regionFilter) { }
+}
+
+export class GetLocationsByRegions {
+  static readonly type = '[documentsLibrary] Get The List Of Locations By Regions';
+  constructor(public filter?: LocationsByRegionsFilter) { }
 }
