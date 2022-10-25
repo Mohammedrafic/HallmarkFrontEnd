@@ -298,7 +298,7 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
     this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
       this.form.reset();
       this.penaltiesForm.reset();
-      this.penaltiesForm.controls['penaltyCriteria'].setValue(PenaltyCriteria.RateOfHours);
+      this.penaltiesForm.controls['penaltyCriteria'].setValue(PenaltyCriteria.FlatRateOfHours);
     });
   }
 
