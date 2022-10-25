@@ -155,7 +155,7 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
       reason: new FormControl(null, [Validators.required]),
       regionIds: new FormControl([], [Validators.required]),
       locationIds: new FormControl([], [Validators.required]),
-      penaltyCriteria: new FormControl(PenaltyCriteria.RateOfHours, [Validators.required]), // TODO: add bill rate validation
+      penaltyCriteria: new FormControl(PenaltyCriteria.FlatRateOfHours, [Validators.required]),
       flatRate: new FormControl(null, [Validators.required]),
       rateOfHours: new FormControl(null, [Validators.required]),
       flatRateOfHoursPercentage: new FormControl(null, [Validators.required]),

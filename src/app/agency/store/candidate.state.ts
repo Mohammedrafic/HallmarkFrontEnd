@@ -337,11 +337,12 @@ export class CandidateState {
 
   @Action(GetCandidatesCredentialByPage, { cancelUncompleted: true })
   GetCandidatesCredentialByPage(
-    { patchState, dispatch }: StateContext<CandidateStateModel>,
+    { patchState, dispatch, getState }: StateContext<CandidateStateModel>,
     { pageNumber, pageSize, orderId, candidateProfileId }: GetCandidatesCredentialByPage
   ): Observable<CandidateCredentialResponse> {
     patchState({ isCandidateLoading: true });
-    return this.candidateService.getCredentialByCandidateId(pageNumber, pageSize, orderId, candidateProfileId).pipe(
+    const id = getState().candidate?.id as number;
+    return this.candidateService.getCredentialByCandidateId(pageNumber, pageSize, orderId, candidateProfileId || id).pipe(
       tap((payload) => {
         patchState({ isCandidateLoading: false, candidateCredentialResponse: payload });
         return payload;

@@ -6,11 +6,7 @@
   }"
 ></ng-container>
 
-<ng-template
-  #dashboardToolbar
-  let-items="items"
-  let-organizationStructure="organizationStructure"
->
+<ng-template #dashboardToolbar let-items="items" let-organizationStructure="organizationStructure">
   <div class="dashboard-toolbar">
     <div class="left-content">
       <app-filter-chip-list
@@ -29,11 +25,7 @@
       <button ejs-button cssClass="e-outline" (click)="toggleDialog(true)">
         Manage Widgets <i-feather name="sliders" class="icon"></i-feather>
       </button>
-      <button *ngIf="hasOrderManagePermission"
-              ejs-button
-              [isPrimary]="true"
-              [disabled]="!hasOrderCreatePermission"
-              (click)="onCreateOrder()">
+      <button ejs-button [isPrimary]="true" [disabled]="!hasOrderCreatePermission" (click)="onCreateOrder()">
         Quick Order
       </button>
     </div>

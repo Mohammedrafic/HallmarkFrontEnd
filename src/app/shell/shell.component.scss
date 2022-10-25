@@ -673,12 +673,12 @@
         &__title {
           font-weight: bold;
           height: 28px;
-          width: 177px;
+          width: 70%;
           left: 36px;
           top: 5px;
           border-radius: nullpx;
           font-family: Open Sans;
-          font-size: 18px;
+          font-size: 14px;
           font-weight: 700;
           line-height: 28px;
           letter-spacing: 0.015em;
@@ -688,7 +688,7 @@
 
         &__date {
           height: 32px;
-          width: 200px;
+          width: 25%;
           left: 275px;
           top: 12px;
           color: $secondary-dark-blue-20;
