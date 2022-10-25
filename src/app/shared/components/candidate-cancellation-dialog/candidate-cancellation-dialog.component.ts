@@ -139,6 +139,7 @@ export class CandidateCancellationDialogComponent extends DestroyableDirective i
     switch(value) {
       case PenaltyCriteria.FlatRate:
         this.form?.get('rate')?.setValue(this.predefinedPenalties.flatRate || 0);
+        this.form?.get('hours')?.setValue(0);
         break;
       case PenaltyCriteria.RateOfHours:
         this.form?.get('rate')?.setValue(this.predefinedPenalties.flatRateOfHoursPercentage || 0);
