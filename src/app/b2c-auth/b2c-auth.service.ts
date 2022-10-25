@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { filter, Observable, tap } from 'rxjs';
+import { catchError, filter, Observable, tap } from 'rxjs';
 
 import { MsalBroadcastService, MsalGuardConfiguration, MsalService, MSAL_GUARD_CONFIG } from '@azure/msal-angular';
 import {
@@ -11,6 +11,7 @@ import {
   PopupRequest,
   RedirectRequest,
 } from '@azure/msal-browser';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +20,8 @@ export class B2CAuthService {
   constructor(
     @Inject(MSAL_GUARD_CONFIG) private msalGuardConfig: MsalGuardConfiguration,
     private authService: MsalService,
-    private msalBroadcastService: MsalBroadcastService
+    private msalBroadcastService: MsalBroadcastService,
+    private router: Router
   ) {}
 
   public loginSSO(userFlowRequest?: RedirectRequest | PopupRequest) {
@@ -54,6 +56,14 @@ export class B2CAuthService {
   }
 
   public interactionStatusNone(): Observable<InteractionStatus> {
+    this.msalBroadcastService.msalSubject$
+    .pipe(
+      filter((msg: EventMessage) => msg.eventType === EventType.ACQUIRE_TOKEN_FAILURE))
+      .subscribe((result: EventMessage) => {
+        localStorage.clear();
+        sessionStorage.clear();
+        this.router.navigate(['/']);
+      });
     return this.msalBroadcastService.inProgress$.pipe(
       filter((status: InteractionStatus) => status === InteractionStatus.None),
       tap(() => {
