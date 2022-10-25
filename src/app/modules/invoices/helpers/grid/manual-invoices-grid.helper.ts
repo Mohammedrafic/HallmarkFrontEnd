@@ -1,4 +1,4 @@
-import { ICellRendererParams } from '@ag-grid-community/core';
+import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
 import { Attachment, AttachmentsListParams } from '@shared/components/attachments';
 import { GridActionsCellComponent } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import { PendingInvoiceStatus } from '../../enums/invoice-status.enum';
@@ -32,11 +32,16 @@ const invoiceRecordDescriptionMap: Record<InvoiceRecordType, string> = {
   [InvoiceRecordType.ManualInvoiceRecord]: 'Manual',
 };
 
+const commonColumn: ColDef = {
+  sortable: true,
+};
+
 const invoiceRecordTypeColDef: TypedColDef<ManualInvoice> = {
   field: 'invoiceRecordType',
   headerName: 'TYPE',
   valueGetter: (params: TypedValueGetterParams<ManualInvoice>) =>
     invoiceRecordDescriptionMap[params.data.invoiceRecordType],
+  ...commonColumn,
 };
 
 export class ManualInvoicesGridHelper {
@@ -102,6 +107,7 @@ export class ManualInvoicesGridHelper {
       {
         ...weekPeriod,
         minWidth: 150,
+        ...commonColumn,
       },
       vendorFeeAppliedColDef,
       rejectionReasonColDef,
@@ -116,6 +122,7 @@ export class ManualInvoicesGridHelper {
             }
           } as AttachmentsListParams;
         },
+        ...commonColumn,
       },
       amountColDef,
     ];

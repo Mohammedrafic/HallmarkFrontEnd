@@ -13,6 +13,9 @@ type BaseInvoiceColDefsKeys = keyof Pick<BaseInvoice, 'locationName' | 'departme
 type CustomColDefsKeys = 'weekPeriod' | 'attachments' | 'candidateName' | 'orderId' | 'unitName';
 type ColDefKey = BaseInvoiceColDefsKeys | CustomColDefsKeys;
 
+const commonColumn: ColDef = {
+  sortable: true,
+};
 
 export class InvoicesContainerGridHelper {
   public static getColDefsMap(agency: boolean): {[key in ColDefKey]: ColDef} {
@@ -20,14 +23,17 @@ export class InvoicesContainerGridHelper {
       locationName: {
         field: 'locationName',
         headerName: 'Location',
+        ...commonColumn,
       },
       departmentName: {
         field: 'departmentName',
         headerName: 'DEPARTMENT',
+        ...commonColumn,
       },
       skillName: {
         field: 'skillName',
         headerName: 'SKILL',
+        ...commonColumn,
       },
       statusText: {
         headerName: 'STATUS',
@@ -35,6 +41,7 @@ export class InvoicesContainerGridHelper {
         cellRenderer: TableStatusCellComponent,
         cellClass: 'status-cell',
         field: 'statusText',
+        ...commonColumn,
       },
 
       // custom columns definitions
@@ -43,6 +50,7 @@ export class InvoicesContainerGridHelper {
         headerName: 'ATTACHMENTS',
         cellRenderer: AttachmentsListComponent,
         cellClass: 'invoice-records-attachments-list',
+        ...commonColumn,
       },
       candidateName: {
         headerName: 'CANDIDATE NAME',
@@ -50,18 +58,21 @@ export class InvoicesContainerGridHelper {
           const record = params.data as BaseInvoice;
 
           return `${record.candidateLastName}, ${record.candidateFirstName}`
-        }
+        },
+        ...commonColumn,
       },
       orderId: {
         field: 'formattedOrderIdFull',
         headerName: 'ORDER ID',
         width: 120,
         cellRenderer: GridOrderIdCellComponent,
+        ...commonColumn,
       },
       unitName: {
         headerName: agency ? 'ORGANIZATION' : 'AGENCY',
         valueGetter: ({ data: { agencyName, organizationName } }: TypedValueGetterParams<BaseInvoice>) =>
           agency ? organizationName : agencyName,
+        ...commonColumn,
       },
       weekPeriod: {
         headerName: 'WEEK PERIOD',
@@ -82,7 +93,8 @@ export class InvoicesContainerGridHelper {
               state: { timesheetId: id, organizationId },
             }
           };
-        }
+        },
+        ...commonColumn,
       },
     };
   }

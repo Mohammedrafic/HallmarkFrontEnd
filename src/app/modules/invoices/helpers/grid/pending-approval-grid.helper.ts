@@ -5,6 +5,7 @@ import {
 } from '../../interfaces/pending-approval-invoice.interface';
 import { GridActionsCellComponent } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import {
+  ColDef,
   GetDetailRowDataParams,
   GridOptions,
   ICellRendererParams,
@@ -31,6 +32,10 @@ import {
 import { GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
 import { AllInvoicesActionCellComponent } from '../../components/all-invoices-action-cell/all-invoices-action-cell.component';
+
+const commonColumn: ColDef = {
+  sortable: true,
+};
 
 interface PendingApprovalColDefsConfig {
   approve?: (invoice: PendingApprovalInvoice) => void;
@@ -84,6 +89,7 @@ export class PendingApprovalGridHelper {
         cellRenderer: 'agGroupCellRenderer',
         cellClass: 'expansion-toggle-icons-order-1 color-primary-active-blue-10 font-weight-bold',
         flex: 1,
+        ...commonColumn,
       },
       {
         field: 'invoiceStateText',
@@ -92,6 +98,7 @@ export class PendingApprovalGridHelper {
         flex: 1,
         cellRenderer: TableStatusCellComponent,
         cellClass: 'status-cell',
+        ...commonColumn,
       },
       {
         field: 'amount',
@@ -99,29 +106,33 @@ export class PendingApprovalGridHelper {
         headerName: 'Amount',
         cellClass: 'font-weight-bold',
         valueFormatter: numberValueFormatter,
+        ...commonColumn,
       },
       {
         field: 'apDeliveryText',
         headerName: 'Ap Delivery',
         minWidth: 270,
+        ...commonColumn,
       },
       {
         field: 'aggregateByTypeText',
         headerName: 'Group By Type',
         minWidth: 360,
+        ...commonColumn,
       },
       {
         field: 'issuedDate',
         minWidth: 230,
         headerName: 'Issued Date',
         valueFormatter: monthDayYearDateFormatter,
+        ...commonColumn,
       },
-
       {
         field: 'dueDate',
         minWidth: 200,
         headerName: 'Due Date',
         valueFormatter: monthDayYearDateFormatter,
+        ...commonColumn,
       },
     ];
 
@@ -141,6 +152,7 @@ export class PendingApprovalGridHelper {
         cellRenderer: 'agGroupCellRenderer',
         cellClass: 'expansion-toggle-icons-order-1 color-primary-active-blue-10 font-weight-bold',
         flex: 1,
+        ...commonColumn,
       },
       {
         field: 'invoiceStateText',
@@ -149,6 +161,7 @@ export class PendingApprovalGridHelper {
         flex: 1,
         cellRenderer: TableStatusCellComponent,
         cellClass: 'status-cell',
+        ...commonColumn,
       },
       {
         field: 'amount',
@@ -156,34 +169,40 @@ export class PendingApprovalGridHelper {
         headerName: 'Amount',
         cellClass: 'font-weight-bold',
         valueFormatter: numberValueFormatter,
+        ...commonColumn,
       },
       {
         field: 'apDeliveryText',
         headerName: 'Ap Delivery',
         minWidth: 270,
+        ...commonColumn,
       },
       {
         field: 'aggregateByTypeText',
         headerName: 'Group By Type',
         minWidth: 360,
+        ...commonColumn,
       },
       {
         field: 'issuedDate',
         minWidth: 230,
         headerName: 'Issued Date',
         valueFormatter: monthDayYearDateFormatter,
+        ...commonColumn,
       },
       {
         field: 'payDate',
         minWidth: 230,
         headerName: 'Paid Date',
         valueFormatter: monthDayYearDateFormatter,
+        ...commonColumn,
       },
       {
         field: 'dueDate',
         minWidth: 200,
         headerName: 'Due Date',
         valueFormatter: monthDayYearDateFormatter,
+        ...commonColumn,
       },
     ];
     return colDef;
@@ -310,6 +329,7 @@ export class PendingApprovalGridHelper {
         cellRenderer: 'agGroupCellRenderer',
         cellClass: 'expansion-toggle-icons-order-1 color-primary-active-blue-10 font-weight-bold',
         flex: 1,
+        ...commonColumn,
       },
       {
         field: 'invoiceStateText',
@@ -318,6 +338,7 @@ export class PendingApprovalGridHelper {
         flex: 1,
         cellRenderer: TableStatusCellComponent,
         cellClass: 'status-cell',
+        ...commonColumn,
       },
       {
         field: 'amount',
@@ -325,34 +346,40 @@ export class PendingApprovalGridHelper {
         headerName: 'Amount',
         cellClass: 'font-weight-bold',
         valueFormatter: numberValueFormatter,
+        ...commonColumn,
       },
       {
         field: 'apDeliveryText',
         headerName: 'Ap Delivery',
         minWidth: 270,
+        ...commonColumn,
       },
       {
         field: 'aggregateByTypeText',
         headerName: 'Group By Type',
         minWidth: 360,
+        ...commonColumn,
       },
       {
         field: 'issuedDate',
         minWidth: 230,
         headerName: 'Issued Date',
         valueFormatter: monthDayYearDateFormatter,
+        ...commonColumn,
       },
       {
         field: 'payDate',
         minWidth: 230,
         headerName: 'Paid Date',
         valueFormatter: monthDayYearDateFormatter,
+        ...commonColumn,
       },
       {
         field: 'dueDate',
         minWidth: 200,
         headerName: 'Due Date',
         valueFormatter: monthDayYearDateFormatter,
+        ...commonColumn,
       },
     ];
 

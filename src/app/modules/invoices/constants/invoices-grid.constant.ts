@@ -14,6 +14,10 @@ import { TypedColDef, TypedValueGetterParams } from '../interfaces/typed-col-def
 import { ManualInvoice } from '../interfaces';
 import { PendingInvoice } from '../interfaces/pending-invoice-record.interface';
 
+const commonColumn: ColDef = {
+  sortable: true,
+};
+
 export const numberValueFormatter: (params: ValueFormatterParams) => string =
   ({ value }: ValueFormatterParams) => GridValuesHelper.formatNumber(value, '1.2-2');
 
@@ -46,6 +50,7 @@ export const vendorFeeAppliedColDef: TypedColDef<ManualInvoice> = {
   headerName: 'VENDOR FEE\nAPPLIED',
   headerClass: 'multi-line-header',
   valueGetter: (params: TypedValueGetterParams<ManualInvoice>) => params.data.vendorFeeApplicable ? 'Yes' : 'No',
+  ...commonColumn,
 };
 
 export const amountColDef: TypedColDef<ManualInvoice> = {
@@ -54,10 +59,12 @@ export const amountColDef: TypedColDef<ManualInvoice> = {
   width: 110,
   cellClass: 'font-weight-bold',
   valueFormatter: numberValueFormatter,
+  ...commonColumn,
 };
 
 export const rejectionReasonColDef: TypedColDef<ManualInvoice> = {
   field: 'rejectionReason',
   headerName: 'REASON FOR REJECTION',
   minWidth: 200,
+  ...commonColumn,
 };
