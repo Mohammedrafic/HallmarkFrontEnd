@@ -1,4 +1,4 @@
-import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
 import { Injectable } from '@angular/core';
 
 import { ColDef } from '@ag-grid-community/core';
@@ -44,7 +44,8 @@ export class TimesheetRecordsService {
         controls[field] = [value as string | number | boolean, Validators.required];
       });
 
-      controls['billRateConfigId'] = [record['billRateConfigId'], Validators.required]
+      controls['billRateConfigId'] = [record['billRateConfigId'], Validators.required];
+      controls['timeOut'] = [record['timeOut'] || ''];
 
       formGroups[record.id] = this.fb.group(controls);
     });

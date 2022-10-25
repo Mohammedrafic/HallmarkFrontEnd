@@ -16,7 +16,7 @@ export class RecordsAdapter {
       records: diffs.map((item) => this.adaptRecordToPut(item)),
     }
   }
-  
+
   static adaptRecordAddDto(
     data: AddTimsheetForm,
     orgId: number,
@@ -24,6 +24,7 @@ export class RecordsAdapter {
     type: RecordFields,
     ): AddRecordDto {
     data.timeIn = DateTimeHelper.toUtcFormat(data.timeIn);
+    data.timeIn = this.getDateFromParts(DateTimeHelper.toUtcFormat(data.day!), data.timeIn);
 
     if (data.timeOut) {
       data.timeOut = RecordsAdapter.checkTimeOutDate(data.timeIn, data.timeOut);
@@ -43,7 +44,7 @@ export class RecordsAdapter {
       type: MapedRecordsType[type],
       ...data,
     };
-  
+
     return dto;
   }
 
@@ -98,7 +99,7 @@ export class RecordsAdapter {
   static adaptRecordsDiffs(records: RecordValue[], diffs: RecordValue[], deleteIds: number[]): RecordValue[] {
     return records.map((record) => {
       const updatedItem = diffs.find((item) => item.id === record.id);
-    
+
       if (updatedItem) {
         return updatedItem
       }
@@ -115,24 +116,32 @@ export class RecordsAdapter {
       departmentId: record.departmentId,
       value: record.value,
       description: record.description,
-      ...record.timeOut ? { timeOut: 
-        RecordsAdapter.checkTimeOutDate(record.timeIn, record.timeOut)  } : { timeOut: new Date().toISOString()},
-      ...record.description ? { description: record.description } : {},
-      ...record.hasOwnProperty('hadLunchBreak') ? { hadLunchBreak: record.hadLunchBreak } : {},
-    }; 
+      timeOut: record.timeOut ? RecordsAdapter.checkTimeOutDate(record.timeIn, record.timeOut) : null,
+      ...record.description && { description: record.description },
+      ...record.hasOwnProperty('hadLunchBreak') && { hadLunchBreak: record.hadLunchBreak },
+    };
   }
 
   private static checkTimeOutDate(timeIn: string, timeOut: string): string {
     const dtaIn = DateTimeHelper.toUtcFormat(timeIn);
-    const dateOut = DateTimeHelper.toUtcFormat(timeOut);
+    let dateOut = DateTimeHelper.toUtcFormat(timeOut);
+    dateOut = this.getDateFromParts(dtaIn, dateOut);
 
-    if (dtaIn > dateOut) {
+    if (dtaIn >= dateOut) {
       return new Date(new Date(dateOut).setDate(new Date(dateOut).getDate() + 1)).toISOString();
+    }
 
-    } else if ((Math.abs(new Date(dateOut).getTime() - new Date(dtaIn).getTime()) / 3600000) >= 24) {
+    if ((Math.abs(new Date(dateOut).getTime() - new Date(dtaIn).getTime()) / 3600000) >= 24) {
       return new Date(new Date(dateOut).setDate(new Date(dateOut).getDate() - 1)).toISOString();
     }
-    
-    return DateTimeHelper.toUtcFormat(timeOut);
+
+    return dateOut;
+  }
+
+  private static getDateFromParts(dateIn: string, dateOut: string): string {
+    const splitDate = dateIn.split('T')[0];
+    const splitTime = dateOut.split('T')[1];
+
+    return `${splitDate}T${splitTime}`;
   }
 }
