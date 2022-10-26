@@ -18,6 +18,7 @@ enum ReorderCandidateStatuses {
   Onboard = 60,
   Rejected = 100,
   Cancelled = 110,
+  Offboard = 90,
 }
 
 @Component({
