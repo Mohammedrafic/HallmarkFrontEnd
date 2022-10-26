@@ -26,6 +26,11 @@
 
   ejs-chiplist {
     padding-left: 0;
+
+    .ex-chip {
+      width: auto;
+      margin-left: 5px;
+    }
   }
 }
 
