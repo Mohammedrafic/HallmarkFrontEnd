@@ -115,7 +115,7 @@
           </div>
         </div>
         <div class="form-elemet">
-          <div class="group">
+          <div class="group" *ngIf="!isAgency">
             <div class="input-container calendar">
               <label for="regionIds">Region <span class="required">*</span></label>
               <div class="input-group multiselect">

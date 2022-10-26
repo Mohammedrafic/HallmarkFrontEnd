@@ -107,6 +107,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
   public isWordDoc:boolean=false;
+  public isAgency:boolean=false;
 
 
   public gridApi!: GridApi;
@@ -252,7 +253,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;
     }
-
     if (this.user?.businessUnitType === BusinessUnitType.Organization || this.user?.businessUnitType === BusinessUnitType.Agency) {
       this.businessFilterForm.disable();
       this.filterBbusinessControl.patchValue(this.user?.businessUnitId);
@@ -284,7 +284,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     });
   }
   private onFilterBusinessUnitValueChanged(): void {
-    //ToDo: This is not triggered on inital BU select for hallmark user
+    //ToDo: To Check for Org User and Hallmark User while toggle
     this.filterBusinessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       value && this.store.dispatch(new GetBusinessByUnitType(value));
       if (value) {
@@ -298,6 +298,10 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         if (!this.isBusinessFormDisabled) {
           this.filterBbusinessControl.patchValue(0);
         }
+        if(this.filterSelecetdBusinesType == BusinessUnitType.Agency)
+            this.isAgency =true;
+        else
+            this.isAgency =false;
       }
     });
     this.filterBbusinessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
@@ -387,7 +391,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.documentLibraryform.addControl(FormControlNames.StartDate, new FormControl(null, []));
       this.documentLibraryform.addControl(FormControlNames.EndDate, new FormControl(null, []));
       this.documentLibraryform.addControl(FormControlNames.Comments, new FormControl('', []));
-      this.applyDateValidations();
     }
     else if (this.isShare) {
       if (this.documentLibraryform.contains(FormControlNames.RegionIds)) this.documentLibraryform.removeControl(FormControlNames.RegionIds);
@@ -395,6 +398,11 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.documentLibraryform.addControl(FormControlNames.RegionIds, new FormControl(null, []));
       this.documentLibraryform.addControl(FormControlNames.LocationIds, new FormControl(null, []));
 
+    }
+    if(this.isAgency)
+    {
+        if (this.documentLibraryform.contains(FormControlNames.RegionIds)) this.documentLibraryform.removeControl(FormControlNames.RegionIds);
+        if (this.documentLibraryform.contains(FormControlNames.LocationIds)) this.documentLibraryform.removeControl(FormControlNames.LocationIds);
     }
     this.documentLibraryform.addControl(FormControlNames.Agencies, new FormControl(null, []));
     this.documentLibraryform.addControl(FormControlNames.Orgnizations, new FormControl(null, []));
@@ -892,9 +900,13 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         locationsData = locData;
       });
     });
-    isAllRegions = this.documentLibraryform.controls[FormControlNames.RegionIds].value.length === regionsData.length;
-    isAllLocations = this.documentLibraryform.controls[FormControlNames.LocationIds].value.length === locationsData.length;
-
+    if(this.isAgency)
+    {
+      return mapping;
+    }
+      isAllRegions = this.documentLibraryform.controls[FormControlNames.RegionIds].value.length === regionsData.length;
+      isAllLocations = this.documentLibraryform.controls[FormControlNames.LocationIds].value.length === locationsData.length;
+  
     if (isAllRegions && !isAllLocations) {
       mapping[-1] = this.documentLibraryform.controls[FormControlNames.LocationIds].value;
     }
