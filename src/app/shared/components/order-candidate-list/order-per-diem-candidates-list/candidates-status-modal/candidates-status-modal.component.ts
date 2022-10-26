@@ -124,7 +124,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   public form: FormGroup;
   public openRejectDialog = new Subject<boolean>();
   public rejectReasons: RejectReason[] = [];
-  public optionFields = { text: 'statusText', value: 'applicantStatus' };
+  public optionFields = { text: 'statusText', value: 'statusText' };
   public nextApplicantStatuses: ApplicantStatus[];
   public orderCandidateJob: OrderCandidateJob | null;
   public comments: Comment[] = [];
