@@ -51,7 +51,6 @@ import { PositionTrend, PositionTrendDto } from '../models/position-trend.model'
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { DashboartFilterDto } from '../models/dashboard-filter-dto.model';
 import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
-import { debug } from 'console';
 
 @Injectable()
 export class DashboardService {
@@ -313,7 +312,6 @@ export class DashboardService {
   }
 
   private getOrderPositionWidgetData(filter: DashboartFilterDto, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
-    debugger;
     return this.httpClient
       .post<CandidatesPositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { orderStatuses: [orderStatus], ...filter })
       .pipe(map((data) => data.orderStatusesDetails[0]));
