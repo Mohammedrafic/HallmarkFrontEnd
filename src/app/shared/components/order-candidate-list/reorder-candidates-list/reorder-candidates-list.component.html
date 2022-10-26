@@ -61,6 +61,9 @@
                   <ng-container *ngSwitchCase="candidateStatuses.Cancelled">
                     <e-chip [text]="data.statusName" cssClass="e-default"></e-chip>
                   </ng-container>
+                  <ng-container *ngSwitchCase="candidateStatuses.Offboard">
+                    <e-chip [text]="data.statusName" cssClass="e-default"></e-chip>
+                  </ng-container>
                   <ng-container *ngSwitchDefault>
                     <!-- blank statuses -->
                   </ng-container>
