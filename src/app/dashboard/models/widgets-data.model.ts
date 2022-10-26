@@ -20,4 +20,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.INVOICES]: string;
   [WidgetTypeEnum.OPEN_POSITIONS_TREND]: PositionTrend;
   [WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]: PositionTrend;
+  [WidgetTypeEnum.LTA_ORDER_ENDING]: CandidatesPositionDataModel;
 }
