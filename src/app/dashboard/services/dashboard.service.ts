@@ -73,6 +73,7 @@ export class DashboardService {
     [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
     [WidgetTypeEnum.OPEN_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getOpenPositionTrendWidgetData(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getInProgressPositionTrendWidgetData(filters),
+      [WidgetTypeEnum.LTA_ORDER_ENDING]: (filters: DashboartFilterDto) => this.getLTAOrderEndingWidgetData(filters, OrderStatus.Closed),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -313,6 +314,12 @@ export class DashboardService {
   private getOrderPositionWidgetData(filter: DashboartFilterDto, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
     return this.httpClient
       .post<CandidatesPositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { orderStatuses: [orderStatus], ...filter })
+      .pipe(map((data) => data.orderStatusesDetails[0]));
+  }
+
+  private getLTAOrderEndingWidgetData(filter: DashboartFilterDto, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
+    return this.httpClient
+      .post<CandidatesPositionsDto>(`${this.baseUrl}/ltaorderending`, { orderStatuses: [orderStatus], ...filter })
       .pipe(map((data) => data.orderStatusesDetails[0]));
   }
 
