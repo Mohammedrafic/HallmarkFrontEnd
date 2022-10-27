@@ -993,15 +993,15 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         });
     }
 
-    if (order.jobStartDate) {
+    if (order.jobStartDate && !order.isTemplate) {
       this.generalInformationForm.controls['jobStartDate'].patchValue(
-        order.jobStartDate ? DateTimeHelper.convertDateToUtc(order.jobStartDate.toString()) : null
+        DateTimeHelper.convertDateToUtc(order.jobStartDate.toString())
       );
     }
 
-    if (order.jobEndDate) {
+    if (order.jobEndDate && !order.isTemplate) {
       this.generalInformationForm.controls['jobEndDate'].patchValue(
-        order.jobEndDate ? DateTimeHelper.convertDateToUtc(order.jobEndDate.toString()) : null
+        DateTimeHelper.convertDateToUtc(order.jobEndDate.toString())
       );
     }
 
