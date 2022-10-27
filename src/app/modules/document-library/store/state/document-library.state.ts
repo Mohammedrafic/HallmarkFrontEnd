@@ -35,7 +35,8 @@ export interface DocumentLibraryStateModel {
   documentLibraryDto: DocumentLibraryDto | null,
   shareDocumentInfoPage: ShareDocumentInfoPage | null,
   regions: Region[] | null,
-  locations: Location[] | null
+  locations: Location[] | null,
+  saveDocumentFolder: DocumentFolder |null
 }
 
 @State<DocumentLibraryStateModel>({
@@ -52,7 +53,8 @@ export interface DocumentLibraryStateModel {
     documentLibraryDto: null,
     shareDocumentInfoPage: null,
     regions: null,
-    locations :null
+    locations :null,
+    saveDocumentFolder :null
   }
 })
 @Injectable()
@@ -110,6 +112,11 @@ export class DocumentLibraryState {
   @Selector()
   static locations(state: DocumentLibraryStateModel): Location[] | null { return state.locations; }
 
+  @Selector()
+  static saveDocumentFolder(state : DocumentLibraryStateModel) :DocumentFolder | null {
+    return state.saveDocumentFolder;
+  }
+
 
 
   @Action(GetFoldersTree)
@@ -144,11 +151,12 @@ export class DocumentLibraryState {
 
   @Action(SaveDocumentFolder)
   SaveDocumentFolder(
-    { dispatch }: StateContext<DocumentLibraryStateModel>,
+    { dispatch,patchState }: StateContext<DocumentLibraryStateModel>,
     { documentFolder }: SaveDocumentFolder
   ): Observable<DocumentFolder | void> {
     return this.documentLibraryService.saveDocumentFolder(documentFolder).pipe(
       tap((folder) => {
+        patchState({ saveDocumentFolder: folder });
         dispatch([
           new ShowToast(MessageTypes.Success, documentFolder.id > 0 ? RECORD_MODIFIED : RECORD_ADDED),
         ]);

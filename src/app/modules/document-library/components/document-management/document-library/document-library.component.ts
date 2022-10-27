@@ -315,7 +315,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   public onLoadRegionsLocationsOnUnitChange(selectedBusinessUnitId: number) {
-    this.isUpload = true;
     this.createForm();
     this.regionIdControl = this.documentLibraryform.get(FormControlNames.RegionIds) as AbstractControl;
     if (selectedBusinessUnitId == BusinessUnitType.Organization || selectedBusinessUnitId == BusinessUnitType.Agency) {

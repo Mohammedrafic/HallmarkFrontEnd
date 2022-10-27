@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { Observable, Subject, take, takeUntil } from 'rxjs';
-import { DocumentTypeFilter, FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
+import { DocumentFolder, DocumentTypeFilter, FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
 import { DocumentLibraryState } from '../../store/state/document-library.state';
 import { TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
 import { GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, IsAddNewFolder } from '../../store/actions/document-library.actions';
@@ -26,11 +26,15 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
   @Select(DocumentLibraryState.foldersTree)
   foldersTree$: Observable<FolderTreeItem[]>;
 
+  @Select(DocumentLibraryState.saveDocumentFolder)
+  savedDocumentFolder$: Observable<DocumentFolder>;
+
   private unsubscribe$: Subject<void> = new Subject();
   public sidePanelFolderItems: FolderTreeItem[];
   sidePanelDocumentField: any;
   public selectedNode: NodeItem;
   public isAddNewFolderBtnVisible: boolean = true;
+  public isNewFolderInAction: boolean =false;
 
   constructor(private store: Store,
     private changeDetectorRef: ChangeDetectorRef) { }
@@ -56,7 +60,17 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
         setTimeout(() => {
           if (this.sidePanelDocumentField.dataSource?.length) {
             if (this.sidePanelDocumentField.dataSource[0].id != -1) {
+              if(this.isNewFolderInAction)
+              {
+                this.savedDocumentFolder$.subscribe((x:DocumentFolder)=>
+                {
+                  this.tree.selectedNodes = [x.id.toString()];
+                  this.tree.expandAll();
+                });
+              }
+              else
               this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
+              
               const targetNodeId: string = this.tree.selectedNodes[0];
               const element = this.tree?.element.querySelector('[data-uid="' + targetNodeId + '"]');
               const liElements = element?.querySelectorAll('ul li');
@@ -78,12 +92,13 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
   }
 
   public nodeSelected(event: any) {
-    this.selectedNode = event.nodeData;
-    const selectedFolderTreeNode = this.checkSelectedNodeFolderOrDocument(this.sidePanelFolderItems, this.selectedNode.id);
-    if (selectedFolderTreeNode && selectedFolderTreeNode.length > 0) {
-      this.selectedNode.fileType = selectedFolderTreeNode[0].fileType;
-      this.selectedNode.businessUnitId = selectedFolderTreeNode[0].businessUnitId;
-    }
+    this.isNewFolderInAction=false;
+      this.selectedNode = event.nodeData;
+      const selectedFolderTreeNode = this.checkSelectedNodeFolderOrDocument(this.sidePanelFolderItems, this.selectedNode.id);
+      if (selectedFolderTreeNode && selectedFolderTreeNode.length > 0) {
+        this.selectedNode.fileType = selectedFolderTreeNode[0].fileType;
+        this.selectedNode.businessUnitId = selectedFolderTreeNode[0].businessUnitId;
+  }
     this.store.dispatch(new GetDocumentsSelectedNode(this.selectedNode));
   }
 
@@ -128,7 +143,10 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
       ]);
     }
     else
+    {
       this.store.dispatch(new IsAddNewFolder(true));
+      this.isNewFolderInAction=true;
+    }
   }
 
 
