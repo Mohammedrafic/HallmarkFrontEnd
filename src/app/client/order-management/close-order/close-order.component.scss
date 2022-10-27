@@ -6,6 +6,10 @@
   flex-direction: column;
   row-gap: 12px;
 
+  app-datepicker {
+    margin-bottom: 10px;
+  }
+
   .warning {
     color: $supportive-red;
     display: flex;
