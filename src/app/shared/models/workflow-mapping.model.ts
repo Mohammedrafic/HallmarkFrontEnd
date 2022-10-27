@@ -1,6 +1,7 @@
 import { PageOfCollections } from '@shared/models/page.model';
 import { Step } from '@shared/models/workflow.model';
 import { User } from '@shared/models/user-managment-page.model';
+import { WorkflowType } from '@shared/enums/workflow-type';
 
 export class WorkflowMappingGet {
   mappingId: number;
@@ -58,11 +59,13 @@ export class WorkflowByDepartmentAndSkill {
 export interface RolesByPermission {
   type: number;
   roles: RoleWithUser[];
+  workflowType: WorkflowType;
 }
 
 export interface UsersByPermission {
   type: number;
   users: User[];
+  workflowType: WorkflowType;
 }
 
 export type WorkflowMappingPage = PageOfCollections<WorkflowMappingGet>;

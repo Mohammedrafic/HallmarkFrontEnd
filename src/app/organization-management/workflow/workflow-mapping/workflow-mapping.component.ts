@@ -51,7 +51,8 @@ import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { isEmpty } from 'lodash';
 
-type RoleWithUserModel = { [key: number]: RoleWithUser[] };
+type RoleWithUserModel = { [key: number]: { [workflowType: number]: RoleWithUser[] } };
+type WorkflowAsKeyModel = { [key: number]: (UsersByPermission | RolesByPermission)[] };
 
 @Component({
   selector: 'app-workflow-mapping',
@@ -230,57 +231,23 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
         const [usersP, rolesP] = response;
 
         if (usersP && usersP.length > 0) {
-          this.rolesWithUsers = usersP
-            .filter(({ users }: UsersByPermission) => users)
-            .reduce((acc, { type, users }: UsersByPermission) => {
-              if (!isEmpty(this.rolesWithUsers?.[type])) {
-                return {
-                  ...acc,
-                  [type]: [
-                    ...this.rolesWithUsers[type],
-                    ...users.map(({ id, firstName, lastName }: User) => ({
-                      id,
-                      name: `${firstName} ${lastName}`,
-                    })),
-                  ],
-                };
-              } else {
-                return {
-                  ...acc,
-                  [type]: users.map(({ id, firstName, lastName }: User) => ({
-                    id,
-                    name: `${firstName} ${lastName}`,
-                  })),
-                };
-              }
-            }, {});
+          const workFlowAsKey = usersP
+            .filter(({ users }: UsersByPermission) => users?.length)
+            .reduce(this.mapByWorkflowType, {});
+
+          this.rolesWithUsers = Object.entries(workFlowAsKey).reduce((acc: {}, [key, value]) => {
+            return { ...acc, [key]: this.mapUserPermissions(value, +key) };
+          }, {});
         }
 
         if (rolesP && rolesP.length > 0) {
-          this.rolesWithUsers = rolesP
-            .filter(({ roles }: RolesByPermission) => roles)
-            .reduce((acc, { type, roles }: RolesByPermission) => {
-              if (!isEmpty(this.rolesWithUsers?.[type])) {
-                return {
-                  ...acc,
-                  [type]: [
-                    ...this.rolesWithUsers[type],
-                    ...roles.map(({ id, name }: RoleWithUser) => ({
-                      id: id!.toString(),
-                      name,
-                    })),
-                  ],
-                };
-              } else {
-                return {
-                  ...acc,
-                  [type]: roles.map(({ id, name }: RoleWithUser) => ({
-                    id: id!.toString(),
-                    name,
-                  })),
-                };
-              }
-            }, {});
+          const workFlowAsKey = rolesP
+            .filter(({ roles }: RolesByPermission) => roles?.length)
+            .reduce(this.mapByWorkflowType, {});
+
+          this.rolesWithUsers = Object.entries(workFlowAsKey).reduce((acc: {}, [key, value]) => {
+            return { ...acc, [key]: this.mapRolePermissions(value, +key) };
+          }, {});
         }
       });
 
@@ -430,6 +397,66 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       this.store.dispatch(new ShowSideDialog(false));
       this.clearFormDetails();
     });
+  }
+  mapByWorkflowType(acc: WorkflowAsKeyModel, value: UsersByPermission | RolesByPermission) {
+    if (acc?.[value.workflowType]) {
+      return { ...acc, [value.workflowType]: [...acc[value.workflowType], value] };
+    } else {
+      return {
+        ...acc,
+        [value.workflowType]: [value],
+      };
+    }
+  }
+
+  mapRolePermissions(listOfPermissions: any, key: number): { [key: number]: RoleWithUser[] } {
+    return listOfPermissions.reduce((acc: any, { type, roles }: any) => {
+      if (!isEmpty(this.rolesWithUsers?.[key]?.[type])) {
+        return {
+          ...acc,
+          [type]: [
+            ...this.rolesWithUsers[key][type],
+            ...roles.map(({ id, name }: RoleWithUser) => ({
+              id: id!.toString(),
+              name,
+            })),
+          ],
+        };
+      } else {
+        return {
+          ...acc,
+          [type]: roles.map(({ id, name }: RoleWithUser) => ({
+            id: id!.toString(),
+            name,
+          })),
+        };
+      }
+    }, {});
+  }
+
+  mapUserPermissions(listOfPermissions: any, key: number): { [key: number]: RoleWithUser[] } {
+    return listOfPermissions.reduce((acc: any, { type, users }: any) => {
+      if (!isEmpty(this.rolesWithUsers?.[key]?.[type])) {
+        return {
+          ...acc,
+          [type]: [
+            ...this.rolesWithUsers[key][type],
+            ...users.map(({ id, firstName, lastName }: User) => ({
+              id,
+              name: `${firstName} ${lastName}`,
+            })),
+          ],
+        };
+      } else {
+        return {
+          ...acc,
+          [type]: users.map(({ id, firstName, lastName }: User) => ({
+            id,
+            name: `${firstName} ${lastName}`,
+          })),
+        };
+      }
+    }, {});
   }
 
   ngOnDestroy(): void {
@@ -645,7 +672,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
             (st) => st.id === stepMap.workflowStepId
           );
           // @ts-ignore
-          const foundUserRole = this.rolesWithUsers[stepMap.workflowType];
+          const foundUserRole = this.rolesWithUsers[workflowType][stepMap.workflowType];
           if (foundStep && foundUserRole) {
             stepDetails.push({ step: foundStep, roleUser: foundUserRole });
           }
@@ -676,7 +703,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       if (foundMatchedSteps.length) {
         foundMatchedSteps.forEach((foundMatchedStep: StepMapping) => {
           if (foundMatchedStep.workflowStepId) {
-            const foundUserRole = this.rolesWithUsers[foundMatchedStep.workflowType!].find(
+            const foundUserRole = this.rolesWithUsers[foundMatchedStep.workflowType!]?.[step.type].find(
               (r: RoleWithUser) => r.id === foundMatchedStep?.userId || r.id === foundMatchedStep?.roleId?.toString()
             );
             if (foundUserRole) {

@@ -26,7 +26,7 @@ import {
   SetLock,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Actions, ofActionCompleted, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
   GetAllOrganizationSkills,
   GetOrganizationSettings,
@@ -61,7 +61,6 @@ import {
   debounceTime,
   EMPTY,
   filter,
-  first,
   Observable,
   Subject,
   Subscription,

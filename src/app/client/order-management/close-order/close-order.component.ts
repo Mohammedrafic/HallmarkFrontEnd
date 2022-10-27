@@ -169,8 +169,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   public setCloseDateAvailability(isPosition: boolean): void {
-    this.isPosition = isPosition;
-    if (this.isPosition && this.order?.orderType === OrderType.ReOrder) {
+    if (this.order?.orderType === OrderType.ReOrder) {
       this.closeForm.patchValue({ closingDate: new Date(this.order.jobStartDate as Date) });
       this.closeForm.get('closingDate')?.disable();
     } else {

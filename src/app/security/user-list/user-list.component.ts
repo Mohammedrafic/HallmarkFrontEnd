@@ -151,6 +151,7 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
       this.createdUser = user;
       this.userSettingForm.reset();
       this.userSettingForm.enable();
+      this.disableMailFormGroup();
 
       if (user.roles) {
         const editedUser = {
@@ -259,5 +260,10 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
     this.userSettingForm.reset();
     this.userSettingForm.enable();
     this.createdUser = null;
+  }
+
+  private disableMailFormGroup(): void {
+    this.userSettingForm.get('email')?.disable();
+    this.userSettingForm.get('emailConfirmation')?.disable();
   }
 }

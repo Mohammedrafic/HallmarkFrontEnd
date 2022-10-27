@@ -1,15 +1,17 @@
 <section class="job-details" *ngIf="order" [ngSwitch]="order?.orderType">
-  <app-general-order-per-diem-info *ngSwitchCase="orderType.OpenPerDiem" [orderInformation]="order"></app-general-order-per-diem-info>
+  <app-general-order-per-diem-info
+    *ngSwitchCase="orderType.OpenPerDiem"
+    [orderInformation]="order"
+  ></app-general-order-per-diem-info>
   <app-general-reorder-info *ngSwitchCase="orderType.ReOrder" [orderInformation]="order"></app-general-reorder-info>
   <app-general-order-info *ngSwitchDefault [orderInformation]="order"></app-general-order-info>
 </section>
-<ng-container *ngIf="showReasonInfo">
-  <div class="separator"></div>
-  <app-order-close-reason-info [candidate]="reasonClosure" [showCloseData]="false"></app-order-close-reason-info>
-</ng-container>
 <div class="separator"></div>
-<ng-container *ngIf="order?.orderClosureReason">
-  <app-order-close-reason-info [orderInformation]="order"></app-order-close-reason-info>
+<ng-container *ngIf="isClosedOrder">
+  <app-order-close-reason-info
+    [orderInformation]="orderInformation"
+    [showCloseData]="!showReasonInfo"
+  ></app-order-close-reason-info>
   <div class="separator"></div>
 </ng-container>
 <app-order-details [currentOrder]="order"></app-order-details>
