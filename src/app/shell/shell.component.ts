@@ -44,7 +44,8 @@ enum THEME {
   dark = 'dark',
 }
 enum profileMenuItem {
-  edit_profile = 0,
+  // TODO: edit profile
+  /*edit_profile = 0,*/
   theme = 1,
   help=2,
   log_out = 3,
@@ -129,7 +130,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   public isMaximized: boolean = true;
   public searchHeight: number;
   public ProfileMenuItemNames = {
-    [profileMenuItem.edit_profile]: 'Edit Profile',
+      // TODO: edit profile
+   /* [profileMenuItem.edit_profile]: 'Edit Profile',*/
     [profileMenuItem.theme]: 'Theme',
     [profileMenuItem.help]: 'Help',
     [profileMenuItem.log_out]: 'LogOut',
@@ -220,7 +222,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
             this.profileData = [
               {
                 text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
-                items: [{ text: this.ProfileMenuItemNames[profileMenuItem.edit_profile], id: profileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },
+                items: [
+                    // TODO: edit profile
+                  /*{ text: this.ProfileMenuItemNames[profileMenuItem.edit_profile], id: profileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },*/
                 { text: this.ProfileMenuItemNames[profileMenuItem.manage_notifications], id: profileMenuItem.manage_notifications.toString(), iconCss: 'e-settings e-icons' },
                 {
                   text: this.ProfileMenuItemNames[profileMenuItem.theme], id: profileMenuItem.theme.toString(), iconCss: this.isDarkTheme ? 'e-theme-dark e-icons' : 'e-theme-light e-icons', items: [
@@ -277,8 +281,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onSelectProfileMenu(event: any) {
     switch (Number(event.item.properties.id)) {
-      case profileMenuItem.edit_profile:
-        break;
+       // TODO: edit profile
+      //case profileMenuItem.edit_profile:
+      //  break;
       case profileMenuItem.manage_notifications:
         this.manageNotifications();
         break;
