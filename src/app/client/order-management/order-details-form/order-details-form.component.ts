@@ -995,7 +995,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
     if (order.jobStartDate && !order.isTemplate) {
       this.generalInformationForm.controls['jobStartDate'].patchValue(
-        DateTimeHelper.convertDateToUtc(order.jobStartDate.toString())
+        DateTimeHelper.convertDateToUtc(order.jobStartDate.toString()), { emitEvent: false }
       );
     }
 
