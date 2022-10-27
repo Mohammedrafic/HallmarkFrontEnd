@@ -9,5 +9,6 @@ export const WIDGET_PERMISSION_TYPES = [
   PermissionTypes.WidgetPositionsAllStatuses,
   PermissionTypes.WidgetPositionsCounters,
   PermissionTypes.WidgetTasks,
-  PermissionTypes.WidgetTrendsFilled
+  PermissionTypes.WidgetTrendsFilled,
+  PermissionTypes.WidgetLTAOrderEnding
 ];

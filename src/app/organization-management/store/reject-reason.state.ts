@@ -10,7 +10,7 @@ import {
   SaveClosureReasonsError, CreateManualInvoiceRejectReason, SaveManualInvoiceRejectReasonError,
   SaveRejectReasons, SaveRejectReasonsError, SaveRejectReasonsSuccess,
   UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReason, UpdateManualInvoiceRejectReasonSuccess,
-  UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess, GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError, GetPenaltiesByPage, SavePenalty, SavePenaltySuccess, SavePenaltyError, RemovePenalty, UpdatePenalty, ShowOverridePenaltyDialog
+  UpdateRejectReasons, UpdateRejectReasonsSuccess, RemoveOrderRequisition, UpdateOrderRequisitionSuccess, GetOrderRequisitionByPage, SaveOrderRequisition, SaveOrderRequisitionError, GetPenaltiesByPage, SavePenalty, SavePenaltySuccess, SavePenaltyError, RemovePenalty, ShowOverridePenaltyDialog
 } from "@organization-management/store/reject-reason.actions";
 import { catchError, Observable, tap } from "rxjs";
 import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
@@ -324,20 +324,21 @@ export class RejectReasonState {
 
   @Action(SavePenalty)
   SavePenalty(
-    { getState, dispatch}: StateContext<RejectReasonStateModel>,
+    { dispatch}: StateContext<RejectReasonStateModel>,
     { payload }: SavePenalty
   ): Observable<Penalty[] | void> {
-    const state = getState();
-
     return this.rejectReasonService.savePenalty(payload).pipe(
-      tap(payload => {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+      tap(data => {
+        if (payload.candidateCancellationSettingId) {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        } else {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        }
         dispatch(new SavePenaltySuccess());
 
-        return payload;
+        return data;
       }),
       catchError((error: HttpErrorResponse) => {
-        console.log(error);
         if (error.error?.errors?.ForceUpsert) {
           return dispatch(new ShowOverridePenaltyDialog());
         } else {
@@ -357,23 +358,6 @@ export class RejectReasonState {
       tap(() => {
         dispatch(new SavePenaltySuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
-      })
-    );
-  }
-
-  @Action(UpdatePenalty)
-  UpdatePenalty(
-    { dispatch }: StateContext<RejectReasonStateModel>,
-    { payload }: UpdatePenalty
-  ): Observable<Penalty[] | void> {
-    return this.rejectReasonService.savePenalty(payload).pipe(
-      tap(() => {
-        dispatch(new SavePenaltySuccess());
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      }),
-      catchError((error: HttpErrorResponse) => {
-        dispatch(new SavePenaltyError());
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }

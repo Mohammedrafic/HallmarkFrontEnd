@@ -70,6 +70,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     private actions$: Actions
   ) {
     super();
+    this.currentDate.setHours(0,0,0,0);
   }
 
   public get isEditMode(): boolean {

@@ -431,7 +431,7 @@
                     [allowFiltering]="false"
                     [showDropDownIcon]="true"
                     appValidateWithMessage
-                    [dataSource]="rolesWithUsers[orderWorkflowSteps[i]?.type ?? 0]"
+                    [dataSource]="rolesWithUsers[workflowTypes.OrderWorkflow][orderWorkflowSteps[i]?.type ?? 0]"
                     [fields]="fields"
                     formControlName="roleUserList"
                   >
@@ -475,7 +475,9 @@
                     [allowFiltering]="false"
                     [showDropDownIcon]="true"
                     appValidateWithMessage
-                    [dataSource]="rolesWithUsers[applicationWorkflowSteps[i]?.type ?? 0]"
+                    [dataSource]="
+                      rolesWithUsers[workflowTypes.ApplicationWorkflow][applicationWorkflowSteps[i]?.type ?? 0]
+                    "
                     [fields]="fields"
                     formControlName="roleUserList"
                   >

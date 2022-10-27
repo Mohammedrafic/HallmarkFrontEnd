@@ -36,9 +36,6 @@ import { SaveTemplateDialogService } from '@client/order-management/save-templat
 import { AlertTrigger } from '@admin/store/alerts.actions';
 import { AlertTriggerDto } from '@shared/models/alerts-template.model';
 import { UserState } from 'src/app/store/user.state';
-import { User } from '@shared/models/user.model';
-import { AgencyState } from '@agency/store/agency.state';
-import { Agency } from '@shared/models/agency.model';
 import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
 import { ToastUtility } from '@syncfusion/ej2-notifications';
 import { ConfirmService } from '@shared/services/confirm.service';
