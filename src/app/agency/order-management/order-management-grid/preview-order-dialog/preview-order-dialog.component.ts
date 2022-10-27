@@ -71,6 +71,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
   public agencyActionsAllowed = true;
+  public isClosedOrder = false;
   public readonly reasonClosure = {
     orderClosureReason: 'Candidate Rejected',
   } as Order;
@@ -128,6 +129,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   private subsToSelectedOrder(): void {
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
       this.currentOrder = order;
+      this.isClosedOrder = this.currentOrder?.status === OrderStatus.Closed;
       this.cd.markForCheck();
     });
   }

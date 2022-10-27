@@ -162,6 +162,7 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
   public agencyActionsAllowed = true;
   public canCreateOrder: boolean;
   public canCloseOrder: boolean;
+  public isClosedOrder = false;
 
   public readonly nextApplicantStatuses = [
     {
@@ -563,7 +564,8 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
         this.tab.select(1);
         const [order, candidate] = data;
         this.order = order as MergedOrder;
-        this.candidate = candidate;
+        this.candidate = candidate;  
+        this.isClosedOrder = this.candidate.orderStatus === OrderStatus.Closed;
         this.getTemplate();
         windowScrollTop();
         this.sideDialog.show();
