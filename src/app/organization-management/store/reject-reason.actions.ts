@@ -130,12 +130,6 @@ export class RemovePenalty {
   constructor(public id: number){}
 }
 
-export class UpdatePenalty {
-  static readonly type = '[reject reason] Update Penalty';
-  constructor(public payload: PenaltyPayload) {
-  }
-}
-
 export class SavePenaltyError {
   static readonly type = '[reject reason] Save Penalty Error';
 }
