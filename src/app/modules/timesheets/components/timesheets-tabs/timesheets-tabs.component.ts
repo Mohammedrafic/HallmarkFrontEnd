@@ -43,6 +43,10 @@ export class TimesheetsTabsComponent extends Destroyable implements OnChanges {
     return item.title;
   }
 
+  public programSelection(idx = 0): void {
+    this.tabComponent.select(idx);
+  }
+
   public onSelect(selectEvent: SelectingEventArgs): void {
     this.changeTab.emit(selectEvent.selectingIndex);
   }

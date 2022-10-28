@@ -14,7 +14,7 @@
       <div class="devider" *ngIf="!(isMobile$ | async)"></div>
     </div>
     <div
-      [class.disabled]="!(userChatConfig$ | async)"
+      *ngIf="userChatConfig$ | async"
       class="bell-button left"
       (click)="toggleChatDialog()"
     >
@@ -32,7 +32,7 @@
 
     </div>
 
-    <div class="devider" *ngIf="!(isMobile$ | async)"></div>
+    <div class="devider" *ngIf="!(isMobile$ | async) && (userChatConfig$ | async)"></div>
 
     <!-- Temporary solution to log out from the application -->
 

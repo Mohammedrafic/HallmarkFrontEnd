@@ -127,6 +127,14 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return this.statusControl?.value === CredentialStatus.Completed;
   }
 
+  get showRejectReason(): boolean {
+    return this.statusControl?.value === CredentialStatus.Rejected;
+  }
+
+  get isOrganizationSide(): boolean {
+    return this.isOrganization || this.isNavigatedFromOrganizationArea;
+  }
+
   get isOrganization(): boolean {
     return this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
   }
@@ -246,7 +254,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   public onSaveCredential(): void {
-    if (this.addCredentialForm.valid && this.masterCredentialId) {
+    if (this.masterCredentialId && (this.addCredentialForm.valid || this.addCredentialForm.disabled)) {
       this.saveCredential(this.addCredentialForm.getRawValue());
     } else {
       this.addCredentialForm.markAsDirty();
@@ -301,9 +309,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       expireDateApplicable,
       credentialTypeName,
       masterName,
+      rejectReason,
     }: CandidateCredential
   ) {
     event.stopPropagation();
+    this.disableFormForAgency(status as CredentialStatus);
     this.updateCredentialStatusOptions(status as CredentialStatus);
     this.showCertifiedFields = !!expireDateApplicable;
     this.credentialId = id as number;
@@ -322,6 +332,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       experience,
       createdUntil,
       completedDate,
+      rejectReason,
     });
   }
 
@@ -372,6 +383,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       .pipe(delay(500))
       .subscribe(() => {
         this.addCredentialForm.reset();
+        this.addCredentialForm.enable();
         this.searchCredentialForm.reset();
         this.addCredentialForm.markAsPristine();
         this.credentialId = null;
@@ -391,6 +403,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       experience: new FormControl(null, [Validators.maxLength(20)]),
       createdUntil: new FormControl(null),
       completedDate: new FormControl(null),
+      rejectReason: new FormControl(null),
     });
   }
 
@@ -408,7 +421,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     experience,
     createdOn,
     createdUntil,
-    completedDate,
+    completedDate, rejectReason,
   }: CandidateCredential): void {
     if (this.masterCredentialId) {
       this.store.dispatch(
@@ -420,6 +433,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           createdOn,
           createdUntil,
           completedDate,
+          rejectReason,
           masterCredentialId: this.masterCredentialId,
           id: this.credentialId as number,
           orderId: this.orderId,
@@ -493,7 +507,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   private updateCredentialStatusOptions(status: CredentialStatus): void {
-    if (this.isOrganization || this.isNavigatedFromOrganizationArea) {
+    if (this.isOrganizationSide) {
       switch (status) {
         case CredentialStatus.Completed:
           this.setCredentialStatusOptions(orgSideCompletedCredentialStatuses);
@@ -513,6 +527,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           ? agencySideCredentialStatuses
           : [status, ...agencySideCredentialStatuses]
       );
+    }
+  }
+
+  private disableFormForAgency(status: CredentialStatus): void {
+    if (!this.isOrganizationSide && status === CredentialStatus.Rejected) {
+      this.addCredentialForm.disable();
     }
   }
 }
