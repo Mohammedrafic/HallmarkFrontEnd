@@ -262,7 +262,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private initComponentState(): void {
-    this.timesheetsTabs?.programSelection(0);
+    this.timesheetsTabs?.programSelection();
     if (this.isAgency) {
       this.initOrganizationsList();
     } else {
