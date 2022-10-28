@@ -340,7 +340,9 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
       );
   }
 
-  public handleSortingChange(event: string): void {}
+  public handleSortingChange(event: string): void {
+    this.store.dispatch(new Invoices.UpdateFiltersState({ orderBy: event }, true));
+  }
 
   public handleInvoiceRejection(rejectReason: string) {
     this.store.dispatch(new Invoices.RejectInvoice(this.rejectInvoiceId, rejectReason))
