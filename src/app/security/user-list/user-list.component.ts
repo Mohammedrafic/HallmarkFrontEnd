@@ -23,6 +23,7 @@ import { UserDTO, User } from '@shared/models/user-managment-page.model';
 import { take } from 'rxjs/operators';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { UserGridComponent } from './user-grid/user-grid.component';
 
 const DEFAULT_DIALOG_TITLE = 'Add User';
 const EDIT_DIALOG_TITLE = 'Edit User';
@@ -34,6 +35,7 @@ const EDIT_DIALOG_TITLE = 'Edit User';
 })
 export class UserListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild(AddEditUserComponent) addEditUserComponent: AddEditUserComponent;
+  @ViewChild(UserGridComponent) userGridComponent: UserGridComponent;
 
   @Select(SecurityState.businessUserData)
   public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
@@ -223,7 +225,12 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
         ofActionSuccessful(SaveUserSucceeded),
         takeWhile(() => this.isAlive)
       )
-      .subscribe(() => this.closeDialog());
+      .subscribe(() => {
+        let datasource = this.userGridComponent.createServerSideDatasource();
+        this.userGridComponent.gridApi.setServerSideDatasource(datasource);
+        this.closeDialog()
+      }
+        );
   }
 
   private onBusinessUnitValueChanged(): void {
