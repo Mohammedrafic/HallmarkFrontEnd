@@ -1,4 +1,7 @@
 export class ConfigurationDto {
-    Key:string;
-    Value:string;
+    key:string;
+    value:string;
+}
+export class LogiReportDto{
+    logiReportData:ConfigurationDto[]
 }
