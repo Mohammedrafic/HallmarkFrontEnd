@@ -195,7 +195,7 @@ export class BillRateFilters {
   billRateConfigIds?: string[];
   billRateCategories?: string[];
   billRateTypes?: string[];
-  effectiveDate?: Date | null;
+  effectiveDate?: string | null;
   intervalMin?: number | null;
   intervalMax?: number | null;
   considerForWeeklyOt?: boolean | null;

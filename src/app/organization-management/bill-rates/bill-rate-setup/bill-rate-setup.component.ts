@@ -71,6 +71,7 @@ import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/expor
 import { DatePipe } from '@angular/common';
 import { valuesOnly } from '@shared/utils/enum.utils';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-bill-rate-setup',
@@ -639,7 +640,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public onFilterApply(): void {
     this.filters = this.billRateFilterFormGroup.getRawValue();
-    this.filters.effectiveDate = this.filters.effectiveDate || null;
+    const effectiveDate = this.filters.effectiveDate ? DateTimeHelper.toUtcFormat(this.filters.effectiveDate) : null;
+    this.filters.effectiveDate = effectiveDate;
     this.filteredItems = this.filterService.generateChips(
       this.billRateFilterFormGroup,
       this.filterColumns,
