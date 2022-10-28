@@ -22,6 +22,7 @@ export type CandidateCredential = {
   comment?: string;
   credentialTypeId?: number;
   credentialTypeName?: string
+  rejectReason?: string;
 }
 
 export type CredentialFile = {
