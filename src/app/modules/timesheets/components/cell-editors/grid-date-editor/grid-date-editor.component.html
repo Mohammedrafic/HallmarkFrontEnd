@@ -14,35 +14,16 @@
 
   <ng-template [ngSwitchCase]="true">
     <div class="wrapper">
-      <ng-container [ngSwitch]="type">
-
-        <ng-template ngSwitchCase="time">
-          <ejs-timepicker
-            placeholder="HH:MM"
-            format="HH:mm"
-            [value]="dateValue"
-            [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-            [enableMask]="true"
-            [step]="15"
-            [ngClass]="control.invalid ? ['ng-invalid', 'ng-touched'] : []"
-            maskPlaceholder="HH:MM"
-            (change)="handleTimeChange($event)">
-          </ejs-timepicker>
-        </ng-template>
-
-        <ng-template ngSwitchCase="dateTime">
-          <ejs-timepicker
-            name="startDateTime"
-            [step]="15"
-            placeholder="HH:MM"
-            format="HH:mm"
-            [value]="dateValue"
-            [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-            [enableMask]="true"
-            (change)="handleTimeChange($event)">
-          </ejs-timepicker>
-        </ng-template>
-      </ng-container>
+      <ejs-timepicker
+        placeholder="HH:MM"
+        format="HH:mm"
+        [value]="dateValue"
+        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+        [enableMask]="true"
+        [step]="15"
+        maskPlaceholder="HH:MM"
+        (change)="handleTimeChange($event)">
+      </ejs-timepicker>
     </div>
   </ng-template>
 
