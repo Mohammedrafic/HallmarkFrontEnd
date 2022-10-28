@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ONLY_LETTERS } from '@shared/constants';
+import { ALPHANUMERIC, ONLY_LETTERS } from '@shared/constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Titles } from '@shared/enums/title';
 import { OrganizationTypes } from '@shared/enums/organization-type';
@@ -396,7 +396,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
       taxId: new FormControl(organization ? organization.generalInformation.taxId : '', [
         Validators.required,
         Validators.minLength(9),
-        Validators.pattern(/^[0-9\s\-]+$/),
+        Validators.pattern(ALPHANUMERIC),
       ]),
       organizationPrefix: new FormControl(
         {
@@ -457,7 +457,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
         Validators.minLength(10),
         Validators.pattern(/^[0-9]+$/),
       ]),
-      ext: new FormControl(organization ? organization.billingDetails.ext : '', [Validators.pattern(/^[0-9]{5}$/)]),
+      ext: new FormControl(organization ? organization.billingDetails.ext : ''),
     });
     this.BillingDetailsFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.BillingDetailsFormGroup.dirty));
