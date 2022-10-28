@@ -5,7 +5,8 @@ import { A11yModule } from '@angular/cdk/a11y';
 
 import {
   AlignJustify, ChevronDown, ChevronRight, Lock, Menu, MessageSquare, MoreVertical, Package,
-  Percent, Sliders, Trash2, X, AlertCircle, ChevronsDown, Search, Printer } from 'angular-feather/icons';
+  Percent, Sliders, Trash2, X, AlertCircle, ChevronsDown, Search, Printer, ArrowUp
+} from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import {
   AutoCompleteAllModule,
@@ -100,7 +101,7 @@ import { GridOrderIdCellComponent } from './components/grid-order-id-cell/grid-o
     FeatherModule.pick({
       AlignJustify, Lock, Menu, MessageSquare, MoreVertical, Sliders, ChevronRight,
       ChevronDown, X, Percent, Package, Trash2, AlertCircle, ChevronsDown, Search,
-      Printer,
+      Printer, ArrowUp,
     }),
     TabModule,
     DropDownButtonModule,

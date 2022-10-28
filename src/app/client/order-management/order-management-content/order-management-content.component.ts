@@ -40,6 +40,7 @@ import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { FilteredItem } from '@shared/models/filter.model';
 import {
+  FilterStatus,
   Order,
   OrderCandidateJob,
   OrderFilter,
@@ -433,7 +434,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
   }
 
-  public getOrders(): void {
+  public getOrders(cleared?: boolean): void {
     this.filters.orderBy = this.orderBy;
     this.filters.orderPublicId = this.filters.orderPublicId ? this.filters.orderPublicId.toUpperCase() : null;
     this.filters.jobStartDate ? this.filters.jobStartDate : null;
@@ -450,24 +451,24 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.filters.isTemplate = false;
         this.filters.includeReOrders = true;
         this.hasOrderAllOrdersId();
-        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
+        cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.PerDiem:
         this.filters.orderTypes = [OrderType.OpenPerDiem];
         this.filters.includeReOrders = true;
         this.filters.isTemplate = false;
-        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
+        cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.PermPlacement:
         this.filters.orderTypes = [OrderType.PermPlacement];
         this.filters.isTemplate = false;
-        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
+        cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.ReOrders:
         this.hasOrderAllOrdersId();
         this.filters.orderTypes = [OrderType.ReOrder];
         this.filters.isTemplate = false;
-        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
+        cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.Incomplete:
         this.columnsToExport = allOrdersColumnsToExport;
@@ -478,7 +479,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         break;
       case OrganizationOrderManagementTabs.OrderTemplates:
         this.filters.isTemplate = true;
-        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
+        this.store.dispatch([new GetOrders(this.filters)]);
         break;
     }
 
@@ -584,7 +585,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public onFilterClearAll(): void {
     this.orderManagementService.selectedOrderAfterRedirect = null;
     this.clearFilters();
-    this.getOrders();
+    this.getOrders(true);
   }
 
   public onFilterApply(): void {
@@ -1205,7 +1206,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
               CandidatesStatusText.Rejected,
               CandidatStatus.Cancelled,
             ].includes(status.status)
-          ); // TODO: after BE implementation also add Pending, Rejected
+          );
         } else if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
           statuses = data.orderStatuses.filter((status) =>
             [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status)
@@ -1218,7 +1219,18 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.filterColumns.orderStatuses.dataSource = statuses;
         this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
         this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
+        this.setDefaultFilter();
+        this.store.dispatch([new GetOrders(this.filters)])
       });
+  }
+
+  private setDefaultFilter(): void {
+    const statuses = this.filterColumns.orderStatuses.dataSource
+                      .filter((status: FilterStatus) => status.status !== OrderStatusText.Closed)
+                      .map((status: FilterStatus) => status.status);
+    this.OrderFilterFormGroup.get('orderStatuses')?.setValue(statuses);
+    this.filters.orderStatuses = statuses;
+    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }
 
   private onOrderFilterControlValueChangedHandler(): void {

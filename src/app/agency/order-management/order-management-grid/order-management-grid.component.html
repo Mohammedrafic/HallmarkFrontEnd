@@ -359,5 +359,6 @@
     [form]="OrderFilterFormGroup"
     [filterColumns]="filterColumns"
     [activeTab]="selectedTab"
+    (setDefault)="setDefaultFilters($event)"
   ></app-agency-order-filters>
 </app-filter-dialog>

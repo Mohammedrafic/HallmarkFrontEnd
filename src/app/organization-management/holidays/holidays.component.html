@@ -87,8 +87,16 @@
         </ng-template>
       </e-column>
       <e-column field="holidayName" headerText="holiday name" width=200></e-column>
-      <e-column field="startDateTime" type="date" [format]="format" headerText="start date & time" width=200></e-column>
-      <e-column field="endDateTime" type="date" [format]="format" headerText="end date & time" width=200></e-column>
+      <e-column field="startDateTime" headerText="start date & time" width=200>
+        <ng-template #template let-data>
+          {{ data.startDateTime | date: "MM/dd/yyyy hh:mm a":"utc": "en-US" }}
+        </ng-template>
+      </e-column>
+      <e-column field="endDateTime" headerText="end date & time" width=200>
+        <ng-template #template let-data>
+          {{ data.endDateTime | date: "MM/dd/yyyy hh:mm a":"utc": "en-US" }}
+        </ng-template>
+      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">

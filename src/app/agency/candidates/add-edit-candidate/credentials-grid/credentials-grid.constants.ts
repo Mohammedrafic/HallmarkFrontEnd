@@ -3,7 +3,6 @@ import { CredentialStatus } from "@shared/enums/status";
 export const orgSideCredentialStatuses: CredentialStatus[] = [
   CredentialStatus.Pending,
   CredentialStatus.Verified,
-  CredentialStatus.Rejected,
   CredentialStatus.Reviewed
 ];
 
@@ -15,7 +14,8 @@ export const agencySideCredentialStatuses: CredentialStatus[] = [
 export const orgSidePendingCredentialStatuses: CredentialStatus[] = [
   CredentialStatus.Pending,
   CredentialStatus.Reviewed,
-  CredentialStatus.Verified
+  CredentialStatus.Verified,
+  CredentialStatus.Rejected,
 ];
 
 export const orgSideCompletedCredentialStatuses: CredentialStatus[] = [
@@ -28,6 +28,7 @@ export const orgSideCompletedCredentialStatuses: CredentialStatus[] = [
 export const orgSideReviewedCredentialStatuses: CredentialStatus[] = [
   CredentialStatus.Reviewed,
   CredentialStatus.Verified,
-  CredentialStatus.Pending
+  CredentialStatus.Pending,
+  CredentialStatus.Rejected,
 ];
 

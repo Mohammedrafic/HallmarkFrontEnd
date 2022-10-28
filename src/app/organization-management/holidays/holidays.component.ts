@@ -41,6 +41,7 @@ import {
 } from '../store/holidays.actions';
 import { HolidaysState } from '../store/holidays.state';
 import { GetOrganizationStructure } from '../../store/user.actions';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-holidays',
@@ -77,10 +78,6 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   public endTimeField: AbstractControl;
   public today = new Date();
   public maxDate = new Date(2099, 11, 31);
-  public format = {
-    type: 'date',
-    format: 'MM/dd/yyyy hh:mm a',
-  };
   public optionFields = {
     text: 'name',
     value: 'id',
@@ -433,8 +430,8 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
       locations: [0],
       regions: [0],
       holidayName: holiday.holidayName,
-      startDateTime: holiday.startDateTime,
-      endDateTime: holiday.endDateTime,
+      startDateTime: DateTimeHelper.convertDateToUtc(holiday.startDateTime),
+      endDateTime: DateTimeHelper.convertDateToUtc(holiday.endDateTime),
     });
 
     this.store.dispatch(new ShowSideDialog(true));
@@ -454,8 +451,8 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
       locations: [holiday.locationId || 0],
       regions: [holiday.regionId || 0],
       holidayName: holiday.holidayName,
-      startDateTime: holiday.startDateTime,
-      endDateTime: holiday.endDateTime,
+      startDateTime: DateTimeHelper.convertDateToUtc(holiday.startDateTime),
+      endDateTime: DateTimeHelper.convertDateToUtc(holiday.endDateTime),
     });
     this.store.dispatch(new ShowSideDialog(true));
   }

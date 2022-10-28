@@ -20,7 +20,7 @@ import { CancellationReasonsMap } from '@shared/components/candidate-cancellatio
   templateUrl: './penalties.component.html',
   styleUrls: ['./penalties.component.scss']
 })
-export class PenaltiesComponent extends ReasonsComponent implements OnInit,OnDestroy {
+export class PenaltiesComponent extends ReasonsComponent implements OnInit, OnDestroy {
   @Select(RejectReasonState.penalties)
   public reasons$: Observable<PenaltyPage>;
 
