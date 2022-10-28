@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, throttleTime, of } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, throttleTime, of, Subject } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction } from '@core/enums';
@@ -23,6 +23,7 @@ import { TimesheetsService } from '../../services';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ProfileDetailsContainerComponent } from '../profile-details-container/profile-details-container.component';
 import { AppState } from '../../../../store/app.state';
+import { TimesheetsTabsComponent } from '../../components/timesheets-tabs/timesheets-tabs.component';
 
 @Component({
   selector: 'app-timesheets-container',
@@ -33,6 +34,9 @@ import { AppState } from '../../../../store/app.state';
 export class TimesheetsContainerComponent extends Destroyable implements OnInit {
   @ViewChild(ProfileDetailsContainerComponent)
   public timesheetDetailsComponent: ProfileDetailsContainerComponent;
+
+  @ViewChild(TimesheetsTabsComponent)
+  private timesheetsTabs: TimesheetsTabsComponent;
 
   @Select(TimesheetsState.timesheets)
   readonly timesheets$: Observable<TimeSheetsPage>;
@@ -70,7 +74,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public readonly organizationControl: FormControl = new FormControl(null);
   public readonly currentSelectedTableRowIndex: Observable<number>
     = this.timesheetsService.getStream();
-
   public isAgency: boolean;
 
   constructor(
@@ -259,6 +262,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private initComponentState(): void {
+    this.timesheetsTabs?.programSelection(0);
     if (this.isAgency) {
       this.initOrganizationsList();
     } else {
