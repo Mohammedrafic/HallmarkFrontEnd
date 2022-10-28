@@ -16,7 +16,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportUrl, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -24,6 +24,7 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { analyticsConstants } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
+import { ConfigurationDto } from '@shared/models/analytics.model';
 
 @Component({
   selector: 'app-candidate-list',
@@ -64,8 +65,8 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
   departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   selectedDepartments: Department[];
   
-  @Select(LogiReportState.logiReportUrl)
-  public logiReportUrl$: Observable<string>;
+  @Select(LogiReportState.logiReportData)
+  public logiReportData$: Observable<ConfigurationDto[]>;
 
   @Select(SecurityState.bussinesData)
   public businessData$: Observable<BusinessUnit[]>;
@@ -107,15 +108,18 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
     }   
-    this.SetReportUrl();    
+    this.SetReportData();    
   }
 
   ngOnInit(): void {
     
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => { 
-      this.SetReportUrl();
-      this.logiReportUrl$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:string)=>{
-        this.logiReportComponent.SetReportUrl(data);
+      this.SetReportData();
+      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:ConfigurationDto[])=>{
+        if(data.length>0)
+        {
+        this.logiReportComponent.SetReportData(data);
+        }
      });    
       this.agencyOrganizationId=data;   
       this.isInitialLoad = true;
@@ -259,14 +263,14 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
       endDate: { type: ControlTypes.Date, valueType: ValueType.Text }
     }
   }
-  private SetReportUrl(){
-    const logiReportUrl = this.store.selectSnapshot(LogiReportState.logiReportUrl);
-      if(logiReportUrl=='')
+  private SetReportData(){
+    const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
+      if(logiReportData!=null&&logiReportData.length==0)
       {
-        this.store.dispatch(new GetLogiReportUrl());
+        this.store.dispatch(new GetLogiReportData());
       }
       else{
-        this.logiReportComponent?.SetReportUrl(logiReportUrl);
+        this.logiReportComponent?.SetReportData(logiReportData);
       }
   }
   private onOrganizationsChange(): void {

@@ -2,6 +2,7 @@ import { Component, Inject, Input, OnInit } from '@angular/core';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { LogiReportTypes } from 'src/app/shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
+import { ConfigurationDto } from '@shared/models/analytics.model';
 declare const com: any;
 
 @Component({
@@ -12,8 +13,8 @@ declare const com: any;
 export class LogiReportComponent implements OnInit {
   private factory: any;
   private reportIframeName: string = "reportIframe";
-  private uId: string = "admin";
-  private pwd: string = "admin";
+  private uId: string = "";
+  private pwd: string = "";
   private jrdPrefer: any;
   private reportUrl: string;
   @Input() paramsData: any | {};
@@ -29,8 +30,13 @@ export class LogiReportComponent implements OnInit {
     this.factory = com.jinfonet.api.AppFactory;    
     
   }
-  public SetReportUrl(url:string):void{
-    this.reportUrl=url+ 'jinfonet/tryView.jsp';
+  public SetReportData(data:ConfigurationDto[]):void{
+    let url=data.find(i=>i.key=="ReportServer:BaseUrl")?.value;
+    let userId=data.find(i=>i.key=="ReportServer:UId")?.value;
+    let pass=data.find(i=>i.key=="ReportServer:Pwd")?.value;
+    this.reportUrl=url==null?"":url+ 'jinfonet/tryView.jsp';
+    this.uId=userId==null?"":userId;
+    this.pwd=pass==null?"":pass;
   }
   public RenderReport():void
   {
