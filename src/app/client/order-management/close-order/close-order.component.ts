@@ -25,7 +25,6 @@ import { UserAgencyOrganization } from '@shared/models/user-agency-organization.
 import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
 import { AlertTriggerDto } from '@shared/models/alerts-template.model';
 import { SaveCloseOrderSucceeded } from '@client/store/order-managment-content.actions';
-import { OrderStatus } from '@shared/enums/order-management';
 import { AlertTrigger } from '@admin/store/alerts.actions';
 
 @Component({
@@ -169,6 +168,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   public setCloseDateAvailability(isPosition: boolean): void {
+    this.isPosition = isPosition;
     if (this.order?.orderType === OrderType.ReOrder) {
       this.closeForm.patchValue({ closingDate: new Date(this.order.jobStartDate as Date) });
       this.closeForm.get('closingDate')?.disable();
