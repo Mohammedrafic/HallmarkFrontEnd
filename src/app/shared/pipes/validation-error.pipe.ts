@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ONLY_LETTERS, ONLY_NUMBER, ALPHANUMERICS_AND_SYMBOLS, ALPHANUMERIC } from '@shared/constants';
+import { ONLY_LETTERS, ONLY_NUMBER, ONLY_NUMBER_AND_DOT, ALPHANUMERICS_AND_SYMBOLS, ALPHANUMERIC } from '@shared/constants';
 
 @Pipe({
   name: 'validationError',
@@ -27,7 +27,7 @@ export class ValidationErrorPipe implements PipeTransform {
         if (this.isWrongValue(ONLY_LETTERS, value)) {
           return 'Only letters are allowed';
         }
-        if (this.isWrongValue(ONLY_NUMBER, value)) {
+        if (this.isWrongValue(ONLY_NUMBER, value) || this.isWrongValue(ONLY_NUMBER_AND_DOT, value)) {
           return 'Only numbers are allowed';
         }
         if (this.isWrongValue(ALPHANUMERICS_AND_SYMBOLS, value)) {

@@ -1,6 +1,14 @@
 @import 'colors';
 @import 'adaptive-response';
 
+.business-dropdowns {
+  display: flex;
+
+  .dropdown-container {
+    margin-right: 12px;
+  }
+}
+
 
 
 .e-switch-wrapper {

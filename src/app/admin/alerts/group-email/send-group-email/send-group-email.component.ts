@@ -86,7 +86,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   public uploaderErrorMessageElement: HTMLElement;
   public file: any;
   public files: File[] = [];
-  @ViewChild('filesUploader') uploadObj: UploaderComponent;
+  @ViewChild('filesUploaderGroupEmail') uploadObj: UploaderComponent;
 
   constructor(private actions$: Actions,
     private store: Store, private fb: FormBuilder) {
@@ -312,9 +312,10 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   }
   
   ngAfterViewInit() {
+    
     setTimeout(() => {
       this.dropElement = document.getElementById('files-droparea') as HTMLElement;
-    }, 3000);
-    this.rteObj.refreshUI();
+    }, 4000);
+    
   }
 }

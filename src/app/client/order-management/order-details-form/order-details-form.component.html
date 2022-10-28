@@ -110,7 +110,7 @@
                 <div class="form-line">
                   <!-- Hourly rate -->
                   <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
-                    <label>Hourly rate<span class="required">*</span></label>
+                    <label>Hourly Rate<span class="required">*</span></label>
                     <div class="input-group">
                       <input
                         class="e-input"
@@ -305,7 +305,9 @@
 
                   <!-- Shift Start Time -->
                   <div *ngIf="isPermPlacementOrder" class="input-container calendar form-line-item-20">
-                    <label for="startTime">Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label>
+                    <label for="startTime"
+                      >Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                    >
                     <div class="input-group datepicker bootstrap">
                       <ejs-timepicker
                         placeholder="HH:MM"
@@ -322,7 +324,9 @@
 
                   <!-- Shift End Time -->
                   <div *ngIf="isPermPlacementOrder" class="input-container calendar form-line-item-20">
-                    <label for="startTime">Shift End Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label>
+                    <label for="startTime"
+                      >Shift End Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                    >
                     <div class="input-group datepicker bootstrap">
                       <ejs-timepicker
                         placeholder="HH:MM"
@@ -355,7 +359,9 @@
 
                   <!-- Shift Start Time -->
                   <div class="input-container calendar form-line-item-20">
-                    <label for="startTime">Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label>
+                    <label for="startTime"
+                      >Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                    >
                     <div class="input-group datepicker bootstrap">
                       <ejs-timepicker
                         placeholder="HH:MM"
@@ -372,7 +378,9 @@
 
                   <!-- Shift End Time -->
                   <div class="input-container calendar form-line-item-20">
-                    <label for="startTime">Shift End Time<span class="required"  *ngIf="isShiftTimeRequired">*</span></label>
+                    <label for="startTime"
+                      >Shift End Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                    >
                     <div class="input-group datepicker bootstrap">
                       <ejs-timepicker
                         placeholder="HH:MM"
@@ -506,7 +514,7 @@
                     <ejs-dropdownlist
                       formControlName="orderRequisitionReasonId"
                       appValidateWithMessage
-                      (change)='onRequisitionChange($event)'
+                      (change)="onRequisitionChange($event)"
                       [dataSource]="(reasons$ | async)?.items"
                       [fields]="reasonForRequisitionFields"
                     >
@@ -711,8 +719,9 @@
             <div class="form-line">
               <!-- Special Project Category -->
               <div class="input-container bootstrap form-line-item-30">
-
-                <label>Special Project Category<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label>
+                <label
+                  >Special Project Category<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label
+                >
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
                     formControlName="projectTypeId"
@@ -771,7 +780,8 @@
           [comments]="comments"
           [commentContainerId]="commentContainerId"
           [useBackground]="false"
-          [isCreating]="!orderId"></app-comments>
+          [isCreating]="!orderId"
+        ></app-comments>
       </div>
     </div>
   </div>

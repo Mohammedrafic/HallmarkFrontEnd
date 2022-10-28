@@ -69,9 +69,9 @@ export class DocumentLibraryDto {
   status: string;
   businessUnitId: number | null;
   businessUnitName: string | null;
-  regionId: number | null;
+  regionId: string | null;
   regionName: string | null;
-  locationId: number | null;
+  locationId: string | null;
   locationName: string | null;
   isSharedWithMe: boolean;
   documentVisibilities: any | null;
@@ -172,6 +172,24 @@ export class UnShareDocumentsFilter {
   documentIds: number[];
 }
 
+export class regionFilter {
+  ids?: number[];
+  name?: string[];
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+  getAll?: boolean;
+  businessUnitId: number;
+}
+
+export class LocationsByRegionsFilter {
+  ids?: number[];
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+  getAll?: boolean;
+  businessUnitId: number;
+}
 
 
 

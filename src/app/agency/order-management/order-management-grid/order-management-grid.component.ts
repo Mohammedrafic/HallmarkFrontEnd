@@ -73,6 +73,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PreviewOrderDialogComponent } from '@agency/order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
+import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -335,6 +336,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
   }
 
+  public setDefaultFilters(statuses: number[]): void {
+    this.filters.orderStatuses = statuses;
+    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+    this.filteredItems$.next(this.filteredItems.length);
+    this.dispatchNewPage();
+  }
+
   private onTabChange(): void {
     this.ordersTab$
       .pipe(
@@ -357,7 +365,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
             this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
             this.filteredItems$.next(this.filteredItems.length);
           }
-          this.dispatchNewPage();
+          this.store.dispatch(new GetAgencyFilterOptions());
         })
       )
       .subscribe();
@@ -754,7 +762,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.openPreview.next(false);
         this.openCandidat.next(false);
         this.clearFilters();
-        this.dispatchNewPage();
         this.store.dispatch(new GetAgencyFilterOptions());
       });
   }

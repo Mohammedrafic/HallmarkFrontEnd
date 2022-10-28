@@ -7,9 +7,21 @@ import { documentsColumnField, documentsColumnHeaderText, DocType } from "../enu
 import { valuesOnly } from "@shared/utils/enum.utils";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
 
+export const UNIT_FIELDS = {
+  text: 'text',
+  value: 'id',
+};
+
+export const DISABLED_GROUP = [BusinessUnitType.Agency, BusinessUnitType.Organization];
+
 export const BUSINESS_UNITS_VALUES = Object.values(BusinessUnitType)
   .filter(valuesOnly)
   .map((text, id) => ({ text, id: id + 1 }));
+
+export const BUSSINES_DATA_FIELDS = {
+  text: 'name',
+  value: 'id',
+};
 
 export const DOCUMENT_TYPE_VALUES = Object.values(DocType)
   .filter(valuesOnly)

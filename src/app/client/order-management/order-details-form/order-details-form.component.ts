@@ -3,18 +3,7 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import {
-  combineLatest,
-  debounceTime,
-  filter,
-  Observable,
-  skip,
-  Subject,
-  switchMap,
-  take,
-  takeUntil,
-  throttleTime,
-} from 'rxjs';
+import { combineLatest, debounceTime, filter, Observable, skip, Subject, switchMap, take, takeUntil, throttleTime } from 'rxjs';
 
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -23,7 +12,7 @@ import {
   GetLocationsByRegionId,
   GetMasterSkillsByOrganization,
   GetOrganizationSettings,
-  GetRegions,
+  GetRegions
 } from '@organization-management/store/organization-management.actions';
 import {
   ClearSelectedOrder,
@@ -34,7 +23,7 @@ import {
   GetProjectSpecialData,
   GetSuggestedDetails,
   SetIsDirtyOrderForm,
-  SetPredefinedBillRatesData,
+  SetPredefinedBillRatesData
 } from '@client/store/order-managment-content.actions';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -53,10 +42,8 @@ import { OrderType } from '@shared/enums/order-type';
 import { Duration } from '@shared/enums/durations';
 import { JobDistribution } from '@shared/enums/job-distibution';
 import { JobClassification } from '@shared/enums/job-classification';
-import { integerValidator } from '@shared/validators/integer.validator';
-import { currencyValidator } from '@shared/validators/currency.validator';
 
-import { ORDER_CONTACT_DETAIL_TITLES, ORDER_EDITS, ORDER_PER_DIEM_EDITS } from '@shared/constants';
+import { ONLY_NUMBER, ONLY_NUMBER_AND_DOT, ORDER_CONTACT_DETAIL_TITLES, ORDER_EDITS, ORDER_PER_DIEM_EDITS } from '@shared/constants';
 import PriceUtils from '@shared/utils/price.utils';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { SkillCategory } from '@shared/models/skill-category.model';
@@ -259,11 +246,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         locationId: [null, Validators.required],
         departmentId: [null, Validators.required],
         skillId: [null, Validators.required],
-        hourlyRate: [null, [Validators.required, Validators.maxLength(10)]],
-        openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
-        minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
-        joiningBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
-        compBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
+        hourlyRate: [null, [Validators.required, Validators.maxLength(10), Validators.pattern(ONLY_NUMBER_AND_DOT)]],
+        openPositions: [null, [Validators.required, Validators.maxLength(10), Validators.pattern(ONLY_NUMBER)]],
+        minYrsRequired: [null, [Validators.maxLength(10), Validators.pattern(ONLY_NUMBER)]],
+        joiningBonus: [null, [Validators.maxLength(10), Validators.pattern(ONLY_NUMBER_AND_DOT)]],
+        compBonus: [null, [Validators.maxLength(10), Validators.pattern(ONLY_NUMBER_AND_DOT)]],
         duration: [null, Validators.required],
         jobStartDate: [null, Validators.required],
         jobEndDate: [null, Validators.required],
@@ -694,23 +681,24 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.generalInformationForm.controls['hourlyRate']?.setValidators([
         Validators.required,
         Validators.maxLength(10),
+        Validators.pattern(ONLY_NUMBER_AND_DOT),
       ]);
       this.generalInformationForm.controls['openPositions'].setValidators([
         Validators.required,
         Validators.maxLength(10),
-        integerValidator(1),
+        Validators.pattern(ONLY_NUMBER),
       ]);
       this.generalInformationForm.controls['minYrsRequired'].setValidators([
         Validators.maxLength(10),
-        integerValidator(1),
+        Validators.pattern(ONLY_NUMBER),
       ]);
       this.generalInformationForm.controls['joiningBonus']?.setValidators([
         Validators.maxLength(10),
-        currencyValidator(1),
+        Validators.pattern(ONLY_NUMBER_AND_DOT),
       ]);
       this.generalInformationForm.controls['compBonus']?.setValidators([
         Validators.maxLength(10),
-        currencyValidator(1),
+        Validators.pattern(ONLY_NUMBER_AND_DOT),
       ]);
       this.generalInformationForm.controls['duration']?.setValidators(Validators.required);
       this.generalInformationForm.controls['jobStartDate'].setValidators(Validators.required);
@@ -920,7 +908,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       const formControl = this.formBuilder.control(null, [
         Validators.required,
         Validators.maxLength(10),
-        currencyValidator(1),
+        Validators.pattern(ONLY_NUMBER_AND_DOT),
       ]);
       this.generalInformationForm.addControl(controlName, formControl, { emitEvent: false });
     });
@@ -1201,12 +1189,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   setShiftsValidation(shiftStart: AbstractControl, shiftEnd: AbstractControl): void {
-    shiftStart.addValidators([
-      Validators.required,
-    ]);
-    shiftEnd.addValidators([
-      Validators.required,
-    ]);
+    shiftStart.addValidators([Validators.required]);
+    shiftEnd.addValidators([Validators.required]);
   }
 
   clearShiftsValidation(shiftStart: AbstractControl, shiftEnd: AbstractControl): void {
