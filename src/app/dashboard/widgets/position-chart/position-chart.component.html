@@ -13,9 +13,12 @@
   <ng-template #positionChat>
     <div class="widget">
       <span class="widget__title">{{ chartData?.count }}</span>
-      <span class="widget__type"
+      <span class="widget__type" *ngIf="!isLTAOrderEnding"
             (mousedown)="defineMousePosition($event)"
             (click)="toSourceContent($event)">{{ chartData?.statusName | titlecase }} Positions</span>
+      <span class="widget__type" *ngIf="isLTAOrderEnding"
+            (mousedown)="defineMousePosition($event)"
+            (click)="toSourceContent($event)">Order Ending in next 45 days</span>
     </div>
   </ng-template>
 </app-widget-wrapper>
