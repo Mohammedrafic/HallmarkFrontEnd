@@ -14,7 +14,7 @@ import {
   SidebarComponent,
   TreeViewComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { filter, Observable, Subject, takeUntil, distinctUntilChanged, debounceTime, map } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, distinctUntilChanged, debounceTime, map, interval } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '../client/client.config';
@@ -211,36 +211,12 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
         this.canManageNotificationTemplates = this.hasPermission(permissionsIds, PermissionTypes.CanManageNotificationTemplates);
         this.removeManageNotificationOptionInHeader();
       });
-        this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
-          if (user) {
-            this.userLogin = user;
-            this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
-            this.store.dispatch(new GetAlertsForCurrentUser({}))
-            this.alertStateModel$.subscribe((x) => {
-              this.alerts = x;
-            });
-            this.profileData = [
-              {
-                text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
-                items: [
-                    // TODO: edit profile
-                  /*{ text: this.ProfileMenuItemNames[profileMenuItem.edit_profile], id: profileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },*/
-                { text: this.ProfileMenuItemNames[profileMenuItem.manage_notifications], id: profileMenuItem.manage_notifications.toString(), iconCss: 'e-settings e-icons' },
-                {
-                  text: this.ProfileMenuItemNames[profileMenuItem.theme], id: profileMenuItem.theme.toString(), iconCss: this.isDarkTheme ? 'e-theme-dark e-icons' : 'e-theme-light e-icons', items: [
-                    { text: this.ProfileMenuItemNames[profileMenuItem.light_theme], id: profileMenuItem.light_theme.toString() },
-                    { text: this.ProfileMenuItemNames[profileMenuItem.dark_theme], id: profileMenuItem.dark_theme.toString() }
-                  ]
-                },
-                { text: this.ProfileMenuItemNames[profileMenuItem.help], id: profileMenuItem.help.toString(), iconCss: 'e-circle-info e-icons' },
-                { text: this.ProfileMenuItemNames[profileMenuItem.contact_us], id: profileMenuItem.contact_us.toString(), iconCss: 'e-ddb-icons e-contactus' },
-                { text: this.ProfileMenuItemNames[profileMenuItem.log_out], id: profileMenuItem.log_out.toString(), iconCss: 'e-ddb-icons e-logout' }
 
-              ]
-              },
-            ];
-          }
-        });
+    this.getAlertsPoolling();
+    interval(60000).subscribe(() => {
+      this.getAlertsPoolling();
+    }
+    );
         this.watchForUnreadMessages();
       }
 
@@ -264,6 +240,39 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private getCurrentUserPermissions(): void {
     this.store.dispatch(new GetCurrentUserPermissions());
+  }
+
+  private getAlertsPoolling(): void {
+    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+      if (user) {
+        this.userLogin = user;
+        this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
+        this.store.dispatch(new GetAlertsForCurrentUser({}))
+        this.alertStateModel$.subscribe((x) => {
+          this.alerts = x;
+        });
+        this.profileData = [
+          {
+            text: this.userLogin.firstName + ' ' + this.userLogin.lastName,
+            items: [
+              // TODO: edit profile
+              /*{ text: this.ProfileMenuItemNames[profileMenuItem.edit_profile], id: profileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },*/
+              { text: this.ProfileMenuItemNames[profileMenuItem.manage_notifications], id: profileMenuItem.manage_notifications.toString(), iconCss: 'e-settings e-icons' },
+              {
+                text: this.ProfileMenuItemNames[profileMenuItem.theme], id: profileMenuItem.theme.toString(), iconCss: this.isDarkTheme ? 'e-theme-dark e-icons' : 'e-theme-light e-icons', items: [
+                  { text: this.ProfileMenuItemNames[profileMenuItem.light_theme], id: profileMenuItem.light_theme.toString() },
+                  { text: this.ProfileMenuItemNames[profileMenuItem.dark_theme], id: profileMenuItem.dark_theme.toString() }
+                ]
+              },
+              { text: this.ProfileMenuItemNames[profileMenuItem.help], id: profileMenuItem.help.toString(), iconCss: 'e-circle-info e-icons' },
+              { text: this.ProfileMenuItemNames[profileMenuItem.contact_us], id: profileMenuItem.contact_us.toString(), iconCss: 'e-ddb-icons e-contactus' },
+              { text: this.ProfileMenuItemNames[profileMenuItem.log_out], id: profileMenuItem.log_out.toString(), iconCss: 'e-ddb-icons e-logout' }
+
+            ]
+          },
+        ];
+      }
+    })
   }
 
   private hasPermission(permissions: number[], id: number): boolean{
@@ -347,7 +356,6 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       if (menu.menuItems.length) {
         let r = menu.menuItems.find(element=>element.id == 6)?.children.find(e=>e.route == "/alerts/user-subscription");
         if(r != undefined){
-          this.store.dispatch(new ShouldDisableUserDropDown(true));
           this.router.navigate([r.route]);
         }
       }

@@ -28,6 +28,8 @@ import { positionTrendLegendPalette } from '../../constants/position-trend-legen
 import { WidgetLegengDataModel } from '../../models/widget-legend-data.model';
 import { DashboardService } from '../../services/dashboard.service';
 import { PositionTrendTypeEnum } from '../../enums/position-trend-type.enum';
+import { UserState } from '../../../store/user.state';
+import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-line-chart',
@@ -171,7 +173,12 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   }
 
   public redirectToSourceContent(): void {
-    this.dashboardService.redirectToUrl('client/order-management');
+    const user = this.store.selectSnapshot(UserState.user);
+    if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
+      this.dashboardService.redirectToUrl('agency/order-management');
+    } else {
+      this.dashboardService.redirectToUrl('client/order-management');
+    }
   }
 
   public generateLegendData(chartData: PositionsByTypeAggregatedModel): WidgetLegengDataModel[] {

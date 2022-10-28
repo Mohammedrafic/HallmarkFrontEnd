@@ -1,4 +1,4 @@
-import { ICellRendererParams, CheckboxSelectionCallbackParams } from '@ag-grid-community/core';
+import { ICellRendererParams, CheckboxSelectionCallbackParams, ColDef } from '@ag-grid-community/core';
 
 import { AgencyStatus } from '@shared/enums/status';
 import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
@@ -9,6 +9,10 @@ import {
   ToggleRowExpansionHeaderCellComponent
 } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
 import { numberValueFormatter } from '../../constants';
+
+const commonColumn: ColDef = {
+  sortable: true,
+};
 
 interface GetPendingInvoiceRecordsColDefsConfig {
   previewAttachment: (attachment: Attachment) => void,
@@ -42,6 +46,7 @@ export class PendingInvoicesGridHelper {
         minWidth: 240,
         headerComponent: ToggleRowExpansionHeaderCellComponent,
         cellRenderer: 'agGroupCellRenderer',
+        ...commonColumn,
       },
       unitName,
       candidateName,
@@ -59,6 +64,7 @@ export class PendingInvoicesGridHelper {
           };
         },
         cellClass: 'invoice-records-attachments-list',
+        ...commonColumn,
       },
       departmentName,
       skillName,
@@ -70,6 +76,7 @@ export class PendingInvoicesGridHelper {
         type: 'rightAligned',
         cellClass: 'font-weight-bold align-right',
         valueFormatter: numberValueFormatter,
+        ...commonColumn,
       },
       {
         field: 'hours',
@@ -78,6 +85,7 @@ export class PendingInvoicesGridHelper {
         type: 'rightAligned',
         cellClass: 'font-weight-bold align-right',
         valueFormatter: numberValueFormatter,
+        ...commonColumn,
       },
       {
         field: 'miles',
@@ -86,6 +94,7 @@ export class PendingInvoicesGridHelper {
         type: 'rightAligned',
         cellClass: 'font-weight-bold align-right',
         valueFormatter: numberValueFormatter,
+        ...commonColumn,
       },
       {
         field: 'amount',
@@ -93,6 +102,7 @@ export class PendingInvoicesGridHelper {
         width: 110,
         cellClass: 'font-weight-bold',
         valueFormatter: numberValueFormatter,
+        ...commonColumn,
       },
     ];
   }
