@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Select, Store } from '@ngxs/store';
+import { Actions, Select, Store } from '@ngxs/store';
 import { Observable, Subject, take, takeUntil } from 'rxjs';
 import { DocumentFolder, DocumentTypeFilter, FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
 import { DocumentLibraryState } from '../../store/state/document-library.state';
@@ -37,6 +37,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
   public isNewFolderInAction: boolean =false;
 
   constructor(private store: Store,
+    private action$: Actions,
     private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
@@ -53,8 +54,8 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
 
   public initSidePanelDocs(): void {
     this.foldersTree$.pipe(takeUntil(this.unsubscribe$)).subscribe((folderTree: FolderTreeItem[]) => {
-      this.isAddNewFolderBtnVisible = true;
       if (folderTree != null && folderTree.length > 0) {
+        this.isAddNewFolderBtnVisible = true;
         this.sidePanelFolderItems = folderTree;
         this.sidePanelDocumentField = { dataSource: this.sidePanelFolderItems, id: 'id', text: 'name', parentID: 'parentId', child: 'children' };
         setTimeout(() => {
