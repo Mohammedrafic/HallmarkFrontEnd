@@ -119,7 +119,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     { text: MoreMenuType[2], id: '2' }
   ];
 
-  public statusItems: ItemModel[] = [
+  public  statusItems: ItemModel[] = [
     { text: StatusEnum[0], id: '0' },
     { text: StatusEnum[1], id: '1' }
   ];
@@ -307,19 +307,20 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.filterBbusinessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
       if (value) {
         this.filterSelectedBusinesUnitId = value;
-        this.onLoadRegionsLocationsOnUnitChange(value);
+        this.loadRegionsAndLocations(value);
         this.getDocumentTypes(value);
         this.getFolderTree(value);
       }
     });
   }
 
-  public onLoadRegionsLocationsOnUnitChange(selectedBusinessUnitId: number) {
+  public loadRegionsAndLocations(selectedBusinessUnitId: number) {
+
     this.createForm();
-    this.regionIdControl = this.documentLibraryform.get(FormControlNames.RegionIds) as AbstractControl;
-    if (selectedBusinessUnitId == BusinessUnitType.Organization || selectedBusinessUnitId == BusinessUnitType.Agency) {
+    if (!this.isAgency) {
+      this.regionIdControl = this.documentLibraryform.get(FormControlNames.RegionIds) as AbstractControl;
       let regionFilter: regionFilter = {
-        businessUnitId:selectedBusinessUnitId,
+        businessUnitId: selectedBusinessUnitId,
         getAll: true,
         ids: [selectedBusinessUnitId]
       };
@@ -337,11 +338,25 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           this.changeDetectorRef.markForCheck();
         }
       });
-
     }
     else {
       this.clearRegionsLocations();
     }
+  }
+
+  public onRegionSelect(event: any) {
+    this.regionIdControl = this.documentLibraryform.get(FormControlNames.RegionIds) as AbstractControl;
+    this.regionIdControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+      if (this.regionIdControl?.value?.length > 0) {
+        let locationFilter: LocationsByRegionsFilter = {
+          ids: data,
+          getAll: true,
+          businessUnitId: this.filterSelectedBusinesUnitId !=null ?this.filterSelectedBusinesUnitId :0
+        };
+        this.store.dispatch(new GetLocationsByRegions(locationFilter));
+        this.changeDetectorRef.markForCheck();
+      }
+    });
   }
 
   public clearRegionsLocations() {
@@ -390,6 +405,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.documentLibraryform.addControl(FormControlNames.StartDate, new FormControl(null, []));
       this.documentLibraryform.addControl(FormControlNames.EndDate, new FormControl(null, []));
       this.documentLibraryform.addControl(FormControlNames.Comments, new FormControl('', []));
+      this.documentLibraryform.get(FormControlNames.StatusIds)?.setValue(this.statusItems[0].id);
     }
     else if (this.isShare) {
       if (this.documentLibraryform.contains(FormControlNames.RegionIds)) this.documentLibraryform.removeControl(FormControlNames.RegionIds);
@@ -773,7 +789,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.dialogWidth = '800px';
       this.createForm();
       this.documentLibraryform.reset();
-      this.onLoadRegionsLocationsOnUnitChange(docItem.businessUnitId != null ? docItem.businessUnitId:0);
+      this.loadRegionsAndLocations(docItem.businessUnitId != null ? docItem.businessUnitId:0);
       let status = this.statusItems.find((x) => x.text == docItem.status);
       this.startDate = docItem.startDate != null ? new Date(docItem.startDate.toString()) : this.startDate;
       this.store.dispatch(new GetDocumentById(docItem.id));

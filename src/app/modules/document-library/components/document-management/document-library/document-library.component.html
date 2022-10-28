@@ -128,6 +128,7 @@
                                  appValidateWithMessage
                                  [dataSource]="regions$ | async"
                                  [selectAllText]='allOption'
+                                 (select)="onRegionSelect($event)"
                                  [showSelectAll]="true">
                 </ejs-multiselect>
               </div>
