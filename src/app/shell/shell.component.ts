@@ -356,7 +356,6 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       if (menu.menuItems.length) {
         let r = menu.menuItems.find(element=>element.id == 6)?.children.find(e=>e.route == "/alerts/user-subscription");
         if(r != undefined){
-          this.store.dispatch(new ShouldDisableUserDropDown(true));
           this.router.navigate([r.route]);
         }
       }
