@@ -1,5 +1,5 @@
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
@@ -22,6 +22,7 @@ import { placeholderDate } from '@shared/constants/placeholder-date';
 import { formatDate } from '@shared/constants/format-date';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { datepickerMask } from '@shared/constants/datepicker-mask';
+import { FilterStatus } from '@shared/models/order-management.model';
 
 enum RLDLevel {
   Orginization,
@@ -41,6 +42,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   @Input() form: FormGroup;
   @Input() filterColumns: any;
   @Input() activeTab: AgencyOrderManagementTabs;
+  @Output() setDefault = new EventEmitter();
 
   public AgencyOrderManagementTabs = AgencyOrderManagementTabs;
 
@@ -209,7 +211,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
               CandidatesStatusText.Rejected,
               CandidatStatus.Cancelled,
             ].includes(status.status)
-          ); // TODO: after BE implementation also add Pending, Rejected
+          );
         } else if (this.activeTab === AgencyOrderManagementTabs.PerDiem) {
           statuses = orderStatuses.filter((status) =>
             [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status)
@@ -227,7 +229,16 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         this.filterColumns.projectTypeIds.dataSource = specialProjectCategories;
         this.filterColumns.projectNameIds.dataSource = projectNames;
         this.filterColumns.poNumberIds.dataSource = poNumbers;
+        this.setDefaultFilter();
       });
+  }
+
+  private setDefaultFilter(): void {
+    const statuses = this.filterColumns.orderStatuses.dataSource
+                      .filter((status: FilterStatus) => status.status !== OrderStatusText.Closed)
+                      .map((status: FilterStatus) => status.status);
+    this.form.get('orderStatuses')?.setValue(statuses);
+    this.setDefault.emit(statuses);
   }
 
   static generateFiltersForm(): FormGroup {
