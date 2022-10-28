@@ -18,7 +18,7 @@ const commonColumn: ColDef = {
   sortable: true,
   resizable: true,
   filter: true,
-}
+};
 
 export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionModel[] => {
   return [
@@ -124,6 +124,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       type: 'rightAligned',
       width: 140,
       minWidth: 140,
+      ...commonColumn,
     },
     {
       field: isAgency ? TimesheetsTableColumns.OrgName : TimesheetsTableColumns.AgencyName,
