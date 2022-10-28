@@ -13,8 +13,9 @@
   </ejs-treeview>
 
 </section>
-<div class="add-folder-fixed">
+<div class="add-folder-fixed" *ngIf="isAddNewFolderBtnVisible">
   <button ejs-button cssClass="e-flat add-folder-button" (click)="handleOnAddNewFolder($event)">
     <span><i-feather name="plus" class="icon"></i-feather> Add New Folder</span>
   </button>
 </div>
+

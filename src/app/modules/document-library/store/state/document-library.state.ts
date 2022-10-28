@@ -7,8 +7,20 @@ import { MessageTypes } from "../../../../shared/enums/message-types";
 import { getAllErrors } from "../../../../shared/utils/error.utils";
 import { ShowToast } from "../../../../store/app.actions";
 import { DocumentLibraryService } from "../../services/document-library.service";
-import { DeletDocuments, DeletDocumentsSucceeded, GetDocumentById, GetDocumentDownloadDeatils, GetDocumentDownloadDeatilsSucceeded, GetDocuments, GetDocumentTypes, GetFoldersTree, GetSharedDocuments, SaveDocumentFolder, SaveDocuments, SearchDocumentTags, ShareDocuments, ShareDocumentsSucceeded, UnShareDocuments, UnShareDocumentsSucceeded } from "../actions/document-library.actions";
-import { DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, FolderTreeItem, DownloadDocumentDetail, SharedDocumentPostDto, ShareDocumentInfoPage, UnShareDocumentsFilter } from "../model/document-library.model";
+import {
+  DeletDocuments, DeletDocumentsSucceeded, GetDocumentById, GetDocumentDownloadDeatils, GetDocumentDownloadDeatilsSucceeded,
+  GetDocuments, GetDocumentTypes, GetFoldersTree, GetSharedDocuments, SaveDocumentFolder, SaveDocuments, SearchDocumentTags,
+  ShareDocuments, ShareDocumentsSucceeded, UnShareDocuments, UnShareDocumentsSucceeded,
+  GetRegionsByOrganizations, GetLocationsByRegions
+} from "../actions/document-library.actions";
+import {
+  DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, FolderTreeItem,
+  DownloadDocumentDetail, SharedDocumentPostDto, ShareDocumentInfoPage, UnShareDocumentsFilter
+} from "../model/document-library.model";
+import { Region } from "@shared/models/region.model";
+import { Location } from "@shared/models/location.model";
+
+
 
 
 export interface DocumentLibraryStateModel {
@@ -22,6 +34,9 @@ export interface DocumentLibraryStateModel {
   sharedDocumentPostDetails: SharedDocumentPostDto[] | null,
   documentLibraryDto: DocumentLibraryDto | null,
   shareDocumentInfoPage: ShareDocumentInfoPage | null,
+  regions: Region[] | null,
+  locations: Location[] | null,
+  saveDocumentFolder: DocumentFolder |null
 }
 
 @State<DocumentLibraryStateModel>({
@@ -36,7 +51,10 @@ export interface DocumentLibraryStateModel {
     documentDownloadDetail: null,
     sharedDocumentPostDetails: null,
     documentLibraryDto: null,
-    shareDocumentInfoPage:null
+    shareDocumentInfoPage: null,
+    regions: null,
+    locations :null,
+    saveDocumentFolder :null
   }
 })
 @Injectable()
@@ -88,6 +106,19 @@ export class DocumentLibraryState {
     return state.savedDocumentLibraryDto;
   }
 
+  @Selector()
+  static regions(state: DocumentLibraryStateModel): Region[] | null { return state.regions; }
+
+  @Selector()
+  static locations(state: DocumentLibraryStateModel): Location[] | null { return state.locations; }
+
+  @Selector()
+  static saveDocumentFolder(state : DocumentLibraryStateModel) :DocumentFolder | null {
+    return state.saveDocumentFolder;
+  }
+
+
+
   @Action(GetFoldersTree)
   GetFoldersTree({ patchState }: StateContext<DocumentLibraryStateModel>, { folderTreeFilter }: GetFoldersTree): Observable<FolderTreeItem[]> {
     return this.documentLibraryService.getFoldersTree(folderTreeFilter).pipe(
@@ -120,11 +151,12 @@ export class DocumentLibraryState {
 
   @Action(SaveDocumentFolder)
   SaveDocumentFolder(
-    { dispatch }: StateContext<DocumentLibraryStateModel>,
+    { dispatch,patchState }: StateContext<DocumentLibraryStateModel>,
     { documentFolder }: SaveDocumentFolder
   ): Observable<DocumentFolder | void> {
     return this.documentLibraryService.saveDocumentFolder(documentFolder).pipe(
       tap((folder) => {
+        patchState({ saveDocumentFolder: folder });
         dispatch([
           new ShowToast(MessageTypes.Success, documentFolder.id > 0 ? RECORD_MODIFIED : RECORD_ADDED),
         ]);
@@ -251,4 +283,31 @@ export class DocumentLibraryState {
       })
     );
   }
+
+  @Action(GetRegionsByOrganizations)
+  GetRegionsByOrganizations({ patchState }: StateContext<DocumentLibraryStateModel>, { filter }: any): Observable<Region[]> {
+    return this.documentLibraryService.getRegionsByOrganizationId(filter).pipe(tap((payload: any) => {
+      if ("items" in payload) {
+        patchState({ regions: payload.items });
+        return payload.items;
+      } else {
+        patchState({ regions: payload });
+        return payload
+      }
+    }));
+  }
+
+  @Action(GetLocationsByRegions)
+  GetLocationsByRegions({ patchState }: StateContext<DocumentLibraryStateModel>, { filter }: any): Observable<Location[]> {
+    return this.documentLibraryService.getLocationsByOrganizationId(filter).pipe(tap((payload: any) => {
+      if ("items" in payload) {
+        patchState({ locations: payload.items });
+        return payload.items;
+      } else {
+        patchState({ locations: payload });
+        return payload
+      }
+    }));
+  }
+
 }

@@ -8,6 +8,9 @@ import {
   ShareDocumentInfoPage, ShareDocumentInfoFilter, UnShareDocumentsFilter
 } from "../store/model/document-library.model";
 
+import { Region } from '@shared/models/region.model';
+import { Location } from '@shared/models/location.model';
+
 @Injectable({ providedIn: 'root' })
 export class DocumentLibraryService {
   constructor(private http: HttpClient) { }
@@ -25,7 +28,7 @@ export class DocumentLibraryService {
 
   public GetDocumentLibraryInfo(documentsFilter: DocumentsFilter): Observable<DocumentsLibraryPage> {
     let params = new HttpParams();
-    params = params.append("BusinessUnitType", documentsFilter == undefined ? 1 : documentsFilter.businessUnitType);
+    params = params.append("BusinessUnitType", documentsFilter.businessUnitType);
     if (documentsFilter?.businessUnitId && documentsFilter?.businessUnitId != null)
       params = params.append("BusinessUnitId", documentsFilter.businessUnitId);
     if (documentsFilter?.regionId && documentsFilter?.regionId != null)
@@ -152,5 +155,24 @@ export class DocumentLibraryService {
   public UnShareDocumets(unShareDocumentsFilter: UnShareDocumentsFilter): Observable<any> {
     return this.http.delete<DocumentLibraryDto>(`/api/DocumentLibrary/UnshareDocuments`, { body: unShareDocumentsFilter });
   }
+
+
+
+  /**
+   * Get the list of available Regions by organizations
+   * @return Array of Regions
+   */
+  public getRegionsByOrganizationId(filter: any): Observable<Region[]> {
+    return this.http.post<Region[]>(`/api/DocumentLibrary/region/filter`, filter);
+  }
+
+  /**
+   * Get the list of available Locations by Regions
+   * @return Array of Locations
+   */
+  public getLocationsByOrganizationId(filter: any): Observable<Location[]> {
+    return this.http.post<Location[]>(`/api/DocumentLibrary/location/filter`, filter);
+  }
+
 
 }
