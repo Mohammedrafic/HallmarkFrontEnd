@@ -17,6 +17,7 @@ import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
 import { FilterName } from '../models/dashboard-filters.model';
 import { FilterKeys } from '../constants/filter-keys';
 import { FilterColumnTypeEnum } from '../enums/dashboard-filter-fields.enum';
+import { BusinessUnitType } from '../../shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-dashboard-control',
@@ -44,6 +45,7 @@ export class DashboardControlComponent extends DestroyableDirective implements O
   public readonly isOpenQuickOrderDialod$: Subject<boolean> = new Subject<boolean>();
   public orderedFilters: Record<FilterName, FilteredItem[]>;
 
+
   constructor(
     private readonly store: Store,
     ) {
@@ -52,6 +54,10 @@ export class DashboardControlComponent extends DestroyableDirective implements O
 
   public ngOnInit(): void {
     this.filteredItems$.pipe(takeUntil(this.destroy$)).subscribe((filters) => this.toPutInOrderFilters(filters));
+    const user = this.store.selectSnapshot(UserState.user);
+    if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
+      this.hasWidgetPermission = false;
+    }
   }
 
 
