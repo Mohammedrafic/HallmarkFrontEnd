@@ -16,6 +16,7 @@ import { AbstractGridConfigurationComponent } from 'src/app/shared/components/ab
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-holidays',
@@ -142,8 +143,8 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
     this.HolidayFormGroup.setValue({
       id: 0,
       holidayName: data.holidayName,
-      startDateTime: data.startDateTime,
-      endDateTime: data.endDateTime,
+      startDateTime: DateTimeHelper.convertDateToUtc(data.startDateTime),
+      endDateTime: DateTimeHelper.convertDateToUtc(data.endDateTime),
     });
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -167,8 +168,8 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
     this.HolidayFormGroup.setValue({
       id: data.id,
       holidayName: data.holidayName,
-      startDateTime: data.startDateTime,
-      endDateTime: data.endDateTime,
+      startDateTime: DateTimeHelper.convertDateToUtc(data.startDateTime),
+      endDateTime: DateTimeHelper.convertDateToUtc(data.endDateTime),
     });
     this.store.dispatch(new ShowSideDialog(true));
   }

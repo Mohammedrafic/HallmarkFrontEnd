@@ -1,5 +1,6 @@
 import { OrganizationRegion } from "./organization.model";
 import { PageOfCollections } from "./page.model";
+import { DateTimeHelper } from '@core/helpers';
 
 export class Holiday {
   id: number;
@@ -10,8 +11,8 @@ export class Holiday {
   constructor(holiday: Holiday) {
     this.id = holiday.id;
     this.holidayName = holiday.holidayName;
-    this.startDateTime = holiday.startDateTime;
-    this.endDateTime = holiday.endDateTime;
+    this.startDateTime = DateTimeHelper.toUtcFormat(holiday.startDateTime);
+    this.endDateTime = DateTimeHelper.toUtcFormat(holiday.endDateTime);
   }
 }
 
@@ -36,8 +37,8 @@ export class OrganizationHoliday {
     this.id = holiday.id;
     this.masterHolidayId = holiday.masterHolidayId;
     this.holidayName = holiday.holidayName;
-    this.startDateTime = holiday.startDateTime;
-    this.endDateTime = holiday.endDateTime;
+    this.startDateTime = DateTimeHelper.toUtcFormat(holiday.startDateTime);
+    this.endDateTime = DateTimeHelper.toUtcFormat(holiday.endDateTime);
     this.regionId = holiday.regionId || null;
     this.locationId = holiday.locationId || null;
 
