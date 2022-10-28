@@ -51,7 +51,7 @@ export const RecordAddDialogConfig: DialogConfig = {
         options: [],
       },
       {
-        title: 'No Lunch Break',
+        title: 'No Meal Break',
         field: 'hadLunchBreak',
         type: FieldType.Toggle,
         disabled: false,
