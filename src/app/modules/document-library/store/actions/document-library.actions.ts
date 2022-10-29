@@ -101,3 +101,13 @@ export class GetLocationsByRegions {
   static readonly type = '[documentsLibrary] Get The List Of Locations By Regions';
   constructor(public filter?: LocationsByRegionsFilter) { }
 }
+
+export class GetShareAssociateAgencies {
+  static readonly type = '[documentsLibrary] Get The List Of Associated Agencies';
+  constructor() { }
+}
+
+export class GetShareOrganizationsDtata {
+  static readonly type = '[documentsLibrary] Get The List Of Share Organizations Data';
+  constructor() { }
+}

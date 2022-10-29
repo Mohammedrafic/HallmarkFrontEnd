@@ -11,11 +11,11 @@ import {
   DeletDocuments, DeletDocumentsSucceeded, GetDocumentById, GetDocumentDownloadDeatils, GetDocumentDownloadDeatilsSucceeded,
   GetDocuments, GetDocumentTypes, GetFoldersTree, GetSharedDocuments, SaveDocumentFolder, SaveDocuments, SearchDocumentTags,
   ShareDocuments, ShareDocumentsSucceeded, UnShareDocuments, UnShareDocumentsSucceeded,
-  GetRegionsByOrganizations, GetLocationsByRegions
+  GetRegionsByOrganizations, GetLocationsByRegions, GetShareAssociateAgencies, GetShareOrganizationsDtata
 } from "../actions/document-library.actions";
 import {
   DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, FolderTreeItem,
-  DownloadDocumentDetail, SharedDocumentPostDto, ShareDocumentInfoPage, UnShareDocumentsFilter
+  DownloadDocumentDetail, SharedDocumentPostDto, ShareDocumentInfoPage, UnShareDocumentsFilter, AssociateAgencyDto, ShareOrganizationsData
 } from "../model/document-library.model";
 import { Region } from "@shared/models/region.model";
 import { Location } from "@shared/models/location.model";
@@ -36,7 +36,9 @@ export interface DocumentLibraryStateModel {
   shareDocumentInfoPage: ShareDocumentInfoPage | null,
   regions: Region[] | null,
   locations: Location[] | null,
-  saveDocumentFolder: DocumentFolder |null
+  saveDocumentFolder: DocumentFolder | null,
+  associateAgencies: AssociateAgencyDto[] | null,
+  shareOrganizationsData: ShareOrganizationsData[] | null
 }
 
 @State<DocumentLibraryStateModel>({
@@ -53,8 +55,10 @@ export interface DocumentLibraryStateModel {
     documentLibraryDto: null,
     shareDocumentInfoPage: null,
     regions: null,
-    locations :null,
-    saveDocumentFolder :null
+    locations: null,
+    saveDocumentFolder: null,
+    associateAgencies: null,
+    shareOrganizationsData:null
   }
 })
 @Injectable()
@@ -113,11 +117,19 @@ export class DocumentLibraryState {
   static locations(state: DocumentLibraryStateModel): Location[] | null { return state.locations; }
 
   @Selector()
-  static saveDocumentFolder(state : DocumentLibraryStateModel) :DocumentFolder | null {
+  static saveDocumentFolder(state: DocumentLibraryStateModel): DocumentFolder | null {
     return state.saveDocumentFolder;
   }
 
+  @Selector()
+  static getShareAssociateAgencies(state: DocumentLibraryStateModel): AssociateAgencyDto[] | null {
+    return state.associateAgencies;
+  }
 
+  @Selector()
+  static getShareOrganizationsData(state: DocumentLibraryStateModel): ShareOrganizationsData[] | null {
+    return state.shareOrganizationsData;
+  }
 
   @Action(GetFoldersTree)
   GetFoldersTree({ patchState }: StateContext<DocumentLibraryStateModel>, { folderTreeFilter }: GetFoldersTree): Observable<FolderTreeItem[]> {
@@ -151,7 +163,7 @@ export class DocumentLibraryState {
 
   @Action(SaveDocumentFolder)
   SaveDocumentFolder(
-    { dispatch,patchState }: StateContext<DocumentLibraryStateModel>,
+    { dispatch, patchState }: StateContext<DocumentLibraryStateModel>,
     { documentFolder }: SaveDocumentFolder
   ): Observable<DocumentFolder | void> {
     return this.documentLibraryService.saveDocumentFolder(documentFolder).pipe(
@@ -310,4 +322,19 @@ export class DocumentLibraryState {
     }));
   }
 
+  @Action(GetShareAssociateAgencies)
+  GetShareAssociateAgencies({ patchState }: StateContext<DocumentLibraryStateModel>, { }: any): Observable<AssociateAgencyDto[]> {
+    return this.documentLibraryService.getShareAssociateAgencies().pipe(tap((payload: any) => {
+      patchState({ associateAgencies: payload });
+      return payload
+    }));
+  }
+
+  @Action(GetShareOrganizationsDtata)
+  GetShareOrganizationsDtata({ patchState }: StateContext<DocumentLibraryStateModel>, { }: any): Observable<ShareOrganizationsData[]> {
+    return this.documentLibraryService.getShareOrganizationsData().pipe(tap((payload: any) => {
+      patchState({ shareOrganizationsData: payload });
+      return payload
+    }));
+  }
 }
