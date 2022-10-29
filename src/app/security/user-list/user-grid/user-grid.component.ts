@@ -89,7 +89,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   public isAgencyUser = false;
   private isAlive = true;
   itemList: Array<User> | undefined;
-  private gridApi: any;
+  public gridApi: any;
   private gridColumnApi: any;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   rowModelType: any;
