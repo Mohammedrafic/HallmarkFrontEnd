@@ -213,10 +213,6 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       });
 
     this.getAlertsPoolling();
-    interval(60000).subscribe(() => {
-      this.getAlertsPoolling();
-    }
-    );
         this.watchForUnreadMessages();
       }
 
@@ -248,8 +244,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
         this.userLogin = user;
         this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
         this.store.dispatch(new GetAlertsForCurrentUser({}))
-        this.alertStateModel$.subscribe((x) => {
-          this.alerts = x;
+        this.alertStateModel$.subscribe((alertdata) => {
+          this.alerts = alertdata;
         });
         this.profileData = [
           {
