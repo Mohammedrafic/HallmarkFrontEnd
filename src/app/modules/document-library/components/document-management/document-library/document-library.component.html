@@ -43,14 +43,14 @@
     <div class="title">
       <h3>{{selectedNodeText}}</h3>
     </div>
-    <div class="row-tool-buttons" *ngIf="this.selectedDocumentNode?.id!=-1 || this.selectedDocumentNode?.parentID!=-1">
-      <button ejs-button cssClass="e-flat seconadry-dark-icon-button" (click)="shareSelectedDocuments($event)">
+    <div class="row-tool-buttons" *ngIf="this.selectedDocumentNode?.id!=-1 || this.selectedDocumentNode?.parentID==-1">
+      <button ejs-button cssClass="e-flat seconadry-dark-icon-button" (click)="shareSelectedDocuments($event)" *ngIf="!isHalmarkSelected">
         <span><i-feather name="share-2" class="icon"></i-feather></span>
       </button>
       <button ejs-button cssClass="e-flat primary-icon-button" style="display:none;">
         <span><i-feather name="edit" class="icon"></i-feather></span>
       </button>
-      <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteSelectedDocuments($event)">
+      <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteSelectedDocuments($event)" *ngIf="!isHalmarkSelected">
         <span><i-feather name="trash-2" class="icon"></i-feather></span>
       </button>
     </div>
