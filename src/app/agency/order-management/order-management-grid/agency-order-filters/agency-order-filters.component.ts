@@ -16,13 +16,13 @@ import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { getDepartmentFromLocations, getLocationsFromRegions } from './agency-order-filters.utils';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
-import { CandidatesStatusText, OrderStatusText } from '@shared/enums/status';
+import { CandidatesStatusText, FilterOrderStatusText } from '@shared/enums/status';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { placeholderDate } from '@shared/constants/placeholder-date';
 import { formatDate } from '@shared/constants/format-date';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { datepickerMask } from '@shared/constants/datepicker-mask';
-import { FilterStatus } from '@shared/models/order-management.model';
+import { FilterOrderStatus, FilterStatus } from '@shared/models/order-management.model';
 
 enum RLDLevel {
   Orginization,
@@ -38,6 +38,8 @@ enum RLDLevel {
 })
 export class AgencyOrderFiltersComponent extends DestroyableDirective implements OnInit, AfterViewInit {
   @ViewChild('regionMultiselect') regionMultiselect: MultiSelectComponent;
+
+  @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
 
   @Input() form: FormGroup;
   @Input() filterColumns: any;
@@ -159,6 +161,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       ofActionSuccessful(ShowFilterDialog),
       debounceTime(100),
       tap(() => {
+        this.orderStatusFilter.refresh();
         this.regionMultiselect.refresh();
       })
     );
@@ -201,7 +204,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         ];
         if (this.activeTab === AgencyOrderManagementTabs.ReOrders) {
           statuses = orderStatuses.filter((status) =>
-            [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status)
+          [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled, FilterOrderStatusText.Closed].includes(status.status)
           );
           candidateStatusesData = candidateStatuses.filter((status) =>
             [
@@ -214,7 +217,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           );
         } else if (this.activeTab === AgencyOrderManagementTabs.PerDiem) {
           statuses = orderStatuses.filter((status) =>
-            [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status)
+            ![FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled].includes(status.status)
           );
           candidateStatusesData = candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         } else {
@@ -235,7 +238,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
 
   private setDefaultFilter(): void {
     const statuses = this.filterColumns.orderStatuses.dataSource
-                      .filter((status: FilterStatus) => status.status !== OrderStatusText.Closed)
+                      .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed].includes(status.status))
                       .map((status: FilterStatus) => status.status);
     this.form.get('orderStatuses')?.setValue(statuses);
     this.setDefault.emit(statuses);
