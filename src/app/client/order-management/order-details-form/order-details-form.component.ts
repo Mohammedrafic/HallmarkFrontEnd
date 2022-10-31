@@ -383,10 +383,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId, jobStartDate.toISOString(), jobEndDate.toISOString()));
     });
 
-    combineLatest([orderTypeControl.valueChanges, departmentIdControl.valueChanges, skillIdControl.valueChanges])
+    combineLatest([orderTypeControl.valueChanges, departmentIdControl.valueChanges, skillIdControl.valueChanges, jobStartDateControl.valueChanges])
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(([orderType, departmentId, skillId]) => {
-        if (isNaN(parseInt(orderType)) || !departmentId || !skillId) {
+      .subscribe(([orderType, departmentId, skillId, jobStartDate]) => {
+        if (isNaN(parseInt(orderType)) || !departmentId || !skillId || !jobStartDate) {
           return;
         }
         if (!this.isEditMode) {
@@ -919,7 +919,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
     this.orderTypeChanged.emit(order.orderType);
 
-    const hourlyRate = this.isPermPlacementOrder
+    const hourlyRate = (this.isPermPlacementOrder || order.isTemplate)
       ? null
       : order.hourlyRate
       ? parseFloat(order.hourlyRate.toString()).toFixed(2)
@@ -983,8 +983,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
     if (order.jobStartDate && !order.isTemplate) {
       this.generalInformationForm.controls['jobStartDate'].patchValue(
-        DateTimeHelper.convertDateToUtc(order.jobStartDate.toString()), { emitEvent: false }
-      );
+        DateTimeHelper.convertDateToUtc(order.jobStartDate.toString()));
     }
 
     if (order.jobEndDate && !order.isTemplate) {
