@@ -44,9 +44,6 @@
       <h3>{{selectedNodeText}}</h3>
     </div>
     <div class="row-tool-buttons" *ngIf="this.selectedDocumentNode?.id!=-1 || this.selectedDocumentNode?.parentID!=-1">
-       <ejs-switch id="switcher"
-                  [checked]="isIncludeSharedWithMe" (change)="onIncludeSharedWithMe($event);"></ejs-switch>
-      <label for="switcher" class="switch-text">Include Shared With Me</label> 
       <button ejs-button cssClass="e-flat seconadry-dark-icon-button" (click)="shareSelectedDocuments($event)">
         <span><i-feather name="share-2" class="icon"></i-feather></span>
       </button>
@@ -66,13 +63,22 @@
 </section>
 
 <app-document-preview-side-dialog [header]="previewTitle" (previewCloseClick)="onClosePreview()" [width]="dialogWidth">
-  <ejs-pdfviewer id="pdfViewer" #pdfViewer [serviceUrl]='service' [documentPath]='document' style="height:600px;" [style.display]="isPdf? 'block' : 'none'">></ejs-pdfviewer>
-  <div>
-    <ejs-documenteditor [enableSelection]=true
-                        [enableSearch]=true [enableEditor]=true
-                        #documentPreview style="width:500px;height:600px;" [style.display]="isWordDoc? 'block' : 'none'"></ejs-documenteditor>
 
-  </div>
+  
+  <ejs-pdfviewer   id="pdfViewer" #pdfViewer [serviceUrl]='service' [documentPath]='pdfDocumentPath' style="height:600px;"
+                   [style.display]="isPdf && !isWordDoc && !isImage ? 'block' : 'none'">
+  </ejs-pdfviewer>
+
+  
+    <ejs-documenteditor [enableSelection]=false
+                        [enableSearch]=false [enableEditor]=false
+                        #wordDocPreview style="width:500px;height:600px;" 
+                        [style.display]="isWordDoc && !isImage && !isPdf ? 'block' : 'none'">
+    </ejs-documenteditor>
+  
+   <div *ngIf="isImage">
+    <img [src]="previewUrl" height="200" [style.display]="isImage && !isWordDoc && !isPdf ? 'block' : 'none'">
+   </div>
 </app-document-preview-side-dialog>
 <app-side-dialog header="{{formDailogTitle}}" (formCancelClicked)="closeDialog()" (formSaveClicked)="handleOnSave()" [width]="dialogWidth">
   <form [formGroup]="documentLibraryform" class="documentlibrary-addnewfolder-form-dialog form-container bootstrap" id="dclForm">
@@ -237,7 +243,126 @@
             </div>
           </div>
         </div>
+        <section *ngIf="!isEditDocument">
+          <div class="form-elemet">
+            <div class="input-container bootstrap">
+              <span><i-feather name="share-2" class="icon"></i-feather></span>
+              <span class="share-with-text">Share With</span>
+            </div>
+          </div>
+          <div class="form-elemet" *ngIf="this.user?.businessUnitType!=businessUnitTypes.Agency">
+            <div class="group">
+              <div class="input-container agency-switcher-container">
+                <div class="input-group datepicker">
+                  <ejs-switch id="agency-switcher"
+                              [checked]="agencySwitch"
+                              (change)="onAgencySwitcher($event);"></ejs-switch>
+                  <label for="agency-switcher" class="switch-text">Agencies</label>
+                </div>
+              </div>
+              <div class="input-container calendar">
+                <div class="input-group multiselect">
+
+                  <ejs-multiselect mode="CheckBox"
+                                   formControlName="agencies"
+                                   placeholder="All"
+                                   [allowFiltering]="true"
+                                   [showDropDownIcon]="true"
+                                   [fields]="agencyFields"
+                                   [dataSource]="AssociateAgencyData"
+                                   [enabled]="agencySwitch">
+                  </ejs-multiselect>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-elemet" *ngIf="this.user?.businessUnitType!=businessUnitTypes.Organization">
+            <div class="group">
+              <div class="input-container agency-switcher-container">
+                <div class="input-group datepicker">
+                  <ejs-switch id="org-switcher"
+                              [checked]="organizationSwitch"
+                              (change)="onOrganizationSwitcher($event);"></ejs-switch>
+                  <label for="org-switcher" class="switch-text">Organization</label>
+                </div>
+              </div>
+              <div class="input-container calendar">
+                <div class="input-group multiselect">
+                  <ejs-multiselect mode="CheckBox"
+                                   formControlName="orgnizations"
+                                   placeholder="All"
+                                   [allowFiltering]="true"
+                                   [showDropDownIcon]="true"
+                                   [fields]="optionFields"
+                                   [dataSource]="ShareOrganizationsData"
+                                   [enabled]="organizationSwitch">
+                  </ejs-multiselect>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </section>
     </section>
+    <section *ngIf="isShare && !isEditDocument && !isUpload">
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <span><i-feather name="share-2" class="icon"></i-feather></span>
+          <span class="share-with-text">Share With</span>
+        </div>
+      </div>
+      <div class="form-elemet" *ngIf="this.user?.businessUnitType!=businessUnitTypes.Agency">
+        <div class="group">
+          <div class="input-container agency-switcher-container">
+            <div class="input-group datepicker">
+              <ejs-switch id="agency-switcher"
+                          [checked]="agencySwitch"
+                          (change)="onAgencySwitcher($event);"></ejs-switch>
+              <label for="agency-switcher" class="switch-text">Agencies</label>
+            </div>
+          </div>
+          <div class="input-container calendar">
+            <div class="input-group multiselect">
+
+              <ejs-multiselect mode="CheckBox"
+                               formControlName="agencies"
+                               placeholder="All"
+                               [allowFiltering]="true"
+                               [showDropDownIcon]="true"
+                               [fields]="agencyFields"
+                               [dataSource]="AssociateAgencyData"
+                               [enabled]="agencySwitch">
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet" *ngIf="this.user?.businessUnitType!=businessUnitTypes.Organization">
+        <div class="group">
+          <div class="input-container agency-switcher-container">
+            <div class="input-group datepicker">
+              <ejs-switch id="org-switcher"
+                          [checked]="organizationSwitch"
+                          (change)="onOrganizationSwitcher($event);"></ejs-switch>
+              <label for="org-switcher" class="switch-text">Organization</label>
+            </div>
+          </div>
+          <div class="input-container calendar">
+            <div class="input-group multiselect">
+              <ejs-multiselect mode="CheckBox"
+                               formControlName="orgnizations"
+                               placeholder="All"
+                               [allowFiltering]="true"
+                               [showDropDownIcon]="true"
+                               [fields]="optionFields"
+                               [dataSource]="ShareOrganizationsData"
+                               [enabled]="organizationSwitch">
+              </ejs-multiselect>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </form>
 </app-side-dialog>

@@ -497,8 +497,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.statusControl?.setValue(CredentialStatus.Pending);
   }
 
-  private setCredentialStatusOptions(statuses: CredentialStatus[]): void {
-    this.credentialStatusOptions = statuses.map((item: CredentialStatus) => {
+  private setCredentialStatusOptions(statuses: CredentialStatus[], currentStatus?: CredentialStatus): void {
+    const credentialStatuses = !currentStatus || statuses.includes(currentStatus) ? statuses : [currentStatus, ...statuses];
+
+    this.credentialStatusOptions = credentialStatuses.map((item: CredentialStatus) => {
       return {
         text: CredentialStatus[item],
         id: item,
@@ -510,23 +512,19 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     if (this.isOrganizationSide) {
       switch (status) {
         case CredentialStatus.Completed:
-          this.setCredentialStatusOptions(orgSideCompletedCredentialStatuses);
+          this.setCredentialStatusOptions(orgSideCompletedCredentialStatuses, status);
           break;
         case CredentialStatus.Pending:
-          this.setCredentialStatusOptions(orgSidePendingCredentialStatuses);
+          this.setCredentialStatusOptions(orgSidePendingCredentialStatuses, status);
           break;
         case CredentialStatus.Reviewed:
-          this.setCredentialStatusOptions(orgSideReviewedCredentialStatuses);
+          this.setCredentialStatusOptions(orgSideReviewedCredentialStatuses, status);
           break;
         default:
-          this.setCredentialStatusOptions(orgSideCredentialStatuses);
+          this.setCredentialStatusOptions(orgSideCredentialStatuses, status);
       }
     } else {
-      this.setCredentialStatusOptions(
-        agencySideCredentialStatuses.includes(status)
-          ? agencySideCredentialStatuses
-          : [status, ...agencySideCredentialStatuses]
-      );
+      this.setCredentialStatusOptions(agencySideCredentialStatuses, status);
     }
   }
 

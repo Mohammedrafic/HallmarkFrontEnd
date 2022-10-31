@@ -51,6 +51,7 @@ import { PositionTrend, PositionTrendDto } from '../models/position-trend.model'
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { DashboartFilterDto } from '../models/dashboard-filter-dto.model';
 import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
+import { DateTimeHelper } from '@core/helpers';
 
 @Injectable()
 export class DashboardService {
@@ -280,20 +281,16 @@ export class DashboardService {
 
   
   private getFirstLastWeekDay(startDate: Date): ITimeSlice {
-    const millisecondsOfminute = 60000;
     const today = new Date();
-    const tzOffSet = new Date().getTimezoneOffset() * millisecondsOfminute;
-    const dateFrom = new Date(startDate.setDate(startDate.getDate() - startDate.getDay()) - tzOffSet).toISOString();
-    const dateTo = new Date(today.setDate(today.getDate() - today.getDay() + 6)).toISOString();
+    const dateFrom = DateTimeHelper.toUtcFormat(new Date(startDate.setDate(startDate.getDate() - startDate.getDay())));
+    const dateTo = DateTimeHelper.toUtcFormat(new Date(today.setDate(today.getDate() - today.getDay() + 6)));
     return { dateFrom, dateTo };
   }
 
   private getFirstLastMonthDay(startDate: Date): ITimeSlice {
-    const millisecondsOfminute = 60000;
     const today = new Date();
-    const tzOffSet = new Date().getTimezoneOffset() * millisecondsOfminute;
-    const dateFrom = new Date(new Date(startDate.getFullYear(), startDate.getMonth(), 1).getTime() - tzOffSet).toISOString();
-    const dateTo = new Date(new Date(today.getFullYear(), today.getMonth() + 1, 0).getTime() - tzOffSet).toISOString();
+    const dateFrom = DateTimeHelper.toUtcFormat(new Date(new Date(startDate.getFullYear(), startDate.getMonth(), 1)));
+    const dateTo =  DateTimeHelper.toUtcFormat(new Date(new Date(today.getFullYear(), today.getMonth() + 1, 0)));
     return { dateFrom, dateTo };
   }
 

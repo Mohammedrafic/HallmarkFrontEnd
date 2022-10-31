@@ -38,7 +38,7 @@ export class LogiReportService {
    * Get the list of Configurations
    * @return ConfigurationDto
    */
-public getLogiReportUrl(): Observable<ConfigurationDto[]> {
-  return this.http.get<ConfigurationDto[]>(`/config/ReportServer:BaseUrl`);
+public getLogiReportData(): Observable<ConfigurationDto[]> {
+  return this.http.get<ConfigurationDto[]>(`/config/ReportServer`);
 }
 }
