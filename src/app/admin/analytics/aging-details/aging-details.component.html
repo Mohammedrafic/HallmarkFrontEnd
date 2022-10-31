@@ -4,6 +4,10 @@
         <div class="toolbar-header-div">{{title }}
         </div>     
       </section>
+      <section class="toolbar-message">
+        <div class="toolbar-message-div">{{message}}
+        </div> 
+      </section>
       <section class="toolbar-buttons">
         <button ejs-button
                 id="filterButton"
@@ -66,7 +70,7 @@
             <ejs-multiselect mode="CheckBox"
                              formControlName="locationIds"
                              appValidateWithMessage
-                             placeholder="All"
+                             [placeholder]="allOption"
                              [allowFiltering]="true"
                              [showDropDownIcon]="true"
                              [dataSource]="filterColumns.locationIds.dataSource"
@@ -95,35 +99,7 @@
           </div>
         </div>
       </div>
-      <div class="form-elemet">
-        <div class="group">
-          <div class="input-container calendar">
-            <label>Start Date<span class="required">*</span></label>
-            <div class="input-group datepicker">
-              <ejs-datepicker id="startDate"
-                              class="datepicker"
-                              format="MM/dd/yyyy"
-                              placeholder="MM/DD/YYYY"
-                              appValidateWithMessage
-                              formControlName="startDate">
-              </ejs-datepicker>
-            </div>
-          </div>
-          <div class="input-container calendar">
-            <label>End Date<span class="required">*</span></label>
-            <div class="input-group datepicker">
-              <ejs-datepicker id="endDate"
-                              class="datepicker"
-                              format="MM/dd/yyyy"
-                              placeholder="MM/DD/YYYY"
-                              appValidateWithMessage
-                              formControlName="endDate"
-                              [min]="agingReportForm.controls['startDate'].value">
-              </ejs-datepicker>
-            </div>
-          </div>
-        </div>
-      </div>
+     
     </form>
   </app-filter-dialog>
   

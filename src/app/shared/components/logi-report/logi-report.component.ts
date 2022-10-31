@@ -111,7 +111,7 @@ export class LogiReportComponent implements OnInit {
     };
     let prptRes = this.reportName;
     let catRes = this.catelogName;
-    let test = this.factory.runReport(
+    let test = this.factory?.runReport(
       server, prptRes, catRes, this.paramsData, entryId);
   };
 }

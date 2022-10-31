@@ -15,6 +15,17 @@
       height: 40px;
       font-weight:bold;
       }
+      
+    }
+    .toolbar-message{
+      .toolbar-message-div{
+        padding-left: 20px;
+        font-size: 14px;
+        height: 40px;
+      }      
+      font-weight:bold;
+      position: relative;
+      display: flex;
     }
     .toolbar-buttons {
       float: right;

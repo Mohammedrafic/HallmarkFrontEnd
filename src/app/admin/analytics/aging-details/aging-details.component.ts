@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewChild,OnDestroy } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
@@ -8,7 +8,7 @@ import { Region, regionFilter } from '@shared/models/region.model';
 import { Department, DepartmentsByLocationsFilter } from '@shared/models/department.model';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
-import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
 import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
@@ -16,16 +16,16 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
+import { ClearLogiReportState, GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
-import { startDateValidator } from '@shared/validators/date.validator';
-import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { analyticsConstants } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
+import { MessageTypes } from '@shared/enums/message-types';
+import { REGIONS_ERROR } from '../analytics.constant';
 
 @Component({
   selector: 'app-aging-details',
@@ -35,18 +35,17 @@ import { ConfigurationDto } from '@shared/models/analytics.model';
 export class AgingDetailsComponent implements OnInit, OnDestroy {
   public paramsData: any = {
     "OrganizationParamAR": "",
-    "StartDateParamAR": "",
-    "EndDateParamAR": "",
     "RegionParamAR": "",
     "LocationParamAR": "",
     "DepartmentParamAR": "",
-    "BearerParamAR":"",
-    "BusinessUnitIdParamJD":"",
-    "HostName":""
+    "BearerParamAR": "",
+    "BusinessUnitIdParamJD": "",
+    "HostName": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AgingReport/AgingReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AgingReport/Aging.cat" };
   public title: string = "Aging Details";
+  public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
   @Select(LogiReportState.regions)
@@ -73,11 +72,11 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
 
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
-  private agencyOrganizationId:number;
+  private agencyOrganizationId: number;
 
   @Select(LogiReportState.logiReportData)
   public logiReportData$: Observable<ConfigurationDto[]>;
-  
+
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
   private unsubscribe$: Subject<void> = new Subject();
   public filterColumns: any;
@@ -98,46 +97,44 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
   public isInitialLoad: boolean = false;
-  public baseUrl:string='';
+  public baseUrl: string = '';
+  private loadCounter = 0;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
     private formBuilder: FormBuilder,
-    private filterService: FilterService,@Inject(APP_SETTINGS) private appSettings: AppSettings) {
-    this.baseUrl = this.appSettings.host.replace("https://","").replace("http://","");
+    private filterService: FilterService, @Inject(APP_SETTINGS) private appSettings: AppSettings) {
+    this.baseUrl = this.appSettings.host.replace("https://", "").replace("http://", "");
     this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
     this.initForm();
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
     }
-    this.SetReportData();  
+    this.SetReportData();
   }
 
   ngOnInit(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => {  
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {    
+      this.store.dispatch(new ClearLogiReportState());
       this.SetReportData();
-      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:ConfigurationDto[])=>{
-        if(data.length>0)
-        {
-        this.logiReportComponent.SetReportData(data);
+     this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
+        if (data.length > 0) {
+          this.logiReportComponent.SetReportData(data);
         }
-     });   
-      this.agencyOrganizationId=data;   
+      });
+      this.agencyOrganizationId = data;
       this.isInitialLoad = true;
       this.orderFilterColumnsSetup();
       this.onFilterControlValueChangedHandler();
+      this.loadCounter = this.loadCounter + 1;
     });
   }
 
   private initForm(): void {
-    let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
     this.agingReportForm = this.formBuilder.group(
       {
-        businessIds: new FormControl({value:[],disabled:true}, [Validators.required]),
-        startDate: new FormControl(startDate, [Validators.required]),
-        endDate: new FormControl(new Date(Date.now()), [Validators.required]),
+        businessIds: new FormControl({ value: [], disabled: true }, [Validators.required]),
         regionIds: new FormControl([], [Validators.required]),
         locationIds: new FormControl([], [Validators.required]),
         departmentIds: new FormControl([], [Validators.required])
@@ -150,11 +147,13 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   }
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
+
     this.businessData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.organizations = data;
       this.filterColumns.businessIds.dataSource = data;
-      this.defaultOrganizations = data.map((list) => list.id).filter(i=>i==this.agencyOrganizationId);
+      this.defaultOrganizations = data.map((list) => list.id).filter(i => i == this.agencyOrganizationId);
     });
+
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (!this.isClearAll) {
         this.selectedOrganizations = this.organizations?.filter((x) => data?.includes(x.id));
@@ -174,6 +173,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
         this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
         let locationFilter: LocationsByRegionsFilter = {
           ids: data,
+          businessUnitIds: this.selectedOrganizations?.map((list) => list.id),
           getAll: true
         };
         this.store.dispatch(new GetLocationsByRegions(locationFilter));
@@ -185,6 +185,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
         this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         let departmentFilter: DepartmentsByLocationsFilter = {
           ids: data,
+          businessUnitIds: this.selectedOrganizations?.map((list) => list.id),
           getAll: true
         };
         this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));
@@ -194,6 +195,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));
       if (this.isInitialLoad) {
+        
         this.SearchReport();
         this.isInitialLoad = false;
       }
@@ -204,30 +206,25 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   }
 
   public SearchReport(): void {
-    let auth="Bearer ";
-    for(let x=0;x<window.localStorage.length;x++)
-    { 
-      if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
-      {
-        auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
+    let auth = "Bearer ";
+    for (let x = 0; x < window.localStorage.length; x++) {
+      if (window.localStorage.key(x)!.indexOf('accesstoken') > 0) {
+        auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let { startDate, endDate } = this.agingReportForm.getRawValue();
     this.paramsData =
-      {
-        "OrganizationParamAR": this.selectedOrganizations?.map((list) => list.id).join(","),
-        "StartDateParamAR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-        "EndDateParamAR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-        "RegionParamAR": this.selectedRegions?.map((list) => list.id).join(","),
-        "LocationParamAR": this.selectedLocations?.map((list) => list.id).join(","),
-        "DepartmentParamAR": this.selectedDepartments?.map((list) => list.departmentId).join(","),
-        "BearerParamAR":auth,
-        "BusinessUnitIdParamJD":window.localStorage.getItem("lastSelectedOrganizationId") == null 
-        ?this.organizations!=null &&this.organizations[0]?.id!=null?
-        this.organizations[0].id.toString():"1": 
+    {
+      "OrganizationParamAR": this.selectedOrganizations?.map((list) => list.id).join(","),
+      "RegionParamAR": this.selectedRegions?.map((list) => list.id).join(","),
+      "LocationParamAR": this.selectedLocations?.map((list) => list.id).join(","),
+      "DepartmentParamAR": this.selectedDepartments?.map((list) => list.departmentId).join(","),
+      "BearerParamAR": auth,
+      "BusinessUnitIdParamJD": window.localStorage.getItem("lastSelectedOrganizationId") == null
+        ? this.organizations != null && this.organizations[0]?.id != null ?
+          this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-        "HostName":this.baseUrl
-      };
+      "HostName": this.baseUrl
+    };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }
@@ -260,20 +257,17 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
         dataSource: [],
         valueField: 'departmentName',
         valueId: 'departmentId',
-      },
-      startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      endDate: { type: ControlTypes.Date, valueType: ValueType.Text }
+      }
     }
   }
-  private SetReportData(){
+  private SetReportData() {
     const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
-      if(logiReportData!=null&&logiReportData.length==0)
-      {
-        this.store.dispatch(new GetLogiReportData());
-      }
-      else{
-        this.logiReportComponent?.SetReportData(logiReportData);
-      }
+    if (logiReportData != null && logiReportData.length == 0) {
+      this.store.dispatch(new GetLogiReportData());
+    }
+    else {
+      this.logiReportComponent?.SetReportData(logiReportData);
+    }
   }
   private onOrganizationsChange(): void {
     this.regions$
@@ -282,9 +276,11 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
         if (data != undefined) {
           this.regions = data;
           this.filterColumns.regionIds.dataSource = this.regions;
-          this.defaultRegions = data.map((list) => list.id);
           this.defaultLocations = [];
           this.defaultDepartments = [];
+          this.filterColumns.locationIds.dataSource = [];
+          this.filterColumns.departmentIds.dataSource = [];
+          this.defaultRegions = data.map((list) => list.id);
         }
       });
   }
@@ -295,8 +291,9 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
         if (data != undefined) {
           this.locations = data;
           this.filterColumns.locationIds.dataSource = this.locations;
-          this.defaultLocations = data.map((list) => list.id);
           this.defaultDepartments = [];
+          this.filterColumns.departmentIds.dataSource = [];
+          this.defaultLocations = data.map((list) => list.id);
         }
       });
   }
@@ -320,21 +317,23 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 90);
-    this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
+    this.filterColumns.locationIds.dataSource = [];
+    this.filterColumns.departmentIds.dataSource = [];
     this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-    this.agingReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
-    this.agingReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.filteredItems = [];
   }
   public onFilterApply(): void {
     this.agingReportForm.markAllAsTouched();
-    if (this.agingReportForm?.invalid) {
+    if (this.defaultOrganizations.length == 0 || this.defaultRegions.length == 0 || this.defaultLocations.length == 0 || this.defaultDepartments.length == 0) {
+      this.message="";
+      let error:any=this.defaultRegions.length == 0?"Regions/Locations/Departments are required":this.defaultLocations.length == 0 ?"Locations/Departments are required":this.defaultDepartments.length == 0?"Departments are required":"";
+      this.store.dispatch(new ShowToast(MessageTypes.Error,error));
+    
       return;
     }
+    this.message="Default filter selected with all regions ,locations and departments for 90 days";
     this.filteredItems = this.filterService.generateChips(this.agingReportForm, this.filterColumns);
     this.SearchReport();
     this.store.dispatch(new ShowFilterDialog(false));

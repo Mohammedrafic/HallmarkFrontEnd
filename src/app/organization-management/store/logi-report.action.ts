@@ -17,3 +17,7 @@ export class GetDepartmentsByLocations {
 export class GetLogiReportData {static readonly type = '[LogiReport] Get Logi Report Data';
 constructor() { }
 }
+export class ClearLogiReportState {
+  static readonly type = '[alerts] Clear Logi Report State';
+  constructor(){}
+}
