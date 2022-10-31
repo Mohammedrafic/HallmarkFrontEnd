@@ -86,7 +86,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     public isIncludeSharedWithMe: boolean = false;
     public dialogWidth: string = '434px';
     public previewTitle: string = "Document Preview";
-    public isPdf: boolean = true;
+    public isPdf: boolean = false;
     public previewUrl: SafeResourceUrl | null;
     public downloadedFileName: string = '';
     public service: string =
@@ -644,8 +644,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
 
 
-    public documentPreview(docItem: any) {
-        debugger;
+  public documentPreview(docItem: any) {
+      
+        this.setDocumentMimeTypeDefaults();
         this.downloadedFileName = '';
         const downloadFilter: DownloadDocumentDetailFilter = {
             documentId: docItem.id,
@@ -675,13 +676,11 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
 
     getPreviewUrl(file: any) {
-        this.setDocumentMimeTypeDefaults();
         let extension = (file != null) ? file.extension : null;
         switch (extension) {
             case '.pdf':
                 this.isPdf = true;
-                this.pdfDocumentPath=file.fileName;
-                this.load(file.sasUrl);
+                this.load(`data:application/pdf;base64,${file.fileAsBase64}`);
                 break;
             case '.jpg':
                 this.isImage =true;
@@ -744,7 +743,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
     }
 
-    public downloadDocument(docItem: DocumentLibraryDto) {
+  public downloadDocument(docItem: DocumentLibraryDto) {
+        this.setDocumentMimeTypeDefaults();
         const downloadFilter: DownloadDocumentDetailFilter = {
             documentId: docItem.id,
             businessUnitType: this.filterSelecetdBusinesType,
@@ -1043,6 +1043,11 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
                   {
                             this.shareDocumentIds = [val?.documentLibrary?.savedDocumentLibraryDto?.id];
                             this.saveShareDocument();
+                  }
+                  else {
+                    this.documentLibraryform.reset();
+                    this.closeDialog();
+                    this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: this.filterSelectedBusinesUnitId }));
                   }
             });
         }
