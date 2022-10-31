@@ -83,8 +83,8 @@
 
         <div class="controls-wrapper">
           <div class="reject-reason-block" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
+            <span class="reason-header">Reject Reason:</span>
             <ejs-tooltip [content]="rejectReason" class="reject-tooltip">
-              <span class="reason-header">Reject Reason:</span>
               <span class="reason-text">{{rejectReason}}</span>
             </ejs-tooltip>
           </div>
