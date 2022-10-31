@@ -63,13 +63,22 @@
 </section>
 
 <app-document-preview-side-dialog [header]="previewTitle" (previewCloseClick)="onClosePreview()" [width]="dialogWidth">
-  <ejs-pdfviewer id="pdfViewer" #pdfViewer [serviceUrl]='service' [documentPath]='document' style="height:600px;" [style.display]="isPdf? 'block' : 'none'">></ejs-pdfviewer>
-  <div>
-    <ejs-documenteditor [enableSelection]=true
-                        [enableSearch]=true [enableEditor]=true
-                        #documentPreview style="width:500px;height:600px;" [style.display]="isWordDoc? 'block' : 'none'"></ejs-documenteditor>
 
-  </div>
+  
+  <ejs-pdfviewer   id="pdfViewer" #pdfViewer [serviceUrl]='service' [documentPath]='pdfDocumentPath' style="height:600px;"
+                   [style.display]="isPdf && !isWordDoc && !isImage ? 'block' : 'none'">
+  </ejs-pdfviewer>
+
+  
+    <ejs-documenteditor [enableSelection]=false
+                        [enableSearch]=false [enableEditor]=false
+                        #wordDocPreview style="width:500px;height:600px;" 
+                        [style.display]="isWordDoc && !isImage && !isPdf ? 'block' : 'none'">
+    </ejs-documenteditor>
+  
+   <div *ngIf="isImage">
+    <img [src]="previewUrl" height="200" [style.display]="isImage && !isWordDoc && !isPdf ? 'block' : 'none'">
+   </div>
 </app-document-preview-side-dialog>
 <app-side-dialog header="{{formDailogTitle}}" (formCancelClicked)="closeDialog()" (formSaveClicked)="handleOnSave()" [width]="dialogWidth">
   <form [formGroup]="documentLibraryform" class="documentlibrary-addnewfolder-form-dialog form-container bootstrap" id="dclForm">

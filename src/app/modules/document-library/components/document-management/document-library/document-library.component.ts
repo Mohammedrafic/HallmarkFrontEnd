@@ -43,6 +43,7 @@ import {
 } from '@syncfusion/ej2-angular-pdfviewer';
 import {
     DocumentEditorComponent,
+
     EditorHistoryService,
     EditorService,
     SearchService
@@ -85,12 +86,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     public isIncludeSharedWithMe: boolean = false;
     public dialogWidth: string = '434px';
     public previewTitle: string = "Document Preview";
-    public isPdf: boolean = true;
+    public isPdf: boolean = false;
     public previewUrl: SafeResourceUrl | null;
     public downloadedFileName: string = '';
     public service: string =
         'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
-    public document: string = 'PDF_Succinctly.pdf';
+    public pdfDocumentPath: string = '';
     public documentLibraryform: FormGroup;
     public isAddNewFolder: boolean = false;
     public isUpload: boolean = false;
@@ -107,6 +108,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     public regionIdControl: AbstractControl;
     public locationIdControl: AbstractControl;
     public isWordDoc: boolean = false;
+    public isImage: boolean = false;
+    public isExcel :boolean =false;
     public isAgency: boolean = false;
     public halmarkSwitch: boolean = false;
     public agencySwitch: boolean = false;
@@ -114,6 +117,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     public businessUnitTypes = BusinessUnitType;
     public AssociateAgencyData: AssociateAgencyDto[] = [];
     public ShareOrganizationsData: ShareOrganizationsData[] = [];
+    documentHeight: number;
+	documentWidth: string;
+    fileAsBase64 : string;
 
     public gridApi!: GridApi;
     public rowData: DocumentLibraryDto[] = [];
@@ -160,8 +166,10 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     @ViewChild('pdfViewer', { static: true })
     public pdfViewer: PdfViewerComponent;
 
-    @ViewChild('documentPreview')
-    public documentEditor: DocumentEditorComponent;
+    @ViewChild('wordDocPreview', { static: true })
+    public documentEditor!: DocumentEditorComponent;
+
+    
 
     @Select(SecurityState.businessUserData)
     public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
@@ -276,7 +284,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
 
     ngAfterViewInit(): void {
-
+        this.documentHeight = window.outerHeight - 180;
+		this.documentWidth = '100%';
     }
 
     ngOnDestroy(): void {
@@ -635,7 +644,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
 
 
-    public documentPreview(docItem: any) {
+  public documentPreview(docItem: any) {
+      
+        this.setDocumentMimeTypeDefaults();
         this.downloadedFileName = '';
         const downloadFilter: DownloadDocumentDetailFilter = {
             documentId: docItem.id,
@@ -665,7 +676,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
 
     getPreviewUrl(file: any) {
-
         let extension = (file != null) ? file.extension : null;
         switch (extension) {
             case '.pdf':
@@ -673,27 +683,25 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
                 this.load(`data:application/pdf;base64,${file.fileAsBase64}`);
                 break;
             case '.jpg':
-                this.isPdf = false;
-                this.isWordDoc = false;
+                this.isImage =true;
                 this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
                     `data:image/jpg;base64,${file.fileAsBase64}`
                 );
                 break;
             case '.png':
-                this.isPdf = false;
-                this.isWordDoc = false;
+                this.isImage =true;
                 this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
                     `data:image/png;base64,${file.fileAsBase64}`
                 );
                 break;
             case '.docx':
-                this.isPdf = false;
                 this.isWordDoc = true;
+                this.fileAsBase64 =file.fileAsBase64;
                 this.loadDocument(file.fileAsBase64);
+                
                 break;
             case '.xlsx':
-                this.isPdf = false;
-                this.isWordDoc = false;
+                this.isExcel = true;
                 this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
                     `https://view.officeapps.live.com/op/embed.aspx?src=${file.sasUrl}`
                 );
@@ -703,15 +711,31 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         }
         this.changeDetectorRef.markForCheck();
     }
-    loadDocument(fileAsBase64: string) {
-        this.documentEditor.height = window.innerHeight * 0.7 + 'px';
-        this.documentEditor.isReadOnly = true;
-        this.documentEditor.pageOutline = '#d3d3d3';
-        this.documentEditor.open(decodeURIComponent(escape(atob(fileAsBase64))));
 
+    setDocumentMimeTypeDefaults()
+    {
+        this.isPdf = false;
+        this.isWordDoc=false;
+        this.isImage=false;
+        this.isExcel=false;
+        this.previewUrl='';
+        this.fileAsBase64='';
     }
 
+  loadDocument(fileAsBase64: string) {
+    this.documentEditor.height = window.innerHeight * 0.7 + 'px';
+    this.documentEditor.isReadOnly = true;
+    this.documentEditor.pageOutline = '#d3d3d3';
+    this.documentEditor.open(decodeURIComponent(escape(atob(fileAsBase64))));
+
+  }
+    
+    onCreate(): void {
+		this.loadDocument(this.fileAsBase64);
+        }
+
     public onClosePreview(): void {
+        this.setDocumentMimeTypeDefaults();
         this.previewUrl = null;
         this.downloadedFileName = '';
         this.changeDetectorRef.markForCheck();
@@ -719,7 +743,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
     }
 
-    public downloadDocument(docItem: DocumentLibraryDto) {
+  public downloadDocument(docItem: DocumentLibraryDto) {
+        this.setDocumentMimeTypeDefaults();
         const downloadFilter: DownloadDocumentDetailFilter = {
             documentId: docItem.id,
             businessUnitType: this.filterSelecetdBusinesType,
@@ -1013,13 +1038,17 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
                 this.documentLibraryform.markAllAsTouched();
                 return;
             }
-            this.store.dispatch(new SaveDocuments(document));
-            this.savedDocumentLibraryDto$.pipe(takeUntil(this.unsubscribe$)).subscribe((retrunDocument) => {
-                if (retrunDocument) {
-                    this.shareDocumentIds = [retrunDocument.id];
-
-                    this.saveShareDocument();
-                }
+            this.store.dispatch(new SaveDocuments(document)).pipe(takeUntil(this.unsubscribe$)).subscribe( (val) => {
+                  if(this.isShare)
+                  {
+                            this.shareDocumentIds = [val?.documentLibrary?.savedDocumentLibraryDto?.id];
+                            this.saveShareDocument();
+                  }
+                  else {
+                    this.documentLibraryform.reset();
+                    this.closeDialog();
+                    this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: this.filterSelectedBusinesUnitId }));
+                  }
             });
         }
         else if (this.isShare) {
