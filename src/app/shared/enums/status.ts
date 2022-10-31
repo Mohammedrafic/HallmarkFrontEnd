@@ -99,6 +99,13 @@ export enum OrderStatusText {
   Closed = 60,
 }
 
+export enum FilterOrderStatusText {
+  Open = 'Open',
+  'In Progress' = 'InProgress',
+  Filled = 'Filled',
+  Closed = 'Closed',
+}
+
 export enum CandidatesStatusText {
   Applied = 10,
   Shortlisted = 20,
