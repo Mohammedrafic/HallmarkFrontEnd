@@ -13,8 +13,11 @@
   </ejs-treeview>
 
 </section>
-<div class="add-folder-fixed" *ngIf="isAddNewFolderBtnVisible">
-  <button ejs-button cssClass="e-flat add-folder-button" (click)="handleOnAddNewFolder($event)">
+<div class="add-folder-fixed">
+  <button ejs-button cssClass="e-flat delete-folder-button" (click)="handleOnDeleteFolder($event)" *ngIf="isDeleteFolder" >
+    <span><i-feather name="trash-2" class="icon"></i-feather>Delete Folder</span>
+  </button>
+  <button ejs-button cssClass="e-flat add-folder-button" (click)="handleOnAddNewFolder($event)" *ngIf="isAddNewFolderBtnVisible">
     <span><i-feather name="plus" class="icon"></i-feather> Add New Folder</span>
   </button>
 </div>

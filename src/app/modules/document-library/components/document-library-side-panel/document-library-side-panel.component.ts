@@ -1,16 +1,18 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { DocumentFolder, FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
+import { DeleteDocumentFolderFilter, DocumentFolder, FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
 import { DocumentLibraryState } from '../../store/state/document-library.state';
 import { TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
-import { GetDocumentsSelectedNode, IsAddNewFolder, SelectedBusinessType } from '../../store/actions/document-library.actions';
+import { DeleteEmptyDocumentsFolder, GetDocumentsSelectedNode, GetFoldersTree, IsAddNewFolder, IsDeleteEmptyFolder, SelectedBusinessType } from '../../store/actions/document-library.actions';
 import { UserState } from '../../../../store/user.state';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { FileType } from '../../enums/documents.enum';
-import { BusinessUnitType } from '../../../../shared/enums/business-unit-type';
-import { User } from '../../../../shared/models/user-managment-page.model';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { User } from '@shared/models/user-managment-page.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_FOLDER_TEXT, DELETE_FOLDER_TITLE } from '@shared/constants';
 
 @Component({
   selector: 'app-document-library-side-panel',
@@ -33,10 +35,13 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
   sidePanelDocumentField: any;
   public selectedNode: NodeItem;
   public isAddNewFolderBtnVisible: boolean = true;
-  public isNewFolderInAction: boolean =false;
+  public isNewFolderInAction: boolean = false;
+  public isDeleteFolder: boolean = false;
+  public selectedBusinessType: number;
 
   constructor(private store: Store,
     private action$: Actions,
+    private confirmService: ConfirmService,
     private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
@@ -46,8 +51,19 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
     }
     this.action$.pipe(ofActionDispatched(SelectedBusinessType), takeUntil(this.unsubscribe$)).subscribe((payload) => {
       if (payload) {
+         this.selectedBusinessType = payload.businessUnitType;
           this.isAddNewFolderBtnVisible = false;
           this.sidePanelDocumentField = { dataSource: [], id: 'id', text: 'name', parentID: 'parentId', child: 'children' };
+      }
+    });
+    this.action$.pipe(ofActionDispatched(IsDeleteEmptyFolder), takeUntil(this.unsubscribe$)).subscribe((payload) => {
+      if (payload) {
+        if (payload.isDeleteFolder) {
+          this.isDeleteFolder = true;
+        }
+        else {
+          this.isDeleteFolder = false;
+        }
       }
     });
     this.initSidePanelDocs();
@@ -152,7 +168,6 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
     }
   }
 
-
   public handleOnSearchTree(event: any) {
     const searchString = event.target.value;
     if (searchString.trim() != '') {
@@ -162,7 +177,34 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
     else {
       this.sidePanelDocumentField = { dataSource: this.sidePanelFolderItems, id: 'id', text: 'name', parentID: 'parentId', child: 'children' };
     }
+    setTimeout(() => {
+      this.tree.expandAll();
+    },1000)
+    
     this.changeDetectorRef.markForCheck();
   }
-
+     
+  public handleOnDeleteFolder(event: any) {
+    this.confirmService
+      .confirm(DELETE_FOLDER_TEXT, {
+        title: DELETE_FOLDER_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button'
+      })
+      .subscribe((confirm) => {
+        if (confirm && this.selectedNode.id) {
+          const deleteFolderFilter: DeleteDocumentFolderFilter = {
+            folderId: this.selectedNode.id,
+            businessUnitType: this.selectedBusinessType,
+            businessUnitId: this.selectedNode.businessUnitId != null ? this.selectedNode.businessUnitId:null
+          }
+          this.store.dispatch(new DeleteEmptyDocumentsFolder(deleteFolderFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
+            const businessUnitType = this.selectedBusinessType;
+            const businessUnitId = this.selectedNode.businessUnitId;
+            this.selectedNode = new NodeItem();
+            this.store.dispatch(new GetFoldersTree({ businessUnitType: businessUnitType, businessUnitId: businessUnitId }));
+          });
+        }
+      });
+  }
 }
