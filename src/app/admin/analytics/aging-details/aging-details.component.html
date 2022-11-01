@@ -1,6 +1,6 @@
  <section class="flex-column">
     <section class="toolbar">
-      <section class="toolbar-header"> 
+      <section class="toolbar-header">
         <div class="toolbar-header-div">{{title }}
         </div>     
       </section>
@@ -31,17 +31,10 @@
         <div class="input-container bootstrap">
           <label>Organization Name<span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-multiselect mode="CheckBox"
-                             formControlName="businessIds"
-                             placeholder="All"
-                             [allowFiltering]="true"
-                             [showDropDownIcon]="true"
-                             appValidateWithMessage
-                             [fields]="bussinesDataFields"
-                             [dataSource]="filterColumns.businessIds.dataSource"
-                             [selectAllText]='allOption'
-                             showSelectAll=true [value]="defaultOrganizations">
-            </ejs-multiselect>
+            <ejs-dropdownlist appValidateWithMessage formControlName="businessIds"
+            [fields]="organizationFields" [dataSource]="filterColumns.businessIds.dataSource"
+             placeholder="Business">
+</ejs-dropdownlist>
           </div>
         </div>
       </div>
@@ -58,7 +51,7 @@
                              [dataSource]="filterColumns.regionIds.dataSource"
                              [fields]="regionFields"
                              [selectAllText]='allOption'
-                             showSelectAll=true [value]="defaultRegions">
+                             showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>
@@ -76,7 +69,7 @@
                              [dataSource]="filterColumns.locationIds.dataSource"
                              [fields]="locationFields"
                              [selectAllText]='allOption'
-                             showSelectAll=true [value]="defaultLocations">
+                             showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>
@@ -94,7 +87,7 @@
                              [dataSource]="filterColumns.departmentIds.dataSource"
                              [fields]="departmentFields"
                              [selectAllText]='allOption'
-                             showSelectAll=true [value]="defaultDepartments">
+                             showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>

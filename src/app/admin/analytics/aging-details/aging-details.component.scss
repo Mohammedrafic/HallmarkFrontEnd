@@ -6,10 +6,11 @@
     justify-content: space-between;
     margin-top: 20px;
     padding-bottom: 10px;
+    display: flex;
     .toolbar-header {
       float: left;
       position: relative;
-      display: flex;
+      
       .toolbar-header-div{
       font-size: 14px;
       height: 40px;
@@ -23,15 +24,13 @@
         font-size: 14px;
         height: 40px;
       }      
-      font-weight:bold;
       position: relative;
-      display: flex;
+      float: left;
     }
     .toolbar-buttons {
       float: right;
       position: relative;
       z-index: 99;
-      display: flex;
 
       .button-filter {
         margin-left: 12px;
