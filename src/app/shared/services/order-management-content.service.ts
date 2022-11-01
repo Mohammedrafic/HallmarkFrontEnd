@@ -450,10 +450,12 @@ export class OrderManagementContentService {
     return this.http.post<number>(`/api/Orders/${payload}/duplicate`, {});
   }
 
-  public getRegularLocalBillRate(
+  public getRegularBillRate(
     orderType: OrderType,
     departmentId: number,
     skillId: number,
+    jobStartDate: string,
+    jobEndDate: string,
     lastSelectedBusinessUnitId?: number
   ): Observable<BillRate[]> {
     let headers = {};
@@ -463,7 +465,7 @@ export class OrderManagementContentService {
     }
     return this.http.get<BillRate[]>('/api/billrates/regular/fororder', {
       headers,
-      params: { orderType, departmentId, skillId },
+      params: { orderType, departmentId, skillId, jobStartDate, jobEndDate },
     });
   }
 

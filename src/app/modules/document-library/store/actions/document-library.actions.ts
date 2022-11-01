@@ -111,3 +111,8 @@ export class GetShareOrganizationsDtata {
   static readonly type = '[documentsLibrary] Get The List Of Share Organizations Data';
   constructor() { }
 }
+
+export class SelectedBusinessType {
+  static readonly type = '[documentsLibrary] selectedBusinessType';
+  constructor(public businessUnitType:number) { }
+}

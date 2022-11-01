@@ -65,12 +65,13 @@ export class AddEditReorderService {
     { reOrderId, reOrderFromId, agencyIds, reorder }: ReorderRequestModel,
     comments: Comment[]
   ): Observable<any> {
+    reorder.reorderDate.setHours(0, 0, 0, 0);
     const prepareFields = {
       reOrderId,
       reOrderFromId,
       agencyIds,
       candidateProfileIds: reorder.candidates,
-      reorderDate: toCorrectTimezoneFormat(reorder.reorderDate),
+      reorderDate: DateTimeHelper.toUtcFormat(reorder.reorderDate),
       shiftEndTime: DateTimeHelper.toUtcFormat(setTimeToDate(getTimeFromDate(reorder.shiftEndTime))!),
       shiftStartTime: DateTimeHelper.toUtcFormat(setTimeToDate(getTimeFromDate(reorder.shiftStartTime))!),
       billRate: reorder.billRate,
