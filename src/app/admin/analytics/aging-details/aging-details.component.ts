@@ -228,9 +228,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
         this.isInitialLoad = false;
       }
     });
-    // this.onOrganizationsChange();
-    // this.onRegionsChange();
-    // this.onLocationsChange();
+    
   }
 
   public SearchReport(): void {
@@ -299,45 +297,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
       this.logiReportComponent?.SetReportData(logiReportData);
     }
   }
-  //private onOrganizationsChange(): void {
-    // this.regions$
-    //   .pipe(takeUntil(this.unsubscribe$))
-    //   .subscribe((data: Region[]) => {
-    //     if (data != undefined) {
-    //       this.regions = data;
-    //       this.filterColumns.regionIds.dataSource = this.regions;
-    //       this.defaultLocations = [];
-    //       this.defaultDepartments = [];
-    //       this.filterColumns.locationIds.dataSource = [];
-    //       this.filterColumns.departmentIds.dataSource = [];
-    //       this.defaultRegions = data.map((list) => list.id);
-    //     }
-    //   });
-  //}
-  // private onRegionsChange(): void {
-  //   this.locations$
-  //     .pipe(takeUntil(this.unsubscribe$))
-  //     .subscribe((data: Location[]) => {
-  //       if (data != undefined) {
-  //         this.locations = data;
-  //         this.filterColumns.locationIds.dataSource = this.locations;
-  //         this.defaultDepartments = [];
-  //         this.filterColumns.departmentIds.dataSource = [];
-  //         this.defaultLocations = data.map((list) => list.id);
-  //       }
-  //     });
-  // }
-  // private onLocationsChange(): void {
-  //   this.departments$
-  //     .pipe(takeUntil(this.unsubscribe$))
-  //     .subscribe((data: Department[]) => {
-  //       if (data != undefined) {
-  //         this.departments = data;
-  //         this.filterColumns.departmentIds.dataSource = this.departments;
-  //         this.defaultDepartments = data.map((list) => list.id);
-  //       }
-  //     });
-  // }
+  
   public showFilters(): void {
     this.onFilterControlValueChangedHandler();
     this.store.dispatch(new ShowFilterDialog(true));

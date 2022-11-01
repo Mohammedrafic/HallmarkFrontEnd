@@ -1,20 +1,18 @@
-import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
-import { Location, LocationsByRegionsFilter } from '@shared/models/location.model';
-import { Region, regionFilter } from '@shared/models/region.model';
-import { Department, DepartmentsByLocationsFilter } from '@shared/models/department.model';
+import { Region, Location, Department} from '@shared/models/visibility-settings.model';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
-import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
 import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
+import { GetBusinessByUnitType, GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
@@ -26,6 +24,11 @@ import { FilterService } from '@shared/services/filter.service';
 import { accrualReportTypesList, analyticsConstants } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
+import { Organisation } from '@shared/models/visibility-settings.model';
+import { User } from '@shared/models/user.model';
+import { uniqBy } from 'lodash';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 
 @Component({
   selector: 'app-client-finance-accrual-report',
@@ -48,6 +51,7 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/ClientFinanceAccrualReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/Accrual.cat" };
   public title: string = "Financial Time Sheet";
+  public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
   @Select(LogiReportState.regions)
@@ -64,24 +68,25 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
   @Select(LogiReportState.departments)
   public departments$: Observable<Department[]>;
   isDepartmentsDropDownEnabled: boolean = false;
-  departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
+  departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(LogiReportState.logiReportData)
   public logiReportData$: Observable<ConfigurationDto[]>;
+  @Select(SecurityState.organisations)
+  public organizationData$: Observable<Organisation[]>;
+  selectedOrganizations: Organisation[];
 
   accrualReportTypeFields:FieldSettingsModel = { text: 'name', value: 'id' };
   selectedDepartments: Department[];
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
   private agencyOrganizationId:number;
-  @Select(SecurityState.bussinesData)
-  public businessData$: Observable<BusinessUnit[]>;
-  selectedOrganizations: BusinessUnit[];
 
-  public bussinesDataFields = BUSINESS_DATA_FIELDS;
+  public bussinesDataFields = BUSINESS_DATA_FIELDS;  
+  public organizationFields = ORGANIZATION_DATA_FIELDS;
   private unsubscribe$: Subject<void> = new Subject();
   public filterColumns: any;
-  public accrualReportForm: FormGroup;
+  public financialTimesheetReportForm: FormGroup;
   public bussinessControl: AbstractControl;
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
@@ -89,8 +94,11 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
-  public organizations: BusinessUnit[] = [];
-  public defaultOrganizations: number[] = [];
+  public organizations: Organisation[] = [];
+  public regionsList:Region[]=[];
+  public locationsList: Location[] = [];
+  public departmentsList: Department[] = [];
+  public defaultOrganizations: number;
   public defaultRegions: (number | undefined)[] = [];
   public defaultLocations: (number | undefined)[] = [];
   public defaultDepartments: (number | undefined)[] = [];
@@ -98,20 +106,24 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
   public isInitialLoad: boolean = false;  
-  public baseUrl:string='';
+  public baseUrl:string='';  
+  public user: User | null;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
     private formBuilder: FormBuilder,
-    private filterService: FilterService,@Inject(APP_SETTINGS) private appSettings: AppSettings) {
+    private filterService: FilterService,         
+    private changeDetectorRef: ChangeDetectorRef,
+    @Inject(APP_SETTINGS) private appSettings: AppSettings) {
       this.baseUrl = this.appSettings.host.replace("https://","").replace("http://","");
       this.store.dispatch(new SetHeaderState({ title: "Analytics", iconName: '' }));
     this.initForm();
-    const user = this.store.selectSnapshot(UserState.user);
-    if (user?.businessUnitType != null) {
-      this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
+    this.user = this.store.selectSnapshot(UserState.user);
+    if (this.user?.id != null) {
+      this.store.dispatch(new GetOrganizationsStructureAll(this.user?.id));
     }
-    this.SetReportData();    
+
+    this.SetReportData();
   }
 
   ngOnInit(): void {
@@ -127,7 +139,7 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
       this.agencyOrganizationId=data;   
       this.isInitialLoad = true;
       this.orderFilterColumnsSetup();
-      this.accrualReportForm.get(analyticsConstants.formControlNames.accrualReportTypes)?.setValue(0);
+      this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.accrualReportTypes)?.setValue(0);
       this.onFilterControlValueChangedHandler();
     });
   }
@@ -135,7 +147,7 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
   private initForm(): void {
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.accrualReportForm = this.formBuilder.group(
+    this.financialTimesheetReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl({value:[],disabled:true}, [Validators.required]),
         startDate: new FormControl(startDate, [Validators.required]),
@@ -152,63 +164,90 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
     this.unsubscribe$.complete();
   }
   public onFilterControlValueChangedHandler(): void {
-    this.bussinessControl = this.accrualReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
-    this.businessData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.organizations = data;
-      this.filterColumns.businessIds.dataSource = data;
-      this.defaultOrganizations = data.map((list) => list.id).filter(i=>i==this.agencyOrganizationId);
+    this.bussinessControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
+    
+    this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.organizations = uniqBy(data,'organizationId');
+      this.filterColumns.businessIds.dataSource = this.organizations;
+      this.defaultOrganizations = this.agencyOrganizationId;
+      let orgList = this.organizations?.filter((x) => this.agencyOrganizationId==x.organizationId);
+        this.regionsList=[];        
+        this.locationsList=[];
+        this.departmentsList=[];
+        orgList.forEach((value) => {
+          this.regionsList.push(...value.regions);
+          value.regions.forEach((region) => {
+            this.locationsList.push(...region.locations);
+            region.locations.forEach((location) => {
+              this.departmentsList.push(...location.departments);
+            });
+          });
+        });
+        if (this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {      
+          this.showToastMessage(this.regionsList.length,this.locationsList.length,this.departmentsList.length);
+        }
+      this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+      this.changeDetectorRef.detectChanges();
     });
-    this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => { 
+
+    this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (!this.isClearAll) {
-        this.selectedOrganizations = this.organizations?.filter((x) => data?.includes(x.id));
-        let regionFilter: regionFilter = {
-          ids: data,
-          getAll: true
-        };
-        this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
+        let orgList = this.organizations?.filter((x) => data==x.organizationId);
+        this.selectedOrganizations = orgList;       
+        
+        
+        this.regions =this.regionsList;
+        this.filterColumns.regionIds.dataSource = this.regions;
+        this.defaultRegions=this.regionsList.map((list) => list.id);
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);        
+        this.changeDetectorRef.detectChanges();
       }
       else {
         this.isClearAll = false;
       }
     });
-    this.regionIdControl = this.accrualReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
+    this.regionIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.regionIdControl.value.length > 0) {
-        this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
-        let locationFilter: LocationsByRegionsFilter = {
-          ids: data,
-          businessUnitIds:this.selectedOrganizations?.map((list) => list.id),
-          getAll: true
-        };
-        this.store.dispatch(new GetLocationsByRegions(locationFilter));
+        let regionList = this.regions?.filter((object) => data?.includes(object.id));
+        this.selectedRegions = regionList;
+        this.locations=this.locationsList.filter(i=>data?.includes(i.regionId));
+        this.filterColumns.locationIds.dataSource=this.locations;
+        this.defaultLocations=this.locations.map((list)=>list.id);
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
+        this.changeDetectorRef.detectChanges();
+      }
+      else
+      { 
+          
       }
     });
-    this.locationIdControl = this.accrualReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
+    this.locationIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.locationIdControl.value.length > 0) {
         this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
-        let departmentFilter: DepartmentsByLocationsFilter = {
-          ids: data,
-          businessUnitIds:this.selectedOrganizations?.map((list) => list.id),
-          getAll: true
-        };
-        this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));
+        this.departments=this.departmentsList.filter(i=>data?.includes(i.locationId));
+        this.filterColumns.departmentIds.dataSource=this.departments;
+        this.defaultDepartments=this.departments.map((list)=>list.id);
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue(this.defaultDepartments);
+        this.changeDetectorRef.detectChanges();
       }
     });
-    this.departmentIdControl = this.accrualReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
+    this.departmentIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));
+      this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
       if (this.isInitialLoad) {
+
         this.SearchReport();
         this.isInitialLoad = false;
       }
     });
-    this.onOrganizationsChange();
-    this.onRegionsChange();
-    this.onLocationsChange();
-  }
+    }
 
   public SearchReport(): void {
+    this.message = "Default filter selected with all regions ,locations and departments for 90 days";
+    
+    this.filteredItems = this.filterService.generateChips(this.financialTimesheetReportForm, this.filterColumns);
     let auth="Bearer ";
     for(let x=0;x<window.localStorage.length;x++)
     { 
@@ -217,7 +256,7 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
         auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let { startDate, endDate } = this.accrualReportForm.getRawValue();
+    let { startDate, endDate } = this.financialTimesheetReportForm.getRawValue();
     this.paramsData =
     {
       "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.id),
@@ -225,14 +264,14 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
       "EndDateParamACCR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "RegionParamACCR": this.selectedRegions?.map((list) => list.id),
       "LocationParamACCR": this.selectedLocations?.map((list) => list.id),
-      "DepartmentParamACCR": this.selectedDepartments?.map((list) => list.departmentId),
+      "DepartmentParamACCR": this.selectedDepartments?.map((list) => list.id),
       "BearerParamACCR":auth,
       "BusinessUnitIdParamACCR":window.localStorage.getItem("lastSelectedOrganizationId") == null 
       ?this.organizations!=null &&this.organizations[0]?.id!=null?
       this.organizations[0].id.toString():"1": 
       window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName":this.baseUrl,
-      "AccrualReportFilterACCR":this.accrualReportForm.controls['accrualReportTypes'].value.toString()
+      "AccrualReportFilterACCR":this.financialTimesheetReportForm.controls['accrualReportTypes'].value.toString()
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -264,8 +303,8 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: 'departmentName',
-        valueId: 'departmentId',
+        valueField: 'name',
+        valueId: 'id',
       },
       startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       endDate: { type: ControlTypes.Date, valueType: ValueType.Text },
@@ -288,69 +327,41 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
         this.logiReportComponent?.SetReportData(logiReportData);
       }
   }
-  private onOrganizationsChange(): void {
-    this.regions$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: Region[]) => {
-        if (data != undefined) {
-          this.regions = data;
-          this.filterColumns.regionIds.dataSource = this.regions;
-          this.defaultRegions = data.map((list) => list.id);
-          this.defaultLocations = [];
-          this.defaultDepartments = [];
-        }
-      });
-  }
-  private onRegionsChange(): void {
-    this.locations$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: Location[]) => {
-        if (data != undefined) {
-          this.locations = data;
-          this.filterColumns.locationIds.dataSource = this.locations;
-          this.defaultLocations = data.map((list) => list.id);
-          this.defaultDepartments = [];
-        }
-      });
-  }
-  private onLocationsChange(): void {
-    this.departments$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: Department[]) => {
-        if (data != undefined) {
-          this.departments = data;
-          this.filterColumns.departmentIds.dataSource = this.departments;
-          this.defaultDepartments = data.map((list) => list.departmentId);
-        }
-      });
-  }
+  
   public showFilters(): void {
     this.onFilterControlValueChangedHandler();
     this.store.dispatch(new ShowFilterDialog(true));
   }
   public onFilterDelete(event: FilteredItem): void {
-    this.filterService.removeValue(event, this.accrualReportForm, this.filterColumns);
+    this.filterService.removeValue(event, this.financialTimesheetReportForm, this.filterColumns);
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.accrualReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
-    this.accrualReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
-    this.accrualReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
-    this.accrualReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
-    this.accrualReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
-    this.accrualReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
-    this.accrualReportForm.get(analyticsConstants.formControlNames.accrualReportTypes)?.setValue(0);
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.accrualReportTypes)?.setValue(0);
     this.filteredItems = [];
   }
   public onFilterApply(): void {
-    this.accrualReportForm.markAllAsTouched();
-    if (this.accrualReportForm?.invalid) {
+    this.financialTimesheetReportForm.markAllAsTouched();
+    if (this.financialTimesheetReportForm?.invalid) {
       return;
     }
-    this.filteredItems = this.filterService.generateChips(this.accrualReportForm, this.filterColumns);
+    this.filteredItems = this.filterService.generateChips(this.financialTimesheetReportForm, this.filterColumns);
     this.SearchReport();
     this.store.dispatch(new ShowFilterDialog(false));
+  }
+  public showToastMessage(regionsLength:number,locationsLength:number,departmentsLength:number)
+  {
+    this.message = "";
+    let error:any= regionsLength == 0 ? "Regions/Locations/Departments are required" : locationsLength == 0 ? "Locations/Departments are required" : departmentsLength == 0 ? "Departments are required" : "";
+
+    this.store.dispatch([new ShowToast(MessageTypes.Error, error)]);
+    return;  
   }
 }

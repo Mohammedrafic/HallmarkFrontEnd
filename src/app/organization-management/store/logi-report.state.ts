@@ -1,3 +1,4 @@
+import { FinancialTimeSheetReportFilterOptions } from "@admin/analytics/models/financial-timesheet.model";
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { ConfigurationDto, LogiReportDto } from "@shared/models/analytics.model";
@@ -6,7 +7,7 @@ import { LocationsPage } from "@shared/models/location.model";
 import { Region, regionsPage } from "@shared/models/region.model";
 import { LogiReportService } from "@shared/services/logi-report.service";
 import { filter, Observable, tap } from "rxjs";
-import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState } from "./logi-report.action";
+import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetFinancialTimeSheetReportFilterOptions } from "./logi-report.action";
 
 export interface LogiReportStateModel {
 
@@ -14,6 +15,7 @@ export interface LogiReportStateModel {
     regions: Region[] | regionsPage;
     locations: Location[] | LocationsPage;
     logiReportDto:ConfigurationDto[];
+    financialTimeSheetFilterOptions:FinancialTimeSheetReportFilterOptions|null;
 }
 @State<LogiReportStateModel>({
     name: 'LogiReport',
@@ -22,7 +24,8 @@ export interface LogiReportStateModel {
         departments: [],
         regions: [],
         locations: [],
-        logiReportDto:[]
+        logiReportDto:[],
+        financialTimeSheetFilterOptions:null
     },
 })
 @Injectable()
@@ -93,7 +96,15 @@ export class LogiReportState {
     ):void{
       patchState({ regions: [],locations:[],departments:[] });
     }
-
+    
+    @Action(GetFinancialTimeSheetReportFilterOptions)
+    GetFinancialTimeSheetReportFilterOptions({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<FinancialTimeSheetReportFilterOptions> {
+        return this.logiReportService.getFinancialTimeSheetReportFilterOptions(filter).pipe(tap((payload: any) => {           
+                patchState({ financialTimeSheetFilterOptions: payload });
+                return payload
+           
+        }));
+    }
 }
 
 

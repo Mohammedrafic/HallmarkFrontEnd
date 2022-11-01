@@ -1,3 +1,4 @@
+import { FinancialTimeSheetFilter } from "@admin/analytics/models/financial-timesheet.model";
 import { DepartmentsByLocationsFilter } from "@shared/models/department.model";
 import { LocationsByRegionsFilter } from "@shared/models/location.model";
 import { regionFilter } from "@shared/models/region.model";
@@ -20,4 +21,8 @@ constructor() { }
 export class ClearLogiReportState {
   static readonly type = '[alerts] Clear Logi Report State';
   constructor(){}
+}
+export class GetFinancialTimeSheetReportFilterOptions{
+  static readonly type = '[LogiReport] Get Financial TimeSheet Report Filter Options';
+  constructor(public filter?: FinancialTimeSheetFilter) { }
 }

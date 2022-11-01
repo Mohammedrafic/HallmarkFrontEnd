@@ -1,3 +1,4 @@
+import {  FinancialTimeSheetReportFilterOptions} from "@admin/analytics/models/financial-timesheet.model";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { ConfigurationDto } from "@shared/models/analytics.model";
@@ -40,5 +41,12 @@ export class LogiReportService {
    */
 public getLogiReportData(): Observable<ConfigurationDto[]> {
   return this.http.get<ConfigurationDto[]>(`/config/ReportServer`);
+}
+/**
+   * Get the Financial Timesheet  Filter Options
+   * @return FinancialTimeSheetReportFilterOptions
+   */
+public getFinancialTimeSheetReportFilterOptions(filter:any): Observable<FinancialTimeSheetReportFilterOptions> {
+  return this.http.post<FinancialTimeSheetReportFilterOptions>(`/api/LogiReport/financialtimesheet/filter`,filter);
 }
 }
