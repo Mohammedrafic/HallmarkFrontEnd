@@ -648,18 +648,18 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
 
   public documentPreview(docItem: any) {
-
-    this.setDocumentMimeTypeDefaults();
+    this.closeDialog();
     this.downloadedFileName = '';
     const downloadFilter: DownloadDocumentDetailFilter = {
       documentId: docItem.id,
       businessUnitType: this.filterSelecetdBusinesType,
       businessUnitId: this.filterSelectedBusinesUnitId
     }
-    this.store.dispatch(new GetDocumentDownloadDeatils(downloadFilter));
-    this.documentDownloadDetail$.pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: DownloadDocumentDetail) => {
-        if (data) {
+
+    this.store.dispatch(new GetDocumentDownloadDeatils(downloadFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
+      if (val) {
+        var data = val?.documentLibrary?.documentDownloadDetail;
+        if (data != null) {
           if (this.downloadedFileName != data.fileName) {
             this.downloadedFileName = data.fileName;
             if (data.fileAsBase64 && data.fileAsBase64 != '') {
@@ -670,7 +670,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             this.changeDetectorRef.markForCheck();
           }
         }
-      });
+      }
+    });
   }
 
 
@@ -682,26 +683,27 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     let extension = (file != null) ? file.extension : null;
     switch (extension) {
       case '.pdf':
+        this.previewUrl = '';
         this.isPdf = true;
         this.load(`data:application/pdf;base64,${file.fileAsBase64}`);
         break;
       case '.jpg':
-        this.isImage =true;
+        this.isImage = true;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
           `data:image/jpg;base64,${file.fileAsBase64}`
         );
         break;
       case '.png':
-        this.isImage =true;
+        this.isImage = true;
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
           `data:image/png;base64,${file.fileAsBase64}`
         );
         break;
       case '.docx':
         this.isWordDoc = true;
-        this.fileAsBase64 =file.fileAsBase64;
-        this.loadDocument(file.fileAsBase64);
-
+        //ToDo: If preview donot work in Iframe another alternate should be looked for.
+        //DocumentEditor is removed as the requirement do not expect for any editing.
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://view.officeapps.live.com/op/embed.aspx?src=' + file.sasUrl);
         break;
       case '.xlsx':
         this.isExcel = true;
@@ -725,25 +727,12 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.fileAsBase64='';
   }
 
-  loadDocument(fileAsBase64: string) {
-    this.documentEditor.height = window.innerHeight * 0.7 + 'px';
-    this.documentEditor.isReadOnly = true;
-    this.documentEditor.pageOutline = '#d3d3d3';
-    this.documentEditor.open(decodeURIComponent(escape(atob(fileAsBase64))));
-
-  }
-
-  onCreate(): void {
-    this.loadDocument(this.fileAsBase64);
-  }
-
   public onClosePreview(): void {
     this.setDocumentMimeTypeDefaults();
     this.previewUrl = null;
     this.downloadedFileName = '';
     this.changeDetectorRef.markForCheck();
     this.store.dispatch(new ShowDocPreviewSideDialog(false));
-
   }
 
   public downloadDocument(docItem: DocumentLibraryDto) {
