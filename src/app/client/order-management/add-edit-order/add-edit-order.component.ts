@@ -471,7 +471,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
 
     const billRates = this.billRatesComponent?.billRatesControl.value;
-    let regularBillRate = this.billRatesSyncService.getBillRateForSync(billRates);
+    const regularBillRate = this.billRatesSyncService.getBillRateForSync(billRates);
 
     if (!regularBillRate) {
       return;

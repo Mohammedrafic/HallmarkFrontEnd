@@ -12,7 +12,7 @@ import {
   GetLocationsByRegionId,
   GetMasterSkillsByOrganization,
   GetOrganizationSettings,
-  GetRegions
+  GetRegions,
 } from '@organization-management/store/organization-management.actions';
 import {
   ClearSelectedOrder,
@@ -23,7 +23,7 @@ import {
   GetProjectSpecialData,
   GetSuggestedDetails,
   SetIsDirtyOrderForm,
-  SetPredefinedBillRatesData
+  SetPredefinedBillRatesData,
 } from '@client/store/order-managment-content.actions';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -383,14 +383,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId, jobStartDate.toISOString(), jobEndDate.toISOString()));
     });
 
-    combineLatest([orderTypeControl.valueChanges, departmentIdControl.valueChanges, skillIdControl.valueChanges, jobStartDateControl.valueChanges])
+    combineLatest([orderTypeControl.valueChanges, departmentIdControl.valueChanges, skillIdControl.valueChanges, jobStartDateControl.valueChanges, jobEndDateControl.valueChanges])
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(([orderType, departmentId, skillId, jobStartDate]) => {
-        if (isNaN(parseInt(orderType)) || !departmentId || !skillId || !jobStartDate) {
+      .subscribe(([orderType, departmentId, skillId, jobStartDate, jobEndDate]) => {
+        if (isNaN(parseInt(orderType)) || !departmentId || !skillId || !jobStartDate || !jobEndDate) {
           return;
         }
         if (!this.isEditMode) {
-          this.populateHourlyRateField(orderType, departmentId, skillId);
+          this.populateHourlyRateField(orderType, departmentId, skillId, jobStartDate, jobEndDate);
         }
       });
 
@@ -614,12 +614,20 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     firstContactDetailsControl.controls['mobilePhone'].patchValue(mobilePhone);
   }
 
-  private populateHourlyRateField(orderType: OrderType, departmentId: number, skillId: number): void {
+  private populateHourlyRateField(
+    orderType: OrderType,
+    departmentId: number,
+    skillId: number,
+    jobStartDate: Date,
+    jobEndDate: Date
+  ): void {
     if (orderType === OrderType.PermPlacement) {
       return;
     }
+    const startDate = DateTimeHelper.toUtcFormat(jobStartDate);
+    const endDate = DateTimeHelper.toUtcFormat(jobEndDate);
     this.orderManagementService
-      .getRegularLocalBillRate(orderType, departmentId, skillId)
+      .getRegularBillRate(orderType, departmentId, skillId, startDate, endDate)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((billRates: BillRate[]) => {
         const billRateValue = billRates[0]?.rateHour.toFixed(2) || '';
