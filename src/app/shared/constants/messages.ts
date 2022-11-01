@@ -40,6 +40,7 @@ export const ORDER_WITHOUT_BILLRATES =
 export const ORDER_WITHOUT_CRED_BILLRATES =
   'Added order doesn’t contain the Credentials and Bill Rates. Please edit the order to onboard candidates successfully';
 export const UNSAVE_CHANGES_TEXT = 'Do you want to save changes?';
+export const REQUIRED_PERMISSIONS = 'Separate permission right is required';
 
 export const updateCandidateJobMessage = (dates: string[]) =>
   `For this candidate job timesheets will be recalculated for the next start dates: ${dates.join(', ')}`;

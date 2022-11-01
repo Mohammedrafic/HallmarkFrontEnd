@@ -137,12 +137,12 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     });
 
     this.startTimeField = this.HolidayFormGroup.get('startDateTime') as AbstractControl;
-    this.startTimeField.addValidators(startDateValidator(this.HolidayFormGroup, 'endDateTime', this.today));
+    this.startTimeField.addValidators(startDateValidator(this.HolidayFormGroup, 'endDateTime'));
     this.startTimeField.valueChanges.subscribe(() =>
       this.endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
     this.endTimeField = this.HolidayFormGroup.get('endDateTime') as AbstractControl;
-    this.endTimeField.addValidators(endDateValidator(this.HolidayFormGroup, 'startDateTime', this.today));
+    this.endTimeField.addValidators(endDateValidator(this.HolidayFormGroup, 'startDateTime'));
     this.endTimeField.valueChanges.subscribe(() =>
       this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );

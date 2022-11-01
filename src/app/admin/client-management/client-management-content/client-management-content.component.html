@@ -8,15 +8,20 @@
     <ng-container right>
       <section class="org-controls-container">
         <div>
-          <button
-            *ngIf="hasCreateOrganizationPermission"
-            ejs-button
-            appHideBeforeSyncfusionLoad
-            [isPrimary]="true"
-            (click)="navigateToOrganizationForm()"
-          >
-            Add Organization
-          </button>
+          <app-tooltip-container
+            [message]="toolTipMessage"
+            [showToolTip]="!userPermission[userPermissions.CanCreateDeleteOrganization]">
+           <button
+              *ngIf="hasCreateOrganizationPermission"
+              ejs-button
+              appHideBeforeSyncfusionLoad
+              [isPrimary]="true"
+              [disabled]="!userPermission[userPermissions.CanCreateDeleteOrganization]"
+              (click)="navigateToOrganizationForm()"
+            >
+              Add Organization
+            </button>
+          </app-tooltip-container>
           <button
             ejs-dropdownbutton
             appHideBeforeSyncfusionLoad
