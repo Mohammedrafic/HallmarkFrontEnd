@@ -24,6 +24,9 @@ import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/stor
 import { UserState } from 'src/app/store/user.state';
 import { ExportOrganizations, GetOrganizationDataSources, GetOrganizationsByPage } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
+import { Permission } from "@core/interface";
+import { UserPermissions } from "@core/enums";
+import { REQUIRED_PERMISSIONS } from "@shared/constants";
 
 @Component({
   selector: 'app-client-management-content',
@@ -47,8 +50,10 @@ export class ClientManagementContentComponent
   ];
   public fileName: string;
   public defaultFileName: string;
-
+  public userPermission: Permission;
   public readonly statusEnum = Status;
+  public readonly userPermissions = UserPermissions;
+  public readonly toolTipMessage = REQUIRED_PERMISSIONS;
 
   readonly ROW_HEIGHT = 64;
 
@@ -246,6 +251,8 @@ export class ClientManagementContentComponent
   }
 
   private subscribeOnPermissions(): void {
+    this.userPermission = this.store.selectSnapshot(UserState.userPermission);
+
     this.currentUserPermissions$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((permissions) => (this.permissions = permissions));
