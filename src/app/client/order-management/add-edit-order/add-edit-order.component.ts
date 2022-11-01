@@ -247,7 +247,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (order?.credentials) {
       this.orderCredentials = [...order.credentials];
     }
-    if (order?.billRates) {
+    if (order?.billRates && !order.isTemplate) {
+
       this.orderBillRates = [...order.billRates];
     }
   }

@@ -40,7 +40,7 @@
               <ng-template #headerText>{{isReOrder ? 'Re-Order Details' : 'Order Details'}}</ng-template>
               <ng-template #content>
                 <section class="order-details" *ngIf="currentOrder">
-                  <section class="job-details"  *ngIf="currentOrder" [ngSwitch]="currentOrder?.orderType">
+                  <section class="job-details" [ngSwitch]="currentOrder?.orderType">
                     <app-general-order-per-diem-info *ngSwitchCase="orderType.OpenPerDiem" [orderInformation]="currentOrder"></app-general-order-per-diem-info>
                     <app-general-reorder-info *ngSwitchCase="orderType.ReOrder" [orderInformation]="currentOrder"></app-general-reorder-info>
                     <app-general-order-info *ngSwitchDefault [orderInformation]="currentOrder"></app-general-order-info>
