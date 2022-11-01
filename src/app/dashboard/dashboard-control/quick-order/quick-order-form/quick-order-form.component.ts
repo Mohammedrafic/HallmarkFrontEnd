@@ -65,6 +65,7 @@ import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shi
 import { ManualInvoiceReason } from '@shared/models/manual-invoice-reasons.model';
 import { DurationService } from '@shared/services/duration.service';
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-quick-order-form',
@@ -567,15 +568,17 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.orderTypeControl.valueChanges,
       this.generalInformationForm.controls['departmentId'].valueChanges,
       this.generalInformationForm.controls['skillId'].valueChanges,
+      this.generalInformationForm.controls['jobStartDate'].valueChanges,
+      this.generalInformationForm.controls['jobEndDate'].valueChanges,
       this.userIsAdmin ? this.organizationForm.controls['organization'].valueChanges : of(null),
     ])
       .pipe(takeUntil(this.destroy$), debounceTime(300))
-      .subscribe(([orderType, departmentId, skillId, organizationId]) => {
-        if (isNaN(parseInt(orderType)) || !departmentId || !skillId) {
+      .subscribe(([orderType, departmentId, skillId, jobStartDate, jobEndDate, organizationId]) => {
+        if (isNaN(parseInt(orderType)) || !departmentId || !skillId || !jobStartDate || !jobEndDate) {
           return;
         }
 
-        this.populateHourlyRateField(orderType, departmentId, skillId, organizationId);
+        this.populateHourlyRateField(orderType, departmentId, skillId, jobStartDate, jobEndDate, organizationId);
       });
   }
 
@@ -583,11 +586,15 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     orderType: OrderType,
     departmentId: number,
     skillId: number,
+    jobStartDate: Date,
+    jobEndDate: Date,
     organizationId?: number
   ): void {
     if (this.isTravelerOrder || this.isContactToPermOrder) {
+      const startDate = DateTimeHelper.toUtcFormat(jobStartDate);
+      const endDate = DateTimeHelper.toUtcFormat(jobEndDate);
       this.orderManagementService
-        .getRegularLocalBillRate(orderType, departmentId, skillId, organizationId)
+        .getRegularBillRate(orderType, departmentId, skillId, startDate, endDate, organizationId)
         .pipe(take(1))
         .subscribe((billRates: BillRate[]) =>
           this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0]?.rateHour.toFixed(2) || null)
