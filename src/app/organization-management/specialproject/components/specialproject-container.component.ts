@@ -1,11 +1,10 @@
 import { Component, OnDestroy, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 import { SpecialProjectTabs, AddButtonText } from '@shared/enums/special-project-tabs.enum'
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ShowSideDialog } from '../../../store/app.actions';
-import { Organization, OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { UserState } from '../../../store/user.state';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
@@ -26,18 +25,18 @@ import { SpecialProjectCategoryComponent } from '../components/special-project-c
 import { SpecialProjectCategory } from '@shared/models/special-project-category.model';
 import { GetSpecialProjectCategoryById, SaveSpecialProjectCategory } from '../../store/special-project-category.actions';
 import { FormControlNames } from '../enums/specialproject.enum';
-import { ProjectNames, SaveSpecialProjectMappingDto, SpecialProjectMapping } from '@shared/models/special-project-mapping.model';
+import { ProjectNames, SaveSpecialProjectMappingDto } from '@shared/models/special-project-mapping.model';
 import { GetProjectNamesByTypeId, SaveSpecialProjectMapping, SpecialProjectShowConfirmationPopUp } from '../../store/special-project-mapping.actions';
 import { ProjectMappingComponent } from '../components/project-mapping/project-mapping.component';
 import { SpecialProjectMappingState } from '../../store/special-project-mapping.state';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE } from '../../../shared/constants';
+import { DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE } from '@shared/constants';
 import { SavePurchaseOrderMapping, ShowConfirmationPopUp } from '../../store/purchase-order-mapping.actions';
-import { PurchaseOrderMappingState } from '../../store/purchase-order-mapping.state';
-import { PurchaseOrderNames, SavePurchaseOrderMappingDto } from '../../../shared/models/purchase-order-mapping.model';
+import {  SavePurchaseOrderMappingDto } from '../../../shared/models/purchase-order-mapping.model';
 import { PurchaseOrderMappingComponent } from '../components/purchase-order-mapping/purchase-order-mapping.component';
 import { datesValidator } from '@shared/validators/date.validator';
+import { AbstractPermission } from "@shared/helpers/permissions";
 
 @Component({
   selector: 'app-specialproject-container',
@@ -45,7 +44,7 @@ import { datesValidator } from '@shared/validators/date.validator';
   styleUrls: ['./specialproject-container.component.scss']
 })
 
-export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
+export class SpecialProjectContainerComponent extends AbstractPermission implements OnInit, OnDestroy {
   @ViewChild(SpecialProjectsComponent, { static: false }) childC: SpecialProjectsComponent;
   @ViewChild(PurchaseOrdersComponent, { static: false }) childPurchaseComponent: PurchaseOrdersComponent;
   @ViewChild(SpecialProjectCategoryComponent, { static: false }) childSpecialProjectCategoryComponent: SpecialProjectCategoryComponent;
@@ -122,14 +121,16 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   public today = new Date();
   public startDate:any = new Date();
 
-  constructor(private store: Store,
+  constructor(protected override store: Store,
     private changeDetectorRef: ChangeDetectorRef,
     private actions$: Actions,
     private confirmService: ConfirmService) {
+    super(store);
     this.today.setHours(0, 0, 0);
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.startDate = null;
     this.orgStructureDataSetup();
     this.onOrganizationStructureDataLoadHandler();
@@ -190,7 +191,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
     this.getPONames();
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
@@ -804,5 +805,4 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
       this.form.controls['PrePopulateInOrders'].setValue(data.prePopulateInOrders);
     }
   }
-
 }

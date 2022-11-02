@@ -606,7 +606,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
     this.filters.openPositions = this.filters.openPositions || null;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
-    this.getOrders();
+    this.getOrders(true);
     this.store.dispatch(new ShowFilterDialog(false));
   }
 

@@ -54,7 +54,8 @@ export type ImportedDepartment = {
   errorProperties: string[];
 }
 export class DepartmentsByLocationsFilter {
-  ids?: number[];  
+  ids?: number[];
+  businessUnitIds?:number[];
   orderBy?: string;
   pageSize?: number;
   pageNumber?: number;

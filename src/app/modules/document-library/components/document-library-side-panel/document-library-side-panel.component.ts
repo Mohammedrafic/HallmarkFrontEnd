@@ -1,17 +1,18 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Actions, Select, Store } from '@ngxs/store';
-import { Observable, Subject, take, takeUntil } from 'rxjs';
-import { DocumentFolder, DocumentTypeFilter, FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
+import { Observable, Subject, takeUntil } from 'rxjs';
+import { DeleteDocumentFolderFilter, DocumentFolder, FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
 import { DocumentLibraryState } from '../../store/state/document-library.state';
 import { TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
-import { GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, IsAddNewFolder } from '../../store/actions/document-library.actions';
+import { DeleteEmptyDocumentsFolder, GetDocumentsSelectedNode, GetFoldersTree, IsAddNewFolder, IsDeleteEmptyFolder, SelectedBusinessType } from '../../store/actions/document-library.actions';
 import { UserState } from '../../../../store/user.state';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { FileType } from '../../enums/documents.enum';
-import { ORG_ID_STORAGE_KEY } from '@shared/constants';
-import { BusinessUnitType } from '../../../../shared/enums/business-unit-type';
-import { User } from '../../../../shared/models/user-managment-page.model';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { User } from '@shared/models/user-managment-page.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_FOLDER_TEXT, DELETE_FOLDER_TITLE } from '@shared/constants';
 
 @Component({
   selector: 'app-document-library-side-panel',
@@ -34,10 +35,13 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
   sidePanelDocumentField: any;
   public selectedNode: NodeItem;
   public isAddNewFolderBtnVisible: boolean = true;
-  public isNewFolderInAction: boolean =false;
+  public isNewFolderInAction: boolean = false;
+  public isDeleteFolder: boolean = false;
+  public selectedBusinessType: number;
 
   constructor(private store: Store,
     private action$: Actions,
+    private confirmService: ConfirmService,
     private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
@@ -45,6 +49,23 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
     if (user?.businessUnitType == BusinessUnitType.Hallmark) {
       this.isAddNewFolderBtnVisible = false;
     }
+    this.action$.pipe(ofActionDispatched(SelectedBusinessType), takeUntil(this.unsubscribe$)).subscribe((payload) => {
+      if (payload) {
+         this.selectedBusinessType = payload.businessUnitType;
+          this.isAddNewFolderBtnVisible = false;
+          this.sidePanelDocumentField = { dataSource: [], id: 'id', text: 'name', parentID: 'parentId', child: 'children' };
+      }
+    });
+    this.action$.pipe(ofActionDispatched(IsDeleteEmptyFolder), takeUntil(this.unsubscribe$)).subscribe((payload) => {
+      if (payload) {
+        if (payload.isDeleteFolder) {
+          this.isDeleteFolder = true;
+        }
+        else {
+          this.isDeleteFolder = false;
+        }
+      }
+    });
     this.initSidePanelDocs();
   }
   ngOnDestroy(): void {
@@ -61,7 +82,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
         setTimeout(() => {
           if (this.sidePanelDocumentField.dataSource?.length) {
             if (this.sidePanelDocumentField.dataSource[0].id != -1) {
-              if(this.isNewFolderInAction)
+              if (this.isNewFolderInAction)
               {
                 this.savedDocumentFolder$.subscribe((x:DocumentFolder)=>
                 {
@@ -69,21 +90,18 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
                   this.tree.expandAll();
                 });
               }
-              else
-              this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
-              
-              const targetNodeId: string = this.tree.selectedNodes[0];
-              const element = this.tree?.element.querySelector('[data-uid="' + targetNodeId + '"]');
-              const liElements = element?.querySelectorAll('ul li');
-              let nodes = [];
-              if (liElements != undefined && liElements.length > 0) {
-                for (let i = 0; i < liElements?.length; i++) {
-                  const nodeData: any = this.tree?.getNode(liElements[i]);
-                  nodes.push(nodeData.id);
+              else {
+
+                if (this.selectedNode != null && this.selectedNode?.id != undefined && this.selectedNode.businessUnitId == this.sidePanelDocumentField.dataSource[0].businessUnitId) {
+                  this.tree.selectedNodes = ["-2"];
+                  this.tree.selectedNodes = [this.selectedNode.id.toString()];
                 }
-                this.tree.expandAll(nodes);
+                else {
+                  this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
+                }
+                this.tree.expandAll();
+                this.tree.expandedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
               }
-              this.tree.expandedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
             }
           }
         }, 1000);
@@ -150,7 +168,6 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
     }
   }
 
-
   public handleOnSearchTree(event: any) {
     const searchString = event.target.value;
     if (searchString.trim() != '') {
@@ -160,7 +177,34 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
     else {
       this.sidePanelDocumentField = { dataSource: this.sidePanelFolderItems, id: 'id', text: 'name', parentID: 'parentId', child: 'children' };
     }
+    setTimeout(() => {
+      this.tree.expandAll();
+    },1000)
+    
     this.changeDetectorRef.markForCheck();
   }
-
+     
+  public handleOnDeleteFolder(event: any) {
+    this.confirmService
+      .confirm(DELETE_FOLDER_TEXT, {
+        title: DELETE_FOLDER_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button'
+      })
+      .subscribe((confirm) => {
+        if (confirm && this.selectedNode.id && this.selectedNode.parentID!=null && this.selectedNode.parentID!=-1 && this.selectedNode.id!=-1 ) {
+          const deleteFolderFilter: DeleteDocumentFolderFilter = {
+            folderId: this.selectedNode.id,
+            businessUnitType: this.selectedBusinessType,
+            businessUnitId: this.selectedNode.businessUnitId != null ? this.selectedNode.businessUnitId:null
+          }
+          this.store.dispatch(new DeleteEmptyDocumentsFolder(deleteFolderFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
+            const businessUnitType = this.selectedBusinessType;
+            const businessUnitId = this.selectedNode.businessUnitId;
+            this.selectedNode = new NodeItem();
+            this.store.dispatch(new GetFoldersTree({ businessUnitType: businessUnitType, businessUnitId: businessUnitId }));
+          });
+        }
+      });
+  }
 }

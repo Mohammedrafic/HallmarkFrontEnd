@@ -5,7 +5,7 @@ import {
   DocumentFolder, FolderTreeItem, DocumentLibraryDto, Documents, DocumentsFilter,
   DocumentsLibraryPage, DocumentTagFilter, DocumentTags, DocumentTypeFilter, DocumentTypes,
   FolderTreeFilter, DownloadDocumentDetail, DownloadDocumentDetailFilter, DeleteDocumentsFilter, ShareDocumentsFilter, SharedDocumentPostDto,
-  ShareDocumentInfoPage, ShareDocumentInfoFilter, UnShareDocumentsFilter, AssociateAgencyDto, ShareOrganizationsData
+  ShareDocumentInfoPage, ShareDocumentInfoFilter, UnShareDocumentsFilter, AssociateAgencyDto, ShareOrganizationsData, DeleteDocumentFolderFilter
 } from "../store/model/document-library.model";
 
 import { Region } from '@shared/models/region.model';
@@ -186,6 +186,14 @@ export class DocumentLibraryService {
  */
   public getShareOrganizationsData(): Observable<ShareOrganizationsData[]> {
     return this.http.get<ShareOrganizationsData[]>(`/api/DocumentLibrary/share/getOrganizations`);
+  }
+
+  /**
+  * Remove document folder
+  * @param id
+  */
+  public DeleteFolder(deleteDocumentFolderFilter: DeleteDocumentFolderFilter): Observable<any> {
+    return this.http.delete<any>(`/api/DocumentLibrary/DeleteFolder`, { body: deleteDocumentFolderFilter });
   }
 
 }

@@ -7,12 +7,12 @@ import { debounceTime, distinctUntilChanged, filter, Observable, Subject, takeUn
 import { SearchComponent } from '@shared/components/search/search.component';
 import { map } from 'rxjs/operators';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { SecurityState } from '../../security/store/security.state';
 import { RoleTreeField } from '../../security/roles-and-permissions/role-form/role-form.component';
 import { ExternalBillRatePermissions } from '@organization-management/bill-rates/models/external-bill-rate-permissions.enum';
 import { GetPermissionsTree } from 'src/app/security/store/security.actions';
 import { GetOrganizationStructure } from '../../store/user.actions';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 
 export enum BillRateNavigationTabs {
   BillRateSetup,
@@ -26,7 +26,7 @@ export enum BillRateNavigationTabs {
   styleUrls: ['./bill-rates.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BillRatesComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
+export class BillRatesComponent extends AbstractPermissionGrid implements OnInit, AfterViewInit, OnDestroy {
   @Select(SecurityState.roleTreeField)
   public roleTreeField$: Observable<RoleTreeField>;
 
@@ -62,13 +62,13 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
     );
   }
 
-  constructor(private store: Store) {
-    super();
+  constructor(protected override store: Store) {
+    super(store);
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.handlePagePermission();
-    this.subsToPermissions();
     this.store.dispatch(new GetOrganizationStructure());
   }
 
@@ -152,6 +152,8 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
   }
 
   subsToPermissions(): void {
+    this.userPermission = this.store.selectSnapshot(UserState.userPermission);
+
     this.roleTreeField$
       .pipe(
         map((tree) => tree.dataSource),

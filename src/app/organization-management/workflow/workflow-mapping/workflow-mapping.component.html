@@ -10,7 +10,16 @@
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
-      <button ejs-button [isPrimary]="true" (click)="onAddMappingClick()">Add Mapping</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditWorkflows]">
+          <button
+            ejs-button
+            [isPrimary]="true"
+            [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
+            (click)="onAddMappingClick()"
+          >Add Mapping</button>
+      </app-tooltip-container>
     </ng-container>
   </app-page-toolbar>
 
@@ -89,7 +98,7 @@
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemoveButtonClick(data, $event)">
+            <button ejs-button cssClass="e-flat secondary-icon-button" [disabled]="!userPermission[userPermissions.CanEditWorkflows]" (click)="onRemoveButtonClick(data, $event)">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -280,6 +289,7 @@
   </app-filter-dialog>
 
   <app-side-dialog
+    [disableSaveButton]="!userPermission[userPermissions.CanEditWorkflows]"
     *ngIf="isActive"
     (formCancelClicked)="onCancelFormClick()"
     (formSaveClicked)="onSaveFormClick()"

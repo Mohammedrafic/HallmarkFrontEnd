@@ -93,7 +93,8 @@ export type ImportedLocation = {
   errorProperties: string[];
 }
 export class LocationsByRegionsFilter {
-  ids?: number[];  
+  ids?: number[]; 
+  businessUnitIds?:number[]
   orderBy?: string;
   pageSize?: number;
   pageNumber?: number;

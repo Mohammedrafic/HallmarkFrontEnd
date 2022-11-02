@@ -4,9 +4,6 @@ import { combineLatestWith, filter, Observable, Subject, takeUntil, tap, throttl
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import {
-  AbstractGridConfigurationComponent
-} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import {
@@ -34,13 +31,14 @@ import { CredentialType } from '@shared/models/credential-type.model';
 import { ActivatedRoute } from '@angular/router';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 
 @Component({
   selector: 'app-credentials-list',
   templateUrl: './credentials-list.component.html',
   styleUrls: ['./credentials-list.component.scss']
 })
-export class CredentialsListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class CredentialsListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
   public gridSortSettings: SortSettingsModel = { columns: [{ field: 'credentialTypeName', direction: 'Ascending' }] };
@@ -54,7 +52,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
-  
+
   @Select(CredentialsState.credentialDataSources)
   credentialDataSources$: Observable<CredentialFilterDataSources>;
 
@@ -96,7 +94,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     text: 'name', value: 'id'
   };
 
-  constructor(private store: Store,
+  constructor(protected override store: Store,
               private actions$: Actions,
               private confirmService: ConfirmService,
               private datePipe: DatePipe,
@@ -104,12 +102,14 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
               private route: ActivatedRoute,
               private permissionService: PermissionService,
               @Inject(FormBuilder) private builder: FormBuilder) {
-    super();
+    super(store);
     this.formBuilder = builder;
     this.createCredentialsForm();
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
+
     this.filterColumns = {
       credentialIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       credentialTypeIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
@@ -216,8 +216,8 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     const ids = this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null;
     this.store.dispatch(new ExportCredentialList(new ExportPayload(
-      fileType, 
-      { ...this.filters, ids: ids }, 
+      fileType,
+      { ...this.filters, ids: ids },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       null,
       options?.fileName || this.defaultFileName
@@ -345,7 +345,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
     if (!canEdit) {
       const havePermission = !isMasterCredential && this.permissionService.checkPermisionSnapshot(PermissionTypes.ManuallyAddCredential);
-      
+
       if (!havePermission) {
         this.credentialsFormGroup.get('credentialTypeId')?.disable();
         this.credentialsFormGroup.get('name')?.disable();

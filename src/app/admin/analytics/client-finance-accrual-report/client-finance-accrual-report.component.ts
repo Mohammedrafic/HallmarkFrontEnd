@@ -177,6 +177,7 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
         this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
         let locationFilter: LocationsByRegionsFilter = {
           ids: data,
+          businessUnitIds:this.selectedOrganizations?.map((list) => list.id),
           getAll: true
         };
         this.store.dispatch(new GetLocationsByRegions(locationFilter));
@@ -188,6 +189,7 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
         this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         let departmentFilter: DepartmentsByLocationsFilter = {
           ids: data,
+          businessUnitIds:this.selectedOrganizations?.map((list) => list.id),
           getAll: true
         };
         this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));

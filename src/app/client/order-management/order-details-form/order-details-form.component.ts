@@ -294,7 +294,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     this.jobDescriptionForm = this.formBuilder.group({
-      classification: [null],
+      classifications: [null],
       onCallRequired: [false],
       asapStart: [false],
       criticalOrder: [false],
@@ -1018,7 +1018,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       .subscribe(() => this.jobDistributionForm.controls['agency'].patchValue(agencyValues));
 
     this.jobDistributionForm.controls['jobDistributions'].patchValue(order.jobDistributions);
-    this.jobDescriptionForm.controls['classification'].patchValue(order.classification);
+    this.jobDescriptionForm.controls['classifications'].patchValue(order.classifications);
     this.jobDescriptionForm.controls['onCallRequired'].patchValue(order.onCallRequired);
     this.jobDescriptionForm.controls['asapStart'].patchValue(order.asapStart);
     this.jobDescriptionForm.controls['criticalOrder'].patchValue(order.criticalOrder);
@@ -1127,7 +1127,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     const openPositions = this.generalInformationForm.controls['openPositions'];
     const jobDistribution = this.jobDistributionForm.controls['jobDistribution'];
     const agency = this.jobDistributionForm.controls['agency'];
-    const classification = this.jobDescriptionForm.controls['classification'];
+    const classification = this.jobDescriptionForm.controls['classifications'];
     openPositions.disable();
     jobDistribution.disable();
     agency.disable();

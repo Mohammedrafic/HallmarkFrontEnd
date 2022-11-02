@@ -1,10 +1,15 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import {  FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ShowSideDialog, ShowToast } from '../../../store/app.actions';
+import { ShowSideDialog } from '../../../store/app.actions';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import {
+  CANCEL_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+} from '@shared/constants';
 import {
   GetRolesForWorkflowMapping, GetUsersForWorkflowMapping,
   GetWorkflowMappingPages,
@@ -18,9 +23,9 @@ import { Step, Workflow, WorkflowWithDetails, WorkflowWithDetailsPut } from '@sh
 import { ActivatedRoute } from '@angular/router';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
-import { MessageTypes } from '@shared/enums/message-types';
 import { UserState } from '../../../store/user.state';
 import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
+import { AbstractPermission } from "@shared/helpers/permissions";
 
 export enum WorkflowNavigationTabs {
   JobOrderWorkflow,
@@ -32,7 +37,7 @@ export enum WorkflowNavigationTabs {
   templateUrl: './job-order.component.html',
   styleUrls: ['./job-order.component.scss']
 })
-export class JobOrderComponent implements OnInit, OnDestroy {
+export class JobOrderComponent extends AbstractPermission implements OnInit, OnDestroy {
   public isJobOrderWorkflowTabActive = true;
   public isWorkflowMappingTabActive = false;
   public workflowsWithDetails: WorkflowWithDetails[] = [];
@@ -54,17 +59,19 @@ export class JobOrderComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private actions$: Actions,
-              private store: Store,
+              protected override store: Store,
               private route: ActivatedRoute,
               @Inject(FormBuilder) private builder: FormBuilder,
               private confirmService: ConfirmService) {
+    super(store);
     this.formBuilder = builder;
     this.createWorkflowFormGroup();
     this.createCustomOrderStepFormGroup();
     this.createCustomApplicationStepFormGroup();
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.organizationId$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(() => {
       this.store.dispatch(new GetWorkflows());
       this.selectedCard = undefined;
@@ -89,7 +96,7 @@ export class JobOrderComponent implements OnInit, OnDestroy {
       });
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
