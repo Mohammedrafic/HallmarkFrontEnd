@@ -1,18 +1,27 @@
 <section class="container">
   <div class="toolbar-buttons" *ngIf="isJobOrderWorkflowTabActive">
-    <button
-      ejs-button
-      appHideBeforeSyncfusionLoad
-      cssClass="e-outline delete-button"
-      *ngIf="workflowsWithDetails.length !== 0"
-      (click)="onDeleteWorkflowClick()">Delete</button>
-    <button
-      ejs-button
-      appHideBeforeSyncfusionLoad
-      cssClass="save-button"
-      [isPrimary]="true"
-      [disabled]="workflowsWithDetails.length === 0"
-      (click)="onUpdateWorkflowStepsClick()">Save</button>
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!userPermission[userPermissions.CanEditWorkflows]">
+      <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        cssClass="e-outline delete-button"
+        *ngIf="workflowsWithDetails.length !== 0"
+        [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
+        (click)="onDeleteWorkflowClick()">Delete</button>
+    </app-tooltip-container>
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!userPermission[userPermissions.CanEditWorkflows]">
+      <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        cssClass="save-button"
+        [isPrimary]="true"
+        [disabled]="workflowsWithDetails.length === 0 || !userPermission[userPermissions.CanEditWorkflows]"
+        (click)="onUpdateWorkflowStepsClick()">Save</button>
+    </app-tooltip-container>
   </div>
   <ejs-tab
     id="navigationTabs"
@@ -26,6 +35,7 @@
             <section class="workflows-container">
               <app-card-menu
                 [cards]="workflowsWithDetails"
+                [userPermission]="userPermission"
                 (addNewWorkflowClick)="onAddNewWorkflowClick()"
                 (cardClicked)="onCardSelected($event)"
               ></app-card-menu>
@@ -34,6 +44,7 @@
                   <app-workflow-steps
                     [formGroup]="customStepOrderFormGroup"
                     *ngIf="orderWorkflow"
+                    [userPermission]="userPermission"
                     class="workflow-steps"
                     [workflow]="orderWorkflow"
                     [workflowSteps$]="customOrderSteps$"
@@ -46,6 +57,7 @@
                     [formGroup]="customStepApplicationFormGroup"
                     *ngIf="applicationWorkflow"
                     class="workflow-steps"
+                    [userPermission]="userPermission"
                     [workflow]="applicationWorkflow"
                     [workflowSteps$]="customApplicationSteps$"
                     [customStepFormGroup]="customStepApplicationFormGroup"

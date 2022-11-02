@@ -44,6 +44,8 @@ import { OrganizationService } from '@shared/services/organization.service';
 import { B2CAuthService } from '../b2c-auth/b2c-auth.service';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Permission } from "@core/interface";
+import { UserPermissionsService } from "@core/services";
+import { PermissionsAdapter } from "@core/helpers/adapters";
 
 export interface UserStateModel {
   user: User | null;
@@ -88,7 +90,8 @@ export class UserState {
   constructor(
     private userService: UserService,
     private organizationService: OrganizationService,
-    private b2CAuthService: B2CAuthService
+    private b2CAuthService: B2CAuthService,
+    private userPermissionsService: UserPermissionsService
   ) {}
 
   @Selector()
@@ -384,8 +387,14 @@ export class UserState {
   @Action(SetUserPermissions)
   SetUserPermissions(
     { patchState }: StateContext<UserStateModel>,
-    { permissions }: SetUserPermissions
-  ): void {
-    patchState({userPermission: permissions})
+  ): Observable<Permission> {
+    return this.userPermissionsService.getUserPermissions()
+      .pipe(
+        map((permissions: number[]) => PermissionsAdapter.adaptUserPermissions(permissions)),
+        tap((permissions: Permission) => {
+          patchState({userPermission: permissions});
+          return permissions;
+        })
+      );
   }
 }

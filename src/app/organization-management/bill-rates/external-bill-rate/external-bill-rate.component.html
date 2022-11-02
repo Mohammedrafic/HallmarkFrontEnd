@@ -32,7 +32,7 @@
             <button
               ejs-button
               cssClass="e-flat secondary-icon-button"
-              [disabled]="isReadOnly"
+              [disabled]="isReadOnly || !userPermission[userPermissions.CanManageExternalBillRates]"
               (click)="onRemoveRecordButtonClick(data, $event)"
             >
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
@@ -99,6 +99,7 @@
   <app-export-dialog *ngIf="isActive" [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
   <app-side-dialog
+    [disableSaveButton]="!userPermission[userPermissions.CanManageExternalBillRates]"
     (formCancelClicked)="onFormCancelClick()"
     (formSaveClicked)="onFormSaveClick()"
     [header]="isEdit ? 'Edit Ex. Bill Rate' : 'Add Ex. Bill Rate'"

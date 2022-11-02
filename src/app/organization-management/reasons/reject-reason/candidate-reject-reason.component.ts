@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ofActionSuccessful, Select } from "@ngxs/store";
 import { Observable, takeWhile } from "rxjs";
 import {
@@ -10,6 +10,8 @@ import {
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { RejectReasonPage } from "@shared/models/reject-reason.model";
 import { ReasonsComponent } from '@organization-management/reasons/models/reasons-component.class';
+import { UserPermissions } from "@core/enums";
+import { Permission } from "@core/interface";
 
 @Component({
   selector: 'app-candidate-reject-reason',
@@ -17,8 +19,11 @@ import { ReasonsComponent } from '@organization-management/reasons/models/reason
   styleUrls: ['./candidate-reject-reason.component.scss']
 })
 export class CandidateRejectReasonComponent extends ReasonsComponent implements OnInit,OnDestroy {
+  @Input() userPermission: Permission;
+
   @Select(RejectReasonState.rejectReasonsPage)
   public reasons$: Observable<RejectReasonPage>;
+  public readonly userPermissions = UserPermissions;
 
   protected getData(): void {
     this.store.dispatch(new GetRejectReasonsByPage(this.currentPage, this.pageSize));

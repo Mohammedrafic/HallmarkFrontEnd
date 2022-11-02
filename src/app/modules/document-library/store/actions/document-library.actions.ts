@@ -1,4 +1,4 @@
-import { DocumentFolder, NodeItem, Documents, DocumentTypeFilter, DocumentsFilter, DocumentTagFilter, FolderTreeFilter, DownloadDocumentDetailFilter, DownloadDocumentDetail, DeleteDocumentsFilter, ShareDocumentsFilter, ShareDocumentInfoFilter, UnShareDocumentsFilter } from "../model/document-library.model";
+import { DocumentFolder, NodeItem, Documents, DocumentTypeFilter, DocumentsFilter, DocumentTagFilter, FolderTreeFilter, DownloadDocumentDetailFilter, DownloadDocumentDetail, DeleteDocumentsFilter, ShareDocumentsFilter, ShareDocumentInfoFilter, UnShareDocumentsFilter, DeleteDocumentFolderFilter } from "../model/document-library.model";
 import { regionFilter } from '../model/document-library.model';
 import { LocationsByRegionsFilter } from "../model/document-library.model";
 
@@ -115,4 +115,19 @@ export class GetShareOrganizationsDtata {
 export class SelectedBusinessType {
   static readonly type = '[documentsLibrary] selectedBusinessType';
   constructor(public businessUnitType:number) { }
+}
+
+export class IsDeleteEmptyFolder {
+  static readonly type = '[documentsLibrary] delete empty folder';
+  constructor(public isDeleteFolder: boolean) { }
+}
+
+export class DeleteEmptyDocumentsFolder {
+  static readonly type = '[documentsLibrary] delete empty documents folder';
+  constructor(public deleteDocumentFolderFilter: DeleteDocumentFolderFilter) { }
+}
+
+export class DeletDocumentFolderSucceeded {
+  static readonly type = '[documentsLibrary] Delete document folder succeeded';
+  constructor() { }
 }

@@ -19,6 +19,8 @@ import {ExportedFileType} from "@shared/enums/exported-file-type";
 import {DatePipe} from "@angular/common";
 import {ExportColumn, ExportOptions, ExportPayload} from "@shared/models/export.model";
 import {UserState} from "../../../store/user.state";
+import { Permission } from "@core/interface";
+import { UserPermissions } from "@core/enums";
 
 @Component({
   selector: 'app-external-bill-rate',
@@ -33,6 +35,7 @@ export class ExternalBillRateComponent extends AbstractGridConfigurationComponen
   @Input() isActive: boolean = false;
   @Input() searchQuery: string = '';
   @Input() export$: Subject<ExportedFileType> | undefined;
+  @Input() userPermission: Permission;
 
   public externalBillRateTypeForm: FormGroup;
   public isEdit = false;
@@ -53,6 +56,7 @@ export class ExternalBillRateComponent extends AbstractGridConfigurationComponen
   private unsubscribe$: Subject<void> = new Subject();
   private editRecordId?: number;
   public isReadOnly = false;
+  public readonly userPermissions = UserPermissions;
 
   public columnsToExport: ExportColumn[] = [
     { text:'External Bill Rate', column: 'ExternalBillRate'},

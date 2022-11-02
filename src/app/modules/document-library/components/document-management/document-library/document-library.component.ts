@@ -15,7 +15,7 @@ import {
   DeletDocuments, GetDocumentById, GetDocumentDownloadDeatils, GetDocuments,
   GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, GetSharedDocuments,
   IsAddNewFolder, SaveDocumentFolder, SaveDocuments, ShareDocuments, UnShareDocuments,
-  GetLocationsByRegions, GetRegionsByOrganizations, GetShareAssociateAgencies, GetShareOrganizationsDtata, SelectedBusinessType,
+  GetLocationsByRegions, GetRegionsByOrganizations, GetShareAssociateAgencies, GetShareOrganizationsDtata, SelectedBusinessType, IsDeleteEmptyFolder,
 } from '../../../store/actions/document-library.actions';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { documentsColumnField, FileType, FormControlNames, FormDailogTitle, MoreMenuType, StatusEnum } from '../../../enums/documents.enum';
@@ -118,6 +118,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   documentHeight: number;
   documentWidth: string;
   fileAsBase64: string;
+  public allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
 
   public gridApi!: GridApi;
   public rowData: DocumentLibraryDto[] = [];
@@ -614,11 +615,15 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.gridApi?.setRowData([]);
       if (!data || !data?.items.length) {
         this.gridApi?.showNoRowsOverlay();
+        if (this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode.id > 0 && data!=null) {
+          this.store.dispatch(new IsDeleteEmptyFolder(true));
+        }
       }
       else {
         this.gridApi?.hideOverlay();
         this.rowData = data.items;
         this.gridApi?.setRowData(this.rowData);
+        this.store.dispatch(new IsDeleteEmptyFolder(false));
       }
     });
   }

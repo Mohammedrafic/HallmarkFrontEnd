@@ -277,7 +277,7 @@ export class Order {
   shift: number;
   shiftStartTime: Date;
   shiftEndTime: Date;
-  classification: JobClassification;
+  classifications: JobClassification;
   onCallRequired: boolean;
   asapStart: boolean;
   criticalOrder: boolean;

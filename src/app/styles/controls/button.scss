@@ -90,6 +90,10 @@ button.e-control.e-btn {
         color: $primary-active-blue-40;
       }
     }
+
+    &:disabled {
+      color: $secondary-dark-blue-30 !important;
+    }
   }
 }
 
