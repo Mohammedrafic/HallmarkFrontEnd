@@ -24,7 +24,6 @@
             <button
               ejs-button
               cssClass="e-flat primary-icon-button"
-              [disabled]="isReadOnly"
               (click)="onEditRecordButtonClick(data, $event)"
             >
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
@@ -32,8 +31,8 @@
             <button
               ejs-button
               cssClass="e-flat secondary-icon-button"
-              [disabled]="isReadOnly"
               (click)="onRemoveRecordButtonClick(data, $event)"
+              [disabled]="isReadOnly || !userPermission[userPermissions.CanDeleteSettingsBillRates]"
             >
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
@@ -198,6 +197,7 @@
   ></app-export-dialog>
 
   <app-side-dialog
+    [disableSaveButton]="!userPermission[userPermissions.CanEditSettingsBillRates]"
     (formCancelClicked)="onFormCancelClick()"
     (formSaveClicked)="onFormSaveClick()"
     [header]="dialogHeader + ' Record'"
@@ -428,11 +428,11 @@
               format="#"
               formControlName="intervalMin">
             </ejs-numerictextbox>
-            
+
             <ng-template #intervalMinWithTooltip>
-              <ejs-tooltip target='.e-info' 
+              <ejs-tooltip target='.e-info'
               content="Weekly OT rate will be paid after total hours worked per week exceed the set number"
-              
+
               >
                 <ejs-numerictextbox
                   id="intervalMin"

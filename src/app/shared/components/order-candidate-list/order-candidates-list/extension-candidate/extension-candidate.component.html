@@ -21,11 +21,7 @@
             [disabled]="!actionsAllowed"
             placeholder="Select Status"
             (select)="onDropDownChanged($event)"
-            [itemTemplate]="itemTemplate"
           >
-            <ng-template #itemTemplate let-data>
-              <option [disabled]="data.disabled">{{ data.statusText }}</option>
-            </ng-template>
           </ejs-dropdownlist>
         </div>
         <button

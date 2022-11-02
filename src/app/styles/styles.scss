@@ -116,6 +116,12 @@ body {
     }
   }
 
+  .textbox {
+    span.error {
+      top: 53px;
+    }
+  }
+
   h3 {
     margin: 5px;
     font-weight: normal;
@@ -341,6 +347,7 @@ body {
     .candidates-additional-info .container-row,
     .search, .credentials-container,
     .side-menu,
+    .document-side-panel,
     .e-toolbar .e-tbar-btn,
     .dialog .applied-filters .chips-container .e-chip-list .e-chip,
     .filter-chips .e-chip-list .e-chip {

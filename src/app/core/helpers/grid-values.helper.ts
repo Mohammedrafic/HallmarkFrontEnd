@@ -8,7 +8,7 @@ export class GridValuesHelper {
     return formatDate(value, pattern, 'en-US', 'utc');
   }
 
-  public static formatCurrency(value: string): string {
+  public static formatCurrencyValue(value: string): string {
     if (!value) {
       return '';
     }
@@ -27,8 +27,8 @@ export class GridValuesHelper {
     if (isNaN(value)) {
       return '';
     }
-    const formated = value < 0 ? `(${GridValuesHelper.formatCurrency(Math.abs(value).toString())})`
-    : GridValuesHelper.formatCurrency(value.toString());
+    const formated = value < 0 ? `(${GridValuesHelper.formatCurrencyValue(Math.abs(value).toString())})`
+    : GridValuesHelper.formatCurrencyValue(value.toString());
 
     return formated;
   }

@@ -191,6 +191,22 @@ export class LocationsByRegionsFilter {
   businessUnitId: number;
 }
 
+export class AssociateAgencyDto {
+  agencyId: number;
+  agencyName: string;
+}
+
+export class ShareOrganizationsData {
+  id: number;
+  name: string;
+}
+
+export class DeleteDocumentFolderFilter {
+  folderId: number;
+  businessUnitType: number;
+  businessUnitId: number | null;
+}
+
 
 
 

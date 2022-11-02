@@ -131,7 +131,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
       this.orderFilterColumnsSetup();
       this.onFilterControlValueChangedHandler();
       this.loadCounter = this.loadCounter + 1;
-      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.enable() : this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.disable();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
 
@@ -169,7 +169,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
             });
           });
         });
-        if (this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {      
+        if (data.length>0&&this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {      
           this.showToastMessage(this.regionsList.length,this.locationsList.length,this.departmentsList.length);
         }
       this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
@@ -202,10 +202,6 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
         this.defaultLocations=this.locations.map((list)=>list.id);
         this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
         this.changeDetectorRef.detectChanges();
-      }
-      else
-      { 
-          
       }
     });
     this.locationIdControl = this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;

@@ -6,6 +6,8 @@ import { filter, map, mergeMap } from 'rxjs/operators';
 import { B2CAuthService } from './b2c-auth/b2c-auth.service';
 
 import { CheckScreen, SetIsOrganizationAgencyArea } from './store/app.actions';
+import { SetUserPermissions } from "./store/user.actions";
+import { tap } from "rxjs";
 
 @Component({
   selector: 'app-root',
@@ -15,7 +17,11 @@ import { CheckScreen, SetIsOrganizationAgencyArea } from './store/app.actions';
 export class AppComponent implements OnInit {
   public isIframe = false;
 
-  constructor(private router: Router, private store: Store, private b2CAuthService: B2CAuthService) {}
+  constructor(
+    private router: Router,
+              private store: Store,
+              private b2CAuthService: B2CAuthService,
+  ) {}
 
   ngOnInit(): void {
     this.store.dispatch(new CheckScreen());
@@ -26,6 +32,7 @@ export class AppComponent implements OnInit {
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
+      tap(() => this.store.dispatch(new SetUserPermissions())),
       map(() => this.router.routerState.root),
       map(route => {
         while (route.firstChild) route = route.firstChild;

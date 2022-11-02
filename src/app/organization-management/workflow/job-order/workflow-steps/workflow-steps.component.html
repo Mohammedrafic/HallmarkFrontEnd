@@ -72,6 +72,7 @@
             <button
               ejs-button
               cssClass="e-flat default-icon-button"
+              [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
               (click)="onRemoveCustomStepButtonClick(i)">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
@@ -83,6 +84,7 @@
     <div class="button-container" *ngIf="showAddCustomStep">
       <button
         ejs-button
+        [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
         cssClass="e-flat button-with-icon"
         (click)="onAddCustomStepClick()"
       ><i-feather name="plus" class="icon"></i-feather> Add Custom Step</button>

@@ -1,5 +1,4 @@
 import { Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { combineLatest, filter, first, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -11,7 +10,12 @@ import { Region } from '@shared/models/region.model';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
 import { Skill } from '@shared/models/skill.model';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import {
+  CANCEL_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+} from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { WorkflowState } from '../../store/workflow.state';
 import { Step, Workflow, WorkflowFilters, WorkflowWithDetails } from '@shared/models/workflow.model';
@@ -50,6 +54,7 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { isEmpty } from 'lodash';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 
 type RoleWithUserModel = { [key: number]: { [workflowType: number]: RoleWithUser[] } };
 type WorkflowAsKeyModel = { [key: number]: (UsersByPermission | RolesByPermission)[] };
@@ -60,7 +65,7 @@ type WorkflowAsKeyModel = { [key: number]: (UsersByPermission | RolesByPermissio
   styleUrls: ['./workflow-mapping.component.scss'],
   providers: [DetailRowService, MaskedDateTimeService],
 })
-export class WorkflowMappingComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class WorkflowMappingComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('regionDropdown') regionDropdown: MultiSelectComponent;
   @ViewChild('locationDropdown') locationDropdown: MultiSelectComponent;
@@ -146,13 +151,13 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   };
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private actions$: Actions,
     private filterService: FilterService,
     @Inject(FormBuilder) private builder: FormBuilder,
     private confirmService: ConfirmService
   ) {
-    super();
+    super(store);
     this.formBuilder = builder;
     this.createWorkflowMappingFormGroup();
     this.WorkflowFilterFormGroup = this.formBuilder.group({
@@ -165,7 +170,9 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     });
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
+
     this.filterColumns = {
       regionIds: {
         type: ControlTypes.Multiselect,

@@ -109,9 +109,9 @@ export class TimesheetRecordsService {
     return RecordFields.Time;
   }
 
-  public controlTabsVisibility(billRates: DropdownOption[], tabs: TabComponent): void {
+  public controlTabsVisibility(billRates: DropdownOption[], tabs: TabComponent, records: TimesheetRecordsDto): void {
     const isMilageAvaliable = billRates.some((rate) => rate.text.includes('Mileage'));
-    const isExpensesAvaliable = billRates.some((rate) => rate.text.includes('Charge'));
+    const isExpensesAvaliable = !!records.expenses.viewMode.length;
 
     tabs.hideTab(1, !isMilageAvaliable);
     tabs.hideTab(2, !isExpensesAvaliable);

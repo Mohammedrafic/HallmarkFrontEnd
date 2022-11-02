@@ -330,7 +330,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       }),
       filter(() => !!this.gridApi),
       tap((data) => {
-        this.timesheetRecordsService.controlTabsVisibility(data[0], this.tabs);
+        this.timesheetRecordsService.controlTabsVisibility(data[0], this.tabs, this.records);
         this.gridApi.hideOverlay();
        }),
       takeUntil(this.componentDestroy()),

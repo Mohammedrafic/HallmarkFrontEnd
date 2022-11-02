@@ -221,6 +221,7 @@
 </app-filter-dialog>
 
 <app-side-dialog
+  [disableSaveButton]="!userPermission[userPermissions.CanEditOrganizationSettings]"
   (formCancelClicked)="onFormCancelClick()"
   (formSaveClicked)="onFormSaveClick()"
   [header]="dialogHeader + ' Settings'"

@@ -214,7 +214,9 @@ app-navigation-panel {
 .reject-reason-block {
   font-size: 14px;
   font-weight: 400;
-  max-width: 89%;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .reason-header {
@@ -230,7 +232,8 @@ app-navigation-panel {
   border-radius: 8px;
   background-color: $secondary-dark-blue-50;
   padding: 10px 17px;
-  width: 84%;
+  width: auto;
+  max-width: 700px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -242,9 +245,4 @@ app-navigation-panel {
   align-items: center;
   justify-content: flex-start;
   max-width: 87%;
-}
-
-.reject-tooltip {
-  display: flex;
-  align-items: center;
 }

@@ -1,4 +1,6 @@
 import {
+  DownloadCredentialFiles,
+  DownloadCredentialFilesSucceeded,
   GetCandidatesCredentialByPage,
   GetCredentialFiles,
   GetCredentialFilesSucceeded,
@@ -17,6 +19,7 @@ import { CandidateState } from '@agency/store/candidate.state';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { DateTimeHelper } from "@core/helpers";
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
@@ -26,6 +29,7 @@ import {
   DELETE_RECORD_TITLE,
 } from '@shared/constants/messages';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { MessageTypes } from "@shared/enums/message-types";
 import { CredentialStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import {
   CandidateCredential,
@@ -40,8 +44,10 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
+import { SelectionSettingsModel } from "@syncfusion/ej2-grids/src/grid/base/grid-model";
 import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil } from 'rxjs';
-import { SetHeaderState, ShowSideDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { CredentialGridService } from "@agency/services/credential-grid.service";
 import { UserState } from 'src/app/store/user.state';
 import {
   agencySideCredentialStatuses,
@@ -83,6 +89,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public showCertifiedFields: boolean;
   public credentialStatusOptions: FieldSettingsModel[] = [];
   public readonly orderCredentialId = 0;
+  public readonly selectionOptions: SelectionSettingsModel = {
+    type: 'Multiple',
+    mode: 'Row',
+    persistSelection: true,
+  };
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
@@ -139,6 +150,14 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
   }
 
+  get isAllRowsSelected(): boolean {
+    return this.selectedItems.length === this.pageSize;
+  }
+
+  get bulkDownloadAmountText(): string {
+    return `${this.isAllRowsSelected ? 'All' : this.selectedItems.length } ${ this.selectedItems.length === 1 ? 'Row' : 'Rows' } Selected`;
+  }
+
   private get statusControl(): AbstractControl | null {
     return this.addCredentialForm.get('status');
   }
@@ -148,6 +167,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     private route: ActivatedRoute,
     private actions$: Actions,
     private fb: FormBuilder,
+    private credentialGridService: CredentialGridService,
     private confirmService: ConfirmService
   ) {
     super();
@@ -158,44 +178,13 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   ngOnInit(): void {
     this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
     this.store.dispatch(new GetCredentialTypes());
-    this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
-      this.currentPage = page;
-      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
-    });
-    this.actions$
-      .pipe(ofActionSuccessful(SaveCandidatesCredentialSucceeded))
-      .subscribe((credential: { payload: CandidateCredential }) => {
-        this.credentialId = credential.payload.id as number;
-        this.disabledCopy = false;
-        this.uploadFiles(this.credentialId);
-
-        if (!this.removeFiles) {
-          this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
-          this.addCredentialForm.markAsPristine();
-          this.closeDialog();
-        }
-      });
-    this.actions$.pipe(ofActionSuccessful(SaveCandidatesCredentialFailed)).subscribe(() => {
-      this.disabledCopy = false;
-    });
-    this.actions$.pipe(ofActionSuccessful(UploadCredentialFilesSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
-      this.addCredentialForm.markAsPristine();
-      this.closeDialog();
-    });
-    this.actions$.pipe(ofActionSuccessful(RemoveCandidatesCredentialSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
-    });
-    this.actions$.pipe(ofActionSuccessful(GetCredentialFilesSucceeded)).subscribe((files: { payload: Blob }) => {
-      if (this.file) {
-        downloadBlobFile(files.payload, this.file.name);
-        this.file = null;
-      }
-    });
+    this.watchForPageChanges();
+    this.watchForCandidateActions();
     this.createAddCredentialForm();
     this.createSearchCredentialForm();
-    this.subscribeOnSearchUpdate();
-    this.subscribeOnCandidateCredential();
+    this.watchForSearchUpdate();
+    this.watchForCandidateCredential();
+    this.watchForDownloadCredentialFiles();
   }
 
   ngOnDestroy(): void {
@@ -283,7 +272,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     });
   }
 
-  public onViewFiles(id: number) {
+  public onViewFiles(event: MouseEvent, id: number) {
+    event.stopPropagation();
     this.store.dispatch(new GetGroupedCredentialsFiles()).subscribe(() => this.openFileViewerDialog.emit(id));
   }
 
@@ -361,6 +351,22 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       .subscribe(() => {
         this.store.dispatch(new RemoveCandidatesCredential(data));
       });
+  }
+
+  public bulkDownload(): void {
+    const rowsWithFiles = this.credentialGridService.getCredentialRowsWithFiles(this.selectedItems);
+
+    if (!rowsWithFiles.length && !this.isAllRowsSelected) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, 'Selected rows do not have files'));
+      return;
+    }
+
+    if (this.isAllRowsSelected) {
+      this.store.dispatch(new DownloadCredentialFiles(this.candidateProfileId, []));
+    } else {
+      const fileIds = this.credentialGridService.getCandidateCredentialFileIds(rowsWithFiles);
+      this.store.dispatch(new DownloadCredentialFiles(this.candidateProfileId, fileIds));
+    }
   }
 
   public selectMasterCredentialId(event: { data: Credential }): void {
@@ -442,7 +448,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     }
   }
 
-  private subscribeOnSearchUpdate(): void {
+  private watchForSearchUpdate(): void {
     merge(
       (this.searchTermControl as AbstractControl).valueChanges,
       (this.credentialTypeIdControl as AbstractControl).valueChanges
@@ -485,7 +491,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     });
   }
 
-  private subscribeOnCandidateCredential(): void {
+  private watchForCandidateCredential(): void {
     this.candidateCredential$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((response: CandidateCredentialResponse) => {
@@ -497,8 +503,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.statusControl?.setValue(CredentialStatus.Pending);
   }
 
-  private setCredentialStatusOptions(statuses: CredentialStatus[]): void {
-    this.credentialStatusOptions = statuses.map((item: CredentialStatus) => {
+  private setCredentialStatusOptions(statuses: CredentialStatus[], currentStatus?: CredentialStatus): void {
+    const credentialStatuses = !currentStatus || statuses.includes(currentStatus) ? statuses : [currentStatus, ...statuses];
+
+    this.credentialStatusOptions = credentialStatuses.map((item: CredentialStatus) => {
       return {
         text: CredentialStatus[item],
         id: item,
@@ -510,23 +518,19 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     if (this.isOrganizationSide) {
       switch (status) {
         case CredentialStatus.Completed:
-          this.setCredentialStatusOptions(orgSideCompletedCredentialStatuses);
+          this.setCredentialStatusOptions(orgSideCompletedCredentialStatuses, status);
           break;
         case CredentialStatus.Pending:
-          this.setCredentialStatusOptions(orgSidePendingCredentialStatuses);
+          this.setCredentialStatusOptions(orgSidePendingCredentialStatuses, status);
           break;
         case CredentialStatus.Reviewed:
-          this.setCredentialStatusOptions(orgSideReviewedCredentialStatuses);
+          this.setCredentialStatusOptions(orgSideReviewedCredentialStatuses, status);
           break;
         default:
-          this.setCredentialStatusOptions(orgSideCredentialStatuses);
+          this.setCredentialStatusOptions(orgSideCredentialStatuses, status);
       }
     } else {
-      this.setCredentialStatusOptions(
-        agencySideCredentialStatuses.includes(status)
-          ? agencySideCredentialStatuses
-          : [status, ...agencySideCredentialStatuses]
-      );
+      this.setCredentialStatusOptions(agencySideCredentialStatuses, status);
     }
   }
 
@@ -534,5 +538,54 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     if (!this.isOrganizationSide && status === CredentialStatus.Rejected) {
       this.addCredentialForm.disable();
     }
+  }
+
+  private watchForDownloadCredentialFiles(): void {
+    this.actions$.pipe(ofActionSuccessful(DownloadCredentialFilesSucceeded), takeUntil(this.unsubscribe$))
+      .subscribe((payload: { file: Blob, candidateName: string }) => {
+        const dateTime = DateTimeHelper.formatDateUTC(DateTimeHelper.toUtcFormat(new Date()), 'MM/dd/YYYY HH:mm');
+        downloadBlobFile(payload.file, `${payload.candidateName} Credentials ${dateTime}.zip`);
+      });
+  }
+
+  private watchForPageChanges(): void {
+    this.pageSubject.pipe(debounceTime(1), takeUntil(this.unsubscribe$)).subscribe((page) => {
+      this.currentPage = page;
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
+    });
+  }
+
+  private watchForCandidateActions(): void {
+    this.actions$
+      .pipe(ofActionSuccessful(SaveCandidatesCredentialSucceeded), takeUntil(this.unsubscribe$))
+      .subscribe((credential: { payload: CandidateCredential }) => {
+        this.credentialId = credential.payload.id as number;
+        this.disabledCopy = false;
+        this.uploadFiles(this.credentialId);
+
+        if (!this.removeFiles) {
+          this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
+          this.addCredentialForm.markAsPristine();
+          this.closeDialog();
+        }
+      });
+
+    this.actions$.pipe(ofActionSuccessful(SaveCandidatesCredentialFailed), takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.disabledCopy = false;
+    });
+    this.actions$.pipe(ofActionSuccessful(UploadCredentialFilesSucceeded), takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
+      this.addCredentialForm.markAsPristine();
+      this.closeDialog();
+    });
+    this.actions$.pipe(ofActionSuccessful(RemoveCandidatesCredentialSucceeded), takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
+    });
+    this.actions$.pipe(ofActionSuccessful(GetCredentialFilesSucceeded), takeUntil(this.unsubscribe$)).subscribe((files: { payload: Blob }) => {
+      if (this.file) {
+        downloadBlobFile(files.payload, this.file.name);
+        this.file = null;
+      }
+    });
   }
 }

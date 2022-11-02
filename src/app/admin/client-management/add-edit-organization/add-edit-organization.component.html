@@ -357,15 +357,14 @@
                   <div class="input-container">
                     <label>Ext</label>
                     <div class="input-group">
-                      <ejs-numerictextbox
-                        class="numeric-input"
-                        min="0"
-                        maxlength="5"
-                        format="#"
+                      <input
+                        appValidateWithMessage
                         formControlName="ext"
-                        [showSpinButton]="false"
-                      >
-                      </ejs-numerictextbox>
+                        class="e-input"
+                        mask="00000"
+                        [validation]="false"
+                        type="text"
+                      />
                     </div>
                   </div>
                 </div>
@@ -500,7 +499,7 @@
             ></ejs-radiobutton>
           </div>
           <div class="input-container bootstrap">
-            <div class="input-group">
+            <div class="input-group textbox">
               <ejs-textbox appValidateWithMessage formControlName="paymentDescription" [multiline]="true"></ejs-textbox>
             </div>
           </div>

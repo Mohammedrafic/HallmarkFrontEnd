@@ -40,6 +40,7 @@ import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { FilteredItem } from '@shared/models/filter.model';
 import {
+  FilterOrderStatus,
   FilterStatus,
   Order,
   OrderCandidateJob,
@@ -69,7 +70,7 @@ import {
   takeUntil,
   throttleTime,
 } from 'rxjs';
-import { CandidatesStatusText, OrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
+import { CandidatesStatusText, FilterOrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import {
   SetHeaderState,
   ShowCloseOrderDialog,
@@ -118,7 +119,7 @@ import { SettingsHelper } from '@core/helpers/settings.helper';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
-import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { PermissionService } from '../../../security/services/permission.service';
 
@@ -133,6 +134,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @ViewChild('search') search: SearchComponent;
   @ViewChild('detailsDialog') detailsDialog: OrderDetailsDialogComponent;
   @ViewChild('tabNavigation') tabNavigation: TabNavigationComponent;
+
+  @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
 
   @Select(OrderManagementContentState.ordersPage)
   ordersPage$: Observable<OrderManagementPage>;
@@ -528,6 +531,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
+    setTimeout(() => this.orderStatusFilter?.refresh(), 300);
   }
 
   public onFilterDelete(event: FilteredItem): void {
@@ -602,7 +606,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
     this.filters.openPositions = this.filters.openPositions || null;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
-    this.getOrders();
+    this.getOrders(true);
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
@@ -1196,7 +1200,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         ];
         if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
           statuses = data.orderStatuses.filter((status) =>
-            [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status)
+            [FilterOrderStatusText.Open, FilterOrderStatusText['In Progress'], FilterOrderStatusText.Filled, FilterOrderStatusText.Closed].includes(status.status)
           );
           candidateStatuses = data.candidateStatuses.filter((status) =>
             [
@@ -1208,8 +1212,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
             ].includes(status.status)
           );
         } else if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
-          statuses = data.orderStatuses.filter((status) =>
-            [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status)
+          statuses = data.orderStatuses.filter((status: FilterOrderStatus) =>
+            ![FilterOrderStatusText.Filled, FilterOrderStatusText['In Progress']].includes(status.status)
           );
           candidateStatuses = data.candidateStatuses.filter((status) => statusesByDefault.includes(status.status));
         } else {
@@ -1226,7 +1230,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private setDefaultFilter(): void {
     const statuses = this.filterColumns.orderStatuses.dataSource
-                      .filter((status: FilterStatus) => status.status !== OrderStatusText.Closed)
+                      .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed].includes(status.status))
                       .map((status: FilterStatus) => status.status);
     this.OrderFilterFormGroup.get('orderStatuses')?.setValue(statuses);
     this.filters.orderStatuses = statuses;
@@ -1370,7 +1374,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public getMenuForReorders(order: OrderManagement): ItemModel[] {
-    if (!order.children.length && order.orderCloseDate && order.status !== OrderStatus.Closed) {
+    if (!order.children?.length && order.orderCloseDate && order.status !== OrderStatus.Closed) {
       return this.moreMenu;
     }
 

@@ -1,6 +1,6 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
 
-export function startDateValidator(form: AbstractControl, controlName: string, minDate: Date): ValidatorFn {
+export function startDateValidator(form: AbstractControl, controlName: string, minDate: Date | string = ''): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     if (form && control.value) {
       const isLessThanMin = control.value < minDate;
@@ -16,7 +16,7 @@ export function startDateValidator(form: AbstractControl, controlName: string, m
   };
 }
 
-export function endDateValidator(form: AbstractControl, controlName: string, minDate: Date): ValidatorFn {
+export function endDateValidator(form: AbstractControl, controlName: string, minDate: Date | string = ''): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     if (form && control.value) {
       const isLessThanMin = control.value < minDate;

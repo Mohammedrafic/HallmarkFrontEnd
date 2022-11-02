@@ -53,6 +53,8 @@ import { ManualInvoiceReasonsState } from '@admin/store/manual-invoice-reasons.s
 import { OrganizationProfileComponent } from './organization-profile/organization-profile.component';
 import { MasterCredentialsComponent } from './master-data/master-credentials/master-credentials.component';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
+import { NgxMaskModule } from 'ngx-mask';
 
 const sidebarIcons = {
   Download,
@@ -117,8 +119,9 @@ const sidebarIcons = {
     MultiSelectAllModule,
     DropDownButtonModule,
     TimesheetsModule,
+    TooltipContainerModule,
     FeatherModule.pick(sidebarIcons),
-
+    NgxMaskModule.forChild(),
     //STORE
     NgxsModule.forFeature([
       AdminState,
@@ -130,7 +133,7 @@ const sidebarIcons = {
   ],
   providers: [
     ResizeService,
-    PageService
+    PageService,
   ]
 })
 export class AdminModule { }

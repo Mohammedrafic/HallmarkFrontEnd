@@ -5,9 +5,6 @@ import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import {
-  AbstractGridConfigurationComponent
-} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ShowSideDialog } from '../../../store/app.actions';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import { OrganizationManagementState } from '../../store/organization-management.state';
@@ -36,6 +33,7 @@ import {
   UpdateCredentialSetupSucceeded
 } from '@organization-management/store/credentials.actions';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 
 @Component({
   selector: 'app-credentials-setup',
@@ -43,8 +41,8 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
   styleUrls: ['./credentials-setup.component.scss'],
   providers: [MaskedDateTimeService]
 })
-export class CredentialsSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
-  @ViewChild('grid') grid: GridComponent;
+export class CredentialsSetupComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
+@ViewChild('grid') grid: GridComponent;
 
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
@@ -82,19 +80,20 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   private unsubscribe$: Subject<void> = new Subject();
   private lastSelectedCredential: CredentialSetupFilterGet | null;
 
-  constructor(private store: Store,
+  constructor(protected override store: Store,
               private actions$: Actions,
               @Inject(FormBuilder) private builder: FormBuilder,
               private router: Router,
               private route: ActivatedRoute,
               private confirmService: ConfirmService) {
-    super();
+    super(store);
     this.formBuilder = builder;
     this.createCredentialsForm();
     this.createHeaderFilterFormGroup();
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.organizationChangedHandler();
     this.onRegionsDataLoaded();
     this.onSkillGroupDataLoaded();

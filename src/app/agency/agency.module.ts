@@ -97,6 +97,7 @@ import { CandidateExperienceComponent } from './candidates/import-candidates/can
 import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
 import { ExtensionModule } from '@shared/components/extension/extension.module';
 import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
+import { CredentialGridService } from "@agency/services/credential-grid.service";
 import { ElectronicFormComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/electronic-form/electronic-form.component';
 import { ManualFormComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/manual-form/manual-form.component';
 import { PaymentDialogComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/payment-dialog.component';
@@ -211,5 +212,6 @@ const sidebarIcons = {
     ChildOrderDialogModule,
   ],
   exports: [FileViewerComponent],
+  providers: [CredentialGridService],
 })
 export class AgencyModule {}

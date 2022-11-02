@@ -54,7 +54,7 @@ export const billRateColDef: ColDef = {
   width: 110,
   valueFormatter: (data) => {
     if(!data.value) return '0'
-    return GridValuesHelper.formatCurrency(data.value)
+    return GridValuesHelper.formatCurrencyValue(data.value)
   },
 };
 
@@ -100,7 +100,7 @@ export const totalCol: ColDef = {
   width: 140,
   valueFormatter: (data) => {
     if(!data.value) return '0'
-    return GridValuesHelper.formatCurrency(data.value)
+    return GridValuesHelper.formatCurrencyValue(data.value)
   },
 };
 
@@ -163,6 +163,7 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     field: 'hadLunchBreak',
     headerName: 'No Meal Break',
     width: 125,
+    type: 'rightAligned',
     cellRenderer: SwitchEditorComponent,
     ...commonColumn,
     cellRendererParams: {
@@ -260,7 +261,7 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
     cellRenderer: InputEditorComponent,
     valueFormatter: (data) => {
       if(!data.value) return '0'
-      return GridValuesHelper.formatCurrency(data.value)
+      return GridValuesHelper.formatCurrencyValue(data.value)
     },
     cellRendererParams: {
       editMode: true,

@@ -247,7 +247,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (order?.credentials) {
       this.orderCredentials = [...order.credentials];
     }
-    if (order?.billRates) {
+    if (order?.billRates && !order.isTemplate) {
+
       this.orderBillRates = [...order.billRates];
     }
   }
@@ -470,7 +471,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
 
     const billRates = this.billRatesComponent?.billRatesControl.value;
-    let regularBillRate = this.billRatesSyncService.getBillRateForSync(billRates);
+    const regularBillRate = this.billRatesSyncService.getBillRateForSync(billRates);
 
     if (!regularBillRate) {
       return;
@@ -574,7 +575,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       shiftStartTime,
       shiftEndTime,
       jobDistributions,
-      classification,
+      classifications,
       onCallRequired,
       asapStart,
       criticalOrder,
@@ -642,7 +643,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       shift,
       shiftStartTime,
       shiftEndTime,
-      classification,
+      classifications,
       onCallRequired,
       asapStart,
       criticalOrder,

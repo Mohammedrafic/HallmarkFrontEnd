@@ -98,7 +98,7 @@ import { ExtensionGridModel } from '@shared/components/extension/extension-sideb
 import { OrderType } from '@shared/enums/order-type';
 import { createUniqHashObj } from '@core/helpers/functions.helper';
 import { DateTimeHelper } from '@core/helpers';
-import { ApplicantStatus as ApplicantStatusEnum} from '@shared/enums/applicant-status.enum'
+import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -435,16 +435,19 @@ export class OrderManagementContentState {
     return this.orderManagementService.getOrderById(payload).pipe(
       tap((payload) => {
         patchState({ selectedOrder: payload });
-        const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = payload;
-        dispatch(
-          new SetPredefinedBillRatesData(
-            orderType,
-            departmentId,
-            skillId,
-            jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
-            jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
-          )
-        );
+        const { orderType, departmentId, skillId, jobStartDate, jobEndDate, isTemplate } = payload;
+
+        if (!isTemplate) {
+          dispatch(
+            new SetPredefinedBillRatesData(
+              orderType,
+              departmentId,
+              skillId,
+              jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
+              jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
+            )
+          );
+        }
 
         return payload;
       })

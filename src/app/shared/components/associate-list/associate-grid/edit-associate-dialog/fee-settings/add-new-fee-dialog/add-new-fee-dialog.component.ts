@@ -31,6 +31,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 export class AddNewFeeDialogComponent extends DestroyableDirective implements OnInit {
   @Input() openEvent: Subject<number>;
   @Input() openEditEvent: Subject<FeeExceptions>;
+  @Input() disableSaveButton: boolean = false;
 
   @ViewChild('addFeeSideDialog') sideDialog: DialogComponent;
 

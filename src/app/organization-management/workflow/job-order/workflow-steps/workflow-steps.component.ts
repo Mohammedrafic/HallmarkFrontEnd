@@ -9,6 +9,8 @@ import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { Actions, ofActionSuccessful } from '@ngxs/store';
 import { RemoveWorkflowDeclined } from '../../../store/workflow.actions';
+import { UserPermissions } from "@core/enums";
+import { Permission } from "@core/interface";
 
 @Component({
   selector: 'app-workflow-steps',
@@ -19,6 +21,7 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   @Input() workflow: Workflow;
   @Input() workflowSteps$: Subject<Step[]>;
   @Input() customStepFormGroup: FormGroup;
+  @Input() userPermission: Permission;
 
   @Output() customStepAddClick = new EventEmitter;
   @Output() customStepRemoveClick = new EventEmitter;
@@ -35,6 +38,7 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   public shortlistedIsAgencyStep: boolean;
   public offeredIsAgencyStep: boolean;
   public onboardedIsAgencyStep: boolean;
+  public readonly userPermissions = UserPermissions;
 
   get customStepStatus() {
     return this.customStepFormGroup.get('customStepStatus') as FormArray;

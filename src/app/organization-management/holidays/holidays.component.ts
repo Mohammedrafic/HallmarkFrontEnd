@@ -15,7 +15,6 @@ import { endDateValidator, startDateValidator } from '@shared/validators/date.va
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetDirtyState } from 'src/app/admin/store/admin.actions';
-import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
   CANCEL_CONFIRM_TEXT,
   DATA_OVERRIDE_TEXT,
@@ -42,6 +41,7 @@ import {
 import { HolidaysState } from '../store/holidays.state';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { DateTimeHelper } from '@core/helpers';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 
 @Component({
   selector: 'app-holidays',
@@ -49,7 +49,7 @@ import { DateTimeHelper } from '@core/helpers';
   styleUrls: ['./holidays.component.scss'],
   providers: [SortService],
 })
-export class HolidaysComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class HolidaysComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   private holidayIdUnderEdit: number = 0;
@@ -107,15 +107,16 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   public filterColumns: any;
   public yearsList: number[] = [];
 
+
   constructor(
-    private store: Store,
+    protected override store: Store,
     private actions$: Actions,
     private fb: FormBuilder,
     private confirmService: ConfirmService,
     private filterService: FilterService,
     private datePipe: DatePipe
   ) {
-    super();
+    super(store);
     this.idFieldName = 'foreignKey';
     this.today.setHours(0, 0, 0);
     this.HolidayFilterFormGroup = this.fb.group({
@@ -137,12 +138,12 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     });
 
     this.startTimeField = this.HolidayFormGroup.get('startDateTime') as AbstractControl;
-    this.startTimeField.addValidators(startDateValidator(this.HolidayFormGroup, 'endDateTime', this.today));
+    this.startTimeField.addValidators(startDateValidator(this.HolidayFormGroup, 'endDateTime'));
     this.startTimeField.valueChanges.subscribe(() =>
       this.endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
     this.endTimeField = this.HolidayFormGroup.get('endDateTime') as AbstractControl;
-    this.endTimeField.addValidators(endDateValidator(this.HolidayFormGroup, 'startDateTime', this.today));
+    this.endTimeField.addValidators(endDateValidator(this.HolidayFormGroup, 'startDateTime'));
     this.endTimeField.valueChanges.subscribe(() =>
       this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
@@ -227,7 +228,8 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     });
   }
 
-  ngOnInit() {
+  override ngOnInit() {
+    super.ngOnInit();
     this.filterColumns = {
       holidayNames: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
       years: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },

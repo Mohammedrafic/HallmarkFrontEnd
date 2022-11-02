@@ -19,7 +19,7 @@
             <button ejs-button cssClass="e-outline button-cancel" id="cancelFormButton" (click)="onCancel()">
               Cancel
             </button>
-            <button ejs-button id="addFormButton" type="submit" [isPrimary]="true" (click)="onAdd()">Add</button>
+            <button ejs-button id="addFormButton" type="submit" [isPrimary]="true" (click)="onAdd()" [disabled]="disableSaveButton">Add</button>
           </div>
         </div>
       </section>

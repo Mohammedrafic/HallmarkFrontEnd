@@ -9,6 +9,7 @@ import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
 import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
 import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
+import { FilterOrderStatusText } from '@shared/enums/status';
 
 export class OrderManagement {
   id: number;
@@ -276,7 +277,7 @@ export class Order {
   shift: number;
   shiftStartTime: Date;
   shiftEndTime: Date;
-  classification: JobClassification;
+  classifications: JobClassification;
   onCallRequired: boolean;
   asapStart: boolean;
   criticalOrder: boolean;
@@ -549,6 +550,11 @@ export class OrderPartnerAgency {
   name: string;
 }
 
+export class FilterOrderStatus {
+  status: FilterOrderStatusText;
+  statusText: string;
+}
+
 export class FilterStatus {
   status: number;
   statusText: string;
@@ -556,7 +562,7 @@ export class FilterStatus {
 
 export class OrderFilterDataSource {
   partneredAgencies: OrderPartnerAgency[];
-  orderStatuses: FilterStatus[];
+  orderStatuses: FilterOrderStatus[];
   candidateStatuses: FilterStatus[];
 }
 

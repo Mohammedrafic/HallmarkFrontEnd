@@ -71,6 +71,9 @@ import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/expor
 import { DatePipe } from '@angular/common';
 import { valuesOnly } from '@shared/utils/enum.utils';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { DateTimeHelper } from '@core/helpers';
+import { UserPermissions } from "@core/enums";
+import { Permission } from "@core/interface";
 
 @Component({
   selector: 'app-bill-rate-setup',
@@ -85,6 +88,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   @Input() export$: Subject<ExportedFileType> | undefined;
   @Input() filteredItems$: Subject<number>;
   @Input() importDialogEvent: Subject<boolean>;
+  @Input() userPermission: Permission;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
@@ -98,6 +102,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public departments: OrganizationDepartment[] = [];
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
+  public readonly userPermissions = UserPermissions;
 
   @Select(OrganizationManagementState.allOrganizationSkills)
   skills$: Observable<Skill[]>;
@@ -639,7 +644,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public onFilterApply(): void {
     this.filters = this.billRateFilterFormGroup.getRawValue();
-    this.filters.effectiveDate = this.filters.effectiveDate || null;
+    const effectiveDate = this.filters.effectiveDate ? DateTimeHelper.toUtcFormat(this.filters.effectiveDate) : null;
+    this.filters.effectiveDate = effectiveDate;
     this.filteredItems = this.filterService.generateChips(
       this.billRateFilterFormGroup,
       this.filterColumns,

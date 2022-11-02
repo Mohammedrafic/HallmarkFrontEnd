@@ -1,11 +1,16 @@
 <section class="container">
   <div class="toolbar-buttons">
-    <button
-      ejs-button
-      appHideBeforeSyncfusionLoad
-      [isPrimary]="true"
-      (click)="addReason()"
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!userPermission[userPermissions.CanOrganizationEditOrders] || !userPermission[userPermissions.CanManageOrderClosureReasons]">
+      <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        [isPrimary]="true"
+        [disabled]="!userPermission[userPermissions.CanOrganizationEditOrders] || !userPermission[userPermissions.CanManageOrderClosureReasons]"
+        (click)="addReason()"
       >Add {{ reasonsNavigationTabs.Penalties === selectedTab ? 'Penalties' : 'Reason' }}</button>
+    </app-tooltip-container>
   </div>
 
   <ejs-tab
@@ -15,7 +20,7 @@
       <e-tabitem>
         <ng-template #headerText><div>Candidate Rejection</div></ng-template>
         <ng-template #content>
-          <app-candidate-reject-reason (editReason)="onEdit($event)" [form]="form"></app-candidate-reject-reason>
+          <app-candidate-reject-reason [userPermission]="userPermission" (editReason)="onEdit($event)" [form]="form"></app-candidate-reject-reason>
         </ng-template>
       </e-tabitem>
 
@@ -36,7 +41,7 @@
       <e-tabitem>
         <ng-template #headerText><div>Order Closure</div></ng-template>
         <ng-template #content>
-          <app-closure-reason (editReason)="onEdit($event)" [form]="form"></app-closure-reason>
+          <app-closure-reason [userPermission]="userPermission" (editReason)="onEdit($event)" [form]="form"></app-closure-reason>
         </ng-template>
       </e-tabitem>
 
@@ -51,6 +56,7 @@
 </section>
 
 <app-side-dialog
+  [disableSaveButton]="userPermission[userPermissions.CanOrganizationEditOrders] || userPermission[userPermissions.CanManageOrderClosureReasons]"
   header="{{ title }} {{ reasonsNavigationTabs.Penalties === selectedTab ? 'Penalties' : 'Reason' }}"
   (formSaveClicked)="saveReason()"
   (formCancelClicked)="closeDialog()"

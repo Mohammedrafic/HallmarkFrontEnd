@@ -9,6 +9,8 @@ export const RECORD_CANNOT_BE_UPDATED = 'Record cannot be updated';
 export const DELETE_RECORD_TEXT = 'Are you sure you want to delete?';
 export const DELETE_RECORD_TITLE = 'Delete Record';
 export const DELETE_CONFIRM_TEXT = 'Are you sure you want to leave this page without saving?';
+export const DELETE_FOLDER_TEXT = 'Are you sure you want to delete folder?';
+export const DELETE_FOLDER_TITLE = 'Delete Folder';
 export const ADD_CONFIRM_TEXT = 'Are you sure you want to add Bill rate for Onboarded Candidate? This may lead to recalculating values and generating new invoice records.';
 export const EDIT_CONFIRM_TEXT = 'Are you sure you want to edit the Bill rate for Onboarded Candidate? This may lead to recalculating values and generating new invoice records.';
 export const DELETE_CONFIRM_TITLE = 'Unsaved Progress';
@@ -38,6 +40,7 @@ export const ORDER_WITHOUT_BILLRATES =
 export const ORDER_WITHOUT_CRED_BILLRATES =
   'Added order doesn’t contain the Credentials and Bill Rates. Please edit the order to onboard candidates successfully';
 export const UNSAVE_CHANGES_TEXT = 'Do you want to save changes?';
+export const REQUIRED_PERMISSIONS = 'Separate permission right is required';
 
 export const updateCandidateJobMessage = (dates: string[]) =>
   `For this candidate job timesheets will be recalculated for the next start dates: ${dates.join(', ')}`;

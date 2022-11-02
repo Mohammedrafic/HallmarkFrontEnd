@@ -3,7 +3,7 @@ import {
   ElectronicPaymentDetails,
   PaymentDetails,
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
-import { AgencyStatus } from "@shared/enums/status";
+import { AgencyStatus, FilterOrderStatusText } from "@shared/enums/status";
 
 export type Agency = {
   createUnder?: AgencyCreateUnder;
@@ -85,7 +85,7 @@ export type AgencyOrderFilteringOptions = {
     name: string;
   }[];
   orderStatuses: {
-    status: number;
+    status: FilterOrderStatusText;
     statusText: string;
   }[];
   candidateStatuses: {
