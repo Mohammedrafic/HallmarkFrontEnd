@@ -163,6 +163,7 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     field: 'hadLunchBreak',
     headerName: 'No Meal Break',
     width: 125,
+    type: 'rightAligned',
     cellRenderer: SwitchEditorComponent,
     ...commonColumn,
     cellRendererParams: {
