@@ -31,7 +31,7 @@ import {
   GetUserOrganizations,
   GetOrderPermissions,
   SetAgencyActionsAllowed,
-  SetAgencyInvoicesActionsAllowed,
+  SetAgencyInvoicesActionsAllowed, SetUserPermissions,
 } from './user.actions';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 import {
@@ -43,6 +43,7 @@ import {
 import { OrganizationService } from '@shared/services/organization.service';
 import { B2CAuthService } from '../b2c-auth/b2c-auth.service';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { Permission } from "@core/interface";
 
 export interface UserStateModel {
   user: User | null;
@@ -58,6 +59,7 @@ export interface UserStateModel {
   orderPermissions: CurrentUserPermission[];
   agencyActionsAllowed: boolean;
   agencyInvoicesActionsAllowed: boolean;
+  userPermission: Permission;
 }
 
 const AGENCY = 'Agency';
@@ -78,6 +80,7 @@ const AGENCY = 'Agency';
     orderPermissions: [],
     agencyActionsAllowed: true,
     agencyInvoicesActionsAllowed: true,
+    userPermission: {}
   },
 })
 @Injectable()
@@ -87,6 +90,11 @@ export class UserState {
     private organizationService: OrganizationService,
     private b2CAuthService: B2CAuthService
   ) {}
+
+  @Selector()
+  static userPermission(state: UserStateModel): Permission {
+    return state.userPermission;
+  }
 
   @Selector()
   static user(state: UserStateModel): User | null {
@@ -371,5 +379,13 @@ export class UserState {
     patchState({
       agencyInvoicesActionsAllowed: allowed,
     });
+  }
+
+  @Action(SetUserPermissions)
+  SetUserPermissions(
+    { patchState }: StateContext<UserStateModel>,
+    { permissions }: SetUserPermissions
+  ): void {
+    patchState({userPermission: permissions})
   }
 }

@@ -81,3 +81,36 @@ body.light .e-pager .e-icon-prev::before, body.light .e-grid-menu .e-icon-prev::
 body.light .e-grid .e-focused:not(.e-menu-item) {
   box-shadow: none;
 }
+
+body.light, body.dark {
+  .with-selected-rows {
+    .e-pager {
+      border-color: transparent;
+      background: transparent;
+
+      .e-pagercontainer {
+        border-color: transparent;
+        background: transparent;
+      }
+
+      .e-numericitem {
+        border-color: $white;
+        background: transparent;
+        color: $white;
+
+        &.e-currentitem {
+          background: $white;
+          color: $primary-active-blue-10;
+        }
+      }
+
+      .e-nextpage, .e-prevpage {
+        background: transparent;
+
+        &::before {
+          color: $white;
+        }
+      }
+    }
+  }
+}

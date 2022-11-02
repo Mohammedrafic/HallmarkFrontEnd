@@ -226,3 +226,13 @@ export class SaveCandidateImportResultSucceeded {
   static readonly type = '[candidate] Save Candidate Import Result Succeeded';
   constructor(public payload: CandidateImportResult) { }
 }
+
+export class DownloadCredentialFiles {
+  static readonly type = '[candidate] Download Credential Files';
+  constructor(public candidateProfileId: number, public candidateCredentialFileIds: number[]) {}
+}
+
+export class DownloadCredentialFilesSucceeded {
+  static readonly type = '[candidate] Download Credential Files Succeeded';
+  constructor(public file: Blob, public candidateName: string) {}
+}

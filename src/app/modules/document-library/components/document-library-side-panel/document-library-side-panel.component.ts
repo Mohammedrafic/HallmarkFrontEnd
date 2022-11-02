@@ -1,15 +1,14 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Actions, Select, Store } from '@ngxs/store';
-import { Observable, Subject, take, takeUntil } from 'rxjs';
-import { DocumentFolder, DocumentTypeFilter, FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
+import { Observable, Subject, takeUntil } from 'rxjs';
+import { DocumentFolder, FolderTreeItem, NodeItem } from '../../store/model/document-library.model';
 import { DocumentLibraryState } from '../../store/state/document-library.state';
 import { TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
-import { GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, IsAddNewFolder } from '../../store/actions/document-library.actions';
+import { GetDocumentsSelectedNode, IsAddNewFolder, SelectedBusinessType } from '../../store/actions/document-library.actions';
 import { UserState } from '../../../../store/user.state';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { FileType } from '../../enums/documents.enum';
-import { ORG_ID_STORAGE_KEY } from '@shared/constants';
 import { BusinessUnitType } from '../../../../shared/enums/business-unit-type';
 import { User } from '../../../../shared/models/user-managment-page.model';
 
@@ -45,6 +44,12 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
     if (user?.businessUnitType == BusinessUnitType.Hallmark) {
       this.isAddNewFolderBtnVisible = false;
     }
+    this.action$.pipe(ofActionDispatched(SelectedBusinessType), takeUntil(this.unsubscribe$)).subscribe((payload) => {
+      if (payload) {
+          this.isAddNewFolderBtnVisible = false;
+          this.sidePanelDocumentField = { dataSource: [], id: 'id', text: 'name', parentID: 'parentId', child: 'children' };
+      }
+    });
     this.initSidePanelDocs();
   }
   ngOnDestroy(): void {
@@ -61,7 +66,7 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
         setTimeout(() => {
           if (this.sidePanelDocumentField.dataSource?.length) {
             if (this.sidePanelDocumentField.dataSource[0].id != -1) {
-              if(this.isNewFolderInAction)
+              if (this.isNewFolderInAction)
               {
                 this.savedDocumentFolder$.subscribe((x:DocumentFolder)=>
                 {
@@ -69,21 +74,18 @@ export class DocumentLibrarySidePanelComponent implements OnInit, OnDestroy {
                   this.tree.expandAll();
                 });
               }
-              else
-              this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
-              
-              const targetNodeId: string = this.tree.selectedNodes[0];
-              const element = this.tree?.element.querySelector('[data-uid="' + targetNodeId + '"]');
-              const liElements = element?.querySelectorAll('ul li');
-              let nodes = [];
-              if (liElements != undefined && liElements.length > 0) {
-                for (let i = 0; i < liElements?.length; i++) {
-                  const nodeData: any = this.tree?.getNode(liElements[i]);
-                  nodes.push(nodeData.id);
+              else {
+
+                if (this.selectedNode != null && this.selectedNode?.id != undefined && this.selectedNode.businessUnitId == this.sidePanelDocumentField.dataSource[0].businessUnitId) {
+                  this.tree.selectedNodes = ["-2"];
+                  this.tree.selectedNodes = [this.selectedNode.id.toString()];
                 }
-                this.tree.expandAll(nodes);
+                else {
+                  this.tree.selectedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
+                }
+                this.tree.expandAll();
+                this.tree.expandedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
               }
-              this.tree.expandedNodes = [this.sidePanelDocumentField.dataSource[0].id.toString()];
             }
           }
         }, 1000);

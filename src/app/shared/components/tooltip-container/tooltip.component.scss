@@ -1,0 +1,7 @@
+#tooltip {
+  display: inline-block;
+}
+
+#tooltip [disabled] {
+  pointer-events: none;
+}

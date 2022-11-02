@@ -425,6 +425,10 @@ body.light, body.dark {
         height: 14px;
       }
     }
+
+    &.with-selected-rows {
+      background: $primary-active-blue-10;
+    }
   }
 
 
