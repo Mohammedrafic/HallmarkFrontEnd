@@ -54,7 +54,7 @@ export const billRateColDef: ColDef = {
   width: 110,
   valueFormatter: (data) => {
     if(!data.value) return '0'
-    return GridValuesHelper.formatCurrency(data.value)
+    return GridValuesHelper.formatCurrencyValue(data.value)
   },
 };
 
@@ -100,7 +100,7 @@ export const totalCol: ColDef = {
   width: 140,
   valueFormatter: (data) => {
     if(!data.value) return '0'
-    return GridValuesHelper.formatCurrency(data.value)
+    return GridValuesHelper.formatCurrencyValue(data.value)
   },
 };
 
@@ -260,7 +260,7 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
     cellRenderer: InputEditorComponent,
     valueFormatter: (data) => {
       if(!data.value) return '0'
-      return GridValuesHelper.formatCurrency(data.value)
+      return GridValuesHelper.formatCurrencyValue(data.value)
     },
     cellRendererParams: {
       editMode: true,

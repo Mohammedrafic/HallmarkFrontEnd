@@ -29,7 +29,8 @@ import {
   monthDayYearDateFormatter,
   titleValueCellRendererSelector,
   RateReasonValueGetter,
-  DepartmentNameGetter
+  DepartmentNameGetter,
+  CurrencyFormatter
 } from '../../constants';
 import { GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
@@ -256,13 +257,6 @@ export class PendingApprovalGridHelper {
                 }
               },
               {
-                field: 'amount',
-                headerName: 'Total',
-                cellClass: 'font-weight-bold',
-                cellRendererSelector: titleValueCellRendererSelector,
-                valueFormatter: numberValueFormatter,
-              },
-              {
                 ...weekPeriod,
                 valueGetter: weekPeriodValueGetter,
                 headerName: 'Week Period',
@@ -272,7 +266,22 @@ export class PendingApprovalGridHelper {
                 field: 'dateTime',
                 valueFormatter: monthDayYearDateFormatter,
                 headerName: 'Date',
+                width: 120,
                 cellRendererSelector: titleValueCellRendererSelector,
+              },
+
+              {
+                field: 'billRateConfigTitle',
+                headerName: 'Bill Rate Type',
+                width: 150,
+                cellRendererSelector: titleValueCellRendererSelector,
+              },
+              {
+                field: 'billRate',
+                headerName: 'Rate',
+                width: 100,
+                cellRendererSelector: titleValueCellRendererSelector,
+                valueGetter: RateReasonValueGetter,
               },
               {
                 field: 'value',
@@ -282,19 +291,17 @@ export class PendingApprovalGridHelper {
                 width: 100,
               },
               {
-                field: 'billRateConfigTitle',
-                headerName: 'Bill Rate Type',
+                field: 'amount',
+                headerName: 'Total',
+                width: 120,
+                cellClass: 'font-weight-bold',
                 cellRendererSelector: titleValueCellRendererSelector,
-              },
-              {
-                field: 'billRate',
-                headerName: 'Bill Rate',
-                cellRendererSelector: titleValueCellRendererSelector,
-                valueGetter: RateReasonValueGetter,
+                valueFormatter: CurrencyFormatter,
               },
               {
                 field: 'locationName',
-                minWidth: 210,
+                minWidth: 150,
+                initialWidth: 150,
                 headerName: 'Location',
                 cellRendererSelector: titleValueCellRendererSelector,
               },

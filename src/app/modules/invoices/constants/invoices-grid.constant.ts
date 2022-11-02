@@ -14,6 +14,7 @@ import { TypedColDef, TypedValueGetterParams } from '../interfaces/typed-col-def
 import { ManualInvoice } from '../interfaces';
 import { PendingInvoice } from '../interfaces/pending-invoice-record.interface';
 import { PendingApprovalInvoiceRecord } from '../interfaces/pending-approval-invoice.interface';
+import { formatCurrency } from '@angular/common';
 
 const commonColumn: ColDef = {
   sortable: true,
@@ -22,8 +23,8 @@ const commonColumn: ColDef = {
 export const numberValueFormatter: (params: ValueFormatterParams) => string =
   ({ value }: ValueFormatterParams) => GridValuesHelper.formatNumber(value, '1.2-2');
 
-export const currencyFormatter: ValueFormatterFunc =
-  ({ value }: ValueFormatterParams) => GridValuesHelper.formatCurrency(value);
+export const CurrencyFormatter: ValueFormatterFunc =
+  ({ value }: ValueFormatterParams) => GridValuesHelper.formatCurrencyValue(value);
 
 export const monthDayYearDateFormatter: ValueFormatterFunc =
   ({ value }: ValueFormatterParams) => GridValuesHelper.formatDate(value, 'MM/dd/yyyy');
@@ -75,7 +76,7 @@ export const RateReasonValueGetter: ValueGetterFunc = (
   if (params.data.timesheetTypeText === 'Expenses') {
     return params.data.reasonCode || '-';
   }
-  return params.data.billRate;
+  return GridValuesHelper.formatCurrencyValue(params.data.billRate.toString());
 };
 
 export const DepartmentNameGetter: ValueGetterFunc = (
