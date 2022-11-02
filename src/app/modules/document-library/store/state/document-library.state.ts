@@ -11,7 +11,7 @@ import {
   DeletDocuments, DeletDocumentsSucceeded, GetDocumentById, GetDocumentDownloadDeatils, GetDocumentDownloadDeatilsSucceeded,
   GetDocuments, GetDocumentTypes, GetFoldersTree, GetSharedDocuments, SaveDocumentFolder, SaveDocuments, SearchDocumentTags,
   ShareDocuments, ShareDocumentsSucceeded, UnShareDocuments, UnShareDocumentsSucceeded,
-  GetRegionsByOrganizations, GetLocationsByRegions, GetShareAssociateAgencies, GetShareOrganizationsDtata
+  GetRegionsByOrganizations, GetLocationsByRegions, GetShareAssociateAgencies, GetShareOrganizationsDtata, DeleteEmptyDocumentsFolder, DeletDocumentFolderSucceeded
 } from "../actions/document-library.actions";
 import {
   DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, FolderTreeItem,
@@ -174,7 +174,9 @@ export class DocumentLibraryState {
         ]);
         return folder;
       }),
-      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
     );
   }
 
@@ -336,5 +338,19 @@ export class DocumentLibraryState {
       patchState({ shareOrganizationsData: payload });
       return payload
     }));
+  }
+
+  @Action(DeleteEmptyDocumentsFolder)
+  DeleteEmptyDocumentsFolder({ dispatch }: StateContext<DocumentLibraryStateModel>, { deleteDocumentFolderFilter }: DeleteEmptyDocumentsFolder): Observable<any> {
+    return this.documentLibraryService.DeleteFolder(deleteDocumentFolderFilter).pipe(
+      tap(() => {
+        const message = 'Folder deleted successfully';
+        const actions = [new DeletDocumentFolderSucceeded(), new ShowToast(MessageTypes.Success, message)];
+        dispatch([...actions, new DeletDocumentFolderSucceeded()]);
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
   }
 }
