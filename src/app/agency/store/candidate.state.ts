@@ -21,6 +21,8 @@ import { SkillsService } from 'src/app/shared/services/skills.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { CandidateService } from '../services/candidates.service';
 import {
+  DownloadCredentialFiles,
+  DownloadCredentialFilesSucceeded,
   GetAllSkills,
   GetCandidateById,
   GetCandidateByIdSucceeded,
@@ -534,5 +536,24 @@ export class CandidateState {
       }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Candidates were not imported'))))
     );
+  }
+
+  @Action(DownloadCredentialFiles)
+  DownloadCredentialFiles(
+    { dispatch, getState }: StateContext<CandidateStateModel>,
+    { candidateProfileId, candidateCredentialFileIds }: DownloadCredentialFiles
+  ): Observable<Observable<void> | Blob> {
+    const candidate = getState().candidate;
+    return this.candidateService.downloadCredentialFiles(
+      candidateProfileId || candidate?.id as number,
+      candidateCredentialFileIds
+    )
+      .pipe(
+        tap((payload: Blob) => {
+          dispatch(new DownloadCredentialFilesSucceeded(payload, `${candidate?.firstName} ${candidate?.lastName}`));
+          return payload;
+        }),
+        catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download files'))))
+      );
   }
 }

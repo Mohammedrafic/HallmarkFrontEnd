@@ -6,7 +6,7 @@ import { LocationsPage } from "@shared/models/location.model";
 import { Region, regionsPage } from "@shared/models/region.model";
 import { LogiReportService } from "@shared/services/logi-report.service";
 import { filter, Observable, tap } from "rxjs";
-import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData } from "./logi-report.action";
+import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState } from "./logi-report.action";
 
 export interface LogiReportStateModel {
 
@@ -87,6 +87,13 @@ export class LogiReportState {
                 return payload==null?[]:payload;           
     }));
     }
+    @Action(ClearLogiReportState)
+    ClearLogiReportState(
+      { patchState }: StateContext<LogiReportStateModel>
+    ):void{
+      patchState({ regions: [],locations:[],departments:[] });
+    }
+
 }
 
 

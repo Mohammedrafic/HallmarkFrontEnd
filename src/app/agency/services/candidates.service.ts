@@ -247,4 +247,12 @@ export class CandidateService {
   public saveCandidateImportResult(successfullRecords: CandidateImportRecord[]): Observable<CandidateImportResult> {
     return this.http.post<CandidateImportResult>('/api/CandidateProfile/saveimport', successfullRecords);
   }
+
+  public downloadCredentialFiles(candidateProfileId: number, candidateCredentialFileIds: number[]): Observable<Blob> {
+    return this.http.post(
+      '/api/CandidateCredentials/bulkDownload',
+      { candidateProfileId, candidateCredentialFileIds },
+      { responseType: 'blob' }
+    );
+  }
 }

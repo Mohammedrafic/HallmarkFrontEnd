@@ -25,6 +25,10 @@ export class TitleValueCellRendererComponent extends GridCellRenderer<TitleValue
     const titleValueParams = params.titleValueParams;
 
     this.title = titleValueParams?.title || params.colDef?.headerName || '';
+
+    if (this.title === 'Rate' && params.data.timesheetTypeText === 'Expenses') {
+      this.title = 'Reason'
+    }
     this.value = [titleValueParams?.value, this.value].find((value: unknown) => value != null && value !== '') as string;
     this.showCell = this.value != null && this.value !== '';
   }
