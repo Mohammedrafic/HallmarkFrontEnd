@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { distinctUntilChanged, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, Subject, takeWhile } from 'rxjs';
 import { AssociateOrganizationsAgency, FeeExceptionsPage } from '@shared/models/associate-organizations.model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -22,13 +22,14 @@ import { Router } from '@angular/router';
 import { Tabs } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
 import { UserState } from '../../../../../store/user.state';
 import { AgencyStatus } from '@shared/enums/status';
+import { AbstractPermission } from "@shared/helpers/permissions";
 
 @Component({
   selector: 'app-edit-associate-dialog',
   templateUrl: './edit-associate-dialog.component.html',
   styleUrls: ['./edit-associate-dialog.component.scss'],
 })
-export class EditAssociateDialogComponent implements OnInit, OnDestroy {
+export class EditAssociateDialogComponent extends AbstractPermission implements OnInit, OnDestroy {
   @Input() openEvent: Subject<AssociateOrganizationsAgency>;
   @Output() editEndEvent = new EventEmitter<never>();
 
@@ -51,16 +52,19 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
   public readonly agencyStatus = AgencyStatus;
 
   private isAlive = true;
-  private isAgency: boolean;
+  public isAgency: boolean;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private actions$: Actions,
     private confirmService: ConfirmService,
     private router: Router
-  ) {}
+  ) {
+    super(store);
+  }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit()
     this.isAgency = this.router.url.includes('agency');
     this.onOpenEvent();
     this.width = this.getDialogWidth();
@@ -75,7 +79,7 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.isAlive = false;
     this.sideDialog.hide();
   }

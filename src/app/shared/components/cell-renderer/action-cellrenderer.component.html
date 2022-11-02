@@ -1,8 +1,8 @@
 <div class="row-tool-buttons">
-  <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit($event)">
+  <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit($event)" [disabled]="!userPermission[userPermissions.CanManageSpecialProjects]">
     <span><i-feather name="edit" class="icon"></i-feather></span>
   </button>
-  <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove($event)">
+  <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove($event)" [disabled]="!userPermission[userPermissions.CanManageSpecialProjects]">
     <span><i-feather name="trash-2" class="icon"></i-feather></span>
   </button>
 </div>

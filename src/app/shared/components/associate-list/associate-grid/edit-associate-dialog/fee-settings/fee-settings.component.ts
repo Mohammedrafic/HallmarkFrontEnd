@@ -19,6 +19,8 @@ import {
   RemoveFeeExceptionsById,
 } from '@shared/components/associate-list/store/associate.actions';
 import { AgencyStatus } from '@shared/enums/status';
+import { Permission } from "@core/interface";
+import { UserPermissions } from "@core/enums";
 
 @Component({
   selector: 'app-fee-settings',
@@ -31,8 +33,11 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
   @Input() form: FormGroup;
   @Input() areAgencyActionsAllowed: boolean;
   @Input() editAgencyOrg: AssociateOrganizationsAgency;
+  @Input() userPermission: Permission;
+  @Input() isAgency: boolean;
 
   public openAddNewFeeDialog = new Subject<number>();
+  public readonly userPermissions = UserPermissions;
   public editFeeData = new Subject<FeeExceptions>();
   public classificationValueAccess = (_: string, { classification }: FeeExceptions) => {
     return FeeSettingsClassification[classification];

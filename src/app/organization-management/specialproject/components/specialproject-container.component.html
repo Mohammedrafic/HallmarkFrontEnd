@@ -1,7 +1,11 @@
 <section class="flex-column">
   <section class="container">
     <div class="toolbar-buttons">
-      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="handleOnAdd()">{{addButtonTitle}}</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanManageSpecialProjects]">
+        <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" [disabled]="!userPermission[userPermissions.CanManageSpecialProjects]" (click)="handleOnAdd()">{{addButtonTitle}}</button>
+      </app-tooltip-container>
     </div>
     <ejs-tab (selected)="onTabSelected($event)">
       <e-tabitems>

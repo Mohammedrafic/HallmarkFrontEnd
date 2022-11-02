@@ -8,8 +8,12 @@ import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SetDirtyState } from '../store/organization-management.actions';
 import { DeleteShift, DeleteShiftSucceeded, ExportShifts, GetShiftsByPage, SaveShift, SaveShiftSucceeded } from '../store/shifts.actions';
 import { ShiftsState } from '../store/shifts.state';
-import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import {
+  CANCEL_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+} from 'src/app/shared/constants/messages';
 import { Shift } from 'src/app/shared/models/shift.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
@@ -18,6 +22,7 @@ import { DatePipe } from '@angular/common';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserState } from 'src/app/store/user.state';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 
 @Component({
   selector: 'app-shifts',
@@ -25,7 +30,7 @@ import { UserState } from 'src/app/store/user.state';
   styleUrls: ['./shifts.component.scss'],
   providers: [SortService, MaskedDateTimeService]
 })
-export class ShiftsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -54,12 +59,12 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   public fileName: string;
   public defaultFileName: string;
 
-  constructor(private store: Store,
+  constructor(protected override store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
-    super();
+    super(store);
     this.ShiftFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
       name: new FormControl(null, [ Validators.required ]),
@@ -69,7 +74,8 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
     });
   }
 
-  ngOnInit() {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.currentPage = 1;
       this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
@@ -112,8 +118,8 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.defaultFileName = 'Organization Shifts ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportShifts(new ExportPayload(
-      fileType, 
-      { /** TODO: put filters here */ }, 
+      fileType,
+      { /** TODO: put filters here */ },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val.id) : null,
       options?.fileName || this.defaultFileName

@@ -13,11 +13,11 @@ import {
   ShowExportCredentialListDialog,
 } from '../store/credentials.actions';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { CredentialsListComponent } from '@shared/components/credentials-list/credentials-list.component';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 
 type ComponentPermissionTitle = 'canAddManual' | 'canManageOrganizationCredential';
 type Permisions = Record<ComponentPermissionTitle, boolean>;
@@ -32,7 +32,7 @@ const COMPONENT_PERMISSIONS: Record<ComponentPermissionTitle, PermissionTypes> =
   templateUrl: './credentials.component.html',
   styleUrls: ['./credentials.component.scss'],
 })
-export class CredentialsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class CredentialsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('navigationTabs') navigationTabs: TabComponent;
   @ViewChild(RouterOutlet) outlet: RouterOutlet;
 
@@ -52,17 +52,18 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private store: Store,
+    protected override store: Store,
     private actions$: Actions,
     private permissionService: PermissionService
   ) {
-    super();
+    super(store);
     actions$
       .pipe(ofActionDispatched(SetCredentialsFilterCount))
       .subscribe((count) => (this.filteredItemsCount = count.payload));
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.store.dispatch(new GetOrganizationStructure());
     this.permissions$ = this.permissionService.checkPermisionFor<Permisions>(COMPONENT_PERMISSIONS);
   }

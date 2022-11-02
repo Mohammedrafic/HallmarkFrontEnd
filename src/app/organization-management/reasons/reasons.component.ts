@@ -18,8 +18,13 @@ import {
   SavePenaltySuccess,
   ShowOverridePenaltyDialog
 } from '@organization-management/store/reject-reason.actions';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE, ALPHANUMERICS_AND_SYMBOLS, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE } from '@shared/constants';
+import {
+  CANCEL_REJECTION_REASON,
+  DELETE_CONFIRM_TITLE,
+  ALPHANUMERICS_AND_SYMBOLS,
+  DATA_OVERRIDE_TEXT,
+  DATA_OVERRIDE_TITLE,
+} from '@shared/constants';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { delay, filter, takeWhile, Observable } from 'rxjs';
@@ -30,6 +35,7 @@ import { CancellationReasonsMap } from '@shared/components/candidate-cancellatio
 import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { UserState } from 'src/app/store/user.state';
 import { Penalty } from '@shared/models/penalty.model';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 
 export enum ReasonsNavigationTabs {
   Rejection,
@@ -44,11 +50,12 @@ export enum ReasonsNavigationTabs {
   templateUrl: './reasons.component.html',
   styleUrls: ['./reasons.component.scss']
 })
-export class ReasonsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class ReasonsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   public selectedTab: ReasonsNavigationTabs = ReasonsNavigationTabs.Rejection;
   public reasonsNavigationTabs = ReasonsNavigationTabs;
   public form: FormGroup;
   public penaltiesForm: FormGroup;
+
   private isEdit = false;
   public title: string = '';
   private isAlive = true;
@@ -69,8 +76,8 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
     value: 'id',
   };
 
-  constructor(private store: Store, private confirmService: ConfirmService, private actions$: Actions) {
-    super();
+  constructor(protected override store: Store, private confirmService: ConfirmService, private actions$: Actions) {
+    super(store);
     for(const [key, val] of Object.entries(CancellationReasonsMap)) {
       this.cancellationReasons.push({
         id: +key, name: val
@@ -78,7 +85,8 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
     }
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.createForm();
     this.subscribeOnSaveReasonSuccess();
     this.penaltiesSubscriptionHandler();
@@ -198,7 +206,7 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
               id: this.form.value.id,
               reason: this.form.value.reason
             }
-      
+
             this.store.dispatch(new UpdateRejectReasons(payload));
           }
           break;

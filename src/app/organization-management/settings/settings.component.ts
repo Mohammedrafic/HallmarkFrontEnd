@@ -42,6 +42,7 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { PermissionService } from 'src/app/security/services/permission.service';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -54,7 +55,7 @@ export enum TextFieldTypeControl {
   styleUrls: ['./settings.component.scss'],
   providers: [DetailRowService, MaskedDateTimeService],
 })
-export class SettingsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class SettingsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
   public organizationSettingsFormGroup: FormGroup;
@@ -135,19 +136,20 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   };
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     @Inject(FormBuilder) private builder: FormBuilder,
     private confirmService: ConfirmService,
     private filterService: FilterService,
     private permissionService: PermissionService
   ) {
-    super();
+    super(store);
     this.formBuilder = builder;
     this.createSettingsForm();
     this.createRegionLocationDepartmentForm();
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.filterColumns = {
       regionIds: {
         type: ControlTypes.Multiselect,

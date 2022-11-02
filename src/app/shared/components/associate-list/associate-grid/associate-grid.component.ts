@@ -21,6 +21,8 @@ import {
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { UserState } from '../../../../store/user.state';
 import { AgencyStatus } from '@shared/enums/status';
+import { UserPermissions } from "@core/enums";
+import { Permission } from "@core/interface";
 
 @Component({
   selector: 'app-associate-grid',
@@ -31,6 +33,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
   @Input() public associateEvent$: Subject<boolean>;
   @Input() public isAgency: boolean;
   @Input() areAgencyActionsAllowed: boolean;
+  @Input() userPermission: Permission;
 
   @ViewChild('grid') grid: GridComponent;
 
@@ -45,6 +48,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
     return this.isAgency ? 'Organization' : 'Agency';
   }
 
+  public readonly userPermissions = UserPermissions;
   public priceUtils = PriceUtils;
   public readonly agencyStatus = AgencyStatus;
   public jobDistributionColumns = JOB_DISTRIBUTION_COLUMNS;

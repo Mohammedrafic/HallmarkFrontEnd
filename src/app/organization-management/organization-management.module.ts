@@ -107,6 +107,7 @@ import { ImportRegionsComponent } from './regions/import-regions/import-regions.
 import { RegionsGridComponent } from './regions/import-regions/regions-grid/regions-grid.component';
 import { PenaltiesComponent } from './reasons/penalties/penalties.component';
 import { PenaltiesGridActionsRendererComponent } from './reasons/penalties/penalties-grid-actions-renderer/penalties-grid-actions-renderer.component';
+import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 
 const sidebarIcons = {
   Download,
@@ -205,6 +206,7 @@ const sidebarIcons = {
     AgGridModule,
     AppGridModule,
     TooltipAllModule,
+    TooltipContainerModule,
 
     FeatherModule.pick(sidebarIcons),
 

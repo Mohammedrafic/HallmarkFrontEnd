@@ -14,6 +14,7 @@
   <div class="button-container">
     <button
       ejs-button
+      [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
       cssClass="e-flat button-with-icon"
       (click)="onAddNewWorkflowClick()"
     ><i-feather name="plus" class="icon"></i-feather> Add New Workflow</button>
