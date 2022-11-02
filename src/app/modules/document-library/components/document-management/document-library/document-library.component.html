@@ -96,7 +96,7 @@
       </div>
     </section>
     <section *ngIf="isUpload">
-      <app-document-library-upload (uploadToFile)="uploadToFile($event)"></app-document-library-upload>
+      <app-document-library-upload (uploadToFile)="uploadToFile($event)" [allowedExtensions]="allowedExtensions"></app-document-library-upload>
       <section *ngIf="selectedFile!=null || isEditDocument">
         <div class="form-elemet">
           <div class="group">

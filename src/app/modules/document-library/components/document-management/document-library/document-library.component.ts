@@ -118,6 +118,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   documentHeight: number;
   documentWidth: string;
   fileAsBase64: string;
+  public allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
 
   public gridApi!: GridApi;
   public rowData: DocumentLibraryDto[] = [];
