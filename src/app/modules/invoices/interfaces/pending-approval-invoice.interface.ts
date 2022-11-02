@@ -38,4 +38,10 @@ export interface PendingApprovalInvoiceRecord {
   timesheetTypeText: string;
   value: number;
   weekNumber: number;
+  dateTime: string;
+  billRate: number;
+  agencyName: string;
+  costCenterFormattedName: string;
+  extDepartmentId: string;
+  reasonCode: string;
 }

@@ -13,6 +13,7 @@ import {
 import { TypedColDef, TypedValueGetterParams } from '../interfaces/typed-col-def.interface';
 import { ManualInvoice } from '../interfaces';
 import { PendingInvoice } from '../interfaces/pending-invoice-record.interface';
+import { PendingApprovalInvoiceRecord } from '../interfaces/pending-approval-invoice.interface';
 
 const commonColumn: ColDef = {
   sortable: true,
@@ -68,3 +69,15 @@ export const rejectionReasonColDef: TypedColDef<ManualInvoice> = {
   minWidth: 200,
   ...commonColumn,
 };
+
+export const RateReasonValueGetter: ValueGetterFunc = (
+  params: TypedValueGetterParams<PendingApprovalInvoiceRecord>) => {
+  if (params.data.timesheetTypeText === 'Expenses') {
+    return params.data.reasonCode || '-';
+  }
+  return params.data.billRate;
+};
+
+export const DepartmentNameGetter: ValueGetterFunc = (
+  params: TypedValueGetterParams<PendingApprovalInvoiceRecord>
+) => `${params.data.departmentName} (${params.data.extDepartmentId})`;

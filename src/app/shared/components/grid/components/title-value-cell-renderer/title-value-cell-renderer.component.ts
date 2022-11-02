@@ -21,10 +21,15 @@ export class TitleValueCellRendererComponent extends GridCellRenderer<TitleValue
   }
 
   public override agInit(params: TitleValueCellRendererParams): void {
+    console.log(params, 'params')
     super.agInit(params);
     const titleValueParams = params.titleValueParams;
 
     this.title = titleValueParams?.title || params.colDef?.headerName || '';
+
+    if (this.title === 'Bill Rate' && params.data.timesheetTypeText === 'Expenses') {
+      this.title = 'Reason'
+    }
     this.value = [titleValueParams?.value, this.value].find((value: unknown) => value != null && value !== '') as string;
     this.showCell = this.value != null && this.value !== '';
   }
