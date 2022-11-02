@@ -565,3 +565,10 @@ html, body {
     background-color: $secondary-dark-blue-20 !important;
   }
 }
+
+.deployed-candidate {
+  &__order-id{ 
+    color: $primary-active-blue-10;
+    font-weight: 700;
+  }
+}

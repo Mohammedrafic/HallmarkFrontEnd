@@ -13,11 +13,17 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SET_READONLY_STATUS } from '@shared/constants';
+import {
+  DELETE_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  deployedCandidateMessage,
+  DEPLOYED_CANDIDATE,
+  SET_READONLY_STATUS,
+} from '@shared/constants';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, firstValueFrom } from 'rxjs';
 
 import { BillRate } from '@shared/models/bill-rate.model';
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
@@ -67,7 +73,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
   @Input() actionsAllowed: boolean;
-  
+
   public statusesFormControl = new FormControl();
   public openRejectDialog = new Subject<boolean>();
   public billRatesData: BillRate[] = [];
@@ -77,6 +83,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public optionFields = { text: 'statusText', value: 'statusText' };
   public rejectReasons: RejectReason[] = [];
   public isRejected = false;
+  public isClosedPosition = false;
   public candidatStatus = CandidatStatus;
   public candidateJob: OrderCandidateJob | null;
   public today = new Date();
@@ -152,6 +159,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.readOnlyMode =
       changes['candidate']?.currentValue.status === ApplicantStatusEnum.Withdraw ||
       changes['candidate']?.currentValue.status === ApplicantStatusEnum.Rejected;
+    this.isClosedPosition = this.candidate.candidateStatus === ApplicantStatusEnum.Offboard;
 
     this.checkRejectReason();
     this.switchFormState();
@@ -215,46 +223,67 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
         this.store.dispatch(new GetRejectReasonsForOrganisation());
         this.openRejectDialog.next(true);
       } else {
-        if (!this.formGroup.errors && this.candidateJob) {
-          const value = this.formGroup.getRawValue();
-          this.store
-            .dispatch(
-              new UpdateOrganisationCandidateJob({
-                orderId: this.candidateJob.orderId,
-                organizationId: this.candidateJob.organizationId,
-                jobId: this.candidateJob.jobId,
-                nextApplicantStatus: event.itemData,
-                candidateBillRate: this.candidateJob.candidateBillRate,
-                offeredBillRate: value.offeredBillRate,
-                requestComment: this.candidateJob.requestComment,
-                actualStartDate: this.candidateJob.actualStartDate,
-                actualEndDate: this.candidateJob.actualEndDate,
-                clockId: this.candidateJob.clockId,
-                guaranteedWorkWeek: value.guaranteedWorkWeek,
-                offeredStartDate: toCorrectTimezoneFormat(value.offeredStartDate),
-                allowDeployWoCredentials: true,
-                billRates: this.billRatesComponent.billRatesControl.value,
-              })
-            )
-            .subscribe(() => {
-              this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-              if (reloadJob) {
-                this.store.dispatch(
-                  new GetOrganisationCandidateJob(
-                    this.candidateJob?.organizationId as number,
-                    this.candidate.candidateJobId
-                  )
-                );
-              }
-            });
-          if (!reloadJob) {
-            this.closeDialog();
-          }
-        }
+        this.offerCandidate(event.itemData, reloadJob);
       }
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, SET_READONLY_STATUS));
     }
+  }
+
+  private async offerCandidate(applicantStatus: ApplicantStatus, reloadJob: boolean): Promise<void> {
+    if (!this.formGroup.errors && this.candidateJob) {
+      const offerCandidate = this.isDeployedCandidate ? await this.shouldChangeCandidateStatus() : true;
+
+      if (offerCandidate) {
+        const value = this.formGroup.getRawValue();
+        this.store
+          .dispatch(
+            new UpdateOrganisationCandidateJob({
+              orderId: this.candidateJob.orderId,
+              organizationId: this.candidateJob.organizationId,
+              jobId: this.candidateJob.jobId,
+              nextApplicantStatus: applicantStatus,
+              candidateBillRate: this.candidateJob.candidateBillRate,
+              offeredBillRate: value.offeredBillRate,
+              requestComment: this.candidateJob.requestComment,
+              actualStartDate: this.candidateJob.actualStartDate,
+              actualEndDate: this.candidateJob.actualEndDate,
+              clockId: this.candidateJob.clockId,
+              guaranteedWorkWeek: value.guaranteedWorkWeek,
+              offeredStartDate: toCorrectTimezoneFormat(value.offeredStartDate),
+              allowDeployWoCredentials: true,
+              billRates: this.billRatesComponent.billRatesControl.value,
+            })
+          )
+          .subscribe(() => {
+            this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+            if (reloadJob) {
+              this.store.dispatch(
+                new GetOrganisationCandidateJob(
+                  this.candidateJob?.organizationId as number,
+                  this.candidate.candidateJobId
+                )
+              );
+            }
+          });
+        if (!reloadJob) {
+          this.closeDialog();
+        }
+      } else {
+        this.statusesFormControl.reset();
+      }
+    }
+  }
+
+  private shouldChangeCandidateStatus(): Promise<boolean> {
+    const options = {
+      title: DEPLOYED_CANDIDATE,
+      okButtonLabel: 'Proceed',
+      okButtonClass: 'ok-button',
+    };
+
+    //TODO Remove mock data after providing by BE the endpoint to get orderIds of deployed candidate
+    return firstValueFrom(this.confirmService.confirm(deployedCandidateMessage(['NL-1234', 'NL-1266']), options));
   }
 
   public onBillRatesChanged(): void {
@@ -321,16 +350,14 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
     });
-    this.applicantStatuses$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data: ApplicantStatus[]) => {
-        this.nextApplicantStatuses = data;
-        if (!data.length) {
-          this.statusesFormControl.disable();
-        } else {
-          this.statusesFormControl.enable();
-        }
-      });
+    this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ApplicantStatus[]) => {
+      this.nextApplicantStatuses = data;
+      if (!data.length) {
+        this.statusesFormControl.disable();
+      } else {
+        this.statusesFormControl.enable();
+      }
+    });
     this.orderPermissions$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: CurrentUserPermission[]) => (this.orderPermissions = data) && this.mapPermissions());
@@ -347,7 +374,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.canOffer = false;
     this.canOnboard = false;
     this.canClose = false;
-    this.orderPermissions.forEach(permission => {
+    this.orderPermissions.forEach((permission) => {
       this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
       this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
       this.canReject = this.canReject || permission.permissionId === PermissionTypes.CanRejectCandidate;

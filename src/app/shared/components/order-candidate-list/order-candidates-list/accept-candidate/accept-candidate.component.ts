@@ -12,15 +12,20 @@ import {
 } from '@angular/core';
 import {
   CancellationReasonsMap,
-  PenaltiesMap
-} from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
+  PenaltiesMap,
+} from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { PenaltyCriteria } from "@shared/enums/candidate-cancellation";
+import {
+  DELETE_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  deployedCandidateMessage,
+  DEPLOYED_CANDIDATE,
+} from '@shared/constants';
+import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, firstValueFrom } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
@@ -120,7 +125,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get showAccepteAction(): boolean {
-    return this.candidate?.statusName !== 'Accepted' && !this.isReadOnly && !this.candidate.deployedCandidateInfo;
+    return this.candidate?.statusName !== 'Accepted' && !this.isReadOnly;
   }
 
   get isAgencyAndOnboard(): boolean {
@@ -180,14 +185,34 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  public onAccept(): void {
-    this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
+  public async onAccept(): Promise<void> {
+    const acceptCandidate = this.isDeployedCandidate ? await this.shouldChangeCandidateStatus() : true;
+
+    if (acceptCandidate) {
+      this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
+    }
   }
 
-  public onApply(): void {
+  public async onApply(): Promise<void> {
     if (this.form.valid) {
-      this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Applied, statusText: 'Applied' });
+      const applyCandidate = this.isDeployedCandidate ? await this.shouldChangeCandidateStatus() : true;
+
+      if (applyCandidate) {
+        this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Applied, statusText: 'Applied' });
+        this.closeDialog();
+      }
     }
+  }
+
+  private shouldChangeCandidateStatus(): Promise<boolean> {
+    const options = {
+      title: DEPLOYED_CANDIDATE,
+      okButtonLabel: 'Proceed',
+      okButtonClass: 'ok-button',
+    };
+
+    //TODO Remove mock data after providing by BE the endpoint to get orderIds of deployed candidate
+    return firstValueFrom(this.confirmService.confirm(deployedCandidateMessage(['NL-1234', 'NL-1266']), options));
   }
 
   public onWithdraw(): void {
@@ -347,7 +372,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       ApplicantStatusEnum.OnBoarded,
       ApplicantStatusEnum.PreOfferCustom,
     ];
-    if (readOnlyStatuses.includes(this.candidateStatus) || this.isDeployedCandidate) {
+    if (readOnlyStatuses.includes(this.candidateStatus)) {
       this.isReadOnly = true;
     }
   }
@@ -368,9 +393,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.form.markAsPristine();
   }
 
-  private setCancellationControls(value: PenaltyCriteria): void{
+  private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
   }
 }
-

@@ -4,7 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil, firstValueFrom } from 'rxjs';
 
 import { ApplyOrderApplicants, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
@@ -16,6 +16,8 @@ import PriceUtils from '@shared/utils/price.utils';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { deployedCandidateMessage, DEPLOYED_CANDIDATE } from '@shared/constants';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -64,8 +66,9 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   constructor(
     private store: Store,
     private commentsService: CommentsService,
-    private changeDetectorRef: ChangeDetectorRef
-    ) {}
+    private changeDetectorRef: ChangeDetectorRef,
+    private confirmService: ConfirmService,
+  ) {}
 
   ngOnChanges(): void {
     this.readOnlyMode = !!this.isDeployedCandidate && this.isAgency;
@@ -88,27 +91,42 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.closeDialogEmitter.next();
   }
 
-  applyOrderApplicants(): void {
+  public async applyOrderApplicants(): Promise<void> {
     this.formGroup.markAllAsTouched();
     if (this.formGroup.valid) {
-      const value = this.formGroup.getRawValue();
-      this.store
-        .dispatch(
-          new ApplyOrderApplicants({
-            orderId: this.orderId,
-            organizationId: this.organizationId,
-            candidateId: this.candidateId,
-            candidateBillRate: value.candidateBillRate,
-            expAsTravelers: value.expAsTravelers,
-            availableStartDate: toCorrectTimezoneFormat(value.availableStartDate),
-            requestComment: value.requestComment,
-          })
-        )
-        .subscribe(() => {
-          this.store.dispatch(new ReloadOrderCandidatesLists());
-        });
-      this.closeDialog();
+      const applyCandidate = this.isDeployedCandidate ? await this.shouldApplyDeployedCandidate() : true;
+
+      if (applyCandidate) {
+        const value = this.formGroup.getRawValue();
+        this.store
+          .dispatch(
+            new ApplyOrderApplicants({
+              orderId: this.orderId,
+              organizationId: this.organizationId,
+              candidateId: this.candidateId,
+              candidateBillRate: value.candidateBillRate,
+              expAsTravelers: value.expAsTravelers,
+              availableStartDate: toCorrectTimezoneFormat(value.availableStartDate),
+              requestComment: value.requestComment,
+            })
+          )
+          .subscribe(() => {
+            this.store.dispatch(new ReloadOrderCandidatesLists());
+          });
+        this.closeDialog();
+      }
     }
+  }
+
+  private shouldApplyDeployedCandidate(): Promise<boolean> {
+    const options = {
+      title: DEPLOYED_CANDIDATE,
+      okButtonLabel: 'Proceed',
+      okButtonClass: 'ok-button',
+    };
+
+    //TODO Remove mock data after providing by BE the endpoint to get orderIds of deployed candidate
+    return firstValueFrom(this.confirmService.confirm(deployedCandidateMessage(['NL-1234', 'NL-1266']), options));
   }
 
   private createForm(): void {
