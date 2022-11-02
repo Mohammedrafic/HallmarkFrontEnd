@@ -943,34 +943,13 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   public setDictionaryRegionMappings() {
+
     let mapping: { [id: number]: number[]; } = {};
-    let isAllRegions: boolean = false;
-    let isAllLocations: boolean = false;
-    let regionsData: Region[] = [];
-    let locationsData: Region[] = [];
-    this.regions$.subscribe((data) => {
-      regionsData = data;
-      this.locations$.subscribe((locData: any) => {
-        locationsData = locData;
-      });
-    });
     if (this.isAgency) {
       return mapping;
     }
-    isAllRegions = this.documentLibraryform.controls[FormControlNames.RegionIds].value.length === regionsData.length;
-    isAllLocations = this.documentLibraryform.controls[FormControlNames.LocationIds].value.length === locationsData.length;
 
-    if (isAllRegions && !isAllLocations) {
-      mapping[-1] = this.documentLibraryform.controls[FormControlNames.LocationIds].value;
-    }
-    else if (!isAllRegions && isAllLocations) {
-      const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
-      selectedRegions.forEach((regionItem: any) => {
-        mapping[regionItem] = [-1];
-      });
-    }
-    else {
-      const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
+    const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
       if (selectedRegions.length > 0) {
         selectedRegions.forEach((regionItem: any) => {
           let mappingLocItems: number[] = [];
@@ -991,7 +970,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
         });
       }
-    }
     return mapping;
   }
 
