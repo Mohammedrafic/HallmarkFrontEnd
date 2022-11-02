@@ -21,7 +21,6 @@ export class TitleValueCellRendererComponent extends GridCellRenderer<TitleValue
   }
 
   public override agInit(params: TitleValueCellRendererParams): void {
-    console.log(params, 'params')
     super.agInit(params);
     const titleValueParams = params.titleValueParams;
 

@@ -281,12 +281,11 @@ export class PendingApprovalGridHelper {
                 valueFormatter: numberValueFormatter,
                 width: 100,
               },
-              // {
-              //   field: 'billRate',
-              //   headerName: 'Bill Rate Type',
-              //   cellRendererSelector: titleValueCellRendererSelector,
-              //   valueFormatter: numberValueFormatter,
-              // },
+              {
+                field: 'billRateConfigTitle',
+                headerName: 'Bill Rate Type',
+                cellRendererSelector: titleValueCellRendererSelector,
+              },
               {
                 field: 'billRate',
                 headerName: 'Bill Rate',
