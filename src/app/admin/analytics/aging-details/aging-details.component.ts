@@ -131,7 +131,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
       this.orderFilterColumnsSetup();
       this.onFilterControlValueChangedHandler();
       this.loadCounter = this.loadCounter + 1;
-      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.enable() : this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.disable();
+      this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }
 
@@ -169,7 +169,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
             });
           });
         });
-        if (this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {      
+        if (data.length>0&&this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {      
           this.showToastMessage(this.regionsList.length,this.locationsList.length,this.departmentsList.length);
         }
       this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
@@ -203,10 +203,6 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
         this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
         this.changeDetectorRef.detectChanges();
       }
-      else
-      { 
-          
-      }
     });
     this.locationIdControl = this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -228,9 +224,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
         this.isInitialLoad = false;
       }
     });
-    // this.onOrganizationsChange();
-    // this.onRegionsChange();
-    // this.onLocationsChange();
+   
   }
 
   public SearchReport(): void {
@@ -299,45 +293,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
       this.logiReportComponent?.SetReportData(logiReportData);
     }
   }
-  //private onOrganizationsChange(): void {
-    // this.regions$
-    //   .pipe(takeUntil(this.unsubscribe$))
-    //   .subscribe((data: Region[]) => {
-    //     if (data != undefined) {
-    //       this.regions = data;
-    //       this.filterColumns.regionIds.dataSource = this.regions;
-    //       this.defaultLocations = [];
-    //       this.defaultDepartments = [];
-    //       this.filterColumns.locationIds.dataSource = [];
-    //       this.filterColumns.departmentIds.dataSource = [];
-    //       this.defaultRegions = data.map((list) => list.id);
-    //     }
-    //   });
-  //}
-  // private onRegionsChange(): void {
-  //   this.locations$
-  //     .pipe(takeUntil(this.unsubscribe$))
-  //     .subscribe((data: Location[]) => {
-  //       if (data != undefined) {
-  //         this.locations = data;
-  //         this.filterColumns.locationIds.dataSource = this.locations;
-  //         this.defaultDepartments = [];
-  //         this.filterColumns.departmentIds.dataSource = [];
-  //         this.defaultLocations = data.map((list) => list.id);
-  //       }
-  //     });
-  // }
-  // private onLocationsChange(): void {
-  //   this.departments$
-  //     .pipe(takeUntil(this.unsubscribe$))
-  //     .subscribe((data: Department[]) => {
-  //       if (data != undefined) {
-  //         this.departments = data;
-  //         this.filterColumns.departmentIds.dataSource = this.departments;
-  //         this.defaultDepartments = data.map((list) => list.id);
-  //       }
-  //     });
-  // }
+  
   public showFilters(): void {
     this.onFilterControlValueChangedHandler();
     this.store.dispatch(new ShowFilterDialog(true));

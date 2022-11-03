@@ -48,8 +48,10 @@ export const usedByOrderErrorMessage = (val: string, entities: string) =>
   `${val} cannot be deleted. This ${val} was used in ${entities}.`;
 export const usedInMappingMessage = (mappingName: string) =>
   `This change has been affected ${mappingName} Mapping, please update it on the ${mappingName} Mapping tab`;
-export const SEND_EMAIL = 'Sent email';
-export const SEND_EMAIL_REQUIRED = 'Required';
 export const DEPLOYED_CANDIDATE = 'Deployed Candidate';
 export const deployedCandidateMessage = (orderIds: string[]) =>
   `<span class="deployed-candidate__message">Candidate is already working on order <span class="deployed-candidate__order-id"> ${orderIds.join(', ')}</span>. Do you wish to proceed?</span>`;
+  export const SEND_EMAIL = 'Sent email';
+export const SEND_EMAIL_REQUIRED = 'Required';
+export const DOCUMENT_UPLOAD_SUCCESS = 'Document uploaded successfully';
+export const DOCUMENT_UPLOAD_EDIT = 'Document modified successfully';
