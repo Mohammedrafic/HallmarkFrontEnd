@@ -6,13 +6,7 @@ import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoic
 import { Store } from '@ngxs/store';
 import { InvoicesModel } from '../../store/invoices.model';
 import { InvoiceState } from '../../enums';
-
-interface AllInvoiceCell {
- approve: () => void;
- pay: () => void;
- canEdit: boolean;
- canPay: boolean;
-}
+import { AllInvoiceCell } from '../../interfaces';
 
 @Component({
   selector: 'app-all-invoices-action-cell',

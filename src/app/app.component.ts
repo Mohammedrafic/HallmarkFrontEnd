@@ -19,12 +19,12 @@ export class AppComponent implements OnInit {
 
   constructor(
     private router: Router,
-              private store: Store,
-              private b2CAuthService: B2CAuthService,
+    private store: Store,
+    private b2CAuthService: B2CAuthService,
   ) {}
 
   ngOnInit(): void {
-    this.store.dispatch(new CheckScreen());
+    this.store.dispatch([new CheckScreen(), new SetUserPermissions()]);
 
     this.isIframe = window !== window.parent && !window.opener;
 

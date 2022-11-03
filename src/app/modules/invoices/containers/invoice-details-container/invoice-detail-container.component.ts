@@ -6,7 +6,7 @@ import {
   Input,
   OnChanges,
   OnInit,
-  Output, SimpleChanges,
+  Output,
   ViewChild
 } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
@@ -30,7 +30,7 @@ import { InvoicePrintingService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesState } from '../../store/state/invoices.state';
-import { InvoicesModel } from './../../store/invoices.model';
+import { InvoicesModel } from '../../store/invoices.model';
 import { GRID_CONFIG } from '@shared/constants';
 
 interface ExportOption extends ItemModel {
@@ -91,7 +91,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     this.getDialogState();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(): void {
     this.isActionBtnDisabled = this.checkActionBtnDisabled();
   }
 
