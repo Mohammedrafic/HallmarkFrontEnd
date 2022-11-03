@@ -108,7 +108,8 @@
                        type="text"
                        appValidateWithMessage
                        maxlength="50"
-                       formControlName="documentName" />
+                       tabindex="1"
+                       formControlName="documentName"/>
               </div>
             </div>
             <div class="input-container"></div>
@@ -118,8 +119,8 @@
           <div class="group" *ngIf="!isAgency">
             <div class="input-container calendar">
               <label for="regionIds">Region <span class="required">*</span></label>
-              <div class="input-group multiselect">
-                <ejs-multiselect id="regionIds" mode="CheckBox"
+              <div class="input-group multiselect" >
+                <ejs-multiselect #regionIdsControl id="regionIds" mode="CheckBox"
                                  formControlName="regionIds"
                                  placeholder="All"
                                  [fields]="optionFields"
@@ -129,7 +130,8 @@
                                  [dataSource]="regions$ | async"
                                  [selectAllText]='allOption'
                                  (select)="onRegionSelect($event)"
-                                 [showSelectAll]="true">
+                                 [showSelectAll]="true"
+                                 tabindex="2">
                 </ejs-multiselect>
               </div>
             </div>
@@ -145,7 +147,8 @@
                                  appValidateWithMessage
                                  [dataSource]="locations$ | async"
                                  [selectAllText]='allOption'
-                                 [showSelectAll]="true">
+                                 [showSelectAll]="true"
+                                 tabindex="3">
                 </ejs-multiselect>
               </div>
             </div>
@@ -160,7 +163,7 @@
                   <ejs-dropdownlist appValidateWithMessage
                                     formControlName="typeIds"
                                     [fields]="optionFields"
-                                    [dataSource]="documentsTypes$ | async"></ejs-dropdownlist>
+                                    [dataSource]="documentsTypes$ | async" tabindex="4"></ejs-dropdownlist>
                 </div>
               </div>
             </div>
@@ -172,7 +175,7 @@
                        type="text"
                        appValidateWithMessage
                        maxlength="50"
-                       formControlName="tags" />
+                       formControlName="tags" tabindex="5" />
               </div>
             </div>
           </div>
@@ -186,7 +189,8 @@
                   <ejs-dropdownlist formControlName="statusIds"
                                     appValidateWithMessage
                                     [dataSource]="statusItems"
-                                    [fields]="statusFields">
+                                    [fields]="statusFields"
+                                    tabindex="6">
                   </ejs-dropdownlist>
 
                 </div>
@@ -201,7 +205,8 @@
                                   format="MM/dd/yyyy"
                                   placeholder="MM/DD/YYYY"
                                   appValidateWithMessage
-                                  formControlName="startDate">
+                                  formControlName="startDate"
+                                  tabindex="7">
                   </ejs-datepicker>
                 </div>
               </div>
@@ -216,7 +221,8 @@
                                   placeholder="MM/DD/YYYY"
                                   appValidateWithMessage
                                   formControlName="endDate"
-                                  [min]="startDate">
+                                  [min]="startDate"
+                                  tabindex="8">
                   </ejs-datepicker>
                 </div>
               </div>
@@ -233,7 +239,7 @@
                         maxlength="3000"
                         appValidateWithMessage
                         name="comments"
-                        formControlName="comments"></textarea>
+                        formControlName="comments" tabindex="9"></textarea>
             </div>
           </div>
         </div>
@@ -250,12 +256,12 @@
                 <div class="input-group datepicker">
                   <ejs-switch id="agency-switcher"
                               [checked]="agencySwitch"
-                              (change)="onAgencySwitcher($event);"></ejs-switch>
+                              (change)="onAgencySwitcher($event);" tabindex="10"></ejs-switch>
                   <label for="agency-switcher" class="switch-text">Agencies</label>
                 </div>
               </div>
               <div class="input-container calendar">
-                <div class="input-group multiselect">
+                <div class="input-group multiselect" tabindex="11">
 
                   <ejs-multiselect mode="CheckBox"
                                    formControlName="agencies"
@@ -264,7 +270,7 @@
                                    [showDropDownIcon]="true"
                                    [fields]="agencyFields"
                                    [dataSource]="AssociateAgencyData"
-                                   [enabled]="agencySwitch">
+                                   [enabled]="agencySwitch" >
                   </ejs-multiselect>
                 </div>
               </div>
@@ -276,12 +282,12 @@
                 <div class="input-group datepicker">
                   <ejs-switch id="org-switcher"
                               [checked]="organizationSwitch"
-                              (change)="onOrganizationSwitcher($event);"></ejs-switch>
+                              (change)="onOrganizationSwitcher($event);" tabindex="12"></ejs-switch>
                   <label for="org-switcher" class="switch-text">Organization</label>
                 </div>
               </div>
               <div class="input-container calendar">
-                <div class="input-group multiselect">
+                <div class="input-group multiselect" tabindex="13">
                   <ejs-multiselect mode="CheckBox"
                                    formControlName="orgnizations"
                                    placeholder="All"
@@ -289,7 +295,7 @@
                                    [showDropDownIcon]="true"
                                    [fields]="optionFields"
                                    [dataSource]="ShareOrganizationsData"
-                                   [enabled]="organizationSwitch">
+                                   [enabled]="organizationSwitch" >
                   </ejs-multiselect>
                 </div>
               </div>
