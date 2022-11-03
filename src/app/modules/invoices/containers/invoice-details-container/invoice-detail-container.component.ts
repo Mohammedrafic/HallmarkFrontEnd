@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output, SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 
 import { map, Observable, takeUntil, throttleTime } from 'rxjs';
@@ -33,7 +43,7 @@ interface ExportOption extends ItemModel {
   styleUrls: ['./invoice-detail-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InvoiceDetailContainerComponent extends Destroyable implements OnInit {
+export class InvoiceDetailContainerComponent extends Destroyable implements OnInit, OnChanges {
   @Select(InvoicesState.isInvoiceDetailDialogOpen)
   isInvoiceDetailDialogOpen$: Observable<InvoiceDialogActionPayload>;
 
@@ -63,6 +73,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   public gridOptions: GridOptions = {};
   public gridSummaryOptions: GridOptions = {};
   public isAgency: boolean;
+  public isActionBtnDisabled = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -75,20 +86,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     super();
   }
 
-  public get actionBtnDisabled(): boolean {
-    if (!this.actionAllowed) {
-      return true;
-    }
-
-    if (this.actionBtnText === InvoicesActionBtn.Approve) {
-      return !this.approveAllowed;
-    } else {
-      return !this.payAllowed;
-    }
-  }
-
   public get actionBtnText(): string {
-    const status = this.invoiceDetail.meta.invoiceStateText.toLowerCase() as INVOICES_STATUSES;
+    const status = this.invoiceDetail?.meta.invoiceStateText.toLowerCase() as INVOICES_STATUSES;
     let result: string;
 
     if (this.isAgency) {
@@ -103,6 +102,10 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
 
   ngOnInit(): void {
     this.getDialogState();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.isActionBtnDisabled = this.actionBtnDisabled();
   }
 
   public handleProfileClose(): void {
@@ -188,5 +191,17 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     this.columnDefinitions = this.invoicesContainerService.getDetailColDef();
     this.columnSummaryDefinitions = this.invoicesContainerService.getDetailSummaryColDef(summaryLocation);
     this.isAgency = this.invoicesContainerService.isAgency();
+  }
+
+  private actionBtnDisabled(): boolean {
+    if (!this.actionAllowed) {
+      return true;
+    }
+
+    if (this.actionBtnText === InvoicesActionBtn.Approve) {
+      return !this.approveAllowed;
+    } else {
+      return !this.payAllowed;
+    }
   }
 }
