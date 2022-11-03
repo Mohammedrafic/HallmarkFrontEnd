@@ -3,12 +3,12 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { OrderApplicantsApplyData, OrderApplicantsInitialData } from "@shared/models/order-applicants.model";
+import { OrderApplicantsApplyData, OrderApplicantsInitialData } from '@shared/models/order-applicants.model';
+import { OverlappedOrderIds } from '@shared/models/overlapped-orders-dto.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderApplicantsService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Get the order applicants data
@@ -29,5 +29,15 @@ export class OrderApplicantsService {
    */
   public applyOrderApplicants(order: OrderApplicantsApplyData): Observable<never> {
     return this.http.post<never>(`/api/OrderApplicants/apply`, order);
+  }
+
+  public getDeployedCandidateOrderIds(
+    orderId: number,
+    candidateProfileId: number,
+    organizationId: number
+  ): Observable<OverlappedOrderIds[]> {
+    return this.http.get<OverlappedOrderIds[]>('/api/OrderApplicants/overlappingorders', {
+      params: { orderId, candidateProfileId, organizationId },
+    });
   }
 }

@@ -145,6 +145,7 @@ import { AssignCredentialSideComponent } from './components/credentials-list/ass
 import { SendEmailSideDialogComponent } from './components/send-email-side-dialog/send-email-side-dialog.component';
 import { DocumentPreviewSideDialogComponent } from './components/document-preview-side-dialog/document-preview-side-dialog.component';
 import { CustomSideDialogComponent } from './components/custom-side-dialog/custom-side-dialog.component';
+import { OrderManagementState } from '@agency/store/order-management.state';
 
 const icons = {
   AlertCircle,
@@ -269,7 +270,7 @@ const COMPONENTS = [
     MaskedTextBoxAllModule,
     TabAllModule,
     DropDownButtonAllModule,
-    NgxsModule.forFeature([BillRateState, SecurityState, CommentsState, AlertsState]),
+    NgxsModule.forFeature([BillRateState, SecurityState, CommentsState, AlertsState, OrderManagementState]),
     PageToolbarModule,
     FilterDialogModule,
     SideMenuModule,
