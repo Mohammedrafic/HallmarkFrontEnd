@@ -278,7 +278,8 @@ export class PendingApprovalGridHelper {
               {
                 field: 'billRate',
                 headerName: 'Rate',
-                width: 100,
+                // minWidth: 100,
+                // initialWidth: 100,
                 cellRendererSelector: titleValueCellRendererSelector,
                 valueGetter: RateReasonValueGetter,
               },

@@ -185,7 +185,8 @@ export class AllInvoicesGridHelper {
               {
                 field: 'billRate',
                 headerName: 'Rate',
-                width: 100,
+                minWidth: 80,
+                maxWidth: 190,
                 cellRendererSelector: titleValueCellRendererSelector,
                 valueGetter: RateReasonValueGetter,
               },
