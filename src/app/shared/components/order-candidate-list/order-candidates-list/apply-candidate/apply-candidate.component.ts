@@ -4,7 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { Observable, Subject, takeUntil, firstValueFrom } from 'rxjs';
+import { Observable, Subject, takeUntil, of, take } from 'rxjs';
 
 import { ApplyOrderApplicants, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
@@ -91,34 +91,36 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.closeDialogEmitter.next();
   }
 
-  public async applyOrderApplicants(): Promise<void> {
+  public applyOrderApplicants(): void {
     this.formGroup.markAllAsTouched();
     if (this.formGroup.valid) {
-      const applyCandidate = this.isDeployedCandidate ? await this.shouldApplyDeployedCandidate() : true;
-
-      if (applyCandidate) {
-        const value = this.formGroup.getRawValue();
-        this.store
-          .dispatch(
-            new ApplyOrderApplicants({
-              orderId: this.orderId,
-              organizationId: this.organizationId,
-              candidateId: this.candidateId,
-              candidateBillRate: value.candidateBillRate,
-              expAsTravelers: value.expAsTravelers,
-              availableStartDate: toCorrectTimezoneFormat(value.availableStartDate),
-              requestComment: value.requestComment,
-            })
-          )
-          .subscribe(() => {
-            this.store.dispatch(new ReloadOrderCandidatesLists());
-          });
-        this.closeDialog();
-      }
+      this.shouldApplyDeployedCandidate()
+        .pipe(take(1))
+        .subscribe((isConfirm) => {
+          if (isConfirm) {
+            const value = this.formGroup.getRawValue();
+            this.store
+              .dispatch(
+                new ApplyOrderApplicants({
+                  orderId: this.orderId,
+                  organizationId: this.organizationId,
+                  candidateId: this.candidateId,
+                  candidateBillRate: value.candidateBillRate,
+                  expAsTravelers: value.expAsTravelers,
+                  availableStartDate: toCorrectTimezoneFormat(value.availableStartDate),
+                  requestComment: value.requestComment,
+                })
+              )
+              .subscribe(() => {
+                this.store.dispatch(new ReloadOrderCandidatesLists());
+              });
+            this.closeDialog();
+          }
+        });
     }
   }
 
-  private shouldApplyDeployedCandidate(): Promise<boolean> {
+  private shouldApplyDeployedCandidate(): Observable<boolean> {
     const options = {
       title: DEPLOYED_CANDIDATE,
       okButtonLabel: 'Proceed',
@@ -126,7 +128,9 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     };
 
     //TODO Remove mock data after providing by BE the endpoint to get orderIds of deployed candidate
-    return firstValueFrom(this.confirmService.confirm(deployedCandidateMessage(['NL-1234', 'NL-1266']), options));
+    return this.isDeployedCandidate
+      ? this.confirmService.confirm(deployedCandidateMessage(['NL-1234', 'NL-1266']), options)
+      : of(true);
   }
 
   private createForm(): void {

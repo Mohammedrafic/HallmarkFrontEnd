@@ -19,7 +19,7 @@ import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, merge, Observable, Subject, switchMap, takeUntil, firstValueFrom } from 'rxjs';
+import { filter, merge, Observable, Subject, switchMap, takeUntil, of, take } from 'rxjs';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -330,53 +330,56 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     return billRates as BillRate[];
   }
 
-  private async onAccept(): Promise<void> {
+  private onAccept(): void {
     if (this.form.valid && this.candidateJob) {
-      const acceptCandidate = this.isDeployedCandidate ? await this.shouldChangeCandidateStatus() : true;
-
-      if (acceptCandidate) {
-        const value = this.form.getRawValue();
-        this.store
-          .dispatch(
-            new UpdateOrganisationCandidateJob({
-              organizationId: this.candidateJob.organizationId,
-              jobId: this.candidateJob.jobId,
-              orderId: this.candidateJob.orderId,
-              nextApplicantStatus: {
-                applicantStatus: 60,
-                statusText: 'Onboard',
-              },
-              candidateBillRate: value.candidateBillRate,
-              offeredBillRate: value.offeredBillRate,
-              requestComment: value.comments,
-              actualStartDate: toCorrectTimezoneFormat(value.startDate),
-              actualEndDate: toCorrectTimezoneFormat(value.endDate),
-              clockId: value.clockId,
-              guaranteedWorkWeek: value.workWeek,
-              allowDeployWoCredentials: value.allow,
-              billRates: this.billRatesData,
-              offeredStartDate: this.candidateJob.offeredStartDate,
-            })
-          )
-          .subscribe(() => {
-            this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-          });
-        this.closeDialog();
-      } else {
-        this.jobStatusControl.reset();
-      }
+      this.shouldChangeCandidateStatus()
+        .pipe(take(1))
+        .subscribe((isConfirm) => {
+          if (isConfirm && this.candidateJob) {
+            const value = this.form.getRawValue();
+            this.store
+              .dispatch(
+                new UpdateOrganisationCandidateJob({
+                  organizationId: this.candidateJob.organizationId,
+                  jobId: this.candidateJob.jobId,
+                  orderId: this.candidateJob.orderId,
+                  nextApplicantStatus: {
+                    applicantStatus: 60,
+                    statusText: 'Onboard',
+                  },
+                  candidateBillRate: value.candidateBillRate,
+                  offeredBillRate: value.offeredBillRate,
+                  requestComment: value.comments,
+                  actualStartDate: toCorrectTimezoneFormat(value.startDate),
+                  actualEndDate: toCorrectTimezoneFormat(value.endDate),
+                  clockId: value.clockId,
+                  guaranteedWorkWeek: value.workWeek,
+                  allowDeployWoCredentials: value.allow,
+                  billRates: this.billRatesData,
+                  offeredStartDate: this.candidateJob.offeredStartDate,
+                })
+              )
+              .subscribe(() => {
+                this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+              });
+            this.closeDialog();
+          } else {
+            this.jobStatusControl.reset();
+          }
+        });
     }
   }
 
-  private shouldChangeCandidateStatus(): Promise<boolean> {
+  private shouldChangeCandidateStatus(): Observable<boolean> {
     const options = {
       title: DEPLOYED_CANDIDATE,
       okButtonLabel: 'Proceed',
       okButtonClass: 'ok-button',
     };
 
-    //TODO Remove mock data after providing by BE the endpoint to get orderIds of deployed candidate
-    return firstValueFrom(this.confirmService.confirm(deployedCandidateMessage(['NL-1234', 'NL-1266']), options));
+    return this.isDeployedCandidate
+      ? this.confirmService.confirm(deployedCandidateMessage([]), options)
+      : of(true);
   }
 
   private patchForm(): void {

@@ -23,7 +23,7 @@ import {
 import { MessageTypes } from '@shared/enums/message-types';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, Observable, Subject, takeUntil, firstValueFrom } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
 
 import { BillRate } from '@shared/models/bill-rate.model';
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
@@ -230,60 +230,63 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private async offerCandidate(applicantStatus: ApplicantStatus, reloadJob: boolean): Promise<void> {
+  private offerCandidate(applicantStatus: ApplicantStatus, reloadJob: boolean): void {
     if (!this.formGroup.errors && this.candidateJob) {
-      const offerCandidate = this.isDeployedCandidate ? await this.shouldChangeCandidateStatus() : true;
-
-      if (offerCandidate) {
-        const value = this.formGroup.getRawValue();
-        this.store
-          .dispatch(
-            new UpdateOrganisationCandidateJob({
-              orderId: this.candidateJob.orderId,
-              organizationId: this.candidateJob.organizationId,
-              jobId: this.candidateJob.jobId,
-              nextApplicantStatus: applicantStatus,
-              candidateBillRate: this.candidateJob.candidateBillRate,
-              offeredBillRate: value.offeredBillRate,
-              requestComment: this.candidateJob.requestComment,
-              actualStartDate: this.candidateJob.actualStartDate,
-              actualEndDate: this.candidateJob.actualEndDate,
-              clockId: this.candidateJob.clockId,
-              guaranteedWorkWeek: value.guaranteedWorkWeek,
-              offeredStartDate: toCorrectTimezoneFormat(value.offeredStartDate),
-              allowDeployWoCredentials: true,
-              billRates: this.billRatesComponent.billRatesControl.value,
-            })
-          )
-          .subscribe(() => {
-            this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-            if (reloadJob) {
-              this.store.dispatch(
-                new GetOrganisationCandidateJob(
-                  this.candidateJob?.organizationId as number,
-                  this.candidate.candidateJobId
-                )
-              );
+      this.shouldChangeCandidateStatus()
+        .pipe(take(1))
+        .subscribe((isConfirm) => {
+          if (isConfirm && this.candidateJob) {
+            const value = this.formGroup.getRawValue();
+            this.store
+              .dispatch(
+                new UpdateOrganisationCandidateJob({
+                  orderId: this.candidateJob.orderId,
+                  organizationId: this.candidateJob.organizationId,
+                  jobId: this.candidateJob.jobId,
+                  nextApplicantStatus: applicantStatus,
+                  candidateBillRate: this.candidateJob.candidateBillRate,
+                  offeredBillRate: value.offeredBillRate,
+                  requestComment: this.candidateJob.requestComment,
+                  actualStartDate: this.candidateJob.actualStartDate,
+                  actualEndDate: this.candidateJob.actualEndDate,
+                  clockId: this.candidateJob.clockId,
+                  guaranteedWorkWeek: value.guaranteedWorkWeek,
+                  offeredStartDate: toCorrectTimezoneFormat(value.offeredStartDate),
+                  allowDeployWoCredentials: true,
+                  billRates: this.billRatesComponent.billRatesControl.value,
+                })
+              )
+              .subscribe(() => {
+                this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+                if (reloadJob) {
+                  this.store.dispatch(
+                    new GetOrganisationCandidateJob(
+                      this.candidateJob?.organizationId as number,
+                      this.candidate.candidateJobId
+                    )
+                  );
+                }
+              });
+            if (!reloadJob) {
+              this.closeDialog();
             }
-          });
-        if (!reloadJob) {
-          this.closeDialog();
-        }
-      } else {
-        this.statusesFormControl.reset();
-      }
+          } else {
+            this.statusesFormControl.reset();
+          }
+        });
     }
   }
 
-  private shouldChangeCandidateStatus(): Promise<boolean> {
+  private shouldChangeCandidateStatus(): Observable<boolean> {
     const options = {
       title: DEPLOYED_CANDIDATE,
       okButtonLabel: 'Proceed',
       okButtonClass: 'ok-button',
     };
 
-    //TODO Remove mock data after providing by BE the endpoint to get orderIds of deployed candidate
-    return firstValueFrom(this.confirmService.confirm(deployedCandidateMessage(['NL-1234', 'NL-1266']), options));
+    return this.isDeployedCandidate
+      ? this.confirmService.confirm(deployedCandidateMessage([]), options)
+      : of(true);
   }
 
   public onBillRatesChanged(): void {
