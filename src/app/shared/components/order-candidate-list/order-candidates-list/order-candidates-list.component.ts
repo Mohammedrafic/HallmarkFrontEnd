@@ -3,7 +3,7 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob,
-  GetPredefinedBillRates, SetPredefinedBillRatesData
+  GetPredefinedBillRates
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Select, Store } from '@ngxs/store';
@@ -13,7 +13,7 @@ import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { Order, OrderCandidatesList } from '@shared/models/order-management.model';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { combineLatest, Observable, Subject, switchMap } from 'rxjs';
+import { combineLatest, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { UserState } from 'src/app/store/user.state';
 import { Duration } from '../../../enums/durations';
@@ -127,7 +127,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           this.store.dispatch(
             new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId)
           );
-          if (!this.isShowDropdown && !this.candidate.deployedCandidateInfo) {
+          if (!this.isShowDropdown) {
             this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
           }
           this.openDialog(this.offerDeployment);
