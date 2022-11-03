@@ -6,6 +6,8 @@ import { Destroyable } from '@core/helpers';
 import { UserPermissions } from '@core/enums';
 
 import { UserState } from '../../../store/user.state';
+import { takeUntil } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
 
 @Directive()
 export class InvoicesPermissionHelper extends Destroyable {
@@ -24,13 +26,17 @@ export class InvoicesPermissionHelper extends Destroyable {
   }
 
   public checkPermissions(isAgency: boolean): void {
-    const permission = this.store.selectSnapshot(UserState.userPermission);
-
-    if (isAgency) {
-      this.setAgencyPermissions(permission);
-    } else {
-      this.setOrgPermissions(permission);
-    }
+    this.store.select(UserState.userPermission).pipe(
+      filter((data) => !!Object.keys(data).length),
+      take(1),
+      takeUntil(this.componentDestroy())
+    ).subscribe((permission: Permission) => {
+      if (isAgency) {
+        this.setAgencyPermissions(permission);
+      } else {
+        this.setOrgPermissions(permission);
+      }
+    });
   }
 
   private setAgencyPermissions(permission: Permission): void {
