@@ -16,7 +16,7 @@ import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-conf
 export class OrganizationInvoicesContainerService extends InvoicesContainerService {
   public getColDefsByTab(
     tabIndex: OrganizationInvoicesGridTab,
-    { organizationId }: { organizationId: number }
+    { organizationId, canPay, canEdit }: { organizationId: number, canPay: boolean, canEdit: boolean }
   ): ColDef[] {
     switch (tabIndex) {
       case OrganizationInvoicesGridTab.Manual:
@@ -37,6 +37,7 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
           downloadAttachment: (attachment) => this.store.dispatch(
             new Invoices.DownloadAttachment(organizationId, attachment),
           ),
+          canEdit,
         });
       case OrganizationInvoicesGridTab.PendingRecords:
         return PendingInvoicesGridHelper.getOrganizationColDefs({
@@ -51,12 +52,14 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
         return PendingApprovalGridHelper.getOrganizationColDefs({
           approve: (invoice: PendingApprovalInvoice) =>
             this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.PendingPayment)),
+          actionEnabled: canEdit
         });
       case OrganizationInvoicesGridTab.PendingPayment:
         return PendingApprovalGridHelper.getOrganizationColDefs({
           approve: (invoice: PendingApprovalInvoice) =>
             this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.Paid)),
-          actionTitle: 'Pay'
+          actionTitle: 'Pay',
+          actionEnabled: canPay
         });
       case OrganizationInvoicesGridTab.Paid:
         return  PendingApprovalGridHelper.getOrganizationPaidColDefs();
@@ -66,6 +69,8 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
           this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.PendingPayment)),
           pay: (invoice: PendingApprovalInvoice) =>
           this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.Paid)),
+          canEdit,
+          canPay
         })
       default:
         return [];

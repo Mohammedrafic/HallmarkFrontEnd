@@ -356,3 +356,20 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
     }
   }
 }
+
+.relative {
+  position: relative;
+}
+
+.tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: inline-block;
+}
+
+.tooltip [disabled] {
+  pointer-events: none;
+}

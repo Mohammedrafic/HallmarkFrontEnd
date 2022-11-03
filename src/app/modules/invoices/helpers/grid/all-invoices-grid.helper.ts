@@ -40,12 +40,13 @@ export class AllInvoicesGridHelper {
         cellRenderer: AllInvoicesActionCellComponent,
         cellRendererParams: {
           pay: pay,
+          canPay: true,
         },
         sortable: false,
         suppressMenu: true,
         filter: false,
         resizable: false,
-      } :       {
+      } : {
         field: '',
         headerName: '',
         headerCheckboxSelection: true,
