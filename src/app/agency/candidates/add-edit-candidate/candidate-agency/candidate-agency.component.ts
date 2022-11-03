@@ -1,10 +1,11 @@
 import { GetAgencyByPage } from '@agency/store/agency.actions';
 import { AgencyState } from '@agency/store/agency.state';
 import { AfterViewInit, Component, Input } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { UserState } from 'src/app/store/user.state';
+import { GRID_CONFIG } from '@shared/constants';
 
 @Component({
   selector: 'app-candidate-agency',
@@ -23,7 +24,7 @@ export class CandidateAgencyComponent implements AfterViewInit {
   agencies$: Observable<any>;
 
   constructor(private store: Store) {
-    store.dispatch(new GetAgencyByPage(1, 100, {})); // TODO: needed until we dont have agency switcher in the header
+    store.dispatch(new GetAgencyByPage(GRID_CONFIG.initialPage, GRID_CONFIG.initialRowsPerPage, {})); // TODO: needed until we dont have agency switcher in the header
   }
 
   ngAfterViewInit(): void {

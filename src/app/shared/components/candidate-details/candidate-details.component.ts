@@ -7,7 +7,7 @@ import {
   GetCandidateRegions,
   GetCandidateSkills,
   SetNavigation,
-  SetPageFilters,
+  SetPageFilters
 } from '@shared/components/candidate-details/store/candidate.actions';
 import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
 import { combineLatest, filter, Observable, takeUntil, tap } from 'rxjs';
@@ -22,12 +22,13 @@ import {
   CandidatesDetailsRegions,
   FilterColumnsModel,
   FiltersModal,
-  NavigationTabModel,
+  NavigationTabModel
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { UserState } from '../../../store/user.state';
 import { OrderTypeOptionsForCandidates } from '@shared/components/candidate-details/candidate-details.constant';
 import { toCorrectTimezoneFormat } from '../../utils/date-time.utils';
+import { GRID_CONFIG } from '@shared/constants';
 
 @Component({
   selector: 'app-candidate-details',
@@ -69,8 +70,8 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   public orderTypes = OrderTypeOptionsForCandidates;
   public candidatesPage: CandidateDetailsPage;
 
-  public pageNumber = 1;
-  public pageSize = 30;
+  public pageNumber = GRID_CONFIG.initialPage;
+  public pageSize = GRID_CONFIG.initialRowsPerPage;
   private selectedTab: number | null;
 
   constructor(
@@ -267,8 +268,8 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   private clearFilters(): void {
-    this.pageNumber = 1;
-    this.pageSize = 30;
+    this.pageNumber = GRID_CONFIG.initialPage;
+    this.pageSize = GRID_CONFIG.initialRowsPerPage;
     this.filtersForm.reset();
     this.filteredItems = [];
     this.filters = null;
@@ -301,8 +302,8 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   private updatePage(): void {
     this.store.dispatch(
       new GetCandidateDetailsPage({
-        pageNumber: this.pageNumber ?? 1,
-        pageSize: this.pageSize ?? 30,
+        pageNumber: this.pageNumber ?? GRID_CONFIG.initialPage,
+        pageSize: this.pageSize ?? GRID_CONFIG.initialRowsPerPage,
         tab: this.selectedTab,
         ...this.filters,
       })

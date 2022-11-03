@@ -87,6 +87,11 @@
     display: flex;
     align-items: center;
     column-gap: 15px;
+
+    .total-rows {
+      color: $secondary-dark-blue-15;
+      font-size: 14px;
+    }
   }
 
   &__pager.e-pager {

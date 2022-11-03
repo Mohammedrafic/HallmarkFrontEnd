@@ -1,14 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  QueryList,
-  ViewChild,
-  ViewChildren,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -19,7 +9,7 @@ import {
   PagerComponent,
   RowDataBoundEventArgs,
   SelectionSettingsModel,
-  TextWrapSettingsModel,
+  TextWrapSettingsModel
 } from '@syncfusion/ej2-angular-grids';
 import { CheckBoxComponent } from '@syncfusion/ej2-angular-buttons';
 
@@ -37,7 +27,7 @@ import {
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
-  ROW_HEIGHT,
+  ROW_HEIGHT
 } from './order-management-grid.constants';
 import {
   ClearOrders,
@@ -47,7 +37,7 @@ import {
   GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
   GetOrderById,
-  ReloadOrderCandidatesLists,
+  ReloadOrderCandidatesLists
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import {
@@ -55,7 +45,7 @@ import {
   AgencyOrderManagement,
   AgencyOrderManagementPage,
   Order,
-  OrderManagementChild,
+  OrderManagementChild
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -73,7 +63,6 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PreviewOrderDialogComponent } from '@agency/order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
-import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -452,8 +441,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         new GetAgencyOrderCandidatesList(
           event.data.orderId,
           event.data.organizationId,
-          1,
-          30,
+          GRID_CONFIG.initialPage,
+          GRID_CONFIG.initialRowsPerPage,
           this.orderManagementAgencyService.excludeDeployed
         )
       );
