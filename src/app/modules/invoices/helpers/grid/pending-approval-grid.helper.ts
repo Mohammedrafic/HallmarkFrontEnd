@@ -269,7 +269,6 @@ export class PendingApprovalGridHelper {
                 width: 120,
                 cellRendererSelector: titleValueCellRendererSelector,
               },
-
               {
                 field: 'billRateConfigTitle',
                 headerName: 'Bill Rate Type',

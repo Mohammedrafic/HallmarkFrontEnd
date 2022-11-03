@@ -10,7 +10,7 @@ import { TitleValueCellRendererParams } from '@shared/components/grid/models';
 import { TypedColDef, TypedValueGetterParams } from '../../interfaces/typed-col-def.interface';
 import { PendingApprovalInvoice, PendingApprovalInvoiceRecord } from '../../interfaces/pending-approval-invoice.interface';
 import { numberValueFormatter, invoicesRowDetailsOffsetColDef, monthDayYearDateFormatter,
-  titleValueCellRendererSelector, weekPeriodValueGetter } from '../../constants';
+  titleValueCellRendererSelector, weekPeriodValueGetter, RateReasonValueGetter, CurrencyFormatter, DepartmentNameGetter } from '../../constants';
 import {
   InvoiceRecordsTableRowDetailsComponent
 } from '../../components/invoice-records-table-row-details/invoice-records-table-row-details.component';
@@ -163,14 +163,6 @@ export class AllInvoicesGridHelper {
                 }
               },
               {
-                field: 'amount',
-                headerName: 'Amount',
-                cellClass: 'font-weight-bold',
-                cellRendererSelector: titleValueCellRendererSelector,
-                cellRendererParams: rendererParams,
-                valueFormatter: numberValueFormatter,
-              },
-              {
                 ...weekPeriod,
                 valueGetter: weekPeriodValueGetter,
                 headerName: 'Week Period',
@@ -178,11 +170,41 @@ export class AllInvoicesGridHelper {
                 cellRendererParams: rendererParams,
               },
               {
-                field: 'value',
-                headerName: 'Total Hours',
+                field: 'dateTime',
+                valueFormatter: monthDayYearDateFormatter,
+                headerName: 'Date',
+                width: 120,
                 cellRendererSelector: titleValueCellRendererSelector,
+              },
+              {
+                field: 'billRateConfigTitle',
+                headerName: 'Bill Rate Type',
+                width: 150,
+                cellRendererSelector: titleValueCellRendererSelector,
+              },
+              {
+                field: 'billRate',
+                headerName: 'Rate',
+                width: 100,
+                cellRendererSelector: titleValueCellRendererSelector,
+                valueGetter: RateReasonValueGetter,
+              },
+              {
+                field: 'value',
+                headerName: 'Hours',
+                cellRendererSelector: titleValueCellRendererSelector,
+                valueFormatter: numberValueFormatter,
                 cellRendererParams: rendererParams,
                 width: 100,
+              },
+              {
+                field: 'amount',
+                headerName: 'Total',
+                width: 120,
+                cellClass: 'font-weight-bold',
+                cellRendererParams: rendererParams,
+                cellRendererSelector: titleValueCellRendererSelector,
+                valueFormatter: CurrencyFormatter,
               },
               {
                 field: 'locationName',
@@ -194,9 +216,10 @@ export class AllInvoicesGridHelper {
               {
                 field: 'departmentName',
                 minWidth: 160,
-                headerName: 'Department',
+                headerName: 'Department (Cost Center)',
                 cellRendererSelector: titleValueCellRendererSelector,
                 cellRendererParams: rendererParams,
+                valueGetter: DepartmentNameGetter,
               },
               {
                 field: 'timesheetTypeText',
@@ -205,6 +228,15 @@ export class AllInvoicesGridHelper {
                 cellRendererSelector: titleValueCellRendererSelector,
                 cellRendererParams: rendererParams,
               },
+              {
+                field: 'feeAmount',
+                headerName: 'Agency Fee',
+                width: 120,
+                cellClass: 'font-weight-bold',
+                cellRendererParams: rendererParams,
+                cellRendererSelector: titleValueCellRendererSelector,
+                valueFormatter: CurrencyFormatter,
+              }
             ] as TypedColDef<PendingApprovalInvoiceRecord>[],
           },
           getDetailRowData: (params: GetDetailRowDataParams) => params.successCallback(
