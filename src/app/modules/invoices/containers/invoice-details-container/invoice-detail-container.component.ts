@@ -74,6 +74,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   public gridSummaryOptions: GridOptions = {};
   public isAgency: boolean;
   public isActionBtnDisabled = false;
+  public actionBtnText = '';
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -86,26 +87,12 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     super();
   }
 
-  public get actionBtnText(): string {
-    const status = this.invoiceDetail?.meta.invoiceStateText.toLowerCase() as INVOICES_STATUSES;
-    let result: string;
-
-    if (this.isAgency) {
-      const permission = (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay || this.actionAllowed;
-      result = permission && this.payAllowed ? AgencyActionBtnOnStatus.get(status) as string : '';
-    } else {
-      result = ActionBtnOnStatus.get(status) as string;
-    }
-
-    return result || '';
-  }
-
   ngOnInit(): void {
     this.getDialogState();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.isActionBtnDisabled = this.actionBtnDisabled();
+    this.isActionBtnDisabled = this.checkActionBtnDisabled();
   }
 
   public handleProfileClose(): void {
@@ -175,6 +162,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
           this.invoiceDetail = payload.invoiceDetail as InvoiceDetail;
           if (payload.invoiceDetail) {
             this.initTableColumns(this.invoiceDetail.summary[0]?.locationName || '');
+            this.setActionBtnText();
             if (this.chipList) {
               this.chipList.cssClass = this.chipsCssClass.transform(this.invoiceDetail.meta.invoiceStateText);
               this.chipList.text = this.invoiceDetail.meta.invoiceStateText.toUpperCase();
@@ -193,7 +181,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     this.isAgency = this.invoicesContainerService.isAgency();
   }
 
-  private actionBtnDisabled(): boolean {
+  private checkActionBtnDisabled(): boolean {
     if (!this.actionAllowed) {
       return true;
     }
@@ -203,5 +191,19 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     } else {
       return !this.payAllowed;
     }
+  }
+
+  private setActionBtnText(): void {
+    const status = this.invoiceDetail.meta.invoiceStateText.toLowerCase() as INVOICES_STATUSES;
+    let result: string;
+
+    if (this.isAgency) {
+      const permission = (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay || this.actionAllowed;
+      result = permission && this.payAllowed ? AgencyActionBtnOnStatus.get(status) as string : '';
+    } else {
+      result = ActionBtnOnStatus.get(status) as string;
+    }
+
+    this.actionBtnText = result || '';
   }
 }
