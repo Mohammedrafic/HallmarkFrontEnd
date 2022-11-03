@@ -3,7 +3,7 @@ import { debounceTime, filter, map, merge, Observable, Subject, takeUntil, takeW
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { CandidatesStatusText, CandidateStatus, CandidateStatusOptions, STATUS_COLOR_GROUP } from '@shared/enums/status';
+import { CandidatesStatusText, CandidateStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserState } from '../../../../../store/user.state';
 import { SaveCandidateSucceeded } from '@agency/store/candidate.actions';
@@ -28,13 +28,16 @@ import {
   ExportCandidateList,
   GetAllSkills,
   GetCandidatesByPage,
+  GetRegionList,
 } from '../../store/candidate-list.actions';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { ExportColumn, ExportOptions } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
 import { isNil } from 'lodash';
+import { optionFields, regionFields } from '@shared/constants';
+import { adaptToNameEntity } from '../../../../helpers/dropdown-options.helper';
+import { filterColumns } from './candidate-list.constants';
 
 @Component({
   selector: 'app-candidate-list',
@@ -56,6 +59,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Select(UserState.lastSelectedOrganizationId)
   lastSelectedOrgId$: Observable<number>;
 
+  @Select(CandidateListState.listOfRegions)
+  regions$: Observable<string[]>;
+
   @Input() filteredItems$: Subject<number>;
   @Input() export$: Subject<ExportedFileType>;
   @Input() search$: Subject<string>;
@@ -70,13 +76,14 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public filters: CandidateListFilters = {
+    candidateName: null,
     profileStatuses: [],
-    regionsIds: [],
+    regionsNames: [],
     skillsIds: [],
     tab: 0,
   };
   public CandidateFilterFormGroup: FormGroup;
-  public filterColumns: CandidateListFiltersColumn;
+  public filterColumns: CandidateListFiltersColumn = filterColumns;
   public readonly statusEnum = CandidateStatus;
   public readonly candidateStatus = CandidatesStatusText;
   public candidates$: Observable<CandidateList>;
@@ -97,10 +104,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     checkboxMode: 'ResetOnRowClick',
     persistSelection: true,
   };
-  public optionFields = {
-    text: 'name',
-    value: 'id',
-  };
+  public optionFields = optionFields;
+  public regionFields = regionFields;
 
   private pageSubject = new Subject<number>();
   private includeDeployedCandidates: boolean = true;
@@ -120,16 +125,22 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   ) {
     super();
     this.CandidateFilterFormGroup = this.fb.group({
+      candidateName: new FormControl([]),
       profileStatuses: new FormControl([]),
-      regionsIds: new FormControl([]),
+      regionsNames: new FormControl([]),
       skillsIds: new FormControl([]),
     });
   }
 
   ngOnInit(): void {
-    this.subscribeOnInitialData();
+    this.dispatchInitialIcon();
+    this.subscribeOnSaveState();
+    this.subscribeOnPageSubject();
+    this.subscribeOnActions();
+    this.subscribeOnDeploydCandidates();
+    this.subscribeOnSkills();
+    this.subscribeOnRegions();
     this.updateCandidates();
-    this.candidateFilterSetup();
     this.subscribeOnExportAction();
     this.setFileName();
   }
@@ -151,9 +162,11 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public onFilterApply(): void {
     this.filters = this.CandidateFilterFormGroup.getRawValue();
+    console.log(this.filters);
     this.filters.profileStatuses = this.filters.profileStatuses || [];
-    this.filters.regionsIds = this.filters.regionsIds || [];
+    this.filters.regionsNames = this.filters.regionsNames || [];
     this.filters.skillsIds = this.filters.skillsIds || [];
+    this.filters.candidateName = this.filters.candidateName || null;
     this.filteredItems = this.filterService.generateChips(this.CandidateFilterFormGroup, this.filterColumns);
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -163,7 +176,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public onFilterClose(): void {
     this.CandidateFilterFormGroup.setValue({
       profileStatuses: this.filters.profileStatuses || [],
-      regionsIds: this.filters.regionsIds || [],
+      regionsNames: this.filters.regionsNames || [],
       skillsIds: this.filters.skillsIds || [],
     });
     this.filteredItems = this.filterService.generateChips(this.CandidateFilterFormGroup, this.filterColumns);
@@ -206,7 +219,10 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         okButtonClass: 'delete-button',
         title: 'Inactivate the Candidate',
       })
-      .pipe(filter((confirm) => !!confirm))
+      .pipe(
+        filter((confirm) => !!confirm),
+        takeUntil(this.unsubscribe$)
+      )
       .subscribe(() => {
         this.inactivateCandidate(id);
       });
@@ -227,7 +243,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       new ExportCandidateList({
         filterQuery: {
           profileStatuses: this.filters.profileStatuses!,
-          regionsIds: this.filters.regionsIds!,
+          regionsNames: this.filters.regionsNames!,
           skillsIds: this.filters.skillsIds!,
           includeDeployedCandidates: this.includeDeployedCandidates,
           candidateProfileIds: this.selectedItems.length
@@ -253,11 +269,16 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       pageSize: this.pageSize,
       profileStatuses: this.filters.profileStatuses!,
       skillsIds: this.filters.skillsIds!,
-      regionsIds: this.filters.regionsIds!,
+      regionsNames: this.filters.regionsNames!,
+      candidateName: this.filters.candidateName!,
       tab: this.activeTab ?? 0,
       includeDeployedCandidates: this.includeDeployedCandidates,
     };
     this.store.dispatch(new GetCandidatesByPage(candidateListRequest));
+  }
+
+  public regionTrackBy(index: number, region: string): string {
+    return region;
   }
 
   private updateCandidates(): void {
@@ -265,33 +286,43 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       map((value: CandidateList) => {
         return {
           ...value,
-          items: this.addSkillEllipsis(value?.items),
+          items: this.addSkillRegionEllipsis(value?.items),
         };
       })
     );
   }
 
-  private addSkillEllipsis(candidates: CandidateRow[]): any {
+  private addSkillRegionEllipsis(candidates: CandidateRow[]): CandidateRow[] {
     return (
       candidates &&
       candidates.map((candidate: CandidateRow) => {
         if (candidate.candidateProfileSkills.length > 2) {
           const [first, second] = candidate.candidateProfileSkills;
-          return {
+          candidate = {
             ...candidate,
             candidateProfileSkills: [first, second, { skillDescription: '...' }],
           };
-        } else {
-          return candidate;
         }
+        if (candidate.candidateProfileRegions.length > 2) {
+          const [first, second] = candidate.candidateProfileRegions;
+          candidate = {
+            ...candidate,
+            candidateProfileRegions: [first, second, { regionDescription: '...' }],
+          };
+        }
+
+        return candidate;
       })
     );
   }
 
   private inactivateCandidate(id: number) {
-    this.store.dispatch(new ChangeCandidateProfileStatus(id, CandidateStatus.Inactive)).subscribe(() => {
-      this.dispatchNewPage();
-    });
+    this.store
+      .dispatch(new ChangeCandidateProfileStatus(id, CandidateStatus.Inactive))
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => {
+        this.dispatchNewPage();
+      });
   }
 
   private clearFilters(): void {
@@ -302,73 +333,77 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.filteredItems$.next(this.filteredItems.length);
   }
 
-  private candidateFilterSetup(): void {
-    this.filterColumns = {
-      regionsIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      skillsIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      profileStatuses: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: CandidateStatusOptions,
-        valueField: 'name',
-        valueId: 'id',
-      },
-    };
+  private dispatchInitialIcon(): void {
+    this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
   }
 
-  private subscribeOnInitialData(): void {
-    this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
+  private subscribeOnSaveState(): void {
     merge(this.lastSelectedAgencyId$, this.lastSelectedOrgId$)
       .pipe(
-        takeUntil(this.unsubscribe$),
-        filter((value) => !!value)
+        filter((value) => !!value),
+        takeUntil(this.unsubscribe$)
       )
       .subscribe(() => {
         this.dispatchNewPage();
         this.clearFilters();
-        this.onSkillDataLoadHandler();
+        this.store.dispatch([new GetRegionList(), new GetAllSkills()]);
       });
-    this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
+  }
+
+  private subscribeOnPageSubject(): void {
+    this.pageSubject.pipe(debounceTime(1), takeUntil(this.unsubscribe$)).subscribe((page) => {
       this.currentPage = page;
       this.dispatchNewPage();
     });
+  }
+
+  private subscribeOnActions(): void {
     this.actions$
-      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveCandidateSucceeded))
+      .pipe(ofActionSuccessful(SaveCandidateSucceeded), takeUntil(this.unsubscribe$))
       .subscribe((agency: { payload: Candidate }) => {
         this.dispatchNewPage();
       });
-    this.includeDeployedCandidates$.subscribe((isInclude: boolean) => {
+  }
+
+  private subscribeOnDeploydCandidates(): void {
+    this.includeDeployedCandidates$.pipe(takeUntil(this.unsubscribe$)).subscribe((isInclude: boolean) => {
       this.includeDeployedCandidates = isInclude;
       this.dispatchNewPage();
     });
   }
 
-  private onSkillDataLoadHandler(): void {
-    this.store.dispatch(new GetAllSkills());
-    this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe((skills) => {
-      if (skills?.length > 0 && this.filterColumns) {
+  private subscribeOnSkills(): void {
+    this.skills$
+      .pipe(
+        filter((skill) => !!skill),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((skills) => {
         this.filterColumns.skillsIds.dataSource = skills;
-      }
-    });
+      });
+  }
+
+  private subscribeOnRegions(): void {
+    this.regions$
+      .pipe(
+        filter((region) => !!region),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((regions) => {
+        this.filterColumns.regionsNames.dataSource = adaptToNameEntity(regions);
+      });
   }
 
   private subscribeOnExportAction(): void {
-    this.export$.pipe(takeWhile(() => this.isAlive)).subscribe((event: ExportedFileType) => {
-      this.defaultFileName = `Candidates ${this.generateDateTime(this.datePipe)}`;
-      this.defaultExport(event);
-    });
+    this.export$
+      .pipe(
+        takeWhile(() => this.isAlive),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((event: ExportedFileType) => {
+        this.defaultFileName = `Candidates ${this.generateDateTime(this.datePipe)}`;
+        this.defaultExport(event);
+      });
   }
 
   private setFileName(): void {

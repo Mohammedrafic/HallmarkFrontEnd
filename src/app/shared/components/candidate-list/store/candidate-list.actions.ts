@@ -19,3 +19,7 @@ export class ExportCandidateList {
   static readonly type = '[candidate list] Export Candidate List';
   constructor(public payload: CandidateListExport) {}
 }
+
+export class GetRegionList {
+  static readonly type = '[candidate list] Get Region List';
+}

@@ -263,6 +263,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewIn
     candidateProfileContactDetail,
     professionalSummary,
     candidateProfileSkills,
+    candidateProfileRegions
   }: Candidate) {
     this.candidateForm.get('generalInfo')?.patchValue({
       firstName,
@@ -272,6 +273,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewIn
       classification,
       profileStatus,
       candidateAgencyStatus,
+      candidateProfileRegions,
       ssn: ssn ? this.getStringSsn(ssn) : null,
       candidateProfileSkills: candidateProfileSkills.map((skill) => skill.id),
     });
