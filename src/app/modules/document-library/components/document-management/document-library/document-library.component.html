@@ -26,7 +26,7 @@
       <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline button-filter" style="display:none;">
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </button>
-      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="handleOnUploadBtnClick()">
+      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="handleOnUploadBtnClick()" *ngIf="!isSharedFolderClick">
         <i-feather name="upload" class="icon"></i-feather>Upload
       </button>
     </div>
@@ -37,7 +37,7 @@
     <div class="title">
       <h3>{{selectedNodeText}}</h3>
     </div>
-    <div class="row-tool-buttons" *ngIf="this.selectedDocumentNode?.id!=-1 || this.selectedDocumentNode?.parentID==-1">
+    <div class="row-tool-buttons" *ngIf="!isSharedFolderClick">
       <button ejs-button cssClass="e-flat seconadry-dark-icon-button" (click)="shareSelectedDocuments($event)" *ngIf="!isHalmarkSelected">
         <span><i-feather name="share-2" class="icon"></i-feather></span>
       </button>
@@ -52,6 +52,7 @@
 </section>
 <section>
   <app-document-library-table [gridOptions]="gridOptions"
+                              [totalRecordsCount]="rowData.length"
                               (onGridReadyEvent)="onGridReady($event)"
                               (onGridPageSizeChanged)="onPageSizeChanged($event)"></app-document-library-table>
 </section>

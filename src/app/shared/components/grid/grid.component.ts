@@ -12,7 +12,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
-  ViewEncapsulation,
+  ViewEncapsulation
 } from '@angular/core';
 
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
@@ -38,7 +38,7 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Input() public allowBulkSelection: boolean = false;
   @Input() public allowBulkButton: boolean = false;
   @Input() public rowSelection: 'single' | 'multiple' = 'single';
-  @Input() public pageSize: number = GRID_CONFIG.rowsPerPageDropDownObject[0].value;
+  @Input() public pageSize: number = GRID_CONFIG.rowsPerPageDropDownObject[2].value;
   @Input() public rowData: Data[] | null | undefined;
   @Input() public totalRecordsCount: number = 1;
   @Input() public gridOptions: GridOptions;

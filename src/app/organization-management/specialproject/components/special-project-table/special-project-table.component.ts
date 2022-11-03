@@ -1,8 +1,5 @@
-import {
-  GridReadyEvent,
-  GridOptions
-} from '@ag-grid-community/core';
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { GridOptions, GridReadyEvent } from '@ag-grid-community/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { GRID_CONFIG } from '@shared/constants';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { Select } from '@ngxs/store';
@@ -18,6 +15,7 @@ export class SpecialProjectTableComponent extends AbstractGridConfigurationCompo
 
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   @Input() gridOptions: GridOptions;
+  @Input() totalRecordsCount: number;
 
   @Output() onGridReadyEvent: EventEmitter<GridReadyEvent> = new EventEmitter<GridReadyEvent>();
   @Output() onGridPageSizeChanged = new EventEmitter<any>();

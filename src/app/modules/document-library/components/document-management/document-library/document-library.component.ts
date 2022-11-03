@@ -119,6 +119,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   documentWidth: string;
   fileAsBase64: string;
   public allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
+  public isSharedFolderClick: boolean = false;
 
   public gridApi!: GridApi;
   public rowData: DocumentLibraryDto[] = [];
@@ -246,6 +247,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
     this.action$.pipe(ofActionDispatched(GetDocumentsSelectedNode), takeUntil(this.unsubscribe$)).subscribe((payload) => {
       this.selectedNodeText = '';
+      this.isSharedFolderClick = false;
       if (payload.payload) {
         if (this.previousFolderId != payload.payload.id) {
           this.selectedNodeText = '';
@@ -258,6 +260,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
               if (this.selectedDocumentNode?.id != -1 && this.selectedDocumentNode?.parentID != -1)
                 this.getDocuments(this.filterSelectedBusinesUnitId);
               else if (this.selectedDocumentNode?.id == -1 || this.selectedDocumentNode.parentID == -1) {
+                this.isSharedFolderClick = true;
+                this.store.dispatch(new IsDeleteEmptyFolder(false));
                 this.getSharedDocuments(this.filterSelectedBusinesUnitId);
               }
             }, 1000);
@@ -939,34 +943,13 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   public setDictionaryRegionMappings() {
+
     let mapping: { [id: number]: number[]; } = {};
-    let isAllRegions: boolean = false;
-    let isAllLocations: boolean = false;
-    let regionsData: Region[] = [];
-    let locationsData: Region[] = [];
-    this.regions$.subscribe((data) => {
-      regionsData = data;
-      this.locations$.subscribe((locData: any) => {
-        locationsData = locData;
-      });
-    });
     if (this.isAgency) {
       return mapping;
     }
-    isAllRegions = this.documentLibraryform.controls[FormControlNames.RegionIds].value.length === regionsData.length;
-    isAllLocations = this.documentLibraryform.controls[FormControlNames.LocationIds].value.length === locationsData.length;
 
-    if (isAllRegions && !isAllLocations) {
-      mapping[-1] = this.documentLibraryform.controls[FormControlNames.LocationIds].value;
-    }
-    else if (!isAllRegions && isAllLocations) {
-      const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
-      selectedRegions.forEach((regionItem: any) => {
-        mapping[regionItem] = [-1];
-      });
-    }
-    else {
-      const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
+    const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
       if (selectedRegions.length > 0) {
         selectedRegions.forEach((regionItem: any) => {
           let mappingLocItems: number[] = [];
@@ -987,7 +970,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
         });
       }
-    }
     return mapping;
   }
 
@@ -1086,7 +1068,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       unitIds = this.documentLibraryform.get(FormControlNames.Orgnizations)?.value;
     }
     let mapping: { [id: number]: number[]; } = {};
-    if (unitType != 0 && unitIds.length > 0) {
+    if (unitType != 0 && unitIds?.length > 0) {
       const shareDocumentsFilter: ShareDocumentsFilter = {
         documentIds: this.shareDocumentIds,
         businessUnitType: unitType,
@@ -1102,7 +1084,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     else {
       this.documentLibraryform.reset();
       this.closeDialog();
-      this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: this.filterSelectedBusinesUnitId }));
     }
   }
 
