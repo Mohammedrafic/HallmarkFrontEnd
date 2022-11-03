@@ -43,6 +43,8 @@ import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from 
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { SettingsFilterCols } from './settings.constant';
+import { SettingsDataAdapter } from './helpers/settings-data.adapter';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -128,7 +130,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   public SettingsFilterFormGroup: FormGroup;
   public filters: OrganizationSettingFilter = {};
-  public filterColumns: any;
+  public filterColumns = SettingsFilterCols;
 
   public optionFields = {
     text: 'name',
@@ -150,93 +152,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   override ngOnInit(): void {
     super.ngOnInit();
-    this.filterColumns = {
-      regionIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      locationIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      departmentIds: {
-        type: ControlTypes.Multiselect,
-        valueType: ValueType.Id,
-        dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
-      },
-      attributes: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-    };
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
-      if (id) {
-        this.organizationId = id;
-      } else {
-        this.organizationId = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
-      }
-      this.clearFilters();
-      this.store.dispatch(new GetOrganizationSettingsFilterOptions());
-      this.getSettings();
-    });
+    this.watchForOrgId();
     this.mapGridData();
-
-    this.organizationStructure$
-      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
-      .subscribe((structure: OrganizationStructure) => {
-        this.orgStructure = structure;
-        this.orgRegions = structure.regions;
-        this.allRegions = [...this.orgRegions];
-        this.filterColumns.regionIds.dataSource = this.allRegions;
-      });
-
-    this.organizationSettingsFilterOptions$
-      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
-      .subscribe((options: string[]) => {
-        this.filterColumns.attributes.dataSource = options;
-      });
-
-    this.SettingsFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
-      if (val?.length) {
-        const selectedRegions: OrganizationRegion[] = [];
-        val.forEach((id) =>
-          selectedRegions.push(this.allRegions.find((region) => region.id === id) as OrganizationRegion)
-        );
-        this.filterColumns.locationIds.dataSource = [];
-        selectedRegions.forEach((region) => {
-          this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
-        });
-      } else {
-        this.filterColumns.locationIds.dataSource = [];
-        this.SettingsFilterFormGroup.get('locationIds')?.setValue([]);
-        this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
-      }
-    });
-
-    this.SettingsFilterFormGroup.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
-      if (val?.length) {
-        const selectedLocations: OrganizationLocation[] = [];
-        val.forEach((id) =>
-          selectedLocations.push(
-            this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)
-          )
-        );
-        this.filterColumns.departmentIds.dataSource = [];
-        selectedLocations.forEach((location) => {
-          this.filterColumns.departmentIds.dataSource.push(...(location.departments as []));
-        });
-      } else {
-        this.filterColumns.departmentIds.dataSource = [];
-        this.SettingsFilterFormGroup.get('departmentIds')?.setValue([]);
-        this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
-      }
-    });
-
+    this.watchForStructure();
+    this.watchForSFilterOptions();
+    this.watchForRegionControl();
+    this.watchForLocationControl();
     this.setPermissionsToManageSettings();
   }
 
@@ -422,29 +343,15 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   public mapGridData(): void {
-    this.settings$.subscribe((data) => {
+    this.settings$
+    .pipe(
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((data) => {
       this.lastAvailablePage = this.getLastPage(data);
-      data.forEach((item) => {
-        if (
-          item.controlType === OrganizationSettingControlType.Select ||
-          item.controlType === OrganizationSettingControlType.Multiselect
-        ) {
-          if (typeof item.value === 'string') {
-            item.value = this.getDropDownOptionsFromString(item.value, item.valueOptions);
-          }
-
-          if (item.children && item.children.length > 0) {
-            item.children.forEach((child) => {
-              if (typeof child.value === 'string') {
-                child.value = this.getDropDownOptionsFromString(child.value, item.valueOptions);
-              }
-            });
-          }
-        }
-      });
-
-      this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
-      this.totalDataRecords = data.length;
+      const adaptedData = SettingsDataAdapter.adaptSettings(data);
+      this.gridDataSource = this.getRowsPerPage(adaptedData, this.currentPagerPage);
+      this.totalDataRecords = adaptedData.length;
     });
   }
 
@@ -648,22 +555,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   }
 
-  private getDropDownOptionsFromString(
-    text: string,
-    valueOptions: OrganizationSettingValueOptions[]
-  ): OrganizationSettingsDropDownOption[] {
-    let options: OrganizationSettingsDropDownOption[] = [];
-    if (text) {
-      let optionIds = text.split(';');
-      optionIds.forEach((id) => {
-        const foundOption = valueOptions.find((option) => option.key === id);
-        if (foundOption) {
-          options.push({ value: foundOption.key, text: foundOption.value });
-        }
-      });
-    }
-    return options;
-  }
+  // TODO: move to helper class
+
 
   private getDropDownOptionIds(data: any): string[] {
     const ids: string[] = [];
@@ -737,5 +630,84 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       ).subscribe(({ canManageOrganizationConfigurations }) => {
         this.settingKeys.forEach((key) => this.hasPermissions[key] = canManageOrganizationConfigurations);
       });
+  }
+
+  private watchForOrgId(): void {
+    this.organizationId$.pipe(
+      takeUntil(this.unsubscribe$),
+    ).subscribe((id) => {
+      this.organizationId = id || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+      this.clearFilters();
+      this.store.dispatch(new GetOrganizationSettingsFilterOptions());
+      this.getSettings();
+    });
+  }
+
+  private watchForStructure(): void {
+    this.organizationStructure$
+    .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+    .subscribe((structure: OrganizationStructure) => {
+      this.orgStructure = structure;
+      this.orgRegions = structure.regions;
+      this.allRegions = [...this.orgRegions];
+      this.filterColumns.regionIds.dataSource = this.allRegions;
+    });
+  }
+
+  private watchForSFilterOptions(): void {
+    this.organizationSettingsFilterOptions$
+    .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+    .subscribe((options: string[]) => {
+      this.filterColumns.attributes.dataSource = options;
+    });
+  }
+
+  private watchForRegionControl(): void {
+    this.SettingsFilterFormGroup.get('regionIds')?.valueChanges
+    .pipe(
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((val: number[]) => {
+      if (val?.length) {
+        const selectedRegions: OrganizationRegion[] = [];
+        val.forEach((id) =>
+          selectedRegions.push(this.allRegions.find((region) => region.id === id) as OrganizationRegion)
+        );
+        this.filterColumns.locationIds.dataSource = [];
+        selectedRegions.forEach((region) => {
+          this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
+        });
+      } else {
+        this.filterColumns.locationIds.dataSource = [];
+        this.SettingsFilterFormGroup.get('locationIds')?.setValue([]);
+        this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
+      }
+    });
+  }
+
+  private watchForLocationControl(): void {
+    this.SettingsFilterFormGroup.get('locationIds')?.valueChanges
+    .pipe(
+      takeUntil(this.unsubscribe$),
+    )
+    .subscribe((val: number[]) => {
+      if (val?.length) {
+        const selectedLocations: OrganizationLocation[] = [];
+        val.forEach((id) =>
+          selectedLocations.push(
+            this.filterColumns.locationIds.dataSource
+            .find((location: OrganizationLocation) => location.id === id) as OrganizationLocation,
+          )
+        );
+        this.filterColumns.departmentIds.dataSource = [];
+        selectedLocations.forEach((location) => {
+          this.filterColumns.departmentIds.dataSource.push(...(location.departments as []));
+        });
+      } else {
+        this.filterColumns.departmentIds.dataSource = [];
+        this.SettingsFilterFormGroup.get('departmentIds')?.setValue([]);
+        this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
+      }
+    });
   }
 }
