@@ -20,6 +20,7 @@ interface GetManualInvoicesColDefsConfig {
 export interface OrganizationGetManualInvoicesColDefsConfig extends GetManualInvoicesColDefsConfig {
   approve: (invoice: ManualInvoice) => void,
   reject: (invoice: ManualInvoice) => void,
+  canEdit: boolean,
 }
 
 export interface AgencyGetManualInvoicesColDefsConfig extends GetManualInvoicesColDefsConfig {
@@ -129,7 +130,7 @@ export class ManualInvoicesGridHelper {
   }
 
   static getOrganizationColDefs(
-    { approve, reject, downloadAttachment, previewAttachment }: OrganizationGetManualInvoicesColDefsConfig
+    { approve, reject, downloadAttachment, previewAttachment, canEdit }: OrganizationGetManualInvoicesColDefsConfig
   ): TypedColDef<ManualInvoice>[] {
     const {
       attachments,
@@ -161,7 +162,7 @@ export class ManualInvoicesGridHelper {
                 titleClass: 'color-supportive-green-10',
                 disabled: [
                   PendingInvoiceStatus.Approved,
-                ].includes(status) || agencyStatus === AgencyStatus.Terminated,
+                ].includes(status) || agencyStatus === AgencyStatus.Terminated || !canEdit,
               },
               {
                 action: reject,
@@ -170,7 +171,7 @@ export class ManualInvoicesGridHelper {
                 disabled: [
                   PendingInvoiceStatus.Approved,
                   PendingInvoiceStatus.Rejected,
-                ].includes(status) || agencyStatus === AgencyStatus.Terminated,
+                ].includes(status) || agencyStatus === AgencyStatus.Terminated || !canEdit,
               },
             ],
           } as GridActionsCellConfig

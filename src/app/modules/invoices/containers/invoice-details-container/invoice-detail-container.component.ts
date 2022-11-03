@@ -18,7 +18,7 @@ import {
   ActionBtnOnStatus, AgencyActionBtnOnStatus,
   NewStatusDependsOnAction
 } from '../../constants/invoice-detail.constant';
-import { InvoiceState, INVOICES_STATUSES } from '../../enums';
+import { InvoiceState, INVOICES_STATUSES, InvoicesActionBtn } from '../../enums';
 import { InvoiceDetail, InvoiceDialogActionPayload, InvoiceUpdateEmmit, PrintingPostDto } from '../../interfaces';
 import { InvoicePrintingService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
@@ -46,6 +46,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   @Input() currentSelectedRowIndex: number | null = null;
   @Input() maxRowIndex: number = 30;
   @Input() actionAllowed = true;
+  @Input() approveAllowed = false;
+  @Input() payAllowed = false;
 
   @Output() updateTable: EventEmitter<InvoiceUpdateEmmit> = new EventEmitter<InvoiceUpdateEmmit>();
 
@@ -76,14 +78,25 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     super();
   }
 
+  public get actionBtnDisabled(): boolean {
+    if (!this.actionAllowed) {
+      return true;
+    }
+
+    if (this.actionBtnText === InvoicesActionBtn.Approve) {
+      return !this.approveAllowed;
+    } else {
+      return !this.payAllowed;
+    }
+  }
+
   public get actionBtnText(): string {
     const status = this.invoiceDetail.meta.invoiceStateText.toLowerCase() as INVOICES_STATUSES;
     let result: string;
 
     if (this.isAgency) {
       const permission = (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay || this.actionAllowed;
-      result = permission ? AgencyActionBtnOnStatus.get(status) as string : '';
-
+      result = permission && this.payAllowed ? AgencyActionBtnOnStatus.get(status) as string : '';
     } else {
       result = ActionBtnOnStatus.get(status) as string;
     }

@@ -21,7 +21,7 @@ import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicePrintingService, InvoicesService } from '../../services';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { UNIT_ORGANIZATIONS_FIELDS } from 'src/app/modules/timesheets/constants';
-import { DataSourceItem } from '@core/interface';
+import { DataSourceItem, Permission } from '@core/interface';
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
 import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
 import {
@@ -40,6 +40,7 @@ import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { UserState } from 'src/app/store/user.state';
 import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
 import { InvoicesModel } from '../../store/invoices.model';
+import { InvoicesPermissionHelper } from '../../helpers/invoices-permission.helper';
 
 @Component({
   selector: 'app-invoices-container',
@@ -47,7 +48,7 @@ import { InvoicesModel } from '../../store/invoices.model';
   styleUrls: ['./invoices-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InvoicesContainerComponent extends Destroyable implements OnInit, AfterViewInit {
+export class InvoicesContainerComponent extends InvoicesPermissionHelper implements OnInit, AfterViewInit {
   @Select(InvoicesState.invoicesOrganizations)
   readonly organizations$: Observable<DataSourceItem[]>;
 
@@ -126,27 +127,28 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
   public invoicePayAllowed = true;
 
   constructor(
-    private store: Store,
     private cdr: ChangeDetectorRef,
     private invoicesService: InvoicesService,
     private actions$: Actions,
     private invoicesContainerService: InvoicesContainerService,
     private printingService: InvoicePrintingService,
     @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
+    store: Store,
   ) {
-    super();
+    super(store);
 
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
 
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
     this.organizationId$ = this.isAgency ? this.organizationControl.valueChanges : this.organizationChangeId$;
-
-    if (this.isAgency) {
-      this.checkActionsAllowed();
-    }
   }
 
   public ngOnInit(): void {
+    if (this.isAgency) {
+      this.checkActionsAllowed();
+    }
+
+    this.checkPermissions(this.isAgency);
     this.watchDialogVisibility();
     this.startFiltersWatching();
     this.watchForInvoiceStatusChange();
@@ -251,8 +253,8 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit, A
 
     this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx,
       { organizationId: this.organizationId,
-        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay || this.invoicePayAllowed,
-        canEdit: this.agencyActionsAllowed,
+        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay || this.invoicePayAllowed && this.payInvoiceEnabled,
+        canEdit: this.agencyActionsAllowed && this.approveInvoiceEnabled,
       });
 
 

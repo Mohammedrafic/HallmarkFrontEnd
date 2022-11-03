@@ -39,18 +39,21 @@ const commonColumn: ColDef = {
 
 interface PendingApprovalColDefsConfig {
   approve?: (invoice: PendingApprovalInvoice) => void;
-  actionTitle?: string,
+  actionTitle?: string;
+  actionEnabled: boolean;
 }
 
 interface AllColDefsConfig {
   approve?: (invoice: PendingApprovalInvoice) => void;
   pay?: (invoice: PendingApprovalInvoice) => void;
   actionTitle?: string,
+  canEdit: boolean,
+  canPay: boolean,
 }
 
 export class PendingApprovalGridHelper {
   public static getOrganizationColDefs(
-    { approve, actionTitle }: PendingApprovalColDefsConfig
+    { approve, actionTitle, actionEnabled }: PendingApprovalColDefsConfig
   ): TypedColDef<PendingApprovalInvoice>[] {
     const colDef = [
       approve ? {
@@ -72,7 +75,7 @@ export class PendingApprovalGridHelper {
                 titleClass: 'color-supportive-green-10',
                 disabled: [
                   PendingInvoiceStatus.Approved,
-                ].includes(status),
+                ].includes(status) || !actionEnabled,
               },
             ],
           } as GridActionsCellConfig
@@ -302,7 +305,7 @@ export class PendingApprovalGridHelper {
   }
 
   public static getOrganizationAllColDefs(
-    { approve, pay }: AllColDefsConfig
+    { approve, pay, canEdit, canPay }: AllColDefsConfig
   ): TypedColDef<PendingApprovalInvoice>[] {
     const colDef = [
       {
@@ -316,6 +319,8 @@ export class PendingApprovalGridHelper {
         cellRendererParams: {
           approve: approve,
           pay: pay,
+          canEdit,
+          canPay,
         },
         sortable: false,
         suppressMenu: true,

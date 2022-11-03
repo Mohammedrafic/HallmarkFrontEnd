@@ -139,4 +139,18 @@ export enum UserPermissions {
   CanManageNotificationTemplates = 3401,
   CanViewMasterRegions = 3402,
   WidgetLTAOrderEnding = 3403,
+
+  // Organization Invoices
+  OrganizationInvoices = 3500,
+  CanOrganizationViewInvoices = 3501,
+  CanOrganizationGenerateInvoices = 3502,
+  CanOrganizationCreateManualInvoices = 3503,
+  CanOrganizationApproveInvoices = 3504,
+  CanOrganizationSetInvoiceStatusToPaid = 3505,
+
+  // Agency Invoices
+  AgencyInvoices = 3600,
+  CanAgencyViewInvoices = 3601,
+  CanAgencyCreateManualInvoices = 3602,
+  CanAgencySetInvoiceStatusToPaid = 3603,
 }
