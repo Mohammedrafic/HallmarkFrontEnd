@@ -50,6 +50,7 @@ export class Documents {
   comments: string;
   selectedFile?: Blob | null
   isEdit?: boolean | false
+  status?: number;
 }
 
 export class DocumentLibraryDto {
@@ -124,7 +125,27 @@ export class DownloadDocumentDetail {
   createdAt: Date;
 }
 
+export class DownloadPreviewDetail {
+  id: number;
+  name: string;
+  fileName: string;
+  extension: string;
+  fileAsBase64: string;
+  sasUrl: string;
+  contentType: string;
+  metadata: any;
+  folderId: number | null;
+  active: boolean;
+  createdAt: Date;
+}
+
 export class DownloadDocumentDetailFilter {
+  documentId: number;
+  businessUnitType: number;
+  businessUnitId: number | null;
+}
+
+export class PreviewDocumentDetailFilter {
   documentId: number;
   businessUnitType: number;
   businessUnitId: number | null;
