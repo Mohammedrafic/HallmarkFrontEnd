@@ -24,11 +24,19 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
       sortable: true,
     },
     {
-      field: 'classification',
+      field: 'classifications',
       headerName: 'CLASSIFICATION',
       width: 170,
-      valueFormatter: (params: { data: CandidatesDetailsModel }) =>
-        `${JobClassification[params.data.classification] ?? ''}`,
+      valueFormatter: (params: { data: CandidatesDetailsModel }) => {
+        let value = '';
+        params.data.classifications?.forEach((classification, index) => {
+          value += JobClassification[classification];
+          if (params.data.classifications.length !== (index + 1)) {
+            value += ', ';
+          }
+        });
+        return `${value}`
+      },
       sortable: true,
     },
     {

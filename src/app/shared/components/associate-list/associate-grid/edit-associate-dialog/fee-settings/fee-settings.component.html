@@ -19,7 +19,7 @@
       <h3>Fee Exception</h3>
     </div>
     <div class="actions">
-      <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated" class="action-link" (click)="addNew()"
+      <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || (!userPermission[userPermissions.CanEditFeeExceptions] && !isAgency)" class="action-link" (click)="addNew()"
       ><i-feather name="plus" class="icon"></i-feather> Add Fee Exception</button
       >
     </div>
@@ -46,7 +46,7 @@
             <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated" cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated" cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
+            <button ejs-button [disabled]="!areAgencyActionsAllowed || editAgencyOrg?.agencyStatus === agencyStatus.Inactive || editAgencyOrg?.agencyStatus === agencyStatus.Terminated || (!userPermission[userPermissions.CanEditFeeExceptions] && !isAgency)" cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -91,6 +91,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(feeExceptionsPage$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -111,5 +114,5 @@
   </ejs-grid>
 </section>
 
-<app-add-new-fee-dialog [openEvent]="openAddNewFeeDialog" [openEditEvent]="editFeeData"></app-add-new-fee-dialog>
+<app-add-new-fee-dialog [openEvent]="openAddNewFeeDialog" [openEditEvent]="editFeeData" [disableSaveButton]="!userPermission[userPermissions.CanEditFeeExceptions] && !isAgency"></app-add-new-fee-dialog>
 

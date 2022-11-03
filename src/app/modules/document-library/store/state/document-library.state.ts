@@ -2,16 +2,15 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { catchError, Observable, of, tap } from "rxjs";
-import { RECORD_ADDED, RECORD_MODIFIED } from "../../../../shared/constants";
-import { MessageTypes } from "../../../../shared/enums/message-types";
-import { getAllErrors } from "../../../../shared/utils/error.utils";
+import { DOCUMENT_UPLOAD_EDIT, DOCUMENT_UPLOAD_SUCCESS, RECORD_ADDED, RECORD_MODIFIED } from "../../../../shared/constants";
+import { MessageTypes } from "@shared/enums/message-types";
 import { ShowToast } from "../../../../store/app.actions";
 import { DocumentLibraryService } from "../../services/document-library.service";
 import {
   DeletDocuments, DeletDocumentsSucceeded, GetDocumentById, GetDocumentDownloadDeatils, GetDocumentDownloadDeatilsSucceeded,
   GetDocuments, GetDocumentTypes, GetFoldersTree, GetSharedDocuments, SaveDocumentFolder, SaveDocuments, SearchDocumentTags,
   ShareDocuments, ShareDocumentsSucceeded, UnShareDocuments, UnShareDocumentsSucceeded,
-  GetRegionsByOrganizations, GetLocationsByRegions, GetShareAssociateAgencies, GetShareOrganizationsDtata
+  GetRegionsByOrganizations, GetLocationsByRegions, GetShareAssociateAgencies, GetShareOrganizationsDtata, DeleteEmptyDocumentsFolder, DeletDocumentFolderSucceeded
 } from "../actions/document-library.actions";
 import {
   DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, FolderTreeItem,
@@ -174,7 +173,9 @@ export class DocumentLibraryState {
         ]);
         return folder;
       }),
-      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
     );
   }
 
@@ -183,13 +184,14 @@ export class DocumentLibraryState {
     { dispatch, patchState }: StateContext<DocumentLibraryStateModel>,
     { document }: SaveDocuments
   ): Observable<DocumentLibraryDto | void> {
+    let isEditDocument: boolean = document.isEdit != undefined ? document.isEdit : false;
     return this.documentLibraryService.saveDocuments(document).pipe(
-      tap((document) => {
-        patchState({ savedDocumentLibraryDto: document });
+      tap((data) => {
+        patchState({ savedDocumentLibraryDto: data });
         dispatch([
-          new ShowToast(MessageTypes.Success, document.id > 0 ? RECORD_MODIFIED : RECORD_ADDED),
+          new ShowToast(MessageTypes.Success, isEditDocument ? DOCUMENT_UPLOAD_EDIT : DOCUMENT_UPLOAD_SUCCESS),
         ]);
-        return document;
+        return data;
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
@@ -336,5 +338,19 @@ export class DocumentLibraryState {
       patchState({ shareOrganizationsData: payload });
       return payload
     }));
+  }
+
+  @Action(DeleteEmptyDocumentsFolder)
+  DeleteEmptyDocumentsFolder({ dispatch }: StateContext<DocumentLibraryStateModel>, { deleteDocumentFolderFilter }: DeleteEmptyDocumentsFolder): Observable<any> {
+    return this.documentLibraryService.DeleteFolder(deleteDocumentFolderFilter).pipe(
+      tap(() => {
+        const message = 'Folder deleted successfully';
+        const actions = [new DeletDocumentFolderSucceeded(), new ShowToast(MessageTypes.Success, message)];
+        dispatch([...actions, new DeletDocumentFolderSucceeded()]);
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
   }
 }

@@ -32,6 +32,7 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
   public readonly maxFileSize = 10485760; // 10 mb
   public selectedFile: FileInfo | null;
   public firstActive = true;
+  public uploaderErrorMessageElement: HTMLElement;
 
   public fields = {
     text: 'name',
@@ -65,11 +66,27 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
   public selectFile(event: SelectedEventArgs): void {
     if (event.filesData.length) {
       this.importResult = null;
-      this.selectedFile = event.filesData[0];
-      this.uploadToFile.next(this.selectedFile.rawFile as Blob);
+      if (event.filesData[0].statusCode === '1') {
+        this.selectedFile = event.filesData[0];
+        this.uploadToFile.next(this.selectedFile.rawFile as Blob);
+      }
+      else {
+        this.addValidationMessage(event.filesData[0]);
+      }
     }
   }
-
+  private addValidationMessage(file: FileInfo) {
+    requestAnimationFrame(() => {
+      this.uploaderErrorMessageElement = document.getElementsByClassName('e-validation-fails')[0] ?
+        document.getElementsByClassName('e-validation-fails')[0] as HTMLElement :
+        document.getElementsByClassName('e-file-status e-file-invalid')[0] as HTMLElement;
+      if (this.uploaderErrorMessageElement) {
+        this.uploaderErrorMessageElement.innerText = file.size > this.maxFileSize
+          ? 'The file should not exceed 10MB.'
+          : 'The file should be in .pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png format.';
+      }
+    });
+  }
   public onTabSelecting(event: SelectEventArgs): void {
     if (event.isSwiped) {
       event.cancel = true;

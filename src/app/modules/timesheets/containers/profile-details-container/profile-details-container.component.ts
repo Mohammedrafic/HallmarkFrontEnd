@@ -1,14 +1,5 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewChild
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { filter, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
@@ -50,8 +41,9 @@ import { TimesheetDetails } from '../../store/actions/timesheet-details.actions'
 import { TimesheetDetailsService } from '../../services';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import { FileForUpload } from '@core/interface';
-import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
 import { AgencyStatus } from '@shared/enums/status';
+import { GRID_CONFIG } from '@shared/constants';
+import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
 
 @Component({
   selector: 'app-profile-details-container',
@@ -77,7 +69,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   @Input() currentSelectedRowIndex: number | null = null;
 
-  @Input() maxRowIndex: number = 30;
+  @Input() maxRowIndex: number = GRID_CONFIG.initialRowsPerPage;
 
   @Output() readonly nextPreviousOrderEvent = new EventEmitter<boolean>();
 

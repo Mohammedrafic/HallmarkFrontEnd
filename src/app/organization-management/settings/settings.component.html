@@ -143,6 +143,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{totalDataRecords}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -221,6 +224,7 @@
 </app-filter-dialog>
 
 <app-side-dialog
+  [disableSaveButton]="!userPermission[userPermissions.CanEditOrganizationSettings]"
   (formCancelClicked)="onFormCancelClick()"
   (formSaveClicked)="onFormSaveClick()"
   [header]="dialogHeader + ' Settings'"

@@ -40,7 +40,7 @@ export abstract class AbstractGridConfigurationComponent {
 
   // rows per page
   rowsPerPageDropDown = GRID_CONFIG.rowsPerPageDropDown;
-  activeRowsPerPageDropDown = GRID_CONFIG.rowsPerPageDropDown[0];
+  activeRowsPerPageDropDown = GRID_CONFIG.rowsPerPageDropDown[2];
 
   // go to page
   lastAvailablePage = 0;
@@ -52,7 +52,7 @@ export abstract class AbstractGridConfigurationComponent {
   pageSizePager = GRID_CONFIG.initialRowsPerPage;
   currentPagerPage: number = 1;
 
-  pageSize = 30;
+  pageSize = 100;
   currentPage = 1;
   orderBy = '';
 

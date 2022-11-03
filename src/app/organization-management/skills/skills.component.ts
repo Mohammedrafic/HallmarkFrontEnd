@@ -6,8 +6,12 @@ import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ExportSkills, GetAllSkillsCategories, GetAssignedSkillsByPage, GetSkillDataSources, RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded, SetDirtyState } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
-import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import {
+  CANCEL_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+} from 'src/app/shared/constants/messages';
 import { Skill, SkillDataSource, SkillFilters } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
@@ -19,6 +23,7 @@ import { UserState } from 'src/app/store/user.state';
 import { FilteredItem } from '@shared/models/filter.model';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilterService } from '@shared/services/filter.service';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 
 @Component({
   selector: 'app-skills',
@@ -26,7 +31,7 @@ import { FilterService } from '@shared/services/filter.service';
   styleUrls: ['./skills.component.scss'],
   providers: [SortService, MaskedDateTimeService]
 })
-export class SkillsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class SkillsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   public optionFields = {
@@ -70,13 +75,13 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   public defaultFileName: string;
   public filters: SkillFilters = {};
 
-  constructor(private store: Store,
+  constructor(protected override store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
               private confirmService: ConfirmService,
               private filterService: FilterService,
               private datePipe: DatePipe) {
-    super();
+    super(store);
     this.idFieldName = 'foreignKey';
     this.SkillFormGroup = this.fb.group({
       id: new FormControl(0),
@@ -98,7 +103,8 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     });
   }
 
-  ngOnInit() {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.filterColumns = {
       skillCategories: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
       skillAbbrs: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },

@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
-  Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 
 import { map, Observable, takeUntil, throttleTime } from 'rxjs';
@@ -14,17 +13,15 @@ import { Destroyable } from '@core/helpers';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportPayload } from '@shared/models/export.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import {
-  ActionBtnOnStatus, AgencyActionBtnOnStatus,
-  NewStatusDependsOnAction
-} from '../../constants/invoice-detail.constant';
-import { InvoiceState, INVOICES_STATUSES, InvoicesActionBtn } from '../../enums';
+import { ActionBtnOnStatus, AgencyActionBtnOnStatus, NewStatusDependsOnAction } from '../../constants/invoice-detail.constant';
+import { INVOICES_STATUSES, InvoiceState, InvoicesActionBtn } from '../../enums';
 import { InvoiceDetail, InvoiceDialogActionPayload, InvoiceUpdateEmmit, PrintingPostDto } from '../../interfaces';
 import { InvoicePrintingService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { InvoicesModel } from './../../store/invoices.model';
+import { GRID_CONFIG } from '@shared/constants';
 
 interface ExportOption extends ItemModel {
   ext: string | null;
@@ -44,7 +41,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
   @Input() currentSelectedRowIndex: number | null = null;
-  @Input() maxRowIndex: number = 30;
+  @Input() maxRowIndex: number = GRID_CONFIG.initialRowsPerPage;
   @Input() actionAllowed = true;
   @Input() approveAllowed = false;
   @Input() payAllowed = false;

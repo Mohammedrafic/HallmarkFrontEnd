@@ -294,7 +294,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     this.jobDescriptionForm = this.formBuilder.group({
-      classification: [null],
+      classifications: [null],
       onCallRequired: [false],
       asapStart: [false],
       criticalOrder: [false],
@@ -374,23 +374,23 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.store.dispatch(new GetSuggestedDetails(locationId));
     });
 
-    combineLatest([orderTypeControl.valueChanges, departmentIdControl.valueChanges, skillIdControl.valueChanges, jobStartDateControl.valueChanges, jobEndDateControl.valueChanges])
-    .pipe(takeUntil(this.unsubscribe$))
-    .subscribe(([orderType, departmentId, skillId, jobStartDate, jobEndDate]) => {
-      if (isNaN(parseInt(orderType)) || !departmentId || !skillId || !jobStartDate || !jobEndDate) {
+    combineLatest([orderTypeControl.valueChanges, departmentIdControl.valueChanges, skillIdControl.valueChanges, jobStartDateControl.valueChanges])
+    .pipe(debounceTime(50), takeUntil(this.unsubscribe$))
+    .subscribe(([orderType, departmentId, skillId, jobStartDate]) => {
+      if (isNaN(parseInt(orderType)) || !departmentId || !skillId || !jobStartDate) {
         return;
       }
-      this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId, jobStartDate.toISOString(), jobEndDate.toISOString()));
+      this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId, jobStartDate.toISOString(), jobEndDateControl.value.toISOString()));
     });
 
-    combineLatest([orderTypeControl.valueChanges, departmentIdControl.valueChanges, skillIdControl.valueChanges, jobStartDateControl.valueChanges, jobEndDateControl.valueChanges])
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(([orderType, departmentId, skillId, jobStartDate, jobEndDate]) => {
-        if (isNaN(parseInt(orderType)) || !departmentId || !skillId || !jobStartDate || !jobEndDate) {
+    combineLatest([orderTypeControl.valueChanges, departmentIdControl.valueChanges, skillIdControl.valueChanges, jobStartDateControl.valueChanges])
+      .pipe(debounceTime(50), takeUntil(this.unsubscribe$))
+      .subscribe(([orderType, departmentId, skillId, jobStartDate]) => {
+        if (isNaN(parseInt(orderType)) || !departmentId || !skillId || !jobStartDate) {
           return;
         }
         if (!this.isEditMode) {
-          this.populateHourlyRateField(orderType, departmentId, skillId, jobStartDate, jobEndDate);
+          this.populateHourlyRateField(orderType, departmentId, skillId, jobStartDate, jobEndDateControl.value);
         }
       });
 
@@ -1018,7 +1018,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       .subscribe(() => this.jobDistributionForm.controls['agency'].patchValue(agencyValues));
 
     this.jobDistributionForm.controls['jobDistributions'].patchValue(order.jobDistributions);
-    this.jobDescriptionForm.controls['classification'].patchValue(order.classification);
+    this.jobDescriptionForm.controls['classifications'].patchValue(order.classifications);
     this.jobDescriptionForm.controls['onCallRequired'].patchValue(order.onCallRequired);
     this.jobDescriptionForm.controls['asapStart'].patchValue(order.asapStart);
     this.jobDescriptionForm.controls['criticalOrder'].patchValue(order.criticalOrder);
@@ -1127,7 +1127,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     const openPositions = this.generalInformationForm.controls['openPositions'];
     const jobDistribution = this.jobDistributionForm.controls['jobDistribution'];
     const agency = this.jobDistributionForm.controls['agency'];
-    const classification = this.jobDescriptionForm.controls['classification'];
+    const classification = this.jobDescriptionForm.controls['classifications'];
     openPositions.disable();
     jobDistribution.disable();
     agency.disable();

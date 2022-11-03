@@ -13,13 +13,13 @@ import {
 } from '@angular/core';
 import {
   CancellationReasonsMap,
-  PenaltiesMap
-} from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
-import { PenaltyCriteria } from "@shared/enums/candidate-cancellation";
-import { JobCancellation } from "@shared/models/candidate-cancellation.model";
+  PenaltiesMap,
+} from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
+import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
+import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, merge, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { filter, merge, Observable, Subject, switchMap, takeUntil, of, take } from 'rxjs';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -41,14 +41,20 @@ import {
   ReloadOrganisationOrderCandidatesLists,
   SetIsDirtyOrderForm,
   SetPredefinedBillRatesData,
-  UpdateOrganisationCandidateJob
+  UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, SET_READONLY_STATUS } from '@shared/constants';
+import {
+  DELETE_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  deployedCandidateMessage,
+  DEPLOYED_CANDIDATE,
+  SET_READONLY_STATUS,
+} from '@shared/constants';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
@@ -140,9 +146,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   get isReadOnlyBillRates(): boolean {
-    return (
-      !this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard
-    );
+    return !this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard;
   }
 
   get candidateStatus(): ApplicantStatusEnum {
@@ -154,7 +158,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   get showStatusDropdown(): boolean {
-    return !this.isRejected && !this.isDeployedCandidate && !this.isCancelled
+    return !this.isRejected && !this.isDeployedCandidate && !this.isCancelled;
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -328,34 +332,54 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   private onAccept(): void {
     if (this.form.valid && this.candidateJob) {
-      const value = this.form.getRawValue();
-      this.store
-        .dispatch(
-          new UpdateOrganisationCandidateJob({
-            organizationId: this.candidateJob.organizationId,
-            jobId: this.candidateJob.jobId,
-            orderId: this.candidateJob.orderId,
-            nextApplicantStatus: {
-              applicantStatus: 60,
-              statusText: 'Onboard',
-            },
-            candidateBillRate: value.candidateBillRate,
-            offeredBillRate: value.offeredBillRate,
-            requestComment: value.comments,
-            actualStartDate: toCorrectTimezoneFormat(value.startDate),
-            actualEndDate: toCorrectTimezoneFormat(value.endDate),
-            clockId: value.clockId,
-            guaranteedWorkWeek: value.workWeek,
-            allowDeployWoCredentials: value.allow,
-            billRates: this.billRatesData,
-            offeredStartDate: this.candidateJob.offeredStartDate,
-          })
-        )
-        .subscribe(() => {
-          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+      this.shouldChangeCandidateStatus()
+        .pipe(take(1))
+        .subscribe((isConfirm) => {
+          if (isConfirm && this.candidateJob) {
+            const value = this.form.getRawValue();
+            this.store
+              .dispatch(
+                new UpdateOrganisationCandidateJob({
+                  organizationId: this.candidateJob.organizationId,
+                  jobId: this.candidateJob.jobId,
+                  orderId: this.candidateJob.orderId,
+                  nextApplicantStatus: {
+                    applicantStatus: 60,
+                    statusText: 'Onboard',
+                  },
+                  candidateBillRate: value.candidateBillRate,
+                  offeredBillRate: value.offeredBillRate,
+                  requestComment: value.comments,
+                  actualStartDate: toCorrectTimezoneFormat(value.startDate),
+                  actualEndDate: toCorrectTimezoneFormat(value.endDate),
+                  clockId: value.clockId,
+                  guaranteedWorkWeek: value.workWeek,
+                  allowDeployWoCredentials: value.allow,
+                  billRates: this.billRatesData,
+                  offeredStartDate: this.candidateJob.offeredStartDate,
+                })
+              )
+              .subscribe(() => {
+                this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+              });
+            this.closeDialog();
+          } else {
+            this.jobStatusControl.reset();
+          }
         });
-      this.closeDialog();
     }
+  }
+
+  private shouldChangeCandidateStatus(): Observable<boolean> {
+    const options = {
+      title: DEPLOYED_CANDIDATE,
+      okButtonLabel: 'Proceed',
+      okButtonClass: 'ok-button',
+    };
+
+    return this.isDeployedCandidate
+      ? this.confirmService.confirm(deployedCandidateMessage([]), options)
+      : of(true);
   }
 
   private patchForm(): void {
@@ -475,7 +499,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.canOffer = false;
     this.canOnboard = false;
     this.canClose = false;
-    this.orderPermissions.forEach(permission => {
+    this.orderPermissions.forEach((permission) => {
       this.canShortlist = this.canShortlist || permission.permissionId === PermissionTypes.CanShortlistCandidate;
       this.canInterview = this.canInterview || permission.permissionId === PermissionTypes.CanInterviewCandidate;
       this.canReject = this.canReject || permission.permissionId === PermissionTypes.CanRejectCandidate;
@@ -558,7 +582,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.changeDetectorRef.markForCheck();
   }
 
-  private setCancellationControls(value: PenaltyCriteria): void{
+  private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
   }

@@ -1,7 +1,7 @@
 import { ResizeSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
 export const GRID_CONFIG = {
-  initialRowsPerPage: 30,
+  initialRowsPerPage: 100,
   initialPage: 1,
   rowsPerPageDropDown: ['30 Rows', '50 Rows', '100 Rows'],
   rowsPerPageDropDownObject: [
@@ -18,6 +18,6 @@ export const GRID_CONFIG = {
   fullScreenGridHeight: '100%',
   initialRowHeight: 64,
   resizeSettings: { mode: 'Auto' } as ResizeSettingsModel,
-  gridPageSettings: { pageSizes: true, pageSize: 30 },
+  gridPageSettings: { pageSizes: true, pageSize: 100 },
   columns: []
 };

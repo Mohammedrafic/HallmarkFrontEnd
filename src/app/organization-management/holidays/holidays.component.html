@@ -24,11 +24,16 @@
           Export <i-feather name="download" class="icon"></i-feather>
         </div>
       </button>
-      <button
-        ejs-button
-        id="addDepartmentButton"
-        [isPrimary]="true"
-        (click)='addHoliday()'>Add Holiday</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditOrganizationHolidays]">
+        <button
+          ejs-button
+          id="addDepartmentButton"
+          [disabled]="!userPermission[userPermissions.CanEditOrganizationHolidays]"
+          [isPrimary]="true"
+          (click)='addHoliday()'>Add Holiday</button>
+      </app-tooltip-container>
     </section>
   </section>
   <ejs-grid class="grid grid-component"
@@ -60,7 +65,7 @@
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="editHoliday(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteHoliday(data, $event)">
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteHoliday(data, $event)" [disabled]="!userPermission[userPermissions.CanEditOrganizationHolidays]">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -123,6 +128,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(holidaysPage$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -202,6 +210,7 @@
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-side-dialog
+  [disableSaveButton]="!userPermission[userPermissions.CanEditOrganizationHolidays]"
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveHoliday()"
   header="{{ title }} Holiday"

@@ -201,6 +201,12 @@ export class ShareOrganizationsData {
   name: string;
 }
 
+export class DeleteDocumentFolderFilter {
+  folderId: number;
+  businessUnitType: number;
+  businessUnitId: number | null;
+}
+
 
 
 

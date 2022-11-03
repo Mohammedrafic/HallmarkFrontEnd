@@ -93,6 +93,9 @@
                                   [showSpinButton]="false"
                                   (change)="onGoToClick($event)">
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(agencies$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager id="gridPager"

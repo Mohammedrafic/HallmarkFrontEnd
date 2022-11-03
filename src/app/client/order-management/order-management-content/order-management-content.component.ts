@@ -23,18 +23,15 @@ import {
   LockUpdatedSuccessfully,
   ReloadOrganisationOrderCandidatesLists,
   SelectNavigationTab,
-  SetLock,
+  SetLock
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import {
-  GetAllOrganizationSkills,
-  GetOrganizationSettings,
-} from '@organization-management/store/organization-management.actions';
+import { GetAllOrganizationSkills, GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
@@ -48,7 +45,7 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementChild,
-  OrderManagementPage,
+  OrderManagementPage
 } from '@shared/models/order-management.model';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Skill } from '@shared/models/skill.model';
@@ -68,7 +65,7 @@ import {
   Subscription,
   take,
   takeUntil,
-  throttleTime,
+  throttleTime
 } from 'rxjs';
 import { CandidatesStatusText, FilterOrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import {
@@ -77,7 +74,7 @@ import {
   ShowExportDialog,
   ShowFilterDialog,
   ShowSideDialog,
-  ShowToast,
+  ShowToast
 } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
@@ -95,7 +92,7 @@ import {
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
-  ROW_HEIGHT,
+  ROW_HEIGHT
 } from './order-management-content.constants';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -127,7 +124,7 @@ import { PermissionService } from '../../../security/services/permission.service
   selector: 'app-order-management-content',
   templateUrl: './order-management-content.component.html',
   styleUrls: ['./order-management-content.component.scss'],
-  providers: [VirtualScrollService, DetailRowService, MaskedDateTimeService], 
+  providers: [VirtualScrollService, DetailRowService, MaskedDateTimeService],
 })
 export class OrderManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') override gridWithChildRow: GridComponent;
@@ -606,7 +603,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
     this.filters.openPositions = this.filters.openPositions || null;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
-    this.getOrders();
+    this.getOrders(true);
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
@@ -717,8 +714,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           new GetAgencyOrderCandidatesList(
             data.id,
             data.organizationId,
-            1,
-            30,
+            GRID_CONFIG.initialPage,
+            GRID_CONFIG.initialRowsPerPage,
             this.orderManagementService.excludeDeployed
           )
         );
@@ -855,8 +852,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       new GetAgencyOrderCandidatesList(
         reOrder.id,
         reOrder.organizationId,
-        1,
-        30,
+        GRID_CONFIG.initialPage,
+        GRID_CONFIG.initialRowsPerPage,
         this.orderManagementService.excludeDeployed
       )
     );
@@ -898,8 +895,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       new GetAgencyOrderCandidatesList(
         order.id,
         order.organizationId,
-        1,
-        30,
+        GRID_CONFIG.initialPage,
+        GRID_CONFIG.initialRowsPerPage,
         this.orderManagementService.excludeDeployed
       )
     );
@@ -1000,8 +997,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           new GetAgencyOrderCandidatesList(
             this.selectedOrder.id,
             this.selectedOrder.organizationId as number,
-            1,
-            30,
+            GRID_CONFIG.initialPage,
+            GRID_CONFIG.initialRowsPerPage,
             this.orderManagementService.excludeDeployed
           )
         );
@@ -1413,7 +1410,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private applyDashboardFilters(): void {
     this.orderStaus >0 ? this.numberArr.push(this.orderStaus) : [];
     this.filters.orderStatuses = this.numberArr;
-   
+
     combineLatest([this.organizationId$, this.filteredItems$])
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(([organizationId, items]) => {
@@ -1507,8 +1504,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       new GetAgencyOrderCandidatesList(
         order.id,
         order.organizationId as number,
-        1,
-        30,
+        GRID_CONFIG.initialPage,
+        GRID_CONFIG.initialRowsPerPage,
         this.orderManagementService.excludeDeployed
       )
     );

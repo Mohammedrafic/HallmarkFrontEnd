@@ -20,7 +20,11 @@
           Export <i-feather name="download" class="icon"></i-feather>
         </div>
       </button>
-      <button ejs-button id="addDepartmentButton" [isPrimary]="true" (click)='addSkill()'>Add Skill</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditAssignedSkills]">
+        <button ejs-button id="addDepartmentButton" [isPrimary]="true" (click)='addSkill()' [disabled]="!userPermission[userPermissions.CanEditAssignedSkills]">Add Skill</button>
+      </app-tooltip-container>
     </section>
   </section>
   <ejs-grid class="grid grid-component"
@@ -45,7 +49,7 @@
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editSkill(data, $event)">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editSkill(data, $event)" [disabled]="!userPermission[userPermissions.CanEditAssignedSkills]">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
             <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteSkill(data, $event)">
@@ -60,7 +64,7 @@
       <e-column field="allowOnboard" headerText="allow onboard" width=150>
         <ng-template #template let-data>
           <div class="bootstrap">
-            <ejs-checkbox [checked]="data.allowOnboard" (change)="allowOnBoardChange(data, $event)" label=""></ejs-checkbox>
+            <ejs-checkbox [checked]="data.allowOnboard" (change)="allowOnBoardChange(data, $event)" label="" [disabled]="!userPermission[userPermissions.CanEditAssignedSkills]"></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
@@ -91,6 +95,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(skills$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -167,6 +174,7 @@
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-side-dialog
+  [disableSaveButton]="!userPermission[userPermissions.CanEditAssignedSkills]"
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveSkill()"
   header="{{ title }} Skill"

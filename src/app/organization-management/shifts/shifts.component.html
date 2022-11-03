@@ -14,7 +14,11 @@
           Export <i-feather name="download" class="icon"></i-feather>
         </div>
       </button>
-      <button ejs-button id="addDepartmentButton" [isPrimary]="true" (click)="addShift()">Add Shift</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditShifts]">
+          <button ejs-button id="addDepartmentButton" [isPrimary]="true" (click)="addShift()" [disabled]="!userPermission[userPermissions.CanEditShifts]">Add Shift</button>
+      </app-tooltip-container>
     </section>
   </section>
   <ejs-grid class="grid grid-component"
@@ -41,7 +45,7 @@
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="editShift(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteShift(data, $event)">
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteShift(data, $event)" [disabled]="!userPermission[userPermissions.CanEditShifts]">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -78,6 +82,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(shiftsPage$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -101,6 +108,7 @@
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-side-dialog
+  [disableSaveButton]="!userPermission[userPermissions.CanEditShifts]"
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveShift()"
   header="{{ title }} Shift"

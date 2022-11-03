@@ -1,12 +1,18 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit,
-  ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
   combineLatest,
-  combineLatestWith, debounceTime, distinctUntilChanged, filter, map, Observable,
-  switchMap, takeUntil, tap,
+  combineLatestWith,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  Observable,
+  switchMap,
+  takeUntil,
+  tap
 } from 'rxjs';
 
 import { PageOfCollections } from '@shared/models/page.model';
@@ -14,8 +20,14 @@ import { Destroyable } from '@core/helpers';
 import { DialogAction } from '@core/enums';
 import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import {
-  BaseInvoice, InvoicesFilterState, InvoiceUpdateEmmit, ManualInvoice, ManualInvoicesData,
-  PrintingPostDto, SelectedInvoiceRow, GridContainerTabConfig
+  BaseInvoice,
+  GridContainerTabConfig,
+  InvoicesFilterState,
+  InvoiceUpdateEmmit,
+  ManualInvoice,
+  ManualInvoicesData,
+  PrintingPostDto,
+  SelectedInvoiceRow
 } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicePrintingService, InvoicesService } from '../../services';
@@ -24,22 +36,17 @@ import { UNIT_ORGANIZATIONS_FIELDS } from 'src/app/modules/timesheets/constants'
 import { DataSourceItem, Permission } from '@core/interface';
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
 import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
-import {
-  PendingInvoice,
-  PendingInvoiceRecord,
-  PendingInvoicesData
-} from '../../interfaces/pending-invoice-record.interface';
+import { PendingInvoice, PendingInvoiceRecord, PendingInvoicesData } from '../../interfaces/pending-invoice-record.interface';
 import { InvoicesTableTabsComponent } from '../../components/invoices-table-tabs/invoices-table-tabs.component';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
-import {
-  RejectReasonInputDialogComponent
-} from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
+import { RejectReasonInputDialogComponent } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
 import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
 import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions } from '../../constants';
-import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { UserState } from 'src/app/store/user.state';
 import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
 import { InvoicesModel } from '../../store/invoices.model';
+import { GRID_CONFIG } from '@shared/constants';
+import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 import { InvoicesPermissionHelper } from '../../helpers/invoices-permission.helper';
 
 @Component({
@@ -276,8 +283,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public resetFilters(): void {
     this.store.dispatch(new Invoices.UpdateFiltersState({
-      pageNumber: 1,
-      pageSize: 30,
+      pageNumber: GRID_CONFIG.initialPage,
+      pageSize: GRID_CONFIG.initialRowsPerPage,
     }));
   }
 

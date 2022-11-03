@@ -4,14 +4,14 @@ import { SetHeaderState } from '../../../store/app.actions';
 import { Router } from '@angular/router';
 import { UserState } from '../../../store/user.state';
 import { distinctUntilChanged, takeUntil } from 'rxjs';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { AbstractPermission } from "@shared/helpers/permissions";
 
 @Component({
   selector: 'app-associate-list',
   templateUrl: './associate-list.component.html',
   styleUrls: ['./associate-list.component.scss'],
 })
-export class AssociateListComponent extends DestroyableDirective implements OnInit {
+export class AssociateListComponent extends AbstractPermission implements OnInit {
   public isAgency = false;
   public associateEvent = new EventEmitter<boolean>();
   public agencyActionsAllowed = true;
@@ -20,13 +20,15 @@ export class AssociateListComponent extends DestroyableDirective implements OnIn
     return this.isAgency ? 'Organizations' : 'Agencies';
   }
 
-  constructor(private store: Store, private router: Router) {
-    super();
+  constructor(protected override store: Store, private router: Router) {
+    super(store);
 
     this.setHeaderName();
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
+
     if (this.isAgency) {
       this.checkForAgencyStatus();
     }
@@ -42,6 +44,7 @@ export class AssociateListComponent extends DestroyableDirective implements OnIn
       new SetHeaderState({ title: `Associated ${this.isAgency ? 'Organizations' : 'Agencies'}`, iconName: 'clock' })
     );
   }
+
   private checkForAgencyStatus(): void {
     this.store
       .select(UserState.agencyActionsAllowed)

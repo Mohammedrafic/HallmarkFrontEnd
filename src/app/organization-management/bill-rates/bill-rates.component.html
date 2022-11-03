@@ -9,16 +9,20 @@
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
     </button>
-    <button
-      *ngIf="isBillRateSetupTabActive"
-      [disabled]="isReadOnly"
-      ejs-button
-      id="importButton"
-      cssClass="e-outline button-import"
-      (click)="onImportDataClick()"
-    >
-      Import <i-feather name="upload" class="icon"></i-feather>
-    </button>
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!isReadOnly && !userPermission[userPermissions.CanEditSettingsBillRates]">
+      <button
+        *ngIf="isBillRateSetupTabActive"
+        [disabled]="isReadOnly || !userPermission[userPermissions.CanEditSettingsBillRates]"
+        ejs-button
+        id="importButton"
+        cssClass="e-outline button-import"
+        (click)="onImportDataClick()"
+      >
+        Import <i-feather name="upload" class="icon"></i-feather>
+      </button>
+    </app-tooltip-container>
     <button
       ejs-dropdownbutton
       [items]="exportOptions"
@@ -27,9 +31,18 @@
     >
       <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
     </button>
-    <button *ngIf="showButton" ejs-button [isPrimary]="true" (click)="addBillRateSetupRecord()">
-      {{ addBillRateBtnText }}
-    </button>
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!userPermission[userPermissions.CanManageExternalBillRates] || !userPermission[userPermissions.CanEditSettingsBillRates]">
+      <button
+        *ngIf="showButton"
+        ejs-button [isPrimary]="true"
+        (click)="addBillRateSetupRecord()"
+        [disabled]="!userPermission[userPermissions.CanManageExternalBillRates] || !userPermission[userPermissions.CanEditSettingsBillRates]"
+      >
+        {{ addBillRateBtnText }}
+      </button>
+    </app-tooltip-container>
   </div>
 
   <ejs-tab id="navigationTabs" (selected)="onTabSelected($event)">
@@ -42,6 +55,7 @@
             [export$]="exportMap.get(selectedTab)"
             [isActive]="isBillRateSetupTabActive"
             [importDialogEvent]="importDialogEvent"
+            [userPermission]="userPermission"
           >
           </app-bill-rate-setup>
         </ng-template>
@@ -54,6 +68,7 @@
             [export$]="exportMap.get(selectedTab)"
             [searchQuery]="searchQuery"
             [isActive]="isExternalBillRateType"
+            [userPermission]="userPermission"
           >
           </app-external-bill-rate>
         </ng-template>
@@ -66,6 +81,7 @@
             [export$]="exportMap.get(selectedTab)"
             [searchQuery]="searchQuery"
             [isActive]="isExternalBillRateTypeMapping"
+            [userPermission]="userPermission"
           >
           </app-bill-rate-type-mapping>
         </ng-template>

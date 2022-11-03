@@ -10,7 +10,7 @@ import {
   GridOptions,
   ICellRendererParams,
   IDetailCellRendererParams,
-  RowHeightParams
+  RowHeightParams,
 } from '@ag-grid-community/core';
 import { ManualInvoice } from '../../interfaces';
 import { PendingInvoiceStatus } from '../../enums/invoice-status.enum';
@@ -27,7 +27,10 @@ import {
   numberValueFormatter, weekPeriodValueGetter,
   invoicesRowDetailsOffsetColDef,
   monthDayYearDateFormatter,
-  titleValueCellRendererSelector
+  titleValueCellRendererSelector,
+  RateReasonValueGetter,
+  DepartmentNameGetter,
+  CurrencyFormatter
 } from '../../constants';
 import { GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
@@ -257,36 +260,60 @@ export class PendingApprovalGridHelper {
                 }
               },
               {
-                field: 'amount',
-                headerName: 'Amount',
-                cellClass: 'font-weight-bold',
-                cellRendererSelector: titleValueCellRendererSelector,
-                valueFormatter: numberValueFormatter,
-              },
-              {
                 ...weekPeriod,
                 valueGetter: weekPeriodValueGetter,
                 headerName: 'Week Period',
                 cellRendererSelector: titleValueCellRendererSelector,
               },
               {
+                field: 'dateTime',
+                valueFormatter: monthDayYearDateFormatter,
+                headerName: 'Date',
+                width: 120,
+                cellRendererSelector: titleValueCellRendererSelector,
+              },
+
+              {
+                field: 'billRateConfigTitle',
+                headerName: 'Bill Rate Type',
+                width: 150,
+                cellRendererSelector: titleValueCellRendererSelector,
+              },
+              {
+                field: 'billRate',
+                headerName: 'Rate',
+                width: 100,
+                cellRendererSelector: titleValueCellRendererSelector,
+                valueGetter: RateReasonValueGetter,
+              },
+              {
                 field: 'value',
-                headerName: 'Total Hours',
+                headerName: 'Hours',
                 cellRendererSelector: titleValueCellRendererSelector,
                 valueFormatter: numberValueFormatter,
                 width: 100,
               },
               {
+                field: 'amount',
+                headerName: 'Total',
+                width: 120,
+                cellClass: 'font-weight-bold',
+                cellRendererSelector: titleValueCellRendererSelector,
+                valueFormatter: CurrencyFormatter,
+              },
+              {
                 field: 'locationName',
-                minWidth: 210,
+                minWidth: 150,
+                initialWidth: 150,
                 headerName: 'Location',
                 cellRendererSelector: titleValueCellRendererSelector,
               },
               {
                 field: 'departmentName',
                 minWidth: 160,
-                headerName: 'Department',
+                headerName: 'Department (Cost Center)',
                 cellRendererSelector: titleValueCellRendererSelector,
+                valueGetter: DepartmentNameGetter,
               },
               {
                 field: 'timesheetTypeText',
@@ -294,6 +321,11 @@ export class PendingApprovalGridHelper {
                 headerName: 'Type',
                 cellRendererSelector: titleValueCellRendererSelector,
               },
+              {
+                field: 'agencyName',
+                headerName: 'Agency Name',
+                cellRendererSelector: titleValueCellRendererSelector,
+              }
             ] as TypedColDef<PendingApprovalInvoiceRecord>[],
           },
           getDetailRowData: (params: GetDetailRowDataParams) => params.successCallback(
