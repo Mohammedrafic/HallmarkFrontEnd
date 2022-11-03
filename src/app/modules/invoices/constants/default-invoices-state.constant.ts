@@ -1,6 +1,7 @@
 import { InvoicesModel } from '../store/invoices.model';
 import { InvoiceDefaultFilterColumns } from './invoices.constant';
 import { InvoicesFilterState } from '../interfaces';
+import { GRID_CONFIG } from '@shared/constants';
 
 export const DefaultInvoicesState: InvoicesModel = {
   invoicesData: null,
@@ -31,7 +32,7 @@ export const DefaultInvoicesState: InvoicesModel = {
 };
 
 export const DefaultFiltersState: InvoicesFilterState = {
-  pageNumber: 1,
-  pageSize: 30,
+  pageNumber: GRID_CONFIG.initialPage,
+  pageSize: GRID_CONFIG.initialRowsPerPage,
   organizationId: null,
 };

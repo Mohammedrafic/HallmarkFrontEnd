@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
 import { DialogUtility } from '@syncfusion/ej2-angular-popups';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from "@shared/constants";
 
 @Injectable({
   providedIn: 'root',

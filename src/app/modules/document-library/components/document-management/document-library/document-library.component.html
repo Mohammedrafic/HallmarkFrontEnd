@@ -52,6 +52,7 @@
 </section>
 <section>
   <app-document-library-table [gridOptions]="gridOptions"
+                              [totalRecordsCount]="rowData.length"
                               (onGridReadyEvent)="onGridReady($event)"
                               (onGridPageSizeChanged)="onPageSizeChanged($event)"></app-document-library-table>
 </section>

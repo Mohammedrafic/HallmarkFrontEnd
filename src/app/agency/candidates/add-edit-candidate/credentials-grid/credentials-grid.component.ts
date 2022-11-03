@@ -561,6 +561,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       .subscribe((credential: { payload: CandidateCredential }) => {
         this.credentialId = credential.payload.id as number;
         this.disabledCopy = false;
+        this.selectedItems = [];
         this.uploadFiles(this.credentialId);
 
         if (!this.removeFiles) {
