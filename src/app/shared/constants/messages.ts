@@ -49,4 +49,6 @@ export const usedByOrderErrorMessage = (val: string, entities: string) =>
 export const usedInMappingMessage = (mappingName: string) =>
   `This change has been affected ${mappingName} Mapping, please update it on the ${mappingName} Mapping tab`;
   export const SEND_EMAIL = 'Sent email';
-  export const SEND_EMAIL_REQUIRED = 'Required';
+export const SEND_EMAIL_REQUIRED = 'Required';
+export const DOCUMENT_UPLOAD_SUCCESS = 'Document uploaded successfully';
+export const DOCUMENT_UPLOAD_EDIT = 'Document modified successfully';
