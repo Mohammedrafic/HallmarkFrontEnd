@@ -216,7 +216,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       okButtonClass: 'ok-button',
     };
 
-    return this.isDeployedCandidate
+    return this.isDeployedCandidate  && this.isAgency
       ? this.confirmService.confirm(deployedCandidateMessage(this.deployedCandidateOrderIds), options)
       : of(true);
   }

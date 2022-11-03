@@ -378,8 +378,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       okButtonClass: 'ok-button',
     };
 
-    return this.isDeployedCandidate
-      ? this.confirmService.confirm(deployedCandidateMessage([]), options)
+    return this.isDeployedCandidate && this.isAgency
+      ? this.confirmService.confirm(deployedCandidateMessage(this.deployedCandidateOrderIds), options)
       : of(true);
   }
 
@@ -538,8 +538,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     } else if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
       this.openCandidateCancellationDialog.next();
     } else {
-      this.store.dispatch(new GetRejectReasonsForOrganisation());
-      this.openRejectDialog.next(true);
+      this.onReject();
     }
   }
   private createForm(): void {

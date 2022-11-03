@@ -221,8 +221,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public updateCandidateJob(event: { itemData: ApplicantStatus }, reloadJob = false): void {
     if (event.itemData?.isEnabled) {
       if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
-        this.store.dispatch(new GetRejectReasonsForOrganisation());
-        this.openRejectDialog.next(true);
+        this.onReject();
       } else {
         this.offerCandidate(event.itemData, reloadJob);
       }
@@ -285,7 +284,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       okButtonClass: 'ok-button',
     };
 
-    return this.isDeployedCandidate
+    return this.isDeployedCandidate && this.isAgency
       ? this.confirmService.confirm(deployedCandidateMessage(this.deployedCandidateOrderIds), options)
       : of(true);
   }
