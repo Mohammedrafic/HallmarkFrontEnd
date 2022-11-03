@@ -55,6 +55,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit, 
   public reasonsNavigationTabs = ReasonsNavigationTabs;
   public form: FormGroup;
   public penaltiesForm: FormGroup;
+  public canRejectOrClosure = true;
 
   private isEdit = false;
   public title: string = '';
@@ -90,6 +91,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit, 
     this.createForm();
     this.subscribeOnSaveReasonSuccess();
     this.penaltiesSubscriptionHandler();
+    this.canRejectOrClosureReason();
   }
 
   ngOnDestroy(): void {
@@ -98,6 +100,7 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit, 
 
   public onTabSelected(selectedTab: any): void {
     this.selectedTab = selectedTab.selectedIndex;
+    this.canRejectOrClosureReason();
   }
 
   private penaltiesSubscriptionHandler(): void {
@@ -331,5 +334,11 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit, 
     } else {
       this.closeSideDialog()
     }
+  }
+
+  private canRejectOrClosureReason(): void {
+    this.canRejectOrClosure = this.selectedTab === 0 ?
+      this.userPermission[this.userPermissions.CanRejectCandidate] :
+      this.userPermission[this.userPermissions.CanManageOrderClosureReasons];
   }
 }
