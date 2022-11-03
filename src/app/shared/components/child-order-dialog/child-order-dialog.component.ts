@@ -22,7 +22,7 @@ import {
   SelectingEventArgs,
   TabComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { GetAgencyExtensions, GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import { GetAgencyExtensions, GetCandidateJob, GetDeployedCandidateOrderIds, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
 import {
@@ -133,6 +133,7 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
 
   @Select(OrderManagementContentState.extensions) organizationExtensions$: Observable<any>;
   @Select(OrderManagementState.extensions) agencyExtensions$: Observable<any>;
+  @Select(OrderManagementState.deployedCandidateOrderIds) deployedCandidateOrderIds$: Observable<string[]>;
 
   @Select(UserState.currentUserPermissions)
   public currentUserPermissions$: Observable<any[]>;
@@ -258,12 +259,21 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
     if (candidate) {
       this.setCloseOrderButtonState();
       this.setAddExtensionBtnState(candidate);
+      this.getDeployedCandidateOrders();
 
       if (this.chipList) {
         this.chipList.cssClass = this.chipsCssClass.transform(
           this.orderStatusText[changes['candidate'].currentValue.orderStatus]
         );
       }
+    }
+  }
+
+  private getDeployedCandidateOrders(): void {
+    if(this.candidate.deployedCandidateInfo) {
+      const { orderId, candidateId, organizationId } = this.candidate;
+      const organizationPrefix = this.order.organizationPrefix;
+      this.store.dispatch(new GetDeployedCandidateOrderIds(orderId!, candidateId, organizationId, organizationPrefix));
     }
   }
 

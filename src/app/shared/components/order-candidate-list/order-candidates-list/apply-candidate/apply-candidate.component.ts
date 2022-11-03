@@ -37,6 +37,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isAgency: boolean = false;
   @Input() isLocked: boolean | undefined = false;
   @Input() actionsAllowed: boolean;
+  @Input() deployedCandidateOrderIds: string[];
 
   public formGroup: FormGroup;
   public readOnlyMode: boolean;
@@ -127,9 +128,8 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       okButtonClass: 'ok-button',
     };
 
-    //TODO Remove mock data after providing by BE the endpoint to get orderIds of deployed candidate
     return this.isDeployedCandidate
-      ? this.confirmService.confirm(deployedCandidateMessage(['NL-1234', 'NL-1266']), options)
+      ? this.confirmService.confirm(deployedCandidateMessage(this.deployedCandidateOrderIds), options)
       : of(true);
   }
 

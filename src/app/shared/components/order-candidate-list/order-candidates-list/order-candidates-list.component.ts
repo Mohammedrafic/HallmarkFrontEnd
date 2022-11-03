@@ -1,4 +1,4 @@
-import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import { GetCandidateJob, GetDeployedCandidateOrderIds, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
@@ -41,6 +41,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   @Select(OrderManagementContentState.selectedOrder)
   public selectedOrgOrder$: Observable<Order>;
 
+  @Select(OrderManagementState.deployedCandidateOrderIds) deployedCandidateOrderIds$: Observable<string[]>;
+
   public templateState: Subject<any> = new Subject();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
@@ -81,6 +83,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     }
 
     this.candidate = { ...data };
+    this.getDeployedCandidateOrders();
 
     this.orderCandidateListViewService.setIsCandidateOpened(true);
     if (this.order && this.candidate) {
@@ -139,6 +142,15 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           this.openDialog(this.onboarded);
         }
       }
+    }
+  }
+
+  private getDeployedCandidateOrders(): void {
+    if(this.candidate.deployedCandidateInfo) {
+      const candidateId = this.candidate.candidateId;
+      const organizationId = this.candidate.deployedCandidateInfo.organizationId;
+      const organizationPrefix = this.selectedOrder.organizationPrefix || '';
+      this.store.dispatch(new GetDeployedCandidateOrderIds(this.order.orderId, candidateId, organizationId, organizationPrefix))
     }
   }
 

@@ -73,6 +73,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
   @Input() actionsAllowed: boolean;
+  @Input() deployedCandidateOrderIds: string[];
 
   public statusesFormControl = new FormControl();
   public openRejectDialog = new Subject<boolean>();
@@ -285,7 +286,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     };
 
     return this.isDeployedCandidate
-      ? this.confirmService.confirm(deployedCandidateMessage([]), options)
+      ? this.confirmService.confirm(deployedCandidateMessage(this.deployedCandidateOrderIds), options)
       : of(true);
   }
 

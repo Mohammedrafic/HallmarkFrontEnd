@@ -163,6 +163,7 @@
       [isAgency]="isAgency"
       [orderDuration]="selectedOrder.duration"
       [actionsAllowed]="agencyActionsAllowed"
+      [deployedCandidateOrderIds]="(deployedCandidateOrderIds$ | async) ?? []"
     ></app-onboarded-candidate>
   </ng-template>
 
@@ -172,6 +173,7 @@
       [candidate]="candidate"
       [isAgency]="isAgency"
       [actionsAllowed]="agencyActionsAllowed"
+      [deployedCandidateOrderIds]="(deployedCandidateOrderIds$ | async) ?? []"
     ></app-accept-candidate>
   </ng-template>
 
@@ -184,6 +186,7 @@
       [order]="$any((selectedAgOrder$ | async))"
       [isLocked]="(selectedAgOrder$ | async)?.isLocked"
       [actionsAllowed]="agencyActionsAllowed"
+      [deployedCandidateOrderIds]="(deployedCandidateOrderIds$ | async) ?? []"
     >
     </app-apply-candidate>
   </ng-template>
@@ -194,6 +197,7 @@
       [candidate]="candidate"
       [isAgency]="isAgency"
       [actionsAllowed]="agencyActionsAllowed"
+      [deployedCandidateOrderIds]="(deployedCandidateOrderIds$ | async) ?? []"
     ></app-offer-deployment>
   </ng-template>
   <ng-template #footerTemplate>

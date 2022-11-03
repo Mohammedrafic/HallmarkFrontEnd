@@ -96,6 +96,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() isAgency: boolean = false;
   @Input() orderDuration: Duration;
   @Input() actionsAllowed: boolean;
+  @Input() deployedCandidateOrderIds: string[];
 
   public override form: FormGroup;
   public jobStatusControl: FormControl;
@@ -331,7 +332,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private onAccept(): void {
-    if (this.form.valid && this.candidateJob) {
+    if (!this.form.errors && this.candidateJob) {
       this.shouldChangeCandidateStatus()
         .pipe(take(1))
         .subscribe((isConfirm) => {
@@ -588,7 +589,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private switchFormState(): void {
-    if ((this.isDeployedCandidate && !this.isAgency) || this.isCancelled) {
+    if (!this.isAgency || this.isCancelled) {
       this.form?.disable();
     } else {
       this.form?.enable();
