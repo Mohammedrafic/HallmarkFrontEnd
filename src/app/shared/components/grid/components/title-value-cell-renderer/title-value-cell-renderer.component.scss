@@ -8,6 +8,9 @@
   .title-value-cell-renderer-container {
     line-height: normal;
     text-align: left;
+    display: inline-block;
+    white-space: break-spaces;
+
 
     .cell-title {
       font-style: normal;

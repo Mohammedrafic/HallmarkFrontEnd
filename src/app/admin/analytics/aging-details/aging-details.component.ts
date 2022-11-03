@@ -229,7 +229,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
 
   public SearchReport(): void {
     this.message = "Default filter selected with all regions ,locations and departments for 90 days";
-    this.filteredItems = this.filterService.generateChips(this.agingReportForm, this.filterColumns);
+    this.filteredItems = [];
     let auth = "Bearer ";
     for (let x = 0; x < window.localStorage.length; x++) {
       if (window.localStorage.key(x)!.indexOf('accesstoken') > 0) {
@@ -238,14 +238,14 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     }
     this.paramsData =
     {
-      "OrganizationParamAR": this.selectedOrganizations?.map((list) => list.id).join(","),
+      "OrganizationParamAR": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
       "RegionParamAR": this.selectedRegions?.map((list) => list.id).join(","),
       "LocationParamAR": this.selectedLocations?.map((list) => list.id).join(","),
       "DepartmentParamAR": this.selectedDepartments?.map((list) => list.id).join(","),
       "BearerParamAR": auth,
       "BusinessUnitIdParamJD": window.localStorage.getItem("lastSelectedOrganizationId") == null
-        ? this.organizations != null && this.organizations[0]?.id != null ?
-          this.organizations[0].id.toString() : "1" :
+        ? this.organizations != null && this.organizations[0]?.organizationId != null ?
+          this.organizations[0].organizationId.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl
     };
