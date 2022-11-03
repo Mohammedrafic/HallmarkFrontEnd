@@ -38,6 +38,8 @@ import { isNil } from 'lodash';
 import { optionFields, regionFields } from '@shared/constants';
 import { adaptToNameEntity } from '../../../../helpers/dropdown-options.helper';
 import { filterColumns } from './candidate-list.constants';
+import { Permission } from '@core/interface';
+import { UserPermissions } from '@core/enums';
 
 @Component({
   selector: 'app-candidate-list',
@@ -68,6 +70,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Input() includeDeployedCandidates$: Subject<boolean>;
   @Input() isAgency: boolean;
   @Input() agencyActionsAllowed: boolean;
+  @Input() userPermission: Permission;
   @Input() set tab(tabIndex: number) {
     if (!isNil(tabIndex)) {
       this.activeTab = tabIndex;
@@ -87,6 +90,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public readonly statusEnum = CandidateStatus;
   public readonly candidateStatus = CandidatesStatusText;
   public candidates$: Observable<CandidateList>;
+  public readonly userPermissions = UserPermissions;
   public columnsToExport: ExportColumn[] = [
     { text: 'Name', column: 'Name' },
     { text: 'Profile Status', column: 'ProfileStatus' },
@@ -162,7 +166,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public onFilterApply(): void {
     this.filters = this.CandidateFilterFormGroup.getRawValue();
-    console.log(this.filters);
     this.filters.profileStatuses = this.filters.profileStatuses || [];
     this.filters.regionsNames = this.filters.regionsNames || [];
     this.filters.skillsIds = this.filters.skillsIds || [];

@@ -1,13 +1,13 @@
 import { Component, Inject, OnInit, ViewChild,OnDestroy } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Location, LocationsByRegionsFilter } from '@shared/models/location.model';
 import { Region, regionFilter } from '@shared/models/region.model';
 import { Department, DepartmentsByLocationsFilter } from '@shared/models/department.model';
-import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import {  FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import {  Observable, Subject, takeUntil } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -64,7 +64,7 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
   isDepartmentsDropDownEnabled: boolean = false;
   departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   selectedDepartments: Department[];
-  
+
   @Select(LogiReportState.logiReportData)
   public logiReportData$: Observable<ConfigurationDto[]>;
 
@@ -107,21 +107,21 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
-    }   
-    this.SetReportData();    
+    }
+    this.SetReportData();
   }
 
   ngOnInit(): void {
-    
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => { 
+
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => {
       this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:ConfigurationDto[])=>{
         if(data.length>0)
         {
         this.logiReportComponent.SetReportData(data);
         }
-     });    
-      this.agencyOrganizationId=data;   
+     });
+      this.agencyOrganizationId=data;
       this.isInitialLoad = true;
       this.orderFilterColumnsSetup();
       this.onFilterControlValueChangedHandler();
@@ -202,11 +202,11 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
     this.onRegionsChange();
     this.onLocationsChange();
   }
- 
+
   public SearchReport(): void {
     let auth="Bearer ";
     for(let x=0;x<window.localStorage.length;x++)
-    { 
+    {
       if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
       {
         auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
@@ -222,15 +222,15 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
       "LocationParamCRR": this.selectedLocations?.map((list) => list.id),
       "DepartmentParamCRR": this.selectedDepartments?.map((list) => list.departmentId),
       "BearerParamCRR":auth,
-      "BusinessUnitIdParamCRR":window.localStorage.getItem("lastSelectedOrganizationId") == null 
+      "BusinessUnitIdParamCRR":window.localStorage.getItem("lastSelectedOrganizationId") == null
       ?this.organizations!=null &&this.organizations[0]?.id!=null?
-      this.organizations[0].id.toString():"1": 
+      this.organizations[0].id.toString():"1":
       window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName":this.baseUrl
     };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
-  }  
+  }
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
       businessIds: {
