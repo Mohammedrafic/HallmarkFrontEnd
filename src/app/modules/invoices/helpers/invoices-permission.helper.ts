@@ -44,6 +44,8 @@ export class InvoicesPermissionHelper extends Destroyable {
     this.createManualEnabled = permission[UserPermissions.CanAgencyViewInvoices]
       && permission[UserPermissions.CanAgencyCreateManualInvoices];
 
+    this.approveInvoiceEnabled = this.createManualEnabled;
+
     this.payInvoiceEnabled = permission[UserPermissions.CanAgencyViewInvoices]
       && permission[UserPermissions.CanAgencySetInvoiceStatusToPaid];
   }
