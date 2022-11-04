@@ -71,13 +71,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public readonly daysOfWeek = Days;
   public readonly daysOfWeekFields = {
     text: 'text',
-    value: 'text',
+    value: 'id',
   };
 
   public readonly groupInvoicesOptions = groupInvoicesOptions;
   public readonly groupInvoicesFields = {
     text: 'text',
-    value: 'text',
+    value: 'id',
   };
 
   @Select(OrganizationManagementState.organizationSettings)
@@ -303,7 +303,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   public onOverrideButtonClick(data: any): void {
     this.isFormShown = true;
-    this.formControlType = this.getControlType(data);
+    this.formControlType = data.controlType;
     this.regionFormGroup.reset();
     this.regionRequiredFormGroup.reset();
     this.locationFormGroup.reset();
@@ -320,7 +320,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.isFormShown = true;
     this.addActiveCssClass(event);
     this.isEdit = true;
-    this.formControlType = this.getControlType(parentRecord);
+    this.formControlType = parentRecord.controlType;
     this.setFormValidation(parentRecord);
 
     if (!childRecord) {
@@ -615,7 +615,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.organizationSettingsFormGroup.setValue({
       settingValueId: null,
       settingKey: data.settingKey,
-      controlType: this.getControlType(data),
+      controlType: data.controlType,
       name: data.name,
       value: null,
     });
@@ -673,7 +673,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.organizationSettingsFormGroup.setValue({
         settingValueId: this.isParentEdit ? null : childData.settingValueId,
         settingKey: parentData.settingKey,
-        controlType: this.getControlType(parentData),
+        controlType: parentData.controlType,
         name: parentData.name,
         value: dynamicValue?.isDictionary || dynamicValue?.isInvoice ? !!dynamicValue.isEnabled : dynamicValue,
       });
@@ -819,11 +819,5 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       .subscribe(({ canManageOrganizationConfigurations }) => {
         this.settingKeys.forEach((key) => (this.hasPermissions[key] = canManageOrganizationConfigurations));
       });
-  }
-
-  private getControlType(data: any): number {
-    return data.settingKey === 'InvoiceAutoGeneration'
-      ? OrganizationSettingControlType.InvoiceAutoGeneration
-      : data.controlType;
   }
 }
