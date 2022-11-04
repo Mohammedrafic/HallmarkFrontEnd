@@ -155,7 +155,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.checkActionsAllowed();
     }
 
-    this.checkPermissions(this.isAgency);
+    this.checkPermissions(this.isAgency).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => this.handleChangeTab(0));
     this.watchDialogVisibility();
     this.startFiltersWatching();
     this.watchForInvoiceStatusChange();
@@ -258,6 +260,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       ...this.invoicesContainerService.getGridOptions(tabIdx, this.organizationId),
     };
 
+    console.log(this.approveInvoiceEnabled, 'approveInvoiceEnabled');
     this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx,
       { organizationId: this.organizationId,
         canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay || this.invoicePayAllowed && this.payInvoiceEnabled,
