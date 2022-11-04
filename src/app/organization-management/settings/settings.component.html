@@ -347,7 +347,7 @@
       </div>
     </form>
 
-    <from
+    <form
     [formGroup]="invoiceGeneratingFormGroup"
     *ngIf="formControlType === organizationSettingControlType.InvoiceAutoGeneration"
   >
@@ -392,7 +392,7 @@
         </ejs-dropdownlist>
       </div>
     </div>
-  </from>
+  </form>
 
     <div [ngSwitch]="formControlType">
       <ng-container *ngSwitchCase="organizationSettingControlType.Checkbox">

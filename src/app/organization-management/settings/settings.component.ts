@@ -720,7 +720,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   private watchForStructure(): void {
     this.organizationStructure$
-    .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+    .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
     .subscribe((structure: OrganizationStructure) => {
       this.orgStructure = structure;
       this.orgRegions = structure.regions;
@@ -731,7 +731,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   private watchForSFilterOptions(): void {
     this.organizationSettingsFilterOptions$
-    .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+    .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
     .subscribe((options: string[]) => {
       this.filterColumns.attributes.dataSource = options;
     });
