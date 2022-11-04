@@ -660,13 +660,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
     if (this.formControlType === OrganizationSettingControlType.InvoiceAutoGeneration) {
       const valueOptions = this.isParentEdit ? parentData.value : childData.value;
-      dynamicValue = {
-        IsEnabled: false,
-        DayOfWeek: 'Friday',
-        isInvoice: true,
-        GroupingBy: 'Location',
-        Time: '2022-11-01 07:00:00.0000000 +00:00',
-      };
+      dynamicValue = { ...JSON.parse(valueOptions), isInvoice: true };
     }
 
     setTimeout(() => {
@@ -678,17 +672,18 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         value: dynamicValue?.isDictionary || dynamicValue?.isInvoice ? !!dynamicValue.isEnabled : dynamicValue,
       });
 
-      dynamicValue?.isDictionary &&
+      if (dynamicValue?.isDictionary) {
         this.pushStartDateFormGroup.setValue({
           daysToPush: dynamicValue.daysToPush || null,
           daysToConsider: dynamicValue.daysToConsider || null,
         });
+      }
 
       if (dynamicValue?.isInvoice) {
         this.invoiceGeneratingFormGroup.setValue({
-          time: dynamicValue.Time,
-          dayOfWeek: dynamicValue.DayOfWeek,
-          groupingBy: dynamicValue.GroupingBy,
+          time: dynamicValue.time,
+          dayOfWeek: dynamicValue.dayOfWeek,
+          groupingBy: dynamicValue.groupingBy,
         });
       }
     });
