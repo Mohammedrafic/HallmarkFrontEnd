@@ -42,7 +42,7 @@ import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
 
-import { activePositionsLegendPalette } from '../constants/active-positions-legend-palette';
+import { activePositionsLegendDisplayText, activePositionsLegendPalette } from '../constants/active-positions-legend-palette';
 import { ActivePositionsChartStatuses } from '../enums/active-positions-legend-palette.enum';
 import { candidateLegendPalette } from '../constants/candidate-legend-palette';
 import { CandidateChartStatuses } from '../enums/candidate-legend-palette.enum';
@@ -329,7 +329,7 @@ export class DashboardService {
           chartData: lodashMapPlain(
             orderStatusesDetails,
             ({ count, statusName }: ActivePositionTypeInfo, index: number) => ({
-              label: statusName,
+              label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses],
               value: count,
               color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses],
             })
