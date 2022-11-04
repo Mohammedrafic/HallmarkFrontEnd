@@ -107,7 +107,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public locationIdControl: AbstractControl;
   public isWordDoc: boolean = false;
   public isImage: boolean = false;
-  public isExcel :boolean =false;
+  public isExcel: boolean = false;
   public isAgency: boolean = false;
   public halmarkSwitch: boolean = false;
   public agencySwitch: boolean = false;
@@ -717,15 +717,11 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         break;
       case '.docx':
         this.isWordDoc = true;
-        //ToDo: If preview donot work in Iframe another alternate should be looked for.
-        //DocumentEditor is removed as the requirement do not expect for any editing.
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://view.officeapps.live.com/op/embed.aspx?src=' + file.sasUrl);
         break;
       case '.xlsx':
-        this.isExcel = true;
-        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          `https://view.officeapps.live.com/op/embed.aspx?src=${file.sasUrl}`
-        );
+        this.isWordDoc = true;
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://view.officeapps.live.com/op/embed.aspx?src=' + file.sasUrl);
         break;
       default:
 
@@ -733,14 +729,13 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.changeDetectorRef.markForCheck();
   }
 
-  setDocumentMimeTypeDefaults()
-  {
+  setDocumentMimeTypeDefaults() {
     this.isPdf = false;
-    this.isWordDoc=false;
-    this.isImage=false;
-    this.isExcel=false;
-    this.previewUrl='';
-    this.fileAsBase64='';
+    this.isWordDoc = false;
+    this.isImage = false;
+    this.isExcel = false;
+    this.previewUrl = '';
+    this.fileAsBase64 = '';
   }
 
   public onClosePreview(): void {
@@ -851,11 +846,13 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             this.documentLibraryform.get(FormControlNames.Comments)?.setValue(data.comments);
             setTimeout(() => {
               const editRegionIds = data?.regionId?.split(',').map(Number) != undefined ? data?.regionId?.split(',').map(Number) : [];
-              this.setRegionsOnEdit(editRegionIds);
+              this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(editRegionIds);
               const editLocationIds = data?.locationId?.split(',').map(Number) != undefined ? data?.locationId?.split(',').map(Number) : [];
-              this.setLocationsOnEdit(editLocationIds);
+              setTimeout(() => {
+                this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(editLocationIds);
+              }, 500);
               this.changeDetectorRef.markForCheck();
-            }, 1000)
+            }, 500)
             this.store.dispatch(new ShowSideDialog(true));
           }
         });
@@ -866,8 +863,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
     if (editRegionIds.length > 0) {
       this.regions$.subscribe((data) => {
-        const allRegionsIds = data.map(region => region.id);
-        this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(allRegionsIds);
+        this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(editRegionIds);
       });
     } else {
       this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(editRegionIds);
@@ -877,8 +873,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public setLocationsOnEdit(editLocationIds: any) {
     if (editLocationIds.length > 0) {
       this.locations$.subscribe((data) => {
-        const allLocIds = data.map(loc => loc.id);
-        this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(allLocIds);
+        this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(editLocationIds);
       });
     } else {
       this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(editLocationIds);
@@ -959,26 +954,26 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
 
     const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
-      if (selectedRegions.length > 0) {
-        selectedRegions.forEach((regionItem: any) => {
-          let mappingLocItems: number[] = [];
-          const selectedLoactions = this.documentLibraryform.get(FormControlNames.LocationIds)?.value;
-          let x = this.locations$.subscribe((data: any) => {
-            if (selectedLoactions.length > 0) {
-              selectedLoactions.forEach((selLocItem: any) => {
-                let selectedLocation = data.filter((locItem: any) => { return locItem.id == selLocItem && locItem.regionId == regionItem });
-                if (selectedLocation.length > 0)
-                  mappingLocItems.push(selectedLocation[0].id);
-              });
-              mapping[regionItem] = mappingLocItems;
-            }
-            else {
-              mapping[regionItem] = [];
-            }
-          });
-
+    if (selectedRegions.length > 0) {
+      selectedRegions.forEach((regionItem: any) => {
+        let mappingLocItems: number[] = [];
+        const selectedLoactions = this.documentLibraryform.get(FormControlNames.LocationIds)?.value;
+        let x = this.locations$.subscribe((data: any) => {
+          if (selectedLoactions.length > 0) {
+            selectedLoactions.forEach((selLocItem: any) => {
+              let selectedLocation = data.filter((locItem: any) => { return locItem.id == selLocItem && locItem.regionId == regionItem });
+              if (selectedLocation.length > 0)
+                mappingLocItems.push(selectedLocation[0].id);
+            });
+            mapping[regionItem] = mappingLocItems;
+          }
+          else {
+            mapping[regionItem] = [];
+          }
         });
-      }
+
+      });
+    }
     return mapping;
   }
 
@@ -1027,9 +1022,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         this.documentLibraryform.markAllAsTouched();
         return;
       }
-      this.store.dispatch(new SaveDocuments(document)).pipe(takeUntil(this.unsubscribe$)).subscribe( (val) => {
-        if(this.isShare)
-        {
+      this.store.dispatch(new SaveDocuments(document)).pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
+        if (this.isShare) {
           this.shareDocumentIds = [val?.documentLibrary?.savedDocumentLibraryDto?.id];
           this.saveShareDocument();
         }
