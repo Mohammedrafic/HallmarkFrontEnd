@@ -121,5 +121,5 @@ export class GetAgencyExtensions {
 
 export class GetDeployedCandidateOrderIds {
   static readonly type = '[agency order management] Get Deployed Candidate Order Ids';
-  constructor(public orderId: number, public candidateProfileId: number, public organizationId: number, public organizationPrefix: string) {}
+  constructor(public orderId: number, public candidateProfileId: number, public organizationId: number) {}
 }

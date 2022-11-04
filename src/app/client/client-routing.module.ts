@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { OrderManagementContentComponent } from './order-management/order-management-content/order-management-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
-import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { ClientComponent } from './client.component';

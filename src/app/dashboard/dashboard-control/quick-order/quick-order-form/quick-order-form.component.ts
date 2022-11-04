@@ -596,8 +596,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.orderManagementService
         .getRegularBillRate(orderType, departmentId, skillId, startDate, endDate, organizationId)
         .pipe(take(1))
-        .subscribe((billRates: BillRate[]) =>
-          this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0]?.rateHour.toFixed(2) || null)
+        .subscribe((billRate: BillRate) =>
+          this.generalInformationForm.controls['hourlyRate'].patchValue(billRate?.rateHour.toFixed(2) || null)
         );
     }
   }

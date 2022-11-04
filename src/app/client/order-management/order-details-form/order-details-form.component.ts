@@ -629,9 +629,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.orderManagementService
       .getRegularBillRate(orderType, departmentId, skillId, startDate, endDate)
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((billRates: BillRate[]) => {
-        const billRateValue = billRates[0]?.rateHour.toFixed(2) || '';
-        this.generalInformationForm.controls['hourlyRate'].patchValue(billRateValue);
+      .subscribe((billRate: BillRate) => {
+        const billRateValue = billRate?.rateHour.toFixed(2) || '';
+        this.generalInformationForm.controls['hourlyRate'].patchValue(billRateValue, { emitEvent: false });
       });
   }
 
