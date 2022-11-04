@@ -22,7 +22,7 @@
             <button ejs-button
                     cssClass="e-flat secondary-icon-button"
                     (click)="onRemove(data)"
-                    [disabled]="!areAgencyActionsAllowed || data.agencyStatus === agencyStatus.Inactive || data.agencyStatus === agencyStatus.Terminated || (!userPermission[userPermissions.CanEditAssociatedOrganizations] && !isAgency)"
+                    [disabled]="!areAgencyActionsAllowed || data.agencyStatus === agencyStatus.Inactive || data.agencyStatus === agencyStatus.Terminated || !userPermission[userPermissions.CanEditAssociatedOrganizations]"
             >
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
@@ -66,6 +66,9 @@
               >
               </ejs-numerictextbox>
             </section>
+            <div class="total-rows">
+              Total Rows: {{(associateListPage$ | async)?.totalCount}}
+            </div>
             <section class="right-side-pager-controls">
               <ejs-pager
                 id="gridPager"

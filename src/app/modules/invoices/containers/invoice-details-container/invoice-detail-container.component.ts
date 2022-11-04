@@ -1,5 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
-  Input, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 
 import { map, Observable, takeUntil, throttleTime } from 'rxjs';
@@ -14,17 +23,15 @@ import { Destroyable } from '@core/helpers';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportPayload } from '@shared/models/export.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import {
-  ActionBtnOnStatus, AgencyActionBtnOnStatus,
-  NewStatusDependsOnAction
-} from '../../constants/invoice-detail.constant';
-import { InvoiceState, INVOICES_STATUSES } from '../../enums';
+import { ActionBtnOnStatus, AgencyActionBtnOnStatus, NewStatusDependsOnAction } from '../../constants/invoice-detail.constant';
+import { INVOICES_STATUSES, InvoiceState, InvoicesActionBtn } from '../../enums';
 import { InvoiceDetail, InvoiceDialogActionPayload, InvoiceUpdateEmmit, PrintingPostDto } from '../../interfaces';
 import { InvoicePrintingService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesState } from '../../store/state/invoices.state';
-import { InvoicesModel } from './../../store/invoices.model';
+import { InvoicesModel } from '../../store/invoices.model';
+import { GRID_CONFIG } from '@shared/constants';
 
 interface ExportOption extends ItemModel {
   ext: string | null;
@@ -36,7 +43,7 @@ interface ExportOption extends ItemModel {
   styleUrls: ['./invoice-detail-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InvoiceDetailContainerComponent extends Destroyable implements OnInit {
+export class InvoiceDetailContainerComponent extends Destroyable implements OnInit, OnChanges {
   @Select(InvoicesState.isInvoiceDetailDialogOpen)
   isInvoiceDetailDialogOpen$: Observable<InvoiceDialogActionPayload>;
 
@@ -44,8 +51,10 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
   @Input() currentSelectedRowIndex: number | null = null;
-  @Input() maxRowIndex: number = 30;
+  @Input() maxRowIndex: number = GRID_CONFIG.initialRowsPerPage;
   @Input() actionAllowed = true;
+  @Input() approveAllowed = false;
+  @Input() payAllowed = false;
 
   @Output() updateTable: EventEmitter<InvoiceUpdateEmmit> = new EventEmitter<InvoiceUpdateEmmit>();
 
@@ -64,6 +73,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   public gridOptions: GridOptions = {};
   public gridSummaryOptions: GridOptions = {};
   public isAgency: boolean;
+  public isActionBtnDisabled = false;
+  public actionBtnText = '';
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -76,23 +87,12 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     super();
   }
 
-  public get actionBtnText(): string {
-    const status = this.invoiceDetail.meta.invoiceStateText.toLowerCase() as INVOICES_STATUSES;
-    let result: string;
-
-    if (this.isAgency) {
-      const permission = (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay || this.actionAllowed;
-      result = permission ? AgencyActionBtnOnStatus.get(status) as string : '';
-
-    } else {
-      result = ActionBtnOnStatus.get(status) as string;
-    }
-
-    return result || '';
-  }
-
   ngOnInit(): void {
     this.getDialogState();
+  }
+
+  ngOnChanges(): void {
+    this.isActionBtnDisabled = this.checkActionBtnDisabled();
   }
 
   public handleProfileClose(): void {
@@ -162,6 +162,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
           this.invoiceDetail = payload.invoiceDetail as InvoiceDetail;
           if (payload.invoiceDetail) {
             this.initTableColumns(this.invoiceDetail.summary[0]?.locationName || '');
+            this.setActionBtnText();
             if (this.chipList) {
               this.chipList.cssClass = this.chipsCssClass.transform(this.invoiceDetail.meta.invoiceStateText);
               this.chipList.text = this.invoiceDetail.meta.invoiceStateText.toUpperCase();
@@ -178,5 +179,31 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     this.columnDefinitions = this.invoicesContainerService.getDetailColDef();
     this.columnSummaryDefinitions = this.invoicesContainerService.getDetailSummaryColDef(summaryLocation);
     this.isAgency = this.invoicesContainerService.isAgency();
+  }
+
+  private checkActionBtnDisabled(): boolean {
+    if (!this.actionAllowed) {
+      return true;
+    }
+
+    if (this.actionBtnText === InvoicesActionBtn.Approve) {
+      return !this.approveAllowed;
+    } else {
+      return !this.payAllowed;
+    }
+  }
+
+  private setActionBtnText(): void {
+    const status = this.invoiceDetail.meta.invoiceStateText.toLowerCase() as INVOICES_STATUSES;
+    let result: string;
+
+    if (this.isAgency) {
+      const permission = (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay || this.actionAllowed;
+      result = permission && this.payAllowed ? AgencyActionBtnOnStatus.get(status) as string : '';
+    } else {
+      result = ActionBtnOnStatus.get(status) as string;
+    }
+
+    this.actionBtnText = result || '';
   }
 }

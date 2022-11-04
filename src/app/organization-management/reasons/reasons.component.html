@@ -2,12 +2,12 @@
   <div class="toolbar-buttons">
     <app-tooltip-container
       [message]="toolTipMessage"
-      [showToolTip]="!userPermission[userPermissions.CanOrganizationEditOrders] || !userPermission[userPermissions.CanManageOrderClosureReasons]">
+      [showToolTip]="!canRejectOrClosure">
       <button
         ejs-button
         appHideBeforeSyncfusionLoad
         [isPrimary]="true"
-        [disabled]="!userPermission[userPermissions.CanOrganizationEditOrders] || !userPermission[userPermissions.CanManageOrderClosureReasons]"
+        [disabled]="!canRejectOrClosure"
         (click)="addReason()"
       >Add {{ reasonsNavigationTabs.Penalties === selectedTab ? 'Penalties' : 'Reason' }}</button>
     </app-tooltip-container>
@@ -56,7 +56,7 @@
 </section>
 
 <app-side-dialog
-  [disableSaveButton]="userPermission[userPermissions.CanOrganizationEditOrders] || userPermission[userPermissions.CanManageOrderClosureReasons]"
+  [disableSaveButton]="!canRejectOrClosure"
   header="{{ title }} {{ reasonsNavigationTabs.Penalties === selectedTab ? 'Penalties' : 'Reason' }}"
   (formSaveClicked)="saveReason()"
   (formCancelClicked)="closeDialog()"

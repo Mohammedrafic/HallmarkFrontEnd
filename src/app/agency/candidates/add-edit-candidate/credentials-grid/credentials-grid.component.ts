@@ -56,6 +56,8 @@ import {
   orgSidePendingCredentialStatuses,
   orgSideReviewedCredentialStatuses,
 } from './credentials-grid.constants';
+import { Permission } from '@core/interface';
+import { UserPermissions } from '@core/enums';
 
 @Component({
   selector: 'app-credentials-grid',
@@ -69,6 +71,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Input() orderId: number | null;
   @Input() areAgencyActionsAllowed: boolean;
   @Input() isCandidateAssigned = false;
+  @Input() userPermission: Permission;
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
@@ -87,6 +90,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public today = new Date();
   public optionFields = { text: 'text', value: 'id' };
   public showCertifiedFields: boolean;
+  public readonly userPermissions = UserPermissions;
   public credentialStatusOptions: FieldSettingsModel[] = [];
   public readonly orderCredentialId = 0;
   public readonly selectionOptions: SelectionSettingsModel = {
@@ -561,6 +565,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       .subscribe((credential: { payload: CandidateCredential }) => {
         this.credentialId = credential.payload.id as number;
         this.disabledCopy = false;
+        this.selectedItems = [];
         this.uploadFiles(this.credentialId);
 
         if (!this.removeFiles) {

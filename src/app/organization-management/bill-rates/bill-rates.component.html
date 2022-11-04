@@ -33,12 +33,12 @@
     </button>
     <app-tooltip-container
       [message]="toolTipMessage"
-      [showToolTip]="!userPermission[userPermissions.CanManageExternalBillRates] || !userPermission[userPermissions.CanEditSettingsBillRates]">
+      [showToolTip]="!canAddBillRate">
       <button
         *ngIf="showButton"
         ejs-button [isPrimary]="true"
         (click)="addBillRateSetupRecord()"
-        [disabled]="!userPermission[userPermissions.CanManageExternalBillRates] || !userPermission[userPermissions.CanEditSettingsBillRates]"
+        [disabled]="!canAddBillRate"
       >
         {{ addBillRateBtnText }}
       </button>

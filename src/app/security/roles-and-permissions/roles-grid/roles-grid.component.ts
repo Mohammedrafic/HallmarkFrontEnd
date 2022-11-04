@@ -139,6 +139,9 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
           onClick: this.onRemove.bind(this),
           label: 'Delete',
         },
+        valueGetter: (params: { data: { canDelete: string } }) => {
+         return params.data.canDelete = 'CanEditRolesPermissions'
+        },
         pinned: 'left',
         suppressMovable: true,
         filter: false,

@@ -10,9 +10,10 @@ import {
   Skill,
   SkillDataSource,
   SkillFilters,
-  SkillsPage,
+  SkillsPage
 } from '@shared/models/skill.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { GRID_CONFIG } from '@shared/constants';
 
 @Injectable({ providedIn: 'root' })
 export class SkillsService {
@@ -23,7 +24,7 @@ export class SkillsService {
    * @return skills page
    */
   public getAllMasterSkills(): Observable<SkillsPage> {
-    return this.http.get<SkillsPage>(`/api/masterSkills`, { params: { PageNumber: 1, PageSize: 100 } });
+    return this.http.get<SkillsPage>(`/api/masterSkills`, { params: { PageNumber: GRID_CONFIG.initialPage, PageSize: GRID_CONFIG.initialRowsPerPage } });
   }
 
   /**

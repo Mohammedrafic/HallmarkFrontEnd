@@ -10,8 +10,8 @@ export type CandidateRow = {
   middleName: string | null;
   profileStatus: CandidateStatus;
   lastAssignmentEndDate: string | null;
-  region: string | null;
-  candidateProfileSkills: string[];
+  candidateProfileRegions: string[] | Array<string | { regionDescription: string }>;
+  candidateProfileSkills: string[] | Array<string | { skillDescription: string }>;
   photoId: string | null;
   candidateStatus: ApplicantStatus;
 };
@@ -22,15 +22,17 @@ export interface CandidateListRequest {
   pageSize: number;
   profileStatuses: CandidateStatus[];
   skillsIds: number[];
-  regionsIds: number[];
+  regionsNames: string[];
   tab: number;
+  candidateName: string | null;
   includeDeployedCandidates: boolean;
 }
 
 export type CandidateListFilters = {
+  candidateName?: string | null;
   profileStatuses?: CandidateStatus[];
   skillsIds?: number[];
-  regionsIds?: number[];
+  regionsNames?: string[];
   tab?: number;
 };
 
@@ -42,10 +44,16 @@ export interface FilterColumn {
   valueType: number;
 }
 
+export interface CandidateNameFilterColumn {
+  valueType: number;
+  type: number;
+}
+
 export interface CandidateListFiltersColumn {
   profileStatuses: FilterColumn;
   skillsIds: FilterColumn;
-  regionsIds: FilterColumn;
+  regionsNames: FilterColumn;
+  candidateName: CandidateNameFilterColumn;
 }
 
 export type CandidateListExport = {
@@ -53,7 +61,7 @@ export type CandidateListExport = {
     orderBy: string;
     profileStatuses: CandidateStatus[];
     skillsIds: number[];
-    regionsIds: number[];
+    regionsNames: string[];
     includeDeployedCandidates: boolean;
     candidateProfileIds: any[] | null;
   };

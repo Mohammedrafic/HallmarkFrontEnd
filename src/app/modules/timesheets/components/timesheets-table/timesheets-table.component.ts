@@ -12,6 +12,7 @@ import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { TimesheetsSelectedRowEvent } from '../../interface';
 import { TimesheetsColumnsDefinition } from '../../constants';
 import { TimesheetsTableColumns } from '../../enums';
+import { GRID_CONFIG } from '@shared/constants';
 
 @Component({
   selector: 'app-timesheets-table',
@@ -43,7 +44,7 @@ export class TimesheetsTableComponent extends Destroyable implements OnInit, OnC
     TimesheetsColumnsDefinition(this.router.url.includes('agency'));
   public currentPageSubj: BaseObservable<number> = new BaseObservable<number>(1);
   public currentPage$: Observable<number> = this.currentPageSubj.getStream();
-  public pageSize = 30;
+  public pageSize = GRID_CONFIG.initialRowsPerPage;
   public isLoading = false;
   public isAgency = false;
   public rowSelection: 'single' | 'multiple' = 'multiple';

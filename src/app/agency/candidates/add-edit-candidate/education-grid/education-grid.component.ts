@@ -25,6 +25,8 @@ import { Education } from 'src/app/shared/models/education.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { valuesOnly } from 'src/app/shared/utils/enum.utils';
 import { ShowSideDialog } from 'src/app/store/app.actions';
+import { UserPermissions } from '@core/enums';
+import { Permission } from '@core/interface';
 
 @Component({
   selector: 'app-education-grid',
@@ -35,6 +37,7 @@ import { ShowSideDialog } from 'src/app/store/app.actions';
 export class EducationGridComponent extends AbstractGridConfigurationComponent implements OnInit {
   @Input() readonlyMode = false;
   @Input() areAgencyActionsAllowed: boolean;
+  @Input() userPermission: Permission;
 
   @ViewChild('grid') grid: GridComponent;
 
@@ -43,6 +46,7 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
 
   public today = new Date();
   public title = '';
+  public readonly userPermissions = UserPermissions;
   public educationForm: FormGroup;
   public optionFields = {
     text: 'text',

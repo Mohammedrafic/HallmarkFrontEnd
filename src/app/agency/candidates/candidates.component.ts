@@ -3,17 +3,17 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { distinctUntilChanged, Observable, Subject, takeWhile } from 'rxjs';
 import { ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CandidateListComponent } from '@shared/components/candidate-list/components/candidate-list/candidate-list.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserState } from '../../store/user.state';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 
 @Component({
   selector: 'app-candidates',
   templateUrl: './candidates.component.html',
   styleUrls: ['./candidates.component.scss'],
 })
-export class CandidatesComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class CandidatesComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('candidateList') candidateList: CandidateListComponent;
 
   public includeDeployedCandidates$: Subject<boolean> = new Subject<boolean>();
@@ -28,11 +28,12 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
 
   public openImportDialog$: Observable<void> = this.openImportDialog.asObservable();
 
-  constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
-    super();
+  constructor(protected override store: Store, private router: Router, private route: ActivatedRoute) {
+    super(store);
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.isAgency = this.router.url.includes('agency');
 
     if (this.isAgency) {
