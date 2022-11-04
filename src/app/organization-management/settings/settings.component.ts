@@ -509,6 +509,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       dynamicValue = { ...JSON.parse(valueOptions), isDictionary: true };
     }
 
+    // TODO: run outside zone
     setTimeout(() => {
       this.organizationSettingsFormGroup.setValue({
         settingValueId: this.isParentEdit ? null : childData.settingValueId,
@@ -556,11 +557,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   // TODO: move to helper class
-
-
   private getDropDownOptionIds(data: any): string[] {
     const ids: string[] = [];
-
+    // TODO: rework with map
     if (data) {
       data.forEach((item: OrganizationSettingsDropDownOption) => {
         ids.push(item.value);
