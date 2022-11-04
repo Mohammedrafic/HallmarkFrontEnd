@@ -43,7 +43,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   public billRateForm: FormGroup;
   public intervalMinField: AbstractControl;
   public intervalMaxField: AbstractControl;
-  public billRatesOptions: BillRateOption[];
+  public billRatesOptions: BillRateOption[] = [];
   public selectedBillRateUnit: BillRateUnit = BillRateUnit.Multiplier;
 
   private editBillRateIndex: string | null;
@@ -54,6 +54,8 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.billRatesChanges();
+
     this.billRateForm = BillRateFormComponent.createForm();
 
     this.intervalMinField = this.billRateForm.get('intervalMin') as AbstractControl;
@@ -67,12 +69,6 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     this.intervalMaxField.valueChanges.subscribe(() =>
       this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
-
-    this.billRatesOptions$.pipe(
-      takeUntil(this.unsubscribe$),
-    ).subscribe((options: BillRateOption[]) => {
-      this.billRatesOptions = options;
-    });
   }
 
   ngOnDestroy(): void {
@@ -105,6 +101,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       foundBillRateOption?.unit === BillRateUnit.Hours
         ? String(value.rateHour)
         : parseFloat(value.rateHour.toString()).toFixed(2);
+    BillRateFormComponent.calculateOTSFlags = false;
 
     this.billRateForm.patchValue(
       {
@@ -118,6 +115,9 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         billType: value.billType,
         editAllowed: value.editAllowed || false,
         isPredefined: value.isPredefined || false,
+        seventhDayOtEnabled: value.seventhDayOtEnabled,
+        weeklyOtEnabled: value.weeklyOtEnabled,
+        dailyOtEnabled: value.dailyOtEnabled,
       }
     );
 
@@ -139,11 +139,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     }
 
     this.selectedBillRateUnit = foundBillRateOption?.unit as BillRateUnit;
-    this.store.dispatch(new ShowSideDialog(true)).pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe(() => {
-      this.billRateForm.patchValue({ effectiveDate: value.effectiveDate });
-    });
+    this.store.dispatch(new ShowSideDialog(true));
   }
 
   public onRemoveBillRate({ index }: BillRatesGridEvent): void {
@@ -264,5 +260,14 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     billRateConfig?.patchValue({ ...value.billRateConfig });
     billRateControl.patchValue({ ...value, billRateConfig });
     return billRateControl;
+  }
+
+  private billRatesChanges(): void {
+    this.billRatesOptions$.pipe(
+      filter((data) => !!data.length),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((options: BillRateOption[]) => {
+      this.billRatesOptions = options;
+    });
   }
 }
