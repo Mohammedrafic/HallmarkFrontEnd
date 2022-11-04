@@ -41,7 +41,9 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { PermissionService } from 'src/app/security/services/permission.service';
-import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { Days } from '@shared/enums/days';
+import { groupInvoicesOptions } from 'src/app/modules/invoices/constants';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -63,7 +65,20 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public locationFormGroup: FormGroup;
   public departmentFormGroup: FormGroup;
   public pushStartDateFormGroup: FormGroup;
+  public invoiceGeneratingFormGroup: FormGroup;
   public formBuilder: FormBuilder;
+
+  public readonly daysOfWeek = Days;
+  public readonly daysOfWeekFields = {
+    text: 'text',
+    value: 'text',
+  };
+
+  public readonly groupInvoicesOptions = groupInvoicesOptions;
+  public readonly groupInvoicesFields = {
+    text: 'text',
+    value: 'text',
+  };
 
   @Select(OrganizationManagementState.organizationSettings)
   public settings$: Observable<OrganizationSettingsGet[]>;
@@ -288,7 +303,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   public onOverrideButtonClick(data: any): void {
     this.isFormShown = true;
-    this.formControlType = data.controlType;
+    this.formControlType = this.getControlType(data);
     this.regionFormGroup.reset();
     this.regionRequiredFormGroup.reset();
     this.locationFormGroup.reset();
@@ -305,7 +320,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.isFormShown = true;
     this.addActiveCssClass(event);
     this.isEdit = true;
-    this.formControlType = parentRecord.controlType;
+    this.formControlType = this.getControlType(parentRecord);
     this.setFormValidation(parentRecord);
 
     if (!childRecord) {
@@ -344,7 +359,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.regionRequiredFormGroup.dirty ||
       this.locationFormGroup.dirty ||
       this.departmentFormGroup.dirty ||
-      this.pushStartDateFormGroup.dirty
+      this.pushStartDateFormGroup.dirty ||
+      this.invoiceGeneratingFormGroup.dirty
     ) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
@@ -369,34 +385,62 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   public onFormSaveClick(): void {
     if (this.isEdit) {
-      if (this.organizationSettingsFormGroup.valid && this.isPushStartDateValid()) {
+      if (
+        this.organizationSettingsFormGroup.valid &&
+        this.isPushStartDateValid() &&
+        this.invoiceAutoGeneratingValig()
+      ) {
         this.sendForm();
       } else {
         this.organizationSettingsFormGroup.markAllAsTouched();
-        this.validatePushStartDateForm()
+        this.validatePushStartDateForm();
+        this.validateInvoiceGeneratingForm();
       }
     } else {
-      if (this.regionRequiredFormGroup.valid && this.isPushStartDateValid()) {
+      if (this.regionRequiredFormGroup.valid && this.isPushStartDateValid() && this.invoiceAutoGeneratingValig()) {
         if (this.organizationSettingsFormGroup.valid) {
           this.sendForm();
         } else {
           this.organizationSettingsFormGroup.markAllAsTouched();
           this.validatePushStartDateForm();
+          this.validateInvoiceGeneratingForm();
         }
       } else {
         this.regionRequiredFormGroup.markAllAsTouched();
-        this.validatePushStartDateForm()
+        this.validatePushStartDateForm();
+        this.validateInvoiceGeneratingForm();
       }
     }
   }
 
   private isPushStartDateValid(): boolean {
-    return this.formControlType !== OrganizationSettingControlType.FixedKeyDictionary || this.pushStartDateFormGroup.valid;
+    return (
+      this.formControlType !== OrganizationSettingControlType.FixedKeyDictionary || this.pushStartDateFormGroup.valid
+    );
   }
 
   private validatePushStartDateForm(): void {
-    if(this.formControlType === OrganizationSettingControlType.FixedKeyDictionary && this.pushStartDateFormGroup.invalid) {
+    if (
+      this.formControlType === OrganizationSettingControlType.FixedKeyDictionary &&
+      this.pushStartDateFormGroup.invalid
+    ) {
       this.pushStartDateFormGroup.markAllAsTouched();
+    }
+  }
+
+  private invoiceAutoGeneratingValig(): boolean {
+    return (
+      this.formControlType !== OrganizationSettingControlType.InvoiceAutoGeneration ||
+      this.invoiceGeneratingFormGroup.valid
+    );
+  }
+
+  private validateInvoiceGeneratingForm(): void {
+    if (
+      this.formControlType === OrganizationSettingControlType.InvoiceAutoGeneration &&
+      this.invoiceGeneratingFormGroup.invalid
+    ) {
+      this.invoiceGeneratingFormGroup.markAllAsTouched();
     }
   }
 
@@ -497,6 +541,19 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         dynamicValue = JSON.stringify(pushStartDate);
         break;
 
+      case OrganizationSettingControlType.InvoiceAutoGeneration:
+        const invoiceAutoGeneration = {
+          isEnabled: this.organizationSettingsFormGroup.controls['value'].value,
+
+          dayOfWeek: this.invoiceGeneratingFormGroup.controls['dayOfWeek'].value,
+
+          groupingBy: this.invoiceGeneratingFormGroup.controls['groupingBy'].value,
+
+          time: this.invoiceGeneratingFormGroup.controls['time'].value,
+        };
+        dynamicValue = JSON.stringify(invoiceAutoGeneration);
+        break;
+
       default:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
         break;
@@ -558,7 +615,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.organizationSettingsFormGroup.setValue({
       settingValueId: null,
       settingKey: data.settingKey,
-      controlType: data.controlType,
+      controlType: this.getControlType(data),
       name: data.name,
       value: null,
     });
@@ -601,13 +658,24 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       dynamicValue = { ...JSON.parse(valueOptions), isDictionary: true };
     }
 
+    if (this.formControlType === OrganizationSettingControlType.InvoiceAutoGeneration) {
+      const valueOptions = this.isParentEdit ? parentData.value : childData.value;
+      dynamicValue = {
+        IsEnabled: false,
+        DayOfWeek: 'Friday',
+        isInvoice: true,
+        GroupingBy: 'Location',
+        Time: '2022-11-01 07:00:00.0000000 +00:00',
+      };
+    }
+
     setTimeout(() => {
       this.organizationSettingsFormGroup.setValue({
         settingValueId: this.isParentEdit ? null : childData.settingValueId,
         settingKey: parentData.settingKey,
-        controlType: parentData.controlType,
+        controlType: this.getControlType(parentData),
         name: parentData.name,
-        value: dynamicValue?.isDictionary ? !!dynamicValue.isEnabled : dynamicValue,
+        value: dynamicValue?.isDictionary || dynamicValue?.isInvoice ? !!dynamicValue.isEnabled : dynamicValue,
       });
 
       dynamicValue?.isDictionary &&
@@ -615,6 +683,14 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
           daysToPush: dynamicValue.daysToPush || null,
           daysToConsider: dynamicValue.daysToConsider || null,
         });
+
+      if (dynamicValue?.isInvoice) {
+        this.invoiceGeneratingFormGroup.setValue({
+          time: dynamicValue.Time,
+          dayOfWeek: dynamicValue.DayOfWeek,
+          groupingBy: dynamicValue.GroupingBy,
+        });
+      }
     });
   }
 
@@ -683,6 +759,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.locationFormGroup.reset();
     this.departmentFormGroup.reset();
     this.pushStartDateFormGroup.reset();
+    this.invoiceGeneratingFormGroup.reset();
     this.isEdit = false;
     this.isParentEdit = false;
     this.dropdownDataSource = [];
@@ -713,6 +790,11 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       daysToConsider: [null, Validators.required],
       daysToPush: [null, Validators.required],
     });
+    this.invoiceGeneratingFormGroup = this.formBuilder.group({
+      dayOfWeek: [null, Validators.required],
+      time: [null, Validators.required],
+      groupingBy: [null, Validators.required],
+    });
   }
 
   private getActiveRowsPerPage(): number {
@@ -731,10 +813,17 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   private setPermissionsToManageSettings(): void {
-    this.permissionService.getPermissions().pipe(
-        takeUntil(this.unsubscribe$)
-      ).subscribe(({ canManageOrganizationConfigurations }) => {
-        this.settingKeys.forEach((key) => this.hasPermissions[key] = canManageOrganizationConfigurations);
+    this.permissionService
+      .getPermissions()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(({ canManageOrganizationConfigurations }) => {
+        this.settingKeys.forEach((key) => (this.hasPermissions[key] = canManageOrganizationConfigurations));
       });
+  }
+
+  private getControlType(data: any): number {
+    return data.settingKey === 'InvoiceAutoGeneration'
+      ? OrganizationSettingControlType.InvoiceAutoGeneration
+      : data.controlType;
   }
 }
