@@ -5,7 +5,8 @@ import {
   DocumentFolder, FolderTreeItem, DocumentLibraryDto, Documents, DocumentsFilter,
   DocumentsLibraryPage, DocumentTagFilter, DocumentTags, DocumentTypeFilter, DocumentTypes,
   FolderTreeFilter, DownloadDocumentDetail, DownloadDocumentDetailFilter, DeleteDocumentsFilter, ShareDocumentsFilter, SharedDocumentPostDto,
-  ShareDocumentInfoPage, ShareDocumentInfoFilter, UnShareDocumentsFilter, AssociateAgencyDto, ShareOrganizationsData, DeleteDocumentFolderFilter
+  ShareDocumentInfoPage, ShareDocumentInfoFilter, UnShareDocumentsFilter, AssociateAgencyDto, ShareOrganizationsData, DeleteDocumentFolderFilter,
+  PreviewDocumentDetailFilter
 } from "../store/model/document-library.model";
 
 import { Region } from '@shared/models/region.model';
@@ -109,6 +110,16 @@ export class DocumentLibraryService {
       params = params.append("BusinessUnitType", documentDownloadFIlter.businessUnitType);
     if (documentDownloadFIlter?.businessUnitId && documentDownloadFIlter?.businessUnitId != null)
       params = params.append("BusinessUnitId", documentDownloadFIlter.businessUnitId);
+    return this.http.get<DownloadDocumentDetail>(`/api/DocumentLibrary/GetDocumentForDownload`, { params: params });
+  }
+
+  public GetDocumentPreviewDetails(documentPreviewFIlter: PreviewDocumentDetailFilter): Observable<DownloadDocumentDetail> {
+    let params = new HttpParams();
+    params = params.append("DocumentId", documentPreviewFIlter.documentId);
+    if (documentPreviewFIlter?.businessUnitType && documentPreviewFIlter?.businessUnitType != null)
+      params = params.append("BusinessUnitType", documentPreviewFIlter.businessUnitType);
+    if (documentPreviewFIlter?.businessUnitId && documentPreviewFIlter?.businessUnitId != null)
+      params = params.append("BusinessUnitId", documentPreviewFIlter.businessUnitId);
     return this.http.get<DownloadDocumentDetail>(`/api/DocumentLibrary/GetDocumentForDownload`, { params: params });
   }
 

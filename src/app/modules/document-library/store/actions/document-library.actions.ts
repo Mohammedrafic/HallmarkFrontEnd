@@ -1,4 +1,8 @@
-import { DocumentFolder, NodeItem, Documents, DocumentTypeFilter, DocumentsFilter, DocumentTagFilter, FolderTreeFilter, DownloadDocumentDetailFilter, DownloadDocumentDetail, DeleteDocumentsFilter, ShareDocumentsFilter, ShareDocumentInfoFilter, UnShareDocumentsFilter, DeleteDocumentFolderFilter } from "../model/document-library.model";
+import {
+  DocumentFolder, NodeItem, Documents, DocumentTypeFilter, DocumentsFilter,
+  DocumentTagFilter, FolderTreeFilter, DownloadDocumentDetailFilter, DownloadDocumentDetail, DeleteDocumentsFilter,
+  ShareDocumentsFilter, ShareDocumentInfoFilter, UnShareDocumentsFilter, DeleteDocumentFolderFilter, PreviewDocumentDetailFilter, DownloadPreviewDetail
+} from "../model/document-library.model";
 import { regionFilter } from '../model/document-library.model';
 import { LocationsByRegionsFilter } from "../model/document-library.model";
 
@@ -47,9 +51,19 @@ export class GetDocumentDownloadDeatils {
   constructor(public documentDowloadDetailFilter: DownloadDocumentDetailFilter) { }
 }
 
+export class GetDocumentPreviewDeatils {
+  static readonly type = '[documentsLibrary] Get document preview details';
+  constructor(public documentPreveiwDetailFilter: PreviewDocumentDetailFilter) { }
+}
+
 export class GetDocumentDownloadDeatilsSucceeded {
   static readonly type = '[documentsLibrary] Get document download details Succeeded';
   constructor(public documentDownloadDetail: DownloadDocumentDetail) { }
+}
+
+export class GetDocumentPreviewDeatilsSucceeded {
+  static readonly type = '[documentsLibrary] Get document preview details Succeeded';
+  constructor(public documentPreviewDetail: DownloadPreviewDetail) { }
 }
 
 export class DeletDocuments {
