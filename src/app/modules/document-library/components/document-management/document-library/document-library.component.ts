@@ -8,14 +8,14 @@ import { SpecialProjectMessages } from '../../../../../organization-management/s
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { SetHeaderState, ShowDocPreviewSideDialog, ShowSideDialog, ShowToast } from '../../../../../store/app.actions';
 import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, DocumentLibraryColumnsDefinition, UNIT_FIELDS } from '../../../constants/documents.constant';
-import { AssociateAgencyDto, DeleteDocumentsFilter, DocumentFolder, DocumentLibraryDto, Documents, DocumentsFilter, DocumentsLibraryPage, DocumentTags, DocumentTypeFilter, DocumentTypes, DownloadDocumentDetail, DownloadDocumentDetailFilter, NodeItem, ShareDocumentDto, ShareDocumentInfoFilter, ShareDocumentInfoPage, ShareDocumentsFilter, ShareOrganizationsData, UnShareDocumentsFilter } from '../../../store/model/document-library.model';
+import { AssociateAgencyDto, DeleteDocumentsFilter, DocumentFolder, DocumentLibraryDto, Documents, DocumentsFilter, DocumentsLibraryPage, DocumentTags, DocumentTypeFilter, DocumentTypes, DownloadDocumentDetail, DownloadDocumentDetailFilter, NodeItem, PreviewDocumentDetailFilter, ShareDocumentDto, ShareDocumentInfoFilter, ShareDocumentInfoPage, ShareDocumentsFilter, ShareOrganizationsData, UnShareDocumentsFilter } from '../../../store/model/document-library.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { DocumentLibraryState } from '../../../store/state/document-library.state';
 import {
   DeletDocuments, GetDocumentById, GetDocumentDownloadDeatils, GetDocuments,
   GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, GetSharedDocuments,
   IsAddNewFolder, SaveDocumentFolder, SaveDocuments, ShareDocuments, UnShareDocuments,
-  GetLocationsByRegions, GetRegionsByOrganizations, GetShareAssociateAgencies, GetShareOrganizationsDtata, SelectedBusinessType, IsDeleteEmptyFolder,
+  GetLocationsByRegions, GetRegionsByOrganizations, GetShareAssociateAgencies, GetShareOrganizationsDtata, SelectedBusinessType, IsDeleteEmptyFolder, GetDocumentPreviewDeatils,
 } from '../../../store/actions/document-library.actions';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { documentsColumnField, FileType, FormControlNames, FormDailogTitle, MoreMenuType, StatusEnum } from '../../../enums/documents.enum';
@@ -666,15 +666,15 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public documentPreview(docItem: any) {
     this.closeDialog();
     this.downloadedFileName = '';
-    const downloadFilter: DownloadDocumentDetailFilter = {
+    const downloadFilter: PreviewDocumentDetailFilter = {
       documentId: docItem.id,
       businessUnitType: this.filterSelecetdBusinesType,
       businessUnitId: this.filterSelectedBusinesUnitId
     }
 
-    this.store.dispatch(new GetDocumentDownloadDeatils(downloadFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
+    this.store.dispatch(new GetDocumentPreviewDeatils(downloadFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
       if (val) {
-        var data = val?.documentLibrary?.documentDownloadDetail;
+        var data = val?.documentLibrary?.documentPreviewDetail;
         if (data != null) {
           if (this.downloadedFileName != data.fileName) {
             this.downloadedFileName = data.fileName;
@@ -842,11 +842,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.documentLibraryDto$.pipe(takeUntil(this.unsubscribe$))
         .subscribe((data: DocumentLibraryDto) => {
           if (data) {
-            const editRegionIds = data?.regionId?.split(',').map(Number) != undefined ? data?.regionId?.split(',').map(Number) : [];
-            this.setRegionsOnEdit(editRegionIds);
-            const editLocationIds = data?.locationId?.split(',').map(Number) != undefined ? data?.locationId?.split(',').map(Number) : [];
-            this.setLocationsOnEdit(editLocationIds);
-            this.changeDetectorRef.markForCheck();
             this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(data.name);
             this.documentLibraryform.get(FormControlNames.TypeIds)?.setValue(data.docType);
             this.documentLibraryform.get(FormControlNames.Tags)?.setValue(data.tags);
@@ -854,6 +849,13 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             this.documentLibraryform.get(FormControlNames.StartDate)?.setValue(data.startDate != null ? new Date(data.startDate.toString()) : this.startDate);
             this.documentLibraryform.get(FormControlNames.EndDate)?.setValue(data.endDate != null ? new Date(data.endDate.toString()) : null);
             this.documentLibraryform.get(FormControlNames.Comments)?.setValue(data.comments);
+            setTimeout(() => {
+              const editRegionIds = data?.regionId?.split(',').map(Number) != undefined ? data?.regionId?.split(',').map(Number) : [];
+              this.setRegionsOnEdit(editRegionIds);
+              const editLocationIds = data?.locationId?.split(',').map(Number) != undefined ? data?.locationId?.split(',').map(Number) : [];
+              this.setLocationsOnEdit(editLocationIds);
+              this.changeDetectorRef.markForCheck();
+            }, 1000)
             this.store.dispatch(new ShowSideDialog(true));
           }
         });
@@ -862,7 +864,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   public setRegionsOnEdit(editRegionIds: any) {
 
-    if (editRegionIds.length > 0 && editRegionIds[0] == -1) {
+    if (editRegionIds.length > 0) {
       this.regions$.subscribe((data) => {
         const allRegionsIds = data.map(region => region.id);
         this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(allRegionsIds);
@@ -873,7 +875,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   public setLocationsOnEdit(editLocationIds: any) {
-    if (editLocationIds.length > 0 && editLocationIds[0] == -1) {
+    if (editLocationIds.length > 0) {
       this.locations$.subscribe((data) => {
         const allLocIds = data.map(loc => loc.id);
         this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(allLocIds);
@@ -1017,6 +1019,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         tags: this.documentLibraryform.get(FormControlNames.Tags)?.value,
         comments: this.documentLibraryform.get(FormControlNames.Comments)?.value,
         selectedFile: this.selectedFile,
+        status: parseInt(this.documentLibraryform.get(FormControlNames.StatusIds)?.value),
         isEdit: this.isEditDocument
       }
       if (this.documentLibraryform.get(FormControlNames.DocumentName)?.value.trim() == '') {

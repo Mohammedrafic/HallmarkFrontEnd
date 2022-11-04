@@ -5,9 +5,6 @@ import { Select, Store } from '@ngxs/store';
 import { filter, Observable } from 'rxjs';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 
-import {
-  AbstractGridConfigurationComponent
-} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ShowExportDialog, ShowSideDialog, ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import {
@@ -26,13 +23,14 @@ import { ExportCredentialTypes, GetCredentialTypes, RemoveCredentialType, SaveCr
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 
 @Component({
   selector: 'app-master-credentials-types',
   templateUrl: './master-credentials-types.component.html',
   styleUrls: ['./master-credentials-types.component.scss']
 })
-export class MasterCredentialsTypesComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class MasterCredentialsTypesComponent extends AbstractPermissionGrid implements OnInit {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 
@@ -56,16 +54,17 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
     return this.isEdit ? 'Edit' : 'Add';
   }
 
-  constructor(private store: Store,
+  constructor(protected override store: Store,
               @Inject(FormBuilder) private builder: FormBuilder,
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
-    super();
+    super(store);
     this.formBuilder = builder;
     this.createTypeForm();
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.store.dispatch(new GetCredentialTypes());
     this.mapGridData();
   }
