@@ -21,12 +21,17 @@
       Export <i-feather name="download" class="icon"></i-feather>
     </div>
   </button>
-  <button
-    ejs-button
-    appHideBeforeSyncfusionLoad
-    id="addDepartmentButton"
-    (click)="addSkill()"
-    [isPrimary]="true">Add {{ tabs[currentTab] }}</button>
+  <app-tooltip-container
+    [message]="toolTipMessage"
+    [showToolTip]="!canAddSkillOrCategories">
+    <button
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      [disabled]="!canAddSkillOrCategories"
+      id="addDepartmentButton"
+      (click)="addSkill()"
+      [isPrimary]="true">Add {{ tabs[currentTab] }}</button>
+  </app-tooltip-container>
 </section>
 <ejs-tab class="tabs" (selected)="tabSelected($event)">
   <e-tabitems>
@@ -35,7 +40,7 @@
         <div>Skills</div>
       </ng-template>
       <ng-template #content>
-        <app-skills-grid [filteredItems$]="filteredItems$" [export$]="exportSkills$" [isActive]="isSkillsActive"></app-skills-grid>
+        <app-skills-grid [filteredItems$]="filteredItems$" [userPermission]="userPermission" [export$]="exportSkills$" [isActive]="isSkillsActive"></app-skills-grid>
       </ng-template>
     </e-tabitem>
     <e-tabitem>
@@ -43,7 +48,7 @@
         <div>Categories</div>
       </ng-template>
       <ng-template #content>
-        <app-skill-categories-grid [export$]="exportCategories$" [isActive]="isCategoriesActive"></app-skill-categories-grid>
+        <app-skill-categories-grid [export$]="exportCategories$" [userPermission]="userPermission" [isActive]="isCategoriesActive"></app-skill-categories-grid>
       </ng-template>
     </e-tabitem>
   </e-tabitems>

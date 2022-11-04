@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
 import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
 import { DialogMode } from "@shared/enums/dialog-mode.enum";
 import { ShowSideDialog } from "../../../store/app.actions";
@@ -18,13 +17,14 @@ import {
   UpdateRejectMasterReasons,
   UpdateRejectMasterReasonsSuccess
 } from "@admin/store/reject-reason-mater.action";
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 
 @Component({
   selector: 'app-reject-reason-master',
   templateUrl: './reject-reason-master.component.html',
   styleUrls: ['./reject-reason-master.component.scss']
 })
-export class RejectReasonMasterComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class RejectReasonMasterComponent extends AbstractPermissionGrid implements OnInit {
   @Select(RejectReasonMasterState.rejectReasonsPage)
   public rejectReasonPage$: Observable<RejectReasonPage>;
 
@@ -40,13 +40,14 @@ export class RejectReasonMasterComponent extends AbstractGridConfigurationCompon
 
   constructor(
     private confirmService: ConfirmService,
-    private store: Store,
+    protected override store: Store,
     private actions$: Actions
   ) {
-    super();
+    super(store);
   }
 
-  public ngOnInit(): void {
+  public override ngOnInit(): void {
+    super.ngOnInit();
     this.createForm();
     this.initGrid();
     this.subscribeOnSaveReasonError();

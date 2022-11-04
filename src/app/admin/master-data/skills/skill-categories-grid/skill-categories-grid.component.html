@@ -20,7 +20,7 @@
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="editCategory(data, $event)">
             <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
           </button>
-          <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteCategory(data, $event)">
+          <button ejs-button [disabled]="!userPermission[userPermissions.CanEditSkillCategories]" cssClass="e-flat secondary-icon-button" (click)="deleteCategory(data, $event)">
             <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
           </button>
         </div>
@@ -79,7 +79,7 @@
 
 <app-side-dialog *ngIf="isActive"
   (formCancelClicked)="closeDialog()"
-  (formSaveClicked)="saveCategory()"
+  (formSaveClicked)="saveCategory()" [disableSaveButton]="!userPermission[userPermissions.CanEditSkillCategories]"
   header="{{ this.CategoryFormGroup.get('id')?.value == 0 ? 'Add' : 'Edit' }} Category"
   >
   <form class="categories-form-dialog form-container bootstrap"
