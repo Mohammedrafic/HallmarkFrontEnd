@@ -96,6 +96,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() isAgency: boolean = false;
   @Input() orderDuration: Duration;
   @Input() actionsAllowed: boolean;
+  @Input() deployedCandidateOrderIds: string[];
 
   public override form: FormGroup;
   public jobStatusControl: FormControl;
@@ -331,7 +332,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private onAccept(): void {
-    if (this.form.valid && this.candidateJob) {
+    if (!this.form.errors && this.candidateJob) {
       this.shouldChangeCandidateStatus()
         .pipe(take(1))
         .subscribe((isConfirm) => {
@@ -377,8 +378,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       okButtonClass: 'ok-button',
     };
 
-    return this.isDeployedCandidate
-      ? this.confirmService.confirm(deployedCandidateMessage([]), options)
+    return this.isDeployedCandidate && this.isAgency
+      ? this.confirmService.confirm(deployedCandidateMessage(this.deployedCandidateOrderIds), options)
       : of(true);
   }
 
@@ -537,8 +538,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     } else if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
       this.openCandidateCancellationDialog.next();
     } else {
-      this.store.dispatch(new GetRejectReasonsForOrganisation());
-      this.openRejectDialog.next(true);
+      this.onReject();
     }
   }
   private createForm(): void {
@@ -588,7 +588,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private switchFormState(): void {
-    if ((this.isDeployedCandidate && !this.isAgency) || this.isCancelled) {
+    if (!this.isAgency || this.isCancelled) {
       this.form?.disable();
     } else {
       this.form?.enable();

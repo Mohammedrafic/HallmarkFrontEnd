@@ -617,15 +617,22 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new GetDocuments(this.getDocumentFilter(selectedBusinessUnitId)));
     this.documentsPage$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       this.gridApi?.setRowData([]);
-      if (!data || !data?.items.length) {
+      let dataFilter = data;
+      if (this.filterSelecetdBusinesType == BusinessUnitType.Organization) {
+        if (dataFilter?.items.length) {
+          dataFilter.items = data.items.filter((item) => { return !(item.regionName?.trim().length == 0 || item.locationName?.trim().length == 0) });
+        }
+      }
+
+      if (!dataFilter || !dataFilter?.items.length) {
         this.gridApi?.showNoRowsOverlay();
-        if (this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode.id > 0 && data!=null) {
+        if (this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode.id > 0 && dataFilter != null) {
           this.store.dispatch(new IsDeleteEmptyFolder(true));
         }
       }
       else {
         this.gridApi?.hideOverlay();
-        this.rowData = data.items;
+        this.rowData = dataFilter.items;
         this.gridApi?.setRowData(this.rowData);
         this.store.dispatch(new IsDeleteEmptyFolder(false));
       }
@@ -1084,6 +1091,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     else {
       this.documentLibraryform.reset();
       this.closeDialog();
+      this.store.dispatch(new GetFoldersTree({ businessUnitType: this.filterSelecetdBusinesType, businessUnitId: this.filterSelectedBusinesUnitId }));
     }
   }
 

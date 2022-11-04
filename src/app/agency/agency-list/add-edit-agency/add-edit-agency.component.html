@@ -6,7 +6,15 @@
   <ng-container right>
     <ng-container *ngIf="!isSeccondStepActive">
       <button [disabled]="!agencyForm?.dirty" ejs-button cssClass="e-outline" (click)="onClear()">Clear</button>
-      <button ejs-button [disabled]="activeUser.businessUnitType === businessUnitType.Agency && (activeUser.agencyStatus === agencyStatus.Inactive || activeUser.agencyStatus === agencyStatus.Terminated)" [isPrimary]="true" (click)="onSave()">Save</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditAgencyProfile]">
+        <button
+          ejs-button
+          [disabled]="(activeUser.businessUnitType === businessUnitType.Agency && (activeUser.agencyStatus === agencyStatus.Inactive || activeUser.agencyStatus === agencyStatus.Terminated))|| !userPermission[userPermissions.CanEditAgencyProfile]"
+          [isPrimary]="true"
+          (click)="onSave()">Save</button>
+      </app-tooltip-container>
     </ng-container>
   </ng-container>
 </app-page-toolbar>

@@ -14,21 +14,21 @@
   </fa-icon>
 </button>
 
-<button *ngIf="label=='Delete'" 
-  style='color:#dc3545; background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;' 
+<button *ngIf="label=='Delete'"
+  style='color:#dc3545; background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;'
   [attr.title]="label"
-        [disabled]="params.data.agencyStatus === agencyStatus.Inactive || params.data.agencyStatus === agencyStatus.Terminated || params.data?.isDefault"
+        [disabled]="params.data.agencyStatus === agencyStatus.Inactive || params.data.agencyStatus === agencyStatus.Terminated || params.data?.isDefault || !userPermission[userPermissions[params.data.canDelete]]"
   (click)="onClick($event)">
   <fa-icon [icon]='faTrash' class="pr-3">
     Edit
   </fa-icon>
 </button>
-<button *ngIf="label=='View'" 
-  style='color:rgb(62, 127, 255); background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;' 
+<button *ngIf="label=='View'"
+  style='color:rgb(62, 127, 255); background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;'
   [attr.title]="label"
   (click)="onClick($event)">
   <fa-icon [icon]='faEdit' class="pr-3">
-   
+
     Edit
   </fa-icon>
 </button>

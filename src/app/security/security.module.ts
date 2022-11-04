@@ -30,6 +30,7 @@ import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { RolesFiltersComponent } from './roles-and-permissions/roles-grid/roles-filters/roles-filters.component';
 import { UsersFiltersComponent } from './user-list/user-grid/users-filters/users-filters.component';
+import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 
 const scurityIcons = {
   Sliders,
@@ -74,6 +75,7 @@ const scurityIcons = {
     DropDownButtonModule,
     MultiselectDropdownModule,
     InputModule,
+    TooltipContainerModule,
 
     FeatherModule.pick(scurityIcons),
   ],

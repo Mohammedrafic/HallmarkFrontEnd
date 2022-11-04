@@ -11,7 +11,7 @@ import {
   ChangeCandidateProfileStatus,
   ExportCandidateList,
   GetAllSkills,
-  GetCandidatesByPage,
+  GetCandidatesByPage, GetRegionList
 } from './candidate-list.actions';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
@@ -20,6 +20,7 @@ export interface CandidateListStateModel {
   isCandidateLoading: boolean;
   candidateList: CandidateList | null;
   listOfSkills: ListOfSkills[] | null;
+  listOfRegions: string[] | null;
 }
 
 @State<CandidateListStateModel>({
@@ -28,6 +29,7 @@ export interface CandidateListStateModel {
     isCandidateLoading: false,
     candidateList: null,
     listOfSkills: null,
+    listOfRegions: null
   },
 })
 @Injectable()
@@ -40,6 +42,11 @@ export class CandidateListState {
   @Selector()
   static listOfSkills(state: CandidateListStateModel): ListOfSkills[] | null {
     return state.listOfSkills;
+  }
+
+  @Selector()
+  static listOfRegions(state: CandidateListStateModel): string[] | null {
+    return state.listOfRegions
   }
   constructor(private candidateListService: CandidateListService) {}
 
@@ -84,5 +91,14 @@ export class CandidateListState {
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
       })
     );
+  }
+
+  @Action(GetRegionList)
+  GetRegionList({patchState}: StateContext<CandidateListStateModel>): Observable<string[]> {
+    return this.candidateListService.getRegions().pipe(tap((data)=> {
+      patchState({
+        listOfRegions: data
+      })
+    }))
   }
 }

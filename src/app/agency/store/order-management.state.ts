@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 
 import { isUndefined } from 'lodash';
 
@@ -39,6 +39,7 @@ import {
   GetAgencyOrdersPage,
   GetCandidateJob,
   GetCandidatesBasicInfo,
+  GetDeployedCandidateOrderIds,
   GetOrderApplicantsData,
   GetOrderById,
   GetOrganizationStructure,
@@ -60,6 +61,7 @@ import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.e
 import { ExtensionGridModel } from '@shared/components/extension/extension-sidebar/models/extension.model';
 import { OrderManagementContentStateModel } from '@client/store/order-managment-content.state';
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
+import { OverlappedOrderIds } from '@shared/models/overlapped-orders-dto.model';
 
 export interface OrderManagementModel {
   ordersPage: AgencyOrderManagementPage | null;
@@ -76,6 +78,7 @@ export interface OrderManagementModel {
   organizationStructure: OrganizationStructure[];
   ordersTab: AgencyOrderManagementTabs;
   extensions: any;
+  deployedCandidateOrderIds: string[];
 }
 
 @State<OrderManagementModel>({
@@ -98,6 +101,7 @@ export interface OrderManagementModel {
     historicalEvents: [],
     ordersTab: AgencyOrderManagementTabs.MyAgency,
     extensions: null,
+    deployedCandidateOrderIds: [],
   },
 })
 @Injectable()
@@ -198,6 +202,11 @@ export class OrderManagementState {
   @Selector()
   static extensions(state: OrderManagementContentStateModel): any | null {
     return state.extensions;
+  }
+
+  @Selector()
+  static deployedCandidateOrderIds(state: OrderManagementModel): string[] {
+    return state.deployedCandidateOrderIds;
   }
 
   constructor(
@@ -316,7 +325,7 @@ export class OrderManagementState {
       tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'))),
       catchError((error) => {
         const errorMessage = error?.error?.errors?.CandidateBillRate[0] ?? 'Candidate cannot be updated';
-        return of(dispatch(new ShowToast(MessageTypes.Error, errorMessage)))
+        return of(dispatch(new ShowToast(MessageTypes.Error, errorMessage)));
       })
     );
   }
@@ -429,5 +438,16 @@ export class OrderManagementState {
     return this.extensionSidebarService
       .getExtensions(id, orderId, organizationId)
       .pipe(tap((extensions) => patchState({ extensions })));
+  }
+
+  @Action(GetDeployedCandidateOrderIds)
+  getDeployedCandidateOrderIds(
+    { patchState }: StateContext<OrderManagementModel>,
+    { orderId, candidateProfileId, organizationId, organizationPrefix }: GetDeployedCandidateOrderIds
+  ): Observable<string[]> {
+    return this.orderApplicantsService.getDeployedCandidateOrderIds(orderId, candidateProfileId, organizationId,).pipe(
+      map((data: OverlappedOrderIds[]) => data.map((dto) => organizationPrefix + '-' + dto.orderPublicId)),
+      tap((orderIds) => patchState({ deployedCandidateOrderIds: orderIds }))
+    );
   }
 }

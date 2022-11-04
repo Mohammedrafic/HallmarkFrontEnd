@@ -41,6 +41,7 @@ export class BillRatesComponent extends AbstractPermissionGrid implements OnInit
   ]);
   public isReadOnly = false; // TODO: temporary solution, until specific service provided
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
+  public canAddBillRate = true;
 
   addBillRateBtnText: string = 'Add Record';
   selectedTab: BillRateNavigationTabs = BillRateNavigationTabs.BillRateSetup;
@@ -68,9 +69,11 @@ export class BillRatesComponent extends AbstractPermissionGrid implements OnInit
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.canAddRates();
     this.handlePagePermission();
     this.store.dispatch(new GetOrganizationStructure());
   }
+
 
   ngAfterViewInit(): void {
     this.subsToSearch();
@@ -91,6 +94,9 @@ export class BillRatesComponent extends AbstractPermissionGrid implements OnInit
 
   public onTabSelected(selectedTab: any): void {
     this.selectedTab = selectedTab.selectedIndex;
+
+    this.canAddRates();
+
     this.isBillRateSetupTabActive = BillRateNavigationTabs.BillRateSetup === selectedTab.selectedIndex;
     this.isExternalBillRateType = BillRateNavigationTabs.ExternalBillRateType === selectedTab.selectedIndex;
     this.isExternalBillRateTypeMapping =
@@ -176,5 +182,11 @@ export class BillRatesComponent extends AbstractPermissionGrid implements OnInit
             )
           );
       });
+  }
+
+  private canAddRates(): void {
+    this.canAddBillRate = this.selectedTab === 0 ?
+      this.userPermission[this.userPermissions.CanEditSettingsBillRates] :
+      this.userPermission[this.userPermissions.CanManageExternalBillRates];
   }
 }

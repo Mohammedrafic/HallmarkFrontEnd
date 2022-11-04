@@ -13,7 +13,6 @@ import {
   SaveAgencySucceeded,
 } from 'src/app/agency/store/agency.actions';
 import { AgencyState } from 'src/app/agency/store/agency.state';
-import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { AgencyStatus, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { Agency, AgencyFilteringOptions, AgencyListFilters, AgencyPage } from 'src/app/shared/models/agency.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
@@ -24,13 +23,14 @@ import { DatePipe } from '@angular/common';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { agencyListFilterColumns, agencyStatusMapper } from '@agency/agency-list/agency-list.constants';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 
 @Component({
   selector: 'app-agency-list',
   templateUrl: './agency-list.component.html',
   styleUrls: ['./agency-list.component.scss'],
 })
-export class AgencyListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class AgencyListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
   public readonly statusEnum = AgencyStatus;
@@ -61,7 +61,7 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
   agencyFilteringOptions$: Observable<AgencyFilteringOptions>;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private router: Router,
     private actions$: Actions,
     private confirmService: ConfirmService,
@@ -69,11 +69,12 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
     private filterService: FilterService,
     private formBuilder: FormBuilder
   ) {
-    super();
+    super(store);
     this.store.dispatch(new SetHeaderState({ title: 'Agency List', iconName: 'clock' }));
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.initAgencyListFilterFormGroup();
     this.dispatchNewPage();
     this.subscribeOnPageChanges();

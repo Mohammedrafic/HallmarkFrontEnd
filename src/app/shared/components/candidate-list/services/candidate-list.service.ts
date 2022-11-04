@@ -40,4 +40,8 @@ export class CandidateListService {
   public export(payload: ExportPayload): Observable<Blob> {
     return this.http.post(`/api/CandidateProfile/export`, payload, { responseType: 'blob' });
   }
+
+  public getRegions(): Observable<string[]> {
+    return this.http.get<string[]>('/api/Regions/UsaCanadaStates')
+  }
 }

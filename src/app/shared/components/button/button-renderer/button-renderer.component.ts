@@ -3,16 +3,20 @@ import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { Component } from '@angular/core';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { AgencyStatus } from '@shared/enums/status';
+import { AbstractPermission } from '@shared/helpers/permissions';
+import { Store } from '@ngxs/store';
 
 @Component({
   selector: 'app-button-renderer',
   templateUrl: './button-renderer.component.html',
   styleUrls: ['./button-renderer.component.scss'],
 })
-export class ButtonRendererComponent implements ICellRendererAngularComp {
+export class ButtonRendererComponent extends AbstractPermission implements ICellRendererAngularComp {
   public readonly agencyStatus = AgencyStatus;
 
-  constructor() {}
+  constructor(protected override store: Store) {
+    super(store);
+  }
   faEdit = faEdit as IconProp;
   faTrash = faTrash as IconProp;
   params: any;

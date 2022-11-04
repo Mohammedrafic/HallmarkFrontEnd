@@ -78,6 +78,8 @@ import { AllInvoicesActionCellComponent } from './components/all-invoices-action
 import { NumericalConverterModule } from '@shared/pipes/numerical-converter/numerical-converter.module';
 import { InvoiceAgencyResolver } from './resolvers/invoice-agency.resolver';
 import { GridOrderIdCellComponent } from './components/grid-order-id-cell/grid-order-id-cell.component';
+import { InvoicesPermissionHelper } from './helpers/invoices-permission.helper';
+import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 
 @NgModule({
   declarations: [
@@ -101,7 +103,7 @@ import { GridOrderIdCellComponent } from './components/grid-order-id-cell/grid-o
     FeatherModule.pick({
       AlignJustify, Lock, Menu, MessageSquare, MoreVertical, Sliders, ChevronRight,
       ChevronDown, X, Percent, Package, Trash2, AlertCircle, ChevronsDown, Search,
-      Printer, ArrowUp,
+      Printer, ArrowUp
     }),
     TabModule,
     DropDownButtonModule,
@@ -132,7 +134,8 @@ import { GridOrderIdCellComponent } from './components/grid-order-id-cell/grid-o
     ListBoxModule,
     A11yModule,
     TableStatusCellModule,
-    NumericalConverterModule
+    NumericalConverterModule,
+    TooltipContainerModule
   ],
   providers: [
     InvoicesService,
@@ -143,6 +146,7 @@ import { GridOrderIdCellComponent } from './components/grid-order-id-cell/grid-o
     ManualInvoiceAttachmentsApiService,
     InvoicePrintingService,
     InvoiceAgencyResolver,
+    InvoicesPermissionHelper,
     {
       provide: AddDialogHelperService,
       useClass: AddInvoiceService,

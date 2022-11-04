@@ -61,6 +61,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
   @Input() actionsAllowed: boolean;
+  @Input() deployedCandidateOrderIds: string[];
 
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
@@ -215,8 +216,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       okButtonClass: 'ok-button',
     };
 
-    return this.isDeployedCandidate
-      ? this.confirmService.confirm(deployedCandidateMessage([]), options)
+    return this.isDeployedCandidate  && this.isAgency
+      ? this.confirmService.confirm(deployedCandidateMessage(this.deployedCandidateOrderIds), options)
       : of(true);
   }
 

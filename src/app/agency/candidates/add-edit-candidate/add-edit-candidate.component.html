@@ -10,7 +10,11 @@
   <ng-container right>
     <ng-container *ngIf="!readonlyMode && showSaveProfileButtons">
       <button ejs-button [disabled]="!candidateForm?.dirty" cssClass="e-outline"  (click)="clearForm()">Clear</button>
-      <button ejs-button [isPrimary]="true" (click)="save()" [disabled]="!agencyActionsAllowed">Save</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditCandidateProfile]">
+        <button ejs-button [isPrimary]="true" (click)="save()" [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]">Save</button>
+      </app-tooltip-container>
     </ng-container>
   </ng-container>
 </app-page-toolbar>
@@ -56,7 +60,7 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-experience-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="agencyActionsAllowed"></app-experience-grid>
+        <app-experience-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission"></app-experience-grid>
       </ng-template>
     </e-tabitem>
     <e-tabitem>
@@ -67,7 +71,7 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-education-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="agencyActionsAllowed"></app-education-grid>
+        <app-education-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission"></app-education-grid>
       </ng-template>
     </e-tabitem>
     <e-tabitem>
@@ -83,6 +87,7 @@
           [areAgencyActionsAllowed]="agencyActionsAllowed"
           [isCandidateAssigned]="isCandidateAssigned"
           [orderId]="orderId"
+          [userPermission]="userPermission"
         ></app-credentials-grid>
       </ng-template>
     </e-tabitem>

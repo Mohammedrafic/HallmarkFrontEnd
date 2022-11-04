@@ -20,7 +20,7 @@
             <button ejs-button [disabled]="!agencyActionsAllowed ||
             editAgencyOrg?.agencyStatus === agencyStatus.Inactive ||
             editAgencyOrg?.agencyStatus === agencyStatus.Terminated ||
-            ((!userPermission[userPermissions.CanEditFeeExceptions] || !userPermission[userPermissions.CanEditPartnershipSettings]) && !isAgency)"
+            (!userPermission[userPermissions.CanEditFeeExceptions] || !userPermission[userPermissions.CanEditPartnershipSettings])"
                     id="addFormButton" type="submit" [isPrimary]="true" (click)="onSave()">
               Save
             </button>
@@ -34,7 +34,7 @@
             <e-tabitem>
               <ng-template #headerText> Fee Settings </ng-template>
               <ng-template #content>
-                <app-fee-settings [editAgencyOrg]="editAgencyOrg" [isAgency]="isAgency" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission" [form]="$any(feeSettingsForm)"></app-fee-settings>
+                <app-fee-settings [editAgencyOrg]="editAgencyOrg" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission" [form]="$any(feeSettingsForm)"></app-fee-settings>
               </ng-template>
             </e-tabitem>
 
