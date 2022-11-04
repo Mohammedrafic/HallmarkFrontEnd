@@ -260,7 +260,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       ...this.invoicesContainerService.getGridOptions(tabIdx, this.organizationId),
     };
 
-    console.log(this.approveInvoiceEnabled, 'approveInvoiceEnabled');
     this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx,
       { organizationId: this.organizationId,
         canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay || this.invoicePayAllowed && this.payInvoiceEnabled,
