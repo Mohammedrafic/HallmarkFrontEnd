@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ListBox, ListBoxChangeEventArgs, SelectionSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { MenuSettings } from '@shared/models';
 
 @Component({
   selector: 'app-side-menu',
@@ -8,7 +9,7 @@ import { ListBox, ListBoxChangeEventArgs, SelectionSettingsModel } from '@syncfu
   styleUrls: ['./side-menu.component.scss'],
 })
 export class SideMenuComponent implements AfterViewInit {
-  @Input() config: { [key: string]: Object }[];
+  @Input() config: MenuSettings[];
   selectionSettings: SelectionSettingsModel = { mode: 'Single' };
 
   @ViewChild('listBox')
