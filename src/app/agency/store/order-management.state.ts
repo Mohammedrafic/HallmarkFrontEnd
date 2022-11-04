@@ -443,10 +443,10 @@ export class OrderManagementState {
   @Action(GetDeployedCandidateOrderIds)
   getDeployedCandidateOrderIds(
     { patchState }: StateContext<OrderManagementModel>,
-    { orderId, candidateProfileId, organizationId, organizationPrefix }: GetDeployedCandidateOrderIds
+    { orderId, candidateProfileId, organizationId }: GetDeployedCandidateOrderIds
   ): Observable<string[]> {
     return this.orderApplicantsService.getDeployedCandidateOrderIds(orderId, candidateProfileId, organizationId,).pipe(
-      map((data: OverlappedOrderIds[]) => data.map((dto) => organizationPrefix + '-' + dto.orderPublicId)),
+      map((data: OverlappedOrderIds[]) => data.map((dto) => dto.orgPrefix + '-' + dto.orderPublicId)),
       tap((orderIds) => patchState({ deployedCandidateOrderIds: orderIds }))
     );
   }
