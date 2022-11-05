@@ -5,11 +5,10 @@
       <label>Bill Rate Title<span class="required">*</span></label>
       <div class="input-group dropdown">
         <ejs-dropdownlist
-          #billRateOptions
           [fields]="optionFields"
           appValidateWithMessage
           formControlName="billRateConfigId"
-          [dataSource]="billRateOptionsForSelect"
+          [dataSource]="billRateOptions"
         ></ejs-dropdownlist>
       </div>
     </div>
