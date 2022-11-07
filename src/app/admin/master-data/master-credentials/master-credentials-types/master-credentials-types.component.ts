@@ -19,7 +19,13 @@ import { CredentialType } from '@shared/models/credential-type.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 
 import { AdminState } from '@admin/store/admin.state';
-import { ExportCredentialTypes, GetCredentialTypes, RemoveCredentialType, SaveCredentialType, UpdateCredentialType } from '@admin/store/admin.actions';
+import {
+  ExportCredentialTypes,
+  GetCredentialTypes,
+  RemoveCredentialType,
+  SaveCredentialType,
+  UpdateCredentialType
+} from '@admin/store/admin.actions';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';

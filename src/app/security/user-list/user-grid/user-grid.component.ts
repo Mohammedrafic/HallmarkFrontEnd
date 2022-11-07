@@ -1,14 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  ViewChild,
-  ViewEncapsulation,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
 import { FormGroup } from '@angular/forms';
 import { Role, RolesFilters, RolesPage } from '@shared/models/roles.model';
@@ -29,13 +19,6 @@ import { DatePipe } from '@angular/common';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
-import {
-  ColDef,
-  GridReadyEvent,
-  IServerSideDatasource,
-  IServerSideGetRowsRequest,
-  PaginationChangedEvent,
-} from '@ag-grid-enterprise/all-modules';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { AppState } from '../../../store/app.state';
 
@@ -87,6 +70,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   public readonly statusEnum = CreateUserStatus;
   public readonly visibilityEnum = Visibility;
   public isAgencyUser = false;
+  public totalRecordsCount: number;
   private isAlive = true;
   itemList: Array<User> | undefined;
   public gridApi: any;
@@ -449,6 +433,8 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
           );
           self.usersPage$.pipe().subscribe((data: any) => {
             self.itemList = data?.items;
+            self.totalRecordsCount = data?.totalCount;
+
             if (!self.itemList || !self.itemList.length) {
               self.gridApi.showNoRowsOverlay();
             } else {

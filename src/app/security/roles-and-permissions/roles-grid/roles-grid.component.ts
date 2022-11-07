@@ -1,4 +1,4 @@
-import { GetBusinessByUnitType, ExportRoleList } from '../../store/security.actions';
+import { ExportRoleList, GetBusinessByUnitType, GetRolesPage, RemoveRole } from '../../store/security.actions';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { filter, Observable, Subject, takeWhile } from 'rxjs';
@@ -16,7 +16,6 @@ import { PermissionsTree } from '@shared/models/permission.model';
 import { rolesFilterColumns } from 'src/app/security/roles-and-permissions/roles-and-permissions.constants';
 
 import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
-import { GetRolesPage, RemoveRole } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
 
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
@@ -73,6 +72,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
 
   private filters: RolesFilters = {};
   private isAlive = true;
+  public totalRecordsCount: number;
 
   itemList: Array<Role> | undefined;
   public gridApi: any;
@@ -294,6 +294,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
           self.dispatchNewPage(sort, filter);
           self.rolesPage$.pipe().subscribe((data: any) => {
             self.itemList = data?.items;
+            self.totalRecordsCount = data?.totalCount;
             if (!self.itemList || !self.itemList.length) {
               self.gridApi.showNoRowsOverlay();
             } else {

@@ -7,15 +7,57 @@ import { map, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SpecialProjectMessages } from '../../../../../organization-management/specialproject/constants/specialprojects.constant';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { SetHeaderState, ShowDocPreviewSideDialog, ShowSideDialog, ShowToast } from '../../../../../store/app.actions';
-import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, DocumentLibraryColumnsDefinition, UNIT_FIELDS } from '../../../constants/documents.constant';
-import { AssociateAgencyDto, DeleteDocumentsFilter, DocumentFolder, DocumentLibraryDto, Documents, DocumentsFilter, DocumentsLibraryPage, DocumentTags, DocumentTypeFilter, DocumentTypes, DownloadDocumentDetail, DownloadDocumentDetailFilter, NodeItem, PreviewDocumentDetailFilter, ShareDocumentDto, ShareDocumentInfoFilter, ShareDocumentInfoPage, ShareDocumentsFilter, ShareOrganizationsData, UnShareDocumentsFilter } from '../../../store/model/document-library.model';
+import {
+  BUSINESS_UNITS_VALUES,
+  BUSSINES_DATA_FIELDS,
+  DocumentLibraryColumnsDefinition,
+  UNIT_FIELDS
+} from '../../../constants/documents.constant';
+import {
+  AssociateAgencyDto,
+  DeleteDocumentsFilter,
+  DocumentFolder,
+  DocumentLibraryDto,
+  Documents,
+  DocumentsFilter,
+  DocumentsLibraryPage,
+  DocumentTags,
+  DocumentTypeFilter,
+  DocumentTypes,
+  DownloadDocumentDetail,
+  DownloadDocumentDetailFilter,
+  NodeItem,
+  PreviewDocumentDetailFilter,
+  ShareDocumentDto,
+  ShareDocumentInfoFilter,
+  ShareDocumentInfoPage,
+  ShareDocumentsFilter,
+  ShareOrganizationsData,
+  UnShareDocumentsFilter
+} from '../../../store/model/document-library.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { DocumentLibraryState } from '../../../store/state/document-library.state';
 import {
-  DeletDocuments, GetDocumentById, GetDocumentDownloadDeatils, GetDocuments,
-  GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, GetSharedDocuments,
-  IsAddNewFolder, SaveDocumentFolder, SaveDocuments, ShareDocuments, UnShareDocuments,
-  GetLocationsByRegions, GetRegionsByOrganizations, GetShareAssociateAgencies, GetShareOrganizationsDtata, SelectedBusinessType, IsDeleteEmptyFolder, GetDocumentPreviewDeatils,
+  DeletDocuments,
+  GetDocumentById,
+  GetDocumentDownloadDeatils,
+  GetDocumentPreviewDeatils,
+  GetDocuments,
+  GetDocumentsSelectedNode,
+  GetDocumentTypes,
+  GetFoldersTree,
+  GetLocationsByRegions,
+  GetRegionsByOrganizations,
+  GetShareAssociateAgencies,
+  GetSharedDocuments,
+  GetShareOrganizationsDtata,
+  IsAddNewFolder,
+  IsDeleteEmptyFolder,
+  SaveDocumentFolder,
+  SaveDocuments,
+  SelectedBusinessType,
+  ShareDocuments,
+  UnShareDocuments
 } from '../../../store/actions/document-library.actions';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { documentsColumnField, FileType, FormControlNames, FormDailogTitle, MoreMenuType, StatusEnum } from '../../../enums/documents.enum';
@@ -39,16 +81,8 @@ import {
   TextSelectionService,
   ToolbarService
 } from '@syncfusion/ej2-angular-pdfviewer';
-import {
-  DocumentEditorComponent,
-
-  EditorHistoryService,
-  EditorService,
-  SearchService
-} from '@syncfusion/ej2-angular-documenteditor';
+import { DocumentEditorComponent, EditorHistoryService, EditorService, SearchService } from '@syncfusion/ej2-angular-documenteditor';
 import { User } from '../../../../../shared/models/user-managment-page.model';
-import { regionFilter } from '../../../store/model/document-library.model';
-import { LocationsByRegionsFilter } from '../../../store/model/document-library.model';
 
 
 @Component({
@@ -120,6 +154,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   fileAsBase64: string;
   public allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
   public isSharedFolderClick: boolean = false;
+  public totalRecordsCount: number;
 
   public gridApi!: GridApi;
   public rowData: DocumentLibraryDto[] = [];
@@ -606,6 +641,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         this.gridApi?.hideOverlay();
         const documentData = [...new Set(data.items.map((item: ShareDocumentDto) => item.document))]
         this.rowData = documentData;
+        this.totalRecordsCount = data.totalPages;
         this.gridApi?.setRowData(this.rowData);
       }
     });
