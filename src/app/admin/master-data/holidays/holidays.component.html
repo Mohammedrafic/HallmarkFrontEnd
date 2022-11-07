@@ -183,6 +183,9 @@
         </div>
       </div>
     </div>
+    <p *ngIf="(startTimeField?.errors || endTimeField?.errors) as errorObj" class="error">
+      {{ errorObj['invalidDate'] ? 'Start date should be before end date or less' : '' }}
+    </p>
   </form>
 </app-side-dialog>
 
