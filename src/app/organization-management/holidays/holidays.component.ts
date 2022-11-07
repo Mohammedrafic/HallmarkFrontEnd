@@ -21,7 +21,7 @@ import {
   DATA_OVERRIDE_TITLE,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE,
+  DELETE_RECORD_TITLE, ERROR_START_LESS_END_DATE
 } from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
@@ -106,6 +106,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
   public filters: HolidayFilters = {};
   public filterColumns: any;
   public yearsList: number[] = [];
+  public datesValidationMessage = ERROR_START_LESS_END_DATE;
 
 
   constructor(

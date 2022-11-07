@@ -13,6 +13,7 @@ import {
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
+import { AbstractPermission } from "@shared/helpers/permissions";
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 
 import {
@@ -79,7 +80,6 @@ import { ShowCloseOrderDialog, ShowToast } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from '../../../security/services/permission.service';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 enum Template {
   accept,
@@ -101,7 +101,7 @@ enum MobileMenuItems {
   templateUrl: './child-order-dialog.component.html',
   styleUrls: ['./child-order-dialog.component.scss'],
 })
-export class ChildOrderDialogComponent extends DestroyableDirective implements OnInit, OnChanges, OnDestroy {
+export class ChildOrderDialogComponent extends AbstractPermission implements OnInit, OnChanges, OnDestroy {
   @Input() order: MergedOrder;
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild] | null>;
   @Input() candidate: OrderManagementChild;
@@ -218,7 +218,7 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
   constructor(
     private chipsCssClass: ChipsCssClass,
     private router: Router,
-    private store: Store,
+    protected override store: Store,
     private actions$: Actions,
     private commentsService: CommentsService,
     private confirmService: ConfirmService,
@@ -226,9 +226,12 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
     private reOpenOrderService: ReOpenOrderService,
     private permissionService: PermissionService,
     private changeDetectorRef: ChangeDetectorRef
-  ) {super();}
+  ) {
+    super(store);
+  }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.isAgency = this.router.url.includes('agency');
     this.isOrganization = this.router.url.includes('client');
     this.selectedOrder$ = this.isAgency ? this.agencySelectedOrder$ : this.orgSelectedOrder$;
@@ -564,7 +567,7 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
         this.tab.select(1);
         const [order, candidate] = data;
         this.order = order as MergedOrder;
-        this.candidate = candidate;  
+        this.candidate = candidate;
         this.isClosedOrder = this.candidate.orderStatus === OrderStatus.Closed;
         this.getTemplate();
         windowScrollTop();

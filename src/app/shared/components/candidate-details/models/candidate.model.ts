@@ -43,6 +43,7 @@ export type FiltersModal = {
   startDate?: string;
   endDate?: string;
   orderTypes?: Array<number>;
+  organizationIds?: number[];
 };
 
 export interface FiltersPageModal extends FiltersModal {

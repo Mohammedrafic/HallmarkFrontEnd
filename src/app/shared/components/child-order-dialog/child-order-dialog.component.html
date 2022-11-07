@@ -119,7 +119,7 @@
                         [isTab]="true"
                         (closeModalEvent)="onClose()"
                         [isAgency]="isAgency"
-                        [actionsAllowed]="agencyActionsAllowed"
+                        [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
                       ></app-accept-candidate>
                       <section *ngIf="isReorderType">
                         <ng-container *ngTemplateOutlet="acceptFormSection"></ng-container>
@@ -132,7 +132,7 @@
                         [candidate]="$any(candidate)"
                         [order]="$any(selectedOrder$ | async)"
                         [isTab]="true"
-                        [actionsAllowed]="agencyActionsAllowed"
+                        [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
                       >
                       </app-apply-candidate>
                     </ng-container>
@@ -154,7 +154,7 @@
                         [isTab]="true"
                         appUnsavedForm
                         [dialogEvent]="$any(openEvent)"
-                        [actionsAllowed]="agencyActionsAllowed"
+                        [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
                         [currentOrder]="order"
                       >
                       </app-extension-candidate>

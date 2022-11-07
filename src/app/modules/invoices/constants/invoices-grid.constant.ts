@@ -71,6 +71,27 @@ export const rejectionReasonColDef: TypedColDef<ManualInvoice> = {
   ...commonColumn,
 };
 
+export const commentColDef: TypedColDef<ManualInvoice> = {
+  field: 'comment',
+  headerName: 'COMMENT',
+  minWidth: 200,
+  ...commonColumn,
+};
+
+export const linkedInvoiceIdColDef: TypedColDef<ManualInvoice> = {
+  field: 'linkedInvoiceId',
+  headerName: 'LINKED INVOICE ID',
+  minWidth: 120,
+  ...commonColumn,
+};
+
+export const reasonCodeColDef: TypedColDef<ManualInvoice> = {
+  field: 'reasonCode',
+  headerName: 'REASON CODE',
+  minWidth: 120,
+  ...commonColumn,
+};
+
 export const RateReasonValueGetter: ValueGetterFunc = (
   params: TypedValueGetterParams<PendingApprovalInvoiceRecord>) => {
   if (params.data.timesheetTypeText === 'Expenses') {
