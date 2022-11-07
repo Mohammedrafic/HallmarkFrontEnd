@@ -26,8 +26,10 @@ import {
   DocumentTypes,
   DownloadDocumentDetail,
   DownloadDocumentDetailFilter,
+  LocationsByRegionsFilter,
   NodeItem,
   PreviewDocumentDetailFilter,
+  regionFilter,
   ShareDocumentDto,
   ShareDocumentInfoFilter,
   ShareDocumentInfoPage,
@@ -83,7 +85,6 @@ import {
 } from '@syncfusion/ej2-angular-pdfviewer';
 import { DocumentEditorComponent, EditorHistoryService, EditorService, SearchService } from '@syncfusion/ej2-angular-documenteditor';
 import { User } from '../../../../../shared/models/user-managment-page.model';
-
 
 @Component({
   selector: 'app-document-library',
