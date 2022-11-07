@@ -261,8 +261,9 @@
         [billRates]="billRatesData"
         [isActive]="isActiveCandidateDialog$ | async"
         [readOnlyMode]="isReadOnlyBillRates"
-        (billRatesChanged)="onBillRatesChanged($event)">
-      </app-bill-rates>
+        (billRatesChanged)="onBillRatesChanged($event)"
+        [disabledActionMode]="!hasEditOrderBillRatesPermission"
+      ></app-bill-rates>
     </ng-template>
   </section>
   <ng-container *ngIf="showStatusDropdown || isDeployedCandidate">

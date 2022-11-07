@@ -19,7 +19,7 @@
           <ejs-dropdownlist [fields]="optionFields"
                             [dataSource]="nextApplicantStatuses"
                             [formControl]="statusesFormControl"
-                            [disabled]="!actionsAllowed" 
+                            [disabled]="!actionsAllowed"
                             [itemTemplate]="itemTemplate"
                             placeholder="Select Status"
                             (select)="updateCandidateJob($event)">
@@ -189,6 +189,7 @@
                     [billRates]="billRatesData"
                     [isActive]="true"
                     [readOnlyMode]="isReadOnlyBillRates"
+                    [disabledActionMode]="!hasEditOrderBillRatesPermission"
                     (billRatesChanged)="onBillRatesChanged()">
     </app-bill-rates>
   </section>

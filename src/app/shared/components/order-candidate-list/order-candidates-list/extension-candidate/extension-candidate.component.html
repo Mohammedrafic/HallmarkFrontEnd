@@ -292,8 +292,8 @@
         (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)"
         [isActive]="true"
         [readOnlyMode]="isReadOnlyBillRates"
-      >
-      </app-bill-rates>
+        [disabledActionMode]="!hasEditOrderBillRatesPermission"
+      ></app-bill-rates>
     </ng-template>
   </section>
   <ng-container *ngIf="canAccept || !isAgency">

@@ -50,6 +50,7 @@ import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { hasEditOrderBillRatesPermission } from '../../order-candidate-list.utils';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -89,6 +90,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public candidateJob: OrderCandidateJob | null;
   public today = new Date();
   public priceUtils = PriceUtils;
+  public hasEditOrderBillRatesPermission: boolean;
 
   get showYearsOfExperience(): boolean {
     return (
@@ -360,6 +362,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     });
     this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ApplicantStatus[]) => {
       this.nextApplicantStatuses = data;
+      this.hasEditOrderBillRatesPermission = hasEditOrderBillRatesPermission(this.applicationStatus || this.candidate.status, data);
       if (!data.length) {
         this.statusesFormControl.disable();
       } else {

@@ -25,6 +25,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
 
   @Input() isActive: boolean | null = false;
   @Input() readOnlyMode = false;
+  @Input() disabledActionMode: boolean;
   @Input() set billRates(values: BillRate[]) {
     if (values) {
       this.billRatesControl = new FormArray([]);
