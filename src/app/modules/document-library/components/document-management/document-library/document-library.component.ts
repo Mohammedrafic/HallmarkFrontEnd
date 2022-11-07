@@ -165,14 +165,21 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     { text: MoreMenuType[1], id: '1' },
     { text: MoreMenuType[2], id: '2' }
   ];
+  public editMoreMenuItems: ItemModel[] = [
+    { text: MoreMenuType[0], id: '0' },
+    { text: MoreMenuType[1], id: '1' },
+    { text: MoreMenuType[2], id: '2' },
+    { text: MoreMenuType[3], id: '3' }
+  ];
 
   public statusItems: ItemModel[] = [
-    { text: StatusEnum[0], id: '0' },
-    { text: StatusEnum[1], id: '1' }
+    { text: StatusEnum[0], id: '1' },
+    { text: StatusEnum[1], id: '0' }
   ];
 
   public actionCellrenderParams: any = {
     editMenuITems: this.editMenuItems,
+    editMoreMenuITems: this.editMoreMenuItems,
     select: (event: any, params: DocumentLibraryDto) => {
       this.menuOptionSelected(event, params)
     },
@@ -977,7 +984,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   public handleOnSave() {
     this.documentLibraryform.markAllAsTouched();
-    if (this.documentLibraryform.invalid) {
+    if (this.documentLibraryform.invalid && (this.isUpload || this.isEditDocument)) {
       return;
     }
     this.SaveFolderOrDocument();
