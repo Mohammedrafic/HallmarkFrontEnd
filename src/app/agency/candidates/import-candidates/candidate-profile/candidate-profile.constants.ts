@@ -1,6 +1,6 @@
-import { ColDef } from "@ag-grid-community/core";
+import { ColDef } from '@ag-grid-community/core';
 
-import { GridErroredCellComponent } from "@shared/components/import-dialog-content/grid-errored-cell/grid-errored-cell.component";
+import { GridErroredCellComponent } from '@shared/components/import-dialog-content/grid-errored-cell/grid-errored-cell.component';
 
 export const candidateProfileColumns: ColDef[] = [
   {
@@ -115,6 +115,12 @@ export const candidateProfileColumns: ColDef[] = [
     field: 'professionalSummary',
     width: 220,
     headerName: 'Professional Summary',
+    cellRenderer: GridErroredCellComponent,
+  },
+  {
+    field: 'region',
+    width: 150,
+    headerName: 'Region',
     cellRenderer: GridErroredCellComponent,
   },
 ];

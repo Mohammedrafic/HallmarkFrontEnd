@@ -32,7 +32,8 @@ export type CandidateProfile = {
   phone2: string;
   key: string;
   errorProperties: string[];
-}
+  region?: string[];
+};
 
 export type CandidateExperiencesImport = {
   email: string;
