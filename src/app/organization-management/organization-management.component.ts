@@ -5,6 +5,8 @@ import { SetHeaderState } from '../store/app.actions';
 import { ORG_SETTINGS } from './organization-management-menu.config';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { MenuSettings } from '@shared/models';
+import { Permission } from '@core/interface';
+import { filter, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-organization-management',
@@ -21,7 +23,21 @@ export class OrganizationManagementComponent extends AbstractPermission implemen
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.setMenuConfig();
+    this.watchForPermissions();
+  }
 
+  private watchForPermissions(): void {
+    this.getPermissionStream().pipe(
+      filter(() => this.sideMenuConfig.length <= 1),
+      takeUntil(this.componentDestroy())
+    ).subscribe((permissions: Permission) => {
+        this.userPermission = permissions;
+        this.setMenuConfig();
+    });
+  }
+
+  private setMenuConfig(): void {
     this.sideMenuConfig = this.checkValidPermissions(ORG_SETTINGS);
   }
 }

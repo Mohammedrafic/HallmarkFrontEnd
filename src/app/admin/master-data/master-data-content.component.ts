@@ -5,6 +5,8 @@ import { SetHeaderState } from 'src/app/store/app.actions';
 import { MASTER_DATA_CONFIG } from '../admin-menu.config';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { MenuSettings } from '@shared/models';
+import { Permission } from '@core/interface';
+import { filter, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-master-data-content',
@@ -21,7 +23,21 @@ export class MasterDataContentComponent extends AbstractPermission implements On
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.setMenuConfig();
+    this.watchForPermissions();
+  }
 
+  private watchForPermissions(): void {
+      this.getPermissionStream().pipe(
+        filter(() => this.sideMenuConfig.length <= 1),
+        takeUntil(this.componentDestroy())
+      ).subscribe((permissions: Permission) => {
+        this.userPermission = permissions;
+        this.setMenuConfig();
+      });
+  }
+
+  private setMenuConfig(): void {
     this.sideMenuConfig = this.checkValidPermissions(MASTER_DATA_CONFIG);
   }
 }
