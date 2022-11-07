@@ -4,7 +4,7 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { CandidatesStatusText, CandidateStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserState } from '../../../../../store/user.state';
 import { SaveCandidateSucceeded } from '@agency/store/candidate.actions';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -40,6 +40,8 @@ import { adaptToNameEntity } from '../../../../helpers/dropdown-options.helper';
 import { filterColumns } from './candidate-list.constants';
 import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 
 @Component({
   selector: 'app-candidate-list',
@@ -48,6 +50,7 @@ import { UserPermissions } from '@core/enums';
 })
 export class CandidateListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
+  @ViewChild('regionMultiselect') public readonly regionMultiselect: MultiSelectComponent;
 
   @Select(CandidateListState.candidates)
   private _candidates$: Observable<CandidateList>;
@@ -137,6 +140,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   ngOnInit(): void {
+    this.store.dispatch([new GetRegionList()]);
     this.dispatchInitialIcon();
     this.subscribeOnSaveState();
     this.subscribeOnPageSubject();
@@ -174,6 +178,19 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));
     this.filteredItems$.next(this.filteredItems.length);
+    this.filterService.setPreservedFIltersGlobal(this.filters);
+  }
+
+  private setDefaultFilter(): void {
+    if (this.filterService.canPreserveFilters()) {
+      const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersGlobal);
+      if (preservedFilters?.regions) {
+        this.CandidateFilterFormGroup.get('regionsNames')?.setValue([...preservedFilters.regions]);
+        this.filters.regionsNames = [...preservedFilters.regions];
+        this.filteredItems = this.filterService.generateChips(this.CandidateFilterFormGroup, this.filterColumns);
+        this.filteredItems$.next(this.filteredItems.length);
+      }
+    }
   }
 
   public onFilterClose(): void {
@@ -341,15 +358,17 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private subscribeOnSaveState(): void {
-    merge(this.lastSelectedAgencyId$, this.lastSelectedOrgId$)
+    merge(this.lastSelectedAgencyId$, this.lastSelectedOrgId$, this.regions$)
       .pipe(
         filter((value) => !!value),
+        debounceTime(300),
         takeUntil(this.unsubscribe$)
       )
       .subscribe(() => {
         this.dispatchNewPage();
         this.clearFilters();
-        this.store.dispatch([new GetRegionList(), new GetAllSkills()]);
+        this.setDefaultFilter();
+        this.store.dispatch([new GetAllSkills()]);
       });
   }
 
@@ -366,6 +385,14 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       .subscribe((agency: { payload: Candidate }) => {
         this.dispatchNewPage();
       });
+
+    this.actions$.pipe(
+      ofActionDispatched(ShowFilterDialog),
+      debounceTime(300),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.regionMultiselect.refresh();
+    });
   }
 
   private subscribeOnDeploydCandidates(): void {
