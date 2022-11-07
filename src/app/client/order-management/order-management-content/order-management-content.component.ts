@@ -119,6 +119,8 @@ import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { PermissionService } from '../../../security/services/permission.service';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { PreservedFilters } from '@shared/models/preserved-filters.model';
 
 @Component({
   selector: 'app-order-management-content',
@@ -162,6 +164,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private readonly candidatesJob$: Observable<OrderCandidateJob | null>;
 
   @Select(DashboardState.filteredItems) private readonly filteredItems$: Observable<FilteredItem[]>;
+
+  @Select(PreservedFiltersState.preservedFilters) private readonly preservedFilters$: Observable<PreservedFilters>;
 
   @Select(OrderManagementContentState.projectSpecialData)
   public readonly projectSpecialData$: Observable<ProjectSpecialData>;
@@ -251,6 +255,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private prefix: string | null;
   private orderId: number | null;
   private creatingReorder = false;
+  private filterApplied = false;
 
   constructor(
     private store: Store,
@@ -315,7 +320,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   ngOnInit(): void {
     this.handleDashboardFilters();
     this.orderFilterColumnsSetup();
-    this.onOrderFilterDataSourcesLoadHandler();
 
     this.onOrganizationStructureDataLoadHandler();
     this.onDuplicateOrderSucceededHandler();
@@ -584,12 +588,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onFilterClearAll(): void {
+    this.filterApplied = true;
     this.orderManagementService.selectedOrderAfterRedirect = null;
     this.clearFilters();
     this.getOrders(true);
   }
 
   public onFilterApply(): void {
+    this.filterApplied = true;
     this.filters = this.OrderFilterFormGroup.getRawValue();
     this.filters.candidateName = this.filters.candidateName || null;
     this.filters.orderPublicId = this.filters.orderPublicId || null;
@@ -605,6 +611,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.getOrders(true);
     this.store.dispatch(new ShowFilterDialog(false));
+    this.filterService.setPreservedFIlters(this.filters);
   }
 
   public onDataBound(): void {
@@ -801,6 +808,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public tabSelected(tabIndex: OrganizationOrderManagementTabs): void {
     this.activeTab = tabIndex;
     this.clearFilters();
+    this.filterApplied = false;
 
     // Don’t need reload orders if we go back from the candidate page
     if (!this.previousSelectedOrderId) {
@@ -1065,7 +1073,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         );
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
       }
-      this.getOrders();
+      this.getOrders(this.filterApplied);
     });
   }
 
@@ -1226,6 +1234,17 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private setDefaultFilter(): void {
+    if (this.filterService.canPreserveFilters()) {
+      const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
+      if (preservedFilters?.regions) {
+        this.OrderFilterFormGroup.get('regionIds')?.setValue([...preservedFilters.regions]);
+        this.filters.regionIds = [...preservedFilters.regions];
+        if (preservedFilters?.locations) {
+          this.OrderFilterFormGroup.get('locationIds')?.setValue(preservedFilters.locations);
+          this.filters.locationIds = preservedFilters.locations;
+        }
+      }
+    }
     const statuses = this.filterColumns.orderStatuses.dataSource
                       .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed].includes(status.status))
                       .map((status: FilterStatus) => status.status);
@@ -1307,6 +1326,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.orgStructure = structure;
         this.regions = structure.regions;
         this.filterColumns.regionIds.dataSource = this.regions;
+        this.onOrderFilterDataSourcesLoadHandler();
       });
   }
 

@@ -8,6 +8,7 @@ import { B2CAuthService } from './b2c-auth/b2c-auth.service';
 import { CheckScreen, SetIsOrganizationAgencyArea } from './store/app.actions';
 import { SetUserPermissions } from "./store/user.actions";
 import { tap } from "rxjs";
+import { InitPreservedFilters } from './store/preserved-filters.actions';
 
 @Component({
   selector: 'app-root',

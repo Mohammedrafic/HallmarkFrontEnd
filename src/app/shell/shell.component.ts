@@ -38,6 +38,8 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { AnalyticsApiService } from '@shared/services/analytics-api.service';
 import {  ShowSideDialog } from 'src/app/store/app.actions';
+import { InitPreservedFilters } from '../store/preserved-filters.actions';
+import { FilterService } from '@shared/services/filter.service';
 
 enum THEME {
   light = 'light',
@@ -177,7 +179,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     private orderManagementAgencyService: OrderManagementAgencyService,
     private actions$: Actions,
     private analyticsApiService: AnalyticsApiService<string>,
+    private filterService: FilterService
   ) {
+    this.filterService.canPreserveFilters() && store.dispatch(new InitPreservedFilters());
     router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((data: any) => {
       if (this.tree) {
         const menuItem = this.tree.getTreeData().find((el) => el['route'] === data['url']);
