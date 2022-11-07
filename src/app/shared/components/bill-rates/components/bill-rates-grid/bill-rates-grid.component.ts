@@ -23,6 +23,7 @@ export class BillRatesGridComponent extends AbstractGridConfigurationComponent i
     });
   }
   public readOnly: boolean = false;
+  @Input() disabledActionMode: boolean;
   @Input() billRatesData: BillRate[];
   @Input() billRateOptions: BillRateOption[];
 

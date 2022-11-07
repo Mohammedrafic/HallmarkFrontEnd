@@ -384,7 +384,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private switchFormState(): void {
-    if (this.isApplied && !this.candidate.deployedCandidateInfo) {
+    if (this.isApplied) {
       this.form?.enable();
     } else {
       this.form?.disable();

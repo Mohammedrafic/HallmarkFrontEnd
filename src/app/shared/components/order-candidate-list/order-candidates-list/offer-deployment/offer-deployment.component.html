@@ -19,7 +19,7 @@
           <ejs-dropdownlist [fields]="optionFields"
                             [dataSource]="nextApplicantStatuses"
                             [formControl]="statusesFormControl"
-                            [disabled]="!actionsAllowed" 
+                            [disabled]="!actionsAllowed"
                             [itemTemplate]="itemTemplate"
                             placeholder="Select Status"
                             (select)="updateCandidateJob($event)">
@@ -189,12 +189,13 @@
                     [billRates]="billRatesData"
                     [isActive]="true"
                     [readOnlyMode]="isReadOnlyBillRates"
+                    [disabledActionMode]="!hasEditOrderBillRatesPermission"
                     (billRatesChanged)="onBillRatesChanged()">
     </app-bill-rates>
   </section>
-  <ng-container *ngIf="(!isRejected && !isDeployedCandidate && !isReadOnly) || (isDeployedCandidate && !isRejected)">
+  <ng-container *ngIf="(!isRejected && !isReadOnly && !isClosedPosition)">
     <div class="mobile-actions" [ngClass]="{'tab': isTab}">
-      <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isDeployedCandidate && !isReadOnly">
+      <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isReadOnly && !isClosedPosition">
         <ejs-dropdownlist [fields]="optionFields"
                           [dataSource]="nextApplicantStatuses"
                           [formControl]="statusesFormControl"
@@ -206,7 +207,6 @@
           </ng-template>
         </ejs-dropdownlist>
       </div>
-      <button *ngIf="isDeployedCandidate && !isRejected" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
     </div>
   </ng-container>
 </section>

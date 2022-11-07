@@ -23,15 +23,11 @@ import { filter, merge, Observable, Subject, switchMap, takeUntil, of, take } fr
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import {
-  ApplicantStatus,
-  ApplicantStatus as ApplicantStatusEnum,
-  CandidatStatus,
-} from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
@@ -66,6 +62,7 @@ import { UserState } from 'src/app/store/user.state';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { hasEditOrderBillRatesPermission } from '../../order-candidate-list.utils';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -121,6 +118,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public canOffer = false;
   public canOnboard = false;
   public canClose = false;
+  public hasEditOrderBillRatesPermission: boolean;
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
@@ -214,7 +212,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       });
   }
 
-  public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatus; isEnabled: boolean } }): void {
+  public onDropDownChanged(event: { itemData: ApplicantStatus }): void {
     if (event.itemData?.isEnabled) {
       this.handleOnboardedCandidate(event);
     } else {
@@ -477,6 +475,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private subscribeOnGetStatus(): void {
     this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ApplicantStatus[]) => {
       this.nextApplicantStatuses = data;
+      this.hasEditOrderBillRatesPermission = hasEditOrderBillRatesPermission(
+        this.candidateJob?.applicantStatus?.applicantStatus || this.candidate?.status as number,
+        data
+      );
       if (!data.length) {
         this.jobStatusControl.disable();
       } else {
@@ -532,7 +534,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     }
   }
 
-  private handleOnboardedCandidate(event: { itemData: { applicantStatus: ApplicantStatus } }): void {
+  private handleOnboardedCandidate(event: { itemData: ApplicantStatus }): void {
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded) {
       this.onAccept();
     } else if (event.itemData?.applicantStatus === ApplicantStatusEnum.Cancelled) {
@@ -595,7 +597,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     }
   }
 
-  public onReject(): void {
+  private onReject(): void {
     this.store.dispatch(new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
   }
