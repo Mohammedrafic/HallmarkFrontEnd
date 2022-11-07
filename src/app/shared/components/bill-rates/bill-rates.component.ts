@@ -217,6 +217,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       }
 
       const applicantStatus = this.store.selectSnapshot(OrderManagementContentState.candidatesJob)?.applicantStatus.applicantStatus;
+
       if (applicantStatus === CandidatStatus.OnBoard && !this.isOrderPage) {
         const confirmText = this.editBillRateIndex ? EDIT_CONFIRM_TEXT : ADD_CONFIRM_TEXT;
 
