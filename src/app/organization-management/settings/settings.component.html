@@ -347,12 +347,63 @@
       </div>
     </form>
 
+    <form
+    [formGroup]="invoiceGeneratingFormGroup"
+    *ngIf="formControlType === organizationSettingControlType.InvoiceAutoGeneration"
+  >
+    <div class="row">
+      <div class="input-container bootstrap">
+        <label>Day of week <span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            appValidateWithMessage
+            [dataSource]="daysOfWeek"
+            [fields]="daysOfWeekFields"
+            formControlName="dayOfWeek">
+          </ejs-dropdownlist>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Time<span class="required">*</span> </label>
+        <div class="input-group">
+          <ejs-timepicker
+            placeholder="HH:MM"
+            formControlName="time"
+            appValidateWithMessage
+            format="HH:mm"
+            [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+            [enableMask]="true"
+            [step]="15"
+            maskPlaceholder="HH:MM"
+          >
+          </ejs-timepicker>
+        </div>
+      </div>
+    </div>
+    <div class="input-container bootstrap">
+      <label >Grouping By<span class="required">*</span></label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist
+          appValidateWithMessage
+          [dataSource]="groupInvoicesOptions"
+          [fields]="groupInvoicesFields"
+          formControlName="groupingBy"
+        >
+        </ejs-dropdownlist>
+      </div>
+    </div>
+  </form>
+
     <div [ngSwitch]="formControlType">
       <ng-container *ngSwitchCase="organizationSettingControlType.Checkbox">
         <ng-container *ngTemplateOutlet="switcher"></ng-container>
       </ng-container>
 
       <ng-container *ngSwitchCase="organizationSettingControlType.FixedKeyDictionary">
+        <ng-container *ngTemplateOutlet="switcher"></ng-container>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="organizationSettingControlType.InvoiceAutoGeneration">
         <ng-container *ngTemplateOutlet="switcher"></ng-container>
       </ng-container>
 
