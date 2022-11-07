@@ -60,8 +60,20 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private unsubscribe$: Subject<void> = new Subject();
   private candidateId: number;
 
+  get candidateStatus(): ApplicantStatus {
+    return this.candidate.status || (this.candidate.candidateStatus as any);
+  }
+
   get isDeployedCandidate(): boolean {
-    return !!this.candidate.deployedCandidateInfo && this.candidate.candidateStatus !== ApplicantStatus.OnBoarded;
+    return !!this.candidate.deployedCandidateInfo && this.candidateStatus !== ApplicantStatus.OnBoarded;
+  }
+
+  get isOnboardedCandidate(): boolean {
+    return this.candidateStatus === ApplicantStatus.OnBoarded;
+  }
+
+  get isAcceptedCandidate(): boolean {
+    return this.candidateStatus === ApplicantStatus.Accepted;
   }
 
   constructor(
@@ -72,8 +84,8 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   ) {}
 
   ngOnChanges(): void {
-    this.readOnlyMode = !!this.isDeployedCandidate && this.isAgency;
-    this.showComments = this.candidate.status !== ApplicantStatus.NotApplied;
+    this.readOnlyMode = this.isOnboardedCandidate && this.isAcceptedCandidate && this.isAgency;
+    this.showComments = this.candidateStatus !== ApplicantStatus.NotApplied;
   }
 
   ngOnInit(): void {

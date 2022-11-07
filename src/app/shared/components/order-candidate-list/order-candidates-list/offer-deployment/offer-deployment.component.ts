@@ -148,6 +148,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public canOnboard = false;
   public canClose = false;
 
+  get candidateStatus(): ApplicantStatusEnum {
+    return this.candidate.status || (this.candidate.candidateStatus as any);
+  }
+
   constructor(
     private store: Store,
     private actions$: Actions,
@@ -157,10 +161,11 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   ) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
-    this.readOnlyMode =
-      changes['candidate']?.currentValue.status === ApplicantStatusEnum.Withdraw ||
-      changes['candidate']?.currentValue.status === ApplicantStatusEnum.Rejected;
-    this.isClosedPosition = this.candidate.candidateStatus === ApplicantStatusEnum.Offboard;
+    if (changes['candidate']?.currentValue) {
+      this.readOnlyMode =
+        this.candidateStatus === ApplicantStatusEnum.Withdraw || this.candidateStatus === ApplicantStatusEnum.Rejected;
+      this.isClosedPosition = this.candidateStatus === ApplicantStatusEnum.Offboard;
+    }
 
     this.checkRejectReason();
     this.switchFormState();
@@ -431,14 +436,14 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private switchFormState(): void {
-    if (this.isDeployedCandidate) {
+    if (this.isReadOnly) {
       this.formGroup?.disable();
     } else {
       this.formGroup?.enable();
     }
   }
 
-  public onReject(): void {
+  private onReject(): void {
     this.store.dispatch(new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
   }

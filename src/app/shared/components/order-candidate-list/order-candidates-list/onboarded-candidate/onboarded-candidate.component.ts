@@ -595,7 +595,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     }
   }
 
-  public onReject(): void {
+  private onReject(): void {
     this.store.dispatch(new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
   }
