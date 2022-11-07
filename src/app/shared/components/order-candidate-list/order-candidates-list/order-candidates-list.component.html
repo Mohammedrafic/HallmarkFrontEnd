@@ -175,7 +175,7 @@
       (closeModalEvent)="onCloseDialog()"
       [candidate]="candidate"
       [isAgency]="isAgency"
-      [actionsAllowed]="agencyActionsAllowed"
+      [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
       [deployedCandidateOrderIds]="(deployedCandidateOrderIds$ | async) ?? []"
     ></app-accept-candidate>
   </ng-template>
@@ -188,7 +188,7 @@
       [isAgency]="isAgency"
       [order]="$any((selectedAgOrder$ | async))"
       [isLocked]="(selectedAgOrder$ | async)?.isLocked"
-      [actionsAllowed]="agencyActionsAllowed"
+      [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
       [deployedCandidateOrderIds]="(deployedCandidateOrderIds$ | async) ?? []"
     >
     </app-apply-candidate>

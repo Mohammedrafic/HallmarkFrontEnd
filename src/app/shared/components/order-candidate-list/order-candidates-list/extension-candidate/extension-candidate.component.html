@@ -24,19 +24,23 @@
           >
           </ejs-dropdownlist>
         </div>
-        <button
-          ejs-button
-          cssClass="e-outline"
-          [isPrimary]="true"
-          *ngIf="canAccept"
-          [disabled]="!actionsAllowed"
-          (click)="onReject()"
-        >
-          Reject
-        </button>
-        <button ejs-button [isPrimary]="true" *ngIf="canAccept" [disabled]="!actionsAllowed" (click)="onAccept()">
-          Accept
-        </button>
+        <app-tooltip-container [showToolTip]="!actionsAllowed">
+          <button
+            ejs-button
+            cssClass="e-outline"
+            [isPrimary]="true"
+            *ngIf="canAccept"
+            [disabled]="!actionsAllowed"
+            (click)="onReject()"
+          >
+            Reject
+          </button>
+        </app-tooltip-container>
+        <app-tooltip-container [showToolTip]="!actionsAllowed">
+          <button ejs-button [isPrimary]="true" *ngIf="canAccept" [disabled]="!actionsAllowed" (click)="onAccept()">
+            Accept
+          </button>
+        </app-tooltip-container>
       </div>
     </div>
   </section>

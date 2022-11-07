@@ -18,6 +18,7 @@ import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigatio
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 
+import { AbstractPermission } from "@shared/helpers/permissions";
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
 import { AgencyOrderManagement, Order, OrderCandidatesListPage } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
@@ -36,7 +37,7 @@ import { UserState } from '../../../../store/user.state';
   styleUrls: ['./preview-order-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
+export class PreviewOrderDialogComponent extends AbstractPermission implements OnInit, OnChanges, OnDestroy {
   @Input() order: AgencyOrderManagement;
   @Input() openEvent: Subject<boolean>;
   @Input() orderPositionSelected$: Subject<boolean>;
@@ -95,7 +96,11 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
 
   @Output() selectReOrder = new EventEmitter<any>();
 
-  constructor(private chipsCssClass: ChipsCssClass, private store: Store, private cd: ChangeDetectorRef) {}
+  constructor(private chipsCssClass: ChipsCssClass,
+              protected override store: Store,
+              private cd: ChangeDetectorRef) {
+    super(store);
+  }
 
   public get isReOrder(): boolean {
     return !isNil(this.order?.reOrderId || this.order?.id);
@@ -107,7 +112,8 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
     );
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.onOpenEvent();
     this.subsToSelectedOrder();
     this.subscribeOnOrderCandidatePage();
@@ -120,7 +126,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
     }
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.isAlive = false;
     this.unsubscribe$.next();
     this.unsubscribe$.complete();

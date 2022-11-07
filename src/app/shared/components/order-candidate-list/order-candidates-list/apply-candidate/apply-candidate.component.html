@@ -13,14 +13,16 @@
           </e-chips>
         </ejs-chiplist>
       <div class="e-card-content">
-        <button
-          ejs-button
-          [isPrimary]="true"
-          [disabled]="isLocked || !actionsAllowed"
-          class="apply-button"
-          (click)="applyOrderApplicants()">
-          Apply
-        </button>
+        <app-tooltip-container [showToolTip]="!actionsAllowed">
+          <button
+            ejs-button
+            [isPrimary]="true"
+            [disabled]="isLocked || !actionsAllowed"
+            class="apply-button"
+            (click)="applyOrderApplicants()">
+            Apply
+          </button>
+        </app-tooltip-container>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
           <i-feather name="x" class="icon"></i-feather>
         </button>

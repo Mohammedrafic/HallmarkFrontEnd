@@ -125,5 +125,5 @@
   [candidateJob]="candidateJob"
   [isAgency]="isAgency"
   [isLocked]="order?.isLocked"
-  [actionsAllowed]="agencyActionsAllowed"
+  [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
 ></app-candidates-status-modal>

@@ -29,12 +29,12 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GetAllOrganizationSkills, GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import { FilteredItem } from '@shared/models/filter.model';
 import {
   FilterOrderStatus,
@@ -128,7 +128,7 @@ import { PreservedFilters } from '@shared/models/preserved-filters.model';
   styleUrls: ['./order-management-content.component.scss'],
   providers: [VirtualScrollService, DetailRowService, MaskedDateTimeService],
 })
-export class OrderManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class OrderManagementContentComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') override gridWithChildRow: GridComponent;
   @ViewChild('search') search: SearchComponent;
   @ViewChild('detailsDialog') detailsDialog: OrderDetailsDialogComponent;
@@ -207,6 +207,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private search$ = new Subject();
   public selectedDataRow: OrderManagement;
 
+  public hasCreateEditOrderPermission: boolean;
   public selectedOrder: Order;
   public openDetails = new Subject<boolean>();
   public orderPositionSelected$ = new Subject<{ state: boolean; index?: number }>();
@@ -258,7 +259,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private filterApplied = false;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private router: Router,
     private route: ActivatedRoute,
     private actions$: Actions,
@@ -274,7 +275,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     private reOpenOrderService: ReOpenOrderService,
     private permissionService: PermissionService
   ) {
-    super();
+    super(store);
     this.isRedirectedFromDashboard =
       this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromDashboard'] || false;
     this.orderStaus = this.router.getCurrentNavigation()?.extras?.state?.['orderStatus'] || 0;
@@ -317,7 +318,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     });
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
+    this.hasCreateEditOrderPermission = this.userPermission[this.userPermissions.CanCreateOrders]
+      || this.userPermission[this.userPermissions.CanOrganizationEditOrders]
     this.handleDashboardFilters();
     this.orderFilterColumnsSetup();
 
