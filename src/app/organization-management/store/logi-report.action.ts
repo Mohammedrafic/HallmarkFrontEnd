@@ -24,5 +24,5 @@ export class ClearLogiReportState {
 }
 export class GetFinancialTimeSheetReportFilterOptions{
   static readonly type = '[LogiReport] Get Financial TimeSheet Report Filter Options';
-  constructor(public filter?: FinancialTimeSheetFilter) { }
+  constructor(public filter: FinancialTimeSheetFilter) { }
 }

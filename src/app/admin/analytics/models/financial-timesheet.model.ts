@@ -1,19 +1,21 @@
+import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 
 export class FinancialTimeSheetReportFilterOptions {    
       orderStatuses: {
-        status: number;
+        status: string;
         statusText: string;
       }[];
       candidateStatuses: {
-        status: number;
+        status: ApplicantStatus;
         statusText: string;
       }[];
       masterSkills: {
         id:number;
-        businessUnitId?:number;
+        organizationid?:number;
         skillCategoryId:number;
-        skillAbbr:string;
-        skillDescription:string;
+        Name:string;
+        Description:string;
+        Abbr:string;        
       }[];
       skillCategories: {
         id: number;
@@ -21,5 +23,5 @@ export class FinancialTimeSheetReportFilterOptions {
       }[];
   }
   export class FinancialTimeSheetFilter {
-    businessUnitIds:number[]
+    businessUnitIds: number[]
   }

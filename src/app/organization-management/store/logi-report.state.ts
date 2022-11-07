@@ -45,6 +45,10 @@ export class LogiReportState {
     @Selector()
     static logiReportData(state: LogiReportStateModel): ConfigurationDto[]  { return state.logiReportDto; }
 
+    @Selector()
+    static financialTimeSheetFilterData(state: LogiReportStateModel): FinancialTimeSheetReportFilterOptions|null  { return state.financialTimeSheetFilterOptions; }
+    
+
     @Action(GetRegionsByOrganizations)
     GetRegionsByOrganizations({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<Region[]> {
         return this.logiReportService.getRegionsByOrganizationId(filter).pipe(tap((payload: any) => {

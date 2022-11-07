@@ -14,7 +14,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType, GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetFinancialTimeSheetReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
@@ -29,6 +29,8 @@ import { User } from '@shared/models/user.model';
 import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
+import { FinancialTimeSheetFilter, FinancialTimeSheetReportFilterOptions } from '../models/financial-timesheet.model';
+import { OrderTypeOptions } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-client-finance-accrual-report',
@@ -72,6 +74,10 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
 
   @Select(LogiReportState.logiReportData)
   public logiReportData$: Observable<ConfigurationDto[]>;
+
+  @Select(LogiReportState.financialTimeSheetFilterData)
+  public financialTimeSheetFilterData$: Observable<FinancialTimeSheetReportFilterOptions>;
+  
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
   selectedOrganizations: Organisation[];
@@ -108,6 +114,7 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
   public isInitialLoad: boolean = false;  
   public baseUrl:string='';  
   public user: User | null;
+  public filterOptions:FinancialTimeSheetReportFilterOptions;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -129,6 +136,12 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
   ngOnInit(): void {
     
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => { 
+      this.financialTimeSheetFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:FinancialTimeSheetReportFilterOptions|null) => { 
+        if(data!=null)
+        {
+          this.filterOptions=data;
+        }
+        });
       this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:ConfigurationDto[])=>{
         if(data.length>0)
@@ -138,6 +151,8 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
      });  
       this.agencyOrganizationId=data;   
       this.isInitialLoad = true;
+      let filter=new FinancialTimeSheetFilter();
+      this.store.dispatch(new GetFinancialTimeSheetReportFilterOptions(filter));
       this.orderFilterColumnsSetup();
       this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.accrualReportTypes)?.setValue(0);
       this.onFilterControlValueChangedHandler();
@@ -306,8 +321,51 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
         valueField: 'name',
         valueId: 'id',
       },
+      skillCategoryIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      skillIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      candidateName: {
+        type: ControlTypes.Text,
+        valueType: ValueType.Text
+      },
+      candidateStatuses: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Text,
+        dataSource: [],
+        valueField: 'statusText',
+        valueId: 'status',
+      },
+      orderTypes: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: OrderTypeOptions,
+        valueField: 'name',
+        valueId: 'id',
+      },
       startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       endDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      jobStatuses: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Text,
+        dataSource: [],
+        valueField: 'statusText',
+        valueId: 'status',
+      },
+      jobId: {
+        type: ControlTypes.Text,
+        valueType: ValueType.Text
+      },
       accrualReportTypes:{
         type:ControlTypes.Dropdown,
         valueType: ValueType.Id,
