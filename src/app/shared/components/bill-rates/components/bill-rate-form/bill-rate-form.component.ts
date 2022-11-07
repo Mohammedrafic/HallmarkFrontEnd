@@ -175,7 +175,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
         if (billRateConfig) {
           this.setBillTypesAndUpdateControl(billRateConfig.billTypes);
           this.selectedBillRateUnit = billRateConfig.unit;
-          this.billRateForm.get('rateHour')?.setValue('');
+          this.billRateForm.get('rateHour')?.setValue('0');
           this.isIntervalMinEnabled = billRateConfig.intervalMin;
           this.isIntervalMaxEnabled = billRateConfig.intervalMax;
           this.isIntervalMinRequired = billRateConfig.intervalMinRequired;

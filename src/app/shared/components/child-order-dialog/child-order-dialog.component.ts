@@ -585,7 +585,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private getComments(): void {
     this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
         this.changeDetectorRef.markForCheck();
@@ -679,7 +679,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   }
 
   private subscribeOnSelectedOrder() {
-    this.selectedOrder$.pipe(takeUntil(this.destroy$))
+    this.selectedOrder$.pipe(takeUntil(this.componentDestroy()))
     .subscribe((data) => {
       this.selectedOrder = data;
     });
@@ -710,7 +710,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   private subscribeOnPermissions(): void {
     this.permissionService.getPermissions()
-    .pipe(takeUntil(this.destroy$))
+    .pipe(takeUntil(this.componentDestroy()))
     .subscribe(({ canCloseOrder, canCreateOrder }) => {
       this.canCreateOrder = canCreateOrder;
       this.canCloseOrder = canCloseOrder;

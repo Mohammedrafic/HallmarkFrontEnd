@@ -4,10 +4,12 @@
       <h3>Bill Rates</h3>
     </div>
     <div *ngIf="!readOnly" class="actions">
-      <span class="action-link" (click)="addNew()">
-        <i-feather name="plus" class="icon"></i-feather>
-        Add Bill Rate
-      </span>
+      <app-tooltip-container [showToolTip]="disabledActionMode">
+        <button ejs-button [disabled]="disabledActionMode" class="action-link" (click)="addNew()">
+          <i-feather name="plus" class="icon"></i-feather>
+          Add Bill Rate
+        </button>
+      </app-tooltip-container>
     </div>
   </div>
   <ejs-grid #grid class="e-gridwithheader"
@@ -25,10 +27,10 @@
       <e-column [visible]="!readOnly" textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit($event, data)">
+            <button ejs-button [disabled]="disabledActionMode" cssClass="e-flat primary-icon-button" (click)="onEdit($event, data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" [disabled]="data.isPredefined" (click)="onRemove($event, data)">
+            <button ejs-button cssClass="e-flat secondary-icon-button" [disabled]="data.isPredefined || disabledActionMode" (click)="onRemove($event, data)">
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>

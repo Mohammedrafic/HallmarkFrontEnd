@@ -24,6 +24,12 @@ export class FilterService {
     }
   }
 
+  public setPreservedFIltersGlobal(filters: any, regionPropName = 'regionsNames'): void {
+    if (this.canPreserveFilters()) {
+      this.store.dispatch(new SetPreservedFilters({ regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null }, true));
+    }
+  }
+
   /**
    * Remove value from form control
    * @param event item to remove

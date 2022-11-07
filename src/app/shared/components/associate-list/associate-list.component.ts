@@ -48,7 +48,7 @@ export class AssociateListComponent extends AbstractPermission implements OnInit
   private checkForAgencyStatus(): void {
     this.store
       .select(UserState.agencyActionsAllowed)
-      .pipe(distinctUntilChanged(), takeUntil(this.destroy$))
+      .pipe(distinctUntilChanged(), takeUntil(this.componentDestroy()))
       .subscribe((value) => {
         this.agencyActionsAllowed = value;
       });
