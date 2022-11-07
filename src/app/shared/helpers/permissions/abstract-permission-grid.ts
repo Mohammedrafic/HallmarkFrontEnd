@@ -1,14 +1,16 @@
+import { Directive, OnInit } from "@angular/core";
+
 import { Permission, PermissionGrid } from "@core/interface";
 import { UserPermissions } from "@core/enums";
 import { REQUIRED_PERMISSIONS } from "@shared/constants";
 import { Store } from "@ngxs/store";
 import { UserState } from "../../../store/user.state";
-import { Directive, OnInit } from "@angular/core";
 import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
+import { filter, take } from 'rxjs';
 
 @Directive()
 export abstract class AbstractPermissionGrid extends AbstractGridConfigurationComponent implements OnInit, PermissionGrid {
-  public userPermission: Permission;
+  public userPermission: Permission = {};
   public readonly userPermissions = UserPermissions;
   public readonly toolTipMessage = REQUIRED_PERMISSIONS;
 
@@ -23,6 +25,9 @@ export abstract class AbstractPermissionGrid extends AbstractGridConfigurationCo
   }
 
   private getPermission(): void {
-    this.userPermission = this.store.selectSnapshot(UserState.userPermission);
+    this.store.select(UserState.userPermission).pipe(
+      filter((permissions: Permission) => !!Object.keys(permissions).length),
+      take(1)
+    ).subscribe((permissions: Permission) => this.userPermission = permissions);
   }
 }

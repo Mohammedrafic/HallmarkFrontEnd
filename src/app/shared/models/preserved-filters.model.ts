@@ -3,3 +3,8 @@ export type PreservedFilters = {
   regions: number[],
   locations: number[]
 };
+
+export type PreservedFiltersGlobal = {
+  regions: string[],
+  locations: string[]
+};
