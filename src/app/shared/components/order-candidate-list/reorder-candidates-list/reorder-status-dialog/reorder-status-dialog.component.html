@@ -112,10 +112,14 @@
             </ng-template>
           </ejs-dropdownlist>
         </div>
-        <button ejs-button class="e-outline"
-          [disabled]="!actionsAllowed" (click)="onReject()" *ngIf="isOfferedBillRate">Reject</button>
-        <button ejs-button [isPrimary]="true" class="apply-button"
-          [disabled]="!actionsAllowed" (click)="onAccept()" *ngIf="showAccept">Accept</button>
+        <app-tooltip-container [showToolTip]="!actionsAllowed">
+          <button ejs-button class="e-outline"
+                  [disabled]="!actionsAllowed" (click)="onReject()" *ngIf="isOfferedBillRate">Reject</button>
+        </app-tooltip-container>
+        <app-tooltip-container [showToolTip]="!actionsAllowed">
+          <button ejs-button [isPrimary]="true" class="apply-button"
+                  [disabled]="!actionsAllowed" (click)="onAccept()" *ngIf="showAccept">Accept</button>
+        </app-tooltip-container>
       </div>
       <hr class="mobile" />
     </ng-container>

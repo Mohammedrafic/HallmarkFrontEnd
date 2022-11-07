@@ -59,8 +59,12 @@
               <ng-template #headerText>Candidates <span class="e-badge e-badge-success e-badge-circle">{{countOrderCandidates$ | async}}</span></ng-template>
               <ng-template #content>
                 <ng-container *ngIf="currentOrder">
-                  <app-extension-candidate [actionsAllowed]="agencyActionsAllowed" *ngIf="currentOrder.extensionFromId; else candidateOrder" [currentOrder]="currentOrder" [dialogEvent]="openEvent">
-                  </app-extension-candidate>
+                  <app-extension-candidate
+                    [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
+                    *ngIf="currentOrder.extensionFromId; else candidateOrder"
+                    [currentOrder]="currentOrder"
+                    [dialogEvent]="openEvent"
+                  ></app-extension-candidate>
                 </ng-container>
                 <ng-template #candidateOrder>
                   <app-candidates-order [currentOrder]="currentOrder"></app-candidates-order>

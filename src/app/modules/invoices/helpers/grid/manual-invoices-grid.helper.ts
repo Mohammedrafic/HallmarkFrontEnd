@@ -8,7 +8,14 @@ import {
   InvoicesContainerGridHelper
 } from './invoices-container-grid.helper';
 import { InvoiceRecordType } from '../../enums';
-import { amountColDef, rejectionReasonColDef, vendorFeeAppliedColDef } from '../../constants';
+import {
+  amountColDef,
+  commentColDef,
+  linkedInvoiceIdColDef,
+  reasonCodeColDef,
+  rejectionReasonColDef,
+  vendorFeeAppliedColDef
+} from '../../constants';
 import { GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import { AgencyStatus } from '@shared/enums/status';
 
@@ -73,20 +80,20 @@ export class ManualInvoicesGridHelper {
           const { status } = params.data as ManualInvoice;
 
           return {
-            actionsConfig: [
+            actionsConfig: canEdit ? [
               {
                 action: edit,
                 iconName: 'edit',
                 iconClass: 'color-primary-active-blue-10',
-                disabled: [PendingInvoiceStatus.Approved].includes(status) || !canEdit,
+                disabled: [PendingInvoiceStatus.Approved].includes(status),
               },
               {
                 action: deleteInvoice,
                 iconName: 'trash-2',
                 iconClass: 'color-supportive-red',
-                disabled: [PendingInvoiceStatus.Approved].includes(status) || !canEdit,
+                disabled: [PendingInvoiceStatus.Approved].includes(status),
               },
-            ],
+            ] : [],
           }
         },
         headerCheckboxSelection: true,
@@ -112,6 +119,9 @@ export class ManualInvoicesGridHelper {
       },
       vendorFeeAppliedColDef,
       rejectionReasonColDef,
+      commentColDef,
+      linkedInvoiceIdColDef,
+      reasonCodeColDef,
       {
         ...attachments,
         cellRendererParams: (params: ICellRendererParams) => {

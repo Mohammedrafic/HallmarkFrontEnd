@@ -105,6 +105,7 @@ import { FilterDialogModule } from '@shared/components/filter-dialog/filter-dial
 import { DeployCandidateMessageComponent } from './components/order-candidate-list/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
 import { ExBillRateNamesPipe } from '@shared/pipes/external-bill-rate-names.pipe';
 import { SideMenuModule } from '@shared/components/side-menu/side-menu.module';
+import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 import { SecurityState } from '../security/store/security.state';
 import { NavigationPanelComponent } from './components/navigation-panel/navigation-panel.component';
 import { CandidateAvatarPipe } from './pipes/candidate-avatar.pipe';
@@ -192,7 +193,6 @@ const COMPONENTS = [
   MessageToastComponent,
   FileUploadDialogComponent,
   ExportDialogComponent,
-  SearchComponent,
   DialogNextPreviousComponent,
   OrderDetailsComponent,
   SearchComponent,
@@ -200,9 +200,6 @@ const COMPONENTS = [
   GeneralOrderPerDiemInfoComponent,
   OrderCandidatesListComponent,
   OrderPerDiemCandidatesListComponent,
-  CustomProgressBarComponent,
-  ApplyCandidateComponent,
-  AcceptCandidateComponent,
   CustomProgressBarComponent,
   BillRatesViewGridComponent,
   CommentsComponent,
@@ -223,7 +220,6 @@ const COMPONENTS = [
   ReorderCandidatesListComponent,
   OrderReOrdersContainerComponent,
   ExtensionCandidateComponent,
-  ActionCellRendererComponent,
   CustomIconComponent,
   ActionCellRendererComponent,
   EmailSideDialogComponent,
@@ -270,6 +266,7 @@ const COMPONENTS = [
     MaskedTextBoxAllModule,
     TabAllModule,
     DropDownButtonAllModule,
+    TooltipContainerModule,
     NgxsModule.forFeature([BillRateState, SecurityState, CommentsState, AlertsState, OrderManagementState]),
     PageToolbarModule,
     FilterDialogModule,
@@ -291,7 +288,7 @@ const COMPONENTS = [
     ErrorMessageComponent,
     CandidateAvatarPipe,
     AcceptFormComponent,
-    
+
     ImportDialogContentComponent,
     MultiSelectModule
   ],
@@ -313,7 +310,7 @@ const COMPONENTS = [
     SendEmailSideDialogComponent,
     DocumentPreviewSideDialogComponent,
     CustomSideDialogComponent,
-    
+
   ],
   providers: [
     DatePipe,
