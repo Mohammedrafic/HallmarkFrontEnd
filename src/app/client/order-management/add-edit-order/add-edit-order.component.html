@@ -75,6 +75,7 @@
             #billRates
             [billRates]="orderBillRates"
             [isActive]="selectedTab === SelectedTab.BillRates"
+            [isOrderPage]="true"
             (billRatesChanged)="onBillRatesChanged()"
             (hourlyRateSync)="hourlyRateToOrderSync($event)"
           >
