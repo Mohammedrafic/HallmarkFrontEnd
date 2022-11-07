@@ -25,6 +25,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
 
   @Input() isActive: boolean | null = false;
   @Input() readOnlyMode = false;
+  @Input() isOrderPage = false;
   @Input() disabledActionMode: boolean;
   @Input() set billRates(values: BillRate[]) {
     if (values) {
@@ -217,7 +218,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
 
       const applicantStatus = this.store.selectSnapshot(OrderManagementContentState.candidatesJob)?.applicantStatus.applicantStatus;
 
-      if (applicantStatus === CandidatStatus.OnBoard) {
+      if (applicantStatus === CandidatStatus.OnBoard && !this.isOrderPage) {
         const confirmText = this.editBillRateIndex ? EDIT_CONFIRM_TEXT : ADD_CONFIRM_TEXT;
 
         this.confirmService
