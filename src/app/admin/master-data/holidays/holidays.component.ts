@@ -12,7 +12,13 @@ import { endDateValidator, startDateValidator } from '@shared/validators/date.va
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SetDirtyState } from 'src/app/admin/store/admin.actions';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import {
+  CANCEL_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+  ERROR_START_LESS_END_DATE
+} from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { DateTimeHelper } from '@core/helpers';
@@ -52,6 +58,7 @@ export class MasterHolidaysComponent extends AbstractPermissionGrid implements O
   public fileName: string;
   public defaultFileName: string;
   public yearFilter: number;
+  public datesValidationMessage = ERROR_START_LESS_END_DATE;
 
   constructor(protected override store: Store,
               private actions$: Actions,
