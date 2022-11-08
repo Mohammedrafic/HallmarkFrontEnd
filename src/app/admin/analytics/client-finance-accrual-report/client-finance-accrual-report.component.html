@@ -67,7 +67,7 @@
     </div>
     <div class="form-elemet">
       <div class="group">
-        <div class="input-container calendar">
+        <div class="input-container bootstrap">
           <label>Skill Category</label>
           <div class="input-group dropdown">
             <ejs-multiselect mode="CheckBox" formControlName="skillCategoryIds" placeholder="All"
@@ -76,9 +76,9 @@
             </ejs-multiselect>
           </div>
         </div>
-        <div class="input-container dropdown">
+        <div class="input-container bootstrap">
           <label>Skills</label>
-          <div class="input-group datepicker">
+          <div class="input-group dropdown">
             <ejs-multiselect mode="CheckBox" formControlName="skillIds"  placeholder="All"
               [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skillIds.dataSource"
               [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
@@ -89,17 +89,17 @@
     </div>
     <div class="form-elemet">
       <div class="group">
-        <div class="input-container calendar">
+        <div class="input-container bootstrap">
           <label>Candidate Name</label>
           <div class="input-group dropdown">          
             <ejs-autocomplete formControlName="candidateName"  [dataSource]="filterColumns.candidateName.dataSource" 
              filterType='StartsWith' [fields]='candidateNameFields'
-                    [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending'></ejs-autocomplete>
+                    [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending' (filtering)='onFiltering($event)'></ejs-autocomplete>
           </div>
         </div>
-        <div class="input-container dropdown">
+        <div class="input-container bootstrap">
           <label>Candidate Status</label>
-          <div class="input-group datepicker">
+          <div class="input-group dropdown">
             <ejs-multiselect mode="CheckBox" formControlName="candidateStatuses"  placeholder="All"
               [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.candidateStatuses.dataSource"
               [fields]="candidateStatusesFields" [selectAllText]='allOption' showSelectAll=true>
@@ -130,6 +130,39 @@
       </div>
     </div>
     <div class="form-elemet">
+      <div class="group">
+        <div class="input-container bootstrap">
+          <label>Order Type</label>
+          <div class="input-group dropdown">
+              <ejs-multiselect mode="CheckBox" formControlName="orderTypes"  placeholder="All"
+              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.orderTypes.dataSource"
+              [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container bootstrap">
+          <label>Job Status</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox" formControlName="jobStatuses"  placeholder="All"
+              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.jobStatuses.dataSource"
+              [fields]="jobStatusesFields" [selectAllText]='allOption' showSelectAll=true>
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-elemet">
+      <div class="group">
+      <div class="input-container dropdown">
+        <label>Job Id</label>
+        <div class="input-group">
+          <input class="e-input"
+                 type="text"
+                 appValidateWithMessage
+                 maxlength="50"
+                 formControlName="jobId" />
+        </div>
+      </div>
       <div class="input-container bootstrap">
         <label>Report Type<span class="required">*</span></label>
         <div class="input-group dropdown">
@@ -137,6 +170,7 @@
             [fields]="accrualReportTypeFields" [dataSource]="filterColumns.accrualReportTypes.dataSource"
             placeholder=""></ejs-dropdownlist>
         </div>
+      </div>
       </div>
     </div>
 

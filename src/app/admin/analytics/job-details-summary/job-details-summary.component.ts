@@ -158,7 +158,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       };
       this.store.dispatch(new GetJobDetailSummaryReportFilterOptions(filter));
       this.orderFilterColumnsSetup();
-      this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.accrualReportTypes)?.setValue(1);
+      this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
       this.onFilterControlValueChangedHandler();
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
@@ -400,7 +400,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue([]);
     this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
-    this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.candidateStatuses)?.setValue(null);
+    this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue(null);
     this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue(null);
     this.filteredItems = [];
   }
