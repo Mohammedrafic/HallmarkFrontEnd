@@ -13,7 +13,6 @@ import { OrderApplicantsInitialData } from '@shared/models/order-applicants.mode
 import {
   AgencyOrderManagement,
   AgencyOrderManagementPage,
-  CandidatesBasicInfo,
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
@@ -38,8 +37,7 @@ import {
   GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
   GetCandidateJob,
-  GetCandidatesBasicInfo,
-  GetDeployedCandidateOrderIds,
+  GetDeployedCandidateOrderInfo,
   GetOrderApplicantsData,
   GetOrderById,
   GetOrganizationStructure,
@@ -61,14 +59,13 @@ import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.e
 import { ExtensionGridModel } from '@shared/components/extension/extension-sidebar/models/extension.model';
 import { OrderManagementContentStateModel } from '@client/store/order-managment-content.state';
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
-import { OverlappedOrderIds } from '@shared/models/overlapped-orders-dto.model';
+import { OverlappedOrderInfo } from '@shared/models/overlapped-orders-dto.model';
 
 export interface OrderManagementModel {
   ordersPage: AgencyOrderManagementPage | null;
   orderCandidatesListPage: OrderCandidatesListPage | null;
   orderCandidatesInformation: Order | null;
   candidatesJob: OrderCandidateJob | null;
-  candidatesBasicInfo: CandidatesBasicInfo | null;
   orderApplicantsInitialData: OrderApplicantsInitialData | null;
   selectedOrder: Order | null;
   orderDialogOptions: DialogNextPreviousOption;
@@ -78,7 +75,7 @@ export interface OrderManagementModel {
   organizationStructure: OrganizationStructure[];
   ordersTab: AgencyOrderManagementTabs;
   extensions: any;
-  deployedCandidateOrderIds: string[];
+  deployedCandidateOrderInfo: OverlappedOrderInfo[];
 }
 
 @State<OrderManagementModel>({
@@ -90,7 +87,6 @@ export interface OrderManagementModel {
     orderApplicantsInitialData: null,
     selectedOrder: null,
     candidatesJob: null,
-    candidatesBasicInfo: null,
     rejectionReasonsList: [],
     orderDialogOptions: {
       next: false,
@@ -101,7 +97,7 @@ export interface OrderManagementModel {
     historicalEvents: [],
     ordersTab: AgencyOrderManagementTabs.MyAgency,
     extensions: null,
-    deployedCandidateOrderIds: [],
+    deployedCandidateOrderInfo: [],
   },
 })
 @Injectable()
@@ -186,11 +182,6 @@ export class OrderManagementState {
   }
 
   @Selector()
-  static candidateBasicInfo(state: OrderManagementModel): CandidatesBasicInfo | null {
-    return state.candidatesBasicInfo;
-  }
-
-  @Selector()
   static ordersTab(state: OrderManagementModel): AgencyOrderManagementTabs | null {
     return state.ordersTab;
   }
@@ -205,8 +196,8 @@ export class OrderManagementState {
   }
 
   @Selector()
-  static deployedCandidateOrderIds(state: OrderManagementModel): string[] {
-    return state.deployedCandidateOrderIds;
+  static deployedCandidateOrderInfo(state: OrderManagementModel): OverlappedOrderInfo[] {
+    return state.deployedCandidateOrderInfo;
   }
 
   constructor(
@@ -393,23 +384,6 @@ export class OrderManagementState {
       .pipe(tap((payload) => patchState({ organizationStructure: payload })));
   }
 
-  @Action(GetCandidatesBasicInfo)
-  GetCandidatesBasicInfo(
-    { patchState }: StateContext<OrderManagementModel>,
-    { organizationId, jobId }: GetCandidatesBasicInfo
-  ): Observable<CandidatesBasicInfo> {
-    return this.orderManagementContentService.getCandidatesBasicInfo(organizationId, jobId).pipe(
-      tap((payload) => {
-        patchState({ candidatesBasicInfo: payload });
-        return payload;
-      }),
-      catchError(() => {
-        patchState({ candidatesBasicInfo: null });
-        return of();
-      })
-    );
-  }
-
   @Action(ExportAgencyOrders)
   ExportAgencyOrders({}: StateContext<OrderManagementModel>, { payload, tab }: ExportAgencyOrders): Observable<any> {
     return this.orderManagementContentService.exportAgency(payload, tab).pipe(
@@ -440,14 +414,14 @@ export class OrderManagementState {
       .pipe(tap((extensions) => patchState({ extensions })));
   }
 
-  @Action(GetDeployedCandidateOrderIds)
-  getDeployedCandidateOrderIds(
+  @Action(GetDeployedCandidateOrderInfo)
+  GetDeployedCandidateOrderInfo(
     { patchState }: StateContext<OrderManagementModel>,
-    { orderId, candidateProfileId, organizationId }: GetDeployedCandidateOrderIds
-  ): Observable<string[]> {
-    return this.orderApplicantsService.getDeployedCandidateOrderIds(orderId, candidateProfileId, organizationId,).pipe(
-      map((data: OverlappedOrderIds[]) => data.map((dto) => dto.orgPrefix + '-' + dto.orderPublicId)),
-      tap((orderIds) => patchState({ deployedCandidateOrderIds: orderIds }))
+    { orderId, candidateProfileId, organizationId }: GetDeployedCandidateOrderInfo
+  ): Observable<OverlappedOrderInfo[]> {
+    return this.orderApplicantsService.GetDeployedCandidateOrderInfo(orderId, candidateProfileId, organizationId,).pipe(
+      map((data: OverlappedOrderInfo[]) => data.map((dto) => ({ ...dto, orderPublicId: dto.orgPrefix + '-' + dto.orderPublicId}))),
+      tap((orderIds) => patchState({ deployedCandidateOrderInfo: orderIds }))
     );
   }
 }
