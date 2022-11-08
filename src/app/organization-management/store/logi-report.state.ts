@@ -1,4 +1,4 @@
-import { FinancialTimeSheetReportFilterOptions } from "@admin/analytics/models/financial-timesheet.model";
+import { FinancialTimeSheetReportFilterOptions, SearchCandidate } from "@admin/analytics/models/financial-timesheet.model";
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { ConfigurationDto, LogiReportDto } from "@shared/models/analytics.model";
@@ -7,7 +7,7 @@ import { LocationsPage } from "@shared/models/location.model";
 import { Region, regionsPage } from "@shared/models/region.model";
 import { LogiReportService } from "@shared/services/logi-report.service";
 import { filter, Observable, tap } from "rxjs";
-import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetFinancialTimeSheetReportFilterOptions } from "./logi-report.action";
+import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetFinancialTimeSheetReportFilterOptions, GetFinancialTimeSheetCandidateSearch } from "./logi-report.action";
 
 export interface LogiReportStateModel {
 
@@ -16,6 +16,8 @@ export interface LogiReportStateModel {
     locations: Location[] | LocationsPage;
     logiReportDto:ConfigurationDto[];
     financialTimeSheetFilterOptions:FinancialTimeSheetReportFilterOptions|null;
+    searchCandidates:SearchCandidate[];
+
 }
 @State<LogiReportStateModel>({
     name: 'LogiReport',
@@ -25,7 +27,8 @@ export interface LogiReportStateModel {
         regions: [],
         locations: [],
         logiReportDto:[],
-        financialTimeSheetFilterOptions:null
+        financialTimeSheetFilterOptions:null,
+        searchCandidates:[]
     },
 })
 @Injectable()
@@ -48,6 +51,8 @@ export class LogiReportState {
     @Selector()
     static financialTimeSheetFilterData(state: LogiReportStateModel): FinancialTimeSheetReportFilterOptions|null  { return state.financialTimeSheetFilterOptions; }
     
+    @Selector()
+    static financialTimeSheetCandidateSearch(state: LogiReportStateModel): SearchCandidate[]  { return state.searchCandidates; }
 
     @Action(GetRegionsByOrganizations)
     GetRegionsByOrganizations({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<Region[]> {
@@ -105,6 +110,14 @@ export class LogiReportState {
     GetFinancialTimeSheetReportFilterOptions({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<FinancialTimeSheetReportFilterOptions> {
         return this.logiReportService.getFinancialTimeSheetReportFilterOptions(filter).pipe(tap((payload: any) => {           
                 patchState({ financialTimeSheetFilterOptions: payload });
+                return payload
+           
+        }));
+    }
+    @Action(GetFinancialTimeSheetCandidateSearch)
+    GetFinancialTimeSheetCandidateSearch({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<FinancialTimeSheetReportFilterOptions> {
+        return this.logiReportService.getFinancialTimeSheetCandidateSearch(filter).pipe(tap((payload: any) => {           
+                patchState({ searchCandidates: payload });
                 return payload
            
         }));

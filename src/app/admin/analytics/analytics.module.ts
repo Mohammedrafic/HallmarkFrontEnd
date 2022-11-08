@@ -5,7 +5,7 @@ import { CandidateListComponent } from './candidate-list/candidate-list.componen
 import { AnalyticsRoutingModule } from './analytics-routing.module';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { LogiWebReportComponent } from '@shared/components/logi-web-report/logi-web-report.component';
-import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListModule, MultiSelectAllModule,AutoCompleteAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxsModule } from '@ngxs/store';
 import { UserState } from 'src/app/store/user.state';
@@ -102,6 +102,7 @@ import { FeatherModule } from 'angular-feather';
     DatePickerModule,
     ButtonModule,
     FeatherModule,
+    AutoCompleteAllModule,
     NgxsModule.forFeature([OrganizationManagementState,UserState,SecurityState,LogiReportState])
   ]
 })

@@ -97,7 +97,6 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   public isClearAll: boolean = false;
   public isInitialLoad: boolean = false;
   public baseUrl: string = '';
-  private loadCounter = 0;
   public user: User | null;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
@@ -130,7 +129,6 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
       this.isInitialLoad = true;
       this.orderFilterColumnsSetup();
       this.onFilterControlValueChangedHandler();
-      this.loadCounter = this.loadCounter + 1;
       this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
     });
   }

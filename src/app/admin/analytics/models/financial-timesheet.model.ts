@@ -25,3 +25,13 @@ export class FinancialTimeSheetReportFilterOptions {
   export class FinancialTimeSheetFilter {
     businessUnitIds: number[]
   }
+  export class FinancialCandidateSearchFilter{
+    searchText:string;
+  }
+  export class SearchCandidate{
+    id:number;
+    firstName:string;
+    middleName:string|null;
+    lastName:string;
+    fullName:string;
+  }

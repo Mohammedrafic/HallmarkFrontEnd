@@ -325,7 +325,6 @@ export class JobDetailsComponent implements OnInit ,OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.jobDetailsForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.jobDetailsForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.jobDetailsForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.jobDetailsForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);

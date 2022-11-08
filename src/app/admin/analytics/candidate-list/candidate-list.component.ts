@@ -322,7 +322,6 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.candidateRegularRateForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.candidateRegularRateForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.candidateRegularRateForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.candidateRegularRateForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
