@@ -145,3 +145,8 @@ export class DeletDocumentFolderSucceeded {
   static readonly type = '[documentsLibrary] Delete document folder succeeded';
   constructor() { }
 }
+
+export class GetDocumentsByCognitiveSearch {
+  static readonly type = '[documentsLibrary] Get documents by CognitiveSearch';
+  constructor(public keyword: string) { }
+}

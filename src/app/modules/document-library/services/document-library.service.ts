@@ -143,6 +143,13 @@ export class DocumentLibraryService {
     return this.http.get<DocumentLibraryDto>(`/api/DocumentLibrary/GetById/${Id}`);
   }
 
+  public GetDocumentsByCognitiveSearch(keyword: string): Observable<DocumentLibraryDto> {
+    let params = new HttpParams();
+    params = params.append("Keyword", keyword);
+    params = params.append("IncludeContent", true);
+    return this.http.get<DocumentLibraryDto>(`/api/DocumentLibrary/CognitiveSearchDocuments`,{params: params});
+  }
+
   public GetSharedDocuments(documentsFilter: ShareDocumentInfoFilter): Observable<ShareDocumentInfoPage> {
     let params = new HttpParams();
     params = params.append("BusinessUnitType", documentsFilter == undefined ? 1 : documentsFilter.businessUnitType);
