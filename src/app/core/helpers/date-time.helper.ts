@@ -138,7 +138,7 @@ export class DateTimeHelper {
     let result = null;
 
     datesArray.forEach((el: string, idx: number) => {
-      const dateCheck: number = new Date(el).getTime();
+      const dateCheck: number = DateTimeHelper.convertDateToUtc(el).getTime();
       const diffTime = existDate - dateCheck;
 
       if (diffTime < closedToDate && dateCheck <= existDate) {
