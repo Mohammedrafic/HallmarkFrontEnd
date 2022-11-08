@@ -65,10 +65,10 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(associateListPage$ | async)?.totalCount}}
+              </div>
             </section>
-            <div class="total-rows">
-              Total Rows: {{(associateListPage$ | async)?.totalCount}}
-            </div>
             <section class="right-side-pager-controls">
               <ejs-pager
                 id="gridPager"

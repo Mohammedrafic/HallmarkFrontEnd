@@ -18,8 +18,6 @@ import { FilterName } from '../models/dashboard-filters.model';
 import { FilterKeys } from '../constants/filter-keys';
 import { FilterColumnTypeEnum } from '../enums/dashboard-filter-fields.enum';
 import { BusinessUnitType } from '../../shared/enums/business-unit-type';
-import { AppState } from '../../store/app.state';
-import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 
 @Component({
   selector: 'app-dashboard-control',
@@ -43,7 +41,7 @@ export class DashboardControlComponent extends DestroyableDirective implements O
 
   @Select(DashboardState.filteredItems) public readonly filteredItems$: Observable<FilteredItem[]>;
   @Select(UserState.organizationStructure) public readonly organizationStructure$: Observable<OrganizationStructure>;
-  @Select(AppState.isOrganizationAgencyArea) public readonly isOrganizationAgencyArea: Observable<IsOrganizationAgencyAreaStateModel>;
+  @Select(UserState.isAgencyUser) public readonly isAgencyUser: Observable<boolean>;
 
   public readonly isOpenQuickOrderDialod$: Subject<boolean> = new Subject<boolean>();
   public orderedFilters: Record<FilterName, FilteredItem[]>;
