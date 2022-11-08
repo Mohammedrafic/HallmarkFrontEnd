@@ -22,11 +22,16 @@
           Export <i-feather name="download" class="icon"></i-feather>
         </div>
       </button>
-      <button
-        ejs-button
-        id="addDepartmentButton"
-        [isPrimary]="true"
-        (click)="addHoliday()">Add Holiday</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditMasterHolidays]">
+        <button
+          ejs-button
+          [disabled]="!userPermission[userPermissions.CanEditMasterHolidays]"
+          id="addDepartmentButton"
+          [isPrimary]="true"
+          (click)="addHoliday()">Add Holiday</button>
+      </app-tooltip-container>
     </section>
   </section>
   <ejs-grid
@@ -52,13 +57,13 @@
       <e-column textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]=!isLoaded>
-            <button ejs-button cssClass="e-flat default-icon-button" (click)="copyHoliday(data, $event)">
+            <button ejs-button [disabled]="!userPermission[userPermissions.CanEditMasterHolidays]" cssClass="e-flat default-icon-button" (click)="copyHoliday(data, $event)">
               <span class="edit-button"><i-feather name="copy" class="icon"></i-feather></span>
             </button>
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="editHoliday(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteHoliday(data, $event)">
+            <button ejs-button [disabled]="!userPermission[userPermissions.CanEditMasterHolidays]" cssClass="e-flat secondary-icon-button" (click)="deleteHoliday(data, $event)">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -128,6 +133,7 @@
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-side-dialog
+  [disableSaveButton]="!userPermission[userPermissions.CanEditMasterHolidays]"
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveHoliday()"
   header="{{ title }} Holiday"
@@ -177,6 +183,9 @@
         </div>
       </div>
     </div>
+    <p *ngIf="(startTimeField?.errors || endTimeField?.errors) as errorObj" class="error">
+      {{ errorObj['invalidDate'] ? datesValidationMessage : '' }}
+    </p>
   </form>
 </app-side-dialog>
 

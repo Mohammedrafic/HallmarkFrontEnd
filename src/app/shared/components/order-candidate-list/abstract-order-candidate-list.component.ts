@@ -16,13 +16,13 @@ import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { AppState } from "src/app/store/app.state";
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
-import { AbstractGridConfigurationComponent } from '../abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrderManagementState } from '@agency/store/order-management.state';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 
 @Directive()
 export abstract class AbstractOrderCandidateListComponent
-  extends AbstractGridConfigurationComponent
+  extends AbstractPermissionGrid
   implements OnInit, OnDestroy
 {
   @ViewChild('orderCandidatesGrid') grid: GridComponent;
@@ -46,11 +46,12 @@ export abstract class AbstractOrderCandidateListComponent
   protected pageSubject = new Subject<number>();
   protected unsubscribe$: Subject<void> = new Subject();
 
-  constructor(protected store: Store, protected router: Router) {
-    super();
+  constructor(protected override store: Store, protected router: Router) {
+    super(store);
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.isAgency = this.router.url.includes('agency');
     this.isOrganization = this.router.url.includes('client');
 

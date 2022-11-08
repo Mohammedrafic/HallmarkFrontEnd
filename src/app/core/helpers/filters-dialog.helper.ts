@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Directive, EventEmitter, Inject, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Directive, EventEmitter, Inject, Input, Output, ViewChild } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { takeUntil } from 'rxjs';
@@ -9,14 +9,18 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { Destroyable } from '@core/helpers/destroyable.helper';
 import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
-import { CustomFormGroup } from '@core/interface';
+import { CustomFormGroup, DataSourceItem } from '@core/interface';
 import { leftOnlyValidValues } from '@core/helpers/validators.helper';
 import { APP_FILTERS_CONFIG, filterOptionFields } from '@core/constants/filters-helper.constant';
 
 import { findSelectedItems } from './functions.helper';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 
 @Directive()
 export class FiltersDialogHelper<T, F, S> extends Destroyable {
+  @ViewChild('regionMultiselect') regionMultiselect: MultiSelectComponent;
+  
   @Input() activeTabIdx: number;
 
   @Output() readonly updateTableByFilters: EventEmitter<F> = new EventEmitter<F>();
@@ -30,6 +34,8 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
   public filterColumns: T;
   public formGroup: CustomFormGroup<T>;
 
+  private isPreservedFilterSet = false;
+
   constructor(
     @Inject(APP_FILTERS_CONFIG) protected readonly filtersConfig: Record<string, string>,
     protected store: Store,
@@ -42,15 +48,37 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
 
   public applyFilters(): void {
     const filters: F = leftOnlyValidValues(this.formGroup);
+    const preservedFiltersState = this.formGroup.getRawValue();
 
     this.updateTableByFilters.emit(filters);
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
+
+    const orgs: number[] = [];
+    if (preservedFiltersState.regionsIds) {
+      (this.filterColumns as any).regionsIds?.dataSource?.forEach((val: DataSourceItem) => {
+        if (preservedFiltersState.regionsIds?.includes(val.id)) {
+          orgs.push(val.organizationId as number);
+        }
+      });
+      preservedFiltersState.organizationIds = orgs.filter((item, pos) => orgs.indexOf(item) == pos);
+    }
+    
+    this.filterService.setPreservedFIlters(preservedFiltersState, 'regionsIds');
   }
 
-  public clearAllFilters(eventEmmit = true): void {
-    this.formGroup.reset();
-    this.filteredItems = [];
+  public clearAllFilters(eventEmmit = true, keepPreservedFilters = false): void {
+    if (keepPreservedFilters) {
+      Object.keys(this.formGroup.controls).forEach(key => {
+        if (key !== 'regionsIds' && key !== 'locationIds') {
+          this.formGroup.controls[key].reset();
+        }
+      });
+      this.filteredItems = this.filteredItems.filter(item => item.column === 'regionsIds' || item.column === 'locationIds');
+    } else {
+      this.formGroup.reset();
+      this.filteredItems = [];
+    }
     this.appliedFiltersAmount.emit(this.filteredItems.length);
     if (eventEmmit) {
       this.resetFilters.emit();
@@ -76,6 +104,20 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
       this.orgRegions = dataSource || [];
       this.allRegions = [...this.orgRegions];
       this.filterColumns = filters;
+      let preservedFilters = null;
+      if (this.filterService.canPreserveFilters() && !this.isPreservedFilterSet) {
+        preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
+        if (preservedFilters && (this.filterColumns as any).regionsIds?.dataSource) {
+          this.isPreservedFilterSet = true;
+          const dataSource: any[] = [];
+          (this.filterColumns as any).regionsIds.dataSource.map((region: any) => dataSource.push(...region.locations));
+          (this.filterColumns as any).locationIds.dataSource = dataSource;
+          this.formGroup.controls['regionsIds'].setValue([...preservedFilters?.regions] || [], { emitEvent: false });
+          this.formGroup.controls['locationIds'].setValue([...preservedFilters?.locations] || [], { emitEvent: false });
+          this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
+          this.appliedFiltersAmount.emit(this.filteredItems.length);
+        }
+      }
       this.cdr.detectChanges();
     });
   }

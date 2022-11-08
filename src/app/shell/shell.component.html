@@ -214,8 +214,8 @@
   </div>
 </ejs-sidebar>
 
-  <app-chat-container *ngIf="userChatConfig$ | async"></app-chat-container>
-  <app-custom-side-dialog [header]="contactHeaderTitle" [width]="dialogWidth">
-    <app-contactus></app-contactus>
-  </app-custom-side-dialog>
+<app-chat-container *ngIf="userChatConfig$ | async"></app-chat-container>
+<app-custom-side-dialog [header]="contactHeaderTitle" [width]="dialogWidth">
+  <app-contactus></app-contactus>
+</app-custom-side-dialog>
 

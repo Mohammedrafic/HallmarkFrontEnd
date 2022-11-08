@@ -8,7 +8,6 @@ import {
   AgencyOrderManagement,
   AgencyOrderManagementPage,
   ApplicantStatus,
-  CandidatesBasicInfo,
   CreateOrderDto,
   EditOrderDto,
   Order,
@@ -396,17 +395,6 @@ export class OrderManagementContentService {
   }
 
   /**
-   * Get basic info about candidate
-   @param organizationId
-   @param jobId
-   */
-  public getCandidatesBasicInfo(organizationId: number, jobId: number): Observable<CandidatesBasicInfo> {
-    return this.http.get<CandidatesBasicInfo>(
-      `/api/AppliedCandidates/basicInfo?OrganizationId=${organizationId}&JobId=${jobId}`
-    );
-  }
-
-  /**
    * Export organization list
    * @param payload
    * @param tab
@@ -457,13 +445,13 @@ export class OrderManagementContentService {
     jobStartDate: string,
     jobEndDate: string,
     lastSelectedBusinessUnitId?: number
-  ): Observable<BillRate[]> {
+  ): Observable<BillRate> {
     let headers = {};
 
     if (lastSelectedBusinessUnitId) {
       headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
     }
-    return this.http.get<BillRate[]>('/api/billrates/regular/fororder', {
+    return this.http.get<BillRate>('/api/billrates/regular/fororder', {
       headers,
       params: { orderType, departmentId, skillId, jobStartDate, jobEndDate },
     });

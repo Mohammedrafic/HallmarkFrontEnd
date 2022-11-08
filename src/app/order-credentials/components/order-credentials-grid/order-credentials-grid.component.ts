@@ -1,10 +1,10 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 
 import { GridComponent, GroupSettingsModel, PageSettingsModel } from '@syncfusion/ej2-angular-grids';
 
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 
-import { IOrderCredential, IOrderCredentialItem } from '@order-credentials/types';
+import { IOrderCredentialItem } from '@order-credentials/types';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ConfirmService } from '@shared/services/confirm.service';
 
@@ -13,7 +13,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
   templateUrl: './order-credentials-grid.component.html',
   styleUrls: ['./order-credentials-grid.component.scss']
 })
-export class OrderCredentialsGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class OrderCredentialsGridComponent extends AbstractGridConfigurationComponent implements OnChanges, OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
   @Input() credential: IOrderCredentialItem[];
@@ -29,9 +29,17 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
   public pageSizes: any;
   public totalItemCount:number=0;
   public totalPageCount: number=1;
-  
+
   constructor(private confirmService: ConfirmService) {
     super();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const { credential } = changes;
+
+    if (!credential.isFirstChange() && credential?.currentValue) {
+      this.totalItemCount = credential.currentValue.length;
+    }
   }
 
 
@@ -41,7 +49,7 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
     });
     this.allowSorting=true;
     this.groupOptions = { columns: ['credentialType'] };
-     this.gridPageSettings = { pageSizes: this.rowsPerPageDropDown, pageSize: this.pageSize};
+    this.gridPageSettings = { pageSizes: this.rowsPerPageDropDown, pageSize: this.pageSize};
     this.totalItemCount = this.credential.length;
     this.totalPageCount = this.totalItemCount / this.pageSize;
   }

@@ -160,6 +160,6 @@
   [isAgency]="isAgency"
   [candidateJob]="candidateJob"
   [dialogNextPreviousOption]="dialogNextPreviousOption"
-  [actionsAllowed]="agencyActionsAllowed"
+  [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-reorder-status-dialog>

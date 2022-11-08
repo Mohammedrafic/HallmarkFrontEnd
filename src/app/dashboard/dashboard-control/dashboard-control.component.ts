@@ -1,7 +1,7 @@
-import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-import { Store, Select } from '@ngxs/store';
-import { Observable, takeUntil, Subject } from 'rxjs';
+import { Select, Store } from '@ngxs/store';
+import { Observable, Subject, takeUntil } from 'rxjs';
 
 import { ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -41,6 +41,7 @@ export class DashboardControlComponent extends DestroyableDirective implements O
 
   @Select(DashboardState.filteredItems) public readonly filteredItems$: Observable<FilteredItem[]>;
   @Select(UserState.organizationStructure) public readonly organizationStructure$: Observable<OrganizationStructure>;
+  @Select(UserState.isAgencyUser) public readonly isAgencyUser: Observable<boolean>;
 
   public readonly isOpenQuickOrderDialod$: Subject<boolean> = new Subject<boolean>();
   public orderedFilters: Record<FilterName, FilteredItem[]>;

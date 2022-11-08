@@ -14,6 +14,8 @@ import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_R
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { UserPermissions } from '@core/enums';
+import { Permission } from '@core/interface';
 
 @Component({
   selector: 'app-skill-categories-grid',
@@ -27,6 +29,7 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
 
   @Input() isActive: boolean = false;
   @Input() export$: Subject<ExportedFileType>;
+  @Input() userPermission: Permission;
 
   @ViewChild('grid')
   public grid: GridComponent;
@@ -40,6 +43,7 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
   ];
   public fileName: string;
   public defaultFileName: string;
+  public readonly userPermissions = UserPermissions;
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -83,7 +87,7 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
-  
+
   public closeExport() {
     this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
@@ -96,8 +100,8 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.store.dispatch(new ExportSkillCategories(new ExportPayload(
-      fileType, 
-      {  }, 
+      fileType,
+      {  },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
       options?.fileName || this.defaultFileName

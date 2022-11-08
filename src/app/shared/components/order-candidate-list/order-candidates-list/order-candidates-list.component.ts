@@ -1,4 +1,4 @@
-import { GetCandidateJob, GetDeployedCandidateOrderIds, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import { GetCandidateJob, GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
@@ -11,6 +11,7 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { Order, OrderCandidatesList } from '@shared/models/order-management.model';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { combineLatest, Observable, Subject } from 'rxjs';
@@ -41,7 +42,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   @Select(OrderManagementContentState.selectedOrder)
   public selectedOrgOrder$: Observable<Order>;
 
-  @Select(OrderManagementState.deployedCandidateOrderIds) deployedCandidateOrderIds$: Observable<string[]>;
+  @Select(OrderManagementState.deployedCandidateOrderInfo)
+  public readonly deployedCandidateOrderInfo$: Observable<DeployedCandidateOrderInfo[]>;
 
   public templateState: Subject<any> = new Subject();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
@@ -51,6 +53,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public defaultDuration: Duration = Duration.Other;
   public selectedOrder: Order;
   public agencyActionsAllowed = true;
+  public candidateOrderIds: string[] = [];
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
@@ -74,6 +77,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       });
     if (this.isAgency) {
       this.checkForAgencyStatus();
+      this.subscribeToDeployedCandidateOrdersInfo();
     }
   }
 
@@ -146,11 +150,10 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   }
 
   private getDeployedCandidateOrders(): void {
-    if(this.candidate.deployedCandidateInfo) {
+    if (!!this.candidate.deployedCandidateInfo) {
       const candidateId = this.candidate.candidateId;
       const organizationId = this.candidate.deployedCandidateInfo.organizationId;
-      const organizationPrefix = this.selectedOrder.organizationPrefix || '';
-      this.store.dispatch(new GetDeployedCandidateOrderIds(this.order.orderId, candidateId, organizationId, organizationPrefix))
+      this.store.dispatch(new GetDeployedCandidateOrderInfo(this.order.orderId, candidateId, organizationId));
     }
   }
 
@@ -176,5 +179,11 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
 
   private initPredefinedBillRates(): void {
     this.store.dispatch(new GetPredefinedBillRates());
+  }
+
+  private subscribeToDeployedCandidateOrdersInfo(): void {
+    this.deployedCandidateOrderInfo$.pipe(takeUntil(this.unsubscribe$)).subscribe((ordersInfo) => {
+      this.candidateOrderIds = ordersInfo.map((data) => data.orderPublicId);
+    })
   }
 }

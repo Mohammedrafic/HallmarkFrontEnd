@@ -40,7 +40,7 @@
             <button
               ejs-button
               cssClass="e-outline edit-button"
-              [disabled]="disableEdit || !canCreateOrder"
+              [disabled]="disableEdit || !canCreateOrder || !hasCreateEditOrderPermission"
               (click)="editOrder(order)"
             >
               <i-feather name="edit" class="icon"></i-feather>
@@ -49,7 +49,7 @@
               ejs-button
               cssClass="e-outline"
               *ngIf="!canCloseOrder"
-              [disabled]="disableCloseOrder || !canCloseOrderPermission"
+              [disabled]="disableCloseOrder || !canCloseOrderPermission || !hasCreateEditOrderPermission"
               (click)="closeOrder(order)"
             >
               Close Order
@@ -58,7 +58,7 @@
               ejs-button
               cssClass="e-outline"
               *ngIf="canReOpen"
-              [disabled]="!canCloseOrderPermission"
+              [disabled]="!canCloseOrderPermission || !hasCreateEditOrderPermission"
               (click)="reOpenOrder(order)"
             >
               Re-Open
@@ -68,14 +68,14 @@
               cssClass="e-outline"
               *ngIf="showCreateReOrder"
               (click)="createReOrder()"
-              [disabled]="disableCreateReOrder || !canCreateOrder"
+              [disabled]="disableCreateReOrder || !canCreateOrder || !hasCreateEditOrderPermission"
             >
               Create Re-Order
             </button>
             <button
               ejs-button
               cssClass="e-primary delete-button"
-              [disabled]="!canCreateOrder"
+              [disabled]="!canCreateOrder || !hasCreateEditOrderPermission"
               (click)="deleteOrder(order.id)"
               *ngIf="!showCloseButton"
             >
@@ -87,7 +87,7 @@
               *ngIf="showLockOrder"
               [isPrimary]="true"
               (click)="lockOrder()"
-              [disabled]="disabledLock || !canCreateOrder"
+              [disabled]="disabledLock || !canCreateOrder || !hasCreateEditOrderPermission"
             >
               {{ order?.isLocked ? 'Unlock' : 'Lock' }}
               <i-feather *ngIf="!order?.isLocked" name="lock" class="icon"></i-feather>
@@ -98,7 +98,7 @@
               *ngIf="mobileMenu.length"
               ejs-dropdownbutton
               [items]="mobileMenu"
-              [disabled]="!canCreateOrder"
+              [disabled]="!canCreateOrder || !hasCreateEditOrderPermission"
               (select)="onMobileMenuSelect($event)"
               iconCss="e-icons"
               cssClass="e-caret-hide primary-icon-button menu-mobile"

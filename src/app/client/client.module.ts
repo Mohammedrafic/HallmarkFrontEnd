@@ -88,6 +88,7 @@ import { ExtensionModule } from '@shared/components/extension/extension.module';
 import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
 import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
 import { ReopenOrderModule } from '@client/order-management/reopen-order/reopen-order.module';
+import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 
 const gridIcons = {
   MessageSquare,
@@ -171,6 +172,7 @@ const gridIcons = {
     ChildOrderDialogModule,
     AssociateListModule,
     DropDownButtonAllModule,
+    TooltipContainerModule,
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
     ExtensionModule,

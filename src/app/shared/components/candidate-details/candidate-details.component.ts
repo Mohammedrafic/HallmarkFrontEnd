@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { SetHeaderState, ShowFilterDialog } from '../../../store/app.actions';
 import {
@@ -10,7 +9,7 @@ import {
   SetPageFilters
 } from '@shared/components/candidate-details/store/candidate.actions';
 import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
-import { combineLatest, filter, Observable, takeUntil, tap } from 'rxjs';
+import { combineLatest, filter, Observable, takeUntil, tap, debounceTime, take } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { FilterService } from '@shared/services/filter.service';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -29,6 +28,8 @@ import { UserState } from '../../../store/user.state';
 import { OrderTypeOptionsForCandidates } from '@shared/components/candidate-details/candidate-details.constant';
 import { toCorrectTimezoneFormat } from '../../utils/date-time.utils';
 import { GRID_CONFIG } from '@shared/constants';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { PreservedFilters } from '@shared/models/preserved-filters.model';
 
 @Component({
   selector: 'app-candidate-details',
@@ -63,6 +64,9 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   @Select(UserState.lastSelectedOrganizationId)
   lastSelectedOrganizationId$: Observable<number>;
 
+  @Select(PreservedFiltersState.preservedFilters)
+  preservedFilters$: Observable<PreservedFilters>;
+
   public filtersForm: FormGroup;
   public filters: FiltersModal | null;
   public filterColumns: FilterColumnsModel;
@@ -73,10 +77,9 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   public pageNumber = GRID_CONFIG.initialPage;
   public pageSize = GRID_CONFIG.initialRowsPerPage;
   private selectedTab: number | null;
+  private filterApplied = false;
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
     private store: Store,
     private formBuilder: FormBuilder,
     private filterService: FilterService,
@@ -86,6 +89,9 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   ngOnInit(): void {
+    if (this.filterService.canPreserveFilters()) {
+      this.store.dispatch(new GetCandidateRegions());
+    }
     this.setHeaderName();
     this.createFilterForm();
     this.initFilterColumns();
@@ -107,12 +113,14 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   public onFilterClearAll(): void {
+    this.filterApplied = true;
     this.clearFilters();
     this.store.dispatch(new SetPageFilters(this.filters));
     this.updatePage();
   }
 
   public onFilterApply(): void {
+    this.filterApplied = true;
     const formData = this.filtersForm.getRawValue();
     const { startDate, endDate } = formData;
     this.filters = {
@@ -125,6 +133,17 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     this.updatePage();
     this.store.dispatch(new SetPageFilters(this.filters));
     this.store.dispatch(new ShowFilterDialog(false));
+    const orgs: number[] = [];
+    if (this.filters?.regionsIds) {
+      this.filterColumns.regionsIds.dataSource?.forEach((val) => {
+        if (this.filters?.regionsIds?.includes(val.id)) {
+          orgs.push(val.organizationId);
+        }
+      });
+      this.filters.organizationIds = orgs.filter((item, pos) => orgs.indexOf(item) == pos);
+    }
+    
+    this.filterService.setPreservedFIlters(this.filters, 'regionsIds');
   }
 
   public onFilterDelete(event: FilteredItem): void {
@@ -144,7 +163,9 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   public showFilters(): void {
     this.store.dispatch(new GetCandidateSkills());
-    this.store.dispatch(new GetCandidateRegions());
+    if (!this.filterService.canPreserveFilters()) {
+      this.store.dispatch(new GetCandidateRegions());
+    }
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
@@ -186,6 +207,10 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
           this.store.dispatch(new SetNavigation(false));
         } else {
           this.clearFilters();
+          this.filterApplied = false;
+          if (this.filterService.canPreserveFilters()) {
+            this.setPreservedFilters();
+          }
         }
         this.store.dispatch(new SetNavigation(false));
         this.updatePage();
@@ -204,7 +229,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   private subscribeOnRegions(): Observable<CandidatesDetailsRegions[]> {
     return this.candidateRegions$.pipe(
-      tap((regions: CandidatesDetailsRegions[]) => (this.filterColumns.regionsIds.dataSource = regions))
+      tap((regions: CandidatesDetailsRegions[]) => (this.filterColumns.regionsIds.dataSource = regions || []))
     );
   }
 
@@ -289,14 +314,39 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   private subscribeOnAgencyOrganizationChanges(): void {
-    combineLatest([this.lastSelectedOrganizationId$, this.lastSelectedAgencyId$])
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        if (!this.isNavigationFromAnotherPage()) {
-          this.clearFilters();
-          this.updatePage();
-        }
-      });
+    if (this.filterService.canPreserveFilters()) {
+      combineLatest([this.lastSelectedOrganizationId$, this.lastSelectedAgencyId$, this.preservedFilters$.pipe(filter(Boolean), take(1)), this.candidateRegions$])
+        .pipe(takeUntil(this.destroy$), debounceTime(600))
+        .subscribe(() => {
+          if (!this.isNavigationFromAnotherPage()) {
+            this.clearFilters();
+            this.setPreservedFilters();
+            this.updatePage();
+          }
+        });
+    } else {
+      combineLatest([this.lastSelectedOrganizationId$, this.lastSelectedAgencyId$])
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          if (!this.isNavigationFromAnotherPage()) {
+            this.clearFilters();
+            this.updatePage();
+          }
+        });
+    }
+  }
+
+  private setPreservedFilters(): void {
+    const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
+    if (preservedFilters?.regions) {
+      this.filtersForm.get('regionsIds')?.setValue([...preservedFilters.regions]);
+      if (this.filters) {
+        this.filters.regionsIds = [...preservedFilters.regions];
+      } else {
+        this.filters = this.filtersForm.getRawValue();
+      }
+    }
+    this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns, this.datePipe);
   }
 
   private updatePage(): void {

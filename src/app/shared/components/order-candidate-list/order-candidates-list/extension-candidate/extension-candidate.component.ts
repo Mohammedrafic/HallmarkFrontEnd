@@ -55,6 +55,7 @@ import { UserState } from 'src/app/store/user.state';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
+import { hasEditOrderBillRatesPermission } from '../../order-candidate-list.utils';
 
 interface IExtensionCandidate extends Pick<UnsavedFormComponentRef, 'form'> {}
 
@@ -113,6 +114,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   public canOffer = false;
   public canOnboard = false;
   public canClose = false;
+  public hasEditOrderBillRatesPermission: boolean;
 
   public applicantStatusEnum = ApplicantStatusEnum;
 
@@ -324,6 +326,10 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     }
 
     this.applicantStatuses = statuses;
+    this.hasEditOrderBillRatesPermission = hasEditOrderBillRatesPermission(
+        this.candidateJob?.applicantStatus?.applicantStatus || this.candidate?.status as number,
+        this.applicantStatuses
+    );
     this.changeDetectorRef.markForCheck();
 
     if (!this.applicantStatuses.length) {

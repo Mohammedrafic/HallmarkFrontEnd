@@ -4,16 +4,28 @@ import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { Observable, Subject, takeWhile, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SecurityState } from 'src/app/security/store/security.state';
-import { alertsFilterColumns, BUSINESS_UNITS_VALUES, BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, User_DATA_FIELDS } from '../alerts.constants';
+import {
+  alertsFilterColumns,
+  BUSINESS_DATA_FIELDS,
+  BUSINESS_UNITS_VALUES,
+  DISABLED_GROUP,
+  OPRION_FIELDS,
+  User_DATA_FIELDS
+} from '../alerts.constants';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
 import { ToggleSwitchComponent } from '../toggle-switch/toggle-switch.component';
 import { GridReadyEvent } from '@ag-grid-community/core';
 import { AlertChannel, AlertEnum } from 'src/app/admin/alerts/alerts.enum';
 import { GetUserSubscriptionPage, UpdateUserSubscription } from '@admin/store/alerts.actions';
-import { UserSubscription, UserSubscriptionFilters, UserSubscriptionPage, UserSubscriptionRequest } from '@shared/models/user-subscription.model';
+import {
+  UserSubscription,
+  UserSubscriptionFilters,
+  UserSubscriptionPage,
+  UserSubscriptionRequest
+} from '@shared/models/user-subscription.model';
 import { AlertsState } from '@admin/store/alerts.state';
 import { GetAllUsersPage, GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -22,7 +34,7 @@ import { SetHeaderState, ShouldDisableUserDropDown, ShowToast } from 'src/app/st
 import { User, UsersPage } from '@shared/models/user.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_MODIFIED, GRID_CONFIG } from '@shared/constants';
+import { GRID_CONFIG, RECORD_MODIFIED } from '@shared/constants';
 import { AppState } from '../../../store/app.state';
 
 @Component({
@@ -66,6 +78,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
   public title: string = "Notification Subscription";
   public userGuid: string = "";
   public unsubscribe$: Subject<void> = new Subject();
+  public totalRecordsCount: number;
   itemList: Array<UserSubscription> | undefined;
   private gridApi: any;
   private gridColumnApi: any;
@@ -246,7 +259,7 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
       }
     });
   }
-  
+
   public onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
@@ -328,6 +341,8 @@ export class UserSubscriptionComponent extends AbstractGridConfigurationComponen
           self.userSubscriptionPage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
 
             self.itemList = data?.items;
+            self.totalRecordsCount = data?.totalCount;
+
             if (!self.itemList || !self.itemList.length) {
               self.gridApi.showNoRowsOverlay();
             }

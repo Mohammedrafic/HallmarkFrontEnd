@@ -1,11 +1,11 @@
 import { DismissAlertDto } from './../shared/models/alerts-template.model';
 import { DismissAlert, DismissAllAlerts } from './../admin/store/alerts.actions';
-import { GetAlertsForCurrentUser, ShouldDisableUserDropDown, ShowCustomSideDialog } from './../store/app.actions';
+import { GetAlertsForCurrentUser, ShowCustomSideDialog } from './../store/app.actions';
 import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-
-import { Actions, Select, Store } from '@ngxs/store';
+import { OutsideZone } from "@core/decorators";
+import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import {
   ContextMenuComponent,
@@ -30,14 +30,14 @@ import { faBan, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { ToggleChatDialog, UnreadMessage } from '@core/actions';
-import { ofActionDispatched } from '@ngxs/store';
 
 import { AnalyticsMenuId } from '@shared/constants/menu-config';
 
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { AnalyticsApiService } from '@shared/services/analytics-api.service';
-import {  ShowSideDialog } from 'src/app/store/app.actions';
+import { InitPreservedFilters } from '../store/preserved-filters.actions';
+import { FilterService } from '@shared/services/filter.service';
 
 enum THEME {
   light = 'light',
@@ -47,12 +47,12 @@ enum profileMenuItem {
   // TODO: edit profile
   /*edit_profile = 0,*/
   theme = 1,
-  help=2,
+  help = 2,
   log_out = 3,
   light_theme = 4,
-  dark_theme=5,
+  dark_theme = 5,
   manage_notifications = 6,
-  contact_us =7
+  contact_us = 7,
 }
 
 @Component({
@@ -130,19 +130,18 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   public isMaximized: boolean = true;
   public searchHeight: number;
   public ProfileMenuItemNames = {
-      // TODO: edit profile
-   /* [profileMenuItem.edit_profile]: 'Edit Profile',*/
+    // TODO: edit profile
+    /* [profileMenuItem.edit_profile]: 'Edit Profile',*/
     [profileMenuItem.theme]: 'Theme',
     [profileMenuItem.help]: 'Help',
     [profileMenuItem.log_out]: 'LogOut',
-    [profileMenuItem.light_theme]: "Light",
-    [profileMenuItem.dark_theme]: "Dark",
-    [profileMenuItem.manage_notifications]: "Manage Notifications",
-    [profileMenuItem.contact_us]: "Contact Us"
-
-  }
+    [profileMenuItem.light_theme]: 'Light',
+    [profileMenuItem.dark_theme]: 'Dark',
+    [profileMenuItem.manage_notifications]: 'Manage Notifications',
+    [profileMenuItem.contact_us]: 'Contact Us',
+  };
   public isUnreadMessages = false;
-  public isContactOpen : boolean  =false;
+  public isContactOpen: boolean = false;
 
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
@@ -166,7 +165,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   canManageOtherUserNotifications: boolean;
   canManageNotificationTemplates: boolean;
 
-  isDialogOpen: boolean =false;
+  isDialogOpen: boolean = false;
   public dialogWidth: string;
   public contactHeaderTitle = 'Contact Support';
 
@@ -177,7 +176,10 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     private orderManagementAgencyService: OrderManagementAgencyService,
     private actions$: Actions,
     private analyticsApiService: AnalyticsApiService<string>,
+    private filterService: FilterService,
+    private readonly ngZone: NgZone,
   ) {
+    this.filterService.canPreserveFilters() && store.dispatch(new InitPreservedFilters());
     router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((data: any) => {
       if (this.tree) {
         const menuItem = this.tree.getTreeData().find((el) => el['route'] === data['url']);
@@ -192,7 +194,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.dialogWidth ="800px";
+    this.dialogWidth = '800px';
     this.subsToOrderAgencyIds();
     this.isDarkTheme$.pipe(takeUntil(this.unsubscribe$)).subscribe((isDark) => {
       this.isDarkTheme = isDark;
@@ -207,14 +209,21 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
         map((permissions) => permissions.map((permission) => permission.permissionId))
       )
       .subscribe((permissionsIds: number[]) => {
-        this.canManageOtherUserNotifications = this.hasPermission(permissionsIds, PermissionTypes.CanManageNotificationsForOtherUsers);
-        this.canManageNotificationTemplates = this.hasPermission(permissionsIds, PermissionTypes.CanManageNotificationTemplates);
+        this.canManageOtherUserNotifications = this.hasPermission(
+          permissionsIds,
+          PermissionTypes.CanManageNotificationsForOtherUsers
+        );
+        this.canManageNotificationTemplates = this.hasPermission(
+          permissionsIds,
+          PermissionTypes.CanManageNotificationTemplates
+        );
         this.removeManageNotificationOptionInHeader();
       });
 
     this.getAlertsPoolling();
-        this.watchForUnreadMessages();
-      }
+    
+    this.watchForUnreadMessages();
+  }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
@@ -222,14 +231,17 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngAfterViewInit(): void {
     this.hideAnalyticsSubMenuItems();
+    this.getAlertsPoollingTime();
   }
 
   private removeManageNotificationOptionInHeader(): void {
     if (this.canManageNotificationTemplates == false || this.canManageOtherUserNotifications == false) {
-        const n = this.profileData[0].items?.findIndex(x=>x.id==profileMenuItem.manage_notifications.toString());
-        if (n != undefined && n > 0){
-          this.profileData[0].items?.splice(n,1);
-        }
+      const profileManageNotificationId = this.profileData[0].items?.findIndex(
+        (x) => x.id == profileMenuItem.manage_notifications.toString()
+      );
+      if (profileManageNotificationId != undefined && profileManageNotificationId > 0) {
+        this.profileData[0].items?.splice(profileManageNotificationId, 1);
+      }
     }
     this.profileDatasource = this.profileData;
   }
@@ -238,12 +250,13 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.store.dispatch(new GetCurrentUserPermissions());
   }
 
+
   private getAlertsPoolling(): void {
     this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
       if (user) {
         this.userLogin = user;
         this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
-        this.store.dispatch(new GetAlertsForCurrentUser({}))
+        this.store.dispatch(new GetAlertsForCurrentUser({}));
         this.alertStateModel$.subscribe((alertdata) => {
           this.alerts = alertdata;
         });
@@ -253,25 +266,60 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
             items: [
               // TODO: edit profile
               /*{ text: this.ProfileMenuItemNames[profileMenuItem.edit_profile], id: profileMenuItem.edit_profile.toString(), iconCss: 'e-ddb-icons e-settings' },*/
-              { text: this.ProfileMenuItemNames[profileMenuItem.manage_notifications], id: profileMenuItem.manage_notifications.toString(), iconCss: 'e-settings e-icons' },
               {
-                text: this.ProfileMenuItemNames[profileMenuItem.theme], id: profileMenuItem.theme.toString(), iconCss: this.isDarkTheme ? 'e-theme-dark e-icons' : 'e-theme-light e-icons', items: [
-                  { text: this.ProfileMenuItemNames[profileMenuItem.light_theme], id: profileMenuItem.light_theme.toString() },
-                  { text: this.ProfileMenuItemNames[profileMenuItem.dark_theme], id: profileMenuItem.dark_theme.toString() }
-                ]
+                text: this.ProfileMenuItemNames[profileMenuItem.manage_notifications],
+                id: profileMenuItem.manage_notifications.toString(),
+                iconCss: 'e-settings e-icons',
               },
-              { text: this.ProfileMenuItemNames[profileMenuItem.help], id: profileMenuItem.help.toString(), iconCss: 'e-circle-info e-icons' },
-              { text: this.ProfileMenuItemNames[profileMenuItem.contact_us], id: profileMenuItem.contact_us.toString(), iconCss: 'e-ddb-icons e-contactus' },
-              { text: this.ProfileMenuItemNames[profileMenuItem.log_out], id: profileMenuItem.log_out.toString(), iconCss: 'e-ddb-icons e-logout' }
-
-            ]
+              {
+                text: this.ProfileMenuItemNames[profileMenuItem.theme],
+                id: profileMenuItem.theme.toString(),
+                iconCss: this.isDarkTheme ? 'e-theme-dark e-icons' : 'e-theme-light e-icons',
+                items: [
+                  {
+                    text: this.ProfileMenuItemNames[profileMenuItem.light_theme],
+                    id: profileMenuItem.light_theme.toString(),
+                  },
+                  {
+                    text: this.ProfileMenuItemNames[profileMenuItem.dark_theme],
+                    id: profileMenuItem.dark_theme.toString(),
+                  },
+                ],
+              },
+              {
+                text: this.ProfileMenuItemNames[profileMenuItem.help],
+                id: profileMenuItem.help.toString(),
+                iconCss: 'e-circle-info e-icons',
+              },
+              {
+                text: this.ProfileMenuItemNames[profileMenuItem.contact_us],
+                id: profileMenuItem.contact_us.toString(),
+                iconCss: 'e-ddb-icons e-contactus',
+              },
+              {
+                text: this.ProfileMenuItemNames[profileMenuItem.log_out],
+                id: profileMenuItem.log_out.toString(),
+                iconCss: 'e-ddb-icons e-logout',
+              },
+            ],
           },
         ];
       }
-    })
+    });
   }
 
-  private hasPermission(permissions: number[], id: number): boolean{
+  @OutsideZone
+  private getAlertsPoollingTime(): void {
+    setInterval(() => {
+      this.alertStateModel$.subscribe((alertdata) => {
+        this.alerts = alertdata;
+      });
+    }, 60000
+    );
+
+  }
+
+  private hasPermission(permissions: number[], id: number): boolean {
     return permissions.includes(id);
   }
 
@@ -286,7 +334,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onSelectProfileMenu(event: any) {
     switch (Number(event.item.properties.id)) {
-       // TODO: edit profile
+      // TODO: edit profile
       //case profileMenuItem.edit_profile:
       //  break;
       case profileMenuItem.manage_notifications:
@@ -306,7 +354,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       case profileMenuItem.log_out:
         this.logout();
         break;
-        case profileMenuItem.contact_us:
+      case profileMenuItem.contact_us:
         this.contactUs();
         break;
     }
@@ -314,13 +362,14 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onSideBarCreated(): void {
     // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
-    this.isMobile$.pipe(
-      takeUntil(this.unsubscribe$),
-      filter((isMobile: boolean) => isMobile)
+    this.isMobile$
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((isMobile: boolean) => isMobile)
       )
       .subscribe(() => {
-       this.store.dispatch(new ToggleSidebarState(true));
-    });
+        this.store.dispatch(new ToggleSidebarState(true));
+      });
 
     this.isSideBarDocked$.pipe(takeUntil(this.unsubscribe$)).subscribe((isDocked) => (this.sidebar.isOpen = isDocked));
     this.isFirstLoad$.pipe(takeUntil(this.unsubscribe$)).subscribe((isFirstLoad) => {
@@ -350,13 +399,15 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   manageNotifications(): void {
     this.menu$.pipe(takeUntil(this.unsubscribe$)).subscribe((menu: Menu) => {
       if (menu.menuItems.length) {
-        let r = menu.menuItems.find(element=>element.id == 6)?.children.find(e=>e.route == "/alerts/user-subscription");
-        if(r != undefined){
-          this.router.navigate([r.route]);
+        const menuItems = menu.menuItems
+          .find((element) => element.id == 6)
+          ?.children.find((e) => e.route == '/alerts/user-subscription');
+        if (menuItems) {
+          this.router.navigate([menuItems.route]);
         }
       }
-  });
-}
+    });
+  }
 
   public toggleMobileSidebar(): void {
     this.isSidebarHidden = !this.isSidebarHidden;
@@ -379,7 +430,6 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   nodeSelect(args: NodeSelectEventArgs): void {
-
     if (args.node.classList.contains('e-level-1') && this.sidebar.isOpen) {
       this.tree.collapseAll();
       this.tree.expandAll([args.node]);
@@ -422,8 +472,12 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   hideAnalyticsSubMenuItems() {
     let element = this.tree?.element.querySelector('[data-uid="Analytics"]');
-    element?.querySelectorAll('ul li').forEach((el: any) => { el.style.display = 'none' });
-    element?.querySelectorAll('.e-text-content .e-icons').forEach((el: any) => { el.style.display = 'none' });
+    element?.querySelectorAll('ul li').forEach((el: any) => {
+      el.style.display = 'none';
+    });
+    element?.querySelectorAll('.e-text-content .e-icons').forEach((el: any) => {
+      el.style.display = 'none';
+    });
   }
 
   onBeforeContextMenuOpen(event: any): void {
@@ -448,7 +502,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       if (!isTablet) {
         this.contextmenu.items = [];
       }
-    })
+    });
   }
 
   logout(): void {
@@ -459,9 +513,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     const user = this.store.selectSnapshot(UserState.user);
     let url = '';
     if (user?.businessUnitType === BusinessUnitType.Agency) {
-      url = 'https://green-pebble-0878e040f.1.azurestaticapps.net/';
+      url = 'https://eiiahelp.einsteinii.org/';
     } else {
-      url = 'https://lemon-sea-05b5a7c0f.1.azurestaticapps.net/';
+      url = 'https://eiiohelp.einsteinii.org/';
     }
     window.open(url, '_blank');
   }
@@ -489,10 +543,9 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.isMaximized) {
       this.searchInput?.nativeElement?.focus();
     }
-    if (!this.sidebar.isOpen)
+    if (!this.sidebar.isOpen) {
       this.isMaximized = false;
-    else
-      this.isMaximized = true;
+    } else this.isMaximized = true;
   }
 
   public handleOnSearchMenuTextKeyUp(event: KeyboardEvent): void {
@@ -500,8 +553,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     if (value != '') {
       this.searchString = value;
       this.searchResult = this.getData(this.searchString.toLowerCase());
-    }
-    else {
+    } else {
       this.searchString = '';
       this.searchResult = [];
     }
@@ -514,7 +566,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   getData(searchText: string) {
     const menuItems = [...this.sideBarMenu];
     const filterMenuItems = menuItems.filter((item: MenuItem) => item.id != AnalyticsMenuId);
-    return this.getValueLogic((filterMenuItems != null && filterMenuItems.length > 0) ? filterMenuItems : menuItems, searchText);
+    return this.getValueLogic(filterMenuItems && filterMenuItems.length > 0 ? filterMenuItems : menuItems, searchText);
   }
 
   getValueLogic(data: any, filterText: string) {
@@ -545,7 +597,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     }, 500);
   }
 
-  getAlertsForUser(){
+  getAlertsForUser() {
     this.store.dispatch(new GetAlertsForCurrentUser({}));
     this.alertStateModel$.subscribe((x) => {
       this.alerts = x;
@@ -561,7 +613,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.alertSidebar.hide();
   }
 
-  alertSideBarClearAllClick(){
+  alertSideBarClearAllClick() {
     this.allAlertDismiss();
   }
 
@@ -569,8 +621,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     var model: DismissAlertDto = {
       Id: id,
     };
-    this.store.dispatch(new DismissAlert(model)).subscribe((x)=>{
-      if(x){
+    this.store.dispatch(new DismissAlert(model)).subscribe((x) => {
+      if (x) {
         this.getAlertsForUser();
       }
     });
@@ -586,20 +638,19 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private watchForUnreadMessages(): void {
     this.actions$
-    .pipe(
-      ofActionDispatched(UnreadMessage),
-      filter(() => !this.store.snapshot().chat.chatOpen as boolean),
-      distinctUntilChanged(),
-      debounceTime(1500),
-      takeUntil(this.unsubscribe$),
-    )
-    .subscribe((value) => {
-      this.isUnreadMessages = true;
-    });
+      .pipe(
+        ofActionDispatched(UnreadMessage),
+        filter(() => !this.store.snapshot().chat.chatOpen as boolean),
+        distinctUntilChanged(),
+        debounceTime(1500),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((value) => {
+        this.isUnreadMessages = true;
+      });
   }
 
-  contactUs()
-  {
+  contactUs() {
     this.store.dispatch(new ShowCustomSideDialog(true));
   }
 }

@@ -27,6 +27,7 @@ import {
 } from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
+import { hasEditOrderBillRatesPermission } from "@shared/components/order-candidate-list/order-candidate-list.utils";
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-candidate.constants';
 import { SET_READONLY_STATUS } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -153,6 +154,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public canOnboard = false;
   public canClose = false;
   public orderPermissions: CurrentUserPermission[];
+  public hasEditOrderBillRatesPermission: boolean;
 
   private defaultApplicantStatuses: ApplicantStatus[];
 
@@ -186,7 +188,14 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   private subscribeForJobStatus(): void {
     this.jobStatus$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((data) => (!data.length ? this.jobStatusControl.disable() : this.jobStatusControl.enable()));
+      .subscribe((data) => {
+        this.hasEditOrderBillRatesPermission = hasEditOrderBillRatesPermission(this.currentCandidateApplicantStatus, data);
+        if (!data.length) {
+          this.jobStatusControl.disable();
+        } else {
+          this.jobStatusControl.enable();
+        }
+      });
   }
 
   private subscribeForOrderPermissions(): void {

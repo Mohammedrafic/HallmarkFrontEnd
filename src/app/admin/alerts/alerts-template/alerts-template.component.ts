@@ -116,6 +116,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   private filters: AlertsTemplateFilters = {};
   public title: string = "Notification Templates";
   public export$ = new Subject<ExportedFileType>();
+  public totalRecordsCount: number;
+
   defaultValue: any;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   rowModelType: any;
@@ -354,6 +356,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
 
           self.alertsTemplatePage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
             self.itemList = data?.items;
+            self.totalRecordsCount = data?.totalCount;
+
             if (!self.itemList || !self.itemList.length) {
               self.gridApi.showNoRowsOverlay();
             }

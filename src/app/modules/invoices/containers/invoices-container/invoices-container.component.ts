@@ -155,7 +155,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.checkActionsAllowed();
     }
 
-    this.checkPermissions(this.isAgency);
+    this.checkPermissions(this.isAgency).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => this.handleChangeTab(0));
     this.watchDialogVisibility();
     this.startFiltersWatching();
     this.watchForInvoiceStatusChange();

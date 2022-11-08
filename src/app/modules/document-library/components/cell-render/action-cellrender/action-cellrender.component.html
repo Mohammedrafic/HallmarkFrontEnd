@@ -2,7 +2,11 @@
   <button ejs-button cssClass="e-flat download-icon" (click)="documentDownload($event);">
     <span><i-feather name="download" class="icon"></i-feather></span>
   </button>
-  <button ejs-dropdownbutton cssClass="e-flat ellipsis-icon" [items]="params.data.editMenuITems" (select)="menuOptionSelected($event)">
+  <button 
+  *ngIf="!params.data.isSharedWithMe"
+   ejs-dropdownbutton cssClass="e-flat ellipsis-icon" 
+   [items]="params.data.isSharedByMe ? params.editMoreMenuITems : params.editMenuITems"
+   (select)="menuOptionSelected($event)">
     <span><i-feather name="more-vertical" class="icon"></i-feather></span>
   </button>
 </div>

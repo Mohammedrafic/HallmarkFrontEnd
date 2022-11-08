@@ -4,7 +4,6 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnChanges,
   OnInit,
   Output,
   ViewChild
@@ -43,7 +42,7 @@ interface ExportOption extends ItemModel {
   styleUrls: ['./invoice-detail-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InvoiceDetailContainerComponent extends Destroyable implements OnInit, OnChanges {
+export class InvoiceDetailContainerComponent extends Destroyable implements OnInit {
   @Select(InvoicesState.isInvoiceDetailDialogOpen)
   isInvoiceDetailDialogOpen$: Observable<InvoiceDialogActionPayload>;
 
@@ -89,10 +88,6 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
 
   ngOnInit(): void {
     this.getDialogState();
-  }
-
-  ngOnChanges(): void {
-    this.isActionBtnDisabled = this.checkActionBtnDisabled();
   }
 
   public handleProfileClose(): void {
@@ -161,8 +156,9 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
           this.sideDialog.show();
           this.invoiceDetail = payload.invoiceDetail as InvoiceDetail;
           if (payload.invoiceDetail) {
-            this.initTableColumns(this.invoiceDetail.summary[0]?.locationName || '');
             this.setActionBtnText();
+            this.isActionBtnDisabled = this.checkActionBtnDisabled();
+            this.initTableColumns(this.invoiceDetail.summary[0]?.locationName || '');
             if (this.chipList) {
               this.chipList.cssClass = this.chipsCssClass.transform(this.invoiceDetail.meta.invoiceStateText);
               this.chipList.text = this.invoiceDetail.meta.invoiceStateText.toUpperCase();

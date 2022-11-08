@@ -12,6 +12,7 @@ export interface DropdownOption {
 export interface DataSourceItem {
   id: number;
   name: string;
+  organizationId?: number;
 }
 export interface CommonDialogConformMessages {
   confirmUnsavedChages: string;

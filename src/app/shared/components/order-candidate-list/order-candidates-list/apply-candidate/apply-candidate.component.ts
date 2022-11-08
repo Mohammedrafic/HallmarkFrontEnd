@@ -18,6 +18,7 @@ import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { deployedCandidateMessage, DEPLOYED_CANDIDATE } from '@shared/constants';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -37,7 +38,8 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isAgency: boolean = false;
   @Input() isLocked: boolean | undefined = false;
   @Input() actionsAllowed: boolean;
-  @Input() deployedCandidateOrderIds: string[];
+  @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
+  @Input() candidateOrderIds: string[];
 
   public formGroup: FormGroup;
   public readOnlyMode: boolean;
@@ -60,8 +62,20 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private unsubscribe$: Subject<void> = new Subject();
   private candidateId: number;
 
+  get candidateStatus(): ApplicantStatus {
+    return this.candidate.status || (this.candidate.candidateStatus as any);
+  }
+
   get isDeployedCandidate(): boolean {
-    return !!this.candidate.deployedCandidateInfo && this.candidate.candidateStatus !== ApplicantStatus.OnBoarded;
+    return !!this.candidate.deployedCandidateInfo && this.candidateStatus !== ApplicantStatus.OnBoarded;
+  }
+
+  get isOnboardedCandidate(): boolean {
+    return this.candidateStatus === ApplicantStatus.OnBoarded;
+  }
+
+  get isAcceptedCandidate(): boolean {
+    return this.candidateStatus === ApplicantStatus.Accepted;
   }
 
   constructor(
@@ -72,8 +86,8 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   ) {}
 
   ngOnChanges(): void {
-    this.readOnlyMode = !!this.isDeployedCandidate && this.isAgency;
-    this.showComments = this.candidate.status !== ApplicantStatus.NotApplied;
+    this.readOnlyMode = this.isOnboardedCandidate && this.isAcceptedCandidate && this.isAgency;
+    this.showComments = this.candidateStatus !== ApplicantStatus.NotApplied;
   }
 
   ngOnInit(): void {
@@ -129,7 +143,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     };
 
     return this.isDeployedCandidate && this.isAgency
-      ? this.confirmService.confirm(deployedCandidateMessage(this.deployedCandidateOrderIds), options)
+      ? this.confirmService.confirm(deployedCandidateMessage(this.candidateOrderIds), options)
       : of(true);
   }
 

@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, throttleTime, of, Subject } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, throttleTime, of, Subject, combineLatest, debounceTime } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction } from '@core/enums';
@@ -24,6 +24,9 @@ import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ProfileDetailsContainerComponent } from '../profile-details-container/profile-details-container.component';
 import { AppState } from '../../../../store/app.state';
 import { TimesheetsTabsComponent } from '../../components/timesheets-tabs/timesheets-tabs.component';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { FilterService } from '@shared/services/filter.service';
+import { PreservedFilters } from '@shared/models/preserved-filters.model';
 
 @Component({
   selector: 'app-timesheets-container',
@@ -50,6 +53,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   @Select(TimesheetsState.timesheetsFilters)
   readonly timesheetsFilters$!: Observable<TimesheetsFilterState>;
 
+  @Select(TimesheetsState.timesheetsFiltersColumns)
+  readonly timesheetsFiltersColumns$: Observable<TimesheetsFilterState>;
+
   @Select(TimesheetsState.organizations)
   readonly organizations$!: Observable<DataSourceItem[]>;
 
@@ -64,6 +70,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   @Select(UserState.lastSelectedAgencyId)
   agencyId$: Observable<number>;
+
+  @Select(PreservedFiltersState.preservedFilters)
+  preservedFilters$: Observable<PreservedFilters>;
 
   public tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public activeTabIdx = 0;
@@ -82,6 +91,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     private cd: ChangeDetectorRef,
     private route: ActivatedRoute,
     private location: Location,
+    private filterService: FilterService
   ) {
     super();
     store.dispatch([
@@ -103,9 +113,12 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public handleChangeTab(tabIndex: number): void {
     this.activeTabIdx = tabIndex;
-    this.store.dispatch(new Timesheets.UpdateFiltersState({
-      statusIds: this.tabConfig[tabIndex].value,
-    }));
+    this.store.dispatch(new Timesheets.UpdateFiltersState(
+      { statusIds: this.tabConfig[tabIndex].value },
+      this.activeTabIdx !== 0,
+      false,
+      true
+    ));
   }
 
   public handleChangePage(pageNumber: number): void {
@@ -181,12 +194,15 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private onOrganizationChangedHandler(): void {
-    (this.isAgency ? this.agencyId$ : this.organizationId$).pipe(
-      filter(Boolean),
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.store.dispatch(new Timesheets.ResetFiltersState());
-      this.initComponentState();
+    (combineLatest([this.isAgency ? this.agencyId$ : this.organizationId$, this.preservedFilters$])).pipe(
+      takeUntil(this.componentDestroy()),
+      debounceTime(600),
+    ).subscribe((val) => {
+      const [id, filters] = val;
+      if (id) {
+        this.store.dispatch(new Timesheets.ResetFiltersState());
+        this.initComponentState();
+      }
     });
   }
 
@@ -215,7 +231,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     ).subscribe();
   }
 
-  private initOrganizationsList(): void {
+  private initOrganizationsList(preservedFilters: PreservedFilters | null): void {
     this.store.dispatch(new Timesheets.GetOrganizations())
     .pipe(
       switchMap(() => this.organizations$.pipe(
@@ -227,10 +243,17 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
       this.store.dispatch(new Timesheets.SelectOrganization(orgId));
       this.organizationControl.setValue(orgId, { emitEvent: false });
-      this.store.dispatch([
-        new Timesheets.UpdateFiltersState({ organizationId: orgId }, this.activeTabIdx !== 0),
-        new Timesheets.GetFiltersDataSource()
-      ]);
+      if (preservedFilters && this.filterService.canPreserveFilters()) {
+        this.store.dispatch([
+          new Timesheets.UpdateFiltersState({ organizationId: orgId, regionsIds: [...preservedFilters.regions], locationIds: [...preservedFilters.locations] }, this.activeTabIdx !== 0),
+          new Timesheets.GetFiltersDataSource()
+        ]);
+      } else {
+        this.store.dispatch([
+          new Timesheets.UpdateFiltersState({ organizationId: orgId }, this.activeTabIdx !== 0),
+          new Timesheets.GetFiltersDataSource()
+        ]);
+      }
     });
   }
 
@@ -262,14 +285,26 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private initComponentState(): void {
+    let preservedFilters = null;
+    if (this.filterService.canPreserveFilters()) {
+      preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
+    }
     this.timesheetsTabs?.programSelection();
     if (this.isAgency) {
-      this.initOrganizationsList();
+      this.initOrganizationsList(preservedFilters);
     } else {
-      this.store.dispatch([
-        new Timesheets.UpdateFiltersState(),
-        new Timesheets.GetFiltersDataSource()
-      ]);
+      if (preservedFilters) {
+        this.store.dispatch([
+          new Timesheets.UpdateFiltersState({ regionsIds: [...preservedFilters.regions], locationIds: [...preservedFilters.locations]}),
+          new Timesheets.GetFiltersDataSource()
+        ]);
+      } else {
+        this.store.dispatch([
+          new Timesheets.UpdateFiltersState(),
+          new Timesheets.GetFiltersDataSource()
+        ]);
+      }
+      
     }
   }
 

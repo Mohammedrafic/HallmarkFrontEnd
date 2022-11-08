@@ -50,6 +50,8 @@ import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { hasEditOrderBillRatesPermission } from '../../order-candidate-list.utils';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -73,7 +75,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
   @Input() actionsAllowed: boolean;
-  @Input() deployedCandidateOrderIds: string[];
+  @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
+  @Input() candidateOrderIds: string[];
 
   public statusesFormControl = new FormControl();
   public openRejectDialog = new Subject<boolean>();
@@ -89,6 +92,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public candidateJob: OrderCandidateJob | null;
   public today = new Date();
   public priceUtils = PriceUtils;
+  public hasEditOrderBillRatesPermission: boolean;
 
   get showYearsOfExperience(): boolean {
     return (
@@ -148,6 +152,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public canOnboard = false;
   public canClose = false;
 
+  get candidateStatus(): ApplicantStatusEnum {
+    return this.candidate.status || (this.candidate.candidateStatus as any);
+  }
+
   constructor(
     private store: Store,
     private actions$: Actions,
@@ -157,10 +165,11 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   ) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
-    this.readOnlyMode =
-      changes['candidate']?.currentValue.status === ApplicantStatusEnum.Withdraw ||
-      changes['candidate']?.currentValue.status === ApplicantStatusEnum.Rejected;
-    this.isClosedPosition = this.candidate.candidateStatus === ApplicantStatusEnum.Offboard;
+    if (changes['candidate']?.currentValue) {
+      this.readOnlyMode =
+        this.candidateStatus === ApplicantStatusEnum.Withdraw || this.candidateStatus === ApplicantStatusEnum.Rejected;
+      this.isClosedPosition = this.candidateStatus === ApplicantStatusEnum.Offboard;
+    }
 
     this.checkRejectReason();
     this.switchFormState();
@@ -285,7 +294,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     };
 
     return this.isDeployedCandidate && this.isAgency
-      ? this.confirmService.confirm(deployedCandidateMessage(this.deployedCandidateOrderIds), options)
+      ? this.confirmService.confirm(deployedCandidateMessage(this.candidateOrderIds), options)
       : of(true);
   }
 
@@ -355,6 +364,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     });
     this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ApplicantStatus[]) => {
       this.nextApplicantStatuses = data;
+      this.hasEditOrderBillRatesPermission = hasEditOrderBillRatesPermission(this.applicationStatus || this.candidate.status, data);
       if (!data.length) {
         this.statusesFormControl.disable();
       } else {
@@ -431,14 +441,14 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private switchFormState(): void {
-    if (this.isDeployedCandidate) {
+    if (this.isReadOnly) {
       this.formGroup?.disable();
     } else {
       this.formGroup?.enable();
     }
   }
 
-  public onReject(): void {
+  private onReject(): void {
     this.store.dispatch(new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
   }

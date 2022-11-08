@@ -23,6 +23,7 @@ import { B2cModule } from './b2c-auth/b2c-auth.module';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { Overlay } from '@angular/cdk/overlay';
 import { ContactusState } from './store/contact-us.state';
+import { PreservedFiltersState } from './store/preserved-filters.state';
 
 @NgModule({
   declarations: [AppComponent],
@@ -33,7 +34,7 @@ import { ContactusState } from './store/contact-us.state';
     Spinnermodule,
 
     //STORE
-    NgxsModule.forRoot([AppState, UserState, RejectReasonState,ContactusState]),
+    NgxsModule.forRoot([AppState, UserState, RejectReasonState, ContactusState, PreservedFiltersState]),
     NgxsReduxDevtoolsPluginModule.forRoot({
       disabled: environment.production,
     }),
