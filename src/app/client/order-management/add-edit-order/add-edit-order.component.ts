@@ -180,6 +180,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         }
       });
     }
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe(() => {
+      this.router.navigate(['/client/order-management']);
+    });
     if (this.isTemplate) {
       this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
         this.initCredentialsAndBillRates(order);

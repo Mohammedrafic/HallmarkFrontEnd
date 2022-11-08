@@ -115,6 +115,10 @@ export class GetAgencyExtensions {
 }
 
 export class GetDeployedCandidateOrderInfo {
-  static readonly type = '[agency order management] Get Deployed Candidate Order Ids';
+  static readonly type = '[agency order management] Get Deployed Candidate Order Info';
   constructor(public orderId: number, public candidateProfileId: number, public organizationId: number) {}
+}
+
+export class ClearDeployedCandidateOrderInfo {
+  static readonly type = '[agency order management] Clear Deployed Candidate Order Info';
 }
