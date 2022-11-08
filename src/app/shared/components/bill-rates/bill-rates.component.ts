@@ -13,6 +13,7 @@ import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid
 import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-bill-rates',
@@ -109,7 +110,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       {
         billRateConfig: value.billRateConfig,
         billRateConfigId: value.billRateConfigId,
-        effectiveDate: value.effectiveDate,
+        effectiveDate: DateTimeHelper.convertDateToUtc(value.effectiveDate),
         id: value.id,
         intervalMax: value.intervalMax && String(value.intervalMax),
         intervalMin: value.intervalMin && String(value.intervalMin),
@@ -214,6 +215,11 @@ export class BillRatesComponent implements OnInit, OnDestroy {
           this.billRateForm.get('billRateConfigId')?.enable({ emitEvent: false });
           this.billRateForm.get('effectiveDate')?.enable({ emitEvent: false });
         }
+      }
+
+      if (value.effectiveDate) {
+        value.effectiveDate = DateTimeHelper.toUtcFormat(value.effectiveDate);
+        this.billRateForm.get('effectiveDate')?.patchValue(value.effectiveDate);
       }
 
       const applicantStatus = this.store.selectSnapshot(OrderManagementContentState.candidatesJob)?.applicantStatus.applicantStatus;
