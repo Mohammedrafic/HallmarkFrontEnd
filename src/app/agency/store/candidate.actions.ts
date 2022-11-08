@@ -1,4 +1,4 @@
-import { CandidateImportRecord, CandidateImportResult } from "@shared/models/candidate-profile-import.model";
+import { CandidateImportRecord, CandidateImportResult } from '@shared/models/candidate-profile-import.model';
 import { CandidateCredential } from '@shared/models/candidate-credential.model';
 import { Candidate } from 'src/app/shared/models/candidate.model';
 import { Education } from 'src/app/shared/models/education.model';
@@ -6,7 +6,7 @@ import { Experience } from 'src/app/shared/models/experience.model';
 
 export class GetCandidatesByPage {
   static readonly type = '[candidate] Get Candidates by Page';
-  constructor(public pageNumber: number, public pageSize: number) { }
+  constructor(public pageNumber: number, public pageSize: number) {}
 }
 
 export class GetCandidateById {
@@ -31,17 +31,14 @@ export class SaveCandidateSucceeded {
 
 export class RemoveCandidateFromStore {
   static readonly type = '[candidate] Remove Candidate From Store';
-  constructor() {}
 }
 
 export class GetAllSkills {
   static readonly type = '[candidate] Get All Skills';
-  constructor() {}
 }
 
 export class GetExperienceByCandidateId {
   static readonly type = '[candidate] Get Experience By Candidate Id';
-  constructor() {}
 }
 
 export class SaveExperience {
@@ -61,12 +58,10 @@ export class RemoveExperience {
 
 export class RemoveExperienceSucceeded {
   static readonly type = '[candidate] Remove Experience Succeeded';
-  constructor() {}
 }
 
 export class GetEducationByCandidateId {
   static readonly type = '[candidate] Get Education By Candidate Id';
-  constructor() {}
 }
 
 export class SaveEducation {
@@ -86,7 +81,6 @@ export class RemoveEducation {
 
 export class RemoveEducationSucceeded {
   static readonly type = '[candidate] Remove Education Succeeded';
-  constructor() {}
 }
 
 export class UploadCandidatePhoto {
@@ -111,10 +105,12 @@ export class GetCandidatePhotoSucceeded {
 
 export class GetCandidatesCredentialByPage {
   static readonly type = '[candidate] Get Candidates Credential by Page';
-  constructor(public pageNumber: number,
-              public pageSize: number,
-              public orderId: number | null,
-              public candidateProfileId: number) {}
+  constructor(
+    public pageNumber: number,
+    public pageSize: number,
+    public orderId: number | null,
+    public candidateProfileId: number
+  ) {}
 }
 
 export class GetMasterCredentials {
@@ -134,7 +130,6 @@ export class SaveCandidatesCredentialSucceeded {
 
 export class SaveCandidatesCredentialFailed {
   static readonly type = '[candidate] Save Candidates Credential Failed';
-  constructor() {}
 }
 
 export class RemoveCandidatesCredential {
@@ -144,12 +139,10 @@ export class RemoveCandidatesCredential {
 
 export class RemoveCandidatesCredentialSucceeded {
   static readonly type = '[candidate] Remove Candidates Credential Succeeded';
-  constructor() {}
 }
 
 export class GetCredentialTypes {
   static readonly type = '[candidate] Get Credential Types';
-  constructor() {}
 }
 
 export class UploadCredentialFiles {
@@ -179,52 +172,50 @@ export class GetCredentialPdfFilesSucceeded {
 
 export class GetGroupedCredentialsFiles {
   static readonly type = '[candidate] Get Grouped Credentials Files';
-  constructor() {}
 }
 
 export class UploadCredentialFilesSucceeded {
   static readonly type = '[candidate] Upload Credential Files Succeeded';
-  constructor() {}
 }
 
 export class GetCandidateProfileTemplate {
   static readonly type = '[candidate] Get Candidate Profile Template';
-  constructor() { }
+  constructor() {}
 }
 
 export class GetCandidateProfileTemplateSucceeded {
   static readonly type = '[candidate] Get Candidate Profile Template Succeeded';
-  constructor(public payload: Blob) { }
+  constructor(public payload: Blob) {}
 }
 
 export class GetCandidateProfileErrors {
   static readonly type = '[candidate] Get Candidate Profile Errors';
-  constructor(public payload: CandidateImportRecord[]) { }
+  constructor(public payload: CandidateImportRecord[]) {}
 }
 
 export class GetCandidateProfileErrorsSucceeded {
   static readonly type = '[candidate] Get Candidate Profile Errors Succeeded';
-  constructor(public payload: Blob) { }
+  constructor(public payload: Blob) {}
 }
 
 export class UploadCandidateProfileFile {
   static readonly type = '[candidate] Upload Candidate Profile File';
-  constructor(public payload: Blob) { }
+  constructor(public payload: Blob) {}
 }
 
 export class UploadCandidateProfileFileSucceeded {
   static readonly type = '[candidate] Upload Candidate Profile File Succeeded';
-  constructor(public payload: CandidateImportResult) { }
+  constructor(public payload: CandidateImportResult) {}
 }
 
 export class SaveCandidateImportResult {
   static readonly type = '[candidate] Save Candidate Import Result';
-  constructor(public payload: CandidateImportRecord[]) { }
+  constructor(public payload: CandidateImportRecord[]) {}
 }
 
 export class SaveCandidateImportResultSucceeded {
   static readonly type = '[candidate] Save Candidate Import Result Succeeded';
-  constructor(public payload: CandidateImportResult) { }
+  constructor(public payload: CandidateImportResult) {}
 }
 
 export class DownloadCredentialFiles {

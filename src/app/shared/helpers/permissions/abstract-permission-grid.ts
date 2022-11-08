@@ -4,9 +4,9 @@ import { Permission, PermissionGrid } from "@core/interface";
 import { UserPermissions } from "@core/enums";
 import { REQUIRED_PERMISSIONS } from "@shared/constants";
 import { Store } from "@ngxs/store";
-import { UserState } from "../../../store/user.state";
+import { UserState } from "src/app/store/user.state";
 import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
-import { filter, take } from 'rxjs';
+import { filter, Observable, take } from 'rxjs';
 
 @Directive()
 export abstract class AbstractPermissionGrid extends AbstractGridConfigurationComponent implements OnInit, PermissionGrid {
@@ -29,5 +29,10 @@ export abstract class AbstractPermissionGrid extends AbstractGridConfigurationCo
       filter((permissions: Permission) => !!Object.keys(permissions).length),
       take(1)
     ).subscribe((permissions: Permission) => this.userPermission = permissions);
+  }
+
+  protected getPermissionStream(): Observable<Permission> {
+    return this.store.select(UserState.userPermission)
+      .pipe(filter((permissions: Permission) => !!Object.keys(permissions).length));
   }
 }
