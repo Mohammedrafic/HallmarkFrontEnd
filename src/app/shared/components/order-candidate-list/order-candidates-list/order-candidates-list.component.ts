@@ -1,10 +1,8 @@
-import { GetCandidateJob, GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import { ClearDeployedCandidateOrderInfo, GetCandidateJob, GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { GetAvailableSteps, GetOrganisationCandidateJob,
-  GetPredefinedBillRates
-} from '@client/store/order-managment-content.actions';
+import { GetAvailableSteps, GetOrganisationCandidateJob, GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Select, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -53,7 +51,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public defaultDuration: Duration = Duration.Other;
   public selectedOrder: Order;
   public agencyActionsAllowed = true;
-  public candidateOrderIds: string[] = [];
+  public deployedCandidateOrderIds: string[] = [];
   public isOrderOverlapped = false;
 
   get isShowDropdown(): boolean {
@@ -159,6 +157,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   }
 
   public onCloseDialog(): void {
+    this.clearDeployedCandidateOrderInfo();
     this.sideDialog.hide();
   }
 
@@ -183,7 +182,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   private subscribeToDeployedCandidateOrdersInfo(): void {
     this.deployedCandidateOrderInfo$.pipe(takeUntil(this.unsubscribe$)).subscribe((ordersInfo) => {
       this.isOrderOverlappingByDate(ordersInfo);
-      this.candidateOrderIds = ordersInfo.map((data) => data.orderPublicId);
+      this.deployedCandidateOrderIds = ordersInfo.map((data) => data.orderPublicId);
     });
   }
 
@@ -225,5 +224,11 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       return startDate_1 < endDate_2;
     }
     return true;
+  }
+
+  private clearDeployedCandidateOrderInfo(): void {
+    if (this.deployedCandidateOrderIds.length) {
+      this.store.dispatch(new ClearDeployedCandidateOrderInfo());
+    }
   }
 }
