@@ -2,9 +2,9 @@ import { DismissAlertDto } from './../shared/models/alerts-template.model';
 import { DismissAlert, DismissAllAlerts } from './../admin/store/alerts.actions';
 import { GetAlertsForCurrentUser, ShowCustomSideDialog } from './../store/app.actions';
 import { GetAlertsForUserStateModel } from './../shared/models/get-alerts-for-user-state-model';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-
+import { OutsideZone } from "@core/decorators";
 import { Actions, Select, Store, ofActionDispatched } from '@ngxs/store';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import {
@@ -176,7 +176,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     private orderManagementAgencyService: OrderManagementAgencyService,
     private actions$: Actions,
     private analyticsApiService: AnalyticsApiService<string>,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private readonly ngZone: NgZone,
   ) {
     this.filterService.canPreserveFilters() && store.dispatch(new InitPreservedFilters());
     router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((data: any) => {
@@ -220,6 +221,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       });
 
     this.getAlertsPoolling();
+    
     this.watchForUnreadMessages();
   }
 
@@ -229,6 +231,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   ngAfterViewInit(): void {
     this.hideAnalyticsSubMenuItems();
+    this.getAlertsPoollingTime();
   }
 
   private removeManageNotificationOptionInHeader(): void {
@@ -246,6 +249,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   private getCurrentUserPermissions(): void {
     this.store.dispatch(new GetCurrentUserPermissions());
   }
+
 
   private getAlertsPoolling(): void {
     this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
@@ -302,6 +306,17 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
         ];
       }
     });
+  }
+
+  @OutsideZone
+  private getAlertsPoollingTime(): void {
+    setInterval(() => {
+      this.alertStateModel$.subscribe((alertdata) => {
+        this.alerts = alertdata;
+      });
+    }, 60000
+    );
+
   }
 
   private hasPermission(permissions: number[], id: number): boolean {
