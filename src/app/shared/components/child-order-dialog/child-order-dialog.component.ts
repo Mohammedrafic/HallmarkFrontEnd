@@ -725,7 +725,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   private getDeployedCandidateOrders(): void {
     if (!!this.candidate.deployedCandidateInfo) {
       const candidateId = this.candidate.candidateId;
-      const organizationId = this.candidate.deployedCandidateInfo.organizationId;
+      const organizationId = this.candidate.organizationId || this.candidate.deployedCandidateInfo.organizationId;
       const orderId = this.candidate.orderId;
       this.store.dispatch(new GetDeployedCandidateOrderInfo(orderId, candidateId, organizationId));
     }

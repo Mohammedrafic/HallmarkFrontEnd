@@ -153,7 +153,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   private getDeployedCandidateOrders(): void {
     if (!!this.candidate.deployedCandidateInfo) {
       const candidateId = this.candidate.candidateId;
-      const organizationId = this.candidate.deployedCandidateInfo.organizationId;
+      const organizationId = this.candidate.organizationId || this.candidate.deployedCandidateInfo.organizationId;
       this.store.dispatch(new GetDeployedCandidateOrderInfo(this.order.orderId, candidateId, organizationId));
     }
   }

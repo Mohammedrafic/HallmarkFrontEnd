@@ -12,6 +12,6 @@
   </ng-container>
   <ng-template #orgMessage>
     Employee is already working on an assignment till
-    <span>{{ candidateBasicInfo[0]?.positionActualEndDate | date: 'MM/dd/yyyy' }}</span>
+    <span>{{ candidateBasicInfo.pop()?.positionActualEndDate | date: 'MM/dd/yyyy' }}</span>
   </ng-template>
 </div>
