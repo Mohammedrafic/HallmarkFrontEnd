@@ -23,7 +23,7 @@ import {
   SelectingEventArgs,
   TabComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { GetAgencyExtensions, GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import { GetAgencyExtensions, GetCandidateJob, GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
 import {
@@ -80,6 +80,7 @@ import { ShowCloseOrderDialog, ShowToast } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from '../../../security/services/permission.service';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 enum Template {
   accept,
@@ -136,6 +137,9 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
 
   @Select(UserState.currentUserPermissions)
   public currentUserPermissions$: Observable<any[]>;
+
+  @Select(OrderManagementState.deployedCandidateOrderInfo)
+  public readonly deployedCandidateOrderInfo$: Observable<DeployedCandidateOrderInfo[]>;
 
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
@@ -261,6 +265,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     if (candidate) {
       this.setCloseOrderButtonState();
       this.setAddExtensionBtnState(candidate);
+      this.getDeployedCandidateOrders();
 
       if (this.chipList) {
         this.chipList.cssClass = this.chipsCssClass.transform(
@@ -715,5 +720,14 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       this.canCreateOrder = canCreateOrder;
       this.canCloseOrder = canCloseOrder;
     });
+  }
+
+  private getDeployedCandidateOrders(): void {
+    if (!!this.candidate.deployedCandidateInfo) {
+      const candidateId = this.candidate.candidateId;
+      const organizationId = this.candidate.deployedCandidateInfo.organizationId;
+      const orderId = this.candidate.orderId;
+      this.store.dispatch(new GetDeployedCandidateOrderInfo(orderId, candidateId, organizationId));
+    }
   }
 }

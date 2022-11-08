@@ -18,6 +18,7 @@ import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { deployedCandidateMessage, DEPLOYED_CANDIDATE } from '@shared/constants';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -37,7 +38,8 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isAgency: boolean = false;
   @Input() isLocked: boolean | undefined = false;
   @Input() actionsAllowed: boolean;
-  @Input() deployedCandidateOrderIds: string[];
+  @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
+  @Input() candidateOrderIds: string[];
 
   public formGroup: FormGroup;
   public readOnlyMode: boolean;
@@ -141,7 +143,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     };
 
     return this.isDeployedCandidate && this.isAgency
-      ? this.confirmService.confirm(deployedCandidateMessage(this.deployedCandidateOrderIds), options)
+      ? this.confirmService.confirm(deployedCandidateMessage(this.candidateOrderIds), options)
       : of(true);
   }
 

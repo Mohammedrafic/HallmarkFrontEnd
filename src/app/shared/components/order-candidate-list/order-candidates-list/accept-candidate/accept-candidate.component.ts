@@ -44,6 +44,7 @@ import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -61,7 +62,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
   @Input() actionsAllowed: boolean;
-  @Input() deployedCandidateOrderIds: string[];
+  @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
+  @Input() candidateOrderIds: string[];
 
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
@@ -217,7 +219,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     };
 
     return this.isDeployedCandidate  && this.isAgency
-      ? this.confirmService.confirm(deployedCandidateMessage(this.deployedCandidateOrderIds), options)
+      ? this.confirmService.confirm(deployedCandidateMessage(this.candidateOrderIds), options)
       : of(true);
   }
 
