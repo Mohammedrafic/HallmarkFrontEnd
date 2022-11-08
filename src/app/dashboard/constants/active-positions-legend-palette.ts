@@ -9,3 +9,13 @@ export const activePositionsLegendPalette: Record<ActivePositionsChartStatuses, 
   [ActivePositionsChartStatuses.CLOSED]: 'var(--widget-status-rejected-closed)',
   [ActivePositionsChartStatuses.INCOMPLETE]: 'var(--widget-status-shortlisted-incomplete)',
 }
+
+export const activePositionsLegendDisplayText: Record<ActivePositionsChartStatuses, string> = {
+  [ActivePositionsChartStatuses.OPEN]: ActivePositionsChartStatuses.OPEN,
+  [ActivePositionsChartStatuses.IN_PROGRESS]: 'In Progress',
+  [ActivePositionsChartStatuses.PENDING]: 'In Progress (Pending)',
+  [ActivePositionsChartStatuses.ACCEPTED]: 'In Progress (Accepted)',
+  [ActivePositionsChartStatuses.FILLED]: ActivePositionsChartStatuses.FILLED,
+  [ActivePositionsChartStatuses.CLOSED]: ActivePositionsChartStatuses.CLOSED,
+  [ActivePositionsChartStatuses.INCOMPLETE]: ActivePositionsChartStatuses.INCOMPLETE,
+}
