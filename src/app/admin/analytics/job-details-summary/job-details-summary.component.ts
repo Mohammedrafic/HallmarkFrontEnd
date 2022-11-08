@@ -187,7 +187,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
         departmentIds: new FormControl([], [Validators.required]),
         skillCategoryIds: new FormControl([], [Validators.required]),
         skillIds: new FormControl([], [Validators.required]),
-        condidateStatus: new FormControl(null, [Validators.required]),
+        candidateStatuses: new FormControl(null, [Validators.required]),
         jobId: new FormControl(null, []),
       }
     );
@@ -400,7 +400,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
     this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue([]);
     this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
-    this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.CondidateStatus)?.setValue(null);
+    this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.candidateStatuses)?.setValue(null);
     this.jobDetailsSummaryReportForm.get(analyticsConstants.formControlNames.JobId)?.setValue(null);
     this.filteredItems = [];
   }

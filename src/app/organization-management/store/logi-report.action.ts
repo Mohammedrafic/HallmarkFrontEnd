@@ -1,4 +1,4 @@
-import { FinancialCandidateSearchFilter, FinancialTimeSheetFilter } from "@admin/analytics/models/financial-timesheet.model";
+import { CommonReportFilter, CommonCandidateSearchFilter } from "@admin/analytics/models/common-report.model";
 import { DepartmentsByLocationsFilter } from "@shared/models/department.model";
 import { LocationsByRegionsFilter } from "@shared/models/location.model";
 import { regionFilter } from "@shared/models/region.model";
@@ -23,13 +23,13 @@ export class ClearLogiReportState {
   static readonly type = '[alerts] Clear Logi Report State';
   constructor(){}
 }
-export class GetFinancialTimeSheetReportFilterOptions{
-  static readonly type = '[LogiReport] Get Financial TimeSheet Report Filter Options';
-  constructor(public filter: FinancialTimeSheetFilter) { }
+export class GetCommonReportFilterOptions{
+  static readonly type = '[LogiReport] Get Common Report Filter Options';
+  constructor(public filter: CommonReportFilter) { }
 }
-export class GetFinancialTimeSheetCandidateSearch{
-  static readonly type = '[LogiReport] Get Financial TimeSheet Candidate Search';
-  constructor(public filter: FinancialCandidateSearchFilter) { }
+export class GetCommonReportCandidateSearch{
+  static readonly type = '[LogiReport] Get Common Candidate Search';
+  constructor(public filter: CommonCandidateSearchFilter) { }
 }
 export class GetJobDetailSummaryReportFilterOptions {
   static readonly type = '[LogiReport] Get Job Detail Summary Report Filter Options';

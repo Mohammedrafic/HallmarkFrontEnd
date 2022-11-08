@@ -70,18 +70,39 @@
         <div class="input-container calendar">
           <label>Skill Category</label>
           <div class="input-group dropdown">
-            <ejs-multiselect mode="CheckBox" formControlName="skillCategoryIds" appValidateWithMessage placeholder="All"
+            <ejs-multiselect mode="CheckBox" formControlName="skillCategoryIds" placeholder="All"
               [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skillCategoryIds.dataSource"
-              [fields]="accrualReportTypeFields" [selectAllText]='allOption' showSelectAll=true>
+              [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>
         <div class="input-container dropdown">
           <label>Skills</label>
           <div class="input-group datepicker">
-            <ejs-multiselect mode="CheckBox" formControlName="skillIds" appValidateWithMessage placeholder="All"
+            <ejs-multiselect mode="CheckBox" formControlName="skillIds"  placeholder="All"
               [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skillIds.dataSource"
-              [fields]="accrualReportTypeFields" [selectAllText]='allOption' showSelectAll=true>
+              [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-elemet">
+      <div class="group">
+        <div class="input-container calendar">
+          <label>Candidate Name</label>
+          <div class="input-group dropdown">          
+            <ejs-autocomplete formControlName="candidateName"  [dataSource]="filterColumns.candidateName.dataSource" 
+             filterType='StartsWith' [fields]='candidateNameFields'
+                    [autofill]='true' [placeholder]='remoteWaterMark' sortOrder='Ascending'></ejs-autocomplete>
+          </div>
+        </div>
+        <div class="input-container dropdown">
+          <label>Candidate Status</label>
+          <div class="input-group datepicker">
+            <ejs-multiselect mode="CheckBox" formControlName="candidateStatuses"  placeholder="All"
+              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.candidateStatuses.dataSource"
+              [fields]="candidateStatusesFields" [selectAllText]='allOption' showSelectAll=true>
             </ejs-multiselect>
           </div>
         </div>

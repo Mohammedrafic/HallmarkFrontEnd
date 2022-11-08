@@ -14,7 +14,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType, GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetFinancialTimeSheetReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
@@ -29,7 +29,7 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
-import { FinancialTimeSheetFilter, FinancialTimeSheetReportFilterOptions, SearchCandidate } from '../models/financial-timesheet.model';
+import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SearchCandidate, SkillCategoryDto } from '../models/common-report.model';
 import { OrderTypeOptions } from '@shared/enums/order-type';
 
 @Component({
@@ -75,10 +75,10 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
   @Select(LogiReportState.logiReportData)
   public logiReportData$: Observable<ConfigurationDto[]>;
 
-  @Select(LogiReportState.financialTimeSheetFilterData)
-  public financialTimeSheetFilterData$: Observable<FinancialTimeSheetReportFilterOptions>;
+  @Select(LogiReportState.commonReportFilterData)
+  public financialTimeSheetFilterData$: Observable<CommonReportFilterOptions>;
 
-  @Select(LogiReportState.financialTimeSheetCandidateSearch)
+  @Select(LogiReportState.commonReportCandidateSearch)
   public financialTimeSheetCandidateSearchData$: Observable<SearchCandidate[]>;
  
   candidateSearchData:SearchCandidate[]=[];
@@ -88,7 +88,13 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
   selectedOrganizations: Organisation[];
 
   accrualReportTypeFields:FieldSettingsModel = { text: 'name', value: 'id' };
+  commonFields:FieldSettingsModel = { text: 'name', value: 'id' };
+  candidateNameFields:FieldSettingsModel={text: 'fullName',value: 'id'};
+  remoteWaterMark: string = 'e.g. Andrew Fuller';
+  candidateStatusesFields:FieldSettingsModel={text: 'statusText',value: 'status'};
   selectedDepartments: Department[];
+  selectedSkillCategories:SkillCategoryDto[];
+  selectedSkills:MasterSkillDto[];
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
   private agencyOrganizationId:number;
@@ -102,6 +108,8 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
   public departmentIdControl: AbstractControl;
+  public skillCategoryIdControl: AbstractControl;
+  public skillIdControl: AbstractControl;
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
@@ -113,13 +121,15 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
   public defaultRegions: (number | undefined)[] = [];
   public defaultLocations: (number | undefined)[] = [];
   public defaultDepartments: (number | undefined)[] = [];
+  public defaultSkillCategories: (number | undefined)[] = [];
+  public defaultSkills: (number | undefined)[] = [];
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
   public isInitialLoad: boolean = false;  
   public baseUrl:string='';  
   public user: User | null;
-  public filterOptions:FinancialTimeSheetReportFilterOptions;
+  public filterOptionsData:CommonReportFilterOptions;
   public candidateFilterData:SearchCandidate[]=[];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
@@ -144,10 +154,14 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
      this.candidateSearchData=data;
     });
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => { 
-      this.financialTimeSheetFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:FinancialTimeSheetReportFilterOptions|null) => { 
+      this.financialTimeSheetFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:CommonReportFilterOptions|null) => { 
         if(data!=null)
         {
-          this.filterOptions=data;
+          this.filterOptionsData=data;
+          this.filterColumns.skillCategoryIds.dataSource=data.skillCategories;
+          this.filterColumns.skillIds.dataSource=[];
+          this.filterColumns.jobStatuses.dataSource=data.orderStatuses;
+          this.filterColumns.candidateStatuses.dataSource=data.candidateStatuses;
         }
         });
       this.SetReportData();
@@ -161,10 +175,10 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
       this.isInitialLoad = true;
       let businessIdData=[];
       businessIdData.push(data);
-      let filter:FinancialTimeSheetFilter={
+      let filter:CommonReportFilter={
         businessUnitIds: businessIdData
       };
-      this.store.dispatch(new GetFinancialTimeSheetReportFilterOptions(filter));
+      this.store.dispatch(new GetCommonReportFilterOptions(filter));
       this.orderFilterColumnsSetup();
       this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.accrualReportTypes)?.setValue(1);
       this.onFilterControlValueChangedHandler();
@@ -272,6 +286,23 @@ export class ClientFinanceAccrualReportComponent implements OnInit,OnDestroy {
 
         this.SearchReport();
         this.isInitialLoad = false;
+      }
+    });
+    this.skillCategoryIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds) as AbstractControl;
+    this.skillCategoryIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (this.skillCategoryIdControl.value.length > 0) {
+        this.selectedSkillCategories = this.filterOptionsData.skillCategories?.filter((object) => data?.includes(object.id));
+        let skills=this.filterOptionsData.masterSkills.filter(i=>data?.includes(i.skillCategoryId));
+        this.filterColumns.skillIds.dataSource=skills;
+        this.defaultSkills=skills.map((list)=>list.id);
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
+        this.changeDetectorRef.detectChanges();
+      }
+    });
+    this.skillIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillIds) as AbstractControl;
+    this.skillIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (this.skillIdControl.value.length > 0) {
+        this.selectedSkills = this.filterOptionsData.masterSkills?.filter((object) => data?.includes(object.id));
       }
     });
     

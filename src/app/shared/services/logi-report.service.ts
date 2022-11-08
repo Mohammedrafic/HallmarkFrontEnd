@@ -1,4 +1,4 @@
-import {  FinancialTimeSheetReportFilterOptions, SearchCandidate} from "@admin/analytics/models/financial-timesheet.model";
+import {  CommonReportFilterOptions, SearchCandidate} from "@admin/analytics/models/common-report.model";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { ConfigurationDto } from "@shared/models/analytics.model";
@@ -43,17 +43,17 @@ public getLogiReportData(): Observable<ConfigurationDto[]> {
   return this.http.get<ConfigurationDto[]>(`/config/ReportServer`);
 }
 /**
-   * Get the Financial Timesheet  Filter Options
-   * @return FinancialTimeSheetReportFilterOptions
+   * Get the Common Report  Filter Options
+   * @return CommonReportFilterOptions
    */
-public getFinancialTimeSheetReportFilterOptions(filter:any): Observable<FinancialTimeSheetReportFilterOptions> {
-  return this.http.post<FinancialTimeSheetReportFilterOptions>(`/api/LogiReport/financialtimesheet/filter`,filter);
+public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOptions> {
+  return this.http.post<CommonReportFilterOptions>(`/api/LogiReport/financialtimesheet/filter`,filter);
 }
 /**
-   * Get the Financial Timesheet Candidate Search
+   * Get the Common Candidate Search
    * @return SearchCandidate
    */
- public getFinancialTimeSheetCandidateSearch(filter:any): Observable<SearchCandidate[]> {
+ public getCommonCandidateSearch(filter:any): Observable<SearchCandidate[]> {
   return this.http.post<SearchCandidate[]>(`/api/LogiReport/financialtimesheet/candidatesearch`,filter);
 }
 }
