@@ -140,7 +140,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   ngOnInit(): void {
-    this.store.dispatch([new GetRegionList()]);
+    if (this.filterService.canPreserveFilters()) {
+      this.store.dispatch([new GetRegionList()]);
+    }
     this.dispatchInitialIcon();
     this.subscribeOnSaveState();
     this.subscribeOnPageSubject();
@@ -365,10 +367,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         takeUntil(this.unsubscribe$)
       )
       .subscribe(() => {
-        this.dispatchNewPage();
         this.clearFilters();
         this.setDefaultFilter();
+        this.dispatchNewPage();
         this.store.dispatch([new GetAllSkills()]);
+        if (!this.filterService.canPreserveFilters()) {
+          this.store.dispatch([new GetRegionList()]);
+        }
       });
   }
 

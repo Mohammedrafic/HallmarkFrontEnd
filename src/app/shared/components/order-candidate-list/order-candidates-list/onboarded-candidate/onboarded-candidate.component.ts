@@ -63,6 +63,7 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { hasEditOrderBillRatesPermission } from '../../order-candidate-list.utils';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -93,7 +94,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() isAgency: boolean = false;
   @Input() orderDuration: Duration;
   @Input() actionsAllowed: boolean;
-  @Input() deployedCandidateOrderIds: string[];
+  @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
+  @Input() candidateOrderIds: string[];
 
   public override form: FormGroup;
   public jobStatusControl: FormControl;
@@ -377,7 +379,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     };
 
     return this.isDeployedCandidate && this.isAgency
-      ? this.confirmService.confirm(deployedCandidateMessage(this.deployedCandidateOrderIds), options)
+      ? this.confirmService.confirm(deployedCandidateMessage(this.candidateOrderIds))
       : of(true);
   }
 

@@ -106,6 +106,7 @@
                         (closeModalEvent)="onClose()"
                         [orderDuration]="(selectedOrder$ | async)?.duration!"
                         [actionsAllowed]="agencyActionsAllowed"
+                        [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
                       ></app-onboarded-candidate>
                       <section *ngIf="isReorderType">
                         <ng-container *ngTemplateOutlet="acceptFormSection"></ng-container>
@@ -120,6 +121,7 @@
                         (closeModalEvent)="onClose()"
                         [isAgency]="isAgency"
                         [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
+                        [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
                       ></app-accept-candidate>
                       <section *ngIf="isReorderType">
                         <ng-container *ngTemplateOutlet="acceptFormSection"></ng-container>
@@ -133,6 +135,7 @@
                         [order]="$any(selectedOrder$ | async)"
                         [isTab]="true"
                         [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
+                        [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
                       >
                       </app-apply-candidate>
                     </ng-container>
@@ -142,6 +145,7 @@
                         [candidate]="$any(candidate)"
                         [isTab]="true"
                         [actionsAllowed]="agencyActionsAllowed"
+                        [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
                       ></app-offer-deployment>
                     </ng-container>
 

@@ -51,6 +51,7 @@ import { UserState } from 'src/app/store/user.state';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { hasEditOrderBillRatesPermission } from '../../order-candidate-list.utils';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -74,7 +75,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
   @Input() actionsAllowed: boolean;
-  @Input() deployedCandidateOrderIds: string[];
+  @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
+  @Input() candidateOrderIds: string[];
 
   public statusesFormControl = new FormControl();
   public openRejectDialog = new Subject<boolean>();
@@ -292,7 +294,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     };
 
     return this.isDeployedCandidate && this.isAgency
-      ? this.confirmService.confirm(deployedCandidateMessage(this.deployedCandidateOrderIds), options)
+      ? this.confirmService.confirm(deployedCandidateMessage(this.candidateOrderIds), options)
       : of(true);
   }
 

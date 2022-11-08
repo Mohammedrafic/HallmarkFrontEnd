@@ -40,7 +40,7 @@
         </button>
       </div>
     </div>
-    <app-deploy-candidate-message *ngIf="candidate.deployedCandidateInfo && !isOnboard" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
+    <app-deploy-candidate-message *ngIf="candidate.deployedCandidateInfo && !isOnboard" [isAgency]="isAgency" [candidateBasicInfo]="deployedCandidateOrderInfo"></app-deploy-candidate-message>
   </section>
   <section class="content-container">
     <div class="candidate-info">

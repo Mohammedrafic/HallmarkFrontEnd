@@ -60,7 +60,7 @@
       <e-column field="intervalMax" headerText="Interval Max" textAlign="Right"></e-column>
 
       <e-column headerText="Effective Date" textAlign="Right">
-        <ng-template #template let-data>{{data.effectiveDate | date:'M/d/y'}}</ng-template>
+        <ng-template #template let-data>{{data.effectiveDate | date:'M/d/y': 'utc': 'en-US'}}</ng-template>
       </e-column>
     </e-columns>
   </ejs-grid>
