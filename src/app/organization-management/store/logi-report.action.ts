@@ -2,6 +2,7 @@ import { FinancialCandidateSearchFilter, FinancialTimeSheetFilter } from "@admin
 import { DepartmentsByLocationsFilter } from "@shared/models/department.model";
 import { LocationsByRegionsFilter } from "@shared/models/location.model";
 import { regionFilter } from "@shared/models/region.model";
+import { JobDetailSummaryFilter } from "../../admin/analytics/models/jobdetail-summary.model";
 
 export class GetRegionsByOrganizations {
   static readonly type = '[LogiReport] Get The List Of Regions By Organizations';
@@ -29,4 +30,8 @@ export class GetFinancialTimeSheetReportFilterOptions{
 export class GetFinancialTimeSheetCandidateSearch{
   static readonly type = '[LogiReport] Get Financial TimeSheet Candidate Search';
   constructor(public filter: FinancialCandidateSearchFilter) { }
+}
+export class GetJobDetailSummaryReportFilterOptions {
+  static readonly type = '[LogiReport] Get Job Detail Summary Report Filter Options';
+  constructor(public filter: JobDetailSummaryFilter) { }
 }

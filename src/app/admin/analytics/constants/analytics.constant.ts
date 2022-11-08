@@ -7,7 +7,11 @@ export const analyticsConstants = {
     DepartmentIds: 'departmentIds',
     StartDate: 'startDate',
     EndDate:'endDate',
-    accrualReportTypes:'accrualReportTypes'
+    accrualReportTypes: 'accrualReportTypes',
+    SkillCategoryIds: 'skillCategoryIds',
+    SkillIds: 'skillIds',
+    CondidateStatus: 'condidateStatus',
+    JobId:'jobId'
   }
 }
 export const accrualReportTypesList : { name: string; id: number }[] = [  

@@ -7,7 +7,8 @@ import { LocationsPage } from "@shared/models/location.model";
 import { Region, regionsPage } from "@shared/models/region.model";
 import { LogiReportService } from "@shared/services/logi-report.service";
 import { filter, Observable, tap } from "rxjs";
-import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetFinancialTimeSheetReportFilterOptions, GetFinancialTimeSheetCandidateSearch } from "./logi-report.action";
+import { JobDetailSummaryReportFilterOptions } from "../../admin/analytics/models/jobdetail-summary.model";
+import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetFinancialTimeSheetReportFilterOptions, GetFinancialTimeSheetCandidateSearch, GetJobDetailSummaryReportFilterOptions } from "./logi-report.action";
 
 export interface LogiReportStateModel {
 
@@ -16,7 +17,8 @@ export interface LogiReportStateModel {
     locations: Location[] | LocationsPage;
     logiReportDto:ConfigurationDto[];
     financialTimeSheetFilterOptions:FinancialTimeSheetReportFilterOptions|null;
-    searchCandidates:SearchCandidate[];
+    searchCandidates: SearchCandidate[];
+    jobDetailSummaryReportFilterOptions: JobDetailSummaryReportFilterOptions | null;
 
 }
 @State<LogiReportStateModel>({
@@ -28,7 +30,8 @@ export interface LogiReportStateModel {
         locations: [],
         logiReportDto:[],
         financialTimeSheetFilterOptions:null,
-        searchCandidates:[]
+        searchCandidates: [],
+        jobDetailSummaryReportFilterOptions:null
     },
 })
 @Injectable()
@@ -53,6 +56,9 @@ export class LogiReportState {
     
     @Selector()
     static financialTimeSheetCandidateSearch(state: LogiReportStateModel): SearchCandidate[]  { return state.searchCandidates; }
+
+    @Selector()
+    static jobDetailSummaryReportFilterData(state: LogiReportStateModel): JobDetailSummaryReportFilterOptions | null { return state.jobDetailSummaryReportFilterOptions; }
 
     @Action(GetRegionsByOrganizations)
     GetRegionsByOrganizations({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<Region[]> {
@@ -121,7 +127,16 @@ export class LogiReportState {
                 return payload
            
         }));
-    }
+  }
+
+  @Action(GetJobDetailSummaryReportFilterOptions)
+  GetJobDetailSummaryReportFilterOptions({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<JobDetailSummaryReportFilterOptions> {
+    return this.logiReportService.getFinancialTimeSheetReportFilterOptions(filter).pipe(tap((payload: any) => {
+      patchState({ jobDetailSummaryReportFilterOptions: payload });
+      return payload
+
+    }));
+  }
 }
 
 
