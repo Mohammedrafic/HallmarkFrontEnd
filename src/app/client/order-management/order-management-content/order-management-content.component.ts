@@ -26,6 +26,7 @@ import {
   SetLock
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { Permission } from "@core/interface";
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GetAllOrganizationSkills, GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -320,8 +321,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   override ngOnInit(): void {
     super.ngOnInit();
-    this.hasCreateEditOrderPermission = this.userPermission[this.userPermissions.CanCreateOrders]
-      || this.userPermission[this.userPermissions.CanOrganizationEditOrders]
+    this.watchForPermissions();
     this.handleDashboardFilters();
     this.orderFilterColumnsSetup();
 
@@ -1606,5 +1606,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     ];
 
     this.closedOrderMenu = [{ text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder }];
+  }
+
+  private watchForPermissions(): void {
+    this.getPermissionStream().pipe(takeUntil(this.unsubscribe$)).subscribe((permissions: Permission) => {
+      this.hasCreateEditOrderPermission = permissions[this.userPermissions.CanCreateOrders]
+        || permissions[this.userPermissions.CanOrganizationEditOrders]
+    });
   }
 }

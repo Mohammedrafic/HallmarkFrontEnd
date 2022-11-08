@@ -11,16 +11,10 @@ import { MoreMenuType } from '../../../enums/documents.enum';
 export class ActionCellrenderComponent implements ICellRendererAngularComp {
 
   public params: any;
+
   agInit(params: any): void {
     this.params = params;
-    if (this.params.data.isSharedWithMe) {
-      this.params.data.editMenuITems = [];
-      let unShareItem: ItemModel = { text: MoreMenuType[3], id: '3' };
-      this.params.data.editMenuITems.push(unShareItem);
-    }
-    else {
-      this.params.data.editMenuITems = this.params.editMenuITems;
-    }
+
   }
 
   documentDownload(event: MouseEvent) {
