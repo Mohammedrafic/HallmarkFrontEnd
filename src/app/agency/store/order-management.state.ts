@@ -426,7 +426,7 @@ export class OrderManagementState {
           orderPublicId: dto.orgPrefix + '-' + dto.orderPublicId,
         }))
       ),
-      tap((orderIds) => patchState({ deployedCandidateOrderInfo: orderIds }))
+      tap((orderInfo) => patchState({ deployedCandidateOrderInfo: orderInfo }))
     );
   }
 }
