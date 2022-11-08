@@ -40,6 +40,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() actionsAllowed: boolean;
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
   @Input() candidateOrderIds: string[];
+  @Input() isOrderOverlapped: boolean;
 
   public formGroup: FormGroup;
   public readOnlyMode: boolean;
@@ -142,7 +143,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       okButtonClass: 'ok-button',
     };
 
-    return this.isDeployedCandidate && this.isAgency
+    return this.isDeployedCandidate && this.isAgency && this.isOrderOverlapped
       ? this.confirmService.confirm(deployedCandidateMessage(this.candidateOrderIds), options)
       : of(true);
   }

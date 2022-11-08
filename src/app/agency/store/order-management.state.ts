@@ -28,6 +28,7 @@ import {
   ApplyOrderApplicants,
   ApplyOrderApplicantsSucceed,
   ClearAgencyHistoricalData,
+  ClearDeployedCandidateOrderInfo,
   ClearOrders,
   ExportAgencyOrders,
   GetAgencyExtensions,
@@ -428,5 +429,10 @@ export class OrderManagementState {
       ),
       tap((orderInfo) => patchState({ deployedCandidateOrderInfo: orderInfo }))
     );
+  }
+
+  @Action(ClearDeployedCandidateOrderInfo)
+  ClearDeployedCandidateOrderInfo({ patchState }: StateContext<OrderManagementModel>): OrderManagementModel {
+    return patchState({ deployedCandidateOrderInfo: [] });
   }
 }

@@ -96,6 +96,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   @Input() actionsAllowed: boolean;
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
   @Input() candidateOrderIds: string[];
+  @Input() isOrderOverlapped: boolean;
 
   public override form: FormGroup;
   public jobStatusControl: FormControl;
@@ -378,8 +379,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       okButtonClass: 'ok-button',
     };
 
-    return this.isDeployedCandidate && this.isAgency
-      ? this.confirmService.confirm(deployedCandidateMessage(this.candidateOrderIds))
+    return this.isDeployedCandidate && this.isAgency && this.isOrderOverlapped
+      ? this.confirmService.confirm(deployedCandidateMessage(this.candidateOrderIds), options)
       : of(true);
   }
 
