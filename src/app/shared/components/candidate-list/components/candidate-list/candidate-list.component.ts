@@ -371,9 +371,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         this.setDefaultFilter();
         this.dispatchNewPage();
         this.store.dispatch([new GetAllSkills()]);
-        if (!this.filterService.canPreserveFilters()) {
-          this.store.dispatch([new GetRegionList()]);
-        }
       });
   }
 
