@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { OrderApplicantsApplyData, OrderApplicantsInitialData } from '@shared/models/order-applicants.model';
-import { OverlappedOrderIds } from '@shared/models/overlapped-orders-dto.model';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderApplicantsService {
@@ -17,11 +17,14 @@ export class OrderApplicantsService {
    * @param candidateId
    * @return Order Applicants Initial Data
    */
-  public getOrderApplicantsData(orderId: number, organizationId: number, candidateId: number): Observable<OrderApplicantsInitialData> {
-    return this.http.get<OrderApplicantsInitialData>(
-      `/api/OrderApplicants/initialData`,
-      { params: { OrderId: orderId, OrganizationId: organizationId, CandidateId: candidateId }}
-    );
+  public getOrderApplicantsData(
+    orderId: number,
+    organizationId: number,
+    candidateId: number
+  ): Observable<OrderApplicantsInitialData> {
+    return this.http.get<OrderApplicantsInitialData>(`/api/OrderApplicants/initialData`, {
+      params: { OrderId: orderId, OrganizationId: organizationId, CandidateId: candidateId },
+    });
   }
 
   /**
@@ -31,12 +34,12 @@ export class OrderApplicantsService {
     return this.http.post<never>(`/api/OrderApplicants/apply`, order);
   }
 
-  public getDeployedCandidateOrderIds(
+  public getDeployedCandidateOrderInfo(
     orderId: number,
     candidateProfileId: number,
     organizationId: number
-  ): Observable<OverlappedOrderIds[]> {
-    return this.http.get<OverlappedOrderIds[]>('/api/OrderApplicants/overlappingorders', {
+  ): Observable<DeployedCandidateOrderInfo[]> {
+    return this.http.get<DeployedCandidateOrderInfo[]>('/api/OrderApplicants/overlappingorders', {
       params: { orderId, candidateProfileId, organizationId },
     });
   }

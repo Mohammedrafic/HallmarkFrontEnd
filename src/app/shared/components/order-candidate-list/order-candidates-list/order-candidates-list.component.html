@@ -166,7 +166,8 @@
       [isAgency]="isAgency"
       [orderDuration]="selectedOrder.duration"
       [actionsAllowed]="agencyActionsAllowed"
-      [deployedCandidateOrderIds]="(deployedCandidateOrderIds$ | async) ?? []"
+      [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
+      [candidateOrderIds]="candidateOrderIds"
     ></app-onboarded-candidate>
   </ng-template>
 
@@ -176,7 +177,8 @@
       [candidate]="candidate"
       [isAgency]="isAgency"
       [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
-      [deployedCandidateOrderIds]="(deployedCandidateOrderIds$ | async) ?? []"
+      [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
+      [candidateOrderIds]="candidateOrderIds"
     ></app-accept-candidate>
   </ng-template>
 
@@ -189,7 +191,8 @@
       [order]="$any((selectedAgOrder$ | async))"
       [isLocked]="(selectedAgOrder$ | async)?.isLocked"
       [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
-      [deployedCandidateOrderIds]="(deployedCandidateOrderIds$ | async) ?? []"
+      [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
+      [candidateOrderIds]="candidateOrderIds"
     >
     </app-apply-candidate>
   </ng-template>
@@ -200,7 +203,8 @@
       [candidate]="candidate"
       [isAgency]="isAgency"
       [actionsAllowed]="agencyActionsAllowed"
-      [deployedCandidateOrderIds]="(deployedCandidateOrderIds$ | async) ?? []"
+      [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
+      [candidateOrderIds]="candidateOrderIds"
     ></app-offer-deployment>
   </ng-template>
   <ng-template #footerTemplate>

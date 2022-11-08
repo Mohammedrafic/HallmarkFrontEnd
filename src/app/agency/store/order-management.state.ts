@@ -59,7 +59,7 @@ import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.e
 import { ExtensionGridModel } from '@shared/components/extension/extension-sidebar/models/extension.model';
 import { OrderManagementContentStateModel } from '@client/store/order-managment-content.state';
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
-import { OverlappedOrderInfo } from '@shared/models/overlapped-orders-dto.model';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 export interface OrderManagementModel {
   ordersPage: AgencyOrderManagementPage | null;
@@ -75,7 +75,7 @@ export interface OrderManagementModel {
   organizationStructure: OrganizationStructure[];
   ordersTab: AgencyOrderManagementTabs;
   extensions: any;
-  deployedCandidateOrderInfo: OverlappedOrderInfo[];
+  deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
 }
 
 @State<OrderManagementModel>({
@@ -196,7 +196,7 @@ export class OrderManagementState {
   }
 
   @Selector()
-  static deployedCandidateOrderInfo(state: OrderManagementModel): OverlappedOrderInfo[] {
+  static deployedCandidateOrderInfo(state: OrderManagementModel): DeployedCandidateOrderInfo[] {
     return state.deployedCandidateOrderInfo;
   }
 
@@ -418,9 +418,14 @@ export class OrderManagementState {
   GetDeployedCandidateOrderInfo(
     { patchState }: StateContext<OrderManagementModel>,
     { orderId, candidateProfileId, organizationId }: GetDeployedCandidateOrderInfo
-  ): Observable<OverlappedOrderInfo[]> {
-    return this.orderApplicantsService.GetDeployedCandidateOrderInfo(orderId, candidateProfileId, organizationId,).pipe(
-      map((data: OverlappedOrderInfo[]) => data.map((dto) => ({ ...dto, orderPublicId: dto.orgPrefix + '-' + dto.orderPublicId}))),
+  ): Observable<DeployedCandidateOrderInfo[]> {
+    return this.orderApplicantsService.getDeployedCandidateOrderInfo(orderId, candidateProfileId, organizationId).pipe(
+      map((data: DeployedCandidateOrderInfo[]) =>
+        data.map((dto) => ({
+          ...dto,
+          orderPublicId: dto.orgPrefix + '-' + dto.orderPublicId,
+        }))
+      ),
       tap((orderIds) => patchState({ deployedCandidateOrderInfo: orderIds }))
     );
   }
