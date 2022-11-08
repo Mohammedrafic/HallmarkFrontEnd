@@ -168,6 +168,7 @@
       [actionsAllowed]="agencyActionsAllowed"
       [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
       [candidateOrderIds]="candidateOrderIds"
+      [isOrderOverlapped]="isOrderOverlapped"
     ></app-onboarded-candidate>
   </ng-template>
 
@@ -179,6 +180,7 @@
       [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
       [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
       [candidateOrderIds]="candidateOrderIds"
+      [isOrderOverlapped]="isOrderOverlapped"
     ></app-accept-candidate>
   </ng-template>
 
@@ -193,6 +195,7 @@
       [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
       [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
       [candidateOrderIds]="candidateOrderIds"
+      [isOrderOverlapped]="isOrderOverlapped"
     >
     </app-apply-candidate>
   </ng-template>
@@ -205,6 +208,7 @@
       [actionsAllowed]="agencyActionsAllowed"
       [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
       [candidateOrderIds]="candidateOrderIds"
+      [isOrderOverlapped]="isOrderOverlapped"
     ></app-offer-deployment>
   </ng-template>
   <ng-template #footerTemplate>

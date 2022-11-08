@@ -77,6 +77,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() actionsAllowed: boolean;
   @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
   @Input() candidateOrderIds: string[];
+  @Input() isOrderOverlapped: boolean;
 
   public statusesFormControl = new FormControl();
   public openRejectDialog = new Subject<boolean>();
@@ -293,7 +294,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       okButtonClass: 'ok-button',
     };
 
-    return this.isDeployedCandidate && this.isAgency
+    return this.isDeployedCandidate && this.isAgency && this.isOrderOverlapped
       ? this.confirmService.confirm(deployedCandidateMessage(this.candidateOrderIds), options)
       : of(true);
   }

@@ -54,6 +54,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public selectedOrder: Order;
   public agencyActionsAllowed = true;
   public candidateOrderIds: string[] = [];
+  public isOrderOverlapped = false;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
@@ -167,14 +168,12 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   }
 
   private checkForAgencyStatus(): void {
-    this.store.select(UserState.agencyActionsAllowed)
-    .pipe(
-      distinctUntilChanged(),
-      takeUntil(this.unsubscribe$),
-    )
-    .subscribe((value) => {
-      this.agencyActionsAllowed = value;
-    });
+    this.store
+      .select(UserState.agencyActionsAllowed)
+      .pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$))
+      .subscribe((value) => {
+        this.agencyActionsAllowed = value;
+      });
   }
 
   private initPredefinedBillRates(): void {
@@ -183,7 +182,48 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
 
   private subscribeToDeployedCandidateOrdersInfo(): void {
     this.deployedCandidateOrderInfo$.pipe(takeUntil(this.unsubscribe$)).subscribe((ordersInfo) => {
+      this.isOrderOverlappingByDate(ordersInfo);
       this.candidateOrderIds = ordersInfo.map((data) => data.orderPublicId);
-    })
+    });
+  }
+
+  private isOrderOverlappingByDate(ordersInfo: DeployedCandidateOrderInfo[]): void {
+    const timeRange_1 = {
+      start: this.selectedOrder.jobStartDate,
+      end: this.selectedOrder.jobEndDate,
+    };
+
+    ordersInfo.forEach((order) => {
+      const timeRange_2 = {
+        start: order.positionActualStartDate,
+        end: order.positionActualEndDate,
+      };
+      const isOverlaped = this.isThereOverlappingDateRange(timeRange_1, timeRange_2);
+
+      if (isOverlaped) {
+        this.isOrderOverlapped = isOverlaped;
+      }
+    });
+  }
+
+  private isThereOverlappingDateRange(
+    timeRange_1: { start: Date | string; end: Date | string },
+    timeRange_2: { start: Date | string; end: Date | string }
+  ): boolean {
+    const startDate_1 = new Date(timeRange_1.start).getTime();
+    const endDate_1 = new Date(timeRange_1.end).getTime();
+    const startDate_2 = new Date(timeRange_2.start).getTime();
+    const endDate_2 = new Date(timeRange_2.end).getTime();
+
+    if (endDate_1 && endDate_2) {
+      return startDate_1 <= endDate_2 && startDate_2 <= endDate_1;
+    }
+    if (endDate_1 && !endDate_2) {
+      return endDate_1 > startDate_2;
+    }
+    if (!endDate_1 && endDate_2) {
+      return startDate_1 < endDate_2;
+    }
+    return true;
   }
 }
