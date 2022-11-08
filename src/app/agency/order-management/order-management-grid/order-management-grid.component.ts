@@ -339,8 +339,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
             this.OrderFilterFormGroup.get('regionIds')?.setValue([...preservedFilters.regions]);
             this.filters.regionIds = [...preservedFilters.regions];
             if (preservedFilters?.locations) {
-              this.OrderFilterFormGroup.get('locationIds')?.setValue(preservedFilters.locations);
-              this.filters.locationIds = preservedFilters.locations;
+              this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
+              this.filters.locationIds = [...preservedFilters.locations];
             }
           }
           this.setDefaultStatuses(statuses);

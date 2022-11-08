@@ -245,7 +245,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       this.organizationControl.setValue(orgId, { emitEvent: false });
       if (preservedFilters && this.filterService.canPreserveFilters()) {
         this.store.dispatch([
-          new Timesheets.UpdateFiltersState({ organizationId: orgId, regionsIds: [...preservedFilters.regions], locationIds: preservedFilters.locations }, this.activeTabIdx !== 0),
+          new Timesheets.UpdateFiltersState({ organizationId: orgId, regionsIds: [...preservedFilters.regions], locationIds: [...preservedFilters.locations] }, this.activeTabIdx !== 0),
           new Timesheets.GetFiltersDataSource()
         ]);
       } else {
@@ -295,7 +295,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     } else {
       if (preservedFilters) {
         this.store.dispatch([
-          new Timesheets.UpdateFiltersState({ regionsIds: [...preservedFilters.regions], locationIds: preservedFilters.locations}),
+          new Timesheets.UpdateFiltersState({ regionsIds: [...preservedFilters.regions], locationIds: [...preservedFilters.locations]}),
           new Timesheets.GetFiltersDataSource()
         ]);
       } else {

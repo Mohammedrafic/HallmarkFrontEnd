@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { State, Action, StateContext, Selector } from '@ngxs/store';
+import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { getAllErrors } from '@shared/utils/error.utils';
@@ -8,44 +8,40 @@ import { catchError, map, Observable, tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MENU_CONFIG } from '@shared/constants';
 import {
-  USER_STORAGE_KEY,
-  ORG_ID_STORAGE_KEY,
   AGENCY_ID_STORAGE_KEY,
   LAST_SELECTED_BUSINESS_UNIT_TYPE,
+  ORG_ID_STORAGE_KEY,
+  USER_STORAGE_KEY
 } from '@shared/constants/local-storage-keys';
 import { ChildMenuItem, Menu, MenuItem } from '@shared/models/menu.model';
 
 import { User, UsersAssignedToRole } from '@shared/models/user.model';
 import { UserService } from '@shared/services/user.service';
 import {
-  GetUserMenuConfig,
-  SetCurrentUser,
-  LogoutUser,
-  GetUserAgencies,
-  SaveLastSelectedOrganizationAgencyId,
-  SetLastSelectedOrganizationAgencyId,
-  GetOrganizationStructure,
-  LastSelectedOrganisationAgency,
-  GetUsersAssignedToRole,
   GetCurrentUserPermissions,
-  GetUserOrganizations,
   GetOrderPermissions,
+  GetOrganizationStructure,
+  GetUserAgencies,
+  GetUserMenuConfig,
+  GetUserOrganizations,
+  GetUsersAssignedToRole,
+  LastSelectedOrganisationAgency,
+  LogoutUser,
+  SaveLastSelectedOrganizationAgencyId,
   SetAgencyActionsAllowed,
-  SetAgencyInvoicesActionsAllowed, SetUserPermissions,
+  SetAgencyInvoicesActionsAllowed,
+  SetCurrentUser,
+  SetLastSelectedOrganizationAgencyId,
+  SetUserPermissions
 } from './user.actions';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
-import {
-  OrganizationDepartment,
-  OrganizationLocation,
-  OrganizationRegion,
-  OrganizationStructure,
-} from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 import { B2CAuthService } from '../b2c-auth/b2c-auth.service';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { Permission } from "@core/interface";
-import { UserPermissionsService } from "@core/services";
-import { PermissionsAdapter } from "@core/helpers/adapters";
+import { Permission } from '@core/interface';
+import { UserPermissionsService } from '@core/services';
+import { PermissionsAdapter } from '@core/helpers/adapters';
 
 export interface UserStateModel {
   user: User | null;
@@ -179,6 +175,11 @@ export class UserState {
   @Selector()
   static isMspUser(state: UserStateModel): boolean {
     return state.user?.businessUnitType === BusinessUnitType.MSP;
+  }
+
+  @Selector()
+  static isAgencyUser(state: UserStateModel): boolean {
+    return state.user?.businessUnitType === BusinessUnitType.Agency;
   }
 
   @Selector([UserState.isHallmarkUser, UserState.isMspUser])

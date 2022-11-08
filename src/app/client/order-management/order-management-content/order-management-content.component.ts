@@ -258,6 +258,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private orderId: number | null;
   private creatingReorder = false;
   private filterApplied = false;
+  private isIncomplete = false;
 
   constructor(
     protected override store: Store,
@@ -453,7 +454,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.filters.agencyType =
       this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) || null : null;
     this.filters.pageSize = this.pageSize;
-
+    this.isIncomplete = false;
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
         this.filters.isTemplate = false;
@@ -481,13 +482,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       case OrganizationOrderManagementTabs.Incomplete:
         this.columnsToExport = allOrdersColumnsToExport;
         this.filters.isTemplate = false;
-        this.store.dispatch(
-          new GetOrders({ ...this.filters, pageNumber: this.currentPage, pageSize: this.pageSize }, true)
-        );
+        this.isIncomplete = true;
+        cleared ? this.store.dispatch([new GetOrders(this.filters, true)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.OrderTemplates:
         this.filters.isTemplate = true;
-        this.store.dispatch([new GetOrders(this.filters)]);
+        cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
     }
 
@@ -1233,7 +1233,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
         this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
         this.setDefaultFilter();
-        this.store.dispatch([new GetOrders(this.filters)])
+        this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
       });
   }
 
@@ -1244,16 +1244,18 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.OrderFilterFormGroup.get('regionIds')?.setValue([...preservedFilters.regions]);
         this.filters.regionIds = [...preservedFilters.regions];
         if (preservedFilters?.locations) {
-          this.OrderFilterFormGroup.get('locationIds')?.setValue(preservedFilters.locations);
-          this.filters.locationIds = preservedFilters.locations;
+          this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
+          this.filters.locationIds = [...preservedFilters.locations];
         }
       }
     }
-    const statuses = this.filterColumns.orderStatuses.dataSource
+    if (!(this.filters.isTemplate || this.isIncomplete)) {
+      const statuses = this.filterColumns.orderStatuses.dataSource
                       .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed].includes(status.status))
                       .map((status: FilterStatus) => status.status);
-    this.OrderFilterFormGroup.get('orderStatuses')?.setValue(statuses);
-    this.filters.orderStatuses = statuses;
+      this.OrderFilterFormGroup.get('orderStatuses')?.setValue(statuses);
+      this.filters.orderStatuses = statuses;
+    }
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }
 

@@ -109,8 +109,11 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
         preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
         if (preservedFilters && (this.filterColumns as any).regionsIds?.dataSource) {
           this.isPreservedFilterSet = true;
+          const dataSource: any[] = [];
+          (this.filterColumns as any).regionsIds.dataSource.map((region: any) => dataSource.push(...region.locations));
+          (this.filterColumns as any).locationIds.dataSource = dataSource;
           this.formGroup.controls['regionsIds'].setValue([...preservedFilters?.regions] || [], { emitEvent: false });
-          this.formGroup.controls['locationIds'].setValue(preservedFilters?.locations || [], { emitEvent: false });
+          this.formGroup.controls['locationIds'].setValue([...preservedFilters?.locations] || [], { emitEvent: false });
           this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
           this.appliedFiltersAmount.emit(this.filteredItems.length);
         }
