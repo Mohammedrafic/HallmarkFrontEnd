@@ -375,10 +375,10 @@ export class DocumentLibraryState {
   }
 
   @Action(GetDocumentsByCognitiveSearch)
-  GetDocumentsByCognitiveSearch({ patchState }: StateContext<DocumentLibraryStateModel>, { keyword }: GetDocumentsByCognitiveSearch): Observable<DocumentLibraryDto> {
-    return this.documentLibraryService.GetDocumentsByCognitiveSearch(keyword).pipe(
+  GetDocumentsByCognitiveSearch({ patchState }: StateContext<DocumentLibraryStateModel>, { keyword, businessUnitType, businessUnitId }: GetDocumentsByCognitiveSearch): Observable<DocumentsLibraryPage> {
+    return this.documentLibraryService.GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId).pipe(
       tap((payload) => {
-        patchState({ documentLibraryDto: payload });
+        patchState({ documentsPage: payload });
       })
     );
   }
