@@ -219,6 +219,10 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     return menu;
   }
 
+  get isClosedOrderPosition(): boolean {
+    return this.candidate.orderStatus === OrderStatus.Closed || !!this.candidate.positionClosureReason || !!this.selectedOrder?.orderClosureReason;
+  }
+
   constructor(
     private chipsCssClass: ChipsCssClass,
     private router: Router,
@@ -573,7 +577,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         const [order, candidate] = data;
         this.order = order as MergedOrder;
         this.candidate = candidate;
-        this.isClosedOrder = this.candidate.orderStatus === OrderStatus.Closed;
+        this.isClosedOrder = this.isClosedOrderPosition;
         this.getTemplate();
         windowScrollTop();
         this.sideDialog.show();
