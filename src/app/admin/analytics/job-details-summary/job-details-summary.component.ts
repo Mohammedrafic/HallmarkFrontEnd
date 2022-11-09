@@ -344,8 +344,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   }
 
   public SearchReport(): void {
-    this.message = "Default filter selected with all regions ,locations and departments for last 30 and next 30 days";
-
+   
     this.filteredItems = [];
     let auth = "Bearer ";
     for (let x = 0; x < window.localStorage.length; x++) {
@@ -355,6 +354,12 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     }
     let { businessIds, candidateName, candidateStatuses, departmentIds, jobId, jobStatuses, locationIds,
       regionIds, skillCategoryIds,agencyIds, skillIds, startDate, endDate } = this.jobDetailSummaryReportForm.getRawValue();
+      if (!this.jobDetailSummaryReportForm.dirty) {
+        this.message = "Default filter selected with all regions ,locations and departments for last 30 and next 30 days";
+      }
+      else {
+        this.message = ""
+      } 
     this.paramsData =
     {
       "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.organizationId),

@@ -2,32 +2,42 @@
 
 .flex-column {
     height:auto;
-  .toolbar {
-    justify-content: space-between;
-    margin-top: 20px;
-    padding-bottom: 10px;
-    .toolbar-header {
-      float: left;
-      position: relative;
+    .toolbar {
+      justify-content: space-between;
+      margin-top: 20px;
+      padding-bottom: 10px;
       display: flex;
-      .toolbar-header-div{
-      font-size: 14px;
-      height: 40px;
-      font-weight:bold;
+      .toolbar-header {
+        float: left;
+        position: relative;
+        
+        .toolbar-header-div{
+        font-size: 14px;
+        height: 40px;
+        font-weight:bold;
+        }
+        
+      }
+      .toolbar-message{
+        .toolbar-message-div{
+          padding-left: 20px;
+          font-size: 14px;
+          height: 40px;
+        }      
+        position: relative;
+        float: left;
+      }
+      .toolbar-buttons {
+        float: right;
+        position: relative;
+        z-index: 99;
+  
+        .button-filter {
+          margin-left: 12px;
+          margin-right: 6px;
+        }
       }
     }
-    .toolbar-buttons {
-      float: right;
-      position: relative;
-      z-index: 99;
-      display: flex;
-
-      .button-filter {
-        margin-left: 12px;
-        margin-right: 6px;
-      }
-    }
-  }
 }
 
 .accrual-report-section {

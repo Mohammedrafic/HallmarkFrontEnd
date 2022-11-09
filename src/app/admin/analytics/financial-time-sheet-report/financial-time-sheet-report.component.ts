@@ -331,8 +331,8 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     
   }
 
-  public SearchReport(): void {
-    this.message = "Default filter selected with all regions ,locations and departments for 90 days";
+  public SearchReport(): void {   
+   
 
     this.filteredItems = [];
     let auth = "Bearer ";
@@ -343,6 +343,12 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     }
     let {accrualReportTypes,businessIds,candidateName,candidateStatuses,departmentIds,jobId,jobStatuses,locationIds,orderTypes,
       regionIds,skillCategoryIds,skillIds,startDate, endDate } = this.financialTimesheetReportForm.getRawValue();
+      if (!this.financialTimesheetReportForm.dirty) {
+        this.message = "Default filter selected with all regions ,locations and departments for 90 days";
+      }
+      else {
+        this.message = ""
+      }
     this.paramsData =
     {
       "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.organizationId),
