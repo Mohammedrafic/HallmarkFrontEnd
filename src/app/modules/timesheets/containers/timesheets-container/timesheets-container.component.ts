@@ -205,16 +205,29 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private onOrganizationChangedHandler(): void {
-    (combineLatest([this.isAgency ? this.agencyId$ : this.organizationId$, this.preservedFilters$.pipe(filter(Boolean), take(1))])).pipe(
-      takeUntil(this.componentDestroy()),
-      debounceTime(600),
-    ).subscribe((val) => {
-      const [id, filters] = val;
-      if (id) {
-        this.store.dispatch(new Timesheets.ResetFiltersState());
-        this.initComponentState();
-      }
-    });
+    if (this.filterService.canPreserveFilters()) {
+      (combineLatest([this.isAgency ? this.agencyId$ : this.organizationId$, this.preservedFilters$.pipe(filter(Boolean), take(1))])).pipe(
+        takeUntil(this.componentDestroy()),
+        debounceTime(600),
+      ).subscribe((val) => {
+        const [id, filters] = val;
+        if (id) {
+          this.store.dispatch(new Timesheets.ResetFiltersState());
+          this.initComponentState();
+        }
+      });
+    } else {
+      (combineLatest([this.isAgency ? this.agencyId$ : this.organizationId$])).pipe(
+        takeUntil(this.componentDestroy()),
+        debounceTime(600),
+      ).subscribe((val) => {
+        const [id] = val;
+        if (id) {
+          this.store.dispatch(new Timesheets.ResetFiltersState());
+          this.initComponentState();
+        }
+      });
+    }
   }
 
   private startFiltersWatching(): void {
