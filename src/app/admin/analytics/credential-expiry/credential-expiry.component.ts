@@ -323,7 +323,6 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.credentialExpiryForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);

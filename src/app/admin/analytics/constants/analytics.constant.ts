@@ -7,11 +7,18 @@ export const analyticsConstants = {
     DepartmentIds: 'departmentIds',
     StartDate: 'startDate',
     EndDate:'endDate',
-    accrualReportTypes:'accrualReportTypes'
+    AccrualReportTypes: 'accrualReportTypes',
+    SkillCategoryIds: 'skillCategoryIds',
+    SkillIds: 'skillIds',
+    CandidateStatuses: 'candidateStatuses',
+    JobId:'jobId',
+    CandidateName:'candidateName',
+    OrderTypes:'orderTypes',
+    JobStatuses:'jobStatuses',
+    AgencyIds:'agencyIds'
   }
 }
-export const accrualReportTypesList : { name: string; id: number }[] = [
-  { name: 'Default', id: 0 },
-  { name: 'Invoice date range', id: 1 },
-  { name: 'Time sheet date range', id: 2 },
+export const accrualReportTypesList : { name: string; id: number }[] = [  
+  { name: 'Timesheet date range', id: 1 },
+  { name: 'Invoice date range', id: 0 }
 ];

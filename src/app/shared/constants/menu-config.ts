@@ -165,12 +165,12 @@ export const MENU_CONFIG: any = {
     40: {
       // Custom Reports
       icon: 'pie-chart',
-      route: '/analytics/client-finance-accrual-report',
+      route: '/analytics/financial-time-sheet-report',
     },
     41: {
       // Accrual Report
       icon: '',
-      route: '/analytics/client-finance-accrual-report',
+      route: '/analytics/financial-time-sheet-report',
     },
     42: {
       // Invoice Summary
@@ -685,12 +685,12 @@ export const MENU_CONFIG: any = {
     40: {
       // Custom Reports
       icon: 'pie-chart',
-      route: '/analytics/client-finance-accrual-report',
+      route: '/analytics/financial-time-sheet-report',
     },
     41: {
       // Accrual Report
       icon: '',
-      route: '/analytics/client-finance-accrual-report',
+      route: '/analytics/financial-time-sheet-report',
     },
     42: {
       // Invoice Summary
