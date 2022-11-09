@@ -8,6 +8,7 @@ export class CommonReportFilterOptions {
       }[];
       masterSkills: MasterSkillDto[];
       skillCategories: SkillCategoryDto[];
+      agencies: AgencyDto[];
   }
   export class OrderStatusDto{
     status: string;
@@ -28,7 +29,11 @@ export class CommonReportFilterOptions {
   export class SkillCategoryDto{
     id: number;
     name: string;
-  }
+}
+export class AgencyDto {
+  agencyId: number;
+  agencyName: string;
+}
   export class CommonReportFilter {
     businessUnitIds: number[]
   }

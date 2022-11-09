@@ -32,3 +32,8 @@ export enum FieldType {
 export enum FilesClearEvent {
   ClearAll = 'clearAllFiles',
 }
+
+export enum ExcludeSpinnerUrl {
+  ReportCandidatesearch ='financialtimesheet/candidatesearch'
+}
+

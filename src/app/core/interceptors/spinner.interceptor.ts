@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
 
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { ExcludeSpinnerUrl } from '../enums/common.enum';
 
 import { SpinnerInterceptorHelperService } from '../services/spinner';
 
@@ -18,7 +19,9 @@ export class LoadingInterceptor implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    this.spinnerService.addUrlToQueue(request.url);
+    if (!request.url.includes(ExcludeSpinnerUrl.ReportCandidatesearch)) {
+      this.spinnerService.addUrlToQueue(request.url);
+    }
 
     return next.handle(request)
     .pipe(

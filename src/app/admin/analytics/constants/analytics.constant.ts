@@ -15,6 +15,7 @@ export const analyticsConstants = {
     CandidateName:'candidateName',
     OrderTypes:'orderTypes',
     JobStatuses:'jobStatuses',
+    AgencyIds:'agencyIds'
   }
 }
 export const accrualReportTypesList : { name: string; id: number }[] = [  
