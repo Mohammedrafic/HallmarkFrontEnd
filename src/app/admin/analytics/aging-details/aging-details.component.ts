@@ -154,10 +154,17 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
       this.organizations = uniqBy(data,'organizationId');
       this.filterColumns.businessIds.dataSource = this.organizations;
       this.defaultOrganizations = this.agencyOrganizationId;
-      let orgList = this.organizations?.filter((x) => this.agencyOrganizationId==x.organizationId);
-        this.regionsList=[];        
-        this.locationsList=[];
-        this.departmentsList=[];
+      this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+      this.changeDetectorRef.detectChanges();
+    });
+
+    this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (!this.isClearAll) {
+        let orgList = this.organizations?.filter((x) => data==x.organizationId);
+        this.selectedOrganizations = orgList;       
+        this.regionsList = [];
+        this.locationsList = [];
+        this.departmentsList = [];
         orgList.forEach((value) => {
           this.regionsList.push(...value.regions);
           value.regions.forEach((region) => {
@@ -167,18 +174,9 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
             });
           });
         });
-        if (data.length>0&&this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {      
-          this.showToastMessage(this.regionsList.length,this.locationsList.length,this.departmentsList.length);
+        if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+          this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
         }
-      this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
-      this.changeDetectorRef.detectChanges();
-    });
-
-    this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (!this.isClearAll) {
-        let orgList = this.organizations?.filter((x) => data==x.organizationId);
-        this.selectedOrganizations = orgList;       
-        
         
         this.regions =this.regionsList;
         this.filterColumns.regionIds.dataSource = this.regions;
@@ -188,6 +186,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
       }
       else {
         this.isClearAll = false;
+        this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);  
       }
     });
     this.regionIdControl = this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
@@ -195,22 +194,28 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
       if (this.regionIdControl.value.length > 0) {
         let regionList = this.regions?.filter((object) => data?.includes(object.id));
         this.selectedRegions = regionList;
-        this.locations=this.locationsList.filter(i=>data?.includes(i.regionId));
-        this.filterColumns.locationIds.dataSource=this.locations;
-        this.defaultLocations=this.locations.map((list)=>list.id);
+        this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
+        this.filterColumns.locationIds.dataSource = this.locations;
+        this.defaultLocations = this.locations.map((list) => list.id);
         this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
         this.changeDetectorRef.detectChanges();
+      }
+      else {
+        this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
       }
     });
     this.locationIdControl = this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
     this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.locationIdControl.value.length > 0) {
         this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
-        this.departments=this.departmentsList.filter(i=>data?.includes(i.locationId));
-        this.filterColumns.departmentIds.dataSource=this.departments;
-        this.defaultDepartments=this.departments.map((list)=>list.id);
+        this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
+        this.filterColumns.departmentIds.dataSource = this.departments;
+        this.defaultDepartments = this.departments.map((list) => list.id);
         this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue(this.defaultDepartments);
         this.changeDetectorRef.detectChanges();
+      }
+      else {
+        this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
     this.departmentIdControl = this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;

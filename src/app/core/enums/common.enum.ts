@@ -33,7 +33,4 @@ export enum FilesClearEvent {
   ClearAll = 'clearAllFiles',
 }
 
-export enum ExcludeSpinnerUrl {
-  ReportCandidatesearch ='financialtimesheet/candidatesearch'
-}
 
