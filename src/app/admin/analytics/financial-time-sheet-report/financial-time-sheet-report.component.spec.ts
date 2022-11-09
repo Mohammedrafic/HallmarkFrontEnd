@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ClientFinanceAccrualReportComponent } from './client-finance-accrual-report.component';
+import { FinancialTimeSheetReportComponent } from './financial-time-sheet-report.component';
 
 describe('ClientFinanceAccrualReportComponent', () => {
-  let component: ClientFinanceAccrualReportComponent;
-  let fixture: ComponentFixture<ClientFinanceAccrualReportComponent>;
+  let component: FinancialTimeSheetReportComponent;
+  let fixture: ComponentFixture<FinancialTimeSheetReportComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ClientFinanceAccrualReportComponent ]
+      declarations: [ FinancialTimeSheetReportComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ClientFinanceAccrualReportComponent);
+    fixture = TestBed.createComponent(FinancialTimeSheetReportComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

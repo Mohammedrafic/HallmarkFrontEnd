@@ -35,11 +35,11 @@ import { OrderTypeOptions } from '@shared/enums/order-type';
 import { OutsideZone } from "@core/decorators";
 
 @Component({
-  selector: 'app-client-finance-accrual-report',
-  templateUrl: './client-finance-accrual-report.component.html',
-  styleUrls: ['./client-finance-accrual-report.component.scss']
+  selector: 'app-financial-time-sheet-report',
+  templateUrl: './financial-time-sheet-report.component.html',
+  styleUrls: ['./financial-time-sheet-report.component.scss']
 })
-export class ClientFinanceAccrualReportComponent implements OnInit, OnDestroy {
+export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   public paramsData: any = {
     "OrganizationParamACCR": "",
     "StartDateParamACCR": "",

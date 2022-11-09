@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { OrganizationInvoicesContainerService } from '../../modules/invoices/services/invoices-container/organization-invoices-container.service';
-import { ClientFinanceAccrualReportComponent } from './client-finance-accrual-report/client-finance-accrual-report.component';
+import { FinancialTimeSheetReportComponent } from './financial-time-sheet-report/financial-time-sheet-report.component';
 import { AgencyDepartmentSpentHoursComponent } from './agency-department-spent-hours/agency-department-spent-hours.component';
 import { AgingDetailsComponent } from './aging-details/aging-details.component';
 import { AnalyticsComponent } from './analytics.component';
@@ -45,8 +45,8 @@ const routes: Routes = [
     component: AnalyticsComponent,
     children: [
       {
-        path: 'client-finance-accrual-report',
-        component: ClientFinanceAccrualReportComponent,
+        path: 'financial-time-sheet-report',
+        component: FinancialTimeSheetReportComponent,
         data: {
           isOrganizationArea: true,
         }
