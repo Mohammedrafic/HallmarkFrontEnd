@@ -16,6 +16,7 @@ import { APP_FILTERS_CONFIG, filterOptionFields } from '@core/constants/filters-
 import { findSelectedItems } from './functions.helper';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { ActivatedRoute } from '@angular/router';
 
 @Directive()
 export class FiltersDialogHelper<T, F, S> extends Destroyable {
@@ -33,6 +34,7 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
   public filterOptionFields = filterOptionFields;
   public filterColumns: T;
   public formGroup: CustomFormGroup<T>;
+  public isAgencyArea: boolean;
 
   private isPreservedFilterSet = false;
 
@@ -42,8 +44,10 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
     protected filterService: FilterService,
     protected cdr: ChangeDetectorRef,
     private filtersHelperService: FiltersDialogHelperService,
+    private route: ActivatedRoute,
   ) {
     super();
+    this.isAgencyArea = this.route.snapshot.data['isAgencyArea'];
   }
 
   public applyFilters(): void {
@@ -64,7 +68,11 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
       preservedFiltersState.organizationIds = orgs.filter((item, pos) => orgs.indexOf(item) == pos);
     }
     
-    this.filterService.setPreservedFIlters(preservedFiltersState, 'regionsIds');
+    if (this.isAgencyArea) {
+      this.filterService.setPreservedFIltersTimesheets(preservedFiltersState, 'regionsIds');
+    } else {
+      this.filterService.setPreservedFIlters(preservedFiltersState, 'regionsIds');
+    }
   }
 
   public clearAllFilters(eventEmmit = true, keepPreservedFilters = false): void {
@@ -106,7 +114,7 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
       this.filterColumns = filters;
       let preservedFilters = null;
       if (this.filterService.canPreserveFilters() && !this.isPreservedFilterSet) {
-        preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
+        preservedFilters = this.isAgencyArea ? this.store.selectSnapshot(PreservedFiltersState.preservedFiltersTimesheets) : this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
         if (preservedFilters && (this.filterColumns as any).regionsIds?.dataSource) {
           this.isPreservedFilterSet = true;
           const dataSource: any[] = [];

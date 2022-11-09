@@ -5,10 +5,12 @@ import { PreservedFiltersService } from '@shared/services/preserved-filters.serv
 import { InitPreservedFilters, SetPreservedFilters } from './preserved-filters.actions';
 import { PreservedFilters } from '@shared/models/preserved-filters.model';
 import { PreservedFiltersGlobal } from '@shared/models/preserved-filters.model';
+import { SetPreservedFiltersForTimesheets } from './preserved-filters.actions';
 
 export interface PreservedFiltersStateModel {
   preservedFilters: PreservedFilters | null;
   preservedFiltersGlobal: PreservedFiltersGlobal | null;
+  preservedFiltersTimesheets: PreservedFilters | null;
 }
 
 @State<PreservedFiltersStateModel>({
@@ -16,6 +18,7 @@ export interface PreservedFiltersStateModel {
   defaults: {
     preservedFilters: null,
     preservedFiltersGlobal: null,
+    preservedFiltersTimesheets: null,
   },
 })
 @Injectable()
@@ -34,12 +37,17 @@ export class PreservedFiltersState {
     return state.preservedFiltersGlobal;
   }
 
+  @Selector()
+  static preservedFiltersTimesheets(state: PreservedFiltersStateModel): PreservedFilters | null {
+    return state.preservedFiltersTimesheets;
+  }
+
   @Action(InitPreservedFilters)
   InitPreservedFilters({ patchState }: StateContext<PreservedFiltersStateModel>): Observable<{state: string}> {
     return this.preservedFIltersService.getPreservedFilters().pipe(
       tap((filters: {state: string}) => {
         const state = JSON.parse(filters.state);
-        return patchState({ preservedFilters: state.filters || null, preservedFiltersGlobal: state.global || null });
+        return patchState({ preservedFilters: state.filters || null, preservedFiltersGlobal: state.global || null, preservedFiltersTimesheets: state.timesheets || null });
       })
     );
   }
@@ -52,6 +60,13 @@ export class PreservedFiltersState {
       patchState({ preservedFilters: payload as PreservedFilters });
     }
     const state = getState();
-    return this.preservedFIltersService.setPreservedFilters(JSON.stringify({ filters: state.preservedFilters, global: state.preservedFiltersGlobal }));
+    return this.preservedFIltersService.setPreservedFilters(JSON.stringify({ filters: state.preservedFilters, global: state.preservedFiltersGlobal, timesheets: state.preservedFiltersTimesheets }));
+  }
+
+  @Action(SetPreservedFiltersForTimesheets)
+  SetPreservedFiltersForTimesheets({ patchState, getState }: StateContext<PreservedFiltersStateModel>, { payload }: SetPreservedFilters): Observable<string> {
+    patchState({ preservedFiltersTimesheets: payload as PreservedFilters });
+    const state = getState();
+    return this.preservedFIltersService.setPreservedFilters(JSON.stringify({ filters: state.preservedFilters, global: state.preservedFiltersGlobal, timesheets: state.preservedFiltersTimesheets }));
   }
 }

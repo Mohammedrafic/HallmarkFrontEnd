@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, throttleTime, of, Subject, combineLatest, debounceTime, take } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, of, combineLatest, debounceTime, take } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction } from '@core/enums';
@@ -114,7 +114,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public handleChangeTab(tabIndex: number): void {
     let preservedFilters = null;
     if (this.filterService.canPreserveFilters()) {
-      preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
+      preservedFilters = this.isAgency ? this.store.selectSnapshot(PreservedFiltersState.preservedFiltersTimesheets) : this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
     }
     this.activeTabIdx = tabIndex;
     if (preservedFilters) {
@@ -231,12 +231,15 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.organizationControl.valueChanges.pipe(
       filter(Boolean),
       distinctUntilChanged(),
-      switchMap((organizationId: number) => this.store.dispatch(
-        [
-          new Timesheets.UpdateFiltersState({ organizationId }, this.activeTabIdx !== 0),
-          new Timesheets.SelectOrganization(organizationId),
-        ]
-      )),
+      switchMap((organizationId: number) => {
+        this.filterService.setPreservedFIltersTimesheets({ organizationIds: [organizationId] });
+        return this.store.dispatch(
+          [
+            new Timesheets.UpdateFiltersState({ organizationId }, this.activeTabIdx !== 0),
+            new Timesheets.SelectOrganization(organizationId),
+          ]
+        )
+      }),
       switchMap(() => this.store.dispatch(new Timesheets.GetFiltersDataSource())),
       takeUntil(this.componentDestroy()),
     ).subscribe();
@@ -250,7 +253,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       )),
       takeUntil(this.componentDestroy()),
     ).subscribe(res => {
-      const orgId = this.getOrganizationIdFromState() || res[0].id;
+      const preservedOrgIds = preservedFilters?.organizations || [];
+      const orgId = this.filterService.canPreserveFilters() ? (preservedOrgIds[0] || this.getOrganizationIdFromState() || res[0].id) : (this.getOrganizationIdFromState() || res[0].id);
 
       this.store.dispatch(new Timesheets.SelectOrganization(orgId));
       this.organizationControl.setValue(orgId, { emitEvent: false });
@@ -297,12 +301,14 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   private initComponentState(): void {
     let preservedFilters = null;
+    let preservedFiltersAgency = null;
     if (this.filterService.canPreserveFilters()) {
       preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
+      preservedFiltersAgency = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersTimesheets);
     }
     this.timesheetsTabs?.programSelection();
     if (this.isAgency) {
-      this.initOrganizationsList(preservedFilters);
+      this.initOrganizationsList(preservedFiltersAgency);
     } else {
       if (preservedFilters) {
         this.store.dispatch([

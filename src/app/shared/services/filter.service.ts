@@ -7,7 +7,7 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
 import { User } from '@shared/models/user.model';
 import { isBoolean, isDate, isEmpty, isNumber } from 'lodash';
-import { SetPreservedFilters } from 'src/app/store/preserved-filters.actions';
+import { SetPreservedFilters, SetPreservedFiltersForTimesheets } from 'src/app/store/preserved-filters.actions';
 
 @Injectable({ providedIn: 'root' })
 export class FilterService {
@@ -21,6 +21,12 @@ export class FilterService {
   public setPreservedFIlters(filters: any, regionPropName = 'regionIds'): void {
     if (this.canPreserveFilters()) {
       this.store.dispatch(new SetPreservedFilters({ regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null }));
+    }
+  }
+
+  public setPreservedFIltersTimesheets(filters: any, regionPropName = 'regionIds'): void {
+    if (this.canPreserveFilters()) {
+      this.store.dispatch(new SetPreservedFiltersForTimesheets({ regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null }));
     }
   }
 
