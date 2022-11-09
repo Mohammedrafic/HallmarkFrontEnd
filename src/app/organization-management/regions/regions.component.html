@@ -25,7 +25,7 @@
       (select)="exportSelected($event)"
       id="importButton"
       cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
-     
+
       <button
         ejs-button
         id="addDepartmentButton"
@@ -96,6 +96,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(regions$ | async)?.length}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager

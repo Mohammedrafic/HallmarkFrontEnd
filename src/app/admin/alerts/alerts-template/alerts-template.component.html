@@ -54,6 +54,9 @@
                         [(value)]="activeRowsPerPageDropDown"
                         (change)="onPageSizeChanged($event)">
       </ejs-dropdownlist>
+      <div class="total-rows">
+        Total Rows: {{totalRecordsCount}}
+      </div>
     </div>
   </div>
 </section>

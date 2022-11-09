@@ -1,9 +1,8 @@
-import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { takeWhile } from 'rxjs';
 
-import { DropDownListComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
 
 import {
@@ -26,15 +25,11 @@ import { DateTimeHelper } from '@core/helpers';
   templateUrl: './bill-rate-form.component.html',
   styleUrls: ['./bill-rate-form.component.scss'],
 })
-export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
-  @ViewChild('billRateOptions')
-  public billRateOptionsDropdown: DropDownListComponent;
-
+export class BillRateFormComponent implements OnInit, OnDestroy {
   @ViewChild('rateHours')
   public rateHoursInput: MaskedTextBoxComponent;
 
   @Input() billRateForm: FormGroup;
-  @Input() billRateOptions: BillRateOption[];
   @Input() billRatesData: BillRate[];
   @Input() selectedBillRateUnit: BillRateUnit;
 
@@ -50,8 +45,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
     value: 'id',
   };
 
-  public billRateOptionsForSelect: BillRateOption[];
-
+  public billRateOptions: BillRateOption[] = [];
   public isIntervalMinEnabled = true;
   public isIntervalMaxEnabled = true;
   public isIntervalMinRequired = true;
@@ -62,6 +56,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
   public additionalLableForMinMax: string | null = null;
   public hideFilds = new Set<string>();
   public isWeeklyOT = false;
+  public static calculateOTSFlags = true;
 
   private mileageBillRateId = 11;
 
@@ -95,6 +90,8 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
+    this.startBillRatesOptionsWatching();
+
     const intervalMinControl = this.billRateForm.controls['intervalMin'];
     const intervalMaxControl = this.billRateForm.controls['intervalMax'];
 
@@ -111,13 +108,6 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
     this.onBillRateConfigIdChanged();
   }
 
-  ngOnChanges(): void {
-    if (this.billRateOptions) {
-      this.predefinedBillRates = this.store.selectSnapshot(OrderManagementContentState.predefinedBillRates);
-      this.billRateOptionsForSelect = this.billRateOptions;
-    }
-  }
-
   ngOnDestroy(): void {
     this.isAlive = false;
   }
@@ -125,6 +115,16 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
   setBillTypesAndUpdateControl(types: Array<BillRateType>): void {
     this.billRateTypes = BillRateTypes.filter((type) => types.includes(type.id));
     this.billRateForm.get('billType')?.reset();
+  }
+
+  private startBillRatesOptionsWatching(): void {
+    this.store.select(OrderManagementContentState.predefinedBillRatesOptions).pipe(
+      takeWhile(() => this.isAlive),
+    ).subscribe((options: BillRateOption[]) => {
+      this.predefinedBillRates = this.store.selectSnapshot(OrderManagementContentState.predefinedBillRates);
+      this.billRateOptions = options;
+      this.cdr.detectChanges();
+    });
   }
 
   private startEffectiveDateWatching(): void {
@@ -136,19 +136,23 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setOTValue(): void {
-    const configId = this.billRateForm.get('billRateConfigId')?.value;
-    const billRates = this.predefinedBillRates.filter(el => el.billRateConfigId === configId);
-    const billRatesDates = billRates.map(el => el.effectiveDate);
-    const date = this.billRateForm.get('effectiveDate')?.value;
+    if (BillRateFormComponent.calculateOTSFlags) {
+      const configId = this.billRateForm.get('billRateConfigId')?.value;
+      const billRates = this.predefinedBillRates.filter(el => el.billRateConfigId === configId);
+      const billRatesDates = billRates.map(el => el.effectiveDate);
+      const date = this.billRateForm.get('effectiveDate')?.value;
 
-    const idx = DateTimeHelper.findPreviousNearestDate(billRatesDates, date);
+      const idx = DateTimeHelper.findPreviousNearestDate(billRatesDates, date);
 
-    if (idx !== null && billRates[idx]) {
-      const { seventhDayOtEnabled, weeklyOtEnabled, dailyOtEnabled } = billRates[idx];
+      if (idx !== null && billRates[idx]) {
+        const { seventhDayOtEnabled, weeklyOtEnabled, dailyOtEnabled } = billRates[idx];
 
-      this.billRateForm?.get('seventhDayOtEnabled')?.setValue(seventhDayOtEnabled);
-      this.billRateForm?.get('weeklyOtEnabled')?.setValue(weeklyOtEnabled);
-      this.billRateForm?.get('dailyOtEnabled')?.setValue(dailyOtEnabled);
+        this.billRateForm?.get('seventhDayOtEnabled')?.setValue(seventhDayOtEnabled);
+        this.billRateForm?.get('weeklyOtEnabled')?.setValue(weeklyOtEnabled);
+        this.billRateForm?.get('dailyOtEnabled')?.setValue(dailyOtEnabled);
+      }
+    } else {
+      BillRateFormComponent.calculateOTSFlags = true;
     }
 
     this.cdr.detectChanges();
@@ -160,7 +164,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
       ?.valueChanges.pipe(takeWhile(() => this.isAlive))
       .subscribe(() => {
         const configId = this.billRateForm.get('billRateConfigId')?.value;
-        const billRateConfig = this.billRateOptionsDropdown.getDataByValue(configId) as BillRateOption;
+        const billRateConfig = this.billRateOptions.find((option) => configId === option.id) as BillRateOption;
         this.billRateConfigControl?.patchValue({
           ...billRateConfig,
         });
@@ -171,7 +175,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
         if (billRateConfig) {
           this.setBillTypesAndUpdateControl(billRateConfig.billTypes);
           this.selectedBillRateUnit = billRateConfig.unit;
-          this.billRateForm.get('rateHour')?.setValue('');
+          this.billRateForm.get('rateHour')?.setValue('0');
           this.isIntervalMinEnabled = billRateConfig.intervalMin;
           this.isIntervalMaxEnabled = billRateConfig.intervalMax;
           this.isIntervalMinRequired = billRateConfig.intervalMinRequired;
@@ -235,7 +239,8 @@ export class BillRateFormComponent implements OnInit, OnDestroy, OnChanges {
         this.additionalLableForMinMax = 'Work Week';
         this.hideFilds.add('intervalMax');
         this.hideFilds.add('rateHour');
-        this.billRateForm.get('rateHour')?.setErrors(null);
+        this.billRateForm.get('rateHour')?.clearValidators();
+        this.billRateForm.get('rateHour')?.updateValueAndValidity();
         break;
       case BillRateCalculationType.WeeklyOT:
         this.isWeeklyOT = true;

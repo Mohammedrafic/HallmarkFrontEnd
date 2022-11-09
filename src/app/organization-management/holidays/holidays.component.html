@@ -128,6 +128,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(holidaysPage$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -334,6 +337,9 @@
         </div>
       </div>
     </div>
+    <p *ngIf="(startTimeField?.errors || endTimeField?.errors) as errorObj" class="error">
+      {{ errorObj['invalidDate'] ? datesValidationMessage : '' }}
+    </p>
   </form>
 </app-side-dialog>
 

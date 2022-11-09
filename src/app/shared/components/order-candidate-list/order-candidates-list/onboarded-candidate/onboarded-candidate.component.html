@@ -13,7 +13,7 @@
         </ejs-chiplist>
       </div>
       <div class="e-card-content button-container">
-        <div class="input-group dropdown bootstrap input-readonly" *ngIf="!isRejected && !isDeployedCandidate && !isCancelled">
+        <div class="input-group dropdown bootstrap input-readonly" *ngIf="!isRejected && !isCancelled">
           <ejs-dropdownlist
             [fields]="optionFields"
             [formControl]="jobStatusControl"
@@ -27,15 +27,12 @@
             </ng-template>
           </ejs-dropdownlist>
         </div>
-        <button *ngIf="isDeployedCandidate" ejs-button cssClass="e-outline"
-          [disabled]="!actionsAllowed || !canReject"
-          (click)="onReject()">Reject</button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
     </div>
-    <app-deploy-candidate-message *ngIf="isDeployedCandidate" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
+    <app-deploy-candidate-message *ngIf="isDeployedCandidate" [isAgency]="isAgency" [candidateBasicInfo]="deployedCandidateOrderInfo"></app-deploy-candidate-message>
   </section>
   <section class="content-container">
     <div class="candidate-info">
@@ -264,8 +261,9 @@
         [billRates]="billRatesData"
         [isActive]="isActiveCandidateDialog$ | async"
         [readOnlyMode]="isReadOnlyBillRates"
-        (billRatesChanged)="onBillRatesChanged($event)">
-      </app-bill-rates>
+        (billRatesChanged)="onBillRatesChanged($event)"
+        [disabledActionMode]="!hasEditOrderBillRatesPermission"
+      ></app-bill-rates>
     </ng-template>
   </section>
   <ng-container *ngIf="showStatusDropdown || isDeployedCandidate">
@@ -284,7 +282,6 @@
           </ng-template>
         </ejs-dropdownlist>
       </div>
-      <button *ngIf="isDeployedCandidate" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
     </div>
   </ng-container>
 </section>

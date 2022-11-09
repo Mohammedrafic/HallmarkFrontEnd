@@ -4,7 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil, of, take } from 'rxjs';
 
 import { ApplyOrderApplicants, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
@@ -16,6 +16,9 @@ import PriceUtils from '@shared/utils/price.utils';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { deployedCandidateMessage, DEPLOYED_CANDIDATE } from '@shared/constants';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -35,6 +38,9 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isAgency: boolean = false;
   @Input() isLocked: boolean | undefined = false;
   @Input() actionsAllowed: boolean;
+  @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
+  @Input() candidateOrderIds: string[];
+  @Input() isOrderOverlapped: boolean;
 
   public formGroup: FormGroup;
   public readOnlyMode: boolean;
@@ -57,19 +63,32 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private unsubscribe$: Subject<void> = new Subject();
   private candidateId: number;
 
+  get candidateStatus(): ApplicantStatus {
+    return this.candidate.status || (this.candidate.candidateStatus as any);
+  }
+
   get isDeployedCandidate(): boolean {
-    return !!this.candidate.deployedCandidateInfo && this.candidate.candidateStatus !== ApplicantStatus.OnBoarded;
+    return !!this.candidate.deployedCandidateInfo && this.candidateStatus !== ApplicantStatus.OnBoarded;
+  }
+
+  get isOnboardedCandidate(): boolean {
+    return this.candidateStatus === ApplicantStatus.OnBoarded;
+  }
+
+  get isAcceptedCandidate(): boolean {
+    return this.candidateStatus === ApplicantStatus.Accepted;
   }
 
   constructor(
     private store: Store,
     private commentsService: CommentsService,
-    private changeDetectorRef: ChangeDetectorRef
-    ) {}
+    private changeDetectorRef: ChangeDetectorRef,
+    private confirmService: ConfirmService,
+  ) {}
 
   ngOnChanges(): void {
-    this.readOnlyMode = !!this.isDeployedCandidate && this.isAgency;
-    this.showComments = this.candidate.status !== ApplicantStatus.NotApplied;
+    this.readOnlyMode = this.isOnboardedCandidate && this.isAcceptedCandidate && this.isAgency;
+    this.showComments = this.candidateStatus !== ApplicantStatus.NotApplied;
   }
 
   ngOnInit(): void {
@@ -88,27 +107,45 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.closeDialogEmitter.next();
   }
 
-  applyOrderApplicants(): void {
+  public applyOrderApplicants(): void {
     this.formGroup.markAllAsTouched();
     if (this.formGroup.valid) {
-      const value = this.formGroup.getRawValue();
-      this.store
-        .dispatch(
-          new ApplyOrderApplicants({
-            orderId: this.orderId,
-            organizationId: this.organizationId,
-            candidateId: this.candidateId,
-            candidateBillRate: value.candidateBillRate,
-            expAsTravelers: value.expAsTravelers,
-            availableStartDate: toCorrectTimezoneFormat(value.availableStartDate),
-            requestComment: value.requestComment,
-          })
-        )
-        .subscribe(() => {
-          this.store.dispatch(new ReloadOrderCandidatesLists());
+      this.shouldApplyDeployedCandidate()
+        .pipe(take(1))
+        .subscribe((isConfirm) => {
+          if (isConfirm) {
+            const value = this.formGroup.getRawValue();
+            this.store
+              .dispatch(
+                new ApplyOrderApplicants({
+                  orderId: this.orderId,
+                  organizationId: this.organizationId,
+                  candidateId: this.candidateId,
+                  candidateBillRate: value.candidateBillRate,
+                  expAsTravelers: value.expAsTravelers,
+                  availableStartDate: toCorrectTimezoneFormat(value.availableStartDate),
+                  requestComment: value.requestComment,
+                })
+              )
+              .subscribe(() => {
+                this.store.dispatch(new ReloadOrderCandidatesLists());
+              });
+            this.closeDialog();
+          }
         });
-      this.closeDialog();
     }
+  }
+
+  private shouldApplyDeployedCandidate(): Observable<boolean> {
+    const options = {
+      title: DEPLOYED_CANDIDATE,
+      okButtonLabel: 'Proceed',
+      okButtonClass: 'ok-button',
+    };
+
+    return this.isDeployedCandidate && this.isAgency && this.isOrderOverlapped
+      ? this.confirmService.confirm(deployedCandidateMessage(this.candidateOrderIds), options)
+      : of(true);
   }
 
   private createForm(): void {

@@ -1,16 +1,6 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  QueryList,
-  ViewChild,
-  ViewChildren,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap } from 'rxjs';
+import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap, take } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
@@ -19,7 +9,7 @@ import {
   PagerComponent,
   RowDataBoundEventArgs,
   SelectionSettingsModel,
-  TextWrapSettingsModel,
+  TextWrapSettingsModel
 } from '@syncfusion/ej2-angular-grids';
 import { CheckBoxComponent } from '@syncfusion/ej2-angular-buttons';
 
@@ -37,7 +27,7 @@ import {
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
-  ROW_HEIGHT,
+  ROW_HEIGHT
 } from './order-management-grid.constants';
 import {
   ClearOrders,
@@ -48,6 +38,7 @@ import {
   GetAgencyOrdersPage,
   GetOrderById,
   ReloadOrderCandidatesLists,
+  GetOrganizationStructure,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import {
@@ -55,7 +46,7 @@ import {
   AgencyOrderManagement,
   AgencyOrderManagementPage,
   Order,
-  OrderManagementChild,
+  OrderManagementChild
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -74,6 +65,8 @@ import { PreviewOrderDialogComponent } from '@agency/order-management/order-mana
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -153,9 +146,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private actions$: Actions,
     private datePipe: DatePipe,
     private filterService: FilterService,
-    private orderManagementAgencyService: OrderManagementAgencyService
+    private orderManagementAgencyService: OrderManagementAgencyService,
+    private router: Router,
   ) {
     super();
+    this.listenRedirectFromExtension();
+    this.checkRouterState();
   }
 
   ngOnInit(): void {
@@ -167,6 +163,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onReloadOrderCandidatesLists();
     this.onExportSelectedSubscribe();
     this.idFieldName = 'orderId';
+
     this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe((value: string) => {
       if (value.length >= 2) {
         this.OrderFilterFormGroup.controls['jobTitle'].setValue(value);
@@ -176,16 +173,19 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.onFilterApply();
       }
     });
+
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.ordersPage = data;
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
     });
+
     this.subscribeOnPageChanges();
     this.onTabChange();
     this.onCommentRead();
     this.listenRedirectFromExtension();
     this.listenRedirectFromPerDiem();
     this.listenRedirectFromReOrder();
+    
   }
 
   ngOnDestroy(): void {
@@ -337,6 +337,31 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public setDefaultFilters(statuses: number[]): void {
+    if (this.filterService.canPreserveFilters()) {
+      const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
+      if (preservedFilters?.organizations) {
+        this.OrderFilterFormGroup.get('organizationIds')?.setValue(preservedFilters.organizations);
+        this.filters.organizationIds = preservedFilters.organizations;
+        this.actions$.pipe(ofActionSuccessful(GetOrganizationStructure), take(1)).subscribe(() => {
+          if (preservedFilters?.regions) {
+            this.OrderFilterFormGroup.get('regionIds')?.setValue([...preservedFilters.regions]);
+            this.filters.regionIds = [...preservedFilters.regions];
+            if (preservedFilters?.locations) {
+              this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
+              this.filters.locationIds = [...preservedFilters.locations];
+            }
+          }
+          this.setDefaultStatuses(statuses);
+        });
+      } else {
+        this.setDefaultStatuses(statuses);
+      }
+    } else {
+      this.setDefaultStatuses(statuses);
+    }
+  }
+
+  private setDefaultStatuses(statuses: number[]): void {
     this.filters.orderStatuses = statuses;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.filteredItems$.next(this.filteredItems.length);
@@ -452,8 +477,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         new GetAgencyOrderCandidatesList(
           event.data.orderId,
           event.data.organizationId,
-          1,
-          30,
+          GRID_CONFIG.initialPage,
+          GRID_CONFIG.initialRowsPerPage,
           this.orderManagementAgencyService.excludeDeployed
         )
       );
@@ -678,6 +703,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));
     this.filteredItems$.next(this.filteredItems.length);
+    this.filterService.setPreservedFIlters(this.filters);
   }
   // End - Filter
 
@@ -807,5 +833,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.currentPage = page;
       this.dispatchNewPage();
     });
+  }
+
+  private checkRouterState(): void {
+    const orderId = this.router.getCurrentNavigation()?.extras?.state?.['publicId'];
+    const orderPrefix = this.router.getCurrentNavigation()?.extras?.state?.['prefix'] || '';
+
+    if (orderId && orderPrefix) {
+      this.orderManagementAgencyService.orderId$.next({ id: orderId, prefix: orderPrefix });
+    }
   }
 }

@@ -23,6 +23,8 @@ import {
 import { Experience } from 'src/app/shared/models/experience.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
+import { Permission } from '@core/interface';
+import { UserPermissions } from '@core/enums';
 
 @Component({
   selector: 'app-experience-grid',
@@ -33,6 +35,7 @@ import { ShowSideDialog } from 'src/app/store/app.actions';
 export class ExperienceGridComponent extends AbstractGridConfigurationComponent implements OnInit {
   @Input() readonlyMode = false;
   @Input() areAgencyActionsAllowed: boolean;
+  @Input() userPermission: Permission;
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('endDate') endDate: DatePickerComponent;
@@ -43,6 +46,7 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
 
   public title = '';
   public experienceForm: FormGroup;
+  public readonly userPermissions = UserPermissions;
 
   private today = new Date();
 

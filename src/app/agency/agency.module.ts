@@ -103,6 +103,7 @@ import { ManualFormComponent } from './agency-list/add-edit-agency/payment-detai
 import { PaymentDialogComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/payment-dialog.component';
 import { JobDistributionComponent } from './agency-list/add-edit-agency/job-distribution/job-distribution.component';
 import { OrderMatchColumnComponent } from './candidates/add-edit-candidate/credentials-grid/order-match-column/order-match-column.component';
+import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 
 const sidebarIcons = {
   Sliders,
@@ -205,6 +206,8 @@ const sidebarIcons = {
     ExtensionModule,
     AssociateListModule,
     RadioButtonModule,
+    TooltipContainerModule,
+
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),

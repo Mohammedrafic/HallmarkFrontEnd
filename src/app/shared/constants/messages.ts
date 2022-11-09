@@ -41,6 +41,7 @@ export const ORDER_WITHOUT_CRED_BILLRATES =
   'Added order doesn’t contain the Credentials and Bill Rates. Please edit the order to onboard candidates successfully';
 export const UNSAVE_CHANGES_TEXT = 'Do you want to save changes?';
 export const REQUIRED_PERMISSIONS = 'Separate permission right is required';
+export const ERROR_START_LESS_END_DATE = 'Start date should be before end date or less';
 
 export const updateCandidateJobMessage = (dates: string[]) =>
   `For this candidate job timesheets will be recalculated for the next start dates: ${dates.join(', ')}`;
@@ -48,5 +49,10 @@ export const usedByOrderErrorMessage = (val: string, entities: string) =>
   `${val} cannot be deleted. This ${val} was used in ${entities}.`;
 export const usedInMappingMessage = (mappingName: string) =>
   `This change has been affected ${mappingName} Mapping, please update it on the ${mappingName} Mapping tab`;
+export const DEPLOYED_CANDIDATE = 'Deployed Candidate';
+export const deployedCandidateMessage = (orderIds: string[]) =>
+  `<span class="deployed-candidate__message">Candidate is already working on order <span class="deployed-candidate__order-id"> ${orderIds.join(', ')}</span>. Do you wish to proceed?</span>`;
   export const SEND_EMAIL = 'Sent email';
-  export const SEND_EMAIL_REQUIRED = 'Required';
+export const SEND_EMAIL_REQUIRED = 'Required';
+export const DOCUMENT_UPLOAD_SUCCESS = 'Document uploaded successfully';
+export const DOCUMENT_UPLOAD_EDIT = 'Document modified successfully';

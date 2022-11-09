@@ -7,15 +7,59 @@ import { map, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SpecialProjectMessages } from '../../../../../organization-management/specialproject/constants/specialprojects.constant';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { SetHeaderState, ShowDocPreviewSideDialog, ShowSideDialog, ShowToast } from '../../../../../store/app.actions';
-import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, DocumentLibraryColumnsDefinition, UNIT_FIELDS } from '../../../constants/documents.constant';
-import { AssociateAgencyDto, DeleteDocumentsFilter, DocumentFolder, DocumentLibraryDto, Documents, DocumentsFilter, DocumentsLibraryPage, DocumentTags, DocumentTypeFilter, DocumentTypes, DownloadDocumentDetail, DownloadDocumentDetailFilter, NodeItem, ShareDocumentDto, ShareDocumentInfoFilter, ShareDocumentInfoPage, ShareDocumentsFilter, ShareOrganizationsData, UnShareDocumentsFilter } from '../../../store/model/document-library.model';
+import {
+  BUSINESS_UNITS_VALUES,
+  BUSSINES_DATA_FIELDS,
+  DocumentLibraryColumnsDefinition,
+  UNIT_FIELDS
+} from '../../../constants/documents.constant';
+import {
+  AssociateAgencyDto,
+  DeleteDocumentsFilter,
+  DocumentFolder,
+  DocumentLibraryDto,
+  Documents,
+  DocumentsFilter,
+  DocumentsLibraryPage,
+  DocumentTags,
+  DocumentTypeFilter,
+  DocumentTypes,
+  DownloadDocumentDetail,
+  DownloadDocumentDetailFilter,
+  LocationsByRegionsFilter,
+  NodeItem,
+  PreviewDocumentDetailFilter,
+  regionFilter,
+  ShareDocumentDto,
+  ShareDocumentInfoFilter,
+  ShareDocumentInfoPage,
+  ShareDocumentsFilter,
+  ShareOrganizationsData,
+  UnShareDocumentsFilter
+} from '../../../store/model/document-library.model';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { DocumentLibraryState } from '../../../store/state/document-library.state';
 import {
-  DeletDocuments, GetDocumentById, GetDocumentDownloadDeatils, GetDocuments,
-  GetDocumentsSelectedNode, GetDocumentTypes, GetFoldersTree, GetSharedDocuments,
-  IsAddNewFolder, SaveDocumentFolder, SaveDocuments, ShareDocuments, UnShareDocuments,
-  GetLocationsByRegions, GetRegionsByOrganizations, GetShareAssociateAgencies, GetShareOrganizationsDtata, SelectedBusinessType, IsDeleteEmptyFolder,
+  DeletDocuments,
+  GetDocumentById,
+  GetDocumentDownloadDeatils,
+  GetDocumentPreviewDeatils,
+  GetDocuments,
+  GetDocumentsSelectedNode,
+  GetDocumentTypes,
+  GetFoldersTree,
+  GetLocationsByRegions,
+  GetRegionsByOrganizations,
+  GetShareAssociateAgencies,
+  GetSharedDocuments,
+  GetShareOrganizationsDtata,
+  IsAddNewFolder,
+  IsDeleteEmptyFolder,
+  SaveDocumentFolder,
+  SaveDocuments,
+  SelectedBusinessType,
+  ShareDocuments,
+  UnShareDocuments
 } from '../../../store/actions/document-library.actions';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { documentsColumnField, FileType, FormControlNames, FormDailogTitle, MoreMenuType, StatusEnum } from '../../../enums/documents.enum';
@@ -39,17 +83,8 @@ import {
   TextSelectionService,
   ToolbarService
 } from '@syncfusion/ej2-angular-pdfviewer';
-import {
-  DocumentEditorComponent,
-
-  EditorHistoryService,
-  EditorService,
-  SearchService
-} from '@syncfusion/ej2-angular-documenteditor';
+import { DocumentEditorComponent, EditorHistoryService, EditorService, SearchService } from '@syncfusion/ej2-angular-documenteditor';
 import { User } from '../../../../../shared/models/user-managment-page.model';
-import { regionFilter } from '../../../store/model/document-library.model';
-import { LocationsByRegionsFilter } from '../../../store/model/document-library.model';
-
 
 @Component({
   selector: 'app-document-library',
@@ -107,7 +142,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public locationIdControl: AbstractControl;
   public isWordDoc: boolean = false;
   public isImage: boolean = false;
-  public isExcel :boolean =false;
+  public isExcel: boolean = false;
   public isAgency: boolean = false;
   public halmarkSwitch: boolean = false;
   public agencySwitch: boolean = false;
@@ -119,6 +154,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   documentWidth: string;
   fileAsBase64: string;
   public allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
+  public isSharedFolderClick: boolean = false;
+  public totalRecordsCount: number;
 
   public gridApi!: GridApi;
   public rowData: DocumentLibraryDto[] = [];
@@ -128,14 +165,21 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     { text: MoreMenuType[1], id: '1' },
     { text: MoreMenuType[2], id: '2' }
   ];
+  public editMoreMenuItems: ItemModel[] = [
+    { text: MoreMenuType[0], id: '0' },
+    { text: MoreMenuType[1], id: '1' },
+    { text: MoreMenuType[2], id: '2' },
+    { text: MoreMenuType[3], id: '3' }
+  ];
 
   public statusItems: ItemModel[] = [
-    { text: StatusEnum[0], id: '0' },
-    { text: StatusEnum[1], id: '1' }
+    { text: StatusEnum[0], id: '1' },
+    { text: StatusEnum[1], id: '0' }
   ];
 
   public actionCellrenderParams: any = {
     editMenuITems: this.editMenuItems,
+    editMoreMenuITems: this.editMoreMenuItems,
     select: (event: any, params: DocumentLibraryDto) => {
       this.menuOptionSelected(event, params)
     },
@@ -246,6 +290,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
     this.action$.pipe(ofActionDispatched(GetDocumentsSelectedNode), takeUntil(this.unsubscribe$)).subscribe((payload) => {
       this.selectedNodeText = '';
+      this.isSharedFolderClick = false;
       if (payload.payload) {
         if (this.previousFolderId != payload.payload.id) {
           this.selectedNodeText = '';
@@ -258,6 +303,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
               if (this.selectedDocumentNode?.id != -1 && this.selectedDocumentNode?.parentID != -1)
                 this.getDocuments(this.filterSelectedBusinesUnitId);
               else if (this.selectedDocumentNode?.id == -1 || this.selectedDocumentNode.parentID == -1) {
+                this.isSharedFolderClick = true;
+                this.store.dispatch(new IsDeleteEmptyFolder(false));
                 this.getSharedDocuments(this.filterSelectedBusinesUnitId);
               }
             }, 1000);
@@ -602,6 +649,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         this.gridApi?.hideOverlay();
         const documentData = [...new Set(data.items.map((item: ShareDocumentDto) => item.document))]
         this.rowData = documentData;
+        this.totalRecordsCount = data.totalPages;
         this.gridApi?.setRowData(this.rowData);
       }
     });
@@ -613,15 +661,22 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new GetDocuments(this.getDocumentFilter(selectedBusinessUnitId)));
     this.documentsPage$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       this.gridApi?.setRowData([]);
-      if (!data || !data?.items.length) {
+      let dataFilter = data;
+      if (this.filterSelecetdBusinesType == BusinessUnitType.Organization) {
+        if (dataFilter?.items.length) {
+          dataFilter.items = data.items.filter((item) => { return !(item.regionName?.trim().length == 0 || item.locationName?.trim().length == 0) });
+        }
+      }
+
+      if (!dataFilter || !dataFilter?.items.length) {
         this.gridApi?.showNoRowsOverlay();
-        if (this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode.id > 0 && data!=null) {
+        if (this.selectedDocumentNode?.id != undefined && this.selectedDocumentNode.id > 0 && dataFilter != null) {
           this.store.dispatch(new IsDeleteEmptyFolder(true));
         }
       }
       else {
         this.gridApi?.hideOverlay();
-        this.rowData = data.items;
+        this.rowData = dataFilter.items;
         this.gridApi?.setRowData(this.rowData);
         this.store.dispatch(new IsDeleteEmptyFolder(false));
       }
@@ -655,15 +710,15 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   public documentPreview(docItem: any) {
     this.closeDialog();
     this.downloadedFileName = '';
-    const downloadFilter: DownloadDocumentDetailFilter = {
+    const downloadFilter: PreviewDocumentDetailFilter = {
       documentId: docItem.id,
       businessUnitType: this.filterSelecetdBusinesType,
       businessUnitId: this.filterSelectedBusinesUnitId
     }
 
-    this.store.dispatch(new GetDocumentDownloadDeatils(downloadFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
+    this.store.dispatch(new GetDocumentPreviewDeatils(downloadFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
       if (val) {
-        var data = val?.documentLibrary?.documentDownloadDetail;
+        var data = val?.documentLibrary?.documentPreviewDetail;
         if (data != null) {
           if (this.downloadedFileName != data.fileName) {
             this.downloadedFileName = data.fileName;
@@ -706,15 +761,11 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         break;
       case '.docx':
         this.isWordDoc = true;
-        //ToDo: If preview donot work in Iframe another alternate should be looked for.
-        //DocumentEditor is removed as the requirement do not expect for any editing.
         this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://view.officeapps.live.com/op/embed.aspx?src=' + file.sasUrl);
         break;
       case '.xlsx':
-        this.isExcel = true;
-        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          `https://view.officeapps.live.com/op/embed.aspx?src=${file.sasUrl}`
-        );
+        this.isWordDoc = true;
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://view.officeapps.live.com/op/embed.aspx?src=' + file.sasUrl);
         break;
       default:
 
@@ -722,14 +773,13 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     this.changeDetectorRef.markForCheck();
   }
 
-  setDocumentMimeTypeDefaults()
-  {
+  setDocumentMimeTypeDefaults() {
     this.isPdf = false;
-    this.isWordDoc=false;
-    this.isImage=false;
-    this.isExcel=false;
-    this.previewUrl='';
-    this.fileAsBase64='';
+    this.isWordDoc = false;
+    this.isImage = false;
+    this.isExcel = false;
+    this.previewUrl = '';
+    this.fileAsBase64 = '';
   }
 
   public onClosePreview(): void {
@@ -831,11 +881,6 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.documentLibraryDto$.pipe(takeUntil(this.unsubscribe$))
         .subscribe((data: DocumentLibraryDto) => {
           if (data) {
-            const editRegionIds = data?.regionId?.split(',').map(Number) != undefined ? data?.regionId?.split(',').map(Number) : [];
-            this.setRegionsOnEdit(editRegionIds);
-            const editLocationIds = data?.locationId?.split(',').map(Number) != undefined ? data?.locationId?.split(',').map(Number) : [];
-            this.setLocationsOnEdit(editLocationIds);
-            this.changeDetectorRef.markForCheck();
             this.documentLibraryform.get(FormControlNames.DocumentName)?.setValue(data.name);
             this.documentLibraryform.get(FormControlNames.TypeIds)?.setValue(data.docType);
             this.documentLibraryform.get(FormControlNames.Tags)?.setValue(data.tags);
@@ -843,6 +888,15 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
             this.documentLibraryform.get(FormControlNames.StartDate)?.setValue(data.startDate != null ? new Date(data.startDate.toString()) : this.startDate);
             this.documentLibraryform.get(FormControlNames.EndDate)?.setValue(data.endDate != null ? new Date(data.endDate.toString()) : null);
             this.documentLibraryform.get(FormControlNames.Comments)?.setValue(data.comments);
+            setTimeout(() => {
+              const editRegionIds = data?.regionId?.split(',').map(Number) != undefined ? data?.regionId?.split(',').map(Number) : [];
+              this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(editRegionIds);
+              const editLocationIds = data?.locationId?.split(',').map(Number) != undefined ? data?.locationId?.split(',').map(Number) : [];
+              setTimeout(() => {
+                this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(editLocationIds);
+              }, 500);
+              this.changeDetectorRef.markForCheck();
+            }, 500)
             this.store.dispatch(new ShowSideDialog(true));
           }
         });
@@ -851,10 +905,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   public setRegionsOnEdit(editRegionIds: any) {
 
-    if (editRegionIds.length > 0 && editRegionIds[0] == -1) {
+    if (editRegionIds.length > 0) {
       this.regions$.subscribe((data) => {
-        const allRegionsIds = data.map(region => region.id);
-        this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(allRegionsIds);
+        this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(editRegionIds);
       });
     } else {
       this.documentLibraryform.get(FormControlNames.RegionIds)?.setValue(editRegionIds);
@@ -862,10 +915,9 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
   }
 
   public setLocationsOnEdit(editLocationIds: any) {
-    if (editLocationIds.length > 0 && editLocationIds[0] == -1) {
+    if (editLocationIds.length > 0) {
       this.locations$.subscribe((data) => {
-        const allLocIds = data.map(loc => loc.id);
-        this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(allLocIds);
+        this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(editLocationIds);
       });
     } else {
       this.documentLibraryform.get(FormControlNames.LocationIds)?.setValue(editLocationIds);
@@ -932,61 +984,39 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
 
   public handleOnSave() {
     this.documentLibraryform.markAllAsTouched();
-    if (this.documentLibraryform.invalid) {
+    if (this.documentLibraryform.invalid && (this.isUpload || this.isEditDocument)) {
       return;
     }
     this.SaveFolderOrDocument();
   }
 
   public setDictionaryRegionMappings() {
+
     let mapping: { [id: number]: number[]; } = {};
-    let isAllRegions: boolean = false;
-    let isAllLocations: boolean = false;
-    let regionsData: Region[] = [];
-    let locationsData: Region[] = [];
-    this.regions$.subscribe((data) => {
-      regionsData = data;
-      this.locations$.subscribe((locData: any) => {
-        locationsData = locData;
-      });
-    });
     if (this.isAgency) {
       return mapping;
     }
-    isAllRegions = this.documentLibraryform.controls[FormControlNames.RegionIds].value.length === regionsData.length;
-    isAllLocations = this.documentLibraryform.controls[FormControlNames.LocationIds].value.length === locationsData.length;
 
-    if (isAllRegions && !isAllLocations) {
-      mapping[-1] = this.documentLibraryform.controls[FormControlNames.LocationIds].value;
-    }
-    else if (!isAllRegions && isAllLocations) {
-      const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
+    const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
+    if (selectedRegions.length > 0) {
       selectedRegions.forEach((regionItem: any) => {
-        mapping[regionItem] = [-1];
-      });
-    }
-    else {
-      const selectedRegions = this.documentLibraryform.get(FormControlNames.RegionIds)?.value;
-      if (selectedRegions.length > 0) {
-        selectedRegions.forEach((regionItem: any) => {
-          let mappingLocItems: number[] = [];
-          const selectedLoactions = this.documentLibraryform.get(FormControlNames.LocationIds)?.value;
-          let x = this.locations$.subscribe((data: any) => {
-            if (selectedLoactions.length > 0) {
-              selectedLoactions.forEach((selLocItem: any) => {
-                let selectedLocation = data.filter((locItem: any) => { return locItem.id == selLocItem && locItem.regionId == regionItem });
-                if (selectedLocation.length > 0)
-                  mappingLocItems.push(selectedLocation[0].id);
-              });
-              mapping[regionItem] = mappingLocItems;
-            }
-            else {
-              mapping[regionItem] = [];
-            }
-          });
-
+        let mappingLocItems: number[] = [];
+        const selectedLoactions = this.documentLibraryform.get(FormControlNames.LocationIds)?.value;
+        let x = this.locations$.subscribe((data: any) => {
+          if (selectedLoactions.length > 0) {
+            selectedLoactions.forEach((selLocItem: any) => {
+              let selectedLocation = data.filter((locItem: any) => { return locItem.id == selLocItem && locItem.regionId == regionItem });
+              if (selectedLocation.length > 0)
+                mappingLocItems.push(selectedLocation[0].id);
+            });
+            mapping[regionItem] = mappingLocItems;
+          }
+          else {
+            mapping[regionItem] = [];
+          }
         });
-      }
+
+      });
     }
     return mapping;
   }
@@ -1028,6 +1058,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         tags: this.documentLibraryform.get(FormControlNames.Tags)?.value,
         comments: this.documentLibraryform.get(FormControlNames.Comments)?.value,
         selectedFile: this.selectedFile,
+        status: parseInt(this.documentLibraryform.get(FormControlNames.StatusIds)?.value),
         isEdit: this.isEditDocument
       }
       if (this.documentLibraryform.get(FormControlNames.DocumentName)?.value.trim() == '') {
@@ -1035,9 +1066,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         this.documentLibraryform.markAllAsTouched();
         return;
       }
-      this.store.dispatch(new SaveDocuments(document)).pipe(takeUntil(this.unsubscribe$)).subscribe( (val) => {
-        if(this.isShare)
-        {
+      this.store.dispatch(new SaveDocuments(document)).pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
+        if (this.isShare) {
           this.shareDocumentIds = [val?.documentLibrary?.savedDocumentLibraryDto?.id];
           this.saveShareDocument();
         }
@@ -1086,7 +1116,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       unitIds = this.documentLibraryform.get(FormControlNames.Orgnizations)?.value;
     }
     let mapping: { [id: number]: number[]; } = {};
-    if (unitType != 0 && unitIds.length > 0) {
+    if (unitType != 0 && unitIds?.length > 0) {
       const shareDocumentsFilter: ShareDocumentsFilter = {
         documentIds: this.shareDocumentIds,
         businessUnitType: unitType,

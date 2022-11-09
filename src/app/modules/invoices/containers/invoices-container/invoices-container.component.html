@@ -44,12 +44,14 @@
       <button
         ejs-button
         appHideBeforeSyncfusionLoad
-        class="e-primary"
-        [disabled]="!agencyActionsAllowed"
+        class="e-primary relative"
+        [disabled]="!agencyActionsAllowed || !createManualEnabled"
         (click)="openAddDialog()"
         *ngIf="tabConfig?.manualInvoiceCreationEnabled"
-        >
+      >
         Add Manual Invoice
+        <ejs-tooltip *ngIf="!createManualEnabled" class="tooltip" content="Separate permission right is required" position="BottomCenter">
+        </ejs-tooltip>
       </button>
 
 
@@ -71,20 +73,20 @@
       </div>
 
 <!--      TODO: Move to component-->
-      <ejs-tooltip content="Select record in the table"
+      <ejs-tooltip [content]="getCreateInvoiceTooltip"
                    position="BottomCenter"
-                   [opensOn]="!groupingInvoiceRecordsIds.length ? 'Auto' : 'Custom'">
+                   [opensOn]="!groupingInvoiceRecordsIds.length || !createInvoiceEnabled ? 'Auto' : 'Custom'">
         <div class="invoices-split-button" *ngIf="tabConfig?.groupingEnabled">
           <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-primary"
                   class="main-button"
-                  [disabled]="!groupingInvoiceRecordsIds.length"
+                  [disabled]="!groupingInvoiceRecordsIds.length || !createInvoiceEnabled"
                   (click)="groupInvoices()">
             Create Invoice By {{groupInvoicesBy.text}}
           </button>
 
           <button ejs-button cssClass="e-primary"
                   class="dropdown-button"
-                  [disabled]="!groupingInvoiceRecordsIds.length"
+                  [disabled]="!groupingInvoiceRecordsIds.length || !createInvoiceEnabled"
                   (click)="showGroupingOverlay()">
             <i-feather name="chevron-down" class="icon"></i-feather>
           </button>
@@ -164,6 +166,8 @@
   [currentSelectedRowIndex]="currentSelectedTableRowIndex | async"
   [maxRowIndex]="0"
   [actionAllowed]="invoicePayAllowed"
+  [approveAllowed]="approveInvoiceEnabled"
+  [payAllowed]="payInvoiceEnabled"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
   (updateTable)="handleUpdateTable($event)"
 ></app-invoice-detail-container>

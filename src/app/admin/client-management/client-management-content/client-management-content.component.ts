@@ -3,7 +3,6 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
@@ -24,9 +23,7 @@ import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/stor
 import { UserState } from 'src/app/store/user.state';
 import { ExportOrganizations, GetOrganizationDataSources, GetOrganizationsByPage } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
-import { Permission } from "@core/interface";
-import { UserPermissions } from "@core/enums";
-import { REQUIRED_PERMISSIONS } from "@shared/constants";
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 
 @Component({
   selector: 'app-client-management-content',
@@ -35,7 +32,7 @@ import { REQUIRED_PERMISSIONS } from "@shared/constants";
   providers: [SortService],
 })
 export class ClientManagementContentComponent
-  extends AbstractGridConfigurationComponent
+  extends AbstractPermissionGrid
   implements OnInit, AfterViewInit, OnDestroy
 {
   private pageSubject = new Subject<number>();
@@ -50,10 +47,7 @@ export class ClientManagementContentComponent
   ];
   public fileName: string;
   public defaultFileName: string;
-  public userPermission: Permission;
   public readonly statusEnum = Status;
-  public readonly userPermissions = UserPermissions;
-  public readonly toolTipMessage = REQUIRED_PERMISSIONS;
 
   readonly ROW_HEIGHT = 64;
 
@@ -84,14 +78,14 @@ export class ClientManagementContentComponent
   private permissions: CurrentUserPermission[] = [];
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private router: Router,
     private route: ActivatedRoute,
     private datePipe: DatePipe,
     private filterService: FilterService,
     private fb: FormBuilder
   ) {
-    super();
+    super(store);
     this.idFieldName = 'organizationId';
     this.fileName = 'Organizations ' + datePipe.transform(Date.now(), 'MM/dd/yyyy');
     store.dispatch(new SetHeaderState({ title: 'Organization List', iconName: 'file-text' }));
@@ -104,8 +98,8 @@ export class ClientManagementContentComponent
     });
   }
 
-  ngOnInit(): void {
-    this.subscribeOnPermissions();
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.idFieldName = 'organizationId';
     this.filterColumns = {
       searchTerm: { type: ControlTypes.Text },
@@ -248,14 +242,6 @@ export class ClientManagementContentComponent
 
   public editOrganization(data: Organization): void {
     this.router.navigate(['./edit', data.organizationId], { relativeTo: this.route });
-  }
-
-  private subscribeOnPermissions(): void {
-    this.userPermission = this.store.selectSnapshot(UserState.userPermission);
-
-    this.currentUserPermissions$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((permissions) => (this.permissions = permissions));
   }
 
   private getFiltersForExport(): OrganizationFilter & { organizationNames: string[] } {

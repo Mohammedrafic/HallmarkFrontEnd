@@ -40,6 +40,7 @@ export class AccumulationChartComponent
   public legendData: WidgetLegengDataModel[] = [];
   public totalScore: number = 0;
   public legendPosition: LegendPositionEnum = LegendPositionEnum.Right;
+  public datalabel: Object;
 
   public readonly tooltipSettings: TooltipSettingsModel = {
     enable: true,
@@ -75,6 +76,7 @@ export class AccumulationChartComponent
 
   public ngOnInit(): void {
     this.filteredChartData$ = this.getFilteredChartData();
+    this.datalabel = { visible: true };
   }
 
   public onClickLegend(label: string): void {

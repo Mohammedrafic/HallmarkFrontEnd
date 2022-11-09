@@ -48,6 +48,9 @@ export class AddDialogHelper<T> extends TimesheetDateHelper {
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
   }
 
+  /**
+   * TODO: rework with unique field.
+   */
   public trackByIndex(index: number): number {
     return index;
   }
@@ -58,6 +61,10 @@ export class AddDialogHelper<T> extends TimesheetDateHelper {
 
   public cancelChanges(): void {
     if (this.form?.touched) {
+
+      /**
+       * TODO: move this chain in AddDialogHelperService, leave only subscription.
+       */
       this.confirmService.confirm(this.confirmMessages.confirmAddFormCancel, {
         title: 'Unsaved Progress',
         okButtonLabel: 'Leave',

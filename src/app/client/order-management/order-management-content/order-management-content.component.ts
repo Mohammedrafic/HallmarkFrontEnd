@@ -23,21 +23,19 @@ import {
   LockUpdatedSuccessfully,
   ReloadOrganisationOrderCandidatesLists,
   SelectNavigationTab,
-  SetLock,
+  SetLock
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { Permission } from "@core/interface";
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import {
-  GetAllOrganizationSkills,
-  GetOrganizationSettings,
-} from '@organization-management/store/organization-management.actions';
+import { GetAllOrganizationSkills, GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 import { FilteredItem } from '@shared/models/filter.model';
 import {
   FilterOrderStatus,
@@ -48,7 +46,7 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementChild,
-  OrderManagementPage,
+  OrderManagementPage
 } from '@shared/models/order-management.model';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Skill } from '@shared/models/skill.model';
@@ -68,7 +66,7 @@ import {
   Subscription,
   take,
   takeUntil,
-  throttleTime,
+  throttleTime
 } from 'rxjs';
 import { CandidatesStatusText, FilterOrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import {
@@ -77,7 +75,7 @@ import {
   ShowExportDialog,
   ShowFilterDialog,
   ShowSideDialog,
-  ShowToast,
+  ShowToast
 } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
@@ -95,7 +93,7 @@ import {
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
-  ROW_HEIGHT,
+  ROW_HEIGHT
 } from './order-management-content.constants';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -122,14 +120,16 @@ import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { PermissionService } from '../../../security/services/permission.service';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { PreservedFilters } from '@shared/models/preserved-filters.model';
 
 @Component({
   selector: 'app-order-management-content',
   templateUrl: './order-management-content.component.html',
   styleUrls: ['./order-management-content.component.scss'],
-  providers: [VirtualScrollService, DetailRowService, MaskedDateTimeService], 
+  providers: [VirtualScrollService, DetailRowService, MaskedDateTimeService],
 })
-export class OrderManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class OrderManagementContentComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') override gridWithChildRow: GridComponent;
   @ViewChild('search') search: SearchComponent;
   @ViewChild('detailsDialog') detailsDialog: OrderDetailsDialogComponent;
@@ -165,6 +165,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private readonly candidatesJob$: Observable<OrderCandidateJob | null>;
 
   @Select(DashboardState.filteredItems) private readonly filteredItems$: Observable<FilteredItem[]>;
+
+  @Select(PreservedFiltersState.preservedFilters) private readonly preservedFilters$: Observable<PreservedFilters>;
 
   @Select(OrderManagementContentState.projectSpecialData)
   public readonly projectSpecialData$: Observable<ProjectSpecialData>;
@@ -206,6 +208,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private search$ = new Subject();
   public selectedDataRow: OrderManagement;
 
+  public hasCreateEditOrderPermission: boolean;
   public selectedOrder: Order;
   public openDetails = new Subject<boolean>();
   public orderPositionSelected$ = new Subject<{ state: boolean; index?: number }>();
@@ -254,9 +257,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private prefix: string | null;
   private orderId: number | null;
   private creatingReorder = false;
+  private filterApplied = false;
+  private isIncomplete = false;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private router: Router,
     private route: ActivatedRoute,
     private actions$: Actions,
@@ -272,7 +277,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     private reOpenOrderService: ReOpenOrderService,
     private permissionService: PermissionService
   ) {
-    super();
+    super(store);
     this.isRedirectedFromDashboard =
       this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromDashboard'] || false;
     this.orderStaus = this.router.getCurrentNavigation()?.extras?.state?.['orderStatus'] || 0;
@@ -315,10 +320,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     });
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
+    this.watchForPermissions();
     this.handleDashboardFilters();
     this.orderFilterColumnsSetup();
-    this.onOrderFilterDataSourcesLoadHandler();
 
     this.onOrganizationStructureDataLoadHandler();
     this.onDuplicateOrderSucceededHandler();
@@ -448,7 +454,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filters.agencyType =
       this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) || null : null;
     this.filters.pageSize = this.pageSize;
-
+    this.isIncomplete = false;
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
         this.filters.isTemplate = false;
@@ -476,13 +482,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       case OrganizationOrderManagementTabs.Incomplete:
         this.columnsToExport = allOrdersColumnsToExport;
         this.filters.isTemplate = false;
-        this.store.dispatch(
-          new GetOrders({ ...this.filters, pageNumber: this.currentPage, pageSize: this.pageSize }, true)
-        );
+        this.isIncomplete = true;
+        cleared ? this.store.dispatch([new GetOrders(this.filters, true)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.OrderTemplates:
         this.filters.isTemplate = true;
-        this.store.dispatch([new GetOrders(this.filters)]);
+        cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
         break;
     }
 
@@ -587,12 +592,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onFilterClearAll(): void {
+    this.filterApplied = true;
     this.orderManagementService.selectedOrderAfterRedirect = null;
     this.clearFilters();
     this.getOrders(true);
   }
 
   public onFilterApply(): void {
+    this.filterApplied = true;
     this.filters = this.OrderFilterFormGroup.getRawValue();
     this.filters.candidateName = this.filters.candidateName || null;
     this.filters.orderPublicId = this.filters.orderPublicId || null;
@@ -608,6 +615,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.getOrders(true);
     this.store.dispatch(new ShowFilterDialog(false));
+    this.filterService.setPreservedFIlters(this.filters);
   }
 
   public onDataBound(): void {
@@ -717,8 +725,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           new GetAgencyOrderCandidatesList(
             data.id,
             data.organizationId,
-            1,
-            30,
+            GRID_CONFIG.initialPage,
+            GRID_CONFIG.initialRowsPerPage,
             this.orderManagementService.excludeDeployed
           )
         );
@@ -804,6 +812,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public tabSelected(tabIndex: OrganizationOrderManagementTabs): void {
     this.activeTab = tabIndex;
     this.clearFilters();
+    this.filterApplied = false;
 
     // Don’t need reload orders if we go back from the candidate page
     if (!this.previousSelectedOrderId) {
@@ -855,8 +864,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       new GetAgencyOrderCandidatesList(
         reOrder.id,
         reOrder.organizationId,
-        1,
-        30,
+        GRID_CONFIG.initialPage,
+        GRID_CONFIG.initialRowsPerPage,
         this.orderManagementService.excludeDeployed
       )
     );
@@ -898,8 +907,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       new GetAgencyOrderCandidatesList(
         order.id,
         order.organizationId,
-        1,
-        30,
+        GRID_CONFIG.initialPage,
+        GRID_CONFIG.initialRowsPerPage,
         this.orderManagementService.excludeDeployed
       )
     );
@@ -1000,8 +1009,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           new GetAgencyOrderCandidatesList(
             this.selectedOrder.id,
             this.selectedOrder.organizationId as number,
-            1,
-            30,
+            GRID_CONFIG.initialPage,
+            GRID_CONFIG.initialRowsPerPage,
             this.orderManagementService.excludeDeployed
           )
         );
@@ -1068,7 +1077,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         );
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
       }
-      this.getOrders();
+      this.getOrders(this.filterApplied);
     });
   }
 
@@ -1224,16 +1233,29 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
         this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
         this.setDefaultFilter();
-        this.store.dispatch([new GetOrders(this.filters)])
+        this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
       });
   }
 
   private setDefaultFilter(): void {
-    const statuses = this.filterColumns.orderStatuses.dataSource
+    if (this.filterService.canPreserveFilters()) {
+      const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
+      if (preservedFilters?.regions) {
+        this.OrderFilterFormGroup.get('regionIds')?.setValue([...preservedFilters.regions]);
+        this.filters.regionIds = [...preservedFilters.regions];
+        if (preservedFilters?.locations) {
+          this.OrderFilterFormGroup.get('locationIds')?.setValue([...preservedFilters.locations]);
+          this.filters.locationIds = [...preservedFilters.locations];
+        }
+      }
+    }
+    if (!(this.filters.isTemplate || this.isIncomplete)) {
+      const statuses = this.filterColumns.orderStatuses.dataSource
                       .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed].includes(status.status))
                       .map((status: FilterStatus) => status.status);
-    this.OrderFilterFormGroup.get('orderStatuses')?.setValue(statuses);
-    this.filters.orderStatuses = statuses;
+      this.OrderFilterFormGroup.get('orderStatuses')?.setValue(statuses);
+      this.filters.orderStatuses = statuses;
+    }
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }
 
@@ -1310,6 +1332,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.orgStructure = structure;
         this.regions = structure.regions;
         this.filterColumns.regionIds.dataSource = this.regions;
+        this.onOrderFilterDataSourcesLoadHandler();
       });
   }
 
@@ -1413,7 +1436,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private applyDashboardFilters(): void {
     this.orderStaus >0 ? this.numberArr.push(this.orderStaus) : [];
     this.filters.orderStatuses = this.numberArr;
-   
+
     combineLatest([this.organizationId$, this.filteredItems$])
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(([organizationId, items]) => {
@@ -1507,8 +1530,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       new GetAgencyOrderCandidatesList(
         order.id,
         order.organizationId as number,
-        1,
-        30,
+        GRID_CONFIG.initialPage,
+        GRID_CONFIG.initialRowsPerPage,
         this.orderManagementService.excludeDeployed
       )
     );
@@ -1585,5 +1608,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     ];
 
     this.closedOrderMenu = [{ text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder }];
+  }
+
+  private watchForPermissions(): void {
+    this.getPermissionStream().pipe(takeUntil(this.unsubscribe$)).subscribe((permissions: Permission) => {
+      this.hasCreateEditOrderPermission = permissions[this.userPermissions.CanCreateOrders]
+        || permissions[this.userPermissions.CanOrganizationEditOrders]
+    });
   }
 }

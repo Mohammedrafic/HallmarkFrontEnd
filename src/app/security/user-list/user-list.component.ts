@@ -21,9 +21,9 @@ import { UserSettingsComponent } from './add-edit-user/user-settings/user-settin
 import { ConfirmService } from '@shared/services/confirm.service';
 import { UserDTO, User } from '@shared/models/user-managment-page.model';
 import { take } from 'rxjs/operators';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserGridComponent } from './user-grid/user-grid.component';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 
 const DEFAULT_DIALOG_TITLE = 'Add User';
 const EDIT_DIALOG_TITLE = 'Edit User';
@@ -33,7 +33,7 @@ const EDIT_DIALOG_TITLE = 'Edit User';
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss'],
 })
-export class UserListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class UserListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild(AddEditUserComponent) addEditUserComponent: AddEditUserComponent;
   @ViewChild(UserGridComponent) userGridComponent: UserGridComponent;
 
@@ -68,12 +68,13 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
 
   private isAlive = true;
 
-  constructor(private store: Store, private confirmService: ConfirmService, private actions$: Actions) {
-    super();
+  constructor(protected override store: Store, private confirmService: ConfirmService, private actions$: Actions) {
+    super(store);
     this.store.dispatch(new SetHeaderState({ title: 'Users', iconName: 'lock' }));
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.businessForm = this.generateBusinessForm();
     this.userSettingForm = UserSettingsComponent.createForm();
     this.onBusinessUnitValueChanged();

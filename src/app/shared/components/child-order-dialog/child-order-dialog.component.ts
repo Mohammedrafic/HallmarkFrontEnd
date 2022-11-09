@@ -13,6 +13,7 @@ import {
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
+import { AbstractPermission } from "@shared/helpers/permissions";
 import { JobCancellation } from '@shared/models/candidate-cancellation.model';
 
 import {
@@ -22,7 +23,7 @@ import {
   SelectingEventArgs,
   TabComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { GetAgencyExtensions, GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import { GetAgencyExtensions, GetCandidateJob, GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
 import {
@@ -79,7 +80,7 @@ import { ShowCloseOrderDialog, ShowToast } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from '../../../security/services/permission.service';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 enum Template {
   accept,
@@ -101,7 +102,7 @@ enum MobileMenuItems {
   templateUrl: './child-order-dialog.component.html',
   styleUrls: ['./child-order-dialog.component.scss'],
 })
-export class ChildOrderDialogComponent extends DestroyableDirective implements OnInit, OnChanges, OnDestroy {
+export class ChildOrderDialogComponent extends AbstractPermission implements OnInit, OnChanges, OnDestroy {
   @Input() order: MergedOrder;
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild] | null>;
   @Input() candidate: OrderManagementChild;
@@ -136,6 +137,9 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
 
   @Select(UserState.currentUserPermissions)
   public currentUserPermissions$: Observable<any[]>;
+
+  @Select(OrderManagementState.deployedCandidateOrderInfo)
+  public readonly deployedCandidateOrderInfo$: Observable<DeployedCandidateOrderInfo[]>;
 
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
@@ -218,7 +222,7 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
   constructor(
     private chipsCssClass: ChipsCssClass,
     private router: Router,
-    private store: Store,
+    protected override store: Store,
     private actions$: Actions,
     private commentsService: CommentsService,
     private confirmService: ConfirmService,
@@ -226,9 +230,12 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
     private reOpenOrderService: ReOpenOrderService,
     private permissionService: PermissionService,
     private changeDetectorRef: ChangeDetectorRef
-  ) {super();}
+  ) {
+    super(store);
+  }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.isAgency = this.router.url.includes('agency');
     this.isOrganization = this.router.url.includes('client');
     this.selectedOrder$ = this.isAgency ? this.agencySelectedOrder$ : this.orgSelectedOrder$;
@@ -258,6 +265,7 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
     if (candidate) {
       this.setCloseOrderButtonState();
       this.setAddExtensionBtnState(candidate);
+      this.getDeployedCandidateOrders();
 
       if (this.chipList) {
         this.chipList.cssClass = this.chipsCssClass.transform(
@@ -564,7 +572,7 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
         this.tab.select(1);
         const [order, candidate] = data;
         this.order = order as MergedOrder;
-        this.candidate = candidate;  
+        this.candidate = candidate;
         this.isClosedOrder = this.candidate.orderStatus === OrderStatus.Closed;
         this.getTemplate();
         windowScrollTop();
@@ -582,7 +590,7 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
   private getComments(): void {
     this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe((comments: Comment[]) => {
         this.comments = comments;
         this.changeDetectorRef.markForCheck();
@@ -676,7 +684,7 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
   }
 
   private subscribeOnSelectedOrder() {
-    this.selectedOrder$.pipe(takeUntil(this.destroy$))
+    this.selectedOrder$.pipe(takeUntil(this.componentDestroy()))
     .subscribe((data) => {
       this.selectedOrder = data;
     });
@@ -707,10 +715,19 @@ export class ChildOrderDialogComponent extends DestroyableDirective implements O
 
   private subscribeOnPermissions(): void {
     this.permissionService.getPermissions()
-    .pipe(takeUntil(this.destroy$))
+    .pipe(takeUntil(this.componentDestroy()))
     .subscribe(({ canCloseOrder, canCreateOrder }) => {
       this.canCreateOrder = canCreateOrder;
       this.canCloseOrder = canCloseOrder;
     });
+  }
+
+  private getDeployedCandidateOrders(): void {
+    if (!!this.candidate.deployedCandidateInfo) {
+      const candidateId = this.candidate.candidateId;
+      const organizationId = this.candidate.organizationId || this.candidate.deployedCandidateInfo.organizationId;
+      const orderId = this.candidate.orderId;
+      this.store.dispatch(new GetDeployedCandidateOrderInfo(orderId, candidateId, organizationId));
+    }
   }
 }

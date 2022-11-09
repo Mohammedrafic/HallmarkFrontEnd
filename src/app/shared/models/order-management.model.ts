@@ -107,6 +107,7 @@ export type AgencyOrderManagement = {
 };
 
 export type OrderManagementChild = {
+  orderId: number;
   orderPublicId?: number;
   candidateBillRate: number;
   candidateId: number;

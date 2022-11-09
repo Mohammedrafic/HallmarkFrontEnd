@@ -26,16 +26,24 @@
               ></ejs-dropdownlist>
             </div>
             <!--TODO: create and use ReadOnly Mode for it-->
-            <button ejs-button cssClass="e-outline"
-              [disabled]="!actionsAllowed"
-              (click)="onReject()" *ngIf="showRejectButton">Reject</button>
-            <button ejs-button cssClass="e-outline"
-              [disabled]="!actionsAllowed"
-              (click)="onWithdraw()" *ngIf="showWithdrawButton">Withdraw</button>
-            <button ejs-button cssClass="e-primary" (click)="onApply()"
-              [disabled]="isLocked || !actionsAllowed" *ngIf="showApplyButton">Apply</button>
-            <button ejs-button cssClass="e-primary" (click)="onAccept()"
-              [disabled]="!actionsAllowed"*ngIf="showAcceptButton">Accept</button>
+            <app-tooltip-container [showToolTip]="!actionsAllowed">
+              <button ejs-button cssClass="e-outline"
+                      [disabled]="!actionsAllowed"
+                      (click)="onReject()" *ngIf="showRejectButton">Reject</button>
+            </app-tooltip-container>
+            <app-tooltip-container [showToolTip]="!actionsAllowed">
+              <button ejs-button cssClass="e-outline"
+                      [disabled]="!actionsAllowed"
+                      (click)="onWithdraw()" *ngIf="showWithdrawButton">Withdraw</button>
+            </app-tooltip-container>
+            <app-tooltip-container [showToolTip]="!actionsAllowed">
+              <button ejs-button cssClass="e-primary" (click)="onApply()"
+                      [disabled]="isLocked || !actionsAllowed" *ngIf="showApplyButton">Apply</button>
+            </app-tooltip-container>
+            <app-tooltip-container [showToolTip]="!actionsAllowed">
+              <button ejs-button cssClass="e-primary" (click)="onAccept()"
+                      [disabled]="!actionsAllowed"*ngIf="showAcceptButton">Accept</button>
+            </app-tooltip-container>
             <div ejs-button cssClass="e-flat close-button custom-button" (click)="closeDialog()">
               <i-feather name="x" class="icon"></i-feather>
             </div>

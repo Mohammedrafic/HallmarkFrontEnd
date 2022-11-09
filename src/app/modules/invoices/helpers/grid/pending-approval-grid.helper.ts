@@ -42,18 +42,21 @@ const commonColumn: ColDef = {
 
 interface PendingApprovalColDefsConfig {
   approve?: (invoice: PendingApprovalInvoice) => void;
-  actionTitle?: string,
+  actionTitle?: string;
+  actionEnabled: boolean;
 }
 
 interface AllColDefsConfig {
   approve?: (invoice: PendingApprovalInvoice) => void;
   pay?: (invoice: PendingApprovalInvoice) => void;
   actionTitle?: string,
+  canEdit: boolean,
+  canPay: boolean,
 }
 
 export class PendingApprovalGridHelper {
   public static getOrganizationColDefs(
-    { approve, actionTitle }: PendingApprovalColDefsConfig
+    { approve, actionTitle, actionEnabled }: PendingApprovalColDefsConfig
   ): TypedColDef<PendingApprovalInvoice>[] {
     const colDef = [
       approve ? {
@@ -75,7 +78,7 @@ export class PendingApprovalGridHelper {
                 titleClass: 'color-supportive-green-10',
                 disabled: [
                   PendingInvoiceStatus.Approved,
-                ].includes(status),
+                ].includes(status) || !actionEnabled,
               },
             ],
           } as GridActionsCellConfig
@@ -269,7 +272,6 @@ export class PendingApprovalGridHelper {
                 width: 120,
                 cellRendererSelector: titleValueCellRendererSelector,
               },
-
               {
                 field: 'billRateConfigTitle',
                 headerName: 'Bill Rate Type',
@@ -279,7 +281,8 @@ export class PendingApprovalGridHelper {
               {
                 field: 'billRate',
                 headerName: 'Rate',
-                width: 100,
+                // minWidth: 100,
+                // initialWidth: 100,
                 cellRendererSelector: titleValueCellRendererSelector,
                 valueGetter: RateReasonValueGetter,
               },
@@ -334,7 +337,7 @@ export class PendingApprovalGridHelper {
   }
 
   public static getOrganizationAllColDefs(
-    { approve, pay }: AllColDefsConfig
+    { approve, pay, canEdit, canPay }: AllColDefsConfig
   ): TypedColDef<PendingApprovalInvoice>[] {
     const colDef = [
       {
@@ -348,6 +351,8 @@ export class PendingApprovalGridHelper {
         cellRendererParams: {
           approve: approve,
           pay: pay,
+          canEdit,
+          canPay,
         },
         sortable: false,
         suppressMenu: true,

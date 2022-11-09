@@ -1,14 +1,17 @@
+import { Directive, OnInit } from "@angular/core";
+
 import { Permission, PermissionGrid } from "@core/interface";
 import { UserPermissions } from "@core/enums";
 import { REQUIRED_PERMISSIONS } from "@shared/constants";
 import { Store } from "@ngxs/store";
 import { UserState } from "../../../store/user.state";
-import { Directive, OnInit } from "@angular/core";
-import { DestroyableDirective } from "@shared/directives/destroyable.directive";
+import { MenuSettings } from '@shared/models';
+import { filter, Observable, takeUntil } from 'rxjs';
+import { Destroyable } from '@core/helpers';
 
 @Directive()
-export abstract class AbstractPermission extends DestroyableDirective implements OnInit, PermissionGrid {
-  public userPermission: Permission;
+export abstract class AbstractPermission extends Destroyable implements OnInit, PermissionGrid {
+  public userPermission: Permission = {};
   public readonly userPermissions = UserPermissions;
   public readonly toolTipMessage = REQUIRED_PERMISSIONS;
 
@@ -23,6 +26,22 @@ export abstract class AbstractPermission extends DestroyableDirective implements
   }
 
   private getPermission(): void {
-    this.userPermission = this.store.selectSnapshot(UserState.userPermission);
+    this.getPermissionStream()
+      .pipe(takeUntil(this.componentDestroy()))
+      .subscribe((permissions: Permission) => {
+        this.userPermission = permissions;
+    });
+  }
+
+  protected checkValidPermissions(settings: MenuSettings[]): MenuSettings[] {
+    return settings.filter((setting: MenuSettings) => setting.permissionKey ?
+      this.userPermission[this.userPermissions[setting.permissionKey as unknown as number]] : setting);
+  }
+
+  protected getPermissionStream(): Observable<Permission> {
+   return this.store.select(UserState.userPermission).pipe(
+      filter((permissions: Permission) => !!Object.keys(permissions).length),
+
+    );
   }
 }

@@ -4,7 +4,7 @@
       <h3>Experience</h3>
     </div>
     <div class="actions">
-      <button ejs-button [disabled]="!areAgencyActionsAllowed" class="action-link" *ngIf="!readonlyMode" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Experience</button>
+      <button ejs-button [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditExperience]" class="action-link" *ngIf="!readonlyMode" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Experience</button>
     </div>
   </div>
   <ejs-grid #grid class="e-gridwithheader"
@@ -23,7 +23,7 @@
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" [disabled]="!areAgencyActionsAllowed" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></button>
-            <button ejs-button cssClass="e-flat secondary-icon-button enabled-button" [disabled]="!areAgencyActionsAllowed" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></button>
+            <button ejs-button cssClass="e-flat secondary-icon-button enabled-button" [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditExperience]" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></button>
           </div>
         </ng-template>
       </e-column>
@@ -41,6 +41,7 @@
 </section>
 
 <app-side-dialog header="{{ title }} Experience"
+                 [disableSaveButton]="!userPermission[userPermissions.CanEditExperience]"
                  (formCancelClicked)="closeDialog()"
                  (formSaveClicked)="saveExperience()">
   <form class="experience-form-dialog form-container bootstrap"

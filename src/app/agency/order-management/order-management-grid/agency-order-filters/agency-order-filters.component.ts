@@ -38,7 +38,8 @@ enum RLDLevel {
 })
 export class AgencyOrderFiltersComponent extends DestroyableDirective implements OnInit, AfterViewInit {
   @ViewChild('regionMultiselect') regionMultiselect: MultiSelectComponent;
-
+  @ViewChild('organizationMultiselect') organizationMultiselect: MultiSelectComponent;
+  @ViewChild('locationMultiselect') locationMultiselect: MultiSelectComponent;
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
 
   @Input() form: FormGroup;
@@ -161,6 +162,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       ofActionSuccessful(ShowFilterDialog),
       debounceTime(100),
       tap(() => {
+        this.organizationMultiselect.refresh();
+        this.locationMultiselect.refresh();
         this.orderStatusFilter.refresh();
         this.regionMultiselect.refresh();
       })

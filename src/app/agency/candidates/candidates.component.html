@@ -13,17 +13,22 @@
       <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline" (click)="onImport()" [disabled]="!agencyActionsAllowed">
         Import <span><i-feather name="upload" class="icon"></i-feather></span>
       </button>
-      <button
-        ejs-dropdownbutton
-        appHideBeforeSyncfusionLoad
-        cssClass="e-outline button-export"
-        [items]="exportOptions"
-        (select)="exportSelected($event)"
-      >
-        <div class="button-export-container">
-          Export <i-feather name="download" class="icon"></i-feather>
-        </div>
-      </button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditCandidateProfile]">
+        <button
+          ejs-dropdownbutton
+          [disabled]="!userPermission[userPermissions.CanEditCandidateProfile]"
+          appHideBeforeSyncfusionLoad
+          cssClass="e-outline button-export"
+          [items]="exportOptions"
+          (select)="exportSelected($event)"
+        >
+          <div class="button-export-container">
+            Export <i-feather name="download" class="icon"></i-feather>
+          </div>
+        </button>
+      </app-tooltip-container>
       <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
         <div class="filter-button-content">
           <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-circle">{{
@@ -32,13 +37,18 @@
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
-      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToCandidateForm()" [disabled]="!agencyActionsAllowed">Add Candidate</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditCandidateProfile]">
+          <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="navigateToCandidateForm()" [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]">Add Candidate</button>
+      </app-tooltip-container>
     </div>
   </ng-container>
 </app-page-toolbar>
 
 <section>
   <app-candidate-list
+    [userPermission]="userPermission"
     #candidateList
     [filteredItems$]="filteredItems$"
     [export$]="exportUsers$"

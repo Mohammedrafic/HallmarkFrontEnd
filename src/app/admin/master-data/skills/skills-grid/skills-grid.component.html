@@ -23,7 +23,7 @@
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="editSkill(data, $event)">
             <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
           </button>
-          <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteSkill(data, $event)">
+          <button ejs-button [disabled]="!userPermission[userPermissions.CanEditMasterSkills]" cssClass="e-flat secondary-icon-button" (click)="deleteSkill(data, $event)">
             <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
           </button>
         </div>
@@ -58,6 +58,9 @@
               (change)="onGoToClick($event)"
             >
             </ejs-numerictextbox>
+            <div class="total-rows">
+              Total Rows: {{(masterSkills$ | async)?.totalCount}}
+            </div>
           </section>
           <section class="right-side-pager-controls">
             <ejs-pager
@@ -136,7 +139,7 @@
 <app-side-dialog *ngIf="isActive"
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveSkill()"
-  header="{{ SkillFormGroup.get('id')?.value == 0 ? 'Add' : 'Edit' }} Skill"
+  header="{{ SkillFormGroup.get('id')?.value == 0 ? 'Add' : 'Edit' }} Skill" [disableSaveButton]="!userPermission[userPermissions.CanEditMasterSkills]"
   >
   <form class="skills-form-dialog form-container bootstrap"
         id="addEditSkillsForm"

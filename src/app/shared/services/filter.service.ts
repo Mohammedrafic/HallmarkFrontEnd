@@ -1,13 +1,40 @@
 import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Store } from '@ngxs/store';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
+import { User } from '@shared/models/user.model';
 import { isBoolean, isDate, isEmpty, isNumber } from 'lodash';
+import { SetPreservedFilters, SetPreservedFiltersForTimesheets } from 'src/app/store/preserved-filters.actions';
 
 @Injectable({ providedIn: 'root' })
 export class FilterService {
-  constructor() {}
+  constructor(private store: Store) {}
+
+  public canPreserveFilters(): boolean {
+    const user = JSON.parse(localStorage.getItem('User') || '') as User;
+    return ![BusinessUnitType.Hallmark, BusinessUnitType.MSP].includes(user.businessUnitType);
+  }
+
+  public setPreservedFIlters(filters: any, regionPropName = 'regionIds'): void {
+    if (this.canPreserveFilters()) {
+      this.store.dispatch(new SetPreservedFilters({ regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null }));
+    }
+  }
+
+  public setPreservedFIltersTimesheets(filters: any, regionPropName = 'regionIds'): void {
+    if (this.canPreserveFilters()) {
+      this.store.dispatch(new SetPreservedFiltersForTimesheets({ regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null }));
+    }
+  }
+
+  public setPreservedFIltersGlobal(filters: any, regionPropName = 'regionsNames'): void {
+    if (this.canPreserveFilters()) {
+      this.store.dispatch(new SetPreservedFilters({ regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null }, true));
+    }
+  }
 
   /**
    * Remove value from form control
@@ -52,18 +79,20 @@ export class FilterService {
         switch (filterColumns[key].type) {
           case ControlTypes.Multiselect:
             val.forEach((item: any) => {
-              const filteredItem = filterColumns[key].dataSource.find(
+              const filteredItem = filterColumns[key].dataSource?.find(
                 (data: any) => data[filterColumns[key].valueId] === item
               );
-              chips.push({
-                text:
-                  filterColumns[key].valueType === ValueType.Id ? filteredItem[filterColumns[key].valueField] : item,
-                column: key,
-                value: item,
-                organizationId: filteredItem?.organizationId || filteredItem?.businessUnitId || null,
-                regionId: filteredItem?.regionId || null,
-                locationId: filteredItem?.locationId || null,
-              });
+              if (filteredItem) {
+                chips.push({
+                  text:
+                    filterColumns[key].valueType === ValueType.Id ? filteredItem[filterColumns[key].valueField] : item,
+                  column: key,
+                  value: item,
+                  organizationId: filteredItem?.organizationId || filteredItem?.businessUnitId || null,
+                  regionId: filteredItem?.regionId || null,
+                  locationId: filteredItem?.locationId || null,
+                });
+              }
             });
             break;
 

@@ -104,6 +104,12 @@ export interface InvoiceDialogActionPayload {
   invoiceDetail: InvoiceDetail | null;
 }
 
+export interface AllInvoiceCell {
+  approve: () => void;
+  pay: () => void;
+  canEdit: boolean;
+  canPay: boolean;
+}
 
 export interface InvoicePermissions {
   agencyCanPay: boolean;

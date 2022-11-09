@@ -83,6 +83,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() orderPositionSelected$: Subject<{ state: boolean; index?: number }>;
   @Input() children: OrderManagementChild[] | undefined;
   @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
+  @Input() hasCreateEditOrderPermission: boolean;
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
@@ -228,7 +229,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     this.subscribeOnOrderCandidatePage();
     this.subsToTabChange();
     this.subscribeOnPermissions();
-   
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -391,7 +392,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         }),
         take(1)
       )
-      .subscribe(() => {      
+      .subscribe(() => {
         this.reOpenOrderSuccess.emit(this.order);
       });
   }

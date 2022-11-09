@@ -187,40 +187,6 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
   actionCol(),
 ]);
 
-export const MilesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
-  dayColDef,
-  ...(isStatusAvaliable ? [recordStatusCell] : []),
-  {
-    ...editableCostCenterDef,
-    width: 220,
-  },
-  {
-    ...billRateTypeStatic,
-    width: 200,
-  },
-  attachmentsCol,
-  {
-    ...amountColdef('Miles'),
-    width: 200,
-    cellRenderer: InputEditorComponent,
-    cellRendererParams: {
-      editMode: true,
-      isEditable: false,
-      type: EditFieldTypes.Text,
-      validators: [Validators.min(0), Validators.max(24), Validators.required],
-    }
-  },
-  {
-    ...billRateColDef,
-    width: 150,
-  },
-  {
-    ...totalCol,
-    width: 200,
-  },
-  actionCol(true),
-]);
-
 export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
   dayColDef,
   ...(isStatusAvaliable ? [recordStatusCell] : []),
@@ -272,12 +238,6 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
   },
   actionCol(),
 ]);
-
-export const TimesheetRecordsColConfig: Record<string, ((isStatusAvaliable: boolean) => ColDef[])> = {
-  [RecordFields.Time]: TimesheetRecordsColdef,
-  [RecordFields.Miles]: MilesRecordsColDef,
-  [RecordFields.Expenses]: ExpensesRecordsColDef,
-}
 
 export const RecordsTabConfig: TabConfig[] = [
   {

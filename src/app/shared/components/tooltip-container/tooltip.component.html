@@ -1,17 +1,10 @@
-<ng-container *ngIf="!showToolTip">
-  <ng-container *ngTemplateOutlet="tmContent"></ng-container>
-</ng-container>
-
-<ejs-tooltip
-  id="tooltip"
-  [showTipPointer]="false"
-  position="BottomCenter"
-  [content]="message"
-  *ngIf="showToolTip"
->
-  <ng-container *ngTemplateOutlet="tmContent"></ng-container>
-</ejs-tooltip>
-
-<ng-template #tmContent>
+<div class="tooltip-container">
   <ng-content></ng-content>
-</ng-template>
+  <ejs-tooltip
+    class="tooltip"
+    [showTipPointer]="false"
+    position="BottomCenter"
+    [content]="message"
+    *ngIf="showToolTip"
+  ></ejs-tooltip>
+</div>

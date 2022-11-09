@@ -13,6 +13,7 @@ import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid
 import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-bill-rates',
@@ -25,6 +26,8 @@ export class BillRatesComponent implements OnInit, OnDestroy {
 
   @Input() isActive: boolean | null = false;
   @Input() readOnlyMode = false;
+  @Input() isOrderPage = false;
+  @Input() disabledActionMode: boolean;
   @Input() set billRates(values: BillRate[]) {
     if (values) {
       this.billRatesControl = new FormArray([]);
@@ -43,7 +46,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   public billRateForm: FormGroup;
   public intervalMinField: AbstractControl;
   public intervalMaxField: AbstractControl;
-  public billRatesOptions: BillRateOption[];
+  public billRatesOptions: BillRateOption[] = [];
   public selectedBillRateUnit: BillRateUnit = BillRateUnit.Multiplier;
 
   private editBillRateIndex: string | null;
@@ -54,6 +57,8 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.billRatesChanges();
+
     this.billRateForm = BillRateFormComponent.createForm();
 
     this.intervalMinField = this.billRateForm.get('intervalMin') as AbstractControl;
@@ -67,12 +72,6 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     this.intervalMaxField.valueChanges.subscribe(() =>
       this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
-
-    this.billRatesOptions$.pipe(
-      takeUntil(this.unsubscribe$),
-    ).subscribe((options: BillRateOption[]) => {
-      this.billRatesOptions = options;
-    });
   }
 
   ngOnDestroy(): void {
@@ -105,12 +104,13 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       foundBillRateOption?.unit === BillRateUnit.Hours
         ? String(value.rateHour)
         : parseFloat(value.rateHour.toString()).toFixed(2);
+    BillRateFormComponent.calculateOTSFlags = false;
 
     this.billRateForm.patchValue(
       {
         billRateConfig: value.billRateConfig,
         billRateConfigId: value.billRateConfigId,
-        effectiveDate: value.effectiveDate,
+        effectiveDate: DateTimeHelper.convertDateToUtc(value.effectiveDate),
         id: value.id,
         intervalMax: value.intervalMax && String(value.intervalMax),
         intervalMin: value.intervalMin && String(value.intervalMin),
@@ -118,6 +118,9 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         billType: value.billType,
         editAllowed: value.editAllowed || false,
         isPredefined: value.isPredefined || false,
+        seventhDayOtEnabled: value.seventhDayOtEnabled,
+        weeklyOtEnabled: value.weeklyOtEnabled,
+        dailyOtEnabled: value.dailyOtEnabled,
       }
     );
 
@@ -139,11 +142,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     }
 
     this.selectedBillRateUnit = foundBillRateOption?.unit as BillRateUnit;
-    this.store.dispatch(new ShowSideDialog(true)).pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe(() => {
-      this.billRateForm.patchValue({ effectiveDate: value.effectiveDate });
-    });
+    this.store.dispatch(new ShowSideDialog(true));
   }
 
   public onRemoveBillRate({ index }: BillRatesGridEvent): void {
@@ -218,9 +217,14 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         }
       }
 
+      if (value.effectiveDate) {
+        value.effectiveDate = DateTimeHelper.toUtcFormat(value.effectiveDate);
+        this.billRateForm.get('effectiveDate')?.patchValue(value.effectiveDate);
+      }
+
       const applicantStatus = this.store.selectSnapshot(OrderManagementContentState.candidatesJob)?.applicantStatus.applicantStatus;
 
-      if (applicantStatus === CandidatStatus.OnBoard) {
+      if (applicantStatus === CandidatStatus.OnBoard && !this.isOrderPage) {
         const confirmText = this.editBillRateIndex ? EDIT_CONFIRM_TEXT : ADD_CONFIRM_TEXT;
 
         this.confirmService
@@ -264,5 +268,14 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     billRateConfig?.patchValue({ ...value.billRateConfig });
     billRateControl.patchValue({ ...value, billRateConfig });
     return billRateControl;
+  }
+
+  private billRatesChanges(): void {
+    this.billRatesOptions$.pipe(
+      filter((data) => !!data.length),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((options: BillRateOption[]) => {
+      this.billRatesOptions = options;
+    });
   }
 }

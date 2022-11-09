@@ -131,6 +131,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{candidatesList?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -157,6 +160,6 @@
   [isAgency]="isAgency"
   [candidateJob]="candidateJob"
   [dialogNextPreviousOption]="dialogNextPreviousOption"
-  [actionsAllowed]="agencyActionsAllowed"
+  [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-reorder-status-dialog>

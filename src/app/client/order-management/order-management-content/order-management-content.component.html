@@ -27,15 +27,19 @@
     >
       <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
     </button>
-    <button
-      [disabled]="!canCreateOrder"
-      ejs-button
-      appHideBeforeSyncfusionLoad
-      [isPrimary]="true"
-      (click)="navigateToOrderForm()"
-    >
-      Create Order
-    </button>
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
+      <button
+        [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        [isPrimary]="true"
+        (click)="navigateToOrderForm()"
+      >
+        Create Order
+      </button>
+    </app-tooltip-container>
   </ng-container>
 </app-page-toolbar>
 
@@ -112,12 +116,13 @@
                 !canCreateOrder ||
                 data.status === orderStatus.PreOpen ||
                 data.status === orderStatus.Closed ||
-                !settings[SettingsKeys.IsReOrder]?.value
+                !settings[SettingsKeys.IsReOrder]?.value ||
+                !hasCreateEditOrderPermission
               "
             >
               <span><i-feather name="calendar" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat default-icon-button with-badge">
+            <button ejs-button [disabled]="!hasCreateEditOrderPermission" cssClass="e-flat default-icon-button with-badge">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
               <span *ngIf="data.unreadComments > 0" class="e-badge e-badge-success e-badge-pill right-overflow">{{
                 data.unreadComments
@@ -127,7 +132,7 @@
               ejs-button
               cssClass="e-flat secondary-icon-button"
               [class.green-background]="!data.isLocked"
-              [disabled]="!canCreateOrder || disabledLock(data.status) || data?.extensionFromId"
+              [disabled]="!canCreateOrder || disabledLock(data.status) || data?.extensionFromId || !hasCreateEditOrderPermission"
               (click)="lockOrder(data); $event.stopPropagation()"
               *ngIf="isLockMenuButtonsShown"
             >
@@ -139,7 +144,7 @@
             <button
               (click)="$event.stopPropagation()"
               ejs-dropdownbutton
-              [disabled]="data.orderType === orderTypes.ReOrder && data.status === orderStatus.Closed"
+              [disabled]="data.orderType === orderTypes.ReOrder && data.status === orderStatus.Closed || !hasCreateEditOrderPermission"
               [items]="
                 (data.status === orderStatus.Closed && closedOrderMenu) ||
                 (activeTab === OrganizationOrderManagementTabs.ReOrders && getMenuForReorders(data)) ||
@@ -157,7 +162,7 @@
               <i-feather
                 name="trash-2"
                 class="icon delete-template"
-                [class.disable]="!canCreateOrder"
+                [class.disable]="!canCreateOrder || !hasCreateEditOrderPermission"
                 (click)="deleteOrder(data?.id)"
               ></i-feather>
             </div>
@@ -455,6 +460,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(ordersPage$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -963,6 +971,7 @@
   [settings]="settings"
   [openEvent]="openDetails"
   [orderPositionSelected$]="orderPositionSelected$"
+  [hasCreateEditOrderPermission]="hasCreateEditOrderPermission"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid()"
   (closeReOrderEmitter)="onAddReorderClose()"

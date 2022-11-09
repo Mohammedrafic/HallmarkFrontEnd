@@ -2,16 +2,16 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { catchError, Observable, of, tap } from "rxjs";
-import { RECORD_ADDED, RECORD_MODIFIED } from "../../../../shared/constants";
-import { MessageTypes } from "../../../../shared/enums/message-types";
-import { getAllErrors } from "../../../../shared/utils/error.utils";
+import { DOCUMENT_UPLOAD_EDIT, DOCUMENT_UPLOAD_SUCCESS, RECORD_ADDED, RECORD_MODIFIED } from "../../../../shared/constants";
+import { MessageTypes } from "@shared/enums/message-types";
 import { ShowToast } from "../../../../store/app.actions";
 import { DocumentLibraryService } from "../../services/document-library.service";
 import {
   DeletDocuments, DeletDocumentsSucceeded, GetDocumentById, GetDocumentDownloadDeatils, GetDocumentDownloadDeatilsSucceeded,
   GetDocuments, GetDocumentTypes, GetFoldersTree, GetSharedDocuments, SaveDocumentFolder, SaveDocuments, SearchDocumentTags,
   ShareDocuments, ShareDocumentsSucceeded, UnShareDocuments, UnShareDocumentsSucceeded,
-  GetRegionsByOrganizations, GetLocationsByRegions, GetShareAssociateAgencies, GetShareOrganizationsDtata, DeleteEmptyDocumentsFolder, DeletDocumentFolderSucceeded
+  GetRegionsByOrganizations, GetLocationsByRegions, GetShareAssociateAgencies, GetShareOrganizationsDtata,
+  DeleteEmptyDocumentsFolder, DeletDocumentFolderSucceeded, GetDocumentPreviewDeatils, GetDocumentPreviewDeatilsSucceeded
 } from "../actions/document-library.actions";
 import {
   DocumentFolder, DocumentLibraryDto, Documents, DocumentsLibraryPage, DocumentTags, DocumentTypes, FolderTreeItem,
@@ -38,7 +38,8 @@ export interface DocumentLibraryStateModel {
   locations: Location[] | null,
   saveDocumentFolder: DocumentFolder | null,
   associateAgencies: AssociateAgencyDto[] | null,
-  shareOrganizationsData: ShareOrganizationsData[] | null
+  shareOrganizationsData: ShareOrganizationsData[] | null,
+  documentPreviewDetail: DownloadDocumentDetail | null,
 }
 
 @State<DocumentLibraryStateModel>({
@@ -58,7 +59,8 @@ export interface DocumentLibraryStateModel {
     locations: null,
     saveDocumentFolder: null,
     associateAgencies: null,
-    shareOrganizationsData:null
+    shareOrganizationsData: null,
+    documentPreviewDetail: null
   }
 })
 @Injectable()
@@ -93,6 +95,11 @@ export class DocumentLibraryState {
   @Selector()
   static documentDownloadDetail(state: DocumentLibraryStateModel): DownloadDocumentDetail | null {
     return state.documentDownloadDetail;
+  }
+
+  @Selector()
+  static documentPreviewDetail(state: DocumentLibraryStateModel): DownloadDocumentDetail | null {
+    return state.documentPreviewDetail;
   }
 
   @Selector()
@@ -185,13 +192,14 @@ export class DocumentLibraryState {
     { dispatch, patchState }: StateContext<DocumentLibraryStateModel>,
     { document }: SaveDocuments
   ): Observable<DocumentLibraryDto | void> {
+    let isEditDocument: boolean = document.isEdit != undefined ? document.isEdit : false;
     return this.documentLibraryService.saveDocuments(document).pipe(
-      tap((document) => {
-        patchState({ savedDocumentLibraryDto: document });
+      tap((data) => {
+        patchState({ savedDocumentLibraryDto: data });
         dispatch([
-          new ShowToast(MessageTypes.Success, document.id > 0 ? RECORD_MODIFIED : RECORD_ADDED),
+          new ShowToast(MessageTypes.Success, isEditDocument ? DOCUMENT_UPLOAD_EDIT : DOCUMENT_UPLOAD_SUCCESS),
         ]);
-        return document;
+        return data;
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
@@ -224,6 +232,17 @@ export class DocumentLibraryState {
       tap((payload) => {
         patchState({ documentDownloadDetail: payload });
         dispatch(new GetDocumentDownloadDeatilsSucceeded(payload));
+        return payload;
+      })
+    );
+  }
+
+  @Action(GetDocumentPreviewDeatils)
+  GetDocumentPreviewDeatils({ patchState, dispatch }: StateContext<DocumentLibraryStateModel>, { documentPreveiwDetailFilter }: GetDocumentPreviewDeatils): Observable<DownloadDocumentDetail> {
+    return this.documentLibraryService.GetDocumentPreviewDetails(documentPreveiwDetailFilter).pipe(
+      tap((payload) => {
+        patchState({ documentPreviewDetail: payload });
+        dispatch(new GetDocumentPreviewDeatilsSucceeded(payload));
         return payload;
       })
     );
