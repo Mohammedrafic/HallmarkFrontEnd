@@ -226,22 +226,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       this.organizations = uniqBy(data, 'organizationId');
       this.filterColumns.businessIds.dataSource = this.organizations;
       this.defaultOrganizations = this.agencyOrganizationId;
-      let orgList = this.organizations?.filter((x) => this.agencyOrganizationId == x.organizationId);
-      this.regionsList = [];
-      this.locationsList = [];
-      this.departmentsList = [];
-      orgList.forEach((value) => {
-        this.regionsList.push(...value.regions);
-        value.regions.forEach((region) => {
-          this.locationsList.push(...region.locations);
-          region.locations.forEach((location) => {
-            this.departmentsList.push(...location.departments);
-          });
-        });
-      });
-      if (data.length > 0 && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-        this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
-      }
+      
       this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
       this.changeDetectorRef.detectChanges();
     });
@@ -250,6 +235,21 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       if (!this.isClearAll) {
         let orgList = this.organizations?.filter((x) => data == x.organizationId);
         this.selectedOrganizations = orgList;
+        this.regionsList = [];
+        this.locationsList = [];
+        this.departmentsList = [];
+        orgList.forEach((value) => {
+          this.regionsList.push(...value.regions);
+          value.regions.forEach((region) => {
+            this.locationsList.push(...region.locations);
+            region.locations.forEach((location) => {
+              this.departmentsList.push(...location.departments);
+            });
+          });
+        });
+        if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+          this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+        }
 
         let businessIdData = [];
         businessIdData.push(data);
@@ -265,6 +265,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       }
       else {
         this.isClearAll = false;
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       }
     });
     this.regionIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
@@ -279,7 +280,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         this.changeDetectorRef.detectChanges();
       }
       else {
-
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
       }
     });
     this.locationIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds) as AbstractControl;
@@ -291,6 +292,9 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         this.defaultDepartments = this.departments.map((list) => list.id);
         this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue(this.defaultDepartments);
         this.changeDetectorRef.detectChanges();
+      }
+      else {
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
       }
     });
     this.departmentIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
@@ -312,6 +316,9 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         this.defaultSkills = skills.map((list) => list.id);
         this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue(this.defaultSkills);
         this.changeDetectorRef.detectChanges();
+      }
+      else {
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillIds)?.setValue([]);
       }
     });
     this.skillIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillIds) as AbstractControl;
