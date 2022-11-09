@@ -30,6 +30,8 @@ export interface Timesheet {
   mileageStatusText: TIMETHEETS_STATUSES;
   workWeek: string;
   agencyStatus: AgencyStatus;
+  orderPublicId: number;
+  orgPrefix: string;
 }
 
 export interface TimesheetsFilterState {
