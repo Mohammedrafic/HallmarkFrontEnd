@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { Location } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, throttleTime, of, Subject, combineLatest, debounceTime } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, tap, throttleTime, of, Subject, combineLatest, debounceTime, take } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { RowNode } from '@ag-grid-community/core';
 import { DialogAction } from '@core/enums';
@@ -112,13 +112,24 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public handleChangeTab(tabIndex: number): void {
+    let preservedFilters = null;
+    if (this.filterService.canPreserveFilters()) {
+      preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
+    }
     this.activeTabIdx = tabIndex;
-    this.store.dispatch(new Timesheets.UpdateFiltersState(
-      { statusIds: this.tabConfig[tabIndex].value },
-      this.activeTabIdx !== 0,
-      false,
-      true
-    ));
+    if (preservedFilters) {
+      this.store.dispatch(new Timesheets.UpdateFiltersState(
+        { statusIds: this.tabConfig[tabIndex].value, regionsIds: [...preservedFilters.regions], locationIds: preservedFilters.locations },
+        this.activeTabIdx !== 0,
+        false,
+      ));
+    } else {
+      this.store.dispatch(new Timesheets.UpdateFiltersState(
+        { statusIds: this.tabConfig[tabIndex].value },
+        this.activeTabIdx !== 0,
+        false,
+      ));
+    }
   }
 
   public handleChangePage(pageNumber: number): void {
@@ -194,7 +205,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private onOrganizationChangedHandler(): void {
-    (combineLatest([this.isAgency ? this.agencyId$ : this.organizationId$, this.preservedFilters$])).pipe(
+    (combineLatest([this.isAgency ? this.agencyId$ : this.organizationId$, this.preservedFilters$.pipe(filter(Boolean), take(1))])).pipe(
       takeUntil(this.componentDestroy()),
       debounceTime(600),
     ).subscribe((val) => {
@@ -209,7 +220,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   private startFiltersWatching(): void {
     this.timesheetsFilters$.pipe(
       filter(Boolean),
-      throttleTime(100),
+      debounceTime(300),
       filter((filters) => this.isAgency ? !isNaN(filters.organizationId as number) : true),
       switchMap(() => this.store.dispatch(new Timesheets.GetAll())),
       takeUntil(this.componentDestroy()),

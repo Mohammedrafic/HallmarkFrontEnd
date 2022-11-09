@@ -16,7 +16,6 @@ export const dateRangeValidator: ValidatorFn = ((control: AbstractControl): Vali
 export const leftOnlyValidValues = <T>(formGroup: FormGroup): T => {
   return Object.entries(formGroup.controls).reduce((acc: any, [key, control]: [string, AbstractControl]) => {
     if (
-      control.dirty &&
       (!Array.isArray(control.value) && control.value ||
         Array.isArray(control.value) && control.value.length)
     ) {
