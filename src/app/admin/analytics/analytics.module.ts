@@ -17,7 +17,7 @@ import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { SharedModule } from '@shared/shared.module';
 import { FillRateComponent } from './fillrate/fillrate.component';
 import { JobDetailsComponent } from './job-details/job-details.component';
-import { ClientFinanceAccrualReportComponent } from './client-finance-accrual-report/client-finance-accrual-report.component';
+import { FinancialTimeSheetReportComponent } from './financial-time-sheet-report/financial-time-sheet-report.component';
 import { InvoiceSummaryComponent } from './invoice-summary/invoice-summary.component';
 import { AgingDetailsComponent } from './aging-details/aging-details.component';
 import { ClientFinanceReportComponent } from './client-finance-report/client-finance-report.component';
@@ -59,7 +59,7 @@ import { FeatherModule } from 'angular-feather';
     LogiWebReportComponent,
     FillRateComponent,
     JobDetailsComponent,
-    ClientFinanceAccrualReportComponent,
+    FinancialTimeSheetReportComponent,
     InvoiceSummaryComponent,
     AgingDetailsComponent,
     ClientFinanceReportComponent,
