@@ -124,6 +124,8 @@ export class ClientManagementContentComponent
       this.currentPage = page;
       this.getOrganizationList();
     });
+
+    this.subscribeOnPermissions();
   }
 
   ngAfterViewInit(): void {
@@ -248,5 +250,11 @@ export class ClientManagementContentComponent
     const { businessUnitNames, ...filtersRest } = this.filters;
 
     return { ...filtersRest, organizationNames: this.filters.businessUnitNames as string[] };
+  }
+
+  private subscribeOnPermissions(): void {
+    this.currentUserPermissions$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((permissions) => (this.permissions = permissions));
   }
 }
