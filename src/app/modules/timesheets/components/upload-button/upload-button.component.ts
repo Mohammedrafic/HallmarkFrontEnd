@@ -23,7 +23,7 @@ export class UploadButtonComponent {
   public readonly uploadTooltip: TooltipComponent;
 
   public readonly allowedFileExtensions: string = FileExtensionsString;
-  public readonly maxFileSize: number = FileSize.MB_10;
+  public readonly maxFileSize: number = FileSize.MB_20;
 
   public emitSelectedFiles(files: FileForUpload[]): void {
     this.uploadTooltip.close();
