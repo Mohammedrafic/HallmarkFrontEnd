@@ -354,7 +354,7 @@
                     appValidateWithMessage
                     [dataSource]="jobDistributions"
                     [fields]="jobDistributionFields"
-                    [allowFiltering]="false"
+                    [allowFiltering]="true"
                     [showDropDownIcon]="true"
                   >
                   </ejs-multiselect>
@@ -378,7 +378,7 @@
                     [dataSource]="associateAgencies$ | async"
                     [fields]="associateAgencyFields"
                     [showSelectAll]="true"
-                    [allowFiltering]="false"
+                    [allowFiltering]="true"
                     [showDropDownIcon]="true"
                   >
                   </ejs-multiselect>

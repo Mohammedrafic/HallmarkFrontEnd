@@ -36,6 +36,7 @@
               appValidateWithMessage
               formControlName="regionIds"
               mode="CheckBox"
+              [allowFiltering]="true"
               [fields]="optionFields"
               [dataSource]="feeExceptionsInitialData.regions"
             ></ejs-multiselect>
@@ -48,6 +49,7 @@
               mode="CheckBox"
               appValidateWithMessage
               formControlName="classifications"
+              [allowFiltering]="true"
               [fields]="optionFields"
               [dataSource]="classification"
             ></ejs-multiselect>
@@ -60,6 +62,7 @@
               mode="CheckBox"
               appValidateWithMessage
               formControlName="masterSkillIds"
+              [allowFiltering]="true"
               [fields]="masterSkillsFields"
               [dataSource]="feeExceptionsInitialData.masterSkills"
             ></ejs-multiselect>

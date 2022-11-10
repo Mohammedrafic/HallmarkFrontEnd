@@ -198,7 +198,7 @@
                          formControlName="years"
                          placeholder="All"
                          [fields]="optionFields"
-                         [allowFiltering]="false"
+                         [allowFiltering]="true"
                          [showDropDownIcon]="true"
                          [dataSource]="filterColumns.years.dataSource">
         </ejs-multiselect>
@@ -229,7 +229,7 @@
                              selectAllText="Select All"
                              [fields]="optionFields"
                              [showSelectAll]="true"
-                             [allowFiltering]="false"
+                             [allowFiltering]="true"
                              [showDropDownIcon]="true"
                              [dataSource]="regions">
             </ejs-multiselect>
@@ -247,7 +247,7 @@
                              selectAllText="Select All"
                              [fields]="optionFields"
                              [showSelectAll]="true"
-                             [allowFiltering]="false"
+                             [allowFiltering]="true"
                              [showDropDownIcon]="true"
                              [dataSource]="locations">
               <ng-template #itemTemplate="" let-data="">

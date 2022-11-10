@@ -125,6 +125,7 @@
       <div class="input-group dropdown">
         <ejs-multiselect
           mode="CheckBox"
+          [allowFiltering]="true"
           [fields]="filterOptionFields"
           [dataSource]="filterColumns.skillCategories.dataSource"
           [showDropDownIcon]="true"
@@ -137,6 +138,7 @@
       <div class="input-group dropdown">
         <ejs-multiselect
           mode="CheckBox"
+          [allowFiltering]="true"
           [dataSource]="filterColumns.skillAbbrs.dataSource"
           [showDropDownIcon]="true"
           formControlName="skillAbbrs"
@@ -148,6 +150,7 @@
       <div class="input-group dropdown">
         <ejs-multiselect
           mode="CheckBox"
+          [allowFiltering]="true"
           [dataSource]="filterColumns.skillDescriptions.dataSource"
           [showDropDownIcon]="true"
           formControlName="skillDescriptions"
@@ -159,6 +162,7 @@
       <div class="input-group dropdown">
         <ejs-multiselect
           mode="CheckBox"
+          [allowFiltering]="true"
           [dataSource]="filterColumns.glNumbers.dataSource"
           [showDropDownIcon]="true"
           formControlName="glNumbers"
