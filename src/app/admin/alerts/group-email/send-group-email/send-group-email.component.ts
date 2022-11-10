@@ -63,7 +63,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   @ViewChild('RTEGroupEmail') public rteObj: RichTextEditorComponent;
   private listboxEle: HTMLElement;
   private editArea: HTMLElement;
-  userData: User[];
+  public userData: User[];
   public range: Range = new Range();
   public isBusinessFormDisabled = false;
   public businessUnits = BUSINESS_UNITS_VALUES;

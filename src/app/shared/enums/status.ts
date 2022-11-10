@@ -2,9 +2,9 @@ import { TIMETHEETS_STATUSES } from '../../modules/timesheets/enums';
 import { INVOICES_STATUSES } from '../../modules/invoices/enums';
 
 export enum Status {
+  'Active',
   'In Progress',
   'Inactive',
-  'Active',
   'Suspended',
 }
 
