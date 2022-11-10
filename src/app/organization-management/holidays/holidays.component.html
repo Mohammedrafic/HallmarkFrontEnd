@@ -111,6 +111,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -271,6 +272,7 @@
           <div class="input-group dropdown">
             <ejs-dropdownlist
               appValidateWithMessage
+              [allowFiltering]="true"
               [dataSource]="editRegions"
               [fields]="optionFields"
               formControlName="regionId">
@@ -285,6 +287,7 @@
           <div class="input-group dropdown">
             <ejs-dropdownlist
               appValidateWithMessage
+              [allowFiltering]="true"
               [dataSource]="locations"
               [fields]="optionFields"
               formControlName="locationId">

@@ -54,6 +54,7 @@
           <div class="input-group dropdown">
             <ejs-dropdownlist formControlName="projectCategory"
                               appValidateWithMessage
+                              [allowFiltering]="true"
                               [dataSource]=" this.orgStructureData.projectTypeIds.dataSource"
                               [fields]="projectTypeFields">
             </ejs-dropdownlist>
@@ -178,6 +179,7 @@
             <div class="input-group dropdown">
               <ejs-dropdownlist formControlName="projectCategoryMapping"
                                 appValidateWithMessage
+                                [allowFiltering]="true"
                                 [dataSource]="this.orgStructureData.projectTypeIds.dataSource"
                                 [fields]="projectTypeFields"
                                 (select)="onProjectTypeDropDownChanged($event)">
@@ -192,6 +194,7 @@
             <div class="input-group dropdown">
               <ejs-dropdownlist formControlName="projectNameMapping"
                                 appValidateWithMessage
+                                [allowFiltering]="true"
                                 [dataSource]="this.orgStructureData.projectNameIds.dataSource"
                                 [fields]="projectNameFields">
               </ejs-dropdownlist>
@@ -207,6 +210,7 @@
             <div class="input-group dropdown">
               <ejs-dropdownlist formControlName="poNamesMapping"
                                 appValidateWithMessage
+                                [allowFiltering]="true"
                                 [dataSource]="this.orgStructureData.poNameIds.dataSource"
                                 [fields]="poNameFields">
               </ejs-dropdownlist>

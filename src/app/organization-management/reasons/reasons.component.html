@@ -83,6 +83,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             appValidateWithMessage
+            [allowFiltering]="true"
             [dataSource]="cancellationReasons"
             [fields]="optionFields"
             formControlName="reason">

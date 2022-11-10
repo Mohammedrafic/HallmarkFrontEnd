@@ -9,11 +9,12 @@
   <ng-template [ngSwitchCase]="true">
     <div class="bootstrap dropdown-editor-dropdown-container">
       <ejs-dropdownlist
-      [dataSource]="options"
-      [value]="value.text"
-      (change)="itemChange($event)"
-    >
-    </ejs-dropdownlist>
+        [allowFiltering]="true"
+        [dataSource]="options"
+        [value]="value.text"
+        (change)="itemChange($event)"
+      >
+      </ejs-dropdownlist>
     </div>
 
   </ng-template>

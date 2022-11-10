@@ -38,6 +38,7 @@
                 appValidateWithMessage
                 formControlName="parentBusinessUnitId"
                 [fields]="createUnderFields"
+                [allowFiltering]="true"
                 [dataSource]="businessUnits$ | async"
               ></ejs-dropdownlist>
             </div>

@@ -32,8 +32,12 @@
       <div class="input-container bootstrap">
         <label>Organization Name<span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist appValidateWithMessage formControlName="businessIds" [fields]="organizationFields"
-            [dataSource]="filterColumns.businessIds.dataSource" placeholder="Business">
+          <ejs-dropdownlist appValidateWithMessage
+                            formControlName="businessIds"
+                            [fields]="organizationFields"
+                            [dataSource]="filterColumns.businessIds.dataSource"
+                            [allowFiltering]="true"
+                            placeholder="Business">
           </ejs-dropdownlist>
         </div>
       </div>
@@ -173,9 +177,13 @@
       <div class="input-container bootstrap">
         <label>Report Type<span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist appValidateWithMessage formControlName="accrualReportTypes"
-            [fields]="accrualReportTypeFields" [dataSource]="filterColumns.accrualReportTypes.dataSource"
-            placeholder=""></ejs-dropdownlist>
+          <ejs-dropdownlist appValidateWithMessage
+                            formControlName="accrualReportTypes"
+                            [fields]="accrualReportTypeFields"
+                            [dataSource]="filterColumns.accrualReportTypes.dataSource"
+                            [allowFiltering]="true"
+                            placeholder="">
+          </ejs-dropdownlist>
         </div>
       </div>
       </div>

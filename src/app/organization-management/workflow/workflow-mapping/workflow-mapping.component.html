@@ -150,6 +150,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -394,6 +395,7 @@
             <ejs-dropdownlist
               id="workflowType"
               appValidateWithMessage
+              [allowFiltering]="true"
               [dataSource]="workflowGroupTypesData"
               [fields]="workflowGroupTypesFields"
               formControlName="workflowType"
@@ -408,11 +410,12 @@
           <label for="workflowName">Workflow Name<span class="required">*</span></label>
           <div class="input-group dropdown">
             <ejs-dropdownlist
-              id="workflowName"
               appValidateWithMessage
+              id="workflowName"
+              formControlName="workflowName"
+              [allowFiltering]="true"
               [dataSource]="workflows$ | async"
               [fields]="fields"
-              formControlName="workflowName"
             >
             </ejs-dropdownlist>
           </div>

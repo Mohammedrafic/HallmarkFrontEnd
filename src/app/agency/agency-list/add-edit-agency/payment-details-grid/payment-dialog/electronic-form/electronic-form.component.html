@@ -98,13 +98,26 @@
       <div class="dropdown-container">
         <label for="bankCountry">Country<span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist id="bankCountry" appValidateWithMessage [fields]="optionFields" formControlName="bankCountry" [dataSource]="countries"></ejs-dropdownlist>
+          <ejs-dropdownlist
+            appValidateWithMessage
+            id="bankCountry"
+            formControlName="bankCountry"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [dataSource]="countries"
+          ></ejs-dropdownlist>
         </div>
       </div>
       <div class="dropdown-container">
         <label for="bankState">State</label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist id="bankState" appValidateWithMessage formControlName="bankState" [dataSource]="bankCountryStates"></ejs-dropdownlist>
+          <ejs-dropdownlist
+            appValidateWithMessage
+            id="bankState"
+            formControlName="bankState"
+            [allowFiltering]="true"
+            [dataSource]="bankCountryStates"
+          ></ejs-dropdownlist>
         </div>
       </div>
     </div>
@@ -180,13 +193,26 @@
       <div class="dropdown-container">
         <label for="accountHolderCountry">Country<span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist id="accountHolderCountry" appValidateWithMessage [fields]="optionFields" formControlName="accountHolderCountry" [dataSource]="countries"></ejs-dropdownlist>
+          <ejs-dropdownlist
+            appValidateWithMessage
+            id="accountHolderCountry"
+            formControlName="accountHolderCountry"
+            [allowFiltering]="true"
+            [fields]="optionFields"
+            [dataSource]="countries"
+          ></ejs-dropdownlist>
         </div>
       </div>
       <div class="dropdown-container">
         <label for="accountHolderState">State</label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist id="accountHolderState" appValidateWithMessage formControlName="accountHolderState" [dataSource]="accountHolderCountryStates"></ejs-dropdownlist>
+          <ejs-dropdownlist
+            appValidateWithMessage
+            id="accountHolderState"
+            formControlName="accountHolderState"
+            [allowFiltering]="true"
+            [dataSource]="accountHolderCountryStates"
+          ></ejs-dropdownlist>
         </div>
       </div>
     </div>
