@@ -87,6 +87,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   }
 
   ngOnInit(): void {
+    this.isAgency = this.invoicesContainerService.isAgency();
     this.getDialogState();
   }
 
@@ -174,7 +175,6 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   private initTableColumns(summaryLocation: string): void {
     this.columnDefinitions = this.invoicesContainerService.getDetailColDef();
     this.columnSummaryDefinitions = this.invoicesContainerService.getDetailSummaryColDef(summaryLocation);
-    this.isAgency = this.invoicesContainerService.isAgency();
   }
 
   private checkActionBtnDisabled(): boolean {
