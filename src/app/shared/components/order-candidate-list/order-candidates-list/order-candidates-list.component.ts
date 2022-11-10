@@ -181,28 +181,27 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
 
   private subscribeToDeployedCandidateOrdersInfo(): void {
     this.deployedCandidateOrderInfo$.pipe(takeUntil(this.unsubscribe$)).subscribe((ordersInfo) => {
-      this.isOrderOverlappingByDate(ordersInfo);
+      this.isOrderOverlapped = this.isOrderOverlappingByDate(ordersInfo);
       this.deployedCandidateOrderIds = ordersInfo.map((data) => data.orderPublicId);
     });
   }
 
-  private isOrderOverlappingByDate(ordersInfo: DeployedCandidateOrderInfo[]): void {
+  private isOrderOverlappingByDate(ordersInfo: DeployedCandidateOrderInfo[]): boolean {
     const timeRange_1 = {
       start: this.selectedOrder.jobStartDate,
       end: this.selectedOrder.jobEndDate,
     };
+    const isOverlaped: boolean[] = [];
 
     ordersInfo.forEach((order) => {
       const timeRange_2 = {
         start: order.positionActualStartDate,
         end: order.positionActualEndDate,
       };
-      const isOverlaped = this.isThereOverlappingDateRange(timeRange_1, timeRange_2);
-
-      if (isOverlaped) {
-        this.isOrderOverlapped = isOverlaped;
-      }
+      isOverlaped.push(this.isThereOverlappingDateRange(timeRange_1, timeRange_2));
     });
+
+    return isOverlaped.includes(true);
   }
 
   private isThereOverlappingDateRange(

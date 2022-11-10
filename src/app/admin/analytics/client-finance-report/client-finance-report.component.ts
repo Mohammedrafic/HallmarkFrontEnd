@@ -324,7 +324,6 @@ export class ClientFinanceReportComponent implements OnInit,OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.clientFinanceReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.clientFinanceReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.clientFinanceReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.clientFinanceReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);

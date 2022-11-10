@@ -1,3 +1,4 @@
+import {  CommonReportFilterOptions, SearchCandidate} from "@admin/analytics/models/common-report.model";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { ConfigurationDto } from "@shared/models/analytics.model";
@@ -40,5 +41,19 @@ export class LogiReportService {
    */
 public getLogiReportData(): Observable<ConfigurationDto[]> {
   return this.http.get<ConfigurationDto[]>(`/config/ReportServer`);
+}
+/**
+   * Get the Common Report  Filter Options
+   * @return CommonReportFilterOptions
+   */
+public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOptions> {
+  return this.http.post<CommonReportFilterOptions>(`/api/LogiReport/financialtimesheet/filter`,filter);
+}
+/**
+   * Get the Common Candidate Search
+   * @return SearchCandidate
+   */
+ public getCommonCandidateSearch(filter:any): Observable<SearchCandidate[]> {
+  return this.http.post<SearchCandidate[]>(`/api/LogiReport/financialtimesheet/candidatesearch`,filter);
 }
 }

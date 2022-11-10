@@ -3,9 +3,11 @@ import {
   HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { includes } from 'lodash/fp';
 
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { ExcludeSpinnerUrls } from '../constants/filters-helper.constant';
 
 import { SpinnerInterceptorHelperService } from '../services/spinner';
 
@@ -18,7 +20,9 @@ export class LoadingInterceptor implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    this.spinnerService.addUrlToQueue(request.url);
+    if (!this.checkExcludeSpinnerUrls(request.url)) {
+      this.spinnerService.addUrlToQueue(request.url);
+    }
 
     return next.handle(request)
     .pipe(
@@ -34,4 +38,9 @@ export class LoadingInterceptor implements HttpInterceptor {
       }),
     ) as Observable<HttpEvent<unknown>>;
   }
+
+  checkExcludeSpinnerUrls(url:string): boolean {
+    return ExcludeSpinnerUrls.some(item => url.includes(item));
+  }
+
 }

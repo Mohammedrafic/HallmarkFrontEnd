@@ -66,6 +66,7 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -145,9 +146,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private actions$: Actions,
     private datePipe: DatePipe,
     private filterService: FilterService,
-    private orderManagementAgencyService: OrderManagementAgencyService
+    private orderManagementAgencyService: OrderManagementAgencyService,
+    private router: Router,
   ) {
     super();
+    this.listenRedirectFromExtension();
+    this.checkRouterState();
   }
 
   ngOnInit(): void {
@@ -159,6 +163,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onReloadOrderCandidatesLists();
     this.onExportSelectedSubscribe();
     this.idFieldName = 'orderId';
+
     this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe((value: string) => {
       if (value.length >= 2) {
         this.OrderFilterFormGroup.controls['jobTitle'].setValue(value);
@@ -168,16 +173,19 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.onFilterApply();
       }
     });
+
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.ordersPage = data;
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
     });
+
     this.subscribeOnPageChanges();
     this.onTabChange();
     this.onCommentRead();
     this.listenRedirectFromExtension();
     this.listenRedirectFromPerDiem();
     this.listenRedirectFromReOrder();
+    
   }
 
   ngOnDestroy(): void {
@@ -825,5 +833,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.currentPage = page;
       this.dispatchNewPage();
     });
+  }
+
+  private checkRouterState(): void {
+    const orderId = this.router.getCurrentNavigation()?.extras?.state?.['publicId'];
+    const orderPrefix = this.router.getCurrentNavigation()?.extras?.state?.['prefix'] || '';
+
+    if (orderId && orderPrefix) {
+      this.orderManagementAgencyService.orderId$.next({ id: orderId, prefix: orderPrefix });
+    }
   }
 }
