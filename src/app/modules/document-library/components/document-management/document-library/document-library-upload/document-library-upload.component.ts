@@ -1,4 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { FileSize } from "@core/enums";
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -29,7 +30,7 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
   public targetElement: HTMLElement = document.body;
   public dropElement: HTMLElement;
   @Input() allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
-  public readonly maxFileSize = 10485760; // 10 mb
+  public readonly maxFileSize = FileSize.MB_10;
   public selectedFile: FileInfo | null;
   public firstActive = true;
   public uploaderErrorMessageElement: HTMLElement;
