@@ -6,6 +6,7 @@
     <div class="dropdown-container bootstrap">
       <ejs-dropdownlist
         *ngIf="!isAgencyUser"
+        [allowFiltering]="true"
         [dataSource]="commentsFilterItems"
         [(value)]="selectedFilter"
         (select)="onFilterChange($event)"

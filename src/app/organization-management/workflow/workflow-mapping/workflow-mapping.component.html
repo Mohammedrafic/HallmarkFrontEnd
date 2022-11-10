@@ -150,6 +150,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -313,7 +314,7 @@
               [dataSource]="orgRegions"
               [fields]="fields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="regions"
             >
@@ -335,7 +336,7 @@
               [dataSource]="locations"
               [fields]="fields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="locations"
             >
@@ -357,7 +358,7 @@
               [dataSource]="departments"
               [fields]="fields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="departments"
             >
@@ -378,7 +379,7 @@
               [dataSource]="skills$ | async"
               [fields]="skillsFields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="skills"
             >
@@ -394,6 +395,7 @@
             <ejs-dropdownlist
               id="workflowType"
               appValidateWithMessage
+              [allowFiltering]="true"
               [dataSource]="workflowGroupTypesData"
               [fields]="workflowGroupTypesFields"
               formControlName="workflowType"
@@ -408,11 +410,12 @@
           <label for="workflowName">Workflow Name<span class="required">*</span></label>
           <div class="input-group dropdown">
             <ejs-dropdownlist
-              id="workflowName"
               appValidateWithMessage
+              id="workflowName"
+              formControlName="workflowName"
+              [allowFiltering]="true"
               [dataSource]="workflows$ | async"
               [fields]="fields"
-              formControlName="workflowName"
             >
             </ejs-dropdownlist>
           </div>
@@ -441,7 +444,7 @@
                   <ejs-multiselect
                     selectAllText="Select All"
                     mode="CheckBox"
-                    [allowFiltering]="false"
+                    [allowFiltering]="true"
                     [showDropDownIcon]="true"
                     appValidateWithMessage
                     [dataSource]="rolesWithUsers[workflowTypes.OrderWorkflow][orderWorkflowSteps[i]?.type ?? 0]"
@@ -485,7 +488,7 @@
                   <ejs-multiselect
                     selectAllText="Select All"
                     mode="CheckBox"
-                    [allowFiltering]="false"
+                    [allowFiltering]="true"
                     [showDropDownIcon]="true"
                     appValidateWithMessage
                     [dataSource]="

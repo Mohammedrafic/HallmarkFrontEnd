@@ -12,6 +12,7 @@
         <ejs-dropdownlist
           *ngIf="organizations$ | async as organizations"
           placeholder="Select organization"
+          [allowFiltering]="true"
           [dataSource]="organizations"
           [fields]="unitOrganizationsFields"
           [formControl]="organizationControl">

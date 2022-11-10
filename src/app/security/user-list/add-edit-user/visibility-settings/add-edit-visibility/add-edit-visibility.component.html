@@ -35,6 +35,7 @@
             <div class="input-group dropdown">
               <ejs-dropdownlist appValidateWithMessage
                                 formControlName="organisationIds"
+                                [allowFiltering]="true"
                                 [fields]="organisationFields"
                                 [dataSource]="organisations"
                                 [enabled]="!isOrganisationUser">
@@ -49,7 +50,7 @@
                                mode="CheckBox"
                                selectAllText="All"
                                [showSelectAll]="true"
-                               [allowFiltering]="false"
+                               [allowFiltering]="true"
                                [showDropDownIcon]="true"
                                [fields]="optionFields"
                                [dataSource]="regions"
@@ -70,7 +71,7 @@
                                mode="CheckBox"
                                selectAllText="All"
                                [showSelectAll]="true"
-                               [allowFiltering]="false"
+                               [allowFiltering]="true"
                                [showDropDownIcon]="true"
                                [fields]="optionFields"
                                [dataSource]="locations"
@@ -91,7 +92,7 @@
                                mode="CheckBox"
                                selectAllText="All"
                                [showSelectAll]="true"
-                               [allowFiltering]="false"
+                               [allowFiltering]="true"
                                [showDropDownIcon]="true"
                                [fields]="optionFields"
                                [dataSource]="departments"

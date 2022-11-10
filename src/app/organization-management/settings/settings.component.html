@@ -126,6 +126,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -252,6 +253,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             id="region"
+            [allowFiltering]="true"
             [dataSource]="regions$ | async"
             [fields]="regionLocationFields"
             (select)="onRegionChange($event)"
@@ -269,6 +271,7 @@
           <ejs-dropdownlist
             id="regionRequired"
             appValidateWithMessage
+            [allowFiltering]="true"
             [dataSource]="regions$ | async"
             [fields]="regionLocationFields"
             (select)="onRegionChange($event)"
@@ -284,6 +287,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             id="location"
+            [allowFiltering]="true"
             [dataSource]="locations$ | async"
             [fields]="regionLocationFields"
             (select)="onLocationChange($event)"
@@ -300,6 +304,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             id="department"
+            [allowFiltering]="true"
             [dataSource]="departments$ | async"
             [fields]="departmentFields"
             (select)="onDepartmentChange($event)"
@@ -357,6 +362,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             appValidateWithMessage
+            [allowFiltering]="true"
             [dataSource]="daysOfWeek"
             [fields]="daysOfWeekFields"
             formControlName="dayOfWeek">
@@ -385,6 +391,7 @@
       <div class="input-group dropdown">
         <ejs-dropdownlist
           appValidateWithMessage
+          [allowFiltering]="true"
           [dataSource]="groupInvoicesOptions"
           [fields]="groupInvoicesFields"
           formControlName="groupingBy"
@@ -475,6 +482,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             id="dropdown"
+            [allowFiltering]="true"
             [dataSource]="dropdownDataSource"
             [fields]="dropdownFields"
             appValidateWithMessage
@@ -490,7 +498,7 @@
             id="dropdownMulti"
             mode="CheckBox"
             appValidateWithMessage
-            [allowFiltering]="false"
+            [allowFiltering]="true"
             [dataSource]="dropdownDataSource"
             [fields]="dropdownFields"
             selectAllText="All"
