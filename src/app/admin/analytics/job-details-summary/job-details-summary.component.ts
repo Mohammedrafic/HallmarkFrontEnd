@@ -42,23 +42,22 @@ import { analyticsConstants } from '../constants/analytics.constant';
 export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
 
   public paramsData: any = {
-    "OrganizationParamACCR": "",
-    "StartDateParamACCR": "",
-    "EndDateParamACCR": "",
-    "RegionParamACCR": "",
-    "LocationParamACCR": "",
-    "DepartmentParamACCR": "",
-    "SkillCategoryParamACCR": "",
-    "SkillParamACCR": "",
-    "CandidateNameACCR": "",
-    "CandidateStatusACCR": "",
-    "OrderTypeACCR": "",
-    "JobStatusACCR": "",
-    "JobIdACCR": "",
-    "BearerParamACCR": "",
-    "BusinessUnitIdParamACCR": "",
+    "OrganizationParamJDSR": "",
+    "StartDateParamJDSR": "",
+    "EndDateParamJDSR": "",
+    "RegionParamJDSR": "",
+    "LocationParamJDSR": "",
+    "DepartmentParamJDSR": "",
+    "SkillCategoryParamJDSR": "",
+    "SkillParamJDSR": "",
+    "CandidateNameJDSR": "",
+    "CandidateStatusJDSR": "",
+    "JobStatusJDSR": "",
+    "JobIdJDSR": "",
+    "AgencysJDSR":"",
+    "BearerParamJDSR": "",
+    "BusinessUnitIdParamJDSR": "",
     "HostName": "",
-    "AccrualReportFilterACCR": ""
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/ClientFinanceAccrualReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/Accrual.cat" };
@@ -362,26 +361,25 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       } 
     this.paramsData =
     {
-      "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.organizationId),
-      "StartDateParamACCR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateParamACCR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamACCR": regionIds,
-      "LocationParamACCR": locationIds,
-      "DepartmentParamACCR": departmentIds,
-      "SkillCategoryParamACCR": skillCategoryIds,
-      "SkillParamACCR": skillIds,
-      "CandidateNameACCR": candidateName == null ? '' : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
-      "CandidateStatusACCR": candidateStatuses,
-      "OrderTypeACCR": "",
-      "JobStatusACCR": jobStatuses,
-      "JobIdACCR": jobId,
-      "BearerParamACCR": auth,
-      "BusinessUnitIdParamACCR": window.localStorage.getItem("lastSelectedOrganizationId") == null
+      "OrganizationParamJDSR": this.selectedOrganizations?.map((list) => list.organizationId),
+      "StartDateParamJDSR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "EndDateParamJDSR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "RegionParamJDSR": regionIds,
+      "LocationParamJDSR": locationIds,
+      "DepartmentParamJDSR": departmentIds,
+      "SkillCategoryParamJDSR": skillCategoryIds,
+      "SkillParamJDSR": skillIds,
+      "CandidateNameJDSR": candidateName == null ? '' : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
+      "CandidateStatusJDSR": candidateStatuses,
+      "JobStatusJDSR": jobStatuses,
+      "JobIdJDSR": jobId,
+      "AgencysJDSR":agencyIds,
+      "BearerParamJDSR": auth,
+      "BusinessUnitIdParamJDSR": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "AccrualReportFilterACCR": ""
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
