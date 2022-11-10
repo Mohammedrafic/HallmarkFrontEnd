@@ -75,8 +75,8 @@ export class AccumulationChartComponent
   }
 
   public ngOnInit(): void {
+    this.datalabel = {visible: true };
     this.filteredChartData$ = this.getFilteredChartData();
-    this.datalabel = { visible: true };
   }
 
   public onClickLegend(label: string): void {

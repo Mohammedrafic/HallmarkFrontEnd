@@ -15,6 +15,7 @@
         <div class="input-group dropdown bootstrap">
           <ejs-dropdownlist
             *ngIf="!isAgency"
+            [allowFiltering]="true"
             [fields]="optionFields"
             [dataSource]="applicantStatuses"
             [formControl]="statusesFormControl"
@@ -300,6 +301,7 @@
     <div class="mobile-actions" [ngClass]="{ tab: isTab }">
       <div class="input-group dropdown bootstrap" *ngIf="!isAgency">
         <ejs-dropdownlist
+          [allowFiltering]="true"
           [fields]="optionFields"
           [dataSource]="applicantStatuses"
           [formControl]="statusesFormControl"

@@ -1,3 +1,4 @@
+import { GetDocumentsByCognitiveSearch } from './../../../store/actions/document-library.actions';
 import { CellClickedEvent, FilterChangedEvent, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { DatePipe } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
@@ -1216,5 +1217,14 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
           this.ShareOrganizationsData = shareOrgsData;
         }
       });
+  }
+
+  doCognitiveSearch(event: any){    
+    const businessUnitId = this.businessFilterForm.get('filterBusiness')?.value
+    const businessUnitType = this.businessFilterForm.get('filterBusinessUnit')?.value    
+    const keyword = event.target.value;
+    if (keyword.trim() != '' && event.code == 'Enter' && keyword.length >= 3) {
+      this.store.dispatch(new GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId));
+    }
   }
 }

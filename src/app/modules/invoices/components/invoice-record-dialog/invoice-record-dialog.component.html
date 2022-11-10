@@ -23,6 +23,7 @@
                         <label>Day</label>
                         <ejs-dropdownlist
                                 title="Group by choice"
+                                [allowFiltering]="true"
                                 [fields]="{}"
                                 [dataSource]="[]">
                         </ejs-dropdownlist>
@@ -57,6 +58,7 @@
                     <div class="mr-12">
                         <label>Cost center <span class="required"></span></label>
                         <ejs-dropdownlist
+                                [allowFiltering]="true"
                                 [dataSource]="costCenterOptions">
                         </ejs-dropdownlist>
                     </div>
@@ -64,6 +66,7 @@
                     <div>
                         <label>Category <span class="required"></span></label>
                         <ejs-dropdownlist
+                                [allowFiltering]="true"
                                 [dataSource]="categoryOptions">
                         </ejs-dropdownlist>
                     </div>

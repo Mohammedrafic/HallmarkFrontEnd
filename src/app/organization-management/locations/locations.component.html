@@ -5,6 +5,7 @@
         id="regionsDropDown"
         class="region-dropdown"
         placeholder="Region"
+        [allowFiltering]="true"
         [dataSource]="regions$ | async"
         [fields]="regionFields"
         (change)="onRegionDropDownChanged($event)"
@@ -102,6 +103,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -303,6 +305,7 @@
               id="businessLine"
               appValidateWithMessage
               formControlName="businessLineId"
+              [allowFiltering]="true"
               [fields]="businessLineFields"
               [dataSource]="businessLineDataSource"
             >
@@ -320,6 +323,7 @@
               id="locationType"
               appValidateWithMessage
               formControlName="locationType"
+              [allowFiltering]="true"
               [fields]="locationTypeOptionFields"
               [dataSource]="locationTypes$ | async"
           >
@@ -336,6 +340,7 @@
               id="timeZone"
               appValidateWithMessage
               formControlName="timeZone"
+              [allowFiltering]="true"
               [fields]="timeZoneOptionFields"
               [dataSource]="timeZoneIds$ | async"
             >
@@ -378,6 +383,7 @@
             <ejs-dropdownlist
               id="state"
               appValidateWithMessage
+              [allowFiltering]="true"
               [dataSource]="statesGeneral$ | async"
               formControlName="state">
             </ejs-dropdownlist>
@@ -460,6 +466,7 @@
                 id="phoneType"
                 appValidateWithMessage
                 formControlName="phoneType"
+                [allowFiltering]="true"
                 [dataSource]="phoneTypes$ | async"
               >
               </ejs-dropdownlist>

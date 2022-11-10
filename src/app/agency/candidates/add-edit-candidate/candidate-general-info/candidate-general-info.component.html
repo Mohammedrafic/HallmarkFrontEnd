@@ -33,7 +33,7 @@
             <div class="input-group">
               <ejs-multiselect appValidateWithMessage
                                mode="CheckBox"
-                               [allowFiltering]="false"
+                               [allowFiltering]="true"
                                formControlName="candidateProfileSkills"
                                [fields]="skillsFields"
                                [dataSource]="skills">
@@ -47,6 +47,7 @@
                                 [enabled]="enableStatusFields"
                                 [fields]="optionFields"
                                 formControlName="profileStatus"
+                                [allowFiltering]="true"
                                 [dataSource]="statuses"
                                 placeholder="Status">
               </ejs-dropdownlist>
@@ -59,6 +60,7 @@
                                 [enabled]="enableStatusFields"
                                 [fields]="optionFields"
                                 formControlName="candidateAgencyStatus"
+                                [allowFiltering]="true"
                                 [dataSource]="statuses"
                                 placeholder="Status">
               </ejs-dropdownlist>
@@ -114,6 +116,7 @@
               <ejs-dropdownlist appValidateWithMessage
                                 [fields]="optionFields"
                                 formControlName="classification"
+                                [allowFiltering]="true"
                                 [dataSource]="classifications">
               </ejs-dropdownlist>
             </div>

@@ -18,6 +18,7 @@
           <div class="e-card-content button-container">
             <div class="input-group dropdown bootstrap input-readonly" *ngIf="isBillRatePending">
               <ejs-dropdownlist
+                [allowFiltering]="true"
                 [fields]="optionFields"
                 [formControl]="jobStatusControl"
                 [disabled]="!actionsAllowed"
@@ -100,6 +101,7 @@
       <div class="mobile-actions">
         <div class="input-group dropdown bootstrap input-readonly" *ngIf="isBillRatePending">
           <ejs-dropdownlist
+            [allowFiltering]="true"
             [fields]="optionFields"
             [formControl]="jobStatusControl"
             [dataSource]="jobStatus$ | async"
