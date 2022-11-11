@@ -515,7 +515,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.formControlType === OrganizationSettingControlType.Multiselect ||
       this.formControlType === OrganizationSettingControlType.Select
     ) {
-      this.dropdownDataSource = data.valueOptions;
+      this.dropdownDataSource = data.valueOptions.sort((a: any, b: any) => a.value?.localeCompare(b.value));
     }
 
     this.organizationSettingsFormGroup.setValue({
