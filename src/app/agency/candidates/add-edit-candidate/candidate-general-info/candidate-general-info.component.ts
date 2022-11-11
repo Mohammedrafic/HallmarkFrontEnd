@@ -36,7 +36,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
     this.enableStatusFields = value as boolean;
     this.statuses = Object.values(value ? CreatedCandidateStatus : CandidateStatus)
       .filter(valuesOnly)
-      .map((text, id) => ({ text, id }));
+      .map((text, id) => ({ text, id })).sort((a, b) => a.text.localeCompare(b.text));
   }
 
   @Select(CandidateState.skills)

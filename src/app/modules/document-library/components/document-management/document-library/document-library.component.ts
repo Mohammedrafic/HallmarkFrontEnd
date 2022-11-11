@@ -9,7 +9,6 @@ import { SpecialProjectMessages } from '../../../../../organization-management/s
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { SetHeaderState, ShowDocPreviewSideDialog, ShowSideDialog, ShowToast } from '../../../../../store/app.actions';
 import {
-  BUSINESS_UNITS_VALUES,
   BUSSINES_DATA_FIELDS,
   DocumentLibraryColumnsDefinition,
   UNIT_FIELDS
@@ -86,6 +85,7 @@ import {
 } from '@syncfusion/ej2-angular-pdfviewer';
 import { DocumentEditorComponent, EditorHistoryService, EditorService, SearchService } from '@syncfusion/ej2-angular-documenteditor';
 import { User } from '../../../../../shared/models/user-managment-page.model';
+import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 
 @Component({
   selector: 'app-document-library',

@@ -11,6 +11,7 @@ import { agencyStatusCreationOptions, agencyStatusOptions } from '../../agency-l
 import PriceUtils from '@shared/utils/price.utils';
 import { AgencyStatusesModel } from "@shared/models/agency.model";
 import { ALPHANUMERIC } from '@shared/constants';
+import { COUNTRIES } from '@shared/constants/countries-list';
 
 @Component({
   selector: 'app-general-info-group',
@@ -21,10 +22,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   @Input() formGroup: FormGroup;
   @Input() isAgencyUser: boolean;
 
-  public countries = [
-    { id: Country.USA, text: Country[0] },
-    { id: Country.Canada, text: Country[1] },
-  ];
+  public countries = COUNTRIES;
   public priceUtils = PriceUtils;
   public states$ = new Subject();
   public statuses: AgencyStatusesModel[] = agencyStatusCreationOptions;
