@@ -31,13 +31,14 @@ export class ButtonRendererComponent extends AbstractPermission implements ICell
     return true;
   }
 
-  onClick($event: any) {
+  onClick($event: any, btnName?: string) {
     if (this.params.onClick instanceof Function) {
-      const params = {
+      const eventParams = {
         event: $event,
         rowData: this.params.node.data,
+        btnName: btnName || null,
       };
-      this.params.onClick(params);
+      this.params.onClick(eventParams);
     }
   }
 }

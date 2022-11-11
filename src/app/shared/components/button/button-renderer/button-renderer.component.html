@@ -32,3 +32,16 @@
     Edit
   </fa-icon>
 </button>
+<ng-container *ngIf="label==='Edit Mail'">
+  <button
+    class="icon-btn"
+    (click)="onClick($event, 'edit')">
+    <i-feather name="edit" class="icon"></i-feather>
+  </button>
+  <button
+    *ngIf="!params.data.isDeleted && !params.data.isLoggedIn"
+    class="icon-btn"
+    (click)="onClick($event, 'mail')">
+    <i-feather name="mail" class="icon"></i-feather>
+  </button>
+</ng-container>

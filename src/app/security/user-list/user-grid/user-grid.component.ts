@@ -110,8 +110,8 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         headerName: 'Action',
         cellRenderer: 'buttonRenderer',
         cellRendererParams: {
-          onClick: this.onEdit.bind(this),
-          label: 'Edit',
+          onClick: this.onButtonClick.bind(this),
+          label: 'Edit Mail',
         },
         width: 50,
         pinned: 'left',
@@ -206,6 +206,10 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         filter: false,
         sortable: false,
       },
+      {
+        field: 'lastTimeLoggedInDate',
+        filter: false,
+      },
     ];
 
     this.defaultColDef = {
@@ -278,8 +282,8 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.isAlive = false;
   }
 
-  public onEdit(data: any): void {
-    this.editUserEvent.emit(data?.rowData);
+  public onButtonClick(data: any): void {
+    data.btnName === 'edit' ? this.onEdit(data) : this.onMail(data);
   }
 
   public rowDataBound(args: RowDataBoundEventArgs): void {
@@ -352,6 +356,14 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
       var datasource = this.createServerSideDatasource();
       this.gridApi.setServerSideDatasource(datasource);
     }
+  }
+
+  private onEdit(data: any): void {
+    this.editUserEvent.emit(data?.rowData);
+  }
+
+  private onMail(data: any): void {
+    console.log('mail works');
   }
 
   private updateUsers(): void {
@@ -432,6 +444,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
             )
           );
           self.usersPage$.pipe().subscribe((data: any) => {
+            console.log(data);
             self.itemList = data?.items;
             self.totalRecordsCount = data?.totalCount;
 
