@@ -44,7 +44,6 @@ import { Days } from '@shared/enums/days';
 import { groupInvoicesOptions } from 'src/app/modules/invoices/constants';
 import { SettingsFilterCols } from './settings.constant';
 import { SettingsDataAdapter } from './helpers/settings-data.adapter';
-import { DateTimeHelper } from '@core/helpers';
 
 export enum TextFieldTypeControl {
   Email = 1,
