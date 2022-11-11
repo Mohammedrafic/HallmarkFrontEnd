@@ -32,3 +32,10 @@ export enum FieldType {
 export enum FilesClearEvent {
   ClearAll = 'clearAllFiles',
 }
+
+export enum InputAttrType {
+  Text = 'text',
+  Tel = 'tel',
+  Mail = 'email',
+  Number = 'number',
+}

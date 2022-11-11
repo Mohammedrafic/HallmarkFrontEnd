@@ -59,13 +59,13 @@ export class LocationFilterOptions {
 }
 
 export class LocationType{
-  LocationTypeId : number;
-  Name: string;
+  locationTypeId : number;
+  name: string;
 }
 
 export class TimeZoneModel {
-  SystemTimeZoneName: string;
-  TimeZoneId: string;
+  systemTimeZoneName: string;
+  timeZoneId: string;
 }
 
 export type ImportedLocation = {

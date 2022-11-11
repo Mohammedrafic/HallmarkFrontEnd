@@ -7,16 +7,17 @@
         placeholder="Region"
         [dataSource]="regions$ | async"
         [fields]="regionFields"
-        (change)="onRegionDropDownChanged($event)"
+        (change)="changeRegion($event)"
         [value]="defaultValue"
       ></ejs-dropdownlist>
       <button
         ejs-button
         cssClass="e-flat button-with-icon"
-        (click)="onAddRegionClick()"
+        (click)="openAddRegionDialog()"
         [class.hidden]="!isLoaded"
       ><i-feather name="plus" class="icon"></i-feather> Add Region</button>
     </section>
+
     <section [class.hidden]="!isLoaded">
       <button
         ejs-button
@@ -24,7 +25,11 @@
         cssClass="e-outline button-filter"
         (click)="showFilters()">
         <div class="filter-button-content">
-          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle align-text">{{ filteredItems.length }}</span>
+          <span
+            *ngIf="filteredItems.length"
+            class="e-badge e-badge-success e-badge-circle align-text">
+            {{ filteredItems.length }}
+          </span>
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
@@ -32,7 +37,7 @@
         ejs-button
         id="importButton"
         cssClass="e-outline button-import"
-        (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather></button>
+        (click)="openImportDialog()">Import <i-feather name="upload" class="icon"></i-feather></button>
       <button
         ejs-dropdownbutton
         [items]="exportOptions"
@@ -47,7 +52,7 @@
         ejs-button
         id="addDepartmentButton"
         [isPrimary]="true"
-        (click)='onAddDepartmentClick()'>Add Location</button>
+        (click)='openAddLocationDialog()'>Add Location</button>
     </section>
   </section>
 
@@ -73,10 +78,10 @@
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, $event)">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editLocation(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemoveButtonClick(data, $event)">
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteLocation(data, $event)">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -104,7 +109,7 @@
                 class="dropdown-no-border"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
-                (change)="onRowsDropDownChanged()"
+                (change)="changeRowsPerPage()"
               >
               </ejs-dropdownlist>
               <ejs-numerictextbox
@@ -117,7 +122,7 @@
                 min="1"
                 [max]="(locations$ | async)?.totalPages"
                 [showSpinButton]="false"
-                (change)="onGoToClick($event)"
+                (change)="selectPage($event)"
               >
               </ejs-numerictextbox>
               <div class="total-rows">
@@ -132,7 +137,7 @@
                 [totalRecordsCount]="(locations$ | async)?.totalCount"
                 [enablePagerMessage]="false"
                 [currentPage]="currentPage"
-                (click)="onGoToClick($event)"
+                (click)="selectPage($event)"
               >
               </ejs-pager>
             </section>
@@ -145,8 +150,15 @@
 
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
-<app-filter-dialog [items]="filteredItems" [count]="(locations$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
-  <form class="bootstrap" [formGroup]="LocationFilterFormGroup">
+<app-filter-dialog
+  [items]="filteredItems"
+  [count]="(locations$ | async)?.totalCount"
+  (deleteFilter)="deleteFilter($event)"
+  (clearAllFiltersClicked)="clearFilter()"
+  (applyFilterClicked)="applyFilter()"
+  (closeDialogClicked)="closeFilter()"
+>
+  <form class="bootstrap" [formGroup]="locationFilterForm">
     <div class="input-container">
       <label>Location Id</label>
       <div class="input-group multiselect">
@@ -247,9 +259,9 @@
 </app-filter-dialog>
 
 <app-side-dialog
-  (formCancelClicked)="onFormCancelClick()"
-  (formSaveClicked)="onFormSaveClick()"
-  [header]="dialogHeader + ' Location'"
+  (formCancelClicked)="cancelEditLocation()"
+  (formSaveClicked)="saveLocation()"
+  [header]="dialogHeader"
   [width]="'832px'"
 >
   <form
@@ -257,257 +269,120 @@
     id="addEditRecordForm"
     [formGroup]="locationDetailsFormGroup"
   >
-    <div>
-      <div class="input-container">
-        <label for="externalId">Location Id</label>
-        <div class="input-group">
-          <input id="externalId"
-                  class="e-input"
-                  type="text"
-                  maxlength="50"
+    <div class="form-block">
+      <ng-container *ngFor="let control of locationDialogConfig.baseForm">
+        <ng-container [ngSwitch]="control.fieldType">
+
+          <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
+            <div class="input-container form-dropdown" [ngStyle]="{'grid-area': control.gridAreaName}">
+              <label [for]="control.field">
+                {{control.title}}
+                <span class="required" *ngIf="control.required">*</span>
+              </label>
+              <div class="input-group dropdown">
+                <ejs-dropdownlist
+                  *ngIf="control.sourceKey"
                   appValidateWithMessage
-                  formControlName="externalId"/>
-        </div>
-      </div>
-    </div>
-
-    <div class="group">
-      <div class="input-container">
-        <label for="invoiceId">Invoice Location ID </label>
-        <div class="input-group">
-          <input id="invoiceId"
-                  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  appValidateWithMessage
-                  formControlName="invoiceId"/>
-        </div>
-      </div>
-
-      <div class="input-container">
-        <label for="name">Location Name<span class="required">*</span></label>
-        <div class="input-group">
-          <input id="name"
-                  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  appValidateWithMessage
-                  formControlName="name"/>
-        </div>
-      </div>
-      <div class="input-container">
-        <label for="businessLine">Business Line</label>
-        <div class="input-group">
-          <div class="input-group dropdown">
-            <ejs-dropdownlist
-              id="businessLine"
-              appValidateWithMessage
-              formControlName="businessLineId"
-              [fields]="businessLineFields"
-              [dataSource]="businessLineDataSource"
-            >
-            </ejs-dropdownlist>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="large-group">
-      <div class="input-container">
-        <label for="locationType">Location Type </label>
-        <div class="input-group">
-          <div class="input-group dropdown">
-            <ejs-dropdownlist
-              id="locationType"
-              appValidateWithMessage
-              formControlName="locationType"
-              [fields]="locationTypeOptionFields"
-              [dataSource]="locationTypes$ | async"
-          >
-            </ejs-dropdownlist>
-          </div>
-   </div>
-      </div>
-
-      <div class="input-container">
-        <label for="timeZone">Time Zone</label>
-        <div class="input-group">
-          <div class="input-group dropdown">
-            <ejs-dropdownlist
-              id="timeZone"
-              appValidateWithMessage
-              formControlName="timeZone"
-              [fields]="timeZoneOptionFields"
-              [dataSource]="timeZoneIds$ | async"
-            >
-            </ejs-dropdownlist>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="large-group">
-      <div class="input-container">
-        <label for="address1">Address 1<span class="required">*</span></label>
-        <div class="input-group">
-          <input id="address1"
-                  class="e-input"
-                  type="text"
-                  maxlength="100"
-                  appValidateWithMessage
-                  formControlName="address1"/>
-        </div>
-      </div>
-
-      <div class="input-container">
-        <label for="address2">Address 2</label>
-        <div class="input-group">
-          <input id="address2"
-                  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  appValidateWithMessage
-                  formControlName="address2"/>
-        </div>
-      </div>
-    </div>
-
-    <div class="group">
-      <div class="input-container form-dropdown">
-        <label for="state">State <span class="required">*</span></label>
-          <div class="input-group dropdown">
-            <ejs-dropdownlist
-              id="state"
-              appValidateWithMessage
-              [dataSource]="statesGeneral$ | async"
-              formControlName="state">
-            </ejs-dropdownlist>
-        </div>
-      </div>
-
-      <div class="input-container">
-        <label for="city">City <span class="required">*</span></label>
-        <div class="input-group">
-          <input
-            id="city"
-            class="e-input"
-            type="text"
-            maxlength="20"
-            appValidateWithMessage
-            formControlName="city"/>
-        </div>
-      </div>
-
-      <div class="input-container">
-        <label for="zip">Zipcode <span class="required">*</span></label>
-        <div class="input-group">
-          <input id="zip"
-                  class="e-input"
-                  type="text"
-                  pattern="[0-9]*"
-                  maxlength="6"
-                  appValidateWithMessage
-                  formControlName="zip"/>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <h3 class="title">Contacts</h3>
-
-      <div class="combined-group">
-        <div class="input-container">
-          <label for="contactPerson">Contact Person</label>
-          <div class="input-group">
-            <input id="contactPerson"
-                    class="e-input"
-                    type="text"
-                    maxlength="50"
-                    appValidateWithMessage
-                    formControlName="contactPerson"/>
-          </div>
-        </div>
-
-        <div class="input-container">
-          <label for="contactEmail">Contact Person Email</label>
-          <div class="input-group">
-            <input id="contactEmail"
-                    class="e-input"
-                    type="email"
-                    appValidateWithMessage
-                    formControlName="contactEmail"/>
-          </div>
-        </div>
-      </div>
-
-      <div class="group">
-        <div class="input-container">
-          <label for="phoneNumber">Phone Number</label>
-          <div class="input-group">
-            <input id="phoneNumber"
-                    class="e-input"
-                    type="tel"
-                    pattern="^[0-9]*$"
-                    maxlength="10"
-                    appValidateWithMessage
-                    formControlName="phoneNumber"/>
-          </div>
-        </div>
-
-        <div class="input-container">
-          <label for="phoneType">Phone Type</label>
-            <div class="input-group dropdown">
-              <ejs-dropdownlist
-                id="phoneType"
-                appValidateWithMessage
-                formControlName="phoneType"
-                [dataSource]="phoneTypes$ | async"
-              >
-              </ejs-dropdownlist>
+                  [dataSource]="formSourcesMap[control.sourceKey]"
+                  [formControlName]="control.field">
+                </ejs-dropdownlist>
+              </div>
             </div>
-        </div>
+          </ng-template>
 
-        <div class="input-container">
-          <label for="ext">Ext</label>
-          <div class="input-group">
-            <input id="ext"
-                    class="e-input"
-                    type="text"
-                    maxlength="50"
-                    formControlName="ext"/>
-          </div>
-        </div>
+          <ng-template [ngSwitchCase]="FieldTypes.Input">
+            <div class="input-container" [ngStyle]="{'grid-area': control.gridAreaName}">
+              <label [for]="control.field">
+                {{control.title}}
+                <span class="required" *ngIf="control.required">*</span>
+              </label>
+              <div class="input-group">
+                <input
+                  [attr.maxlength]="control.maxLen || null"
+                  [pattern]="control.pattern || '.*'"
+                  class="e-input"
+                  type="text"
+                  appValidateWithMessage
+                  [formControlName]="control.field"/>
+              </div>
+            </div>
+          </ng-template>
 
-        <div class="input-container">
-          <label for="glNumber">GL Number</label>
-          <div class="input-group">
-            <input id="glNumber"
-                    class="e-input"
-                    type="text"
-                    maxlength="50"
-                    formControlName="glNumber"/>
-          </div>
-        </div>
-      </div>
+        </ng-container>
+      </ng-container>
+    </div>
 
-      <div class="group">
+    <ng-container *ngIf="locationDialogConfig.subForms?.length">
+
+      <ng-container *ngFor="let subForm of locationDialogConfig.subForms">
 
         <div>
-          <div class="input-container calendar">
-            <label for="inactiveDate">Inactive Date</label>
-            <div class="input-group datepicker">
-              <ejs-datepicker
-                id="inactiveDate"
-                class="datepicker"
-                format="MM/dd/yyyy"
-                placeholder="MM/DD/YYYY"
-                formControlName="inactiveDate"
-              >
-              </ejs-datepicker>
-            </div>
+          <h3 class="title">{{subForm.formTitle}}</h3>
+          <div [ngClass]="subForm.containerClass">
+            <ng-container *ngFor="let control of subForm.controls">
+
+              <ng-container [ngSwitch]="control.fieldType">
+                <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
+                  <div class="input-container form-dropdown" [ngStyle]="{'grid-area': control.gridAreaName}">
+                    <label [for]="control.field">
+                      {{control.title}}
+                      <span class="required" *ngIf="control.required">*</span>
+                    </label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist
+                        *ngIf="control.sourceKey"
+                        appValidateWithMessage
+                        [dataSource]="formSourcesMap[control.sourceKey]"
+                        [formControlName]="control.field">
+                      </ejs-dropdownlist>
+                    </div>
+                  </div>
+                </ng-template>
+      
+                <ng-template [ngSwitchCase]="FieldTypes.Input">
+                  <div class="input-container" [ngStyle]="{'grid-area': control.gridAreaName}">
+                    <label [for]="control.field">
+                      {{control.title}}
+                      <span class="required" *ngIf="control.required">*</span>
+                    </label>
+                    <div class="input-group">
+                      <input
+                        [attr.maxlength]="control.maxLen || null"
+                        [pattern]="control.pattern || '.*'"
+                        class="e-input"
+                        [type]="control.inputType || 'text'"
+                        appValidateWithMessage
+                        [formControlName]="control.field"/>
+                    </div>
+                  </div>
+                </ng-template>
+    
+                <ng-template [ngSwitchCase]="FieldTypes.Date">
+                  <div class="input-container calendar" [ngStyle]="{'grid-area': control.gridAreaName}">
+                    <label [for]="control.field">
+                      {{control.title}}
+                      <span class="required" *ngIf="control.required">*</span>
+                    </label>
+                    <div class="input-group datepicker">
+                      <ejs-datepicker
+                        class="datepicker"
+                        format="MM/dd/yyyy"
+                        placeholder="MM/DD/YYYY"
+                        [formControlName]="control.field"
+                      >
+                      </ejs-datepicker>
+                    </div>
+                  </div>
+                </ng-template>
+              </ng-container>
+  
+            </ng-container>
           </div>
+
         </div>
-      </div>
-    </div>
+
+      </ng-container>
+    </ng-container>
   </form>
 </app-side-dialog>
 
@@ -518,7 +393,7 @@
   isModal="true"
   [visible]="false"
   showCloseIcon="true"
-  (overlayClick)="hideDialog()"
+  (overlayClick)="hideRegionDialog()"
   width="448px"
   height="282px"
 >
@@ -553,12 +428,12 @@
         id="cancelDialogButton"
         ejs-button
         cssClass="e-outline"
-        (click)="hideDialog()">Cancel</button>
+        (click)="hideRegionDialog()">Cancel</button>
       <button
         id="okDialogButton"
         ejs-button
         [isPrimary]="true"
-        (click)="onOkDialogClick()">Save</button>
+        (click)="saveRegion()">Save</button>
     </div>
   </ng-template>
 </ejs-dialog>

@@ -108,6 +108,7 @@ import { RegionsGridComponent } from './regions/import-regions/regions-grid/regi
 import { PenaltiesComponent } from './reasons/penalties/penalties.component';
 import { PenaltiesGridActionsRendererComponent } from './reasons/penalties/penalties-grid-actions-renderer/penalties-grid-actions-renderer.component';
 import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
+import { LocationsService } from './locations/locations.service';
 
 const sidebarIcons = {
   Download,
@@ -228,6 +229,6 @@ const sidebarIcons = {
     ImportDialogContentModule,
   ],
   exports: [BillRatesComponent],
-  providers: [ResizeService, PageService],
+  providers: [ResizeService, PageService, LocationsService],
 })
 export class OrganizationManagementModule {}
