@@ -82,17 +82,15 @@ export class FilterService {
               const filteredItem = filterColumns[key].dataSource?.find(
                 (data: any) => data[filterColumns[key].valueId] === item
               );
-              if (filteredItem) {
-                chips.push({
-                  text:
-                    filterColumns[key].valueType === ValueType.Id ? filteredItem[filterColumns[key].valueField] : item,
-                  column: key,
-                  value: item,
-                  organizationId: filteredItem?.organizationId || filteredItem?.businessUnitId || null,
-                  regionId: filteredItem?.regionId || null,
-                  locationId: filteredItem?.locationId || null,
-                });
-              }
+              chips.push({
+                text:
+                  filterColumns[key].valueType === ValueType.Id ? filteredItem[filterColumns[key].valueField] : item,
+                column: key,
+                value: item,
+                organizationId: filteredItem?.organizationId || filteredItem?.businessUnitId || null,
+                regionId: filteredItem?.regionId || null,
+                locationId: filteredItem?.locationId || null,
+              });
             });
             break;
 
