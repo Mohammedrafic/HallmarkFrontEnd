@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { tap } from 'rxjs/operators';
+import { tap, distinctUntilChanged } from 'rxjs/operators';
 import { filter, map, Observable, Subject, take, takeUntil, throttleTime, switchMap, merge, combineLatest } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -50,7 +50,8 @@ import { LocationsService } from './locations.service';
 import { TakeUntilDestroy } from '@core/decorators';
 import { FieldType } from '@core/enums';
 import { DropdownOption } from '@core/interface';
-import { LocationsFormSource } from './locations.interface';
+import { LocationsFormConfig, LocationsFormSource, LocationsSubFormConfig } from './locations.interface';
+import { LocationsTrackKey } from './locations.enum';
 
 @Component({
   selector: 'app-locations',
@@ -150,6 +151,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.watchForOrgChange();
     this.watchForOrganizations();
     this.populateFormOptions();
+    this.watchForIrpControl();
     this.store.dispatch(new GetLocationTypes());
     this.store.dispatch(new GetUSCanadaTimeZoneIds());
     this.store.dispatch(new GetAllBusinessLines());
@@ -255,6 +257,9 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.grid.pageSettings.pageSize = this.pageSize;
   }
 
+  /**
+   * TODO: remove any with correct interface 
+   */
   selectPage(event: any): void {
     if (event.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
@@ -374,6 +379,14 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     }
   }
 
+  trackByField(index: number, item: LocationsFormConfig): string {
+    return item.field;
+  }
+
+  trackByKey(index: number, item: LocationsSubFormConfig): LocationsTrackKey {
+    return item.trackKey;
+  }
+
   override updatePage(): void {
     this.getLocations();
   }
@@ -451,6 +464,9 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.businessLines$
       .pipe(
         map((businessLines) => {
+          /**
+           * TODO: move to helper function
+           */
           if (id && businessLines.find((item) => item.id === id)) {
             return businessLines;
           } else {
@@ -463,7 +479,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         take(1),
       )
       .subscribe((data) => {
-        this.formSourcesMap['businessLineData'] = data;
+        this.formSourcesMap.businessLineData = data;
       });
   }
 
@@ -540,6 +556,16 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       this.formSourcesMap.timeZoneIds = timeZones;
       this.formSourcesMap.states = states;
       this.formSourcesMap.phoneType = phoneTypes;
+    });
+  }
+
+  private watchForIrpControl(): void {
+    this.locationDetailsFormGroup.get('isIrp')?.valueChanges
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((isIrpOn) => {
+
     });
   }
 }

@@ -148,7 +148,12 @@
   </ejs-grid>
 </section>
 
-<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+<app-export-dialog
+  [columns]="columnsToExport"
+  [fileName]="fileName"
+  (cancel)="closeExport()"
+  (export)="export($event)">
+</app-export-dialog>
 
 <app-filter-dialog
   [items]="filteredItems"
@@ -270,7 +275,7 @@
     [formGroup]="locationDetailsFormGroup"
   >
     <div class="form-block">
-      <ng-container *ngFor="let control of locationDialogConfig.baseForm">
+      <ng-container *ngFor="let control of locationDialogConfig.baseForm; trackBy: trackByField">
         <ng-container [ngSwitch]="control.fieldType">
 
           <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
@@ -308,18 +313,27 @@
             </div>
           </ng-template>
 
+          <ng-template [ngSwitchCase]="FieldTypes.Toggle">
+            <div class="input-container blue-text" [ngStyle]="{'grid-area': control.gridAreaName}">
+              <ejs-switch
+                appValidateWithMessage
+                [formControlName]="control.field"
+              ></ejs-switch>
+              <label [for]="control.field">{{ control.title }} <span *ngIf="control.required" class="required">*</span>
+              </label>
+            </div>
+          </ng-template>
+
         </ng-container>
       </ng-container>
     </div>
 
     <ng-container *ngIf="locationDialogConfig.subForms?.length">
-
-      <ng-container *ngFor="let subForm of locationDialogConfig.subForms">
-
+      <ng-container *ngFor="let subForm of locationDialogConfig.subForms; trackBy: trackByKey">
         <div>
           <h3 class="title">{{subForm.formTitle}}</h3>
           <div [ngClass]="subForm.containerClass">
-            <ng-container *ngFor="let control of subForm.controls">
+            <ng-container *ngFor="let control of subForm.controls; trackBy: trackByField">
 
               <ng-container [ngSwitch]="control.fieldType">
                 <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
@@ -378,9 +392,7 @@
   
             </ng-container>
           </div>
-
         </div>
-
       </ng-container>
     </ng-container>
   </form>

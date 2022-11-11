@@ -41,6 +41,13 @@ export const LocationsDialogConfig: LocationDialogConfig = {
       maxLen: 50,
     },
     {
+      field: 'isIrp',
+      title: 'Include in IRP',
+      fieldType: FieldType.Toggle,
+      gridAreaName: 'irpArea',
+      required: false,
+    },
+    {
       field: 'invoiceId',
       title: 'Invoice Location ID',
       fieldType: FieldType.Input,
@@ -64,14 +71,14 @@ export const LocationsDialogConfig: LocationDialogConfig = {
       gridAreaName: 'businessLineArea',
       required: false,
     },
-    {
-      field: 'locationType',
-      title: 'Location Type',
-      fieldType: FieldType.Dropdown,
-      sourceKey: LocationsSourceKeys.LocationTypes,
-      gridAreaName: 'locationTypeArea',
-      required: false,
-    },
+    // {
+    //   field: 'locationType',
+    //   title: 'Location Type',
+    //   fieldType: FieldType.Dropdown,
+    //   sourceKey: LocationsSourceKeys.LocationTypes,
+    //   gridAreaName: 'locationTypeArea',
+    //   required: false,
+    // },
     {
       field: 'timeZone',
       title: 'Time Zone',

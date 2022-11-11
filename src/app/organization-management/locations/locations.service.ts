@@ -30,7 +30,8 @@ export class LocationsService {
       phoneType: [null],
       timeZone: [null],
       locationType: [null],
-      organizationId:0
+      organizationId: 0,
+      isIrp: [null]
     }) as CustomFormGroup<LocationsForm>;
   }
 

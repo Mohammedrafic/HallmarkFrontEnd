@@ -1,4 +1,6 @@
 @import "../../styles/variables/colors";
+@import 'mixins';
+
 .flex-column {
   .toolbar {
     display: flex;
@@ -61,6 +63,12 @@
 
   .input-container {
     margin-bottom: 12px;
+
+    &.blue-text {
+      label {
+        color: #3E7FFF;
+      }
+    }
     // width: 386px;
 
     input {
@@ -120,13 +128,13 @@
 
 .form-block {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows:repeat(5, 1fr);
   gap: 15px;
   grid-template-areas: 
-  "exteranlArea exteranlArea . ."
+  "exteranlArea exteranlArea . irpArea"
   "invoiceArea nameArea businessLineArea ."
-  "locationTypeArea locationTypeArea timeZoneArea timeZoneArea"
+  "timeZoneArea timeZoneArea . ."
   "address1Area address1Area address2Area address2Area"
   "stateArea cityArea zipArea .";
 }
@@ -140,4 +148,10 @@
   "personArea personArea emailArea ."
   "phoneArea phoneTypeArea extArea glArea"
   "inactivateArea . . ."
+}
+
+::ng-deep {
+  .input-container {
+    @include toggle;
+  }
 }
