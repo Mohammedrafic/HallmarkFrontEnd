@@ -290,7 +290,8 @@ const COMPONENTS = [
     AcceptFormComponent,
 
     ImportDialogContentComponent,
-    MultiSelectModule
+    MultiSelectModule,
+    TooltipModule
   ],
   declarations: [
     ...COMPONENTS,
