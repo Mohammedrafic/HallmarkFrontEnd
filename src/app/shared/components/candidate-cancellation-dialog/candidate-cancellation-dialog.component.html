@@ -25,6 +25,7 @@
           <ejs-dropdownlist
             appValidateWithMessage
             formControlName="jobCancellationReason"
+            [allowFiltering]="true"
             [fields]="optionFields"
             [dataSource]="reasons"
           ></ejs-dropdownlist>
@@ -37,6 +38,7 @@
             appValidateWithMessage
             formControlName="penaltyCriteria"
             placeholder="Select Penalty"
+            [allowFiltering]="true"
             [fields]="optionFields"
             [dataSource]="penalties"
             [enabled]="isReasonSelected"

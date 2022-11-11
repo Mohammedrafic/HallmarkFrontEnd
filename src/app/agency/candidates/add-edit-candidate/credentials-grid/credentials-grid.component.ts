@@ -57,7 +57,7 @@ import {
   orgSideReviewedCredentialStatuses,
 } from './credentials-grid.constants';
 import { Permission } from '@core/interface';
-import { UserPermissions } from '@core/enums';
+import { FileSize, UserPermissions } from '@core/enums';
 
 @Component({
   selector: 'app-credentials-grid',
@@ -77,8 +77,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
 
   public readonly statusEnum = CredentialStatus;
-  public readonly allowedExtensions: string = '.pdf, .doc, .docx, .jpg, .jpeg, .png';
-  public readonly maxFileSize = 10485760; // 10 mb
+  public readonly allowedExtensions: string = '.pdf, .jpg, .jpeg, .png';
+  public readonly maxFileSize = FileSize.MB_20;
   public uploaderErrorMessageElement: HTMLElement;
   public dropElement: HTMLElement;
   public addCredentialForm: FormGroup;
@@ -489,8 +489,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       if (this.uploaderErrorMessageElement) {
         this.uploaderErrorMessageElement.innerText =
           file.size > this.maxFileSize
-            ? 'The file exceeds the limitation, max allowed 10 MB.'
-            : 'The file should be in pdf, doc, docx, jpg, jpeg, png format.';
+            ? 'The file exceeds the limitation, max allowed 20 MB.'
+            : 'The file should be in pdf, jpg, jpeg, png format.';
       }
     });
   }

@@ -7,6 +7,7 @@
                             formControlName="businessUnit"
                             [fields]="optionFields"
                             [dataSource]="businessUnits"
+                            [allowFiltering]="true"
                             placeholder="Business Unit"></ejs-dropdownlist>
         </div>
       </div>
@@ -15,6 +16,7 @@
                           formControlName="business"
                           [fields]="bussinesDataFields"
                           [dataSource]="businessData$ | async"
+                          [allowFiltering]="true"
                           placeholder=Business
                           [value]="defaultValue"></ejs-dropdownlist>
       </div>
@@ -51,6 +53,7 @@
       <ejs-dropdownlist id="rowsPerPage"
                         class="dropdown-no-border"
                         [dataSource]="rowsPerPageDropDown"
+                        [allowFiltering]="true"
                         [(value)]="activeRowsPerPageDropDown"
                         (change)="onPageSizeChanged($event)">
       </ejs-dropdownlist>

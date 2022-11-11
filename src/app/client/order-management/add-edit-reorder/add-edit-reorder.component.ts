@@ -45,7 +45,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public readonly datepickerMask = { month: 'MM', day: 'DD', year: 'YYYY' };
   public readonly timepickerMask = { hour: 'HH', minute: 'MM' };
   public readonly numericInputAttributes = { maxLength: '10' };
-  public readonly currentDate: Date = new Date();
 
   public reorderForm: FormGroup;
   public dialogTitle: string = 'Add Re-Order';
@@ -70,7 +69,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     private actions$: Actions
   ) {
     super();
-    this.currentDate.setHours(0,0,0,0);
   }
 
   public get isEditMode(): boolean {

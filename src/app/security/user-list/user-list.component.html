@@ -7,6 +7,7 @@
             appValidateWithMessage
             appHideBeforeSyncfusionLoad
             formControlName="businessUnit"
+            [allowFiltering]="true"
             [fields]="unitFields"
             [dataSource]="businessUnits"
             placeholder="Business Unit"
@@ -19,6 +20,7 @@
             appValidateWithMessage
             appHideBeforeSyncfusionLoad
             formControlName="business"
+            [allowFiltering]="true"
             [fields]="bussinesDataFields"
             [dataSource]="bussinesUserData$ | async"
             placeholder="Business"

@@ -52,7 +52,7 @@ export class CommentsComponent {
 
   public selectedFilter = CommentsFilter.All;
   public showExternal = false;
-  public commentsFilterItems = [ CommentsFilter.All, CommentsFilter.Internal, CommentsFilter.External ];
+  public commentsFilterItems = [ CommentsFilter.All, CommentsFilter.External, CommentsFilter.Internal ];
   public commentsFilter = CommentsFilter;
   public isExternal = false;
   public isAgencyUser = false;

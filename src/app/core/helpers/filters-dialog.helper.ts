@@ -23,6 +23,7 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
   @ViewChild('regionMultiselect') regionMultiselect: MultiSelectComponent;
   
   @Input() activeTabIdx: number;
+  @Input() orgId: number | null;
 
   @Output() readonly updateTableByFilters: EventEmitter<F> = new EventEmitter<F>();
   @Output() readonly appliedFiltersAmount: EventEmitter<number> = new EventEmitter<number>();

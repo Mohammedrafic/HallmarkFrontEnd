@@ -49,7 +49,7 @@ export class TimesheetTableLinkComponent implements ICellRendererAngularComp {
     } else {
       if (this.params.colDef?.field === TimesheetsTableColumns.OrderId) {
         this.router.navigate(['client/order-management'], {
-          state: { publicId: this.cellValue.orderPublicId, redirectedFromToast: true, prefix: this.cellValue.orgPrefix }
+          state: { publicId: this.cellValue.orderPublicId, timesheetRedirect: true, prefix: this.cellValue.orgPrefix }
         });
       }
     }

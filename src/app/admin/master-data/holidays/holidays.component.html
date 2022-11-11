@@ -9,6 +9,7 @@
           (change)="yearChanged($event)"
           showClearButton="true"
           [dataSource]="yearsList"
+          [allowFiltering]="true"
           placeholder="Year"
         ></ejs-dropdownlist>
       </div>
@@ -90,6 +91,7 @@
                 id="rowsPerPage"
                 class="dropdown-no-border"
                 [dataSource]="rowsPerPageDropDown"
+                [allowFiltering]="true"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
               >

@@ -6,7 +6,7 @@
     <section>
       <button (click)="showFilters()" ejs-button id="filterButton" cssClass="e-outline button-filter">
         <div class="filter-button-content">
-          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredItems.length }}</span>
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
@@ -78,6 +78,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -125,6 +126,7 @@
       <div class="input-group dropdown">
         <ejs-multiselect
           mode="CheckBox"
+          [allowFiltering]="true"
           [fields]="filterOptionFields"
           [dataSource]="filterColumns.skillCategories.dataSource"
           [showDropDownIcon]="true"
@@ -137,6 +139,7 @@
       <div class="input-group dropdown">
         <ejs-multiselect
           mode="CheckBox"
+          [allowFiltering]="true"
           [dataSource]="filterColumns.skillAbbrs.dataSource"
           [showDropDownIcon]="true"
           formControlName="skillAbbrs"
@@ -148,6 +151,7 @@
       <div class="input-group dropdown">
         <ejs-multiselect
           mode="CheckBox"
+          [allowFiltering]="true"
           [dataSource]="filterColumns.skillDescriptions.dataSource"
           [showDropDownIcon]="true"
           formControlName="skillDescriptions"
@@ -159,6 +163,7 @@
       <div class="input-group dropdown">
         <ejs-multiselect
           mode="CheckBox"
+          [allowFiltering]="true"
           [dataSource]="filterColumns.glNumbers.dataSource"
           [showDropDownIcon]="true"
           formControlName="glNumbers"
@@ -187,10 +192,11 @@
         <label for="skillCategoryId">Skill Category <span class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-dropdownlist
-            name="skillCategoryId"
-            [fields]="optionFields"
             appValidateWithMessage
+            name="skillCategoryId"
             formControlName="skillCategoryId"
+            [fields]="optionFields"
+            [allowFiltering]="true"
             [dataSource]="(allSkillsCategories$ | async)?.items"
           ></ejs-dropdownlist>
         </div>

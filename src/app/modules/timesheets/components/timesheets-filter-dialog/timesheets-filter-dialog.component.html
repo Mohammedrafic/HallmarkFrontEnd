@@ -23,6 +23,7 @@
         <ejs-multiselect
           id="orderId"
           mode="CheckBox"
+          [allowFiltering]="true"
           [fields]="filterOptionFields"
           [dataSource]="filterColumns.orderIds?.dataSource"
           [showDropDownIcon]="true"
@@ -36,6 +37,7 @@
         <ejs-multiselect
           id="status"
           mode="CheckBox"
+          [allowFiltering]="true"
           [fields]="filterOptionFields"
           [dataSource]="filterColumns.statusIds?.dataSource"
           [showDropDownIcon]="true"
@@ -51,6 +53,7 @@
             #regionMultiselect
             id="region"
             mode="CheckBox"
+            [allowFiltering]="true"
             [fields]="filterOptionFields"
             [dataSource]="filterColumns.regionsIds?.dataSource"
             [showDropDownIcon]="true"
@@ -64,6 +67,7 @@
           <ejs-multiselect
             id="location"
             mode="CheckBox"
+            [allowFiltering]="true"
             [fields]="filterOptionFields"
             [dataSource]="filterColumns.locationIds?.dataSource"
             [showDropDownIcon]="true"
@@ -80,6 +84,7 @@
           <ejs-multiselect
             id="department"
             mode="CheckBox"
+            [allowFiltering]="true"
             [fields]="filterOptionFields"
             [dataSource]="filterColumns.departmentIds?.dataSource"
             [showDropDownIcon]="true"
@@ -94,6 +99,7 @@
           <ejs-multiselect
             id="agencyName"
             mode="CheckBox"
+            [allowFiltering]="true"
             [fields]="filterOptionFields"
             [dataSource]="filterColumns.agencyIds?.dataSource"
             [showDropDownIcon]="true"
@@ -108,6 +114,7 @@
         <ejs-multiselect
           id="skill"
           mode="CheckBox"
+          [allowFiltering]="true"
           [fields]="filterOptionFields"
           [dataSource]="filterColumns.skillIds?.dataSource"
           [showDropDownIcon]="true"

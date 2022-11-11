@@ -5,9 +5,10 @@
       <label>Bill Rate Title<span class="required">*</span></label>
       <div class="input-group dropdown">
         <ejs-dropdownlist
-          [fields]="optionFields"
           appValidateWithMessage
           formControlName="billRateConfigId"
+          [allowFiltering]="true"
+          [fields]="optionFields"
           [dataSource]="billRateOptions"
         ></ejs-dropdownlist>
       </div>
@@ -29,9 +30,10 @@
       <div class="input-group">
         <div class="input-group dropdown">
           <ejs-dropdownlist
+            appValidateWithMessage
             formControlName="billType"
             [fields]="billRateFields"
-            appValidateWithMessage
+            [allowFiltering]="true"
             [dataSource]="billRateTypes"
           ></ejs-dropdownlist>
         </div>

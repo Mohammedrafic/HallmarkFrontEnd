@@ -26,3 +26,9 @@
 .e-upload, .e-upload-file-list {
   border: none !important;
 }
+
+.e-file-container {
+  .e-file-name, .e-file-type {
+    color: $black !important;
+  }
+}

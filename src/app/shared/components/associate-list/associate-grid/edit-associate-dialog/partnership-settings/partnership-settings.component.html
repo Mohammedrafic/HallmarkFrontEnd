@@ -4,8 +4,9 @@
     <div class="input-group dropdown">
       <ejs-dropdownlist
         appValidateWithMessage
-        [fields]="optionFields"
         formControlName="status"
+        [allowFiltering]="true"
+        [fields]="optionFields"
         [dataSource]="partnershipStatus"
       ></ejs-dropdownlist>
     </div>
@@ -20,8 +21,9 @@
             <div class="input-group dropdown">
               <ejs-dropdownlist
                 appValidateWithMessage
-                [fields]="optionFields"
                 formControlName="agencyCategory"
+                [fields]="optionFields"
+                [allowFiltering]="true"
                 [dataSource]="agencyCategoryTier"
               ></ejs-dropdownlist>
             </div>
@@ -127,10 +129,11 @@
             <div class="input-group dropdown">
               <ejs-dropdownlist
                 appValidateWithMessage
-                [fields]="optionFields"
                 formControlName="submissionPercentageOverrideRestriction"
-                [dataSource]="submission"
                 placeholder="Submission"
+                [fields]="optionFields"
+                [allowFiltering]="true"
+                [dataSource]="submission"            
               ></ejs-dropdownlist>
             </div>
           </div>
