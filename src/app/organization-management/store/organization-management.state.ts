@@ -677,6 +677,10 @@ export class OrganizationManagementState {
         patchState({ isLocationLoading: false });
         dispatch(new GetRegions());
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error,
+          (error.error.errors != null && error.error.errors != undefined) ? 'Dependencies:'+error.error.errors.EntityInUse[0] : error.error.detail));
       })
     );
   }
