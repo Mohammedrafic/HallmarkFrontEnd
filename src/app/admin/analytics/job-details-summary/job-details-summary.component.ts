@@ -253,8 +253,6 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
             });
           });
         });
-
-        debugger;
         if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
           this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
         }
