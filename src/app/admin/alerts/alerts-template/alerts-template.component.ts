@@ -26,7 +26,7 @@ import { SetHeaderState, ShowEmailSideDialog, ShowOnScreenSideDialog, ShowSmsSid
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { AlertsEmailTemplateFormComponent } from './alerts-email-template-form/alerts-email-template-form.component';
-import { BUSINESS_DATA_FIELDS, BUSINESS_UNITS_VALUES, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor } from '../alerts.constants';
+import { BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor } from '../alerts.constants';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 import { AlertChannel } from '../alerts.enum';
 import { AlertsSmsTemplateFromComponent } from './alerts-sms-template-from/alerts-sms-template-from.component';
@@ -41,6 +41,7 @@ import { GRID_CONFIG, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AppState } from '../../../store/app.state';
+import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 
 @Component({
   selector: 'app-template',

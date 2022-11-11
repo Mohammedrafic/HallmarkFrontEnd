@@ -64,6 +64,14 @@ export enum AgencyStatus {
   Terminated,
 }
 
+export const AgencyStatuses = [
+  { id: AgencyStatus.Active, text: 'Active' },
+  { id: AgencyStatus.Inactive, text: 'Inactive' },
+  { id: AgencyStatus.InProgress, text: 'In Progress' },
+  { id: AgencyStatus.Suspended, text: 'Suspended' },
+  { id: AgencyStatus.Terminated, text: 'Terminated' },
+]
+
 export enum CandidateStatus {
   Inactive,
   Active,

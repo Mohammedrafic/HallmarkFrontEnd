@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
 
 import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
+import { COUNTRIES } from '@shared/constants/countries-list';
 
 @Component({
   selector: 'app-candidate-contact-details',
@@ -16,10 +17,7 @@ export class CandidateContactDetailsComponent implements OnInit, AfterViewInit {
     text: 'text',
     value: 'id',
   };
-  public countries = [
-    { id: Country.USA, text: Country[0] },
-    { id: Country.Canada, text: Country[1] },
-  ];
+  public countries = COUNTRIES;
   public states$: BehaviorSubject<Array<string>>;
 
   ngOnInit(): void {

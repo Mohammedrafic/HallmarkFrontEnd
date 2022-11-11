@@ -1,24 +1,22 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { HtmlEditorService, ImageService, LinkService, RichTextEditorComponent, TableService, ToolbarService, ToolbarType } from '@syncfusion/ej2-angular-richtexteditor';
-import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { Observable, Subject, takeWhile } from 'rxjs';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { BUSINESS_UNITS_VALUES, BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor, User_DATA_FIELDS } from '../../alerts.constants';
+import { BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor, User_DATA_FIELDS } from '../../alerts.constants';
 import { Actions, Select, Store } from '@ngxs/store';
 import { GetBusinessByUnitType, GetAllUsersPage } from 'src/app/security/store/security.actions';
-import { ClearAlertTemplateState, GetAlertsTemplatePage, GetTemplateByAlertId, GetUserSubscriptionPage, SaveTemplateByAlertId, UpdateTemplateByAlertId } from '@admin/store/alerts.actions';
+import { GetUserSubscriptionPage } from '@admin/store/alerts.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from '@shared/models/alerts-template.model';
 import { UserState } from 'src/app/store/user.state';
 import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { User, UsersPage } from '@shared/models/user.model';
 import { AppState } from 'src/app/store/app.state';
-import { ShouldDisableUserDropDown } from 'src/app/store/app.actions';
 import { AlertsState } from '@admin/store/alerts.state';
 import { UserSubscriptionFilters, UserSubscriptionPage } from '@shared/models/user-subscription.model';
-import { FilterService } from '@shared/services/filter.service';
+import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 
 @Component({
   selector: 'app-send-group-email',
