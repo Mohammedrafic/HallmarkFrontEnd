@@ -59,8 +59,8 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     "BusinessUnitIdParamJDSR": "",
     "HostName": "",
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/ClientFinanceAccrualReport.cls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/Accrual.cat" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialReport/CredentialReport.wls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialReport/Credential.cat" };
   public title: string = "Job Detail Summary";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
@@ -147,6 +147,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   public user: User | null;
   public filterOptionsData: CommonReportFilterOptions;
   public candidateFilterData: { [key: number]: SearchCandidate; }[] = [];
+  public isLoadNewFilter: boolean = false;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -223,6 +224,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
+
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
 
@@ -251,8 +253,13 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
             });
           });
         });
-        if ((data==null || data<=0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+
+        debugger;
+        if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
           this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+        }
+        else {
+          this.isLoadNewFilter = true;
         }
         let businessIdData = [];
         businessIdData.push(data);
@@ -342,6 +349,8 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
 
   }
 
+  
+
   public SearchReport(): void {
    
     this.filteredItems = [];
@@ -354,31 +363,30 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     let { businessIds, candidateName, candidateStatuses, departmentIds, jobId, jobStatuses, locationIds,
       regionIds, skillCategoryIds,agencyIds, skillIds, startDate, endDate } = this.jobDetailSummaryReportForm.getRawValue();
       if (!this.jobDetailSummaryReportForm.dirty) {
-        this.message = "Default filter selected with all regions ,locations and departments for last 30 and next 30 days";
+        this.message = "Default filter selected with all regions ,locations and departments.";
       }
       else {
+        this.isLoadNewFilter = false;
         this.message = ""
-      } 
+    }
+
     this.paramsData =
     {
       "OrganizationParamJDSR": this.selectedOrganizations?.map((list) => list.organizationId),
       "StartDateParamJDSR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamJDSR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamJDSR": regionIds,
-      "LocationParamJDSR": locationIds,
-      "DepartmentParamJDSR": departmentIds,
-      "SkillCategoryParamJDSR": skillCategoryIds,
-      "SkillParamJDSR": skillIds,
-      "CandidateNameJDSR": candidateName == null ? '' : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
-      "CandidateStatusJDSR": candidateStatuses,
-      "JobStatusJDSR": jobStatuses,
-      "JobIdJDSR": jobId,
-      "AgencysJDSR":agencyIds,
+      "RegionParamJDSR": regionIds?.join(","),
+      "LocationParamJDSR": locationIds?.join(","),
+      "DepartmentParamJDSR": departmentIds?.join(","),
+      "SkillCategoryParamJDSR": skillCategoryIds?.length>0? skillCategoryIds?.join(","):'null',
+      "SkillParamJDSR": skillIds?.length>0? skillIds?.join(","):"null",
+      "CandidateNameJDSR": candidateName == null ? 'null' : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
+      "CandidateStatusJDSR": candidateStatuses?.length > 0 ? candidateStatuses.join(",") : 'null',
+      "JobStatusJDSR": jobStatuses?.length > 0 ? jobStatuses.join(",") : 'null',
+      "JobIdJDSR": (jobId != null && jobId.length > 0) ? jobId : 'null',
+      "AgencysJDSR": agencyIds?.length > 0 ? agencyIds.join(",") : 'null',
       "BearerParamJDSR": auth,
-      "BusinessUnitIdParamJDSR": window.localStorage.getItem("lastSelectedOrganizationId") == null
-        ? this.organizations != null && this.organizations[0]?.id != null ?
-          this.organizations[0].id.toString() : "1" :
-        window.localStorage.getItem("lastSelectedOrganizationId"),
+      "BusinessUnitIdParamJDSR": businessIds,
       "HostName": this.baseUrl,
     };
     this.logiReportComponent.paramsData = this.paramsData;
@@ -475,7 +483,9 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   }
 
   public showFilters(): void {
-    this.onFilterControlValueChangedHandler();
+    if (this.isLoadNewFilter) {
+      this.onFilterControlValueChangedHandler();
+    }
     this.store.dispatch(new ShowFilterDialog(true));
   }
   public onFilterDelete(event: FilteredItem): void {
