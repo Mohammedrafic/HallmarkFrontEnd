@@ -98,6 +98,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   public isInitialLoad: boolean = false;
   public baseUrl: string = '';
   public user: User | null;
+  public isResetFilter: boolean = false;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -177,6 +178,9 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
         if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
           this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
         }
+        else {
+          this.isResetFilter = true;
+        }
 
         this.regions = this.regionsList;
         this.filterColumns.regionIds.dataSource = this.regions;
@@ -242,6 +246,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
       this.message = "Default filter selected with all regions ,locations and departments";
     }
     else {
+      this.isResetFilter = false;
       this.message = ""
     }
     this.paramsData =
@@ -303,7 +308,9 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   }
 
   public showFilters(): void {
-    this.onFilterControlValueChangedHandler();
+    if (this.isResetFilter) {
+      this.onFilterControlValueChangedHandler();
+    }
     this.store.dispatch(new ShowFilterDialog(true));
   }
   public onFilterDelete(event: FilteredItem): void {
