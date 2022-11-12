@@ -41,26 +41,26 @@ import { OutsideZone } from "@core/decorators";
 })
 export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   public paramsData: any = {
-    "OrganizationParamACCR": "",
-    "StartDateParamACCR": "",
-    "EndDateParamACCR": "",
-    "RegionParamACCR": "",
-    "LocationParamACCR": "",
-    "DepartmentParamACCR": "",
-    "SkillCategoryParamACCR":"",
-    "SkillParamACCR":"",
-    "CandidateNameACCR":"",
-    "CandidateStatusACCR":"",
-    "OrderTypeACCR":"",
-    "JobStatusACCR":"",
-    "JobIdACCR":"",
-    "BearerParamACCR": "",
-    "BusinessUnitIdParamACCR": "",
+    "OrganizationParamFTS": "",
+    "StartDateParamFTS": "",
+    "EndDateParamFTS": "",
+    "RegionParamFTS": "",
+    "LocationParamFTS": "",
+    "DepartmentParamFTS": "",
+    "SkillCategoriesParamFTS":"",
+    "SkillsParamFTS":"",
+    "CandidateNameParamFTS":"",
+    "CandidateStatusesParamFTS":"",
+    "OrderTypesParamFTS":"",
+    "JobStatusesParamFTS":"",
+    "JobIdParamFTS":"",
+    "BearerParamFTS": "",
+    "BusinessUnitIdParamFTS": "",
     "HostName": "",
-    "AccrualReportFilterACCR": ""
+    "AccrualReportFilterTypeFTS": ""
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/ClientFinanceAccrualReport.cls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/Accrual.cat" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.wls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.cat" };
   public title: string = "Financial Time Sheet";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
@@ -351,26 +351,26 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       }
     this.paramsData =
     {
-      "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.organizationId),
-      "StartDateParamACCR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateParamACCR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamACCR": regionIds,
-      "LocationParamACCR": locationIds,
-      "DepartmentParamACCR": departmentIds,
-      "SkillCategoryParamACCR":skillCategoryIds,
-      "SkillParamACCR":skillIds,
-      "CandidateNameACCR":candidateName==null?'':this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName),
-      "CandidateStatusACCR":candidateStatuses,
-      "OrderTypeACCR":orderTypes,
-      "JobStatusACCR":jobStatuses,
-      "JobIdACCR":jobId,
-      "BearerParamACCR": auth,
-      "BusinessUnitIdParamACCR": window.localStorage.getItem("lastSelectedOrganizationId") == null
+      "OrganizationParamFTS": this.selectedOrganizations?.map((list) => list.organizationId),
+      "StartDateParamFTS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "EndDateParamFTS": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "RegionParamFTS": regionIds.join(","),
+      "LocationParamFTS": locationIds.join(","),
+      "DepartmentParamFTS": departmentIds.join(","),
+      "SkillCategoriesParamFTS":skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
+      "SkillsParamFTS":skillIds.length==0?"null":skillIds.join(","),
+      "CandidateNameParamFTS":candidateName==null?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName),
+      "CandidateStatusesParamFTS":candidateStatuses.length==0?"null":candidateStatuses.join(","),
+      "OrderTypesParamFTS":orderTypes.length==0?"null":orderTypes.join(","),
+      "JobStatusesParamFTS":jobStatuses.length==0?"null":jobStatuses.join(","),
+      "JobIdParamFTS":jobId==null?"null":jobId,
+      "BearerParamFTS": auth,
+      "BusinessUnitIdParamFTS": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "AccrualReportFilterACCR": accrualReportTypes
+      "AccrualReportFilterTypeFTS": accrualReportTypes.toString()
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
