@@ -22,8 +22,3 @@ export const OPTION_FIELDS = {
 export const PAYMENT_MODE = Object.values(PaymentDetailMode)
   .filter(valuesOnly)
   .map((text, id: number) => ({ text, id }));
-
-export const COUNTRIES = [
-  { id: Country.USA, text: Country[0] },
-  { id: Country.Canada, text: Country[1] },
-];
