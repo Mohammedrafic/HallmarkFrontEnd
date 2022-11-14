@@ -40,8 +40,7 @@ import { FeatureFlagService, featureFlagProviderFactory } from '@core/services/f
       disabled: environment.production,
     }),
     // In case you don't have Redux DevTools uncomment import below.
-    // NgxsLoggerPluginModule.forRoot({import { HttpClient } from '@angular/common/http';
-
+    // NgxsLoggerPluginModule.forRoot({
     //   disabled: environment.production,
     // }),
     NgxMaskModule.forRoot(),
