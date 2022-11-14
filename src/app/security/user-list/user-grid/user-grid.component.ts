@@ -7,7 +7,7 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { Select, Store } from '@ngxs/store';
 import { SecurityState } from '../../store/security.state';
 import { map, Observable, Subject, takeWhile } from 'rxjs';
-import { ExportUserList, GetRolesPage, GetUsersPage } from '../../store/security.actions';
+import { ExportUserList, GetRolesPage, GetUsersPage, ResendWelcomeEmail } from '../../store/security.actions';
 import { CreateUserStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { User, UsersPage } from '@shared/models/user-managment-page.model';
 import { UserState } from '../../../store/user.state';
@@ -21,6 +21,7 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { AppState } from '../../../store/app.state';
+import { ButtonRenderedEvent } from '@shared/models/button.model';
 
 enum Visibility {
   Unassigned,
@@ -207,7 +208,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         sortable: false,
       },
       {
-        field: 'lastTimeLoggedInDate',
+        field: 'lastLoginDate',
         filter: false,
       },
     ];
@@ -282,7 +283,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.isAlive = false;
   }
 
-  public onButtonClick(data: any): void {
+  public onButtonClick(data: ButtonRenderedEvent): void {
     data.btnName === 'edit' ? this.onEdit(data) : this.onMail(data);
   }
 
@@ -358,12 +359,12 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     }
   }
 
-  private onEdit(data: any): void {
+  private onEdit(data: ButtonRenderedEvent): void {
     this.editUserEvent.emit(data?.rowData);
   }
 
-  private onMail(data: any): void {
-    console.log('mail works');
+  private onMail(data: ButtonRenderedEvent): void {
+    this.store.dispatch(new ResendWelcomeEmail(data.rowData.id!));
   }
 
   private updateUsers(): void {
@@ -444,7 +445,6 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
             )
           );
           self.usersPage$.pipe().subscribe((data: any) => {
-            console.log(data);
             self.itemList = data?.items;
             self.totalRecordsCount = data?.totalCount;
 

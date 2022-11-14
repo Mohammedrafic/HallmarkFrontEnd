@@ -30,6 +30,7 @@ import {
   ExportUserList,
   ExportRoleList,
   GetAllUsersPage,
+  ResendWelcomeEmail,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -524,5 +525,9 @@ export class SecurityState {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );
+  }
+  @Action(ResendWelcomeEmail)
+  ResendWelcomeEmail(state: StateContext<SecurityStateModel>, { userId }: ResendWelcomeEmail): Observable<void> {
+    return this.userService.resendWelcomeEmail(userId);
   }
 }
