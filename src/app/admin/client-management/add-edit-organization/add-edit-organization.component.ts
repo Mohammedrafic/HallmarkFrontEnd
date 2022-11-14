@@ -2,13 +2,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ALPHANUMERIC, ONLY_LETTERS } from '@shared/constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Titles } from '@shared/enums/title';
 import { OrganizationTypes } from '@shared/enums/organization-type';
 import { User } from '@shared/models/user-managment-page.model';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { Country } from 'src/app/shared/enums/states';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { ContactDetails, Organization } from 'src/app/shared/models/organization.model';
@@ -30,13 +29,19 @@ import {
   UploadOrganizationLogo,
 } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
+import { AddEditOrganizationService } from '@admin/client-management/services/add-edit-organization.service';
+import { Destroyable } from '@core/helpers';
+import { FeatureFlagApiService } from '@shared/services/feature-flag-api.service';
+import { filter, take } from 'rxjs/operators';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { SHOULD_LOC_DEP_INCLUDE_IRP } from '@shared/constants';
 
 @Component({
   selector: 'app-add-edit-organization',
   templateUrl: './add-edit-organization.component.html',
   styleUrls: ['./add-edit-organization.component.scss'],
 })
-export class AddEditOrganizationComponent implements OnInit, OnDestroy {
+export class AddEditOrganizationComponent extends Destroyable implements OnInit, OnDestroy {
   public allowExtensions: string = '.png, .jpg, .jpeg';
   public dropElement: HTMLElement;
   public filesDetails: Blob[] = [];
@@ -57,30 +62,20 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   public titles = Titles;
   public isMspUser = false;
   public organizationTypes = OrganizationTypes;
-  private showDataBaseControlValue: boolean = false;
-  private logoToDelete: boolean = false;
-
   public createUnderFields = {
     text: 'name',
     value: 'id',
   };
-
   public optionFields = {
     text: 'text',
     value: 'id',
   };
-
-  get showDataBaseControl(): boolean {
-    return this.showDataBaseControlValue;
-  }
-
-  set showDataBaseControl(value: boolean) {
-    this.showDataBaseControlValue = value;
-  }
-
-  private unsubscribe$: Subject<void> = new Subject();
-  private user: User | null;
   public profileMode: boolean = false;
+  public isIRPFlagEnabled = false;
+
+  private showDataBaseControlValue: boolean = false;
+  private logoToDelete: boolean = false;
+  private user: User | null;
 
   @Select(AdminState.countries)
   countries$: Observable<string[]>;
@@ -113,42 +108,36 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     return this.title === 'Add';
   }
 
+  get showDataBaseControl(): boolean {
+    return this.showDataBaseControlValue;
+  }
+
+  set showDataBaseControl(value: boolean) {
+    this.showDataBaseControlValue = value;
+  }
+
   constructor(
     private actions$: Actions,
     private store: Store,
     private router: Router,
     private route: ActivatedRoute,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private addEditOrganizationService: AddEditOrganizationService,
+    private featureFlagApiService: FeatureFlagApiService,
+    private confirmService: ConfirmService,
   ) {
-    actions$
-      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetOrganizationByIdSucceeded))
-      .subscribe((organization: { payload: Organization }) => {
-        this.currentBusinessUnitId = organization.payload.organizationId as number;
-        this.initForms(organization.payload);
-        this.isSameAsOrg = organization.payload.billingDetails.sameAsOrganization;
-        if (this.isSameAsOrg) {
-          this.disableBillingForm();
-        }
-        if (this.profileMode) {
-          this.disableForms();
-        }
-      });
-    actions$
-      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetOrganizationLogoSucceeded))
-      .subscribe((logo: { payload: Blob }) => {
-        this.logo = logo.payload;
-      });
+    super();
+
+    this.checkFeatureFlag();
+
+    this.startGetOrgByIdActionWatching();
+    this.startGetOrgLogoActionWatching();
 
     if (route.snapshot.paramMap.get('profile')) {
-      this.profileMode = true;
-      store.dispatch(new SetHeaderState({ iconName: 'user', title: 'Organization Profile' }));
-      const user = this.store.selectSnapshot(UserState.user);
-      store.dispatch(new GetOrganizationById(user?.businessUnitId as number));
-      store.dispatch(new GetOrganizationLogo(user?.businessUnitId as number));
+      this.orgProfileActions();
     } else {
-      store.dispatch(new SetHeaderState({ iconName: 'file-text', title: 'Organization List' }));
-      store.dispatch(new GetBusinessUnitList());
-      store.dispatch(new GetDBConnections());
+      this.orgListActions();
+
       if (route.snapshot.paramMap.get('organizationId')) {
         this.title = 'Edit';
         const businessUnitId = parseInt(route.snapshot.paramMap.get('organizationId') as string);
@@ -159,13 +148,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
       }
     }
     if (!this.profileMode) {
-      actions$
-        .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveOrganizationSucceeded))
-        .subscribe((organization: { payload: Organization }) => {
-          this.currentBusinessUnitId = organization.payload.organizationId as number;
-          this.uploadImages(this.currentBusinessUnitId);
-          this.navigateBack();
-        });
+      this.startSaveOrgActionWatching();
     }
   }
 
@@ -179,9 +162,9 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     this.subscribeOnUser();
   }
 
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+  override ngOnDestroy(): void {
+    super.ngOnDestroy();
+
     this.user = null;
   }
 
@@ -193,6 +176,8 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   }
 
   public save(): void {
+    this.removeUnnecessaryControls();
+
     if (
       this.CreateUnderFormGroup.valid &&
       (this.GeneralInformationFormGroup.disabled || this.GeneralInformationFormGroup.valid) &&
@@ -251,23 +236,8 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     } else {
       this.isEditTitle.push(false);
     }
-    return this.fb.group({
-      id: new FormControl(contact ? contact.id : 0),
-      title: new FormControl(contact ? contact.title : ''),
-      contactPerson: new FormControl(contact ? contact.contactPerson : '', [
-        Validators.required,
-        Validators.maxLength(100),
-      ]),
-      phoneNumberExt: new FormControl(contact ? contact.phoneNumberExt : '', [
-        Validators.minLength(10),
-        Validators.pattern(/^[0-9]+$/),
-      ]),
-      email: new FormControl(contact ? contact.email : '', [
-        Validators.email,
-        Validators.maxLength(100),
-        Validators.pattern(/^\S+@\S+\.\S+$/),
-      ]),
-    });
+
+    return this.addEditOrganizationService.createContactForm(contact);
   }
 
   private createContactForm(): void {
@@ -286,19 +256,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   private copyGeneralToBilling(): void {
     // Populate billing states dropdown with correct data
     this.store.dispatch(new SetBillingStatesByCountry(this.GeneralInformationFormGroup.controls['country'].value));
-    this.BillingDetailsFormGroup.setValue({
-      id: this.BillingDetailsFormGroup.controls['id'].value,
-      name: this.GeneralInformationFormGroup.controls['name'].value,
-      address: this.GeneralInformationFormGroup.controls['addressLine1'].value,
-      country: this.GeneralInformationFormGroup.controls['country'].value,
-      state: this.GeneralInformationFormGroup.controls['state'].value,
-      city: this.GeneralInformationFormGroup.controls['city'].value,
-      zipCode: this.GeneralInformationFormGroup.controls['zipCode'].value,
-      phone1: this.GeneralInformationFormGroup.controls['phone1Ext'].value,
-      phone2: this.GeneralInformationFormGroup.controls['phone2Ext'].value,
-      fax: this.GeneralInformationFormGroup.controls['fax'].value,
-      ext: '',
-    });
+    this.addEditOrganizationService.populateBillingForm(this.BillingDetailsFormGroup, this.GeneralInformationFormGroup);
   }
 
   private enableBillingForm(): void {
@@ -371,6 +329,22 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     }
   }
 
+  public checkIPRFormControl({ checked }: { checked: boolean }): void {
+    if (!this.isAddMode && this.PreferencesFormGroup.get('vms')?.value && checked) {
+      this.confirmService.confirm(SHOULD_LOC_DEP_INCLUDE_IRP, {
+        title: 'Confirm',
+        okButtonLabel: 'YES',
+        cancelButtonLabel: 'NO',
+        okButtonClass: ''
+      }).pipe(
+        take(1),
+        takeUntil(this.componentDestroy())
+      ).subscribe((value: boolean) => {
+        this.PreferencesFormGroup.get('irp')?.setValue(value);
+      });
+    }
+  }
+
   private initForms(organization?: Organization): void {
     let businessUnitId: string | number = '';
     if (organization?.createUnder?.parentUnitId) {
@@ -388,78 +362,12 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     this.CreateUnderFormGroup.valueChanges.subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.CreateUnderFormGroup.dirty));
     });
-    this.GeneralInformationFormGroup = this.fb.group({
-      id: new FormControl(organization ? organization.generalInformation.id : 0),
-      name: new FormControl(organization ? organization.generalInformation.name : '', [Validators.required]),
-      organizationType: new FormControl(organization ? organization.generalInformation.organizationType : ''),
-      externalId: new FormControl(organization ? organization.generalInformation.externalId : ''),
-      taxId: new FormControl(organization ? organization.generalInformation.taxId : '', [
-        Validators.required,
-        Validators.minLength(9),
-        Validators.pattern(ALPHANUMERIC),
-      ]),
-      organizationPrefix: new FormControl(
-        {
-          value: organization ? organization.generalInformation.organizationPrefix : '',
-          disabled: this.user?.businessUnitType === BusinessUnitType.Organization || organization?.isOrganizationUsed,
-        },
-        [Validators.required, Validators.maxLength(3), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)]
-      ),
-      addressLine1: new FormControl(organization ? organization.generalInformation.addressLine1 : '', [
-        Validators.required,
-      ]),
-      addressLine2: new FormControl(organization ? organization.generalInformation.addressLine2 : ''),
-      country: new FormControl(organization ? organization.generalInformation.country : 0, [Validators.required]),
-      state: new FormControl(organization ? organization.generalInformation.state : '', [Validators.required]),
-      city: new FormControl(organization ? organization.generalInformation.city : '', [Validators.required]),
-      zipCode: new FormControl(organization ? organization.generalInformation.zipCode : '', [
-        Validators.minLength(5),
-        Validators.pattern(/^[0-9]+$/),
-      ]),
-      phone1Ext: new FormControl(organization ? organization.generalInformation.phone1Ext : '', [
-        Validators.minLength(10),
-        Validators.pattern(/^[0-9]+$/),
-      ]),
-      phone2Ext: new FormControl(organization ? organization.generalInformation.phone2Ext : '', [
-        Validators.minLength(10),
-        Validators.pattern(/^[0-9]+$/),
-      ]),
-      fax: new FormControl(organization ? organization.generalInformation.fax : '', [
-        Validators.minLength(10),
-        Validators.pattern(/^[0-9]+$/),
-      ]),
-      status: new FormControl(organization ? organization.generalInformation.status : 0, [Validators.required]),
-      website: new FormControl(organization ? organization.generalInformation.website : ''),
-    });
-    this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+    this.GeneralInformationFormGroup = this.addEditOrganizationService.createGeneralInfoGroup(organization, this.user);
+    this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500), takeUntil(this.componentDestroy())).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.GeneralInformationFormGroup.dirty));
     });
-    this.BillingDetailsFormGroup = this.fb.group({
-      id: new FormControl(organization ? organization.billingDetails.id : 0),
-      name: new FormControl(organization ? organization.billingDetails.name : '', [Validators.required]),
-      address: new FormControl(organization ? organization.billingDetails.address : ''),
-      country: new FormControl(organization ? organization.billingDetails.country : 0, [Validators.required]),
-      state: new FormControl(organization ? organization.billingDetails.state : '', [Validators.required]),
-      city: new FormControl(organization ? organization.billingDetails.city : '', [Validators.required]),
-      zipCode: new FormControl(organization ? organization.billingDetails.zipCode : '', [
-        Validators.minLength(5),
-        Validators.pattern(/^[0-9]+$/),
-      ]),
-      phone1: new FormControl(organization ? organization.billingDetails.phone1 : '', [
-        Validators.minLength(10),
-        Validators.pattern(/^[0-9]+$/),
-      ]),
-      phone2: new FormControl(organization ? organization.billingDetails.phone2 : '', [
-        Validators.minLength(10),
-        Validators.pattern(/^[0-9]+$/),
-      ]),
-      fax: new FormControl(organization ? organization.billingDetails.fax : '', [
-        Validators.minLength(10),
-        Validators.pattern(/^[0-9]+$/),
-      ]),
-      ext: new FormControl(organization ? organization.billingDetails.ext : ''),
-    });
-    this.BillingDetailsFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+    this.BillingDetailsFormGroup = this.addEditOrganizationService.createBillingDetailForm(organization);
+    this.BillingDetailsFormGroup.valueChanges.pipe(debounceTime(500), takeUntil(this.componentDestroy())).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.BillingDetailsFormGroup.dirty));
     });
     if (organization) {
@@ -471,21 +379,13 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
         contacts: new FormArray([this.newContactFormGroup()]),
       });
     }
-    this.ContactFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+    this.ContactFormGroup.valueChanges.pipe(debounceTime(500), takeUntil(this.componentDestroy())).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.ContactFormGroup.dirty));
     });
     this.ContactFormArray = this.ContactFormGroup.get('contacts') as FormArray;
-    this.PreferencesFormGroup = this.fb.group({
-      id: new FormControl(organization ? organization.preferences.id : 0),
-      weekStartsOn: new FormControl(organization ? organization.preferences.weekStartsOn : '', [Validators.required]),
-      paymentOptions: new FormControl(organization ? organization.preferences.paymentOptions.toString() : '0', [
-        Validators.required,
-      ]),
-      paymentDescription: new FormControl(organization ? organization.preferences.paymentDescription : '', [
-        Validators.required,
-      ]),
-    });
-    this.PreferencesFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+    this.PreferencesFormGroup = this.addEditOrganizationService.createPreferencesForm(organization);
+
+    this.PreferencesFormGroup.valueChanges.pipe(debounceTime(500), takeUntil(this.componentDestroy())).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.PreferencesFormGroup.dirty));
     });
     if (organization) {
@@ -501,7 +401,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   }
 
   private subscribeOnUser(): void {
-    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
+    this.user$.pipe(takeUntil(this.componentDestroy())).subscribe((user) => {
       this.user = user;
       this.showDataBaseControl = this.title === 'Add' && this.user?.businessUnitType === BusinessUnitType.Hallmark;
       this.updateDataBaseValidators();
@@ -511,6 +411,69 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   private updateDataBaseValidators(): void {
     if (this.showDataBaseControl) {
       this.dataBaseConnectionsFormGroup.get('connectionName')?.addValidators([Validators.required]);
+    }
+  }
+
+  private startGetOrgByIdActionWatching(): void {
+    this.actions$
+      .pipe(ofActionSuccessful(GetOrganizationByIdSucceeded), takeUntil(this.componentDestroy()))
+      .subscribe((organization: { payload: Organization }) => {
+        this.currentBusinessUnitId = organization.payload.organizationId as number;
+        this.initForms(organization.payload);
+        this.isSameAsOrg = organization.payload.billingDetails.sameAsOrganization;
+        if (this.isSameAsOrg) {
+          this.disableBillingForm();
+        }
+        if (this.profileMode) {
+          this.disableForms();
+        }
+      });
+  }
+
+  private startGetOrgLogoActionWatching(): void {
+    this.actions$
+      .pipe(ofActionSuccessful(GetOrganizationLogoSucceeded), takeUntil(this.componentDestroy()))
+      .subscribe((logo: { payload: Blob }) => {
+        this.logo = logo.payload;
+      });
+  }
+
+  private orgProfileActions(): void {
+    this.profileMode = true;
+    this.store.dispatch(new SetHeaderState({ iconName: 'user', title: 'Organization Profile' }));
+    const user = this.store.selectSnapshot(UserState.user);
+    this.store.dispatch(new GetOrganizationById(user?.businessUnitId as number));
+    this.store.dispatch(new GetOrganizationLogo(user?.businessUnitId as number));
+  }
+
+  private orgListActions(): void {
+    this.store.dispatch(new SetHeaderState({ iconName: 'file-text', title: 'Organization List' }));
+    this.store.dispatch(new GetBusinessUnitList());
+    this.store.dispatch(new GetDBConnections());
+  }
+
+  private startSaveOrgActionWatching(): void {
+    this.actions$
+      .pipe(ofActionSuccessful(SaveOrganizationSucceeded), takeUntil(this.componentDestroy()))
+      .subscribe((organization: { payload: Organization }) => {
+        this.currentBusinessUnitId = organization.payload.organizationId as number;
+        this.uploadImages(this.currentBusinessUnitId);
+        this.navigateBack();
+      });
+  }
+
+  private checkFeatureFlag(): void {
+    this.featureFlagApiService.checkFeatureFlag('IRP').pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe((flag: boolean) => {
+      this.isIRPFlagEnabled = flag;
+    });
+  }
+
+  private removeUnnecessaryControls(): void {
+    if (!this.isIRPFlagEnabled) {
+      this.PreferencesFormGroup.removeControl('irp');
+      this.PreferencesFormGroup.removeControl('vms');
     }
   }
 }

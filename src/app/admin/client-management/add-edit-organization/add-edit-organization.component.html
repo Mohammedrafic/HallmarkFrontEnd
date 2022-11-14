@@ -473,6 +473,20 @@
       </div>
       <div class="e-card-content">
         <form *ngIf="PreferencesFormGroup" [formGroup]="PreferencesFormGroup" id="preferancesDetails">
+          <div *ngIf="isIRPFlagEnabled" class="bootstrap system-wrapper">
+            <label class="label-gray">System Configuration (at least one system should be selected)<span class="required">*</span></label>
+            <div class="checkbox-group">
+              <ejs-checkbox
+                formControlName="irp"
+                label="IRP"
+                (change)="checkIPRFormControl($event)"
+              ></ejs-checkbox>
+              <ejs-checkbox
+                formControlName="vms"
+                label="VMS"
+              ></ejs-checkbox>
+            </div>
+          </div>
           <div class="dropdown-container bootstrap">
             <label>Week Starts On<span class="required">*</span></label>
             <div class="input-group dropdown">
