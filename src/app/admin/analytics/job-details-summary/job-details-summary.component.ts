@@ -101,7 +101,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
+  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'id' };
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedDepartments: Department[];
   selectedSkillCategories: SkillCategoryDto[];
@@ -372,7 +372,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
 
     this.paramsData =
     {
-      "OrganizationParamJDSR": this.selectedOrganizations?.map((list) => list.organizationId),
+      "OrganizationParamJDSR": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
       "StartDateParamJDSR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamJDSR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "RegionParamJDSR": regionIds?.join(","),
@@ -380,10 +380,10 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       "DepartmentParamJDSR": departmentIds?.join(","),
       "SkillCategoryParamJDSR": skillCategoryIds?.length>0? skillCategoryIds?.join(","):'null',
       "SkillParamJDSR": skillIds?.length>0? skillIds?.join(","):"null",
-      "CandidateNameJDSR": candidateName == null ? 'null' : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName)[0],
+      "CandidateNameJDSR": candidateName == null||candidateName=="" ? 'null' : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName)[0],
       "CandidateStatusJDSR": candidateStatuses?.length > 0 ? candidateStatuses.join(",") : 'null',
       "JobStatusJDSR": jobStatuses?.length > 0 ? jobStatuses.join(",") : 'null',
-      "JobIdJDSR": (jobId != null && jobId.length > 0) ? jobId : 'null',
+      "JobIdJDSR": jobId == null || jobId=="" ?  'null':jobId,
       "AgencysJDSR": agencyIds?.length > 0 ? agencyIds.join(",") : 'null',
       "BearerParamJDSR": auth,
       "BusinessUnitIdParamJDSR": businessIds,
@@ -457,7 +457,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
         valueType: ValueType.Text,
         dataSource: [],
         valueField: 'statusText',
-        valueId: 'status',
+        valueId: 'id',
       },
       jobId: {
         type: ControlTypes.Text,
