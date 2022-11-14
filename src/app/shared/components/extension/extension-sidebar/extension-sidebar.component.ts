@@ -1,13 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import {
-  extensionDurationPrimary,
-  extensionDurationSecondary,
-} from '@shared/components/extension/extension-sidebar/config';
+import { extensionDurationPrimary, extensionDurationSecondary } from '@shared/components/extension/extension-sidebar/config';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Duration } from '@shared/enums/durations';
-import { combineLatest, distinctUntilChanged, filter } from 'rxjs';
-import isEqual from 'lodash/fp/isEqual';
+import { combineLatest, filter, startWith } from 'rxjs';
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
 import isNil from 'lodash/fp/isNil';
 import { addDays } from '@shared/utils/date-time.utils';
@@ -42,14 +38,15 @@ export class ExtensionSidebarComponent implements OnInit {
 
   public minDate: Date;
   public extensionForm: FormGroup;
-  public comments: Comment[] = [];
+  public comments: Comment[] = []
+  public startDate: Date;
 
-  get billRateControl(): FormControl {
+  private get billRateControl(): FormControl {
     return this.extensionForm?.get('billRate') as FormControl;
   }
 
   public constructor(
-    public formBuilder: FormBuilder,
+    private formBuilder: FormBuilder,
     private extensionSidebarService: ExtensionSidebarService,
     private store: Store,
     private billRatesSyncService: BillRatesSyncService
@@ -60,33 +57,11 @@ export class ExtensionSidebarComponent implements OnInit {
     this.initExtensionForm();
     this.listenPrimaryDuration();
     this.listenDurationChanges();
+    this.listenStartEndDatesChanges();
     this.subsToBillRateControlChange();
   }
 
-  subsToBillRateControlChange(): void {
-    this.billRateControl.valueChanges.subscribe((value) => {
-      if (!this.billRatesComponent?.billRatesControl.value) {
-        return;
-      }
-
-      const billRates = this.billRatesComponent?.billRatesControl.value;
-      let billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(billRates);
-
-      if (!billRateToUpdate) {
-        return;
-      }
-
-      const restBillRates = this.billRatesComponent?.billRatesControl.value.filter(
-        (billRate: BillRate) => billRate.id !== billRateToUpdate?.id
-      );
-
-      billRateToUpdate.rateHour = value || '0.00';
-
-      this.billRatesComponent.billRatesControl.patchValue([billRateToUpdate, ...restBillRates]);
-    });
-  }
-
-  hourlyRateToOrderSync(event: { value: string; billRate?: BillRate }): void {
+  public hourlyRateToOrderSync(event: { value: string; billRate?: BillRate }): void {
     const { value, billRate } = event;
     if (!value) {
       return;
@@ -124,13 +99,36 @@ export class ExtensionSidebarComponent implements OnInit {
       });
   }
 
+  private subsToBillRateControlChange(): void {
+    this.billRateControl.valueChanges.subscribe((value) => {
+      if (!this.billRatesComponent?.billRatesControl.value) {
+        return;
+      }
+
+      const billRates = this.billRatesComponent?.billRatesControl.value;
+      let billRateToUpdate: BillRate | null = this.billRatesSyncService.getBillRateForSync(billRates);
+
+      if (!billRateToUpdate) {
+        return;
+      }
+
+      const restBillRates = this.billRatesComponent?.billRatesControl.value.filter(
+        (billRate: BillRate) => billRate.id !== billRateToUpdate?.id
+      );
+
+      billRateToUpdate.rateHour = value || '0.00';
+
+      this.billRatesComponent.billRatesControl.patchValue([billRateToUpdate, ...restBillRates]);
+    });
+  }
+
   private initExtensionForm(): void {
     const { actualEndDate, candidateBillRate } = this.candidateJob || {};
     this.extensionForm = this.formBuilder.group({
       durationPrimary: [Duration.Other],
       durationSecondary: [],
       durationTertiary: [],
-      startDate: [addDays(actualEndDate, 1)],
+      startDate: [addDays(actualEndDate, 1), [Validators.required]],
       endDate: ['', [Validators.required]],
       billRate: [candidateBillRate, [Validators.required]],
       comments: [null],
@@ -143,10 +141,12 @@ export class ExtensionSidebarComponent implements OnInit {
       const durationTertiary = this.extensionForm.get('durationTertiary');
 
       if (duration === Duration.Other) {
-        durationSecondary?.enable();
-        durationTertiary?.enable();
+        durationSecondary?.enable({emitEvent: false});
+        durationTertiary?.enable({emitEvent: false});
         durationSecondary?.reset();
         durationTertiary?.reset();
+        this.extensionForm.get('startDate')?.markAsPristine();
+        this.extensionForm.get('endDate')?.markAsPristine();
       } else {
         durationSecondary?.disable();
         durationTertiary?.disable();
@@ -163,12 +163,29 @@ export class ExtensionSidebarComponent implements OnInit {
     combineLatest([durationSecondary$, durationTertiary$])
       .pipe(
         filter(([durationSecondary$, durationTertiary$]) => !isNil(durationSecondary$) && !isNil(durationTertiary$)),
-        distinctUntilChanged((previous: number[], current: number[]) => isEqual(previous, current))
       )
       .subscribe(([durationSecondary, durationTertiary]: number[]) => {
         const { value: startDate } = this.extensionForm.get('startDate')!;
         const endDate = this.extensionSidebarService.getEndDate(startDate, durationSecondary, durationTertiary);
         this.extensionForm.patchValue({ endDate });
+      });
+  }
+
+  private listenStartEndDatesChanges(): void {
+    const startDateControl = this.extensionForm.get('startDate');
+    const endDateControl = this.extensionForm.get('endDate');
+
+    combineLatest([
+      startDateControl?.valueChanges.pipe(startWith(null))!,
+      endDateControl?.valueChanges.pipe(startWith(null))!
+    ])
+      .pipe(filter(() => startDateControl?.dirty! || endDateControl?.dirty!))
+      .subscribe(([startDate, endDate]) => {
+        this.startDate = startDate;
+        if (startDate > endDate) {
+          this.extensionForm.get('endDate')?.setErrors({incorrect: true});
+        }
+        this.extensionForm.get('durationPrimary')?.setValue(Duration.Other);
       });
   }
 }

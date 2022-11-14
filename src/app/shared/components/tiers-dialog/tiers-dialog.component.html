@@ -1,0 +1,70 @@
+<app-side-dialog
+  (formCancelClicked)="closeDialog()"
+  (formSaveClicked)="saveTiers()"
+  header="{{ title }}"
+>
+  <div class="form" *ngIf="tierForm">
+    <form [formGroup]="tierForm" class="tier-form-dialog bootstrap">
+      <ng-container *ngFor="let field of dialogConfig?.fields; trackBy:trackByIndex">
+        <ng-container [ngSwitch]="field.type">
+
+          <ng-template [ngSwitchCase]="FieldTypes.Input">
+            <div class="input-container">
+              <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+              </label>
+              <div class="input-group">
+                <input
+                  class="e-input"
+                  [name]="field.field"
+                  appValidateWithMessage
+                  [formControlName]="field.field"
+                />
+              </div>
+            </div>
+          </ng-template>
+
+          <ng-template [ngSwitchCase]="FieldTypes.Number">
+            <div class="input-container">
+              <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+              </label>
+              <div class="input-group">
+                <ejs-numerictextbox
+                  class="numeric-input"
+                  appValidateWithMessage
+                  min="0"
+                  format="0"
+                  id="numOfHours"
+                  [formControlName]="field.field"
+                  [showSpinButton]="false"
+                >
+                </ejs-numerictextbox>
+              </div>
+            </div>
+          </ng-template>
+
+          <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
+            <div class="input-container">
+              <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+              </label>
+              <div class="input-group">
+                <ejs-multiselect
+                  appValidateWithMessage
+                  selectAllText="Select All"
+                  mode="CheckBox"
+                  [dataSource]="field.dataSource"
+                  [fields]="optionFields"
+                  [showSelectAll]="true"
+                  [allowFiltering]="false"
+                  [showDropDownIcon]="true"
+                  [formControlName]="field.field"
+                >
+                </ejs-multiselect>
+              </div>
+            </div>
+          </ng-template>
+
+        </ng-container>
+      </ng-container>
+    </form>
+  </div>
+</app-side-dialog>

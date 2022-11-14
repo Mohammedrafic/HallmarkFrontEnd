@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AddEditUserComponent } from 'src/app/security/user-list/add-edit-user/add-edit-user.component';
-import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, UNIT_FIELDS, DISABLED_GROUP } from './user-list.constants';
+import { BUSSINES_DATA_FIELDS, UNIT_FIELDS, DISABLED_GROUP } from './user-list.constants';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { SecurityState } from '../store/security.state';
 import { filter, map, Observable, Subject, takeWhile } from 'rxjs';
@@ -24,6 +24,7 @@ import { take } from 'rxjs/operators';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserGridComponent } from './user-grid/user-grid.component';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 
 const DEFAULT_DIALOG_TITLE = 'Add User';
 const EDIT_DIALOG_TITLE = 'Edit User';

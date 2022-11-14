@@ -514,7 +514,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.formControlType === OrganizationSettingControlType.Multiselect ||
       this.formControlType === OrganizationSettingControlType.Select
     ) {
-      this.dropdownDataSource = data.valueOptions;
+      this.dropdownDataSource = data.valueOptions.sort((a: any, b: any) => a.value?.localeCompare(b.value));
     }
 
     this.organizationSettingsFormGroup.setValue({
@@ -565,7 +565,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
     if (this.formControlType === OrganizationSettingControlType.InvoiceAutoGeneration) {
       const valueOptions = this.isParentEdit ? parentData.value : childData.value;
-      dynamicValue = { ...JSON.parse(valueOptions), isInvoice: true };
+      dynamicValue = { ...valueOptions, isInvoice: true };
     }
 
     // TODO: run outside zone

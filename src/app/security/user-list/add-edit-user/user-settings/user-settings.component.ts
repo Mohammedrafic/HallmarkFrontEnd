@@ -19,6 +19,7 @@ import { RolesPerUser } from '@shared/models/user-managment-page.model';
 import { SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { AgencyStatus } from '@shared/enums/status';
+import { COUNTRIES } from '@shared/constants/countries-list';
 
 @Component({
   selector: 'app-user-settings',
@@ -54,10 +55,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
     text: 'name',
     value: 'id',
   };
-  public countries = [
-    { id: Country.USA, text: Country[0] },
-    { id: Country.Canada, text: Country[1] },
-  ];
+  public countries = COUNTRIES;
 
   get businessUnitControl(): AbstractControl | null {
     return this.form.get('businessUnitType');
