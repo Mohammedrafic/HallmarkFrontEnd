@@ -52,6 +52,7 @@ import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { DashboartFilterDto } from '../models/dashboard-filter-dto.model';
 import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
 import { DateTimeHelper } from '@core/helpers';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable()
 export class DashboardService {
@@ -413,6 +414,6 @@ export class DashboardService {
   }
 
   public getAllSkills(): Observable<AllOrganizationsSkill[]> {
-    return this.httpClient.get<AllOrganizationsSkill[]>(`/api/AssignedSkills/forOrganizations`);
+    return this.httpClient.get<AllOrganizationsSkill[]>(`/api/AssignedSkills/forOrganizations`).pipe(map((data) => sortByField(data, 'skillDescription')));
   }
 }
