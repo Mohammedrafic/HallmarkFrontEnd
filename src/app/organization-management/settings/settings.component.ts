@@ -566,7 +566,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
     if (this.formControlType === OrganizationSettingControlType.InvoiceAutoGeneration) {
       const valueOptions = this.isParentEdit ? parentData.value : childData.value;
-      dynamicValue = { ...JSON.parse(valueOptions), isInvoice: true };
+      dynamicValue = { ...valueOptions, isInvoice: true };
     }
 
     // TODO: run outside zone
