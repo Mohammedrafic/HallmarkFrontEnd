@@ -1,0 +1,25 @@
+<section class="tiers">
+  <div class="toolbar">
+    <div class="title">
+      <h3>Tiers</h3>
+    </div>
+    <div class="btn-container">
+      <button
+        ejs-button
+        id="addDepartmentButton"
+        [isPrimary]="true"
+        (click)="addTier()"
+      >Add New Tier</button>
+    </div>
+  </div>
+  <div class="grid-container">
+    <app-tiers-grid (editTier)="handleEditTier($event)"></app-tiers-grid>
+  </div>
+</section>
+
+<app-tiers-dialog
+  [regionsStructure]="regionsStructure"
+  [selectedTier]="selectedTier"
+  [isEditDialog]="isEdit"
+  (saveTier)="handleSaveTier($event)"
+></app-tiers-dialog>
