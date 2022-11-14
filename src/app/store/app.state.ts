@@ -13,7 +13,8 @@ import {
   SetIsOrganizationAgencyArea,
   GetAlertsForCurrentUser,
   CheckScreen,
-  ShouldDisableUserDropDown
+  ShouldDisableUserDropDown,
+  SetIrpFlag
 } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
@@ -33,7 +34,8 @@ export interface AppStateModel {
   isMobileScreen: boolean;
   isTabletScreen: boolean;
   isDekstopScreen: boolean;
-  shouldDisableUserDropDown:boolean;
+  shouldDisableUserDropDown: boolean;
+  isIrpEnabled: boolean;
 }
 
 @State<AppStateModel>({
@@ -53,11 +55,17 @@ export interface AppStateModel {
     isMobileScreen: false,
     isTabletScreen: false,
     isDekstopScreen: false,
-    shouldDisableUserDropDown:false
+    shouldDisableUserDropDown:false,
+    isIrpEnabled: false,
   },
 })
 @Injectable()
 export class AppState {
+  constructor(
+    private userService: UserService,
+    private breakpointObserver: BreakpointObserver
+    ) {}
+
   @Selector()
   static isMobile(state: AppStateModel): boolean { return state.isMobile; }
 
@@ -91,13 +99,13 @@ export class AppState {
   @Selector()
   static isDekstopScreen(state: AppStateModel): boolean { return state.isDekstopScreen; }
 
-  constructor(
-    private userService: UserService,
-    private breakpointObserver: BreakpointObserver
-    ) {}
   @Selector()
   static shouldDisableUserDropDown(state: AppStateModel): boolean { return state.shouldDisableUserDropDown; }
-
+  
+  @Selector()
+  static isIrpFlagEnabled(state: AppStateModel): boolean {
+    return state.isIrpEnabled;
+  }
 
   @Action(ToggleMobileView)
   ToggleMobileView({ patchState }: StateContext<AppStateModel>, { payload }: ToggleMobileView): void {
@@ -159,5 +167,15 @@ export class AppState {
   @Action(ShouldDisableUserDropDown)
   ShouldDisableUserDropDown({ patchState }: StateContext<AppStateModel>, { payload }: ShouldDisableUserDropDown): void {
     patchState({ shouldDisableUserDropDown: payload });
+  }
+
+  @Action(SetIrpFlag)
+  SetIrpFlag(
+    { patchState }: StateContext<AppStateModel>,
+    { irpEnabled }: SetIrpFlag,
+  ): void {
+    patchState({
+      isIrpEnabled: irpEnabled,
+    });
   }
 }
