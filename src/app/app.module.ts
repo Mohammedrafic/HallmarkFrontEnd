@@ -3,7 +3,7 @@ import { Spinnermodule } from './core/components/spinner/spinner.module';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgxsModule, Store } from '@ngxs/store';
+import { NgxsModule } from '@ngxs/store';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
 import { NgxMaskModule } from 'ngx-mask';
