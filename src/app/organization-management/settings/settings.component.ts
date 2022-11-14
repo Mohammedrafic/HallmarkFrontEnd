@@ -454,7 +454,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
           groupingBy: this.invoiceGeneratingFormGroup.controls['groupingBy'].value,
 
-          time: this.invoiceGeneratingFormGroup.controls['time'].value,
+          time: this.invoiceGeneratingFormGroup.controls['time'].value.toISOString(),
         };
         dynamicValue = JSON.stringify(invoiceAutoGeneration);
         break;
