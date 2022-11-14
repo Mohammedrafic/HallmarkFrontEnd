@@ -1,9 +1,9 @@
 import { LoadingInterceptor } from './core/interceptors/spinner.interceptor';
 import { Spinnermodule } from './core/components/spinner/spinner.module';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgxsModule } from '@ngxs/store';
+import { NgxsModule, Store } from '@ngxs/store';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
 import { NgxMaskModule } from 'ngx-mask';
@@ -24,6 +24,7 @@ import { RejectReasonState } from '@organization-management/store/reject-reason.
 import { Overlay } from '@angular/cdk/overlay';
 import { ContactusState } from './store/contact-us.state';
 import { PreservedFiltersState } from './store/preserved-filters.state';
+import { FeatureFlagService, featureFlagProviderFactory } from '@core/services/feature-flag';
 
 @NgModule({
   declarations: [AppComponent],
@@ -39,7 +40,8 @@ import { PreservedFiltersState } from './store/preserved-filters.state';
       disabled: environment.production,
     }),
     // In case you don't have Redux DevTools uncomment import below.
-    // NgxsLoggerPluginModule.forRoot({
+    // NgxsLoggerPluginModule.forRoot({import { HttpClient } from '@angular/common/http';
+
     //   disabled: environment.production,
     // }),
     NgxMaskModule.forRoot(),
@@ -63,6 +65,12 @@ import { PreservedFiltersState } from './store/preserved-filters.state';
       multi: true,
     },
     Overlay,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: featureFlagProviderFactory,
+      deps: [FeatureFlagService],
+      multi: true,
+    }
   ],
   bootstrap: [AppComponent, MsalRedirectComponent],
 })
