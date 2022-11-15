@@ -1,0 +1,112 @@
+@import "../../styles/variables/colors";
+
+.flex-column {
+  height: auto;
+
+  .toolbar {
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-bottom: 10px;
+    display: flex;
+
+    .toolbar-header {
+      float: left;
+      position: relative;
+
+      .toolbar-header-div {
+        font-size: 14px;
+        height: 40px;
+        font-weight: bold;
+      }
+    }
+
+    .toolbar-message {
+      .toolbar-message-div {
+        padding-left: 20px;
+        font-size: 14px;
+        height: 40px;
+      }
+
+      position: relative;
+      float: left;
+    }
+
+    .toolbar-buttons {
+      float: right;
+      position: relative;
+      z-index: 99;
+
+      .button-filter {
+        margin-left: 12px;
+        margin-right: 6px;
+      }
+    }
+  }
+}
+
+.invoice-report-section {
+  display: flex;
+  height: 65%;
+  padding-top: 20px !important;
+}
+
+.form-line {
+  display: flex;
+  align-items: flex-end;
+  padding-top: 10px;
+
+  &:not(:last-child) {
+    margin-bottom: 10px;
+  }
+
+  > *:not(:first-child) {
+    box-sizing: border-box;
+    padding-left: 10px;
+  }
+}
+
+.form-line-item-20 {
+  width: 20%;
+}
+
+.form-line-item-25 {
+  width: 25%;
+}
+
+.form-line-item-30 {
+  width: 30%;
+}
+
+.form-line-item-40 {
+  width: 40%;
+}
+
+.form-line-item-50 {
+  width: 50%;
+}
+
+.form-line-item-60 {
+  width: 60%;
+}
+
+.filter-form-dialog {
+  .form-elemet {
+    margin-bottom: 20px;
+  }
+}
+
+.form-container {
+  padding-top: 5px;
+
+  .group {
+    display: flex;
+
+    .input-container:first-child {
+      padding-right: 13px;
+    }
+
+    .input-container {
+      width: 100%;
+    }
+  }
+}

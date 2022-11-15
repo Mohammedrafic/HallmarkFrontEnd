@@ -101,7 +101,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
+  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'id' };
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedDepartments: Department[];
   selectedSkillCategories: SkillCategoryDto[];
@@ -238,42 +238,44 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     });
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (!this.isClearAll) {
-        let orgList = this.organizations?.filter((x) => data == x.organizationId);
-        this.selectedOrganizations = orgList;
-        this.regionsList = [];
-        this.locationsList = [];
-        this.departmentsList = [];
-        orgList.forEach((value) => {
-          this.regionsList.push(...value.regions);
-          value.regions.forEach((region) => {
-            this.locationsList.push(...region.locations);
-            region.locations.forEach((location) => {
-              this.departmentsList.push(...location.departments);
+      if (data != null) {
+        if (!this.isClearAll) {
+          let orgList = this.organizations?.filter((x) => data == x.organizationId);
+          this.selectedOrganizations = orgList;
+          this.regionsList = [];
+          this.locationsList = [];
+          this.departmentsList = [];
+          orgList.forEach((value) => {
+            this.regionsList.push(...value.regions);
+            value.regions.forEach((region) => {
+              this.locationsList.push(...region.locations);
+              region.locations.forEach((location) => {
+                this.departmentsList.push(...location.departments);
+              });
             });
           });
-        });
-        if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-          this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          }
+          else {
+            this.isLoadNewFilter = true;
+          }
+          let businessIdData = [];
+          businessIdData.push(data);
+          let filter: CommonReportFilter = {
+            businessUnitIds: businessIdData
+          };
+          this.store.dispatch(new GetCommonReportFilterOptions(filter));
+          this.regions = this.regionsList;
+          this.filterColumns.regionIds.dataSource = this.regions;
+          this.defaultRegions = this.regionsList.map((list) => list.id);
+          this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+          this.changeDetectorRef.detectChanges();
         }
         else {
-          this.isLoadNewFilter = true;
+          this.isClearAll = false;
+          this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
         }
-        let businessIdData = [];
-        businessIdData.push(data);
-        let filter: CommonReportFilter = {
-          businessUnitIds: businessIdData
-        };
-        this.store.dispatch(new GetCommonReportFilterOptions(filter));
-        this.regions = this.regionsList;
-        this.filterColumns.regionIds.dataSource = this.regions;
-        this.defaultRegions = this.regionsList.map((list) => list.id);
-        this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
-        this.changeDetectorRef.detectChanges();
-      }
-      else {
-        this.isClearAll = false;
-        this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       }
     });
     this.regionIdControl = this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
@@ -361,7 +363,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     let { businessIds, candidateName, candidateStatuses, departmentIds, jobId, jobStatuses, locationIds,
       regionIds, skillCategoryIds,agencyIds, skillIds, startDate, endDate } = this.jobDetailSummaryReportForm.getRawValue();
       if (!this.jobDetailSummaryReportForm.dirty) {
-        this.message = "Default filter selected with all regions ,locations and departments.";
+        this.message = "Default filter selected with all regions ,locations and departments for last and next 30 days.";
       }
       else {
         this.isLoadNewFilter = false;
@@ -370,7 +372,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
 
     this.paramsData =
     {
-      "OrganizationParamJDSR": this.selectedOrganizations?.map((list) => list.organizationId),
+      "OrganizationParamJDSR": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
       "StartDateParamJDSR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamJDSR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "RegionParamJDSR": regionIds?.join(","),
@@ -378,10 +380,10 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       "DepartmentParamJDSR": departmentIds?.join(","),
       "SkillCategoryParamJDSR": skillCategoryIds?.length>0? skillCategoryIds?.join(","):'null',
       "SkillParamJDSR": skillIds?.length>0? skillIds?.join(","):"null",
-      "CandidateNameJDSR": candidateName == null ? 'null' : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
+      "CandidateNameJDSR": candidateName == null||candidateName=="" ? 'null' : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName)[0],
       "CandidateStatusJDSR": candidateStatuses?.length > 0 ? candidateStatuses.join(",") : 'null',
       "JobStatusJDSR": jobStatuses?.length > 0 ? jobStatuses.join(",") : 'null',
-      "JobIdJDSR": (jobId != null && jobId.length > 0) ? jobId : 'null',
+      "JobIdJDSR": jobId == null || jobId=="" ?  'null':jobId,
       "AgencysJDSR": agencyIds?.length > 0 ? agencyIds.join(",") : 'null',
       "BearerParamJDSR": auth,
       "BusinessUnitIdParamJDSR": businessIds,
@@ -455,7 +457,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
         valueType: ValueType.Text,
         dataSource: [],
         valueField: 'statusText',
-        valueId: 'status',
+        valueId: 'id',
       },
       jobId: {
         type: ControlTypes.Text,
