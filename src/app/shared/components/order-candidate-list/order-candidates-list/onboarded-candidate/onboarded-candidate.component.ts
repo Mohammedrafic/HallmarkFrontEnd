@@ -64,6 +64,7 @@ import { GetOrderPermissions } from 'src/app/store/user.actions';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { hasEditOrderBillRatesPermission } from '../../order-candidate-list.utils';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -307,6 +308,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   public onStartDateChange(event: ChangedEventArgs): void {
     const actualStartDate = new Date(event.value!);
     const actualEndDate = this.durationService.getEndDate(this.orderDuration, actualStartDate);
+
     this.form.patchValue({
       endDate: actualEndDate,
     });
@@ -385,42 +387,50 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private patchForm(): void {
-    this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
-      this.candidateJob = value;
-      if (value) {
-        this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
-        this.getComments();
-        if (!this.isAgency) {
-          this.getOrderPermissions(value.orderId);
+    this.candidateJobState$
+      .pipe(
+        takeUntil(this.unsubscribe$)
+      ).subscribe((value) => {
+        this.candidateJob = value;
+
+        if (value) {
+          this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
+          this.getComments();
+          if (!this.isAgency) {
+            this.getOrderPermissions(value.orderId);
+          }
+          this.billRatesData = [...value?.billRates];
+          console.log(value.order.jobStartDate.toString())
+          this.form.patchValue({
+            jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
+            date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
+              DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString())],
+            billRates: PriceUtils.formatNumbers(value.order.hourlyRate),
+            candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
+            candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
+            locationName: value.order.locationName,
+            avStartDate: this.getDateString(value.availableStartDate),
+            yearExp: value.yearsOfExperience,
+            travelExp: value.expAsTravelers,
+            comments: value.requestComment,
+            workWeek: value.guaranteedWorkWeek ? value.guaranteedWorkWeek : '',
+            clockId: value.clockId ? value.clockId : '',
+            offeredBillRate: value.offeredBillRate ? PriceUtils.formatNumbers(value.offeredBillRate) : null,
+            allow: value.allowDeployCredentials,
+            startDate: value.actualStartDate ? DateTimeHelper.convertDateToUtc(value.actualStartDate)
+            : DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
+            endDate: value.actualEndDate ? DateTimeHelper.convertDateToUtc(value.actualEndDate) 
+            : DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString()),
+            rejectReason: value.rejectReason,
+            offeredStartDate: this.getDateString(value.offeredStartDate),
+            jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
+            penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
+            rate: value.jobCancellation?.rate,
+            hours: value.jobCancellation?.hours,
+          });
+          this.switchFormState();
         }
-        this.billRatesData = [...value?.billRates];
-        this.form.patchValue({
-          jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-          date: [value.order.jobStartDate, value.order.jobEndDate],
-          billRates: PriceUtils.formatNumbers(value.order.hourlyRate),
-          candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
-          candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
-          locationName: value.order.locationName,
-          avStartDate: this.getDateString(value.availableStartDate),
-          yearExp: value.yearsOfExperience,
-          travelExp: value.expAsTravelers,
-          comments: value.requestComment,
-          workWeek: value.guaranteedWorkWeek ? value.guaranteedWorkWeek : '',
-          clockId: value.clockId ? value.clockId : '',
-          offeredBillRate: value.offeredBillRate ? PriceUtils.formatNumbers(value.offeredBillRate) : null,
-          allow: value.allowDeployCredentials,
-          startDate: value.actualStartDate ? value.actualStartDate : value.order.jobStartDate,
-          endDate: value.actualEndDate ? value.actualEndDate : value.order.jobEndDate,
-          rejectReason: value.rejectReason,
-          offeredStartDate: this.getDateString(value.offeredStartDate),
-          jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
-          penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
-          rate: value.jobCancellation?.rate,
-          hours: value.jobCancellation?.hours,
-        });
-        this.switchFormState();
-      }
-      this.changeDetectorRef.markForCheck();
+        this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -439,7 +449,9 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
       )
       .subscribe(() => {
         const value = this.form.getRawValue();
-        this.form.patchValue({ date: [value.startDate, value.endDate] });
+        this.form.patchValue({ date: [
+          DateTimeHelper.convertDateToUtc(value.startDate),
+          DateTimeHelper.convertDateToUtc(value.endDate)]});
       });
   }
 
