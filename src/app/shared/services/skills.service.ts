@@ -34,7 +34,7 @@ export class SkillsService {
    * @return list of master skills
    */
   public getAllMasterSkillsArray(): Observable<ListOfSkills[]> {
-    return this.http.get<ListOfSkills[]>('/api/MasterSkills/listByActiveBusinessUnit');
+    return this.http.get<ListOfSkills[]>('/api/MasterSkills/listByActiveBusinessUnit').pipe(map((data) => sortByField(data, 'name')));
   }
 
   /**

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import {
   Agency,
@@ -10,6 +10,7 @@ import {
   AgencyRegionSkills,
 } from 'src/app/shared/models/agency.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { sortBy } from '@shared/helpers/sort-array.helper';
 
 @Injectable({
   providedIn: 'root',
@@ -79,7 +80,9 @@ export class AgencyService {
   }
 
   public getAgencyFilteringOptions(): Observable<AgencyFilteringOptions> {
-    return this.http.get<AgencyFilteringOptions>(`/api/Agency/filteringOptions`);
+    return this.http
+      .get<AgencyFilteringOptions>(`/api/Agency/filteringOptions`)
+      .pipe(map((data) => Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortBy(value)]))));
   }
 
   /**

@@ -21,6 +21,7 @@ import { InvoiceMetaAdapter, InvoicesAdapter, ManualInvoiceAdapter } from '../..
 import { ManualInvoiceStrategy, ManualInvoiceStrategyMap } from '../../helpers/manual-invoice-strategy';
 import { Attachment } from '@shared/components/attachments';
 import { CustomFilesPropModel } from '@shared/components/file-uploader/custom-files-prop-model.interface';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-manual-invoice-dialog',
@@ -266,7 +267,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     }) as OrganizationRegion;
 
     const locations = InvoiceMetaAdapter.createLocationsOptions(candidateRegion?.locations || [] as OrganizationLocation[]);
-    this.dropDownOptions.invoiceLocations = locations;
+    this.dropDownOptions.invoiceLocations = sortByField(locations, 'text');
     this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
     if (this.postionSearch) {
       this.form?.get('locationId')?.patchValue(this.postionSearch.locationId);
@@ -316,7 +317,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     const locations: OrganizationLocation[] = this.store.snapshot().invoices.organizationLocations;
     const deps = locations.find((location) => location.id === id)?.departments as OrganizationDepartment[];
 
-    this.dropDownOptions.invoiceDepartments = InvoiceMetaAdapter.createDepartmentsOptions(deps);
+    this.dropDownOptions.invoiceDepartments = sortByField(InvoiceMetaAdapter.createDepartmentsOptions(deps), 'text');
     this.updateOptions();
   }
 
