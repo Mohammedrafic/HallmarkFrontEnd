@@ -142,7 +142,7 @@ export class SkillsService {
    * Get Assigned skills data sources for filter dropdown
    * @return list of skill descriptions, abbrs, GL numbers
    */
- public getSkillsDataSources(): Observable<SkillDataSource> {
+  public getSkillsDataSources(): Observable<SkillDataSource> {
     return this.http
       .get<SkillDataSource>(`/api/AssignedSkills/getAvailableData`)
       .pipe(map((data) => Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortBy(value)]))));
@@ -161,6 +161,12 @@ export class SkillsService {
    * @return list of master skills filtering options
    */
   public getMasterSkillsDataSources(): Observable<MasterSkillDataSources> {
-    return this.http.get<MasterSkillDataSources>(`/api/masterSkills/filteringOptions`);
+    return this.http.get<MasterSkillDataSources>(`/api/masterSkills/filteringOptions`).pipe(
+      map((data) => ({
+        skillCategories: sortByField(data.skillCategories, 'name'),
+        skillAbbreviations: sortBy(data.skillAbbreviations),
+        skillDescriptions: sortBy(data.skillDescriptions),
+      }))
+    );
   }
 }

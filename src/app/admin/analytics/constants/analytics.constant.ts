@@ -18,7 +18,7 @@ export const analyticsConstants = {
     AgencyIds:'agencyIds'
   }
 }
-export const accrualReportTypesList : { name: string; id: number }[] = [  
+export const accrualReportTypesList : { name: string; id: number }[] = [
+  { name: 'Invoice date range', id: 0 },
   { name: 'Timesheet date range', id: 1 },
-  { name: 'Invoice date range', id: 0 }
 ];
