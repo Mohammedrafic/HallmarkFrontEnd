@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { tap, distinctUntilChanged } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { filter, map, Observable, Subject, take, takeUntil, throttleTime, switchMap, merge, combineLatest } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -52,6 +52,7 @@ import { FieldType } from '@core/enums';
 import { DropdownOption } from '@core/interface';
 import { LocationsFormConfig, LocationsFormSource, LocationsSubFormConfig } from './locations.interface';
 import { LocationsTrackKey } from './locations.enum';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-locations',
@@ -125,6 +126,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   };
   public locationDialogConfig = LocationsDialogConfig;
   public readonly FieldTypes = FieldType;
+  public isIrpEnabled = false;
 
   private businessUnitId: number;
   private pageSubject = new Subject<number>();
@@ -143,6 +145,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   ) {
     super();
     this.createForms();
+    this.setIrpFlag();
   }
 
   ngOnInit(): void {
@@ -567,5 +570,10 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     .subscribe((isIrpOn) => {
 
     });
+  }
+
+  private setIrpFlag(): void {
+    this.isIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+    console.log(this.store.selectSnapshot(UserState.userPermission))
   }
 }
