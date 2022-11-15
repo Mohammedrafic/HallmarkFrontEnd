@@ -76,6 +76,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public activeTabIdx = 0;
+  public orgId: number | null = null;
   public appliedFiltersAmount = 0;
   public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
   public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
@@ -245,6 +246,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       filter(Boolean),
       distinctUntilChanged(),
       switchMap((organizationId: number) => {
+        this.orgId = organizationId;
         this.filterService.setPreservedFIltersTimesheets({ organizationIds: [organizationId] });
         return this.store.dispatch(
           [
@@ -268,7 +270,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     ).subscribe(res => {
       const preservedOrgIds = preservedFilters?.organizations || [];
       const orgId = this.filterService.canPreserveFilters() ? (preservedOrgIds[0] || this.getOrganizationIdFromState() || res[0].id) : (this.getOrganizationIdFromState() || res[0].id);
-
       this.store.dispatch(new Timesheets.SelectOrganization(orgId));
       this.organizationControl.setValue(orgId, { emitEvent: false });
       if (preservedFilters && this.filterService.canPreserveFilters()) {

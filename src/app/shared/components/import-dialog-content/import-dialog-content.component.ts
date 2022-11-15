@@ -15,7 +15,7 @@ import {
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ImportResult } from '@shared/models/import.model';
-import { UploaderFileStatus } from '@core/enums';
+import { FileSize, UploaderFileStatus } from '@core/enums';
 
 @Component({
   selector: 'app-import-dialog-content',
@@ -45,7 +45,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   public targetElement: HTMLElement = document.body;
   public dropElement: HTMLElement;
   public readonly allowedExtensions: string = '.xlsx';
-  public readonly maxFileSize = 10485760; // 10 mb
+  public readonly maxFileSize = FileSize.MB_10;
   public selectedFile: FileInfo | null;
   public firstActive = true;
 

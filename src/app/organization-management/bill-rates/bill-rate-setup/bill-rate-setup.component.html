@@ -151,6 +151,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -221,7 +222,7 @@
               [dataSource]="orgRegions"
               [fields]="fields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="regionIds"
             >
@@ -241,7 +242,7 @@
               [dataSource]="locations"
               [fields]="fields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="locationIds"
             >
@@ -263,7 +264,7 @@
               [dataSource]="departments"
               [fields]="fields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="departmentIds"
             >
@@ -282,7 +283,7 @@
               [dataSource]="skills$ | async"
               [fields]="skillsFields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="skillIds"
             >
@@ -298,6 +299,7 @@
             <ejs-dropdownlist
               id="billRatesTitle"
               appValidateWithMessage
+              [allowFiltering]="true"
               [dataSource]="billRatesOptions$ | async"
               [fields]="billRateTitleFields"
               formControlName="billRateTitleId"
@@ -317,7 +319,7 @@
               [dataSource]="orderTypes"
               [fields]="orderTypesFields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="orderTypeIds"
             >
@@ -346,6 +348,7 @@
             <ejs-dropdownlist
               id="billRatesTitle"
               appValidateWithMessage
+              [allowFiltering]="true"
               [dataSource]="billRateTypesOptions"
               [fields]="fields"
               formControlName="billRatesType"
@@ -580,7 +583,7 @@
               formControlName="skillIds"
               placeholder="All"
               [fields]="skillsFields"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               [dataSource]="filterColumns.skillIds.dataSource"
             >
@@ -596,7 +599,7 @@
             formControlName="orderTypes"
             placeholder="All"
             [fields]="orderTypesFields"
-            [allowFiltering]="false"
+            [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.orderTypes.dataSource"
           >
@@ -612,7 +615,7 @@
               formControlName="billRateCategories"
               placeholder="All"
               [fields]="orderTypesFields"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               [dataSource]="filterColumns.billRateCategories.dataSource"
             >
@@ -627,7 +630,7 @@
               formControlName="billRateTypes"
               placeholder="All"
               [fields]="orderTypesFields"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               [dataSource]="filterColumns.billRateTypes.dataSource"
             >
@@ -644,7 +647,7 @@
               formControlName="billRateConfigIds"
               placeholder="All"
               [fields]="billRateTitleFields"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               [dataSource]="filterColumns.billRateConfigIds.dataSource"
             >

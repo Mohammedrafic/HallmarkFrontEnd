@@ -6,3 +6,6 @@ export const filterOptionFields = {
   text: 'name',
   value: 'id'
 };
+
+export const ExcludeSpinnerUrls = ['financialtimesheet/candidatesearch','Alerts/GetAlertsForUser'];
+

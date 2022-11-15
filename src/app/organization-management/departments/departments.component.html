@@ -5,6 +5,7 @@
         id="regionsDropDown"
         class="region-dropdown"
         placeholder="Region"
+        [allowFiltering]="true"
         [dataSource]="regions$ | async"
         [fields]="regionFields"
         (change)="onRegionDropDownChanged($event)"
@@ -14,6 +15,7 @@
         id="locationsDropDown"
         class="location-dropdown"
         placeholder="Location"
+        [allowFiltering]="true"
         [enabled]="isLocationsDropDownEnabled"
         [dataSource]="locations$ | async"
         [fields]="locationFields"
@@ -28,7 +30,7 @@
         cssClass="e-outline button-filter"
         (click)="showFilters()">
         <div class="filter-button-content">
-          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle align-text">{{ filteredItems.length }}</span>
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill align-text">{{ filteredItems.length }}</span>
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
@@ -102,6 +104,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"

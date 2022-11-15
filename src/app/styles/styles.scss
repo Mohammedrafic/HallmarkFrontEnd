@@ -515,13 +515,22 @@ a, a:hover, a:focus, a:active {
 .filter-button-content {
   display: flex;
 
-  .e-badge.e-badge-circle.e-badge-success {
+  .e-badge.e-badge-circle.e-badge-success,
+  .e-badge.e-badge-pill.e-badge-success {
     margin-right: 8px;
     top: 0;
     padding-right: 1px;
 
     &.align-text {
       padding-right: 0;
+    }
+  }
+
+  .e-badge.e-badge-pill.e-badge-success {
+    padding-right: 4px;
+
+    &.align-text {
+      padding-right: 5px;
     }
   }
 }

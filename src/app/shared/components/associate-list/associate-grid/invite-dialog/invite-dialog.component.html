@@ -36,8 +36,9 @@
           <div class="input-group dropdown">
             <ejs-multiselect
               appValidateWithMessage
-              [formControl]="control"
               mode="CheckBox"
+              [formControl]="control"
+              [allowFiltering]="true"
               [fields]="optionFields"
               [dataSource]="associateAgencyOrg$ | async"
             ></ejs-multiselect>

@@ -11,7 +11,7 @@
         cssClass="e-outline button-filter"
         (click)="showFilters()">
         <div class="filter-button-content">
-          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredItems.length }}</span>
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
@@ -115,6 +115,7 @@
           </span>
           <span *ngIf="data.controlType === organizationSettingControlType.Text">{{data.value}}</span>
           <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{data.value | date: 'MM/dd/yyyy'}}</span>
+          <span *ngIf="data.controlType === organizationSettingControlType.InvoiceAutoGeneration">{{data.value.isEnabled ? 'Yes' : 'No'}}</span>
         </ng-template>
       </e-column>
     </e-columns>
@@ -126,6 +127,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -252,6 +254,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             id="region"
+            [allowFiltering]="true"
             [dataSource]="regions$ | async"
             [fields]="regionLocationFields"
             (select)="onRegionChange($event)"
@@ -269,6 +272,7 @@
           <ejs-dropdownlist
             id="regionRequired"
             appValidateWithMessage
+            [allowFiltering]="true"
             [dataSource]="regions$ | async"
             [fields]="regionLocationFields"
             (select)="onRegionChange($event)"
@@ -284,6 +288,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             id="location"
+            [allowFiltering]="true"
             [dataSource]="locations$ | async"
             [fields]="regionLocationFields"
             (select)="onLocationChange($event)"
@@ -300,6 +305,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             id="department"
+            [allowFiltering]="true"
             [dataSource]="departments$ | async"
             [fields]="departmentFields"
             (select)="onDepartmentChange($event)"
@@ -357,6 +363,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             appValidateWithMessage
+            [allowFiltering]="true"
             [dataSource]="daysOfWeek"
             [fields]="daysOfWeekFields"
             formControlName="dayOfWeek">
@@ -385,6 +392,7 @@
       <div class="input-group dropdown">
         <ejs-dropdownlist
           appValidateWithMessage
+          [allowFiltering]="true"
           [dataSource]="groupInvoicesOptions"
           [fields]="groupInvoicesFields"
           formControlName="groupingBy"
@@ -475,6 +483,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             id="dropdown"
+            [allowFiltering]="true"
             [dataSource]="dropdownDataSource"
             [fields]="dropdownFields"
             appValidateWithMessage
@@ -490,7 +499,7 @@
             id="dropdownMulti"
             mode="CheckBox"
             appValidateWithMessage
-            [allowFiltering]="false"
+            [allowFiltering]="true"
             [dataSource]="dropdownDataSource"
             [fields]="dropdownFields"
             selectAllText="All"

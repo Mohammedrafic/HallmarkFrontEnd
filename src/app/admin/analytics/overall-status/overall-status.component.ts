@@ -327,7 +327,6 @@ export class OverallStatusComponent implements OnInit ,OnDestroy{
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.overallStatusReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.overallStatusReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.overallStatusReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.overallStatusReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);

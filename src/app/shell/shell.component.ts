@@ -311,6 +311,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   @OutsideZone
   private getAlertsPoollingTime(): void {
     setInterval(() => {
+      this.store.dispatch(new GetAlertsForCurrentUser({}));
       this.alertStateModel$.subscribe((alertdata) => {
         this.alerts = alertdata;
       });

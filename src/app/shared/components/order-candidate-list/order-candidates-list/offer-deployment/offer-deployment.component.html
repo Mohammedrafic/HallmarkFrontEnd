@@ -21,6 +21,7 @@
                             [formControl]="statusesFormControl"
                             [disabled]="!actionsAllowed"
                             [itemTemplate]="itemTemplate"
+                            [allowFiltering]="true"
                             placeholder="Select Status"
                             (select)="updateCandidateJob($event)">
             <ng-template #itemTemplate let-data>
@@ -200,6 +201,7 @@
                           [dataSource]="nextApplicantStatuses"
                           [formControl]="statusesFormControl"
                           [itemTemplate]="itemTemplate"
+                          [allowFiltering]="true"
                           placeholder="Select Status"
                           (select)="updateCandidateJob($event)">
           <ng-template #itemTemplate let-data>

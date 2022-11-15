@@ -14,9 +14,10 @@ import { UserState } from 'src/app/store/user.state';
 import { GetBusinessByUnitType, GetPermissionsTree, SaveRole, SaveRoleSucceeded } from '../store/security.actions';
 import { SecurityState } from '../store/security.state';
 import { RoleFormComponent } from './role-form/role-form.component';
-import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, OPRION_FIELDS } from './roles-and-permissions.constants';
+import { BUSSINES_DATA_FIELDS, OPRION_FIELDS } from './roles-and-permissions.constants';
 import { RolesGridComponent } from './roles-grid/roles-grid.component';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 
 const DEFAULT_DIALOG_TITLE = 'Add Role';
 const EDIT_DIALOG_TITLE = 'Edit Role';

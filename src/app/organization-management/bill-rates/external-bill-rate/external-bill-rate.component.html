@@ -59,6 +59,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -134,6 +135,7 @@
             <ejs-dropdownlist
               id="billRatesTitle"
               appValidateWithMessage
+              [allowFiltering]="true"
               [dataSource]="billRatesOptions$ | async"
               [fields]="billRateTitleFields"
               formControlName="billRateTitleId">

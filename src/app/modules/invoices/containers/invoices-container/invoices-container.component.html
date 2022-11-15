@@ -12,6 +12,7 @@
         <ejs-dropdownlist
           *ngIf="organizations$ | async as organizations"
           placeholder="Select organization"
+          [allowFiltering]="true"
           [dataSource]="organizations"
           [fields]="unitOrganizationsFields"
           [formControl]="organizationControl">
@@ -24,7 +25,7 @@
       cssClass="e-outline button-filter button--no-wrap"
       (click)="showFilters()">
       <div class="filter-button-content">
-        <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-circle">{{ appliedFiltersAmount }}</span>
+        <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-pill align-text">{{ appliedFiltersAmount }}</span>
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
     </button>

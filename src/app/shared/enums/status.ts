@@ -2,9 +2,9 @@ import { TIMETHEETS_STATUSES } from '../../modules/timesheets/enums';
 import { INVOICES_STATUSES } from '../../modules/invoices/enums';
 
 export enum Status {
+  'Active',
   'In Progress',
   'Inactive',
-  'Active',
   'Suspended',
 }
 
@@ -64,6 +64,14 @@ export enum AgencyStatus {
   Terminated,
 }
 
+export const AgencyStatuses = [
+  { id: AgencyStatus.Active, text: 'Active' },
+  { id: AgencyStatus.Inactive, text: 'Inactive' },
+  { id: AgencyStatus.InProgress, text: 'In Progress' },
+  { id: AgencyStatus.Suspended, text: 'Suspended' },
+  { id: AgencyStatus.Terminated, text: 'Terminated' },
+]
+
 export enum CandidateStatus {
   Inactive,
   Active,
@@ -118,6 +126,6 @@ export enum CandidatesStatusText {
 }
 
 export const CandidateStatusOptions = [
-  { id: CandidateStatus.Inactive, name: 'Inactive' },
   { id: CandidateStatus.Active, name: 'Active' },
+  { id: CandidateStatus.Inactive, name: 'Inactive' },
 ];

@@ -38,7 +38,7 @@ import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from '@shared/models/order-management.model';
 import { Document } from '@shared/models/document.model';
 
-import { OrderType } from '@shared/enums/order-type';
+import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { Duration } from '@shared/enums/durations';
 import { JobDistribution } from '@shared/enums/job-distibution';
 import { JobClassification } from '@shared/enums/job-classification';
@@ -117,12 +117,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public locationIdControl: AbstractControl;
   public departmentIdControl: AbstractControl;
 
-  public orderTypes = [
-    { id: OrderType.ContractToPerm, name: 'Contract To Perm' },
-    { id: OrderType.OpenPerDiem, name: 'Open Per Diem' },
-    { id: OrderType.PermPlacement, name: 'Perm. Placement' },
-    { id: OrderType.Traveler, name: 'Traveler' },
-  ];
+  public orderTypes = OrderTypeOptions;
   public orderTypesDataSource: { id: number; name: string }[];
   public orderTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
 

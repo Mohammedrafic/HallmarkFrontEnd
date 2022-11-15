@@ -109,6 +109,14 @@ import { PenaltiesComponent } from './reasons/penalties/penalties.component';
 import { PenaltiesGridActionsRendererComponent } from './reasons/penalties/penalties-grid-actions-renderer/penalties-grid-actions-renderer.component';
 import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 import { LocationsService } from './locations/locations.service';
+import { TiersComponent } from './tiers/tiers.component';
+import { TiersGridComponent } from './tiers/tiers-grid/tiers-grid.component';
+import { GridActionRendererComponent } from './tiers/tiers-grid/grid-action-renderer/grid-action-renderer.component';
+import { TiersDialogModule } from '@shared/components/tiers-dialog/tiers-dialog.module';
+import { TIER_DIALOG_TYPE } from '@shared/components/tiers-dialog/constants';
+import { Tiers } from '@shared/enums/tiers.enum';
+import { TiersState } from '@organization-management/store/tiers.state';
+import { TiersApiService } from '@shared/services';
 
 const sidebarIcons = {
   Download,
@@ -172,7 +180,10 @@ const sidebarIcons = {
     ImportRegionsComponent,
     RegionsGridComponent,
     PenaltiesComponent,
-    PenaltiesGridActionsRendererComponent
+    PenaltiesGridActionsRendererComponent,
+    TiersComponent,
+    TiersGridComponent,
+    GridActionRendererComponent
   ],
   imports: [
     CommonModule,
@@ -208,6 +219,7 @@ const sidebarIcons = {
     AppGridModule,
     TooltipAllModule,
     TooltipContainerModule,
+    TiersDialogModule,
 
     FeatherModule.pick(sidebarIcons),
 
@@ -225,10 +237,21 @@ const sidebarIcons = {
       SpecialProjectMappingState,
       PurchaseOrderMappingState,
       BusinessLinesState,
+      TiersState
     ]),
     ImportDialogContentModule,
   ],
   exports: [BillRatesComponent],
-  providers: [ResizeService, PageService, LocationsService],
+  providers:
+    [
+      ResizeService,
+      PageService,
+      TiersApiService,
+      LocationsService,
+      {
+        provide: TIER_DIALOG_TYPE,
+        useValue: Tiers.tierSettings
+      }
+    ],
 })
 export class OrganizationManagementModule {}

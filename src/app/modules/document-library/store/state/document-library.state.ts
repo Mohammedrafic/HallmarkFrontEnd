@@ -1,3 +1,4 @@
+import { GetDocumentsByCognitiveSearch } from './../actions/document-library.actions';
 import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
@@ -369,6 +370,15 @@ export class DocumentLibraryState {
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetDocumentsByCognitiveSearch)
+  GetDocumentsByCognitiveSearch({ patchState }: StateContext<DocumentLibraryStateModel>, { keyword, businessUnitType, businessUnitId }: GetDocumentsByCognitiveSearch): Observable<DocumentsLibraryPage> {
+    return this.documentLibraryService.GetDocumentsByCognitiveSearch(keyword, businessUnitType, businessUnitId).pipe(
+      tap((payload) => {
+        patchState({ documentsPage: payload });
       })
     );
   }

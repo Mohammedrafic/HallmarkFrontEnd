@@ -322,7 +322,6 @@ export class OvertimeComponent implements OnInit ,OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.overtimeReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.overtimeReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.overtimeReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.overtimeReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
