@@ -389,7 +389,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private patchForm(): void {
     this.candidateJobState$
       .pipe(
-        takeUntil(this.unsubscribe$)
+        takeUntil(this.unsubscribe$),
       ).subscribe((value) => {
         this.candidateJob = value;
 
@@ -400,7 +400,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             this.getOrderPermissions(value.orderId);
           }
           this.billRatesData = [...value?.billRates];
-          console.log(value.order.jobStartDate.toString())
+
           this.form.patchValue({
             jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
             date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
@@ -435,7 +435,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private getDateString(date: string): string | null {
-    return this.datePipe.transform(date, 'MM/dd/yyyy');
+    return this.datePipe.transform(date, 'MM/dd/yyyy', 'utc');
   }
 
   private subscribeOnDate(): void {
