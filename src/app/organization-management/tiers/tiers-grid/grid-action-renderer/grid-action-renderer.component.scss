@@ -14,4 +14,11 @@
   .icon {
     color: $supportive-red;
   }
+
+  &[disabled] {
+    .icon {
+      color: $bill-rates-grid-hover-shadow !important;
+    }
+  }
 }
+

@@ -4,12 +4,17 @@
       <h3>Tiers</h3>
     </div>
     <div class="btn-container">
-      <button
-        ejs-button
-        id="addDepartmentButton"
-        [isPrimary]="true"
-        (click)="addTier()"
-      >Add New Tier</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditOrganizationTiers]">
+        <button
+          ejs-button
+          id="addDepartmentButton"
+          [disabled]="!userPermission[userPermissions.CanEditOrganizationTiers]"
+          [isPrimary]="true"
+          (click)="addTier()"
+        >Add New Tier</button>
+      </app-tooltip-container>
     </div>
   </div>
   <div class="grid-container">
@@ -22,4 +27,5 @@
   [selectedTier]="selectedTier"
   [isEditDialog]="isEdit"
   (saveTier)="handleSaveTier($event)"
+  [permission]="!userPermission[userPermissions.CanEditOrganizationTiers]"
 ></app-tiers-dialog>
