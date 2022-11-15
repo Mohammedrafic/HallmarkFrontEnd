@@ -7,3 +7,4 @@ export const TIME_SELECTION_OF_CHART_LINE = 'timeSelectionOfChartLine';
 export const IS_DARK_THEME = 'isDarkTheme';
 export const RECENT_SEARCH_MENU_HISTROY = 'recentHistory';
 export const CREDENTIALS_STORAGE_KEY = 'credentialsConfig';
+export const LogiReportJsLoaded='logiReportJsLoaded';

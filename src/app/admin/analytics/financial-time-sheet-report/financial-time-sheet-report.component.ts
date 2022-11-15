@@ -15,7 +15,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType, GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
@@ -61,7 +61,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.wls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.cat" };
-  public title: string = "Financial Time Sheet";
+  public title: string = "Financial Timesheet";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
@@ -166,6 +166,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
    
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+      this.store.dispatch(new ClearLogiReportState());
       this.financialTimeSheetFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {
           this.filterOptionsData = data;
@@ -347,7 +348,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     let {accrualReportTypes,businessIds,candidateName,candidateStatuses,departmentIds,jobId,jobStatuses,locationIds,orderTypes,
       regionIds,skillCategoryIds,skillIds,startDate, endDate } = this.financialTimesheetReportForm.getRawValue();
       if (!this.financialTimesheetReportForm.dirty) {
-        this.message = "Default filter selected with all regions ,locations and departments for 90 days";
+        this.message = "Default filter selected with all regions, locations and departments for 90 days";
       }
       else {
         this.isResetFilter = false;
