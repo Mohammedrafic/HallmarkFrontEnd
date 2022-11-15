@@ -46,7 +46,7 @@ export interface BillRatesStateModel {
   billRatesPage: BillRateSetupPage | null,
   externalBillRateTypePage: ExternalBillRateTypePage | null,
   externalBillRateMappingPage: ExternalBillRateMappingPage | null,
-  externalBillRateMapped: ExternalBillRateMapped | null,
+  externalBillRateMapped: ExternalBillRateMapped[],
   billRateOptions: BillRateOption[]
 }
 
@@ -56,7 +56,7 @@ export interface BillRatesStateModel {
     billRatesPage: null,
     externalBillRateTypePage: null,
     externalBillRateMappingPage: null,
-    externalBillRateMapped: null,
+    externalBillRateMapped: [],
     billRateOptions: []
   }
 })
@@ -73,7 +73,7 @@ export class BillRatesState {
   static externalBillRateMapping(state: BillRatesStateModel): ExternalBillRateMappingPage | null { return state.externalBillRateMappingPage; }
 
   @Selector()
-  static externalBillRateMapped(state: BillRatesStateModel): ExternalBillRateMapped | null { return state.externalBillRateMapped; }
+  static externalBillRateMapped(state: BillRatesStateModel): ExternalBillRateMapped[] { return state.externalBillRateMapped; }
 
   @Selector()
   static billRateOptions(state: BillRatesStateModel): any { return state.billRateOptions; }
@@ -105,7 +105,7 @@ export class BillRatesState {
   }
 
   @Action(GetExternalBillRateMappingById)
-  GetExternalBillRateMappingById({ patchState }: StateContext<BillRatesStateModel>, {id}: { id: number }): Observable<ExternalBillRateMapped> {
+  GetExternalBillRateMappingById({ patchState }: StateContext<BillRatesStateModel>, {id}: { id: number }): Observable<ExternalBillRateMapped[]> {
     return this.billRatesService.getExternalBillRateMappingById(id).pipe(tap((payload) => {
       patchState({ externalBillRateMapped: payload });
       return payload;

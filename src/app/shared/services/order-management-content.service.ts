@@ -34,6 +34,7 @@ import { DateTimeHelper } from '@core/helpers';
 import { orderFieldsConfig } from '@client/order-management/add-edit-order/order-fields';
 import { Penalty } from '@shared/models/penalty.model';
 import { JobCancellationReason } from '@shared/enums/candidate-cancellation';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -182,7 +183,7 @@ export class OrderManagementContentService {
   public getAvailableSteps(organizationId: number, jobId: number): Observable<ApplicantStatus[]> {
     return this.http.get<ApplicantStatus[]>(
       `/api/AppliedCandidates/availableSteps?OrganizationId=${organizationId}&JobId=${jobId}`
-    );
+    ).pipe(map((data) => sortByField(data, 'statusText')));
   }
 
   /**
@@ -381,7 +382,19 @@ export class OrderManagementContentService {
    * Get order filter data sources
    */
   public getOrderFilterDataSources(): Observable<OrderFilterDataSource> {
-    return this.http.get<OrderFilterDataSource>('/api/OrdersFilteringOptions/organization');
+    return this.http.get<OrderFilterDataSource>('/api/OrdersFilteringOptions/organization').pipe(
+      map((data) => {
+        const sortedFields: Record<keyof OrderFilterDataSource, string> = {
+          candidateStatuses: 'statusText',
+          orderStatuses: 'statusText',
+          partneredAgencies: 'name',
+          poNumbers: 'poNumber',
+          projectNames: 'projectName',
+          specialProjectCategories: 'projectType',
+        }
+          return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]))
+      }),
+    );
   }
 
   /**

@@ -565,6 +565,9 @@ export class OrderFilterDataSource {
   partneredAgencies: OrderPartnerAgency[];
   orderStatuses: FilterOrderStatus[];
   candidateStatuses: FilterStatus[];
+  poNumbers: { id: number; poNumber: string }[];
+  projectNames: { id: number; projectName: string }[];
+  specialProjectCategories: { id: number; projectType: string }[];
 }
 
 export type CandidateListEvent = {

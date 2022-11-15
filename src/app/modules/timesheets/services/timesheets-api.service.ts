@@ -13,6 +13,7 @@ import {
 import { CostCenterAdapter } from '../helpers';
 import { RecordsAdapter } from '../helpers';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable()
 export class TimesheetsApiService {
@@ -82,7 +83,10 @@ export class TimesheetsApiService {
     organizationId: number | null = null
   ): Observable<TimesheetsFilteringOptions> {
     return this.http.get<TimesheetsFilteringOptions>(
-      `/api/Timesheets/filteringOptions${organizationId ? `/${organizationId}` : ''}`);
+      `/api/Timesheets/filteringOptions${organizationId ? `/${organizationId}` : ''}`).pipe( map((data) => {
+        return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, 'name')]));
+      })
+    );
   }
 
   public getCandidateCostCenters(jobId: number, orgId: number, isAgency: boolean): Observable<DropdownOption[]>{
@@ -91,7 +95,7 @@ export class TimesheetsApiService {
 
     return this.http.get<CostCentersDto>(endpoint)
     .pipe(
-      map((res) => CostCenterAdapter(res)),
+      map((res) => sortByField(CostCenterAdapter(res), 'text')),
     );
   }
 
