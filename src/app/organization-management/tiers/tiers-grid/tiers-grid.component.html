@@ -1,0 +1,11 @@
+<app-grid
+  [columnDefinitions]="columnDefinitions"
+  [rowData]="(tiersPage$ | async)?.items"
+  (navigateToPageEmitter)="handleChangePage($event)"
+  (pageSizeChangeEmitter)="handleChangePageSize($event)"
+  [isLoading]="isLoading"
+  [pageSize]="filters.pageSize"
+  [currentPage]="filters.pageNumber"
+  [totalRecordsCount]="(tiersPage$ | async)?.totalCount || 0"
+  (gridReadyEmitter)="gridReady($event)"
+></app-grid>

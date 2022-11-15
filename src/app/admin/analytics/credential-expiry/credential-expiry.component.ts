@@ -26,7 +26,7 @@ import { analyticsConstants } from '../constants/analytics.constant';
 import { FilterService } from '@shared/services/filter.service';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
-import { AgencyDto, CommonReportFilterOptions } from '../models/common-report.model';
+import { AgencyDto, CandidateStatusDto, CommonReportFilterOptions } from '../models/common-report.model';
 
 @Component({
   selector: 'app-credential-expiry',
@@ -93,6 +93,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public locationIdControl: AbstractControl;
   public departmentIdControl: AbstractControl;
   public agencyIdControl: AbstractControl;
+  public candidateStatusesIdControl: AbstractControl;
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
@@ -100,7 +101,9 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public defaultOrganizations:number[] =[];
   public defaultRegions:(number|undefined)[] =[];
   public defaultLocations:(number|undefined)[]=[];
-  public defaultDepartments:(number|undefined)[]=[];
+  public defaultDepartments: (number | undefined)[] = [];
+  public defaultAgencys: (number | undefined)[] = [];
+  public defaultCandidateStatuses: (number | undefined)[] = [];
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
@@ -109,8 +112,9 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public filterOptionsData: CommonReportFilterOptions;
 
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
-  selectedAgencies: AgencyDto[];
+  selectedAgencies: AgencyDto[] = [];
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
+  selectedCandidateStatuses: CandidateStatusDto[] = [];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   constructor(private store: Store,
     private formBuilder: FormBuilder,
@@ -145,6 +149,8 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
           this.filterOptionsData = data;
           this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
           this.filterColumns.agencyIds.dataSource = data.agencies;
+          this.defaultCandidateStatuses = data.candidateStatuses.map((list) => list.status);
+          this.defaultAgencys = data.agencies.map((list) => list.agencyId);
         }
       });
       this.onFilterControlValueChangedHandler();
@@ -232,13 +238,21 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       }
     });
 
+    this.candidateStatusesIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses) as AbstractControl;
+    this.candidateStatusesIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (this.candidateStatusesIdControl.value.length > 0) {
+        let candidateStatusesData = this.filterOptionsData.candidateStatuses;
+        this.selectedCandidateStatuses = candidateStatusesData?.filter((object) => data?.includes(object.status));
+      }
+    });
+
     this.onOrganizationsChange();
     this.onRegionsChange();
     this.onLocationsChange();
   }
  
   public SearchReport(): void {
-    let auth="Bearer ";
+    let auth = "Bearer ";
     for(let x=0;x<window.localStorage.length;x++)
     { 
       if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
@@ -247,24 +261,24 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       }
     }
     let { startDate, endDate, candidateStatuses, jobId } = this.credentialExpiryForm.getRawValue();
+    
       this.paramsData =
       {
-        "OrganizationParamCREXP": this.selectedOrganizations?.map((list) => list.id).join(","),
+       "OrganizationParamCREXP": this.selectedOrganizations?.map((list) => list.id).join(","),
       "StartDateParamCREXP": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamCREXP": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "RegionParamCREXP": this.selectedRegions?.map((list) => list.id).join(","),
       "LocationParamCREXP": this.selectedLocations?.map((list) => list.id).join(","),
-       "DepartmentParamCREXP": this.selectedDepartments?.map((list) => list.departmentId).join(","),
-       "AgencyParamCREXP": this.selectedAgencies?.map((list) => list.agencyId).join(","),
-       "CandidateStatusCREXP": candidateStatuses.map((list: FieldSettingsModel) => list.text).join(","),
-       "JobIdCREXP": jobId,
+      "DepartmentParamCREXP": this.selectedDepartments?.map((list) => list.departmentId).join(","),
+      "AgencyParamCREXP": this.selectedAgencies.length ==0?"null":this.selectedAgencies?.map((list) => list.agencyId).join(","),
+      "CandidateStatusCREXP": this.selectedCandidateStatuses.length == 0 ? "null" : this.selectedCandidateStatuses?.map((list) => list.status).join(","),
+      "JobIdCREXP": jobId.trim() == "" ? "null" : jobId.trim(),
       "BearerParamCREXP":auth,
       "BusinessUnitIdParamCREXP":window.localStorage.getItem("lastSelectedOrganizationId") == null 
       ?this.organizations!=null &&this.organizations[0]?.id!=null?
       this.organizations[0].id.toString():"1": 
       window.localStorage.getItem("lastSelectedOrganizationId"),
         "HostName": this.baseUrl,
-        
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();

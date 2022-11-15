@@ -1,0 +1,17 @@
+@import "colors";
+
+.icon {
+  cursor: pointer;
+}
+
+.edit-button {
+  .icon {
+    color: $primary-active-blue-10;
+  }
+}
+
+.remove-button {
+  .icon {
+    color: $supportive-red;
+  }
+}

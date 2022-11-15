@@ -115,6 +115,7 @@
           </span>
           <span *ngIf="data.controlType === organizationSettingControlType.Text">{{data.value}}</span>
           <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{data.value | date: 'MM/dd/yyyy'}}</span>
+          <span *ngIf="data.controlType === organizationSettingControlType.InvoiceAutoGeneration">{{data.value.isEnabled ? 'Yes' : 'No'}}</span>
         </ng-template>
       </e-column>
     </e-columns>

@@ -20,5 +20,5 @@ export const analyticsConstants = {
 }
 export const accrualReportTypesList : { name: string; id: number }[] = [
   { name: 'Invoice date range', id: 0 },
-  { name: 'Timesheet date range', id: 1 },
+  { name: 'Timesheet date range', id: 1 }
 ];

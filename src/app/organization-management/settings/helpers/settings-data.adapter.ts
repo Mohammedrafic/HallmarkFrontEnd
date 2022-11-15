@@ -30,6 +30,10 @@ export class SettingsDataAdapter {
         }
       }
 
+      if (item.controlType === OrganizationSettingControlType.InvoiceAutoGeneration) {
+        item.value = JSON.parse(item.value);
+      }
+
       return item;
     });
   }

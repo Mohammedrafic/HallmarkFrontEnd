@@ -340,7 +340,6 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
       .subscribe((confirm) => {
         if (confirm && region.id ) {
           this.store.dispatch(new DeleteRegionById(region.id));
-          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
           this.regionFormGroup.reset();
         }
         this.removeActiveCssClass();
