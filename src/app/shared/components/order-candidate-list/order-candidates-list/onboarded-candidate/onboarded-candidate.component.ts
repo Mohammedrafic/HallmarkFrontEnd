@@ -435,7 +435,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private getDateString(date: string): string | null {
-    return this.datePipe.transform(date, 'MM/dd/yyyy', 'utc');
+    return this.datePipe.transform(date, 'MM/dd/yyyy');
   }
 
   private subscribeOnDate(): void {
