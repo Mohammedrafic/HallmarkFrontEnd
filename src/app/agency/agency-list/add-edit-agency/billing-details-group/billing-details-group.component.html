@@ -20,8 +20,9 @@
             <div class="input-group dropdown">
               <ejs-dropdownlist
                 appValidateWithMessage
-                [fields]="optionFields"
                 formControlName="country"
+                [fields]="optionFields"
+                [allowFiltering]="true"
                 [dataSource]="countries"
               ></ejs-dropdownlist>
             </div>
@@ -32,6 +33,7 @@
               <ejs-dropdownlist
                 appValidateWithMessage
                 formControlName="state"
+                [allowFiltering]="true"
                 [dataSource]="states$ | async"
               ></ejs-dropdownlist>
             </div>

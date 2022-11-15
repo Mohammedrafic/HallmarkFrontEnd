@@ -17,6 +17,7 @@ import { ReasonsComponent } from './reasons/reasons.component';
 import { RegionsComponent } from './regions/regions.component';
 import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
 import { BusinessLinesComponent } from './business-lines/business-lines.component';
+import { TiersComponent } from "@organization-management/tiers/tiers.component";
 
 const routes: Routes = [
   {
@@ -129,6 +130,13 @@ const routes: Routes = [
       {
         path: 'businesslines',
         component: BusinessLinesComponent,
+        data: {
+          isOrganizationArea: true
+        }
+      },
+      {
+        path: 'tiers',
+        component: TiersComponent,
         data: {
           isOrganizationArea: true
         }

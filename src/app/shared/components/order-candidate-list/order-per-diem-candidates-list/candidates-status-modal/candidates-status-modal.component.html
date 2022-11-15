@@ -18,6 +18,7 @@
           <div class="e-card-content button-container">
             <div class="input-group dropdown bootstrap" *ngIf="showDropdown">
               <ejs-dropdownlist
+                [allowFiltering]="true"
                 [fields]="optionFields"
                 [formControl]="statusesFormControl"
                 [dataSource]="nextApplicantStatuses"
@@ -126,8 +127,14 @@
     <ng-container *ngIf="showDropdown || showRejectButton || showWithdrawButton || showApplyButton || showAcceptButton">
       <div class="mobile-actions">
         <div class="input-group dropdown bootstrap" *ngIf="showDropdown">
-          <ejs-dropdownlist [fields]="optionFields" [formControl]="statusesFormControl" [dataSource]="nextApplicantStatuses"
-            placeholder="Select Status" (select)="onDropDownChanged($event)"></ejs-dropdownlist>
+          <ejs-dropdownlist
+            placeholder="Select Status"
+            [allowFiltering]="true"
+            [fields]="optionFields"
+            [formControl]="statusesFormControl"
+            [dataSource]="nextApplicantStatuses"
+            (select)="onDropDownChanged($event)"
+          ></ejs-dropdownlist>
         </div>
         <!--TODO: create and use ReadOnly Mode for it-->
         <button ejs-button cssClass="e-outline" [disabled]="!actionsAllowed"

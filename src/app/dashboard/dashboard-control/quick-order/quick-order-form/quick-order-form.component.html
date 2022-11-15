@@ -7,6 +7,7 @@
           <ejs-dropdownlist
             formControlName="organization"
             appValidateWithMessage
+            [allowFiltering]="true"
             [dataSource]="allOrganizations"
             [fields]="organizationTypeFields"
             (select)="onOrganizationDropDownSelected($event)"
@@ -22,6 +23,7 @@
           <ejs-dropdownlist
             formControlName="orderType"
             appValidateWithMessage
+            [allowFiltering]="true"
             [dataSource]="orderTypes"
             [fields]="orderTypeFields"
           >
@@ -61,6 +63,7 @@
                 <ejs-dropdownlist
                   formControlName="regionId"
                   appValidateWithMessage
+                  [allowFiltering]="true"
                   [enabled]="isRegionsDropDownEnabled"
                   [dataSource]="regionDataSource"
                   [fields]="regionFields"
@@ -77,6 +80,7 @@
                 <ejs-dropdownlist
                   formControlName="locationId"
                   appValidateWithMessage
+                  [allowFiltering]="true"
                   [enabled]="isLocationsDropDownEnabled"
                   [dataSource]="locationDataSource"
                   [fields]="locationFields"
@@ -93,6 +97,7 @@
                 <ejs-dropdownlist
                   formControlName="departmentId"
                   appValidateWithMessage
+                  [allowFiltering]="true"
                   [enabled]="isDepartmentsDropDownEnabled"
                   [dataSource]="departmentDataSource"
                   [fields]="departmentFields"
@@ -109,6 +114,7 @@
                 <ejs-dropdownlist
                   formControlName="skillId"
                   appValidateWithMessage
+                  [allowFiltering]="true"
                   [dataSource]="skillDataSource"
                   [fields]="skillFields"
                 >
@@ -163,6 +169,7 @@
                 <ejs-dropdownlist
                   formControlName="duration"
                   appValidateWithMessage
+                  [allowFiltering]="true"
                   [dataSource]="durations"
                   [fields]="durationFields"
                 >
@@ -292,6 +299,7 @@
                 <ejs-dropdownlist
                   formControlName="shift"
                   appValidateWithMessage
+                  [allowFiltering]="true"
                   [dataSource]="masterShiftNames"
                   [fields]="masterShiftFields"
                 >
@@ -354,7 +362,7 @@
                     appValidateWithMessage
                     [dataSource]="jobDistributions"
                     [fields]="jobDistributionFields"
-                    [allowFiltering]="false"
+                    [allowFiltering]="true"
                     [showDropDownIcon]="true"
                   >
                   </ejs-multiselect>
@@ -378,7 +386,7 @@
                     [dataSource]="associateAgencies$ | async"
                     [fields]="associateAgencyFields"
                     [showSelectAll]="true"
-                    [allowFiltering]="false"
+                    [allowFiltering]="true"
                     [showDropDownIcon]="true"
                   >
                   </ejs-multiselect>
@@ -394,6 +402,7 @@
                   <ejs-dropdownlist
                     formControlName="orderRequisitionReasonId"
                     appValidateWithMessage
+                    [allowFiltering]="true"
                     [dataSource]="(reasons$ | async)?.items"
                     [fields]="reasonForRequisitionFields"
                     (change)="onRequisitionChange($event)"
@@ -433,7 +442,12 @@
               <div *ngIf="!isEditContactTitle" class="input-container bootstrap">
                 <label>Title<span class="required">*</span></label>
                 <div class="input-group dropdown">
-                  <ejs-dropdownlist [dataSource]="contactDetailTitles" appValidateWithMessage formControlName="title">
+                  <ejs-dropdownlist
+                    formControlName="title"
+                    appValidateWithMessage
+                    [allowFiltering]="true"
+                    [dataSource]="contactDetailTitles"
+                  >
                   </ejs-dropdownlist>
                 </div>
               </div>
@@ -491,6 +505,7 @@
               <ejs-dropdownlist
                 formControlName="projectTypeId"
                 appValidateWithMessage
+                [allowFiltering]="true"
                 [dataSource]="(projectSpecialData$ | async)?.specialProjectCategories"
                 [fields]="specialProjectCategoriesFields"
               >
@@ -504,6 +519,7 @@
               <ejs-dropdownlist
                 formControlName="projectNameId"
                 appValidateWithMessage
+                [allowFiltering]="true"
                 [dataSource]="(projectSpecialData$ | async)?.projectNames"
                 [fields]="projectNameFields"
               >
@@ -517,6 +533,7 @@
               <ejs-dropdownlist
                 formControlName="poNumberId"
                 appValidateWithMessage
+                [allowFiltering]="true"
                 [dataSource]="(projectSpecialData$ | async)?.poNumbers"
                 [fields]="poNumberFields"
               >

@@ -5,6 +5,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist appHideBeforeSyncfusionLoad
                             formControlName="filterBusinessUnit"
+                            [allowFiltering]="true"
                             [fields]="unitFields"
                             [dataSource]="businessUnits"
                             placeholder="Business Unit"></ejs-dropdownlist>
@@ -14,11 +15,16 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist appHideBeforeSyncfusionLoad
                             formControlName="filterBusiness"
+                            [allowFiltering]="true"
                             [fields]="bussinesDataFields"
                             [dataSource]="bussinesUserData$ | async"
                             placeholder="Business"></ejs-dropdownlist>
         </div>
-      </div>
+      </div>      
+    </div>
+    <div>
+      <app-search #search class="search" placeholder="Search keyword" 
+        (inputKeyUpEnter)="doCognitiveSearch($event)"></app-search>
     </div>
   </ng-container>
   <ng-container right *ngIf="!isHalmarkSelected">
@@ -163,6 +169,7 @@
                 <div class="input-group dropdown">
                   <ejs-dropdownlist appValidateWithMessage
                                     formControlName="typeIds"
+                                    [allowFiltering]="true"
                                     [fields]="optionFields"
                                     [dataSource]="documentsTypes$ | async" tabindex="4"></ejs-dropdownlist>
                 </div>
@@ -189,6 +196,7 @@
                 <div class="input-group dropdown">
                   <ejs-dropdownlist formControlName="statusIds"
                                     appValidateWithMessage
+                                    [allowFiltering]="true"
                                     [dataSource]="statusItems"
                                     [fields]="statusFields"
                                     tabindex="6">

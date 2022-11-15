@@ -3,7 +3,7 @@
     <app-search [hidden]="isBillRateSetupTabActive" class="search" #search> </app-search>
     <button *ngIf="isBillRateSetupTabActive" ejs-button cssClass="e-outline button-filter" (click)="filter()">
       <div class="filter-button-content">
-        <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-circle align-text">{{
+        <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-pill align-text">{{
           filteredItems
         }}</span>
         Filters <i-feather name="sliders" class="icon"></i-feather>

@@ -42,26 +42,25 @@ import { analyticsConstants } from '../constants/analytics.constant';
 export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
 
   public paramsData: any = {
-    "OrganizationParamACCR": "",
-    "StartDateParamACCR": "",
-    "EndDateParamACCR": "",
-    "RegionParamACCR": "",
-    "LocationParamACCR": "",
-    "DepartmentParamACCR": "",
-    "SkillCategoryParamACCR": "",
-    "SkillParamACCR": "",
-    "CandidateNameACCR": "",
-    "CandidateStatusACCR": "",
-    "OrderTypeACCR": "",
-    "JobStatusACCR": "",
-    "JobIdACCR": "",
-    "BearerParamACCR": "",
-    "BusinessUnitIdParamACCR": "",
+    "OrganizationParamJDSR": "",
+    "StartDateParamJDSR": "",
+    "EndDateParamJDSR": "",
+    "RegionParamJDSR": "",
+    "LocationParamJDSR": "",
+    "DepartmentParamJDSR": "",
+    "SkillCategoryParamJDSR": "",
+    "SkillParamJDSR": "",
+    "CandidateNameJDSR": "",
+    "CandidateStatusJDSR": "",
+    "JobStatusJDSR": "",
+    "JobIdJDSR": "",
+    "AgencysJDSR":"",
+    "BearerParamJDSR": "",
+    "BusinessUnitIdParamJDSR": "",
     "HostName": "",
-    "AccrualReportFilterACCR": ""
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/ClientFinanceAccrualReport.cls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/Accrual.cat" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialReport/CredentialReport.wls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialReport/Credential.cat" };
   public title: string = "Job Detail Summary";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
@@ -102,7 +101,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
+  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'id' };
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedDepartments: Department[];
   selectedSkillCategories: SkillCategoryDto[];
@@ -148,6 +147,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   public user: User | null;
   public filterOptionsData: CommonReportFilterOptions;
   public candidateFilterData: { [key: number]: SearchCandidate; }[] = [];
+  public isLoadNewFilter: boolean = false;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -224,6 +224,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
+
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
 
@@ -237,39 +238,44 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     });
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (!this.isClearAll) {
-        let orgList = this.organizations?.filter((x) => data == x.organizationId);
-        this.selectedOrganizations = orgList;
-        this.regionsList = [];
-        this.locationsList = [];
-        this.departmentsList = [];
-        orgList.forEach((value) => {
-          this.regionsList.push(...value.regions);
-          value.regions.forEach((region) => {
-            this.locationsList.push(...region.locations);
-            region.locations.forEach((location) => {
-              this.departmentsList.push(...location.departments);
+      if (data != null) {
+        if (!this.isClearAll) {
+          let orgList = this.organizations?.filter((x) => data == x.organizationId);
+          this.selectedOrganizations = orgList;
+          this.regionsList = [];
+          this.locationsList = [];
+          this.departmentsList = [];
+          orgList.forEach((value) => {
+            this.regionsList.push(...value.regions);
+            value.regions.forEach((region) => {
+              this.locationsList.push(...region.locations);
+              region.locations.forEach((location) => {
+                this.departmentsList.push(...location.departments);
+              });
             });
           });
-        });
-        if ((data==null || data<=0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-          this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          }
+          else {
+            this.isLoadNewFilter = true;
+          }
+          let businessIdData = [];
+          businessIdData.push(data);
+          let filter: CommonReportFilter = {
+            businessUnitIds: businessIdData
+          };
+          this.store.dispatch(new GetCommonReportFilterOptions(filter));
+          this.regions = this.regionsList;
+          this.filterColumns.regionIds.dataSource = this.regions;
+          this.defaultRegions = this.regionsList.map((list) => list.id);
+          this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+          this.changeDetectorRef.detectChanges();
         }
-        let businessIdData = [];
-        businessIdData.push(data);
-        let filter: CommonReportFilter = {
-          businessUnitIds: businessIdData
-        };
-        this.store.dispatch(new GetCommonReportFilterOptions(filter));
-        this.regions = this.regionsList;
-        this.filterColumns.regionIds.dataSource = this.regions;
-        this.defaultRegions = this.regionsList.map((list) => list.id);
-        this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
-        this.changeDetectorRef.detectChanges();
-      }
-      else {
-        this.isClearAll = false;
-        this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+        else {
+          this.isClearAll = false;
+          this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
+        }
       }
     });
     this.regionIdControl = this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
@@ -343,6 +349,8 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
 
   }
 
+  
+
   public SearchReport(): void {
    
     this.filteredItems = [];
@@ -355,33 +363,31 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     let { businessIds, candidateName, candidateStatuses, departmentIds, jobId, jobStatuses, locationIds,
       regionIds, skillCategoryIds,agencyIds, skillIds, startDate, endDate } = this.jobDetailSummaryReportForm.getRawValue();
       if (!this.jobDetailSummaryReportForm.dirty) {
-        this.message = "Default filter selected with all regions ,locations and departments for last 30 and next 30 days";
+        this.message = "Default filter selected with all regions ,locations and departments for last and next 30 days.";
       }
       else {
+        this.isLoadNewFilter = false;
         this.message = ""
-      } 
+    }
+
     this.paramsData =
     {
-      "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.organizationId),
-      "StartDateParamACCR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateParamACCR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamACCR": regionIds,
-      "LocationParamACCR": locationIds,
-      "DepartmentParamACCR": departmentIds,
-      "SkillCategoryParamACCR": skillCategoryIds,
-      "SkillParamACCR": skillIds,
-      "CandidateNameACCR": candidateName == null ? '' : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName),
-      "CandidateStatusACCR": candidateStatuses,
-      "OrderTypeACCR": "",
-      "JobStatusACCR": jobStatuses,
-      "JobIdACCR": jobId,
-      "BearerParamACCR": auth,
-      "BusinessUnitIdParamACCR": window.localStorage.getItem("lastSelectedOrganizationId") == null
-        ? this.organizations != null && this.organizations[0]?.id != null ?
-          this.organizations[0].id.toString() : "1" :
-        window.localStorage.getItem("lastSelectedOrganizationId"),
+      "OrganizationParamJDSR": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "StartDateParamJDSR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "EndDateParamJDSR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "RegionParamJDSR": regionIds?.join(","),
+      "LocationParamJDSR": locationIds?.join(","),
+      "DepartmentParamJDSR": departmentIds?.join(","),
+      "SkillCategoryParamJDSR": skillCategoryIds?.length>0? skillCategoryIds?.join(","):'null',
+      "SkillParamJDSR": skillIds?.length>0? skillIds?.join(","):"null",
+      "CandidateNameJDSR": candidateName == null||candidateName=="" ? 'null' : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName)[0],
+      "CandidateStatusJDSR": candidateStatuses?.length > 0 ? candidateStatuses.join(",") : 'null',
+      "JobStatusJDSR": jobStatuses?.length > 0 ? jobStatuses.join(",") : 'null',
+      "JobIdJDSR": jobId == null || jobId=="" ?  'null':jobId,
+      "AgencysJDSR": agencyIds?.length > 0 ? agencyIds.join(",") : 'null',
+      "BearerParamJDSR": auth,
+      "BusinessUnitIdParamJDSR": businessIds,
       "HostName": this.baseUrl,
-      "AccrualReportFilterACCR": ""
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -451,7 +457,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
         valueType: ValueType.Text,
         dataSource: [],
         valueField: 'statusText',
-        valueId: 'status',
+        valueId: 'id',
       },
       jobId: {
         type: ControlTypes.Text,
@@ -477,7 +483,9 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   }
 
   public showFilters(): void {
-    this.onFilterControlValueChangedHandler();
+    if (this.isLoadNewFilter) {
+      this.onFilterControlValueChangedHandler();
+    }
     this.store.dispatch(new ShowFilterDialog(true));
   }
   public onFilterDelete(event: FilteredItem): void {

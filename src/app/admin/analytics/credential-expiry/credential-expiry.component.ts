@@ -26,6 +26,7 @@ import { analyticsConstants } from '../constants/analytics.constant';
 import { FilterService } from '@shared/services/filter.service';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
+import { AgencyDto, CandidateStatusDto, CommonReportFilterOptions } from '../models/common-report.model';
 
 @Component({
   selector: 'app-credential-expiry',
@@ -42,7 +43,10 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     "DepartmentParamCREXP": "",
     "BearerParamCREXP":"",
     "BusinessUnitIdParamCREXP":"",
-    "HostName":""
+    "HostName": "",
+    "AgencyParamCREXP": "",
+    "CandidateStatusCREXP": "",
+    "JobIdCREXP": "",
   };
   public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialExpiry/CredentialExpiry.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialExpiry/CredentialExpiry.cat" };
@@ -69,6 +73,9 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   @Select(LogiReportState.logiReportData)
   public logiReportData$: Observable<ConfigurationDto[]>;
 
+  @Select(LogiReportState.commonReportFilterData)
+  public CommonReportFilterData$: Observable<CommonReportFilterOptions>;
+
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
   private agencyOrganizationId:number;
@@ -85,6 +92,8 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public regionIdControl: AbstractControl;
   public locationIdControl: AbstractControl;
   public departmentIdControl: AbstractControl;
+  public agencyIdControl: AbstractControl;
+  public candidateStatusesIdControl: AbstractControl;
   public regions: Region[] = [];
   public locations: Location[] = [];
   public departments: Department[] = [];
@@ -92,12 +101,20 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
   public defaultOrganizations:number[] =[];
   public defaultRegions:(number|undefined)[] =[];
   public defaultLocations:(number|undefined)[]=[];
-  public defaultDepartments:(number|undefined)[]=[];
+  public defaultDepartments: (number | undefined)[] = [];
+  public defaultAgencys: (number | undefined)[] = [];
+  public defaultCandidateStatuses: (number | undefined)[] = [];
   public today = new Date();
   public filteredItems: FilteredItem[] = [];
   public isClearAll: boolean = false;
   public isInitialLoad: boolean = false;
-  public baseUrl:string;
+  public baseUrl: string;
+  public filterOptionsData: CommonReportFilterOptions;
+
+  agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
+  selectedAgencies: AgencyDto[] = [];
+  candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
+  selectedCandidateStatuses: CandidateStatusDto[] = [];
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   constructor(private store: Store,
     private formBuilder: FormBuilder,
@@ -114,7 +131,8 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
 
   ngOnInit(): void {
     
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => { 
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+   
       this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:ConfigurationDto[])=>{
         if(data.length>0)
@@ -125,6 +143,16 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       this.agencyOrganizationId=data;   
       this.isInitialLoad = true;
       this.orderFilterColumnsSetup();
+      
+      this.CommonReportFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
+        if (data != null) {
+          this.filterOptionsData = data;
+          this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
+          this.filterColumns.agencyIds.dataSource = data.agencies;
+          this.defaultCandidateStatuses = data.candidateStatuses.map((list) => list.status);
+          this.defaultAgencys = data.agencies.map((list) => list.agencyId);
+        }
+      });
       this.onFilterControlValueChangedHandler();
     });
   }
@@ -138,7 +166,10 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         endDate: new FormControl(new Date(Date.now()), [Validators.required]),
         regionIds: new FormControl([], [Validators.required]),
         locationIds: new FormControl([], [Validators.required]),
-        departmentIds: new FormControl([], [Validators.required])
+        departmentIds: new FormControl([], [Validators.required]),
+        agencyIds: new FormControl([]),
+        jobId: new FormControl(''),
+        candidateStatuses: new FormControl([]),
       }
     );
   }
@@ -198,13 +229,30 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         this.SearchReport();
       }
     });
+
+    this.agencyIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.AgencyIds) as AbstractControl;
+    this.agencyIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (this.agencyIdControl.value.length > 0) {
+        let agencyData = this.filterOptionsData.agencies;
+        this.selectedAgencies = agencyData?.filter((object) => data?.includes(object.agencyId));
+      }
+    });
+
+    this.candidateStatusesIdControl = this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses) as AbstractControl;
+    this.candidateStatusesIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (this.candidateStatusesIdControl.value.length > 0) {
+        let candidateStatusesData = this.filterOptionsData.candidateStatuses;
+        this.selectedCandidateStatuses = candidateStatusesData?.filter((object) => data?.includes(object.status));
+      }
+    });
+
     this.onOrganizationsChange();
     this.onRegionsChange();
     this.onLocationsChange();
   }
  
   public SearchReport(): void {
-    let auth="Bearer ";
+    let auth = "Bearer ";
     for(let x=0;x<window.localStorage.length;x++)
     { 
       if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
@@ -212,21 +260,25 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-      let { startDate, endDate } = this.credentialExpiryForm.getRawValue();
+    let { startDate, endDate, candidateStatuses, jobId } = this.credentialExpiryForm.getRawValue();
+    
       this.paramsData =
       {
-        "OrganizationParamCREXP": this.selectedOrganizations?.map((list) => list.id).join(","),
+       "OrganizationParamCREXP": this.selectedOrganizations?.map((list) => list.id).join(","),
       "StartDateParamCREXP": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamCREXP": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
       "RegionParamCREXP": this.selectedRegions?.map((list) => list.id).join(","),
       "LocationParamCREXP": this.selectedLocations?.map((list) => list.id).join(","),
       "DepartmentParamCREXP": this.selectedDepartments?.map((list) => list.departmentId).join(","),
+      "AgencyParamCREXP": this.selectedAgencies.length ==0?"null":this.selectedAgencies?.map((list) => list.agencyId).join(","),
+      "CandidateStatusCREXP": this.selectedCandidateStatuses.length == 0 ? "null" : this.selectedCandidateStatuses?.map((list) => list.status).join(","),
+      "JobIdCREXP": jobId.trim() == "" ? "null" : jobId.trim(),
       "BearerParamCREXP":auth,
       "BusinessUnitIdParamCREXP":window.localStorage.getItem("lastSelectedOrganizationId") == null 
       ?this.organizations!=null &&this.organizations[0]?.id!=null?
       this.organizations[0].id.toString():"1": 
       window.localStorage.getItem("lastSelectedOrganizationId"),
-      "HostName":this.baseUrl
+        "HostName": this.baseUrl,
       };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
@@ -262,7 +314,25 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
         valueId: 'departmentId',
       },
       startDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      endDate: { type: ControlTypes.Date, valueType: ValueType.Text }
+      endDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      agencyIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'agencyName',
+        valueId: 'agencyId',
+      },
+      jobId: {
+        type: ControlTypes.Text,
+        valueType: ValueType.Text
+      },
+      candidateStatuses: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Text,
+        dataSource: [],
+        valueField: 'statusText',
+        valueId: 'status',
+      },
     }
   }
   private SetReportData(){
@@ -328,6 +398,9 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.StartDate)?.setValue(startDate);
     this.credentialExpiryForm.get(analyticsConstants.formControlNames.EndDate)?.setValue(new Date(Date.now()));
+    this.credentialExpiryForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue([]);
+    this.credentialExpiryForm.get(analyticsConstants.formControlNames.CandidateStatuses)?.setValue([]);
+    this.credentialExpiryForm.get(analyticsConstants.formControlNames.JobId)?.setValue('');
     this.filteredItems = [];
   }
   public onFilterApply(): void {
@@ -335,7 +408,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
     if (this.credentialExpiryForm?.invalid) {
       return;
     }
-    this.filteredItems = this.filterService.generateChips(this.credentialExpiryForm, this.filterColumns);
+    this.filteredItems = [];
     this.SearchReport();
     this.store.dispatch(new ShowFilterDialog(false));
   }

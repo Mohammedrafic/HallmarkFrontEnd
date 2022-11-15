@@ -28,7 +28,7 @@ body.light, body.dark {
       border-top: 1px solid $secondary-dark-blue-40;
       padding: 15px;
       display: flex;
-      justify-content: end;
+      justify-content: flex-end;
       flex-direction: row-reverse;
 
       .ok-button {

@@ -42,6 +42,7 @@
               id="rowsPerPage"
               class="dropdown-no-border"
               [dataSource]="rowsPerPageDropDown"
+              [allowFiltering]="true"
               [(value)]="activeRowsPerPageDropDown"
               (change)="onRowsDropDownChanged()"
             >
@@ -148,7 +149,14 @@
       <div class="input-container">
         <label for="skillCategoryId">Skill Category <span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist name="skillCategoryId" [fields]="optionFields" appValidateWithMessage formControlName="skillCategoryId" [dataSource]="(allSkillsCategories$ | async)?.items"></ejs-dropdownlist>
+          <ejs-dropdownlist
+            appValidateWithMessage
+            name="skillCategoryId"
+            formControlName="skillCategoryId"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [dataSource]="(allSkillsCategories$ | async)?.items">
+          </ejs-dropdownlist>
         </div>
       </div>
     </div>

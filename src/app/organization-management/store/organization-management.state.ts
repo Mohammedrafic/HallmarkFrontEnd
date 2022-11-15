@@ -143,6 +143,7 @@ import {
   RECORD_ADDED,
   RECORD_ALREADY_EXISTS,
   RECORD_CANNOT_BE_DELETED,
+  RECORD_DELETE,
   RECORD_MODIFIED,
   RECORD_SAVED,
   usedByOrderErrorMessage,
@@ -675,8 +676,13 @@ export class OrganizationManagementState {
     return this.regionService.deleteRegionById(regionId).pipe(
       tap((payload) => {
         patchState({ isLocationLoading: false });
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
         dispatch(new GetRegions());
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error,
+          (error.error.errors != null && error.error.errors != undefined) ? 'Dependencies:'+error.error.errors.EntityInUse[0] : error.error.detail));
       })
     );
   }

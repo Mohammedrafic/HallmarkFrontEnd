@@ -15,6 +15,7 @@
       <div class="e-card-content button-container">
         <div class="input-group dropdown bootstrap input-readonly" *ngIf="!isRejected && !isCancelled">
           <ejs-dropdownlist
+            [allowFiltering]="true"
             [fields]="optionFields"
             [formControl]="jobStatusControl"
             [dataSource]="nextApplicantStatuses"
@@ -55,7 +56,11 @@
                     <div class="input-container bootstrap">
                       <label class="input-group">Job Date</label>
                       <div class="input-group input-readonly">
-                        <ejs-daterangepicker formControlName="date" placeholder="DD/MM/YYYY - DD/MM/YYYY" readonly="true"></ejs-daterangepicker>
+                        <ejs-daterangepicker
+                          formControlName="date"
+                          placeholder="DD/MM/YYYY - DD/MM/YYYY"
+                          readonly="true">
+                        </ejs-daterangepicker>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
@@ -270,6 +275,7 @@
     <div class="mobile-actions" [ngClass]="{'tab': isTab}">
       <div class="input-group dropdown bootstrap input-readonly" *ngIf="showStatusDropdown">
         <ejs-dropdownlist
+          [allowFiltering]="true"
           [fields]="optionFields"
           [formControl]="jobStatusControl"
           [dataSource]="nextApplicantStatuses"

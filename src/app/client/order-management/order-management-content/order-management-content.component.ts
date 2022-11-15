@@ -259,6 +259,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private creatingReorder = false;
   private filterApplied = false;
   private isIncomplete = false;
+  private timesheetRedirect = false;
 
   constructor(
     protected override store: Store,
@@ -278,13 +279,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private permissionService: PermissionService
   ) {
     super(store);
-    this.isRedirectedFromDashboard =
-      this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromDashboard'] || false;
-    this.orderStaus = this.router.getCurrentNavigation()?.extras?.state?.['orderStatus'] || 0;
+    const routerState = this.router.getCurrentNavigation()?.extras?.state;
 
-    this.isRedirectedFromToast = this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromToast'] || false;
-    this.quickOrderId = this.router.getCurrentNavigation()?.extras?.state?.['publicId'];
-    this.prefix = this.router.getCurrentNavigation()?.extras?.state?.['prefix'];
+    this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
+    this.orderStaus = routerState?.['orderStatus'] || 0;
+    this.isRedirectedFromToast = routerState?.['redirectedFromToast'] || false;
+    this.timesheetRedirect = !!routerState?.['timesheetRedirect'];
+    this.quickOrderId = routerState?.['publicId'];
+    this.prefix = routerState?.['prefix'];
 
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.fb.group({
@@ -1232,7 +1234,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.filterColumns.orderStatuses.dataSource = statuses;
         this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
         this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
-        this.setDefaultFilter();
+        if (!this.timesheetRedirect) {
+          this.setDefaultFilter();
+        }
         this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
       });
   }
@@ -1332,6 +1336,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.orgStructure = structure;
         this.regions = structure.regions;
         this.filterColumns.regionIds.dataSource = this.regions;
+        /**
+         * TODO: remove observable chain from subscription
+         */
         this.onOrderFilterDataSourcesLoadHandler();
       });
   }
@@ -1554,7 +1561,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private handleRedirectFromQuickOrderToast(): void {
-    if (this.isRedirectedFromToast) {
+    if (this.isRedirectedFromToast || this.timesheetRedirect) {
       let prefix = this.prefix || '';
       this.orderManagementService.orderId$.next({ id: this.quickOrderId, prefix: prefix });
     }

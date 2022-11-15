@@ -26,6 +26,7 @@
           [fields]="createUnderFields"
           formControlName="createUnder"
           [dataSource]="businessUnits$ | async"
+          [allowFiltering]="true"
         ></ejs-dropdownlist>
       </div>
     </form>
@@ -34,6 +35,7 @@
       <div class="input-group dropdown connection-string-dropdown">
         <ejs-dropdownlist
           [dataSource]="dataBaseConnections$ | async"
+          [allowFiltering]="true"
           formControlName="connectionName"
           appValidateWithMessage
         ></ejs-dropdownlist>
@@ -105,6 +107,7 @@
                     <ejs-dropdownlist
                       formControlName="organizationType"
                       [dataSource]="organizationTypes"
+                      [allowFiltering]="true"
                     ></ejs-dropdownlist>
                   </div>
                 </div>
@@ -132,6 +135,7 @@
                         appValidateWithMessage
                         [fields]="optionFields"
                         formControlName="country"
+                        [allowFiltering]="true"
                         [dataSource]="countries$ | async"
                         (change)="onGeneralCountryChange($event)"
                       ></ejs-dropdownlist>
@@ -144,6 +148,7 @@
                         appValidateWithMessage
                         formControlName="state"
                         [dataSource]="statesGeneral$ | async"
+                        [allowFiltering]="true"
                       ></ejs-dropdownlist>
                     </div>
                   </div>
@@ -230,6 +235,7 @@
                         formControlName="status"
                         [fields]="optionFields"
                         [dataSource]="statuses$ | async"
+                        [allowFiltering]="true"
                       ></ejs-dropdownlist>
                     </div>
                   </div>
@@ -273,9 +279,10 @@
                     <div class="input-group dropdown">
                       <ejs-dropdownlist
                         appValidateWithMessage
-                        [fields]="optionFields"
                         formControlName="country"
+                        [fields]="optionFields"
                         [dataSource]="countries$ | async"
+                        [allowFiltering]="true"
                         (change)="onBillingCountryChange($event)"
                       ></ejs-dropdownlist>
                     </div>
@@ -287,6 +294,7 @@
                         appValidateWithMessage
                         formControlName="state"
                         [dataSource]="statesBilling$ | async"
+                        [allowFiltering]="true"
                       ></ejs-dropdownlist>
                     </div>
                   </div>
@@ -389,7 +397,11 @@
               >
                 <div *ngIf="!isEditTitle[i]" class="dropdown-container bootstrap">
                   <label>Contact Type</label>
-                  <ejs-dropdownlist formControlName="title" [dataSource]="titles"></ejs-dropdownlist>
+                  <ejs-dropdownlist
+                    formControlName="title"
+                    [dataSource]="titles"
+                    [allowFiltering]="true"
+                  ></ejs-dropdownlist>
                 </div>
                 <div *ngIf="isEditTitle[i]" class="input-container bootstrap">
                   <label>Contact Type</label>
@@ -495,6 +507,7 @@
                 formControlName="weekStartsOn"
                 [fields]="optionFields"
                 [dataSource]="days$ | async"
+                [allowFiltering]="true"
               ></ejs-dropdownlist>
             </div>
           </div>

@@ -246,6 +246,7 @@
         <div class="e-card-content button-container" *ngIf="isOnboard && !isAgency">
           <div class="input-group dropdown bootstrap input-readonly">
             <ejs-dropdownlist
+              [allowFiltering]="true"
               [fields]="optionFields"
               [formControl]="jobStatusControl"
               [dataSource]="nextApplicantStatuses"
