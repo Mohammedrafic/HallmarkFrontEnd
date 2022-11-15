@@ -137,8 +137,9 @@ export class LogiReportComponent implements OnInit {
   };
 
   private injectReportApiJs(): Promise<void> {
-    let jrReportApiJsInjected= window.localStorage.getItem(LogiReportJsLoaded)
-    return jrReportApiJsInjected!=null&&jrReportApiJsInjected=="true"
+    let jrReportApiJsInjected= window.localStorage.getItem(LogiReportJsLoaded);
+    let jsfile=document.getElementById("j$vm");
+    return jrReportApiJsInjected!=null&&jrReportApiJsInjected=="true"&&jsfile!=null
       ? Promise.resolve()
       : new Promise((resolve: () => void, reject: () => void) => {
           const script = document.createElement('script');
