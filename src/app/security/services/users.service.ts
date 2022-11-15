@@ -56,7 +56,7 @@ export class UsersService {
     FilterModel: any,
     GetAll:boolean
   ): Observable<UsersPage> {
-    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel ,GetAll});
+    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel ,GetAll}).pipe(map((data) => ({ ...data, items: sortByField(data.items, 'fullName')})));
   }
 
   /**
