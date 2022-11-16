@@ -63,7 +63,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialReport/Credential.cat" };
   public title: string = "Job Detail Summary";
   public message: string = "";
-  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
+  public reportType: LogiReportTypes = LogiReportTypes.WebReport;
   public allOption: string = "All";
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
@@ -168,8 +168,8 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {      
     this.orderFilterColumnsSetup();
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
       this.CommonReportFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {

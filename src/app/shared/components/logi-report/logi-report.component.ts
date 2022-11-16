@@ -25,7 +25,7 @@ declare global {
 })
 
 export class LogiReportComponent implements OnInit {
-  private factory: any;
+  private static factory: any;
   private reportIframeName: string = "reportIframe";
   private uId: string = "";
   private pwd: string = "";
@@ -92,7 +92,7 @@ export class LogiReportComponent implements OnInit {
         active: 1
       };
       console.log(this.reportUrl);
-    let task = this.factory.runDashboard(server, resExt, entryId);
+    let task = LogiReportComponent.factory.runDashboard(server, resExt, entryId);
   }
 
   private ShowReport(entryId: string): void {
@@ -132,7 +132,7 @@ export class LogiReportComponent implements OnInit {
     };
     let prptRes = this.reportName;
     let catRes = this.catelogName;
-    let test = this.factory?.runReport(
+    let test = LogiReportComponent.factory?.runReport(
       server, prptRes, catRes, this.paramsData, entryId);
   };
 
@@ -147,7 +147,7 @@ export class LogiReportComponent implements OnInit {
           script.type = 'text/javascript';
           window.localStorage.setItem(LogiReportJsLoaded,"true");
           script.onload = (): void => {
-            this.factory = com.jinfonet.api.AppFactory;            
+            LogiReportComponent.factory = com.jinfonet.api.AppFactory;            
             clearTimeout(this.scriptLoadTimeoutHandle);
             resolve();
           };
