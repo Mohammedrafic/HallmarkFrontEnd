@@ -375,7 +375,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       if (this.isPermPlacementOrder || isNaN(parseInt(orderType)) || !departmentId || !skillId || !jobStartDate) {
         return;
       }
-      this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId, jobStartDate.toISOString(), jobEndDateControl.value.toISOString()));
+      this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId, DateTimeHelper.toUtcFormat(jobStartDate), DateTimeHelper.toUtcFormat(jobEndDateControl.value)));
     });
 
     combineLatest([orderTypeControl.valueChanges, departmentIdControl.valueChanges, skillIdControl.valueChanges, jobStartDateControl.valueChanges])

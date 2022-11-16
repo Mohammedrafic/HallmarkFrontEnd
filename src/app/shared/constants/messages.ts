@@ -42,6 +42,7 @@ export const ORDER_WITHOUT_CRED_BILLRATES =
 export const UNSAVE_CHANGES_TEXT = 'Do you want to save changes?';
 export const REQUIRED_PERMISSIONS = 'Separate permission right is required';
 export const ERROR_START_LESS_END_DATE = 'Start date should be before end date or less';
+export const SHOULD_LOC_DEP_INCLUDE_IRP = 'Should all locations and departments be included in IRP?';
 
 export const updateCandidateJobMessage = (dates: string[]) =>
   `For this candidate job timesheets will be recalculated for the next start dates: ${dates.join(', ')}`;

@@ -316,7 +316,7 @@
           </span>
         </ng-template>
         <ng-template #template let-data>
-          <span>{{ data.startDate | date: formatDate }}</span>
+          <span>{{ data.startDate | date: 'MM/dd/yyy':'UTC' }}</span>
         </ng-template>
       </e-column>
       <e-column field="shift" headerText="SHIFT" width="160" minWidth="80" maxWidth="200" [visible]="false">
