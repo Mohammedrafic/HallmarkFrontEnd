@@ -20,8 +20,8 @@ export class AddEditOrganizationService {
       paymentDescription: new FormControl(organization?.preferences.paymentDescription || '', [
         Validators.required,
       ]),
-      irp: new FormControl(!!organization?.preferences.irp),
-      vms: new FormControl(!!organization?.preferences.vms),
+      isIRPEnabled: new FormControl(!!organization?.preferences.isIRPEnabled),
+      isVMCEnabled: new FormControl(!!organization?.preferences.isVMCEnabled),
     });
   }
 

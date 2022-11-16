@@ -104,8 +104,8 @@ export class Preferences {
   paymentDescription: string;
   weekStartsOn: number;
   considerLunch: boolean;
-  irp?: boolean;
-  vms?: boolean;
+  isIRPEnabled?: boolean;
+  isVMCEnabled?: boolean;
 }
 
 export class OrganizationPage {

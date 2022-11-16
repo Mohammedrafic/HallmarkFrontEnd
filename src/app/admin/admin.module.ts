@@ -56,7 +56,6 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 import { NgxMaskModule } from 'ngx-mask';
 import { AddEditOrganizationService } from '@admin/client-management/services/add-edit-organization.service';
-import { FeatureFlagApiService } from '@shared/services/feature-flag-api.service';
 
 const sidebarIcons = {
   Download,
@@ -136,8 +135,7 @@ const sidebarIcons = {
   providers: [
     ResizeService,
     PageService,
-    AddEditOrganizationService,
-    FeatureFlagApiService
+    AddEditOrganizationService
   ]
 })
 export class AdminModule { }

@@ -489,13 +489,15 @@
             <label class="label-gray">System Configuration (at least one system should be selected)<span class="required">*</span></label>
             <div class="checkbox-group">
               <ejs-checkbox
-                formControlName="irp"
+                formControlName="isIRPEnabled"
                 label="IRP"
+                [disabled]="!isOrgHasIRPPermissions"
                 (change)="checkIPRFormControl($event)"
               ></ejs-checkbox>
               <ejs-checkbox
-                formControlName="vms"
+                formControlName="isVMCEnabled"
                 label="VMS"
+                [disabled]="!isOrgHasIRPPermissions"
               ></ejs-checkbox>
             </div>
           </div>

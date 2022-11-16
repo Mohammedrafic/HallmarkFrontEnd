@@ -1,13 +1,21 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { debounceTime, Observable, takeUntil } from 'rxjs';
+import { take } from 'rxjs/operators';
+
+import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Titles } from '@shared/enums/title';
 import { OrganizationTypes } from '@shared/enums/organization-type';
 import { User } from '@shared/models/user-managment-page.model';
-import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { debounceTime, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { SHOULD_LOC_DEP_INCLUDE_IRP } from '@shared/constants';
+import { Destroyable } from '@core/helpers';
+import { AddEditOrganizationService } from '@admin/client-management/services/add-edit-organization.service';
+
 import { Country } from 'src/app/shared/enums/states';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { ContactDetails, Organization } from 'src/app/shared/models/organization.model';
@@ -29,12 +37,7 @@ import {
   UploadOrganizationLogo,
 } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
-import { AddEditOrganizationService } from '@admin/client-management/services/add-edit-organization.service';
-import { Destroyable } from '@core/helpers';
-import { FeatureFlagApiService } from '@shared/services/feature-flag-api.service';
-import { filter, take } from 'rxjs/operators';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { SHOULD_LOC_DEP_INCLUDE_IRP } from '@shared/constants';
+import { AppState } from '../../../store/app.state';
 
 @Component({
   selector: 'app-add-edit-organization',
@@ -72,6 +75,7 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
   };
   public profileMode: boolean = false;
   public isIRPFlagEnabled = false;
+  public isOrgHasIRPPermissions = true;
 
   private showDataBaseControlValue: boolean = false;
   private logoToDelete: boolean = false;
@@ -123,12 +127,12 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private addEditOrganizationService: AddEditOrganizationService,
-    private featureFlagApiService: FeatureFlagApiService,
     private confirmService: ConfirmService,
   ) {
     super();
 
     this.checkFeatureFlag();
+    this.checkOrgPermissions();
 
     this.startGetOrgByIdActionWatching();
     this.startGetOrgLogoActionWatching();
@@ -330,7 +334,7 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
   }
 
   public checkIPRFormControl({ checked }: { checked: boolean }): void {
-    if (!this.isAddMode && this.PreferencesFormGroup.get('vms')?.value && checked) {
+    if (!this.isAddMode && this.PreferencesFormGroup.get('isVMCEnabled')?.value && checked) {
       this.confirmService.confirm(SHOULD_LOC_DEP_INCLUDE_IRP, {
         title: 'Confirm',
         okButtonLabel: 'YES',
@@ -340,7 +344,7 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
         take(1),
         takeUntil(this.componentDestroy())
       ).subscribe((value: boolean) => {
-        this.PreferencesFormGroup.get('irp')?.setValue(value);
+        this.PreferencesFormGroup.get('isIRPEnabled')?.setValue(value);
       });
     }
   }
@@ -463,17 +467,17 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
   }
 
   private checkFeatureFlag(): void {
-    this.featureFlagApiService.checkFeatureFlag('IRP').pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe((flag: boolean) => {
-      this.isIRPFlagEnabled = flag;
-    });
+    this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+  }
+
+  private checkOrgPermissions(): void {
+    this.isOrgHasIRPPermissions = this.store.selectSnapshot(UserState.isHallmarkUser);
   }
 
   private removeUnnecessaryControls(): void {
     if (!this.isIRPFlagEnabled) {
-      this.PreferencesFormGroup.removeControl('irp');
-      this.PreferencesFormGroup.removeControl('vms');
+      this.PreferencesFormGroup.removeControl('isIRPEnabled');
+      this.PreferencesFormGroup.removeControl('isVMCEnabled');
     }
   }
 }
