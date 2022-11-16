@@ -422,7 +422,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             endDate: value.actualEndDate ? DateTimeHelper.convertDateToUtc(value.actualEndDate) 
             : DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString()),
             rejectReason: value.rejectReason,
-            offeredStartDate: this.getDateString(value.offeredStartDate),
+            offeredStartDate: DateTimeHelper.formatDateUTC(
+              DateTimeHelper.convertDateToUtc(value.offeredStartDate).toString(), 'MM/dd/YYYY'),
             jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
             penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
             rate: value.jobCancellation?.rate,
