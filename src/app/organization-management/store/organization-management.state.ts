@@ -143,6 +143,7 @@ import {
   RECORD_ADDED,
   RECORD_ALREADY_EXISTS,
   RECORD_CANNOT_BE_DELETED,
+  RECORD_DELETE,
   RECORD_MODIFIED,
   RECORD_SAVED,
   usedByOrderErrorMessage,
@@ -162,6 +163,7 @@ import { NodatimeService } from '@shared/services/nodatime.service';
 import { HttpErrorResponse } from "@angular/common/http";
 import { BillRatesService } from '@shared/services/bill-rates.service';
 import { ImportedBillRate } from '@shared/models';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 interface DropdownOption {
   id: number;
@@ -323,9 +325,20 @@ export class OrganizationManagementState {
   }
 
   @Selector()
+  static sortedDepartments(state: OrganizationManagementStateModel): Department[] | DepartmentsPage {
+    return sortByField(state.departments as Department[], 'departmentName');
+  }
+
+  @Selector()
   static regions(state: OrganizationManagementStateModel): Region[] {
     return state.regions;
   }
+
+  @Selector()
+  static sortedRegions(state: OrganizationManagementStateModel): Region[] {
+    return sortByField(state.regions, 'name');
+  }
+
   @Selector()
   static GetRegionFilterOptions(state: OrganizationManagementStateModel): Region[] {
     return state.regions;
@@ -338,6 +351,11 @@ export class OrganizationManagementState {
   @Selector()
   static locationsByRegionId(state: OrganizationManagementStateModel): Location[] | LocationsPage {
     return state.locations;
+  }
+
+  @Selector()
+  static sortedoLocationsByRegionId(state: OrganizationManagementStateModel): Location[] {
+    return sortByField(state.locations as Location[], 'name');
   }
 
   @Selector()
@@ -675,6 +693,7 @@ export class OrganizationManagementState {
     return this.regionService.deleteRegionById(regionId).pipe(
       tap((payload) => {
         patchState({ isLocationLoading: false });
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
         dispatch(new GetRegions());
         return payload;
       }),

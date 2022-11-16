@@ -7,9 +7,10 @@ import {
   UserVisibilitySettingBody,
   UserVisibilitySettingsPage,
 } from '@shared/models/visibility-settings.model';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { RolesPerUser, User, UserDTO, UsersPage } from '@shared/models/user-managment-page.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable({
   providedIn: 'root',
@@ -55,7 +56,7 @@ export class UsersService {
     FilterModel: any,
     GetAll:boolean
   ): Observable<UsersPage> {
-    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel ,GetAll});
+    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel ,GetAll}).pipe(map((data) => ({ ...data, items: sortByField(data.items, 'fullName')})));
   }
 
   /**
@@ -116,8 +117,10 @@ export class UsersService {
    * @param userId
    * @return UserVisibilitySettingsPage
    */
-  public getUserVisibilitySettingsOrganisation(userId: string): Observable<Organisation[]> {
-    return this.http.get<Organisation[]>(`/api/Organizations/structure/All/${userId}`);
+   public getUserVisibilitySettingsOrganisation(userId: string): Observable<Organisation[]> {
+    return this.http
+      .get<Organisation[]>(`/api/Organizations/structure/All/${userId}`)
+      .pipe(map((organizations) => sortByField(organizations, 'name')));
   }
 
   /**

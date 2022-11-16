@@ -24,11 +24,13 @@ import { RejectReasonState } from '@organization-management/store/reject-reason.
 import { Overlay } from '@angular/cdk/overlay';
 import { ContactusState } from './store/contact-us.state';
 import { PreservedFiltersState } from './store/preserved-filters.state';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
     Spinnermodule,

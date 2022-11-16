@@ -1,5 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { COUNTRIES } from '@shared/constants/countries-list';
 import { Subject, takeWhile } from 'rxjs';
 import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
 
@@ -11,10 +12,7 @@ import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
 export class BillingDetailsGroupComponent implements OnInit, OnDestroy {
   @Input() formGroup: FormGroup;
 
-  public countries = [
-    { id: Country.USA, text: Country[0] },
-    { id: Country.Canada, text: Country[1] },
-  ];
+  public countries = COUNTRIES;
   public states$ = new Subject();
   public optionFields = {
     text: 'text',

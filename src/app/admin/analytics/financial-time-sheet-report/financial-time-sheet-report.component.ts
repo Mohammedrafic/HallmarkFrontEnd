@@ -1,23 +1,21 @@
 import { ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ChangeEventArgs, FieldSettingsModel, AutoComplete, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
 import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
-import { BusinessUnit } from '@shared/models/business-unit.model';
-import { GetBusinessByUnitType, GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
+import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
-import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -33,6 +31,7 @@ import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 import { CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SearchCandidate, SkillCategoryDto } from '../models/common-report.model';
 import { OrderTypeOptions } from '@shared/enums/order-type';
 import { OutsideZone } from "@core/decorators";
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-financial-time-sheet-report',
@@ -41,27 +40,27 @@ import { OutsideZone } from "@core/decorators";
 })
 export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   public paramsData: any = {
-    "OrganizationParamACCR": "",
-    "StartDateParamACCR": "",
-    "EndDateParamACCR": "",
-    "RegionParamACCR": "",
-    "LocationParamACCR": "",
-    "DepartmentParamACCR": "",
-    "SkillCategoryParamACCR":"",
-    "SkillParamACCR":"",
-    "CandidateNameACCR":"",
-    "CandidateStatusACCR":"",
-    "OrderTypeACCR":"",
-    "JobStatusACCR":"",
-    "JobIdACCR":"",
-    "BearerParamACCR": "",
-    "BusinessUnitIdParamACCR": "",
+    "OrganizationParamFTS": "",
+    "StartDateParamFTS": "",
+    "EndDateParamFTS": "",
+    "RegionParamFTS": "",
+    "LocationParamFTS": "",
+    "DepartmentParamFTS": "",
+    "SkillCategoriesParamFTS":"",
+    "SkillsParamFTS":"",
+    "CandidateNameParamFTS":"",
+    "CandidateStatusesParamFTS":"",
+    "OrderTypesParamFTS":"",
+    "JobStatusesParamFTS":"",
+    "JobIdParamFTS":"",
+    "BearerParamFTS": "",
+    "BusinessUnitIdParamFTS": "",
     "HostName": "",
-    "AccrualReportFilterACCR": ""
+    "AccrualReportFilterTypeFTS": ""
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/ClientFinanceAccrualReport.cls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/Accrual.cat" };
-  public title: string = "Financial Time Sheet";
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.wls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.cat" };
+  public title: string = "Financial Timesheet";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
@@ -101,7 +100,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
+  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'id' };
   selectedDepartments: Department[];
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
@@ -143,6 +142,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   public user: User | null;
   public filterOptionsData: CommonReportFilterOptions;
   public candidateFilterData :{ [key: number]: SearchCandidate; }[] = [];
+  public isResetFilter: boolean = false;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -165,6 +165,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
    
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+      this.store.dispatch(new ClearLogiReportState());
       this.financialTimeSheetFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {
           this.filterOptionsData = data;
@@ -235,22 +236,29 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       if (!this.isClearAll) {
         let orgList = this.organizations?.filter((x) => data == x.organizationId);
         this.selectedOrganizations = orgList;
-        this.regionsList = [];
-        this.locationsList = [];
-        this.departmentsList = [];
+        const regionsList: Region[] = [];
+        const locationsList: Location[] = [];
+        const departmentsList: Department[] = [];
         orgList.forEach((value) => {
-          this.regionsList.push(...value.regions);
+          regionsList.push(...value.regions);
           value.regions.forEach((region) => {
-            this.locationsList.push(...region.locations);
+            locationsList.push(...region.locations);
             region.locations.forEach((location) => {
-              this.departmentsList.push(...location.departments);
+              departmentsList.push(...location.departments);
             });
           });
         });
+
+        this.regionsList = sortByField(regionsList, 'name');
+        this.locationsList = sortByField(locationsList, 'name');
+        this.departmentsList = sortByField(departmentsList, 'name');
+
         if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
           this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
         }
-
+        else {
+          this.isResetFilter = true;
+        }
         let businessIdData = [];
         businessIdData.push(data);
         let filter: CommonReportFilter = {
@@ -300,7 +308,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     this.departmentIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
-      if (this.isInitialLoad) {
+      if (this.isInitialLoad&&data.length>0) {
 
         this.SearchReport();
         this.isInitialLoad = false;
@@ -344,33 +352,34 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     let {accrualReportTypes,businessIds,candidateName,candidateStatuses,departmentIds,jobId,jobStatuses,locationIds,orderTypes,
       regionIds,skillCategoryIds,skillIds,startDate, endDate } = this.financialTimesheetReportForm.getRawValue();
       if (!this.financialTimesheetReportForm.dirty) {
-        this.message = "Default filter selected with all regions ,locations and departments for 90 days";
+        this.message = "Default filter selected with all regions, locations and departments for 90 days";
       }
       else {
+        this.isResetFilter = false;
         this.message = ""
       }
     this.paramsData =
     {
-      "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.organizationId),
-      "StartDateParamACCR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateParamACCR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamACCR": regionIds,
-      "LocationParamACCR": locationIds,
-      "DepartmentParamACCR": departmentIds,
-      "SkillCategoryParamACCR":skillCategoryIds,
-      "SkillParamACCR":skillIds,
-      "CandidateNameACCR":candidateName==null?'':this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName),
-      "CandidateStatusACCR":candidateStatuses,
-      "OrderTypeACCR":orderTypes,
-      "JobStatusACCR":jobStatuses,
-      "JobIdACCR":jobId,
-      "BearerParamACCR": auth,
-      "BusinessUnitIdParamACCR": window.localStorage.getItem("lastSelectedOrganizationId") == null
+      "OrganizationParamFTS": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "StartDateParamFTS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "EndDateParamFTS": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "RegionParamFTS": regionIds.join(","),
+      "LocationParamFTS": locationIds.join(","),
+      "DepartmentParamFTS": departmentIds.join(","),
+      "SkillCategoriesParamFTS":skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
+      "SkillsParamFTS":skillIds.length==0?"null":skillIds.join(","),
+      "CandidateNameParamFTS":candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName),
+      "CandidateStatusesParamFTS":candidateStatuses.length==0?"null":candidateStatuses.join(","),
+      "OrderTypesParamFTS":orderTypes.length==0?"null":orderTypes.join(","),
+      "JobStatusesParamFTS":jobStatuses.length==0?"null":jobStatuses.join(","),
+      "JobIdParamFTS":jobId==null||jobId==""?"null":jobId,
+      "BearerParamFTS": auth,
+      "BusinessUnitIdParamFTS": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "AccrualReportFilterACCR": accrualReportTypes
+      "AccrualReportFilterTypeFTS": accrualReportTypes.toString()
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -447,7 +456,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         valueType: ValueType.Text,
         dataSource: [],
         valueField: 'statusText',
-        valueId: 'status',
+        valueId: 'id',
       },
       jobId: {
         type: ControlTypes.Text,
@@ -473,7 +482,9 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   }
 
   public showFilters(): void {
+    if (this.isResetFilter) {
     this.onFilterControlValueChangedHandler();
+    }
     this.store.dispatch(new ShowFilterDialog(true));
   }
   public onFilterDelete(event: FilteredItem): void {

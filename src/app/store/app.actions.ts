@@ -107,3 +107,8 @@ export class ShowCustomSideDialog {
   static readonly type = '[app] Set Email Side Dialog Showing state';
   constructor(public isCustomDialogShown: boolean) { }
 }
+
+export class SetIrpFlag {
+  static readonly type = '[app] Set Irp flag';
+  constructor(public readonly irpEnabled: boolean) {}
+}

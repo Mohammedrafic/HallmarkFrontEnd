@@ -97,6 +97,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { createUniqHashObj } from '@core/helpers/functions.helper';
 import { DateTimeHelper } from '@core/helpers';
 import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -237,7 +238,8 @@ export class OrderManagementContentState {
       (el: BillRate) => el.billRateConfig
     );
 
-    return Object.values(uniqBillRatesHashObj).map((el: BillRateOption) => el);
+    const billRateOptions = Object.values(uniqBillRatesHashObj).map((el: BillRateOption) => el);
+    return sortByField(billRateOptions, 'title');
   }
 
   @Selector()

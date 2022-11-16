@@ -37,6 +37,7 @@ import {  SavePurchaseOrderMappingDto } from '../../../shared/models/purchase-or
 import { PurchaseOrderMappingComponent } from '../components/purchase-order-mapping/purchase-order-mapping.component';
 import { datesValidator } from '@shared/validators/date.validator';
 import { AbstractPermission } from "@shared/helpers/permissions";
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-specialproject-container',
@@ -210,7 +211,8 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
     this.store.dispatch(new GetPurchaseOrders());
     this.purchaseOrderPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (data?.items) {
-        this.orgStructureData.poNameIds.dataSource = data?.items.map((item) => { return { id: item.id, name: item.poName } });
+        const poNames = data?.items.map((item) => { return { id: item.id, name: item.poName } });
+        this.orgStructureData.poNameIds.dataSource = sortByField(poNames, 'name');
       }
     });
 

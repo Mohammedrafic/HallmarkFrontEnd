@@ -1,0 +1,13 @@
+<div class="row-tool-buttons">
+  <button ejs-button cssClass="e-flat primary-icon-button" (click)="editTier()">
+    <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+  </button>
+  <button
+    ejs-button
+    cssClass="e-flat secondary-icon-button"
+    [disabled]="!userPermission[userPermissions.CanEditOrganizationTiers]"
+    class="remove-button"
+    (click)="deleteTier()">
+    <span><i-feather name="trash-2" class="icon"></i-feather></span>
+  </button>
+</div>

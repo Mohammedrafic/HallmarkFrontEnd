@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import {
   AssociateOrganizationsAgency,
   AssociateOrganizationsAgencyPage,
@@ -11,6 +11,7 @@ import {
   JobDistributionInitialData,
   PartnershipSettings,
 } from '@shared/models/associate-organizations.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable()
 export class AssociateService {
@@ -136,6 +137,11 @@ export class AssociateService {
   public getFeeExceptionsInitialData(organizationAgencyId: number): Observable<FeeExceptionsInitialData> {
     return this.http.get<FeeExceptionsInitialData>(`/api/FeeExceptions/initialData`, {
       params: { OrganizationId: organizationAgencyId },
-    });
+    }).pipe(map((data) => { 
+      const sortedFields: Record<keyof FeeExceptionsInitialData, string> = {
+        regions: 'name',
+        masterSkills: 'skillDescription'
+      }
+      return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof FeeExceptionsInitialData])]))}));
   }
 }

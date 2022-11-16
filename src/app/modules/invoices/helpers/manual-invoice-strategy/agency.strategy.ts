@@ -13,6 +13,7 @@ import { InvoiceMetaAdapter } from '../invoice-meta.adapter';
 import { ManualInvoiceStrategy } from './strategy.interface';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { ShowToast } from 'src/app/store/app.actions';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable({ providedIn: 'any'})
 export class AgencyStrategy implements ManualInvoiceStrategy {
@@ -35,12 +36,13 @@ export class AgencyStrategy implements ManualInvoiceStrategy {
       }
 
       if (isPosition) {
-        options.invoiceCandidates = meta.map(el => ({
+        const invoiceCandidates = meta.map(el => ({
           text: `${el.candidateFirstName} ${el.candidateLastName}`,
           value: el.candidateId,
         }));
+        options.invoiceCandidates = sortByField(invoiceCandidates, 'text');
       } else {
-        options.invoiceCandidates = InvoiceMetaAdapter.createCandidateOptions(meta);
+        options.invoiceCandidates = sortByField(InvoiceMetaAdapter.createCandidateOptions(meta), 'text');
       }
       this.connectConfigOptions(config, options);
       form.get('nameId')?.patchValue(meta[0].candidateId);

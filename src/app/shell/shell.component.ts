@@ -180,7 +180,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly ngZone: NgZone,
   ) {
     this.filterService.canPreserveFilters() && store.dispatch(new InitPreservedFilters());
-    router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((data: any) => {
+    router.events.pipe(filter((event) => event instanceof NavigationEnd), debounceTime(50)).subscribe((data: any) => {
       if (this.tree) {
         const menuItem = this.tree.getTreeData().find((el) => el['route'] === data['url']);
         if (menuItem) {

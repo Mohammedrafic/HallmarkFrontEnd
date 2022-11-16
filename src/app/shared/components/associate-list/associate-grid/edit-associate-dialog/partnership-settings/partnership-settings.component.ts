@@ -50,10 +50,11 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
     .map((name) => ({ name, id: JobDistributionOrderType[name as JobDistributionOrderType] }));
   public partnershipStatus = Object.values(PartnershipStatus)
     .filter(valuesOnly)
-    .map((name, id) => ({ name, id }));
+    .map((name, id) => ({ name, id })).sort((a, b) => (a.name as string).localeCompare(b.name as string));
   public agencyCategoryTier = Object.values(DistributionLevels)
     .filter(valuesOnly)
-    .map((name) => ({ name, id: DistributionLevels[name as DistributionLevels] }));
+    .map((name) => ({ name, id: DistributionLevels[name as DistributionLevels] }))
+    .sort((a, b) => (a.name as string).localeCompare(b.name as string));
   public submission = Object.values(SubmissionPercentageOverrideRestriction)
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));

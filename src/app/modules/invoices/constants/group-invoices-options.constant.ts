@@ -13,7 +13,7 @@ export interface GroupInvoicesOption {
   text: string;
   id: InvoicesAggregationType;
   tooltip: string;
-  [key: string]: Object,
+  [key: string]: Object;
 }
 
 export const groupInvoicesOptions: GroupInvoicesOption[] = [
@@ -23,26 +23,25 @@ export const groupInvoicesOptions: GroupInvoicesOption[] = [
   //   tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.Region],
   // },
   {
-    id: InvoicesAggregationType.Location,
-    text:  'Location',
-    tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.Location],
-  },
-  {
-    id: InvoicesAggregationType.CostCenter,
-    text:  'Cost Center',
-    tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.CostCenter],
+    id: InvoicesAggregationType.Agency,
+    text: 'Agency',
+    tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.Agency],
   },
   {
     id: InvoicesAggregationType.Candidate,
-    text:  'Candidate',
+    text: 'Candidate',
     tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.Candidate],
   },
   {
-    id: InvoicesAggregationType.Agency,
-    text:  'Agency',
-    tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.Agency],
+    id: InvoicesAggregationType.CostCenter,
+    text: 'Cost Center',
+    tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.CostCenter],
+  },
+  {
+    id: InvoicesAggregationType.Location,
+    text: 'Location',
+    tooltip: groupInvoicesByHintsMap[InvoicesAggregationType.Location],
   }
 ];
-
 
 export const defaultGroupInvoicesOption: GroupInvoicesOption = groupInvoicesOptions[0];

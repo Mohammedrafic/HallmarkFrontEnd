@@ -7,5 +7,8 @@ export const filterOptionFields = {
   value: 'id'
 };
 
-export const ExcludeSpinnerUrls = ['financialtimesheet/candidatesearch','Alerts/GetAlertsForUser'];
-
+export const ExcludeSpinnerUrls = [
+  'financialtimesheet/candidatesearch',
+  '/api/Audit/uiaction',
+  'Alerts/GetAlertsForUser'
+];

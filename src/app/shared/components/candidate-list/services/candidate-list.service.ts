@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { CandidateList, CandidateListRequest } from '../types/candidate-list.model';
 import { ListOfSkills } from '../../../models/skill.model';
 import { CandidateStatus } from '../../../enums/status';
 import { ExportPayload } from '../../../models/export.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { sortBy } from '@shared/helpers/sort-array.helper';
 
 @Injectable()
 export class CandidateListService {
@@ -23,7 +25,9 @@ export class CandidateListService {
    * @return list of skills
    */
   public getAllSkills(): Observable<ListOfSkills[]> {
-    return this.http.get<ListOfSkills[]>('/api/MasterSkills/listByActiveBusinessUnit');
+    return this.http
+      .get<ListOfSkills[]>('/api/MasterSkills/listByActiveBusinessUnit')
+      .pipe(map((data) => sortByField(data, 'name')));
   }
 
   /**
@@ -42,6 +46,6 @@ export class CandidateListService {
   }
 
   public getRegions(): Observable<string[]> {
-    return this.http.get<string[]>('/api/Regions/UsaCanadaStates')
+    return this.http.get<string[]>('/api/Regions/UsaCanadaStates').pipe(map((data) => sortBy(data)));
   }
 }

@@ -290,9 +290,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       .filter(valuesOnly)
       .map((name) => ({ name, id: BillRateCategory[name as BillRateCategory] }));
 
-    this.filterColumns.billRateTypes.dataSource = Object.values(BillRateType)
-      .filter(valuesOnly)
-      .map((name) => ({ name, id: BillRateType[name as BillRateType] }));
+    this.filterColumns.billRateTypes.dataSource = BillRateTypes
 
     this.organizationStructure$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
@@ -479,6 +477,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public onFormSaveClick(): void {
     if (this.billRatesFormGroup.valid) {
+      const effectiveDate: Date = this.billRatesFormGroup.controls['effectiveDate'].value;
+      if (effectiveDate) {
+        effectiveDate.setHours(0, 0, 0, 0);
+      }
       const isAllRegions = this.billRatesFormGroup.controls['regionIds'].value.length === this.allRegions.length;
       const billRate: BillRateSetupPost = {
         billRateSettingId: this.editRecordId,
@@ -502,7 +504,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
             ? [] // [] means All on the BE side
             : this.billRatesFormGroup.controls['orderTypeIds'].value,
         rateHour: this.billRatesFormGroup.controls['billRateValueRateTimes'].value,
-        effectiveDate: this.billRatesFormGroup.controls['effectiveDate'].value,
+        effectiveDate: effectiveDate,
         intervalMin: this.billRatesFormGroup.controls['intervalMin'].value,
         intervalMax: this.billRatesFormGroup.controls['intervalMax'].value,
         considerForWeeklyOT: this.billRatesFormGroup.controls['considerForWeeklyOt'].value

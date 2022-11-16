@@ -9,7 +9,6 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import {
   alertsFilterColumns,
   BUSINESS_DATA_FIELDS,
-  BUSINESS_UNITS_VALUES,
   DISABLED_GROUP,
   OPRION_FIELDS,
   User_DATA_FIELDS
@@ -36,6 +35,7 @@ import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-
 import { MessageTypes } from '@shared/enums/message-types';
 import { GRID_CONFIG, RECORD_MODIFIED } from '@shared/constants';
 import { AppState } from '../../../store/app.state';
+import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 
 @Component({
   selector: 'app-user-subscription',

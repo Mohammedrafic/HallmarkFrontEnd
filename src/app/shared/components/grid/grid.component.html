@@ -5,6 +5,7 @@
     (selectionChanged)="handleMultiSelectionChanged($event)"
     (rowClicked)="handleSelectionChanged($event)"
     (sortChanged)="handleSortChanged($event)"
+    (rowDragEnd)="handleRowDragEvent($event)"
     [columnDefs]="columnDefinitions"
     [defaultColDef]="defaultColumnDefinition"
     [modules]="modules"
@@ -14,6 +15,8 @@
     [suppressRowClickSelection]="suppressRowClickSelection"
     [rowSelection]="rowSelection"
     [gridOptions]="gridOptions"
+    [rowDragManaged]="rowDragManaged"
+    [suppressMoveWhenRowDragging]="suppressMoveWhenRowDragging"
     [overlayNoRowsTemplate]="gridEmptyMessage"
     class="ag-theme-alpine app-grid__component"
   ></ag-grid-angular>

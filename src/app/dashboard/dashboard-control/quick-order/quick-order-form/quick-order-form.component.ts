@@ -25,7 +25,7 @@ import {
 } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
-import { OrderType } from '@shared/enums/order-type';
+import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Department, Location, Organisation, Region } from '@shared/models/visibility-settings.model';
 import { Department as ContactDetails } from '@shared/models/department.model';
@@ -100,12 +100,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public priceUtils = PriceUtils;
   public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
 
-  public readonly orderTypes = [
-    { id: OrderType.ContractToPerm, name: 'Contract To Perm' },
-    { id: OrderType.OpenPerDiem, name: 'Open Per Diem' },
-    { id: OrderType.PermPlacement, name: 'Perm. Placement' },
-    { id: OrderType.Traveler, name: 'Traveler' },
-  ];
+  public readonly orderTypes = OrderTypeOptions;
   public readonly orderTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public readonly organizationTypeFields: FieldSettingsModel = { text: 'name', value: 'organizationId' };
@@ -153,7 +148,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   public readonly masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  @Select(RejectReasonState.orderRequisition)
+  @Select(RejectReasonState.sortedOrderRequisition)
   public readonly reasons$: Observable<RejectReasonPage>;
 
   public readonly reasonForRequisitionFields: FieldSettingsModel = { text: 'reason', value: 'id' };
