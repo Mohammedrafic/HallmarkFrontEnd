@@ -52,9 +52,12 @@
         </ng-template>
       </e-column>
       <e-column field="name" headerText="shift name" width=200></e-column>
-      <e-column field="shortName" headerText="shift short name" width=200></e-column>
+      <e-column *ngIf="!isIrpFlagEnabled" field="shortName" headerText="shift short name" width=200></e-column>
       <e-column field="standardStartTime" headerText="start time" width=120></e-column>
       <e-column field="standardEndTime" headerText="end time" width=120></e-column>
+      <e-column headerText="on call shift" width=100>
+        <ng-template #template let-data>{{data.onCall ? 'Yes' : 'No'}}</ng-template>
+      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
@@ -133,7 +136,7 @@
     </div>
 
     <div>
-      <div class="input-container">
+      <div *ngIf="!isIrpFlagEnabled" class="input-container">
         <label for="shortName">Shift Short Name <span class="required">*</span></label>
         <div class="input-group">
           <input class="e-input"
@@ -178,6 +181,11 @@
           </ejs-timepicker>
         </div>
       </div>
+    </div>
+
+    <div class="on-call-toggle">
+      <ejs-switch class="switch"></ejs-switch>
+      <span>On Call</span>
     </div>
   </form>
 </app-side-dialog>

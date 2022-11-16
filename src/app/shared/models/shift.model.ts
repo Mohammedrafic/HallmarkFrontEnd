@@ -7,11 +7,12 @@ export class Shift {
   locationI: number;
   departmentId: number;
   name: string;
-  shortName: string;
+  shortName?: string;
   startTime: string;
   endTime: string;
   standardStartTime?: string;
   standardEndTime?: string;
+  onCall?: boolean;
 
   constructor(shift: Shift) {
     this.id = shift.id;
