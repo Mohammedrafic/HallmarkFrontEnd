@@ -74,6 +74,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { DateTimeHelper } from '@core/helpers';
 import { UserPermissions } from "@core/enums";
 import { Permission } from "@core/interface";
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-bill-rate-setup',
@@ -345,10 +346,12 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           selectedRegions.push(this.orgRegions.find((region) => region.id === id) as OrganizationRegion)
         );
         this.filterColumns.locationIds.dataSource = [];
+        const locations: OrganizationLocation[] = [];
         selectedRegions.forEach((region) => {
           region.locations?.forEach((location) => (location.regionName = region.name));
-          this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
+          locations.push(...(region.locations as []));
         });
+        this.filterColumns.locationIds.dataSource = sortByField(locations, 'name');
       } else {
         this.filterColumns.locationIds.dataSource = [];
         this.billRateFilterFormGroup.get('locationIds')?.setValue([]);
@@ -361,12 +364,14 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRateFilterFormGroup.get('locationIds')?.valueChanges.subscribe((locationIds: number[]) => {
       if (locationIds && locationIds.length > 0) {
         this.filterColumns.departmentIds.dataSource = [];
+        const departments: OrganizationDepartment[] = [];
         locationIds.forEach((id) => {
           const selectedLocation = this.filterColumns.locationIds.dataSource.find(
             (location: OrganizationLocation) => location.id === id
           );
-          this.filterColumns.departmentIds.dataSource.push(...(selectedLocation?.departments as []));
+          departments.push(...(selectedLocation?.departments as []));
         });
+        this.filterColumns.departmentIds.dataSource = sortByField(departments, 'name');
       } else {
         this.filterColumns.departmentIds.dataSource = [];
         this.billRateFilterFormGroup.get('departmentIds')?.setValue([]);
@@ -724,15 +729,17 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       ?.valueChanges.pipe(takeUntil(this.unsubscribe$))
       .subscribe((regionIds: number[]) => {
         if (regionIds && regionIds.length > 0) {
-          this.locations = [];
+          const locations: OrganizationLocation[] = [];
           regionIds.forEach((id) => {
             const selectedRegion = this.orgRegions.find((region) => region.id === id);
-            this.locations.push(...(selectedRegion?.locations as any));
+            locations.push(...(selectedRegion?.locations as any));
           });
-          this.departments = [];
+          this.locations = sortByField(locations, 'name');
+          const departments: OrganizationDepartment[] = [];
           this.locations.forEach((location) => {
-            this.departments.push(...location.departments);
+            departments.push(...location.departments);
           });
+          this.departments = sortByField(departments, 'name');
         } else {
           this.locations = [];
           this.departments = [];
@@ -750,11 +757,12 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       ?.valueChanges.pipe(takeUntil(this.unsubscribe$))
       .subscribe((locationIds: number[]) => {
         if (locationIds && locationIds.length > 0) {
-          this.departments = [];
+          const departments: OrganizationDepartment[] = [];
           locationIds.forEach((id) => {
             const selectedLocation = this.locations.find((location) => location.id === id);
-            this.departments.push(...(selectedLocation?.departments as []));
+            departments.push(...(selectedLocation?.departments as []));
           });
+          this.departments = sortByField(departments, 'name');
         } else {
           this.departments = [];
         }

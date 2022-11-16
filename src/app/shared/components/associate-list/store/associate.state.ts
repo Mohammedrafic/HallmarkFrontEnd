@@ -38,7 +38,7 @@ export interface AssociateStateModel {
   feeExceptionsInitialData: FeeExceptionsInitialData | null;
   partnershipSettings: PartnershipSettings | null;
   jobDistributionInitialData: JobDistributionInitialData | null;
-  associateAgencyOrg: string | null;
+  associateAgencyOrg: { id: number, name: string }[];
 }
 @State<AssociateStateModel>({
   name: 'associateList',
@@ -50,7 +50,7 @@ export interface AssociateStateModel {
     feeExceptionsInitialData: null,
     jobDistributionInitialData: null,
     partnershipSettings: null,
-    associateAgencyOrg: null,
+    associateAgencyOrg: [],
   },
 })
 @Injectable()
@@ -68,7 +68,7 @@ export class AssociateListState {
   }
 
   @Selector()
-  static associateAgencyOrg(state: AssociateStateModel): string | null {
+  static associateAgencyOrg(state: AssociateStateModel): { id: number, name: string }[] {
     return state.associateAgencyOrg;
   }
 
@@ -253,9 +253,9 @@ export class AssociateListState {
   }
 
   @Action(GetAssociateAgencyOrg)
-  GetAssociateAgencyOrg({ patchState }: StateContext<AssociateStateModel>): Observable<string> {
+  GetAssociateAgencyOrg({ patchState }: StateContext<AssociateStateModel>): Observable<{ id: number, name: string }[]> {
     return this.associateService.getAssociateAgencyOrg().pipe(
-      tap((payload: string) => {
+      tap((payload: { id: number, name: string }[]) => {
         patchState({ associateAgencyOrg: payload });
       })
     );

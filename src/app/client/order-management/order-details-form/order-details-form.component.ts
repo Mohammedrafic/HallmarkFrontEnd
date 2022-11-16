@@ -159,7 +159,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedRegion: Region;
 
-  @Select(OrganizationManagementState.sortedoLocationsByRegionId)
+  @Select(OrganizationManagementState.sortedLocationsByRegionId)
   locations$: Observable<Location[]>;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedLocation: Location;

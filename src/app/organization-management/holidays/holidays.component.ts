@@ -154,20 +154,22 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
         this.selectedRegions = [];
         if (val !== null) {
           this.selectedRegions.push(this.regions.find((region) => region.id === val) as OrganizationRegion);
+          const locations: OrganizationLocation[] = []
           this.selectedRegions.forEach((region) => {
             if (region) {
               region.locations?.forEach((location) => (location.regionName = region.name));
-              this.locations = [...(region.locations as [])];
+              locations.push(...(region.locations as []));
             } else {
-              this.locations = [
+              locations.push(
                 {
                   name: 'All',
                   id: 0,
                   departments: [],
                 },
-              ];
+              );
             }
           });
+          this.locations = sortByField(locations, 'name');
         } else {
           this.locations = [];
           this.isAllRegionsSelected = false;
@@ -181,13 +183,13 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
           val.forEach((id) =>
             this.selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
           );
-          this.locations = [];
+          const locations: OrganizationLocation[] = [];
           this.isAllRegionsSelected = val.length === this.regions.length;
           this.selectedRegions.forEach((region) => {
             region.locations?.forEach((location) => (location.regionName = region.name));
-            this.locations.push(...(region.locations as []));
+            locations.push(...(region.locations as []));
           });
-          this.locations = sortByField(this.locations, 'name');
+          this.locations = sortByField(locations, 'name');
         } else {
           this.locations = [];
           this.isAllRegionsSelected = false;
