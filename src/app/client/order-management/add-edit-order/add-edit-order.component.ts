@@ -33,14 +33,16 @@ import isNil from 'lodash/fp/isNil';
 import { AbstractControl } from '@angular/forms';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { SaveTemplateDialogService } from '@client/order-management/save-template-dialog/save-template-dialog.service';
-import { AlertTrigger } from '@admin/store/alerts.actions';
-import { AlertTriggerDto } from '@shared/models/alerts-template.model';
-import { UserState } from 'src/app/store/user.state';
-import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
 import { ToastUtility } from '@syncfusion/ej2-notifications';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
-import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
+import { OrderJobDistribution } from '@shared/enums/job-distibution';
+import {
+  JOB_DISTRIBUTION_TITLE,
+  PROCEED_FOR_ALL_AGENCY,
+  PROCEED_FOR_TIER_LOGIC
+} from '@shared/constants';
+import { JobDistributionModel } from '@shared/models/job-distribution.model';
 
 enum SelectedTab {
   OrderDetails,
@@ -336,48 +338,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   public save(): void {
-    const isRegularBillRate =
-      this.billRatesComponent?.billRatesControl.value.some((item: BillRate) => item.billRateConfigId === 1) ||
-      this.orderBillRates.some((item: BillRate) => item.billRateConfigId === 1);
-    const billRatesValid = isRegularBillRate || this.isPerDiem || this.isPermPlacementOrder;
-    const credentialsValid = this.orderCredentials?.length;
-    const orderValid =
-      (this.orderDetailsFormComponent.orderTypeForm.disabled || this.orderDetailsFormComponent.orderTypeForm.valid) &&
-      this.orderDetailsFormComponent.generalInformationForm.valid &&
-      this.orderDetailsFormComponent.jobDistributionForm.valid &&
-      this.orderDetailsFormComponent.jobDescriptionForm.valid &&
-      this.orderDetailsFormComponent.contactDetailsForm.valid &&
-      this.orderDetailsFormComponent.workLocationForm.valid &&
-      this.orderDetailsFormComponent.specialProject.valid;
-
-    if (!billRatesValid) {
-      this.showBillRatesValidationMessage();
-    }
-    if (!credentialsValid) {
-      this.showCredentialsValidationMessage();
-    }
-    if (!orderValid) {
-      this.showOrderFormValidationMessage();
-    }
-
-    if (orderValid && billRatesValid && credentialsValid) {
-      const order = this.collectOrderData(true);
-      const documents = this.orderDetailsFormComponent.documents;
-
-      const hourlyRate = this.orderDetailsFormComponent.generalInformationForm.getRawValue().hourlyRate;
-      if (this.needToShowConfirmPopup(order, hourlyRate)) {
-        this.showConfirmPopupForZeroRate(order, documents);
-      } else {
-        this.proceedWithSaving(order, documents);
-      }
+    if(this.order) {
+      this.checkJobDistributionChange();
     } else {
-      this.orderDetailsFormComponent.orderTypeForm.markAllAsTouched();
-      this.orderDetailsFormComponent.generalInformationForm.markAllAsTouched();
-      this.orderDetailsFormComponent.jobDistributionForm.markAllAsTouched();
-      this.orderDetailsFormComponent.jobDescriptionForm.markAllAsTouched();
-      this.orderDetailsFormComponent.contactDetailsForm.markAllAsTouched();
-      this.orderDetailsFormComponent.workLocationForm.markAllAsTouched();
-      this.orderDetailsFormComponent.specialProject.markAllAsTouched();
+      this.saveOrder();
     }
   }
 
@@ -750,6 +714,81 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.store.dispatch(new SaveOrder(extendedOrder, documents));
     this.selectOrderTemplatesTab();
     this.closeSaveTemplateDialog();
+  }
+
+  private saveOrder(): void {
+    const isRegularBillRate =
+      this.billRatesComponent?.billRatesControl.value.some((item: BillRate) => item.billRateConfigId === 1) ||
+      this.orderBillRates.some((item: BillRate) => item.billRateConfigId === 1);
+    const billRatesValid = isRegularBillRate || this.isPerDiem || this.isPermPlacementOrder;
+    const credentialsValid = this.orderCredentials?.length;
+    const orderValid =
+      (this.orderDetailsFormComponent.orderTypeForm.disabled || this.orderDetailsFormComponent.orderTypeForm.valid) &&
+      this.orderDetailsFormComponent.generalInformationForm.valid &&
+      this.orderDetailsFormComponent.jobDistributionForm.valid &&
+      this.orderDetailsFormComponent.jobDescriptionForm.valid &&
+      this.orderDetailsFormComponent.contactDetailsForm.valid &&
+      this.orderDetailsFormComponent.workLocationForm.valid &&
+      this.orderDetailsFormComponent.specialProject.valid;
+
+    if (!billRatesValid) {
+      this.showBillRatesValidationMessage();
+    }
+    if (!credentialsValid) {
+      this.showCredentialsValidationMessage();
+    }
+    if (!orderValid) {
+      this.showOrderFormValidationMessage();
+    }
+
+    if (orderValid && billRatesValid && credentialsValid) {
+      const order = this.collectOrderData(true);
+      const documents = this.orderDetailsFormComponent.documents;
+
+      const hourlyRate = this.orderDetailsFormComponent.generalInformationForm.getRawValue().hourlyRate;
+      if (this.needToShowConfirmPopup(order, hourlyRate)) {
+        this.showConfirmPopupForZeroRate(order, documents);
+      } else {
+        this.proceedWithSaving(order, documents);
+      }
+    } else {
+      this.orderDetailsFormComponent.orderTypeForm.markAllAsTouched();
+      this.orderDetailsFormComponent.generalInformationForm.markAllAsTouched();
+      this.orderDetailsFormComponent.jobDistributionForm.markAllAsTouched();
+      this.orderDetailsFormComponent.jobDescriptionForm.markAllAsTouched();
+      this.orderDetailsFormComponent.contactDetailsForm.markAllAsTouched();
+      this.orderDetailsFormComponent.workLocationForm.markAllAsTouched();
+      this.orderDetailsFormComponent.specialProject.markAllAsTouched();
+    }
+  }
+
+  private checkJobDistributionChange(): void {
+    const [selectedDistribution] = this.getJobDistributionValues(
+      this.orderDetailsFormComponent.jobDistributionForm.value.jobDistributions
+    );
+    const [updatedDistribution] = this.getJobDistributionValues(this.order.jobDistributions);
+
+    if(updatedDistribution !== selectedDistribution && updatedDistribution === OrderJobDistribution.Selected){
+      this.confirmService
+        .confirm(
+          selectedDistribution === OrderJobDistribution.All ?
+            PROCEED_FOR_ALL_AGENCY : PROCEED_FOR_TIER_LOGIC,
+          {
+                  title: JOB_DISTRIBUTION_TITLE,
+                  okButtonLabel: 'Proceed',
+                  okButtonClass: 'primary'
+          }).pipe(
+            filter(Boolean)
+          ).subscribe(() => {
+            this.saveOrder();
+          });
+    } else {
+      this.saveOrder();
+    }
+  }
+
+  private getJobDistributionValues(jobDistributions: JobDistributionModel[]): number[] {
+   return jobDistributions.map((distribution: JobDistributionModel) => distribution.jobDistributionOption);
   }
 
   private markControlsAsRequired(): void {

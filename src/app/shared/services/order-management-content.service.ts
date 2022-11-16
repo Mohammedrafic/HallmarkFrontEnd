@@ -165,7 +165,7 @@ export class OrderManagementContentService {
       locationId: payload.order.locationId,
       reason: reason
     });
-  }  
+  }
 
   /**
    * Update candidate job
