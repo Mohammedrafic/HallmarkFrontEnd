@@ -95,7 +95,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
   public workflowGroupTypesData = [{ id: WorkflowGroupType.Organization, text: this.jobOrderWorkflow }];
   public workflowGroupTypesFields: FieldSettingsModel = { text: 'text', value: 'id' };
 
-  @Select(WorkflowState.workflows)
+  @Select(WorkflowState.sortedWorkflows)
   workflows$: Observable<WorkflowWithDetails[]>;
   public workflows: WorkflowWithDetails[];
 

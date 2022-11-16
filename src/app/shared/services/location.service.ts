@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { ImportResult } from "@shared/models/import.model";
 import {
@@ -82,7 +82,9 @@ export class LocationService {
    * Get Location Filtering Options
    */
   public getLocationFilterOptions(regionId: number): Observable<LocationFilterOptions> {
-    return this.http.get<LocationFilterOptions>(`/api/Locations/filteringoptions`, { params: { RegionId: regionId }});
+    return this.http.get<LocationFilterOptions>(`/api/Locations/filteringoptions`, { params: { RegionId: regionId }}).pipe(map((data) => {
+      return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], [...value].sort()]));
+    }));
   }
 
   /**

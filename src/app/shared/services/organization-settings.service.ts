@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { OrganizationSettingFilter, OrganizationSettingsGet, OrganizationSettingsPost } from '@shared/models/organization-settings.model';
+import { sortBy } from '@shared/helpers/sort-array.helper';
 
 @Injectable({ providedIn: 'root' })
 export class OrganizationSettingsService {
@@ -36,6 +37,6 @@ export class OrganizationSettingsService {
    * Get organization settings filtering options
    */
   public getOrganizationSettingsFilteringOptions(): Observable<string[]> {
-    return this.http.get<string[]>(`/api/OrganizationSettings/filteringOptions`);
+    return this.http.get<string[]>(`/api/OrganizationSettings/filteringOptions`).pipe(map((data) => sortBy(data)));
   }
 }

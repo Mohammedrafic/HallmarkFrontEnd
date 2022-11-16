@@ -1,23 +1,21 @@
 import { ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ChangeEventArgs, FieldSettingsModel, AutoComplete, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
 import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
-import { BusinessUnit } from '@shared/models/business-unit.model';
-import { GetBusinessByUnitType, GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
+import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
-import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -33,6 +31,7 @@ import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 import { CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SearchCandidate, SkillCategoryDto } from '../models/common-report.model';
 import { OrderTypeOptions } from '@shared/enums/order-type';
 import { OutsideZone } from "@core/decorators";
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-financial-time-sheet-report',
@@ -237,18 +236,23 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       if (!this.isClearAll) {
         let orgList = this.organizations?.filter((x) => data == x.organizationId);
         this.selectedOrganizations = orgList;
-        this.regionsList = [];
-        this.locationsList = [];
-        this.departmentsList = [];
+        const regionsList: Region[] = [];
+        const locationsList: Location[] = [];
+        const departmentsList: Department[] = [];
         orgList.forEach((value) => {
-          this.regionsList.push(...value.regions);
+          regionsList.push(...value.regions);
           value.regions.forEach((region) => {
-            this.locationsList.push(...region.locations);
+            locationsList.push(...region.locations);
             region.locations.forEach((location) => {
-              this.departmentsList.push(...location.departments);
+              departmentsList.push(...location.departments);
             });
           });
         });
+
+        this.regionsList = sortByField(regionsList, 'name');
+        this.locationsList = sortByField(locationsList, 'name');
+        this.departmentsList = sortByField(departmentsList, 'name');
+
         if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
           this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
         }

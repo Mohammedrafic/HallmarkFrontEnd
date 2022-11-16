@@ -36,6 +36,7 @@ import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { UserState } from 'src/app/store/user.state';
 import { Penalty } from '@shared/models/penalty.model';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 export enum ReasonsNavigationTabs {
   Rejection,
@@ -79,11 +80,8 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit, 
 
   constructor(protected override store: Store, private confirmService: ConfirmService, private actions$: Actions) {
     super(store);
-    for(const [key, val] of Object.entries(CancellationReasonsMap)) {
-      this.cancellationReasons.push({
-        id: +key, name: val
-      });
-    }
+    const cancellationReasons = Object.entries(CancellationReasonsMap).map(([key, value]) => ({ id: +key, name: value}));
+    this.cancellationReasons = sortByField(cancellationReasons, 'name');
   }
 
   override ngOnInit(): void {
@@ -116,12 +114,13 @@ export class ReasonsComponent extends AbstractPermissionGrid implements OnInit, 
         val.forEach((id) =>
           this.selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
         );
-        this.locations = [];
+        const regionLocations: OrganizationLocation[] = [];
         this.isAllRegionsSelected = val.length === this.regions.length;
         this.selectedRegions.forEach((region) => {
           region.locations?.forEach((location) => (location.regionName = region.name));
-          this.locations.push(...(region.locations as []));
+          regionLocations.push(...(region.locations as []));
         });
+        this.locations = sortByField(regionLocations, 'name');
       } else {
         this.locations = [];
         this.isAllRegionsSelected = false;

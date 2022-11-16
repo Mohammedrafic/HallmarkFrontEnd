@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { ProjectName, ProjectType } from '@shared/models/project.model';
 import {ProjectSpecialData} from "@shared/models/project-special-data.model";
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectsService {
@@ -24,7 +25,7 @@ export class ProjectsService {
    * @return list of project types
    */
   public getProjectTypes(): Observable<ProjectType[]> {
-    return this.http.get<ProjectType[]>(`/api/orders/projectTypes`);
+    return this.http.get<ProjectType[]>(`/api/orders/projectTypes`).pipe(map((data) => sortByField(data, 'projectType')));
   }
 
   /**
@@ -37,6 +38,18 @@ export class ProjectsService {
     if (lastSelectedBusinessUnitId) {
       headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
     }
-    return this.http.get<ProjectSpecialData>(`/api/orders/specialProjectData`, { headers });
+    return this.http.get<ProjectSpecialData>(`/api/orders/specialProjectData`, { headers }).pipe(
+      map((data) => {
+        const sortedFields: Record<string, string> = {
+          poNumbers: 'poNumber',
+          projectNames: 'projectName',
+          specialProjectCategories: 'projectType',
+        };
+
+        return Object.fromEntries(
+          Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key])])
+        );
+      })
+    );
   }
 }

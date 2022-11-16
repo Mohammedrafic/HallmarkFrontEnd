@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable, tap } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { Holiday, HolidayFilters, HolidaysPage, OrganizationHoliday, OrganizationHolidaysPage } from '@shared/models/holiday.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { sortBy } from '@shared/helpers/sort-array.helper';
 
 @Injectable({ providedIn: 'root' })
 export class HolidaysService {
@@ -139,6 +140,6 @@ export class HolidaysService {
    * @return list of names
    */
   public getHolidaysDataSources(): Observable<string[]> {
-    return this.http.get<string[]>(`/api/OrganizationHolidays/availiableNames`);
+    return this.http.get<string[]>(`/api/OrganizationHolidays/availiableNames`).pipe(map((data) => sortBy(data)));
   }
 }

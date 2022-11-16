@@ -3,6 +3,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 export type User = {
   firstName: string;
   lastName: string;
+  fullName: string;
   email: string;
   emailConfirmation: string;
   isDeleted: boolean;
