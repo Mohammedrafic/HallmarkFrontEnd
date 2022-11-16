@@ -7,3 +7,4 @@ export * from './order-contact-detail-titles';
 export * from './regex-patterns';
 export * from './ot-billrates-configuration';
 export * from './dropdown-options';
+export * from './organization-settings';
