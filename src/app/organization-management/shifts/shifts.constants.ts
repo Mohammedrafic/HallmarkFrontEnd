@@ -1,6 +1,6 @@
 import { ExportColumn } from "@shared/models/export.model";
 
-export const IrpShiftExportColumns: ExportColumn[] = [
+export const ShiftExportColumns: ExportColumn[] = [
   { text: 'Shift Name', column: 'Name' },
   { text: 'Start Time', column: 'StartTime' },
   { text: 'End Time', column: 'EndTime' },

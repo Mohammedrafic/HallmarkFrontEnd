@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { ShiftExportColumns } from "@organization-management/shifts/shifts.constants";
 import { ShiftsService } from "@organization-management/shifts/shifts.service";
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
@@ -23,7 +24,6 @@ import { DatePipe } from '@angular/common';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserState } from 'src/app/store/user.state';
-import { AppState } from "src/app/store/app.state";
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 
 @Component({
@@ -45,9 +45,6 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
-  @Select(AppState.isIrpFlagEnabled)
-  private isIrpFlagEnabled$: Observable<boolean>;
-
   public ShiftFormGroup: FormGroup;
   public optionFields = {
     text: 'name', value: 'id'
@@ -55,10 +52,9 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
   public title = '';
   public showForm = true;
   public maskPlaceholderValue: Object = { hour: 'HH', minute: 'MM' };
-  public columnsToExport: ExportColumn[] = [];
+  public columnsToExport: ExportColumn[] = ShiftExportColumns;
   public fileName: string;
   public defaultFileName: string;
-  public isIrpFlagEnabled: boolean;
 
   constructor(protected override store: Store,
               private actions$: Actions,
@@ -70,9 +66,9 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.ShiftFormGroup = this.shiftsService.getShiftForm();
     this.watchForShiftPage();
     this.watchForShiftActions();
-    this.watchForIrpFlag();
   }
 
   ngOnDestroy(): void {
@@ -128,7 +124,6 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
     this.ShiftFormGroup.setValue({
       id: data.id,
       name: data.name,
-      shortName: data.shortName,
       startTime: startDate,
       endTime: endDate,
     });
@@ -221,14 +216,6 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
       takeUntil(this.unsubscribe$)
     ).subscribe(() => {
       this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
-    });
-  }
-
-  private watchForIrpFlag(): void {
-    this.isIrpFlagEnabled$.pipe(takeUntil(this.unsubscribe$)).subscribe((isIrpFlagEnabled: boolean) => {
-      this.isIrpFlagEnabled = isIrpFlagEnabled;
-      this.ShiftFormGroup = this.shiftsService.getShiftForm(isIrpFlagEnabled);
-      this.columnsToExport = this.shiftsService.getShiftExportColumns(isIrpFlagEnabled);
     });
   }
 }
