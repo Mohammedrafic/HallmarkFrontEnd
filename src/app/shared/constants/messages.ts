@@ -57,3 +57,7 @@ export const deployedCandidateMessage = (orderIds: string[]) =>
 export const SEND_EMAIL_REQUIRED = 'Required';
 export const DOCUMENT_UPLOAD_SUCCESS = 'Document uploaded successfully';
 export const DOCUMENT_UPLOAD_EDIT = 'Document modified successfully';
+export const DOCUMENT_SHARED_SUCCESS = 'Documents shared successfully';
+export const DOCUMENT_DELETE_SUCCESS = 'Documents deleted successfully';
+export const DOCUMENT_UNSHARED_SUCCESS = 'Documents UnShared successfully';
+export const FOLDER_DELETE_SUCCESS = 'Folder deleted successfully';
