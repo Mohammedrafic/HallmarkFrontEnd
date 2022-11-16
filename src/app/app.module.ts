@@ -66,12 +66,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
       multi: true,
     },
     Overlay,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: featureFlagProviderFactory,
-      deps: [FeatureFlagService],
-      multi: true,
-    }
   ],
   bootstrap: [AppComponent, MsalRedirectComponent],
 })
