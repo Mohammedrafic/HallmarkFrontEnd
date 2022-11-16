@@ -19,6 +19,7 @@ import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { deployedCandidateMessage, DEPLOYED_CANDIDATE } from '@shared/constants';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -115,6 +116,9 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
         .subscribe((isConfirm) => {
           if (isConfirm) {
             const value = this.formGroup.getRawValue();
+            if (value.availableStartDate) {
+              value.availableStartDate.setHours(0, 0, 0, 0);
+            }
             this.store
               .dispatch(
                 new ApplyOrderApplicants({
@@ -123,7 +127,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
                   candidateId: this.candidateId,
                   candidateBillRate: value.candidateBillRate,
                   expAsTravelers: value.expAsTravelers,
-                  availableStartDate: toCorrectTimezoneFormat(value.availableStartDate),
+                  availableStartDate: DateTimeHelper.toUtcFormat(value.availableStartDate),
                   requestComment: value.requestComment,
                 })
               )
