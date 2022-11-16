@@ -7,12 +7,12 @@ import { ShowSideDialog } from "../../store/app.actions";
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { UserState } from '../../store/user.state';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { Tiers } from '@organization-management/store/tiers.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE } from '@shared/constants';
 import { TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
 import { TierDetails } from '@shared/components/tiers-dialog/interfaces';
+import { AbstractPermission } from '@shared/helpers/permissions';
 
 @Component({
   selector: 'app-tiers',
@@ -20,7 +20,7 @@ import { TierDetails } from '@shared/components/tiers-dialog/interfaces';
   styleUrls: ['./tiers.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TiersComponent extends DestroyableDirective implements OnInit {
+export class TiersComponent extends AbstractPermission implements OnInit {
   @Select(UserState.organizationStructure)
   private organizationStructure$: Observable<OrganizationStructure>;
 
@@ -31,14 +31,15 @@ export class TiersComponent extends DestroyableDirective implements OnInit {
   private tierFormState: TierDTO;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private actions$: Actions,
     private confirmService: ConfirmService,
   ) {
-    super();
+    super(store);
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.getOrganizationStructure();
     this.watchForRegionStructure();
     this.watchForOverrideTier();
@@ -71,7 +72,7 @@ export class TiersComponent extends DestroyableDirective implements OnInit {
     this.organizationStructure$
       .pipe(
         filter(Boolean),
-        takeUntil(this.destroy$)
+        takeUntil(this.componentDestroy())
       ).subscribe(
         (structure: OrganizationStructure) => {
         this.regionsStructure = structure.regions;
@@ -90,7 +91,7 @@ export class TiersComponent extends DestroyableDirective implements OnInit {
           })
       }),
         filter(Boolean),
-        takeUntil(this.destroy$),
+        takeUntil(this.componentDestroy()),
       ).subscribe(() => {
       this.store.dispatch(new Tiers.SaveTier({
         ...this.tierFormState,

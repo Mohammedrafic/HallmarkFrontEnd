@@ -52,6 +52,8 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
     this.setDialogTitle(value);
   };
 
+  @Input() permission: boolean;
+
   public dialogConfig: TierDialogConfig;
   public title: string = '';
   public regions: OrganizationRegion[] = [];

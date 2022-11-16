@@ -10,6 +10,7 @@ import { MENU_CONFIG } from '@shared/constants';
 import {
   AGENCY_ID_STORAGE_KEY,
   LAST_SELECTED_BUSINESS_UNIT_TYPE,
+  LogiReportJsLoaded,
   ORG_ID_STORAGE_KEY,
   USER_STORAGE_KEY
 } from '@shared/constants/local-storage-keys';
@@ -212,6 +213,7 @@ export class UserState {
     window.localStorage.removeItem(USER_STORAGE_KEY);
     window.localStorage.removeItem(ORG_ID_STORAGE_KEY);
     window.localStorage.removeItem(AGENCY_ID_STORAGE_KEY);
+    window.localStorage.removeItem(LogiReportJsLoaded);
     patchState({
       user: null,
       lastSelectedAgencyId: null,

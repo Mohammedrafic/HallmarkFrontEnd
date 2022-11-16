@@ -25,11 +25,13 @@ import { Overlay } from '@angular/cdk/overlay';
 import { ContactusState } from './store/contact-us.state';
 import { PreservedFiltersState } from './store/preserved-filters.state';
 import { FeatureFlagService, featureFlagProviderFactory } from '@core/services/feature-flag';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
     Spinnermodule,

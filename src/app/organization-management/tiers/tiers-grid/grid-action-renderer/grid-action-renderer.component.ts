@@ -8,7 +8,7 @@ import { Tiers } from '@organization-management/store/tiers.actions';
 import { TierGridColumns } from '@organization-management/tiers/interfaces';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { AbstractPermission } from '@shared/helpers/permissions';
 
 @Component({
   selector: 'app-grid-action-renderer',
@@ -16,14 +16,14 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
   styleUrls: ['./grid-action-renderer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GridActionRendererComponent extends DestroyableDirective {
+export class GridActionRendererComponent extends AbstractPermission {
   public cellValue: TierGridColumns;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private readonly confirmService: ConfirmService
   ) {
-    super();
+    super(store);
   }
 
   public agInit(params: ICellRendererParams): void {
@@ -47,7 +47,7 @@ export class GridActionRendererComponent extends DestroyableDirective {
         okButtonClass: 'delete-button',
       }).pipe(
         filter(Boolean),
-        takeUntil(this.destroy$),
+        takeUntil(this.componentDestroy()),
       )
       .subscribe(() => {
         this.store.dispatch(new Tiers.DeleteTier(this.cellValue.data.id));
