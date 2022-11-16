@@ -148,7 +148,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   public readonly masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  @Select(RejectReasonState.orderRequisition)
+  @Select(RejectReasonState.sortedOrderRequisition)
   public readonly reasons$: Observable<RejectReasonPage>;
 
   public readonly reasonForRequisitionFields: FieldSettingsModel = { text: 'reason', value: 'id' };

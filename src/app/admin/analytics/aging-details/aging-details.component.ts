@@ -243,7 +243,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
       }
     }
     if (!this.agingReportForm.dirty) {
-      this.message = "Default filter selected with all regions ,locations and departments";
+      this.message = "Default filter selected with all regions, locations and departments";
     }
     else {
       this.isResetFilter = false;

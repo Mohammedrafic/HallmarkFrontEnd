@@ -29,7 +29,7 @@ export class OrganizationManagementComponent extends AbstractPermission implemen
 
   private watchForPermissions(): void {
     this.getPermissionStream().pipe(
-      filter(() => this.sideMenuConfig.length <= 2),
+      filter(() => this.sideMenuConfig.length <= 1),
       takeUntil(this.componentDestroy())
     ).subscribe((permissions: Permission) => {
         this.userPermission = permissions;

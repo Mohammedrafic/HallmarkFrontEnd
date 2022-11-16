@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 
 @Injectable({
@@ -16,7 +17,20 @@ export class OrderFilteringOptionsService {
    * @return Array of options for agency filter
    */
   public getAgencyOptions(): Observable<AgencyOrderFilteringOptions> {
-    return this.http.get<AgencyOrderFilteringOptions>(`/api/OrdersFilteringOptions/agency`);
+    return this.http.get<AgencyOrderFilteringOptions>(`/api/OrdersFilteringOptions/agency`).pipe(
+      map((data) => {
+        const sortedFields: Record<keyof AgencyOrderFilteringOptions, string> = {
+          partneredOrganizations: 'name',
+          candidateStatuses: 'statusText',
+          orderStatuses: 'statusText',
+          masterSkills: 'name',
+          poNumbers: 'poNumber',
+          projectNames: 'projectName',
+          specialProjectCategories: 'projectType',
+        }
+          return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof AgencyOrderFilteringOptions])]))
+      }),
+    );;
   }
 }
 

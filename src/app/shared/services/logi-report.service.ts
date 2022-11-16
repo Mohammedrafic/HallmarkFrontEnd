@@ -1,11 +1,12 @@
 import {  CommonReportFilterOptions, SearchCandidate} from "@admin/analytics/models/common-report.model";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { sortByField } from "@shared/helpers/sort-by-field.helper";
 import { ConfigurationDto } from "@shared/models/analytics.model";
 import { DepartmentsPage } from "@shared/models/department.model";
 import { LocationsPage } from "@shared/models/location.model";
 import { regionsPage } from "@shared/models/region.model";
-import { Observable } from "rxjs";
+import { map, Observable } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class LogiReportService {
@@ -47,7 +48,17 @@ public getLogiReportData(): Observable<ConfigurationDto[]> {
    * @return CommonReportFilterOptions
    */
 public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOptions> {
-  return this.http.post<CommonReportFilterOptions>(`/api/LogiReport/financialtimesheet/filter`,filter);
+  return this.http.post<CommonReportFilterOptions>(`/api/LogiReport/financialtimesheet/filter`,filter).pipe(map((data) => {
+    const sortedFields: Record<keyof CommonReportFilterOptions, string> = { 
+      candidateStatuses: 'statusText',
+      orderStatuses: 'statusText',
+      masterSkills: 'name',
+      skillCategories: 'name',
+      agencies: 'agencyName',
+    }
+    
+    return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof CommonReportFilterOptions])]))
+  }));
 }
 /**
    * Get the Common Candidate Search

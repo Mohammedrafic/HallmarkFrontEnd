@@ -34,6 +34,7 @@ import {
 } from '@organization-management/store/credentials.actions';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-credentials-setup',
@@ -331,7 +332,7 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
 
       if (regionId) {
         const selectedRegion = this.orgRegions.find(region => region.id === regionId);
-        this.locations.push(...selectedRegion?.locations as any);
+        this.locations.push(...sortByField(selectedRegion?.locations ?? [], 'name') as []);
         this.locations.forEach(location => this.departments.push(...location.departments));
 
         const filter: CredentialSetupFilterDto = {
@@ -359,7 +360,7 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
 
       if (locationId) {
         const selectedLocation = this.locations.find(location => location.id === locationId);
-        this.departments.push(...selectedLocation?.departments as []);
+        this.departments.push(...sortByField(selectedLocation?.departments ?? [], 'name') as []);
 
         const filter: CredentialSetupFilterDto = {
           regionId: this.headerFilterFormGroup.controls['regionId'].value,
@@ -408,7 +409,7 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
 
       if (groupId) {
         const selectedGroup = this.groups.find(group => group.id === groupId);
-        this.skills.push(...selectedGroup?.skills as []);
+        this.skills.push(...sortByField(selectedGroup?.skills ?? [], 'name') as []);
 
         const filter: CredentialSetupFilterDto = {
           regionId: this.headerFilterFormGroup.controls['regionId'].value,

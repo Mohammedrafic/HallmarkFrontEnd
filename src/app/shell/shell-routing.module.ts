@@ -1,12 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { FeatureFlagResolverService } from '@core/resolvers';
 import { ShellPageComponent } from './shell.component';
 
 const shellRoutes: Routes = [
   {
     path: '',
     component: ShellPageComponent,
+    resolve: [FeatureFlagResolverService],
     children: [
       {
         path: 'admin',

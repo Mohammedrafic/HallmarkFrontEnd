@@ -70,7 +70,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   @Select(OrganizationManagementState.phoneTypes)
   phoneTypes$: Observable<FieldSettingsModel[]>;
 
-  @Select(OrganizationManagementState.regions)
+  @Select(OrganizationManagementState.sortedRegions)
   regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id'};
   selectedRegion: Region;

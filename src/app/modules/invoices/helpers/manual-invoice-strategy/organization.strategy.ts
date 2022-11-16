@@ -11,6 +11,7 @@ import { AddManInvoiceDialogConfig, AddManInvoiceForm, ManualInvoiceInputOptions
 import { InvoiceMetaAdapter } from '../invoice-meta.adapter';
 import { ManualInvoiceStrategy } from './strategy.interface';
 import { Invoices } from '../../store/actions/invoices.actions';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable({ providedIn: 'any'})
 export class OrganizationStrategy implements ManualInvoiceStrategy {
@@ -33,21 +34,23 @@ export class OrganizationStrategy implements ManualInvoiceStrategy {
       }
 
       if (isPosition) {
-        options.invoiceCandidates = meta.map(el => ({
+        const invoiceCandidates = meta.map(el => ({
           text: `${el.candidateFirstName} ${el.candidateLastName}`,
           value: el.candidateId,
         }));
+        options.invoiceCandidates = sortByField(invoiceCandidates, 'text');
 
-        options.invoiceAgencies = meta.map(el => ({
+        const invoiceAgencies = meta.map(el => ({
           text: el.agencyName,
           value: el.agencyId,
         }));
+        options.invoiceAgencies = sortByField(invoiceAgencies, 'text');
 
         this.connectConfigOptions(config, options);
         form.get('unitId')?.patchValue(meta[0].agencyId, { emitEvent: false, onlySelf: true });
         form.get('nameId')?.patchValue(meta[0].candidateId);
       } else {
-        options.invoiceAgencies = InvoiceMetaAdapter.createAgencyOptions(meta);
+        options.invoiceAgencies = sortByField(InvoiceMetaAdapter.createAgencyOptions(meta), 'text');
         this.connectConfigOptions(config, options);
         form.get('unitId')?.patchValue(options.invoiceAgencies[0].value);
         form.get('nameId')?.patchValue(options.invoiceCandidates[0].value);

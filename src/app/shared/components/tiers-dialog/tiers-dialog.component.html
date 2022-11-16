@@ -1,6 +1,7 @@
 <app-side-dialog
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveTiers()"
+  [disableSaveButton]="permission"
   header="{{ title }}"
 >
   <div class="form" *ngIf="tierForm">

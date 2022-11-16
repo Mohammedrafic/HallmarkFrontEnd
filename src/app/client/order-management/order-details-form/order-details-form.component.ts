@@ -154,17 +154,17 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order | null>;
 
-  @Select(OrganizationManagementState.regions)
+  @Select(OrganizationManagementState.sortedRegions)
   regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedRegion: Region;
 
-  @Select(OrganizationManagementState.locationsByRegionId)
+  @Select(OrganizationManagementState.sortedoLocationsByRegionId)
   locations$: Observable<Location[]>;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedLocation: Location;
 
-  @Select(OrganizationManagementState.departments)
+  @Select(OrganizationManagementState.sortedDepartments)
   departments$: Observable<Department[]>;
   departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   selectedDepartment: Department;
@@ -202,7 +202,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrganizationManagementState.organizationSettings)
   organizationSettings$: Observable<OrganizationSettingsGet[]>;
 
-  @Select(RejectReasonState.orderRequisition)
+  @Select(RejectReasonState.sortedOrderRequisition)
   public reasons$: Observable<RejectReasonPage>;
 
   public isEditMode: boolean;

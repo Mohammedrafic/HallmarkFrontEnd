@@ -1,0 +1,10 @@
+.mat-menu-panel.mat-menu-after {
+  border-radius: 0;
+
+  .mat-menu-content {
+    .mat-menu-item {
+      line-height: 40px;
+      height: 40px;
+    }
+  }
+}
