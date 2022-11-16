@@ -20,6 +20,7 @@ import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-f
 import { AllOrganizationsSkill } from 'src/app/dashboard/models/all-organization-skill.model';
 import { DeleteEventArgs } from '@syncfusion/ej2-angular-buttons';
 import { isEqual } from 'lodash';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 
 @Component({
@@ -206,7 +207,8 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
           this.filterColumns.regionIds.dataSource.push(...(organization.regions as []));
         })
         
-        this.filterColumns.skillIds.dataSource.push(...this.commonSkills as [], ...allOrganizationSkills as [])
+        const sortedSkills: AllOrganizationsSkill[] = sortByField(this.commonSkills.concat(allOrganizationSkills), 'skillDescription');
+        this.filterColumns.skillIds.dataSource.push(...sortedSkills as []);
       } else {
         this.filterColumns.regionIds.dataSource = [];
         this.filterColumns.skillIds.dataSource = this.commonSkills;

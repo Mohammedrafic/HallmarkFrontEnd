@@ -29,6 +29,7 @@ import {
   SaveUpdateCredentialSetupMappingData,
   SaveUpdateCredentialSetupMappingSucceeded
 } from '@organization-management/store/credentials.actions';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 export enum DropdownsList {
   Regions = 'regions',
@@ -460,7 +461,7 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
         this.locations = [];
         regionIds.forEach((id) => {
           const selectedRegion = this.orgRegions.find(region => region.id === id);
-          this.locations.push(...selectedRegion?.locations as any);
+          this.locations.push(...sortByField(selectedRegion?.locations ?? [], 'name') as []);
         });
         this.departments = [];
         this.locations.forEach(location => {
@@ -482,7 +483,7 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
         this.departments = [];
         locationIds.forEach(id => {
           const selectedLocation = this.locations.find(location => location.id === id);
-          this.departments.push(...selectedLocation?.departments as []);
+          this.departments.push(...sortByField(selectedLocation?.departments ?? [], 'name') as []);
         });
       } else {
         this.departments = [];

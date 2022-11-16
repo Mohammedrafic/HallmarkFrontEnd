@@ -201,7 +201,7 @@ export class SecurityState {
 
   @Action(GetBusinessByUnitType)
   GetBusinessByUnitType(
-    { dispatch,patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     { type }: GetBusinessByUnitType
   ): Observable<BusinessUnit[] | void> {
     return this.businessUnitService.getBusinessByUnitType(type).pipe(
@@ -237,7 +237,7 @@ export class SecurityState {
 
   @Action(GetRolesPage)
   GetRolesPage(
-    { dispatch,patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     { businessUnitIds, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters }: GetRolesPage
   ): Observable<RolesPage | void> {
     return this.roleService
@@ -271,7 +271,7 @@ export class SecurityState {
 
   @Action(GetUsersPage)
   GetUsersPage(
-    { dispatch,patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     { businessUnitIds, businessUnitType, pageNumber, pageSize, sortModel, filterModel }: GetUsersPage
   ): Observable<UsersPage | void> {
     return this.userService
@@ -306,7 +306,7 @@ export class SecurityState {
 
   @Action(GetPermissionsTree)
   GetPermissionsTree(
-    { dispatch,patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     { type }: GetPermissionsTree
   ): Observable<PermissionsTree | void> {
     patchState({ isNewRoleDataLoading: true });
@@ -387,7 +387,7 @@ export class SecurityState {
   }
 
   @Action(RemoveRole)
-  RemoveRole({ dispatch,patchState, getState }: StateContext<SecurityStateModel>, { id }: RemoveRole): Observable<RolesPage | void> {
+  RemoveRole({ dispatch, patchState, getState }: StateContext<SecurityStateModel>, { id }: RemoveRole): Observable<RolesPage | void> {
     const state = getState();
     return this.roleService.removeRoles(id).pipe(
       tap(() => {
@@ -461,9 +461,9 @@ export class SecurityState {
 
   @Action(GetOrganizationsStructureAll)
   GetOrganizationsStructureAll(
-    { dispatch,patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     { userId }: GetOrganizationsStructureAll
-  ): Observable<Organisation[] |void> {
+  ): Observable<Organisation[] | void> {
     return this.userService.getUserVisibilitySettingsOrganisation(userId).pipe(
       tap((payload) => {
         payload.forEach((organization: Organisation) => {
@@ -512,7 +512,7 @@ export class SecurityState {
   }
   @Action(GetUSCanadaTimeZoneIds)
   GetUSCanadaTimeZoneIds(
-    { dispatch,patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     {}: GetUSCanadaTimeZoneIds
   ): Observable<TimeZoneModel[] | void> {
     return this.nodatimeService.getUSCanadaTimeZoneIds().pipe(

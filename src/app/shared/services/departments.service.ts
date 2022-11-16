@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import {
   Department,
@@ -12,6 +12,7 @@ import {
 } from '@shared/models/department.model';
 import { ImportResult } from "@shared/models/import.model";
 import { ExportPayload } from '@shared/models/export.model';
+import { sortBy } from '@shared/helpers/sort-array.helper';
 
 @Injectable({ providedIn: 'root' })
 export class DepartmentsService {
@@ -78,8 +79,10 @@ export class DepartmentsService {
   /**
    * Get Department Filtering Options
    */
-  public getDepartmentFilterOptions(locationId: number): Observable<DepartmentFilterOptions> {
-    return this.http.get<DepartmentFilterOptions>(`/api/Departments/filteringoptions`, { params: { LocationId: locationId }});
+   public getDepartmentFilterOptions(locationId: number): Observable<DepartmentFilterOptions> {
+    return this.http
+      .get<DepartmentFilterOptions>(`/api/Departments/filteringoptions`, { params: { LocationId: locationId } })
+      .pipe(map((data) => Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortBy(value)]))));
   }
 
   public getDepartmentsImportTemplate(errorRecords: ImportedDepartment[]): Observable<any> {

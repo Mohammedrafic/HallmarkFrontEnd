@@ -15,7 +15,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType, GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
@@ -170,6 +170,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.orderFilterColumnsSetup();
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
+      this.store.dispatch(new ClearLogiReportState());
       this.CommonReportFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {
           this.filterOptionsData = data;
@@ -363,7 +364,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     let { businessIds, candidateName, candidateStatuses, departmentIds, jobId, jobStatuses, locationIds,
       regionIds, skillCategoryIds,agencyIds, skillIds, startDate, endDate } = this.jobDetailSummaryReportForm.getRawValue();
       if (!this.jobDetailSummaryReportForm.dirty) {
-        this.message = "Default filter selected with all regions ,locations and departments for last and next 30 days.";
+        this.message = "Default filter selected with all regions, locations and departments for last and next 30 days.";
       }
       else {
         this.isLoadNewFilter = false;

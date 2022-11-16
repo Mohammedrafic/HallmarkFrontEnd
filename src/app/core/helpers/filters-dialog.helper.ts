@@ -17,6 +17,7 @@ import { findSelectedItems } from './functions.helper';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { ActivatedRoute } from '@angular/router';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Directive()
 export class FiltersDialogHelper<T, F, S> extends Destroyable {
@@ -143,7 +144,7 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
             region.locations?.forEach(location => location.regionName = region.name);
             res.push(...region.locations as []);
           });
-          this.filtersHelperService.setDataSourceByFormKey(this.filtersConfig['LocationIds'], res);
+          this.filtersHelperService.setDataSourceByFormKey(this.filtersConfig['LocationIds'], sortByField(res, 'name'));
         } else {
           this.resetDataSourceAndChips(this.filtersConfig['LocationIds']);
         }
@@ -160,7 +161,7 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
             const selectedLocation = (this.filterColumns as any).locationIds.dataSource.find((location: OrganizationLocation) => location.id === id);
             res.push(...selectedLocation?.departments as []);
           });
-          this.filtersHelperService.setDataSourceByFormKey(this.filtersConfig['DepartmentIds'], res);
+          this.filtersHelperService.setDataSourceByFormKey(this.filtersConfig['DepartmentIds'], sortByField(res, 'name'));
         } else {
           this.resetDataSourceAndChips(this.filtersConfig['DepartmentIds']);
         }

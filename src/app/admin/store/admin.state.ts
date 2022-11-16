@@ -60,6 +60,7 @@ import { CredentialsService } from '@shared/services/credentials.service';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { UserOrganizationsAgenciesChanged } from 'src/app/store/user.actions';
 import { HttpErrorResponse } from '@angular/common/http';
+import { COUNTRIES } from '@shared/constants/countries-list';
 
 interface DropdownOption {
   id: number;
@@ -97,7 +98,7 @@ export interface AdminStateModel {
 @State<AdminStateModel>({
   name: 'admin',
   defaults: {
-    countries: [{ id: Country.USA, text: Country[0] }, { id: Country.Canada, text: Country[1] }],
+    countries: COUNTRIES,
     statesGeneral: UsaStates,
     statesBilling: UsaStates,
     phoneTypes: GeneralPhoneTypes,

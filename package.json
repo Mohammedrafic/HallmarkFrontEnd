@@ -61,6 +61,7 @@
     "@syncfusion/ej2-layouts": "^20.1.47",
     "@syncfusion/ej2-notifications": "^20.1.47",
     "angular-feather": "^6.3.0",
+    "@angular/material": "13.3.9",
     "jspdf": "2.5.1",
     "jspdf-autotable": "3.5.25",
     "lodash": "^4.17.21",

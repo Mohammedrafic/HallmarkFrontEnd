@@ -12,6 +12,7 @@ import { isArray } from 'lodash';
 import { datepickerMask } from '@shared/constants/datepicker-mask';
 import { formatDate } from '@shared/constants/format-date';
 import { placeholderDate } from '@shared/constants/placeholder-date';
+import { ChangeDetectorRef } from '@angular/core';
 
 enum ExportType {
   'Excel File',
@@ -190,14 +191,17 @@ export abstract class AbstractGridConfigurationComponent {
     this.updatePage();
   }
 
-  contentLoadedHandler() {
+  contentLoadedHandler(cd?: ChangeDetectorRef | null) {
     // Syncfusion Support ticket #403476
     setTimeout(() => {
       this.isLoaded = true;
+      if (cd) {
+        cd.detectChanges();
+      }
     });
   }
 
-  gridDataBound(grid: any): void {
+  gridDataBound(grid: any, cd: ChangeDetectorRef | null = null): void {
     if (this.selectedItems.length) {
       const selectedIndexes: number[] = [];
       grid.dataSource.map((item: any, i: number) => {
@@ -207,7 +211,7 @@ export abstract class AbstractGridConfigurationComponent {
       });
       grid.selectRows(selectedIndexes);
     }
-    this.contentLoadedHandler();
+    this.contentLoadedHandler(cd);
   }
 
   actionBegin(args: PageEventArgs, grid?: any): void {

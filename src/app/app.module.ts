@@ -25,11 +25,13 @@ import { Overlay } from '@angular/cdk/overlay';
 import { ContactusState } from './store/contact-us.state';
 import { PreservedFiltersState } from './store/preserved-filters.state';
 import { FeatureFlagService, featureFlagProviderFactory } from '@core/services/feature-flag';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
     Spinnermodule,
@@ -64,12 +66,6 @@ import { FeatureFlagService, featureFlagProviderFactory } from '@core/services/f
       multi: true,
     },
     Overlay,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: featureFlagProviderFactory,
-      deps: [FeatureFlagService],
-      multi: true,
-    }
   ],
   bootstrap: [AppComponent, MsalRedirectComponent],
 })

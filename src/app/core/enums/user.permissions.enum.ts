@@ -93,6 +93,8 @@ export enum UserPermissions {
   CanViewSettingsBillRates = 1900,
   CanEditSettingsBillRates = 1901,
   CanDeleteSettingsBillRates = 1902,
+  CanViewOrganizationTiers = 1950,
+  CanEditOrganizationTiers = 1951,
   DashboardWidgets = 2000,
   WidgetApplicantsByRegion = 2010,
   WidgetCandidatesByStatus = 2020,

@@ -26,9 +26,9 @@ interface CandidateDetailsStateModel {
   navigationTab: NavigationTabModel;
   pageNumber: number | null;
   pageSize: number | null;
-  candidateSkills: MasterSkillByOrganization | null;
+  candidateSkills: MasterSkillByOrganization[];
   filters: FiltersModal | null;
-  candidateRegions: CandidatesDetailsRegions | null;
+  candidateRegions: CandidatesDetailsRegions[];
   isNavigate: boolean | null;
 }
 
@@ -43,9 +43,9 @@ interface CandidateDetailsStateModel {
     },
     pageNumber: null,
     pageSize: null,
-    candidateSkills: null,
+    candidateSkills: [],
     filters: null,
-    candidateRegions: null,
+    candidateRegions: [],
     isNavigate: null,
   },
 })
@@ -67,7 +67,7 @@ export class CandidateDetailsState {
   }
 
   @Selector()
-  static candidateRegions(state: CandidateDetailsStateModel): CandidatesDetailsRegions | null {
+  static candidateRegions(state: CandidateDetailsStateModel): CandidatesDetailsRegions[] {
     return state.candidateRegions;
   }
 
@@ -87,7 +87,7 @@ export class CandidateDetailsState {
   }
 
   @Selector()
-  static candidateSkills(state: CandidateDetailsStateModel): MasterSkillByOrganization | null {
+  static candidateSkills(state: CandidateDetailsStateModel): MasterSkillByOrganization[] {
     return state.candidateSkills;
   }
 
@@ -136,9 +136,9 @@ export class CandidateDetailsState {
   }
 
   @Action(GetCandidateRegions)
-  GetCandidateRegions({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<CandidatesDetailsRegions> {
+  GetCandidateRegions({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<CandidatesDetailsRegions[]> {
     return this.candidateDetailsService.getRegions().pipe(
-      tap((payload: CandidatesDetailsRegions) => {
+      tap((payload: CandidatesDetailsRegions[]) => {
         patchState({ candidateRegions: payload });
         return payload;
       })
@@ -146,9 +146,9 @@ export class CandidateDetailsState {
   }
 
   @Action(GetCandidateSkills)
-  GetCandidateSkills({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<MasterSkillByOrganization> {
+  GetCandidateSkills({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<MasterSkillByOrganization[]> {
     return this.candidateDetailsService.getSkills().pipe(
-      tap((payload: MasterSkillByOrganization) => {
+      tap((payload: MasterSkillByOrganization[]) => {
         patchState({ candidateSkills: payload });
         return payload;
       })
