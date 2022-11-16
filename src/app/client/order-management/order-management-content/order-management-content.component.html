@@ -142,21 +142,18 @@
               ></span>
             </button>
             <button
+              ejs-button
+              [matMenuTriggerFor]="menu"
               (click)="$event.stopPropagation()"
-              ejs-dropdownbutton
               [disabled]="data.orderType === orderTypes.ReOrder && data.status === orderStatus.Closed || !hasCreateEditOrderPermission"
-              [items]="
-                (data.status === orderStatus.Closed && closedOrderMenu) ||
+              [matMenuTriggerData]="{data: data, items: (data.status === orderStatus.Closed && closedOrderMenu) ||
                 (activeTab === OrganizationOrderManagementTabs.ReOrders && getMenuForReorders(data)) ||
-                (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : getMoreMenu(data))
-              "
-              (select)="menuOptionSelected($event, data)"
+                (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : getMoreMenu(data))}"
               cssClass="e-flat primary-icon-button"
             >
               <span><i-feather name="more-vertical" class="icon"></i-feather></span>
             </button>
           </div>
-
           <ng-template #templateButtons>
             <div class="row-tool-buttons" (click)="stopPropagation($event)">
               <i-feather
@@ -1000,3 +997,14 @@
   (closePositionSuccess)="updatePositionDetails($event)"
 >
 </app-close-order>
+
+<mat-menu #menu="matMenu">
+  <ng-template matMenuContent let-items="items" let-data="data">
+    <button mat-menu-item 
+            *ngFor="let item of items"
+            [disabled]="item.disabled"
+            (click)="menuOptionSelected(item.id, data)">
+            {{ item.text }}
+    </button>
+  </ng-template>
+</mat-menu>

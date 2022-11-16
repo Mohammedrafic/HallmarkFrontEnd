@@ -42,6 +42,7 @@ import { HolidaysState } from '../store/holidays.state';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { DateTimeHelper } from '@core/helpers';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-holidays',
@@ -186,6 +187,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
             region.locations?.forEach((location) => (location.regionName = region.name));
             this.locations.push(...(region.locations as []));
           });
+          this.locations = sortByField(this.locations, 'name');
         } else {
           this.locations = [];
           this.isAllRegionsSelected = false;
@@ -200,10 +202,12 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
           selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
         );
         this.filterColumns.locationIds.dataSource = [];
+        const locations: OrganizationLocation[] = [];
         selectedRegions.forEach((region) => {
           region.locations?.forEach((location) => (location.regionName = region.name));
-          this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
+          locations.push(...(region.locations as []))
         });
+        this.filterColumns.locationIds.dataSource.push(...sortByField(locations, 'name'));
       } else {
         this.filterColumns.locationIds.dataSource = [];
         this.HolidayFilterFormGroup.get('locationIds')?.setValue([]);

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import {
   BillRateFilters,
   BillRateOption,
@@ -16,6 +16,7 @@ import {
 } from '@shared/models/bill-rate.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { ImportResult } from '@shared/models/import.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable({
   providedIn: 'root',
@@ -61,8 +62,8 @@ export class BillRatesService {
    * @param filter filter parameters
    * @return Array of bill rates mapping
    */
-  public getExternalBillRateMappingById(id: number): Observable<ExternalBillRateMapped> {
-    return this.http.get<ExternalBillRateMapped>(`/api/BillRatesConfigs/${id}/ExternalBillRateMappings`);
+  public getExternalBillRateMappingById(id: number): Observable<ExternalBillRateMapped[]> {
+    return this.http.get<ExternalBillRateMapped[]>(`/api/BillRatesConfigs/${id}/ExternalBillRateMappings`).pipe(map((data) => sortByField(data, 'externalBillRateName')));
   }
 
   /**
@@ -132,7 +133,7 @@ export class BillRatesService {
    * @return list of Bill Rate eOptions
    */
   public getBillRateOptions(): Observable<BillRateOption[]> {
-    return this.http.get<BillRateOption[]>(`/api/BillRates/options`);
+    return this.http.get<BillRateOption[]>(`/api/BillRates/options`).pipe(map((data) => sortByField(data, 'title')));
   }
 
   /**

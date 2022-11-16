@@ -1,10 +1,10 @@
 import { JobCancellationReason, PenaltyCriteria } from "@shared/enums/candidate-cancellation";
 
 export const CancellationReasonsMap = {
-  [JobCancellationReason.TravelCancellationOnBehalfOfOrganization]: 'Travel Cancellation on behalf of Organization',
-  [JobCancellationReason.TravelCancellationOnBehalfOfAgency]: 'Travel Cancellation on behalf of Agency',
-  [JobCancellationReason.ReOrderCancellationOnBehalfOfOrganization]: 'Re-Order Cancellation on behalf of Organization',
   [JobCancellationReason.ReOrderCancellationOnBehalfOfAgency]: 'Re-Order Cancellation on behalf of Agency',
+  [JobCancellationReason.ReOrderCancellationOnBehalfOfOrganization]: 'Re-Order Cancellation on behalf of Organization',
+  [JobCancellationReason.TravelCancellationOnBehalfOfAgency]: 'Travel Cancellation on behalf of Agency',
+  [JobCancellationReason.TravelCancellationOnBehalfOfOrganization]: 'Travel Cancellation on behalf of Organization',
 };
 
 export const travelReasonsDataSource = [

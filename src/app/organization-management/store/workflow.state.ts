@@ -35,6 +35,7 @@ import {
   WorkflowMappingPost,
 } from '@shared/models/workflow-mapping.model';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 export interface WorkflowStateModel {
   workflows: WorkflowWithDetails[] | null;
@@ -55,8 +56,8 @@ export interface WorkflowStateModel {
 @Injectable()
 export class WorkflowState {
   @Selector()
-  static workflows(state: WorkflowStateModel): WorkflowWithDetails[] | null {
-    return state.workflows;
+  static sortedWorkflows(state: WorkflowStateModel): WorkflowWithDetails[] | null {
+    return sortByField(state.workflows ?? [], 'name');
   }
 
   @Selector()
