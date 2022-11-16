@@ -44,7 +44,6 @@ import { Days } from '@shared/enums/days';
 import { groupInvoicesOptions } from 'src/app/modules/invoices/constants';
 import { SettingsFilterCols } from './settings.constant';
 import { SettingsDataAdapter } from './helpers/settings-data.adapter';
-import { DateTimeHelper } from '@core/helpers';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -455,7 +454,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
           groupingBy: this.invoiceGeneratingFormGroup.controls['groupingBy'].value,
 
-          time: DateTimeHelper.toUtcFormat(this.invoiceGeneratingFormGroup.controls['time'].value),
+          time: this.invoiceGeneratingFormGroup.controls['time'].value.toISOString(),
         };
         dynamicValue = JSON.stringify(invoiceAutoGeneration);
         break;
