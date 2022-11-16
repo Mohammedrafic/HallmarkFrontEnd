@@ -1,5 +1,5 @@
 import { DatePipe, Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -122,20 +122,30 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { PermissionService } from '../../../security/services/permission.service';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { PreservedFilters } from '@shared/models/preserved-filters.model';
+import { MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
   selector: 'app-order-management-content',
   templateUrl: './order-management-content.component.html',
   styleUrls: ['./order-management-content.component.scss'],
   providers: [VirtualScrollService, DetailRowService, MaskedDateTimeService],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OrderManagementContentComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') override gridWithChildRow: GridComponent;
   @ViewChild('search') search: SearchComponent;
   @ViewChild('detailsDialog') detailsDialog: OrderDetailsDialogComponent;
   @ViewChild('tabNavigation') tabNavigation: TabNavigationComponent;
+  @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
 
   @ViewChild('orderStatusFilter') public readonly orderStatusFilter: MultiSelectComponent;
+
+  @HostListener('window:wheel', ['$event'])
+  onScroll() {
+    if (this.trigger) {
+      this.trigger.closeMenu();
+    }
+  }
 
   @Select(OrderManagementContentState.ordersPage)
   ordersPage$: Observable<OrderManagementPage>;
@@ -260,6 +270,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private filterApplied = false;
   private isIncomplete = false;
   private timesheetRedirect = false;
+  private cd$ = new Subject();
 
   constructor(
     protected override store: Store,
@@ -276,7 +287,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private orderManagementContentService: OrderManagementContentService,
     private addEditReOrderService: AddEditReorderService,
     private reOpenOrderService: ReOpenOrderService,
-    private permissionService: PermissionService
+    private permissionService: PermissionService,
+    private cd: ChangeDetectorRef
   ) {
     super(store);
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
@@ -357,6 +369,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.showFilterFormAfterOpenDialog();
     this.getProjectSpecialData();
     this.subscribeOnPermissions();
+    this.subscribeOnChanges();
   }
 
   ngOnDestroy(): void {
@@ -366,11 +379,18 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.unsubscribe$.complete();
   }
 
+  private subscribeOnChanges(): void {
+    this.cd$.pipe(debounceTime(300), takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.cd.detectChanges();
+    });
+  }
+
   private subscribeOnPermissions(): void {
     this.permissionService.getPermissions().subscribe(({ canCreateOrder, canCloseOrder }) => {
       this.canCreateOrder = canCreateOrder;
       this.canCloseOrder = canCloseOrder;
       this.initMenuItems();
+      this.cd$.next(true);
     });
   }
 
@@ -494,6 +514,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
 
     this.checkSelectedChildrenItem();
+    this.cd$.next(true);
   }
 
   public onFilterClose() {
@@ -538,7 +559,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
-    setTimeout(() => this.orderStatusFilter?.refresh(), 300);
+    setTimeout(() => {this.orderStatusFilter?.refresh(); this.cd$.next(true);}, 300);
   }
 
   public onFilterDelete(event: FilteredItem): void {
@@ -591,6 +612,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           ? [...permPlacementColumnsToExport, ...allOrdersChildColumnsToExport]
           : permPlacementColumnsToExport;
     }
+    this.cd$.next(true);
   }
 
   public onFilterClearAll(): void {
@@ -622,7 +644,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public onDataBound(): void {
     if (this.gridWithChildRow && this.gridWithChildRow.dataSource) {
-      this.gridDataBound(this.gridWithChildRow);
+      this.gridDataBound(this.gridWithChildRow, this.cd);
     }
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
@@ -759,6 +781,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.gridWithChildRow?.clearRowSelection();
         this.selectedIndex = null;
       }
+      this.cd$.next(true);
     });
   }
 
@@ -851,6 +874,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       }
       this.pageSubject.next(1);
     }
+    this.cd$.next(true);
   }
 
   public onOpenReorderDialog(reOrder: OrderManagement, order: OrderManagement): void {
@@ -883,6 +907,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     setTimeout(() => {
       this.onOpenReorderDialog(reOrder, order as OrderManagement);
       this.detailsDialog.tab.select(0);
+      this.cd$.next(true);
     }, tabSwitchAnimation);
   }
 
@@ -920,6 +945,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.orderPositionSelected$.next({ state: true, index });
     this.openChildDialog.next([order, candidate]);
     this.store.dispatch(new GetAvailableSteps(order.organizationId, candidate.jobId));
+    this.cd$.next(true);
   }
 
   public deleteOrder(id: number): void {
@@ -939,8 +965,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       });
   }
 
-  public menuOptionSelected(event: any, data: OrderManagement): void {
-    switch (Number(event.item.properties.id)) {
+  public menuOptionSelected(id: MoreMenuType, data: OrderManagement): void {
+    switch (Number(id)) {
       case MoreMenuType['Edit']:
         this.editOrder(data);
         break;
@@ -1030,6 +1056,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private subscribeForSettings(): void {
     this.organizationSettings$.pipe(takeUntil(this.unsubscribe$)).subscribe((settings) => {
       this.settings = SettingsHelper.mapSettings(settings);
+      this.cd$.next(true);
     });
   }
 
@@ -1238,6 +1265,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.setDefaultFilter();
         }
         this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
+        this.cd$.next(true);
       });
   }
 
@@ -1280,6 +1308,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.OrderFilterFormGroup.get('locationIds')?.setValue([]);
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
       }
+      this.cd$.next(true);
     });
     this.OrderFilterFormGroup.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
@@ -1298,6 +1327,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.OrderFilterFormGroup.get('departmentsIds')?.setValue([]);
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
       }
+      this.cd$.next(true);
     });
   }
 
@@ -1312,12 +1342,14 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           table.style.transform = 'translate(0px, 0px)';
         }
       }
+      this.cd$.next(true);
     });
   }
 
   private onSelectedOrderDataLoadHandler(): void {
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
       this.selectedOrder = order;
+      this.cd$.next(true);
     });
   }
 
@@ -1325,6 +1357,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe((skills) => {
       if (skills && skills.length > 0) {
         this.filterColumns.skillIds.dataSource = skills;
+        this.cd$.next(true);
       }
     });
   }
@@ -1390,6 +1423,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetOrders)).subscribe(() => {
       const [index] = this.gridWithChildRow.getSelectedRowIndexes();
       this.selectedIndex = index;
+      this.cd$.next(true);
     });
   }
 
@@ -1411,7 +1445,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     return this.reOrdersMenu;
   }
 
-  canReOpen(order: OrderManagement): boolean {
+  public canReOpen(order: OrderManagement): boolean {
     return order?.status !== OrderStatus.Closed && Boolean(order?.orderClosureReasonId);
   }
 
@@ -1422,6 +1456,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         if (data.orderId && this.selectedRowRef) {
           this.selectedRowRef.data.unreadComments -= data.readComments;
           this.gridWithChildRow.setRowData(data.orderId, this.selectedRowRef.data);
+          this.cd$.next(true);
         }
       });
   }
@@ -1476,6 +1511,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         });
         this.isRedirectedFromDashboard = false;
         this.dashboardFilterSubscription.unsubscribe();
+        this.cd$.next(true);
       });
   }
 
@@ -1581,6 +1617,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.filterColumns.projectTypeIds.dataSource = specialProjectCategories;
         this.filterColumns.projectNameIds.dataSource = projectNames;
         this.filterColumns.poNumberIds.dataSource = poNumbers;
+        this.cd$.next(true);
       });
     });
   }
@@ -1620,7 +1657,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private watchForPermissions(): void {
     this.getPermissionStream().pipe(takeUntil(this.unsubscribe$)).subscribe((permissions: Permission) => {
       this.hasCreateEditOrderPermission = permissions[this.userPermissions.CanCreateOrders]
-        || permissions[this.userPermissions.CanOrganizationEditOrders]
+        || permissions[this.userPermissions.CanOrganizationEditOrders];
+        this.cd$.next(true);
     });
   }
 }
