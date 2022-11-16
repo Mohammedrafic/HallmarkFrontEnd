@@ -28,7 +28,6 @@ export class TierService {
       organizationTierId: [null],
       name: ['', Validators.required],
       hours: [null, Validators.required],
-      priority: [null, Validators.required],
       regionIds: [null, Validators.required],
       locationIds: [null, Validators.required],
       departmentIds: [null, Validators.required],

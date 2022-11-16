@@ -1,11 +1,14 @@
 <app-grid
-  [columnDefinitions]="columnDefinitions"
-  [rowData]="(tiersPage$ | async)?.items"
   (navigateToPageEmitter)="handleChangePage($event)"
   (pageSizeChangeEmitter)="handleChangePageSize($event)"
+  (gridReadyEmitter)="gridReady($event)"
+  (dragRowEmitter)="rowDragEnd($event)"
+  [columnDefinitions]="columnDefinitions"
+  [rowData]="(tiersPage$ | async)?.items"
   [isLoading]="isLoading"
   [pageSize]="filters.pageSize"
   [currentPage]="filters.pageNumber"
   [totalRecordsCount]="(tiersPage$ | async)?.totalCount || 0"
-  (gridReadyEmitter)="gridReady($event)"
+  [rowDragManaged]="true"
+  [suppressMoveWhenRowDragging]="true"
 ></app-grid>
