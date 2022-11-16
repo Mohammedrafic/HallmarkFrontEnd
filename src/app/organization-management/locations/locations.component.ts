@@ -2,57 +2,54 @@ import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { tap } from 'rxjs/operators';
-import { filter, map, Observable, Subject, take, takeUntil, throttleTime, switchMap, merge, combineLatest } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { combineLatest, filter, map, Observable, Subject, switchMap, take, takeUntil, throttleTime } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { MessageTypes } from '@shared/enums/message-types';
-import { Location, LocationFilter, LocationFilterOptions, LocationsPage, LocationType, TimeZoneModel } from '@shared/models/location.model';
-import { Region } from '@shared/models/region.model';
-import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
-import {
-  ClearLocationList,
-  DeleteLocationById,
-  ExportLocations,
-  GetLocationFilterOptions,
-  GetLocationsByRegionId, GetLocationTypes, GetOrganizationById,
-  GetRegions, GetUSCanadaTimeZoneIds, SaveLocation,
-  SaveRegion,
-  SetGeneralStatesByCountry,
-  UpdateLocation
-} from '../store/organization-management.actions';
-import { OrganizationManagementState } from '../store/organization-management.state';
-
-import {
-  CANCEL_CONFIRM_TEXT,
-  DELETE_CONFIRM_TITLE,
-  DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE
-} from '@shared/constants';
-import { PhoneTypes } from '@shared/enums/phone-types';
-import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
-import { Organization } from '@shared/models/organization.model';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { UserState } from '../../store/user.state';
+import { TakeUntilDestroy } from '@core/decorators';
+import { FieldType, UserPermissions } from '@core/enums';
+import { DropdownOption } from '@core/interface';
 import { GetAllBusinessLines } from '@organization-management/store/business-lines.action';
 import { BusinessLinesState } from '@organization-management/store/business-lines.state';
+import {
+  CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE
+} from '@shared/constants';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { MessageTypes } from '@shared/enums/message-types';
+import { PhoneTypes } from '@shared/enums/phone-types';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { BusinessLines } from '@shared/models/business-line.model';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { FilteredItem } from '@shared/models/filter.model';
+import {
+  Location, LocationFilter, LocationFilterOptions, LocationsPage,
+  LocationType, TimeZoneModel
+} from '@shared/models/location.model';
+import { Organization } from '@shared/models/organization.model';
+import { Region } from '@shared/models/region.model';
+import { ConfirmService } from '@shared/services/confirm.service';
 import { FilterService } from '@shared/services/filter.service';
-import { LocationExportColumns, LocationInitFilters, LocationsDialogConfig, MESSAGE_REGIONS_NOT_SELECTED } from './locations.constant';
-import { LocationsService } from './locations.service';
-import { TakeUntilDestroy } from '@core/decorators';
-import { FieldType } from '@core/enums';
-import { DropdownOption } from '@core/interface';
-import { LocationsFormConfig, LocationsFormSource, LocationsSubFormConfig } from './locations.interface';
-import { LocationsTrackKey } from './locations.enum';
 import { AppState } from 'src/app/store/app.state';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
+import { UserState } from '../../store/user.state';
+import {
+  ClearLocationList, DeleteLocationById, ExportLocations, GetLocationFilterOptions,
+  GetLocationsByRegionId, GetLocationTypes, GetOrganizationById, GetRegions, GetUSCanadaTimeZoneIds,
+  SaveLocation, SaveRegion, SetGeneralStatesByCountry, UpdateLocation
+} from '../store/organization-management.actions';
+import { OrganizationManagementState } from '../store/organization-management.state';
+import {
+  FieldsToHideInIrp, LocationExportColumns, LocationInitFilters,
+  LocationsDialogConfig, LocationsDialogWithIrpConfig, LocationsExportIrpColumns,
+  MESSAGE_REGIONS_NOT_SELECTED
+} from './locations.constant';
+import { LocationsTrackKey } from './locations.enum';
+import { LocationsFormConfig, LocationsFormSource, LocationsSubFormConfig } from './locations.interface';
+import { LocationsService } from './locations.service';
 
 @Component({
   selector: 'app-locations',
@@ -61,7 +58,7 @@ import { AppState } from 'src/app/store/app.state';
   providers: [MaskedDateTimeService],
 })
 @TakeUntilDestroy
-export class LocationsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class LocationsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
   @ViewChild('addRegionDialog') addRegionDialog: DialogComponent;
@@ -96,15 +93,12 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   @Select(BusinessLinesState.allBusinessLines)
   public readonly businessLines$: Observable<BusinessLines[]>;
   
-  public timeZoneOptionFields: FieldSettingsModel = { text: 'systemTimeZoneName', value: 'timeZoneId' };
-  public locationTypeOptionFields:FieldSettingsModel = { text: 'name', value: 'locationTypeId' };
   public regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public locationDetailsFormGroup: FormGroup;
   public regionFormGroup: FormGroup;
   public selectedRegion: Region;
   public defaultValue: Region;
   public businessLineDataSource: DropdownOption[] = [];
-  public readonly businessLineFields = { text: 'line', value: 'id' };
   public columnsToExport: ExportColumn[] = LocationExportColumns;
   public fileName: string;
   public defaultFileName: string;
@@ -126,35 +120,44 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   };
   public locationDialogConfig = LocationsDialogConfig;
   public readonly FieldTypes = FieldType;
-  public isIrpEnabled = false;
+  /**
+   * Feature flag.
+   */
+  public isFeatureIrpEnabled = false;
+  public isOrgVMSEnabled = true;
+  public isOrgIrpEnabled = false;
 
   private businessUnitId: number;
   private pageSubject = new Subject<number>();
   private componentDestroy: () => Observable<unknown>;
+
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit Location' : 'Add Location';
   }
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private confirmService: ConfirmService,
     private datePipe: DatePipe,
     private filterService: FilterService,
     private locationsService: LocationsService,
   ) {
-    super();
+    super(store);
     this.createForms();
-    this.setIrpFlag();
+    this.setIrpFeatureFlag();
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.watchForPageChange();
     this.populateFilterOptions();
     this.watchForOrgChange();
     this.watchForOrganizations();
     this.populateFormOptions();
-    this.watchForIrpControl();
+    if (this.isFeatureIrpEnabled) {
+      this.setPermissions();
+    }
     this.store.dispatch(new GetLocationTypes());
     this.store.dispatch(new GetUSCanadaTimeZoneIds());
     this.store.dispatch(new GetAllBusinessLines());
@@ -291,7 +294,8 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       phoneType: PhoneTypes[location.phoneType] || null,
       timeZone: location.timeZone,
       locationType: location.locationTypeId,
-      organizationId :this.businessUnitId
+      organizationId:this.businessUnitId,
+      includeInIRP: location.includeInIRP,
     });
 
     this.getBusinessLineDataSource(location.businessLineId, location.businessLine);
@@ -369,7 +373,8 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         phoneType: parseInt(PhoneTypes[this.locationDetailsFormGroup.controls['phoneType'].value]),
         timeZone: this.locationDetailsFormGroup.controls['timeZone'].value,
         locationTypeId: this.locationDetailsFormGroup.controls['locationType'].value,
-        organizationId : this.businessUnitId
+        organizationId : this.businessUnitId,
+        includeInIRP: this.locationDetailsFormGroup.controls['includeInIRP'].value,
       }
 
       this.saveOrUpdateLocation(location);
@@ -528,6 +533,11 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       filter(Boolean),
       tap((organization) => {
         this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
+        if (this.isFeatureIrpEnabled) {
+          this.isOrgVMSEnabled = organization.preferences.isVMCEnabled;
+          this.isOrgIrpEnabled = organization.preferences.isIRPEnabled;
+          this.checkFieldsVisibility();
+        }
       }),
       switchMap(() => this.store.dispatch(new GetRegions())),
       takeUntil(this.componentDestroy()),
@@ -562,18 +572,31 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     });
   }
 
-  private watchForIrpControl(): void {
-    this.locationDetailsFormGroup.get('isIrp')?.valueChanges
-    .pipe(
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe((isIrpOn) => {
+  private setIrpFeatureFlag(): void {
+    this.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+    if (this.isFeatureIrpEnabled) {
+      this.locationDialogConfig = LocationsDialogWithIrpConfig;
+      this.columnsToExport = LocationsExportIrpColumns;
+    }
+  }
 
+  private checkFieldsVisibility(): void {
+    this.locationDialogConfig.baseForm = this.locationDialogConfig.baseForm.filter((column) => {
+      if (!this.isOrgVMSEnabled) {
+        return !FieldsToHideInIrp.includes(column.field)
+      }
+      return column;
     });
   }
 
-  private setIrpFlag(): void {
-    this.isIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
-    console.log(this.store.selectSnapshot(UserState.userPermission))
+  private setPermissions(): void {
+    this.getPermissionStream()
+    .pipe(
+      filter((permissions) => !permissions[UserPermissions.CanEditOrganizationalHierarchy]),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      this.locationDetailsFormGroup.get('includeInIRP')?.disable();
+    });
   }
 }

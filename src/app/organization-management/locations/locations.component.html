@@ -99,7 +99,11 @@
       <e-column field="zip" headerText="ZIP" width=200></e-column>
       <e-column field="contactPerson" headerText="CONTACT PERSON" width=200></e-column>
       <e-column field="timeZone" headerText="Timezone" width=200></e-column>
-      <!-- <e-column field="isIrp" headerText="Include in IRP" width=200></e-column> -->
+      <e-column field="includeInIRP" headerText="Include in IRP" width=200 *ngIf="isFeatureIrpEnabled">
+        <ng-template #template let-data>
+          <span>{{ data.includeInIRP ? 'Yes' : 'No'}}</span>
+        </ng-template>
+      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
@@ -263,6 +267,18 @@
         </ejs-multiselect>
       </div>
     </div>
+    <!-- Remove condition after feature implemented -->
+    <div class="input-container" *ngIf="isFeatureIrpEnabled">
+      <label>Include in IRP</label>
+      <div class="input-group multiselect">
+        <ejs-dropdownlist mode="CheckBox"
+                         formControlName="includeInIRP"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [dataSource]="filterColumns.includeInIrp.dataSource">
+        </ejs-dropdownlist>
+      </div>
+    </div>
   </form>
 </app-filter-dialog>
 
@@ -277,7 +293,8 @@
     id="addEditRecordForm"
     [formGroup]="locationDetailsFormGroup"
   >
-    <div class="form-block">
+    <div class="form-block"
+      [ngClass]="{ 'no-inid': !isOrgVMSEnabled && isFeatureIrpEnabled, 'prev-form-view': !isFeatureIrpEnabled }">
       <ng-container *ngFor="let control of locationDialogConfig.baseForm; trackBy: trackByField">
         <ng-container [ngSwitch]="control.fieldType">
 

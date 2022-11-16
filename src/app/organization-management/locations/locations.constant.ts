@@ -13,9 +13,10 @@ export const LocationInitFilters: LocationFilterConfig = {
   states: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
   zipCodes: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
   contactPeople: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+  includeInIrp: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
 };
 
-export const LocationExportColumns : ExportColumn[] = [
+export const LocationExportColumns: ExportColumn[] = [
   { text: 'Ext Location ID', column: 'ExternalId' },
   { text: 'Invoice Location ID', column: 'InvoiceId' },
   { text: 'Location Name', column: 'Name' },
@@ -25,7 +26,21 @@ export const LocationExportColumns : ExportColumn[] = [
   { text: 'City', column: 'City' },
   { text: 'State', column: 'State' },
   { text: 'Zip', column: 'Zip' },
-  { text: 'Contact Person', column: 'ContactPerson' }
+  { text: 'Contact Person', column: 'ContactPerson' },
+];
+
+export const LocationsExportIrpColumns: ExportColumn[] = [
+  { text: 'Ext Location ID', column: 'ExternalId' },
+  { text: 'Invoice Location ID', column: 'InvoiceId' },
+  { text: 'Location Name', column: 'Name' },
+  { text: 'Business Line', column: 'BusinessLine' },
+  { text: 'Address 1', column: 'Address1' },
+  { text: 'Address 2', column: 'Address2' },
+  { text: 'City', column: 'City' },
+  { text: 'State', column: 'State' },
+  { text: 'Zip', column: 'Zip' },
+  { text: 'Contact Person', column: 'ContactPerson' },
+  { text: 'Include in IRP', column: 'includeInIRP'},
 ];
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
@@ -39,13 +54,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
       gridAreaName: 'exteranlArea',
       required: false,
       maxLen: 50,
-    },
-    {
-      field: 'isIrp',
-      title: 'Include in IRP',
-      fieldType: FieldType.Toggle,
-      gridAreaName: 'irpArea',
-      required: false,
+      visible: true,
     },
     {
       field: 'invoiceId',
@@ -54,6 +63,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
       gridAreaName: 'invoiceArea',
       required: false,
       maxLen: 50,
+      visible: true,
     },
     {
       field: 'name',
@@ -62,6 +72,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
       gridAreaName: 'nameArea',
       required: true,
       maxLen: 50,
+      visible: true,
     },
     {
       field: 'businessLineId',
@@ -70,15 +81,17 @@ export const LocationsDialogConfig: LocationDialogConfig = {
       sourceKey: LocationsSourceKeys.BusinessLineData,
       gridAreaName: 'businessLineArea',
       required: false,
+      visible: true,
     },
-    // {
-    //   field: 'locationType',
-    //   title: 'Location Type',
-    //   fieldType: FieldType.Dropdown,
-    //   sourceKey: LocationsSourceKeys.LocationTypes,
-    //   gridAreaName: 'locationTypeArea',
-    //   required: false,
-    // },
+    {
+      field: 'locationType',
+      title: 'Location Type',
+      fieldType: FieldType.Dropdown,
+      sourceKey: LocationsSourceKeys.LocationTypes,
+      gridAreaName: 'locationTypeArea',
+      required: false,
+      visible: true,
+    },
     {
       field: 'timeZone',
       title: 'Time Zone',
@@ -86,6 +99,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
       sourceKey: LocationsSourceKeys.TimeZoneIds,
       gridAreaName: 'timeZoneArea',
       required: false,
+      visible: true,
     },
     {
       field: 'address1',
@@ -94,6 +108,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
       gridAreaName: 'address1Area',
       required: true,
       maxLen: 100,
+      visible: true,
     },
     {
       field: 'address2',
@@ -102,6 +117,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
       gridAreaName: 'address2Area',
       required: false,
       maxLen: 50,
+      visible: true,
     },
     {
       field: 'state',
@@ -110,6 +126,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
       sourceKey: LocationsSourceKeys.States,
       gridAreaName: 'stateArea',
       required: true,
+      visible: true,
     },
     {
       field: 'city',
@@ -117,6 +134,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
       fieldType: FieldType.Input,
       gridAreaName: 'cityArea',
       required: true,
+      visible: true,
     },
     {
       field: 'zip',
@@ -125,7 +143,8 @@ export const LocationsDialogConfig: LocationDialogConfig = {
       gridAreaName: 'zipArea',
       required: true,
       maxLen: 6,
-      pattern: '[0-9]*'
+      pattern: '[0-9]*',
+      visible: true,
     },
   ],
   subForms: [
@@ -141,6 +160,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
           required: false,
           gridAreaName: 'personArea',
           maxLen: 50,
+          visible: true,
         },
         {
           field: 'contactEmail',
@@ -149,6 +169,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
           required: false,
           gridAreaName: 'emailArea',
           inputType: InputAttrType.Mail,
+          visible: true,
         },
         {
           field: 'phoneNumber',
@@ -159,6 +180,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
           pattern: '^[0-9]*$',
           maxLen: 10,
           inputType: InputAttrType.Tel,
+          visible: true,
         },
         {
           field: 'phoneType',
@@ -167,6 +189,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
           gridAreaName: 'phoneTypeArea',
           fieldType: FieldType.Dropdown,
           sourceKey: LocationsSourceKeys.PhoneType,
+          visible: true,
         },
         {
           field: 'ext',
@@ -174,6 +197,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
           required: false,
           gridAreaName: 'extArea',
           fieldType: FieldType.Input,
+          visible: true,
         },
         {
           field: 'glNumber',
@@ -182,6 +206,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
           gridAreaName: 'glArea',
           maxLen: 50,
           fieldType: FieldType.Input,
+          visible: true,
         },
         {
           field: 'inactiveDate',
@@ -189,8 +214,186 @@ export const LocationsDialogConfig: LocationDialogConfig = {
           required: false,
           gridAreaName: 'inactivateArea',
           fieldType: FieldType.Date,
+          visible: true,
         }
       ],
     },
   ],
 };
+
+export const LocationsDialogWithIrpConfig: LocationDialogConfig = {
+  baseForm: [
+    {
+      field: 'externalId',
+      title: 'Location Id',
+      fieldType: FieldType.Input,
+      gridAreaName: 'exteranlArea',
+      required: false,
+      maxLen: 50,
+      visible: true,
+    },
+    {
+      field: 'includeInIRP',
+      title: 'Include in IRP',
+      fieldType: FieldType.Toggle,
+      gridAreaName: 'irpArea',
+      required: false,
+      visible: true,
+    },
+    {
+      field: 'invoiceId',
+      title: 'Invoice Location ID',
+      fieldType: FieldType.Input,
+      gridAreaName: 'invoiceArea',
+      required: false,
+      maxLen: 50,
+      visible: true,
+    },
+    {
+      field: 'name',
+      title: 'Location Name',
+      fieldType: FieldType.Input,
+      gridAreaName: 'nameArea',
+      required: true,
+      maxLen: 50,
+      visible: true,
+    },
+    {
+      field: 'businessLineId',
+      title: 'Business Line',
+      fieldType: FieldType.Dropdown,
+      sourceKey: LocationsSourceKeys.BusinessLineData,
+      gridAreaName: 'businessLineArea',
+      required: false,
+      visible: true,
+    },
+    {
+      field: 'timeZone',
+      title: 'Time Zone',
+      fieldType: FieldType.Dropdown,
+      sourceKey: LocationsSourceKeys.TimeZoneIds,
+      gridAreaName: 'timeZoneArea',
+      required: false,
+      visible: true,
+    },
+    {
+      field: 'address1',
+      title: 'Address 1',
+      fieldType: FieldType.Input,
+      gridAreaName: 'address1Area',
+      required: true,
+      maxLen: 100,
+      visible: true,
+    },
+    {
+      field: 'address2',
+      title: 'Address 2',
+      fieldType: FieldType.Input,
+      gridAreaName: 'address2Area',
+      required: false,
+      maxLen: 50,
+      visible: true,
+    },
+    {
+      field: 'state',
+      title: 'State',
+      fieldType: FieldType.Dropdown,
+      sourceKey: LocationsSourceKeys.States,
+      gridAreaName: 'stateArea',
+      required: true,
+      visible: true,
+    },
+    {
+      field: 'city',
+      title: 'City',
+      fieldType: FieldType.Input,
+      gridAreaName: 'cityArea',
+      required: true,
+      visible: true,
+    },
+    {
+      field: 'zip',
+      title: 'Zipcode',
+      fieldType: FieldType.Input,
+      gridAreaName: 'zipArea',
+      required: true,
+      maxLen: 6,
+      pattern: '[0-9]*',
+      visible: true,
+    },
+  ],
+  subForms: [
+    {
+      formTitle: 'Contacts',
+      trackKey: LocationsTrackKey.Contacts,
+      containerClass: 'contacts-form',
+      controls: [
+        {
+          field: 'contactPerson',
+          title: 'Contact Person',
+          fieldType: FieldType.Input,
+          required: false,
+          gridAreaName: 'personArea',
+          maxLen: 50,
+          visible: true,
+        },
+        {
+          field: 'contactEmail',
+          title: 'Contact Person Email',
+          fieldType: FieldType.Input,
+          required: false,
+          gridAreaName: 'emailArea',
+          inputType: InputAttrType.Mail,
+          visible: true,
+        },
+        {
+          field: 'phoneNumber',
+          title: 'Phone Number',
+          required: false,
+          gridAreaName: 'phoneArea',
+          fieldType: FieldType.Input,
+          pattern: '^[0-9]*$',
+          maxLen: 10,
+          inputType: InputAttrType.Tel,
+          visible: true,
+        },
+        {
+          field: 'phoneType',
+          title: 'Phone Type',
+          required: false,
+          gridAreaName: 'phoneTypeArea',
+          fieldType: FieldType.Dropdown,
+          sourceKey: LocationsSourceKeys.PhoneType,
+          visible: true,
+        },
+        {
+          field: 'ext',
+          title: 'Ext',
+          required: false,
+          gridAreaName: 'extArea',
+          fieldType: FieldType.Input,
+          visible: true,
+        },
+        {
+          field: 'glNumber',
+          title: 'GL Number',
+          required: false,
+          gridAreaName: 'glArea',
+          maxLen: 50,
+          fieldType: FieldType.Input,
+          visible: true,
+        },
+        {
+          field: 'inactiveDate',
+          title: 'Inactive Date',
+          required: false,
+          gridAreaName: 'inactivateArea',
+          fieldType: FieldType.Date,
+          visible: true,
+        }
+      ],
+    },
+  ],
+};
+
+export const FieldsToHideInIrp: string[] = ['invoiceId'];

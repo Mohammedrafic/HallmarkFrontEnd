@@ -23,6 +23,7 @@ export class Location {
   timeZone? : string;
   locationTypeId? :number;
   organizationId :number;
+  includeInIRP: boolean;
 }
 
 export type LocationsPage = PageOfCollections<Location>;

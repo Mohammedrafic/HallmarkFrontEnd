@@ -18,6 +18,7 @@ export interface LocationFilterConfig {
   states: LocationFilterItem<string>;
   zipCodes: LocationFilterItem<string>;
   contactPeople: LocationFilterItem<string>;
+  includeInIrp: LocationFilterItem<string>;
 }
 
 export interface LocationsForm {
@@ -52,6 +53,7 @@ export interface LocationsFormConfig {
   maxLen?: number;
   pattern?: string;
   inputType?: InputAttrType;
+  visible: boolean;
 }
 
 export interface LocationsSubFormConfig {
