@@ -274,8 +274,9 @@
         <ejs-dropdownlist mode="CheckBox"
                          formControlName="includeInIRP"
                          placeholder="All"
+                         [fields]="dropDownfields"
                          [allowFiltering]="true"
-                         [dataSource]="filterColumns.includeInIrp.dataSource">
+                         [dataSource]="filterColumns.includeInIRP.dataSource">
         </ejs-dropdownlist>
       </div>
     </div>
@@ -304,11 +305,12 @@
                 {{control.title}}
                 <span class="required" *ngIf="control.required">*</span>
               </label>
-              <div class="input-group dropdown">
+              <div class="input-group dropdown" *ngIf="control.sourceKey">
                 <ejs-dropdownlist
-                  *ngIf="control.sourceKey"
                   appValidateWithMessage
                   [dataSource]="formSourcesMap[control.sourceKey]"
+                  [fields]="dropDownfields"
+                  [allowFiltering]="true"
                   [formControlName]="control.field">
                 </ejs-dropdownlist>
               </div>

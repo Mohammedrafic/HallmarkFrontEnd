@@ -46,6 +46,12 @@ export class LocationFilter {
   orderBy?: string;
   pageSize?: number;
   pageNumber?: number;
+  includeInIRP?: number;
+}
+
+export interface IrpFilterOption {
+  option: number;
+  optionText: string;
 }
 
 export class LocationFilterOptions {
@@ -57,6 +63,7 @@ export class LocationFilterOptions {
   states: string[];
   zipCodes: string[];
   contactPersons: string[];
+  includeInIRP: IrpFilterOption[];
 }
 
 export class LocationType{

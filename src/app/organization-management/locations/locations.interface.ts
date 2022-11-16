@@ -1,6 +1,6 @@
 import { FieldType, InputAttrType } from '@core/enums';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { DropdownOption } from '@core/interface';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { LocationsSourceKeys, LocationsTrackKey } from './locations.enum';
 
 export interface LocationFilterItem<T> {
@@ -18,7 +18,7 @@ export interface LocationFilterConfig {
   states: LocationFilterItem<string>;
   zipCodes: LocationFilterItem<string>;
   contactPeople: LocationFilterItem<string>;
-  includeInIrp: LocationFilterItem<string>;
+  includeInIRP: LocationFilterItem<DropdownOption>;
 }
 
 export interface LocationsForm {

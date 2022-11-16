@@ -13,7 +13,7 @@ export const LocationInitFilters: LocationFilterConfig = {
   states: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
   zipCodes: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
   contactPeople: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-  includeInIrp: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+  includeInIRP: { type: ControlTypes.Dropdown, valueType: ValueType.Id, dataSource: [] },
 };
 
 export const LocationExportColumns: ExportColumn[] = [

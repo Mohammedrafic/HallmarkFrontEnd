@@ -93,7 +93,8 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   @Select(BusinessLinesState.allBusinessLines)
   public readonly businessLines$: Observable<BusinessLines[]>;
   
-  public regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  public readonly regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  public readonly dropDownfields = { text: 'text', value: 'value' };
   public locationDetailsFormGroup: FormGroup;
   public regionFormGroup: FormGroup;
   public selectedRegion: Region;
@@ -191,6 +192,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       states: this.filters.states || [],
       zipCodes: this.filters.zipCodes || [],
       contactPeople: this.filters.contactPeople || [],
+      includeInIRP: this.filters.includeInIRP || [],
     });
     this.filteredItems = this.filterService.generateChips(this.locationFilterForm, this.filterColumns);
   }
@@ -376,7 +378,6 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         organizationId : this.businessUnitId,
         includeInIRP: this.locationDetailsFormGroup.controls['includeInIRP'].value,
       }
-
       this.saveOrUpdateLocation(location);
 
       this.store.dispatch(new ShowSideDialog(false));
@@ -509,7 +510,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       filter(Boolean),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(options => {
+    .subscribe((options) => {
       this.filterColumns.externalIds.dataSource = options.externalIds;
       this.filterColumns.invoiceIds.dataSource = options.ivnoiceIds;
       this.filterColumns.names.dataSource = options.locationNames;
@@ -518,6 +519,9 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       this.filterColumns.states.dataSource = options.states;
       this.filterColumns.zipCodes.dataSource = options.zipCodes;
       this.filterColumns.contactPeople.dataSource = options.contactPersons;
+      this.filterColumns.includeInIRP.dataSource = options.includeInIRP.map((item) => (
+        { text: item.optionText, value: item.option }
+        ));
     });
   }
 
