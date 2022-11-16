@@ -466,22 +466,6 @@ export class SecurityState {
   ): Observable<Organisation[] | void> {
     return this.userService.getUserVisibilitySettingsOrganisation(userId).pipe(
       tap((payload) => {
-        payload.forEach((organization: Organisation) => {
-          organization.regions.forEach((region: OrganizationRegion) => {
-            region['organizationId'] = organization.organizationId;
-            region['regionId'] = region.id;
-            region.locations?.forEach((location: OrganizationLocation) => {
-              location['organizationId'] = organization.organizationId;
-              location['regionId'] = region.id;
-              location['locationId'] = location.id;
-              location.departments.forEach((department: OrganizationDepartment) => {
-                department['organizationId'] = organization.organizationId;
-                department['regionId'] = region.id;
-                department['locationId'] = location.id;
-              });
-            });
-          });
-        });
         patchState({ organizations: payload });
         return payload;
       }),
