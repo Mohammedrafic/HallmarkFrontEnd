@@ -6,6 +6,14 @@ export interface TierFilters {
   pageSize: number;
 }
 
+export interface TierPriorityDTO {
+  organizationTierId: number;
+  priority: number;
+  orderBy: string | null;
+  pageNumber: number;
+  pageSize: number;
+}
+
 export interface TierGridColumns extends ICellRendererParams {
  edit?: (tier: TierDetails) => TierDetails;
 }

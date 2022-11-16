@@ -489,7 +489,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       if (this.uploaderErrorMessageElement) {
         this.uploaderErrorMessageElement.innerText =
           file.size > this.maxFileSize
-            ? 'The file exceeds the limitation, max allowed 20 MB.'
+            ? 'The file should not exceed 20MB.'
             : 'The file should be in pdf, jpg, jpeg, png format.';
       }
     });

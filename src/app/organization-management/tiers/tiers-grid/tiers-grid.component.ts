@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { ColDef } from "@ag-grid-community/core";
+import { ColDef, RowDragEvent } from "@ag-grid-community/core";
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store'
 import { Observable, takeUntil } from 'rxjs';
@@ -46,6 +46,16 @@ export class TiersGridComponent extends DestroyableDirective implements OnInit {
 
   public gridReady(grid: GridReadyEventModel): void {
     grid.api.sizeColumnsToFit();
+  }
+
+  public rowDragEnd(event: RowDragEvent): void {
+    this.store.dispatch(new Tiers.ChangeTierPriority({
+      organizationTierId: event.node.data.id,
+      priority: ++event.node.rowIndex!,
+      orderBy: null,
+      pageNumber: this.filters.pageNumber,
+      pageSize: this.filters.pageSize
+    }));
   }
 
   public handleChangePage(pageNumber: number): void {

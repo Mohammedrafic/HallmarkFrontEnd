@@ -42,6 +42,7 @@ export const ORDER_WITHOUT_CRED_BILLRATES =
 export const UNSAVE_CHANGES_TEXT = 'Do you want to save changes?';
 export const REQUIRED_PERMISSIONS = 'Separate permission right is required';
 export const ERROR_START_LESS_END_DATE = 'Start date should be before end date or less';
+export const SHOULD_LOC_DEP_INCLUDE_IRP = 'Should all locations and departments be included in IRP?';
 
 export const updateCandidateJobMessage = (dates: string[]) =>
   `For this candidate job timesheets will be recalculated for the next start dates: ${dates.join(', ')}`;
@@ -56,3 +57,7 @@ export const deployedCandidateMessage = (orderIds: string[]) =>
 export const SEND_EMAIL_REQUIRED = 'Required';
 export const DOCUMENT_UPLOAD_SUCCESS = 'Document uploaded successfully';
 export const DOCUMENT_UPLOAD_EDIT = 'Document modified successfully';
+export const DOCUMENT_SHARED_SUCCESS = 'Documents shared successfully';
+export const DOCUMENT_DELETE_SUCCESS = 'Documents deleted successfully';
+export const DOCUMENT_UNSHARED_SUCCESS = 'Documents UnShared successfully';
+export const FOLDER_DELETE_SUCCESS = 'Folder deleted successfully';

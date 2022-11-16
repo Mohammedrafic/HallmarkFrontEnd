@@ -1,5 +1,5 @@
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import type { GridOptions, Module, SelectionChangedEvent, SortChangedEvent } from '@ag-grid-community/core';
+import type { GridOptions, Module, RowDragEvent, SelectionChangedEvent, SortChangedEvent } from '@ag-grid-community/core';
 import { RowNode } from '@ag-grid-community/core';
 import { BehaviorSubject, combineLatest, delay, filter, Observable, takeUntil } from 'rxjs';
 
@@ -38,6 +38,8 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Input() public allowBulkSelection: boolean = false;
   @Input() public allowBulkButton: boolean = false;
   @Input() public rowSelection: 'single' | 'multiple' = 'single';
+  @Input() public rowDragManaged: boolean = false;
+  @Input() public suppressMoveWhenRowDragging: boolean = false;
   @Input() public pageSize: number = GRID_CONFIG.rowsPerPageDropDownObject[2].value;
   @Input() public rowData: Data[] | null | undefined;
   @Input() public totalRecordsCount: number = 1;
@@ -66,6 +68,7 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Output() public exportEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
   @Output() public sortChanged: EventEmitter<string> = new EventEmitter<string>();
   @Output() public multiSelectionChanged: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
+  @Output() public dragRowEmitter: EventEmitter<RowDragEvent> = new EventEmitter<RowDragEvent>();
 
 
   public readonly defaultColumnDefinition: ColumnDefinitionModel = { minWidth: 100, resizable: true };
@@ -107,6 +110,10 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   public handleSortChanged(event: SortChangedEvent): void {
     const columnWithSort = event.columnApi.getColumnState().find((col) => col.sort !== null);
     this.sortChanged.emit(columnWithSort ? `${columnWithSort.colId} ${columnWithSort.sort}` : undefined);
+  }
+
+  public handleRowDragEvent(event: RowDragEvent): void {
+    this.dragRowEmitter.emit(event);
   }
 
   private initLoadingStateChangesListener(): void {

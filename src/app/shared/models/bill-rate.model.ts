@@ -171,7 +171,7 @@ export class BillRateSetupPost {
   billRateConfigId: number;
   orderTypes: number[];
   rateHour: string;
-  effectiveDate: string;
+  effectiveDate: string | Date;
   intervalMin?: number;
   intervalMax?: number;
   considerForWeeklyOT: boolean;
