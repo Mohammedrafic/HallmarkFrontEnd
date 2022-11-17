@@ -333,7 +333,9 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
       if (regionId) {
         const selectedRegion = this.orgRegions.find(region => region.id === regionId);
         this.locations.push(...sortByField(selectedRegion?.locations ?? [], 'name') as []);
-        this.locations.forEach(location => this.departments.push(...location.departments));
+        const departments: OrganizationDepartment[] = []
+        this.locations.forEach(location => departments.push(...location.departments));
+        this.departments = sortByField(departments, 'name');
 
         const filter: CredentialSetupFilterDto = {
           regionId: regionId,

@@ -178,7 +178,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrganizationManagementState.sortedRegions)
   public regions$: Observable<Region[]>;
 
-  @Select(OrganizationManagementState.sortedoLocationsByRegionId)
+  @Select(OrganizationManagementState.sortedLocationsByRegionId)
   public locations$: Observable<Location[]>;
 
   @Select(OrganizationManagementState.sortedDepartments)

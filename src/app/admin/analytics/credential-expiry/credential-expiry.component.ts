@@ -1,13 +1,13 @@
 import { Component, Inject, OnInit, ViewChild,OnDestroy } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Location, LocationsByRegionsFilter } from '@shared/models/location.model';
 import { Region, regionFilter } from '@shared/models/region.model';
 import { Department, DepartmentsByLocationsFilter } from '@shared/models/department.model';
-import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -18,7 +18,6 @@ import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData,  GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
-import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -27,6 +26,7 @@ import { FilterService } from '@shared/services/filter.service';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { AgencyDto, CandidateStatusDto, CommonReportFilterOptions } from '../models/common-report.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-credential-expiry',
@@ -364,7 +364,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       .subscribe((data: Location[]) => {
         if (data != undefined) {
           this.locations = data;
-          this.filterColumns.locationIds.dataSource = this.locations;
+          this.filterColumns.locationIds.dataSource = sortByField(this.locations, 'name');
           this.defaultLocations=data.map((list) => list.id);
           this.defaultDepartments=[];
         }
@@ -376,7 +376,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       .subscribe((data: Department[]) => {
         if (data != undefined) {
           this.departments = data;
-          this.filterColumns.departmentIds.dataSource = this.departments;
+          this.filterColumns.departmentIds.dataSource = sortByField(this.departments, 'departmentName');
           this.defaultDepartments=data.map((list) => list.departmentId);
         }
       });

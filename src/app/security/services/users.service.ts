@@ -120,7 +120,30 @@ export class UsersService {
    public getUserVisibilitySettingsOrganisation(userId: string): Observable<Organisation[]> {
     return this.http
       .get<Organisation[]>(`/api/Organizations/structure/All/${userId}`)
-      .pipe(map((organizations) => sortByField(organizations, 'name')));
+      .pipe(
+        map((organizations) =>
+          sortByField(organizations, 'name').map((org) => ({
+            ...org,
+            regions: sortByField(org.regions, 'name').map((region) => ({
+              ...region,
+              organizationId: org.organizationId,
+              regionId: region.id,
+              locations: sortByField(region.locations, 'name').map((location) => ({
+                ...location,
+                organizationId: org.organizationId,
+                regionId: region.id,
+                locationId: location.id,
+                departments: sortByField(location.departments, 'name').map((department) => ({
+                  ...department,
+                  organizationId: org.organizationId,
+                  regionId: region.id,
+                  locationId: location.id,
+                })),
+              })),
+            })),
+          }))
+        )
+      );
   }
 
   /**
