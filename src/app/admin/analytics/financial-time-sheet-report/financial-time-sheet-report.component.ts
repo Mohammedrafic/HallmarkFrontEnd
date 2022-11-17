@@ -166,20 +166,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
    
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
-      this.orderFilterColumnsSetup();
-      this.financialTimeSheetFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
-        if (data != null) {
-          this.filterOptionsData = data;
-          this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
-          this.filterColumns.skillIds.dataSource = [];
-          this.filterColumns.jobStatuses.dataSource = data.orderStatuses;
-          this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
-          this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
-          this.defaultOrderTypes = OrderTypeOptions.map((list) => list.id);
-          this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
-          this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.OrderTypes)?.setValue(this.defaultOrderTypes);
-        }
-      });
+      this.orderFilterColumnsSetup();      
       this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
@@ -264,6 +251,19 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
           businessUnitIds: businessIdData
         };
         this.store.dispatch(new GetCommonReportFilterOptions(filter));
+        this.financialTimeSheetFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
+          if (data != null) {
+            this.filterOptionsData = data;
+            this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+            this.filterColumns.skillIds.dataSource = [];
+            this.filterColumns.jobStatuses.dataSource = data.orderStatuses;
+            this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
+            this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
+            this.defaultOrderTypes = OrderTypeOptions.map((list) => list.id);
+            this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
+            this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.OrderTypes)?.setValue(this.defaultOrderTypes);
+          }
+        });
         this.regions = this.regionsList;
         this.filterColumns.regionIds.dataSource = this.regions;
         this.defaultRegions = this.regionsList.map((list) => list.id);
@@ -367,7 +367,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       "DepartmentParamFTS": departmentIds.join(","),
       "SkillCategoriesParamFTS":skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
       "SkillsParamFTS":skillIds.length==0?"null":skillIds.join(","),
-      "CandidateNameParamFTS":candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName),
+      "CandidateNameParamFTS":candidateName==null||candidateName==""?"null":candidateName,
       "CandidateStatusesParamFTS":candidateStatuses.length==0?"null":candidateStatuses.join(","),
       "OrderTypesParamFTS":orderTypes.length==0?"null":orderTypes.join(","),
       "JobStatusesParamFTS":jobStatuses.length==0?"null":jobStatuses.join(","),
@@ -532,8 +532,11 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   private onFilterChild(e: FilteringEventArgs)
   {
     if (e.text != '') {
+      let ids=[];
+      ids.push(this.bussinessControl.value);
       let filter: CommonCandidateSearchFilter = {
-        searchText: e.text
+        searchText: e.text,
+        businssUnitIds:ids
       };
       this.filterColumns.dataSource = [];
       this.store.dispatch(new GetCommonReportCandidateSearch(filter))
