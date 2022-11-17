@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { DropdownOption } from '@core/interface';
 import { Store } from '@ngxs/store';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
@@ -52,7 +53,10 @@ export class FilterService {
       form.controls[event.column].setValue(false);
     } else if (filterColumns[event.column].type === ControlTypes.Radio) {
       form.controls[event.column].setValue(filterColumns[event.column].default);
-    } else if (filterColumns[event.column].type === ControlTypes.Date) {
+    } else if (
+      filterColumns[event.column].type === ControlTypes.Date
+      || filterColumns[event.column].type === ControlTypes.Dropdown
+      ) {
       form.controls[event.column].setValue(null);
     } else {
       form.controls[event.column].setValue('');
@@ -110,6 +114,13 @@ export class FilterService {
             }
             break;
 
+          case ControlTypes.Dropdown:
+            const item: DropdownOption = filterColumns[key].dataSource.find((item: DropdownOption) => item.value === val);
+
+            if (item) {
+              chips.push({ text: item.text, column: key, value: val });
+            }
+            break;
           default:
             chips.push({ text: val, column: key, value: val });
             break;

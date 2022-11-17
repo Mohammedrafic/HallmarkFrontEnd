@@ -109,6 +109,7 @@ import { RegionsGridComponent } from './regions/import-regions/regions-grid/regi
 import { PenaltiesComponent } from './reasons/penalties/penalties.component';
 import { PenaltiesGridActionsRendererComponent } from './reasons/penalties/penalties-grid-actions-renderer/penalties-grid-actions-renderer.component';
 import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
+import { LocationsService } from './locations/locations.service';
 import { TiersComponent } from './tiers/tiers.component';
 import { TiersGridComponent } from './tiers/tiers-grid/tiers-grid.component';
 import { GridActionRendererComponent } from './tiers/tiers-grid/grid-action-renderer/grid-action-renderer.component';
@@ -247,6 +248,7 @@ const sidebarIcons = {
       ResizeService,
       PageService,
       TiersApiService,
+      LocationsService,
       ShiftsService,
       {
         provide: TIER_DIALOG_TYPE,
