@@ -5,6 +5,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { AgencyStatus } from '@shared/enums/status';
 import { AbstractPermission } from '@shared/helpers/permissions';
 import { Store } from '@ngxs/store';
+import { ButtonRenderedEvent } from '../../../models/button.model';
 
 @Component({
   selector: 'app-button-renderer',
@@ -31,13 +32,14 @@ export class ButtonRendererComponent extends AbstractPermission implements ICell
     return true;
   }
 
-  onClick($event: any) {
+  onClick($event: Event, btnName?: string): void {
     if (this.params.onClick instanceof Function) {
-      const params = {
+      const eventParams: ButtonRenderedEvent = {
         event: $event,
         rowData: this.params.node.data,
+        btnName: btnName || null,
       };
-      this.params.onClick(params);
+      this.params.onClick(eventParams);
     }
   }
 }

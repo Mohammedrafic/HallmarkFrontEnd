@@ -45,4 +45,14 @@
   .timepicker-field {
     width: 52%;
   }
+
+  .on-call-toggle {
+    display: flex;
+    margin-bottom: 16px;
+
+    span {
+      font-size: 14px;
+      color: $black;
+    }
+  }
 }

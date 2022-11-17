@@ -44,8 +44,9 @@ import {
   Trash2,
   Upload,
 } from 'angular-feather/icons';
-
 import { NgxsModule } from '@ngxs/store';
+
+import { ShiftsService } from "@organization-management/shifts/shifts.service";
 import { OrganizationManagementState } from './store/organization-management.state';
 import { CredentialsState } from './store/credentials.state';
 import { SharedModule } from '@shared/shared.module';
@@ -248,6 +249,7 @@ const sidebarIcons = {
       PageService,
       TiersApiService,
       LocationsService,
+      ShiftsService,
       {
         provide: TIER_DIALOG_TYPE,
         useValue: Tiers.tierSettings

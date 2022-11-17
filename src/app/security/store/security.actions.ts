@@ -144,3 +144,8 @@ export class ChangeBusinessUnit {
   static readonly type = '[security] Change Business Unit';
   constructor(public isChangeUnit: boolean) {}
 }
+
+export class ResendWelcomeEmail {
+  static readonly type = '[security] Resend Welcome Email';
+  constructor(public userId: string) {}
+}
