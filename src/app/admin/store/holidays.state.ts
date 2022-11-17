@@ -5,7 +5,7 @@ import { HolidaysService } from '@shared/services/holidays.service';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { catchError, Observable, of, tap } from "rxjs";
 
-import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages";
+import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED, usedByOrderErrorMessage } from "src/app/shared/constants/messages";
 import { MessageTypes } from "src/app/shared/enums/message-types";
 import { ShowToast } from "src/app/store/app.actions";
 import { DeleteHoliday, DeleteHolidaySucceeded, ExportHolidays, FilterChanged, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded, SetYearFilter } from './holidays.actions';
@@ -83,7 +83,12 @@ export class HolidaysState {
         dispatch(new DeleteHolidaySucceeded(payload));
         return payload;
       }),
-      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Holiday cannot be deleted')))));
+      catchError((error: any) => {
+        const message = error.error.errors?.EntityInUse
+          ? 'Assigned Holiday cannot be removed'
+          : RECORD_CANNOT_BE_DELETED;
+        return dispatch(new ShowToast(MessageTypes.Error, message));
+      }));
   }
 
   @Action(ExportHolidays)
