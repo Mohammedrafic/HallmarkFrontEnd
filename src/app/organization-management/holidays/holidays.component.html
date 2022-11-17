@@ -32,7 +32,7 @@
           id="addDepartmentButton"
           [disabled]="!userPermission[userPermissions.CanEditOrganizationHolidays]"
           [isPrimary]="true"
-          (click)='addHoliday()'>Add Holiday</button>
+          (click)='addHoliday()'>Assign Holiday</button>
       </app-tooltip-container>
     </section>
   </section>
@@ -59,9 +59,6 @@
       <e-column textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-            <button ejs-button cssClass="e-flat default-icon-button" (click)="copyHoliday(data, $event)">
-              <span class="edit-button"><i-feather name="copy" class="icon"></i-feather></span>
-            </button>
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="editHoliday(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
@@ -71,7 +68,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="regionId" headerText="region" width=200>
+      <e-column field="regionId" headerText="region" width="100%">
         <ng-template #template let-data>
           <ng-container *ngIf="!data.regionId">
             All
@@ -81,7 +78,7 @@
           </ng-container>
         </ng-template>
       </e-column>
-      <e-column field="locationId" headerText="location" type="location" width=200>
+      <e-column field="locationId" headerText="location" type="location" width="100%">
         <ng-template #template let-data>
           <ng-container *ngIf="!data.locationId">
             All
@@ -91,13 +88,13 @@
           </ng-container>
         </ng-template>
       </e-column>
-      <e-column field="holidayName" headerText="holiday name" width=200></e-column>
-      <e-column field="startDateTime" headerText="start date & time" width=200>
+      <e-column field="holidayName" headerText="holiday name" width="100%"></e-column>
+      <e-column field="startDateTime" headerText="start date & time" width="100%">
         <ng-template #template let-data>
           {{ data.startDateTime | date: "MM/dd/yyyy hh:mm a":"utc": "en-US" }}
         </ng-template>
       </e-column>
-      <e-column field="endDateTime" headerText="end date & time" width=200>
+      <e-column field="endDateTime" headerText="end date & time" width="100%">
         <ng-template #template let-data>
           {{ data.endDateTime | date: "MM/dd/yyyy hh:mm a":"utc": "en-US" }}
         </ng-template>
@@ -219,7 +216,7 @@
   <form *ngIf="showForm" class="holidays-form-dialog form-container bootstrap"
         id="addEditHolidaysForm"
         [formGroup]="HolidayFormGroup">
-    <ng-container *ngIf="title === 'Add'">
+    <ng-container *ngIf="title === 'Assign'">
       <div>
         <div class="input-container">
           <label>Region <span class="required">*</span></label>
@@ -265,7 +262,7 @@
         </div>
       </div>
     </ng-container>
-    <ng-container *ngIf="title === 'Edit' || title === 'Copy'">
+    <ng-container *ngIf="title === 'Edit'">
       <div>
         <div class="input-container">
           <label for="region">Region <span class="required">*</span></label>
@@ -301,14 +298,13 @@
       <div class="input-container">
         <label for="holidayName">Holiday Name <span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-autocomplete [dataSource]="masterHolidays"
+          <ejs-dropdownlist [dataSource]="masterHolidays"
+                            [allowFiltering]="true"
                             appValidateWithMessage
                             name="holidayName"
                             formControlName="holidayName"
-                            [fields]="holidayOptionFields"
-                            maxlength="50"
-                            [showPopupButton]="true">
-          </ejs-autocomplete>
+                            [fields]="holidayOptionFields">
+          </ejs-dropdownlist>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 export enum DialogMode {
   Add = 'Add',
   Copy = 'Copy',
-  Edit = 'Edit'
+  Edit = 'Edit',
+  Assign = 'Assign',
 };
