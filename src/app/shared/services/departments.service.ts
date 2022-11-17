@@ -12,6 +12,7 @@ import {
 } from '@shared/models/department.model';
 import { ImportResult } from "@shared/models/import.model";
 import { ExportPayload } from '@shared/models/export.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { sortBy } from '@shared/helpers/sort-array.helper';
 
 @Injectable({ providedIn: 'root' })
@@ -82,7 +83,19 @@ export class DepartmentsService {
    public getDepartmentFilterOptions(locationId: number): Observable<DepartmentFilterOptions> {
     return this.http
       .get<DepartmentFilterOptions>(`/api/Departments/filteringoptions`, { params: { LocationId: locationId } })
-      .pipe(map((data) => Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortBy(value)]))));
+      .pipe(
+        map((data) => {
+          const sortedFields: Record<string, string> = {
+           includeInIRP: 'optionText'
+          }
+          return Object.fromEntries(
+            Object.entries(data).map(([key, value]) => [
+              [key],
+              sortedFields[key] ? sortByField(value, sortedFields[key]) : sortBy(value),
+            ])
+          );
+        })
+      );
   }
 
   public getDepartmentsImportTemplate(errorRecords: ImportedDepartment[]): Observable<any> {

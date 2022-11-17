@@ -237,11 +237,11 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       if (!this.isClearAll) {
         let orgList = this.organizations?.filter((x) => data == x.organizationId);
         this.selectedOrganizations = orgList;
-        const regionsList: Region[] = [];
+        this.regionsList = [];
         const locationsList: Location[] = [];
         const departmentsList: Department[] = [];
         orgList.forEach((value) => {
-          regionsList.push(...value.regions);
+          this.regionsList.push(...value.regions);
           value.regions.forEach((region) => {
             locationsList.push(...region.locations);
             region.locations.forEach((location) => {
@@ -249,8 +249,6 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
             });
           });
         });
-
-        this.regionsList = sortByField(regionsList, 'name');
         this.locationsList = sortByField(locationsList, 'name');
         this.departmentsList = sortByField(departmentsList, 'name');
 

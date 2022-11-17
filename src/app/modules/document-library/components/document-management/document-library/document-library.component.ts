@@ -1070,7 +1070,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
       this.store.dispatch(new SaveDocuments(document)).pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
         if (this.isShare) {
           this.shareDocumentIds = [val?.documentLibrary?.savedDocumentLibraryDto?.id];
-          this.saveShareDocument();
+          this.saveShareDocument(true);
         }
         else {
           this.documentLibraryform.reset();
@@ -1105,7 +1105,7 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
     }
   }
 
-  public saveShareDocument() {
+  public saveShareDocument(shareWhileUpload:boolean=false) {
     let unitType: number = 0;
     let unitIds: number[] = [];
     if (this.agencySwitch) {
@@ -1122,7 +1122,8 @@ export class DocumentLibraryComponent extends AbstractGridConfigurationComponent
         documentIds: this.shareDocumentIds,
         businessUnitType: unitType,
         businessUnitIds: unitIds,
-        regionLocationMappings: mapping
+        regionLocationMappings: mapping,
+        isShareWhileUpload:shareWhileUpload
       }
       this.store.dispatch(new ShareDocuments(shareDocumentsFilter)).pipe(takeUntil(this.unsubscribe$)).subscribe(val => {
         this.documentLibraryform.reset();

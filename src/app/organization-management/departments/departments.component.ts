@@ -78,7 +78,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   selectedRegion: Region;
   defaultValue: any;
 
-  @Select(OrganizationManagementState.sortedoLocationsByRegionId)
+  @Select(OrganizationManagementState.sortedLocationsByRegionId)
   locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };

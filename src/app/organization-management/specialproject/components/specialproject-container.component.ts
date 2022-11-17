@@ -483,14 +483,16 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
       if (val?.length) {
         this.form.get('locationIds')?.setValue([]);
         const selectedRegions: OrganizationRegion[] = [];
+        const locations: OrganizationLocation[] = [];
         val.forEach((id) =>
           selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
         );
         this.orgStructureData.locationIds.dataSource = [];
         selectedRegions.forEach((region) => {
           region.locations?.forEach((location) => (location.regionName = region.name));
-          this.orgStructureData.locationIds.dataSource.push(...(region?.locations as []));
+          locations.push(...(region?.locations as []));
         });
+        this.orgStructureData.locationIds.dataSource = sortByField(locations, 'name');
       } else {
         this.orgStructureData.locationIds.dataSource = [];
         this.form.get('locationIds')?.setValue([]);
@@ -501,6 +503,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
       if (val?.length) {
         this.form.get('departmentsIds')?.setValue([]);
         const selectedLocations: OrganizationLocation[] = [];
+        const departments: OrganizationDepartment[] = [];
         val.forEach((id) =>
           selectedLocations.push(
             this.orgStructureData.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)
@@ -508,8 +511,9 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
         );
         this.orgStructureData.departmentsIds.dataSource = [];
         selectedLocations.forEach((location) => {
-          this.orgStructureData.departmentsIds.dataSource.push(...(location?.departments as []));
+          departments.push(...(location?.departments as []));
         });
+        this.orgStructureData.departmentsIds.dataSource = sortByField(departments, 'name');
       } else {
         this.orgStructureData.departmentsIds.dataSource = [];
         this.form.get('departmentsIds')?.setValue([]);

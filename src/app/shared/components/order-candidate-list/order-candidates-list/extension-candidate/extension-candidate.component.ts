@@ -472,7 +472,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   private getDateString(date: string): string | null {
-    return this.datePipe.transform(date, 'MM/dd/yyyy');
+    return this.datePipe.transform(date, 'MM/dd/yyyy', 'utc');
   }
 
   private getComments(): void {

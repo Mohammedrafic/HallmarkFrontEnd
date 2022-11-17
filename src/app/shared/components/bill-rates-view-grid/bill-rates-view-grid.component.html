@@ -39,7 +39,7 @@
       </e-column>
 
       <e-column headerText="Effective Date" textAlign="Right">
-        <ng-template #template let-data>{{data.effectiveDate | date:'M/d/y'}}</ng-template>
+        <ng-template #template let-data>{{data.effectiveDate | date: 'M/d/y': 'utc'}}</ng-template>
       </e-column>
     </e-columns>
   </ejs-grid>

@@ -85,6 +85,9 @@ export abstract class AbstractGridConfigurationComponent {
 
   protected constructor() {}
 
+  /**
+   * TODO: use formatDate instead of passing pipe instance.
+   */
   generateDateTime(datePipe: DatePipe): string {
     if (datePipe) {
       return datePipe.transform(Date.now(), 'MM/dd/yyyy hh:mm a') as string;
@@ -222,6 +225,7 @@ export abstract class AbstractGridConfigurationComponent {
       if (this.refreshing) {
         args.cancel = true;
         this.refreshing = false;
+        return;
       }
     }
     // Syncfusion Support ticket #403476

@@ -280,7 +280,9 @@ export class DocumentLibraryState {
     return this.documentLibraryService.ShareDocumets(shareDocumentsFilter).pipe(
       tap((sharedocuments) => {
         patchState({ sharedDocumentPostDetails: sharedocuments });
-        dispatch(new ShowToast(MessageTypes.Success, DOCUMENT_SHARED_SUCCESS));
+        if (!shareDocumentsFilter.isShareWhileUpload) {
+          dispatch(new ShowToast(MessageTypes.Success, DOCUMENT_SHARED_SUCCESS));
+        }
         const actions = [new ShareDocumentsSucceeded()];
         dispatch([...actions]);
         return sharedocuments;
