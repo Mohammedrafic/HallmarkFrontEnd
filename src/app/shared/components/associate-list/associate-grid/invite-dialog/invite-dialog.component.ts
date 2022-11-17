@@ -26,7 +26,7 @@ export class InviteDialogComponent extends DestroyableDirective implements OnIni
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
   @Select(AssociateListState.associateAgencyOrg)
-  public associateAgencyOrg$: Observable<string>;
+  public associateAgencyOrg$: Observable<{ id: number, name: string }[]>;
 
   @Select(UserState.businessUnitName)
   public businessUnitName$: Observable<string>;

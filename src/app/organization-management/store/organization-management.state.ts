@@ -354,7 +354,7 @@ export class OrganizationManagementState {
   }
 
   @Selector()
-  static sortedoLocationsByRegionId(state: OrganizationManagementStateModel): Location[] {
+  static sortedLocationsByRegionId(state: OrganizationManagementStateModel): Location[] {
     return sortByField(state.locations as Location[], 'name');
   }
 

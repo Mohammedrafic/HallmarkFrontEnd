@@ -32,7 +32,7 @@ body.light, body.dark {
       border-top: 1px solid $secondary-dark-blue-40;
       padding: 15px;
       display: flex;
-      justify-content: flex-end;
+      justify-content: flex-start;
       flex-direction: row-reverse;
 
       .delete-button {

@@ -20,6 +20,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { deployedCandidateMessage, DEPLOYED_CANDIDATE } from '@shared/constants';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -85,6 +86,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     private commentsService: CommentsService,
     private changeDetectorRef: ChangeDetectorRef,
     private confirmService: ConfirmService,
+    private datePipe: DatePipe
   ) {}
 
   ngOnChanges(): void {
@@ -116,8 +118,14 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
         .subscribe((isConfirm) => {
           if (isConfirm) {
             const value = this.formGroup.getRawValue();
-            if (value.availableStartDate) {
+            let availableStartDate = value.availableStartDate;
+            if (value.availableStartDate && value.availableStartDate.setHours) {
               value.availableStartDate.setHours(0, 0, 0, 0);
+            }
+            if (typeof value.availableStartDate === 'string') {
+              const date = new Date(value.availableStartDate);
+              date.setHours(0, 0, 0, 0);
+              availableStartDate = DateTimeHelper.toUtcFormat(date);
             }
             this.store
               .dispatch(
@@ -127,7 +135,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
                   candidateId: this.candidateId,
                   candidateBillRate: value.candidateBillRate,
                   expAsTravelers: value.expAsTravelers,
-                  availableStartDate: DateTimeHelper.toUtcFormat(value.availableStartDate),
+                  availableStartDate: availableStartDate,
                   requestComment: value.requestComment,
                 })
               )
@@ -172,7 +180,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       jobDate: [data.jobStartDate, data.jobEndDate],
       orderBillRate: PriceUtils.formatNumbers(data.orderBillRate),
       locationName: data.locationName,
-      availableStartDate: data.availableStartDate,
+      availableStartDate: this.datePipe.transform(data.availableStartDate, 'MM/dd/yyyy', 'utc'),
       yearsOfExperience: data.yearsOfExperience,
       candidateBillRate: PriceUtils.formatNumbers(data.orderBillRate),
       expAsTravelers: data.expAsTravelers || 0,

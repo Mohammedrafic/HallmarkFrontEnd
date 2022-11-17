@@ -62,7 +62,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/FinancialTimeSheet/FinancialTimeSheet.cat" };
   public title: string = "Financial Timesheet";
   public message: string = "";
-  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
+  public reportType: LogiReportTypes = LogiReportTypes.WebReport;
   public allOption: string = "All";
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
@@ -166,6 +166,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
    
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
+      this.orderFilterColumnsSetup();
       this.financialTimeSheetFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {
           this.filterOptionsData = data;
@@ -187,7 +188,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       });
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
-      this.orderFilterColumnsSetup();
+    
       this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
       this.onFilterControlValueChangedHandler();
       this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
@@ -236,11 +237,11 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       if (!this.isClearAll) {
         let orgList = this.organizations?.filter((x) => data == x.organizationId);
         this.selectedOrganizations = orgList;
-        const regionsList: Region[] = [];
+        this.regionsList = [];
         const locationsList: Location[] = [];
         const departmentsList: Department[] = [];
         orgList.forEach((value) => {
-          regionsList.push(...value.regions);
+          this.regionsList.push(...value.regions);
           value.regions.forEach((region) => {
             locationsList.push(...region.locations);
             region.locations.forEach((location) => {
@@ -248,8 +249,6 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
             });
           });
         });
-
-        this.regionsList = sortByField(regionsList, 'name');
         this.locationsList = sortByField(locationsList, 'name');
         this.departmentsList = sortByField(departmentsList, 'name');
 

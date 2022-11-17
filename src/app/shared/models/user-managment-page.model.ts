@@ -7,6 +7,7 @@ export type User = {
   email: string;
   emailConfirmation: string;
   isDeleted: boolean;
+  lastLoginDate?: string;
   address1?: string;
   address2?: string;
   country?: number | string;
@@ -21,7 +22,7 @@ export type User = {
   businessUnitName?: string;
   assigned: boolean;
   roles: Array<number> | [];
-  timeZone?: string; 
+  timeZone?: string;
 };
 
 export type UserDTO = {

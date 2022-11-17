@@ -1,23 +1,21 @@
 import { ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { EmitType } from '@syncfusion/ej2-base';
-import { ChangeEventArgs, FieldSettingsModel, AutoComplete, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
 import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
-import { BusinessUnit } from '@shared/models/business-unit.model';
-import { GetBusinessByUnitType, GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
+import {GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState } from '@organization-management/store/logi-report.action';
+import { GetCommonReportFilterOptions, GetLogiReportData, GetCommonReportCandidateSearch, ClearLogiReportState } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
-import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -26,13 +24,13 @@ import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { User } from '@shared/models/user.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
-import { uniqBy } from 'lodash';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ORGANIZATION_DATA_FIELDS } from '../analytics.constant';
 import { AgencyDto, CommonCandidateSearchFilter, CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SearchCandidate, SkillCategoryDto } from '../models/common-report.model';
-import { OrderTypeOptions } from '@shared/enums/order-type';
 import { OutsideZone } from "@core/decorators";
 import { analyticsConstants } from '../constants/analytics.constant';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { uniqBy } from 'lodash';
 
 @Component({
   selector: 'app-job-details-summary',
@@ -63,7 +61,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialReport/Credential.cat" };
   public title: string = "Job Detail Summary";
   public message: string = "";
-  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
+  public reportType: LogiReportTypes = LogiReportTypes.WebReport;
   public allOption: string = "All";
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
@@ -168,8 +166,8 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {      
     this.orderFilterColumnsSetup();
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
       this.CommonReportFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {
@@ -285,7 +283,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
         let regionList = this.regions?.filter((object) => data?.includes(object.id));
         this.selectedRegions = regionList;
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
-        this.filterColumns.locationIds.dataSource = this.locations;
+        this.filterColumns.locationIds.dataSource = sortByField(this.locations, 'name');
         this.defaultLocations = this.locations.map((list) => list.id);
         this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
         this.changeDetectorRef.detectChanges();
@@ -299,7 +297,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       if (this.locationIdControl.value.length > 0) {
         this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
-        this.filterColumns.departmentIds.dataSource = this.departments;
+        this.filterColumns.departmentIds.dataSource = sortByField(this.departments, 'name');
         this.defaultDepartments = this.departments.map((list) => list.id);
         this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue(this.defaultDepartments);
         this.changeDetectorRef.detectChanges();

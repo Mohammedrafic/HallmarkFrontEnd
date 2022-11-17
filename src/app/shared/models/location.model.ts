@@ -23,6 +23,7 @@ export class Location {
   timeZone? : string;
   locationTypeId? :number;
   organizationId :number;
+  includeInIRP: boolean;
 }
 
 export type LocationsPage = PageOfCollections<Location>;
@@ -45,6 +46,12 @@ export class LocationFilter {
   orderBy?: string;
   pageSize?: number;
   pageNumber?: number;
+  includeInIRP?: number;
+}
+
+export interface IrpFilterOption {
+  option: number;
+  optionText: string;
 }
 
 export class LocationFilterOptions {
@@ -56,16 +63,17 @@ export class LocationFilterOptions {
   states: string[];
   zipCodes: string[];
   contactPersons: string[];
+  includeInIRP: IrpFilterOption[];
 }
 
 export class LocationType{
-  LocationTypeId : number;
-  Name: string;
+  locationTypeId : number;
+  name: string;
 }
 
 export class TimeZoneModel {
-  SystemTimeZoneName: string;
-  TimeZoneId: string;
+  systemTimeZoneName: string;
+  timeZoneId: string;
 }
 
 export type ImportedLocation = {

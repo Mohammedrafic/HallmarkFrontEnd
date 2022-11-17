@@ -48,7 +48,7 @@ import {
   OrderManagementChild,
   OrderManagementPage
 } from '@shared/models/order-management.model';
-import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Skill } from '@shared/models/skill.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { FilterService } from '@shared/services/filter.service';
@@ -123,6 +123,7 @@ import { PermissionService } from '../../../security/services/permission.service
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { PreservedFilters } from '@shared/models/preserved-filters.model';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-order-management-content',
@@ -197,6 +198,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public moreMenuWithReOpenButton: ItemModel[];
   public moreMenu: ItemModel[];
   public reOrdersMenu: ItemModel[];
+  public filledReOrdersMenu: ItemModel[];
   public closedOrderMenu: ItemModel[];
 
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
@@ -1295,14 +1297,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.OrderFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = [];
+        const locations: OrganizationLocation[] = [];
+
         val.forEach((id) =>
           selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
         );
         this.filterColumns.locationIds.dataSource = [];
         selectedRegions.forEach((region) => {
           region.locations?.forEach((location) => (location.regionName = region.name));
-          this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
+          locations.push(...region.locations as [])
         });
+        this.filterColumns.locationIds.dataSource.push(...sortByField(locations, 'name'));
       } else {
         this.filterColumns.locationIds.dataSource = [];
         this.OrderFilterFormGroup.get('locationIds')?.setValue([]);
@@ -1313,6 +1318,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.OrderFilterFormGroup.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = [];
+        const departments: OrganizationDepartment[] = [];
+
         val.forEach((id) =>
           selectedLocations.push(
             this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)
@@ -1320,8 +1327,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         );
         this.filterColumns.departmentsIds.dataSource = [];
         selectedLocations.forEach((location) => {
-          this.filterColumns.departmentsIds.dataSource.push(...(location.departments as []));
+          departments.push(...(location.departments as []));
         });
+        this.filterColumns.departmentsIds.dataSource.push(...sortByField(departments, 'name'));
       } else {
         this.filterColumns.departmentsIds.dataSource = [];
         this.OrderFilterFormGroup.get('departmentsIds')?.setValue([]);
@@ -1431,13 +1439,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
     if (orderStatuses.includes(OrderStatus.InProgressOfferAccepted)) {
       if (Boolean(order.children?.some((child) => orderStatuses.includes(child.orderStatus)))) {
-        return this.moreMenu;
+        return order.orderType === OrderType.OpenPerDiem ? this.moreMenuWithCloseButton : this.moreMenu;
       }
     }
     return this.canReOpen(order) ? this.moreMenuWithReOpenButton : this.moreMenuWithCloseButton;
   }
 
   public getMenuForReorders(order: OrderManagement): ItemModel[] {
+    if (Boolean(order.children?.some((child) => OrderStatus.Filled === child.orderStatus))) {
+      return this.filledReOrdersMenu;
+    }
+
     if (!order.children?.length && order.orderCloseDate && order.status !== OrderStatus.Closed) {
       return this.moreMenu;
     }
@@ -1649,6 +1661,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.reOrdersMenu = [
       { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
       { text: MoreMenuType[2], id: '2', disabled: !this.canCloseOrder },
+    ];
+
+    this.filledReOrdersMenu = [
+      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder }
     ];
 
     this.closedOrderMenu = [{ text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder }];
