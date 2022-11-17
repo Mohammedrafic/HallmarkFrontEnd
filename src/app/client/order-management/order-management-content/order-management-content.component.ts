@@ -197,6 +197,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public moreMenuWithReOpenButton: ItemModel[];
   public moreMenu: ItemModel[];
   public reOrdersMenu: ItemModel[];
+  public filledReOrdersMenu: ItemModel[];
   public closedOrderMenu: ItemModel[];
 
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
@@ -1431,13 +1432,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
     if (orderStatuses.includes(OrderStatus.InProgressOfferAccepted)) {
       if (Boolean(order.children?.some((child) => orderStatuses.includes(child.orderStatus)))) {
-        return this.moreMenu;
+        return order.orderType === OrderType.OpenPerDiem ? this.moreMenuWithCloseButton : this.moreMenu;
       }
     }
     return this.canReOpen(order) ? this.moreMenuWithReOpenButton : this.moreMenuWithCloseButton;
   }
 
   public getMenuForReorders(order: OrderManagement): ItemModel[] {
+    if (Boolean(order.children?.some((child) => OrderStatus.Filled === child.orderStatus))) {
+      return this.filledReOrdersMenu;
+    }
+
     if (!order.children?.length && order.orderCloseDate && order.status !== OrderStatus.Closed) {
       return this.moreMenu;
     }
@@ -1649,6 +1654,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.reOrdersMenu = [
       { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
       { text: MoreMenuType[2], id: '2', disabled: !this.canCloseOrder },
+    ];
+
+    this.filledReOrdersMenu = [
+      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder }
     ];
 
     this.closedOrderMenu = [{ text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder }];
