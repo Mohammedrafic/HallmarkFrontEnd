@@ -6,6 +6,7 @@ import {
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
+import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import {
@@ -161,7 +162,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   constructor(
     private store: Store,
     private actions$: Actions,
-    private orderCandidateListViewService: OrderCandidateListViewService
+    private orderCandidateListViewService: OrderCandidateListViewService,
+    private datePipe: DatePipe
   ) {
     super();
   }
@@ -351,7 +353,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       locationName,
       departmentName,
       skillName,
-      orderOpenDate: reOrderDate,
+      orderOpenDate: this.datePipe.transform(reOrderDate, 'MM/dd/yyyy', 'utc'),
       shiftStartTime,
       shiftEndTime,
       openPositions,

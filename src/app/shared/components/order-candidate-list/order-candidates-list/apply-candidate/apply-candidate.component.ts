@@ -116,7 +116,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
         .subscribe((isConfirm) => {
           if (isConfirm) {
             const value = this.formGroup.getRawValue();
-            if (value.availableStartDate) {
+            if (value.availableStartDate && value.availableStartDate.setHours) {
               value.availableStartDate.setHours(0, 0, 0, 0);
             }
             this.store
