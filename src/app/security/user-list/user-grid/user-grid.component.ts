@@ -105,7 +105,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         headerName: 'Action',
         cellRenderer: 'buttonRenderer',
         cellRendererParams: {
-          onClick: this.onButtonClick.bind(this),
+          onClick: this.handleUserGridAction.bind(this),
           label: 'Edit Mail',
         },
         width: 50,
@@ -245,8 +245,12 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.isAlive = false;
   }
 
-  public onButtonClick(data: ButtonRenderedEvent): void {
-    data.btnName === 'edit' ? this.onEdit(data) : this.resendWelcomeEmail(data);
+  public handleUserGridAction(data: ButtonRenderedEvent): void {
+    if (data.btnName === 'edit') {
+      this.editUser(data);
+    } else {
+      this.resendWelcomeEmail(data);
+    }
   }
 
   public rowDataBound(args: RowDataBoundEventArgs): void {
@@ -321,7 +325,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     }
   }
 
-  private onEdit(data: ButtonRenderedEvent): void {
+  private editUser(data: ButtonRenderedEvent): void {
     this.editUserEvent.emit(data?.rowData);
   }
 
