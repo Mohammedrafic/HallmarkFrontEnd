@@ -132,6 +132,6 @@ export class UsersService {
   }
 
   public resendWelcomeEmail(userId: string): Observable<void> {
-    return this.http.post<void>('/api/User/resendwelcomeemail', { userId });
+    return this.http.post<void>('/api/Users/resendwelcomeemail', { userId });
   }
 }
