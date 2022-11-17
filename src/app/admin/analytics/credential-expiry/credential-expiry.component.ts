@@ -16,7 +16,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData,  GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
+import { GetCommonReportFilterOptions, GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData,  GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -25,7 +25,7 @@ import { analyticsConstants } from '../constants/analytics.constant';
 import { FilterService } from '@shared/services/filter.service';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
-import { AgencyDto, CandidateStatusDto, CommonReportFilterOptions } from '../models/common-report.model';
+import { AgencyDto, CandidateStatusDto, CommonReportFilter, CommonReportFilterOptions } from '../models/common-report.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
@@ -143,7 +143,13 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
       this.agencyOrganizationId=data;   
       this.isInitialLoad = true;
       this.orderFilterColumnsSetup();
-      
+      let businessIdData = [];
+      businessIdData.push(data);
+      let filter: CommonReportFilter = {
+        businessUnitIds: businessIdData
+      };
+
+      this.store.dispatch(new GetCommonReportFilterOptions(filter));
       this.CommonReportFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {
           this.filterOptionsData = data;
@@ -192,6 +198,7 @@ export class CredentialExpiryComponent implements OnInit,OnDestroy {
           getAll: true
         };
         this.store.dispatch(new GetRegionsByOrganizations(regionFilter));
+        
       }
       else {
         this.isClearAll = false;
