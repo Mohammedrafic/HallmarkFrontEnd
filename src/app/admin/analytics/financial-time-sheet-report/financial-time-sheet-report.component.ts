@@ -367,7 +367,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       "DepartmentParamFTS": departmentIds.join(","),
       "SkillCategoriesParamFTS":skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
       "SkillsParamFTS":skillIds.length==0?"null":skillIds.join(","),
-      "CandidateNameParamFTS":candidateName==null||candidateName==""?"null":candidateName,
+      "CandidateNameParamFTS":candidateName==null||candidateName==""?"null":candidateName.toString(),
       "CandidateStatusesParamFTS":candidateStatuses.length==0?"null":candidateStatuses.join(","),
       "OrderTypesParamFTS":orderTypes.length==0?"null":orderTypes.join(","),
       "JobStatusesParamFTS":jobStatuses.length==0?"null":jobStatuses.join(","),
