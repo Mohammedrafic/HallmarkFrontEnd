@@ -485,6 +485,22 @@
       </div>
       <div class="e-card-content">
         <form *ngIf="PreferencesFormGroup" [formGroup]="PreferencesFormGroup" id="preferancesDetails">
+          <div *ngIf="isIRPFlagEnabled" class="bootstrap system-wrapper">
+            <label class="label-gray">System Configuration (at least one system should be selected)<span class="required">*</span></label>
+            <div class="checkbox-group">
+              <ejs-checkbox
+                formControlName="isIRPEnabled"
+                label="IRP"
+                [disabled]="!isOrgHasIRPPermissions"
+                (change)="checkIPRFormControl($event)"
+              ></ejs-checkbox>
+              <ejs-checkbox
+                formControlName="isVMCEnabled"
+                label="VMS"
+                [disabled]="!isOrgHasIRPPermissions"
+              ></ejs-checkbox>
+            </div>
+          </div>
           <div class="dropdown-container bootstrap">
             <label>Week Starts On<span class="required">*</span></label>
             <div class="input-group dropdown">

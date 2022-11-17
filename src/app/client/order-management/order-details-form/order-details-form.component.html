@@ -10,7 +10,7 @@
             appValidateWithMessage
             [allowFiltering]="true"
             [dataSource]="orderTypesDataSource"
-            [fields]="orderTypeFields"
+            [fields]="optionFields"
           >
           </ejs-dropdownlist>
         </div>
@@ -55,7 +55,7 @@
                       appValidateWithMessage
                       [allowFiltering]="true"
                       [dataSource]="regions$ | async"
-                      [fields]="regionFields"
+                      [fields]="optionFields"
                       (select)="onRegionDropDownChanged($event)"
                     >
                     </ejs-dropdownlist>
@@ -71,7 +71,7 @@
                       appValidateWithMessage
                       [allowFiltering]="true"
                       [dataSource]="locations$ | async"
-                      [fields]="locationFields"
+                      [fields]="optionFields"
                       (select)="onLocationDropDownChanged($event)"
                     >
                     </ejs-dropdownlist>
@@ -103,7 +103,7 @@
                       appValidateWithMessage
                       [allowFiltering]="true"
                       [dataSource]="skills$ | async"
-                      [fields]="skillFields"
+                      [fields]="optionFields"
                       (select)="onSkillsDropDownChanged($event)"
                     >
                     </ejs-dropdownlist>
@@ -251,7 +251,7 @@
                         appValidateWithMessage
                         [allowFiltering]="true"
                         [dataSource]="durations"
-                        [fields]="durationFields"
+                        [fields]="optionFields"
                       >
                       </ejs-dropdownlist>
                     </div>
@@ -304,7 +304,7 @@
                         appValidateWithMessage
                         [allowFiltering]="true"
                         [dataSource]="masterShiftNames"
-                        [fields]="masterShiftFields"
+                        [fields]="optionFields"
                       >
                       </ejs-dropdownlist>
                     </div>
@@ -359,7 +359,7 @@
                         appValidateWithMessage
                         [allowFiltering]="true"
                         [dataSource]="masterShiftNames"
-                        [fields]="masterShiftFields"
+                        [fields]="optionFields"
                       >
                       </ejs-dropdownlist>
                     </div>
@@ -407,49 +407,42 @@
             </form>
           </div>
         </div>
+        <!-- Job Distribution -->
         <div class="job-distibution">
           <div class="title">Job Distribution</div>
           <div class="job-distribution-form-container">
             <form [formGroup]="jobDistributionForm">
               <div class="form-line">
-                <!-- Job Distribution -->
                 <div class="input-container bootstrap form-line-item-40">
                   <label>Job Distribution<span class="required">*</span></label>
                   <div class="input-group dropdown">
-                    <ejs-multiselect
-                      mode="CheckBox"
+                    <ejs-dropdownlist
                       formControlName="jobDistribution"
                       appValidateWithMessage
-                      [dataSource]="jobDistributions"
-                      [fields]="jobDistributionFields"
                       [allowFiltering]="true"
-                      [showDropDownIcon]="true"
+                      [dataSource]="distribution"
+                      [fields]="optionFields"
                     >
-                    </ejs-multiselect>
+                    </ejs-dropdownlist>
                   </div>
                 </div>
-
-                <!-- Agency -->
-                <div class="input-container bootstrap form-line-item-40">
-                  <label>
-                    Agency
-                    <span *ngIf="agencyControlEnabled" class="required">*</span>
-                  </label>
-                  <div class="input-group dropdown">
-                    <ejs-multiselect
-                      mode="CheckBox"
-                      formControlName="agency"
-                      appValidateWithMessage
-                      [enabled]="agencyControlEnabled"
-                      [dataSource]="associateAgencies$ | async"
-                      [fields]="associateAgencyFields"
-                      [showSelectAll]="true"
-                      [allowFiltering]="true"
-                      [showDropDownIcon]="true"
-                    >
-                    </ejs-multiselect>
-                  </div>
+              <div class="input-container bootstrap form-line-item-40">
+                <label> Agency <span *ngIf="agencyControlEnabled" class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-multiselect
+                    mode="CheckBox"
+                    formControlName="agency"
+                    appValidateWithMessage
+                    [enabled]="agencyControlEnabled"
+                    [dataSource]="associateAgencies$ | async"
+                    [fields]="associateAgencyFields"
+                    [showSelectAll]="true"
+                    [allowFiltering]="true"
+                    [showDropDownIcon]="true"
+                  >
+                  </ejs-multiselect>
                 </div>
+              </div>
               </div>
             </form>
           </div>
@@ -467,7 +460,7 @@
                       mode="CheckBox"
                       formControlName="classifications"
                       [dataSource]="jobClassifications"
-                      [fields]="jobClassificationFields"
+                      [fields]="optionFields"
                       [allowFiltering]="true"
                       [showSelectAll]="true"
                       [showDropDownIcon]="true"

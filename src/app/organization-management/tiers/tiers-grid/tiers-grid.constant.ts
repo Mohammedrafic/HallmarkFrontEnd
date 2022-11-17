@@ -6,8 +6,10 @@ export const TiersColumnsDefinition = ( editCallback: (tier: TierDetails) => voi
     {
       headerName: '',
       width: 140,
+      minWidth: 140,
       sortable: true,
       cellRenderer: GridActionRendererComponent,
+      rowDrag: true,
       cellRendererParams: {
         edit: (tier: TierDetails) => {
           editCallback(tier);
@@ -20,13 +22,13 @@ export const TiersColumnsDefinition = ( editCallback: (tier: TierDetails) => voi
       sortable: true,
     },
     {
-      field: 'hours',
-      headerName: 'NUMBER OF HOURS',
+      field: 'priority',
+      headerName: 'PRIORITY',
       sortable: true,
     },
     {
-      field: 'priority',
-      headerName: 'PRIORITY',
+      field: 'hours',
+      headerName: 'NUMBER OF HOURS',
       sortable: true,
     },
     {

@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { ShiftExportColumns } from "@organization-management/shifts/shifts.constants";
+import { ShiftsService } from "@organization-management/shifts/shifts.service";
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
@@ -50,48 +52,23 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
   public title = '';
   public showForm = true;
   public maskPlaceholderValue: Object = { hour: 'HH', minute: 'MM' };
-  public columnsToExport: ExportColumn[] = [
-    { text:'Shift Name', column: 'Name'},
-    { text:'Shift Short Name', column: 'ShortName'},
-    { text:'Start Time', column: 'StartTime'},
-    { text:'End Time', column: 'EndTime'}
-  ];
+  public columnsToExport: ExportColumn[] = ShiftExportColumns;
   public fileName: string;
   public defaultFileName: string;
 
   constructor(protected override store: Store,
               private actions$: Actions,
-              private fb: FormBuilder,
               private confirmService: ConfirmService,
+              private shiftsService: ShiftsService,
               private datePipe: DatePipe) {
     super(store);
-    this.ShiftFormGroup = this.fb.group({
-      id: new FormControl(0, [ Validators.required ]),
-      name: new FormControl(null, [ Validators.required ]),
-      shortName: new FormControl(null, [ Validators.required ]),
-      startTime: new FormControl(null, [ Validators.required ]),
-      endTime: new FormControl(null, [ Validators.required ]),
-    });
   }
 
   override ngOnInit(): void {
     super.ngOnInit();
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
-      this.currentPage = 1;
-      this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
-    });
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
-      this.currentPage = page;
-      this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
-    });
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveShiftSucceeded)).subscribe(() => {
-      this.ShiftFormGroup.reset();
-      this.closeDialog();
-      this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
-    });
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(DeleteShiftSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
-    });
+    this.ShiftFormGroup = this.shiftsService.getShiftForm();
+    this.watchForShiftPage();
+    this.watchForShiftActions();
   }
 
   ngOnDestroy(): void {
@@ -147,7 +124,6 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
     this.ShiftFormGroup.setValue({
       id: data.id,
       name: data.name,
-      shortName: data.shortName,
       startTime: startDate,
       endTime: endDate,
     });
@@ -213,5 +189,33 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
     if (event.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
     }
+  }
+
+  private watchForShiftPage(): void {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.currentPage = 1;
+      this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
+    });
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
+      this.currentPage = page;
+      this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
+    });
+  }
+
+  private watchForShiftActions(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(SaveShiftSucceeded),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.ShiftFormGroup.reset();
+      this.closeDialog();
+      this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
+    });
+    this.actions$.pipe(
+      ofActionSuccessful(DeleteShiftSucceeded),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
+    });
   }
 }

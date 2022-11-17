@@ -50,7 +50,8 @@ export class TiersState {
       tap(() => {
         dispatch([
           new ShowToast(MessageTypes.Success, isEdit ? RECORD_MODIFIED : RECORD_ADDED),
-          new ShowSideDialog(false)
+          new ShowSideDialog(false),
+          new Tiers.UpdatePageAfterSuccessAction()
         ]);
       }),
       catchError((error: HttpErrorResponse) => {
@@ -60,7 +61,7 @@ export class TiersState {
           return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
         }
       })
-    )
+    );
   }
 
   @Action(Tiers.DeleteTier)
@@ -78,6 +79,22 @@ export class TiersState {
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
-    )
+    );
+  }
+
+  @Action(Tiers.ChangeTierPriority)
+  ChangeTierPriority(
+    { patchState, dispatch }: StateContext<TiersStateModel>,
+    { payload }: Tiers.ChangeTierPriority
+  ): Observable<TiersPage | void> {
+    return this.tiersApiService.updateTierPriority(payload).pipe(
+      tap((tiersByPage: TiersPage) => {
+        patchState({ tiersByPage });
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED))
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
   }
 }
