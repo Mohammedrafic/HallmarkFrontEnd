@@ -30,7 +30,7 @@
         <button
           ejs-button
           id="addDepartmentButton"
-          [disabled]="!userPermission[userPermissions.CanEditOrganizationHolidays]"
+          *ngIf="userPermission[userPermissions.CanEditOrganizationHolidays]"
           [isPrimary]="true"
           (click)='addHoliday()'>Assign Holiday</button>
       </app-tooltip-container>

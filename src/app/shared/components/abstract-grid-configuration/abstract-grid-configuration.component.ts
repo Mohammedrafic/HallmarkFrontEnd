@@ -225,6 +225,7 @@ export abstract class AbstractGridConfigurationComponent {
       if (this.refreshing) {
         args.cancel = true;
         this.refreshing = false;
+        return;
       }
     }
     // Syncfusion Support ticket #403476
