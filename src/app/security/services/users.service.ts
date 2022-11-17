@@ -130,4 +130,8 @@ export class UsersService {
   public export(payload: ExportPayload): Observable<Blob> {
     return this.http.post(`/api/Users/export`, payload, { responseType: 'blob' });
   }
+
+  public resendWelcomeEmail(userId: string): Observable<void> {
+    return this.http.post<void>('/api/Users/resendwelcomeemail', { userId });
+  }
 }
