@@ -166,6 +166,7 @@ export class ShareDocumentsFilter {
   businessUnitType: number;
   businessUnitIds: number[] | null;
   regionLocationMappings: { [id: number]: number[]; } | null;
+  isShareWhileUpload: boolean;
 }
 
 export class ShareDocumentDto {
