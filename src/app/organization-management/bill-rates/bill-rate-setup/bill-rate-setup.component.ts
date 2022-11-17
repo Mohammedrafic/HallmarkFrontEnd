@@ -63,8 +63,6 @@ import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/i
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import PriceUtils from '@shared/utils/price.utils';
-import { currencyValidator } from '@shared/validators/currency.validator';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
@@ -74,6 +72,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { DateTimeHelper } from '@core/helpers';
 import { UserPermissions } from "@core/enums";
 import { Permission } from "@core/interface";
+import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
 
 @Component({
   selector: 'app-bill-rate-setup',
@@ -116,7 +115,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   billRatesOptions$: Observable<BillRateOption[]>;
   billRateTitleFields: FieldSettingsModel = { text: 'title', value: 'id' };
   public billRatesOptions: BillRateOption[];
-  public priceUtils = PriceUtils;
 
   public orderTypes = OrderTypeOptions;
   public orderTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -152,7 +150,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   private editRecordId?: number;
-  private billRateValueValidators = [currencyValidator(0), Validators.minLength(1)];
 
   public columnsToExport: ExportColumn[] = [
     { text: 'Region', column: 'Region' },
@@ -174,6 +171,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   ];
   public fileName: string;
   public defaultFileName: string;
+  public isMileageTitleType: boolean;
+  public format = '#';
 
   constructor(
     private store: Store,
@@ -478,7 +477,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public onFormSaveClick(): void {
     if (this.billRatesFormGroup.valid) {
       const effectiveDate: Date = this.billRatesFormGroup.controls['effectiveDate'].value;
-      if (effectiveDate) {
+      if (effectiveDate && !this.isEdit) {
         effectiveDate.setHours(0, 0, 0, 0);
       }
       const isAllRegions = this.billRatesFormGroup.controls['regionIds'].value.length === this.allRegions.length;
@@ -684,7 +683,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       orderTypeIds: ['', [Validators.required]],
       billRatesCategory: [{ value: '', disabled: true }],
       billRatesType: ['', [Validators.required]],
-      billRateValueRateTimes: [null, [Validators.required, Validators.maxLength(11), ...this.billRateValueValidators]],
+      billRateValueRateTimes: [null, [Validators.required, Validators.maxLength(11)]],
       effectiveDate: [null, [Validators.required]],
       intervalMin: [''],
       intervalMax: [''],
@@ -772,7 +771,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRatesFormGroup
       .get('billRateTitleId')
       ?.valueChanges.pipe(takeUntil(this.unsubscribe$))
-      .subscribe((typeId: number) => {
+      .subscribe((typeId: number) => { 
+        this.isMileageTitleType = typeId !== BillRateTitleId.Mileage;
         const foundBillRateOption = this.billRatesOptions.find((option) => option.id === typeId);
 
         if (foundBillRateOption) {
@@ -783,7 +783,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           this.isIntervalMinRequired = foundBillRateOption.intervalMinRequired;
           this.isIntervalMaxRequired = foundBillRateOption.intervalMaxRequired;
           this.billRatesFormGroup.get('billRateValueRateTimes')?.setValue('');
-          this.updateAmountValidators();
           this.billRatesFormGroup.get('billRatesCategory')?.setValue(BillRateCategory[foundBillRateOption.category]);
         }
 
@@ -822,6 +821,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         this.changeFieldsSettingByType(typeId);
 
         this.billRatesFormGroup.updateValueAndValidity();
+        this.setFormatDecimalsValues();
         this.cd.markForCheck();
       });
   }
@@ -871,15 +871,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     }
   }
 
-  updateAmountValidators(): void {
-    if (this.selectedBillRateUnit === this.BillRateUnitList.Currency) {
-      this.billRatesFormGroup.get('billRateValueRateTimes')?.removeValidators(this.billRateValueValidators);
-    } else {
-      this.billRatesFormGroup.get('billRateValueRateTimes')?.addValidators(this.billRateValueValidators);
-    }
-    this.billRatesFormGroup.get('billRateValueRateTimes')?.updateValueAndValidity();
-  }
-
   private setupFormValues(data: BillRateSetup): void {
     if (!data.regionId) {
       const allRegionsIds = this.allRegions.map((region) => region.id);
@@ -919,10 +910,11 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.billRatesFormGroup.controls['orderTypeIds'].setValue(data.orderTypes);
     }
 
+    const decimals = this.isMileageTitleType ? 2 : 3;
     const rateHour =
       foundBillRateOption?.unit === BillRateUnit.Hours
         ? data.rateHour
-        : parseFloat(data.rateHour.toString()).toFixed(2);
+        : parseFloat(data.rateHour.toString()).toFixed(decimals);
     this.billRatesFormGroup.controls['billRateValueRateTimes'].setValue(rateHour);
     this.billRatesFormGroup.controls['effectiveDate'].setValue(data.effectiveDate);
     this.billRatesFormGroup.controls['intervalMin'].setValue(data.intervalMin);
@@ -938,5 +930,11 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   private handlePagePermission(): void {
     const user = this.store.selectSnapshot(UserState.user);
     this.isReadOnly = user?.businessUnitType === BusinessUnitType.Organization;
+  }
+
+  private setFormatDecimalsValues(): void {
+    const isBillRateUnitHours = this.selectedBillRateUnit === this.BillRateUnitList.Hours;
+    this.format = isBillRateUnitHours ? '#' : this.isMileageTitleType ? '###.00' : '###.000';
+    this.decimals = isBillRateUnitHours ? 0 : this.isMileageTitleType ? 2 : 3;
   }
 }
