@@ -548,7 +548,6 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       switchMap(() => this.store.dispatch(new GetRegions())),
       takeUntil(this.componentDestroy()),
     ).subscribe((data) => {
-      console.log(this.isFeatureIrpEnabled && this.isOrgIrpEnabled)
       this.defaultValue = data.organizationManagement.regions[0]?.id as Region;
     });
   }
