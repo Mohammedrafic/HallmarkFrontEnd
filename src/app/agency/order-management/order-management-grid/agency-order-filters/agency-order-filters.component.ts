@@ -23,6 +23,7 @@ import { formatDate } from '@shared/constants/format-date';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { datepickerMask } from '@shared/constants/datepicker-mask';
 import { FilterOrderStatus, FilterStatus } from '@shared/models/order-management.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 enum RLDLevel {
   Orginization,
@@ -127,7 +128,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           const regions: OrganizationRegion[] = this.filterColumns.regionIds.dataSource.filter(
             ({ id }: { id: number }) => value.includes(id)
           );
-          this.filterColumns.locationIds.dataSource = getLocationsFromRegions(regions);
+          this.filterColumns.locationIds.dataSource = sortByField(getLocationsFromRegions(regions), 'name');
         }
       })
     );
@@ -142,7 +143,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           const locations: OrganizationLocation[] = this.filterColumns.locationIds.dataSource.filter(
             ({ id }: { id: number }) => value.includes(id)
           );
-          this.filterColumns.departmentsIds.dataSource = getDepartmentFromLocations(locations);
+          this.filterColumns.departmentsIds.dataSource = sortByField(getDepartmentFromLocations(locations), 'name');
         }
       })
     );
@@ -152,7 +153,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return this.actions$.pipe(
       ofActionSuccessful(GetOrganizationStructure),
       tap(() => {
-        this.filterColumns.regionIds.dataSource = this.store.selectSnapshot(OrderManagementState.gridFilterRegions);
+        const regions = this.store.selectSnapshot(OrderManagementState.gridFilterRegions);
+        this.filterColumns.regionIds.dataSource = sortByField(regions, 'name');
       })
     );
   }
