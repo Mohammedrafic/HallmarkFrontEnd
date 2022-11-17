@@ -150,7 +150,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
     this.HolidayFormGroup.get('regionId')?.valueChanges.subscribe((val: number) => {
-      if (this.title === DialogMode.Edit || this.title === DialogMode.Copy) {
+      if (this.title === DialogMode.Edit) {
         this.selectedRegions = [];
         if (val !== null) {
           this.selectedRegions.push(this.regions.find((region) => region.id === val) as OrganizationRegion);
@@ -177,7 +177,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       }
     });
     this.HolidayFormGroup.get('regions')?.valueChanges.subscribe((val: number[]) => {
-      if (this.title === DialogMode.Add) {
+      if (this.title === DialogMode.Assign) {
         this.selectedRegions = [];
         if (val) {
           val.forEach((id) =>
@@ -217,7 +217,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       }
     });
     this.HolidayFormGroup.get('locations')?.valueChanges.subscribe((val: number[]) => {
-      if (this.title === DialogMode.Add) {
+      if (this.title === DialogMode.Assign) {
         if (val && val.length === this.locations.length) {
           this.isAllLocationsSelected = true;
         } else {
@@ -229,6 +229,8 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       const selectedHoliday = this.masterHolidays.find((holiday) => holiday.holidayName === val);
       if (selectedHoliday) {
         this.HolidayFormGroup.get('masterHolidayId')?.setValue(selectedHoliday.id);
+        this.HolidayFormGroup.get('startDateTime')?.setValue(DateTimeHelper.convertDateToUtc(selectedHoliday.startDateTime));
+        this.HolidayFormGroup.get('endDateTime')?.setValue(DateTimeHelper.convertDateToUtc(selectedHoliday.endDateTime));
       } else {
         this.HolidayFormGroup.get('masterHolidayId')?.setValue(0);
       }
@@ -385,7 +387,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
     this.getOrganizationStructure();
     this.changeAbilityOfHolidayName();
     this.showForm = true;
-    this.title = DialogMode.Add;
+    this.title = DialogMode.Assign;
     this.regions = this.orgStructure.regions;
     this.HolidayFormGroup.controls['id'].setValue(0);
     this.HolidayFormGroup.controls['regionId'].setValue(0);
@@ -425,7 +427,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
 
   public editHoliday(holiday: OrganizationHoliday, event: MouseEvent): void {
     this.getOrganizationStructure();
-    this.changeAbilityOfHolidayName(holiday.isOrganizationHoliday);
+    this.changeAbilityOfHolidayName(false);
     this.holidayIdUnderEdit = holiday.masterHolidayId;
     this.showForm = true;
     this.addActiveCssClass(event);
@@ -443,26 +445,6 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       endDateTime: DateTimeHelper.convertDateToUtc(holiday.endDateTime),
     });
 
-    this.store.dispatch(new ShowSideDialog(true));
-  }
-
-  public copyHoliday(holiday: OrganizationHoliday, event: MouseEvent): void {
-    this.changeAbilityOfHolidayName();
-    this.showForm = true;
-    this.title = DialogMode.Copy;
-    this.addActiveCssClass(event);
-    this.populateDropdownWithAll(holiday);
-    this.HolidayFormGroup.setValue({
-      id: 0,
-      masterHolidayId: holiday.masterHolidayId || 0,
-      regionId: holiday.regionId || 0,
-      locationId: holiday.locationId || 0,
-      locations: [holiday.locationId || 0],
-      regions: [holiday.regionId || 0],
-      holidayName: holiday.holidayName,
-      startDateTime: DateTimeHelper.convertDateToUtc(holiday.startDateTime),
-      endDateTime: DateTimeHelper.convertDateToUtc(holiday.endDateTime),
-    });
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -505,7 +487,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
 
   public saveHoliday(): void {
     if (this.HolidayFormGroup.valid) {
-      if (this.title === DialogMode.Add) {
+      if (this.title === DialogMode.Assign) {
         this.store
           .dispatch(
             new CheckIfExist(
@@ -536,7 +518,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
             }
           });
       } else {
-        this.editOrCopyHandler();
+        this.editHandler();
       }
     } else {
       this.HolidayFormGroup.markAllAsTouched();
@@ -557,10 +539,10 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
 
   private saveHandler(isExist?: boolean): void {
     const holiday = this.HolidayFormGroup.getRawValue() as OrganizationHoliday;
-    this.dispatchSave(this.prepareToCreate(holiday), isExist);
+    this.dispatchSave(holiday, isExist);
   }
 
-  private editOrCopyHandler(): void {
+  private editHandler(): void {
     const holidayToUpdate = this.HolidayFormGroup.getRawValue() as OrganizationHoliday;
     if (this.isEditMode()) {
       holidayToUpdate.masterHolidayId = this.holidayIdUnderEdit;
@@ -602,8 +584,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
 
   private hasSelectedRegions(): boolean {
     return (
-      this.title === DialogMode.Add ||
-      this.title === DialogMode.Copy ||
+      this.title === DialogMode.Assign ||
       (this.isEditMode() && this.HolidayFormGroup.controls['id'].value === 0)
     );
   }
@@ -629,10 +610,6 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
 
   private get holidayName(): AbstractControl {
     return this.HolidayFormGroup.get('holidayName') as AbstractControl;
-  }
-
-  private prepareToCreate(holiday: OrganizationHoliday): OrganizationHoliday {
-    return { ...holiday, masterHolidayId: 0 };
   }
 
   private getOrganizationStructure(): void {
