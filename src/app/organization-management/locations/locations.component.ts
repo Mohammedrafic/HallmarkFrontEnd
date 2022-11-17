@@ -43,7 +43,7 @@ import {
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import {
-  FieldsToHideInIrp, LocationExportColumns, LocationInitFilters,
+  FieldsToHideInIrp, FieldsToHideInVms, LocationExportColumns, LocationInitFilters,
   LocationsDialogConfig, LocationsDialogWithIrpConfig, LocationsExportIrpColumns,
   MESSAGE_REGIONS_NOT_SELECTED
 } from './locations.constant';
@@ -540,12 +540,15 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         if (this.isFeatureIrpEnabled) {
           this.isOrgVMSEnabled = organization.preferences.isVMCEnabled;
           this.isOrgIrpEnabled = organization.preferences.isIRPEnabled;
+          this.columnsToExport = this.isOrgIrpEnabled ? LocationsExportIrpColumns : LocationExportColumns;
+
           this.checkFieldsVisibility();
         }
       }),
       switchMap(() => this.store.dispatch(new GetRegions())),
       takeUntil(this.componentDestroy()),
     ).subscribe((data) => {
+      console.log(this.isFeatureIrpEnabled && this.isOrgIrpEnabled)
       this.defaultValue = data.organizationManagement.regions[0]?.id as Region;
     });
   }
@@ -578,9 +581,9 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
 
   private setIrpFeatureFlag(): void {
     this.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+
     if (this.isFeatureIrpEnabled) {
       this.locationDialogConfig = LocationsDialogWithIrpConfig;
-      this.columnsToExport = LocationsExportIrpColumns;
     }
   }
 
@@ -588,6 +591,10 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.locationDialogConfig.baseForm = this.locationDialogConfig.baseForm.filter((column) => {
       if (!this.isOrgVMSEnabled) {
         return !FieldsToHideInIrp.includes(column.field)
+      }
+
+      if (!this.isOrgIrpEnabled) {
+        return !FieldsToHideInVms.includes(column.field);
       }
       return column;
     });

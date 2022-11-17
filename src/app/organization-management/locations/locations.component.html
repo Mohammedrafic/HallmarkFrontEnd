@@ -99,7 +99,7 @@
       <e-column field="zip" headerText="ZIP" width=200></e-column>
       <e-column field="contactPerson" headerText="CONTACT PERSON" width=200></e-column>
       <e-column field="timeZone" headerText="Timezone" width=200></e-column>
-      <e-column field="includeInIRP" headerText="Include in IRP" width=200 *ngIf="isFeatureIrpEnabled">
+      <e-column field="includeInIRP" headerText="Include in IRP" width=200 *ngIf="isFeatureIrpEnabled && isOrgIrpEnabled">
         <ng-template #template let-data>
           <span>{{ data.includeInIRP ? 'Yes' : 'No'}}</span>
         </ng-template>
@@ -268,7 +268,7 @@
       </div>
     </div>
     <!-- Remove condition after feature implemented -->
-    <div class="input-container" *ngIf="isFeatureIrpEnabled">
+    <div class="input-container" *ngIf="isFeatureIrpEnabled && isOrgIrpEnabled">
       <label>Include in IRP</label>
       <div class="input-group multiselect">
         <ejs-dropdownlist mode="CheckBox"
