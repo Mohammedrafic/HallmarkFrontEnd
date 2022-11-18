@@ -451,7 +451,6 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         break;
 
       case OrganizationSettingControlType.InvoiceAutoGeneration:
-        console.log(this.organizationSettingsFormGroup.value)
         const invoiceAutoGeneration = {
           isEnabled: !!this.organizationSettingsFormGroup.controls['value'].value,
 
