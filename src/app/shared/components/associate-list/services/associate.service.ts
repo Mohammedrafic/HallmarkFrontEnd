@@ -97,8 +97,8 @@ export class AssociateService {
   /**
    * @return associate Agency / Org
    */
-  public getAssociateAgencyOrg(): Observable<string> {
-    return this.http.get<string>('/api/businessUnit/basicInfo');
+  public getAssociateAgencyOrg(): Observable<{id: number, name: string} []> {
+    return this.http.get<{id: number, name: string}[]>('/api/businessUnit/basicInfo').pipe(map((data) => sortByField(data, 'name')));
   }
 
   /**

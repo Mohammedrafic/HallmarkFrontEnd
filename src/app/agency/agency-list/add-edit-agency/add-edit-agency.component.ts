@@ -150,8 +150,13 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
         this.agencyId = agency.payload.agencyDetails.id as number;
         this.uploadImages(this.agencyId);
         this.agencyForm.markAsPristine();
-        this.navigateToAgencyList();
+        if (
+          this.activeUser.businessUnitType === BusinessUnitType.Hallmark
+          || this.activeUser.businessUnitType === BusinessUnitType.MSP) {
+          this.navigateToAgencyList();
+        }
       });
+
     this.actions$
       .pipe(
         takeWhile(() => this.isAlive),
@@ -162,6 +167,7 @@ export class AddEditAgencyComponent extends AbstractPermission implements OnInit
         this.fetchedAgency = agency.payload;
         this.patchAgencyFormValue(this.fetchedAgency);
       });
+  
     this.actions$
       .pipe(
         takeWhile(() => this.isAlive),

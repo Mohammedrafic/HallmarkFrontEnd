@@ -15,10 +15,10 @@ import {
   BillRateUnit,
 } from '@shared/models/bill-rate.model';
 import PriceUtils from '@shared/utils/price.utils';
-import { currencyValidator } from '@shared/validators/currency.validator';
 import { OtBillRatesConfiguration } from '@shared/constants';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { DateTimeHelper } from '@core/helpers';
+import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
 
 @Component({
   selector: 'app-bill-rate-form',
@@ -57,15 +57,16 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
   public hideFilds = new Set<string>();
   public isWeeklyOT = false;
   public static calculateOTSFlags = true;
-
-  private mileageBillRateId = 11;
+  public isMileageTitleType: boolean;
+  public format = '#';
+  public decimals = 2;
 
   get billRateConfigControl(): AbstractControl | null {
     return this.billRateForm.get('billRateConfig');
   }
 
   get isInternalsEnabled(): boolean {
-    return this.billRateForm.get('billRateConfigId')?.value !== this.mileageBillRateId;
+    return this.billRateForm.get('billRateConfigId')?.value !== BillRateTitleId.Mileage;;
   }
 
   get categoryValue(): string {
@@ -172,6 +173,8 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
         const intervalMaxControl = this.billRateForm.get('intervalMax');
         const VALIDATORS = [Validators.required, Validators.minLength(1), Validators.maxLength(10)];
 
+        this.isMileageTitleType = configId !== BillRateTitleId.Mileage;
+
         if (billRateConfig) {
           this.setBillTypesAndUpdateControl(billRateConfig.billTypes);
           this.selectedBillRateUnit = billRateConfig.unit;
@@ -226,6 +229,8 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
         intervalMinControl?.updateValueAndValidity();
 
         this.setOTValue();
+
+        this.setFormatdecimalsValues();
       });
   }
 
@@ -256,7 +261,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
     return new FormGroup({
       id: new FormControl(),
       billRateConfigId: new FormControl(null, [Validators.required]),
-      rateHour: new FormControl(null, [Validators.required, currencyValidator(1)]),
+      rateHour: new FormControl(null, [Validators.required]),
       intervalMin: new FormControl(null),
       intervalMax: new FormControl(null),
       editAllowed: new FormControl(false),
@@ -277,6 +282,13 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
         considerForOT: new FormControl(),
       }),
     });
+  }
+  
+  private setFormatdecimalsValues(): void {
+    const isBillRateUnitHours = this.selectedBillRateUnit === this.BillRateUnitList.Hours;
+    this.format = isBillRateUnitHours ? '#' : this.isMileageTitleType ? '###.00' : '###.000';
+    this.decimals = isBillRateUnitHours ? 0 : this.isMileageTitleType ? 2 : 3;
+    this.cdr.markForCheck()
   }
 }
 

@@ -7,7 +7,6 @@ export class Shift {
   locationI: number;
   departmentId: number;
   name: string;
-  shortName?: string;
   startTime: string;
   endTime: string;
   standardStartTime?: string;
@@ -19,7 +18,6 @@ export class Shift {
     this.regionId = shift.regionId;
     this.departmentId = shift.departmentId;
     this.name = shift.name;
-    this.shortName = shift.shortName;
 
     const startTime = new Date(shift.startTime);
     const endTime = new Date(shift.endTime);

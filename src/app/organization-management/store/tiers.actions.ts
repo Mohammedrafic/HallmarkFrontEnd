@@ -1,5 +1,6 @@
 import { TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
 import { TIERS_ACTIONS } from '@organization-management/enums';
+import { TierPriorityDTO } from '@organization-management/tiers/interfaces';
 
 export namespace Tiers {
   export class GetTiersByPage {
@@ -29,5 +30,12 @@ export namespace Tiers {
 
   export class ShowOverrideTierDialog {
     static readonly type = TIERS_ACTIONS.SHOW_OVERRIDE_TIER_DIALOG;
+  }
+
+  export class ChangeTierPriority {
+    static readonly type = TIERS_ACTIONS.CHANGE_TIER_PRIORITY;
+    constructor(
+      public payload: TierPriorityDTO
+    ) {}
   }
 }

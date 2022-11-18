@@ -52,7 +52,6 @@
         </ng-template>
       </e-column>
       <e-column field="name" headerText="shift name" width=200></e-column>
-      <e-column *ngIf="!isIrpFlagEnabled" field="shortName" headerText="shift short name" width=200></e-column>
       <e-column field="standardStartTime" headerText="start time" width=120></e-column>
       <e-column field="standardEndTime" headerText="end time" width=120></e-column>
       <e-column headerText="on call shift" width=100>
@@ -131,20 +130,6 @@
                  appValidateWithMessage
                  name="name"
                  formControlName="name"/>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div *ngIf="!isIrpFlagEnabled" class="input-container">
-        <label for="shortName">Shift Short Name <span class="required">*</span></label>
-        <div class="input-group">
-          <input class="e-input"
-                 type="text"
-                 maxlength="10"
-                 appValidateWithMessage
-                 name="shortName"
-                 formControlName="shortName"/>
         </div>
       </div>
     </div>

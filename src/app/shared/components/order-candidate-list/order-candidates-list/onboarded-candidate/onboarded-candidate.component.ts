@@ -25,7 +25,7 @@ import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { DatePipe, formatDate } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
@@ -185,7 +185,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
     this.createForm();
     this.patchForm();
-    this.subscribeOnDate();
     this.subscribeOnReasonsList();
     this.checkRejectReason();
     this.subscribeOnUpdateOrganisationCandidateJobError();
@@ -422,7 +421,8 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             endDate: value.actualEndDate ? DateTimeHelper.convertDateToUtc(value.actualEndDate) 
             : DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString()),
             rejectReason: value.rejectReason,
-            offeredStartDate: this.getDateString(value.offeredStartDate),
+            offeredStartDate: DateTimeHelper.formatDateUTC(
+              DateTimeHelper.convertDateToUtc(value.offeredStartDate).toString(), 'MM/dd/YYYY'),
             jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
             penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
             rate: value.jobCancellation?.rate,
@@ -436,23 +436,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   private getDateString(date: string): string | null {
     return this.datePipe.transform(date, 'MM/dd/yyyy');
-  }
-
-  private subscribeOnDate(): void {
-    merge(
-      (this.startDateControl as AbstractControl).valueChanges,
-      (this.endDateControl as AbstractControl).valueChanges
-    )
-      .pipe(
-        filter((value) => !!value),
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe(() => {
-        const value = this.form.getRawValue();
-        this.form.patchValue({ date: [
-          DateTimeHelper.convertDateToUtc(value.startDate),
-          DateTimeHelper.convertDateToUtc(value.endDate)]});
-      });
   }
 
   private subscribeOnReasonsList(): void {

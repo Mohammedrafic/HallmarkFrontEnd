@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 
 import { TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
 import { TiersPage } from '@shared/components/tiers-dialog/interfaces';
+import { TierPriorityDTO } from '@organization-management/tiers/interfaces';
 
 @Injectable()
 export class TiersApiService {
@@ -20,5 +21,9 @@ export class TiersApiService {
 
   public deleteTier(id: number): Observable<void> {
     return this.http.delete<void>(`/api/OrganizationTiers/${id}`);
+  }
+
+  public updateTierPriority(payload: TierPriorityDTO): Observable<TiersPage> {
+    return this.http.post<TiersPage>('/api/OrganizationTiers/priority', payload);
   }
 }

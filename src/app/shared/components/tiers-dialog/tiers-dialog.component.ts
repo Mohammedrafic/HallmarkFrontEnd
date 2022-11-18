@@ -27,6 +27,7 @@ import { ShowSideDialog } from '../../../store/app.actions';
 import { TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { mapperSelectedItems, setDataSourceValue } from '@shared/components/tiers-dialog/helper';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-tiers-dialog',
@@ -129,8 +130,8 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
       .subscribe((value: number[]) => {
         const selectedRegions: OrganizationRegion[] = findSelectedItems(value, this.regions);
         const selectedLocation: OrganizationLocation[] = mapperSelectedItems(selectedRegions,'locations');
-        this.locations = selectedLocation;
-        setDataSourceValue(this.dialogConfig.fields, 'locationIds', selectedLocation);
+        this.locations = sortByField(selectedLocation, 'name');
+        setDataSourceValue(this.dialogConfig.fields, 'locationIds', this.locations);
         this.changeDetection.markForCheck();
       });
   }
@@ -143,7 +144,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
       .subscribe((value: number[]) => {
           const selectedLocation: OrganizationLocation[] = findSelectedItems(value, this.locations);
           const selectedDepartment: OrganizationDepartment[] = mapperSelectedItems(selectedLocation,'departments');
-          setDataSourceValue(this.dialogConfig.fields, 'departmentIds', selectedDepartment)
+          setDataSourceValue(this.dialogConfig.fields, 'departmentIds', sortByField(selectedDepartment, 'name'))
           this.changeDetection.markForCheck();
       })
   }
