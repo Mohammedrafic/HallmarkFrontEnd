@@ -22,6 +22,7 @@ export class AddEditOrganizationService {
       ]),
       isIRPEnabled: new FormControl(!!organization?.preferences.isIRPEnabled),
       isVMCEnabled: new FormControl(!!organization?.preferences.isVMCEnabled),
+      shouldUpdateIRPInHierarchy: new FormControl(!!organization?.preferences.shouldUpdateIRPInHierarchy),
     });
   }
 

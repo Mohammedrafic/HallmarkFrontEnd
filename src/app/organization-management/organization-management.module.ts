@@ -117,6 +117,7 @@ import { TIER_DIALOG_TYPE } from '@shared/components/tiers-dialog/constants';
 import { Tiers } from '@shared/enums/tiers.enum';
 import { TiersState } from '@organization-management/store/tiers.state';
 import { TiersApiService } from '@shared/services';
+import { DepartmentService } from '@organization-management/departments/services/department.service';
 
 const sidebarIcons = {
   Download,
@@ -251,7 +252,8 @@ const sidebarIcons = {
       {
         provide: TIER_DIALOG_TYPE,
         useValue: Tiers.tierSettings
-      }
+      },
+      DepartmentService
     ],
 })
 export class OrganizationManagementModule {}

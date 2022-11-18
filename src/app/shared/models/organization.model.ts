@@ -106,6 +106,7 @@ export class Preferences {
   considerLunch: boolean;
   isIRPEnabled?: boolean;
   isVMCEnabled?: boolean;
+  shouldUpdateIRPInHierarchy?: boolean;
 }
 
 export class OrganizationPage {
