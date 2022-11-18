@@ -164,6 +164,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     return !this.isRejected && !this.isDeployedCandidate && !this.isCancelled;
   }
 
+  get isAcceptedOnboardedCandidate (): boolean {
+    return this.candidateStatus === ApplicantStatusEnum.Accepted || this.candidateStatus === ApplicantStatusEnum.OnBoarded;
+  }
+
   private unsubscribe$: Subject<void> = new Subject();
 
   public comments: Comment[] = [];
@@ -533,20 +537,32 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private disableControlsBasedOnPermissions(): void {
     if (!this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard) {
       this.form.controls['workWeek'].disable();
+    } else {
+      this.form.controls['workWeek'].enable();
     }
     if (!this.canReject && !this.canOffer && !this.canOnboard) {
       this.form.controls['offeredBillRate'].disable();
+    } else {
+      this.form.controls['offeredBillRate'].disable();
     }
     if (!this.canReject && !this.canOffer) {
+      this.form.controls['offeredStartDate'].disable();
+    } else {
       this.form.controls['offeredStartDate'].disable();
     }
     if (!this.canReject && !this.canOnboard) {
       this.form.controls['startDate'].disable();
       this.form.controls['endDate'].disable();
       this.form.controls['clockId'].disable();
+    } else {
+      this.form.controls['startDate'].enable();
+      this.form.controls['endDate'].enable();
+      this.form.controls['clockId'].enable();
     }
     if (!this.canOnboard) {
       this.form.controls['allow'].disable();
+    } else {
+      this.form.controls['allow'].enable();
     }
   }
 
@@ -606,7 +622,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private switchFormState(): void {
-    if (!this.isAgency || this.isCancelled) {
+    if (!this.isAgency && !this.isAcceptedOnboardedCandidate || this.isCancelled) {
       this.form?.disable();
     } else {
       this.form?.enable();
