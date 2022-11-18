@@ -379,7 +379,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       "DepartmentParamJDSR": departmentIds?.join(","),
       "SkillCategoryParamJDSR": skillCategoryIds?.length>0? skillCategoryIds?.join(","):'null',
       "SkillParamJDSR": skillIds?.length>0? skillIds?.join(","):"null",
-      "CandidateNameJDSR": candidateName == null||candidateName=="" ? 'null' : this.candidateSearchData?.filter((i) => i.id == candidateName).map(i => i.fullName)[0],
+      "CandidateNameJDSR": candidateName == null||candidateName=="" ? 'null' : candidateName.toString(),
       "CandidateStatusJDSR": candidateStatuses?.length > 0 ? candidateStatuses.join(",") : 'null',
       "JobStatusJDSR": jobStatuses?.length > 0 ? jobStatuses.join(",") : 'null',
       "JobIdJDSR": jobId == null || jobId=="" ?  'null':jobId,
@@ -534,8 +534,11 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   @OutsideZone
   private onFilterChild(e: FilteringEventArgs) {
     if (e.text != '') {
+      let ids=[];
+      ids.push(this.bussinessControl.value);
       let filter: CommonCandidateSearchFilter = {
-        searchText: e.text
+        searchText: e.text,
+        businssUnitIds:ids
       };
       this.filterColumns.dataSource = [];
       this.store.dispatch(new GetCommonReportCandidateSearch(filter))

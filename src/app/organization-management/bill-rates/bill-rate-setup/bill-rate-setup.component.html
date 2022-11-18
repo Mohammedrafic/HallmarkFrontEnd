@@ -369,34 +369,17 @@
           <label *ngIf="selectedBillRateUnit === BillRateUnitList.Hours">Hours <span class="required">*</span></label>
           <div class="input-group">
             <ejs-numerictextbox
-              *ngIf="selectedBillRateUnit === BillRateUnitList.Hours"
               class="numeric-input"
               appValidateWithMessage
               min="0"
               maxlength="10"
-              [validateDecimalOnType]="true"
-              [showSpinButton]="false"
-              decimals="0"
-              format="#"
               formControlName="billRateValueRateTimes"
+              [validateDecimalOnType]="validateDecimalOnType"
+              [showSpinButton]="false"
+              [format]="format"
+              [decimals]="decimals"
             >
             </ejs-numerictextbox>
-
-            <input
-              *ngIf="
-                selectedBillRateUnit === BillRateUnitList.Multiplier ||
-                selectedBillRateUnit === BillRateUnitList.Currency
-              "
-              class="e-input"
-              type="text"
-              formControlName="billRateValueRateTimes"
-              appValidateWithMessage
-              maxlength="11"
-              (keyup)="priceUtils.verifyDigitsAfterDot(billRatesFormGroup, 'billRateValueRateTimes')"
-              (keydown)="priceUtils.numbersOnly($event)"
-              (focus)="priceUtils.setPriceMask(billRatesFormGroup, 'billRateValueRateTimes', $event)"
-              (blur)="priceUtils.setTwoDecimals(billRatesFormGroup, 'billRateValueRateTimes', $event)"
-            />
           </div>
         </div>
 
