@@ -543,12 +543,12 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     if (!this.canReject && !this.canOffer && !this.canOnboard) {
       this.form.controls['offeredBillRate'].disable();
     } else {
-      this.form.controls['offeredBillRate'].disable();
+      this.form.controls['offeredBillRate'].enable();
     }
     if (!this.canReject && !this.canOffer) {
       this.form.controls['offeredStartDate'].disable();
     } else {
-      this.form.controls['offeredStartDate'].disable();
+      this.form.controls['offeredStartDate'].enable();
     }
     if (!this.canReject && !this.canOnboard) {
       this.form.controls['startDate'].disable();
