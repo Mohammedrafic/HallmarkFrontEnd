@@ -256,13 +256,14 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
-        if (confirm && department.departmentId) {
-          this.store.dispatch(new DeleteDepartmentById(department, this.filters));
-        }
-        this.removeActiveCssClass();
-      });
+      }).pipe(
+        takeUntil(this.componentDestroy()),
+    ).subscribe((confirm) => {
+      if (confirm && department.departmentId) {
+        this.store.dispatch(new DeleteDepartmentById(department, this.filters));
+      }
+      this.removeActiveCssClass();
+    });
   }
 
   onAddDepartmentClick(): void {
@@ -281,7 +282,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'
         }).pipe(
-          filter(Boolean)
+          filter(Boolean),
+          takeUntil(this.componentDestroy()),
       ).subscribe(() => {
         this.store.dispatch(new ShowSideDialog(false));
         this.isEdit = false;
@@ -364,20 +366,26 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   private startPageNumberWatching(): void {
-    this.pageSubject.pipe(throttleTime(1), takeUntil(this.componentDestroy())).subscribe((page) => {
+    this.pageSubject.pipe(
+      throttleTime(1),
+      takeUntil(this.componentDestroy())
+    ).subscribe((page) => {
       this.currentPage = page;
       this.getDepartments();
     });
   }
 
   private startOrgIdWatching(): void {
-    this.organizationId$.pipe(takeUntil(this.componentDestroy())).subscribe(id => {
+    this.organizationId$.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(id => {
       this.clearFilters();
       this.getOrganization(id);
-      this.store.dispatch(new GetRegions()).pipe(takeUntil(this.componentDestroy()))
-        .subscribe((data) => {
-          this.defaultValue = data.organizationManagement.regions[0]?.id;
-        });
+      this.store.dispatch(new GetRegions()).pipe(
+        takeUntil(this.componentDestroy())
+      ).subscribe((data) => {
+        this.defaultValue = data.organizationManagement.regions[0]?.id;
+      });
     });
   }
 
