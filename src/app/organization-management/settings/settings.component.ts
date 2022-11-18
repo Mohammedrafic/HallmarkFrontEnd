@@ -50,7 +50,10 @@ export enum TextFieldTypeControl {
   Email = 1,
   Numeric = 2,
 }
-
+  /**
+   * TODO: component needs to be rework with configurable dialog and form.
+   * Component can be slightly simplified
+   */
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
@@ -168,7 +171,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.watchForOrgId();
     this.mapGridData();
     this.watchForStructure();
-    this.watchForSFilterOptions();
+    this.watchForFilterOptions();
     this.watchForRegionControl();
     this.watchForLocationControl();
     this.setPermissionsToManageSettings();
@@ -449,7 +452,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
       case OrganizationSettingControlType.InvoiceAutoGeneration:
         const invoiceAutoGeneration = {
-          isEnabled: this.organizationSettingsFormGroup.controls['value'].value,
+          isEnabled: !!this.organizationSettingsFormGroup.controls['value'].value,
 
           dayOfWeek: this.invoiceGeneratingFormGroup.controls['dayOfWeek'].value,
 
@@ -529,7 +532,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   private setFormValuesForEdit(parentData: any, childData: any): void {
     let dynamicValue: any;
-
+    
     if (this.formControlType === OrganizationSettingControlType.Checkbox) {
       dynamicValue = this.isParentEdit ? parentData.value === 'true' : childData.value === 'true';
     }
@@ -566,7 +569,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
     if (this.formControlType === OrganizationSettingControlType.InvoiceAutoGeneration) {
       const valueOptions = this.isParentEdit ? parentData.value : childData.value;
-      dynamicValue = { ...valueOptions, isInvoice: true };
+      dynamicValue = { ...JSON.parse(valueOptions), isInvoice: true };
     }
 
     // TODO: run outside zone
@@ -729,7 +732,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     });
   }
 
-  private watchForSFilterOptions(): void {
+  private watchForFilterOptions(): void {
     this.organizationSettingsFilterOptions$
     .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
     .subscribe((options: string[]) => {

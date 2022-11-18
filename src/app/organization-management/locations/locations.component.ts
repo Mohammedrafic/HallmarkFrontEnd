@@ -192,7 +192,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       states: this.filters.states || [],
       zipCodes: this.filters.zipCodes || [],
       contactPeople: this.filters.contactPeople || [],
-      includeInIRP: this.filters.includeInIRP || [],
+      includeInIRP: this.filters.includeInIRP || null,
     });
     this.filteredItems = this.filterService.generateChips(this.locationFilterForm, this.filterColumns);
   }
@@ -208,9 +208,9 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
 
   applyFilter(): void {
     this.filters = this.locationFilterForm.getRawValue();
-    this.filters.regionId = this.selectedRegion.id,
-    this.filters.pageNumber = this.currentPage,
-    this.filters.pageSize = this.pageSizePager
+    this.filters.regionId = this.selectedRegion.id;
+    this.filters.pageNumber = this.currentPage;
+    this.filters.pageSize = this.pageSizePager;
     this.filteredItems = this.filterService.generateChips(this.locationFilterForm, this.filterColumns);
     this.getLocations();
     this.store.dispatch(new ShowFilterDialog(false));
