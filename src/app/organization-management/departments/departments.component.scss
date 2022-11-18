@@ -108,3 +108,9 @@
 .text-box-error {
   color: $supportive-red;
 }
+
+::ng-deep {
+  .input-container {
+    @include toggle;
+  }
+}

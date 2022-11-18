@@ -15,6 +15,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { SHOULD_LOC_DEP_INCLUDE_IRP } from '@shared/constants';
 import { Destroyable } from '@core/helpers';
 import { AddEditOrganizationService } from '@admin/client-management/services/add-edit-organization.service';
+import { OrganizationStatus } from '@shared/enums/status';
 
 import { Country } from 'src/app/shared/enums/states';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
@@ -100,8 +101,8 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
   @Select(AdminState.days)
   days$: Observable<[]>;
 
-  @Select(AdminState.statuses)
-  statuses$: Observable<[]>;
+  @Select(AdminState.organizationStatuses)
+  public organizationStatuses$: Observable<[]>;
 
   @Select(UserState.user)
   user$: Observable<User>;
@@ -395,7 +396,7 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
       this.store.dispatch(new SetDirtyState(this.PreferencesFormGroup.dirty));
     });
 
-    this.isInitStatusIsActive = organization?.generalInformation.status === 0;
+    this.isInitStatusIsActive = organization?.generalInformation.status === OrganizationStatus.Active;
 
     if (organization) {
       //Populate state dropdown with values based on selected country

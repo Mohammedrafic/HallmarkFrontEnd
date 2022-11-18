@@ -70,7 +70,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   @Select(OrganizationManagementState.sortedRegions)
   public regions$: Observable<Region[]>;
 
-  @Select(OrganizationManagementState.sortedoLocationsByRegionId)
+  @Select(OrganizationManagementState.sortedLocationsByRegionId)
   public locations$: Observable<Location[]>;
 
   @ViewChild('grid') grid: GridComponent;

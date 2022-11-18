@@ -1,4 +1,4 @@
-import { SendDocumentAgency } from '../enums/send-document-agency';
+import { OrganizationStatus } from '@shared/enums/status';
 
 export class Organization {
   createUnder?: {
@@ -67,7 +67,7 @@ export class GeneralInformation {
   phone2Ext: string;
   fax: string;
   website: string;
-  status: number;
+  status: OrganizationStatus;
   organizationPrefix: string;
 }
 
