@@ -13,14 +13,12 @@ import { OrderApplicantsInitialData } from '@shared/models/order-applicants.mode
 import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
-import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { deployedCandidateMessage, DEPLOYED_CANDIDATE } from '@shared/constants';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 import { DateTimeHelper } from '@core/helpers';
-import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -86,7 +84,6 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     private commentsService: CommentsService,
     private changeDetectorRef: ChangeDetectorRef,
     private confirmService: ConfirmService,
-    private datePipe: DatePipe
   ) {}
 
   ngOnChanges(): void {
@@ -177,10 +174,10 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private setFormValue(data: OrderApplicantsInitialData): void {
     this.formGroup.setValue({
       orderId: `${this.order?.organizationPrefix ?? ''}-${this.order?.publicId}`,
-      jobDate: [data.jobStartDate, data.jobEndDate],
+      jobDate: [DateTimeHelper.formatDateUTC(data.jobStartDate, 'MM/dd/yyyy'), DateTimeHelper.formatDateUTC(data.jobEndDate, 'MM/dd/yyyy')],
       orderBillRate: PriceUtils.formatNumbers(data.orderBillRate),
       locationName: data.locationName,
-      availableStartDate: this.datePipe.transform(data.availableStartDate, 'MM/dd/yyyy', 'utc'),
+      availableStartDate: DateTimeHelper.formatDateUTC(data.availableStartDate, 'MM/dd/yyyy'),
       yearsOfExperience: data.yearsOfExperience,
       candidateBillRate: PriceUtils.formatNumbers(data.orderBillRate),
       expAsTravelers: data.expAsTravelers || 0,

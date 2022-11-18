@@ -408,7 +408,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
             candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
             locationName: value.order.locationName,
-            avStartDate: this.getDateString(value.availableStartDate),
+            avStartDate: DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy'),
             yearExp: value.yearsOfExperience,
             travelExp: value.expAsTravelers,
             comments: value.requestComment,
