@@ -336,7 +336,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       yearsOfExperience: data.yearsOfExperience,
       expAsTravelers: data.expAsTravelers,
       guaranteedWorkWeek: data.guaranteedWorkWeek,
-      offeredStartDate: DateTimeHelper.formatDateUTC(data.offeredStartDate.toString() || data.order.jobStartDate.toString(), 'MM/dd/yyyy'),
+      offeredStartDate: DateTimeHelper.formatDateUTC(data.offeredStartDate?.toString() || data.order.jobStartDate.toString(), 'MM/dd/yyyy'),
     });
   }
 
