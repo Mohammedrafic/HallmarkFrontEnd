@@ -38,7 +38,6 @@ import {
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
-import { DatePipe } from '@angular/common';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
@@ -149,7 +148,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   constructor(
     private store: Store,
     private actions$: Actions,
-    private datePipe: DatePipe,
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
     private changeDetectionRef: ChangeDetectorRef
@@ -332,7 +330,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()), 
             DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString())],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
-          availableStartDate: value.availableStartDate,
+          availableStartDate: DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy'),
           candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
           locationName: value.order.locationName,
           yearExp: value.yearsOfExperience,

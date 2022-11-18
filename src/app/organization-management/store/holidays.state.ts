@@ -93,7 +93,7 @@ export class HolidaysState {
         return payloadResponse;
       }),
       catchError((error: any) => {
-        return dispatch(new ShowToast(MessageTypes.Error, 'Record already exists, please update Dates'))
+        return dispatch(new ShowToast(MessageTypes.Error, 'Record already exists, please update Dates'));
       })
     );
   }
