@@ -21,14 +21,14 @@ import { AbstractPermission } from '@shared/helpers/permissions';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TiersComponent extends AbstractPermission implements OnInit {
-  @Select(UserState.organizationStructure)
-  private organizationStructure$: Observable<OrganizationStructure>;
-
   public regionsStructure: OrganizationRegion[] = [];
   public selectedTier: TierDetails;
   public isEdit: boolean = false;
 
   private tierFormState: TierDTO;
+
+  @Select(UserState.organizationStructure)
+  private organizationStructure$: Observable<OrganizationStructure>;
 
   constructor(
     protected override store: Store,

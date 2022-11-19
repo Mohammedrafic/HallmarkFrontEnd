@@ -5,8 +5,9 @@ import { Sliders } from 'angular-feather/icons';
 
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 
-import { DashboardControlComponent } from './dashboard-control.component';
+import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 import { SharedModule } from '@shared/shared.module';
+import { DashboardControlComponent } from './dashboard-control.component';
 import { FilterChipListModule } from './filter-chip-list/filter-chip-list.module';
 import { WidgetFilterModule } from './widget-filter/widget-filter.module';
 import { QuickOrderModule } from './quick-order/quick-order.module';
@@ -23,7 +24,8 @@ import { WidgetListModule } from './widget-list/widget-list.module';
     FilterChipListModule,
     WidgetFilterModule,
     WidgetListModule,
-    QuickOrderModule
+    QuickOrderModule,
+    TooltipContainerModule,
   ],
   exports: [DashboardControlComponent],
 })

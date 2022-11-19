@@ -18,6 +18,8 @@ export class TierService {
     switch (type) {
       case Tiers.tierSettings:
         return this.getTierSettingsForm();
+      case Tiers.tierException:
+        return this.getTierExceptionForm();
       default:
         return this.getTierSettingsForm();
     }
@@ -35,25 +37,44 @@ export class TierService {
     }) as CustomFormGroup<TierDTO>;
   }
 
+  private getTierExceptionForm(): CustomFormGroup<TierDTO> {
+    return this.formBuilder.group({
+      organizationTierId: null,
+      regionIds: [null],
+      locationIds: [null],
+      departmentIds: [null],
+    }) as CustomFormGroup<TierDTO>;
+  }
+
   public mapStructureForForms(dialogType: Tiers, tier: TierDetails): TierDTO {
     switch (dialogType) {
       case Tiers.tierSettings:
-        return TierService.getStructureForTierSettings(tier);
+        return this.getStructureForTierSettings(tier);
+      case Tiers.tierException:
+        return this.getStructureForTierException(tier);
       default:
-        return TierService.getStructureForTierSettings(tier);
+        return this.getStructureForTierSettings(tier);
     }
   }
 
-  private static getStructureForTierSettings(tier: TierDetails): TierDTO {
+  private getStructureForTierSettings(tier: TierDetails): TierDTO {
     return {
       organizationTierId: tier.id,
       name: tier.name,
       hours: tier.hours,
-      priority: tier.priority,
       regionIds: [tier.regionId],
       locationIds: [tier.locationId],
       departmentIds: [tier.departmentId],
       forceUpsert: false
     };
+  }
+
+  private getStructureForTierException(tier: TierDetails): TierDTO {
+    return {
+      regionIds: [tier.regionId],
+      locationIds: [tier.locationId],
+      departmentIds: [tier.departmentId],
+      organizationTierId: tier.organizationTierId,
+    }
   }
 }
