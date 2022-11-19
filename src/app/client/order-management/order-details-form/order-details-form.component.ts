@@ -78,7 +78,7 @@ import { DurationService } from '@shared/services/duration.service';
 import { UserState } from 'src/app/store/user.state';
 import { DateTimeHelper } from '@core/helpers';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
-import { DistributionTierApiService, DistributionTierService } from '@client/order-management/order-details-form/services';
+import { DistributionTierService } from '@client/order-management/order-details-form/services';
 import {
   AssociateAgencyFields,
   DepartmentFields,
@@ -91,6 +91,8 @@ import {
   SpecialProjectCategoriesFields
 } from '@client/order-management/order-details-form/order-details.constant';
 import { isNil } from 'lodash';
+import { SettingsViewService } from '@shared/services';
+import { TierLogic } from '@shared/enums/tier-logic.enum';
 
 @Component({
   selector: 'app-order-details-form',
@@ -215,7 +217,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     private orderManagementService: OrderManagementContentService,
     private commentsService: CommentsService,
     private durationService: DurationService,
-    private distributionTierApiService: DistributionTierApiService,
+    private settingsViewService: SettingsViewService,
     private distributionTierService: DistributionTierService
   ) {
     this.orderTypeForm = this.formBuilder.group({
@@ -1199,14 +1201,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       .pipe(
         filter(Boolean),
         switchMap((id: number) => {
-          return this.distributionTierApiService.getTierSettingsForDistribution(
+          return this.settingsViewService.getViewSettingKey(
             OrganizationSettingKeys.TieringLogic,
             OrganizationalHierarchy.Department,
             id)
         }),
         takeUntil(this.unsubscribe$)
-      ).subscribe((value: {TieringLogic: boolean}) => {
-        this.distribution = distributionSource(value.TieringLogic);
+      ).subscribe(({TieringLogic}) => {
+        this.distribution = distributionSource(TieringLogic === TierLogic.Show);
     });
   }
 }
