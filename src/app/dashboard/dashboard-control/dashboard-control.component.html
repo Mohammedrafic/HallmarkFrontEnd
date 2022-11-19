@@ -25,9 +25,11 @@
       <button ejs-button cssClass="e-outline" (click)="toggleDialog(true)">
         Manage Widgets <i-feather name="sliders" class="icon"></i-feather>
       </button>
-      <button *ngIf="(isAgencyUser | async) === false" ejs-button [isPrimary]="true" [disabled]="!hasOrderCreatePermission" (click)="onCreateOrder()">
-        Quick Order
-      </button>
+      <app-tooltip-container [showToolTip]="!hasOrderCreatePermission">
+        <button *ngIf="(isAgencyUser | async) === false" ejs-button [isPrimary]="true" [disabled]="!hasOrderCreatePermission" (click)="onCreateOrder()">
+          Quick Order
+        </button>
+      </app-tooltip-container>
     </div>
   </div>
 
