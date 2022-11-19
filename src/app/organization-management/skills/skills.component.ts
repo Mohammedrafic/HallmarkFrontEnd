@@ -4,14 +4,19 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
-import { ExportSkills, GetAllSkillsCategories, GetAssignedSkillsByPage, GetSkillDataSources, RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded, SetDirtyState } from '../store/organization-management.actions';
-import { OrganizationManagementState } from '../store/organization-management.state';
 import {
-  CANCEL_CONFIRM_TEXT,
-  DELETE_CONFIRM_TITLE,
-  DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE,
-} from 'src/app/shared/constants/messages';
+  ExportSkills,
+  GetAllSkillsCategories,
+  GetAssignedSkillsByPage,
+  GetSkillDataSources,
+  RemoveAssignedSkill,
+  RemoveAssignedSkillSucceeded,
+  SaveAssignedSkill,
+  SaveAssignedSkillSucceeded,
+  SetDirtyState
+} from '../store/organization-management.actions';
+import { OrganizationManagementState } from '../store/organization-management.state';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { Skill, SkillDataSource, SkillFilters } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
@@ -23,7 +28,8 @@ import { UserState } from 'src/app/store/user.state';
 import { FilteredItem } from '@shared/models/filter.model';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilterService } from '@shared/services/filter.service';
-import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { SaveAssignedSkillValue } from '@organization-management/store/skills.actions';
 
 @Component({
   selector: 'app-skills',
@@ -74,6 +80,8 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   public fileName: string;
   public defaultFileName: string;
   public filters: SkillFilters = {};
+  public openAssignSidebarSubject = new Subject<boolean>();
+
 
   constructor(protected override store: Store,
               private actions$: Actions,
@@ -136,6 +144,10 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       this.filterColumns.skillAbbrs.dataSource = dataSource.skillABBRs.filter(item => item);
       this.filterColumns.skillDescriptions.dataSource = dataSource.skillDescriptions;
       this.filterColumns.glNumbers.dataSource = ['blank', ...dataSource.glNumbers.filter(item => item)];
+    });
+
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveAssignedSkillValue)).subscribe(() => {
+      this.getSkills();
     });
   }
 
@@ -231,6 +243,10 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     this.SkillFormGroup.controls['isDefault'].setValue(false);
     this.skillFieldsHandler(false);
     this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  public assignSkill(): void {
+    this.openAssignSidebarSubject.next(true)
   }
 
   public allowOnBoardChange(data: Skill, event: any): void {

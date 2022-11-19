@@ -8,11 +8,11 @@ import { combineLatest, debounceTime, filter, Observable, skip, Subject, switchM
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 import {
+  GetAssignedSkillsByOrganization,
   GetDepartmentsByLocationId,
   GetLocationsByRegionId,
-  GetMasterSkillsByOrganization,
   GetOrganizationSettings,
-  GetRegions,
+  GetRegions
 } from '@organization-management/store/organization-management.actions';
 import {
   ClearSelectedOrder,
@@ -23,7 +23,7 @@ import {
   GetProjectSpecialData,
   GetSuggestedDetails,
   SetIsDirtyOrderForm,
-  SetPredefinedBillRatesData,
+  SetPredefinedBillRatesData
 } from '@client/store/order-managment-content.actions';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -32,7 +32,7 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { Location } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
 import { Department } from '@shared/models/department.model';
-import { MasterSkillByOrganization } from '@shared/models/skill.model';
+import { ListOfSkills } from '@shared/models/skill.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from '@shared/models/order-management.model';
@@ -184,8 +184,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrganizationManagementState.sortedDepartments)
   public departments$: Observable<Department[]>;
 
-  @Select(OrganizationManagementState.masterSkillsByOrganization)
-  public skills$: Observable<MasterSkillByOrganization[]>;
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
+  skills$: Observable<ListOfSkills[]>;
+
+  skillFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  selectedSkills: SkillCategory;
 
   @Select(OrderManagementContentState.projectSpecialData)
   private projectSpecialData$: Observable<ProjectSpecialData>;
@@ -516,7 +519,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   private getFormData(force: boolean = false): void {
     this.store.dispatch(new GetRegions());
-    this.store.dispatch(new GetMasterSkillsByOrganization());
+    this.store.dispatch(new GetAssignedSkillsByOrganization());
     this.store.dispatch(new GetProjectSpecialData());
     this.store.dispatch(new GetAssociateAgencies());
     this.store.dispatch(new GetOrganizationStatesWithKeyCode());
