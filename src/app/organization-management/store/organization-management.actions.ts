@@ -4,7 +4,7 @@ import { Organization } from 'src/app/shared/models/organization.model';
 import { SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { Skill, SkillFilters } from 'src/app/shared/models/skill.model';
 import { Department, DepartmentFilter, ImportedDepartment } from '@shared/models/department.model';
-import { Region, regionFilter,ImportedRegion } from '@shared/models/region.model';
+import { ImportedRegion, Region, regionFilter } from '@shared/models/region.model';
 import { ImportedLocation, Location, LocationFilter } from '@shared/models/location.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialFilter } from '@shared/models/credential.model';
@@ -160,6 +160,11 @@ export class GetSkillsCategoriesByPage {
 
 export class GetMasterSkillsByOrganization {
   static readonly type = '[organizationManagement] Get Master Skills by Organization';
+  constructor() {}
+}
+
+export class GetAssignedSkillsByOrganization {
+  static readonly type = '[organizationManagement] Get Assigned Skills by Organization';
   constructor() {}
 }
 

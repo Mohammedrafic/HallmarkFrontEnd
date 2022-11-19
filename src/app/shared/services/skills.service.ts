@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 
 import { map, Observable } from 'rxjs';
 import {
+  AssignedSkillsByOrganization,
+  AssignedSkillTree,
   ListOfSkills,
   MasterSkillByOrganization,
   MasterSkillDataSources,
@@ -168,5 +170,17 @@ export class SkillsService {
         skillDescriptions: sortBy(data.skillDescriptions),
       }))
     );
+  }
+
+  public getAssignedSkillsTree(): Observable<AssignedSkillTree> {
+    return this.http.get<AssignedSkillTree>('/api/AssignedSkills/assignedSkillsTree');
+  }
+
+  public saveAssignedSkillValue(treeValue: number[]): Observable<number[]> {
+    return this.http.put<number[]>(`/api/AssignedSkills/assignSkills`, treeValue);
+  }
+
+  public getAssignedSkillsByOrganization(): Observable<AssignedSkillsByOrganization[]> {
+    return this.http.get<AssignedSkillsByOrganization[]>(`/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit`);
   }
 }

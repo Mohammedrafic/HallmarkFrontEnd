@@ -20,10 +20,11 @@
           Export <i-feather name="download" class="icon"></i-feather>
         </div>
       </button>
+      <!-- TODO add right permission -->
       <app-tooltip-container
         [message]="toolTipMessage"
-        [showToolTip]="!userPermission[userPermissions.CanEditAssignedSkills]">
-        <button ejs-button id="addDepartmentButton" [isPrimary]="true" (click)='addSkill()' [disabled]="!userPermission[userPermissions.CanEditAssignedSkills]">Add Skill</button>
+        [showToolTip]="!userPermission[userPermissions.AssignedSkills]">
+        <button ejs-button [isPrimary]="true" (click)='assignSkill()' [disabled]="!userPermission[userPermissions.AssignedSkills]">Assign Skill</button>
       </app-tooltip-container>
     </section>
   </section>
@@ -182,7 +183,7 @@
   [disableSaveButton]="!userPermission[userPermissions.CanEditAssignedSkills]"
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveSkill()"
-  header="{{ title }} Skill"
+  header="Edit Skill"
   >
   <form class="skills-form-dialog form-container bootstrap"
         id="addEditSkillsForm"
@@ -266,5 +267,7 @@
     </div>
   </form>
 </app-side-dialog>
+
+<app-assign-skill [openSidebar]="openAssignSidebarSubject"></app-assign-skill>
 
 <app-file-upload-dialog></app-file-upload-dialog>
