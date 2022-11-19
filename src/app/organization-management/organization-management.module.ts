@@ -30,7 +30,7 @@ import {
 } from 'angular-feather/icons';
 import { NgxsModule } from '@ngxs/store';
 
-import { ShiftsService } from "@organization-management/shifts/shifts.service";
+import { ShiftsService } from '@organization-management/shifts/shifts.service';
 import { OrganizationManagementState } from './store/organization-management.state';
 import { CredentialsState } from './store/credentials.state';
 import { SharedModule } from '@shared/shared.module';
@@ -92,7 +92,6 @@ import { ImportRegionsComponent } from './regions/import-regions/import-regions.
 import { RegionsGridComponent } from './regions/import-regions/regions-grid/regions-grid.component';
 import { PenaltiesComponent } from './reasons/penalties/penalties.component';
 import { PenaltiesGridActionsRendererComponent } from './reasons/penalties/penalties-grid-actions-renderer/penalties-grid-actions-renderer.component';
-import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 import { LocationsService } from './locations/locations.service';
 import { TiersComponent } from './tiers/tiers.component';
 import { TiersGridComponent } from './tiers/tiers-grid/tiers-grid.component';

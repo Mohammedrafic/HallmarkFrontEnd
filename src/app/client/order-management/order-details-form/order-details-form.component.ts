@@ -40,7 +40,7 @@ import { Document } from '@shared/models/document.model';
 
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { Duration } from '@shared/enums/durations';
-import {  OrderJobDistribution } from '@shared/enums/job-distibution';
+import { OrderJobDistribution } from '@shared/enums/job-distibution';
 
 import {
   ONLY_NUMBER,
@@ -72,10 +72,7 @@ import { RejectReasonState } from '@organization-management/store/reject-reason.
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { GetOrderRequisitionByPage } from '@organization-management/store/reject-reason.actions';
 import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
-import {
-  distributionSource,
-  ORDER_JOB_DISTRIBUTION,
-} from '@shared/constants/order-job-distribution-list';
+import { distributionSource, ORDER_JOB_DISTRIBUTION } from '@shared/constants/order-job-distribution-list';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 import { DurationService } from '@shared/services/duration.service';
 import { UserState } from 'src/app/store/user.state';
@@ -164,7 +161,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private selectedRegion: Region;
   private selectedLocation: Location;
   private selectedDepartment: Department;
-  private selectedSkills: SkillCategory;
   private touchedFields: Set<string> = new Set();
   private alreadyShownDialog: boolean = false;
   private unsubscribe$: Subject<void> = new Subject();
