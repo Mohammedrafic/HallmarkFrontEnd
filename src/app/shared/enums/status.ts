@@ -8,6 +8,13 @@ export enum Status {
   'Suspended',
 }
 
+export enum OrganizationStatus {
+  'In Progress' = 0,
+  Inactive = 1,
+  Active = 2,
+  Suspended = 3,
+}
+
 export const STATUS_COLOR_GROUP = {
   'e-success': [
     'open',

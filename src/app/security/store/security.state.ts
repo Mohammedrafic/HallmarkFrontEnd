@@ -38,7 +38,7 @@ import { PermissionsTree } from '@shared/models/permission.model';
 import { RoleTreeField } from '../roles-and-permissions/role-form/role-form.component';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants/messages';
+import { EMAIL_RESEND_SUCCESS, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants/messages';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UsersService } from '../services/users.service';
 import { RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
@@ -507,11 +507,17 @@ export class SecurityState {
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
-      })
+      }),
     );
   }
   @Action(ResendWelcomeEmail)
-  ResendWelcomeEmail(state: StateContext<SecurityStateModel>, { userId }: ResendWelcomeEmail): Observable<void> {
-    return this.userService.resendWelcomeEmail(userId);
+  ResendWelcomeEmail({ dispatch }: StateContext<SecurityStateModel>, { userId }: ResendWelcomeEmail): Observable<void> {
+    return this.userService.resendWelcomeEmail(userId)
+    .pipe(
+      tap(() => { dispatch(new ShowToast(MessageTypes.Success, EMAIL_RESEND_SUCCESS)); }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      }),
+    );
   }
 }

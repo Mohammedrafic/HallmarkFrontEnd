@@ -1,4 +1,4 @@
-import { SendDocumentAgency } from '../enums/send-document-agency';
+import { OrganizationStatus } from '@shared/enums/status';
 
 export class Organization {
   createUnder?: {
@@ -67,7 +67,7 @@ export class GeneralInformation {
   phone2Ext: string;
   fax: string;
   website: string;
-  status: number;
+  status: OrganizationStatus;
   organizationPrefix: string;
 }
 
@@ -104,8 +104,9 @@ export class Preferences {
   paymentDescription: string;
   weekStartsOn: number;
   considerLunch: boolean;
-  isIRPEnabled: boolean;
-  isVMCEnabled: boolean;
+  isIRPEnabled?: boolean;
+  isVMCEnabled?: boolean;
+  shouldUpdateIRPInHierarchy?: boolean;
 }
 
 export class OrganizationPage {

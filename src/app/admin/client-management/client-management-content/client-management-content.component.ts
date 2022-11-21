@@ -12,7 +12,7 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { FilterService } from '@shared/services/filter.service';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
-import { Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
+import { OrganizationStatus, Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import {
   Organization,
   OrganizationDataSource,
@@ -47,7 +47,7 @@ export class ClientManagementContentComponent
   ];
   public fileName: string;
   public defaultFileName: string;
-  public readonly statusEnum = Status;
+  public readonly organizationStatus = OrganizationStatus;
 
   readonly ROW_HEIGHT = 64;
 
