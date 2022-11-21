@@ -13,10 +13,10 @@ import { OrganizationTypes } from '@shared/enums/organization-type';
 import { User } from '@shared/models/user-managment-page.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { SHOULD_LOC_DEP_INCLUDE_IRP } from '@shared/constants';
-import { Destroyable } from '@core/helpers';
 import { AddEditOrganizationService } from '@admin/client-management/services/add-edit-organization.service';
 import { OrganizationStatus } from '@shared/enums/status';
 
+import { AbstractPermission } from "@shared/helpers/permissions";
 import { Country } from 'src/app/shared/enums/states';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { ContactDetails, Organization } from 'src/app/shared/models/organization.model';
@@ -45,7 +45,7 @@ import { AppState } from '../../../store/app.state';
   templateUrl: './add-edit-organization.component.html',
   styleUrls: ['./add-edit-organization.component.scss'],
 })
-export class AddEditOrganizationComponent extends Destroyable implements OnInit, OnDestroy {
+export class AddEditOrganizationComponent extends AbstractPermission implements OnInit, OnDestroy {
   public allowExtensions: string = '.png, .jpg, .jpeg';
   public dropElement: HTMLElement;
   public filesDetails: Blob[] = [];
@@ -124,14 +124,14 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
 
   constructor(
     private actions$: Actions,
-    private store: Store,
+    protected override store: Store,
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private addEditOrganizationService: AddEditOrganizationService,
     private confirmService: ConfirmService,
   ) {
-    super();
+    super(store);
 
     this.checkFeatureFlag();
     this.checkOrgPermissions();
@@ -158,7 +158,8 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
     }
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.dropElement = document.getElementById('droparea') as HTMLElement;
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType === BusinessUnitType.MSP) {

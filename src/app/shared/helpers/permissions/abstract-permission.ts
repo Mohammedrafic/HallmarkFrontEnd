@@ -34,8 +34,13 @@ export abstract class AbstractPermission extends Destroyable implements OnInit, 
   }
 
   protected checkValidPermissions(settings: MenuSettings[]): MenuSettings[] {
-    return settings.filter((setting: MenuSettings) => setting.permissionKey ?
-      this.userPermission[this.userPermissions[setting.permissionKey as unknown as number]] : setting);
+    return settings.filter((setting: MenuSettings) => {
+      if (setting.permissionKey) {
+        return this.userPermission[this.userPermissions[setting.permissionKey as unknown as number]];
+      } else {
+        return true;
+      }
+    });
   }
 
   protected getPermissionStream(): Observable<Permission> {

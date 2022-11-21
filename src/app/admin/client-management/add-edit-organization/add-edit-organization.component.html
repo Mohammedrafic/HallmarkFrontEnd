@@ -13,7 +13,18 @@
   <div class="controls-form stick-right">
     <button *ngIf="!profileMode" ejs-button cssClass="e-outline" (click)="clearForm()" id="clearButton">Clear</button>
     <button ejs-button cssClass="e-outline" (click)="navigateBack()" id="cancelButton">Cancel</button>
-    <button ejs-button [isPrimary]="true" (click)="save()" class="save-button" id="saveButton">Save</button>
+    <app-tooltip-container [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]">
+      <button
+        [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
+        ejs-button
+        [isPrimary]="true"
+        (click)="save()"
+        class="save-button"
+        id="saveButton"
+      >
+        Save
+      </button>
+    </app-tooltip-container>
   </div>
 </section>
 <section class="create-under-container bootstrap" *ngIf="!isMspUser && !profileMode">
@@ -384,9 +395,15 @@
         <div class="contact-details">
           <div class="contact-header">
             <div class="title">Contact Details</div>
-            <div class="stick-right add-contact-link" (click)="addContact()">
-              <i-feather name="plus" class="icon"></i-feather> Add Contact
-            </div>
+            <app-tooltip-container class="stick-right" [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]">
+              <button
+                [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
+                ejs-button
+                cssClass="e-outline add-contact-link"
+                (click)="addContact()">
+                <i-feather name="plus" class="icon"></i-feather> Add Contact
+              </button>
+            </app-tooltip-container>
           </div>
           <form *ngIf="ContactFormGroup" [formGroup]="ContactFormGroup" id="contactDetailsGroup">
             <ng-container formArrayName="contacts">
@@ -450,15 +467,17 @@
                   </div>
                 </div>
                 <div class="input-container remove-button-container">
-                  <button
-                    *ngIf="ContactFormArray.controls.length > 1"
-                    ejs-button
-                    cssClass="e-outline"
-                    class="icon-button"
-                    (click)="removeContact(i)"
-                  >
-                    <i-feather name="trash2" class="icon"></i-feather>
-                  </button>
+                  <app-tooltip-container *ngIf="ContactFormArray.controls.length > 1" [showToolTip]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]">
+                    <button
+                      [disabled]="!userPermission[userPermissions.CanEditOrganizationalHierarchy]"
+                      ejs-button
+                      cssClass="e-outline"
+                      class="icon-button"
+                      (click)="removeContact(i)"
+                    >
+                      <i-feather name="trash2" class="icon"></i-feather>
+                    </button>
+                  </app-tooltip-container>
                 </div>
               </div>
             </ng-container>

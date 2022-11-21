@@ -28,8 +28,9 @@ export class OrganizationManagementComponent extends AbstractPermission implemen
   }
 
   private watchForPermissions(): void {
+    const itemsWithoutPermissions = ORG_SETTINGS.filter((item: MenuSettings) => !item.permissionKey).length;
     this.getPermissionStream().pipe(
-      filter(() => this.sideMenuConfig.length <= 1),
+      filter(() => this.sideMenuConfig.length <= itemsWithoutPermissions),
       takeUntil(this.componentDestroy())
     ).subscribe((permissions: Permission) => {
         this.userPermission = permissions;

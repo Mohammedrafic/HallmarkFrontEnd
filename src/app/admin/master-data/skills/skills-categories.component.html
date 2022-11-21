@@ -35,7 +35,7 @@
 </section>
 <ejs-tab class="tabs" (selected)="tabSelected($event)">
   <e-tabitems>
-    <e-tabitem>
+    <e-tabitem *ngIf="userPermission[userPermissions.CanViewMasterSkills]">
       <ng-template #headerText>
         <div>Skills</div>
       </ng-template>
