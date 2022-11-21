@@ -1,7 +1,6 @@
 import { ColDef } from "@ag-grid-community/core";
 
 import { GridErroredCellComponent } from "@shared/components/import-dialog-content/grid-errored-cell/grid-errored-cell.component";
-import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
 export const DepartmentsColumns = (isIRPEnabled: boolean): ColDef[] => {
   const result = [
