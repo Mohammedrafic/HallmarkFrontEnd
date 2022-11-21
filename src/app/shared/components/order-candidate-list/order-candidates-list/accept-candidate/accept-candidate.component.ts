@@ -256,6 +256,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
+
     this.store
       .dispatch(
         new UpdateAgencyCandidateJob({
@@ -267,7 +268,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           offeredBillRate: value.offeredBillRate || null,
           requestComment: value.comments,
           expAsTravelers: value.expAsTravelers,
-          availableStartDate: value.availableStartDate,
+          availableStartDate: DateTimeHelper.toUtcFormat(new Date(value.availableStartDate)),
           actualStartDate: this.candidateJob.actualStartDate,
           actualEndDate: this.candidateJob.actualEndDate,
           clockId: this.candidateJob.clockId,
