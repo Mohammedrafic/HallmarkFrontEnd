@@ -81,6 +81,7 @@ export class MasterSkillDataSources {
 export interface ListOfSkills {
   id: number;
   name: string;
+  masterSkillId?: number
 }
 
 export type AssignedSkillTreeItem = {

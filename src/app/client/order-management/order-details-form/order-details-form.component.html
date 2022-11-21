@@ -103,7 +103,7 @@
                       appValidateWithMessage
                       [allowFiltering]="true"
                       [dataSource]="skills$ | async"
-                      [fields]="optionFields"
+                      [fields]="skillFields"
                       (select)="onSkillsDropDownChanged($event)"
                     >
                     </ejs-dropdownlist>
