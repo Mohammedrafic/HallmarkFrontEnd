@@ -3,11 +3,14 @@ import { FormBuilder, Validators } from '@angular/forms';
 
 import { CustomFormGroup } from '@core/interface';
 import { Tiers } from '@shared/enums/tiers.enum';
-import { TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
+import { TierConfig, TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
 import { TierDetails } from '@shared/components/tiers-dialog/interfaces';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import { Tier_Config } from '@shared/components/tiers-dialog/constants';
 
 @Injectable()
 export class TierService {
+  private tierConfig: TierConfig = Tier_Config;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -46,27 +49,47 @@ export class TierService {
     }) as CustomFormGroup<TierDTO>;
   }
 
-  public mapStructureForForms(dialogType: Tiers, tier: TierDetails): TierDTO {
+  public mapStructureForForms(dialogType: Tiers, tier: TierDetails, regions: OrganizationRegion[]): TierDTO {
     switch (dialogType) {
       case Tiers.tierSettings:
-        return this.getStructureForTierSettings(tier);
+        return this.getStructureForTierSettings(tier, regions);
       case Tiers.tierException:
         return this.getStructureForTierException(tier);
       default:
-        return this.getStructureForTierSettings(tier);
+        return this.getStructureForTierSettings(tier, regions);
     }
   }
 
-  private getStructureForTierSettings(tier: TierDetails): TierDTO {
+  private getStructureForTierSettings(tier: TierDetails, regions: OrganizationRegion[]): TierDTO {
+    if (tier.regionId === null) {
+      this.getTierConfig(regions);
+    }
+
     return {
       organizationTierId: tier.id,
       name: tier.name,
       hours: tier.hours,
-      regionIds: [tier.regionId],
-      locationIds: [tier.locationId],
-      departmentIds: [tier.departmentId],
+      regionIds: tier.regionId ? [tier.regionId] : this.tierConfig.regions,
+      locationIds: tier.locationId ? [tier.locationId] : this.tierConfig.locations,
+      departmentIds:  tier.departmentId ? [tier.departmentId] : this.tierConfig.departments,
       forceUpsert: false
     };
+  }
+
+  private getTierConfig(regions: OrganizationRegion[]): void {
+    this.tierConfig = regions.reduce((config: TierConfig, current: OrganizationRegion) => {
+      const selectedLocations = current.locations?.map((location: OrganizationLocation) => location.id) as number[];
+      const selectedDepartments  = current.locations?.flatMap((location: OrganizationLocation) =>
+        location.departments.map((department: OrganizationDepartment) => department.id)) as number[];
+
+      return  {
+        ...config,
+          regions: [current.id, ...config.regions],
+          locations: [...selectedLocations, ...config.locations],
+          departments: [...selectedDepartments, ...config.departments]
+      } as TierConfig;
+    }, this.tierConfig);
+
   }
 
   private getStructureForTierException(tier: TierDetails): TierDTO {

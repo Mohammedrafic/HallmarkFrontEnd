@@ -55,7 +55,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   @Input() set selectedTier(tier: TierDetails) {
     if (tier) {
       this.selectedTierDetails = tier;
-      this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, tier));
+      this.tierForm?.patchValue(this.tierService.mapStructureForForms(this.dialogType, tier, this.regions));
     }
   };
 
