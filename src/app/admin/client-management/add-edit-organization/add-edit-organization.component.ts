@@ -15,6 +15,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { SHOULD_LOC_DEP_INCLUDE_IRP } from '@shared/constants';
 import { Destroyable } from '@core/helpers';
 import { AddEditOrganizationService } from '@admin/client-management/services/add-edit-organization.service';
+import { OrganizationStatus } from '@shared/enums/status';
 
 import { Country } from 'src/app/shared/enums/states';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
@@ -77,6 +78,7 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
   public isIRPFlagEnabled = false;
   public isOrgHasIRPPermissions = true;
 
+  private isInitStatusIsActive = false;
   private showDataBaseControlValue: boolean = false;
   private logoToDelete: boolean = false;
   private user: User | null;
@@ -99,8 +101,8 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
   @Select(AdminState.days)
   days$: Observable<[]>;
 
-  @Select(AdminState.statuses)
-  statuses$: Observable<[]>;
+  @Select(AdminState.organizationStatuses)
+  public organizationStatuses$: Observable<[]>;
 
   @Select(UserState.user)
   user$: Observable<User>;
@@ -334,7 +336,7 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
   }
 
   public checkIPRFormControl({ checked }: { checked: boolean }): void {
-    if (!this.isAddMode && this.PreferencesFormGroup.get('isVMCEnabled')?.value && checked) {
+    if (this.isInitStatusIsActive && this.PreferencesFormGroup.get('isVMCEnabled')?.value && checked) {
       this.confirmService.confirm(SHOULD_LOC_DEP_INCLUDE_IRP, {
         title: 'Confirm',
         okButtonLabel: 'YES',
@@ -345,6 +347,7 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
         takeUntil(this.componentDestroy())
       ).subscribe((value: boolean) => {
         this.PreferencesFormGroup.get('isIRPEnabled')?.setValue(value);
+        this.PreferencesFormGroup.get('shouldUpdateIRPInHierarchy')?.setValue(value);
       });
     }
   }
@@ -392,6 +395,9 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
     this.PreferencesFormGroup.valueChanges.pipe(debounceTime(500), takeUntil(this.componentDestroy())).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.PreferencesFormGroup.dirty));
     });
+
+    this.isInitStatusIsActive = organization?.generalInformation.status === OrganizationStatus.Active;
+
     if (organization) {
       //Populate state dropdown with values based on selected country
       this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
@@ -478,6 +484,7 @@ export class AddEditOrganizationComponent extends Destroyable implements OnInit,
     if (!this.isIRPFlagEnabled) {
       this.PreferencesFormGroup.removeControl('isIRPEnabled');
       this.PreferencesFormGroup.removeControl('isVMCEnabled');
+      this.PreferencesFormGroup.removeControl('shouldUpdateIRPInHierarchy');
     }
   }
 }

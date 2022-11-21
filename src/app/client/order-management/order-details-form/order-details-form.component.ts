@@ -1100,8 +1100,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         takeUntil(this.unsubscribe$)
       )
       .subscribe((contactDetails) => {
-        const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
+        const { facilityContact, facilityPhoneNo, facilityEmail, unitDescription } = contactDetails;
         this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
+        this.jobDescriptionForm.get('unitDescription')?.setValue(unitDescription);
       });
   }
 

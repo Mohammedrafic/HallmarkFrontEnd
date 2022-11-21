@@ -92,7 +92,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
 
   @Select(BusinessLinesState.allBusinessLines)
   public readonly businessLines$: Observable<BusinessLines[]>;
-  
+
   public readonly regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public readonly dropDownfields = { text: 'text', value: 'value' };
   public locationDetailsFormGroup: FormGroup;
@@ -266,7 +266,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   }
 
   /**
-   * TODO: remove any with correct interface 
+   * TODO: remove any with correct interface
    */
   selectPage(event: any): void {
     if (event.currentPage || event.value) {
@@ -276,7 +276,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
 
   editLocation(location: Location, event: Event): void {
     this.addActiveCssClass(event);
-    
+
     this.locationDetailsFormGroup.setValue({
       invoiceId: location.invoiceId,
       externalId: location.externalId,
@@ -538,8 +538,8 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       tap((organization) => {
         this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
         if (this.isFeatureIrpEnabled) {
-          this.isOrgVMSEnabled = organization.preferences.isVMCEnabled;
-          this.isOrgIrpEnabled = organization.preferences.isIRPEnabled;
+          this.isOrgVMSEnabled = !!organization.preferences.isVMCEnabled;
+          this.isOrgIrpEnabled = !!organization.preferences.isIRPEnabled;
           this.columnsToExport = this.isOrgIrpEnabled ? LocationsExportIrpColumns : LocationExportColumns;
 
           this.checkFieldsVisibility();
@@ -565,7 +565,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         .map((type) => ({ text: type.name, value: type.locationTypeId }));
         const zoneOpts: DropdownOption[] = timeZones
         .map((zone) => ({ text: zone.systemTimeZoneName, value: zone.timeZoneId }));
-        
+
         return [locationOpts, zoneOpts, states, phoneTypes] as [DropdownOption[], DropdownOption[], string[], string[]];
       }),
       takeUntil(this.componentDestroy()),

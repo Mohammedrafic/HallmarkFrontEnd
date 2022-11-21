@@ -1,4 +1,6 @@
-@import "../../styles/variables/colors";
+@import "colors";
+@import "mixins";
+
 .flex-column {
   .toolbar {
     display: flex;
@@ -85,5 +87,30 @@
         }
       }
     }
+  }
+}
+
+.toggle-wrapper {
+  display: flex;
+  align-items: center;
+
+  & span {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+  }
+}
+
+.text-box-fat textarea.e-input {
+  height: 180px !important;
+}
+
+.text-box-error {
+  color: $supportive-red;
+}
+
+::ng-deep {
+  .input-container {
+    @include toggle;
   }
 }
