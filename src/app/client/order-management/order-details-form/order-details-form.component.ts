@@ -185,7 +185,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   skills$: Observable<ListOfSkills[]>;
 
-  skillFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  skillFields: FieldSettingsModel = { text: 'name', value: 'masterSkillId' };
   selectedSkills: SkillCategory;
 
   @Select(OrderManagementContentState.projectSpecialData)
