@@ -14,7 +14,8 @@ import {
   UploadDepartmentsFileSucceeded,
 } from '@organization-management/store/organization-management.actions';
 import { AbstractImport } from '@shared/classes/abstract-import';
-import { departmentsColumns } from './departments-grid.constants';
+import { DepartmentsColumns } from './departments-grid.constants';
+import { AppState } from '../../../store/app.state';
 
 const importConfig = {
   importTemplate: GetDepartmentsImportTemplate,
@@ -33,7 +34,7 @@ const importConfig = {
   styleUrls: ['./import-departments.component.scss'],
 })
 export class ImportDepartmentsComponent extends AbstractImport {
-  public readonly columnDefs: ColDef[] = departmentsColumns;
+  public readonly columnDefs: ColDef[];
   public titleImport: string = 'Import Departments';
 
   constructor(
@@ -42,5 +43,8 @@ export class ImportDepartmentsComponent extends AbstractImport {
     protected override cdr: ChangeDetectorRef
   ) {
     super(actions$, store, importConfig, cdr);
+
+    const isIRPFlagEnabled = store.selectSnapshot(AppState.isIrpFlagEnabled);
+    this.columnDefs = DepartmentsColumns(isIRPFlagEnabled);
   }
 }
