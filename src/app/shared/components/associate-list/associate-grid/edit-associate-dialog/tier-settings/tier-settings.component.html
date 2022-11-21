@@ -1,0 +1,19 @@
+<section class="tier-settings">
+  <div class="tier-container">
+    <div class="input-container bootstrap">
+      <label>Tier</label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist
+          appValidateWithMessage
+          [fields]="optionFields"
+          [dataSource]="tierList$ | async"
+          [allowFiltering]="true"
+          [formControl]="tierControl"
+        ></ejs-dropdownlist>
+      </div>
+    </div>
+  </div>
+  <div class="tier-grid">
+    <app-tier-settings-grid></app-tier-settings-grid>
+  </div>
+</section>

@@ -25,6 +25,7 @@ import {
 } from 'src/app/security/store/security.actions';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-add-edit-visibility',
@@ -190,7 +191,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
           regionsList = [...regionsList, ...filteredRegions] as Region[];
         }
 
-        this.regions = [...regionsList];
+        this.regions = sortByField(regionsList, 'name');
         this.setControlValue(this.regionsControl as FormControl, this.regions, this.editVisibility?.uniqRegionId);
       } else {
         this.regionsControl?.setValue([]);
@@ -212,7 +213,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
           const filteredLocation = this.getFilteredControlValues(region.locations, 'locationName', region);
           locations = [...locations, ...filteredLocation] as Location[];
         });
-        this.locations = [...locations];
+        this.locations = sortByField(locations, 'name');
         this.setControlValue(this.locationsControl as FormControl, this.locations, this.editVisibility?.uniqLocationId);
       } else {
         this.locationsControl?.setValue([]);
@@ -234,7 +235,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
           departments = [...departments, ...filteredDepartments] as Department[];
         });
 
-        this.departments = [...departments];
+        this.departments = sortByField(departments, 'name');
         this.setControlValue(
           this.departmentsControl as FormControl,
           this.departments,

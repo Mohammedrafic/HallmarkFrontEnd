@@ -27,7 +27,7 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[]): Record<Tiers,
         title: 'Region',
         disabled: false,
         required: true,
-        type: FieldType.Dropdown,
+        type: FieldType.MultiSelectDropdown,
         dataSource: regions ?? []
       },
       {
@@ -35,7 +35,7 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[]): Record<Tiers,
         title: 'Location',
         disabled: false,
         required: true,
-        type: FieldType.Dropdown,
+        type: FieldType.MultiSelectDropdown,
         dataSource: []
       },
       {
@@ -43,23 +43,47 @@ export const TiersDialogConfig = (regions?: OrganizationRegion[]): Record<Tiers,
         title: 'Department',
         disabled: false,
         required: true,
-        type: FieldType.Dropdown,
+        type: FieldType.MultiSelectDropdown,
         dataSource: []
       }
     ]
   },
-  //TODO: will implement in next pr
   [Tiers.tierException]: {
-    title: '',
-    editTitle: '',
+    title: 'Add Tier Exception',
+    editTitle: 'Edit Tier Exception',
     fields: [
       {
-        field: '',
-        title: '',
+        field: 'regionIds',
+        title: 'Region',
         disabled: false,
-        required: true,
-        type: FieldType.Input,
+        required: false,
+        type: FieldType.MultiSelectDropdown,
+        dataSource: regions ?? []
       },
+      {
+        field: 'locationIds',
+        title: 'Location',
+        disabled: false,
+        required: false,
+        type: FieldType.MultiSelectDropdown,
+        dataSource: []
+      },
+      {
+        field: 'departmentIds',
+        title: 'Department',
+        disabled: false,
+        required: false,
+        type: FieldType.MultiSelectDropdown,
+        dataSource: []
+      },
+      {
+        field: 'organizationTierId',
+        title: 'Tier name',
+        disabled: false,
+        required: false,
+        type: FieldType.Dropdown,
+        dataSource: []
+      }
     ]
   }
 });

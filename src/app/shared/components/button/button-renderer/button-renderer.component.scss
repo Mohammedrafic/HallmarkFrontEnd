@@ -5,3 +5,11 @@ button {
     color: $bill-rates-grid-hover-shadow !important;
   }
 }
+
+.icon-btn {
+  color: $primary-active-blue-10;
+  background-color: transparent;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}

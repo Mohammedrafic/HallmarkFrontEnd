@@ -1,0 +1,24 @@
+@import "colors";
+
+.icon {
+  cursor: pointer;
+}
+
+.edit-button {
+  .icon {
+    color: $primary-active-blue-10;
+  }
+}
+
+.remove-button {
+  .icon {
+    color: $supportive-red;
+  }
+
+  &[disabled] {
+    .icon {
+      color: $bill-rates-grid-hover-shadow !important;
+    }
+  }
+}
+

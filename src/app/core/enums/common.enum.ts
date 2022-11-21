@@ -5,6 +5,7 @@ export enum FieldType {
   TimeCalendar = 'timeCalendar',
   Number = 'number',
   Dropdown = 'dropdown',
+  MultiSelectDropdown = 'multiSelectDropdown',
   Date = 'date',
   SearchDD = 'searchDD',
   Toggle = 'toggle',
@@ -23,7 +24,7 @@ export enum FieldType {
   Long = 'long',
   Short = 'short',
  }
- 
+
  export enum DialogAction {
   Open = 'open',
   Close = 'close',
@@ -33,4 +34,9 @@ export enum FilesClearEvent {
   ClearAll = 'clearAllFiles',
 }
 
-
+export enum InputAttrType {
+  Text = 'text',
+  Tel = 'tel',
+  Mail = 'email',
+  Number = 'number',
+}

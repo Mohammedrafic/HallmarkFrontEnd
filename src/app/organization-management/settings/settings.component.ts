@@ -36,7 +36,7 @@ import { customEmailValidator } from '@shared/validators/email.validator';
 import { UserState } from '../../store/user.state';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { GetOrganizationStructure } from '../../store/user.actions';
 import { PermissionService } from 'src/app/security/services/permission.service';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
@@ -44,12 +44,17 @@ import { Days } from '@shared/enums/days';
 import { groupInvoicesOptions } from 'src/app/modules/invoices/constants';
 import { SettingsFilterCols } from './settings.constant';
 import { SettingsDataAdapter } from './helpers/settings-data.adapter';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { DateTimeHelper } from '@core/helpers';
 
 export enum TextFieldTypeControl {
   Email = 1,
   Numeric = 2,
 }
-
+  /**
+   * TODO: component needs to be rework with configurable dialog and form.
+   * Component can be slightly simplified
+   */
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
@@ -83,18 +88,18 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   @Select(OrganizationManagementState.organizationSettings)
   public settings$: Observable<OrganizationSettingsGet[]>;
 
-  @Select(OrganizationManagementState.regions)
+  @Select(OrganizationManagementState.sortedRegions)
   regions$: Observable<Region[]>;
 
   @Select(OrganizationManagementState.organizationSettingsFilterOptions)
   organizationSettingsFilterOptions$: Observable<string[]>;
 
-  @Select(OrganizationManagementState.locationsByRegionId)
+  @Select(OrganizationManagementState.sortedLocationsByRegionId)
   locations$: Observable<Location[]>;
 
   public regionLocationFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  @Select(OrganizationManagementState.departments)
+  @Select(OrganizationManagementState.sortedDepartments)
   departments$: Observable<Department[]>;
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
 
@@ -167,7 +172,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.watchForOrgId();
     this.mapGridData();
     this.watchForStructure();
-    this.watchForSFilterOptions();
+    this.watchForFilterOptions();
     this.watchForRegionControl();
     this.watchForLocationControl();
     this.setPermissionsToManageSettings();
@@ -448,13 +453,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
       case OrganizationSettingControlType.InvoiceAutoGeneration:
         const invoiceAutoGeneration = {
-          isEnabled: this.organizationSettingsFormGroup.controls['value'].value,
+          isEnabled: !!this.organizationSettingsFormGroup.controls['value'].value,
 
           dayOfWeek: this.invoiceGeneratingFormGroup.controls['dayOfWeek'].value,
 
           groupingBy: this.invoiceGeneratingFormGroup.controls['groupingBy'].value,
 
-          time: this.invoiceGeneratingFormGroup.controls['time'].value.toISOString(),
+          time: new Date(this.invoiceGeneratingFormGroup.controls['time'].value).toISOString(),
         };
         dynamicValue = JSON.stringify(invoiceAutoGeneration);
         break;
@@ -528,7 +533,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   private setFormValuesForEdit(parentData: any, childData: any): void {
     let dynamicValue: any;
-
+    
     if (this.formControlType === OrganizationSettingControlType.Checkbox) {
       dynamicValue = this.isParentEdit ? parentData.value === 'true' : childData.value === 'true';
     }
@@ -565,7 +570,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
     if (this.formControlType === OrganizationSettingControlType.InvoiceAutoGeneration) {
       const valueOptions = this.isParentEdit ? parentData.value : childData.value;
-      dynamicValue = { ...valueOptions, isInvoice: true };
+      dynamicValue = { ...JSON.parse(valueOptions), isInvoice: true };
     }
 
     // TODO: run outside zone
@@ -728,7 +733,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     });
   }
 
-  private watchForSFilterOptions(): void {
+  private watchForFilterOptions(): void {
     this.organizationSettingsFilterOptions$
     .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
     .subscribe((options: string[]) => {
@@ -744,13 +749,15 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     .subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = [];
+        const locations: OrganizationLocation[] = [];
         val.forEach((id) =>
           selectedRegions.push(this.allRegions.find((region) => region.id === id) as OrganizationRegion)
         );
         this.filterColumns.locationIds.dataSource = [];
         selectedRegions.forEach((region) => {
-          this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
+          locations.push(...(region.locations as []));
         });
+        this.filterColumns.locationIds.dataSource = sortByField(locations, 'name');
       } else {
         this.filterColumns.locationIds.dataSource = [];
         this.SettingsFilterFormGroup.get('locationIds')?.setValue([]);
@@ -767,6 +774,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     .subscribe((val: number[]) => {
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = [];
+        const departments: OrganizationDepartment[] = [];
         val.forEach((id) =>
           selectedLocations.push(
             this.filterColumns.locationIds.dataSource
@@ -775,8 +783,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         );
         this.filterColumns.departmentIds.dataSource = [];
         selectedLocations.forEach((location) => {
-          this.filterColumns.departmentIds.dataSource.push(...(location.departments as []));
+          departments.push(...(location.departments as []));
         });
+        this.filterColumns.departmentIds.dataSource = sortByField(departments, 'name');
       } else {
         this.filterColumns.departmentIds.dataSource = [];
         this.SettingsFilterFormGroup.get('departmentIds')?.setValue([]);

@@ -14,6 +14,7 @@ import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/i
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { DateTimeHelper } from '@core/helpers';
+import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
 
 @Component({
   selector: 'app-bill-rates',
@@ -100,10 +101,11 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     this.editBillRateIndex = index;
 
     const foundBillRateOption = this.billRatesOptions.find((option) => option.id === value.billRateConfigId);
+    const decimals = value.billRateConfigId !== BillRateTitleId.Mileage ? 2 : 3;
     const rateHour =
       foundBillRateOption?.unit === BillRateUnit.Hours
         ? String(value.rateHour)
-        : parseFloat(value.rateHour.toString()).toFixed(2);
+        : parseFloat(value.rateHour.toString()).toFixed(decimals);
     BillRateFormComponent.calculateOTSFlags = false;
 
     this.billRateForm.patchValue(

@@ -1000,7 +1000,7 @@
 
 <mat-menu #menu="matMenu">
   <ng-template matMenuContent let-items="items" let-data="data">
-    <button mat-menu-item 
+    <button mat-menu-item
             *ngFor="let item of items"
             [disabled]="item.disabled"
             (click)="menuOptionSelected(item.id, data)">

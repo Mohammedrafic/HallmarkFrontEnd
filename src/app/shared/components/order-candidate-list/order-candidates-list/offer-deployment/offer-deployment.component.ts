@@ -52,6 +52,7 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { hasEditOrderBillRatesPermission } from '../../order-candidate-list.utils';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -324,18 +325,18 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private setFormValue(data: OrderCandidateJob): void {
     this.formGroup.setValue({
       jobId: `${data.organizationPrefix}-${data.orderPublicId}`,
-      jobDate: [data.order.jobStartDate, data.order.jobEndDate],
+      jobDate: [DateTimeHelper.formatDateUTC(data.order.jobStartDate.toString(), 'MM/dd/yyyy'), DateTimeHelper.formatDateUTC(data.order.jobEndDate.toString(), 'MM/dd/yyyy')],
       offeredBillRate: PriceUtils.formatNumbers(data.offeredBillRate || data.order.hourlyRate),
       orderBillRate: data.order.hourlyRate && PriceUtils.formatNumbers(data.order.hourlyRate),
       locationName: data.order.locationName,
-      availableStartDate: data.availableStartDate,
+      availableStartDate: DateTimeHelper.formatDateUTC(data.availableStartDate, 'MM/dd/yyyy'),
       candidateBillRate: PriceUtils.formatNumbers(data.candidateBillRate),
       requestComment: data.requestComment,
       rejectReason: data.rejectReason,
       yearsOfExperience: data.yearsOfExperience,
       expAsTravelers: data.expAsTravelers,
       guaranteedWorkWeek: data.guaranteedWorkWeek,
-      offeredStartDate: data.offeredStartDate || data.order.jobStartDate,
+      offeredStartDate: DateTimeHelper.formatDateUTC(data.offeredStartDate?.toString() || data.order.jobStartDate.toString(), 'MM/dd/yyyy'),
     });
   }
 

@@ -55,6 +55,7 @@ import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { isEmpty } from 'lodash';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 type RoleWithUserModel = { [key: number]: { [workflowType: number]: RoleWithUser[] } };
 type WorkflowAsKeyModel = { [key: number]: (UsersByPermission | RolesByPermission)[] };
@@ -265,11 +266,12 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
 
     this.workflowMappingFormGroup.get('regions')?.valueChanges.subscribe((regionIds: number[]) => {
       if (regionIds && regionIds.length > 0) {
-        this.locations = [];
+        const locations: OrganizationLocation[] = [];
         regionIds.forEach((id) => {
           const selectedRegion = this.orgRegions.find((region) => region.id === id);
-          this.locations.push(...(selectedRegion?.locations as any));
+          locations.push(...(selectedRegion?.locations as any));
         });
+        this.locations = sortByField(locations, 'name');
         this.departments = [];
         this.locations.forEach((location) => {
           this.departments.push(...location.departments);
@@ -295,13 +297,15 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
     this.WorkflowFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = [];
+        const locations: OrganizationLocation[] = [];
         val.forEach((id) =>
           selectedRegions.push(this.allRegions.find((region) => region.id === id) as OrganizationRegion)
         );
         this.filterColumns.locationIds.dataSource = [];
         selectedRegions.forEach((region) => {
-          this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
+          locations.push(...(region.locations as []));
         });
+        this.filterColumns.locationIds.dataSource = sortByField(locations, 'name');
       } else {
         this.filterColumns.locationIds.dataSource = [];
         this.WorkflowFilterFormGroup.get('locationIds')?.setValue([]);
@@ -312,6 +316,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
     this.WorkflowFilterFormGroup.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = [];
+        const departments: OrganizationDepartment[] = [];
         val.forEach((id) =>
           selectedLocations.push(
             this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)
@@ -319,8 +324,9 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
         );
         this.filterColumns.departmentsIds.dataSource = [];
         selectedLocations.forEach((location) => {
-          this.filterColumns.departmentsIds.dataSource.push(...(location.departments as []));
+          departments.push(...(location.departments as []));
         });
+        this.filterColumns.departmentsIds.dataSource = sortByField(departments, 'name');
       } else {
         this.filterColumns.departmentsIds.dataSource = [];
         this.WorkflowFilterFormGroup.get('departmentsIds')?.setValue([]);
@@ -337,11 +343,12 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
 
     this.workflowMappingFormGroup.get('locations')?.valueChanges.subscribe((locationIds: number[]) => {
       if (locationIds && locationIds.length > 0) {
-        this.departments = [];
+        const departments: OrganizationDepartment[] = [];
         locationIds.forEach((id) => {
           const selectedLocation = this.locations.find((location) => location.id === id);
-          this.departments.push(...(selectedLocation?.departments as []));
+          departments.push(...(selectedLocation?.departments as []));
         });
+        this.departments = sortByField(departments, 'name');
       } else {
         this.departments = [];
       }
@@ -710,7 +717,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
       if (foundMatchedSteps.length) {
         foundMatchedSteps.forEach((foundMatchedStep: StepMapping) => {
           if (foundMatchedStep.workflowStepId) {
-            const foundUserRole = this.rolesWithUsers[foundMatchedStep.workflowType!]?.[step.type].find(
+            const foundUserRole = this.rolesWithUsers[foundMatchedStep.workflowType!]?.[step.type]?.find(
               (r: RoleWithUser) => r.id === foundMatchedStep?.userId || r.id === foundMatchedStep?.roleId?.toString()
             );
             if (foundUserRole) {

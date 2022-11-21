@@ -25,7 +25,7 @@ import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { DatePipe, formatDate } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
@@ -164,6 +164,10 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     return !this.isRejected && !this.isDeployedCandidate && !this.isCancelled;
   }
 
+  get isAcceptedOnboardedCandidate (): boolean {
+    return this.candidateStatus === ApplicantStatusEnum.Accepted || this.candidateStatus === ApplicantStatusEnum.OnBoarded;
+  }
+
   private unsubscribe$: Subject<void> = new Subject();
 
   public comments: Comment[] = [];
@@ -185,7 +189,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
     this.createForm();
     this.patchForm();
-    this.subscribeOnDate();
     this.subscribeOnReasonsList();
     this.checkRejectReason();
     this.subscribeOnUpdateOrganisationCandidateJobError();
@@ -409,7 +412,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
             candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
             locationName: value.order.locationName,
-            avStartDate: this.getDateString(value.availableStartDate),
+            avStartDate: DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy'),
             yearExp: value.yearsOfExperience,
             travelExp: value.expAsTravelers,
             comments: value.requestComment,
@@ -437,23 +440,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
 
   private getDateString(date: string): string | null {
     return this.datePipe.transform(date, 'MM/dd/yyyy');
-  }
-
-  private subscribeOnDate(): void {
-    merge(
-      (this.startDateControl as AbstractControl).valueChanges,
-      (this.endDateControl as AbstractControl).valueChanges
-    )
-      .pipe(
-        filter((value) => !!value),
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe(() => {
-        const value = this.form.getRawValue();
-        this.form.patchValue({ date: [
-          DateTimeHelper.convertDateToUtc(value.startDate),
-          DateTimeHelper.convertDateToUtc(value.endDate)]});
-      });
   }
 
   private subscribeOnReasonsList(): void {
@@ -533,20 +519,32 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private disableControlsBasedOnPermissions(): void {
     if (!this.canShortlist && !this.canInterview && !this.canReject && !this.canOffer && !this.canOnboard) {
       this.form.controls['workWeek'].disable();
+    } else {
+      this.form.controls['workWeek'].enable();
     }
     if (!this.canReject && !this.canOffer && !this.canOnboard) {
       this.form.controls['offeredBillRate'].disable();
+    } else {
+      this.form.controls['offeredBillRate'].enable();
     }
     if (!this.canReject && !this.canOffer) {
       this.form.controls['offeredStartDate'].disable();
+    } else {
+      this.form.controls['offeredStartDate'].enable();
     }
     if (!this.canReject && !this.canOnboard) {
       this.form.controls['startDate'].disable();
       this.form.controls['endDate'].disable();
       this.form.controls['clockId'].disable();
+    } else {
+      this.form.controls['startDate'].enable();
+      this.form.controls['endDate'].enable();
+      this.form.controls['clockId'].enable();
     }
     if (!this.canOnboard) {
       this.form.controls['allow'].disable();
+    } else {
+      this.form.controls['allow'].enable();
     }
   }
 
@@ -606,7 +604,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   }
 
   private switchFormState(): void {
-    if (!this.isAgency || this.isCancelled) {
+    if (!this.isAgency && !this.isAcceptedOnboardedCandidate || this.isCancelled) {
       this.form?.disable();
     } else {
       this.form?.enable();

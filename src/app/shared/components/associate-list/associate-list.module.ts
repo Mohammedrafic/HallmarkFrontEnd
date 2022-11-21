@@ -19,6 +19,13 @@ import { AddNewFeeDialogComponent } from './associate-grid/edit-associate-dialog
 import { PartnershipSettingsComponent } from './associate-grid/edit-associate-dialog/partnership-settings/partnership-settings.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { InviteDialogComponent } from './associate-grid/invite-dialog/invite-dialog.component';
+import { TierSettingsComponent } from './associate-grid/edit-associate-dialog/tier-settings/tier-settings.component';
+import { TierSettingsGridComponent } from './associate-grid/edit-associate-dialog/tier-settings/tier-settings-grid/tier-settings-grid.component';
+import { TiersDialogModule } from '@shared/components/tiers-dialog/tiers-dialog.module';
+import { SettingsViewService, TiersApiService } from '@shared/services';
+import { TIER_DIALOG_TYPE } from '@shared/components/tiers-dialog/constants';
+import { Tiers } from '@shared/enums/tiers.enum';
+import { ActionRendererComponent } from './associate-grid/edit-associate-dialog/tier-settings/tier-settings-grid/action-renderer/action-renderer.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +36,9 @@ import { InviteDialogComponent } from './associate-grid/invite-dialog/invite-dia
     AddNewFeeDialogComponent,
     PartnershipSettingsComponent,
     InviteDialogComponent,
+    TierSettingsComponent,
+    TierSettingsGridComponent,
+    ActionRendererComponent,
   ],
   imports: [
     CommonModule,
@@ -44,10 +54,19 @@ import { InviteDialogComponent } from './associate-grid/invite-dialog/invite-dia
     MultiSelectAllModule,
     CheckBoxModule,
     ReactiveFormsModule,
+    TiersDialogModule,
 
     NgxsModule.forFeature([AssociateListState]),
   ],
-  providers: [AssociateService],
+  providers: [
+    AssociateService,
+    TiersApiService,
+    SettingsViewService,
+    {
+      provide: TIER_DIALOG_TYPE,
+      useValue: Tiers.tierException
+    }
+  ],
   exports: [AssociateListComponent],
 })
 export class AssociateListModule {}

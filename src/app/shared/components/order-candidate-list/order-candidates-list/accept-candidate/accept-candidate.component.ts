@@ -38,13 +38,13 @@ import {
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
-import { DatePipe } from '@angular/common';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -148,7 +148,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   constructor(
     private store: Store,
     private actions$: Actions,
-    private datePipe: DatePipe,
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
     private changeDetectionRef: ChangeDetectorRef
@@ -309,10 +308,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     });
   }
 
-  private getDateString(date: string): string | null {
-    return this.datePipe.transform(date, 'MM/dd/yyyy');
-  }
-
   private getComments(): void {
     this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
@@ -332,9 +327,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-          date: [value.order.jobStartDate, value.order.jobEndDate],
+          date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()), 
+            DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString())],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
-          availableStartDate: value.availableStartDate,
+          availableStartDate: DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy'),
           candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
           locationName: value.order.locationName,
           yearExp: value.yearsOfExperience,
@@ -343,10 +339,13 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           comments: value.requestComment,
           rejectReason: value.rejectReason,
           guaranteedWorkWeek: value.guaranteedWorkWeek,
-          offeredStartDate: this.getDateString(value.offeredStartDate),
+          offeredStartDate: DateTimeHelper.formatDateUTC(
+            DateTimeHelper.convertDateToUtc(value.offeredStartDate).toString(), 'MM/dd/yyyy'),
           clockId: value.clockId,
-          actualStartDate: this.getDateString(value.actualStartDate),
-          actualEndDate: this.getDateString(value.actualEndDate),
+          actualStartDate: DateTimeHelper.formatDateUTC(
+            DateTimeHelper.convertDateToUtc(value.actualStartDate).toString(), 'MM/dd/yyyy'),
+          actualEndDate: DateTimeHelper.formatDateUTC(
+            DateTimeHelper.convertDateToUtc(value.actualEndDate).toString(), 'MM/dd/yyyy'),
           jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
           penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
           rate: value.jobCancellation?.rate,

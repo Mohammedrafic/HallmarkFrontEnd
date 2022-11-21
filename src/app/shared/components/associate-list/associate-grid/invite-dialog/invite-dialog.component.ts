@@ -6,14 +6,11 @@ import { FormControl, Validators } from '@angular/forms';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
-import {
-  InviteOrganizationsAgency,
-  InviteOrganizationsSucceeded,
-} from '@shared/components/associate-list/store/associate.actions';
+import { TiersException } from '@shared/components/associate-list/store/associate.actions';
 import { UserState } from '../../../../../store/user.state';
-import { OPTION_FIELDS } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
 import { Router } from '@angular/router';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { OPTION_FIELDS } from '@shared/components/associate-list/constant';
 
 @Component({
   selector: 'app-invite-dialog',
@@ -26,7 +23,7 @@ export class InviteDialogComponent extends DestroyableDirective implements OnIni
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
   @Select(AssociateListState.associateAgencyOrg)
-  public associateAgencyOrg$: Observable<string>;
+  public associateAgencyOrg$: Observable<{ id: number, name: string }[]>;
 
   @Select(UserState.businessUnitName)
   public businessUnitName$: Observable<string>;
@@ -57,7 +54,7 @@ export class InviteDialogComponent extends DestroyableDirective implements OnIni
 
   public onInvite(): void {
     if (this.control.dirty) {
-      this.store.dispatch(new InviteOrganizationsAgency(this.control.value));
+      this.store.dispatch(new TiersException.InviteOrganizationsAgency(this.control.value));
     } else {
       this.control.markAsTouched();
     }
@@ -97,7 +94,7 @@ export class InviteDialogComponent extends DestroyableDirective implements OnIni
   }
 
   private subscribeOnSuccessInviteOrgAgency(): void {
-    this.actions$.pipe(ofActionSuccessful(InviteOrganizationsSucceeded), takeUntil(this.destroy$)).subscribe(() => {
+    this.actions$.pipe(ofActionSuccessful(TiersException.InviteOrganizationsSucceeded), takeUntil(this.destroy$)).subscribe(() => {
       this.sideDialog.hide();
     });
   }

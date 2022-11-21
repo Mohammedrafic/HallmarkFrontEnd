@@ -13,7 +13,6 @@ import { OrderApplicantsInitialData } from '@shared/models/order-applicants.mode
 import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
-import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { Comment } from '@shared/models/comment.model';
 import { CommentsService } from '@shared/services/comments.service';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -116,8 +115,14 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
         .subscribe((isConfirm) => {
           if (isConfirm) {
             const value = this.formGroup.getRawValue();
-            if (value.availableStartDate) {
+            let availableStartDate = value.availableStartDate;
+            if (value.availableStartDate && value.availableStartDate.setHours) {
               value.availableStartDate.setHours(0, 0, 0, 0);
+            }
+            if (typeof value.availableStartDate === 'string') {
+              const date = new Date(value.availableStartDate);
+              date.setHours(0, 0, 0, 0);
+              availableStartDate = DateTimeHelper.toUtcFormat(date);
             }
             this.store
               .dispatch(
@@ -127,7 +132,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
                   candidateId: this.candidateId,
                   candidateBillRate: value.candidateBillRate,
                   expAsTravelers: value.expAsTravelers,
-                  availableStartDate: DateTimeHelper.toUtcFormat(value.availableStartDate),
+                  availableStartDate: availableStartDate,
                   requestComment: value.requestComment,
                 })
               )
@@ -169,10 +174,10 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private setFormValue(data: OrderApplicantsInitialData): void {
     this.formGroup.setValue({
       orderId: `${this.order?.organizationPrefix ?? ''}-${this.order?.publicId}`,
-      jobDate: [data.jobStartDate, data.jobEndDate],
+      jobDate: [DateTimeHelper.formatDateUTC(data.jobStartDate, 'MM/dd/yyyy'), DateTimeHelper.formatDateUTC(data.jobEndDate, 'MM/dd/yyyy')],
       orderBillRate: PriceUtils.formatNumbers(data.orderBillRate),
       locationName: data.locationName,
-      availableStartDate: data.availableStartDate,
+      availableStartDate: DateTimeHelper.formatDateUTC(data.availableStartDate, 'MM/dd/yyyy'),
       yearsOfExperience: data.yearsOfExperience,
       candidateBillRate: PriceUtils.formatNumbers(data.orderBillRate),
       expAsTravelers: data.expAsTravelers || 0,
