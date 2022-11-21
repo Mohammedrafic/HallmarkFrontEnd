@@ -12,7 +12,8 @@ export const DepartmentsExportCols = (isIRPEnabled: boolean): ExportColumn[] => 
   ];
 
   if (isIRPEnabled) {
-    result.push({ text:'Include in IRP', column: 'IncludeInIRP'});
+    result.push({ text:'Include in IRP', column: 'IncludeInIRPText' });
+    result.push({ text:'Unit Description', column: 'UnitDescription' });
   }
 
   return result;

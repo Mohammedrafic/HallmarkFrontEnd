@@ -347,7 +347,6 @@ export class AddEditOrganizationComponent extends AbstractPermission implements 
         take(1),
         takeUntil(this.componentDestroy())
       ).subscribe((value: boolean) => {
-        this.PreferencesFormGroup.get('isIRPEnabled')?.setValue(value);
         this.PreferencesFormGroup.get('shouldUpdateIRPInHierarchy')?.setValue(value);
       });
     }
