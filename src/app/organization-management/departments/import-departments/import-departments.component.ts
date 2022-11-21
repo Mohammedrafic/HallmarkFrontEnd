@@ -44,7 +44,6 @@ export class ImportDepartmentsComponent extends AbstractImport {
   ) {
     super(actions$, store, importConfig, cdr);
 
-    const isIRPFlagEnabled = store.selectSnapshot(AppState.isIrpFlagEnabled);
-    this.columnDefs = DepartmentsColumns(isIRPFlagEnabled);
+    this.columnDefs = DepartmentsColumns(store.selectSnapshot(AppState.isIrpFlagEnabled));
   }
 }
