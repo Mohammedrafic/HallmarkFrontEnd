@@ -28,13 +28,14 @@ export class MasterDataContentComponent extends AbstractPermission implements On
   }
 
   private watchForPermissions(): void {
-      this.getPermissionStream().pipe(
-        filter(() => this.sideMenuConfig.length <= 1),
-        takeUntil(this.componentDestroy())
-      ).subscribe((permissions: Permission) => {
-        this.userPermission = permissions;
-        this.setMenuConfig();
-      });
+    const itemsWithoutPermissions = MASTER_DATA_CONFIG.filter((item: MenuSettings) => !item.permissionKey).length;
+    this.getPermissionStream().pipe(
+      filter(() => this.sideMenuConfig.length <= itemsWithoutPermissions),
+      takeUntil(this.componentDestroy())
+    ).subscribe((permissions: Permission) => {
+      this.userPermission = permissions;
+      this.setMenuConfig();
+    });
   }
 
   private setMenuConfig(): void {

@@ -307,7 +307,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     }: CandidateCredential
   ) {
     event.stopPropagation();
-    this.disableFormForAgency(status as CredentialStatus);
     this.updateCredentialStatusOptions(status as CredentialStatus);
     this.showCertifiedFields = !!expireDateApplicable;
     this.credentialId = id as number;
@@ -535,12 +534,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       }
     } else {
       this.setCredentialStatusOptions(agencySideCredentialStatuses, status);
-    }
-  }
-
-  private disableFormForAgency(status: CredentialStatus): void {
-    if (!this.isOrganizationSide && status === CredentialStatus.Rejected) {
-      this.addCredentialForm.disable();
     }
   }
 

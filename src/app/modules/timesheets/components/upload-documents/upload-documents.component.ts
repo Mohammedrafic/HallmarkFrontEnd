@@ -9,11 +9,13 @@ import { FileExtensionsString } from '@core/constants';
 import { DialogAction, FilesClearEvent, FileSize } from '@core/enums';
 import { FileForUpload } from '@core/interface';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { ShowToast } from "src/app/store/app.actions";
 
+import { MessageTypes } from "@shared/enums/message-types";
+import { CustomFilesPropModel } from '@shared/components/file-uploader/custom-files-prop-model.interface';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { Attachment, UploadDialogState, UploadDocumentsModel } from '../../interface';
-import { CustomFilesPropModel } from '@shared/components/file-uploader/custom-files-prop-model.interface';
 
 @Component({
   selector: 'app-upload-documents',
@@ -32,7 +34,7 @@ export class UploadDocumentsComponent extends Destroyable implements OnInit {
 
   public readonly allowedFileExtensions: string = FileExtensionsString;
 
-  public readonly maxFileSize: number = FileSize.MB_10;
+  public readonly maxFileSize: number = FileSize.MB_20;
 
   public existingFiles: Attachment[] = [];
 
@@ -78,6 +80,11 @@ export class UploadDocumentsComponent extends Destroyable implements OnInit {
   }
 
   public saveRecord(): void {
+    if (this.hasTooBigFile()) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, 'The file should not exceed 20MB.'));
+      return;
+    }
+
     this.fileChange.emit({
       fileForUpload: this.fileForUploads,
       filesForDelete: this.filesForDelete,
@@ -135,5 +142,9 @@ export class UploadDocumentsComponent extends Destroyable implements OnInit {
     }
 
     this.cdr.detectChanges();
+  }
+
+  private hasTooBigFile(): boolean {
+    return this.fileForUploads.some((file: FileForUpload) => file.blob.size > this.maxFileSize);
   }
 }

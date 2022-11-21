@@ -4,7 +4,7 @@ import { catchError, Observable, of, tap } from 'rxjs';
 import { Days } from 'src/app/shared/enums/days';
 import { SendDocumentAgency } from 'src/app/shared/enums/send-document-agency';
 import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
-import { Status } from 'src/app/shared/enums/status';
+import { OrganizationStatus, Status } from 'src/app/shared/enums/status';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization, OrganizationDataSource, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
@@ -79,6 +79,7 @@ export interface AdminStateModel {
   sendDocumentAgencies: DropdownOption[];
   days: DropdownOption[];
   statuses: DropdownOption[];
+  organizationStatuses: DropdownOption[];
   isOrganizationLoading: boolean;
   organizations: OrganizationPage | null;
   isDepartmentLoading: boolean;
@@ -110,6 +111,7 @@ export interface AdminStateModel {
     ],
     days: Days,
     statuses: Object.keys(Status).filter(StringIsNumber).map((statusName, index) => ({ id: index, text: statusName })),
+    organizationStatuses: Object.keys(OrganizationStatus).filter(StringIsNumber).map((statusName, index) => ({ id: index, text: statusName })),
     isOrganizationLoading: false,
     organizations: null,
     organization: null,
@@ -151,6 +153,9 @@ export class AdminState {
 
   @Selector()
   static statuses(state: AdminStateModel): DropdownOption[] { return state.statuses; }
+
+  @Selector()
+  static organizationStatuses(state: AdminStateModel): DropdownOption[] { return state.organizationStatuses; }
 
   @Selector()
   static isDirty(state: AdminStateModel): boolean { return state.isDirty; }
@@ -244,10 +249,12 @@ export class AdminState {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
       }
       return payloadResponse;
-    }), 
+    }),
     catchError((error: HttpErrorResponse) => {
       if (error.error.errors.Organization) {
-        return dispatch(new ShowToast(MessageTypes.Error, 'Such prefix already exists'));
+        const message = error.error.errors.Organization[0] || 'Such prefix already exists';
+
+        return dispatch(new ShowToast(MessageTypes.Error, message));
       }
       return dispatch(new ShowToast(MessageTypes.Error, 'Changes were not saved. Please try again'));
     }));

@@ -104,6 +104,7 @@ import { TiersApiService } from '@shared/services';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { AssignSkillComponent } from './skills/assign-skill/assign-skill.component';
 import { SkillsState } from '@organization-management/store/skills.state';
+import { DepartmentService } from '@organization-management/departments/services/department.service';
 
 const sidebarIcons = {
   Download,
@@ -242,7 +243,8 @@ const sidebarIcons = {
       {
         provide: TIER_DIALOG_TYPE,
         useValue: Tiers.tierSettings
-      }
+      },
+      DepartmentService
     ],
 })
 export class OrganizationManagementModule {}

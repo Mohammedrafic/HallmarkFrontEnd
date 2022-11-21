@@ -16,7 +16,7 @@ import {
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
 } from 'src/app/shared/constants/messages';
-import { Shift } from 'src/app/shared/models/shift.model';
+import { Shift, ShiftsPage } from 'src/app/shared/models/shift.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -40,7 +40,7 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
   public grid: GridComponent;
 
   @Select(ShiftsState.shiftsPage)
-  shiftsPage$: Observable<any>;
+  shiftsPage$: Observable<ShiftsPage>;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
@@ -111,7 +111,7 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public editShift(data: any, event: any): void {
+  public editShift(data: Shift, event: MouseEvent): void {
     this.showForm = true;
     this.addActiveCssClass(event);
     this.title = 'Edit';
@@ -126,6 +126,7 @@ export class ShiftsComponent extends AbstractPermissionGrid implements OnInit, O
       name: data.name,
       startTime: startDate,
       endTime: endDate,
+      onCall: data.onCall,
     });
     this.store.dispatch(new ShowSideDialog(true));
   }
