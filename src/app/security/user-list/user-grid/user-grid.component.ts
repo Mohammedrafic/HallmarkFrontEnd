@@ -219,7 +219,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         filter: false,
         valueGetter: (params: TypedValueGetterParams<User>) => {
           if (params.data.lastLoginDate) {
-            return formatDate(params.data.lastLoginDate, 'MM/dd/YYYY HH:mm', 'en-US');
+            return formatDate(params.data.lastLoginDate, 'MM/dd/YYYY', 'en-US');
           }
           return '';
         },

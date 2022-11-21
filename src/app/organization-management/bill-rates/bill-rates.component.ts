@@ -57,7 +57,7 @@ export class BillRatesComponent extends AbstractPermissionGrid implements OnInit
 
   get showButton(): boolean {
     return (
-      (!this.isReadOnly && !this.isExternalBillRateTypeMapping) ||
+      (!this.isExternalBillRateTypeMapping) ||
       (this.isExternalBillRateType &&
         (this.externalBillRatePermissionsMap.get(ExternalBillRatePermissions.ManageExternalBillRates) as boolean))
     );
