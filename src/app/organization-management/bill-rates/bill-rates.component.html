@@ -61,7 +61,7 @@
         </ng-template>
       </e-tabitem>
 
-      <e-tabitem>
+      <e-tabitem *ngIf="userPermission[userPermissions.CanViewExternalBillRates] && userPermission[userPermissions.CanManageExternalBillRates]">
         <ng-template #headerText><div>External Bill Rate</div></ng-template>
         <ng-template #content>
           <app-external-bill-rate
@@ -74,7 +74,7 @@
         </ng-template>
       </e-tabitem>
 
-      <e-tabitem>
+      <e-tabitem *ngIf="userPermission[userPermissions.CanViewExternalBillRates] && userPermission[userPermissions.CanManageExternalBillRates]">
         <ng-template #headerText><div>External Bill Rate Mapping</div></ng-template>
         <ng-template #content>
           <app-bill-rate-type-mapping
