@@ -6,7 +6,7 @@ import { switchMap } from 'rxjs/operators';
 
 import { AddDialogHelper } from '@core/helpers';
 import { CustomFormGroup, FileForUpload } from '@core/interface';
-import { DialogAction, FilesClearEvent } from '@core/enums';
+import { DialogAction, FilesClearEvent, FileSize } from '@core/enums';
 import { OrganizationLocation, OrganizationDepartment, OrganizationRegion } from '@shared/models/organization.model';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -43,6 +43,8 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   public dialogShown: boolean = false;
 
   public title: string = '';
+
+  public readonly maxFileSize: number = FileSize.MB_20;
 
   private searchOptions: ManualInvoiceMeta[];
 
