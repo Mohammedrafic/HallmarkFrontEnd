@@ -113,8 +113,9 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
     }
   }
 
-  public onSave(): void {
-    switch (this.editOrgTab.selectedItem) {
+  public onSave(): void { 
+    let switchTabVal=this.switchTab(this.editOrgTab.selectedItem);
+    switch (switchTabVal) {
       case Tabs.JobDistribution:
         this.partnershipForm.markAllAsTouched();
         if (this.partnershipForm.valid) {
@@ -150,10 +151,10 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
   }
 
   public onTabSelecting(tab: SelectingEventArgs): void {
-    this.firstActive = false;
-    this.activeTab = tab.selectingIndex;
-
-    switch (this.editOrgTab.selectedItem) {
+    this.firstActive = false;    
+    this.activeTab = tab.selectingIndex;    
+    let switchTabVal=this.switchTab(this.editOrgTab.selectedItem);
+    switch (switchTabVal) {
       case Tabs.JobDistribution:
         this.confirmSwitchBetweenTab(this.partnershipForm, tab);
         break;
@@ -172,6 +173,11 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
 
   public handleTierControl(tierControl: FormControl): void {
     this.tierControl = tierControl;
+  }
+
+  private switchTab(tabSelected:number):number{
+    //As the Tier Settings tab getting hidden tab so the switch logic is calling wrong tab so adding +1 to the tab number based on condition
+    return this.canViewTierTab==false&&tabSelected>=1?tabSelected+1:tabSelected;
   }
 
   private onOpenEvent(): void {
@@ -268,7 +274,8 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
   }
 
   private checkUserPermission(): void {
-    switch (this.activeTab) {
+    let switchTabVal=this.switchTab(Number(this.activeTab));
+    switch (switchTabVal) {
       case Tabs.FeeSettings:
         this.canEditPermission = this.userPermission[this.userPermissions.CanEditFeeExceptions];
         break;
