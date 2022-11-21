@@ -176,6 +176,7 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
   }
 
   private switchTab(tabSelected:number):number{
+    //As the Tier Settings tab getting hidden tab so the switch logic is calling wrong tab so adding +1 to the tab number based on condition
     return this.canViewTierTab==false&&tabSelected>=1?tabSelected+1:tabSelected;
   }
 
