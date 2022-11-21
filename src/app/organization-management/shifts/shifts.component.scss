@@ -1,4 +1,6 @@
-@import "../../styles/variables/colors";
+@import "colors";
+@import "mixins";
+
 .flex-column {
   .toolbar {
     display: flex;
@@ -45,14 +47,21 @@
   .timepicker-field {
     width: 52%;
   }
+}
 
-  .on-call-toggle {
-    display: flex;
-    margin-bottom: 16px;
+.toggle-wrapper {
+  display: flex;
+  align-items: center;
 
-    span {
-      font-size: 14px;
-      color: $black;
-    }
+  & span {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+  }
+}
+
+::ng-deep {
+  .input-container {
+    @include toggle;
   }
 }
