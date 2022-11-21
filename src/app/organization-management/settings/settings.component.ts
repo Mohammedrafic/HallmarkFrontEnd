@@ -278,13 +278,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   public onFormCancelClick(): void {
     if (
-      this.organizationSettingsFormGroup.dirty ||
-      this.regionFormGroup.dirty ||
-      this.regionRequiredFormGroup.dirty ||
-      this.locationFormGroup.dirty ||
-      this.departmentFormGroup.dirty ||
-      this.pushStartDateFormGroup.dirty ||
-      this.invoiceGeneratingFormGroup.dirty
+      this.organizationSettingsFormGroup.touched ||
+      this.regionFormGroup.touched ||
+      this.regionRequiredFormGroup.touched ||
+      this.locationFormGroup.touched ||
+      this.departmentFormGroup.touched ||
+      this.pushStartDateFormGroup.touched ||
+      this.invoiceGeneratingFormGroup.touched
     ) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
@@ -617,7 +617,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       this.store.dispatch(new GetDepartmentsByLocationId(locationId));
       this.organizationHierarchy = OrganizationHierarchy.Location;
       this.organizationHierarchyId = locationId;
-      this.locationFormGroup.setValue({ locationId: locationId });
+      this.locationFormGroup.patchValue({ locationId: locationId }, { emitEvent: false, onlySelf: true });
     }
   }
 
@@ -625,7 +625,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     if (departmentId) {
       this.organizationHierarchy = OrganizationHierarchy.Department;
       this.organizationHierarchyId = departmentId;
-      this.departmentFormGroup.setValue({ departmentId: departmentId });
+      this.departmentFormGroup.patchValue({ departmentId: departmentId }, { emitEvent: false, onlySelf: true });
     }
   }
 
