@@ -286,10 +286,10 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveHolidaySucceeded)).subscribe(() => {
       this.HolidayFormGroup.reset();
       this.closeDialog();
-      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
+      this.store.dispatch([new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters), new GetHolidayDataSources()]);
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(DeleteHolidaySucceeded)).subscribe(() => {
-      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
+      this.store.dispatch([new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters), new GetHolidayDataSources()]);
     });
     this.holidayDataSource$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((dataSource) => {
       this.filterColumns.holidayNames.dataSource = dataSource;
@@ -494,7 +494,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
               new OrganizationHoliday(
                 this.HolidayFormGroup.getRawValue(),
                 this.selectedRegions,
-                this.isAllRegionsSelected && this.isAllLocationsSelected
+                this.isAllRegionsSelected, this.isAllLocationsSelected
               )
             )
           )
@@ -558,7 +558,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
         new OrganizationHoliday(
           holiday,
           this.hasSelectedRegions() ? this.selectedRegions : undefined,
-          this.isAllRegionsSelected && this.isAllLocationsSelected,
+          this.isAllRegionsSelected, this.isAllLocationsSelected,
           isExist
         )
       )
@@ -573,7 +573,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
         new OrganizationHoliday(
           holiday,
           this.hasSelectedRegions() ? this.selectedRegions : undefined,
-          this.isAllRegionsSelected && this.isAllLocationsSelected,
+          this.isAllRegionsSelected, this.isAllLocationsSelected,
           false
         )
       )
