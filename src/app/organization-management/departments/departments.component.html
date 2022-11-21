@@ -278,7 +278,7 @@
 
     <div *ngIf="isInvoiceDepartmentIdFieldShow">
       <div class="input-container">
-        <label for="invoiceDepartmentId">Invoice Department ID <span *ngIf="isIRPFlagEnabled" class="required">*</span></label>
+        <label for="invoiceDepartmentId">Invoice Department ID <span *ngIf="!isIRPFlagEnabled" class="required">*</span></label>
         <div class="input-group">
           <input id="invoiceDepartmentId"
                   class="e-input"
