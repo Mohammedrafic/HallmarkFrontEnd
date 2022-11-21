@@ -191,7 +191,7 @@ export class AddEditVisibilityComponent extends DestroyableDirective implements 
           regionsList = [...regionsList, ...filteredRegions] as Region[];
         }
 
-        this.regions = [...regionsList];
+        this.regions = sortByField(regionsList, 'name');
         this.setControlValue(this.regionsControl as FormControl, this.regions, this.editVisibility?.uniqRegionId);
       } else {
         this.regionsControl?.setValue([]);

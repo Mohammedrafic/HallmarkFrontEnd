@@ -169,7 +169,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
               );
             }
           });
-          this.locations = sortByField(locations, 'name');
+          this.locations.push(...sortByField(locations, 'name'));
         } else {
           this.locations = [];
           this.isAllRegionsSelected = false;

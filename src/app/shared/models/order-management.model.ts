@@ -388,7 +388,7 @@ export type AcceptJobDTO = {
   offeredStartDate?: string;
   skillName?: string;
   expAsTravelers?: number;
-  availableStartDate?: string;
+  availableStartDate?: string | null;
 };
 
 export type CandidateProfile = {

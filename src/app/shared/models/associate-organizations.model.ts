@@ -23,6 +23,7 @@ export type AssociateOrganizationsAgency = {
   partnershipStatusTitle: string;
   businessUnitName: string;
   agencyStatus: number;
+  tierId: number;
 };
 
 export type AssociateOrganizationsAgencyPage = PageOfCollections<AssociateOrganizationsAgency>;
@@ -103,3 +104,10 @@ export type PartnershipSettings = {
   applyProhibited: boolean;
   submissionPercentageOverrideRestriction: SubmissionPercentageOverrideRestriction;
 };
+
+export interface DepartmentsTierDTO {
+  organizationId: number;
+  regionIds: number[],
+  locationIds: number[],
+  departmentIds: number[],
+}

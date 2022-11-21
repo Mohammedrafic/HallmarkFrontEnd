@@ -1,0 +1,37 @@
+<div class="e-gridcustomheader">
+  <div class="title">
+    <h3>Tier Exception</h3>
+  </div>
+  <div class="actions">
+    <button
+      ejs-button
+      class="action-link"
+      (click)="addTier()"
+      [disabled]="isAgency"
+    >
+      <i-feather name="plus" class="icon"></i-feather>
+      Add Tier Exception
+    </button>
+  </div>
+</div>
+<app-grid
+  (navigateToPageEmitter)="handleChangePage($event)"
+  (pageSizeChangeEmitter)="handleChangePageSize($event)"
+  (gridReadyEmitter)="gridReady($event)"
+  [columnDefinitions]="columnDefinitions"
+  [rowData]="(tiersExceptionPage$ | async)?.items"
+  [isLoading]="isLoading"
+  [pageSize]="filters.pageSize"
+  [currentPage]="filters.pageNumber"
+  [totalRecordsCount]="(tiersExceptionPage$ | async)?.totalCount || 0"
+  class="app-grid-header"
+></app-grid>
+
+<app-tiers-dialog
+  [regionsStructure]="regionsStructure"
+  [selectedTier]="selectedTier"
+  [isEditDialog]="isEdit"
+  (saveTier)="handleSaveTier($event)"
+  [permission]="isAgency"
+  [organizationId]="selectedOrganizationAgency.organizationId!"
+></app-tiers-dialog>

@@ -37,74 +37,81 @@
               <div class="vertical-divider"></div>
             </div>
 
-            <button
-              ejs-button
-              cssClass="e-outline edit-button"
-              [disabled]="disableEdit || !canCreateOrder || !hasCreateEditOrderPermission"
-              (click)="editOrder(order)"
-            >
-              <i-feather name="edit" class="icon"></i-feather>
-            </button>
-            <button
-              ejs-button
-              cssClass="e-outline"
-              *ngIf="!canCloseOrder"
-              [disabled]="disableCloseOrder || !canCloseOrderPermission || !hasCreateEditOrderPermission"
-              (click)="closeOrder(order)"
-            >
-              Close Order
-            </button>
-            <button
-              ejs-button
-              cssClass="e-outline"
-              *ngIf="canReOpen"
-              [disabled]="!canCloseOrderPermission || !hasCreateEditOrderPermission"
-              (click)="reOpenOrder(order)"
-            >
-              Re-Open
-            </button>
-            <button
-              ejs-button
-              cssClass="e-outline"
-              *ngIf="showCreateReOrder"
-              (click)="createReOrder()"
-              [disabled]="disableCreateReOrder || !canCreateOrder || !hasCreateEditOrderPermission"
-            >
-              Create Re-Order
-            </button>
-            <button
-              ejs-button
-              cssClass="e-primary delete-button"
-              [disabled]="!canCreateOrder || !hasCreateEditOrderPermission"
-              (click)="deleteOrder(order.id)"
-              *ngIf="!showCloseButton"
-            >
-              Delete
-            </button>
-            <button
-              ejs-button
-              cssClass="e-outline"
-              *ngIf="showLockOrder"
-              [isPrimary]="true"
-              (click)="lockOrder()"
-              [disabled]="disabledLock || !canCreateOrder || !hasCreateEditOrderPermission"
-            >
-              {{ order?.isLocked ? 'Unlock' : 'Lock' }}
-              <i-feather *ngIf="!order?.isLocked" name="lock" class="icon"></i-feather>
-              <app-custom-icon *ngIf="order?.isLocked" name="unlock" class="icon"></app-custom-icon>
-            </button>
-
-            <button
-              *ngIf="mobileMenu.length"
-              ejs-dropdownbutton
-              [items]="mobileMenu"
-              [disabled]="!canCreateOrder || !hasCreateEditOrderPermission"
-              (select)="onMobileMenuSelect($event)"
-              iconCss="e-icons"
-              cssClass="e-caret-hide primary-icon-button menu-mobile"
-            >
-              <i-feather name="more-vertical" class="icon"></i-feather>
-            </button>
+            <app-tooltip-container [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-button
+                cssClass="e-outline edit-button"
+                [disabled]="disableEdit || !canCreateOrder || !hasCreateEditOrderPermission"
+                (click)="editOrder(order)"
+              >
+                <i-feather name="edit" class="icon"></i-feather>
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="!canCloseOrder" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-button
+                cssClass="e-outline"
+                [disabled]="disableCloseOrder || !canCloseOrderPermission || !hasCreateEditOrderPermission"
+                (click)="closeOrder(order)"
+              >
+                Close Order
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="canReOpen" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-button
+                cssClass="e-outline"
+                [disabled]="!canCloseOrderPermission || !hasCreateEditOrderPermission"
+                (click)="reOpenOrder(order)"
+              >
+                Re-Open
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="showCreateReOrder" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-button
+                cssClass="e-outline"
+                (click)="createReOrder()"
+                [disabled]="disableCreateReOrder || !canCreateOrder || !hasCreateEditOrderPermission"
+              >
+                Create Re-Order
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="!showCloseButton" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-button
+                cssClass="e-primary delete-button"
+                [disabled]="!canCreateOrder || !hasCreateEditOrderPermission"
+                (click)="deleteOrder(order.id)"
+              >
+                Delete
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="showLockOrder" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-button
+                cssClass="e-outline"
+                [isPrimary]="true"
+                (click)="lockOrder()"
+                [disabled]="disabledLock || !canCreateOrder || !hasCreateEditOrderPermission"
+              >
+                {{ order?.isLocked ? 'Unlock' : 'Lock' }}
+                <i-feather *ngIf="!order?.isLocked" name="lock" class="icon"></i-feather>
+                <app-custom-icon *ngIf="order?.isLocked" name="unlock" class="icon"></app-custom-icon>
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="mobileMenu.length" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-dropdownbutton
+                [items]="mobileMenu"
+                [disabled]="!canCreateOrder || !hasCreateEditOrderPermission"
+                (select)="onMobileMenuSelect($event)"
+                iconCss="e-icons"
+                cssClass="e-caret-hide primary-icon-button menu-mobile"
+              >
+                <i-feather name="more-vertical" class="icon"></i-feather>
+              </button>
+            </app-tooltip-container>
 
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>

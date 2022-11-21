@@ -36,6 +36,7 @@ export interface TierDetails {
   priority: number;
   regionId: number;
   regionName: string;
+  organizationTierId: number;
 }
 
 export type TiersPage = PageOfCollections<TierDetails>;

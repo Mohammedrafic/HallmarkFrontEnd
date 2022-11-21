@@ -10,17 +10,16 @@ import {
 } from '@shared/models/associate-organizations.model';
 import { valuesOnly } from '@shared/utils/enum.utils';
 import {
-  DistributionLevels,
   PartnershipStatus,
   SubmissionPercentageOverrideRestriction,
 } from '@shared/enums/partnership-settings';
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
 import {
-  OPTION_FIELDS,
   REGION_OPTION,
 } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { Tabs } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
+import { OPTION_FIELDS } from '@shared/components/associate-list/constant';
 
 @Component({
   selector: 'app-partnership-settings',
@@ -51,10 +50,6 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
   public partnershipStatus = Object.values(PartnershipStatus)
     .filter(valuesOnly)
     .map((name, id) => ({ name, id })).sort((a, b) => (a.name as string).localeCompare(b.name as string));
-  public agencyCategoryTier = Object.values(DistributionLevels)
-    .filter(valuesOnly)
-    .map((name) => ({ name, id: DistributionLevels[name as DistributionLevels] }))
-    .sort((a, b) => (a.name as string).localeCompare(b.name as string));
   public submission = Object.values(SubmissionPercentageOverrideRestriction)
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));
@@ -72,14 +67,10 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
   static createForm(): FormGroup {
     return new FormGroup({
       status: new FormControl(0),
-
-      agencyCategory: new FormControl(),
-
       regionNames: new FormControl([]),
       orderTypes: new FormControl([]),
       classifications: new FormControl([]),
       skillCategoryIds: new FormControl([]),
-
       allowOnBoard: new FormControl(false),
       allowDeployCredentials: new FormControl(false),
       excludeExperience: new FormControl(false),
@@ -87,7 +78,6 @@ export class PartnershipSettingsComponent extends DestroyableDirective implement
       updateBySelf: new FormControl(false),
       loadAgencyCandidateDetails: new FormControl(false),
       applyProhibited: new FormControl(false),
-
       submissionPercentageOverrideRestriction: new FormControl(),
     });
   }

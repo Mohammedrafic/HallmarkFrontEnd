@@ -11,13 +11,14 @@ export class Shift {
   endTime: string;
   standardStartTime?: string;
   standardEndTime?: string;
-  onCall?: boolean;
+  onCall: boolean;
 
   constructor(shift: Shift) {
     this.id = shift.id;
     this.regionId = shift.regionId;
     this.departmentId = shift.departmentId;
     this.name = shift.name;
+    this.onCall = shift.onCall;
 
     const startTime = new Date(shift.startTime);
     const endTime = new Date(shift.endTime);

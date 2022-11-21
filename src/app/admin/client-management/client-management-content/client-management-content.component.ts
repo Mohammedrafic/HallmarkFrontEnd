@@ -70,11 +70,6 @@ export class ClientManagementContentComponent
   public filters: OrganizationFilter = {};
   public filterColumns: any;
 
-  get hasCreateOrganizationPermission(): boolean {
-    const createDeleteOrganizationPermissionId = PermissionTypes.CanCreateDeleteOrganization;
-    return this.permissions.map((permission) => permission.permissionId).includes(createDeleteOrganizationPermissionId);
-  }
-
   private permissions: CurrentUserPermission[] = [];
 
   constructor(

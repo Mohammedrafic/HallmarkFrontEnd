@@ -82,3 +82,27 @@ export interface ListOfSkills {
   id: number;
   name: string;
 }
+
+export type AssignedSkillTreeItem = {
+  id: string;
+  pid: string;
+  cid: number;
+  name: string;
+  skillDescription: string;
+  isAssignable: boolean;
+  hasChild: boolean;
+};
+
+export interface AssignedSkillTree {
+  treeItems: AssignedSkillTreeItem[];
+  assignedSkillIds: string[];
+}
+
+export interface AssignedSkillsByOrganization  {
+  id: number;
+  masterSkillId: number;
+  categoryName: string;
+  skillAbbr: string;
+  skillDescription: string;
+  name: string
+}

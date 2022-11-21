@@ -8,11 +8,11 @@ import { combineLatest, debounceTime, filter, Observable, skip, Subject, switchM
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 import {
+  GetAssignedSkillsByOrganization,
   GetDepartmentsByLocationId,
   GetLocationsByRegionId,
-  GetMasterSkillsByOrganization,
   GetOrganizationSettings,
-  GetRegions,
+  GetRegions
 } from '@organization-management/store/organization-management.actions';
 import {
   ClearSelectedOrder,
@@ -23,7 +23,7 @@ import {
   GetProjectSpecialData,
   GetSuggestedDetails,
   SetIsDirtyOrderForm,
-  SetPredefinedBillRatesData,
+  SetPredefinedBillRatesData
 } from '@client/store/order-managment-content.actions';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -32,7 +32,7 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { Location } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
 import { Department } from '@shared/models/department.model';
-import { MasterSkillByOrganization } from '@shared/models/skill.model';
+import { ListOfSkills } from '@shared/models/skill.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { Order, OrderContactDetails, OrderWorkLocation, SuggestedDetails } from '@shared/models/order-management.model';
@@ -40,7 +40,7 @@ import { Document } from '@shared/models/document.model';
 
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { Duration } from '@shared/enums/durations';
-import {  OrderJobDistribution } from '@shared/enums/job-distibution';
+import { OrderJobDistribution } from '@shared/enums/job-distibution';
 
 import {
   ONLY_NUMBER,
@@ -72,16 +72,13 @@ import { RejectReasonState } from '@organization-management/store/reject-reason.
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { GetOrderRequisitionByPage } from '@organization-management/store/reject-reason.actions';
 import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
-import {
-  distributionSource,
-  ORDER_JOB_DISTRIBUTION,
-} from '@shared/constants/order-job-distribution-list';
+import { distributionSource, ORDER_JOB_DISTRIBUTION } from '@shared/constants/order-job-distribution-list';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 import { DurationService } from '@shared/services/duration.service';
 import { UserState } from 'src/app/store/user.state';
 import { DateTimeHelper } from '@core/helpers';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
-import { DistributionTierApiService, DistributionTierService } from '@client/order-management/order-details-form/services';
+import { DistributionTierService } from '@client/order-management/order-details-form/services';
 import {
   AssociateAgencyFields,
   DepartmentFields,
@@ -94,6 +91,8 @@ import {
   SpecialProjectCategoriesFields
 } from '@client/order-management/order-details-form/order-details.constant';
 import { isNil } from 'lodash';
+import { SettingsViewService } from '@shared/services';
+import { TierLogic } from '@shared/enums/tier-logic.enum';
 
 @Component({
   selector: 'app-order-details-form',
@@ -164,7 +163,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private selectedRegion: Region;
   private selectedLocation: Location;
   private selectedDepartment: Department;
-  private selectedSkills: SkillCategory;
   private touchedFields: Set<string> = new Set();
   private alreadyShownDialog: boolean = false;
   private unsubscribe$: Subject<void> = new Subject();
@@ -184,8 +182,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrganizationManagementState.sortedDepartments)
   public departments$: Observable<Department[]>;
 
-  @Select(OrganizationManagementState.masterSkillsByOrganization)
-  public skills$: Observable<MasterSkillByOrganization[]>;
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
+  skills$: Observable<ListOfSkills[]>;
+
+  skillFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  selectedSkills: SkillCategory;
 
   @Select(OrderManagementContentState.projectSpecialData)
   private projectSpecialData$: Observable<ProjectSpecialData>;
@@ -216,7 +217,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     private orderManagementService: OrderManagementContentService,
     private commentsService: CommentsService,
     private durationService: DurationService,
-    private distributionTierApiService: DistributionTierApiService,
+    private settingsViewService: SettingsViewService,
     private distributionTierService: DistributionTierService
   ) {
     this.orderTypeForm = this.formBuilder.group({
@@ -516,7 +517,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   private getFormData(force: boolean = false): void {
     this.store.dispatch(new GetRegions());
-    this.store.dispatch(new GetMasterSkillsByOrganization());
+    this.store.dispatch(new GetAssignedSkillsByOrganization());
     this.store.dispatch(new GetProjectSpecialData());
     this.store.dispatch(new GetAssociateAgencies());
     this.store.dispatch(new GetOrganizationStatesWithKeyCode());
@@ -1201,14 +1202,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       .pipe(
         filter(Boolean),
         switchMap((id: number) => {
-          return this.distributionTierApiService.getTierSettingsForDistribution(
+          return this.settingsViewService.getViewSettingKey(
             OrganizationSettingKeys.TieringLogic,
             OrganizationalHierarchy.Department,
             id)
         }),
         takeUntil(this.unsubscribe$)
-      ).subscribe((value: {TieringLogic: boolean}) => {
-        this.distribution = distributionSource(value.TieringLogic);
+      ).subscribe(({TieringLogic}) => {
+        this.distribution = distributionSource(TieringLogic === TierLogic.Show);
     });
   }
 }

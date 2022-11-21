@@ -7,6 +7,8 @@ import { SharedModule } from '@shared/shared.module';
 import { NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { TierService } from '@shared/components/tiers-dialog/services';
+import { DialogModule } from '@syncfusion/ej2-angular-popups';
+import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 
 @NgModule({
   declarations: [
@@ -17,7 +19,9 @@ import { TierService } from '@shared/components/tiers-dialog/services';
     SharedModule,
     ReactiveFormsModule,
     NumericTextBoxModule,
-    DropDownListModule
+    DropDownListModule,
+    DialogModule,
+    ButtonModule,
   ],
   providers: [TierService],
   exports: [TiersDialogComponent]

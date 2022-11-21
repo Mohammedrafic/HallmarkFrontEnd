@@ -4,15 +4,15 @@ import { Injectable } from '@angular/core';
 import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 
 @Injectable()
-export class DistributionTierApiService {
+export class SettingsViewService {
   constructor(private http: HttpClient) {}
 
-  public getTierSettingsForDistribution(
+  public getViewSettingKey(
     settingKeys: OrganizationSettingKeys,
     hierarchyLevel: OrganizationalHierarchy,
     id: number
-  ): Observable<{TieringLogic: boolean}> {
-    return this.http.get<{TieringLogic: boolean}>(
+  ): Observable<Record<string, string>> {
+    return this.http.get<Record<string, string>>(
       `/api/OrganizationSettings/byKeys?SettingKeys=${settingKeys}&HierarchyLevel=${hierarchyLevel}&HierarchyId=${id}`
     );
   }

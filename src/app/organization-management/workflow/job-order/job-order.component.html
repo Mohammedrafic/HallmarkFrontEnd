@@ -6,7 +6,7 @@
       <button
         ejs-button
         appHideBeforeSyncfusionLoad
-        cssClass="e-outline delete-button"
+        cssClass="e-danger delete-button"
         *ngIf="workflowsWithDetails.length !== 0"
         [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
         (click)="onDeleteWorkflowClick()">Delete</button>
