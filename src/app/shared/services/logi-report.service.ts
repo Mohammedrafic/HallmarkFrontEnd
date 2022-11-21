@@ -7,6 +7,7 @@ import { DepartmentsPage } from "@shared/models/department.model";
 import { LocationsPage } from "@shared/models/location.model";
 import { regionsPage } from "@shared/models/region.model";
 import { map, Observable } from "rxjs";
+import { AssociateAgencyDto } from "../models/logi-report-file";
 
 @Injectable({ providedIn: 'root' })
 export class LogiReportService {
@@ -67,4 +68,13 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
  public getCommonCandidateSearch(filter:any): Observable<SearchCandidate[]> {
   return this.http.post<SearchCandidate[]>(`/api/LogiReport/financialtimesheet/candidatesearch`,filter);
 }
+
+
+  /**
+   * Get the list of Associate Agencies
+   * @return Array of Associate Agencies
+   */
+   public getAgencies(): Observable<AssociateAgencyDto[]> {
+    return this.http.get<AssociateAgencyDto[]>(`/api/LogiReport/getAgencies`);
+  }
 }

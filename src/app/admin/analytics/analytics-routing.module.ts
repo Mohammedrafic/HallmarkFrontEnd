@@ -37,6 +37,7 @@ import { VendorScorecardComponent } from './vendor-scorecard/vendor-scorecard.co
 import { VmsInvoiceReportComponent } from './vms-invoice-report/vms-invoice-report.component';
 import { YtdReportComponent } from './ytd-report/ytd-report.component';
 import { YtdSummaryComponent } from './ytd-summary/ytd-summary.component';
+import { AccrualReportComponent } from './accrual-report/accrual-report.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '', pathMatch: 'full' },
@@ -68,6 +69,13 @@ const routes: Routes = [
       {
         path: 'client-finance-report',
         component: ClientFinanceReportComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'accrual-report',
+        component: AccrualReportComponent,
         data: {
           isOrganizationArea: true,
         }

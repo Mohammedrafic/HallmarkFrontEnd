@@ -8,7 +8,8 @@ import { Region, regionsPage } from "@shared/models/region.model";
 import { LogiReportService } from "@shared/services/logi-report.service";
 import { filter, Observable, tap } from "rxjs";
 import { JobDetailSummaryReportFilterOptions } from "../../admin/analytics/models/jobdetail-summary.model";
-import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions } from "./logi-report.action";
+import { AssociateAgencyDto } from "../../shared/models/logi-report-file";
+import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions, GetAgencies } from "./logi-report.action";
 
 export interface LogiReportStateModel {
 
@@ -19,7 +20,7 @@ export interface LogiReportStateModel {
     commonReportFilterOptions:CommonReportFilterOptions|null;
     searchCandidates: SearchCandidate[];
     jobDetailSummaryReportFilterOptions: JobDetailSummaryReportFilterOptions | null;
-
+    getAgencies: AssociateAgencyDto[] | null;
 }
 @State<LogiReportStateModel>({
     name: 'LogiReport',
@@ -31,7 +32,8 @@ export interface LogiReportStateModel {
         logiReportDto:[],
         commonReportFilterOptions:null,
         searchCandidates: [],
-        jobDetailSummaryReportFilterOptions:null
+        jobDetailSummaryReportFilterOptions:null,
+        getAgencies: []
     },
 })
 @Injectable()
@@ -59,6 +61,13 @@ export class LogiReportState {
 
     @Selector()
     static jobDetailSummaryReportFilterData(state: LogiReportStateModel): JobDetailSummaryReportFilterOptions | null { return state.jobDetailSummaryReportFilterOptions; }
+
+    @Selector()
+      static getAgencies(state: LogiReportStateModel): AssociateAgencyDto[] | null {
+      return state.getAgencies;
+  }
+
+ 
 
     @Action(GetRegionsByOrganizations)
     GetRegionsByOrganizations({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<Region[]> {
@@ -135,6 +144,15 @@ export class LogiReportState {
       patchState({ jobDetailSummaryReportFilterOptions: payload });
       return payload
 
+    }));
+  }
+
+
+  @Action(GetAgencies)
+  GetAgencies({ patchState }: StateContext<LogiReportStateModel>, { }: any): Observable<AssociateAgencyDto[]> {
+    return this.logiReportService.getAgencies().pipe(tap((payload: any) => {
+      patchState({ getAgencies: payload });
+      return payload
     }));
   }
 }
