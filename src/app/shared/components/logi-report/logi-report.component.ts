@@ -4,6 +4,9 @@ import { LogiReportTypes } from 'src/app/shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { LogiReportJsLoaded } from '@shared/constants';
+import { UserState } from '../../../store/user.state';
+import { Store } from '@ngxs/store';
+import { BusinessUnitType } from '../../enums/business-unit-type';
 //declare const com: any;
 
 declare global {
@@ -39,12 +42,11 @@ export class LogiReportComponent implements OnInit {
   @Input() reportType: LogiReportTypes;
   @Input() resultList: LogiReportFileDetails[];
   
-  constructor(@Inject(APP_SETTINGS) private appSettings: AppSettings) {
+  constructor(@Inject(APP_SETTINGS) private appSettings: AppSettings, private store: Store) {
   }
   
 
   ngOnInit(): void {
-       
     //this.factory = com.jinfonet.api.AppFactory;    
     
   }
@@ -121,12 +123,18 @@ export class LogiReportComponent implements OnInit {
         }
       }
     }
+    const user = this.store.selectSnapshot(UserState.user);
+    var studio_mode = this.reportType == LogiReportTypes.PageReport ? "basic_only" : "view_only";
+    if (user?.businessUnitType === BusinessUnitType.Hallmark) {
+     
+      studio_mode = this.reportType == LogiReportTypes.PageReport ? "interactive" : "view";
+    }
     let server = {
       url: this.reportUrl,
       user: this.uId,
       pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
-      jrd_studio_mode:this.reportType == LogiReportTypes.PageReport? "basic_only":"view_only",
+      jrd_studio_mode: studio_mode,
       "jrs.param_page": true //,
       //"jrs.profile": "profilename"
     };
