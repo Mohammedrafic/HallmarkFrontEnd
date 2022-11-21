@@ -47,7 +47,7 @@ export class ClientManagementContentComponent
   ];
   public fileName: string;
   public defaultFileName: string;
-  public readonly statusEnum = OrganizationStatus;
+  public readonly organizationStatus = OrganizationStatus;
 
   readonly ROW_HEIGHT = 64;
 

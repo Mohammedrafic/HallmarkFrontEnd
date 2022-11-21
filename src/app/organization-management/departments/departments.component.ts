@@ -79,11 +79,11 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   departmentsDetailsFormGroup: FormGroup;
   fieldsSettings: FieldSettingsModel = { text: 'name', value: 'id' };
   irpFieldsSettings: FieldSettingsModel = { text: 'text', value: 'value' };
-  defaultValue: any;
+  defaultValue: number | undefined;
   isLocationsDropDownEnabled: boolean = false;
   columnsToExport: ExportColumn[];
   fileName: string;
-  defaultLocationValue: any;
+  defaultLocationValue: number;
   DepartmentFilterFormGroup: FormGroup;
   filterColumns: FilterColumnsModel;
   importDialogEvent: Subject<boolean> = new Subject<boolean>();
@@ -383,8 +383,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       this.getOrganization(id);
       this.store.dispatch(new GetRegions()).pipe(
         takeUntil(this.componentDestroy())
-      ).subscribe((data) => {
-        this.defaultValue = data.organizationManagement.regions[0]?.id;
+      ).subscribe(() => {
+        const regions = this.store.selectSnapshot(OrganizationManagementState.regions);
+        this.defaultValue = regions[0]?.id;
       });
     });
   }
