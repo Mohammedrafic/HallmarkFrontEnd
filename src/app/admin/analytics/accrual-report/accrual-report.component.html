@@ -96,10 +96,15 @@
             </ejs-multiselect>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="form-elemet">
+      <div class="group">
         <div class="input-container bootstrap">
-          <label>Agency</label>
+          <label>Agency<span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-multiselect mode="CheckBox" formControlName="agencyIds"  placeholder="All"
+            <ejs-multiselect mode="CheckBox" formControlName="agencyIds"  placeholder="All" appValidateWithMessage
               [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="agencyData"
               [fields]="agencyFields" [selectAllText]='allOption' showSelectAll=true>
             </ejs-multiselect>
@@ -107,6 +112,7 @@
         </div>
       </div>
     </div>
+    
     <div class="form-elemet">
       <div class="group">
         <div class="input-container bootstrap">
@@ -131,7 +137,7 @@
     </div>
     <div class="form-elemet">
       <div class="input-container bootstrap">
-          <div class="input-group dropdown">
+          <div class="inline-radio-container">
             <ejs-radiobutton
               formControlName="invoiceType"
               label="By Timesheet"
@@ -146,7 +152,7 @@
             ></ejs-radiobutton>
           </div>
     </div>
-  </div>
+    </div>
     <div class="form-elemet">
       <div class="group">
         <div class="input-container calendar">
