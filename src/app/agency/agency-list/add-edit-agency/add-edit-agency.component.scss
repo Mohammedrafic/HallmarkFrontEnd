@@ -24,9 +24,12 @@
   }
 
   .add-contact-link {
-    @include linkWithIcon;
-  }
+    border: none;
 
+    i-feather {
+      vertical-align: bottom;
+    }
+  }
 }
 
 .create-under {

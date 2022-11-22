@@ -21,7 +21,7 @@ import { UserService } from '@shared/services/user.service';
 import {
   GetCurrentUserPermissions,
   GetOrderPermissions,
-  GetOrganizationStructure,
+  GetOrganizationStructure, GetOrgTierStructure,
   GetUserAgencies,
   GetUserMenuConfig,
   GetUserOrganizations,
@@ -59,6 +59,7 @@ export interface UserStateModel {
   agencyActionsAllowed: boolean;
   agencyInvoicesActionsAllowed: boolean;
   userPermission: Permission;
+  tireOrganizationStructure: OrganizationStructure | null;
 }
 
 const AGENCY = 'Agency';
@@ -74,6 +75,7 @@ const AGENCY = 'Agency';
     lastSelectedOrganizationId: parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string) || null,
     lastSelectedAgencyId: parseInt(window.localStorage.getItem(AGENCY_ID_STORAGE_KEY) as string) || null,
     organizationStructure: null,
+    tireOrganizationStructure: null,
     usersAssignedToRole: null,
     permissions: [],
     orderPermissions: [],
@@ -151,6 +153,11 @@ export class UserState {
   @Selector()
   static usersAssignedToRole(state: UserStateModel): UsersAssignedToRole | null {
     return state.usersAssignedToRole;
+  }
+
+  @Selector()
+  static tireOrganizationStructure(state: UserStateModel): OrganizationStructure | null {
+    return state.tireOrganizationStructure;
   }
 
   @Selector()
@@ -399,5 +406,19 @@ export class UserState {
           return permissions;
         })
       );
+  }
+
+  @Action(GetOrgTierStructure)
+  GetOrgTierStructure(
+    { patchState, dispatch }: StateContext<UserStateModel>,
+  ): Observable<OrganizationStructure | void> {
+    return this.organizationService.getOrgTierStructure().pipe(
+      tap((structure: OrganizationStructure) => {
+        patchState({tireOrganizationStructure: structure})
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    )
   }
 }

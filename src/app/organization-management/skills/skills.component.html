@@ -23,8 +23,8 @@
       <!-- TODO add right permission -->
       <app-tooltip-container
         [message]="toolTipMessage"
-        [showToolTip]="!userPermission[userPermissions.AssignedSkills]">
-        <button ejs-button [isPrimary]="true" (click)='assignSkill()' [disabled]="!userPermission[userPermissions.AssignedSkills]">Assign Skill</button>
+        [showToolTip]="!userPermission[userPermissions.ManageAssignSkills]">
+        <button ejs-button [isPrimary]="true" (click)='assignSkill()' [disabled]="!userPermission[userPermissions.ManageAssignSkills]">Assign Skill</button>
       </app-tooltip-container>
     </section>
   </section>
