@@ -8,7 +8,8 @@ import { Region, regionsPage } from "@shared/models/region.model";
 import { LogiReportService } from "@shared/services/logi-report.service";
 import { filter, Observable, tap } from "rxjs";
 import { JobDetailSummaryReportFilterOptions } from "../../admin/analytics/models/jobdetail-summary.model";
-import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions } from "./logi-report.action";
+import { AssociateAgencyDto } from "../../shared/models/logi-report-file";
+import { GetRegionsByOrganizations, GetLocationsByRegions, GetDepartmentsByLocations, GetLogiReportData, ClearLogiReportState, GetCommonReportFilterOptions, GetCommonReportCandidateSearch, GetJobDetailSummaryReportFilterOptions} from "./logi-report.action";
 
 export interface LogiReportStateModel {
 
@@ -19,7 +20,6 @@ export interface LogiReportStateModel {
     commonReportFilterOptions:CommonReportFilterOptions|null;
     searchCandidates: SearchCandidate[];
     jobDetailSummaryReportFilterOptions: JobDetailSummaryReportFilterOptions | null;
-
 }
 @State<LogiReportStateModel>({
     name: 'LogiReport',
@@ -59,6 +59,7 @@ export class LogiReportState {
 
     @Selector()
     static jobDetailSummaryReportFilterData(state: LogiReportStateModel): JobDetailSummaryReportFilterOptions | null { return state.jobDetailSummaryReportFilterOptions; }
+ 
 
     @Action(GetRegionsByOrganizations)
     GetRegionsByOrganizations({ patchState }: StateContext<LogiReportStateModel>, { filter }: any): Observable<Region[]> {
@@ -138,5 +139,4 @@ export class LogiReportState {
     }));
   }
 }
-
 
