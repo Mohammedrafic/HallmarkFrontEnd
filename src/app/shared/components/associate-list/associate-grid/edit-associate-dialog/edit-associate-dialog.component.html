@@ -29,21 +29,21 @@
         <ejs-tab #editOrgTab (selecting)="onTabSelecting($event)">
           <e-tabitems>
             <e-tabitem *ngIf="userPermission[userPermissions.CanViewFeeExceptions]">
-              <ng-template #headerText> Fee Settings </ng-template>
+              <ng-template #headerText> {{feeSettingsText}} </ng-template>
               <ng-template #content>
                 <app-fee-settings [editAgencyOrg]="editAgencyOrg" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission" [form]="$any(feeSettingsForm)"></app-fee-settings>
               </ng-template>
             </e-tabitem>
 
               <e-tabitem *ngIf="canViewTierTab">
-                <ng-template #headerText> Tier Settings </ng-template>
+                <ng-template #headerText> {{tierExceptionText}} </ng-template>
                 <ng-template #content>
                   <app-tier-settings [editAgencyOrg]="editAgencyOrg" (changeTierControl)="handleTierControl($event)"></app-tier-settings>
                 </ng-template>
               </e-tabitem>
 
             <e-tabitem *ngIf="userPermission[userPermissions.CanViewPartnershipSettings]">
-              <ng-template #headerText> Partnership Settings </ng-template>
+              <ng-template #headerText> {{partnershipText}} </ng-template>
               <ng-template #content>
                 <app-partnership-settings [partnershipForm]="$any(partnershipForm)" [activeTab]="activeTab"></app-partnership-settings>
               </ng-template>
