@@ -188,9 +188,10 @@ export class CandidateState {
 
   @Action(GetAllSkills)
   GetAllSkills({ patchState }: StateContext<CandidateStateModel>, {}: GetAllSkills): Observable<ListOfSkills[]> {
-    return this.skillsService.getAllMasterSkillsArray().pipe(
+    return this.skillsService.getAssignedSkillsByOrganization().pipe(
       tap((payload) => {
-        patchState({ skills: payload.map(({id, masterSkillId, skillDescription}) => ({id, masterSkillId, name: skillDescription})) });
+        patchState({ skills: payload.map(({id, masterSkillId, skillDescription}) => ({id, masterSkillId, name: skillDescription}))});
+        return payload;
       })
     );
   }

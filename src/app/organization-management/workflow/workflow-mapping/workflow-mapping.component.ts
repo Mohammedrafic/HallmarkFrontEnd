@@ -8,14 +8,9 @@ import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@ang
 import { OrganizationManagementState } from '../../store/organization-management.state';
 import { Region } from '@shared/models/region.model';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
+import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { Skill } from '@shared/models/skill.model';
-import {
-  CANCEL_CONFIRM_TEXT,
-  DELETE_CONFIRM_TITLE,
-  DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE,
-} from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { WorkflowState } from '../../store/workflow.state';
 import { Step, Workflow, WorkflowFilters, WorkflowWithDetails } from '@shared/models/workflow.model';
@@ -27,7 +22,7 @@ import {
   GetWorkflowsSucceed,
   RemoveWorkflowMapping,
   SaveWorkflowMapping,
-  SaveWorkflowMappingSucceed,
+  SaveWorkflowMappingSucceed
 } from '../../store/workflow.actions';
 import { UserState } from '../../../store/user.state';
 import { User } from '@shared/models/user-managment-page.model';
@@ -39,22 +34,17 @@ import {
   StepRoleUser,
   UsersByPermission,
   WorkflowMappingPage,
-  WorkflowMappingPost,
+  WorkflowMappingPost
 } from '@shared/models/workflow-mapping.model';
 import { WorkflowType } from '@shared/enums/workflow-type';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
-import {
-  OrganizationDepartment,
-  OrganizationLocation,
-  OrganizationRegion,
-  OrganizationStructure,
-} from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { isEmpty } from 'lodash';
-import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 type RoleWithUserModel = { [key: number]: { [workflowType: number]: RoleWithUser[] } };
@@ -87,7 +77,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
   public departments: OrganizationDepartment[] = [];
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
 
-  @Select(OrganizationManagementState.allOrganizationSkills)
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
   skills$: Observable<Skill[]>;
   skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
   public allSkills: Skill[] = [];
@@ -222,7 +212,7 @@ export class WorkflowMappingComponent extends AbstractPermissionGrid implements 
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.currentPage = 1;
       this.clearFilters();
-      this.store.dispatch(new GetAllOrganizationSkills());
+      this.store.dispatch(new GetAssignedSkillsByOrganization());
       this.store.dispatch(new GetWorkflowMappingPages(this.filters));
       this.store.dispatch(new GetRolesForWorkflowMapping());
       this.store.dispatch(new GetUsersForWorkflowMapping());

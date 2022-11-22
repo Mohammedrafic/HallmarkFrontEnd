@@ -1,17 +1,13 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import {  FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShowSideDialog } from '../../../store/app.actions';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import {
-  CANCEL_CONFIRM_TEXT,
-  DELETE_CONFIRM_TITLE,
-  DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE,
-} from '@shared/constants';
-import {
-  GetRolesForWorkflowMapping, GetUsersForWorkflowMapping,
+  GetRolesForWorkflowMapping,
+  GetUsersForWorkflowMapping,
   GetWorkflowMappingPages,
   GetWorkflows,
   GetWorkflowsSucceed,
@@ -24,8 +20,8 @@ import { ActivatedRoute } from '@angular/router';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { UserState } from '../../../store/user.state';
-import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
-import { AbstractPermission } from "@shared/helpers/permissions";
+import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
+import { AbstractPermission } from '@shared/helpers/permissions';
 
 export enum WorkflowNavigationTabs {
   JobOrderWorkflow,
@@ -112,7 +108,7 @@ export class JobOrderComponent extends AbstractPermission implements OnInit, OnD
 
     // triggers refresh grid and other data if tab changed
     if (this.isWorkflowMappingTabActive) {
-      this.store.dispatch(new GetAllOrganizationSkills());
+      this.store.dispatch(new GetAssignedSkillsByOrganization());
       this.store.dispatch(new GetWorkflowMappingPages());
       this.store.dispatch(new GetRolesForWorkflowMapping());
       this.store.dispatch(new GetUsersForWorkflowMapping());
