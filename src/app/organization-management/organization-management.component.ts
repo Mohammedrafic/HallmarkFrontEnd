@@ -8,9 +8,8 @@ import { MenuSettings } from '@shared/models';
 import { Permission } from '@core/interface';
 import { filter, Observable, switchMap, takeUntil } from 'rxjs';
 import { UserState } from '../store/user.state';
-import { GetOrganizationById, GetRegions } from '@organization-management/store/organization-management.actions';
+import { GetOrganizationById } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { DepartmentsExportCols } from '@organization-management/departments/constants';
 import { AppState } from '../store/app.state';
 
 @Component({
