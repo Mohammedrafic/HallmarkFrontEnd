@@ -19,7 +19,7 @@ import { AssociateListState } from '@shared/components/associate-list/store/asso
 import { FeeSettingsComponent } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/fee-settings.component';
 import { PartnershipSettingsComponent } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/partnership-settings/partnership-settings.component';
 import { TiersException } from '@shared/components/associate-list/store/associate.actions';
-import { Tabs } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
+import { Tabs, TabsText } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
 import { UserState } from '../../../../../store/user.state';
 import { AgencyStatus } from '@shared/enums/status';
 import { AbstractPermission } from "@shared/helpers/permissions";
@@ -57,7 +57,9 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
   public isAgencyInactive: boolean = true;
   public canEditPermission: boolean = true;
   public canViewTierTab: boolean = true;
-
+  public feeSettingsText: string = TabsText[TabsText["Fee Settings"]];
+  public tierExceptionText: string =TabsText[TabsText["Tier Settings"]];
+  public partnershipText: string = TabsText[TabsText["Partnership Settings"]];
   private isAlive = true;
   public isAgency: boolean;
 
@@ -113,8 +115,9 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
     }
   }
 
-  public onSave(): void {
-    switch (this.editOrgTab.selectedItem) {
+  public onSave(): void { 
+    let switchTabVal=this.activeTab;
+    switch (switchTabVal) {
       case Tabs.JobDistribution:
         this.partnershipForm.markAllAsTouched();
         if (this.partnershipForm.valid) {
@@ -150,12 +153,14 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
   }
 
   public onTabSelecting(tab: SelectingEventArgs): void {
-    this.firstActive = false;
-    this.activeTab = tab.selectingIndex;
-
-    switch (this.editOrgTab.selectedItem) {
+    this.firstActive = false;    
+     
+    let switchTabVal=this.switchTab(tab?.selectingItem?.innerText);
+    this.activeTab = switchTabVal; 
+    switch (switchTabVal) {
       case Tabs.JobDistribution:
         this.confirmSwitchBetweenTab(this.partnershipForm, tab);
+         
         break;
       case Tabs.FeeSettings:
         this.confirmSwitchBetweenTab(this.feeSettingsForm, tab);
@@ -172,6 +177,21 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
 
   public handleTierControl(tierControl: FormControl): void {
     this.tierControl = tierControl;
+  }
+
+  private switchTab(tabSelected:string):number{
+    //As the Tier Settings tab getting hidden tab so the switch logic is calling wrong tab so adding +1 to the tab number based on condition
+    switch (tabSelected) {
+      case TabsText[TabsText["Fee Settings"]]:
+        return 0;
+      case TabsText[TabsText["Tier Settings"]]:
+        return 1;
+      case TabsText[TabsText["Partnership Settings"]]:
+        return 2;
+        default:
+        return 0;
+    }
+    
   }
 
   private onOpenEvent(): void {
@@ -245,7 +265,7 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
         .subscribe(() => {
           tabForm.markAsPristine();
           this.editOrgTab.select(tab.selectingIndex);
-          this.activeTab = Tabs[tab.selectingIndex];
+          this.activeTab = this.switchTab(tab?.selectingItem?.innerText);
         });
     }
   }
@@ -268,7 +288,8 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
   }
 
   private checkUserPermission(): void {
-    switch (this.activeTab) {
+    let switchTabVal=this.activeTab;
+    switch (switchTabVal) {
       case Tabs.FeeSettings:
         this.canEditPermission = this.userPermission[this.userPermissions.CanEditFeeExceptions];
         break;
