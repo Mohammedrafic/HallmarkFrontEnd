@@ -11,7 +11,6 @@ export class AddEditOrganizationService {
   }
 
   createPreferencesForm(organization?: Organization): FormGroup {
-    console.log(organization, organization?.preferences.weekStartsOn)
     return this.fb.group({
       id: new FormControl(organization?.preferences.id || 0),
       weekStartsOn: new FormControl(isNaN(organization?.preferences.weekStartsOn as number) 
