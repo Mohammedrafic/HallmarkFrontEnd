@@ -43,6 +43,8 @@ import {
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import {
+  ExportColumnsToHideInIrp,
+  ExportColumnsToHideInVms,
   FieldsToHideInIrp, FieldsToHideInVms, LocationExportColumns, LocationInitFilters,
   LocationsDialogConfig, LocationsDialogWithIrpConfig, LocationsExportIrpColumns,
   MESSAGE_REGIONS_NOT_SELECTED
@@ -123,6 +125,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   public readonly FieldTypes = FieldType;
   /**
    * Feature flag.
+   * TODO: combine flags with object (primitive type obsession)
    */
   public isFeatureIrpEnabled = false;
   public isOrgVMSEnabled = true;
@@ -541,7 +544,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
           this.isOrgVMSEnabled = !!organization.preferences.isVMCEnabled;
           this.isOrgIrpEnabled = !!organization.preferences.isIRPEnabled;
           this.columnsToExport = this.isOrgIrpEnabled ? LocationsExportIrpColumns : LocationExportColumns;
-
+          this.filterExportColumns();
           this.checkFieldsVisibility();
         }
       }),
@@ -582,19 +585,24 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
 
     if (this.isFeatureIrpEnabled) {
-      this.locationDialogConfig = LocationsDialogWithIrpConfig;
+      /**
+       * TODO: investigate why constant changes are not delted after org list navigation.
+       */
+      this.locationDialogConfig = JSON.parse(JSON.stringify(LocationsDialogWithIrpConfig));
     }
   }
 
   private checkFieldsVisibility(): void {
-    this.locationDialogConfig.baseForm = this.locationDialogConfig.baseForm.filter((column) => {
-      if (!this.isOrgVMSEnabled) {
+    this.locationDialogConfig.baseForm = LocationsDialogWithIrpConfig.baseForm
+    .filter((column) => {
+      if (!this.isOrgVMSEnabled && !FieldsToHideInVms.includes(column.field)) {
         return !FieldsToHideInIrp.includes(column.field)
       }
-
-      if (!this.isOrgIrpEnabled) {
+      
+      if (!this.isOrgIrpEnabled || (this.isOrgIrpEnabled && !this.isOrgVMSEnabled)) {
         return !FieldsToHideInVms.includes(column.field);
       }
+
       return column;
     });
   }
@@ -607,6 +615,21 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     )
     .subscribe(() => {
       this.locationDetailsFormGroup.get('includeInIRP')?.disable();
+    });
+  }
+
+  private filterExportColumns(): void {
+    this.columnsToExport = this.columnsToExport
+    .filter((column) => {
+      if (!this.isOrgVMSEnabled && !ExportColumnsToHideInVms.includes(column.column)) {
+        return !ExportColumnsToHideInIrp.includes(column.column)
+      }
+
+      if (!this.isOrgIrpEnabled || (this.isOrgIrpEnabled && !this.isOrgVMSEnabled)) {
+        return !ExportColumnsToHideInVms.includes(column.column);
+      }
+
+      return column;
     });
   }
 }

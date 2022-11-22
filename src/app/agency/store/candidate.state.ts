@@ -1,13 +1,9 @@
-import { HttpErrorResponse } from "@angular/common/http";
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Action, State, StateContext, Selector } from '@ngxs/store';
+import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { catchError, Observable, of, tap } from 'rxjs';
 
-import {
-  CandidateCredential,
-  CandidateCredentialResponse,
-  CredentialGroupedFiles,
-} from '@shared/models/candidate-credential.model';
+import { CandidateCredential, CandidateCredentialResponse, CredentialGroupedFiles } from '@shared/models/candidate-credential.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
 import { CandidateImportResult } from '@shared/models/candidate-profile-import.model';
@@ -65,7 +61,7 @@ import {
   UploadCandidateProfileFile,
   UploadCandidateProfileFileSucceeded,
   UploadCredentialFiles,
-  UploadCredentialFilesSucceeded,
+  UploadCredentialFilesSucceeded
 } from './candidate.actions';
 import { getAllErrors } from '@shared/utils/error.utils';
 
@@ -194,8 +190,7 @@ export class CandidateState {
   GetAllSkills({ patchState }: StateContext<CandidateStateModel>, {}: GetAllSkills): Observable<ListOfSkills[]> {
     return this.skillsService.getAllMasterSkillsArray().pipe(
       tap((payload) => {
-        patchState({ skills: payload });
-        return payload;
+        patchState({ skills: payload.map(({id, masterSkillId, skillDescription}) => ({id, masterSkillId, name: skillDescription})) });
       })
     );
   }

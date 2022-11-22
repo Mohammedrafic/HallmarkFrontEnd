@@ -50,10 +50,10 @@
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editSkill(data, $event)" [disabled]="!userPermission[userPermissions.CanEditAssignedSkills]">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editSkill(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteSkill(data, $event)">
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteSkill(data, $event)" [disabled]="!userPermission[userPermissions.CanEditAssignedSkills]">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
