@@ -1,5 +1,5 @@
 import { ColDef } from '@ag-grid-community/core';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
 
 import { Actions, Store } from '@ngxs/store';
 
@@ -33,8 +33,11 @@ const importConfig = {
   templateUrl: './import-departments.component.html',
   styleUrls: ['./import-departments.component.scss'],
 })
-export class ImportDepartmentsComponent extends AbstractImport {
-  public readonly columnDefs: ColDef[];
+export class ImportDepartmentsComponent extends AbstractImport implements OnChanges {
+  @Input() isOrgUseIRPAndVMS = false;
+  @Input() isInvoiceDepartmentIdFieldShow = false;
+
+  public columnDefs: ColDef[];
   public titleImport: string = 'Import Departments';
 
   constructor(
@@ -43,7 +46,12 @@ export class ImportDepartmentsComponent extends AbstractImport {
     protected override cdr: ChangeDetectorRef
   ) {
     super(actions$, store, importConfig, cdr);
+  }
 
-    this.columnDefs = DepartmentsColumns(store.selectSnapshot(AppState.isIrpFlagEnabled));
+  ngOnChanges(): void {
+    this.columnDefs = DepartmentsColumns(
+      this.store.selectSnapshot(AppState.isIrpFlagEnabled) && this.isOrgUseIRPAndVMS,
+      this.isInvoiceDepartmentIdFieldShow
+    );
   }
 }

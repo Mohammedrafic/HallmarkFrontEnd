@@ -12,6 +12,7 @@ export class Department {
   inactiveDate: string;
   unitDescription: string;
   includeInIRP?: boolean;
+  locationIncludeInIRP?: boolean;
 }
 
 export type DepartmentsPage = PageOfCollections<Department>;
