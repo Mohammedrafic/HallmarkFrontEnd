@@ -137,7 +137,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
       return true;
     }
 
-    const billRate = billRatesTypes[idx];
+    const billRate = filteredBillRatesBySelected[idx];
 
     if (billRate && billRate.efectiveDate > timeIn) {
       return false;
