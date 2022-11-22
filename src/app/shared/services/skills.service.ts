@@ -5,7 +5,6 @@ import { map, Observable } from 'rxjs';
 import {
   AssignedSkillsByOrganization,
   AssignedSkillTree,
-  ListOfSkills,
   MasterSkillByOrganization,
   MasterSkillDataSources,
   MasterSkillFilters,
@@ -35,8 +34,8 @@ export class SkillsService {
    * Get all master skills array
    * @return list of master skills
    */
-  public getAllMasterSkillsArray(): Observable<ListOfSkills[]> {
-    return this.http.get<ListOfSkills[]>('/api/MasterSkills/listByActiveBusinessUnit').pipe(map((data) => sortByField(data, 'name')));
+  public getAllMasterSkillsArray(): Observable<AssignedSkillsByOrganization[]> {
+    return this.http.get<AssignedSkillsByOrganization[]>('/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit');
   }
 
   /**
