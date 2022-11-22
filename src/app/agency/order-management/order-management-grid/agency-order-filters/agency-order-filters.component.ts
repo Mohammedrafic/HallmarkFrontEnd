@@ -24,6 +24,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { datepickerMask } from '@shared/constants/datepicker-mask';
 import { FilterOrderStatus, FilterStatus } from '@shared/models/order-management.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 
 enum RLDLevel {
   Orginization,
@@ -85,7 +86,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return this.form.get('departmentsIds') as AbstractControl;
   }
 
-  constructor(private store: Store, private actions$: Actions) {
+  constructor(private store: Store, private actions$: Actions, private orderManagementAgencyService: OrderManagementAgencyService) {
     super();
   }
 
@@ -242,11 +243,15 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   }
 
   private setDefaultFilter(): void {
-    const statuses = this.filterColumns.orderStatuses.dataSource
-                      .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed].includes(status.status))
-                      .map((status: FilterStatus) => status.status);
-    this.form.get('orderStatuses')?.setValue(statuses);
-    this.setDefault.emit(statuses);
+    const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
+    if (!selectedOrderAfterRedirect) {
+      const statuses = this.filterColumns.orderStatuses.dataSource
+        .filter((status: FilterOrderStatus) => ![FilterOrderStatusText.Closed].includes(status.status))
+        .map((status: FilterStatus) => status.status);
+      this.form.get('orderStatuses')?.setValue(statuses);
+      this.setDefault.emit(statuses);
+    }
+    this.setDefault.emit([]);
   }
 
   static generateFiltersForm(): FormGroup {
