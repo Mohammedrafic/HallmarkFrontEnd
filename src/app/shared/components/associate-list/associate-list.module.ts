@@ -24,6 +24,7 @@ import { TierSettingsGridComponent } from './associate-grid/edit-associate-dialo
 import { TiersDialogModule } from '@shared/components/tiers-dialog/tiers-dialog.module';
 import { SettingsViewService, TiersApiService } from '@shared/services';
 import { TIER_DIALOG_TYPE } from '@shared/components/tiers-dialog/constants';
+import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 import { Tiers } from '@shared/enums/tiers.enum';
 import { ActionRendererComponent } from './associate-grid/edit-associate-dialog/tier-settings/tier-settings-grid/action-renderer/action-renderer.component';
 
@@ -55,7 +56,7 @@ import { ActionRendererComponent } from './associate-grid/edit-associate-dialog/
     CheckBoxModule,
     ReactiveFormsModule,
     TiersDialogModule,
-
+    TooltipContainerModule,
     NgxsModule.forFeature([AssociateListState]),
   ],
   providers: [

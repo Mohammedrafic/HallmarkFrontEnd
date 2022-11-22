@@ -43,7 +43,7 @@
         <app-skills-grid [filteredItems$]="filteredItems$" [userPermission]="userPermission" [export$]="exportSkills$" [isActive]="isSkillsActive"></app-skills-grid>
       </ng-template>
     </e-tabitem>
-    <e-tabitem>
+    <e-tabitem *ngIf="userPermission[userPermissions.CanViewSkillCategories]">
       <ng-template #headerText>
         <div>Categories</div>
       </ng-template>
