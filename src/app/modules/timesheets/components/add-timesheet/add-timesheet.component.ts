@@ -5,8 +5,8 @@ import { filter, takeUntil, Observable, merge } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 
 import { DialogAction } from '@core/enums';
-import { AddDialogHelper } from '@core/helpers';
-import { CustomFormGroup } from '@core/interface';
+import { AddDialogHelper, DateTimeHelper } from '@core/helpers';
+import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { MessageTypes } from '@shared/enums/message-types';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { AddRecordBillRate, AddTimsheetForm, TimesheetDetailsAddDialogState } from '../../interface';
@@ -16,6 +16,7 @@ import { RecordFields } from '../../enums';
 import { RecordsAdapter } from '../../helpers';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { ShowToast } from 'src/app/store/app.actions';
+import { createUniqHashObj } from '@core/helpers/functions.helper';
 
 @Component({
   selector: 'app-add-timesheet',
@@ -97,9 +98,17 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
       if (item.optionsStateKey === 'billRateTypes') {
         const ratesNotForSelect = ['Daily OT', 'Daily Premium OT', 'OT', 'Mileage'];
 
-        item.options = item.options?.filter((option) => {
+        const filteredOptions = item.options?.filter((option) => {
           return !ratesNotForSelect.includes(option.text);
-        });
+        }) as DropdownOption[];
+
+        const uniqBillRatesHashObj = createUniqHashObj(
+          filteredOptions,
+          (el: DropdownOption) => el.value,
+          (el: DropdownOption) => el,
+        );
+
+        item.options = Object.values(uniqBillRatesHashObj);
 
         this.onCallId = item.options?.find((rate) => rate.text.toLowerCase() === 'oncall')?.value as number;
       }
@@ -119,11 +128,19 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
   }
 
   private checkBillRateDate(timeIn: string, billRateId: number): boolean {
-    const billRate = (this.store.snapshot().timesheets['billRateTypes'] as AddRecordBillRate[])
-    .find((rate) => rate.value === billRateId);
+    const billRatesTypes = this.store.snapshot().timesheets['billRateTypes'] as AddRecordBillRate[];
+    const filteredBillRatesBySelected = billRatesTypes.filter((el) => el.value === billRateId);
+    const billRatesDates = filteredBillRatesBySelected.map((el) => el.efectiveDate);
+    const idx = DateTimeHelper.findPreviousNearestDateIndex(billRatesDates, timeIn);
+
+    if (idx === null) {
+      return true;
+    }
+
+    const billRate = billRatesTypes[idx];
 
     if (billRate && billRate.efectiveDate > timeIn) {
-      return false
+      return false;
     }
 
     return true;
