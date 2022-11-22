@@ -36,7 +36,3 @@ export class GetJobDetailSummaryReportFilterOptions {
   constructor(public filter: JobDetailSummaryFilter) { }
 }
 
-export class GetAgencies {
-  static readonly type = '[LogiReport] Get Agencies';
-  constructor() { }
-}

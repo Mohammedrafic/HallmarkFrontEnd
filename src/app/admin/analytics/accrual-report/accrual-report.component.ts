@@ -14,7 +14,10 @@ import { BUSINESS_DATA_FIELDS } from '@admin/alerts/alerts.constants';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { GetOrganizationsStructureAll } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState ,GetAgencies} from '@organization-management/store/logi-report.action';
+import { 
+  GetDepartmentsByLocations, GetCommonReportFilterOptions, GetLocationsByRegions, GetLogiReportData, 
+  GetRegionsByOrganizations, GetCommonReportCandidateSearch, ClearLogiReportState 
+  } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -41,7 +44,7 @@ import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
 export class AccrualReportComponent implements OnInit,OnDestroy {
 
   public paramsData: any = {
-  //Accrual summary params
+  
     "OrganizationsAS": "",
     "RegionAS": "",
     "LocationAS": "",
@@ -56,7 +59,6 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     "InvoiceStartDate": "",
     "InvoiceEndDate": "",
 
-  //Accrual details params
     "OrganizationsAD": "",
     "RegionAD": "",
     "LocationAD": "",
@@ -71,7 +73,6 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     "InvoiceStartDateAD": "",
     "InvoiceEndDateAD": "",
 
-  //Accrual finance params
     "OrganizationsAF": "",
     "RegionAF": "",
     "LocationAF": "",
@@ -128,8 +129,6 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
   public organizationData$: Observable<Organisation[]>;
   selectedOrganizations: Organisation[];
 
-  @Select(LogiReportState.getAgencies)
-  public getAgencies$: Observable<AssociateAgencyDto[]>;
   public agencyFields = {
     text: 'agencyName',
     value: 'agencyId',
@@ -137,12 +136,10 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
   selectedAgencies: AssociateAgencyDto[];
   public defaultAgencyIds: (number | undefined)[] = [];
 
-  // accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  // jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'id' };
   selectedDepartments: Department[];
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
@@ -213,16 +210,31 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
       this.financialTimeSheetFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
+
         if (data != null) {
           this.filterOptionsData = data;
           this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
           this.filterColumns.skillIds.dataSource = [];
           this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
+
+          this.filterColumns.agencyIds.dataSource = [];
+          this.filterColumns.agencyIds.dataSource = data?.agencies;
+
+          this.agencyIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds) as AbstractControl;
+                let agencyIds = data?.agencies;
+                this.selectedAgencies = agencyIds;
+                this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
+                this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
+
+                if (this.isInitialLoad) {
+                  this.SearchReport();
+                  this.isInitialLoad = false;
+                }
+
           this.accrualReportForm.get(accrualConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
         }
       });
       this.SetReportData();
-      this.getAgencyData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
           this.logiReportComponent.SetReportData(data);
@@ -258,27 +270,6 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-  }
-
-  private getAgencyData() {
-    this.store.dispatch(new GetAgencies())
-    .pipe
-    (debounceTime(300),takeUntil(this.unsubscribe$))
-      .subscribe((agencyData: any) => {
-        if (agencyData?.LogiReport?.getAgencies?.length > 0) {
-          this.agencyData = agencyData?.LogiReport?.getAgencies;
-          this.agencyIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds) as AbstractControl;
-                let agencyIds = this.agencyData;
-                this.selectedAgencies = agencyIds;
-                this.defaultAgencyIds = agencyIds.map((list) => list.agencyId);
-                this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
-
-                if (this.isInitialLoad) {
-                  this.SearchReport();
-                  this.isInitialLoad = false;
-                }
-        }
-      });
   }
 
   public onFilterControlValueChangedHandler(): void {
@@ -658,7 +649,6 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
           this.candidateFilterData = result.LogiReport.searchCandidates;
           this.candidateSearchData=result.LogiReport.searchCandidates;
           this.filterColumns.dataSource=this.candidateFilterData;
-           // pass the filter data source to updateData method.
           e.updateData(this.candidateFilterData);
         });
      

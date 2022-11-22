@@ -69,12 +69,4 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
   return this.http.post<SearchCandidate[]>(`/api/LogiReport/financialtimesheet/candidatesearch`,filter);
 }
 
-
-  /**
-   * Get the list of Associate Agencies
-   * @return Array of Associate Agencies
-   */
-   public getAgencies(): Observable<AssociateAgencyDto[]> {
-    return this.http.get<AssociateAgencyDto[]>(`/api/LogiReport/getAgencies`);
-  }
 }
