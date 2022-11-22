@@ -646,8 +646,11 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
   private onFilterChild(e: FilteringEventArgs)
   {
     if (e.text != '') {
+      let ids=[];
+      ids.push(this.bussinessControl.value);
       let filter: CommonCandidateSearchFilter = {
-        searchText: e.text
+        searchText: e.text,
+        businssUnitIds:ids
       };
       this.filterColumns.dataSource = [];
       this.store.dispatch(new GetCommonReportCandidateSearch(filter))
@@ -655,6 +658,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
           this.candidateFilterData = result.LogiReport.searchCandidates;
           this.candidateSearchData=result.LogiReport.searchCandidates;
           this.filterColumns.dataSource=this.candidateFilterData;
+           // pass the filter data source to updateData method.
           e.updateData(this.candidateFilterData);
         });
      
