@@ -28,7 +28,7 @@
       <section class="edit-org" [ngClass]="{ 'first-active': firstActive }">
         <ejs-tab #editOrgTab (selecting)="onTabSelecting($event)">
           <e-tabitems>
-            <e-tabitem>
+            <e-tabitem *ngIf="userPermission[userPermissions.CanViewFeeExceptions]">
               <ng-template #headerText> Fee Settings </ng-template>
               <ng-template #content>
                 <app-fee-settings [editAgencyOrg]="editAgencyOrg" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission" [form]="$any(feeSettingsForm)"></app-fee-settings>
@@ -42,7 +42,7 @@
                 </ng-template>
               </e-tabitem>
 
-            <e-tabitem>
+            <e-tabitem *ngIf="userPermission[userPermissions.CanViewPartnershipSettings]">
               <ng-template #headerText> Partnership Settings </ng-template>
               <ng-template #content>
                 <app-partnership-settings [partnershipForm]="$any(partnershipForm)" [activeTab]="activeTab"></app-partnership-settings>

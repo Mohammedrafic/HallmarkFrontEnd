@@ -88,7 +88,7 @@ export class ExtensionSidebarService {
   }
 
   private prepareExtension(extension: any): ExtensionModel {
-    const { orderId, startDate, endDate, billRate, billRates, comments, jobId } = extension || {};
+    const { orderId, startDate, endDate, billRate, billRates, comments, jobId, durationPrimary } = extension || {};
     return {
       jobId,
       orderId,
@@ -97,6 +97,7 @@ export class ExtensionSidebarService {
       comments,
       actualStartDate: startDate,
       actualEndDate: endDate,
+      duration: durationPrimary,
     };
   }
 }
