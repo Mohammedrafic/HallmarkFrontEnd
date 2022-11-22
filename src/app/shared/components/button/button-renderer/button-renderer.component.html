@@ -17,7 +17,9 @@
 <button *ngIf="label === 'Delete'"
   style='color:#dc3545; background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;'
   [attr.title]="label"
-        [disabled]="params.data.agencyStatus === agencyStatus.Inactive || params.data.agencyStatus === agencyStatus.Terminated || params.data?.isDefault || !userPermission[userPermissions[params.data.canDelete]]"
+        [disabled]="params.data.agencyStatus === agencyStatus.Inactive
+        || params.data.agencyStatus === agencyStatus.Terminated || params.data?.isDefault
+        || !userPermission[userPermissions[params.data.canDelete]]"
   (click)="onClick($event)">
   <fa-icon [icon]='faTrash' class="pr-3">
     Edit
@@ -40,7 +42,7 @@
   </button>
   <!--    TODO delete third ! in lastLoginDate-->
   <button
-    *ngIf="!params.data.isDeleted && !params.data.lastLoginDate"
+    *ngIf="!params.data.isDeleted && !params.data.lastLoginDate && userPermission[userPermissions.CanEditUsers]"
     class="icon-btn"
     (click)="onClick($event, 'mail')">
     <i-feather name="mail" class="icon"></i-feather>

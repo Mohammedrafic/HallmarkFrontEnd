@@ -8,3 +8,9 @@ export interface TierDTO {
   associateOrganizationId?: number;
   forceUpsert?: boolean;
 }
+
+export interface TierConfig {
+  regions: number[];
+  locations: number[];
+  departments: number[];
+}

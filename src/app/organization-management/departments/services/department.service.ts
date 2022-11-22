@@ -56,9 +56,8 @@ export class DepartmentService {
   }
 
   populateDepartmentDetailsForm(formGroup: FormGroup, department: Department, isIRPFlagEnabled: boolean): void {
-    formGroup.setValue({
+    formGroup.patchValue({
       extDepartmentId: department.extDepartmentId,
-      invoiceDepartmentId: department.invoiceDepartmentId,
       departmentName: department.departmentName,
       facilityContact: department.facilityContact,
       facilityEmail: department.facilityEmail,
@@ -69,6 +68,8 @@ export class DepartmentService {
         unitDescription: department.unitDescription,
       })
     });
+
+    formGroup.get('invoiceDepartmentId')?.setValue(department.invoiceDepartmentId);
   }
 
   populateFilterForm(formGroup: FormGroup, filters: DepartmentFilter, isIRPFlagEnabled: boolean): void {

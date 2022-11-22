@@ -40,7 +40,7 @@ export const LocationsExportIrpColumns: ExportColumn[] = [
   { text: 'State', column: 'State' },
   { text: 'Zip', column: 'Zip' },
   { text: 'Contact Person', column: 'ContactPerson' },
-  { text: 'Include in IRP', column: 'includeInIRP'},
+  { text: 'Include in IRP', column: 'IncludeInIRPText'},
 ];
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
