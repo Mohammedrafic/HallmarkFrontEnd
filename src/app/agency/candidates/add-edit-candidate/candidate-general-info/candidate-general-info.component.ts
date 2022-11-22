@@ -57,7 +57,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
   };
   public skillsFields = {
     text: 'name',
-    value: 'id',
+    value: 'masterSkillId',
   };
   public statuses: any;
   public classifications = Object.values(Classification)

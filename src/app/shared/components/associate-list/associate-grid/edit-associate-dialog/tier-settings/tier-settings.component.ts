@@ -21,8 +21,8 @@ export class TierSettingsComponent extends DestroyableDirective implements OnIni
   @Output() public changeTierControl: EventEmitter<FormControl> = new EventEmitter<FormControl>();
 
   @Input() public set editAgencyOrg(org: AssociateOrganizationsAgency) {
-    if(org.tierId) {
-      this.tierControl.patchValue(org.tierId);
+    if(org?.tierId) {
+      this.tierControl.patchValue(org?.tierId);
     }else {
       this.tierControl.reset();
     }

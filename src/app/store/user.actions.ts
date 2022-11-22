@@ -81,3 +81,8 @@ export class SetUserPermissions {
   static readonly type = '[user] Set User Permissions';
   constructor() {}
 }
+
+export class GetOrgTierStructure {
+  static readonly type = '[user] Get Org structure for Tier';
+  constructor() {}
+}

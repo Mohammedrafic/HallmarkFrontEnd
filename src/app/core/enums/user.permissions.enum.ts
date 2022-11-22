@@ -155,4 +155,5 @@ export enum UserPermissions {
   CanAgencyViewInvoices = 3601,
   CanAgencyCreateManualInvoices = 3602,
   CanAgencySetInvoiceStatusToPaid = 3603,
+  ManageAssignSkills = 4040
 }

@@ -11,7 +11,7 @@ import { FillrateReportFilterFormValueModel } from './models/fillrate-report-fil
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { PageOfCollections } from '@shared/models/page.model';
 import { PageQueryParams } from '@shared/services/page-query-filter-params.service';
-import { Skill } from '@shared/models/skill.model';
+import { AssignedSkillsByOrganization } from '@shared/models/skill.model';
 import { SkillsService } from '@shared/services/skills.service';
 import { defaultEmptyPageOfCollections } from '@shared/constants/default-empty-page-of-collections';
 
@@ -43,8 +43,8 @@ export class FillratesReportService {
     private readonly skillsService: SkillsService
   ) {}
 
-  public getAssignedSkills(): Observable<Skill[]> {
-    return this.skillsService.getAllOrganizationSkills();
+  public getAssignedSkills(): Observable<AssignedSkillsByOrganization[]> {
+    return this.skillsService.getAssignedSkillsByOrganization();
   }
 
   public getApplicantsStatuses(): Observable<ApplicantStatus[]> {

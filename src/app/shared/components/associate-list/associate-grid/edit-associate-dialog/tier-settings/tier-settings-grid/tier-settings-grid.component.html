@@ -33,5 +33,5 @@
   [isEditDialog]="isEdit"
   (saveTier)="handleSaveTier($event)"
   [permission]="isAgency"
-  [organizationId]="selectedOrganizationAgency.organizationId!"
+  [organizationId]="selectedOrganizationAgency?.organizationId!"
 ></app-tiers-dialog>

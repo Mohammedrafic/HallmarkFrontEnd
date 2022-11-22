@@ -26,16 +26,16 @@ import {
   SetLock
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Permission } from "@core/interface";
+import { Permission } from '@core/interface';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { GetAllOrganizationSkills, GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
+import { GetAssignedSkillsByOrganization, GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
-import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { FilteredItem } from '@shared/models/filter.model';
 import {
   FilterOrderStatus,
@@ -163,7 +163,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
 
-  @Select(OrganizationManagementState.allOrganizationSkills)
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
   skills$: Observable<Skill[]>;
 
   @Select(OrganizationManagementState.organizationSettings)
@@ -1080,7 +1080,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         if (!this.previousSelectedOrderId) {
           this.pageSubject.next(1);
         }
-        this.store.dispatch(new GetAllOrganizationSkills());
+        this.store.dispatch(new GetAssignedSkillsByOrganization());
       });
   }
 

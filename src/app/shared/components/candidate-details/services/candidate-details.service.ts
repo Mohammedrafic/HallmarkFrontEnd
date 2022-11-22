@@ -4,7 +4,7 @@ import { map, Observable } from 'rxjs';
 import {
   CandidateDetailsPage,
   CandidatesDetailsRegions,
-  FiltersPageModal,
+  FiltersPageModal
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';

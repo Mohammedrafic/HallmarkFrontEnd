@@ -29,7 +29,7 @@ export class OrganizationService {
    * Get organization structure with its regions-locations-departments
    */
   public getOrganizationStructure(): Observable<OrganizationStructure> {
-    return this.http.get<OrganizationStructure>(`/api/Organizations/structure`).pipe(map((data) => ({ 
+    return this.http.get<OrganizationStructure>(`/api/Organizations/structure`).pipe(map((data) => ({
       ...data,
       regions: sortByField(data.regions, 'name')
       })));
@@ -110,5 +110,9 @@ export class OrganizationService {
    public getOrganizationDataSources(): Observable<OrganizationDataSource> {
     return this.http.get<OrganizationDataSource>(`/api/Organizations/filteringOptions`).pipe(
       map((data) => Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortBy(value)]))));
+  }
+
+  public getOrgTierStructure(): Observable<OrganizationStructure> {
+    return this.http.get<OrganizationStructure>('/api/Organizations/structure/configuration?SettingKey=27')
   }
 }

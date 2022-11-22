@@ -88,7 +88,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   filterColumns: FilterColumnsModel;
   importDialogEvent: Subject<boolean> = new Subject<boolean>();
   isIRPFlagEnabled = false;
-  isOrgIRPEnabled = false;
+  isLocationIRPEnabled = false;
+  isOrgUseIRPAndVMS = false;
   isInvoiceDepartmentIdFieldShow = true;
 
   protected componentDestroy: () => Observable<unknown>;
@@ -115,6 +116,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     super();
 
     this.idFieldName = 'departmentId';
+    this.checkIRPFlag();
   }
 
   get dialogHeader(): string {
@@ -122,10 +124,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   ngOnInit(): void {
-    this.checkIRPFlag();
     this.createDepartmentsForm();
 
-    this.columnsToExport = DepartmentsExportCols(this.isIRPFlagEnabled);
     this.filterColumns = this.departmentService.initFilterColumns(this.isIRPFlagEnabled);
 
     this.startDepartmentOptionsWatching();
@@ -219,6 +219,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     if (this.selectedLocation?.id) {
       this.getDepartments();
       this.clearSelection(this.grid);
+      this.isLocationIRPEnabled = this.selectedLocation.includeInIRP;
     } else {
       this.grid.dataSource = [];
     }
@@ -245,6 +246,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.departmentService.populateDepartmentDetailsForm(this.departmentsDetailsFormGroup, department, this.isIRPFlagEnabled);
 
     this.editedDepartmentId = department.departmentId;
+    this.isLocationIRPEnabled = !!department.locationIncludeInIRP;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -268,6 +270,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   onAddDepartmentClick(): void {
     if (this.selectedLocation && this.selectedRegion) {
+      this.isLocationIRPEnabled = this.selectedLocation.includeInIRP;
       this.store.dispatch(new ShowSideDialog(true));
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED));
@@ -341,14 +344,26 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   private checkOrgPreferences(): void {
     const { isIRPEnabled, isVMCEnabled } = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
 
-    this.isOrgIRPEnabled = !!isIRPEnabled;
+    this.isOrgUseIRPAndVMS = !!(isVMCEnabled && isIRPEnabled);
     this.isInvoiceDepartmentIdFieldShow = !this.isIRPFlagEnabled
       || !!isVMCEnabled
       || !(!isVMCEnabled && isIRPEnabled);
 
     if (!this.isInvoiceDepartmentIdFieldShow) {
       this.departmentsDetailsFormGroup.removeControl('invoiceDepartmentId');
+      this.grid.columns.splice(3, 1);
     }
+
+    if (!this.isOrgUseIRPAndVMS) {
+      this.departmentsDetailsFormGroup.removeControl('includeInIRP');
+    }
+
+    if (this.isIRPFlagEnabled && !this.isOrgUseIRPAndVMS) {
+      this.grid.columns.pop();
+    }
+
+    this.columnsToExport = DepartmentsExportCols(this.isIRPFlagEnabled && this.isOrgUseIRPAndVMS, this.isInvoiceDepartmentIdFieldShow);
+    this.grid.refresh();
   }
 
   private createDepartmentsForm(): void {

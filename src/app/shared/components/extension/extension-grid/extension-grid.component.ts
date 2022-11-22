@@ -58,7 +58,7 @@ export class ExtensionGridComponent {
   public constructor(private datePipe: DatePipe) {}
 
   private getFormattedDateWithFormat(date: string, format: string): string {
-    return this.datePipe.transform(date, format) ?? '';
+    return this.datePipe.transform(date, format, 'UTC') ?? '';
   }
 
   private getFormattedDate(date: string): string {

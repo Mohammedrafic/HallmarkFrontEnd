@@ -10,25 +10,26 @@
         [checked]="true"
       ></ejs-switch>
       <label for="switcher" class="switch-text">Include Deployed Candidates</label>
-      <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline" (click)="onImport()" [disabled]="!agencyActionsAllowed">
-        Import <span><i-feather name="upload" class="icon"></i-feather></span>
-      </button>
-      <app-tooltip-container
-        [message]="toolTipMessage"
-        [showToolTip]="!userPermission[userPermissions.CanEditCandidateProfile]">
+      <app-tooltip-container [showToolTip]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]">
         <button
-          ejs-dropdownbutton
-          [disabled]="!userPermission[userPermissions.CanEditCandidateProfile]"
+          ejs-button
           appHideBeforeSyncfusionLoad
-          cssClass="e-outline button-export"
-          [items]="exportOptions"
-          (select)="exportSelected($event)"
-        >
-          <div class="button-export-container">
-            Export <i-feather name="download" class="icon"></i-feather>
-          </div>
+          cssClass="e-outline"
+          (click)="onImport()"
+          [disabled]="!agencyActionsAllowed || !userPermission[userPermissions.CanEditCandidateProfile]">
+          Import <span><i-feather name="upload" class="icon"></i-feather></span>
         </button>
       </app-tooltip-container>
+      <button
+        ejs-dropdownbutton
+        appHideBeforeSyncfusionLoad
+        cssClass="e-outline button-export"
+        [items]="exportOptions"
+        (select)="exportSelected($event)">
+        <div class="button-export-container">
+          Export <i-feather name="download" class="icon"></i-feather>
+        </div>
+      </button>
       <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
         <div class="filter-button-content">
           <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-pill">{{

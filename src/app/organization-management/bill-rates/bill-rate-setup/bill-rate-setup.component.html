@@ -25,6 +25,7 @@
               ejs-button
               cssClass="e-flat primary-icon-button"
               (click)="onEditRecordButtonClick(data, $event)"
+              [disabled]="isReadOnly || !userPermission[userPermissions.CanEditSettingsBillRates]"
             >
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>

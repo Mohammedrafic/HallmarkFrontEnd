@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
 import { CandidateList } from '../types/candidate-list.model';
-import { Action, State, StateContext, Selector } from '@ngxs/store';
+import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { catchError, Observable, tap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ShowToast } from 'src/app/store/app.actions';
-import { getAllErrors } from "@shared/utils/error.utils";
+import { getAllErrors } from '@shared/utils/error.utils';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateListService } from '../services/candidate-list.service';
 import {
   ChangeCandidateProfileStatus,
   ExportCandidateList,
   GetAllSkills,
-  GetCandidatesByPage, GetRegionList
+  GetCandidatesByPage,
+  GetRegionList
 } from './candidate-list.actions';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
@@ -70,7 +71,7 @@ export class CandidateListState {
 
   @Action(GetAllSkills)
   GetAllSkills({ patchState }: StateContext<CandidateListStateModel>): Observable<ListOfSkills[]> {
-    return this.candidateListService.getAllSkills().pipe(tap((data) => patchState({ listOfSkills: data })));
+    return this.candidateListService.getAllSkills().pipe(tap((data) => patchState({ listOfSkills: data.map(({id, masterSkillId, skillDescription}) => ({id, masterSkillId, name: skillDescription})) })));
   }
 
   @Action(ChangeCandidateProfileStatus)

@@ -53,7 +53,7 @@ export enum TextFieldTypeControl {
 }
   /**
    * TODO: component needs to be rework with configurable dialog and form.
-   * Component can be slightly simplified
+   * Component can be slightly simplified. A lot of code smells.
    */
 @Component({
   selector: 'app-settings',
@@ -269,10 +269,9 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       if (childRecord.departmentId) {
         this.departmentChanged(childRecord.departmentId);
       }
-
+      
       this.setFormValuesForEdit(parentRecord, childRecord);
     }
-
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -675,7 +674,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.regionFormGroup = this.formBuilder.group({ regionId: [null] });
     this.regionRequiredFormGroup = this.formBuilder.group({ regionId: [null, Validators.required] });
     this.locationFormGroup = this.formBuilder.group({ locationId: [null] });
-    this.departmentFormGroup = this.formBuilder.group({ departmentId: [null] });
+    this.departmentFormGroup = this.formBuilder.group({ departmentId: [{ value: null, disabled: true }] } );
     this.pushStartDateFormGroup = this.formBuilder.group({
       daysToConsider: [null, Validators.required],
       daysToPush: [null, Validators.required],

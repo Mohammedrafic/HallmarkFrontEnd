@@ -496,7 +496,7 @@
     ></app-image-uploader>
 
     <!---Preferences section-->
-    <div *ngIf="!profileMode" tabindex="0" class="e-card">
+    <div *ngIf="!profileMode || isIRPFlagEnabled" tabindex="0" class="e-card">
       <div class="e-card-header">
         <div class="e-card-header-caption">
           <div class="e-card-title">Preferences</div>
@@ -504,7 +504,7 @@
       </div>
       <div class="e-card-content">
         <form *ngIf="PreferencesFormGroup" [formGroup]="PreferencesFormGroup" id="preferancesDetails">
-          <div *ngIf="isIRPFlagEnabled" class="bootstrap system-wrapper">
+          <div *ngIf="isIRPFlagEnabled" class="bootstrap system-wrapper" [class.border-none]="profileMode">
             <label class="label-gray">System Configuration (at least one system should be selected)<span class="required">*</span></label>
             <div class="checkbox-group">
               <ejs-checkbox
@@ -520,37 +520,39 @@
               ></ejs-checkbox>
             </div>
           </div>
-          <div class="dropdown-container bootstrap">
-            <label>Week Starts On<span class="required">*</span></label>
-            <div class="input-group dropdown">
-              <ejs-dropdownlist
-                appValidateWithMessage
-                formControlName="weekStartsOn"
-                [fields]="optionFields"
-                [dataSource]="days$ | async"
-                [allowFiltering]="true"
-              ></ejs-dropdownlist>
+          <ng-container *ngIf="!profileMode">
+            <div class="dropdown-container bootstrap">
+              <label>Week Starts On<span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <ejs-dropdownlist
+                  appValidateWithMessage
+                  formControlName="weekStartsOn"
+                  [fields]="optionFields"
+                  [dataSource]="days$ | async"
+                  [allowFiltering]="true"
+                ></ejs-dropdownlist>
+              </div>
             </div>
-          </div>
-          <div class="inline-radio-container">
-            <ejs-radiobutton
-              formControlName="paymentOptions"
-              label="Manual Payment"
-              name="paymentOptions"
-              value="0"
-            ></ejs-radiobutton>
-            <ejs-radiobutton
-              formControlName="paymentOptions"
-              label="Electronic Payment"
-              name="paymentOptions"
-              value="1"
-            ></ejs-radiobutton>
-          </div>
-          <div class="input-container bootstrap">
-            <div class="input-group textbox">
-              <ejs-textbox appValidateWithMessage formControlName="paymentDescription" [multiline]="true"></ejs-textbox>
+            <div class="inline-radio-container">
+              <ejs-radiobutton
+                formControlName="paymentOptions"
+                label="Manual Payment"
+                name="paymentOptions"
+                value="0"
+              ></ejs-radiobutton>
+              <ejs-radiobutton
+                formControlName="paymentOptions"
+                label="Electronic Payment"
+                name="paymentOptions"
+                value="1"
+              ></ejs-radiobutton>
             </div>
-          </div>
+            <div class="input-container bootstrap">
+              <div class="input-group textbox">
+                <ejs-textbox appValidateWithMessage formControlName="paymentDescription" [multiline]="true"></ejs-textbox>
+              </div>
+            </div>
+          </ng-container>
         </form>
       </div>
     </div>

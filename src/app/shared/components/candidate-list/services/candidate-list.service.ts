@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { CandidateList, CandidateListRequest } from '../types/candidate-list.model';
-import { ListOfSkills } from '../../../models/skill.model';
+import { AssignedSkillsByOrganization } from '../../../models/skill.model';
 import { CandidateStatus } from '../../../enums/status';
 import { ExportPayload } from '../../../models/export.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
@@ -24,10 +24,10 @@ export class CandidateListService {
    * Get all skills for active business unit
    * @return list of skills
    */
-  public getAllSkills(): Observable<ListOfSkills[]> {
+  public getAllSkills(): Observable<AssignedSkillsByOrganization[]> {
     return this.http
-      .get<ListOfSkills[]>('/api/MasterSkills/listByActiveBusinessUnit')
-      .pipe(map((data) => sortByField(data, 'name')));
+      .get<AssignedSkillsByOrganization[]>('/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit')
+      .pipe(map((data) => sortByField(data, 'skillDescription')));
   }
 
   /**

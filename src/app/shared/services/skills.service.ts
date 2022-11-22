@@ -181,6 +181,6 @@ export class SkillsService {
   }
 
   public getAssignedSkillsByOrganization(): Observable<AssignedSkillsByOrganization[]> {
-    return this.http.get<AssignedSkillsByOrganization[]>(`/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit`);
+    return this.http.get<AssignedSkillsByOrganization[]>(`/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit`).pipe(map((data) => sortByField(data, 'skillDescription')));
   }
 }

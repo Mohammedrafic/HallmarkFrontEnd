@@ -1,27 +1,12 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  Inject,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {
-  OrganizationDepartment,
-  OrganizationLocation,
-  OrganizationRegion,
-  OrganizationStructure,
-} from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserState } from '../../../store/user.state';
-import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
+import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Skill } from '@shared/models/skill.model';
@@ -32,7 +17,7 @@ import {
   DATA_OVERRIDE_TITLE,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE,
+  DELETE_RECORD_TITLE
 } from '@shared/constants';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
 import {
@@ -42,7 +27,7 @@ import {
   GetBillRates,
   SaveUpdateBillRate,
   SaveUpdateBillRateSucceed,
-  ShowConfirmationPopUp,
+  ShowConfirmationPopUp
 } from '@organization-management/store/bill-rates.actions';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
 import {
@@ -55,7 +40,7 @@ import {
   BillRateSetupPost,
   BillRateType,
   BillRateTypes,
-  BillRateUnit,
+  BillRateUnit
 } from '@shared/models/bill-rate.model';
 import { OrderTypeOptions } from '@shared/enums/order-type';
 import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
@@ -70,8 +55,8 @@ import { DatePipe } from '@angular/common';
 import { valuesOnly } from '@shared/utils/enum.utils';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { DateTimeHelper } from '@core/helpers';
-import { UserPermissions } from "@core/enums";
-import { Permission } from "@core/interface";
+import { UserPermissions } from '@core/enums';
+import { Permission } from '@core/interface';
 import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
@@ -104,7 +89,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   public readonly userPermissions = UserPermissions;
 
-  @Select(OrganizationManagementState.allOrganizationSkills)
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
   skills$: Observable<Skill[]>;
   skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
   public allSkills: Skill[] = [];
@@ -424,7 +409,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   }
 
   public loadData(): void {
-    this.store.dispatch(new GetAllOrganizationSkills());
+    this.store.dispatch(new GetAssignedSkillsByOrganization());
     this.store.dispatch(new GetBillRates({ pageNumber: this.currentPage, pageSize: this.pageSize }));
     this.store.dispatch(new GetBillRateOptions());
   }
@@ -779,7 +764,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRatesFormGroup
       .get('billRateTitleId')
       ?.valueChanges.pipe(takeUntil(this.unsubscribe$))
-      .subscribe((typeId: number) => { 
+      .subscribe((typeId: number) => {
         this.isMileageTitleType = typeId !== BillRateTitleId.Mileage;
         const foundBillRateOption = this.billRatesOptions.find((option) => option.id === typeId);
 

@@ -95,9 +95,9 @@
       <e-column field="facilityEmail" headerText="DEPARTMENT EMAIL" width=200></e-column>
       <e-column field="facilityPhoneNo" headerText="DEPARTMENT PHONE NO" [valueAccessor]="formatPhoneNumber" width=200></e-column>
       <e-column field="inactiveDate" headerText="INACTIVE DATE" type="date" format="MM/dd/yyyy" width=200></e-column>
-      <e-column *ngIf="isIRPFlagEnabled" field="includeInIRP" headerText="INCLUDE IN IRP" width=150>
+      <e-column field="includeInIRP" headerText="Include in IRP" width=200>
         <ng-template #template let-data>
-          <p>{{ data.includeInIRP ? 'Yes' : 'No' }}</p>
+          <span>{{ data.includeInIRP ? 'Yes' : 'No' }}</span>
         </ng-template>
       </e-column>
     </e-columns>
@@ -216,7 +216,7 @@
         </ejs-multiselect>
       </div>
     </div>
-    <div *ngIf="isIRPFlagEnabled" class="input-container">
+    <div *ngIf="isIRPFlagEnabled && isOrgUseIRPAndVMS" class="input-container">
       <label>Included in IRP</label>
       <div class="input-group multiselect">
         <ejs-dropdownlist
@@ -254,7 +254,7 @@
   <form class="form-container bootstrap"
         id="addEditRecordForm"
         [formGroup]="departmentsDetailsFormGroup">
-    <div *ngIf="isIRPFlagEnabled && isOrgIRPEnabled">
+    <div *ngIf="isIRPFlagEnabled && isLocationIRPEnabled && isOrgUseIRPAndVMS">
       <div class="input-container toggle-wrapper">
         <ejs-switch class="toggle"
                     formControlName="includeInIRP"
@@ -386,4 +386,9 @@
   </form>
 </app-side-dialog>
 
-<app-import-departments [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-import-departments>
+<app-import-departments
+  [dialogEvent]="importDialogEvent"
+  [isOrgUseIRPAndVMS]="isOrgUseIRPAndVMS"
+  [isInvoiceDepartmentIdFieldShow]="isInvoiceDepartmentIdFieldShow"
+  (reloadItemsList)="updatePage()">
+</app-import-departments>
