@@ -8,7 +8,7 @@ import {
   SetNavigation,
   SetPageFilters,
   SetPageNumber,
-  SetPageSize,
+  SetPageSize
 } from '@shared/components/candidate-details/store/candidate.actions';
 import { Observable, tap } from 'rxjs';
 import { CandidateDetailsService } from '@shared/components/candidate-details/services/candidate-details.service';
@@ -17,9 +17,10 @@ import {
   CandidateDetailsPage,
   CandidatesDetailsRegions,
   FiltersModal,
-  NavigationTabModel,
+  NavigationTabModel
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
+import { SkillsService } from '@shared/services/skills.service';
 
 interface CandidateDetailsStateModel {
   candidateDetailsPage: CandidateDetailsPage | null;
@@ -91,7 +92,7 @@ export class CandidateDetailsState {
     return state.candidateSkills;
   }
 
-  constructor(private candidateDetailsService: CandidateDetailsService) {}
+  constructor(private candidateDetailsService: CandidateDetailsService, private skillsService: SkillsService) {}
 
   @Action(GetCandidateDetailsPage, { cancelUncompleted: true })
   GetCandidateDetailsPage(
@@ -147,7 +148,7 @@ export class CandidateDetailsState {
 
   @Action(GetCandidateSkills)
   GetCandidateSkills({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<MasterSkillByOrganization[]> {
-    return this.candidateDetailsService.getSkills().pipe(
+    return this.skillsService.getAssignedSkillsByOrganization().pipe(
       tap((payload: MasterSkillByOrganization[]) => {
         patchState({ candidateSkills: payload });
         return payload;
