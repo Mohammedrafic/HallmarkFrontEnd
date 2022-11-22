@@ -318,7 +318,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       if (this.canOnboard) {
         statuses.push(this.applicantStatusTypes.Onboard, this.applicantStatusTypes.Canceled);
       } else if (this.canReject) {
-        statuses.push(this.applicantStatusTypes.Rejected);
+        statuses.push(this.applicantStatusTypes.Canceled);
       }
     } else {
       statuses.push({ applicantStatus: candidate.status, statusText: capitalize(CandidatStatus[candidate.status]) });
