@@ -252,6 +252,10 @@
 .system-wrapper {
   margin-bottom: 18px;
   border-bottom: 1px solid $secondary-dark-blue-40;
+
+  &.border-none {
+    border-bottom: none;
+  }
 }
 
 .label-gray {
