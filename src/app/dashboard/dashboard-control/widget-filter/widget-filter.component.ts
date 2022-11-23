@@ -105,7 +105,10 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   }
 
   public ngOnInit(): void {
+    this.onSkillDataLoadHandler();
+    this.onOrganizationStructureDataLoadHandler();
     this.isFilterDialogOpened();
+    this.onFilterControlValueChangedHandler();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -137,9 +140,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     this.actions
       .pipe(ofActionDispatched(ShowFilterDialog), filter((data) => data.isDialogShown), takeUntil(this.destroy$))
       .subscribe(() => {
-        this.onSkillDataLoadHandler();
-        this.onOrganizationStructureDataLoadHandler();
-        this.onFilterControlValueChangedHandler();
         this.getFilterState();
         this.setFilterState();
       });
