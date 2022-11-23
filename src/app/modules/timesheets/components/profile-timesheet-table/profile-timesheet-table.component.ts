@@ -470,18 +470,17 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         this.currentTab,
         this.idsToDelete,
       );
-      console.log(dto, 'dto');
 
-      // this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency)).pipe(
-      //   takeUntil(this.componentDestroy()),
-      // ).subscribe(() => {
-      //   this.loading = false;
-      //   this.changesSaved.emit(true);
-      //   this.isChangesSaved = true;
-      //   this.idsToDelete = [];
-      //   this.setInitialTableState();
-      //   this.cd.detectChanges();
-      // });
+      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency)).pipe(
+        takeUntil(this.componentDestroy()),
+      ).subscribe(() => {
+        this.loading = false;
+        this.changesSaved.emit(true);
+        this.isChangesSaved = true;
+        this.idsToDelete = [];
+        this.setInitialTableState();
+        this.cd.detectChanges();
+      });
     }
   }
 
