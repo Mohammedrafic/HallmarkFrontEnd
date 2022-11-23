@@ -26,6 +26,7 @@ import { AbstractPermission } from "@shared/helpers/permissions";
 import { createDepartmentsTier } from '@shared/helpers';
 import { SettingsViewService } from '@shared/services';
 import { TierLogic } from '@shared/enums/tier-logic.enum';
+import { GetOrgTierStructure } from '../../../../../store/user.actions';
 
 @Component({
   selector: 'app-edit-associate-dialog',
@@ -226,7 +227,8 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
       new TiersException.GetTiers(
         createDepartmentsTier(associateOrganizationsAgency.organizationId!)
       ),
-      new TiersException.GetSelectedOrgAgency(associateOrganizationsAgency)
+      new TiersException.GetSelectedOrgAgency(associateOrganizationsAgency),
+      new GetOrgTierStructure()
     ]);
   }
 
@@ -253,7 +255,7 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
   }
 
   private confirmSwitchBetweenTab(tabForm: FormGroup | FormControl, tab: SelectingEventArgs): void {
-    if (tabForm.dirty) {
+    if (tabForm?.dirty) {
       tab.cancel = true;
       this.confirmService
         .confirm(UNSAVED_TABS_TEXT, {
