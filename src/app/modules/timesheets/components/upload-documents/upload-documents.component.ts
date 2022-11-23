@@ -66,14 +66,12 @@ export class UploadDocumentsComponent extends Destroyable implements OnInit {
         title: 'Unsaved Progress',
         okButtonLabel: 'Proceed',
         okButtonClass: 'delete-button',
-      })
-        .pipe(
-          filter(Boolean),
-          takeUntil(this.componentDestroy())
-        )
-        .subscribe(() => {
-          this.closeDialog();
-        });
+      }).pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      ).subscribe(() => {
+        this.closeDialog();
+      });
     } else {
       this.closeDialog();
     }
@@ -89,11 +87,15 @@ export class UploadDocumentsComponent extends Destroyable implements OnInit {
       fileForUpload: this.fileForUploads,
       filesForDelete: this.filesForDelete,
     });
+
+    this.filesForDelete = [];
+    this.fileForUploads = [];
+
     this.closeDialog();
   }
 
   public clearFiles(): void {
-    this.closeDialog(false);
+    this.resetUploadState(true);
   }
 
   public deleteFile({ id }: CustomFilesPropModel): void {
@@ -123,28 +125,23 @@ export class UploadDocumentsComponent extends Destroyable implements OnInit {
       });
   }
 
-  private closeDialog(closeModal = true): void {
-    this.fileForUploads = [];
-    this.filesForDelete = [...this.existingFiles];
-    this.existingFiles = [];
-    this.filesClearEvent = FilesClearEvent.ClearAll;
+  private closeDialog(): void {
+    this.resetUploadState();
 
-    if (closeModal) {
-      if (this.filesForDelete.length) {
-        this.fileChange.emit({
-          fileForUpload: this.fileForUploads,
-          filesForDelete: this.filesForDelete,
-        });
-        this.filesForDelete = [];
-      }
-      this.sideUploadDialog.hide();
-      this.store.dispatch(new Timesheets.ToggleTimesheetUploadAttachmentsDialog(DialogAction.Close, null));
-    }
-
-    this.cdr.detectChanges();
+    this.sideUploadDialog.hide();
+    this.store.dispatch(new Timesheets.ToggleTimesheetUploadAttachmentsDialog(DialogAction.Close, null));
   }
 
   private hasTooBigFile(): boolean {
     return this.fileForUploads.some((file: FileForUpload) => file.blob.size > this.maxFileSize);
+  }
+
+  private resetUploadState(deleteExistingFiles = false): void {
+    this.filesForDelete = deleteExistingFiles ? [...this.existingFiles] : [];
+    this.fileForUploads = [];
+    this.existingFiles = [];
+    this.filesClearEvent = FilesClearEvent.ClearAll;
+
+    this.cdr.detectChanges();
   }
 }
