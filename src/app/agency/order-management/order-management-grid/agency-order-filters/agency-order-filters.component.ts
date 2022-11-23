@@ -250,8 +250,9 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         .map((status: FilterStatus) => status.status);
       this.form.get('orderStatuses')?.setValue(statuses);
       this.setDefault.emit(statuses);
+    } else {
+      this.setDefault.emit([]);
     }
-    this.setDefault.emit([]);
   }
 
   static generateFiltersForm(): FormGroup {
