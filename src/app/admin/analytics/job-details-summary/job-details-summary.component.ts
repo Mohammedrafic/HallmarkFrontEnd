@@ -6,7 +6,7 @@ import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { EmitType } from '@syncfusion/ej2-base';
 import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -146,6 +146,8 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   public filterOptionsData: CommonReportFilterOptions;
   public candidateFilterData: { [key: number]: SearchCandidate; }[] = [];
   public isLoadNewFilter: boolean = false;
+  private isAlive = true;
+  private previousOrgId: number = 0;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -169,20 +171,6 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {      
     this.orderFilterColumnsSetup();
       this.store.dispatch(new ClearLogiReportState());
-      this.CommonReportFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
-        if (data != null) {
-          this.filterOptionsData = data;
-          this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
-          this.filterColumns.skillIds.dataSource = [];
-          this.filterColumns.jobStatuses.dataSource = data.orderStatuses;
-          this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
-          this.filterColumns.agencyIds.dataSource = data.agencies;
-          this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
-          this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
-          this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
-          this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
-        }
-      });
       this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
@@ -222,37 +210,44 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.isAlive = false;
   }
 
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
 
     this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.organizations = uniqBy(data, 'organizationId');
-      this.filterColumns.businessIds.dataSource = this.organizations;
-      this.defaultOrganizations = this.agencyOrganizationId;
-      
-      this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
-      this.changeDetectorRef.detectChanges();
+      if (data != null && data.length > 0) {
+        this.organizations = uniqBy(data, 'organizationId');
+        this.filterColumns.businessIds.dataSource = this.organizations;
+        this.defaultOrganizations = this.agencyOrganizationId;
+        this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+        this.changeDetectorRef.detectChanges();
+      }
     });
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (data != null) {
+      if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+        this.isAlive = true;
+        this.previousOrgId = data;
         if (!this.isClearAll) {
           let orgList = this.organizations?.filter((x) => data == x.organizationId);
           this.selectedOrganizations = orgList;
-          this.regionsList = [];
-          this.locationsList = [];
+          const locationsList: Location[] = [];
+          const departmentsList: Department[] = [];
           this.departmentsList = [];
           orgList.forEach((value) => {
             this.regionsList.push(...value.regions);
             value.regions.forEach((region) => {
-              this.locationsList.push(...region.locations);
+              locationsList.push(...region.locations);
               region.locations.forEach((location) => {
-                this.departmentsList.push(...location.departments);
+                departmentsList.push(...location.departments);
               });
             });
           });
+          this.locationsList = sortByField(locationsList, 'name');
+          this.departmentsList = sortByField(departmentsList, 'name');
+
           if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
             this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
           }
@@ -265,6 +260,22 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
             businessUnitIds: businessIdData
           };
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
+          this.CommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+            if (data != null) {
+              this.isAlive = false;
+              this.filterOptionsData = data;
+              this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+              this.filterColumns.skillIds.dataSource = [];
+              this.filterColumns.jobStatuses.dataSource = data.orderStatuses;
+              this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
+              this.filterColumns.agencyIds.dataSource = data.agencies;
+              this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
+              this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
+              this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
+              this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
+              this.changeDetectorRef.detectChanges();
+            }
+          });
           this.regions = this.regionsList;
           this.filterColumns.regionIds.dataSource = this.regions;
           this.defaultRegions = this.regionsList.map((list) => list.id);
@@ -283,7 +294,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
         let regionList = this.regions?.filter((object) => data?.includes(object.id));
         this.selectedRegions = regionList;
         this.locations = this.locationsList.filter(i => data?.includes(i.regionId));
-        this.filterColumns.locationIds.dataSource = sortByField(this.locations, 'name');
+        this.filterColumns.locationIds.dataSource = this.locations;
         this.defaultLocations = this.locations.map((list) => list.id);
         this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue(this.defaultLocations);
         this.changeDetectorRef.detectChanges();
@@ -297,7 +308,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       if (this.locationIdControl.value.length > 0) {
         this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         this.departments = this.departmentsList.filter(i => data?.includes(i.locationId));
-        this.filterColumns.departmentIds.dataSource = sortByField(this.departments, 'name');
+        this.filterColumns.departmentIds.dataSource = this.departments;
         this.defaultDepartments = this.departments.map((list) => list.id);
         this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue(this.defaultDepartments);
         this.changeDetectorRef.detectChanges();
@@ -309,7 +320,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     this.departmentIdControl = this.jobDetailSummaryReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
-      if (this.isInitialLoad) {
+      if (this.isInitialLoad && data.length > 0) {
 
         this.SearchReport();
         this.isInitialLoad = false;
@@ -524,7 +535,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     this.message = "";
     let error: any = regionsLength == 0 ? "Regions/Locations/Departments are required" : locationsLength == 0 ? "Locations/Departments are required" : departmentsLength == 0 ? "Departments are required" : "";
 
-    this.store.dispatch([new ShowToast(MessageTypes.Error, error)]);
+    this.store.dispatch(new ShowToast(MessageTypes.Error, error));
     return;
   }
 

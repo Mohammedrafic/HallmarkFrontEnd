@@ -6,7 +6,7 @@ import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { EmitType } from '@syncfusion/ej2-base';
 import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -46,13 +46,13 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     "RegionParamFTS": "",
     "LocationParamFTS": "",
     "DepartmentParamFTS": "",
-    "SkillCategoriesParamFTS":"",
-    "SkillsParamFTS":"",
-    "CandidateNameParamFTS":"",
-    "CandidateStatusesParamFTS":"",
-    "OrderTypesParamFTS":"",
-    "JobStatusesParamFTS":"",
-    "JobIdParamFTS":"",
+    "SkillCategoriesParamFTS": "",
+    "SkillsParamFTS": "",
+    "CandidateNameParamFTS": "",
+    "CandidateStatusesParamFTS": "",
+    "OrderTypesParamFTS": "",
+    "JobStatusesParamFTS": "",
+    "JobIdParamFTS": "",
     "BearerParamFTS": "",
     "BusinessUnitIdParamFTS": "",
     "HostName": "",
@@ -141,8 +141,10 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   public baseUrl: string = '';
   public user: User | null;
   public filterOptionsData: CommonReportFilterOptions;
-  public candidateFilterData :{ [key: number]: SearchCandidate; }[] = [];
+  public candidateFilterData: { [key: number]: SearchCandidate; }[] = [];
   public isResetFilter: boolean = false;
+  private isAlive = true;
+  private previousOrgId: number = 0;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -163,10 +165,10 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-   
+
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
-      this.orderFilterColumnsSetup();      
+      this.orderFilterColumnsSetup();
       this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
@@ -175,7 +177,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       });
       this.agencyOrganizationId = data;
       this.isInitialLoad = true;
-    
+
       this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.AccrualReportTypes)?.setValue(1);
       this.onFilterControlValueChangedHandler();
       this.user?.businessUnitType == BusinessUnitType.Hallmark ? this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.enable() : this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.disable();
@@ -207,72 +209,79 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.isAlive = false;
   }
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
 
     this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.organizations = uniqBy(data, 'organizationId');
-      this.filterColumns.businessIds.dataSource = this.organizations;
-      this.defaultOrganizations = this.agencyOrganizationId;
-      
-      this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
-      this.changeDetectorRef.detectChanges();
+      if (data != null && data.length > 0) {
+        this.organizations = uniqBy(data, 'organizationId');
+        this.filterColumns.businessIds.dataSource = this.organizations;
+        this.defaultOrganizations = this.agencyOrganizationId;
+        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+        this.changeDetectorRef.detectChanges();
+      }
     });
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (!this.isClearAll) {
-        let orgList = this.organizations?.filter((x) => data == x.organizationId);
-        this.selectedOrganizations = orgList;
-        this.regionsList = [];
-        const locationsList: Location[] = [];
-        const departmentsList: Department[] = [];
-        orgList.forEach((value) => {
-          this.regionsList.push(...value.regions);
-          value.regions.forEach((region) => {
-            locationsList.push(...region.locations);
-            region.locations.forEach((location) => {
-              departmentsList.push(...location.departments);
+      if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+        this.isAlive = true;
+        this.previousOrgId = data;
+        if (!this.isClearAll) {
+          let orgList = this.organizations?.filter((x) => data == x.organizationId);
+          this.selectedOrganizations = orgList;
+          this.regionsList = [];
+          const locationsList: Location[] = [];
+          const departmentsList: Department[] = [];
+          orgList.forEach((value) => {
+            this.regionsList.push(...value.regions);
+            value.regions.forEach((region) => {
+              locationsList.push(...region.locations);
+              region.locations.forEach((location) => {
+                departmentsList.push(...location.departments);
+              });
             });
           });
-        });
-        this.locationsList = sortByField(locationsList, 'name');
-        this.departmentsList = sortByField(departmentsList, 'name');
+          this.locationsList = sortByField(locationsList, 'name');
+          this.departmentsList = sortByField(departmentsList, 'name');
 
-        if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-          this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          }
+          else {
+            this.isResetFilter = true;
+          }
+          let businessIdData = [];
+          businessIdData.push(data);
+          let filter: CommonReportFilter = {
+            businessUnitIds: businessIdData
+          };
+          this.store.dispatch(new GetCommonReportFilterOptions(filter));
+          this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
+            if (data != null) {
+              this.isAlive = false;
+              this.filterOptionsData = data;
+              this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
+              this.filterColumns.skillIds.dataSource = [];
+              this.filterColumns.jobStatuses.dataSource = data.orderStatuses;
+              this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
+              this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
+              this.defaultOrderTypes = OrderTypeOptions.map((list) => list.id);
+              this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
+              this.changeDetectorRef.detectChanges();
+            }
+          });
+          this.regions = this.regionsList;
+          this.filterColumns.regionIds.dataSource = this.regions;
+          this.defaultRegions = this.regionsList.map((list) => list.id);
+          this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+          this.changeDetectorRef.detectChanges();
         }
         else {
-          this.isResetFilter = true;
+          this.isClearAll = false;
+          this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
         }
-        let businessIdData = [];
-        businessIdData.push(data);
-        let filter: CommonReportFilter = {
-          businessUnitIds: businessIdData
-        };
-        this.store.dispatch(new GetCommonReportFilterOptions(filter));
-        this.financialTimeSheetFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
-          if (data != null) {
-            this.filterOptionsData = data;
-            this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
-            this.filterColumns.skillIds.dataSource = [];
-            this.filterColumns.jobStatuses.dataSource = data.orderStatuses;
-            this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
-            this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
-            this.defaultOrderTypes = OrderTypeOptions.map((list) => list.id);
-            this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
-            this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.OrderTypes)?.setValue(this.defaultOrderTypes);
-          }
-        });
-        this.regions = this.regionsList;
-        this.filterColumns.regionIds.dataSource = this.regions;
-        this.defaultRegions = this.regionsList.map((list) => list.id);
-        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
-        this.changeDetectorRef.detectChanges();
-      }
-      else {
-        this.isClearAll = false;
-        this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       }
     });
     this.regionIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
@@ -307,7 +316,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     this.departmentIdControl = this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds) as AbstractControl;
     this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
-      if (this.isInitialLoad&&data.length>0) {
+      if (this.isInitialLoad && data.length > 0) {
 
         this.SearchReport();
         this.isInitialLoad = false;
@@ -335,11 +344,11 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         this.selectedSkills = masterSkills?.filter((object) => data?.includes(object.id));
       }
     });
-    
+
   }
 
-  public SearchReport(): void {   
-   
+  public SearchReport(): void {
+
 
     this.filteredItems = [];
     let auth = "Bearer ";
@@ -348,15 +357,15 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let {accrualReportTypes,businessIds,candidateName,candidateStatuses,departmentIds,jobId,jobStatuses,locationIds,orderTypes,
-      regionIds,skillCategoryIds,skillIds,startDate, endDate } = this.financialTimesheetReportForm.getRawValue();
-      if (!this.financialTimesheetReportForm.dirty) {
-        this.message = "Default filter selected with all regions, locations and departments for 90 days";
-      }
-      else {
-        this.isResetFilter = false;
-        this.message = ""
-      }
+    let { accrualReportTypes, businessIds, candidateName, candidateStatuses, departmentIds, jobId, jobStatuses, locationIds, orderTypes,
+      regionIds, skillCategoryIds, skillIds, startDate, endDate } = this.financialTimesheetReportForm.getRawValue();
+    if (!this.financialTimesheetReportForm.dirty) {
+      this.message = "Default filter selected with all regions, locations and departments for 90 days";
+    }
+    else {
+      this.isResetFilter = false;
+      this.message = ""
+    }
     this.paramsData =
     {
       "OrganizationParamFTS": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
@@ -365,13 +374,13 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       "RegionParamFTS": regionIds.join(","),
       "LocationParamFTS": locationIds.join(","),
       "DepartmentParamFTS": departmentIds.join(","),
-      "SkillCategoriesParamFTS":skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
-      "SkillsParamFTS":skillIds.length==0?"null":skillIds.join(","),
-      "CandidateNameParamFTS":candidateName==null||candidateName==""?"null":candidateName.toString(),
-      "CandidateStatusesParamFTS":candidateStatuses.length==0?"null":candidateStatuses.join(","),
-      "OrderTypesParamFTS":orderTypes.length==0?"null":orderTypes.join(","),
-      "JobStatusesParamFTS":jobStatuses.length==0?"null":jobStatuses.join(","),
-      "JobIdParamFTS":jobId==null||jobId==""?"null":jobId,
+      "SkillCategoriesParamFTS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds.join(","),
+      "SkillsParamFTS": skillIds.length == 0 ? "null" : skillIds.join(","),
+      "CandidateNameParamFTS": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
+      "CandidateStatusesParamFTS": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
+      "OrderTypesParamFTS": orderTypes.length == 0 ? "null" : orderTypes.join(","),
+      "JobStatusesParamFTS": jobStatuses.length == 0 ? "null" : jobStatuses.join(","),
+      "JobIdParamFTS": jobId == null || jobId == "" ? "null" : jobId,
       "BearerParamFTS": auth,
       "BusinessUnitIdParamFTS": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
@@ -482,7 +491,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
 
   public showFilters(): void {
     if (this.isResetFilter) {
-    this.onFilterControlValueChangedHandler();
+      this.onFilterControlValueChangedHandler();
     }
     this.store.dispatch(new ShowFilterDialog(true));
   }
@@ -521,33 +530,32 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     this.message = "";
     let error: any = regionsLength == 0 ? "Regions/Locations/Departments are required" : locationsLength == 0 ? "Locations/Departments are required" : departmentsLength == 0 ? "Departments are required" : "";
 
-    this.store.dispatch([new ShowToast(MessageTypes.Error, error)]);
+    this.store.dispatch(new ShowToast(MessageTypes.Error, error));
     return;
   }
-  
+
   public onFiltering: EmitType<FilteringEventArgs> = (e: FilteringEventArgs) => {
     this.onFilterChild(e);
   }
   @OutsideZone
-  private onFilterChild(e: FilteringEventArgs)
-  {
+  private onFilterChild(e: FilteringEventArgs) {
     if (e.text != '') {
-      let ids=[];
+      let ids = [];
       ids.push(this.bussinessControl.value);
       let filter: CommonCandidateSearchFilter = {
         searchText: e.text,
-        businssUnitIds:ids
+        businssUnitIds: ids
       };
       this.filterColumns.dataSource = [];
       this.store.dispatch(new GetCommonReportCandidateSearch(filter))
         .subscribe((result) => {
           this.candidateFilterData = result.LogiReport.searchCandidates;
-          this.candidateSearchData=result.LogiReport.searchCandidates;
-          this.filterColumns.dataSource=this.candidateFilterData;
-           // pass the filter data source to updateData method.
+          this.candidateSearchData = result.LogiReport.searchCandidates;
+          this.filterColumns.dataSource = this.candidateFilterData;
+          // pass the filter data source to updateData method.
           e.updateData(this.candidateFilterData);
         });
-     
+
     }
   }
 }

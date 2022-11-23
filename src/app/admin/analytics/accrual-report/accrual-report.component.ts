@@ -6,7 +6,7 @@ import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Region, Location, Department } from '@shared/models/visibility-settings.model';
 import { EmitType } from '@syncfusion/ej2-base';
 import { FieldSettingsModel, FilteringEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -185,6 +185,8 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
   public filterOptionsData: CommonReportFilterOptions;
   public candidateFilterData :{ [key: number]: SearchCandidate; }[] = [];
   public isResetFilter: boolean = false;
+  private isAlive = true;
+  private previousOrgId: number = 0;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -209,9 +211,9 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
       this.orderFilterColumnsSetup();
-      this.financialTimeSheetFilterData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: CommonReportFilterOptions | null) => {
-
+      this.financialTimeSheetFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
         if (data != null) {
+          this.isAlive = false;
           this.filterOptionsData = data;
           this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
           this.filterColumns.skillIds.dataSource = [];
@@ -270,62 +272,69 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.isAlive = false;
   }
 
   public onFilterControlValueChangedHandler(): void {
     this.bussinessControl = this.accrualReportForm.get(accrualConstants.formControlNames.BusinessIds) as AbstractControl;
 
     this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.organizations = uniqBy(data, 'organizationId');
-      this.filterColumns.businessIds.dataSource = this.organizations;
-      this.defaultOrganizations = this.agencyOrganizationId;
-      
-      this.accrualReportForm.get(accrualConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
-      this.changeDetectorRef.detectChanges();
+      if (data != null && data.length > 0) {
+        this.organizations = uniqBy(data, 'organizationId');
+        this.filterColumns.businessIds.dataSource = this.organizations;
+        this.defaultOrganizations = this.agencyOrganizationId;
+
+        this.accrualReportForm.get(accrualConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+        this.changeDetectorRef.detectChanges();
+      }
     });
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (!this.isClearAll) {
-        let orgList = this.organizations?.filter((x) => data == x.organizationId);
-        this.selectedOrganizations = orgList;
-        const regionsList: Region[] = [];
-        const locationsList: Location[] = [];
-        const departmentsList: Department[] = [];
-        orgList.forEach((value) => {
-          regionsList.push(...value.regions);
-          value.regions.forEach((region) => {
-            locationsList.push(...region.locations);
-            region.locations.forEach((location) => {
-              departmentsList.push(...location.departments);
+      if (data != null && typeof data === 'number' && data != this.previousOrgId) {
+        this.isAlive = true;
+        this.previousOrgId = data;
+        if (!this.isClearAll) {
+          let orgList = this.organizations?.filter((x) => data == x.organizationId);
+          this.selectedOrganizations = orgList;
+          const regionsList: Region[] = [];
+          const locationsList: Location[] = [];
+          const departmentsList: Department[] = [];
+          orgList.forEach((value) => {
+            regionsList.push(...value.regions);
+            value.regions.forEach((region) => {
+              locationsList.push(...region.locations);
+              region.locations.forEach((location) => {
+                departmentsList.push(...location.departments);
+              });
             });
           });
-        });
 
-        this.regionsList = sortByField(regionsList, 'name');
-        this.locationsList = sortByField(locationsList, 'name');
-        this.departmentsList = sortByField(departmentsList, 'name');
+          this.regionsList = sortByField(regionsList, 'name');
+          this.locationsList = sortByField(locationsList, 'name');
+          this.departmentsList = sortByField(departmentsList, 'name');
 
-        if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-          this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          }
+          else {
+            this.isResetFilter = true;
+          }
+          let businessIdData = [];
+          businessIdData.push(data);
+          let filter: CommonReportFilter = {
+            businessUnitIds: businessIdData
+          };
+          this.store.dispatch(new GetCommonReportFilterOptions(filter));
+          this.regions = this.regionsList;
+          this.filterColumns.regionIds.dataSource = this.regions;
+          this.defaultRegions = this.regionsList.map((list) => list.id);
+          this.accrualReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+          this.changeDetectorRef.detectChanges();
         }
         else {
-          this.isResetFilter = true;
+          this.isClearAll = false;
+          this.accrualReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue([]);
         }
-        let businessIdData = [];
-        businessIdData.push(data);
-        let filter: CommonReportFilter = {
-          businessUnitIds: businessIdData
-        };
-        this.store.dispatch(new GetCommonReportFilterOptions(filter));
-        this.regions = this.regionsList;
-        this.filterColumns.regionIds.dataSource = this.regions;
-        this.defaultRegions = this.regionsList.map((list) => list.id);
-        this.accrualReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
-        this.changeDetectorRef.detectChanges();
-      }
-      else {
-        this.isClearAll = false;
-        this.accrualReportForm.get(accrualConstants.formControlNames.RegionIds)?.setValue([]);
       }
     });
     
