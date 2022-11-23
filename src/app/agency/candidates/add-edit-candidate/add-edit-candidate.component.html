@@ -52,7 +52,7 @@
         </section>
       </ng-template>
     </e-tabitem>
-    <e-tabitem>
+    <e-tabitem *ngIf="userPermission[userPermissions.CanViewExperience]">
       <ng-template #headerText>
         <div class="stepper-header">
           <div class="stepper-title">Experience</div>
@@ -62,8 +62,8 @@
       <ng-template #content>
         <app-experience-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission"></app-experience-grid>
       </ng-template>
-    </e-tabitem>
-    <e-tabitem>
+    </e-tabitem >
+    <e-tabitem *ngIf="userPermission[userPermissions.CanViewEducation]">
       <ng-template #headerText>
         <div class="stepper-header">
           <div class="stepper-title">Education</div>
@@ -74,7 +74,7 @@
         <app-education-grid [readonlyMode]="readonlyMode" [areAgencyActionsAllowed]="agencyActionsAllowed" [userPermission]="userPermission"></app-education-grid>
       </ng-template>
     </e-tabitem>
-    <e-tabitem>
+    <e-tabitem *ngIf="userPermission[userPermissions.CanViewCandidateCredentials]">
       <ng-template #headerText>
         <div class="stepper-header">
           <div class="stepper-title">Credentials</div>
