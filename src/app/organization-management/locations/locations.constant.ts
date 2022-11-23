@@ -400,6 +400,6 @@ export const FieldsToHideInIrp: string[] = ['invoiceId'];
 
 export const FieldsToHideInVms: string[] = ['includeInIRP'];
 
-export const ExportColumnsToHideInIrp: string[] = ['InvoiceId'];
+export const ExportImportColumnsToHideInIrp: string[] = ['InvoiceId'];
 
-export const ExportColumnsToHideInVms: string[] = ['IncludeInIRPText'];
+export const ExportImportColumnsToHideInVms: string[] = ['IncludeInIRPText'];
