@@ -13,7 +13,7 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { SecurityState } from 'src/app/security/store/security.state';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
-import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule,RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { SharedModule } from '@shared/shared.module';
 import { FillRateComponent } from './fillrate/fillrate.component';
 import { JobDetailsComponent } from './job-details/job-details.component';
@@ -50,6 +50,9 @@ import { OrderCheckComponent } from './order-check/order-check.component';
 import { OverallStatusComponent } from './overall-status/overall-status.component';
 import { OvertimeComponent } from './overtime/overtime.component';
 import { FeatherModule } from 'angular-feather';
+import { AccrualReportComponent } from './accrual-report/accrual-report.component';
+
+
 
 @NgModule({
   declarations: [
@@ -90,7 +93,8 @@ import { FeatherModule } from 'angular-feather';
     MessageHistoryComponent,
     OrderCheckComponent,
     OverallStatusComponent,
-    OvertimeComponent  ],
+    OvertimeComponent,
+    AccrualReportComponent  ],
   imports: [
     CommonModule,
     SharedModule,
@@ -103,6 +107,7 @@ import { FeatherModule } from 'angular-feather';
     ButtonModule,
     FeatherModule,
     AutoCompleteAllModule,
+    RadioButtonModule,
     NgxsModule.forFeature([OrganizationManagementState,UserState,SecurityState,LogiReportState])
   ]
 })

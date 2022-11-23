@@ -43,8 +43,8 @@ import {
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import {
-  ExportColumnsToHideInIrp,
-  ExportColumnsToHideInVms,
+  ExportImportColumnsToHideInIrp,
+  ExportImportColumnsToHideInVms,
   FieldsToHideInIrp, FieldsToHideInVms, LocationExportColumns, LocationInitFilters,
   LocationsDialogConfig, LocationsDialogWithIrpConfig, LocationsExportIrpColumns,
   MESSAGE_REGIONS_NOT_SELECTED
@@ -621,12 +621,12 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   private filterExportColumns(): void {
     this.columnsToExport = this.columnsToExport
     .filter((column) => {
-      if (!this.isOrgVMSEnabled && !ExportColumnsToHideInVms.includes(column.column)) {
-        return !ExportColumnsToHideInIrp.includes(column.column)
+      if (!this.isOrgVMSEnabled && !ExportImportColumnsToHideInVms.includes(column.column)) {
+        return !ExportImportColumnsToHideInIrp.includes(column.column)
       }
 
-      if (!this.isOrgIrpEnabled || (this.isOrgIrpEnabled && !this.isOrgVMSEnabled)) {
-        return !ExportColumnsToHideInVms.includes(column.column);
+      if (!(this.isOrgIrpEnabled && this.isOrgVMSEnabled)) {
+        return !ExportImportColumnsToHideInVms.includes(column.column);
       }
 
       return column;
