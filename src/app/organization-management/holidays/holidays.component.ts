@@ -269,7 +269,7 @@ export class HolidaysComponent extends AbstractPermissionGrid implements OnInit,
       this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
     });
     this.masterHolidays$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((holidays: Holiday[]) => {
-      this.masterHolidays = holidays;
+      this.masterHolidays = sortByField(holidays, 'holidayName');
     });
     this.organizationStructure$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
