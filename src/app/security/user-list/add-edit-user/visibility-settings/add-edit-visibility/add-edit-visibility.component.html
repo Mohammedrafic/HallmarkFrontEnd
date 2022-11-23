@@ -96,7 +96,8 @@
                                [showDropDownIcon]="true"
                                [fields]="optionFields"
                                [dataSource]="departments"
-                               formControlName="departmentIds">
+                               formControlName="departmentIds"
+                               maximumSelectionLength="50000">
                 <ng-template #itemTemplate let-data>
                   <div class="visibility-option-container">
                     <span>{{data?.name}}</span>
