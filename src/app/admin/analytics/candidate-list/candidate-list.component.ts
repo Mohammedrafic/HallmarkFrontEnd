@@ -109,13 +109,13 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
     }
-    this.SetReportData();
+    //this.SetReportData();
   }
 
   ngOnInit(): void {
 
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => {
-      this.SetReportData();
+     // this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:ConfigurationDto[])=>{
         if(data.length>0)
         {
@@ -196,7 +196,7 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
       this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.departmentId));
       if (this.isInitialLoad) {
         this.isInitialLoad = false;
-        this.SearchReport();
+        setTimeout(()=>{ this.SearchReport()},3000);
       }
     });
     this.onOrganizationsChange();

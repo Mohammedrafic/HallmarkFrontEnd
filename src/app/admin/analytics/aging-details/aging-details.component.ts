@@ -114,13 +114,13 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
       this.store.dispatch(new GetOrganizationsStructureAll(this.user?.id));
     }
 
-    this.SetReportData();
+    //this.SetReportData();
   }
 
   ngOnInit(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: number) => {
       this.store.dispatch(new ClearLogiReportState());
-      this.SetReportData();
+      //this.SetReportData();
       this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
         if (data.length > 0) {
           this.logiReportComponent.SetReportData(data);
@@ -229,7 +229,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
       this.selectedDepartments = this.departments?.filter((object) => data?.includes(object.id));
       if (this.isInitialLoad) {
 
-        this.SearchReport();
+        setTimeout(()=>{ this.SearchReport()},3000);
         this.isInitialLoad = false;
       }
     });
