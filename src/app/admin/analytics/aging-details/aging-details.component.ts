@@ -99,6 +99,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   public baseUrl: string = '';
   public user: User | null;
   public isResetFilter: boolean = false;
+  private previousOrgId: number = 0;
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
 
   constructor(private store: Store,
@@ -152,47 +153,52 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     this.bussinessControl = this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds) as AbstractControl;
 
     this.organizationData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.organizations = uniqBy(data, 'organizationId');
-      this.filterColumns.businessIds.dataSource = this.organizations;
-      this.defaultOrganizations = this.agencyOrganizationId;
-      this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
-      this.changeDetectorRef.detectChanges();
+      if (data != null && data.length > 0) {
+        this.organizations = uniqBy(data, 'organizationId');
+        this.filterColumns.businessIds.dataSource = this.organizations;
+        this.defaultOrganizations = this.agencyOrganizationId;
+        this.agingReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue(this.agencyOrganizationId);
+        this.changeDetectorRef.detectChanges();
+      }
     });
 
     this.bussinessControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (!this.isClearAll) {
-        let orgList = this.organizations?.filter((x) => data == x.organizationId);
-        this.selectedOrganizations = orgList;
-        this.regionsList = [];
-        const locationsList: Location[] = [];
-        const departmentsList: Department[] = [];
-        orgList.forEach((value) => {
-          this.regionsList.push(...value.regions);
-          value.regions.forEach((region) => {
-            locationsList.push(...region.locations);
-            region.locations.forEach((location) => {
-              departmentsList.push(...location.departments);
+      if (typeof data === 'number' && data != this.previousOrgId) {
+        this.previousOrgId = data;
+        if (!this.isClearAll) {
+          let orgList = this.organizations?.filter((x) => data == x.organizationId);
+          this.selectedOrganizations = orgList;
+          this.regionsList = [];
+          const locationsList: Location[] = [];
+          const departmentsList: Department[] = [];
+          orgList.forEach((value) => {
+            this.regionsList.push(...value.regions);
+            value.regions.forEach((region) => {
+              locationsList.push(...region.locations);
+              region.locations.forEach((location) => {
+                departmentsList.push(...location.departments);
+              });
             });
           });
-        });
-        this.locationsList = sortByField(locationsList, 'name');
-        this.departmentsList = sortByField(departmentsList, 'name');
-        if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
-          this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          this.locationsList = sortByField(locationsList, 'name');
+          this.departmentsList = sortByField(departmentsList, 'name');
+          if ((data == null || data <= 0) && this.regionsList.length == 0 || this.locationsList.length == 0 || this.departmentsList.length == 0) {
+            this.showToastMessage(this.regionsList.length, this.locationsList.length, this.departmentsList.length);
+          }
+          else {
+            this.isResetFilter = true;
+          }
+
+          this.regions = this.regionsList;
+          this.filterColumns.regionIds.dataSource = this.regions;
+          this.defaultRegions = this.regionsList.map((list) => list.id);
+          this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+          this.changeDetectorRef.detectChanges();
         }
         else {
-          this.isResetFilter = true;
+          this.isClearAll = false;
+          this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
         }
-
-        this.regions = this.regionsList;
-        this.filterColumns.regionIds.dataSource = this.regions;
-        this.defaultRegions = this.regionsList.map((list) => list.id);
-        this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
-        this.changeDetectorRef.detectChanges();
-      }
-      else {
-        this.isClearAll = false;
-        this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
       }
     });
     this.regionIdControl = this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds) as AbstractControl;
@@ -340,7 +346,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     this.message = "";
     let error: any = regionsLength == 0 ? "Regions/Locations/Departments are required" : locationsLength == 0 ? "Locations/Departments are required" : departmentsLength == 0 ? "Departments are required" : "";
 
-    this.store.dispatch([new ShowToast(MessageTypes.Error, error)]);
+    this.store.dispatch(new ShowToast(MessageTypes.Error, error));
     return;
   }
 
