@@ -198,8 +198,7 @@ export class UserListComponent extends AbstractPermissionGrid implements OnInit,
       this.isBusinessFormDisabled && this.businessForm.disable();
     }
     if (user?.businessUnitType === BusinessUnitType.MSP) {
-      const [Hallmark, ...rest] = this.businessUnits;
-      this.businessUnits = rest;
+      this.businessUnits = this.businessUnits.filter((item) => item.id !== BusinessUnitType.Hallmark);
     }
   }
 

@@ -35,3 +35,4 @@ export class GetJobDetailSummaryReportFilterOptions {
   static readonly type = '[LogiReport] Get Job Detail Summary Report Filter Options';
   constructor(public filter: JobDetailSummaryFilter) { }
 }
+

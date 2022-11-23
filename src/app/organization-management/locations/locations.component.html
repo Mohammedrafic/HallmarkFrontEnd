@@ -88,6 +88,11 @@
           </div>
         </ng-template>
       </e-column>
+      <e-column field="includeInIRPText" headerText="Include in IRP" width=200 *ngIf="isFeatureIrpEnabled && isOrgIrpEnabled && isOrgVMSEnabled">
+        <ng-template #template let-data>
+          <span>{{ data.includeInIRPText }}</span>
+        </ng-template>
+      </e-column>
       <e-column field="externalId" headerText="LOCATION Id" width=200></e-column>
       <e-column field="invoiceId" headerText="INVOICE LOCATION ID" width=200 *ngIf="isOrgVMSEnabled || !isFeatureIrpEnabled"></e-column>
       <e-column field="name" headerText="LOCATION NAME" width=200></e-column>
@@ -99,11 +104,6 @@
       <e-column field="zip" headerText="ZIP" width=200></e-column>
       <e-column field="contactPerson" headerText="CONTACT PERSON" width=200></e-column>
       <e-column field="timeZone" headerText="Timezone" width=200></e-column>
-      <e-column field="includeInIRPText" headerText="Include in IRP" width=200 *ngIf="isFeatureIrpEnabled && isOrgIrpEnabled && isOrgVMSEnabled">
-        <ng-template #template let-data>
-          <span>{{ data.includeInIRPText }}</span>
-        </ng-template>
-      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
@@ -472,4 +472,9 @@
   </ng-template>
 </ejs-dialog>
 
-<app-import-locations [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-import-locations>
+<app-import-locations
+  [dialogEvent]="importDialogEvent"
+  [irpFlagEnabled]="isFeatureIrpEnabled"
+  [orgIrpEnabled]="isOrgIrpEnabled"
+  [orgVMSEnabled]="isOrgVMSEnabled"
+  (reloadItemsList)="updatePage()"></app-import-locations>

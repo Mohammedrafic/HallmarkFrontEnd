@@ -42,6 +42,7 @@ export class TierService {
 
   private getTierExceptionForm(): CustomFormGroup<TierDTO> {
     return this.formBuilder.group({
+      tierExceptionId: null,
       organizationTierId: null,
       regionIds: [null],
       locationIds: [null],
@@ -94,6 +95,7 @@ export class TierService {
 
   private getStructureForTierException(tier: TierDetails): TierDTO {
     return {
+      tierExceptionId: tier.id,
       regionIds: [tier.regionId],
       locationIds: [tier.locationId],
       departmentIds: [tier.departmentId],

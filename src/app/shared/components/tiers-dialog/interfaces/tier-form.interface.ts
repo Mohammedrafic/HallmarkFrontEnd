@@ -7,6 +7,7 @@ export interface TierDTO {
   hours?: number;
   associateOrganizationId?: number;
   forceUpsert?: boolean;
+  tierExceptionId?: number;
 }
 
 export interface TierConfig {
