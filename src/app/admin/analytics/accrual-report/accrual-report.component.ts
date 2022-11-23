@@ -44,7 +44,19 @@ import { AssociateAgencyDto } from '../../../shared/models/logi-report-file';
 export class AccrualReportComponent implements OnInit,OnDestroy {
 
   public paramsData: any = {
+
+    "HostNameAS": "",
+    "BearerParamAS": "",
+    "BusinessUnitIdParamAS": "",
+
+    "HostNameAD": "",
+    "BearerParamAD": "",
+    "BusinessUnitIdParamAD": "",
   
+    "HostNameAF": "",
+    "BearerParamAF": "",
+    "BusinessUnitIdParamAF": "",
+
     "OrganizationsAS": "",
     "RegionAS": "",
     "LocationAS": "",
@@ -419,8 +431,8 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
     {
 
       "HostNameAS": this.baseUrl,
-      "bearerParamAS": auth,
-      "businessUnitIdParamAS": window.localStorage.getItem("lastSelectedOrganizationId") == null
+      "BearerParamAS": auth,
+      "BusinessUnitIdParamAS": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
@@ -432,15 +444,15 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
       "SkillAS": skillIds.length==0?"null":skillIds.join(","),
       "AgencyAS": agencyIds.length==0?"null":agencyIds.join(","),
       "Candidate" :candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
-      "OrderIdAS": orderId,
-      "TimesheetStartDate":  byTimesheetOrInvoiceValue=='0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : "null",
-      "TimesheetEndDate"  :  byTimesheetOrInvoiceValue=='0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'): "null",
-      "InvoiceStartDate"  :  byTimesheetOrInvoiceValue=='1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US'): "null",
-      "InvoiceEndDate"    :  byTimesheetOrInvoiceValue=='1' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'): "null",
+      "OrderIdAS": orderId ==null ? "null" : orderId,
+      "TimesheetStartDate":  byTimesheetOrInvoiceValue=='0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
+      "TimesheetEndDate"  :  byTimesheetOrInvoiceValue=='0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'): formatDate(startDate, '12/31/9999', 'en-US'),
+      "InvoiceStartDate"  :  byTimesheetOrInvoiceValue=='1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US'): formatDate(startDate, '01/01/1900', 'en-US'),
+      "InvoiceEndDate"    :  byTimesheetOrInvoiceValue=='1' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'):  formatDate(startDate, '12/31/9999', 'en-US'),
 
       "HostNameAD": this.baseUrl,
-      "bearerParamAD": auth,
-      "businessUnitIdParamAD": window.localStorage.getItem("lastSelectedOrganizationId") == null
+      "BearerParamAD": auth,
+      "BusinessUnitIdParamAD": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
@@ -452,15 +464,15 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
       "SkillAD": skillIds.length==0?"null":skillIds.join(","),
       "AgencyAD": agencyIds.length==0?"null":agencyIds.join(","),
       "CandidateAD" :candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
-      "OrderIdAD": orderId,
-      "TimesheetStartDateAD":  byTimesheetOrInvoiceValue=='0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : "null",
-      "TimesheetEndDateAD"  :  byTimesheetOrInvoiceValue=='0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'): "null",
-      "InvoiceStartDateAD"  :  byTimesheetOrInvoiceValue=='1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US'): "null",
-      "InvoiceEndDateAD"    :  byTimesheetOrInvoiceValue=='1' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'): "null",
+      "OrderIdAD": orderId ==null ? "null" : orderId,
+      "TimesheetStartDateAD":  byTimesheetOrInvoiceValue=='0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
+      "TimesheetEndDateAD"  :  byTimesheetOrInvoiceValue=='0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'):  formatDate(startDate, '12/31/9999', 'en-US'),
+      "InvoiceStartDateAD"  :  byTimesheetOrInvoiceValue=='1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US'): formatDate(startDate, '01/01/1900', 'en-US'),
+      "InvoiceEndDateAD"    :  byTimesheetOrInvoiceValue=='1' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'):  formatDate(startDate, '12/31/9999', 'en-US'),
 
       "HostNameAF": this.baseUrl,
-      "bearerParamAF": auth,
-      "businessUnitIdParamAF": window.localStorage.getItem("lastSelectedOrganizationId") == null
+      "BearerParamAF": auth,
+      "BusinessUnitIdParamAF": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
@@ -472,11 +484,11 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
       "SkillAF": skillIds.length==0?"null":skillIds.join(","),
       "AgencyAF": agencyIds.length==0?"null":agencyIds.join(","),
       "CandidateAF" :candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
-      "OrderIdAF": orderId,
-      "TimesheetStartDateAF":  byTimesheetOrInvoiceValue=='0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : "null",
-      "TimesheetEndDateAF"  :  byTimesheetOrInvoiceValue=='0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'): "null",
-      "InvoiceStartDateAF"  :  byTimesheetOrInvoiceValue=='1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US'): "null",
-      "InvoiceEndDateAF"    :  byTimesheetOrInvoiceValue=='1' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'): "null",
+      "OrderIdAF": orderId ==null ? "null" : orderId,
+      "TimesheetStartDateAF":  byTimesheetOrInvoiceValue=='0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
+      "TimesheetEndDateAF"  :  byTimesheetOrInvoiceValue=='0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'):  formatDate(startDate, '12/31/9999', 'en-US'),
+      "InvoiceStartDateAF"  :  byTimesheetOrInvoiceValue=='1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US'): formatDate(startDate, '01/01/1900', 'en-US'),
+      "InvoiceEndDateAF"    :  byTimesheetOrInvoiceValue=='1' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'):  formatDate(startDate, '12/31/9999', 'en-US'),
       
     };
     this.logiReportComponent.paramsData = this.paramsData;
