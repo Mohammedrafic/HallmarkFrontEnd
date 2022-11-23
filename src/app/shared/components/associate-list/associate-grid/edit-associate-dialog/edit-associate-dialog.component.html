@@ -17,10 +17,16 @@
           </div>
           <div class="e-card-content">
             <button ejs-button cssClass="e-outline button-cancel" id="cancelFormButton" (click)="onCancel()">Cancel</button>
-            <button ejs-button [disabled]="!agencyActionsAllowed || isAgencyInactive || !canEditPermission"
-                    id="addFormButton" type="submit" [isPrimary]="true" (click)="onSave()">
-              Save
-            </button>
+            <app-tooltip-container [showToolTip]="!agencyActionsAllowed || isAgencyInactive || !canEditPermission">
+              <button
+                ejs-button
+                [disabled]="!agencyActionsAllowed || isAgencyInactive || !canEditPermission"
+                id="addFormButton"
+                type="submit"
+                [isPrimary]="true"
+                (click)="onSave()">Save
+              </button>
+            </app-tooltip-container>
           </div>
         </div>
       </section>

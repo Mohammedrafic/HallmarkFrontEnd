@@ -176,7 +176,6 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
           Validators.required,
           Validators.email,
           Validators.maxLength(100),
-          Validators.pattern(/\S+@\S+\.com/),
         ]),
         emailConfirmation: new FormControl('', [Validators.required, Validators.maxLength(100)]),
         phoneNumber: new FormControl('', [Validators.maxLength(10), Validators.minLength(10)]),

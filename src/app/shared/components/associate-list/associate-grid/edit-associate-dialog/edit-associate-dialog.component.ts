@@ -115,7 +115,7 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
     }
   }
 
-  public onSave(): void { 
+  public onSave(): void {
     let switchTabVal=this.activeTab;
     switch (switchTabVal) {
       case Tabs.JobDistribution:
@@ -153,14 +153,14 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
   }
 
   public onTabSelecting(tab: SelectingEventArgs): void {
-    this.firstActive = false;    
-     
+    this.firstActive = false;
+
     let switchTabVal=this.switchTab(tab?.selectingItem?.innerText);
-    this.activeTab = switchTabVal; 
+    this.activeTab = switchTabVal;
     switch (switchTabVal) {
       case Tabs.JobDistribution:
         this.confirmSwitchBetweenTab(this.partnershipForm, tab);
-         
+
         break;
       case Tabs.FeeSettings:
         this.confirmSwitchBetweenTab(this.feeSettingsForm, tab);
@@ -191,7 +191,7 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
         default:
         return 0;
     }
-    
+
   }
 
   private onOpenEvent(): void {

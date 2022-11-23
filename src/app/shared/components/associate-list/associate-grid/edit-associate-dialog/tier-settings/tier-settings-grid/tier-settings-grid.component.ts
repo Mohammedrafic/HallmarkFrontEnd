@@ -42,7 +42,7 @@ export class TierSettingsGridComponent extends DestroyableDirective implements O
 
   @Select(AssociateListState.getTiersExceptionPage)
   public tiersExceptionPage$: Observable<TierExceptionPage>;
-  @Select(UserState.organizationStructure)
+  @Select(UserState.tireOrganizationStructure)
   private organizationStructure$: Observable<OrganizationStructure>;
   @Select(AssociateListState.getSelectedOrganizationAgency)
   private selectedOrganizationAgency$: Observable<AssociateOrganizationsAgency>;

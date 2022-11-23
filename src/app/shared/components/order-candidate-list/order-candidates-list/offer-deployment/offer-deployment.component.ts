@@ -262,7 +262,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                   actualEndDate: this.candidateJob.actualEndDate,
                   clockId: this.candidateJob.clockId,
                   guaranteedWorkWeek: value.guaranteedWorkWeek,
-                  offeredStartDate: toCorrectTimezoneFormat(value.offeredStartDate),
+                  offeredStartDate: DateTimeHelper.toUtcFormat(new Date(value.offeredStartDate)),
                   allowDeployWoCredentials: true,
                   billRates: this.billRatesComponent.billRatesControl.value,
                 })
@@ -336,7 +336,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       yearsOfExperience: data.yearsOfExperience,
       expAsTravelers: data.expAsTravelers,
       guaranteedWorkWeek: data.guaranteedWorkWeek,
-      offeredStartDate: DateTimeHelper.formatDateUTC(data.offeredStartDate?.toString() || data.order.jobStartDate.toString(), 'MM/dd/yyyy'),
+      offeredStartDate: DateTimeHelper.formatDateUTC(data.offeredStartDate || data.order.jobStartDate.toString(), 'MM/dd/yyyy'),
     });
   }
 

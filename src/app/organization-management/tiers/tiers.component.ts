@@ -4,7 +4,7 @@ import { Actions, ofActionDispatched, Select, Store } from "@ngxs/store";
 import { filter, Observable, switchMap, takeUntil } from 'rxjs';
 
 import { ShowSideDialog } from "../../store/app.actions";
-import { GetOrganizationStructure } from '../../store/user.actions';
+import { GetOrgTierStructure } from '../../store/user.actions';
 import { UserState } from '../../store/user.state';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Tiers } from '@organization-management/store/tiers.actions';
@@ -27,7 +27,7 @@ export class TiersComponent extends AbstractPermission implements OnInit {
 
   private tierFormState: TierDTO;
 
-  @Select(UserState.organizationStructure)
+  @Select(UserState.tireOrganizationStructure)
   private organizationStructure$: Observable<OrganizationStructure>;
 
   constructor(
@@ -65,7 +65,7 @@ export class TiersComponent extends AbstractPermission implements OnInit {
   }
 
   private getOrganizationStructure(): void {
-    this.store.dispatch(new GetOrganizationStructure());
+    this.store.dispatch(new GetOrgTierStructure());
   }
 
   private watchForRegionStructure(): void {

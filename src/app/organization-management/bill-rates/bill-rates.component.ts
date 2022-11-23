@@ -56,11 +56,7 @@ export class BillRatesComponent extends AbstractPermissionGrid implements OnInit
   >();
 
   get showButton(): boolean {
-    return (
-      (!this.isExternalBillRateTypeMapping) ||
-      (this.isExternalBillRateType &&
-        (this.externalBillRatePermissionsMap.get(ExternalBillRatePermissions.ManageExternalBillRates) as boolean))
-    );
+    return !this.isExternalBillRateTypeMapping || this.isExternalBillRateType;
   }
 
   constructor(protected override store: Store) {

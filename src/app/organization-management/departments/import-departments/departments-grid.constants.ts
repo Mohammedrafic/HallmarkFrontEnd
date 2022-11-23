@@ -2,7 +2,7 @@ import { ColDef } from "@ag-grid-community/core";
 
 import { GridErroredCellComponent } from "@shared/components/import-dialog-content/grid-errored-cell/grid-errored-cell.component";
 
-export const DepartmentsColumns = (isIRPEnabled: boolean): ColDef[] => {
+export const DepartmentsColumns = (isIRPEnabled: boolean, isInvoiceDepartmentIdFieldShow: boolean): ColDef[] => {
   const result = [
     {
       field: 'orgName',
@@ -35,12 +35,6 @@ export const DepartmentsColumns = (isIRPEnabled: boolean): ColDef[] => {
       cellRenderer: GridErroredCellComponent,
     },
     {
-      field: 'invoiceDepartmentId',
-      width: 200,
-      headerName: 'Invoice Department ID',
-      cellRenderer: GridErroredCellComponent,
-    },
-    {
       field: 'facilityContact',
       width: 150,
       headerName: 'Department Contact',
@@ -65,6 +59,16 @@ export const DepartmentsColumns = (isIRPEnabled: boolean): ColDef[] => {
       cellRenderer: GridErroredCellComponent,
     },
   ];
+
+  if (isInvoiceDepartmentIdFieldShow) {
+    result.splice(5, 0, {
+      field: 'invoiceDepartmentId',
+      width: 200,
+      headerName: 'Invoice Department ID',
+      cellRenderer: GridErroredCellComponent,
+    });
+  }
+
   if (isIRPEnabled) {
     result.push({
       field: 'includeInIRP',

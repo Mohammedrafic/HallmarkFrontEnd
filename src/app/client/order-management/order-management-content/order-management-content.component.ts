@@ -26,16 +26,16 @@ import {
   SetLock
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Permission } from "@core/interface";
+import { Permission } from '@core/interface';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { GetAllOrganizationSkills, GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
+import { GetAssignedSkillsByOrganization, GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
-import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { FilteredItem } from '@shared/models/filter.model';
 import {
   FilterOrderStatus,
@@ -163,7 +163,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
 
-  @Select(OrganizationManagementState.allOrganizationSkills)
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
   skills$: Observable<Skill[]>;
 
   @Select(OrganizationManagementState.organizationSettings)
@@ -272,6 +272,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private filterApplied = false;
   private isIncomplete = false;
   private timesheetRedirect = false;
+  private redirectFromPerdiem = false;
   private cd$ = new Subject();
 
   constructor(
@@ -1080,7 +1081,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         if (!this.previousSelectedOrderId) {
           this.pageSubject.next(1);
         }
-        this.store.dispatch(new GetAllOrganizationSkills());
+        this.store.dispatch(new GetAssignedSkillsByOrganization());
       });
   }
 
@@ -1101,10 +1102,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private onGridPageChangedHandler(): void {
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
-      if (this.orderPerDiemId || this.orderId) {
-        this.filters.orderPublicId = this.prefix + '-' + this.orderPerDiemId;
+      const { selectedOrderAfterRedirect } = this.orderManagementService;
+      if (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect) {
+        this.filters.orderPublicId = (this.prefix || selectedOrderAfterRedirect?.prefix) + '-' + (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect?.orderId);
         this.OrderFilterFormGroup.controls['orderPublicId'].setValue(
-          (this.prefix + '-' + (this.orderPerDiemId || this.orderId))?.toString()
+          ((this.prefix || selectedOrderAfterRedirect?.prefix) + '-' + (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect?.orderId))?.toString()
         );
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
       }
@@ -1263,8 +1265,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.filterColumns.orderStatuses.dataSource = statuses;
         this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
         this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
-        if (!this.timesheetRedirect) {
+        if (!this.timesheetRedirect && !this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect) {
           this.setDefaultFilter();
+        } else {
+          this.redirectFromPerdiem = false;
         }
         this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
         this.cd$.next(true);
@@ -1534,10 +1538,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.currentPage = 1;
         this.orderId = data.id;
         this.prefix = data.prefix;
+        this.clearFilters();
         this.filters.orderPublicId = this.prefix + '-' + this.orderId;
         this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
-        this.getOrders();
+        this.getOrders(true);
       });
   }
 
@@ -1547,10 +1552,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       .subscribe((data: { id: number; prefix: string }) => {
         this.orderId = data.id;
         this.prefix = data.prefix;
+        this.clearFilters();
+        this.redirectFromPerdiem = true;
         this.filters.orderPublicId = this.prefix + '-' + this.orderId;
         this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
-        this.getOrders();
+        this.getOrders(true);
       });
   }
 

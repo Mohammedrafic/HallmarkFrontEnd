@@ -30,6 +30,8 @@ export class PaymentDetailsGridComponent
 
   @Input() paymentsFormArray: FormArray;
 
+  @Input() hasPermissions: boolean = false;
+
   public openEvent: Subject<boolean> = new Subject<boolean>();
   public override gridHeight = '250';
   public initialSort = {

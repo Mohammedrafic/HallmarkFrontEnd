@@ -134,6 +134,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private orderPerDiemId: number | null;
   private prefix: string | null;
   private orderId: number | null;
+  private redirectFromPerDiem = false;
 
   private isAlive = true;
   private selectedIndex: number | null;
@@ -280,9 +281,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         const candidate = orderMyAgency.children.find(
           (candidate: OrderManagementChild) => candidate.candidateId === selectedOrderAfterRedirect.candidateId
         );
-        this.gridWithChildRow.detailRowModule.expand(0);
+        
         this.onOpenCandidateDialog(candidate as OrderManagementChild, orderMyAgency);
         this.orderManagementAgencyService.selectedOrderAfterRedirect = null;
+        this.gridWithChildRow.detailRowModule.expand(0);
       }
     }
   }
@@ -357,7 +359,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.setDefaultStatuses(statuses);
       }
     } else {
-      this.setDefaultStatuses(statuses);
+      const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
+      if (this.redirectFromPerDiem || selectedOrderAfterRedirect) {
+        this.redirectFromPerDiem = false;
+        selectedOrderAfterRedirect && this.selectedTab && this.dispatchNewPage();
+      } else {
+        this.setDefaultStatuses(statuses);
+      }
     }
   }
 
@@ -713,6 +721,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       .subscribe((data: { id: number; prefix: string }) => {
         this.orderId = data.id;
         this.prefix = data.prefix;
+        this.clearFilters();
         this.filters.orderPublicId = this.prefix + '-' + this.orderId;
         this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
@@ -727,6 +736,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       .subscribe((data: { id: number; prefix: string }) => {
         this.orderId = data.id;
         this.prefix = data.prefix;
+        this.redirectFromPerDiem = true;
+        this.clearFilters();
         this.filters.orderPublicId = this.prefix + '-' + this.orderId;
         this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
         this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
@@ -815,9 +826,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private hasOrderMyAgencyId(): void {
     const { selectedOrderAfterRedirect } = this.orderManagementAgencyService;
     if (selectedOrderAfterRedirect) {
-      this.OrderFilterFormGroup.patchValue({ orderId: selectedOrderAfterRedirect.orderId.toString() });
+      this.OrderFilterFormGroup.patchValue({ orderPublicId: selectedOrderAfterRedirect.prefix + '-' + selectedOrderAfterRedirect.orderId.toString() });
       this.filters = this.OrderFilterFormGroup.getRawValue();
-      this.filters.orderPublicId = selectedOrderAfterRedirect.prefix + '-' + selectedOrderAfterRedirect.orderId;
       this.filters.includeReOrders = false;
       this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
       this.filteredItems$.next(this.filteredItems.length);

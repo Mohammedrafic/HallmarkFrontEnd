@@ -3,21 +3,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GridComponent, SearchService } from '@syncfusion/ej2-angular-grids';
 import { combineLatest, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
-import {
-  AbstractGridConfigurationComponent
-} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrganizationManagementState } from '../../../store/organization-management.state';
 import { ShowSideDialog } from '../../../../store/app.actions';
-import {
-  CANCEL_CONFIRM_TEXT,
-  DELETE_CONFIRM_TITLE,
-  DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE
-} from '@shared/constants/messages';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants/messages';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CredentialSkillGroup, CredentialSkillGroupPage, CredentialSkillGroupPost } from '@shared/models/skill-group.model';
 import {
-  GetAllOrganizationSkills,
+  GetAssignedSkillsByOrganization,
   GetCredentialSkillGroup,
   RemoveCredentialSkillGroup,
   SaveUpdateCredentialSkillGroup
@@ -43,7 +36,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   skillGroups$: Observable<CredentialSkillGroupPage>;
   public skillGroups: CredentialSkillGroup[];
 
-  @Select(OrganizationManagementState.allOrganizationSkills)
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
   allOrganizationSkills$: Observable<Skill[]>;
   public filteredAssignedSkills: Skill[];
   public allAssignedSkills: Skill[];
@@ -265,7 +258,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.currentPage = 1;
       this.store.dispatch(new GetCredentialSkillGroup());
-      this.store.dispatch(new GetAllOrganizationSkills());
+      this.store.dispatch(new GetAssignedSkillsByOrganization());
     });
   }
 

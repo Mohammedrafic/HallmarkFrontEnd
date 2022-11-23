@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { SpecialProjectTabs, AddButtonText } from '@shared/enums/special-project-tabs.enum'
+import { AddButtonText, SpecialProjectTabs } from '@shared/enums/special-project-tabs.enum';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ShowSideDialog } from '../../../store/app.actions';
@@ -14,10 +14,10 @@ import { SpecialProjectState } from '../../store/special-project.state';
 import { ProjectType } from '@shared/models/project.model';
 import { GetProjectTypes, GetSpecialProjectById, SaveSpecialProject } from '../../store/special-project.actions';
 import { SpecialProject } from '@shared/models/special-project.model';
-import { GetAllOrganizationSkills } from '../../store/organization-management.actions';
+import { GetAssignedSkillsByOrganization } from '../../store/organization-management.actions';
 import { SpecialProjectsComponent } from '../components/special-projects/special-projects.component';
 import { PurchaseOrdersComponent } from '../components/purchase-orders/purchase-orders.component';
-import { GetPurchaseOrders, GetPurchaseOrderById, SavePurchaseOrder } from '../../store/purchase-order.actions';
+import { GetPurchaseOrderById, GetPurchaseOrders, SavePurchaseOrder } from '../../store/purchase-order.actions';
 import { PurchaseOrder, PurchaseOrderPage } from '@shared/models/purchase-order.model';
 import { PurchaseOrderState } from '../../store/purchase-order.state';
 import { SpecialProjectCategoryState } from '../../store/special-project-category.state';
@@ -26,17 +26,21 @@ import { SpecialProjectCategory } from '@shared/models/special-project-category.
 import { GetSpecialProjectCategoryById, SaveSpecialProjectCategory } from '../../store/special-project-category.actions';
 import { FormControlNames } from '../enums/specialproject.enum';
 import { ProjectNames, SaveSpecialProjectMappingDto } from '@shared/models/special-project-mapping.model';
-import { GetProjectNamesByTypeId, SaveSpecialProjectMapping, SpecialProjectShowConfirmationPopUp } from '../../store/special-project-mapping.actions';
+import {
+  GetProjectNamesByTypeId,
+  SaveSpecialProjectMapping,
+  SpecialProjectShowConfirmationPopUp
+} from '../../store/special-project-mapping.actions';
 import { ProjectMappingComponent } from '../components/project-mapping/project-mapping.component';
 import { SpecialProjectMappingState } from '../../store/special-project-mapping.state';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE } from '@shared/constants';
 import { SavePurchaseOrderMapping, ShowConfirmationPopUp } from '../../store/purchase-order-mapping.actions';
-import {  SavePurchaseOrderMappingDto } from '../../../shared/models/purchase-order-mapping.model';
+import { SavePurchaseOrderMappingDto } from '../../../shared/models/purchase-order-mapping.model';
 import { PurchaseOrderMappingComponent } from '../components/purchase-order-mapping/purchase-order-mapping.component';
 import { datesValidator } from '@shared/validators/date.validator';
-import { AbstractPermission } from "@shared/helpers/permissions";
+import { AbstractPermission } from '@shared/helpers/permissions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
@@ -88,7 +92,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
   public regions: OrganizationRegion[] = [];
   public orgStructureData: any;
 
-  @Select(OrganizationManagementState.allOrganizationSkills)
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
   skills$: Observable<Skill[]>;
 
   @Select(SpecialProjectState.projectTypes)
@@ -524,7 +528,7 @@ export class SpecialProjectContainerComponent extends AbstractPermission impleme
   }
 
   private onSkillDataLoadHandler(): void {
-    this.store.dispatch(new GetAllOrganizationSkills());
+    this.store.dispatch(new GetAssignedSkillsByOrganization());
     this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe((skills) => {
       if (skills && skills.length > 0) {
         this.orgStructureData.skillIds.dataSource = skills;

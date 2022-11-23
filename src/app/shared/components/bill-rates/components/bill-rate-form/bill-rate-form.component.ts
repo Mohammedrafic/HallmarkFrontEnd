@@ -143,7 +143,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
       const billRatesDates = billRates.map(el => el.effectiveDate);
       const date = this.billRateForm.get('effectiveDate')?.value;
 
-      const idx = DateTimeHelper.findPreviousNearestDate(billRatesDates, date);
+      const idx = DateTimeHelper.findPreviousNearestDateIndex(billRatesDates, date);
 
       if (idx !== null && billRates[idx]) {
         const { seventhDayOtEnabled, weeklyOtEnabled, dailyOtEnabled } = billRates[idx];
@@ -283,7 +283,7 @@ export class BillRateFormComponent implements OnInit, OnDestroy {
       }),
     });
   }
-  
+
   private setFormatdecimalsValues(): void {
     const isBillRateUnitHours = this.selectedBillRateUnit === this.BillRateUnitList.Hours;
     this.format = isBillRateUnitHours ? '#' : this.isMileageTitleType ? '###.00' : '###.000';

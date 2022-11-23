@@ -88,8 +88,13 @@
           </div>
         </ng-template>
       </e-column>
+      <e-column field="includeInIRPText" headerText="Include in IRP" width=200 *ngIf="isFeatureIrpEnabled && isOrgIrpEnabled && isOrgVMSEnabled">
+        <ng-template #template let-data>
+          <span>{{ data.includeInIRPText }}</span>
+        </ng-template>
+      </e-column>
       <e-column field="externalId" headerText="LOCATION Id" width=200></e-column>
-      <e-column field="invoiceId" headerText="INVOICE LOCATION ID" width=200></e-column>
+      <e-column field="invoiceId" headerText="INVOICE LOCATION ID" width=200 *ngIf="isOrgVMSEnabled || !isFeatureIrpEnabled"></e-column>
       <e-column field="name" headerText="LOCATION NAME" width=200></e-column>
       <e-column field="businessLine" headerText="Business Line" width=200></e-column>
       <e-column field="address1" headerText="ADDRESS 1" width=200></e-column>
@@ -99,11 +104,6 @@
       <e-column field="zip" headerText="ZIP" width=200></e-column>
       <e-column field="contactPerson" headerText="CONTACT PERSON" width=200></e-column>
       <e-column field="timeZone" headerText="Timezone" width=200></e-column>
-      <e-column field="includeInIRP" headerText="Include in IRP" width=200 *ngIf="isFeatureIrpEnabled && isOrgIrpEnabled">
-        <ng-template #template let-data>
-          <span>{{ data.includeInIRP ? 'Yes' : 'No'}}</span>
-        </ng-template>
-      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
@@ -183,7 +183,7 @@
         </ejs-multiselect>
       </div>
     </div>
-    <div class="input-container">
+    <div class="input-container" *ngIf="isOrgVMSEnabled || !isFeatureIrpEnabled">
       <label>Invoice Location ID</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
@@ -268,7 +268,7 @@
       </div>
     </div>
     <!-- Remove condition after feature implemented -->
-    <div class="input-container" *ngIf="isFeatureIrpEnabled && isOrgIrpEnabled">
+    <div class="input-container" *ngIf="isFeatureIrpEnabled && isOrgIrpEnabled && isOrgVMSEnabled">
       <label>Include in IRP</label>
       <div class="input-group multiselect">
         <ejs-dropdownlist mode="CheckBox"
@@ -472,4 +472,9 @@
   </ng-template>
 </ejs-dialog>
 
-<app-import-locations [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-import-locations>
+<app-import-locations
+  [dialogEvent]="importDialogEvent"
+  [irpFlagEnabled]="isFeatureIrpEnabled"
+  [orgIrpEnabled]="isOrgIrpEnabled"
+  [orgVMSEnabled]="isOrgVMSEnabled"
+  (reloadItemsList)="updatePage()"></app-import-locations>

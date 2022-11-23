@@ -399,3 +399,7 @@ export const LocationsDialogWithIrpConfig: LocationDialogConfig = {
 export const FieldsToHideInIrp: string[] = ['invoiceId'];
 
 export const FieldsToHideInVms: string[] = ['includeInIRP'];
+
+export const ExportImportColumnsToHideInIrp: string[] = ['InvoiceId'];
+
+export const ExportImportColumnsToHideInVms: string[] = ['IncludeInIRPText'];

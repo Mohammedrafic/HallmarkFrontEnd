@@ -367,7 +367,12 @@ export const MENU_CONFIG: any = {
       // Document Management
       icon: 'file',
       route: '/documents/document-library',
-    }
+    },
+    82: {
+      // New Accrual Report
+      icon: '',
+      route: '/analytics/accrual-report',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -539,7 +544,12 @@ export const MENU_CONFIG: any = {
       // Document Management
       icon: 'file',
       route: '/documents/document-library',
-    }
+    },
+    82: {
+      // New Accrual Report
+      icon: '',
+      route: '/analytics/accrual-report',
+    },
   },
 
   [BusinessUnitType.Organization]: {
@@ -872,7 +882,12 @@ export const MENU_CONFIG: any = {
       // Document Management
       icon: 'file',
       route: '/documents/document-library',
-    }
+    },
+    82: {
+      // New Accrual Report
+      icon: '',
+      route: '/analytics/accrual-report',
+    },
   },
 
   [BusinessUnitType.Agency]: {
