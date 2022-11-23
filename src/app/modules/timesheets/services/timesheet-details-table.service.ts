@@ -66,7 +66,7 @@ export class TimesheetDetailsTableService {
           editMode: true,
           isEditable: false,
           type: EditFieldTypes.Text,
-          validators: [Validators.min(0), Validators.max(24), Validators.required],
+          validators: [Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER), Validators.required],
         }
       },
       {

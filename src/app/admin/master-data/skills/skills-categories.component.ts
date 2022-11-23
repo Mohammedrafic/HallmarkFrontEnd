@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { Subject } from 'rxjs';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { GetAllSkillsCategories } from '../../store/admin.actions';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 
 enum Tabs {
   'Skills',
@@ -17,7 +17,7 @@ enum Tabs {
   templateUrl: './skills-categories.component.html',
   styleUrls: ['./skills-categories.component.scss']
 })
-export class SkillsCategoriesComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class SkillsCategoriesComponent extends AbstractPermissionGrid implements OnInit {
   public currentTab: Tabs = 0;
   public tabs = Tabs;
   public isSkillsActive = true;
@@ -25,13 +25,16 @@ export class SkillsCategoriesComponent extends AbstractGridConfigurationComponen
   public exportSkills$ = new Subject<ExportedFileType>();
   public exportCategories$ = new Subject<ExportedFileType>();
   public filteredItems$ = new Subject<number>();
+  public canAddSkillOrCategories = true;
 
-  constructor(private store: Store) {
-    super();
+  constructor(protected override store: Store) {
+    super(store);
   }
 
-  ngOnInit() {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.store.dispatch(new GetAllSkillsCategories());
+    this.getPermissionSkillCategories();
   }
 
   public showFilters(): void {
@@ -58,5 +61,12 @@ export class SkillsCategoriesComponent extends AbstractGridConfigurationComponen
     this.isSkillsActive = this.tabs['Skills'] === data.selectedIndex;
     this.isCategoriesActive = this.tabs['Categories'] === data.selectedIndex;
     this.currentTab = data.selectedIndex;
+    this.getPermissionSkillCategories();
+  }
+
+  private getPermissionSkillCategories(): void {
+    this.canAddSkillOrCategories = this.currentTab === 0 ?
+      this.userPermission[this.userPermissions.CanEditMasterSkills] :
+      this.userPermission[this.userPermissions.CanEditSkillCategories];
   }
 }

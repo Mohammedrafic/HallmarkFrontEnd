@@ -19,7 +19,7 @@
             <button ejs-button cssClass="e-outline button-cancel" id="cancelFormButton" (click)="onCancel()">
               Cancel
             </button>
-            <button ejs-button id="addFormButton" type="submit" [isPrimary]="true" (click)="onAdd()">Add</button>
+            <button ejs-button id="addFormButton" type="submit" [isPrimary]="true" (click)="onAdd()" [disabled]="disableSaveButton">Add</button>
           </div>
         </div>
       </section>
@@ -36,6 +36,7 @@
               appValidateWithMessage
               formControlName="regionIds"
               mode="CheckBox"
+              [allowFiltering]="true"
               [fields]="optionFields"
               [dataSource]="feeExceptionsInitialData.regions"
             ></ejs-multiselect>
@@ -48,6 +49,7 @@
               mode="CheckBox"
               appValidateWithMessage
               formControlName="classifications"
+              [allowFiltering]="true"
               [fields]="optionFields"
               [dataSource]="classification"
             ></ejs-multiselect>
@@ -60,6 +62,7 @@
               mode="CheckBox"
               appValidateWithMessage
               formControlName="masterSkillIds"
+              [allowFiltering]="true"
               [fields]="masterSkillsFields"
               [dataSource]="feeExceptionsInitialData.masterSkills"
             ></ejs-multiselect>

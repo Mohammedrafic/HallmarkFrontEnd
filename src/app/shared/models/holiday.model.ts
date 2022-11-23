@@ -1,5 +1,6 @@
 import { OrganizationRegion } from "./organization.model";
 import { PageOfCollections } from "./page.model";
+import { DateTimeHelper } from '@core/helpers';
 
 export class Holiday {
   id: number;
@@ -10,8 +11,8 @@ export class Holiday {
   constructor(holiday: Holiday) {
     this.id = holiday.id;
     this.holidayName = holiday.holidayName;
-    this.startDateTime = holiday.startDateTime;
-    this.endDateTime = holiday.endDateTime;
+    this.startDateTime = DateTimeHelper.toUtcFormat(holiday.startDateTime);
+    this.endDateTime = DateTimeHelper.toUtcFormat(holiday.endDateTime);
   }
 }
 
@@ -32,12 +33,12 @@ export class OrganizationHoliday {
   foreignKey?: string;
   isOrganizationHoliday: boolean;
 
-  constructor(holiday: OrganizationHoliday, selectedRegions?: OrganizationRegion[], allRegionsAndLocations?: boolean, isExist?: boolean) {
+  constructor(holiday: OrganizationHoliday, selectedRegions?: OrganizationRegion[], allRegions?: boolean, allLocations?: boolean, isExist?: boolean) {
     this.id = holiday.id;
     this.masterHolidayId = holiday.masterHolidayId;
     this.holidayName = holiday.holidayName;
-    this.startDateTime = holiday.startDateTime;
-    this.endDateTime = holiday.endDateTime;
+    this.startDateTime = DateTimeHelper.toUtcFormat(holiday.startDateTime);
+    this.endDateTime = DateTimeHelper.toUtcFormat(holiday.endDateTime);
     this.regionId = holiday.regionId || null;
     this.locationId = holiday.locationId || null;
 
@@ -47,19 +48,21 @@ export class OrganizationHoliday {
 
     if (selectedRegions) {
       const regions: OrganizationRegion[] = [];
-      if (allRegionsAndLocations) {
+      if (allRegions && allLocations) {
         regions.push({
           id: null,
           locations: null
         });
       } else {
-        holiday.regions?.forEach((regionId: number) => {
+        let selectedRegionsByLocations: any[] = [];
+        selectedRegionsByLocations = selectedRegions.filter(region => region.locations?.find(location => holiday.locations?.includes(location.id))).map(region => region.id);
+        selectedRegionsByLocations.forEach((regionId: number) => {
           const region = selectedRegions.find(region => region.id === regionId);
           const locations = region?.locations?.filter(location => holiday.locations?.includes(location.id)).map(location => location.id);
           if (region) {
             regions.push({
               id: region.id,
-              locations: locations as []
+              locations: allLocations ? null : locations as []
             });
           }
         });

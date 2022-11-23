@@ -1,57 +1,57 @@
-import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { DatePipe } from '@angular/common';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { filter, Observable, Subject, takeUntil, throttleTime ,take, map} from 'rxjs';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { combineLatest, filter, map, Observable, Subject, switchMap, take, takeUntil, throttleTime } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { OrganizationManagementState } from '../store/organization-management.state';
-import { Region } from '@shared/models/region.model';
-import {
-  ClearLocationList,
-  DeleteLocationById,
-  ExportLocations,
-  GetLocationFilterOptions,
-  GetLocationsByRegionId,
-  GetOrganizationById,
-  GetRegions,
-  SaveLocation,
-  SaveRegion,
-  SetGeneralStatesByCountry,
-  UpdateLocation,
-  GetLocationTypes,
-  GetUSCanadaTimeZoneIds
-} from '../store/organization-management.actions';
-import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
-import { MessageTypes } from '@shared/enums/message-types';
-import { Location, LocationFilter, LocationFilterOptions, LocationsPage } from '@shared/models/location.model';
-
-import { PhoneTypes } from '@shared/enums/phone-types';
-import {
-  CANCEL_CONFIRM_TEXT,
-  DELETE_CONFIRM_TITLE,
-  DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE,
-} from '@shared/constants';
-import { Organization } from '@shared/models/organization.model';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { UserState } from '../../store/user.state';
-import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
-import { DatePipe } from '@angular/common';
-import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { FilteredItem } from '@shared/models/filter.model';
-import { FilterService } from '@shared/services/filter.service';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import { BusinessLinesState } from '@organization-management/store/business-lines.state';
-import { BusinessLines } from '@shared/models/business-line.model';
+import { TakeUntilDestroy } from '@core/decorators';
+import { FieldType, UserPermissions } from '@core/enums';
+import { DropdownOption } from '@core/interface';
 import { GetAllBusinessLines } from '@organization-management/store/business-lines.action';
-
-
-export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
+import { BusinessLinesState } from '@organization-management/store/business-lines.state';
+import {
+  CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE
+} from '@shared/constants';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { MessageTypes } from '@shared/enums/message-types';
+import { PhoneTypes } from '@shared/enums/phone-types';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { BusinessLines } from '@shared/models/business-line.model';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { FilteredItem } from '@shared/models/filter.model';
+import {
+  Location, LocationFilter, LocationFilterOptions, LocationsPage,
+  LocationType, TimeZoneModel
+} from '@shared/models/location.model';
+import { Organization } from '@shared/models/organization.model';
+import { Region } from '@shared/models/region.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { FilterService } from '@shared/services/filter.service';
+import { AppState } from 'src/app/store/app.state';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
+import { UserState } from '../../store/user.state';
+import {
+  ClearLocationList, DeleteLocationById, ExportLocations, GetLocationFilterOptions,
+  GetLocationsByRegionId, GetLocationTypes, GetOrganizationById, GetRegions, GetUSCanadaTimeZoneIds,
+  SaveLocation, SaveRegion, SetGeneralStatesByCountry, UpdateLocation
+} from '../store/organization-management.actions';
+import { OrganizationManagementState } from '../store/organization-management.state';
+import {
+  ExportImportColumnsToHideInIrp,
+  ExportImportColumnsToHideInVms,
+  FieldsToHideInIrp, FieldsToHideInVms, LocationExportColumns, LocationInitFilters,
+  LocationsDialogConfig, LocationsDialogWithIrpConfig, LocationsExportIrpColumns,
+  MESSAGE_REGIONS_NOT_SELECTED
+} from './locations.constant';
+import { LocationsTrackKey } from './locations.enum';
+import { LocationsFormConfig, LocationsFormSource, LocationsSubFormConfig } from './locations.interface';
+import { LocationsService } from './locations.service';
 
 @Component({
   selector: 'app-locations',
@@ -59,201 +59,134 @@ export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
   styleUrls: ['./locations.component.scss'],
   providers: [MaskedDateTimeService],
 })
-export class LocationsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+@TakeUntilDestroy
+export class LocationsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
   @ViewChild('addRegionDialog') addRegionDialog: DialogComponent;
 
   @Select(OrganizationManagementState.statesGeneral)
-  statesGeneral$: Observable<string[]>;
+  public readonly statesGeneral$: Observable<string[]>;
 
   @Select(OrganizationManagementState.phoneTypes)
-  phoneTypes$: Observable<FieldSettingsModel[]>;
+  public readonly phoneTypes$: Observable<string[]>;
 
   @Select(OrganizationManagementState.regions)
-  regions$: Observable<Region[]>;
-  regionFields: FieldSettingsModel = { text: 'name', value: 'id'};
-  selectedRegion: Region;
-  defaultValue: any;
+  public readonly regions$: Observable<Region[]>;
 
   @Select(OrganizationManagementState.locationsByRegionId)
-  locations$: Observable<LocationsPage>;
-
-  locationDetailsFormGroup: FormGroup;
-  regionFormGroup: FormGroup;
-  formBuilder: FormBuilder;
+  public readonly locations$: Observable<LocationsPage>;
 
   @Select(OrganizationManagementState.organization)
-  organization$: Observable<Organization>;
+  public readonly organization$: Observable<Organization>;
 
   @Select(UserState.lastSelectedOrganizationId)
-  organizationId$: Observable<number>;
+  public readonly organizationId$: Observable<number>;
 
   @Select(OrganizationManagementState.locationFilterOptions)
-  locationFilterOptions$: Observable<LocationFilterOptions>;
-
+  public readonly locationFilterOptions$: Observable<LocationFilterOptions>;
 
   @Select(OrganizationManagementState.locationTypes)
-  locationTypes$: Observable<GetLocationTypes>;
-  locationTypeOptionFields:FieldSettingsModel ={    text: 'name', value: 'locationTypeId'  };
+  public readonly locationTypes$: Observable<LocationType[]>;
 
   @Select(OrganizationManagementState.timeZones)
-  timeZoneIds$: Observable<GetUSCanadaTimeZoneIds>;
-  timeZoneOptionFields: FieldSettingsModel = { text: 'systemTimeZoneName', value: 'timeZoneId'};
+  public readonly timeZoneIds$: Observable<TimeZoneModel[]>;
 
-  @Select(BusinessLinesState.allBusinessLines) public readonly businessLines$: Observable<BusinessLines[]>;
-  public businessLineDataSource: BusinessLines[];
-  public readonly businessLineFields = { text: 'line', value: 'id' };
+  @Select(BusinessLinesState.allBusinessLines)
+  public readonly businessLines$: Observable<BusinessLines[]>;
 
-  isEdit: boolean;
-  editedLocationId?: number;
-
-  private unsubscribe$: Subject<void> = new Subject();
-  private pageSubject = new Subject<number>();
-
-  get dialogHeader(): string {
-    return this.isEdit ? 'Edit' : 'Add';
-  }
-
-  public columnsToExport: ExportColumn[] = [
-    { text: 'Ext Location ID', column: 'ExternalId' },
-    { text: 'Invoice Location ID', column: 'InvoiceId' },
-    { text: 'Location Name', column: 'Name' },
-    { text: 'Business Line', column: 'BusinessLine' },
-    { text: 'Address 1', column: 'Address1' },
-    { text: 'Address 2', column: 'Address2' },
-    { text: 'City', column: 'City' },
-    { text: 'State', column: 'State' },
-    { text: 'Zip', column: 'Zip' },
-    { text: 'Contact Person', column: 'ContactPerson' }
-  ];
+  public readonly regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  public readonly dropDownfields = { text: 'text', value: 'value' };
+  public locationDetailsFormGroup: FormGroup;
+  public regionFormGroup: FormGroup;
+  public selectedRegion: Region;
+  public defaultValue: Region;
+  public businessLineDataSource: DropdownOption[] = [];
+  public columnsToExport: ExportColumn[] = LocationExportColumns;
   public fileName: string;
   public defaultFileName: string;
-  private businessUnitId: number;
-  public LocationFilterFormGroup: FormGroup;
+  public locationFilterForm: FormGroup;
   public filters: LocationFilter = {
     pageNumber: this.currentPage,
     pageSize: this.pageSizePager
   };
-  public filterColumns: any;
+  public filterColumns = LocationInitFilters;
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
+  public isEdit: boolean;
+  public editedLocationId?: number;
+  public formSourcesMap: LocationsFormSource = {
+    businessLineData: [],
+    locationTypes: [],
+    timeZoneIds: [],
+    states: [],
+    phoneType: [],
+  };
+  public locationDialogConfig = LocationsDialogConfig;
+  public readonly FieldTypes = FieldType;
+  /**
+   * Feature flag.
+   * TODO: combine flags with object (primitive type obsession)
+   */
+  public isFeatureIrpEnabled = false;
+  public isOrgVMSEnabled = true;
+  public isOrgIrpEnabled = false;
 
-  constructor(private store: Store,
-    @Inject(FormBuilder) private builder: FormBuilder,
-    private confirmService: ConfirmService,
-    private datePipe: DatePipe,
-    private filterService: FilterService) {
-    super();
+  private businessUnitId: number;
+  private pageSubject = new Subject<number>();
+  private componentDestroy: () => Observable<unknown>;
 
-    this.formBuilder = builder;
-    this.createLocationForm();
+
+  get dialogHeader(): string {
+    return this.isEdit ? 'Edit Location' : 'Add Location';
   }
 
+  constructor(
+    protected override store: Store,
+    private confirmService: ConfirmService,
+    private datePipe: DatePipe,
+    private filterService: FilterService,
+    private locationsService: LocationsService,
+  ) {
+    super(store);
+    this.createForms();
+    this.setIrpFeatureFlag();
+  }
 
-  ngOnInit(): void {
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
-      this.currentPage = page;
-      this.getLocations();
-    });
-    this.filterColumns = {
-      externalIds: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      invoiceIds: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      names: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      addresses1: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      cities: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      states: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      zipCodes: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      contactPeople: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+  override ngOnInit(): void {
+    super.ngOnInit();
+    this.watchForPageChange();
+    this.populateFilterOptions();
+    this.watchForOrgChange();
+    this.watchForOrganizations();
+    this.populateFormOptions();
+    if (this.isFeatureIrpEnabled) {
+      this.setPermissions();
     }
-    this.locationFilterOptions$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(options => {
-      this.filterColumns.externalIds.dataSource = options.externalIds;
-      this.filterColumns.invoiceIds.dataSource = options.ivnoiceIds;
-      this.filterColumns.names.dataSource = options.locationNames;
-      this.filterColumns.addresses1.dataSource = options.addresses1;
-      this.filterColumns.cities.dataSource = options.cities;
-      this.filterColumns.states.dataSource = options.states;
-      this.filterColumns.zipCodes.dataSource = options.zipCodes;
-      this.filterColumns.contactPeople.dataSource = options.contactPersons;
-    });
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
-      this.businessUnitId = id;
-      this.getOrganization();
-      this.clearFilters();
-    });
-    this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
-      this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
-      this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
-        .subscribe((data) => {
-          this.defaultValue = data.organizationManagement.regions[0]?.id;
-        });;
-    });
     this.store.dispatch(new GetLocationTypes());
     this.store.dispatch(new GetUSCanadaTimeZoneIds());
     this.store.dispatch(new GetAllBusinessLines());
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
     this.store.dispatch(new ClearLocationList());
   }
 
-  private getOrganization() {
-    if (this.businessUnitId) {
-      this.store.dispatch(new GetOrganizationById(this.businessUnitId));
-    } else {
-      this.store.dispatch(new GetOrganizationById(this.store.selectSnapshot(UserState.user)?.businessUnitId as number));
-    }
-  }
-
-  private getLocations() {
-    this.filters.orderBy = this.orderBy;
-    this.filters.pageNumber = this.currentPage;
-    this.filters.pageSize = this.pageSize;
-    this.store.dispatch([
-      new GetLocationsByRegionId(this.selectedRegion.id as number, this.filters),
-      new GetLocationFilterOptions(this.selectedRegion.id as number)
-    ]);
-  }
-
-  public override updatePage(): void {
-    this.getLocations();
-  }
-
-  public override customExport(): void {
-    this.defaultFileName = 'Organization Locations ' + this.generateDateTime(this.datePipe);
-    this.fileName = this.defaultFileName;
-    this.store.dispatch(new ShowExportDialog(true));
-  }
-
-  public closeExport() {
+  closeExport(): void {
     this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
   }
 
-  public export(event: ExportOptions): void {
+  export(event: ExportOptions): void {
     this.closeExport();
     this.defaultExport(event.fileType, event);
   }
 
-  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.defaultFileName = 'Organization Locations ' + this.generateDateTime(this.datePipe);
-    this.store.dispatch(new ExportLocations(new ExportPayload(
-      fileType,
-      { ...this.filters },
-      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
-      this.selectedItems.length ? this.selectedItems.map(val => val.id) : null,
-      options?.fileName || this.defaultFileName
-    )));
-    this.clearSelection(this.grid);
-  }
-
-  public showFilters(): void {
+  showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
-  public onFilterClose() {
-    this.LocationFilterFormGroup.setValue({
+  closeFilter(): void {
+    this.locationFilterForm.setValue({
       externalIds: this.filters.externalIds || [],
       invoiceIds: this.filters.invoiceIds || [],
       names: this.filters.names || [],
@@ -262,62 +195,54 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       states: this.filters.states || [],
       zipCodes: this.filters.zipCodes || [],
       contactPeople: this.filters.contactPeople || [],
+      includeInIRP: this.filters.includeInIRP || null,
     });
-    this.filteredItems = this.filterService.generateChips(this.LocationFilterFormGroup, this.filterColumns);
+    this.filteredItems = this.filterService.generateChips(this.locationFilterForm, this.filterColumns);
   }
 
-  public onFilterDelete(event: FilteredItem): void {
-    this.filterService.removeValue(event, this.LocationFilterFormGroup, this.filterColumns);
+  deleteFilter(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.locationFilterForm, this.filterColumns);
   }
 
-  private clearFilters(): void {
-    this.LocationFilterFormGroup.reset();
-    this.filteredItems = [];
-    this.currentPage = 1;
-    this.filters = {
-      regionId: this.selectedRegion?.id,
-      pageNumber: this.currentPage,
-      pageSize: this.pageSizePager
-    };
-  }
-
-  public onFilterClearAll(): void {
-    this.clearFilters();
+  clearFilter(): void {
+    this.clearFilterForm();
     this.getLocations();
   }
 
-  public onFilterApply(): void {
-    this.filters = this.LocationFilterFormGroup.getRawValue();
-    this.filters.regionId = this.selectedRegion.id,
-      this.filters.pageNumber = this.currentPage,
-      this.filters.pageSize = this.pageSizePager
-    this.filteredItems = this.filterService.generateChips(this.LocationFilterFormGroup, this.filterColumns);
+  applyFilter(): void {
+    this.filters = this.locationFilterForm.getRawValue();
+    this.filters.regionId = this.selectedRegion.id;
+    this.filters.pageNumber = this.currentPage;
+    this.filters.pageSize = this.pageSizePager;
+    this.filteredItems = this.filterService.generateChips(this.locationFilterForm, this.filterColumns);
     this.getLocations();
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  onRegionDropDownChanged(event: ChangeEventArgs): void {
+  changeRegion(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion?.id) {
-      this.onFilterClearAll();
+      this.clearFilter();
     } else {
       this.store.dispatch(new ClearLocationList());
     }
     this.clearSelection(this.grid);
   }
 
-  onAddRegionClick(): void {
+  openAddRegionDialog(): void {
     this.addRegionDialog.show();
   }
 
-  hideDialog(): void {
+  hideRegionDialog(): void {
     this.addRegionDialog.hide();
   }
 
-  onOkDialogClick(): void {
+  saveRegion(): void {
     if (this.regionFormGroup.valid) {
-      let newRegionName = this.regionFormGroup.controls['newRegionName'].value.trim();
+      const newRegionName = this.regionFormGroup.controls['newRegionName'].value.trim();
+
       this.store.dispatch(new SaveRegion({ name: newRegionName }));
+
       this.addRegionDialog.hide();
       this.regionFormGroup.reset();
     } else {
@@ -325,11 +250,11 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     }
   }
 
-  onImportDataClick(): void {
+  openImportDialog(): void {
     this.importDialogEvent.next(true);
   }
 
-  onAddDepartmentClick(): void {
+  openAddLocationDialog(): void {
     if (this.selectedRegion) {
       this.store.dispatch(new ShowSideDialog(true));
       this.getBusinessLineDataSource(null, null);
@@ -338,19 +263,23 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     }
   }
 
-  onRowsDropDownChanged(): void {
+  changeRowsPerPage(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
     this.grid.pageSettings.pageSize = this.pageSize;
   }
 
-  onGoToClick(event: any): void {
+  /**
+   * TODO: remove any with correct interface
+   */
+  selectPage(event: any): void {
     if (event.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
     }
   }
 
-  onEditButtonClick(location: Location, event: any): void {
+  editLocation(location: Location, event: Event): void {
     this.addActiveCssClass(event);
+
     this.locationDetailsFormGroup.setValue({
       invoiceId: location.invoiceId,
       externalId: location.externalId,
@@ -370,7 +299,8 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       phoneType: PhoneTypes[location.phoneType] || null,
       timeZone: location.timeZone,
       locationType: location.locationTypeId,
-      organizationId :this.businessUnitId
+      organizationId:this.businessUnitId,
+      includeInIRP: location.includeInIRP,
     });
 
     this.getBusinessLineDataSource(location.businessLineId, location.businessLine);
@@ -379,7 +309,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  onRemoveButtonClick(location: Location, event: any): void {
+  deleteLocation(location: Location, event: Event): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
@@ -387,22 +317,28 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
       })
-      .subscribe((confirm) => {
-        if (confirm && location.id && this.selectedRegion.id) {
-          this.store.dispatch(new DeleteLocationById(location.id, this.selectedRegion.id, this.filters));
-        }
-        this.removeActiveCssClass();
+      .pipe(
+        tap(() => { this.removeActiveCssClass(); }),
+        filter((confirm) => !!(confirm && location.id && this.selectedRegion.id)),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(() => {
+        this.store.dispatch(new DeleteLocationById(location.id as number, this.selectedRegion.id as number, this.filters));
       });
   }
 
-  onFormCancelClick(): void {
+  cancelEditLocation(): void {
     if (this.locationDetailsFormGroup.dirty) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => !!confirm))
+        })
+        .pipe(
+          filter((confirm) => !!confirm),
+          takeUntil(this.componentDestroy()),
+        )
         .subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));
           this.isEdit = false;
@@ -419,7 +355,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     }
   }
 
-  onFormSaveClick(): void {
+  saveLocation(): void {
     if (this.locationDetailsFormGroup.valid) {
       const location: Location = {
         id: this.editedLocationId,
@@ -442,9 +378,9 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         phoneType: parseInt(PhoneTypes[this.locationDetailsFormGroup.controls['phoneType'].value]),
         timeZone: this.locationDetailsFormGroup.controls['timeZone'].value,
         locationTypeId: this.locationDetailsFormGroup.controls['locationType'].value,
-        organizationId : this.businessUnitId
+        organizationId : this.businessUnitId,
+        includeInIRP: this.locationDetailsFormGroup.controls['includeInIRP'].value,
       }
-
       this.saveOrUpdateLocation(location);
 
       this.store.dispatch(new ShowSideDialog(false));
@@ -453,6 +389,69 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     } else {
       this.locationDetailsFormGroup.markAllAsTouched();
     }
+  }
+
+  trackByField(index: number, item: LocationsFormConfig): string {
+    return item.field;
+  }
+
+  trackByKey(index: number, item: LocationsSubFormConfig): LocationsTrackKey {
+    return item.trackKey;
+  }
+
+  override updatePage(): void {
+    this.getLocations();
+  }
+
+  override customExport(): void {
+    this.defaultFileName = 'Organization Locations ' + this.generateDateTime(this.datePipe);
+    this.fileName = this.defaultFileName;
+    this.store.dispatch(new ShowExportDialog(true));
+  }
+
+  override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = 'Organization Locations ' + this.generateDateTime(this.datePipe);
+
+    this.store.dispatch(new ExportLocations(new ExportPayload(
+      fileType,
+      { ...this.filters },
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      this.selectedItems.length ? this.selectedItems.map(val => val.id) : null,
+      options?.fileName || this.defaultFileName
+    )));
+    this.clearSelection(this.grid);
+  }
+
+  private watchForOrgChange(): void {
+    this.organizationId$
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe((id) => {
+      this.businessUnitId = id;
+      this.getOrganization();
+      this.clearFilterForm();
+    });
+  }
+
+  private getLocations(): void {
+    this.filters.orderBy = this.orderBy;
+    this.filters.pageNumber = this.currentPage;
+    this.filters.pageSize = this.pageSize;
+    this.store.dispatch([
+      new GetLocationsByRegionId(this.selectedRegion.id as number, this.filters),
+      new GetLocationFilterOptions(this.selectedRegion.id as number),
+    ]);
+  }
+
+  private clearFilterForm(): void {
+    this.locationFilterForm.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {
+      regionId: this.selectedRegion?.id,
+      pageNumber: this.currentPage,
+      pageSize: this.pageSizePager
+    };
   }
 
   private saveOrUpdateLocation(location: Location): void {
@@ -467,70 +466,170 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     }
   }
 
-  private createLocationForm(): void {
-    this.locationDetailsFormGroup = this.formBuilder.group({
-      invoiceId: [null],
-      externalId: ['', [Validators.maxLength(50)]],
-      name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      businessLineId: [null],
-      address1: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(100)]],
-      address2: [null, [Validators.maxLength(50)]],
-      zip: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(6), Validators.pattern('^[0-9]*$')]],
-      city: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(20)]],
-      state: ['', [Validators.required]],
-      glNumber: [null, Validators.maxLength(50)],
-      ext: [null, Validators.maxLength(50)],
-      contactEmail: ['', [Validators.email]],
-      contactPerson: ['', [Validators.minLength(1), Validators.maxLength(50)]],
-      inactiveDate: [null],
-      phoneNumber: ['', [Validators.minLength(10), Validators.maxLength(10), Validators.pattern('^[0-9]*$')]],
-      phoneType: [null],
-      timeZone: [null],
-      locationType: [null],
-      organizationId:0
-    });
-
-    this.regionFormGroup = this.formBuilder.group({
-      newRegionName: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]]
-    });
-
-    this.LocationFilterFormGroup = this.formBuilder.group({
-      externalIds: [[]],
-      invoiceIds: [[]],
-      names: [[]],
-      addresses1: [[]],
-      cities: [[]],
-      states: [[]],
-      zipCodes: [[]],
-      contactPeople: [[]]
-    });
+  private createForms(): void {
+    this.locationDetailsFormGroup = this.locationsService.createForm();
+    this.regionFormGroup = this.locationsService.createRegionForm();
+    this.locationFilterForm = this.locationsService.createFilterForm();
   }
 
-  private getActiveRowsPerPage(): number {
-    return parseInt(this.activeRowsPerPageDropDown);
-  }
-
-  private getRowsPerPage(data: object[], currentPage: number): object[] {
-    return data.slice((currentPage * this.getActiveRowsPerPage()) - this.getActiveRowsPerPage(),
-      (currentPage * this.getActiveRowsPerPage()));
-  }
-
-  private getLastPage(data: object[]): number {
-    return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
-  }
-
-  private getBusinessLineDataSource(id: number | null, line: string | null | undefined) {
+  private getBusinessLineDataSource(id: number | null, line: string | null | undefined): void {
     this.businessLines$
       .pipe(
-        take(1),
         map((businessLines) => {
+          /**
+           * TODO: move to helper function
+           */
           if (id && businessLines.find((item) => item.id === id)) {
             return businessLines;
           } else {
             return id && line ? [{ id, line }, ...businessLines] : businessLines
           }
-        })
+        }),
+        map((lines) => {
+          return lines.map((line) => ({ text: line.line, value: line.id }))
+        }),
+        take(1),
       )
-      .subscribe((data) => this.businessLineDataSource = data);
+      .subscribe((data) => {
+        this.formSourcesMap.businessLineData = data;
+      });
+  }
+
+  private watchForPageChange(): void {
+    this.pageSubject
+    .pipe(
+      throttleTime(1),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((page: number) => {
+      this.currentPage = page;
+      this.getLocations();
+    });
+  }
+
+  private populateFilterOptions(): void {
+    this.locationFilterOptions$
+    .pipe(
+      filter(Boolean),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((options) => {
+      this.filterColumns.externalIds.dataSource = options.externalIds;
+      this.filterColumns.invoiceIds.dataSource = options.ivnoiceIds;
+      this.filterColumns.names.dataSource = options.locationNames;
+      this.filterColumns.addresses1.dataSource = options.addresses1;
+      this.filterColumns.cities.dataSource = options.cities;
+      this.filterColumns.states.dataSource = options.states;
+      this.filterColumns.zipCodes.dataSource = options.zipCodes;
+      this.filterColumns.contactPeople.dataSource = options.contactPersons;
+      this.filterColumns.includeInIRP.dataSource = options.includeInIRP.map((item) => (
+        { text: item.optionText, value: item.option }
+        ));
+    });
+  }
+
+  private getOrganization(): void {
+    this.store.dispatch(new GetOrganizationById(
+      this.businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number
+    ));
+  }
+
+  private watchForOrganizations(): void {
+    this.organization$
+    .pipe(
+      filter(Boolean),
+      tap((organization) => {
+        this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
+        if (this.isFeatureIrpEnabled) {
+          this.isOrgVMSEnabled = !!organization.preferences.isVMCEnabled;
+          this.isOrgIrpEnabled = !!organization.preferences.isIRPEnabled;
+          this.columnsToExport = this.isOrgIrpEnabled ? LocationsExportIrpColumns : LocationExportColumns;
+          this.filterExportColumns();
+          this.checkFieldsVisibility();
+        }
+      }),
+      switchMap(() => this.store.dispatch(new GetRegions())),
+      takeUntil(this.componentDestroy()),
+    ).subscribe((data) => {
+      this.defaultValue = data.organizationManagement.regions[0]?.id as Region;
+    });
+  }
+
+  private populateFormOptions(): void {
+    combineLatest([
+      this.locationTypes$,
+      this.timeZoneIds$,
+      this.statesGeneral$,
+      this.phoneTypes$,
+    ])
+    .pipe(
+      map(([locationTypes, timeZones, states, phoneTypes]) => {
+        const locationOpts: DropdownOption[] = locationTypes
+        .map((type) => ({ text: type.name, value: type.locationTypeId }));
+        const zoneOpts: DropdownOption[] = timeZones
+        .map((zone) => ({ text: zone.systemTimeZoneName, value: zone.timeZoneId }));
+
+        return [locationOpts, zoneOpts, states, phoneTypes] as [DropdownOption[], DropdownOption[], string[], string[]];
+      }),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(([locationTypes, timeZones, states, phoneTypes]) => {
+      this.formSourcesMap.locationTypes = locationTypes;
+      this.formSourcesMap.timeZoneIds = timeZones;
+      this.formSourcesMap.states = states;
+      this.formSourcesMap.phoneType = phoneTypes;
+    });
+  }
+
+  private setIrpFeatureFlag(): void {
+    this.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+
+    if (this.isFeatureIrpEnabled) {
+      /**
+       * TODO: investigate why constant changes are not delted after org list navigation.
+       */
+      this.locationDialogConfig = JSON.parse(JSON.stringify(LocationsDialogWithIrpConfig));
+    }
+  }
+
+  private checkFieldsVisibility(): void {
+    this.locationDialogConfig.baseForm = LocationsDialogWithIrpConfig.baseForm
+    .filter((column) => {
+      if (!this.isOrgVMSEnabled && !FieldsToHideInVms.includes(column.field)) {
+        return !FieldsToHideInIrp.includes(column.field)
+      }
+      
+      if (!this.isOrgIrpEnabled || (this.isOrgIrpEnabled && !this.isOrgVMSEnabled)) {
+        return !FieldsToHideInVms.includes(column.field);
+      }
+
+      return column;
+    });
+  }
+
+  private setPermissions(): void {
+    this.getPermissionStream()
+    .pipe(
+      filter((permissions) => !permissions[UserPermissions.CanEditOrganizationalHierarchy]),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      this.locationDetailsFormGroup.get('includeInIRP')?.disable();
+    });
+  }
+
+  private filterExportColumns(): void {
+    this.columnsToExport = this.columnsToExport
+    .filter((column) => {
+      if (!this.isOrgVMSEnabled && !ExportImportColumnsToHideInVms.includes(column.column)) {
+        return !ExportImportColumnsToHideInIrp.includes(column.column)
+      }
+
+      if (!(this.isOrgIrpEnabled && this.isOrgVMSEnabled)) {
+        return !ExportImportColumnsToHideInVms.includes(column.column);
+      }
+
+      return column;
+    });
   }
 }

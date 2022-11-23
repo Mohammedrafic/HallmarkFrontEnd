@@ -4,7 +4,7 @@ import { catchError, Observable, of, tap } from 'rxjs';
 import { Days } from 'src/app/shared/enums/days';
 import { SendDocumentAgency } from 'src/app/shared/enums/send-document-agency';
 import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
-import { Status } from 'src/app/shared/enums/status';
+import { OrganizationStatus, Status } from 'src/app/shared/enums/status';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization, OrganizationDataSource, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
@@ -60,6 +60,7 @@ import { CredentialsService } from '@shared/services/credentials.service';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { UserOrganizationsAgenciesChanged } from 'src/app/store/user.actions';
 import { HttpErrorResponse } from '@angular/common/http';
+import { COUNTRIES } from '@shared/constants/countries-list';
 
 interface DropdownOption {
   id: number;
@@ -78,6 +79,7 @@ export interface AdminStateModel {
   sendDocumentAgencies: DropdownOption[];
   days: DropdownOption[];
   statuses: DropdownOption[];
+  organizationStatuses: DropdownOption[];
   isOrganizationLoading: boolean;
   organizations: OrganizationPage | null;
   isDepartmentLoading: boolean;
@@ -97,7 +99,7 @@ export interface AdminStateModel {
 @State<AdminStateModel>({
   name: 'admin',
   defaults: {
-    countries: [{ id: Country.USA, text: Country[0] }, { id: Country.Canada, text: Country[1] }],
+    countries: COUNTRIES,
     statesGeneral: UsaStates,
     statesBilling: UsaStates,
     phoneTypes: GeneralPhoneTypes,
@@ -109,6 +111,7 @@ export interface AdminStateModel {
     ],
     days: Days,
     statuses: Object.keys(Status).filter(StringIsNumber).map((statusName, index) => ({ id: index, text: statusName })),
+    organizationStatuses: Object.keys(OrganizationStatus).filter(StringIsNumber).map((statusName, index) => ({ id: index, text: statusName })),
     isOrganizationLoading: false,
     organizations: null,
     organization: null,
@@ -150,6 +153,9 @@ export class AdminState {
 
   @Selector()
   static statuses(state: AdminStateModel): DropdownOption[] { return state.statuses; }
+
+  @Selector()
+  static organizationStatuses(state: AdminStateModel): DropdownOption[] { return state.organizationStatuses; }
 
   @Selector()
   static isDirty(state: AdminStateModel): boolean { return state.isDirty; }
@@ -243,10 +249,12 @@ export class AdminState {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
       }
       return payloadResponse;
-    }), 
+    }),
     catchError((error: HttpErrorResponse) => {
       if (error.error.errors.Organization) {
-        return dispatch(new ShowToast(MessageTypes.Error, 'Such prefix already exists'));
+        const message = error.error.errors.Organization[0] || 'Such prefix already exists';
+
+        return dispatch(new ShowToast(MessageTypes.Error, message));
       }
       return dispatch(new ShowToast(MessageTypes.Error, 'Changes were not saved. Please try again'));
     }));

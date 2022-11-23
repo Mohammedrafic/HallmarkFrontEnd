@@ -4,33 +4,15 @@
     <div class="input-group dropdown">
       <ejs-dropdownlist
         appValidateWithMessage
-        [fields]="optionFields"
         formControlName="status"
+        [allowFiltering]="true"
+        [fields]="optionFields"
         [dataSource]="partnershipStatus"
       ></ejs-dropdownlist>
     </div>
   </div>
 
   <section class="main-content">
-    <section>
-      <h3 class="title">Tier</h3>
-      <div class="flex-wrapper">
-        <div class="flex-50">
-          <div class="dropdown-container bootstrap">
-            <div class="input-group dropdown">
-              <ejs-dropdownlist
-                appValidateWithMessage
-                [fields]="optionFields"
-                formControlName="agencyCategory"
-                [dataSource]="agencyCategoryTier"
-              ></ejs-dropdownlist>
-            </div>
-          </div>
-        </div>
-        <div class="flex-50"></div>
-      </div>
-    </section>
-
     <section class="job-distribution bootstrap" *ngIf="jobDistributionInitialData$ | async as jobDistributionInitialData">
       <h3 class="title">Job Distribution</h3>
       <div class="flex-wrapper">
@@ -127,10 +109,11 @@
             <div class="input-group dropdown">
               <ejs-dropdownlist
                 appValidateWithMessage
-                [fields]="optionFields"
                 formControlName="submissionPercentageOverrideRestriction"
-                [dataSource]="submission"
                 placeholder="Submission"
+                [fields]="optionFields"
+                [allowFiltering]="true"
+                [dataSource]="submission"
               ></ejs-dropdownlist>
             </div>
           </div>

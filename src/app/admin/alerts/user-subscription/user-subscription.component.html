@@ -7,7 +7,9 @@
                             formControlName="businessUnit"
                             [fields]="optionFields"
                             [dataSource]="businessUnits"
-                            placeholder="Business Unit"></ejs-dropdownlist>
+                            [allowFiltering]="true"
+                            placeholder="Business Unit">
+          </ejs-dropdownlist>
         </div>
       </div>
       <div class="dropdown-container">
@@ -17,7 +19,9 @@
                             [fields]="businessDataFields"
                             [dataSource]="businessData$ | async"
                             [value]="defaultBusinessValue"
-                            placeholder=Business></ejs-dropdownlist>
+                            [allowFiltering]="true"
+                            placeholder=Business>
+          </ejs-dropdownlist>
         </div>
       </div>
       <div class="dropdown-container">
@@ -27,7 +31,9 @@
                             [fields]="userDataFields"
                             [dataSource]="userData"
                             [value]="defaultUserValue"
-                            placeholder=User></ejs-dropdownlist>
+                            [allowFiltering]="true"
+                            placeholder=User>
+          </ejs-dropdownlist>
         </div>
       </div>
     </div>
@@ -64,9 +70,13 @@
       <ejs-dropdownlist id="rowsPerPage"
                         class="dropdown-no-border"
                         [dataSource]="rowsPerPageDropDown"
+                        [allowFiltering]="true"
                         [(value)]="activeRowsPerPageDropDown"
                         (change)="onPageSizeChanged($event)">
       </ejs-dropdownlist>
+      <div class="total-rows">
+        Total Rows: {{totalRecordsCount}}
+      </div>
     </div>
   </div>
 </section>

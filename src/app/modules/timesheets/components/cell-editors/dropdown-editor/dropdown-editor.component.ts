@@ -7,6 +7,7 @@ import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { Store } from '@ngxs/store';
 
 import { DropdownOption } from '@core/interface';
+import { createUniqHashObj } from '@core/helpers/functions.helper';
 
 @Component({
   selector: 'app-dropdown-editor',
@@ -48,15 +49,21 @@ export class DropdownEditorComponent implements ICellRendererAngularComp {
     const colDef = (params.colDef as ColDef);
     const storeField = colDef.cellRendererParams.storeField as string
     this.editable = colDef.cellRendererParams.isEditable;
-    
+
     this.options = this.store.snapshot().timesheets[storeField];
-    
+
     if (storeField === 'billRateTypes') {
       const ratesNotForSelect = ['Daily OT', 'Daily Premium OT', 'Mileage', 'OT'];
-
-      this.options = this.options.filter((option) => {
+      const filteredOptions = this.options.filter((option) => {
         return !ratesNotForSelect.includes(option.text);
-      })
+      });
+      const uniqBillRatesHashObj = createUniqHashObj(
+        filteredOptions,
+        (el: DropdownOption) => el.value,
+        (el: DropdownOption) => el,
+      );
+
+      this.options = Object.values(uniqBillRatesHashObj);
     }
 
     if (this.options && this.options.length) {

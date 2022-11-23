@@ -6,9 +6,7 @@ import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entit
 
 import { FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
 import { FilterColumns, TimesheetsFilterState } from '../interface';
-import {
-  TimesheetTableApproveCellComponent
-} from '../components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
+import { TimesheetTableApproveCellComponent } from '../components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
 import { TimesheetTableLinkComponent } from '../components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 import { GridValuesHelper } from '../helpers';
@@ -18,7 +16,7 @@ const commonColumn: ColDef = {
   sortable: true,
   resizable: true,
   filter: true,
-}
+};
 
 export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionModel[] => {
   return [
@@ -124,6 +122,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       type: 'rightAligned',
       width: 140,
       minWidth: 140,
+      ...commonColumn,
     },
     {
       field: isAgency ? TimesheetsTableColumns.OrgName : TimesheetsTableColumns.AgencyName,
@@ -177,7 +176,7 @@ export const SavedFiltersParams: TimesheetsTableFiltersColumns[] = [
 
 export const DefaultFiltersState: TimesheetsFilterState = {
   pageNumber: 1,
-  pageSize: 30,
+  pageSize: 100,
 };
 
 export const DefaultTimesheetCollection: TimeSheetsPage = {

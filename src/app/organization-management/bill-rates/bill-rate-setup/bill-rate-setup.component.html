@@ -24,16 +24,16 @@
             <button
               ejs-button
               cssClass="e-flat primary-icon-button"
-              [disabled]="isReadOnly"
               (click)="onEditRecordButtonClick(data, $event)"
+              [disabled]="isReadOnly || !userPermission[userPermissions.CanEditSettingsBillRates]"
             >
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
             <button
               ejs-button
               cssClass="e-flat secondary-icon-button"
-              [disabled]="isReadOnly"
               (click)="onRemoveRecordButtonClick(data, $event)"
+              [disabled]="isReadOnly || !userPermission[userPermissions.CanDeleteSettingsBillRates]"
             >
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
@@ -89,7 +89,7 @@
       </e-column>
       <e-column field="effectiveDate" headerText="EFFECTIVE DATE" width="180">
         <ng-template #template let-data>
-          <span>{{ data.effectiveDate | date: formatDate }}</span>
+          <span>{{ data.effectiveDate | date: 'MM/dd/yyy':'UTC' }}</span>
         </ng-template>
       </e-column>
       <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" textAlign="Right" headerTextAlign="Right" width="250">
@@ -152,6 +152,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -170,6 +171,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(billRatesPage$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -198,6 +202,7 @@
   ></app-export-dialog>
 
   <app-side-dialog
+    [disableSaveButton]="!userPermission[userPermissions.CanEditSettingsBillRates]"
     (formCancelClicked)="onFormCancelClick()"
     (formSaveClicked)="onFormSaveClick()"
     [header]="dialogHeader + ' Record'"
@@ -218,7 +223,7 @@
               [dataSource]="orgRegions"
               [fields]="fields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="regionIds"
             >
@@ -238,7 +243,7 @@
               [dataSource]="locations"
               [fields]="fields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="locationIds"
             >
@@ -260,7 +265,7 @@
               [dataSource]="departments"
               [fields]="fields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="departmentIds"
             >
@@ -279,7 +284,7 @@
               [dataSource]="skills$ | async"
               [fields]="skillsFields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="skillIds"
             >
@@ -295,6 +300,7 @@
             <ejs-dropdownlist
               id="billRatesTitle"
               appValidateWithMessage
+              [allowFiltering]="true"
               [dataSource]="billRatesOptions$ | async"
               [fields]="billRateTitleFields"
               formControlName="billRateTitleId"
@@ -314,7 +320,7 @@
               [dataSource]="orderTypes"
               [fields]="orderTypesFields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="orderTypeIds"
             >
@@ -343,6 +349,7 @@
             <ejs-dropdownlist
               id="billRatesTitle"
               appValidateWithMessage
+              [allowFiltering]="true"
               [dataSource]="billRateTypesOptions"
               [fields]="fields"
               formControlName="billRatesType"
@@ -363,34 +370,17 @@
           <label *ngIf="selectedBillRateUnit === BillRateUnitList.Hours">Hours <span class="required">*</span></label>
           <div class="input-group">
             <ejs-numerictextbox
-              *ngIf="selectedBillRateUnit === BillRateUnitList.Hours"
               class="numeric-input"
               appValidateWithMessage
               min="0"
               maxlength="10"
-              [validateDecimalOnType]="true"
-              [showSpinButton]="false"
-              decimals="0"
-              format="#"
               formControlName="billRateValueRateTimes"
+              [validateDecimalOnType]="validateDecimalOnType"
+              [showSpinButton]="false"
+              [format]="format"
+              [decimals]="decimals"
             >
             </ejs-numerictextbox>
-
-            <input
-              *ngIf="
-                selectedBillRateUnit === BillRateUnitList.Multiplier ||
-                selectedBillRateUnit === BillRateUnitList.Currency
-              "
-              class="e-input"
-              type="text"
-              formControlName="billRateValueRateTimes"
-              appValidateWithMessage
-              maxlength="11"
-              (keyup)="priceUtils.verifyDigitsAfterDot(billRatesFormGroup, 'billRateValueRateTimes')"
-              (keydown)="priceUtils.numbersOnly($event)"
-              (focus)="priceUtils.setPriceMask(billRatesFormGroup, 'billRateValueRateTimes', $event)"
-              (blur)="priceUtils.setTwoDecimals(billRatesFormGroup, 'billRateValueRateTimes', $event)"
-            />
           </div>
         </div>
 
@@ -428,11 +418,11 @@
               format="#"
               formControlName="intervalMin">
             </ejs-numerictextbox>
-            
+
             <ng-template #intervalMinWithTooltip>
-              <ejs-tooltip target='.e-info' 
+              <ejs-tooltip target='.e-info'
               content="Weekly OT rate will be paid after total hours worked per week exceed the set number"
-              
+
               >
                 <ejs-numerictextbox
                   id="intervalMin"
@@ -577,7 +567,7 @@
               formControlName="skillIds"
               placeholder="All"
               [fields]="skillsFields"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               [dataSource]="filterColumns.skillIds.dataSource"
             >
@@ -593,7 +583,7 @@
             formControlName="orderTypes"
             placeholder="All"
             [fields]="orderTypesFields"
-            [allowFiltering]="false"
+            [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.orderTypes.dataSource"
           >
@@ -609,7 +599,7 @@
               formControlName="billRateCategories"
               placeholder="All"
               [fields]="orderTypesFields"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               [dataSource]="filterColumns.billRateCategories.dataSource"
             >
@@ -624,7 +614,7 @@
               formControlName="billRateTypes"
               placeholder="All"
               [fields]="orderTypesFields"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               [dataSource]="filterColumns.billRateTypes.dataSource"
             >
@@ -641,7 +631,7 @@
               formControlName="billRateConfigIds"
               placeholder="All"
               [fields]="billRateTitleFields"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               [dataSource]="filterColumns.billRateConfigIds.dataSource"
             >

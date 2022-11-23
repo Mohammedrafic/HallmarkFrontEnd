@@ -283,6 +283,7 @@
             <ejs-dropdownlist
               id="rowsPerPage"
               class="dropdown-no-border"
+              [allowFiltering]="true"
               [dataSource]="rowsPerPageDropDown"
               [(value)]="activeRowsPerPageDropDown"
               (change)="onRowsDropDownChanged()"
@@ -301,6 +302,9 @@
               (change)="onGoToClick($event)"
             >
             </ejs-numerictextbox>
+            <div class="total-rows">
+              Total Rows: {{ordersPage?.totalCount}}
+            </div>
           </section>
           <section class="right-side-pager-controls">
             <ejs-pager
@@ -359,5 +363,6 @@
     [form]="OrderFilterFormGroup"
     [filterColumns]="filterColumns"
     [activeTab]="selectedTab"
+    (setDefault)="setDefaultFilters($event)"
   ></app-agency-order-filters>
 </app-filter-dialog>

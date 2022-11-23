@@ -8,15 +8,19 @@
     <ng-container right>
       <section class="org-controls-container">
         <div>
-          <button
-            *ngIf="hasCreateOrganizationPermission"
-            ejs-button
-            appHideBeforeSyncfusionLoad
-            [isPrimary]="true"
-            (click)="navigateToOrganizationForm()"
-          >
-            Add Organization
-          </button>
+          <app-tooltip-container
+            [message]="toolTipMessage"
+            [showToolTip]="!userPermission[userPermissions.CanCreateDeleteOrganization]">
+           <button
+              ejs-button
+              appHideBeforeSyncfusionLoad
+              [isPrimary]="true"
+              [disabled]="!userPermission[userPermissions.CanCreateDeleteOrganization]"
+              (click)="navigateToOrganizationForm()"
+            >
+              Add Organization
+            </button>
+          </app-tooltip-container>
           <button
             ejs-dropdownbutton
             appHideBeforeSyncfusionLoad
@@ -31,7 +35,7 @@
           </button>
           <button ejs-button appHideBeforeSyncfusionLoad id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
             <div class="filter-button-content">
-              <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{
+              <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{
                 filteredItems.length
               }}</span>
               Filters <i-feather name="sliders" class="icon"></i-feather>
@@ -86,8 +90,8 @@
             <div class="status-cell">
               <ejs-chiplist>
                 <e-chips>
-                  <e-chip [text]="statusEnum[data.generalInformation.status]"
-                          [cssClass]="getChipCssClass(statusEnum[data.generalInformation.status])"></e-chip>
+                  <e-chip [text]="organizationStatus[data.generalInformation.status]"
+                          [cssClass]="getChipCssClass(organizationStatus[data.generalInformation.status])"></e-chip>
                 </e-chips>
               </ejs-chiplist>
             </div>
@@ -115,6 +119,7 @@
                   id="rowsPerPage"
                   class="dropdown-no-border"
                   [dataSource]="rowsPerPageDropDown"
+                  [allowFiltering]="true"
                   [(value)]="activeRowsPerPageDropDown"
                   (change)="onRowsDropDownChanged()"
                 >
@@ -130,6 +135,9 @@
                   (change)="onGoToClick($event)"
                 >
                 </ejs-numerictextbox>
+                <div class="total-rows">
+                  Total Rows: {{(organizations$ | async)?.totalCount}}
+                </div>
               </section>
               <section class="right-side-pager-controls">
                 <ejs-pager

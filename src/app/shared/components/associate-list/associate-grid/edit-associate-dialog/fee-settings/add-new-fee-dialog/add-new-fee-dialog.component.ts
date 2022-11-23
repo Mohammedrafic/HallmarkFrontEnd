@@ -12,16 +12,13 @@ import PriceUtils from '@shared/utils/price.utils';
 import { valuesOnly } from '@shared/utils/enum.utils';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import {
-  SaveFeeExceptions,
-  SaveFeeExceptionsSucceeded,
-} from '@shared/components/associate-list/store/associate.actions';
+import { TiersException } from '@shared/components/associate-list/store/associate.actions';
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
 import {
   MASTER_SKILLS_FIELDS,
-  OPTION_FIELDS,
 } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/add-new-fee-dialog/fee-dialog.constant';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { OPTION_FIELDS } from '@shared/components/associate-list/constant';
 
 @Component({
   selector: 'app-add-new-fee-dialog',
@@ -31,6 +28,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 export class AddNewFeeDialogComponent extends DestroyableDirective implements OnInit {
   @Input() openEvent: Subject<number>;
   @Input() openEditEvent: Subject<FeeExceptions>;
+  @Input() disableSaveButton: boolean = false;
 
   @ViewChild('addFeeSideDialog') sideDialog: DialogComponent;
 
@@ -86,7 +84,7 @@ export class AddNewFeeDialogComponent extends DestroyableDirective implements On
     this.feeFormGroup.markAllAsTouched();
     if (this.feeFormGroup.valid) {
       const value = this.feeFormGroup.getRawValue();
-      this.store.dispatch(new SaveFeeExceptions({ ...value, associateOrganizationId: this.organizationId }));
+      this.store.dispatch(new TiersException.SaveFeeExceptions({ ...value, associateOrganizationId: this.organizationId }));
     }
   }
 
@@ -125,7 +123,7 @@ export class AddNewFeeDialogComponent extends DestroyableDirective implements On
 
   private subscribeOnSaveFeeExceptions(): void {
     this.actions$
-      .pipe(ofActionSuccessful(SaveFeeExceptionsSucceeded))
+      .pipe(ofActionSuccessful(TiersException.SaveFeeExceptionsSucceeded))
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.sideDialog.hide();

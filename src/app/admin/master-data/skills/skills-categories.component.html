@@ -6,7 +6,7 @@
     id="filterButton"
     cssClass="e-outline button-filter" (click)="showFilters()">
     <div class="filter-button-content">
-      <span *ngIf="(filteredItems$ | async) as filteredItems" class="e-badge e-badge-success e-badge-circle">{{ filteredItems }}</span>
+      <span *ngIf="(filteredItems$ | async) as filteredItems" class="e-badge e-badge-success e-badge-pill align-text">{{ filteredItems }}</span>
       Filters <i-feather name="sliders" class="icon"></i-feather>
     </div>
   </button>
@@ -21,29 +21,34 @@
       Export <i-feather name="download" class="icon"></i-feather>
     </div>
   </button>
-  <button
-    ejs-button
-    appHideBeforeSyncfusionLoad
-    id="addDepartmentButton"
-    (click)="addSkill()"
-    [isPrimary]="true">Add {{ tabs[currentTab] }}</button>
+  <app-tooltip-container
+    [message]="toolTipMessage"
+    [showToolTip]="!canAddSkillOrCategories">
+    <button
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      [disabled]="!canAddSkillOrCategories"
+      id="addDepartmentButton"
+      (click)="addSkill()"
+      [isPrimary]="true">Add {{ tabs[currentTab] }}</button>
+  </app-tooltip-container>
 </section>
 <ejs-tab class="tabs" (selected)="tabSelected($event)">
   <e-tabitems>
-    <e-tabitem>
+    <e-tabitem *ngIf="userPermission[userPermissions.CanViewMasterSkills]">
       <ng-template #headerText>
         <div>Skills</div>
       </ng-template>
       <ng-template #content>
-        <app-skills-grid [filteredItems$]="filteredItems$" [export$]="exportSkills$" [isActive]="isSkillsActive"></app-skills-grid>
+        <app-skills-grid [filteredItems$]="filteredItems$" [userPermission]="userPermission" [export$]="exportSkills$" [isActive]="isSkillsActive"></app-skills-grid>
       </ng-template>
     </e-tabitem>
-    <e-tabitem>
+    <e-tabitem *ngIf="userPermission[userPermissions.CanViewSkillCategories]">
       <ng-template #headerText>
         <div>Categories</div>
       </ng-template>
       <ng-template #content>
-        <app-skill-categories-grid [export$]="exportCategories$" [isActive]="isCategoriesActive"></app-skill-categories-grid>
+        <app-skill-categories-grid [export$]="exportCategories$" [userPermission]="userPermission" [isActive]="isCategoriesActive"></app-skill-categories-grid>
       </ng-template>
     </e-tabitem>
   </e-tabitems>

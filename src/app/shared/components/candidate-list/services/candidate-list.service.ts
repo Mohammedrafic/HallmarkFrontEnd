@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { CandidateList, CandidateListRequest } from '../types/candidate-list.model';
-import { ListOfSkills } from '../../../models/skill.model';
+import { AssignedSkillsByOrganization } from '../../../models/skill.model';
 import { CandidateStatus } from '../../../enums/status';
 import { ExportPayload } from '../../../models/export.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { sortBy } from '@shared/helpers/sort-array.helper';
 
 @Injectable()
 export class CandidateListService {
@@ -22,8 +24,10 @@ export class CandidateListService {
    * Get all skills for active business unit
    * @return list of skills
    */
-  public getAllSkills(): Observable<ListOfSkills[]> {
-    return this.http.get<ListOfSkills[]>('/api/MasterSkills/listByActiveBusinessUnit');
+  public getAllSkills(): Observable<AssignedSkillsByOrganization[]> {
+    return this.http
+      .get<AssignedSkillsByOrganization[]>('/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit')
+      .pipe(map((data) => sortByField(data, 'skillDescription')));
   }
 
   /**
@@ -39,5 +43,9 @@ export class CandidateListService {
    */
   public export(payload: ExportPayload): Observable<Blob> {
     return this.http.post(`/api/CandidateProfile/export`, payload, { responseType: 'blob' });
+  }
+
+  public getRegions(): Observable<string[]> {
+    return this.http.get<string[]>('/api/Regions/UsaCanadaStates').pipe(map((data) => sortBy(data)));
   }
 }

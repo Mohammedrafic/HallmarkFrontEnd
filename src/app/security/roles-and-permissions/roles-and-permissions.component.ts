@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -15,8 +14,10 @@ import { UserState } from 'src/app/store/user.state';
 import { GetBusinessByUnitType, GetPermissionsTree, SaveRole, SaveRoleSucceeded } from '../store/security.actions';
 import { SecurityState } from '../store/security.state';
 import { RoleFormComponent } from './role-form/role-form.component';
-import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, OPRION_FIELDS } from './roles-and-permissions.constants';
+import { BUSSINES_DATA_FIELDS, OPRION_FIELDS } from './roles-and-permissions.constants';
 import { RolesGridComponent } from './roles-grid/roles-grid.component';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 
 const DEFAULT_DIALOG_TITLE = 'Add Role';
 const EDIT_DIALOG_TITLE = 'Edit Role';
@@ -26,7 +27,7 @@ const EDIT_DIALOG_TITLE = 'Edit Role';
   templateUrl: './roles-and-permissions.component.html',
   styleUrls: ['./roles-and-permissions.component.scss'],
 })
-export class RolesAndPermissionsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class RolesAndPermissionsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('roleForm') roleForm: RoleFormComponent;
   @ViewChild(RolesGridComponent, { static: false }) childC: RolesGridComponent;
 
@@ -62,12 +63,13 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
   private isAlive = true;
   private existingRoleName: string[];
 
-  constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {
-    super();
+  constructor(protected override store: Store, private actions$: Actions, private confirmService: ConfirmService) {
+    super(store);
     this.store.dispatch(new SetHeaderState({ title: 'Roles and Permissions', iconName: 'lock' }));
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.businessForm = this.generateBusinessForm();
     this.roleFormGroup = RoleFormComponent.createForm();
     const user = this.store.selectSnapshot(UserState.user);
@@ -78,7 +80,7 @@ export class RolesAndPermissionsComponent extends AbstractGridConfigurationCompo
       this.isBusinessDisabledForNewRole = true;
       this.businessForm.disable();
     }
-    
+
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;

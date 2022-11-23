@@ -3,22 +3,26 @@
     <app-search [hidden]="isBillRateSetupTabActive" class="search" #search> </app-search>
     <button *ngIf="isBillRateSetupTabActive" ejs-button cssClass="e-outline button-filter" (click)="filter()">
       <div class="filter-button-content">
-        <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-circle align-text">{{
+        <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-pill align-text">{{
           filteredItems
         }}</span>
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
     </button>
-    <button
-      *ngIf="isBillRateSetupTabActive"
-      [disabled]="isReadOnly"
-      ejs-button
-      id="importButton"
-      cssClass="e-outline button-import"
-      (click)="onImportDataClick()"
-    >
-      Import <i-feather name="upload" class="icon"></i-feather>
-    </button>
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="isReadOnly || !userPermission[userPermissions.CanEditSettingsBillRates]">
+      <button
+        *ngIf="isBillRateSetupTabActive"
+        [disabled]="isReadOnly || !userPermission[userPermissions.CanEditSettingsBillRates]"
+        ejs-button
+        id="importButton"
+        cssClass="e-outline button-import"
+        (click)="onImportDataClick()"
+      >
+        Import <i-feather name="upload" class="icon"></i-feather>
+      </button>
+    </app-tooltip-container>
     <button
       ejs-dropdownbutton
       [items]="exportOptions"
@@ -27,9 +31,18 @@
     >
       <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
     </button>
-    <button *ngIf="showButton" ejs-button [isPrimary]="true" (click)="addBillRateSetupRecord()">
-      {{ addBillRateBtnText }}
-    </button>
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!canAddBillRate">
+      <button
+        *ngIf="showButton"
+        ejs-button [isPrimary]="true"
+        (click)="addBillRateSetupRecord()"
+        [disabled]="!canAddBillRate"
+      >
+        {{ addBillRateBtnText }}
+      </button>
+    </app-tooltip-container>
   </div>
 
   <ejs-tab id="navigationTabs" (selected)="onTabSelected($event)">
@@ -42,30 +55,33 @@
             [export$]="exportMap.get(selectedTab)"
             [isActive]="isBillRateSetupTabActive"
             [importDialogEvent]="importDialogEvent"
+            [userPermission]="userPermission"
           >
           </app-bill-rate-setup>
         </ng-template>
       </e-tabitem>
 
-      <e-tabitem>
+      <e-tabitem *ngIf="userPermission[userPermissions.CanViewExternalBillRates] && userPermission[userPermissions.CanManageExternalBillRates]">
         <ng-template #headerText><div>External Bill Rate</div></ng-template>
         <ng-template #content>
           <app-external-bill-rate
             [export$]="exportMap.get(selectedTab)"
             [searchQuery]="searchQuery"
             [isActive]="isExternalBillRateType"
+            [userPermission]="userPermission"
           >
           </app-external-bill-rate>
         </ng-template>
       </e-tabitem>
 
-      <e-tabitem>
+      <e-tabitem *ngIf="userPermission[userPermissions.CanViewExternalBillRates] && userPermission[userPermissions.CanManageExternalBillRates]">
         <ng-template #headerText><div>External Bill Rate Mapping</div></ng-template>
         <ng-template #content>
           <app-bill-rate-type-mapping
             [export$]="exportMap.get(selectedTab)"
             [searchQuery]="searchQuery"
             [isActive]="isExternalBillRateTypeMapping"
+            [userPermission]="userPermission"
           >
           </app-bill-rate-type-mapping>
         </ng-template>

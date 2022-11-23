@@ -22,7 +22,7 @@
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
             <span><i-feather name="edit" class="icon"></i-feather></span>
           </button>
-          <button ejs-button [disabled]="!agencyActionsAllowed || data.candidateStatus === candidateStatus.Onboard" cssClass="e-flat secondary-icon-button enabled-button"  (click)="onRemove(data.candidateProfileId)">
+          <button ejs-button [disabled]="!agencyActionsAllowed || data.candidateStatus === candidateStatus.Onboard || !userPermission[userPermissions.CanEditCandidateProfile]" cssClass="e-flat secondary-icon-button enabled-button"  (click)="onRemove(data.candidateProfileId)">
             <span><i-feather name="trash-2" class="icon"></i-feather></span>
           </button>
         </div>
@@ -80,7 +80,10 @@
         </div>
       </ng-template>
     </e-column>
-    <e-column headerText="Region" field="region">
+    <e-column headerText="Region" field="candidateProfileRegions">
+      <ng-template #template let-data>
+        <div *ngFor="let region of data.candidateProfileRegions; trackBy: regionTrackBy">{{ region.regionDescription || region }}</div>
+      </ng-template>
     </e-column>
   </e-columns>
   <ng-template #pagerTemplate let-data>
@@ -90,6 +93,7 @@
           <section class="left-side-pager-controls">
             <ejs-dropdownlist id="rowsPerPage"
                               class="dropdown-no-border"
+                              [allowFiltering]="true"
                               [dataSource]="rowsPerPageDropDown"
                               [(value)]="activeRowsPerPageDropDown"
                               (change)="onRowsDropDownChanged()">
@@ -103,6 +107,9 @@
                                 [showSpinButton]="false"
                                 (change)="onGoToClick($event)">
             </ejs-numerictextbox>
+            <div class="total-rows">
+              Total Rows: {{(candidates$ | async)?.totalCount}}
+            </div>
           </section>
           <section class="right-side-pager-controls">
             <ejs-pager id="gridPager"
@@ -131,16 +138,25 @@
   <form [formGroup]="CandidateFilterFormGroup">
     <div class="bootstrap">
       <div class="input-container">
+        <label>Candidate Name</label>
+        <div class="input-group">
+          <input class="e-input" type="text" maxlength="50" formControlName="candidateName" />
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
         <label>Region</label>
         <div class="input-group multiselect">
           <ejs-multiselect
+            #regionMultiselect
             mode="CheckBox"
-            formControlName="regionsIds"
+            formControlName="regionsNames"
             placeholder="All"
-            [fields]="optionFields"
+            [fields]="regionFields"
             [allowFiltering]="true"
             [showDropDownIcon]="true"
-            [dataSource]="filterColumns.regionsIds.dataSource"
+            [dataSource]="filterColumns.regionsNames.dataSource"
           >
           </ejs-multiselect>
         </div>

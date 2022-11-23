@@ -116,6 +116,12 @@ body {
     }
   }
 
+  .textbox {
+    span.error {
+      top: 53px;
+    }
+  }
+
   h3 {
     margin: 5px;
     font-weight: normal;
@@ -341,6 +347,7 @@ body {
     .candidates-additional-info .container-row,
     .search, .credentials-container,
     .side-menu,
+    .document-side-panel,
     .e-toolbar .e-tbar-btn,
     .dialog .applied-filters .chips-container .e-chip-list .e-chip,
     .filter-chips .e-chip-list .e-chip {
@@ -469,6 +476,7 @@ hr {
 @import './controls/tooltip';
 @import './controls/custom-buttons';
 @import './controls/dropdownbutton.scss';
+@import './controls/menu.scss';
 @import 'text';
 
 a, a:hover, a:focus, a:active {
@@ -508,13 +516,22 @@ a, a:hover, a:focus, a:active {
 .filter-button-content {
   display: flex;
 
-  .e-badge.e-badge-circle.e-badge-success {
+  .e-badge.e-badge-circle.e-badge-success,
+  .e-badge.e-badge-pill.e-badge-success {
     margin-right: 8px;
     top: 0;
     padding-right: 1px;
 
     &.align-text {
       padding-right: 0;
+    }
+  }
+
+  .e-badge.e-badge-pill.e-badge-success {
+    padding-right: 4px;
+
+    &.align-text {
+      padding-right: 5px;
     }
   }
 }
@@ -563,5 +580,12 @@ html, body {
 
   span:first-child {
     background-color: $secondary-dark-blue-20 !important;
+  }
+}
+
+.deployed-candidate {
+  &__order-id{ 
+    color: $primary-active-blue-10;
+    font-weight: 700;
   }
 }

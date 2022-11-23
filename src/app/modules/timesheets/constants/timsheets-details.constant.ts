@@ -54,7 +54,7 @@ export const billRateColDef: ColDef = {
   width: 110,
   valueFormatter: (data) => {
     if(!data.value) return '0'
-    return GridValuesHelper.formatCurrency(data.value)
+    return GridValuesHelper.formatCurrencyValue(data.value)
   },
 };
 
@@ -100,7 +100,7 @@ export const totalCol: ColDef = {
   width: 140,
   valueFormatter: (data) => {
     if(!data.value) return '0'
-    return GridValuesHelper.formatCurrency(data.value)
+    return GridValuesHelper.formatCurrencyValue(data.value)
   },
 };
 
@@ -161,8 +161,9 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
   },
   {
     field: 'hadLunchBreak',
-    headerName: 'No Lunch Break',
+    headerName: 'No Meal Break',
     width: 125,
+    type: 'rightAligned',
     cellRenderer: SwitchEditorComponent,
     ...commonColumn,
     cellRendererParams: {
@@ -184,40 +185,6 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
   billRateColDef,
   totalCol,
   actionCol(),
-]);
-
-export const MilesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
-  dayColDef,
-  ...(isStatusAvaliable ? [recordStatusCell] : []),
-  {
-    ...editableCostCenterDef,
-    width: 220,
-  },
-  {
-    ...billRateTypeStatic,
-    width: 200,
-  },
-  attachmentsCol,
-  {
-    ...amountColdef('Miles'),
-    width: 200,
-    cellRenderer: InputEditorComponent,
-    cellRendererParams: {
-      editMode: true,
-      isEditable: false,
-      type: EditFieldTypes.Text,
-      validators: [Validators.min(0), Validators.max(24), Validators.required],
-    }
-  },
-  {
-    ...billRateColDef,
-    width: 150,
-  },
-  {
-    ...totalCol,
-    width: 200,
-  },
-  actionCol(true),
 ]);
 
 export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
@@ -260,7 +227,7 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
     cellRenderer: InputEditorComponent,
     valueFormatter: (data) => {
       if(!data.value) return '0'
-      return GridValuesHelper.formatCurrency(data.value)
+      return GridValuesHelper.formatCurrencyValue(data.value)
     },
     cellRendererParams: {
       editMode: true,
@@ -271,12 +238,6 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
   },
   actionCol(),
 ]);
-
-export const TimesheetRecordsColConfig: Record<string, ((isStatusAvaliable: boolean) => ColDef[])> = {
-  [RecordFields.Time]: TimesheetRecordsColdef,
-  [RecordFields.Miles]: MilesRecordsColDef,
-  [RecordFields.Expenses]: ExpensesRecordsColDef,
-}
 
 export const RecordsTabConfig: TabConfig[] = [
   {

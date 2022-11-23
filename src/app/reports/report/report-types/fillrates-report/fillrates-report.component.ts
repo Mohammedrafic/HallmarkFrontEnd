@@ -6,11 +6,11 @@ import lodashFilter from 'lodash/fp/filter';
 import lodashMap from 'lodash/fp/map';
 import type { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import type { ValueFormatterParams } from '@ag-grid-community/core';
-import { Observable, forkJoin, takeUntil, filter, distinctUntilChanged } from 'rxjs';
+import { distinctUntilChanged, filter, forkJoin, Observable, takeUntil } from 'rxjs';
 import { Store } from '@ngxs/store';
 
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, NgModule, Type, Inject } from '@angular/core';
-import { FormGroup, FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, NgModule, OnInit, Type } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 
 import { ApplicantStatus } from '@shared/models/order-management.model';
@@ -26,13 +26,8 @@ import { GridModule } from '@shared/components/grid/grid.module';
 import { MultiselectDropdownModule } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module';
 import { PageOfCollections } from '@shared/models/page.model';
 import { PageQueryFilterParamsService, PageQueryParams } from '@shared/services/page-query-filter-params.service';
-import { Skill } from '@shared/models/skill.model';
-import {
-  OrganizationLocation,
-  OrganizationRegion,
-  OrganizationStructure,
-  OrganizationDepartment,
-} from '@shared/models/organization.model';
+import { AssignedSkillsByOrganization, Skill } from '@shared/models/skill.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { FillrateReportFilterFormValueModel } from './models/fillrate-report-filter-form-value.model';
 import { GetOrganizationStructure } from '../../../../store/user.actions';
 import { OrderTypeOptions } from '@shared/enums/order-type';
@@ -258,7 +253,7 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
   protected getFiltersData(): void {
     forkJoin([this.fillratesReportService.getAssignedSkills(), this.fillratesReportService.getApplicantsStatuses()])
       .pipe(takeUntil(this.destroy$))
-      .subscribe(([skills, statuses]: [Skill[], ApplicantStatus[]]) => {
+      .subscribe(([skills, statuses]: [AssignedSkillsByOrganization[], ApplicantStatus[]]) => {
         this.filterColumns['skills'].dataSource = skills;
         this.filterColumns['candidatesStatuses'].dataSource = statuses;
         this.changeDetectorRef.markForCheck();

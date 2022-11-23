@@ -1,7 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { BusinessLines, BusinessLinesDtoModel } from '@shared/models/business-line.model';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +24,7 @@ export class BusinessLineService {
   }
 
   public getAllBusinessLines(): Observable<BusinessLines[]> {
-    return this.httpClient.get<BusinessLines[]>('/api/businesslines/all');
+    return this.httpClient.get<BusinessLines[]>('/api/businesslines/all').pipe(map((data) => sortByField(data, 'line')));
   }
 
   private getCloseReasonsParams(pageNumber?: number, pageSize?: number, orderBy?: string): HttpParams {

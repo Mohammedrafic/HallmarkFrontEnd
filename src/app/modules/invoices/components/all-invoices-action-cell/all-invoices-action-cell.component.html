@@ -1,8 +1,13 @@
-<button ejs-button class="grid-actions-cell-item" cssClass="e-flat e-success"
+<button
+  ejs-button
+  class="grid-actions-cell-item"
+  cssClass="e-flat e-success"
+  [disabled]="isDisabled"
   *ngIf="action"
-        (click)="handleAction($event)">
-    <span *ngIf="actionName"
-          class="grid-actions-cell-item-title">
-        {{actionName}}
+  (click)="handleAction($event)">
+    <span
+      *ngIf="actionName"
+      class="grid-actions-cell-item-title color-supportive-green-10">
+        {{ actionName }}
     </span>
 </button>

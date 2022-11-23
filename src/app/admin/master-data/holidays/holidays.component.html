@@ -9,6 +9,7 @@
           (change)="yearChanged($event)"
           showClearButton="true"
           [dataSource]="yearsList"
+          [allowFiltering]="true"
           placeholder="Year"
         ></ejs-dropdownlist>
       </div>
@@ -22,11 +23,16 @@
           Export <i-feather name="download" class="icon"></i-feather>
         </div>
       </button>
-      <button
-        ejs-button
-        id="addDepartmentButton"
-        [isPrimary]="true"
-        (click)="addHoliday()">Add Holiday</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditMasterHolidays]">
+        <button
+          ejs-button
+          [disabled]="!userPermission[userPermissions.CanEditMasterHolidays]"
+          id="addDepartmentButton"
+          [isPrimary]="true"
+          (click)="addHoliday()">Add Holiday</button>
+      </app-tooltip-container>
     </section>
   </section>
   <ejs-grid
@@ -52,21 +58,29 @@
       <e-column textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="row-tool-buttons" [class.hidden]=!isLoaded>
-            <button ejs-button cssClass="e-flat default-icon-button" (click)="copyHoliday(data, $event)">
+            <button ejs-button [disabled]="!userPermission[userPermissions.CanEditMasterHolidays]" cssClass="e-flat default-icon-button" (click)="copyHoliday(data, $event)">
               <span class="edit-button"><i-feather name="copy" class="icon"></i-feather></span>
             </button>
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="editHoliday(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteHoliday(data, $event)">
+            <button ejs-button [disabled]="!userPermission[userPermissions.CanEditMasterHolidays]" cssClass="e-flat secondary-icon-button" (click)="deleteHoliday(data, $event)">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
         </ng-template>
       </e-column>
       <e-column field="holidayName" headerText="holiday name" width="250"></e-column>
-      <e-column field="startDateTime" type="date" [format]="format" headerText="start date & time" width="250"></e-column>
-      <e-column field="endDateTime" type="date" [format]="format" headerText="end date & time" width="250"></e-column>
+      <e-column field="startDateTime" headerText="start date & time" width=250>
+        <ng-template #template let-data>
+          {{ data.startDateTime | date: "MM/dd/yyyy hh:mm a":"utc": "en-US" }}
+        </ng-template>
+      </e-column>
+      <e-column field="endDateTime" headerText="end date & time" width=250>
+        <ng-template #template let-data>
+          {{ data.endDateTime | date: "MM/dd/yyyy hh:mm a":"utc": "en-US" }}
+        </ng-template>
+      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
@@ -77,6 +91,7 @@
                 id="rowsPerPage"
                 class="dropdown-no-border"
                 [dataSource]="rowsPerPageDropDown"
+                [allowFiltering]="true"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
               >
@@ -94,6 +109,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(holidaysPage$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -117,6 +135,7 @@
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-side-dialog
+  [disableSaveButton]="!userPermission[userPermissions.CanEditMasterHolidays]"
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveHoliday()"
   header="{{ title }} Holiday"
@@ -147,7 +166,6 @@
                           name="startDateTime"
                           formControlName="startDateTime"
                           placeholder="Select Date and Time"
-                          [min]="startTimeField.value || today"
                           [step]="30">
           </ejs-datetimepicker>
         </div>
@@ -162,12 +180,14 @@
                           name="endDateTime"
                           formControlName="endDateTime"
                           placeholder="Select Date and Time"
-                          [min]="startTimeField.value || today"
                           [step]="30">
           </ejs-datetimepicker>
         </div>
       </div>
     </div>
+    <p *ngIf="(startTimeField?.errors || endTimeField?.errors) as errorObj" class="error">
+      {{ errorObj['invalidDate'] ? datesValidationMessage : '' }}
+    </p>
   </form>
 </app-side-dialog>
 

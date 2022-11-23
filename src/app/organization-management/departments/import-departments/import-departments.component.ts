@@ -1,5 +1,5 @@
 import { ColDef } from '@ag-grid-community/core';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
 
 import { Actions, Store } from '@ngxs/store';
 
@@ -14,7 +14,8 @@ import {
   UploadDepartmentsFileSucceeded,
 } from '@organization-management/store/organization-management.actions';
 import { AbstractImport } from '@shared/classes/abstract-import';
-import { departmentsColumns } from './departments-grid.constants';
+import { DepartmentsColumns } from './departments-grid.constants';
+import { AppState } from '../../../store/app.state';
 
 const importConfig = {
   importTemplate: GetDepartmentsImportTemplate,
@@ -32,8 +33,11 @@ const importConfig = {
   templateUrl: './import-departments.component.html',
   styleUrls: ['./import-departments.component.scss'],
 })
-export class ImportDepartmentsComponent extends AbstractImport {
-  public readonly columnDefs: ColDef[] = departmentsColumns;
+export class ImportDepartmentsComponent extends AbstractImport implements OnChanges {
+  @Input() isOrgUseIRPAndVMS = false;
+  @Input() isInvoiceDepartmentIdFieldShow = false;
+
+  public columnDefs: ColDef[];
   public titleImport: string = 'Import Departments';
 
   constructor(
@@ -42,5 +46,12 @@ export class ImportDepartmentsComponent extends AbstractImport {
     protected override cdr: ChangeDetectorRef
   ) {
     super(actions$, store, importConfig, cdr);
+  }
+
+  ngOnChanges(): void {
+    this.columnDefs = DepartmentsColumns(
+      this.store.selectSnapshot(AppState.isIrpFlagEnabled) && this.isOrgUseIRPAndVMS,
+      this.isInvoiceDepartmentIdFieldShow
+    );
   }
 }

@@ -1,4 +1,4 @@
-import { ICellRendererParams } from '@ag-grid-community/core';
+import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
 import { Attachment, AttachmentsListParams } from '@shared/components/attachments';
 import { GridActionsCellComponent } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import { PendingInvoiceStatus } from '../../enums/invoice-status.enum';
@@ -8,7 +8,14 @@ import {
   InvoicesContainerGridHelper
 } from './invoices-container-grid.helper';
 import { InvoiceRecordType } from '../../enums';
-import { amountColDef, rejectionReasonColDef, vendorFeeAppliedColDef } from '../../constants';
+import {
+  amountColDef,
+  commentColDef,
+  linkedInvoiceIdColDef,
+  reasonCodeColDef,
+  rejectionReasonColDef,
+  vendorFeeAppliedColDef
+} from '../../constants';
 import { GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import { AgencyStatus } from '@shared/enums/status';
 
@@ -20,6 +27,7 @@ interface GetManualInvoicesColDefsConfig {
 export interface OrganizationGetManualInvoicesColDefsConfig extends GetManualInvoicesColDefsConfig {
   approve: (invoice: ManualInvoice) => void,
   reject: (invoice: ManualInvoice) => void,
+  canEdit: boolean,
 }
 
 export interface AgencyGetManualInvoicesColDefsConfig extends GetManualInvoicesColDefsConfig {
@@ -32,11 +40,16 @@ const invoiceRecordDescriptionMap: Record<InvoiceRecordType, string> = {
   [InvoiceRecordType.ManualInvoiceRecord]: 'Manual',
 };
 
+const commonColumn: ColDef = {
+  sortable: true,
+};
+
 const invoiceRecordTypeColDef: TypedColDef<ManualInvoice> = {
   field: 'invoiceRecordType',
   headerName: 'TYPE',
   valueGetter: (params: TypedValueGetterParams<ManualInvoice>) =>
     invoiceRecordDescriptionMap[params.data.invoiceRecordType],
+  ...commonColumn,
 };
 
 export class ManualInvoicesGridHelper {
@@ -67,20 +80,20 @@ export class ManualInvoicesGridHelper {
           const { status } = params.data as ManualInvoice;
 
           return {
-            actionsConfig: [
+            actionsConfig: canEdit ? [
               {
                 action: edit,
                 iconName: 'edit',
                 iconClass: 'color-primary-active-blue-10',
-                disabled: [PendingInvoiceStatus.Approved].includes(status) || !canEdit,
+                disabled: [PendingInvoiceStatus.Approved].includes(status),
               },
               {
                 action: deleteInvoice,
                 iconName: 'trash-2',
                 iconClass: 'color-supportive-red',
-                disabled: [PendingInvoiceStatus.Approved].includes(status) || !canEdit,
+                disabled: [PendingInvoiceStatus.Approved].includes(status),
               },
-            ],
+            ] : [],
           }
         },
         headerCheckboxSelection: true,
@@ -102,9 +115,13 @@ export class ManualInvoicesGridHelper {
       {
         ...weekPeriod,
         minWidth: 150,
+        ...commonColumn,
       },
       vendorFeeAppliedColDef,
       rejectionReasonColDef,
+      commentColDef,
+      linkedInvoiceIdColDef,
+      reasonCodeColDef,
       {
         ...attachments,
         cellRendererParams: (params: ICellRendererParams) => {
@@ -116,13 +133,14 @@ export class ManualInvoicesGridHelper {
             }
           } as AttachmentsListParams;
         },
+        ...commonColumn,
       },
       amountColDef,
     ];
   }
 
   static getOrganizationColDefs(
-    { approve, reject, downloadAttachment, previewAttachment }: OrganizationGetManualInvoicesColDefsConfig
+    { approve, reject, downloadAttachment, previewAttachment, canEdit }: OrganizationGetManualInvoicesColDefsConfig
   ): TypedColDef<ManualInvoice>[] {
     const {
       attachments,
@@ -154,7 +172,7 @@ export class ManualInvoicesGridHelper {
                 titleClass: 'color-supportive-green-10',
                 disabled: [
                   PendingInvoiceStatus.Approved,
-                ].includes(status) || agencyStatus === AgencyStatus.Terminated,
+                ].includes(status) || agencyStatus === AgencyStatus.Terminated || !canEdit,
               },
               {
                 action: reject,
@@ -163,7 +181,7 @@ export class ManualInvoicesGridHelper {
                 disabled: [
                   PendingInvoiceStatus.Approved,
                   PendingInvoiceStatus.Rejected,
-                ].includes(status) || agencyStatus === AgencyStatus.Terminated,
+                ].includes(status) || agencyStatus === AgencyStatus.Terminated || !canEdit,
               },
             ],
           } as GridActionsCellConfig

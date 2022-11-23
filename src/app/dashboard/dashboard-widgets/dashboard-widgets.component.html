@@ -58,7 +58,7 @@
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.FILLED_POSITIONS"
                               [isDarkTheme]="isDarkTheme"></app-position-chart>
-          <app-position-chart *ngSwitchCase="widgetTypeEnum.LTA_ORDER_ENDING"
+          <app-position-chart *ngSwitchCase="widgetTypeEnum.LTA_ORDER_ENDING" [isLTAOrderEnding]="true"
                               [chartData]="widgetsData?.[widgetTypeEnum.LTA_ORDER_ENDING]"
                               [isLoading]="isLoading"
                               [description]="widgetDescriptionEnum.LTA_ORDER_ENDING"

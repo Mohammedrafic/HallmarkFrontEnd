@@ -3,7 +3,15 @@
     <h3>Payment Details</h3>
   </div>
   <div class="actions">
-    <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Payment Detail</span>
+    <app-tooltip-container [showToolTip]="!hasPermissions">
+      <button
+        [disabled]="!hasPermissions"
+        ejs-button
+        cssClass="e-outline add-payment-detail"
+        (click)="addNew()">
+        <i-feather name="plus" class="icon"></i-feather> Add Payment Detail
+      </button>
+    </app-tooltip-container>
   </div>
 </div>
 <ejs-grid
@@ -26,10 +34,10 @@
     <e-column textAlign="Right" maxWidth="100">
       <ng-template #template let-data>
         <div class="row-tool-buttons">
-          <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
+          <button [disabled]="!hasPermissions" ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
             <span><i-feather name="edit" class="icon"></i-feather></span>
           </button>
-          <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
+          <button [disabled]="!hasPermissions" ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
             <span><i-feather name="trash-2" class="icon"></i-feather></span>
           </button>
         </div>
@@ -61,6 +69,7 @@
               id="rowsPerPage"
               class="dropdown-no-border"
               [dataSource]="rowsPerPageDropDown"
+              [allowFiltering]="true"
               [(value)]="activeRowsPerPageDropDown"
             >
             </ejs-dropdownlist>

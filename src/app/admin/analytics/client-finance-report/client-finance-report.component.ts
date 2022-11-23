@@ -16,7 +16,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportUrl, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
@@ -25,6 +25,7 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { analyticsConstants } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
+import { ConfigurationDto } from '@shared/models/analytics.model';
 
 @Component({
   selector: 'app-client-finance-report',
@@ -65,8 +66,8 @@ export class ClientFinanceReportComponent implements OnInit,OnDestroy {
   departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   selectedDepartments: Department[];
   
-  @Select(LogiReportState.logiReportUrl)
-  public logiReportUrl$: Observable<string>;
+  @Select(LogiReportState.logiReportData)
+  public logiReportData$: Observable<ConfigurationDto[]>;
 
   @Select(SecurityState.bussinesData)
   public businessData$: Observable<BusinessUnit[]>;
@@ -109,14 +110,17 @@ export class ClientFinanceReportComponent implements OnInit,OnDestroy {
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
     }
-    this.SetReportUrl();    
+    this.SetReportData();    
   }
 
   ngOnInit(): void {    
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => { 
-      this.SetReportUrl();
-      this.logiReportUrl$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:string)=>{
-        this.logiReportComponent.SetReportUrl(data);
+      this.SetReportData();
+      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:ConfigurationDto[])=>{
+        if(data.length>0)
+        {
+        this.logiReportComponent.SetReportData(data);
+        }
      });    
       this.agencyOrganizationId=data;   
       this.isInitialLoad = true;
@@ -170,6 +174,7 @@ export class ClientFinanceReportComponent implements OnInit,OnDestroy {
         this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
         let locationFilter: LocationsByRegionsFilter = {
           ids: data,
+          businessUnitIds:this.selectedOrganizations?.map((list) => list.id),
           getAll: true
         };
         this.store.dispatch(new GetLocationsByRegions(locationFilter));
@@ -181,6 +186,7 @@ export class ClientFinanceReportComponent implements OnInit,OnDestroy {
         this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         let departmentFilter: DepartmentsByLocationsFilter = {
           ids: data,
+          businessUnitIds:this.selectedOrganizations?.map((list) => list.id),
           getAll: true
         };
         this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));
@@ -297,14 +303,14 @@ export class ClientFinanceReportComponent implements OnInit,OnDestroy {
         }
       });
   }
-  private SetReportUrl(){
-    const logiReportUrl = this.store.selectSnapshot(LogiReportState.logiReportUrl);
-      if(logiReportUrl=='')
+  private SetReportData(){
+    const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
+      if(logiReportData!=null&&logiReportData.length==0)
       {
-        this.store.dispatch(new GetLogiReportUrl());
+        this.store.dispatch(new GetLogiReportData());
       }
       else{
-        this.logiReportComponent?.SetReportUrl(logiReportUrl);
+        this.logiReportComponent?.SetReportData(logiReportData);
       }
   }
   public showFilters(): void {
@@ -318,7 +324,6 @@ export class ClientFinanceReportComponent implements OnInit,OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.clientFinanceReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.clientFinanceReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.clientFinanceReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.clientFinanceReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);

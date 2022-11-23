@@ -44,6 +44,7 @@ import {
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
 import { JobDistributionComponent } from '@agency/agency-list/add-edit-agency/job-distribution/job-distribution.component';
 import { AgencyStatus } from '@shared/enums/status';
+import { AbstractPermission } from '@shared/helpers/permissions';
 
 type AgencyFormValue = {
   parentBusinessUnitId: number;
@@ -60,7 +61,7 @@ type AgencyFormValue = {
   templateUrl: './add-edit-agency.component.html',
   styleUrls: ['./add-edit-agency.component.scss'],
 })
-export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDeactivate {
+export class AddEditAgencyComponent extends AbstractPermission implements OnInit, OnDestroy, ComponentCanDeactivate {
   @ViewChild('stepper') tab: TabComponent;
 
   public agencyForm: FormGroup;
@@ -119,18 +120,20 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
   private fetchedAgency: Agency;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private actions$: Actions,
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
     private confirmService: ConfirmService
   ) {
+    super(store);
     this.store.dispatch(new SetHeaderState({ title: 'Agency', iconName: 'clock' }));
     this.store.dispatch(new GetBusinessUnitList());
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.generateAgencyForm();
     this.checkAgencyUser();
     this.onBillingPopulatedChange();
@@ -147,8 +150,13 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
         this.agencyId = agency.payload.agencyDetails.id as number;
         this.uploadImages(this.agencyId);
         this.agencyForm.markAsPristine();
-        this.navigateToAgencyList();
+        if (
+          this.activeUser.businessUnitType === BusinessUnitType.Hallmark
+          || this.activeUser.businessUnitType === BusinessUnitType.MSP) {
+          this.navigateToAgencyList();
+        }
       });
+
     this.actions$
       .pipe(
         takeWhile(() => this.isAlive),
@@ -159,6 +167,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
         this.fetchedAgency = agency.payload;
         this.patchAgencyFormValue(this.fetchedAgency);
       });
+  
     this.actions$
       .pipe(
         takeWhile(() => this.isAlive),
@@ -175,7 +184,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDe
     }
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.isAlive = false;
     this.isRemoveLogo = false;
   }

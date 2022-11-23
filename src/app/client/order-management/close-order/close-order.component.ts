@@ -25,7 +25,6 @@ import { UserAgencyOrganization } from '@shared/models/user-agency-organization.
 import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
 import { AlertTriggerDto } from '@shared/models/alerts-template.model';
 import { SaveCloseOrderSucceeded } from '@client/store/order-managment-content.actions';
-import { OrderStatus } from '@shared/enums/order-management';
 import { AlertTrigger } from '@admin/store/alerts.actions';
 
 @Component({
@@ -81,32 +80,6 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     this.onOrganizationChangedClosureReasons();
     this.initForm();
     this.subscribeOnCloseSideBar();
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveCloseOrderSucceeded)).subscribe((data) => {
-      const userAgencyOrganization = this.store.selectSnapshot(UserState.organizations) as UserAgencyOrganization;
-      let orgName = userAgencyOrganization?.businessUnits?.find(i => i.id == data?.order?.organizationId)?.name;
-      let params: any = {};
-      params['@' + AlertParameterEnum[AlertParameterEnum.Organization]] = orgName == null || orgName == undefined ? "" : orgName;
-      params['@' + AlertParameterEnum[AlertParameterEnum.OrderID]] =
-        data?.order?.organizationPrefix == null
-          ? data?.order?.publicId + ''
-          : data?.order?.organizationPrefix + '-' + data?.order?.publicId;
-      params['@' + AlertParameterEnum[AlertParameterEnum.Location]] = data?.order?.locationName;
-      params['@' + AlertParameterEnum[AlertParameterEnum.Skill]] = data?.order?.skillName == null ? "" : data?.order?.skillName;
-      //For Future Reference
-      // var url = location.origin + '/ui/client/order-management/edit/' + data?.order?.id;
-      params['@' + AlertParameterEnum[AlertParameterEnum.ClickbackURL]] = "";
-      
-      let  alertTriggerDto : AlertTriggerDto = {
-          BusinessUnitId: data?.order?.organizationId,
-          AlertId: AlertIdEnum['Order Status Update: Closed'],
-          Parameters: params,
-        };
-      
-      if (alertTriggerDto.AlertId > 0) {
-        this.store.dispatch(new AlertTrigger(alertTriggerDto));
-      }
-
-    });
   }
   public override ngOnDestroy(): void {
     this.unsubscribe$.next();
@@ -170,7 +143,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   public setCloseDateAvailability(isPosition: boolean): void {
     this.isPosition = isPosition;
-    if (this.isPosition && this.order?.orderType === OrderType.ReOrder) {
+    if (this.order?.orderType === OrderType.ReOrder) {
       this.closeForm.patchValue({ closingDate: new Date(this.order.jobStartDate as Date) });
       this.closeForm.get('closingDate')?.disable();
     } else {

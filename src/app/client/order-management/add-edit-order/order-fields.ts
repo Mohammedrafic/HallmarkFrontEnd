@@ -51,7 +51,7 @@ enum JobDistributions {
 }
 
 enum JobDescription {
-  classification,
+  classifications,
   onCallRequired,
   asapStart,
   criticalOrder,

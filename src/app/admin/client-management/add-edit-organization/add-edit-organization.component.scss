@@ -103,7 +103,7 @@
   .input-container, .dropdown-container {
     margin-bottom: 15px;
     margin-right: 10px;
-    flex: 1 1 0px
+    flex: 1 1 0px;
   }
 
   label:not(.radio-label) {
@@ -138,15 +138,7 @@
       align-items: center;
 
       .add-contact-link {
-        padding: 9px 10px;
-        border-radius: 8px;
-        cursor: pointer;
-        color: $primary-active-blue-10;
-        &:hover,
-        &:focus {
-          background-color: $primary-active-blue-70;
-          border-color: transparent;
-        }
+        border: none;
 
         i-feather {
           vertical-align: bottom;
@@ -247,4 +239,25 @@
 .upload-button {
   width: 100%;
   margin-top: 10px;
+}
+
+.checkbox-group {
+  width: 50%;
+  margin: 12px 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.system-wrapper {
+  margin-bottom: 18px;
+  border-bottom: 1px solid $secondary-dark-blue-40;
+
+  &.border-none {
+    border-bottom: none;
+  }
+}
+
+.label-gray {
+  color: $secondary-dark-blue-30;
 }

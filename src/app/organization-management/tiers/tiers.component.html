@@ -1,0 +1,31 @@
+<section class="tiers">
+  <div class="toolbar">
+    <div class="title">
+      <h3>Tiers</h3>
+    </div>
+    <div class="btn-container">
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditOrganizationTiers]">
+        <button
+          ejs-button
+          id="addDepartmentButton"
+          [disabled]="!userPermission[userPermissions.CanEditOrganizationTiers]"
+          [isPrimary]="true"
+          (click)="addTier()"
+        >Add New Tier</button>
+      </app-tooltip-container>
+    </div>
+  </div>
+  <div class="grid-container">
+    <app-tiers-grid (editTier)="handleEditTier($event)"></app-tiers-grid>
+  </div>
+</section>
+
+<app-tiers-dialog
+  [regionsStructure]="regionsStructure"
+  [selectedTier]="selectedTier"
+  [isEditDialog]="isEdit"
+  (saveTier)="handleSaveTier($event)"
+  [permission]="!userPermission[userPermissions.CanEditOrganizationTiers]"
+></app-tiers-dialog>

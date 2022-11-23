@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
+import { FileSize } from "@core/enums";
 import { SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
 import { FileInfo } from "@syncfusion/ej2-inputs/src/uploader/uploader";
 
@@ -30,7 +31,7 @@ export class ImageUploaderComponent implements OnInit {
   public isImageSelected = false;
   public uploaderErrorMessageElement: HTMLElement;
   public readonly allowedExtensions: string = '.png, .jpg';
-  public readonly maxFileSize = 10485760; // 10 mb
+  public readonly maxFileSize = FileSize.MB_20;
   public dropElement: HTMLElement;
 
   ngOnInit(): void {
@@ -67,7 +68,7 @@ export class ImageUploaderComponent implements OnInit {
         document.getElementsByClassName('e-file-status e-file-invalid')[0] as HTMLElement;
       if (this.uploaderErrorMessageElement) {
         this.uploaderErrorMessageElement.innerText = file.size > this.maxFileSize
-          ? 'The file should not exceed 10MB.'
+          ? 'The file should not exceed 20MB.'
           : 'The file should be in png, jpg format.';
       }
     });

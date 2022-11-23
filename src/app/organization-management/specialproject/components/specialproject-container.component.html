@@ -1,7 +1,11 @@
 <section class="flex-column">
   <section class="container">
     <div class="toolbar-buttons">
-      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="handleOnAdd()">{{addButtonTitle}}</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanManageSpecialProjects]">
+        <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" [disabled]="!userPermission[userPermissions.CanManageSpecialProjects]" (click)="handleOnAdd()">{{addButtonTitle}}</button>
+      </app-tooltip-container>
     </div>
     <ejs-tab (selected)="onTabSelected($event)">
       <e-tabitems>
@@ -50,6 +54,7 @@
           <div class="input-group dropdown">
             <ejs-dropdownlist formControlName="projectCategory"
                               appValidateWithMessage
+                              [allowFiltering]="true"
                               [dataSource]=" this.orgStructureData.projectTypeIds.dataSource"
                               [fields]="projectTypeFields">
             </ejs-dropdownlist>
@@ -174,6 +179,7 @@
             <div class="input-group dropdown">
               <ejs-dropdownlist formControlName="projectCategoryMapping"
                                 appValidateWithMessage
+                                [allowFiltering]="true"
                                 [dataSource]="this.orgStructureData.projectTypeIds.dataSource"
                                 [fields]="projectTypeFields"
                                 (select)="onProjectTypeDropDownChanged($event)">
@@ -188,6 +194,7 @@
             <div class="input-group dropdown">
               <ejs-dropdownlist formControlName="projectNameMapping"
                                 appValidateWithMessage
+                                [allowFiltering]="true"
                                 [dataSource]="this.orgStructureData.projectNameIds.dataSource"
                                 [fields]="projectNameFields">
               </ejs-dropdownlist>
@@ -203,6 +210,7 @@
             <div class="input-group dropdown">
               <ejs-dropdownlist formControlName="poNamesMapping"
                                 appValidateWithMessage
+                                [allowFiltering]="true"
                                 [dataSource]="this.orgStructureData.poNameIds.dataSource"
                                 [fields]="poNameFields">
               </ejs-dropdownlist>
@@ -222,7 +230,7 @@
                              appValidateWithMessage
                              [fields]="optionFields"
                              [showSelectAll]="true"
-                             [allowFiltering]="false"
+                             [allowFiltering]="true"
                              [showDropDownIcon]="true"
                              [dataSource]="orgStructureData.regionIds.dataSource">
             </ejs-multiselect>
@@ -240,7 +248,7 @@
                              appValidateWithMessage
                              [fields]="optionFields"
                              [showSelectAll]="true"
-                             [allowFiltering]="false"
+                             [allowFiltering]="true"
                              [showDropDownIcon]="true"
                              [dataSource]="orgStructureData.locationIds.dataSource">
             </ejs-multiselect>
@@ -258,7 +266,7 @@
                              appValidateWithMessage
                              [fields]="optionFields"
                              [showSelectAll]="true"
-                             [allowFiltering]="false"
+                             [allowFiltering]="true"
                              [showDropDownIcon]="true"
                              [dataSource]="orgStructureData.departmentsIds.dataSource">
             </ejs-multiselect>
@@ -276,7 +284,7 @@
                              appValidateWithMessage
                              [fields]="skillsFields"
                              [showSelectAll]="true"
-                             [allowFiltering]="false"
+                             [allowFiltering]="true"
                              [showDropDownIcon]="true"
                              [dataSource]="orgStructureData.skillIds.dataSource">
             </ejs-multiselect>

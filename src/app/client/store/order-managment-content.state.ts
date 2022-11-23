@@ -55,7 +55,6 @@ import {
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
   ApplicantStatus,
-  CandidatesBasicInfo,
   GetPredefinedBillRatesData,
   Order,
   OrderCandidateJob,
@@ -88,7 +87,6 @@ import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { RejectReasonService } from '@shared/services/reject-reason.service';
 import { RejectReason, RejectReasonPage } from '@shared/models/reject-reason.model';
 import { HistoricalEvent } from '@shared/models/historical-event.model';
-import { GetCandidatesBasicInfo } from '@agency/store/order-management.actions';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { NavigationTabModel } from '@shared/models/navigation-tab.model';
 import { DepartmentsService } from '@shared/services/departments.service';
@@ -98,13 +96,13 @@ import { ExtensionGridModel } from '@shared/components/extension/extension-sideb
 import { OrderType } from '@shared/enums/order-type';
 import { createUniqHashObj } from '@core/helpers/functions.helper';
 import { DateTimeHelper } from '@core/helpers';
-import { ApplicantStatus as ApplicantStatusEnum} from '@shared/enums/applicant-status.enum'
+import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
   selectedOrder: Order | null;
   candidatesJob: OrderCandidateJob | null;
-  candidatesBasicInfo: CandidatesBasicInfo | null;
   applicantStatuses: ApplicantStatus[];
   orderCandidatesListPage: OrderCandidatesListPage | null;
   orderDialogOptions: {
@@ -137,7 +135,6 @@ export interface OrderManagementContentStateModel {
     selectedOrder: null,
     orderCandidatesListPage: null,
     candidatesJob: null,
-    candidatesBasicInfo: null,
     applicantStatuses: [],
     orderDialogOptions: {
       next: false,
@@ -241,7 +238,8 @@ export class OrderManagementContentState {
       (el: BillRate) => el.billRateConfig
     );
 
-    return Object.values(uniqBillRatesHashObj).map((el: BillRateOption) => el);
+    const billRateOptions = Object.values(uniqBillRatesHashObj).map((el: BillRateOption) => el);
+    return sortByField(billRateOptions, 'title');
   }
 
   @Selector()
@@ -286,11 +284,6 @@ export class OrderManagementContentState {
   @Selector()
   static candidateHistoricalData(state: OrderManagementContentStateModel): HistoricalEvent[] | null {
     return state.historicalEvents;
-  }
-
-  @Selector()
-  static candidateBasicInfo(state: OrderManagementContentStateModel): CandidatesBasicInfo | null {
-    return state.candidatesBasicInfo;
   }
 
   @Selector()
@@ -435,16 +428,19 @@ export class OrderManagementContentState {
     return this.orderManagementService.getOrderById(payload).pipe(
       tap((payload) => {
         patchState({ selectedOrder: payload });
-        const { orderType, departmentId, skillId, jobStartDate, jobEndDate } = payload;
-        dispatch(
-          new SetPredefinedBillRatesData(
-            orderType,
-            departmentId,
-            skillId,
-            jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
-            jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
-          )
-        );
+        const { orderType, departmentId, skillId, jobStartDate, jobEndDate, isTemplate } = payload;
+
+        if (!isTemplate) {
+          dispatch(
+            new SetPredefinedBillRatesData(
+              orderType,
+              departmentId,
+              skillId,
+              jobStartDate ? DateTimeHelper.toUtcFormat(jobStartDate) : jobStartDate,
+              jobEndDate ? DateTimeHelper.toUtcFormat(jobEndDate) : jobEndDate
+            )
+          );
+        }
 
         return payload;
       })
@@ -808,23 +804,6 @@ export class OrderManagementContentState {
   @Action(ClearHistoricalData)
   ClearHistoricalData({ patchState }: StateContext<OrderManagementContentStateModel>): void {
     patchState({ historicalEvents: [] });
-  }
-
-  @Action(GetCandidatesBasicInfo)
-  GetCandidatesBasicInfo(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
-    { organizationId, jobId }: GetCandidatesBasicInfo
-  ): Observable<CandidatesBasicInfo> {
-    return this.orderManagementService.getCandidatesBasicInfo(organizationId, jobId).pipe(
-      tap((payload) => {
-        patchState({ candidatesBasicInfo: payload });
-        return payload;
-      }),
-      catchError(() => {
-        patchState({ candidatesBasicInfo: null });
-        return of();
-      })
-    );
   }
 
   @Action(ExportOrders)

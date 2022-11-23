@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AddEditUserComponent } from 'src/app/security/user-list/add-edit-user/add-edit-user.component';
-import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, UNIT_FIELDS, DISABLED_GROUP } from './user-list.constants';
+import { BUSSINES_DATA_FIELDS, UNIT_FIELDS, DISABLED_GROUP } from './user-list.constants';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { SecurityState } from '../store/security.state';
 import { filter, map, Observable, Subject, takeWhile } from 'rxjs';
@@ -21,8 +21,10 @@ import { UserSettingsComponent } from './add-edit-user/user-settings/user-settin
 import { ConfirmService } from '@shared/services/confirm.service';
 import { UserDTO, User } from '@shared/models/user-managment-page.model';
 import { take } from 'rxjs/operators';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { UserGridComponent } from './user-grid/user-grid.component';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 
 const DEFAULT_DIALOG_TITLE = 'Add User';
 const EDIT_DIALOG_TITLE = 'Edit User';
@@ -32,8 +34,9 @@ const EDIT_DIALOG_TITLE = 'Edit User';
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss'],
 })
-export class UserListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class UserListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild(AddEditUserComponent) addEditUserComponent: AddEditUserComponent;
+  @ViewChild(UserGridComponent) userGridComponent: UserGridComponent;
 
   @Select(SecurityState.businessUserData)
   public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
@@ -66,12 +69,13 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
 
   private isAlive = true;
 
-  constructor(private store: Store, private confirmService: ConfirmService, private actions$: Actions) {
-    super();
+  constructor(protected override store: Store, private confirmService: ConfirmService, private actions$: Actions) {
+    super(store);
     this.store.dispatch(new SetHeaderState({ title: 'Users', iconName: 'lock' }));
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.businessForm = this.generateBusinessForm();
     this.userSettingForm = UserSettingsComponent.createForm();
     this.onBusinessUnitValueChanged();
@@ -151,6 +155,7 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
       this.createdUser = user;
       this.userSettingForm.reset();
       this.userSettingForm.enable();
+      this.disableMailFormGroup();
 
       if (user.roles) {
         const editedUser = {
@@ -222,7 +227,12 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
         ofActionSuccessful(SaveUserSucceeded),
         takeWhile(() => this.isAlive)
       )
-      .subscribe(() => this.closeDialog());
+      .subscribe(() => {
+        let datasource = this.userGridComponent.createServerSideDatasource();
+        this.userGridComponent.gridApi.setServerSideDatasource(datasource);
+        this.closeDialog()
+      }
+        );
   }
 
   private onBusinessUnitValueChanged(): void {
@@ -259,5 +269,10 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
     this.userSettingForm.reset();
     this.userSettingForm.enable();
     this.createdUser = null;
+  }
+
+  private disableMailFormGroup(): void {
+    this.userSettingForm.get('email')?.disable();
+    this.userSettingForm.get('emailConfirmation')?.disable();
   }
 }

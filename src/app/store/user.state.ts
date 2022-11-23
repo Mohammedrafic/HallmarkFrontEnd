@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { State, Action, StateContext, Selector } from '@ngxs/store';
+import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { getAllErrors } from '@shared/utils/error.utils';
@@ -8,41 +8,41 @@ import { catchError, map, Observable, tap } from 'rxjs';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MENU_CONFIG } from '@shared/constants';
 import {
-  USER_STORAGE_KEY,
-  ORG_ID_STORAGE_KEY,
   AGENCY_ID_STORAGE_KEY,
   LAST_SELECTED_BUSINESS_UNIT_TYPE,
+  LogiReportJsLoaded,
+  ORG_ID_STORAGE_KEY,
+  USER_STORAGE_KEY
 } from '@shared/constants/local-storage-keys';
 import { ChildMenuItem, Menu, MenuItem } from '@shared/models/menu.model';
 
 import { User, UsersAssignedToRole } from '@shared/models/user.model';
 import { UserService } from '@shared/services/user.service';
 import {
-  GetUserMenuConfig,
-  SetCurrentUser,
-  LogoutUser,
-  GetUserAgencies,
-  SaveLastSelectedOrganizationAgencyId,
-  SetLastSelectedOrganizationAgencyId,
-  GetOrganizationStructure,
-  LastSelectedOrganisationAgency,
-  GetUsersAssignedToRole,
   GetCurrentUserPermissions,
-  GetUserOrganizations,
   GetOrderPermissions,
+  GetOrganizationStructure, GetOrgTierStructure,
+  GetUserAgencies,
+  GetUserMenuConfig,
+  GetUserOrganizations,
+  GetUsersAssignedToRole,
+  LastSelectedOrganisationAgency,
+  LogoutUser,
+  SaveLastSelectedOrganizationAgencyId,
   SetAgencyActionsAllowed,
   SetAgencyInvoicesActionsAllowed,
+  SetCurrentUser,
+  SetLastSelectedOrganizationAgencyId,
+  SetUserPermissions
 } from './user.actions';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
-import {
-  OrganizationDepartment,
-  OrganizationLocation,
-  OrganizationRegion,
-  OrganizationStructure,
-} from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 import { B2CAuthService } from '../b2c-auth/b2c-auth.service';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { Permission } from '@core/interface';
+import { UserPermissionsService } from '@core/services';
+import { PermissionsAdapter } from '@core/helpers/adapters';
 
 export interface UserStateModel {
   user: User | null;
@@ -58,6 +58,8 @@ export interface UserStateModel {
   orderPermissions: CurrentUserPermission[];
   agencyActionsAllowed: boolean;
   agencyInvoicesActionsAllowed: boolean;
+  userPermission: Permission;
+  tireOrganizationStructure: OrganizationStructure | null;
 }
 
 const AGENCY = 'Agency';
@@ -73,11 +75,13 @@ const AGENCY = 'Agency';
     lastSelectedOrganizationId: parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string) || null,
     lastSelectedAgencyId: parseInt(window.localStorage.getItem(AGENCY_ID_STORAGE_KEY) as string) || null,
     organizationStructure: null,
+    tireOrganizationStructure: null,
     usersAssignedToRole: null,
     permissions: [],
     orderPermissions: [],
     agencyActionsAllowed: true,
     agencyInvoicesActionsAllowed: true,
+    userPermission: {}
   },
 })
 @Injectable()
@@ -85,8 +89,14 @@ export class UserState {
   constructor(
     private userService: UserService,
     private organizationService: OrganizationService,
-    private b2CAuthService: B2CAuthService
+    private b2CAuthService: B2CAuthService,
+    private userPermissionsService: UserPermissionsService
   ) {}
+
+  @Selector()
+  static userPermission(state: UserStateModel): Permission {
+    return state.userPermission;
+  }
 
   @Selector()
   static user(state: UserStateModel): User | null {
@@ -146,6 +156,11 @@ export class UserState {
   }
 
   @Selector()
+  static tireOrganizationStructure(state: UserStateModel): OrganizationStructure | null {
+    return state.tireOrganizationStructure;
+  }
+
+  @Selector()
   static currentUserPermissions(state: UserStateModel): CurrentUserPermission[] {
     return state.permissions;
   }
@@ -168,6 +183,11 @@ export class UserState {
   @Selector()
   static isMspUser(state: UserStateModel): boolean {
     return state.user?.businessUnitType === BusinessUnitType.MSP;
+  }
+
+  @Selector()
+  static isAgencyUser(state: UserStateModel): boolean {
+    return state.user?.businessUnitType === BusinessUnitType.Agency;
   }
 
   @Selector([UserState.isHallmarkUser, UserState.isMspUser])
@@ -200,6 +220,7 @@ export class UserState {
     window.localStorage.removeItem(USER_STORAGE_KEY);
     window.localStorage.removeItem(ORG_ID_STORAGE_KEY);
     window.localStorage.removeItem(AGENCY_ID_STORAGE_KEY);
+    window.localStorage.removeItem(LogiReportJsLoaded);
     patchState({
       user: null,
       lastSelectedAgencyId: null,
@@ -371,5 +392,33 @@ export class UserState {
     patchState({
       agencyInvoicesActionsAllowed: allowed,
     });
+  }
+
+  @Action(SetUserPermissions)
+  SetUserPermissions(
+    { patchState }: StateContext<UserStateModel>,
+  ): Observable<Permission> {
+    return this.userPermissionsService.getUserPermissions()
+      .pipe(
+        map((permissions: number[]) => PermissionsAdapter.adaptUserPermissions(permissions)),
+        tap((permissions: Permission) => {
+          patchState({userPermission: permissions});
+          return permissions;
+        })
+      );
+  }
+
+  @Action(GetOrgTierStructure)
+  GetOrgTierStructure(
+    { patchState, dispatch }: StateContext<UserStateModel>,
+  ): Observable<OrganizationStructure | void> {
+    return this.organizationService.getOrgTierStructure().pipe(
+      tap((structure: OrganizationStructure) => {
+        patchState({tireOrganizationStructure: structure})
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    )
   }
 }

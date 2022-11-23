@@ -12,10 +12,17 @@ import { endDateValidator, startDateValidator } from '@shared/validators/date.va
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SetDirtyState } from 'src/app/admin/store/admin.actions';
-import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import {
+  CANCEL_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+  ERROR_START_LESS_END_DATE
+} from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { DateTimeHelper } from '@core/helpers';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 
 @Component({
   selector: 'app-holidays',
@@ -23,7 +30,7 @@ import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
   styleUrls: ['./holidays.component.scss'],
   providers: [SortService]
 })
-export class MasterHolidaysComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class MasterHolidaysComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -51,13 +58,14 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
   public fileName: string;
   public defaultFileName: string;
   public yearFilter: number;
+  public datesValidationMessage = ERROR_START_LESS_END_DATE;
 
-  constructor(private store: Store,
+  constructor(protected override store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
-    super();
+    super(store);
     this.today.setHours(0, 0, 0);
     this.HolidayFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
@@ -72,14 +80,15 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
     }
 
     this.startTimeField = this.HolidayFormGroup.get('startDateTime') as AbstractControl;
-    this.startTimeField.addValidators(startDateValidator(this.HolidayFormGroup, 'endDateTime', this.today));
+    this.startTimeField.addValidators(startDateValidator(this.HolidayFormGroup, 'endDateTime'));
     this.startTimeField.valueChanges.subscribe(() => this.endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
     this.endTimeField = this.HolidayFormGroup.get('endDateTime') as AbstractControl;
-    this.endTimeField.addValidators(endDateValidator(this.HolidayFormGroup, 'startDateTime', this.today));
+    this.endTimeField.addValidators(endDateValidator(this.HolidayFormGroup, 'startDateTime'));
     this.endTimeField.valueChanges.subscribe(() => this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
   }
 
-  ngOnInit() {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize));
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
@@ -142,8 +151,8 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
     this.HolidayFormGroup.setValue({
       id: 0,
       holidayName: data.holidayName,
-      startDateTime: data.startDateTime,
-      endDateTime: data.endDateTime,
+      startDateTime: DateTimeHelper.convertDateToUtc(data.startDateTime),
+      endDateTime: DateTimeHelper.convertDateToUtc(data.endDateTime),
     });
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -167,8 +176,8 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
     this.HolidayFormGroup.setValue({
       id: data.id,
       holidayName: data.holidayName,
-      startDateTime: data.startDateTime,
-      endDateTime: data.endDateTime,
+      startDateTime: DateTimeHelper.convertDateToUtc(data.startDateTime),
+      endDateTime: DateTimeHelper.convertDateToUtc(data.endDateTime),
     });
     this.store.dispatch(new ShowSideDialog(true));
   }

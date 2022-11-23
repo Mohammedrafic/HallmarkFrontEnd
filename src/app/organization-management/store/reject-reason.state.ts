@@ -20,6 +20,7 @@ import { MessageTypes } from "@shared/enums/message-types";
 import { getAllErrors } from "@shared/utils/error.utils";
 import { RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from "@shared/constants";
 import { Penalty, PenaltyPage } from "@shared/models/penalty.model";
+import { sortByField } from "@shared/helpers/sort-by-field.helper";
 
 export interface RejectReasonStateModel {
   rejectReasonsPage: RejectReasonPage | null;
@@ -62,6 +63,13 @@ export class RejectReasonState {
   static orderRequisition(state: RejectReasonStateModel): RejectReasonPage | null {
     return state.orderRequisition;
   }
+
+
+  @Selector()
+  static sortedOrderRequisition(state: RejectReasonStateModel): RejectReasonPage | null {
+    return { ...state.orderRequisition, items: sortByField(state.orderRequisition?.items ?? [], 'reason') } as RejectReasonPage;
+  }
+
 
   @Selector()
   static penalties(state: RejectReasonStateModel): PenaltyPage | null {

@@ -165,12 +165,12 @@ export const MENU_CONFIG: any = {
     40: {
       // Custom Reports
       icon: 'pie-chart',
-      route: '/analytics/client-finance-accrual-report',
+      route: '/analytics/financial-time-sheet-report',
     },
     41: {
       // Accrual Report
       icon: '',
-      route: '/analytics/client-finance-accrual-report',
+      route: '/analytics/financial-time-sheet-report',
     },
     42: {
       // Invoice Summary
@@ -367,7 +367,12 @@ export const MENU_CONFIG: any = {
       // Document Management
       icon: 'file',
       route: '/documents/document-library',
-    }
+    },
+    82: {
+      // New Accrual Report
+      icon: '',
+      route: '/analytics/accrual-report',
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -539,7 +544,12 @@ export const MENU_CONFIG: any = {
       // Document Management
       icon: 'file',
       route: '/documents/document-library',
-    }
+    },
+    82: {
+      // New Accrual Report
+      icon: '',
+      route: '/analytics/accrual-report',
+    },
   },
 
   [BusinessUnitType.Organization]: {
@@ -685,12 +695,12 @@ export const MENU_CONFIG: any = {
     40: {
       // Custom Reports
       icon: 'pie-chart',
-      route: '/analytics/client-finance-accrual-report',
+      route: '/analytics/financial-time-sheet-report',
     },
     41: {
       // Accrual Report
       icon: '',
-      route: '/analytics/client-finance-accrual-report',
+      route: '/analytics/financial-time-sheet-report',
     },
     42: {
       // Invoice Summary
@@ -872,7 +882,12 @@ export const MENU_CONFIG: any = {
       // Document Management
       icon: 'file',
       route: '/documents/document-library',
-    }
+    },
+    82: {
+      // New Accrual Report
+      icon: '',
+      route: '/analytics/accrual-report',
+    },
   },
 
   [BusinessUnitType.Agency]: {

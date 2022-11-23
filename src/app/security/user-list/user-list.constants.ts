@@ -1,11 +1,6 @@
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
 import { ControlTypes, ValueType } from "@shared/enums/control-types.enum";
 import { FilterColumnsModel } from "@shared/models/filter.model";
-import { valuesOnly } from "@shared/utils/enum.utils";
-
-export const BUSINESS_UNITS_VALUES = Object.values(BusinessUnitType)
-  .filter(valuesOnly)
-  .map((text, id) => ({ text, id: id + 1 }));
 
 export const UNIT_FIELDS = {
   text: 'text',

@@ -1,5 +1,5 @@
-import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
@@ -19,13 +19,13 @@ import {
   ExportDepartments,
   ClearLocationList,
   ClearDepartmentList,
-  GetDepartmentFilterOptions,
+  GetDepartmentFilterOptions, GetOrganizationById
 } from '../store/organization-management.actions';
-import { Region } from '../../shared/models/region.model';
-import { Location } from '../../shared/models/location.model';
+import { Region } from '@shared/models/region.model';
+import { Location } from '@shared/models/location.model';
 import { OrganizationManagementState } from '../store/organization-management.state';
-import { MessageTypes } from '../../shared/enums/message-types';
-import { AbstractGridConfigurationComponent } from '../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { MessageTypes } from '@shared/enums/message-types';
+import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
   CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
@@ -33,20 +33,24 @@ import {
   DELETE_RECORD_TITLE,
   RECORD_ADDED,
   RECORD_MODIFIED
-} from '../../shared/constants/messages';
-import { ConfirmService } from '../../shared/services/confirm.service';
+} from '@shared/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserState } from 'src/app/store/user.state';
 import { FilterService } from '@shared/services/filter.service';
-import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import { FilteredItem } from '@shared/models/filter.model';
-
+import { OrganizationRegion } from '@shared/models/organization.model';
+import { FilterColumnsModel, FilteredItem } from '@shared/models/filter.model';
+import { DepartmentService } from '@organization-management/departments/services/department.service';
+import { TakeUntilDestroy } from '@core/decorators';
+import { AppState } from '../../store/app.state';
+import { DepartmentsExportCols } from '@organization-management/departments/constants';
+import { DepartmentsAdapter } from '@organization-management/departments/adapters/departments.adapter';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 
+@TakeUntilDestroy
 @Component({
   selector: 'app-departments',
   templateUrl: './departments.component.html',
@@ -54,111 +58,82 @@ export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location wer
   providers: [MaskedDateTimeService],
 })
 export class DepartmentsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
-  private unsubscribe$: Subject<void> = new Subject();
+  @Select(UserState.lastSelectedOrganizationId)
+  private organizationId$: Observable<number>;
+
+  @Select(OrganizationManagementState.departments)
+  public departments$: Observable<DepartmentsPage>;
+
+  @Select(OrganizationManagementState.departmentFilterOptions)
+  private departmentFilterOptions$: Observable<DepartmentFilterOptions>;
+
+  @Select(OrganizationManagementState.sortedRegions)
+  public regions$: Observable<Region[]>;
+
+  @Select(OrganizationManagementState.sortedLocationsByRegionId)
+  public locations$: Observable<Location[]>;
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 
-  // department form data
   departmentsDetailsFormGroup: FormGroup;
-  formBuilder: FormBuilder;
-
-  @Select(UserState.lastSelectedOrganizationId)
-  organizationId$: Observable<number>;
-
-  @Select(OrganizationManagementState.departments)
-  departments$: Observable<DepartmentsPage>;
-
-  @Select(OrganizationManagementState.departmentFilterOptions)
-  departmentFilterOptions$: Observable<DepartmentFilterOptions>;
-
-  @Select(OrganizationManagementState.regions)
-  regions$: Observable<Region[]>;
-  regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedRegion: Region;
-  defaultValue: any;
-
-  @Select(OrganizationManagementState.locationsByRegionId)
-  locations$: Observable<Location[]>;
+  fieldsSettings: FieldSettingsModel = { text: 'name', value: 'id' };
+  irpFieldsSettings: FieldSettingsModel = { text: 'text', value: 'value' };
+  defaultValue: number | undefined;
   isLocationsDropDownEnabled: boolean = false;
-  locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedLocation: Location;
+  columnsToExport: ExportColumn[];
+  fileName: string;
+  defaultLocationValue: number;
+  DepartmentFilterFormGroup: FormGroup;
+  filterColumns: FilterColumnsModel;
+  importDialogEvent: Subject<boolean> = new Subject<boolean>();
+  isIRPFlagEnabled = false;
+  isLocationIRPEnabled = false;
+  isOrgUseIRPAndVMS = false;
+  isInvoiceDepartmentIdFieldShow = true;
 
-  editedDepartmentId?: number;
-  isEdit: boolean;
+  protected componentDestroy: () => Observable<unknown>;
 
-  public columnsToExport: ExportColumn[] = [
-    { text:'Ext Department ID', column: 'ExtDepartmentId'},
-    { text:'Invoice Department ID', column: 'InvoiceDepartmentId'},
-    { text:'Department Name', column: 'DepartmentName'},
-    { text:'Department Email', column: 'FacilityEmail'},
-    { text:'Department Contact', column: 'FacilityContact'},
-    { text:'Department Phone NO', column: 'FacilityPhoneNo'},
-    { text:'Inactivate Date', column: 'InactiveDate'}
-  ];
-  public fileName: string;
-  public defaultFileName: string;
-    defaultLocationValue: any;
+  private selectedRegion: Region;
+  private selectedLocation: Location;
+  private editedDepartmentId?: number;
+  private isEdit: boolean;
+  private defaultFileName: string;
+  private filters: DepartmentFilter = {
+    pageNumber: this.currentPage,
+    pageSize: this.pageSizePager
+  };
+  private regions: OrganizationRegion[] = [];
+  private pageSubject = new Subject<number>();
+
+  constructor(
+    private store: Store,
+    private confirmService: ConfirmService,
+    private datePipe: DatePipe,
+    private filterService: FilterService,
+    private departmentService: DepartmentService
+  ) {
+    super();
+
+    this.idFieldName = 'departmentId';
+    this.checkIRPFlag();
+  }
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
 
-  public DepartmentFilterFormGroup: FormGroup;
-  public filters: DepartmentFilter = {
-    pageNumber: this.currentPage,
-    pageSize: this.pageSizePager
-  };
-  public filterColumns: any;
-  public orgStructure: OrganizationStructure;
-  public regions: OrganizationRegion[] = [];
-  public importDialogEvent: Subject<boolean> = new Subject<boolean>();
-
-  private pageSubject = new Subject<number>();
-
-  constructor(private store: Store,
-              @Inject(FormBuilder) private builder: FormBuilder,
-              private confirmService: ConfirmService,
-              private datePipe: DatePipe,
-              private filterService: FilterService) {
-    super();
-    this.formBuilder = builder;
-    this.idFieldName = 'departmentId';
-    this.createDepartmentsForm();
-  }
-
   ngOnInit(): void {
-    this.filterColumns = {
-      externalIds: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      invoiceIds: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      departmentNames: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: []},
-      facilityContacts: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      facilityEmails: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      inactiveDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-    }
-    this.departmentFilterOptions$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(options => {
-      this.filterColumns.externalIds.dataSource = options.externalIds;
-      this.filterColumns.invoiceIds.dataSource = options.ivnoiceIds;
-      this.filterColumns.departmentNames.dataSource = options.departmentNames;
-      this.filterColumns.facilityContacts.dataSource = options.facilityContacts;
-      this.filterColumns.facilityEmails.dataSource = options.facilityEmails;
-    });
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
-      this.currentPage = page;
-      this.getDepartments();
-    });
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
-      this.clearFilters();
-      this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
-        .subscribe((data) => {
-          this.defaultValue = data.organizationManagement.regions[0]?.id;
-        });;
-    });
+    this.createDepartmentsForm();
+
+    this.filterColumns = this.departmentService.initFilterColumns(this.isIRPFlagEnabled);
+
+    this.startDepartmentOptionsWatching();
+    this.startPageNumberWatching();
+    this.startOrgIdWatching();
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
     this.store.dispatch(new ClearLocationList());
     this.store.dispatch(new ClearDepartmentList());
   }
@@ -167,26 +142,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.getDepartments();
   }
 
-  private getDepartments(): void {
-    this.filters.locationId = this.selectedLocation.id;
-    this.filters.pageNumber = this.currentPage;
-    this.filters.pageSize = this.pageSize;
-    this.filters.orderBy = this.orderBy;
-    this.store.dispatch([
-      new GetDepartmentsByLocationId(this.selectedLocation.id, this.filters),
-      new GetDepartmentFilterOptions(this.selectedLocation.id as number)
-    ]);
-  }
-
   public onFilterClose() {
-    this.DepartmentFilterFormGroup.setValue({
-      externalIds: this.filters.externalIds || [],
-      invoiceIds: this.filters.invoiceIds || [],
-      departmentNames: this.filters.departmentNames || [],
-      facilityContacts: this.filters.facilityContacts || [],
-      facilityEmails: this.filters.facilityEmails || [],
-      inactiveDate: this.filters.inactiveDate || null,
-    });
+    this.departmentService.populateFilterForm(this.DepartmentFilterFormGroup, this.filters, this.isIRPFlagEnabled);
+
     this.filteredItems = this.filterService.generateChips(this.DepartmentFilterFormGroup, this.filterColumns, this.datePipe);
   }
 
@@ -196,13 +154,6 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   public onFilterDelete(event: FilteredItem): void {
     this.filterService.removeValue(event, this.DepartmentFilterFormGroup, this.filterColumns);
-  }
-
-  private clearFilters(): void {
-    this.DepartmentFilterFormGroup.reset();
-    this.filteredItems = [];
-    this.currentPage = 1;
-    this.filters = {};
   }
 
   public onFilterClearAll(): void {
@@ -249,7 +200,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion?.id) {
-      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id)).pipe(takeUntil(this.unsubscribe$))
+      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id)).pipe(takeUntil(this.componentDestroy()))
         .subscribe((data) => {
           if (data.organizationManagement.locations.length > 0) {
             this.defaultLocationValue = data.organizationManagement.locations[0].id;
@@ -268,6 +219,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     if (this.selectedLocation?.id) {
       this.getDepartments();
       this.clearSelection(this.grid);
+      this.isLocationIRPEnabled = this.selectedLocation.includeInIRP;
     } else {
       this.grid.dataSource = [];
     }
@@ -289,18 +241,12 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     }
   }
 
-  onEditDepartmentClick(department: Department, event: any ): void {
+  onEditDepartmentClick(department: Department, event: any): void {
     this.addActiveCssClass(event);
-    this.departmentsDetailsFormGroup.setValue({
-      extDepartmentId: department.extDepartmentId,
-      invoiceDepartmentId: department.invoiceDepartmentId,
-      departmentName: department.departmentName,
-      facilityContact: department.facilityContact,
-      facilityEmail: department.facilityEmail,
-      facilityPhoneNo: department.facilityPhoneNo,
-      inactiveDate: department.inactiveDate
-    });
+    this.departmentService.populateDepartmentDetailsForm(this.departmentsDetailsFormGroup, department, this.isIRPFlagEnabled);
+
     this.editedDepartmentId = department.departmentId;
+    this.isLocationIRPEnabled = !!department.locationIncludeInIRP;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -312,17 +258,19 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
-        if (confirm && department.departmentId) {
-          this.store.dispatch(new DeleteDepartmentById(department, this.filters));
-        }
-        this.removeActiveCssClass();
-      });
+      }).pipe(
+        takeUntil(this.componentDestroy()),
+    ).subscribe((confirm) => {
+      if (confirm && department.departmentId) {
+        this.store.dispatch(new DeleteDepartmentById(department, this.filters));
+      }
+      this.removeActiveCssClass();
+    });
   }
 
   onAddDepartmentClick(): void {
     if (this.selectedLocation && this.selectedRegion) {
+      this.isLocationIRPEnabled = this.selectedLocation.includeInIRP;
       this.store.dispatch(new ShowSideDialog(true));
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED));
@@ -336,14 +284,16 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => !!confirm))
-        .subscribe(() => {
-          this.store.dispatch(new ShowSideDialog(false));
-          this.isEdit = false;
-          this.editedDepartmentId = undefined;
-          this.departmentsDetailsFormGroup.reset();
-          this.removeActiveCssClass();
-        });
+        }).pipe(
+          filter(Boolean),
+          takeUntil(this.componentDestroy()),
+      ).subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false));
+        this.isEdit = false;
+        this.editedDepartmentId = undefined;
+        this.departmentsDetailsFormGroup.reset();
+        this.removeActiveCssClass();
+      });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
       this.isEdit = false;
@@ -355,17 +305,11 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   onDepartmentFormSaveClick(): void {
     if (this.departmentsDetailsFormGroup.valid) {
-      const department: Department = {
-        departmentId: this.editedDepartmentId,
-        locationId: this.selectedLocation.id,
-        extDepartmentId: this.departmentsDetailsFormGroup.controls['extDepartmentId'].value,
-        invoiceDepartmentId: this.departmentsDetailsFormGroup.controls['invoiceDepartmentId'].value,
-        departmentName: this.departmentsDetailsFormGroup.controls['departmentName'].value,
-        inactiveDate: this.departmentsDetailsFormGroup.controls['inactiveDate'].value,
-        facilityPhoneNo: this.departmentsDetailsFormGroup.controls['facilityPhoneNo'].value,
-        facilityEmail: this.departmentsDetailsFormGroup.controls['facilityEmail'].value,
-        facilityContact: this.departmentsDetailsFormGroup.controls['facilityContact'].value
-      }
+      const department: Department = DepartmentsAdapter.prepareToSave(
+        this.editedDepartmentId,
+        this.selectedLocation.id,
+        this.departmentsDetailsFormGroup
+      );
 
       this.saveOrUpdateDepartment(department);
 
@@ -375,6 +319,10 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     } else {
       this.departmentsDetailsFormGroup.markAllAsTouched();
     }
+  }
+
+  onImportDataClick(): void {
+    this.importDialogEvent.next(true);
   }
 
   private saveOrUpdateDepartment(department: Department): void {
@@ -389,40 +337,99 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     }
   }
 
-  onImportDataClick(): void {
-    this.importDialogEvent.next(true);
+  private checkIRPFlag(): void {
+    this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+  }
+
+  private checkOrgPreferences(): void {
+    const { isIRPEnabled, isVMCEnabled } = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+
+    this.isOrgUseIRPAndVMS = !!(isVMCEnabled && isIRPEnabled);
+    this.isInvoiceDepartmentIdFieldShow = !this.isIRPFlagEnabled
+      || !!isVMCEnabled
+      || !(!isVMCEnabled && isIRPEnabled);
+
+    if (!this.isInvoiceDepartmentIdFieldShow) {
+      this.departmentsDetailsFormGroup.removeControl('invoiceDepartmentId');
+      this.grid.columns.splice(3, 1);
+    }
+
+    if (!this.isOrgUseIRPAndVMS) {
+      this.departmentsDetailsFormGroup.removeControl('includeInIRP');
+    }
+
+    if (this.isIRPFlagEnabled && !this.isOrgUseIRPAndVMS) {
+      this.grid.columns.pop();
+    }
+
+    this.columnsToExport = DepartmentsExportCols(this.isIRPFlagEnabled && this.isOrgUseIRPAndVMS, this.isInvoiceDepartmentIdFieldShow);
+    this.grid.refresh();
   }
 
   private createDepartmentsForm(): void {
-    this.departmentsDetailsFormGroup = this.formBuilder.group({
-      extDepartmentId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      invoiceDepartmentId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      departmentName: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      facilityContact: ['', [Validators.minLength(1), Validators.maxLength(50)]],
-      facilityEmail: ['', [Validators.email]],
-      facilityPhoneNo: ['', [Validators.minLength(1), Validators.maxLength(10), Validators.pattern(/^\d+$/i)]],
-      inactiveDate: [null]
-    });
-    this.DepartmentFilterFormGroup = this.formBuilder.group({
-      externalIds: new FormControl([]),
-      invoiceIds: new FormControl([]),
-      departmentNames: new FormControl([]),
-      facilityContacts: new FormControl([]),
-      facilityEmails: new FormControl([]),
-      inactiveDate: new FormControl(null),
+    this.departmentsDetailsFormGroup = this.departmentService.createDepartmentDetailForm(this.isIRPFlagEnabled);
+    this.DepartmentFilterFormGroup = this.departmentService.createDepartmentFilterForm(this.isIRPFlagEnabled);
+  }
+
+  private startDepartmentOptionsWatching(): void {
+    this.departmentFilterOptions$.pipe(
+      filter(Boolean),
+      takeUntil(this.componentDestroy())
+    ).subscribe(options => {
+      this.departmentService.populateDataSources(this.filterColumns, options as any, this.isIRPFlagEnabled);
     });
   }
 
-  private getActiveRowsPerPage(): number {
-    return parseInt(this.activeRowsPerPageDropDown);
+  private startPageNumberWatching(): void {
+    this.pageSubject.pipe(
+      throttleTime(1),
+      takeUntil(this.componentDestroy())
+    ).subscribe((page) => {
+      this.currentPage = page;
+      this.getDepartments();
+    });
   }
 
-  private getRowsPerPage(data: object[], currentPage: number): object[] {
-    return data.slice((currentPage * this.getActiveRowsPerPage()) - this.getActiveRowsPerPage(),
-      (currentPage * this.getActiveRowsPerPage()));
+  private startOrgIdWatching(): void {
+    this.organizationId$.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(id => {
+      this.clearFilters();
+      this.getOrganization(id);
+      this.store.dispatch(new GetRegions()).pipe(
+        takeUntil(this.componentDestroy())
+      ).subscribe(() => {
+        const regions = this.store.selectSnapshot(OrganizationManagementState.regions);
+        this.defaultValue = regions[0]?.id;
+      });
+    });
   }
 
-  private getLastPage(data: object[]): number {
-    return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
+  private getOrganization(businessUnitId: number) {
+    const id = businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+
+    this.store.dispatch(new GetOrganizationById(id)).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.checkOrgPreferences();
+    });
+  }
+
+  private getDepartments(): void {
+    this.filters.locationId = this.selectedLocation.id;
+    this.filters.pageNumber = this.currentPage;
+    this.filters.pageSize = this.pageSize;
+    this.filters.orderBy = this.orderBy;
+    this.store.dispatch([
+      new GetDepartmentsByLocationId(this.selectedLocation.id, this.filters),
+      new GetDepartmentFilterOptions(this.selectedLocation.id as number)
+    ]);
+  }
+
+  private clearFilters(): void {
+    this.DepartmentFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {};
   }
 }

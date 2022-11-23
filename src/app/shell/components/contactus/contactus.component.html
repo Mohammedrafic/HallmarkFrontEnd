@@ -4,7 +4,6 @@
       <label>Name<span class="required"></span></label>
       <div class="input-group">
         <input formControlName="name" class="e-input" type="text" />
-        <ejs-maskedtextbox class="contact-input" formControlName="name" placeholder=" "></ejs-maskedtextbox>
       </div>
     </div>
   </div>
@@ -22,7 +21,7 @@
     <div class="id-container">
       <div class="dropdown-container bootstrap">
         <label>Topic<span class="required">*</span></label>
-        <ejs-dropdownlist formControlName="topic" [dataSource]="topics"></ejs-dropdownlist>
+        <ejs-dropdownlist formControlName="topic" [dataSource]="topics" [allowFiltering]="true"></ejs-dropdownlist>
       </div>
     </div>
   </div>

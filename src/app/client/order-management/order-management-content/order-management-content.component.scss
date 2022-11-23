@@ -34,8 +34,7 @@
   .controls-header,
   .row-tool-buttons {
     display: flex;
-    justify-content: end;
-    cursor: pointer;
+    justify-content: flex-end;
 
     .icon {
       margin: 0;
@@ -48,7 +47,6 @@
 
   .row-tool-buttons {
     display: flex;
-    cursor: pointer;
 
     .edit-template {
       margin-right: 20px;
@@ -128,6 +126,7 @@
 
 .delete-template {
   color: $supportive-red;
+  cursor: pointer;
 
   &.disable {
     color: $secondary-dark-blue-30;

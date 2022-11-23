@@ -97,11 +97,13 @@ import { CandidateExperienceComponent } from './candidates/import-candidates/can
 import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
 import { ExtensionModule } from '@shared/components/extension/extension.module';
 import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
+import { CredentialGridService } from "@agency/services/credential-grid.service";
 import { ElectronicFormComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/electronic-form/electronic-form.component';
 import { ManualFormComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/manual-form/manual-form.component';
 import { PaymentDialogComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-dialog/payment-dialog.component';
 import { JobDistributionComponent } from './agency-list/add-edit-agency/job-distribution/job-distribution.component';
 import { OrderMatchColumnComponent } from './candidates/add-edit-candidate/credentials-grid/order-match-column/order-match-column.component';
+import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 
 const sidebarIcons = {
   Sliders,
@@ -204,6 +206,8 @@ const sidebarIcons = {
     ExtensionModule,
     AssociateListModule,
     RadioButtonModule,
+    TooltipContainerModule,
+
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),
@@ -211,5 +215,6 @@ const sidebarIcons = {
     ChildOrderDialogModule,
   ],
   exports: [FileViewerComponent],
+  providers: [CredentialGridService],
 })
 export class AgencyModule {}

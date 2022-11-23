@@ -24,6 +24,8 @@ import {ExportedFileType} from "@shared/enums/exported-file-type";
 import {ExportColumn, ExportOptions, ExportPayload} from "@shared/models/export.model";
 import {DatePipe} from "@angular/common";
 import {UserState} from "../../../store/user.state";
+import { UserPermissions } from "@core/enums";
+import { Permission } from "@core/interface";
 
 @Component({
   selector: 'app-bill-rate-type-mapping',
@@ -38,11 +40,13 @@ export class BillRateTypeMappingComponent extends AbstractGridConfigurationCompo
   @Input() isActive: boolean = false;
   @Input() searchQuery: string = '';
   @Input() export$: Subject<ExportedFileType> | undefined;
+  @Input() userPermission: Permission;
 
   public billRateMappingForm: FormGroup;
   public isEdit = false;
   public defaultFileName: string;
   public fileName: string;
+  public readonly userPermissions = UserPermissions;
 
   public columnsToExport: ExportColumn[] = [
     { text:'Bill Rate Title', column: 'BillRateTitle'},

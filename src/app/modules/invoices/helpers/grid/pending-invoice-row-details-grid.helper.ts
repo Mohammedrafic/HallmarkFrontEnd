@@ -19,7 +19,7 @@ import { AttachmentsListComponent, AttachmentsListParams } from '@shared/compone
 import { PendingInvoice, PendingInvoiceRecord } from '../../interfaces/pending-invoice-record.interface';
 import { TypedColDef, TypedValueGetterParams } from '../../interfaces/typed-col-def.interface';
 import { InvoiceType } from '../../enums/invoice-type.enum';
-import { currencyFormatter, invoicesRowDetailsOffsetColDef, titleValueCellRendererSelector } from '../../constants';
+import { CurrencyFormatter, invoicesRowDetailsOffsetColDef, titleValueCellRendererSelector } from '../../constants';
 import { GetPendingInvoiceDetailsColDefsFn, InvoiceAttachment, PendingInvoiceRowDetailsConfig } from '../../interfaces';
 
 
@@ -35,7 +35,7 @@ const rateColDef: TypedColDef<PendingInvoiceRecord> = {
   field: 'rate',
   width: 80,
   headerName: 'Rate',
-  valueFormatter: currencyFormatter,
+  valueFormatter: CurrencyFormatter,
   cellRendererSelector: titleValueCellRendererSelector,
 };
 
@@ -43,7 +43,7 @@ const totalColDef: TypedColDef<PendingInvoiceRecord> = {
   field: 'total',
   width: 80,
   headerName: 'Total',
-  valueFormatter: currencyFormatter,
+  valueFormatter: CurrencyFormatter,
   cellRendererSelector: titleValueCellRendererSelector,
   cellRenderer: TitleValueCellRendererComponent
 };

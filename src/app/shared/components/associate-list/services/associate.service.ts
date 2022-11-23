@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+
+import { map, Observable } from 'rxjs';
+
 import {
   AssociateOrganizationsAgency,
-  AssociateOrganizationsAgencyPage,
+  AssociateOrganizationsAgencyPage, DepartmentsTierDTO,
   FeeExceptionsDTO,
   FeeExceptionsInitialData,
   FeeExceptionsPage,
@@ -11,6 +13,10 @@ import {
   JobDistributionInitialData,
   PartnershipSettings,
 } from '@shared/models/associate-organizations.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
+import { Tier, TierExceptionPage, TierList } from '@shared/components/associate-list/interfaces';
+import { OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 
 @Injectable()
 export class AssociateService {
@@ -96,8 +102,8 @@ export class AssociateService {
   /**
    * @return associate Agency / Org
    */
-  public getAssociateAgencyOrg(): Observable<string> {
-    return this.http.get<string>('/api/businessUnit/basicInfo');
+  public getAssociateAgencyOrg(): Observable<{id: number, name: string} []> {
+    return this.http.get<{id: number, name: string}[]>('/api/businessUnit/basicInfo').pipe(map((data) => sortByField(data, 'name')));
   }
 
   /**
@@ -136,6 +142,31 @@ export class AssociateService {
   public getFeeExceptionsInitialData(organizationAgencyId: number): Observable<FeeExceptionsInitialData> {
     return this.http.get<FeeExceptionsInitialData>(`/api/FeeExceptions/initialData`, {
       params: { OrganizationId: organizationAgencyId },
-    });
+    }).pipe(map((data) => {
+      const sortedFields: Record<keyof FeeExceptionsInitialData, string> = {
+        regions: 'name',
+        masterSkills: 'skillDescription'
+      }
+      return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof FeeExceptionsInitialData])]))}));
+  }
+
+  public getTiers(payload: Partial<DepartmentsTierDTO>): Observable<TierList> {
+    return this.http.get<TierList>('/api/OrganizationTiers/byHierarchy', {params: payload});
+  }
+
+  public saveTierException(payload: TierDTO): Observable<TierDTO> {
+    return this.http.put<TierDTO>('/api/TierExceptions', payload);
+  }
+
+  public getTiersByPage(id: number, pageNumber: number, pageSize: number): Observable<TierExceptionPage> {
+    return this.http.get<TierExceptionPage>(`/api/TierExceptions/associateOrganizationId/${id}?PageNumber=${pageNumber}&PageSize=${pageSize}`)
+  }
+
+  public deleteTierException(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/TierExceptions/${id}`);
+  }
+
+  public saveSelectedTier(payload: Tier): Observable<void> {
+    return this.http.put<void>('/api/AssociateOrganizations/tier', payload);
   }
 }

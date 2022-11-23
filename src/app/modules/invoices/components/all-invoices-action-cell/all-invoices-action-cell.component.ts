@@ -6,6 +6,7 @@ import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoic
 import { Store } from '@ngxs/store';
 import { InvoicesModel } from '../../store/invoices.model';
 import { InvoiceState } from '../../enums';
+import { AllInvoiceCell } from '../../interfaces';
 
 @Component({
   selector: 'app-all-invoices-action-cell',
@@ -18,17 +19,19 @@ export class AllInvoicesActionCellComponent implements ICellRendererAngularComp 
 
   public actionName: string;
 
+  public isDisabled = false;
+
   public invoice: PendingApprovalInvoice;
 
   constructor(
     private store: Store,
   ) {}
 
-  public agInit(params: ICellRendererParams & { approve: () => void, pay: () => void }): void {
+  public agInit(params: ICellRendererParams & AllInvoiceCell): void {
     this.setAction(params);
   }
 
-  public refresh(params: ICellRendererParams & { approve: () => void, pay: () => void }): boolean {
+  public refresh(params: ICellRendererParams & AllInvoiceCell): boolean {
     this.setAction(params);
     return true;
   }
@@ -38,17 +41,19 @@ export class AllInvoicesActionCellComponent implements ICellRendererAngularComp 
     this.action(this.invoice);
   }
 
-  private setAction(params: ICellRendererParams & { approve: () => void, pay: () => void }): void {
+  private setAction(params: ICellRendererParams & AllInvoiceCell): void {
     this.invoice = params.data;
     const state = this.store.snapshot().invoices as InvoicesModel;
 
     if (this.invoice.invoiceState === InvoiceState.SubmittedPendingApproval && !state.isAgencyArea) {
       this.action = params.approve;
       this.actionName = 'Approve';
+      this.isDisabled = !params.canEdit;
     } else if (this.invoice.invoiceState === InvoiceState.PendingPayment
       || (state.isAgencyArea && (this.invoice.invoiceState === InvoiceState.SubmittedPendingApproval))) {
       this.action = params.pay;
       this.actionName = 'Pay';
+      this.isDisabled = !params.canPay;
     }
   }
 }

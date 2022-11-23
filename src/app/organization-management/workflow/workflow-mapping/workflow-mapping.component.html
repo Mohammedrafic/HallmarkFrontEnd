@@ -4,13 +4,22 @@
     <ng-container right>
       <button (click)="showFilters()" ejs-button id="filterButton" cssClass="e-outline button-filter">
         <div class="filter-button-content">
-          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill align-text">{{
             filteredItems.length
           }}</span>
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
-      <button ejs-button [isPrimary]="true" (click)="onAddMappingClick()">Add Mapping</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditWorkflows]">
+          <button
+            ejs-button
+            [isPrimary]="true"
+            [disabled]="!userPermission[userPermissions.CanEditWorkflows]"
+            (click)="onAddMappingClick()"
+          >Add Mapping</button>
+      </app-tooltip-container>
     </ng-container>
   </app-page-toolbar>
 
@@ -89,7 +98,7 @@
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemoveButtonClick(data, $event)">
+            <button ejs-button cssClass="e-flat secondary-icon-button" [disabled]="!userPermission[userPermissions.CanEditWorkflows]" (click)="onRemoveButtonClick(data, $event)">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -141,6 +150,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -159,6 +169,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(workflowMappings$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -280,6 +293,7 @@
   </app-filter-dialog>
 
   <app-side-dialog
+    [disableSaveButton]="!userPermission[userPermissions.CanEditWorkflows]"
     *ngIf="isActive"
     (formCancelClicked)="onCancelFormClick()"
     (formSaveClicked)="onSaveFormClick()"
@@ -300,7 +314,7 @@
               [dataSource]="orgRegions"
               [fields]="fields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="regions"
             >
@@ -322,7 +336,7 @@
               [dataSource]="locations"
               [fields]="fields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="locations"
             >
@@ -344,7 +358,7 @@
               [dataSource]="departments"
               [fields]="fields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="departments"
             >
@@ -365,7 +379,7 @@
               [dataSource]="skills$ | async"
               [fields]="skillsFields"
               [showSelectAll]="true"
-              [allowFiltering]="false"
+              [allowFiltering]="true"
               [showDropDownIcon]="true"
               formControlName="skills"
             >
@@ -381,6 +395,7 @@
             <ejs-dropdownlist
               id="workflowType"
               appValidateWithMessage
+              [allowFiltering]="true"
               [dataSource]="workflowGroupTypesData"
               [fields]="workflowGroupTypesFields"
               formControlName="workflowType"
@@ -395,11 +410,12 @@
           <label for="workflowName">Workflow Name<span class="required">*</span></label>
           <div class="input-group dropdown">
             <ejs-dropdownlist
-              id="workflowName"
               appValidateWithMessage
+              id="workflowName"
+              formControlName="workflowName"
+              [allowFiltering]="true"
               [dataSource]="workflows$ | async"
               [fields]="fields"
-              formControlName="workflowName"
             >
             </ejs-dropdownlist>
           </div>
@@ -428,7 +444,7 @@
                   <ejs-multiselect
                     selectAllText="Select All"
                     mode="CheckBox"
-                    [allowFiltering]="false"
+                    [allowFiltering]="true"
                     [showDropDownIcon]="true"
                     appValidateWithMessage
                     [dataSource]="rolesWithUsers[workflowTypes.OrderWorkflow][orderWorkflowSteps[i]?.type ?? 0]"
@@ -472,7 +488,7 @@
                   <ejs-multiselect
                     selectAllText="Select All"
                     mode="CheckBox"
-                    [allowFiltering]="false"
+                    [allowFiltering]="true"
                     [showDropDownIcon]="true"
                     appValidateWithMessage
                     [dataSource]="

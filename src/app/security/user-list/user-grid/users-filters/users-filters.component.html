@@ -28,6 +28,7 @@
     <div class="input-group dropdown">
       <ejs-dropdownlist
         formControlName="status"
+        [allowFiltering]="true"
         [showClearButton]="true"
         [fields]="statusFields"
         [dataSource]="filterColumns['status'].dataSource"

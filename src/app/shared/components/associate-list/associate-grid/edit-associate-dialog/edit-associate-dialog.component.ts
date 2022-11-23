@@ -1,34 +1,38 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { distinctUntilChanged, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
-import { AssociateOrganizationsAgency, FeeExceptionsPage } from '@shared/models/associate-organizations.model';
+import { FormArray, FormControl, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
+
+import { Actions, Select, Store } from '@ngxs/store';
+import { distinctUntilChanged, filter, Observable, Subject, takeWhile } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { Actions, Select, Store } from '@ngxs/store';
-import { FormArray, FormGroup } from '@angular/forms';
+
+import { AssociateOrganizationsAgency, FeeExceptionsPage } from '@shared/models/associate-organizations.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, UNSAVED_TABS_TEXT } from '@shared/constants';
+import {
+  DELETE_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE, OrganizationalHierarchy, OrganizationSettingKeys,
+  UNSAVED_TABS_TEXT
+} from '@shared/constants';
 import PriceUtils from '@shared/utils/price.utils';
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
 import { FeeSettingsComponent } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/fee-settings/fee-settings.component';
 import { PartnershipSettingsComponent } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/partnership-settings/partnership-settings.component';
-import {
-  GetFeeExceptionsInitialData,
-  GetJobDistributionInitialData,
-  GetPartnershipSettings,
-  SaveBaseFee,
-  SavePartnershipSettings,
-} from '@shared/components/associate-list/store/associate.actions';
-import { Router } from '@angular/router';
-import { Tabs } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
+import { TiersException } from '@shared/components/associate-list/store/associate.actions';
+import { Tabs, TabsText } from '@shared/components/associate-list/associate-grid/edit-associate-dialog/associate-settings.constant';
 import { UserState } from '../../../../../store/user.state';
 import { AgencyStatus } from '@shared/enums/status';
+import { AbstractPermission } from "@shared/helpers/permissions";
+import { createDepartmentsTier } from '@shared/helpers';
+import { SettingsViewService } from '@shared/services';
+import { TierLogic } from '@shared/enums/tier-logic.enum';
 
 @Component({
   selector: 'app-edit-associate-dialog',
   templateUrl: './edit-associate-dialog.component.html',
   styleUrls: ['./edit-associate-dialog.component.scss'],
 })
-export class EditAssociateDialogComponent implements OnInit, OnDestroy {
+export class EditAssociateDialogComponent extends AbstractPermission implements OnInit, OnDestroy {
   @Input() openEvent: Subject<AssociateOrganizationsAgency>;
   @Output() editEndEvent = new EventEmitter<never>();
 
@@ -45,22 +49,32 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
   public width: string;
   public feeSettingsForm: FormGroup;
   public partnershipForm: FormGroup;
+  private tierControl: FormControl;
   public firstActive = true;
   public activeTab: number | string = 0;
   public agencyActionsAllowed = true;
   public readonly agencyStatus = AgencyStatus;
-
+  public isAgencyInactive: boolean = true;
+  public canEditPermission: boolean = true;
+  public canViewTierTab: boolean = true;
+  public feeSettingsText: string = TabsText[TabsText["Fee Settings"]];
+  public tierExceptionText: string =TabsText[TabsText["Tier Settings"]];
+  public partnershipText: string = TabsText[TabsText["Partnership Settings"]];
   private isAlive = true;
-  private isAgency: boolean;
+  public isAgency: boolean;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private actions$: Actions,
     private confirmService: ConfirmService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private settingsViewService: SettingsViewService,
+  ) {
+    super(store);
+  }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit()
     this.isAgency = this.router.url.includes('agency');
     this.onOpenEvent();
     this.width = this.getDialogWidth();
@@ -75,7 +89,7 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.isAlive = false;
     this.sideDialog.hide();
   }
@@ -102,21 +116,31 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
   }
 
   public onSave(): void {
-    switch (this.editOrgTab.selectedItem) {
+    let switchTabVal=this.activeTab;
+    switch (switchTabVal) {
       case Tabs.JobDistribution:
         this.partnershipForm.markAllAsTouched();
         if (this.partnershipForm.valid) {
           const jobDistributionFormValue = this.partnershipForm.getRawValue();
           this.store.dispatch(
-            new SavePartnershipSettings({ ...jobDistributionFormValue, associateOrganizationId: this.editAgencyOrg.id })
+            new TiersException.SavePartnershipSettings({ ...jobDistributionFormValue, associateOrganizationId: this.editAgencyOrg.id })
           );
+        }
+        break;
+      case Tabs.TierException:
+        this.tierControl.markAsTouched();
+        if(this.tierControl.valid) {
+          this.store.dispatch( new TiersException.SaveTier({
+            associateOrganizationId: this.editAgencyOrg.id!,
+            organizationTierId: this.tierControl.value
+          }));
         }
         break;
       case Tabs.FeeSettings:
         this.feeSettingsForm.markAllAsTouched();
         if (this.feeSettingsForm.valid && this.editAgencyOrg.id) {
           const { baseFee } = this.feeSettingsForm.getRawValue();
-          this.store.dispatch(new SaveBaseFee(this.editAgencyOrg.id, baseFee ? baseFee : null));
+          this.store.dispatch(new TiersException.SaveBaseFee(this.editAgencyOrg.id, baseFee ? baseFee : null));
         }
         break;
       default:
@@ -130,11 +154,44 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
 
   public onTabSelecting(tab: SelectingEventArgs): void {
     this.firstActive = false;
-    this.activeTab = tab.selectingIndex;
 
-    this.editOrgTab.selectedItem === Tabs.JobDistribution
-      ? this.confirmSwitchBetweenTab(this.partnershipForm, tab)
-      : this.confirmSwitchBetweenTab(this.feeSettingsForm, tab);
+    let switchTabVal=this.switchTab(tab?.selectingItem?.innerText);
+    this.activeTab = switchTabVal;
+    switch (switchTabVal) {
+      case Tabs.JobDistribution:
+        this.confirmSwitchBetweenTab(this.partnershipForm, tab);
+
+        break;
+      case Tabs.FeeSettings:
+        this.confirmSwitchBetweenTab(this.feeSettingsForm, tab);
+        break;
+      case Tabs.TierException:
+        this.confirmSwitchBetweenTab(this.tierControl, tab);
+        break;
+      default:
+        break;
+    }
+
+    this.checkUserPermission();
+  }
+
+  public handleTierControl(tierControl: FormControl): void {
+    this.tierControl = tierControl;
+  }
+
+  private switchTab(tabSelected:string):number{
+    //As the Tier Settings tab getting hidden tab so the switch logic is calling wrong tab so adding +1 to the tab number based on condition
+    switch (tabSelected) {
+      case TabsText[TabsText["Fee Settings"]]:
+        return 0;
+      case TabsText[TabsText["Tier Settings"]]:
+        return 1;
+      case TabsText[TabsText["Partnership Settings"]]:
+        return 2;
+        default:
+        return 0;
+    }
+
   }
 
   private onOpenEvent(): void {
@@ -142,8 +199,10 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.isAlive))
       .subscribe((associateOrganizationsAgency: AssociateOrganizationsAgency) => {
         if (associateOrganizationsAgency) {
-          const isAgency = this.router.url.includes('agency');
           this.editAgencyOrg = associateOrganizationsAgency;
+          this.isAgencyInactive =
+            associateOrganizationsAgency.agencyStatus === this.agencyStatus.Inactive ||
+            associateOrganizationsAgency.agencyStatus === this.agencyStatus.Terminated;
           this.sideDialog.show();
 
           if (associateOrganizationsAgency.id && associateOrganizationsAgency.organizationId) {
@@ -151,12 +210,24 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
               id: associateOrganizationsAgency.id,
               baseFee: PriceUtils.formatNumbers(associateOrganizationsAgency.baseFee),
             });
-            this.store.dispatch(new GetFeeExceptionsInitialData(associateOrganizationsAgency.organizationId));
-            this.store.dispatch(new GetJobDistributionInitialData());
-            this.store.dispatch(new GetPartnershipSettings(associateOrganizationsAgency.id));
+
+            this.getInitialDataForSettings(associateOrganizationsAgency);
+            this.canViewTierSettings(associateOrganizationsAgency.organizationId);
           }
         }
       });
+  }
+
+  private getInitialDataForSettings(associateOrganizationsAgency: AssociateOrganizationsAgency): void {
+    this.store.dispatch([
+      new TiersException.GetFeeExceptionsInitialData(associateOrganizationsAgency.organizationId!),
+      new TiersException.GetJobDistributionInitialData(),
+      new TiersException.GetPartnershipSettings(associateOrganizationsAgency.id!),
+      new TiersException.GetTiers(
+        createDepartmentsTier(associateOrganizationsAgency.organizationId!)
+      ),
+      new TiersException.GetSelectedOrgAgency(associateOrganizationsAgency)
+    ]);
   }
 
   private onBaseFeeChanged(): void {
@@ -181,7 +252,7 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
     });
   }
 
-  private confirmSwitchBetweenTab(tabForm: FormGroup, tab: SelectingEventArgs): void {
+  private confirmSwitchBetweenTab(tabForm: FormGroup | FormControl, tab: SelectingEventArgs): void {
     if (tabForm.dirty) {
       tab.cancel = true;
       this.confirmService
@@ -194,7 +265,7 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
         .subscribe(() => {
           tabForm.markAsPristine();
           this.editOrgTab.select(tab.selectingIndex);
-          this.activeTab = Tabs[tab.selectingIndex];
+          this.activeTab = this.switchTab(tab?.selectingItem?.innerText);
         });
     }
   }
@@ -214,5 +285,34 @@ export class EditAssociateDialogComponent implements OnInit, OnDestroy {
       .subscribe((value) => {
         this.agencyActionsAllowed = value;
       });
+  }
+
+  private checkUserPermission(): void {
+    let switchTabVal=this.activeTab;
+    switch (switchTabVal) {
+      case Tabs.FeeSettings:
+        this.canEditPermission = this.userPermission[this.userPermissions.CanEditFeeExceptions];
+        break;
+      case Tabs.TierException:
+        this.canEditPermission = !this.isAgency;
+        break;
+      case Tabs.JobDistribution:
+        this.canEditPermission = this.userPermission[this.userPermissions.CanEditPartnershipSettings];
+        break;
+      default:
+        this.canEditPermission = true;
+    }
+  }
+
+  private canViewTierSettings(id: number): void {
+    this.settingsViewService.getViewSettingKey(
+      OrganizationSettingKeys.TieringLogic,
+      OrganizationalHierarchy.Organization,
+      id
+    ).pipe(
+      takeWhile(() => this.isAlive)
+    ).subscribe(({TieringLogic}) => {
+      this.canViewTierTab = TieringLogic === TierLogic.Show;
+    })
   }
 }

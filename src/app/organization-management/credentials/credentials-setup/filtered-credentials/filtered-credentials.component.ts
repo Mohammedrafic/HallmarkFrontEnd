@@ -9,6 +9,8 @@ import { CredentialSetupFilterGet, CredentialSetupFilterDto } from '@shared/mode
 import { CredentialsState } from '@organization-management/store/credentials.state';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { Permission } from "@core/interface";
+import { UserPermissions } from "@core/enums";
 
 @Component({
   selector: 'app-filtered-credentials',
@@ -19,6 +21,7 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
   @ViewChild('filterGrid') grid: GridComponent;
 
   @Input() credentialSetupFilter$: Subject<CredentialSetupFilterDto>;
+  @Input() userPermission: Permission;
 
   @Output() selectedRow: EventEmitter<CredentialSetupFilterGet> = new EventEmitter();
 
@@ -27,6 +30,8 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
 
   @Select(CredentialsState.filteredCredentialSetupData)
   filteredCredentials$: Observable<CredentialSetupFilterGet[]>;
+
+  public readonly userPermissions = UserPermissions;
 
   private credentialSetupFilter: CredentialSetupFilterDto;
   private MAX_PAGE_SIZE = 9999;

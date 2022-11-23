@@ -6,7 +6,7 @@
     <section>
       <button (click)="showFilters()" ejs-button id="filterButton" cssClass="e-outline button-filter">
         <div class="filter-button-content">
-          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredItems.length }}</span>
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
@@ -20,7 +20,12 @@
           Export <i-feather name="download" class="icon"></i-feather>
         </div>
       </button>
-      <button ejs-button id="addDepartmentButton" [isPrimary]="true" (click)='addSkill()'>Add Skill</button>
+      <!-- TODO add right permission -->
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.ManageAssignSkills]">
+        <button ejs-button [isPrimary]="true" (click)='assignSkill()' [disabled]="!userPermission[userPermissions.ManageAssignSkills]">Assign Skill</button>
+      </app-tooltip-container>
     </section>
   </section>
   <ejs-grid class="grid grid-component"
@@ -48,7 +53,7 @@
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="editSkill(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteSkill(data, $event)">
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteSkill(data, $event)" [disabled]="!userPermission[userPermissions.CanEditAssignedSkills]">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -60,7 +65,7 @@
       <e-column field="allowOnboard" headerText="allow onboard" width=150>
         <ng-template #template let-data>
           <div class="bootstrap">
-            <ejs-checkbox [checked]="data.allowOnboard" (change)="allowOnBoardChange(data, $event)" label=""></ejs-checkbox>
+            <ejs-checkbox [checked]="data.allowOnboard" (change)="allowOnBoardChange(data, $event)" label="" [disabled]="!userPermission[userPermissions.CanEditAssignedSkills]"></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
@@ -74,6 +79,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -91,6 +97,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(skills$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -118,6 +127,7 @@
       <div class="input-group dropdown">
         <ejs-multiselect
           mode="CheckBox"
+          [allowFiltering]="true"
           [fields]="filterOptionFields"
           [dataSource]="filterColumns.skillCategories.dataSource"
           [showDropDownIcon]="true"
@@ -130,6 +140,7 @@
       <div class="input-group dropdown">
         <ejs-multiselect
           mode="CheckBox"
+          [allowFiltering]="true"
           [dataSource]="filterColumns.skillAbbrs.dataSource"
           [showDropDownIcon]="true"
           formControlName="skillAbbrs"
@@ -141,6 +152,7 @@
       <div class="input-group dropdown">
         <ejs-multiselect
           mode="CheckBox"
+          [allowFiltering]="true"
           [dataSource]="filterColumns.skillDescriptions.dataSource"
           [showDropDownIcon]="true"
           formControlName="skillDescriptions"
@@ -152,6 +164,7 @@
       <div class="input-group dropdown">
         <ejs-multiselect
           mode="CheckBox"
+          [allowFiltering]="true"
           [dataSource]="filterColumns.glNumbers.dataSource"
           [showDropDownIcon]="true"
           formControlName="glNumbers"
@@ -167,9 +180,10 @@
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-side-dialog
+  [disableSaveButton]="!userPermission[userPermissions.CanEditAssignedSkills]"
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveSkill()"
-  header="{{ title }} Skill"
+  header="Edit Skill"
   >
   <form class="skills-form-dialog form-container bootstrap"
         id="addEditSkillsForm"
@@ -179,10 +193,11 @@
         <label for="skillCategoryId">Skill Category <span class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-dropdownlist
-            name="skillCategoryId"
-            [fields]="optionFields"
             appValidateWithMessage
+            name="skillCategoryId"
             formControlName="skillCategoryId"
+            [fields]="optionFields"
+            [allowFiltering]="true"
             [dataSource]="(allSkillsCategories$ | async)?.items"
           ></ejs-dropdownlist>
         </div>
@@ -252,5 +267,7 @@
     </div>
   </form>
 </app-side-dialog>
+
+<app-assign-skill [openSidebar]="openAssignSidebarSubject"></app-assign-skill>
 
 <app-file-upload-dialog></app-file-upload-dialog>

@@ -18,8 +18,13 @@ import {
   SavePenaltySuccess,
   ShowOverridePenaltyDialog
 } from '@organization-management/store/reject-reason.actions';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE, ALPHANUMERICS_AND_SYMBOLS, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE } from '@shared/constants';
+import {
+  CANCEL_REJECTION_REASON,
+  DELETE_CONFIRM_TITLE,
+  ALPHANUMERICS_AND_SYMBOLS,
+  DATA_OVERRIDE_TEXT,
+  DATA_OVERRIDE_TITLE,
+} from '@shared/constants';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { delay, filter, takeWhile, Observable } from 'rxjs';
@@ -30,6 +35,8 @@ import { CancellationReasonsMap } from '@shared/components/candidate-cancellatio
 import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { UserState } from 'src/app/store/user.state';
 import { Penalty } from '@shared/models/penalty.model';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 export enum ReasonsNavigationTabs {
   Rejection,
@@ -44,11 +51,13 @@ export enum ReasonsNavigationTabs {
   templateUrl: './reasons.component.html',
   styleUrls: ['./reasons.component.scss']
 })
-export class ReasonsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class ReasonsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   public selectedTab: ReasonsNavigationTabs = ReasonsNavigationTabs.Rejection;
   public reasonsNavigationTabs = ReasonsNavigationTabs;
   public form: FormGroup;
   public penaltiesForm: FormGroup;
+  public canRejectOrClosure = true;
+
   private isEdit = false;
   public title: string = '';
   private isAlive = true;
@@ -69,19 +78,18 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
     value: 'id',
   };
 
-  constructor(private store: Store, private confirmService: ConfirmService, private actions$: Actions) {
-    super();
-    for(const [key, val] of Object.entries(CancellationReasonsMap)) {
-      this.cancellationReasons.push({
-        id: +key, name: val
-      });
-    }
+  constructor(protected override store: Store, private confirmService: ConfirmService, private actions$: Actions) {
+    super(store);
+    const cancellationReasons = Object.entries(CancellationReasonsMap).map(([key, value]) => ({ id: +key, name: value}));
+    this.cancellationReasons = sortByField(cancellationReasons, 'name');
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.createForm();
     this.subscribeOnSaveReasonSuccess();
     this.penaltiesSubscriptionHandler();
+    this.canRejectOrClosureReason();
   }
 
   ngOnDestroy(): void {
@@ -90,6 +98,7 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
 
   public onTabSelected(selectedTab: any): void {
     this.selectedTab = selectedTab.selectedIndex;
+    this.canRejectOrClosureReason();
   }
 
   private penaltiesSubscriptionHandler(): void {
@@ -105,12 +114,13 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
         val.forEach((id) =>
           this.selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
         );
-        this.locations = [];
+        const regionLocations: OrganizationLocation[] = [];
         this.isAllRegionsSelected = val.length === this.regions.length;
         this.selectedRegions.forEach((region) => {
           region.locations?.forEach((location) => (location.regionName = region.name));
-          this.locations.push(...(region.locations as []));
+          regionLocations.push(...(region.locations as []));
         });
+        this.locations = sortByField(regionLocations, 'name');
       } else {
         this.locations = [];
         this.isAllRegionsSelected = false;
@@ -198,7 +208,7 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
               id: this.form.value.id,
               reason: this.form.value.reason
             }
-      
+
             this.store.dispatch(new UpdateRejectReasons(payload));
           }
           break;
@@ -323,5 +333,11 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
     } else {
       this.closeSideDialog()
     }
+  }
+
+  private canRejectOrClosureReason(): void {
+    this.canRejectOrClosure = this.selectedTab === 0 ?
+      this.userPermission[this.userPermissions.CanRejectCandidate] :
+      this.userPermission[this.userPermissions.CanManageOrderClosureReasons];
   }
 }

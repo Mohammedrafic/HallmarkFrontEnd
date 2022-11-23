@@ -6,6 +6,7 @@
         <ejs-dropdownlist appValidateWithMessage
                           [fields]="agencyFields"
                           formControlName="agencyId"
+                          [allowFiltering]="true"
                           [dataSource]="(agencies$ | async)?.items">
         </ejs-dropdownlist>
       </div>

@@ -12,6 +12,7 @@
       <label>Organization</label>
       <div class="input-group">
         <ejs-multiselect
+          #organizationMultiselect
           mode="CheckBox"
           selectAllText="All"
           [showSelectAll]="true"
@@ -54,6 +55,7 @@
       <label>Location</label>
       <div class="input-group">
         <ejs-multiselect
+          #locationMultiselect
           mode="CheckBox"
           formControlName="locationIds"
           selectAllText="All"
@@ -150,6 +152,7 @@
       <label>Order Status</label>
       <div class="input-group multiselect">
         <ejs-multiselect
+          #orderStatusFilter
           mode="CheckBox"
           formControlName="orderStatuses"
           placeholder="All"
@@ -170,6 +173,7 @@
           mode="CheckBox"
           placeholder="All"
           formControlName="projectTypeIds"
+          [allowFiltering]="true"
           [dataSource]="filterColumns.projectTypeIds.dataSource"
           [fields]="specialProjectCategoriesFields"
           [showDropDownIcon]="true"
@@ -186,6 +190,7 @@
           mode="CheckBox"
           placeholder="All"
           formControlName="projectNameIds"
+          [allowFiltering]="true"
           [dataSource]="filterColumns.projectNameIds.dataSource"
           [fields]="projectNameFields"
           [showDropDownIcon]="true"
@@ -200,6 +205,7 @@
           mode="CheckBox"
           placeholder="All"
           formControlName="poNumberIds"
+          [allowFiltering]="true"
           [dataSource]="filterColumns.poNumberIds.dataSource"
           [fields]="poNumberFields"
           [showDropDownIcon]="true"

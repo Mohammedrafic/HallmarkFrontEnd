@@ -40,7 +40,7 @@
               <ng-template #headerText>{{isReOrder ? 'Re-Order Details' : 'Order Details'}}</ng-template>
               <ng-template #content>
                 <section class="order-details" *ngIf="currentOrder">
-                  <section class="job-details"  *ngIf="currentOrder" [ngSwitch]="currentOrder?.orderType">
+                  <section class="job-details" [ngSwitch]="currentOrder?.orderType">
                     <app-general-order-per-diem-info *ngSwitchCase="orderType.OpenPerDiem" [orderInformation]="currentOrder"></app-general-order-per-diem-info>
                     <app-general-reorder-info *ngSwitchCase="orderType.ReOrder" [orderInformation]="currentOrder"></app-general-reorder-info>
                     <app-general-order-info *ngSwitchDefault [orderInformation]="currentOrder"></app-general-order-info>
@@ -56,11 +56,15 @@
               </ng-template>
             </e-tabitem>
             <e-tabitem>
-              <ng-template #headerText>Candidates <span class="e-badge e-badge-success e-badge-circle">{{countOrderCandidates$ | async}}</span></ng-template>
+              <ng-template #headerText>Candidates <span class="e-badge e-badge-success e-badge-pill">{{countOrderCandidates$ | async}}</span></ng-template>
               <ng-template #content>
                 <ng-container *ngIf="currentOrder">
-                  <app-extension-candidate [actionsAllowed]="agencyActionsAllowed" *ngIf="currentOrder.extensionFromId; else candidateOrder" [currentOrder]="currentOrder" [dialogEvent]="openEvent">
-                  </app-extension-candidate>
+                  <app-extension-candidate
+                    [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
+                    *ngIf="currentOrder.extensionFromId; else candidateOrder"
+                    [currentOrder]="currentOrder"
+                    [dialogEvent]="openEvent"
+                  ></app-extension-candidate>
                 </ng-container>
                 <ng-template #candidateOrder>
                   <app-candidates-order [currentOrder]="currentOrder"></app-candidates-order>
@@ -70,7 +74,7 @@
             <ng-container *ngIf="currentOrder">
               <e-tabitem *ngIf="orderType.OpenPerDiem === currentOrder.orderType">
                 <ng-template #headerText>
-                  Re-Orders <span class="e-badge e-badge-success e-badge-circle">{{ currentOrder?.reOrders?.length || '0' }}</span>
+                  Re-Orders <span class="e-badge e-badge-success e-badge-pill">{{ currentOrder?.reOrders?.length || '0' }}</span>
                 </ng-template>
                 <ng-template #content>
                   <app-order-reorders-container (selectReOrder)="selectReOrder.emit($event)" [isAgency]="true" [currentOrder]="currentOrder"></app-order-reorders-container>

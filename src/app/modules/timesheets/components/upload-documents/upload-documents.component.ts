@@ -9,11 +9,13 @@ import { FileExtensionsString } from '@core/constants';
 import { DialogAction, FilesClearEvent, FileSize } from '@core/enums';
 import { FileForUpload } from '@core/interface';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { ShowToast } from "src/app/store/app.actions";
 
+import { MessageTypes } from "@shared/enums/message-types";
+import { CustomFilesPropModel } from '@shared/components/file-uploader/custom-files-prop-model.interface';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { Attachment, UploadDialogState, UploadDocumentsModel } from '../../interface';
-import { CustomFilesPropModel } from '@shared/components/file-uploader/custom-files-prop-model.interface';
 
 @Component({
   selector: 'app-upload-documents',
@@ -32,7 +34,7 @@ export class UploadDocumentsComponent extends Destroyable implements OnInit {
 
   public readonly allowedFileExtensions: string = FileExtensionsString;
 
-  public readonly maxFileSize: number = FileSize.MB_10;
+  public readonly maxFileSize: number = FileSize.MB_20;
 
   public existingFiles: Attachment[] = [];
 
@@ -64,29 +66,36 @@ export class UploadDocumentsComponent extends Destroyable implements OnInit {
         title: 'Unsaved Progress',
         okButtonLabel: 'Proceed',
         okButtonClass: 'delete-button',
-      })
-        .pipe(
-          filter(Boolean),
-          takeUntil(this.componentDestroy())
-        )
-        .subscribe(() => {
-          this.closeDialog();
-        });
+      }).pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      ).subscribe(() => {
+        this.closeDialog();
+      });
     } else {
       this.closeDialog();
     }
   }
 
   public saveRecord(): void {
+    if (this.hasTooBigFile()) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, 'The file should not exceed 20MB.'));
+      return;
+    }
+
     this.fileChange.emit({
       fileForUpload: this.fileForUploads,
       filesForDelete: this.filesForDelete,
     });
+
+    this.filesForDelete = [];
+    this.fileForUploads = [];
+
     this.closeDialog();
   }
 
   public clearFiles(): void {
-    this.closeDialog(false);
+    this.resetUploadState(true);
   }
 
   public deleteFile({ id }: CustomFilesPropModel): void {
@@ -116,23 +125,22 @@ export class UploadDocumentsComponent extends Destroyable implements OnInit {
       });
   }
 
-  private closeDialog(closeModal = true): void {
+  private closeDialog(): void {
+    this.resetUploadState();
+
+    this.sideUploadDialog.hide();
+    this.store.dispatch(new Timesheets.ToggleTimesheetUploadAttachmentsDialog(DialogAction.Close, null));
+  }
+
+  private hasTooBigFile(): boolean {
+    return this.fileForUploads.some((file: FileForUpload) => file.blob.size > this.maxFileSize);
+  }
+
+  private resetUploadState(deleteExistingFiles = false): void {
+    this.filesForDelete = deleteExistingFiles ? [...this.existingFiles] : [];
     this.fileForUploads = [];
-    this.filesForDelete = [...this.existingFiles];
     this.existingFiles = [];
     this.filesClearEvent = FilesClearEvent.ClearAll;
-
-    if (closeModal) {
-      if (this.filesForDelete.length) {
-        this.fileChange.emit({
-          fileForUpload: this.fileForUploads,
-          filesForDelete: this.filesForDelete,
-        });
-        this.filesForDelete = [];
-      }
-      this.sideUploadDialog.hide();
-      this.store.dispatch(new Timesheets.ToggleTimesheetUploadAttachmentsDialog(DialogAction.Close, null));
-    }
 
     this.cdr.detectChanges();
   }

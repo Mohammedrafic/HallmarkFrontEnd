@@ -42,7 +42,7 @@ import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
 
-import { activePositionsLegendPalette } from '../constants/active-positions-legend-palette';
+import { activePositionsLegendDisplayText, activePositionsLegendPalette } from '../constants/active-positions-legend-palette';
 import { ActivePositionsChartStatuses } from '../enums/active-positions-legend-palette.enum';
 import { candidateLegendPalette } from '../constants/candidate-legend-palette';
 import { CandidateChartStatuses } from '../enums/candidate-legend-palette.enum';
@@ -51,6 +51,8 @@ import { PositionTrend, PositionTrendDto } from '../models/position-trend.model'
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { DashboartFilterDto } from '../models/dashboard-filter-dto.model';
 import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
+import { DateTimeHelper } from '@core/helpers';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable()
 export class DashboardService {
@@ -280,20 +282,16 @@ export class DashboardService {
 
   
   private getFirstLastWeekDay(startDate: Date): ITimeSlice {
-    const millisecondsOfminute = 60000;
     const today = new Date();
-    const tzOffSet = new Date().getTimezoneOffset() * millisecondsOfminute;
-    const dateFrom = new Date(startDate.setDate(startDate.getDate() - startDate.getDay()) - tzOffSet).toISOString();
-    const dateTo = new Date(today.setDate(today.getDate() - today.getDay() + 6)).toISOString();
+    const dateFrom = DateTimeHelper.toUtcFormat(new Date(startDate.setDate(startDate.getDate() - startDate.getDay())));
+    const dateTo = DateTimeHelper.toUtcFormat(new Date(today.setDate(today.getDate() - today.getDay() + 6)));
     return { dateFrom, dateTo };
   }
 
   private getFirstLastMonthDay(startDate: Date): ITimeSlice {
-    const millisecondsOfminute = 60000;
     const today = new Date();
-    const tzOffSet = new Date().getTimezoneOffset() * millisecondsOfminute;
-    const dateFrom = new Date(new Date(startDate.getFullYear(), startDate.getMonth(), 1).getTime() - tzOffSet).toISOString();
-    const dateTo = new Date(new Date(today.getFullYear(), today.getMonth() + 1, 0).getTime() - tzOffSet).toISOString();
+    const dateFrom = DateTimeHelper.toUtcFormat(new Date(new Date(startDate.getFullYear(), startDate.getMonth(), 1)));
+    const dateTo =  DateTimeHelper.toUtcFormat(new Date(new Date(today.getFullYear(), today.getMonth() + 1, 0)));
     return { dateFrom, dateTo };
   }
 
@@ -332,7 +330,7 @@ export class DashboardService {
           chartData: lodashMapPlain(
             orderStatusesDetails,
             ({ count, statusName }: ActivePositionTypeInfo, index: number) => ({
-              label: statusName,
+              label: activePositionsLegendDisplayText[statusName as ActivePositionsChartStatuses],
               value: count,
               color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses],
             })
@@ -416,6 +414,6 @@ export class DashboardService {
   }
 
   public getAllSkills(): Observable<AllOrganizationsSkill[]> {
-    return this.httpClient.get<AllOrganizationsSkill[]>(`/api/AssignedSkills/forOrganizations`);
+    return this.httpClient.get<AllOrganizationsSkill[]>(`/api/AssignedSkills/forOrganizations`).pipe(map((data) => sortByField(data, 'skillDescription')));
   }
 }

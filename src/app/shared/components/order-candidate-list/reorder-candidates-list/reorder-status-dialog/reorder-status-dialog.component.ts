@@ -6,6 +6,7 @@ import {
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
+import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import {
@@ -27,6 +28,7 @@ import {
 } from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
+import { hasEditOrderBillRatesPermission } from "@shared/components/order-candidate-list/order-candidate-list.utils";
 import { OPTION_FIELDS } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-candidate.constants';
 import { SET_READONLY_STATUS } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -153,13 +155,15 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public canOnboard = false;
   public canClose = false;
   public orderPermissions: CurrentUserPermission[];
+  public hasEditOrderBillRatesPermission: boolean;
 
   private defaultApplicantStatuses: ApplicantStatus[];
 
   constructor(
     private store: Store,
     private actions$: Actions,
-    private orderCandidateListViewService: OrderCandidateListViewService
+    private orderCandidateListViewService: OrderCandidateListViewService,
+    private datePipe: DatePipe
   ) {
     super();
   }
@@ -186,7 +190,14 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   private subscribeForJobStatus(): void {
     this.jobStatus$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((data) => (!data.length ? this.jobStatusControl.disable() : this.jobStatusControl.enable()));
+      .subscribe((data) => {
+        this.hasEditOrderBillRatesPermission = hasEditOrderBillRatesPermission(this.currentCandidateApplicantStatus, data);
+        if (!data.length) {
+          this.jobStatusControl.disable();
+        } else {
+          this.jobStatusControl.enable();
+        }
+      });
   }
 
   private subscribeForOrderPermissions(): void {
@@ -342,7 +353,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       locationName,
       departmentName,
       skillName,
-      orderOpenDate: reOrderDate,
+      orderOpenDate: this.datePipe.transform(reOrderDate, 'MM/dd/yyyy', 'utc'),
       shiftStartTime,
       shiftEndTime,
       openPositions,

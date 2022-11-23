@@ -32,7 +32,7 @@
             <button
               ejs-button
               cssClass="e-flat secondary-icon-button"
-              [disabled]="isReadOnly"
+              [disabled]="isReadOnly || !userPermission[userPermissions.CanManageExternalBillRates]"
               (click)="onRemoveRecordButtonClick(data, $event)"
             >
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
@@ -59,6 +59,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -77,6 +78,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(billRateMapping$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -106,6 +110,7 @@
   </app-export-dialog>
 
   <app-side-dialog
+    [disableSaveButton]="!userPermission[userPermissions.CanManageExternalBillRates]"
     (formCancelClicked)="onFormCancelClick()"
     (formSaveClicked)="onFormSaveClick()"
     [header]="isEdit ? 'Edit' : 'Add Type'"
@@ -124,6 +129,7 @@
             <ejs-dropdownlist
               id="billRatesTitle"
               appValidateWithMessage
+              [allowFiltering]="true"
               [dataSource]="billRatesOptions$ | async"
               [fields]="billRateTitleFields"
               formControlName="billRateTitleId">
@@ -142,7 +148,7 @@
             [dataSource]="externalBillRateMapped$ | async"
             [fields]="externalBillRateMappedFields"
             [showSelectAll]="true"
-            [allowFiltering]="false"
+            [allowFiltering]="true"
             [showDropDownIcon]="true"
             formControlName="externalBillRates">
           </ejs-multiselect>

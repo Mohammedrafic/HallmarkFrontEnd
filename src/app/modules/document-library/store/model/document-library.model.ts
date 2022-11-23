@@ -50,6 +50,7 @@ export class Documents {
   comments: string;
   selectedFile?: Blob | null
   isEdit?: boolean | false
+  status?: number;
 }
 
 export class DocumentLibraryDto {
@@ -69,9 +70,9 @@ export class DocumentLibraryDto {
   status: string;
   businessUnitId: number | null;
   businessUnitName: string | null;
-  regionId: number | null;
+  regionId: string | null;
   regionName: string | null;
-  locationId: number | null;
+  locationId: string | null;
   locationName: string | null;
   isSharedWithMe: boolean;
   documentVisibilities: any | null;
@@ -124,7 +125,27 @@ export class DownloadDocumentDetail {
   createdAt: Date;
 }
 
+export class DownloadPreviewDetail {
+  id: number;
+  name: string;
+  fileName: string;
+  extension: string;
+  fileAsBase64: string;
+  sasUrl: string;
+  contentType: string;
+  metadata: any;
+  folderId: number | null;
+  active: boolean;
+  createdAt: Date;
+}
+
 export class DownloadDocumentDetailFilter {
+  documentId: number;
+  businessUnitType: number;
+  businessUnitId: number | null;
+}
+
+export class PreviewDocumentDetailFilter {
   documentId: number;
   businessUnitType: number;
   businessUnitId: number | null;
@@ -145,6 +166,7 @@ export class ShareDocumentsFilter {
   businessUnitType: number;
   businessUnitIds: number[] | null;
   regionLocationMappings: { [id: number]: number[]; } | null;
+  isShareWhileUpload: boolean;
 }
 
 export class ShareDocumentDto {
@@ -172,6 +194,40 @@ export class UnShareDocumentsFilter {
   documentIds: number[];
 }
 
+export class regionFilter {
+  ids?: number[];
+  name?: string[];
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+  getAll?: boolean;
+  businessUnitId: number;
+}
+
+export class LocationsByRegionsFilter {
+  ids?: number[];
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+  getAll?: boolean;
+  businessUnitId: number;
+}
+
+export class AssociateAgencyDto {
+  agencyId: number;
+  agencyName: string;
+}
+
+export class ShareOrganizationsData {
+  id: number;
+  name: string;
+}
+
+export class DeleteDocumentFolderFilter {
+  folderId: number;
+  businessUnitType: number;
+  businessUnitId: number | null;
+}
 
 
 

@@ -18,6 +18,7 @@
           <div class="e-card-content button-container">
             <div class="input-group dropdown bootstrap input-readonly" *ngIf="isBillRatePending">
               <ejs-dropdownlist
+                [allowFiltering]="true"
                 [fields]="optionFields"
                 [formControl]="jobStatusControl"
                 [disabled]="!actionsAllowed"
@@ -87,6 +88,7 @@
             [billRates]="orderCandidateJob?.billRates || []"
             [isActive]="isActiveCandidateDialog$ | async"
             [readOnlyMode]="isRejectCandidate || (!canShortlist && !canInterview && !canReject && !canOffer && !canOnboard)"
+            [disabledActionMode]="!hasEditOrderBillRatesPermission"
             (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)">
           </app-bill-rates>
         </ng-template>
@@ -99,6 +101,7 @@
       <div class="mobile-actions">
         <div class="input-group dropdown bootstrap input-readonly" *ngIf="isBillRatePending">
           <ejs-dropdownlist
+            [allowFiltering]="true"
             [fields]="optionFields"
             [formControl]="jobStatusControl"
             [dataSource]="jobStatus$ | async"
@@ -112,10 +115,14 @@
             </ng-template>
           </ejs-dropdownlist>
         </div>
-        <button ejs-button class="e-outline"
-          [disabled]="!actionsAllowed" (click)="onReject()" *ngIf="isOfferedBillRate">Reject</button>
-        <button ejs-button [isPrimary]="true" class="apply-button"
-          [disabled]="!actionsAllowed" (click)="onAccept()" *ngIf="showAccept">Accept</button>
+        <app-tooltip-container [showToolTip]="!actionsAllowed">
+          <button ejs-button class="e-outline"
+                  [disabled]="!actionsAllowed" (click)="onReject()" *ngIf="isOfferedBillRate">Reject</button>
+        </app-tooltip-container>
+        <app-tooltip-container [showToolTip]="!actionsAllowed">
+          <button ejs-button [isPrimary]="true" class="apply-button"
+                  [disabled]="!actionsAllowed" (click)="onAccept()" *ngIf="showAccept">Accept</button>
+        </app-tooltip-container>
       </div>
       <hr class="mobile" />
     </ng-container>

@@ -8,7 +8,7 @@ import {
   SetNavigation,
   SetPageFilters,
   SetPageNumber,
-  SetPageSize,
+  SetPageSize
 } from '@shared/components/candidate-details/store/candidate.actions';
 import { Observable, tap } from 'rxjs';
 import { CandidateDetailsService } from '@shared/components/candidate-details/services/candidate-details.service';
@@ -17,18 +17,19 @@ import {
   CandidateDetailsPage,
   CandidatesDetailsRegions,
   FiltersModal,
-  NavigationTabModel,
+  NavigationTabModel
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
+import { SkillsService } from '@shared/services/skills.service';
 
 interface CandidateDetailsStateModel {
   candidateDetailsPage: CandidateDetailsPage | null;
   navigationTab: NavigationTabModel;
   pageNumber: number | null;
   pageSize: number | null;
-  candidateSkills: MasterSkillByOrganization | null;
+  candidateSkills: MasterSkillByOrganization[];
   filters: FiltersModal | null;
-  candidateRegions: CandidatesDetailsRegions | null;
+  candidateRegions: CandidatesDetailsRegions[];
   isNavigate: boolean | null;
 }
 
@@ -43,9 +44,9 @@ interface CandidateDetailsStateModel {
     },
     pageNumber: null,
     pageSize: null,
-    candidateSkills: null,
+    candidateSkills: [],
     filters: null,
-    candidateRegions: null,
+    candidateRegions: [],
     isNavigate: null,
   },
 })
@@ -67,7 +68,7 @@ export class CandidateDetailsState {
   }
 
   @Selector()
-  static candidateRegions(state: CandidateDetailsStateModel): CandidatesDetailsRegions | null {
+  static candidateRegions(state: CandidateDetailsStateModel): CandidatesDetailsRegions[] {
     return state.candidateRegions;
   }
 
@@ -87,11 +88,11 @@ export class CandidateDetailsState {
   }
 
   @Selector()
-  static candidateSkills(state: CandidateDetailsStateModel): MasterSkillByOrganization | null {
+  static candidateSkills(state: CandidateDetailsStateModel): MasterSkillByOrganization[] {
     return state.candidateSkills;
   }
 
-  constructor(private candidateDetailsService: CandidateDetailsService) {}
+  constructor(private candidateDetailsService: CandidateDetailsService, private skillsService: SkillsService) {}
 
   @Action(GetCandidateDetailsPage, { cancelUncompleted: true })
   GetCandidateDetailsPage(
@@ -136,9 +137,9 @@ export class CandidateDetailsState {
   }
 
   @Action(GetCandidateRegions)
-  GetCandidateRegions({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<CandidatesDetailsRegions> {
+  GetCandidateRegions({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<CandidatesDetailsRegions[]> {
     return this.candidateDetailsService.getRegions().pipe(
-      tap((payload: CandidatesDetailsRegions) => {
+      tap((payload: CandidatesDetailsRegions[]) => {
         patchState({ candidateRegions: payload });
         return payload;
       })
@@ -146,9 +147,9 @@ export class CandidateDetailsState {
   }
 
   @Action(GetCandidateSkills)
-  GetCandidateSkills({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<MasterSkillByOrganization> {
-    return this.candidateDetailsService.getSkills().pipe(
-      tap((payload: MasterSkillByOrganization) => {
+  GetCandidateSkills({ patchState }: StateContext<CandidateDetailsStateModel>): Observable<MasterSkillByOrganization[]> {
+    return this.skillsService.getAssignedSkillsByOrganization().pipe(
+      tap((payload: MasterSkillByOrganization[]) => {
         patchState({ candidateSkills: payload });
         return payload;
       })

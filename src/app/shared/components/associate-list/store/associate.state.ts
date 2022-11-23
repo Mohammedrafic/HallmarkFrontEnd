@@ -1,23 +1,7 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import {
-  DeleteAssociateOrganizationsAgencyById,
-  GetAssociateAgencyOrg,
-  GetAssociateListPage,
-  GetFeeExceptionsInitialData,
-  GetFeeSettingByOrganizationId,
-  GetJobDistributionInitialData,
-  GetPartnershipSettings,
-  InviteOrganizationsAgency,
-  InviteOrganizationsSucceeded,
-  RemoveFeeExceptionsById,
-  SaveBaseFee,
-  SaveFeeExceptions,
-  SaveFeeExceptionsSucceeded,
-  SavePartnershipSettings,
-  UpdateAssociateOrganizationsAgencyPage,
-} from '@shared/components/associate-list/store/associate.actions';
-import { Observable, tap } from 'rxjs';
+import { TiersException } from '@shared/components/associate-list/store/associate.actions';
+import { catchError, Observable, tap } from 'rxjs';
 import { AssociateService } from '@shared/components/associate-list/services/associate.service';
 import {
   AssociateOrganizationsAgency,
@@ -28,18 +12,19 @@ import {
   JobDistributionInitialData,
   PartnershipSettings,
 } from '@shared/models/associate-organizations.model';
-import { ShowToast } from '../../../../store/app.actions';
+import { ShowSideDialog, ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_ADDED, RECORD_DELETE, RECORD_SAVED } from '@shared/constants';
+import {
+  RECORD_ADDED,
+  RECORD_DELETE,
+  RECORD_MODIFIED,
+  RECORD_SAVED
+} from '@shared/constants';
+import { TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
+import { HttpErrorResponse } from '@angular/common/http';
+import { getAllErrors } from '@shared/utils/error.utils';
+import { AssociateStateModel, TierExceptionPage, TierList } from '@shared/components/associate-list/interfaces';
 
-export interface AssociateStateModel {
-  associateListPage: AssociateOrganizationsAgencyPage | { items: AssociateOrganizationsAgencyPage['items'] };
-  feeSettings: FeeSettings | null;
-  feeExceptionsInitialData: FeeExceptionsInitialData | null;
-  partnershipSettings: PartnershipSettings | null;
-  jobDistributionInitialData: JobDistributionInitialData | null;
-  associateAgencyOrg: string | null;
-}
 @State<AssociateStateModel>({
   name: 'associateList',
   defaults: {
@@ -50,11 +35,16 @@ export interface AssociateStateModel {
     feeExceptionsInitialData: null,
     jobDistributionInitialData: null,
     partnershipSettings: null,
-    associateAgencyOrg: null,
+    tierList: null,
+    selectedOrganizationAgency: null,
+    tiersExceptionByPage: null,
+    associateAgencyOrg: [],
   },
 })
 @Injectable()
 export class AssociateListState {
+  constructor(private associateService: AssociateService) {}
+
   @Selector()
   static associateListPage(
     state: AssociateStateModel
@@ -68,7 +58,22 @@ export class AssociateListState {
   }
 
   @Selector()
-  static associateAgencyOrg(state: AssociateStateModel): string | null {
+  static getSelectedOrganizationAgency(state: AssociateStateModel): AssociateOrganizationsAgency | null {
+    return state.selectedOrganizationAgency;
+  }
+
+  @Selector()
+  static getTiersExceptionPage(state: AssociateStateModel): TierExceptionPage | null {
+    return state.tiersExceptionByPage;
+  }
+
+  @Selector()
+  static getTiersList(state: AssociateStateModel): TierList | null {
+    return state.tierList;
+  }
+
+  @Selector()
+  static associateAgencyOrg(state: AssociateStateModel): { id: number, name: string }[] {
     return state.associateAgencyOrg;
   }
 
@@ -92,12 +97,10 @@ export class AssociateListState {
     return state.feeSettings?.baseFee;
   }
 
-  constructor(private associateService: AssociateService) {}
-
-  @Action(GetAssociateListPage)
+  @Action(TiersException.GetAssociateListPage)
   GetAssociateListPage(
     { patchState }: StateContext<AssociateStateModel>,
-    { pageNumber, pageSize }: GetAssociateListPage
+    { pageNumber, pageSize }: TiersException.GetAssociateListPage
   ): Observable<AssociateOrganizationsAgencyPage> {
     return this.associateService.getAssociateListByPage(pageNumber, pageSize).pipe(
       tap((payload) => {
@@ -107,10 +110,10 @@ export class AssociateListState {
     );
   }
 
-  @Action(DeleteAssociateOrganizationsAgencyById)
+  @Action(TiersException.DeleteAssociateOrganizationsAgencyById)
   DeleteAssociateOrganizationsAgencyById(
     { dispatch, patchState, getState }: StateContext<AssociateStateModel>,
-    { id }: DeleteAssociateOrganizationsAgencyById
+    { id }: TiersException.DeleteAssociateOrganizationsAgencyById
   ): Observable<never> {
     const state = getState();
     const associateListPage = {
@@ -126,10 +129,10 @@ export class AssociateListState {
     );
   }
 
-  @Action(SaveFeeExceptions)
+  @Action(TiersException.SaveFeeExceptions)
   SaveFeeExceptions(
     { dispatch, patchState, getState }: StateContext<AssociateStateModel>,
-    { feeExceptionsDTO }: SaveFeeExceptions
+    { feeExceptionsDTO }: TiersException.SaveFeeExceptions
   ): Observable<FeeExceptionsPage> {
     const state = getState();
     const baseFee = state.feeSettings?.baseFee;
@@ -140,18 +143,18 @@ export class AssociateListState {
           feeExceptions: payload,
         };
         patchState({ feeSettings });
-        dispatch(new SaveFeeExceptionsSucceeded(payload));
-        dispatch(new UpdateAssociateOrganizationsAgencyPage());
+        dispatch(new TiersException.SaveFeeExceptionsSucceeded(payload));
+        dispatch(new TiersException.UpdateAssociateOrganizationsAgencyPage());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         return payload;
       })
     );
   }
 
-  @Action(RemoveFeeExceptionsById)
+  @Action(TiersException.RemoveFeeExceptionsById)
   RemoveFeeExceptionsById(
     { patchState, getState, dispatch }: StateContext<AssociateStateModel>,
-    { id }: RemoveFeeExceptionsById
+    { id }: TiersException.RemoveFeeExceptionsById
   ): Observable<never> {
     const state = getState();
     return this.associateService.removeFeeExceptionsById(id).pipe(
@@ -164,30 +167,30 @@ export class AssociateListState {
           baseFee: state.feeSettings?.baseFee,
         } as FeeSettings;
         patchState({ feeSettings });
-        dispatch(new UpdateAssociateOrganizationsAgencyPage());
+        dispatch(new TiersException.UpdateAssociateOrganizationsAgencyPage());
       })
     );
   }
 
-  @Action(SavePartnershipSettings)
+  @Action(TiersException.SavePartnershipSettings)
   SavePartnershipSettings(
     { patchState, dispatch }: StateContext<AssociateStateModel>,
-    { payload }: SavePartnershipSettings
+    { payload }: TiersException.SavePartnershipSettings
   ): Observable<PartnershipSettings> {
     return this.associateService.savePartnershipSettings(payload).pipe(
       tap((payload) => {
         patchState({ partnershipSettings: payload });
-        dispatch(new UpdateAssociateOrganizationsAgencyPage());
+        dispatch(new TiersException.UpdateAssociateOrganizationsAgencyPage());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
         return payload;
       })
     );
   }
 
-  @Action(SaveBaseFee)
+  @Action(TiersException.SaveBaseFee)
   SaveBaseFee(
     { patchState, dispatch, getState }: StateContext<AssociateStateModel>,
-    { associateOrganizationId, baseFee }: SaveBaseFee
+    { associateOrganizationId, baseFee }: TiersException.SaveBaseFee
   ): Observable<FeeSettings> {
     const state = getState();
     return this.associateService.saveBaseFee(associateOrganizationId, baseFee).pipe(
@@ -197,16 +200,16 @@ export class AssociateListState {
           baseFee,
         };
         patchState({ feeSettings });
-        dispatch(new UpdateAssociateOrganizationsAgencyPage());
+        dispatch(new TiersException.UpdateAssociateOrganizationsAgencyPage());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
       })
     );
   }
 
-  @Action(GetFeeExceptionsInitialData)
+  @Action(TiersException.GetFeeExceptionsInitialData)
   GetFeeExceptionsInitialData(
     { patchState }: StateContext<AssociateStateModel>,
-    { organizationId }: GetFeeExceptionsInitialData
+    { organizationId }: TiersException.GetFeeExceptionsInitialData
   ): Observable<FeeExceptionsInitialData> {
     return this.associateService.getFeeExceptionsInitialData(organizationId).pipe(
       tap((payload) => {
@@ -215,7 +218,7 @@ export class AssociateListState {
     );
   }
 
-  @Action(GetJobDistributionInitialData)
+  @Action(TiersException.GetJobDistributionInitialData)
   GetJobDistributionInitialData({
     patchState,
   }: StateContext<AssociateStateModel>): Observable<JobDistributionInitialData> {
@@ -226,10 +229,10 @@ export class AssociateListState {
     );
   }
 
-  @Action(GetPartnershipSettings)
+  @Action(TiersException.GetPartnershipSettings)
   GetPartnershipSettings(
     { patchState }: StateContext<AssociateStateModel>,
-    { organizationId }: GetPartnershipSettings
+    { organizationId }: TiersException.GetPartnershipSettings
   ): Observable<PartnershipSettings> {
     return this.associateService.getPartnershipSettingsById(organizationId).pipe(
       tap((payload) => {
@@ -239,32 +242,40 @@ export class AssociateListState {
     );
   }
 
-  @Action(GetFeeSettingByOrganizationId)
+  @Action(TiersException.GetFeeSettingByOrganizationId)
   GetFeeSettingByOrganizationId(
     { patchState, dispatch }: StateContext<AssociateStateModel>,
-    { organizationAgencyId, pageNumber, pageSize }: GetFeeSettingByOrganizationId
-  ): Observable<FeeSettings> {
+    { organizationAgencyId, pageNumber, pageSize }: TiersException.GetFeeSettingByOrganizationId
+  ): Observable<FeeSettings | void> {
     return this.associateService.getFeeSettingByOrganizationId(organizationAgencyId, pageNumber, pageSize).pipe(
       tap((payload) => {
         patchState({ feeSettings: payload });
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
 
-  @Action(GetAssociateAgencyOrg)
-  GetAssociateAgencyOrg({ patchState }: StateContext<AssociateStateModel>): Observable<string> {
+  @Action(TiersException.GetAssociateAgencyOrg)
+  GetAssociateAgencyOrg(
+    { patchState, dispatch }: StateContext<AssociateStateModel>
+  ): Observable<void | { id: number, name: string }[]> {
     return this.associateService.getAssociateAgencyOrg().pipe(
-      tap((payload: string) => {
+      tap((payload: { id: number, name: string }[]) => {
         patchState({ associateAgencyOrg: payload });
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }
 
-  @Action(InviteOrganizationsAgency)
+  @Action(TiersException.InviteOrganizationsAgency)
   InviteOrganizationsAgency(
     { patchState, dispatch, getState }: StateContext<AssociateStateModel>,
-    { organizationIds }: InviteOrganizationsAgency
+    { organizationIds }: TiersException.InviteOrganizationsAgency
   ): Observable<AssociateOrganizationsAgency[]> {
     const state = getState();
 
@@ -277,8 +288,99 @@ export class AssociateListState {
 
         patchState({ associateListPage });
         dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
-        dispatch(new InviteOrganizationsSucceeded(payload));
+        dispatch(new TiersException.InviteOrganizationsSucceeded(payload));
       })
     );
   }
+
+  @Action(TiersException.GetTiers)
+  GetTiers(
+    { patchState, dispatch }: StateContext<AssociateStateModel>,
+    { payload }: TiersException.GetTiers
+  ): Observable<TierList | void> {
+    return this.associateService.getTiers(payload).pipe(
+      tap((tierList: TierList) => {
+        patchState({tierList});
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(TiersException.SaveTierException)
+  SaveTier(
+    { dispatch }: StateContext<AssociateStateModel>,
+    { payload, isEdit }: TiersException.SaveTierException
+  ): Observable<TierDTO | void> {
+    return this.associateService.saveTierException(payload).pipe(
+      tap(() => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, isEdit ? RECORD_MODIFIED : RECORD_ADDED),
+          new ShowSideDialog(false),
+          new TiersException.UpdateExceptionAfterSuccessAction
+        ]);
+      }),
+      catchError((error: HttpErrorResponse) => {
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(TiersException.GetTierExceptionByPage)
+  GetTierExceptionByPage(
+    { patchState, dispatch }: StateContext<AssociateStateModel>,
+    { id, pageNumber, pageSize }: TiersException.GetTierExceptionByPage
+  ): Observable<TierExceptionPage | void> {
+    return this.associateService.getTiersByPage(id,pageNumber,pageSize).pipe(
+      tap((tiersExceptionByPage: TierExceptionPage) => {
+        patchState({ tiersExceptionByPage });
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    )
+  }
+
+  @Action(TiersException.DeleteTierException)
+  DeleteTierException(
+    { dispatch }: StateContext<AssociateStateModel>,
+    { id }: TiersException.DeleteTierException
+  ): Observable<void> {
+    return this.associateService.deleteTierException(id).pipe(
+      tap(() => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_DELETE),
+          new TiersException.UpdateExceptionAfterSuccessAction
+        ])
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    )
+  }
+
+  @Action(TiersException.GetSelectedOrgAgency)
+  GetSelectedOrgAgency(
+    { patchState }: StateContext<AssociateStateModel>,
+    { selectedOrganizationAgency }: TiersException.GetSelectedOrgAgency
+  ): void {
+    patchState({ selectedOrganizationAgency })
+  }
+
+  @Action(TiersException.SaveTier)
+  SaveSelectedTier(
+    { dispatch }: StateContext<AssociateStateModel>,
+    { payload }: TiersException.SaveTier
+  ): Observable<void> {
+    return this.associateService.saveSelectedTier(payload).pipe(
+      tap(() => {
+        dispatch(new ShowToast(MessageTypes.Success,  RECORD_ADDED));
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    )
+  }
 }
+

@@ -14,7 +14,11 @@
           Export <i-feather name="download" class="icon"></i-feather>
         </div>
       </button>
-      <button ejs-button id="addDepartmentButton" [isPrimary]="true" (click)="addShift()">Add Shift</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditShifts]">
+          <button ejs-button id="addDepartmentButton" [isPrimary]="true" (click)="addShift()" [disabled]="!userPermission[userPermissions.CanEditShifts]">Add Shift</button>
+      </app-tooltip-container>
     </section>
   </section>
   <ejs-grid class="grid grid-component"
@@ -41,16 +45,18 @@
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="editShift(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteShift(data, $event)">
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteShift(data, $event)" [disabled]="!userPermission[userPermissions.CanEditShifts]">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
         </ng-template>
       </e-column>
       <e-column field="name" headerText="shift name" width=200></e-column>
-      <e-column field="shortName" headerText="shift short name" width=200></e-column>
       <e-column field="standardStartTime" headerText="start time" width=120></e-column>
       <e-column field="standardEndTime" headerText="end time" width=120></e-column>
+      <e-column headerText="on call shift" width=100>
+        <ng-template #template let-data>{{data.onCall ? 'Yes' : 'No'}}</ng-template>
+      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
@@ -60,6 +66,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -78,6 +85,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(shiftsPage$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -101,6 +111,7 @@
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-side-dialog
+  [disableSaveButton]="!userPermission[userPermissions.CanEditShifts]"
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveShift()"
   header="{{ title }} Shift"
@@ -119,20 +130,6 @@
                  appValidateWithMessage
                  name="name"
                  formControlName="name"/>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="input-container">
-        <label for="shortName">Shift Short Name <span class="required">*</span></label>
-        <div class="input-group">
-          <input class="e-input"
-                 type="text"
-                 maxlength="10"
-                 appValidateWithMessage
-                 name="shortName"
-                 formControlName="shortName"/>
         </div>
       </div>
     </div>
@@ -169,6 +166,11 @@
           </ejs-timepicker>
         </div>
       </div>
+    </div>
+
+    <div class="input-container toggle-wrapper">
+      <ejs-switch class="toggle" formControlName="onCall"></ejs-switch>
+      <span>On Call</span>
     </div>
   </form>
 </app-side-dialog>

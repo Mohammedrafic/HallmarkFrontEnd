@@ -8,7 +8,6 @@ import {
   AgencyOrderManagement,
   AgencyOrderManagementPage,
   ApplicantStatus,
-  CandidatesBasicInfo,
   CreateOrderDto,
   EditOrderDto,
   Order,
@@ -35,6 +34,7 @@ import { DateTimeHelper } from '@core/helpers';
 import { orderFieldsConfig } from '@client/order-management/add-edit-order/order-fields';
 import { Penalty } from '@shared/models/penalty.model';
 import { JobCancellationReason } from '@shared/enums/candidate-cancellation';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -165,7 +165,7 @@ export class OrderManagementContentService {
       locationId: payload.order.locationId,
       reason: reason
     });
-  }  
+  }
 
   /**
    * Update candidate job
@@ -183,7 +183,7 @@ export class OrderManagementContentService {
   public getAvailableSteps(organizationId: number, jobId: number): Observable<ApplicantStatus[]> {
     return this.http.get<ApplicantStatus[]>(
       `/api/AppliedCandidates/availableSteps?OrganizationId=${organizationId}&JobId=${jobId}`
-    );
+    ).pipe(map((data) => sortByField(data, 'statusText')));
   }
 
   /**
@@ -382,7 +382,19 @@ export class OrderManagementContentService {
    * Get order filter data sources
    */
   public getOrderFilterDataSources(): Observable<OrderFilterDataSource> {
-    return this.http.get<OrderFilterDataSource>('/api/OrdersFilteringOptions/organization');
+    return this.http.get<OrderFilterDataSource>('/api/OrdersFilteringOptions/organization').pipe(
+      map((data) => {
+        const sortedFields: Record<keyof OrderFilterDataSource, string> = {
+          candidateStatuses: 'statusText',
+          orderStatuses: 'statusText',
+          partneredAgencies: 'name',
+          poNumbers: 'poNumber',
+          projectNames: 'projectName',
+          specialProjectCategories: 'projectType',
+        }
+          return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof OrderFilterDataSource])]))
+      }),
+    );
   }
 
   /**
@@ -392,17 +404,6 @@ export class OrderManagementContentService {
   public getHistoricalData(organizationId: number, jobId: number): Observable<HistoricalEvent[]> {
     return this.http.get<HistoricalEvent[]>(
       `/api/AppliedCandidates/historicalData?OrganizationId=${organizationId}&CandidateJobId=${jobId}`
-    );
-  }
-
-  /**
-   * Get basic info about candidate
-   @param organizationId
-   @param jobId
-   */
-  public getCandidatesBasicInfo(organizationId: number, jobId: number): Observable<CandidatesBasicInfo> {
-    return this.http.get<CandidatesBasicInfo>(
-      `/api/AppliedCandidates/basicInfo?OrganizationId=${organizationId}&JobId=${jobId}`
     );
   }
 
@@ -450,20 +451,22 @@ export class OrderManagementContentService {
     return this.http.post<number>(`/api/Orders/${payload}/duplicate`, {});
   }
 
-  public getRegularLocalBillRate(
+  public getRegularBillRate(
     orderType: OrderType,
     departmentId: number,
     skillId: number,
+    jobStartDate: string,
+    jobEndDate: string,
     lastSelectedBusinessUnitId?: number
-  ): Observable<BillRate[]> {
+  ): Observable<BillRate> {
     let headers = {};
 
     if (lastSelectedBusinessUnitId) {
       headers = new HttpHeaders({ 'selected-businessunit-id': `${lastSelectedBusinessUnitId}` });
     }
-    return this.http.get<BillRate[]>('/api/billrates/regular/fororder', {
+    return this.http.get<BillRate>('/api/billrates/regular/fororder', {
       headers,
-      params: { orderType, departmentId, skillId },
+      params: { orderType, departmentId, skillId, jobStartDate, jobEndDate },
     });
   }
 

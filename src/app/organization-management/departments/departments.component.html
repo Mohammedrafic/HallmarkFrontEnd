@@ -5,8 +5,9 @@
         id="regionsDropDown"
         class="region-dropdown"
         placeholder="Region"
+        [allowFiltering]="true"
         [dataSource]="regions$ | async"
-        [fields]="regionFields"
+        [fields]="fieldsSettings"
         (change)="onRegionDropDownChanged($event)"
         [value]="defaultValue"
       ></ejs-dropdownlist>
@@ -14,9 +15,10 @@
         id="locationsDropDown"
         class="location-dropdown"
         placeholder="Location"
+        [allowFiltering]="true"
         [enabled]="isLocationsDropDownEnabled"
         [dataSource]="locations$ | async"
-        [fields]="locationFields"
+        [fields]="fieldsSettings"
         (change)="onLocationDropDownChanged($event)"
         [value]="defaultLocationValue"
       ></ejs-dropdownlist>
@@ -28,7 +30,7 @@
         cssClass="e-outline button-filter"
         (click)="showFilters()">
         <div class="filter-button-content">
-          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle align-text">{{ filteredItems.length }}</span>
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill align-text">{{ filteredItems.length }}</span>
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
@@ -93,6 +95,11 @@
       <e-column field="facilityEmail" headerText="DEPARTMENT EMAIL" width=200></e-column>
       <e-column field="facilityPhoneNo" headerText="DEPARTMENT PHONE NO" [valueAccessor]="formatPhoneNumber" width=200></e-column>
       <e-column field="inactiveDate" headerText="INACTIVE DATE" type="date" format="MM/dd/yyyy" width=200></e-column>
+      <e-column field="includeInIRP" headerText="Include in IRP" width=200>
+        <ng-template #template let-data>
+          <span>{{ data.includeInIRP ? 'Yes' : 'No' }}</span>
+        </ng-template>
+      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
@@ -102,6 +109,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -120,6 +128,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(departments$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -153,7 +164,7 @@
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.externalIds.dataSource">
+                         [dataSource]="filterColumns['externalIds'].dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -165,7 +176,7 @@
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.invoiceIds.dataSource">
+                         [dataSource]="filterColumns['invoiceIds'].dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -177,7 +188,7 @@
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.departmentNames.dataSource">
+                         [dataSource]="filterColumns['departmentNames'].dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -189,7 +200,7 @@
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.facilityContacts.dataSource">
+                         [dataSource]="filterColumns['facilityContacts'].dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -201,8 +212,19 @@
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.facilityEmails.dataSource">
+                         [dataSource]="filterColumns['facilityEmails'].dataSource">
         </ejs-multiselect>
+      </div>
+    </div>
+    <div *ngIf="isIRPFlagEnabled && isOrgUseIRPAndVMS" class="input-container">
+      <label>Included in IRP</label>
+      <div class="input-group multiselect">
+        <ejs-dropdownlist
+          [fields]="irpFieldsSettings"
+          formControlName="includeInIRP"
+          [dataSource]="filterColumns['includeInIRP'].dataSource"
+          placeholder="All"
+        ></ejs-dropdownlist>
       </div>
     </div>
     <div class="input-container calendar">
@@ -232,6 +254,14 @@
   <form class="form-container bootstrap"
         id="addEditRecordForm"
         [formGroup]="departmentsDetailsFormGroup">
+    <div *ngIf="isIRPFlagEnabled && isLocationIRPEnabled && isOrgUseIRPAndVMS">
+      <div class="input-container toggle-wrapper">
+        <ejs-switch class="toggle"
+                    formControlName="includeInIRP"
+        ></ejs-switch>
+        <span>Include in IRP</span>
+      </div>
+    </div>
     <div>
       <div class="input-container">
         <label for="extDepartmentId">Ext Department ID <span class="required">*</span></label>
@@ -246,9 +276,9 @@
       </div>
     </div>
 
-    <div>
+    <div *ngIf="isInvoiceDepartmentIdFieldShow">
       <div class="input-container">
-        <label for="invoiceDepartmentId">Invoice Department ID <span class="required">*</span></label>
+        <label for="invoiceDepartmentId">Invoice Department ID <span *ngIf="!isIRPFlagEnabled" class="required">*</span></label>
         <div class="input-group">
           <input id="invoiceDepartmentId"
                   class="e-input"
@@ -321,6 +351,21 @@
       </div>
     </div>
 
+    <div *ngIf="isIRPFlagEnabled">
+      <div class="input-container">
+        <label for="skillDescription">Unit Description</label>
+        <ejs-textbox
+          name="skillDescription"
+          [multiline]="true"
+          formControlName="unitDescription"
+          class="text-box-fat"
+        ></ejs-textbox>
+        <span class="text-box-error" *ngIf="departmentsDetailsFormGroup.get('unitDescription')?.errors">
+          Unit description cannot be more than 2000 characters.
+        </span>
+      </div>
+    </div>
+
     <div>
       <div class="input-container calendar">
         <label for="inactiveDate">Inactive Date</label>
@@ -341,4 +386,9 @@
   </form>
 </app-side-dialog>
 
-<app-import-departments [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-import-departments>
+<app-import-departments
+  [dialogEvent]="importDialogEvent"
+  [isOrgUseIRPAndVMS]="isOrgUseIRPAndVMS"
+  [isInvoiceDepartmentIdFieldShow]="isInvoiceDepartmentIdFieldShow"
+  (reloadItemsList)="updatePage()">
+</app-import-departments>

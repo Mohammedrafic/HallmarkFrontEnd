@@ -16,6 +16,7 @@ export class Candidate {
   profileStatus: number;
   candidateAgencyStatus: number;
   candidateProfileSkills: JobDistributionMasterSkills[];
+  candidateProfileRegions?: string[];
 
   constructor(candidateForm: any) {
     this.agencyId = candidateForm.generalInfo.agencyId;
@@ -31,6 +32,8 @@ export class Candidate {
     this.profileStatus = candidateForm.generalInfo.profileStatus;
     this.candidateAgencyStatus = candidateForm.generalInfo.candidateAgencyStatus;
     this.candidateProfileSkills = candidateForm.generalInfo.candidateProfileSkills;
+    this.candidateProfileRegions = candidateForm.generalInfo.candidateProfileRegions
+
   }
 }
 

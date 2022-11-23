@@ -20,6 +20,7 @@ import { FiltersComponent } from './filters/filters.component';
 import { MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
+import { GridClassificationRendererComponent } from './candidate-grid/grid-classification-renderer/grid-classification-renderer.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
     CandidateGridComponent,
     GridStatusRendererComponent,
     GridNameRendererComponent,
+    GridClassificationRendererComponent,
     GridPositionRendererComponent,
     FiltersComponent,
   ],

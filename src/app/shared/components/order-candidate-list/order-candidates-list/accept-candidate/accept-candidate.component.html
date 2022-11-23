@@ -14,25 +14,33 @@
       </div>
       <div class="e-card-content">
         <div *ngIf="!isCancelled" class="status-actions">
-          <button *ngIf="showRejectButton" ejs-button cssClass="e-outline"
-            [disabled]="!actionsAllowed"
-            (click)="onReject()">Reject</button>
-          <button *ngIf="showWithdrawAction" ejs-button cssClass="e-outline"
-            [disabled]="!actionsAllowed"
-            (click)="onWithdraw()">Withdraw</button>
-          <button ejs-button [isPrimary]="true" *ngIf="showApplyAction" class="apply-button"
-            [disabled]="!actionsAllowed"
-            (click)="onApply()">Apply</button>
-          <button ejs-button [isPrimary]="true" *ngIf="showAccepteAction" class="apply-button"
-            [disabled]="!actionsAllowed"
-            (click)="onAccept()">Accept</button>
+          <app-tooltip-container [showToolTip]="!actionsAllowed">
+            <button *ngIf="showRejectButton" ejs-button cssClass="e-outline"
+                    [disabled]="!actionsAllowed"
+                    (click)="onReject()">Reject</button>
+          </app-tooltip-container>
+          <app-tooltip-container [showToolTip]="!actionsAllowed">
+            <button *ngIf="showWithdrawAction" ejs-button cssClass="e-outline"
+                    [disabled]="!actionsAllowed"
+                    (click)="onWithdraw()">Withdraw</button>
+          </app-tooltip-container>
+          <app-tooltip-container [showToolTip]="!actionsAllowed">
+            <button ejs-button [isPrimary]="true" *ngIf="showApplyAction" class="apply-button"
+                    [disabled]="!actionsAllowed"
+                    (click)="onApply()">Apply</button>
+          </app-tooltip-container>
+          <app-tooltip-container [showToolTip]="!actionsAllowed">
+            <button ejs-button [isPrimary]="true" *ngIf="showAccepteAction" class="apply-button"
+                    [disabled]="!actionsAllowed"
+                    (click)="onAccept()">Accept</button>
+          </app-tooltip-container>
         </div>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
     </div>
-    <app-deploy-candidate-message *ngIf="candidate.deployedCandidateInfo && !isOnboard" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
+    <app-deploy-candidate-message *ngIf="candidate.deployedCandidateInfo && !isOnboard" [isAgency]="isAgency" [candidateBasicInfo]="deployedCandidateOrderInfo"></app-deploy-candidate-message>
   </section>
   <section class="content-container">
     <div class="candidate-info">
@@ -72,6 +80,7 @@
                     <div class="input-group" [ngClass]="{'input-readonly': isApplied}">
                       <ejs-daterangepicker
                         formControlName="date"
+                        format="MM/dd/yyyy"
                         [readonly]="isApplied"
                         placeholder="DD/MM/YYYY - DD/MM/YYYY">
                       </ejs-daterangepicker>

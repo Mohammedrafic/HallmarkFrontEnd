@@ -1,10 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { GRID_CONFIG } from '@shared/constants';
-import {
-  GridReadyEvent,
-  GridOptions
-} from '@ag-grid-community/core';
+import { GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { AppState } from '../../../../../../store/app.state';
 import { Select } from '@ngxs/store';
 import { Observable } from 'rxjs/internal/Observable';
@@ -18,6 +15,7 @@ export class DocumentLibraryTableComponent extends AbstractGridConfigurationComp
 
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   @Input() gridOptions: GridOptions;
+  @Input() totalRecordsCount: number;
 
   @Output() onGridReadyEvent: EventEmitter<GridReadyEvent> = new EventEmitter<GridReadyEvent>();
   @Output() onGridPageSizeChanged = new EventEmitter<any>();

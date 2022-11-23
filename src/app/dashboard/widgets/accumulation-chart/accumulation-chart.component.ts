@@ -17,6 +17,9 @@ import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-com
 import { DashboardService } from '../../services/dashboard.service';
 import { WidgetLegengDataModel } from '../../models/widget-legend-data.model';
 import { LegendPositionEnum } from '../../enums/legend-position.enum';
+import { Store } from '@ngxs/store';
+import { UserState } from '../../../store/user.state';
+import { BusinessUnitType } from '../../../shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-accumulation-chart',
@@ -37,6 +40,7 @@ export class AccumulationChartComponent
   public legendData: WidgetLegengDataModel[] = [];
   public totalScore: number = 0;
   public legendPosition: LegendPositionEnum = LegendPositionEnum.Right;
+  public datalabel: Object;
 
   public readonly tooltipSettings: TooltipSettingsModel = {
     enable: true,
@@ -49,12 +53,17 @@ export class AccumulationChartComponent
 
   private readonly selectedEntries$: BehaviorSubject<string[] | null> = new BehaviorSubject<string[] | null>(null);
 
-  constructor(private readonly dashboardService: DashboardService) {
+  constructor(private readonly dashboardService: DashboardService, private store: Store) {
     super();
   }
 
   public redirectToSourceContent(): void {
-    this.dashboardService.redirectToUrl('client/order-management');
+    const user = this.store.selectSnapshot(UserState.user);
+    if (user?.businessUnitType != null && user?.businessUnitType == BusinessUnitType.Agency) {
+      this.dashboardService.redirectToUrl('agency/candidate-details');
+    } else {
+      this.dashboardService.redirectToUrl('client/order-management');
+    }
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -66,6 +75,7 @@ export class AccumulationChartComponent
   }
 
   public ngOnInit(): void {
+    this.datalabel = {visible: true };
     this.filteredChartData$ = this.getFilteredChartData();
   }
 

@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject } from 'rxjs';
 import {
@@ -14,11 +14,10 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
-import {
-  GetFeeSettingByOrganizationId,
-  RemoveFeeExceptionsById,
-} from '@shared/components/associate-list/store/associate.actions';
+import { TiersException } from '@shared/components/associate-list/store/associate.actions';
 import { AgencyStatus } from '@shared/enums/status';
+import { Permission } from "@core/interface";
+import { UserPermissions } from "@core/enums";
 
 @Component({
   selector: 'app-fee-settings',
@@ -31,8 +30,10 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
   @Input() form: FormGroup;
   @Input() areAgencyActionsAllowed: boolean;
   @Input() editAgencyOrg: AssociateOrganizationsAgency;
+  @Input() userPermission: Permission;
 
   public openAddNewFeeDialog = new Subject<number>();
+  public readonly userPermissions = UserPermissions;
   public editFeeData = new Subject<FeeExceptions>();
   public classificationValueAccess = (_: string, { classification }: FeeExceptions) => {
     return FeeSettingsClassification[classification];
@@ -77,14 +78,16 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter((confirm) => !!confirm))
-      .subscribe(() => this.store.dispatch(new RemoveFeeExceptionsById(data.id)));
+      .pipe(filter(Boolean))
+      .subscribe(() => {
+        this.store.dispatch(new TiersException.RemoveFeeExceptionsById(data.id))
+      });
   }
 
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
       this.store.dispatch(
-        new GetFeeSettingByOrganizationId(this.organizationAgencyId, this.currentPage, this.pageSize)
+        new TiersException.GetFeeSettingByOrganizationId(this.organizationAgencyId, this.currentPage, this.pageSize)
       );
     }
   }
@@ -117,7 +120,7 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
   private subscribeOnIdChanges(): void {
     this.form.get('id')?.valueChanges.subscribe((organizationAgencyId) => {
       this.organizationAgencyId = organizationAgencyId;
-      this.store.dispatch(new GetFeeSettingByOrganizationId(organizationAgencyId, this.currentPage, this.pageSize));
+      this.store.dispatch(new TiersException.GetFeeSettingByOrganizationId(organizationAgencyId, this.currentPage, this.pageSize));
     });
   }
 }

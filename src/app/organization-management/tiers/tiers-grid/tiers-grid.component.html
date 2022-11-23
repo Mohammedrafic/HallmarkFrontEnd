@@ -1,0 +1,14 @@
+<app-grid
+  (navigateToPageEmitter)="handleChangePage($event)"
+  (pageSizeChangeEmitter)="handleChangePageSize($event)"
+  (gridReadyEmitter)="gridReady($event)"
+  (dragRowEmitter)="rowDragEnd($event)"
+  [columnDefinitions]="columnDefinitions"
+  [rowData]="(tiersPage$ | async)?.items"
+  [isLoading]="isLoading"
+  [pageSize]="filters.pageSize"
+  [currentPage]="filters.pageNumber"
+  [totalRecordsCount]="(tiersPage$ | async)?.totalCount || 0"
+  [rowDragManaged]="true"
+  [suppressMoveWhenRowDragging]="true"
+></app-grid>

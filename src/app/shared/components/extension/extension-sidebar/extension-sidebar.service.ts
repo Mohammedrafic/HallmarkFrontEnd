@@ -5,6 +5,7 @@ import { catchError, Observable, of } from 'rxjs';
 import { ExtensionGridModel, ExtensionModel } from './models/extension.model';
 import { AppState } from '../../../../store/app.state';
 import { Store } from '@ngxs/store';
+import { DateTimeHelper } from '@core/helpers';
 
 @Injectable({
   providedIn: 'root',
@@ -88,15 +89,16 @@ export class ExtensionSidebarService {
   }
 
   private prepareExtension(extension: any): ExtensionModel {
-    const { orderId, startDate, endDate, billRate, billRates, comments, jobId } = extension || {};
+    const { orderId, startDate, endDate, billRate, billRates, comments, jobId, durationPrimary } = extension || {};
     return {
       jobId,
       orderId,
       billRate,
       billRates,
       comments,
-      actualStartDate: startDate,
-      actualEndDate: endDate,
+      actualStartDate: DateTimeHelper.setInitHours(startDate),
+      actualEndDate: DateTimeHelper.setInitHours(endDate),
+      duration: durationPrimary,
     };
   }
 }

@@ -5,7 +5,7 @@ import { ColDef } from '@ag-grid-enterprise/all-modules';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
 import { InvoiceDetail, InvoiceInfoUIItem } from '../interfaces';
-import { INVOICES_STATUSES, InvoiceState } from '../enums';
+import { INVOICES_STATUSES, InvoicesActionBtn, InvoiceState } from '../enums';
 
 const hallmarkName = 'Hallmark';
 
@@ -256,14 +256,14 @@ export const invoiceSummaryColumnDefs = (location: string): ColDef[] => [
   },
 ];
 
-export const ActionBtnOnStatus: Map<INVOICES_STATUSES, string> = new Map<INVOICES_STATUSES, string>()
-  .set(INVOICES_STATUSES.SUBMITED_PEND_APPR, 'Approve')
-  .set(INVOICES_STATUSES.PENDING_PAYMENT, 'Pay');
+export const ActionBtnOnStatus: Map<INVOICES_STATUSES, InvoicesActionBtn> = new Map<INVOICES_STATUSES, InvoicesActionBtn>()
+  .set(INVOICES_STATUSES.SUBMITED_PEND_APPR, InvoicesActionBtn.Approve)
+  .set(INVOICES_STATUSES.PENDING_PAYMENT, InvoicesActionBtn.Pay);
 
-export const AgencyActionBtnOnStatus: Map<INVOICES_STATUSES, string> = new Map<INVOICES_STATUSES, string>()
-  .set(INVOICES_STATUSES.SUBMITED_PEND_APPR, 'Pay')
-  .set(INVOICES_STATUSES.PENDING_PAYMENT, 'Pay');
+export const AgencyActionBtnOnStatus: Map<INVOICES_STATUSES, InvoicesActionBtn> = new Map<INVOICES_STATUSES, InvoicesActionBtn>()
+  .set(INVOICES_STATUSES.SUBMITED_PEND_APPR, InvoicesActionBtn.Pay)
+  .set(INVOICES_STATUSES.PENDING_PAYMENT, InvoicesActionBtn.Pay);
 
 export const NewStatusDependsOnAction: Map<string, InvoiceState> = new Map<string, InvoiceState>()
-  .set('Approve', InvoiceState.PendingPayment)
-  .set('Pay', InvoiceState.Paid);
+  .set(InvoicesActionBtn.Approve, InvoiceState.PendingPayment)
+  .set(InvoicesActionBtn.Pay, InvoiceState.Paid);

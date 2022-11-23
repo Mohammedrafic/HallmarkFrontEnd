@@ -1,3 +1,4 @@
+import { Duration } from '@shared/enums/durations';
 import { BillRate } from '@shared/models';
 
 export interface ExtensionModel {
@@ -8,6 +9,7 @@ export interface ExtensionModel {
   comments: string | null;
   billRates: BillRate[];
   jobId: number;
+  duration: Duration;
 }
 
 export interface ExtensionGridModel extends ExtensionModel {

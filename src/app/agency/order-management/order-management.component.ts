@@ -41,7 +41,6 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
 
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
-    this.store.dispatch(new GetAgencyFilterOptions());
   }
 
   public onExportSelected(event: any): void {

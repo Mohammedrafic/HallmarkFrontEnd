@@ -16,6 +16,7 @@ import { PendingInvoice, PendingInvoicesData } from '../interfaces/pending-invoi
 import { ChangeStatusData } from '../../timesheets/interface';
 import { PendingApprovalInvoice, PendingApprovalInvoicesData } from '../interfaces/pending-approval-invoice.interface';
 import { CurrentUserPermission } from '@shared/models/permission.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable()
 export class InvoicesApiService {
@@ -39,7 +40,7 @@ export class InvoicesApiService {
   public getInvoiceOrgReasons(orgId?: number | null): Observable<ManualInvoiceReason[]> {
     const endpoint = orgId ? `/api/ManualInvoiceRecords/creationreasons/organizations/${orgId}`
     : '/api/ManualInvoiceRecords/creationreasons';
-    return this.http.get<ManualInvoiceReason[]>(endpoint);
+    return this.http.get<ManualInvoiceReason[]>(endpoint).pipe(map((data) => sortByField(data, 'reason')));
   }
 
   public getManInvoiceMeta(orgId?: number): Observable<ManualInvoiceMeta[]> {

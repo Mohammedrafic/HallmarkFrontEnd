@@ -1,11 +1,16 @@
 <section class="container">
   <div class="toolbar-buttons">
-    <button
-      ejs-button
-      appHideBeforeSyncfusionLoad
-      [isPrimary]="true"
-      (click)="addReason()"
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!canRejectOrClosure">
+      <button
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        [isPrimary]="true"
+        [disabled]="!canRejectOrClosure"
+        (click)="addReason()"
       >Add {{ reasonsNavigationTabs.Penalties === selectedTab ? 'Penalties' : 'Reason' }}</button>
+    </app-tooltip-container>
   </div>
 
   <ejs-tab
@@ -15,7 +20,7 @@
       <e-tabitem>
         <ng-template #headerText><div>Candidate Rejection</div></ng-template>
         <ng-template #content>
-          <app-candidate-reject-reason (editReason)="onEdit($event)" [form]="form"></app-candidate-reject-reason>
+          <app-candidate-reject-reason [userPermission]="userPermission" (editReason)="onEdit($event)" [form]="form"></app-candidate-reject-reason>
         </ng-template>
       </e-tabitem>
 
@@ -33,10 +38,10 @@
         </ng-template>
       </e-tabitem>
 
-      <e-tabitem>
+      <e-tabitem *ngIf="userPermission[userPermissions.CanViewOrderClosureReasons] && userPermission[userPermissions.CanManageOrderClosureReasons]">
         <ng-template #headerText><div>Order Closure</div></ng-template>
         <ng-template #content>
-          <app-closure-reason (editReason)="onEdit($event)" [form]="form"></app-closure-reason>
+          <app-closure-reason [userPermission]="userPermission" (editReason)="onEdit($event)" [form]="form"></app-closure-reason>
         </ng-template>
       </e-tabitem>
 
@@ -51,6 +56,7 @@
 </section>
 
 <app-side-dialog
+  [disableSaveButton]="!canRejectOrClosure"
   header="{{ title }} {{ reasonsNavigationTabs.Penalties === selectedTab ? 'Penalties' : 'Reason' }}"
   (formSaveClicked)="saveReason()"
   (formCancelClicked)="closeDialog()"
@@ -77,6 +83,7 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             appValidateWithMessage
+            [allowFiltering]="true"
             [dataSource]="cancellationReasons"
             [fields]="optionFields"
             formControlName="reason">
@@ -93,7 +100,7 @@
                             selectAllText="Select All"
                             [fields]="optionFields"
                             [showSelectAll]="true"
-                            [allowFiltering]="false"
+                            [allowFiltering]="true"
                             [showDropDownIcon]="true"
                             [dataSource]="regions">
           </ejs-multiselect>
@@ -111,7 +118,7 @@
                             selectAllText="Select All"
                             [fields]="optionFields"
                             [showSelectAll]="true"
-                            [allowFiltering]="false"
+                            [allowFiltering]="true"
                             [showDropDownIcon]="true"
                             [dataSource]="locations">
             <ng-template #itemTemplate="" let-data="">

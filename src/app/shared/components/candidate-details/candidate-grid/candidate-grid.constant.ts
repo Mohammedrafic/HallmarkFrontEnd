@@ -4,6 +4,7 @@ import { JobClassification } from '@shared/enums/job-classification';
 import { GridNameRendererComponent } from '@shared/components/candidate-details/candidate-grid/grid-name-renderer/grid-name-renderer.component';
 import { GridPositionRendererComponent } from '@shared/components/candidate-details/candidate-grid/grid-position-renderer/grid-position-renderer.component';
 import { CandidatesDetailsModel } from '@shared/components/candidate-details/models/candidate.model';
+import { GridClassificationRendererComponent } from './grid-classification-renderer/grid-classification-renderer.component';
 
 const valueHelper = new GridHelper();
 
@@ -24,11 +25,10 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
       sortable: true,
     },
     {
-      field: 'classification',
+      field: 'classifications',
       headerName: 'CLASSIFICATION',
       width: 170,
-      valueFormatter: (params: { data: CandidatesDetailsModel }) =>
-        `${JobClassification[params.data.classification] ?? ''}`,
+      cellRenderer: GridClassificationRendererComponent,
       sortable: true,
     },
     {

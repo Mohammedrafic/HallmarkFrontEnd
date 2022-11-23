@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { CandidateList } from '../types/candidate-list.model';
-import { Action, State, StateContext, Selector } from '@ngxs/store';
+import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { catchError, Observable, tap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ShowToast } from '../../../../store/app.actions';
+import { ShowToast } from 'src/app/store/app.actions';
+import { getAllErrors } from '@shared/utils/error.utils';
 import { MessageTypes } from '@shared/enums/message-types';
 import { CandidateListService } from '../services/candidate-list.service';
 import {
@@ -11,6 +12,7 @@ import {
   ExportCandidateList,
   GetAllSkills,
   GetCandidatesByPage,
+  GetRegionList
 } from './candidate-list.actions';
 import { ListOfSkills } from '@shared/models/skill.model';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
@@ -19,6 +21,7 @@ export interface CandidateListStateModel {
   isCandidateLoading: boolean;
   candidateList: CandidateList | null;
   listOfSkills: ListOfSkills[] | null;
+  listOfRegions: string[] | null;
 }
 
 @State<CandidateListStateModel>({
@@ -27,6 +30,7 @@ export interface CandidateListStateModel {
     isCandidateLoading: false,
     candidateList: null,
     listOfSkills: null,
+    listOfRegions: null
   },
 })
 @Injectable()
@@ -39,6 +43,11 @@ export class CandidateListState {
   @Selector()
   static listOfSkills(state: CandidateListStateModel): ListOfSkills[] | null {
     return state.listOfSkills;
+  }
+
+  @Selector()
+  static listOfRegions(state: CandidateListStateModel): string[] | null {
+    return state.listOfRegions
   }
   constructor(private candidateListService: CandidateListService) {}
 
@@ -62,15 +71,17 @@ export class CandidateListState {
 
   @Action(GetAllSkills)
   GetAllSkills({ patchState }: StateContext<CandidateListStateModel>): Observable<ListOfSkills[]> {
-    return this.candidateListService.getAllSkills().pipe(tap((data) => patchState({ listOfSkills: data })));
+    return this.candidateListService.getAllSkills().pipe(tap((data) => patchState({ listOfSkills: data.map(({id, masterSkillId, skillDescription}) => ({id, masterSkillId, name: skillDescription})) })));
   }
 
   @Action(ChangeCandidateProfileStatus)
   ChangeCandidateProfileStatus(
-    { patchState }: StateContext<CandidateListStateModel>,
+    { dispatch }: StateContext<CandidateListStateModel>,
     { candidateProfileId, profileStatus }: ChangeCandidateProfileStatus
-  ): Observable<any> {
-    return this.candidateListService.changeCandidateStatus(candidateProfileId, profileStatus);
+  ): Observable<void> {
+    return this.candidateListService.changeCandidateStatus(candidateProfileId, profileStatus).pipe(
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
+    );
   }
 
   @Action(ExportCandidateList)
@@ -81,5 +92,14 @@ export class CandidateListState {
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
       })
     );
+  }
+
+  @Action(GetRegionList)
+  GetRegionList({patchState}: StateContext<CandidateListStateModel>): Observable<string[]> {
+    return this.candidateListService.getRegions().pipe(tap((data)=> {
+      patchState({
+        listOfRegions: data
+      })
+    }))
   }
 }

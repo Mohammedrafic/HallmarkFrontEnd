@@ -1,0 +1,20 @@
+:host {
+  .e-btn {
+    padding: 6px 6px;
+
+    &:disabled {
+      background-color: transparent !important;
+      opacity: 0.6;
+    }
+  }
+
+  button.grid-actions-cell-item {
+    display: flex;
+    align-items: center;
+
+    .grid-actions-cell-item-title {
+      font-weight: 700;
+    }
+  }
+}
+

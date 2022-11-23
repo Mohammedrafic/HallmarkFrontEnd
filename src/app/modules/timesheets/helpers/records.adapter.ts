@@ -24,7 +24,10 @@ export class RecordsAdapter {
     type: RecordFields,
     ): AddRecordDto {
     data.timeIn = DateTimeHelper.toUtcFormat(data.timeIn);
-    data.timeIn = this.getDateFromParts(DateTimeHelper.toUtcFormat(data.day!), data.timeIn);
+
+    if (data.day) {
+      data.timeIn = this.getDateFromParts(DateTimeHelper.toUtcFormat(data.day), data.timeIn);
+    }
 
     if (data.timeOut) {
       data.timeOut = RecordsAdapter.checkTimeOutDate(data.timeIn, data.timeOut);

@@ -3,12 +3,12 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { OrderApplicantsApplyData, OrderApplicantsInitialData } from "@shared/models/order-applicants.model";
+import { OrderApplicantsApplyData, OrderApplicantsInitialData } from '@shared/models/order-applicants.model';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderApplicantsService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Get the order applicants data
@@ -17,11 +17,14 @@ export class OrderApplicantsService {
    * @param candidateId
    * @return Order Applicants Initial Data
    */
-  public getOrderApplicantsData(orderId: number, organizationId: number, candidateId: number): Observable<OrderApplicantsInitialData> {
-    return this.http.get<OrderApplicantsInitialData>(
-      `/api/OrderApplicants/initialData`,
-      { params: { OrderId: orderId, OrganizationId: organizationId, CandidateId: candidateId }}
-    );
+  public getOrderApplicantsData(
+    orderId: number,
+    organizationId: number,
+    candidateId: number
+  ): Observable<OrderApplicantsInitialData> {
+    return this.http.get<OrderApplicantsInitialData>(`/api/OrderApplicants/initialData`, {
+      params: { OrderId: orderId, OrganizationId: organizationId, CandidateId: candidateId },
+    });
   }
 
   /**
@@ -29,5 +32,15 @@ export class OrderApplicantsService {
    */
   public applyOrderApplicants(order: OrderApplicantsApplyData): Observable<never> {
     return this.http.post<never>(`/api/OrderApplicants/apply`, order);
+  }
+
+  public getDeployedCandidateOrderInfo(
+    orderId: number,
+    candidateProfileId: number,
+    organizationId: number
+  ): Observable<DeployedCandidateOrderInfo[]> {
+    return this.http.get<DeployedCandidateOrderInfo[]>('/api/OrderApplicants/overlappingorders', {
+      params: { orderId, candidateProfileId, organizationId },
+    });
   }
 }

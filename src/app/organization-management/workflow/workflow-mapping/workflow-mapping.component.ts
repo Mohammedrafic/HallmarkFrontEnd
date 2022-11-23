@@ -1,5 +1,4 @@
 import { Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { combineLatest, filter, first, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -9,7 +8,7 @@ import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@ang
 import { OrganizationManagementState } from '../../store/organization-management.state';
 import { Region } from '@shared/models/region.model';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
+import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { Skill } from '@shared/models/skill.model';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -23,7 +22,7 @@ import {
   GetWorkflowsSucceed,
   RemoveWorkflowMapping,
   SaveWorkflowMapping,
-  SaveWorkflowMappingSucceed,
+  SaveWorkflowMappingSucceed
 } from '../../store/workflow.actions';
 import { UserState } from '../../../store/user.state';
 import { User } from '@shared/models/user-managment-page.model';
@@ -35,21 +34,18 @@ import {
   StepRoleUser,
   UsersByPermission,
   WorkflowMappingPage,
-  WorkflowMappingPost,
+  WorkflowMappingPost
 } from '@shared/models/workflow-mapping.model';
 import { WorkflowType } from '@shared/enums/workflow-type';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
-import {
-  OrganizationDepartment,
-  OrganizationLocation,
-  OrganizationRegion,
-  OrganizationStructure,
-} from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { isEmpty } from 'lodash';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 type RoleWithUserModel = { [key: number]: { [workflowType: number]: RoleWithUser[] } };
 type WorkflowAsKeyModel = { [key: number]: (UsersByPermission | RolesByPermission)[] };
@@ -60,7 +56,7 @@ type WorkflowAsKeyModel = { [key: number]: (UsersByPermission | RolesByPermissio
   styleUrls: ['./workflow-mapping.component.scss'],
   providers: [DetailRowService, MaskedDateTimeService],
 })
-export class WorkflowMappingComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class WorkflowMappingComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('regionDropdown') regionDropdown: MultiSelectComponent;
   @ViewChild('locationDropdown') locationDropdown: MultiSelectComponent;
@@ -81,7 +77,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   public departments: OrganizationDepartment[] = [];
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
 
-  @Select(OrganizationManagementState.allOrganizationSkills)
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
   skills$: Observable<Skill[]>;
   skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
   public allSkills: Skill[] = [];
@@ -90,7 +86,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   public workflowGroupTypesData = [{ id: WorkflowGroupType.Organization, text: this.jobOrderWorkflow }];
   public workflowGroupTypesFields: FieldSettingsModel = { text: 'text', value: 'id' };
 
-  @Select(WorkflowState.workflows)
+  @Select(WorkflowState.sortedWorkflows)
   workflows$: Observable<WorkflowWithDetails[]>;
   public workflows: WorkflowWithDetails[];
 
@@ -146,13 +142,13 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   };
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private actions$: Actions,
     private filterService: FilterService,
     @Inject(FormBuilder) private builder: FormBuilder,
     private confirmService: ConfirmService
   ) {
-    super();
+    super(store);
     this.formBuilder = builder;
     this.createWorkflowMappingFormGroup();
     this.WorkflowFilterFormGroup = this.formBuilder.group({
@@ -165,7 +161,9 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     });
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
+
     this.filterColumns = {
       regionIds: {
         type: ControlTypes.Multiselect,
@@ -214,7 +212,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.currentPage = 1;
       this.clearFilters();
-      this.store.dispatch(new GetAllOrganizationSkills());
+      this.store.dispatch(new GetAssignedSkillsByOrganization());
       this.store.dispatch(new GetWorkflowMappingPages(this.filters));
       this.store.dispatch(new GetRolesForWorkflowMapping());
       this.store.dispatch(new GetUsersForWorkflowMapping());
@@ -258,11 +256,12 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
     this.workflowMappingFormGroup.get('regions')?.valueChanges.subscribe((regionIds: number[]) => {
       if (regionIds && regionIds.length > 0) {
-        this.locations = [];
+        const locations: OrganizationLocation[] = [];
         regionIds.forEach((id) => {
           const selectedRegion = this.orgRegions.find((region) => region.id === id);
-          this.locations.push(...(selectedRegion?.locations as any));
+          locations.push(...(selectedRegion?.locations as any));
         });
+        this.locations = sortByField(locations, 'name');
         this.departments = [];
         this.locations.forEach((location) => {
           this.departments.push(...location.departments);
@@ -288,13 +287,15 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.WorkflowFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = [];
+        const locations: OrganizationLocation[] = [];
         val.forEach((id) =>
           selectedRegions.push(this.allRegions.find((region) => region.id === id) as OrganizationRegion)
         );
         this.filterColumns.locationIds.dataSource = [];
         selectedRegions.forEach((region) => {
-          this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
+          locations.push(...(region.locations as []));
         });
+        this.filterColumns.locationIds.dataSource = sortByField(locations, 'name');
       } else {
         this.filterColumns.locationIds.dataSource = [];
         this.WorkflowFilterFormGroup.get('locationIds')?.setValue([]);
@@ -305,6 +306,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.WorkflowFilterFormGroup.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = [];
+        const departments: OrganizationDepartment[] = [];
         val.forEach((id) =>
           selectedLocations.push(
             this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)
@@ -312,8 +314,9 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
         );
         this.filterColumns.departmentsIds.dataSource = [];
         selectedLocations.forEach((location) => {
-          this.filterColumns.departmentsIds.dataSource.push(...(location.departments as []));
+          departments.push(...(location.departments as []));
         });
+        this.filterColumns.departmentsIds.dataSource = sortByField(departments, 'name');
       } else {
         this.filterColumns.departmentsIds.dataSource = [];
         this.WorkflowFilterFormGroup.get('departmentsIds')?.setValue([]);
@@ -330,11 +333,12 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
     this.workflowMappingFormGroup.get('locations')?.valueChanges.subscribe((locationIds: number[]) => {
       if (locationIds && locationIds.length > 0) {
-        this.departments = [];
+        const departments: OrganizationDepartment[] = [];
         locationIds.forEach((id) => {
           const selectedLocation = this.locations.find((location) => location.id === id);
-          this.departments.push(...(selectedLocation?.departments as []));
+          departments.push(...(selectedLocation?.departments as []));
         });
+        this.departments = sortByField(departments, 'name');
       } else {
         this.departments = [];
       }
@@ -703,7 +707,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       if (foundMatchedSteps.length) {
         foundMatchedSteps.forEach((foundMatchedStep: StepMapping) => {
           if (foundMatchedStep.workflowStepId) {
-            const foundUserRole = this.rolesWithUsers[foundMatchedStep.workflowType!]?.[step.type].find(
+            const foundUserRole = this.rolesWithUsers[foundMatchedStep.workflowType!]?.[step.type]?.find(
               (r: RoleWithUser) => r.id === foundMatchedStep?.userId || r.id === foundMatchedStep?.roleId?.toString()
             );
             if (foundUserRole) {

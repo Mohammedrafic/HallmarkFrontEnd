@@ -65,11 +65,13 @@
         <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
           <e-tabitems>
             <e-tabitem>
-              <ng-template #headerText>Order Details</ng-template>
+              <ng-template #headerText>{{isReorderType ? 'Re-Order Details' : 'Order Details'}}</ng-template>
               <ng-template #content>
                 <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">
-                  <section class="job-details">
-                    <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
+                  <section class="job-details" [ngSwitch]="currentOrder?.orderType">
+                    <app-general-order-per-diem-info *ngSwitchCase="orderType.OpenPerDiem" [orderInformation]="currentOrder"></app-general-order-per-diem-info>
+                    <app-general-reorder-info *ngSwitchCase="orderType.ReOrder" [orderInformation]="currentOrder"></app-general-reorder-info>
+                    <app-general-order-info *ngSwitchDefault [orderInformation]="currentOrder"></app-general-order-info>
                   </section>
                   <hr />
                   <ng-container *ngIf="isClosedOrder">
@@ -104,6 +106,7 @@
                         (closeModalEvent)="onClose()"
                         [orderDuration]="(selectedOrder$ | async)?.duration!"
                         [actionsAllowed]="agencyActionsAllowed"
+                        [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
                       ></app-onboarded-candidate>
                       <section *ngIf="isReorderType">
                         <ng-container *ngTemplateOutlet="acceptFormSection"></ng-container>
@@ -117,7 +120,8 @@
                         [isTab]="true"
                         (closeModalEvent)="onClose()"
                         [isAgency]="isAgency"
-                        [actionsAllowed]="agencyActionsAllowed"
+                        [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
+                        [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
                       ></app-accept-candidate>
                       <section *ngIf="isReorderType">
                         <ng-container *ngTemplateOutlet="acceptFormSection"></ng-container>
@@ -130,7 +134,8 @@
                         [candidate]="$any(candidate)"
                         [order]="$any(selectedOrder$ | async)"
                         [isTab]="true"
-                        [actionsAllowed]="agencyActionsAllowed"
+                        [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
+                        [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
                       >
                       </app-apply-candidate>
                     </ng-container>
@@ -140,6 +145,7 @@
                         [candidate]="$any(candidate)"
                         [isTab]="true"
                         [actionsAllowed]="agencyActionsAllowed"
+                        [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
                       ></app-offer-deployment>
                     </ng-container>
 
@@ -152,7 +158,7 @@
                         [isTab]="true"
                         appUnsavedForm
                         [dialogEvent]="$any(openEvent)"
-                        [actionsAllowed]="agencyActionsAllowed"
+                        [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
                         [currentOrder]="order"
                       >
                       </app-extension-candidate>
@@ -240,6 +246,7 @@
         <div class="e-card-content button-container" *ngIf="isOnboard && !isAgency">
           <div class="input-group dropdown bootstrap input-readonly">
             <ejs-dropdownlist
+              [allowFiltering]="true"
               [fields]="optionFields"
               [formControl]="jobStatusControl"
               [dataSource]="nextApplicantStatuses"

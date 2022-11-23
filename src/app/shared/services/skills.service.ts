@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import {
+  AssignedSkillsByOrganization,
+  AssignedSkillTree,
   ListOfSkills,
   MasterSkillByOrganization,
   MasterSkillDataSources,
@@ -10,9 +12,12 @@ import {
   Skill,
   SkillDataSource,
   SkillFilters,
-  SkillsPage,
+  SkillsPage
 } from '@shared/models/skill.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { GRID_CONFIG } from '@shared/constants';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { sortBy } from '@shared/helpers/sort-array.helper';
 
 @Injectable({ providedIn: 'root' })
 export class SkillsService {
@@ -23,7 +28,7 @@ export class SkillsService {
    * @return skills page
    */
   public getAllMasterSkills(): Observable<SkillsPage> {
-    return this.http.get<SkillsPage>(`/api/masterSkills`, { params: { PageNumber: 1, PageSize: 100 } });
+    return this.http.get<SkillsPage>(`/api/masterSkills`, { params: { PageNumber: GRID_CONFIG.initialPage, PageSize: GRID_CONFIG.initialRowsPerPage } });
   }
 
   /**
@@ -31,7 +36,7 @@ export class SkillsService {
    * @return list of master skills
    */
   public getAllMasterSkillsArray(): Observable<ListOfSkills[]> {
-    return this.http.get<ListOfSkills[]>('/api/MasterSkills/listByActiveBusinessUnit');
+    return this.http.get<ListOfSkills[]>('/api/MasterSkills/listByActiveBusinessUnit').pipe(map((data) => sortByField(data, 'name')));
   }
 
   /**
@@ -54,7 +59,8 @@ export class SkillsService {
    * @return list of master skills by organization
    */
   public getMasterSkillsByOrganization(): Observable<MasterSkillByOrganization[]> {
-    return this.http.get<MasterSkillByOrganization[]>(`/api/masterSkills/listByOrganization`);
+    return this.http.get<MasterSkillByOrganization[]>(`/api/masterSkills/listByOrganization`).pipe(map((data) => sortByField(data, 'name')
+));
   }
 
   /**
@@ -139,7 +145,9 @@ export class SkillsService {
    * @return list of skill descriptions, abbrs, GL numbers
    */
   public getSkillsDataSources(): Observable<SkillDataSource> {
-    return this.http.get<SkillDataSource>(`/api/AssignedSkills/getAvailableData`);
+    return this.http
+      .get<SkillDataSource>(`/api/AssignedSkills/getAvailableData`)
+      .pipe(map((data) => Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortBy(value)]))));
   }
 
   /**
@@ -147,7 +155,7 @@ export class SkillsService {
    * @return list of master skills
    */
   public getAllOrganizationSkills(): Observable<Skill[]> {
-    return this.http.get<Skill[]>(`/api/AssignedSkills/all`);
+    return this.http.get<Skill[]>(`/api/AssignedSkills/all`).pipe(map((data) => sortByField(data, 'skillDescription')));
   }
 
   /**
@@ -155,6 +163,24 @@ export class SkillsService {
    * @return list of master skills filtering options
    */
   public getMasterSkillsDataSources(): Observable<MasterSkillDataSources> {
-    return this.http.get<MasterSkillDataSources>(`/api/masterSkills/filteringOptions`);
+    return this.http.get<MasterSkillDataSources>(`/api/masterSkills/filteringOptions`).pipe(
+      map((data) => ({
+        skillCategories: sortByField(data.skillCategories, 'name'),
+        skillAbbreviations: sortBy(data.skillAbbreviations),
+        skillDescriptions: sortBy(data.skillDescriptions),
+      }))
+    );
+  }
+
+  public getAssignedSkillsTree(): Observable<AssignedSkillTree> {
+    return this.http.get<AssignedSkillTree>('/api/AssignedSkills/assignedSkillsTree');
+  }
+
+  public saveAssignedSkillValue(treeValue: number[]): Observable<number[]> {
+    return this.http.put<number[]>(`/api/AssignedSkills/assignSkills`, treeValue);
+  }
+
+  public getAssignedSkillsByOrganization(): Observable<AssignedSkillsByOrganization[]> {
+    return this.http.get<AssignedSkillsByOrganization[]>(`/api/AssignedSkills/assignedSkillsForCurrentBusinessUnit`).pipe(map((data) => sortByField(data, 'skillDescription')));
   }
 }

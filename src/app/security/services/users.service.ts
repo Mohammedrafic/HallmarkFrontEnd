@@ -7,9 +7,10 @@ import {
   UserVisibilitySettingBody,
   UserVisibilitySettingsPage,
 } from '@shared/models/visibility-settings.model';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { RolesPerUser, User, UserDTO, UsersPage } from '@shared/models/user-managment-page.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable({
   providedIn: 'root',
@@ -55,7 +56,7 @@ export class UsersService {
     FilterModel: any,
     GetAll:boolean
   ): Observable<UsersPage> {
-    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel ,GetAll});
+    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel ,GetAll}).pipe(map((data) => ({ ...data, items: sortByField(data.items, 'fullName')})));
   }
 
   /**
@@ -116,8 +117,33 @@ export class UsersService {
    * @param userId
    * @return UserVisibilitySettingsPage
    */
-  public getUserVisibilitySettingsOrganisation(userId: string): Observable<Organisation[]> {
-    return this.http.get<Organisation[]>(`/api/Organizations/structure/All/${userId}`);
+   public getUserVisibilitySettingsOrganisation(userId: string): Observable<Organisation[]> {
+    return this.http
+      .get<Organisation[]>(`/api/Organizations/structure/All/${userId}`)
+      .pipe(
+        map((organizations) =>
+          sortByField(organizations, 'name').map((org) => ({
+            ...org,
+            regions: sortByField(org.regions, 'name').map((region) => ({
+              ...region,
+              organizationId: org.organizationId,
+              regionId: region.id,
+              locations: sortByField(region.locations, 'name').map((location) => ({
+                ...location,
+                organizationId: org.organizationId,
+                regionId: region.id,
+                locationId: location.id,
+                departments: sortByField(location.departments, 'name').map((department) => ({
+                  ...department,
+                  organizationId: org.organizationId,
+                  regionId: region.id,
+                  locationId: location.id,
+                })),
+              })),
+            })),
+          }))
+        )
+      );
   }
 
   /**
@@ -126,5 +152,9 @@ export class UsersService {
    */
   public export(payload: ExportPayload): Observable<Blob> {
     return this.http.post(`/api/Users/export`, payload, { responseType: 'blob' });
+  }
+
+  public resendWelcomeEmail(userId: string): Observable<void> {
+    return this.http.post<void>('/api/Users/resendwelcomeemail', { userId });
   }
 }

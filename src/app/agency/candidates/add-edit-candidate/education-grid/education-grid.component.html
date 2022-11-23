@@ -4,7 +4,7 @@
       <h3>Education</h3>
     </div>
     <div class="actions">
-      <button ejs-button *ngIf="!readonlyMode" [disabled]="!areAgencyActionsAllowed" class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Education</button>
+      <button ejs-button *ngIf="!readonlyMode" [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditEducation]" class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Education</button>
     </div>
   </div>
   <ejs-grid #grid class="e-gridwithheader"
@@ -23,7 +23,7 @@
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" [disabled]="!areAgencyActionsAllowed" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></button>
-            <button ejs-button cssClass="e-flat secondary-icon-button enabled-button" [disabled]="!areAgencyActionsAllowed" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></button>
+            <button ejs-button cssClass="e-flat secondary-icon-button enabled-button" [disabled]="!areAgencyActionsAllowed || !userPermission[userPermissions.CanEditEducation]" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></button>
           </div>
         </ng-template>
       </e-column>
@@ -38,6 +38,7 @@
 </section>
 
 <app-side-dialog header="{{ title }} Education"
+                 [disableSaveButton]="!userPermission[userPermissions.CanEditEducation]"
                  (formCancelClicked)="closeDialog()"
                  (formSaveClicked)="saveEducation()">
   <form class="education-form-dialog form-container bootstrap"
@@ -50,6 +51,7 @@
                           [fields]="optionFields"
                           formControlName="degree"
                           appValidateWithMessage
+                          [allowFiltering]="true"
                           [dataSource]="degreeTypes">
         </ejs-dropdownlist>
       </div>

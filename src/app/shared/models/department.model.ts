@@ -10,6 +10,9 @@ export class Department {
   facilityEmail: string;
   facilityPhoneNo: string;
   inactiveDate: string;
+  unitDescription: string;
+  includeInIRP?: boolean;
+  locationIncludeInIRP?: boolean;
 }
 
 export type DepartmentsPage = PageOfCollections<Department>;
@@ -26,6 +29,7 @@ export class DepartmentFilter {
   departmentNames?: string[];
   facilityContacts?: string[];
   facilityEmails?: string[];
+  includeInIRP?: string;
   inactiveDate?: Date;
   orderBy?: string;
   pageSize?: number;
@@ -38,6 +42,7 @@ export class DepartmentFilterOptions {
   departmentNames: string[];
   facilityContacts: string[];
   facilityEmails: string[];
+  includeInIRP?: string[];
 }
 
 export type ImportedDepartment = {
@@ -54,7 +59,8 @@ export type ImportedDepartment = {
   errorProperties: string[];
 }
 export class DepartmentsByLocationsFilter {
-  ids?: number[];  
+  ids?: number[];
+  businessUnitIds?:number[];
   orderBy?: string;
   pageSize?: number;
   pageNumber?: number;

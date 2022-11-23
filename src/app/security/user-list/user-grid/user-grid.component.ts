@@ -1,48 +1,33 @@
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  ViewChild,
-  ViewEncapsulation,
-} from '@angular/core';
-import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { DatePipe, formatDate } from '@angular/common';
 import { FormGroup } from '@angular/forms';
-import { Role, RolesFilters, RolesPage } from '@shared/models/roles.model';
-import { GRID_CONFIG } from '@shared/constants';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { Select, Store } from '@ngxs/store';
-import { SecurityState } from '../../store/security.state';
+
+import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
+import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
+import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
 import { map, Observable, Subject, takeWhile } from 'rxjs';
-import { ExportUserList, GetRolesPage, GetUsersPage } from '../../store/security.actions';
-import { CreateUserStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
-import { User, UsersPage } from '@shared/models/user-managment-page.model';
-import { UserState } from '../../../store/user.state';
+import { Select, Store } from '@ngxs/store';
+
+import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
+import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
+import { GRID_CONFIG } from '@shared/constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { CreateUserStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
+import { ButtonRenderedEvent } from '@shared/models/button.model';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { Role, RolesFilters, RolesPage } from '@shared/models/roles.model';
+import { User, UsersPage } from '@shared/models/user-managment-page.model';
 import { ShowExportDialog } from '../../../store/app.actions';
-import { DatePipe } from '@angular/common';
-import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
-import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
-import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
-import {
-  ColDef,
-  GridReadyEvent,
-  IServerSideDatasource,
-  IServerSideGetRowsRequest,
-  PaginationChangedEvent,
-} from '@ag-grid-enterprise/all-modules';
-import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { AppState } from '../../../store/app.state';
-
-enum Visibility {
-  Unassigned,
-  Assigned,
-}
+import { UserState } from '../../../store/user.state';
+import { ExportUserList, GetRolesPage, GetUsersPage, ResendWelcomeEmail } from '../../store/security.actions';
+import { SecurityState } from '../../store/security.state';
+import { Visibility } from './user-grid.enum';
+import { ColDef } from '@ag-grid-community/core';
+import { TypedValueGetterParams } from 'src/app/modules/invoices/interfaces/typed-col-def.interface';
+import { AutoGroupColDef, DefaultUserGridColDef, SideBarConfig, UserListExportOptions } from './user-grid.constant';
 
 @Component({
   selector: 'app-user-grid',
@@ -73,23 +58,16 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     return Visibility[Number(assigned)];
   };
 
-  public columnsToExport: ExportColumn[] = [
-    { text: 'First Name', column: 'FirstName' },
-    { text: 'Last Name', column: 'LastName' },
-    { text: 'Status', column: 'Status' },
-    { text: 'Email', column: 'Email' },
-    { text: 'Role', column: 'Role' },
-    { text: 'Business', column: 'Business' },
-    { text: 'Visibility', column: 'Visibility' },
-  ];
+  public columnsToExport = UserListExportOptions;
   public fileName: string;
   public defaultFileName: string;
   public readonly statusEnum = CreateUserStatus;
   public readonly visibilityEnum = Visibility;
   public isAgencyUser = false;
+  public totalRecordsCount: number;
   private isAlive = true;
   itemList: Array<User> | undefined;
-  private gridApi: any;
+  public gridApi: any;
   private gridColumnApi: any;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   rowModelType: any;
@@ -99,12 +77,12 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   pagination: boolean;
   paginationPageSize: number;
 
-  defaultColDef: any;
-  autoGroupColumnDef: any;
-  columnDefs: any;
+  defaultColDef: ColDef = DefaultUserGridColDef;
+  autoGroupColumnDef: ColDef = AutoGroupColDef;
+  columnDefs: ColDef[];
   filterText: string | undefined;
   frameworkComponents: any;
-  sideBar: any;
+  sideBar = SideBarConfig;
   serverSideStoreType: any;
   maxBlocksInCache: any;
   filters: RolesFilters;
@@ -121,13 +99,14 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     (this.serverSideInfiniteScroll = true), (this.serverSideFilterOnServer = true), (this.pagination = true);
     (this.paginationPageSize = this.pageSize), (this.cacheBlockSize = this.pageSize);
     this.maxBlocksInCache = 1;
+
     this.columnDefs = [
       {
         headerName: 'Action',
         cellRenderer: 'buttonRenderer',
         cellRendererParams: {
-          onClick: this.onEdit.bind(this),
-          label: 'Edit',
+          onClick: this.handleUserGridAction.bind(this),
+          label: 'Edit Mail',
         },
         width: 50,
         pinned: 'left',
@@ -167,6 +146,9 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         headerName: 'Status',
         field: 'isDeleted',
         width: 50,
+        /**
+         * TODO: rework with arrow fn, remove self.
+         */
         valueGetter: function (params: { data: { isDeleted: boolean } }) {
           return self.statusEnum[+!params.data.isDeleted];
         },
@@ -191,6 +173,9 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         filter: 'agSetColumnFilter',
         filterParams: {
           values: (params: { success: (arg0: any) => void }) => {
+            /**
+             * TODO: remove setTimeout.
+             */
             setTimeout(() => {
               this.rolesPage$.subscribe((data) => {
                 params.success(
@@ -207,6 +192,9 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
       },
       {
         field: 'organization',
+        /**
+         * TODO: rework with arrow fn.
+         */
         valueGetter: function (params: { data: { businessUnitName: string } }) {
           return params.data.businessUnitName || 'All';
         },
@@ -216,64 +204,27 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         headerName: 'Visibility',
         field: 'hasVisibility',
         hide: this.isAgencyUser,
+        /**
+         * TODO: rework with arrow fn.
+         */
         valueGetter: function (params: { data: { hasVisibility: boolean } }) {
           return self.visibilityEnum[params.data.hasVisibility ? 0 : 1];
         },
         filter: false,
         sortable: false,
       },
+      {
+        headerName: 'Last Login Date',
+        field: 'lastLoginDate',
+        filter: false,
+        valueGetter: (params: TypedValueGetterParams<User>) => {
+          if (params.data.lastLoginDate) {
+            return formatDate(params.data.lastLoginDate, 'MM/dd/YYYY', 'en-US');
+          }
+          return '';
+        },
+      },
     ];
-
-    this.defaultColDef = {
-      flex: 2,
-      minWidth: 120,
-      resizable: true,
-      sortable: true,
-      filter: true,
-    };
-
-    this.autoGroupColumnDef = {
-      flex: 1,
-      minWidth: 280,
-      field: 'name',
-    };
-
-    this.sideBar = {
-      toolPanels: [
-        {
-          id: 'columns',
-          labelDefault: 'Columns',
-          labelKey: 'columns',
-          iconKey: 'columns',
-          toolPanel: 'agColumnsToolPanel',
-          toolPanelParams: {
-            suppressRowGroups: true,
-            suppressValues: true,
-            suppressPivots: true,
-            suppressPivotMode: true,
-            suppressColumnFilter: true,
-            suppressColumnSelectAll: true,
-            suppressColumnExpandAll: true,
-          },
-        },
-        {
-          id: 'filters',
-          labelDefault: 'Filters',
-          labelKey: 'filters',
-          iconKey: 'filters',
-          toolPanel: 'agFiltersToolPanel',
-          toolPanelParams: {
-            suppressRowGroups: true,
-            suppressValues: true,
-            suppressPivots: true,
-            suppressPivotMode: true,
-            suppressColumnFilter: true,
-            suppressColumnSelectAll: true,
-            suppressColumnExpandAll: true,
-          },
-        },
-      ],
-    };
   }
 
   public noRowsOverlayComponent: any = CustomNoRowsOverlayComponent;
@@ -294,8 +245,12 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.isAlive = false;
   }
 
-  public onEdit(data: any): void {
-    this.editUserEvent.emit(data?.rowData);
+  public handleUserGridAction(data: ButtonRenderedEvent): void {
+    if (data.btnName === 'edit') {
+      this.editUser(data);
+    } else {
+      this.resendWelcomeEmail(data);
+    }
   }
 
   public rowDataBound(args: RowDataBoundEventArgs): void {
@@ -368,6 +323,14 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
       var datasource = this.createServerSideDatasource();
       this.gridApi.setServerSideDatasource(datasource);
     }
+  }
+
+  private editUser(data: ButtonRenderedEvent): void {
+    this.editUserEvent.emit(data?.rowData);
+  }
+
+  private resendWelcomeEmail(data: ButtonRenderedEvent): void {
+    this.store.dispatch(new ResendWelcomeEmail(data.rowData.id!));
   }
 
   private updateUsers(): void {
@@ -449,6 +412,8 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
           );
           self.usersPage$.pipe().subscribe((data: any) => {
             self.itemList = data?.items;
+            self.totalRecordsCount = data?.totalCount;
+
             if (!self.itemList || !self.itemList.length) {
               self.gridApi.showNoRowsOverlay();
             } else {

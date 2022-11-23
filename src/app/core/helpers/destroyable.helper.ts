@@ -2,7 +2,7 @@ import { OnDestroy } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
-import { TakeUntilDestroy } from '../decorators/take-until-destroy.decorator';
+import { TakeUntilDestroy } from '@core/decorators';
 
 @TakeUntilDestroy
 export abstract class Destroyable implements OnDestroy {

@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import {
   CandidateDetailsPage,
   CandidatesDetailsRegions,
-  FiltersPageModal,
+  FiltersPageModal
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Injectable()
 export class CandidateDetailsService {
@@ -25,15 +26,15 @@ export class CandidateDetailsService {
    * Get candidate skills
    * @return list of skills
    */
-  public getSkills(): Observable<MasterSkillByOrganization> {
-    return this.http.get<MasterSkillByOrganization>('/api/MasterSkills/listByActiveBusinessUnit');
+  public getSkills(): Observable<MasterSkillByOrganization[]> {
+    return this.http.get<MasterSkillByOrganization[]>('/api/MasterSkills/listByActiveBusinessUnit').pipe(map((data) => sortByField(data, 'name')));
   }
 
   /**
    * Get candidate regions
    * @return list of regions
    */
-  public getRegions(): Observable<CandidatesDetailsRegions> {
-    return this.http.get<CandidatesDetailsRegions>('/api/Regions/listByActiveBusinessUnit');
+  public getRegions(): Observable<CandidatesDetailsRegions[]> {
+    return this.http.get<CandidatesDetailsRegions[]>('/api/Regions/listByActiveBusinessUnit').pipe(map((data) => sortByField(data, 'name')));
   }
 }

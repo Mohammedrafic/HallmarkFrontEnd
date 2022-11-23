@@ -12,15 +12,12 @@ import { AssociateListState } from '@shared/components/associate-list/store/asso
 import { combineLatest, debounceTime, filter, Observable, Subject, takeWhile } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
-import {
-  DeleteAssociateOrganizationsAgencyById,
-  GetAssociateAgencyOrg,
-  GetAssociateListPage,
-  UpdateAssociateOrganizationsAgencyPage,
-} from '@shared/components/associate-list/store/associate.actions';
+import { TiersException } from '@shared/components/associate-list/store/associate.actions';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { UserState } from '../../../../store/user.state';
 import { AgencyStatus } from '@shared/enums/status';
+import { UserPermissions } from "@core/enums";
+import { Permission } from "@core/interface";
 
 @Component({
   selector: 'app-associate-grid',
@@ -31,6 +28,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
   @Input() public associateEvent$: Subject<boolean>;
   @Input() public isAgency: boolean;
   @Input() areAgencyActionsAllowed: boolean;
+  @Input() userPermission: Permission;
 
   @ViewChild('grid') grid: GridComponent;
 
@@ -45,6 +43,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
     return this.isAgency ? 'Organization' : 'Agency';
   }
 
+  public readonly userPermissions = UserPermissions;
   public priceUtils = PriceUtils;
   public readonly agencyStatus = AgencyStatus;
   public jobDistributionColumns = JOB_DISTRIBUTION_COLUMNS;
@@ -94,7 +93,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
       .pipe(filter((confirm) => !!confirm))
       .subscribe(() => {
         if (row.id) {
-          this.store.dispatch(new DeleteAssociateOrganizationsAgencyById(row.id));
+          this.store.dispatch(new TiersException.DeleteAssociateOrganizationsAgencyById(row.id));
         }
       });
   }
@@ -114,7 +113,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
   }
 
   private dispatchNewPage(): void {
-    this.store.dispatch(new GetAssociateListPage(this.currentPage, this.pageSize));
+    this.store.dispatch(new TiersException.GetAssociateListPage(this.currentPage, this.pageSize));
   }
 
   private subscribeOnAssociateOrgAgencyDialogEvent(): void {
@@ -126,7 +125,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
   private subscribeOnUpdatePage(): void {
     this.actions$
       .pipe(
-        ofActionSuccessful(UpdateAssociateOrganizationsAgencyPage),
+        ofActionSuccessful(TiersException.UpdateAssociateOrganizationsAgencyPage),
         takeWhile(() => this.isAlive)
       )
       .subscribe(() => {
@@ -138,7 +137,7 @@ export class AssociateGridComponent extends AbstractGridConfigurationComponent i
     combineLatest([this.lastSelectedOrganizationId$, this.lastSelectedAgencyId$])
       .pipe(takeWhile(() => this.isAlive))
       .subscribe(() => {
-        this.store.dispatch(new GetAssociateAgencyOrg());
+        this.store.dispatch(new TiersException.GetAssociateAgencyOrg());
         this.dispatchNewPage();
       });
   }

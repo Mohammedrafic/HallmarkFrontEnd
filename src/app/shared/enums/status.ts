@@ -2,10 +2,17 @@ import { TIMETHEETS_STATUSES } from '../../modules/timesheets/enums';
 import { INVOICES_STATUSES } from '../../modules/invoices/enums';
 
 export enum Status {
+  'Active',
   'In Progress',
   'Inactive',
-  'Active',
   'Suspended',
+}
+
+export enum OrganizationStatus {
+  'In Progress' = 0,
+  Inactive = 1,
+  Active = 2,
+  Suspended = 3,
 }
 
 export const STATUS_COLOR_GROUP = {
@@ -64,6 +71,14 @@ export enum AgencyStatus {
   Terminated,
 }
 
+export const AgencyStatuses = [
+  { id: AgencyStatus.Active, text: 'Active' },
+  { id: AgencyStatus.Inactive, text: 'Inactive' },
+  { id: AgencyStatus.InProgress, text: 'In Progress' },
+  { id: AgencyStatus.Suspended, text: 'Suspended' },
+  { id: AgencyStatus.Terminated, text: 'Terminated' },
+]
+
 export enum CandidateStatus {
   Inactive,
   Active,
@@ -99,6 +114,13 @@ export enum OrderStatusText {
   Closed = 60,
 }
 
+export enum FilterOrderStatusText {
+  Open = 'Open',
+  'In Progress' = 'InProgress',
+  Filled = 'Filled',
+  Closed = 'Closed',
+}
+
 export enum CandidatesStatusText {
   Applied = 10,
   Shortlisted = 20,
@@ -111,6 +133,6 @@ export enum CandidatesStatusText {
 }
 
 export const CandidateStatusOptions = [
-  { id: CandidateStatus.Inactive, name: 'Inactive' },
   { id: CandidateStatus.Active, name: 'Active' },
+  { id: CandidateStatus.Inactive, name: 'Inactive' },
 ];

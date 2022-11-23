@@ -4,13 +4,14 @@ import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { AnalyticsMenuId } from '../../shared/constants/menu-config';
 import { Menu, MenuItem } from '../../shared/models/menu.model';
 import { UserState } from '../../store/user.state';
+import { MenuSettings } from '@shared/models';
 
 @Component({
   selector: 'app-analytics',
   templateUrl: './analytics.component.html',
 })
 export class AnalyticsComponent implements OnInit, OnDestroy  {
-  public sideMenuConfig: { [key: string]: Object }[] = [];
+  public sideMenuConfig: MenuSettings[] = [];
   @Select(UserState.menu)
   menu$: Observable<Menu>;
 
@@ -18,7 +19,7 @@ export class AnalyticsComponent implements OnInit, OnDestroy  {
   public isLoad: boolean = false;
 
   constructor() {
-   
+
   }
   ngOnInit(): void {
     this.isLoad = false;

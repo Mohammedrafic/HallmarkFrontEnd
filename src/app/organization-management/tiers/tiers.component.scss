@@ -1,0 +1,21 @@
+@import "colors";
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+
+  h3{
+      color: $title-black;
+      margin: 8px;
+  }
+
+  button {
+    margin-left: 18px;
+  }
+}
+
+.grid-container {
+  margin-top: 24px;
+  height: 800px;
+}

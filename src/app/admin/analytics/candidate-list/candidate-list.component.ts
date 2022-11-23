@@ -1,13 +1,13 @@
 import { Component, Inject, OnInit, ViewChild,OnDestroy } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Location, LocationsByRegionsFilter } from '@shared/models/location.model';
 import { Region, regionFilter } from '@shared/models/region.model';
 import { Department, DepartmentsByLocationsFilter } from '@shared/models/department.model';
-import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -16,7 +16,7 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportUrl, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
@@ -24,6 +24,8 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { analyticsConstants } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
+import { ConfigurationDto } from '@shared/models/analytics.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-candidate-list',
@@ -63,9 +65,9 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
   isDepartmentsDropDownEnabled: boolean = false;
   departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   selectedDepartments: Department[];
-  
-  @Select(LogiReportState.logiReportUrl)
-  public logiReportUrl$: Observable<string>;
+
+  @Select(LogiReportState.logiReportData)
+  public logiReportData$: Observable<ConfigurationDto[]>;
 
   @Select(SecurityState.bussinesData)
   public businessData$: Observable<BusinessUnit[]>;
@@ -106,18 +108,21 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
-    }   
-    this.SetReportUrl();    
+    }
+    this.SetReportData();
   }
 
   ngOnInit(): void {
-    
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => { 
-      this.SetReportUrl();
-      this.logiReportUrl$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:string)=>{
-        this.logiReportComponent.SetReportUrl(data);
-     });    
-      this.agencyOrganizationId=data;   
+
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => {
+      this.SetReportData();
+      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:ConfigurationDto[])=>{
+        if(data.length>0)
+        {
+        this.logiReportComponent.SetReportData(data);
+        }
+     });
+      this.agencyOrganizationId=data;
       this.isInitialLoad = true;
       this.orderFilterColumnsSetup();
       this.onFilterControlValueChangedHandler();
@@ -168,6 +173,7 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
         this.selectedRegions = this.regions?.filter((object) => data?.includes(object.id));
         let locationFilter: LocationsByRegionsFilter = {
           ids: data,
+          businessUnitIds:this.selectedOrganizations?.map((list) => list.id),
           getAll: true
         };
         this.store.dispatch(new GetLocationsByRegions(locationFilter));
@@ -179,6 +185,7 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
         this.selectedLocations = this.locations?.filter((object) => data?.includes(object.id));
         let departmentFilter: DepartmentsByLocationsFilter = {
           ids: data,
+          businessUnitIds:this.selectedOrganizations?.map((list) => list.id),
           getAll: true
         };
         this.store.dispatch(new GetDepartmentsByLocations(departmentFilter));
@@ -196,11 +203,11 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
     this.onRegionsChange();
     this.onLocationsChange();
   }
- 
+
   public SearchReport(): void {
     let auth="Bearer ";
     for(let x=0;x<window.localStorage.length;x++)
-    { 
+    {
       if(window.localStorage.key(x)!.indexOf('accesstoken')>0)
       {
         auth=auth+ JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
@@ -216,15 +223,15 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
       "LocationParamCRR": this.selectedLocations?.map((list) => list.id),
       "DepartmentParamCRR": this.selectedDepartments?.map((list) => list.departmentId),
       "BearerParamCRR":auth,
-      "BusinessUnitIdParamCRR":window.localStorage.getItem("lastSelectedOrganizationId") == null 
+      "BusinessUnitIdParamCRR":window.localStorage.getItem("lastSelectedOrganizationId") == null
       ?this.organizations!=null &&this.organizations[0]?.id!=null?
-      this.organizations[0].id.toString():"1": 
+      this.organizations[0].id.toString():"1":
       window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName":this.baseUrl
     };
       this.logiReportComponent.paramsData = this.paramsData;
       this.logiReportComponent.RenderReport();
-  }  
+  }
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
       businessIds: {
@@ -259,14 +266,14 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
       endDate: { type: ControlTypes.Date, valueType: ValueType.Text }
     }
   }
-  private SetReportUrl(){
-    const logiReportUrl = this.store.selectSnapshot(LogiReportState.logiReportUrl);
-      if(logiReportUrl=='')
+  private SetReportData(){
+    const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
+      if(logiReportData!=null&&logiReportData.length==0)
       {
-        this.store.dispatch(new GetLogiReportUrl());
+        this.store.dispatch(new GetLogiReportData());
       }
       else{
-        this.logiReportComponent?.SetReportUrl(logiReportUrl);
+        this.logiReportComponent?.SetReportData(logiReportData);
       }
   }
   private onOrganizationsChange(): void {
@@ -275,7 +282,7 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
       .subscribe((data: Region[]) => {
         if (data != undefined) {
           this.regions = data;
-          this.filterColumns.regionIds.dataSource = this.regions;
+          this.filterColumns.regionIds.dataSource = sortByField(this.regions, 'name');
           this.defaultRegions=data.map((list) => list.id);
           this.defaultLocations=[];
           this.defaultDepartments=[];
@@ -288,7 +295,7 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
       .subscribe((data: Location[]) => {
         if (data != undefined) {
           this.locations = data;
-          this.filterColumns.locationIds.dataSource = this.locations;
+          this.filterColumns.locationIds.dataSource = sortByField(this.locations, 'name');
           this.defaultLocations=data.map((list) => list.id);
           this.defaultDepartments=[];
         }
@@ -300,7 +307,7 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
       .subscribe((data: Department[]) => {
         if (data != undefined) {
           this.departments = data;
-          this.filterColumns.departmentIds.dataSource = this.departments;
+          this.filterColumns.departmentIds.dataSource = sortByField(this.departments, 'departmentName');
           this.defaultDepartments=data.map((list) => list.departmentId);
         }
       });
@@ -316,7 +323,6 @@ export class CandidateListComponent implements OnInit ,OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.candidateRegularRateForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.candidateRegularRateForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.candidateRegularRateForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.candidateRegularRateForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);

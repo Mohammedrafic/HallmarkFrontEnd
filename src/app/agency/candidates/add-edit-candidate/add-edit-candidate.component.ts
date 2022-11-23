@@ -38,13 +38,14 @@ import {
   UploadCandidatePhoto,
 } from '../../store/candidate.actions';
 import { CandidateContactDetailsComponent } from './candidate-contact-details/candidate-contact-details.component';
+import { AbstractPermission } from '@shared/helpers/permissions';
 
 @Component({
   selector: 'app-add-edit-candidate',
   templateUrl: './add-edit-candidate.component.html',
   styleUrls: ['./add-edit-candidate.component.scss'],
 })
-export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewInit {
+export class AddEditCandidateComponent extends AbstractPermission implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('stepper') tab: TabComponent;
 
@@ -79,7 +80,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewIn
   private candidateCredentialResponse$: Observable<CandidateCredentialResponse>;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private fb: FormBuilder,
     private actions$: Actions,
     private router: Router,
@@ -89,10 +90,12 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewIn
     private location: Location,
     private readonly ngZone: NgZone,
   ) {
+    super(store);
     store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.generateCandidateForm();
     this.checkForAgencyStatus();
 
@@ -131,7 +134,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewIn
     }
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.store.dispatch(new RemoveCandidateFromStore());
     this.credentialStorage.removeCredentialParams();
     this.unsubscribe$.next();
@@ -263,6 +266,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewIn
     candidateProfileContactDetail,
     professionalSummary,
     candidateProfileSkills,
+    candidateProfileRegions
   }: Candidate) {
     this.candidateForm.get('generalInfo')?.patchValue({
       firstName,
@@ -272,6 +276,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, AfterViewIn
       classification,
       profileStatus,
       candidateAgencyStatus,
+      candidateProfileRegions,
       ssn: ssn ? this.getStringSsn(ssn) : null,
       candidateProfileSkills: candidateProfileSkills.map((skill) => skill.id),
     });

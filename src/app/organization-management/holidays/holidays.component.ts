@@ -15,14 +15,13 @@ import { endDateValidator, startDateValidator } from '@shared/validators/date.va
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetDirtyState } from 'src/app/admin/store/admin.actions';
-import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
   CANCEL_CONFIRM_TEXT,
   DATA_OVERRIDE_TEXT,
   DATA_OVERRIDE_TITLE,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE,
+  DELETE_RECORD_TITLE, ERROR_START_LESS_END_DATE
 } from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
@@ -41,6 +40,9 @@ import {
 } from '../store/holidays.actions';
 import { HolidaysState } from '../store/holidays.state';
 import { GetOrganizationStructure } from '../../store/user.actions';
+import { DateTimeHelper } from '@core/helpers';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-holidays',
@@ -48,7 +50,7 @@ import { GetOrganizationStructure } from '../../store/user.actions';
   styleUrls: ['./holidays.component.scss'],
   providers: [SortService],
 })
-export class HolidaysComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class HolidaysComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   private holidayIdUnderEdit: number = 0;
@@ -77,10 +79,6 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   public endTimeField: AbstractControl;
   public today = new Date();
   public maxDate = new Date(2099, 11, 31);
-  public format = {
-    type: 'date',
-    format: 'MM/dd/yyyy hh:mm a',
-  };
   public optionFields = {
     text: 'name',
     value: 'id',
@@ -109,16 +107,18 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   public filters: HolidayFilters = {};
   public filterColumns: any;
   public yearsList: number[] = [];
+  public datesValidationMessage = ERROR_START_LESS_END_DATE;
+
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private actions$: Actions,
     private fb: FormBuilder,
     private confirmService: ConfirmService,
     private filterService: FilterService,
     private datePipe: DatePipe
   ) {
-    super();
+    super(store);
     this.idFieldName = 'foreignKey';
     this.today.setHours(0, 0, 0);
     this.HolidayFilterFormGroup = this.fb.group({
@@ -140,34 +140,36 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     });
 
     this.startTimeField = this.HolidayFormGroup.get('startDateTime') as AbstractControl;
-    this.startTimeField.addValidators(startDateValidator(this.HolidayFormGroup, 'endDateTime', this.today));
+    this.startTimeField.addValidators(startDateValidator(this.HolidayFormGroup, 'endDateTime'));
     this.startTimeField.valueChanges.subscribe(() =>
       this.endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
     this.endTimeField = this.HolidayFormGroup.get('endDateTime') as AbstractControl;
-    this.endTimeField.addValidators(endDateValidator(this.HolidayFormGroup, 'startDateTime', this.today));
+    this.endTimeField.addValidators(endDateValidator(this.HolidayFormGroup, 'startDateTime'));
     this.endTimeField.valueChanges.subscribe(() =>
       this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false })
     );
     this.HolidayFormGroup.get('regionId')?.valueChanges.subscribe((val: number) => {
-      if (this.title === DialogMode.Edit || this.title === DialogMode.Copy) {
+      if (this.title === DialogMode.Edit) {
         this.selectedRegions = [];
         if (val !== null) {
           this.selectedRegions.push(this.regions.find((region) => region.id === val) as OrganizationRegion);
+          const locations: OrganizationLocation[] = []
           this.selectedRegions.forEach((region) => {
             if (region) {
               region.locations?.forEach((location) => (location.regionName = region.name));
-              this.locations = [...(region.locations as [])];
+              locations.push(...(region.locations as []));
             } else {
-              this.locations = [
+              locations.push(
                 {
                   name: 'All',
                   id: 0,
                   departments: [],
                 },
-              ];
+              );
             }
           });
+          this.locations.push(...sortByField(locations, 'name'));
         } else {
           this.locations = [];
           this.isAllRegionsSelected = false;
@@ -175,18 +177,19 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
       }
     });
     this.HolidayFormGroup.get('regions')?.valueChanges.subscribe((val: number[]) => {
-      if (this.title === DialogMode.Add) {
+      if (this.title === DialogMode.Assign) {
         this.selectedRegions = [];
         if (val) {
           val.forEach((id) =>
             this.selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
           );
-          this.locations = [];
+          const locations: OrganizationLocation[] = [];
           this.isAllRegionsSelected = val.length === this.regions.length;
           this.selectedRegions.forEach((region) => {
             region.locations?.forEach((location) => (location.regionName = region.name));
-            this.locations.push(...(region.locations as []));
+            locations.push(...(region.locations as []));
           });
+          this.locations = sortByField(locations, 'name');
         } else {
           this.locations = [];
           this.isAllRegionsSelected = false;
@@ -201,10 +204,12 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
           selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
         );
         this.filterColumns.locationIds.dataSource = [];
+        const locations: OrganizationLocation[] = [];
         selectedRegions.forEach((region) => {
           region.locations?.forEach((location) => (location.regionName = region.name));
-          this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
+          locations.push(...(region.locations as []))
         });
+        this.filterColumns.locationIds.dataSource.push(...sortByField(locations, 'name'));
       } else {
         this.filterColumns.locationIds.dataSource = [];
         this.HolidayFilterFormGroup.get('locationIds')?.setValue([]);
@@ -212,7 +217,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
       }
     });
     this.HolidayFormGroup.get('locations')?.valueChanges.subscribe((val: number[]) => {
-      if (this.title === DialogMode.Add) {
+      if (this.title === DialogMode.Assign) {
         if (val && val.length === this.locations.length) {
           this.isAllLocationsSelected = true;
         } else {
@@ -224,13 +229,16 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
       const selectedHoliday = this.masterHolidays.find((holiday) => holiday.holidayName === val);
       if (selectedHoliday) {
         this.HolidayFormGroup.get('masterHolidayId')?.setValue(selectedHoliday.id);
+        this.HolidayFormGroup.get('startDateTime')?.setValue(DateTimeHelper.convertDateToUtc(selectedHoliday.startDateTime));
+        this.HolidayFormGroup.get('endDateTime')?.setValue(DateTimeHelper.convertDateToUtc(selectedHoliday.endDateTime));
       } else {
         this.HolidayFormGroup.get('masterHolidayId')?.setValue(0);
       }
     });
   }
 
-  ngOnInit() {
+  override ngOnInit() {
+    super.ngOnInit();
     this.filterColumns = {
       holidayNames: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
       years: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
@@ -278,10 +286,10 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveHolidaySucceeded)).subscribe(() => {
       this.HolidayFormGroup.reset();
       this.closeDialog();
-      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
+      this.store.dispatch([new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters), new GetHolidayDataSources()]);
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(DeleteHolidaySucceeded)).subscribe(() => {
-      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
+      this.store.dispatch([new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters), new GetHolidayDataSources()]);
     });
     this.holidayDataSource$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((dataSource) => {
       this.filterColumns.holidayNames.dataSource = dataSource;
@@ -379,7 +387,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.getOrganizationStructure();
     this.changeAbilityOfHolidayName();
     this.showForm = true;
-    this.title = DialogMode.Add;
+    this.title = DialogMode.Assign;
     this.regions = this.orgStructure.regions;
     this.HolidayFormGroup.controls['id'].setValue(0);
     this.HolidayFormGroup.controls['regionId'].setValue(0);
@@ -419,7 +427,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
 
   public editHoliday(holiday: OrganizationHoliday, event: MouseEvent): void {
     this.getOrganizationStructure();
-    this.changeAbilityOfHolidayName(holiday.isOrganizationHoliday);
+    this.changeAbilityOfHolidayName(false);
     this.holidayIdUnderEdit = holiday.masterHolidayId;
     this.showForm = true;
     this.addActiveCssClass(event);
@@ -433,30 +441,10 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
       locations: [0],
       regions: [0],
       holidayName: holiday.holidayName,
-      startDateTime: holiday.startDateTime,
-      endDateTime: holiday.endDateTime,
+      startDateTime: DateTimeHelper.convertDateToUtc(holiday.startDateTime),
+      endDateTime: DateTimeHelper.convertDateToUtc(holiday.endDateTime),
     });
 
-    this.store.dispatch(new ShowSideDialog(true));
-  }
-
-  public copyHoliday(holiday: OrganizationHoliday, event: MouseEvent): void {
-    this.changeAbilityOfHolidayName();
-    this.showForm = true;
-    this.title = DialogMode.Copy;
-    this.addActiveCssClass(event);
-    this.populateDropdownWithAll(holiday);
-    this.HolidayFormGroup.setValue({
-      id: 0,
-      masterHolidayId: holiday.masterHolidayId || 0,
-      regionId: holiday.regionId || 0,
-      locationId: holiday.locationId || 0,
-      locations: [holiday.locationId || 0],
-      regions: [holiday.regionId || 0],
-      holidayName: holiday.holidayName,
-      startDateTime: holiday.startDateTime,
-      endDateTime: holiday.endDateTime,
-    });
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -499,14 +487,14 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
 
   public saveHoliday(): void {
     if (this.HolidayFormGroup.valid) {
-      if (this.title === DialogMode.Add) {
+      if (this.title === DialogMode.Assign) {
         this.store
           .dispatch(
             new CheckIfExist(
               new OrganizationHoliday(
                 this.HolidayFormGroup.getRawValue(),
                 this.selectedRegions,
-                this.isAllRegionsSelected && this.isAllLocationsSelected
+                this.isAllRegionsSelected, this.isAllLocationsSelected
               )
             )
           )
@@ -530,7 +518,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
             }
           });
       } else {
-        this.editOrCopyHandler();
+        this.editHandler();
       }
     } else {
       this.HolidayFormGroup.markAllAsTouched();
@@ -551,10 +539,10 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
 
   private saveHandler(isExist?: boolean): void {
     const holiday = this.HolidayFormGroup.getRawValue() as OrganizationHoliday;
-    this.dispatchSave(this.prepareToCreate(holiday), isExist);
+    this.dispatchSave(holiday, isExist);
   }
 
-  private editOrCopyHandler(): void {
+  private editHandler(): void {
     const holidayToUpdate = this.HolidayFormGroup.getRawValue() as OrganizationHoliday;
     if (this.isEditMode()) {
       holidayToUpdate.masterHolidayId = this.holidayIdUnderEdit;
@@ -570,7 +558,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
         new OrganizationHoliday(
           holiday,
           this.hasSelectedRegions() ? this.selectedRegions : undefined,
-          this.isAllRegionsSelected && this.isAllLocationsSelected,
+          this.isAllRegionsSelected, this.isAllLocationsSelected,
           isExist
         )
       )
@@ -585,7 +573,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
         new OrganizationHoliday(
           holiday,
           this.hasSelectedRegions() ? this.selectedRegions : undefined,
-          this.isAllRegionsSelected && this.isAllLocationsSelected,
+          this.isAllRegionsSelected, this.isAllLocationsSelected,
           false
         )
       )
@@ -596,8 +584,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
 
   private hasSelectedRegions(): boolean {
     return (
-      this.title === DialogMode.Add ||
-      this.title === DialogMode.Copy ||
+      this.title === DialogMode.Assign ||
       (this.isEditMode() && this.HolidayFormGroup.controls['id'].value === 0)
     );
   }
@@ -623,10 +610,6 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
 
   private get holidayName(): AbstractControl {
     return this.HolidayFormGroup.get('holidayName') as AbstractControl;
-  }
-
-  private prepareToCreate(holiday: OrganizationHoliday): OrganizationHoliday {
-    return { ...holiday, masterHolidayId: 0 };
   }
 
   private getOrganizationStructure(): void {

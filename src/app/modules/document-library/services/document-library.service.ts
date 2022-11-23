@@ -5,8 +5,12 @@ import {
   DocumentFolder, FolderTreeItem, DocumentLibraryDto, Documents, DocumentsFilter,
   DocumentsLibraryPage, DocumentTagFilter, DocumentTags, DocumentTypeFilter, DocumentTypes,
   FolderTreeFilter, DownloadDocumentDetail, DownloadDocumentDetailFilter, DeleteDocumentsFilter, ShareDocumentsFilter, SharedDocumentPostDto,
-  ShareDocumentInfoPage, ShareDocumentInfoFilter, UnShareDocumentsFilter
+  ShareDocumentInfoPage, ShareDocumentInfoFilter, UnShareDocumentsFilter, AssociateAgencyDto, ShareOrganizationsData, DeleteDocumentFolderFilter,
+  PreviewDocumentDetailFilter
 } from "../store/model/document-library.model";
+
+import { Region } from '@shared/models/region.model';
+import { Location } from '@shared/models/location.model';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentLibraryService {
@@ -25,7 +29,7 @@ export class DocumentLibraryService {
 
   public GetDocumentLibraryInfo(documentsFilter: DocumentsFilter): Observable<DocumentsLibraryPage> {
     let params = new HttpParams();
-    params = params.append("BusinessUnitType", documentsFilter == undefined ? 1 : documentsFilter.businessUnitType);
+    params = params.append("BusinessUnitType", documentsFilter.businessUnitType);
     if (documentsFilter?.businessUnitId && documentsFilter?.businessUnitId != null)
       params = params.append("BusinessUnitId", documentsFilter.businessUnitId);
     if (documentsFilter?.regionId && documentsFilter?.regionId != null)
@@ -109,6 +113,16 @@ export class DocumentLibraryService {
     return this.http.get<DownloadDocumentDetail>(`/api/DocumentLibrary/GetDocumentForDownload`, { params: params });
   }
 
+  public GetDocumentPreviewDetails(documentPreviewFIlter: PreviewDocumentDetailFilter): Observable<DownloadDocumentDetail> {
+    let params = new HttpParams();
+    params = params.append("DocumentId", documentPreviewFIlter.documentId);
+    if (documentPreviewFIlter?.businessUnitType && documentPreviewFIlter?.businessUnitType != null)
+      params = params.append("BusinessUnitType", documentPreviewFIlter.businessUnitType);
+    if (documentPreviewFIlter?.businessUnitId && documentPreviewFIlter?.businessUnitId != null)
+      params = params.append("BusinessUnitId", documentPreviewFIlter.businessUnitId);
+    return this.http.get<DownloadDocumentDetail>(`/api/DocumentLibrary/GetDocumentForDownload`, { params: params });
+  }
+
   /**
    * Remove documents by id's
    * @param id
@@ -127,6 +141,15 @@ export class DocumentLibraryService {
 
   public GetDocumentById(Id: number): Observable<DocumentLibraryDto> {
     return this.http.get<DocumentLibraryDto>(`/api/DocumentLibrary/GetById/${Id}`);
+  }
+
+  public GetDocumentsByCognitiveSearch(keyword: string, businessUnitType: any, businessUnitId?: any): Observable<DocumentsLibraryPage> {
+    let params = new HttpParams();
+    params = params.append("Keyword", keyword);
+    params = params.append("BusinessUnitType", businessUnitType);
+    params = params.append("BusinessUnitId", businessUnitId);
+    params = params.append("IncludeContent", true);
+    return this.http.get<DocumentsLibraryPage>(`/api/DocumentLibrary/CognitiveSearchDocuments`, {params: params});
   }
 
   public GetSharedDocuments(documentsFilter: ShareDocumentInfoFilter): Observable<ShareDocumentInfoPage> {
@@ -151,6 +174,46 @@ export class DocumentLibraryService {
  */
   public UnShareDocumets(unShareDocumentsFilter: UnShareDocumentsFilter): Observable<any> {
     return this.http.delete<DocumentLibraryDto>(`/api/DocumentLibrary/UnshareDocuments`, { body: unShareDocumentsFilter });
+  }
+
+  /**
+   * Get the list of available Regions by organizations
+   * @return Array of Regions
+   */
+  public getRegionsByOrganizationId(filter: any): Observable<Region[]> {
+    return this.http.post<Region[]>(`/api/DocumentLibrary/region/filter`, filter);
+  }
+
+  /**
+   * Get the list of available Locations by Regions
+   * @return Array of Locations
+   */
+  public getLocationsByOrganizationId(filter: any): Observable<Location[]> {
+    return this.http.post<Location[]>(`/api/DocumentLibrary/location/filter`, filter);
+  }
+
+  /**
+   * Get the list of Associate Agencies
+   * @return Array of Associate Agencies
+   */
+  public getShareAssociateAgencies(): Observable<AssociateAgencyDto[]> {
+    return this.http.get<AssociateAgencyDto[]>(`/api/DocumentLibrary/share/getAgencies`);
+  }
+
+  /**
+ * Get the list of share organizations
+ * @return Array of share organizations
+ */
+  public getShareOrganizationsData(): Observable<ShareOrganizationsData[]> {
+    return this.http.get<ShareOrganizationsData[]>(`/api/DocumentLibrary/share/getOrganizations`);
+  }
+
+  /**
+  * Remove document folder
+  * @param id
+  */
+  public DeleteFolder(deleteDocumentFolderFilter: DeleteDocumentFolderFilter): Observable<any> {
+    return this.http.delete<any>(`/api/DocumentLibrary/DeleteFolder`, { body: deleteDocumentFolderFilter });
   }
 
 }

@@ -1,16 +1,16 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
-import { AbstractGridConfigurationComponent, EXPORT_OPTIONS } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { MasterCredentialsTypesComponent } from './master-credentials-types/master-credentials-types.component';
 import { Actions, ofActionDispatched, Store } from '@ngxs/store';
 import { SetCredentialsFilterCount, ShowExportCredentialListDialog } from '@organization-management/store/credentials.actions';
 import { map } from 'rxjs';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
-import { GetOrganizationStructure } from 'src/app/store/user.actions';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 
 export enum CredentialsNavigationTabs {
   Types,
@@ -22,7 +22,7 @@ export enum CredentialsNavigationTabs {
   templateUrl: './master-credentials.component.html',
   styleUrls: ['./master-credentials.component.scss'],
 })
-export class MasterCredentialsComponent extends AbstractGridConfigurationComponent {
+export class MasterCredentialsComponent extends AbstractPermissionGrid {
   @ViewChild('navigationTabs') navigationTabs: TabComponent;
   @ViewChild(RouterOutlet) outlet: RouterOutlet;
 
@@ -32,8 +32,8 @@ export class MasterCredentialsComponent extends AbstractGridConfigurationCompone
     map((count) => count.payload)
   );
 
-  constructor(private router: Router, private route: ActivatedRoute, private actions$: Actions, private store: Store) {
-    super();
+  constructor(private router: Router, private route: ActivatedRoute, private actions$: Actions, protected override store: Store) {
+    super(store);
   }
 
   public onTabSelected(selectedTab: any): void {

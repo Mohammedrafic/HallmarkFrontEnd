@@ -1,9 +1,12 @@
+import { DOCUMENT } from "@angular/common";
 import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
   EventEmitter,
+  Inject,
   Input,
+  NgZone,
   OnChanges,
   Output,
   SimpleChanges,
@@ -13,14 +16,16 @@ import {
 import { FileInfo, RemovingEventArgs, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { Store } from '@ngxs/store';
 
+import { FileSizeValueMap } from "@core/constants/file-size.constant";
+import { OutsideZone } from "@core/decorators";
+import { FilesClearEvent, FileSize, UploaderFileStatus } from '@core/enums';
 import { FileAdapter } from '@core/helpers/adapters';
 import { FileForUpload } from '@core/interface';
-import { AllowedFileExtensions } from './file-uploader.constant';
-import { ShowToast } from 'src/app/store/app.actions';
-import { MessageTypes } from '@shared/enums/message-types';
-import { FilesClearEvent, UploaderFileStatus } from '@core/enums';
 import { Attachment } from '@shared/components/attachments';
 import { CustomFilesPropModel } from '@shared/components/file-uploader/custom-files-prop-model.interface';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ShowToast } from 'src/app/store/app.actions';
+import { AllowedFileExtensions } from './file-uploader.constant';
 
 @Component({
   selector: 'app-file-uploader',
@@ -39,7 +44,7 @@ export class FileUploaderComponent implements OnChanges {
 
   @Input() allowedFileExtensions: string = AllowedFileExtensions;
 
-  @Input() maxFileSize: number = 5242880;
+  @Input() maxFileSize: FileSize = FileSize.MB_5;
 
   @Input() showSelectedFiles: boolean = true;
 
@@ -73,7 +78,9 @@ export class FileUploaderComponent implements OnChanges {
   public files: FileForUpload[] = [];
 
   constructor(
+    @Inject(DOCUMENT) private document: Document,
     private store: Store,
+    private readonly ngZone: NgZone,
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -89,6 +96,7 @@ export class FileUploaderComponent implements OnChanges {
   }
 
   public filesSelected(event: SelectedEventArgs): void {
+    this.validateFiles(event);
     if (this.files.length + event.filesData.length <= this.maxFiles) {
       this.setFiles(event);
     } else {
@@ -125,5 +133,31 @@ export class FileUploaderComponent implements OnChanges {
     if (existingFile) {
       this.existingFileDelete.emit(existingFile);
     }
+  }
+
+  private validateFiles(event: SelectedEventArgs): void {
+    const filesData : FileInfo[] = this.fileUploader.getFilesData();
+    const allFiles : FileInfo[] = filesData.concat(event.filesData);
+    allFiles.forEach((file, index) => this.addFilesValidationMessage(file, index));
+  }
+
+  @OutsideZone
+  private addFilesValidationMessage(file: FileInfo, fileIndex: number) {
+    requestAnimationFrame(() => {
+      const uploaderErrorMessageElement = this.document.getElementsByClassName('e-file-status')[fileIndex] as HTMLElement;
+      if (uploaderErrorMessageElement && file.statusCode === '0') {
+        uploaderErrorMessageElement.innerText = file.size > this.maxFileSize
+          ? this.getMaxSizeErrorMessage()
+          : this.getExtensionErrorMessage();
+      }
+    });
+  }
+
+  private getMaxSizeErrorMessage(): string {
+    return `The file should not exceed ${FileSizeValueMap[this.maxFileSize]}MB.`;
+  }
+
+  private getExtensionErrorMessage(): string {
+    return `The file should be in ${this.allowedFileExtensions} format.`;
   }
 }

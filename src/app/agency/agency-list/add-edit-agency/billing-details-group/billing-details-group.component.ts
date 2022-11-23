@@ -1,8 +1,8 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { COUNTRIES } from '@shared/constants/countries-list';
 import { Subject, takeWhile } from 'rxjs';
 import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
-import { ONLY_NUMBER } from "@shared/constants";
 
 @Component({
   selector: 'app-billing-details-group',
@@ -12,10 +12,7 @@ import { ONLY_NUMBER } from "@shared/constants";
 export class BillingDetailsGroupComponent implements OnInit, OnDestroy {
   @Input() formGroup: FormGroup;
 
-  public countries = [
-    { id: Country.USA, text: Country[0] },
-    { id: Country.Canada, text: Country[1] },
-  ];
+  public countries = COUNTRIES;
   public states$ = new Subject();
   public optionFields = {
     text: 'text',
@@ -53,7 +50,7 @@ export class BillingDetailsGroupComponent implements OnInit, OnDestroy {
       phone1: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       phone2: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       fax: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
-      ext: new FormControl('', [Validators.maxLength(5), Validators.pattern(ONLY_NUMBER)]),
+      ext: new FormControl(''),
     });
   }
 }

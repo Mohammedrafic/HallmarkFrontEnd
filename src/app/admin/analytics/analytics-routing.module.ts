@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { OrganizationInvoicesContainerService } from '../../modules/invoices/services/invoices-container/organization-invoices-container.service';
-import { ClientFinanceAccrualReportComponent } from './client-finance-accrual-report/client-finance-accrual-report.component';
+import { FinancialTimeSheetReportComponent } from './financial-time-sheet-report/financial-time-sheet-report.component';
 import { AgencyDepartmentSpentHoursComponent } from './agency-department-spent-hours/agency-department-spent-hours.component';
 import { AgingDetailsComponent } from './aging-details/aging-details.component';
 import { AnalyticsComponent } from './analytics.component';
@@ -37,6 +37,7 @@ import { VendorScorecardComponent } from './vendor-scorecard/vendor-scorecard.co
 import { VmsInvoiceReportComponent } from './vms-invoice-report/vms-invoice-report.component';
 import { YtdReportComponent } from './ytd-report/ytd-report.component';
 import { YtdSummaryComponent } from './ytd-summary/ytd-summary.component';
+import { AccrualReportComponent } from './accrual-report/accrual-report.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '', pathMatch: 'full' },
@@ -45,8 +46,8 @@ const routes: Routes = [
     component: AnalyticsComponent,
     children: [
       {
-        path: 'client-finance-accrual-report',
-        component: ClientFinanceAccrualReportComponent,
+        path: 'financial-time-sheet-report',
+        component: FinancialTimeSheetReportComponent,
         data: {
           isOrganizationArea: true,
         }
@@ -68,6 +69,13 @@ const routes: Routes = [
       {
         path: 'client-finance-report',
         component: ClientFinanceReportComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
+      {
+        path: 'accrual-report',
+        component: AccrualReportComponent,
         data: {
           isOrganizationArea: true,
         }

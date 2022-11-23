@@ -7,12 +7,12 @@ import { debounceTime, distinctUntilChanged, filter, Observable, Subject, takeUn
 import { SearchComponent } from '@shared/components/search/search.component';
 import { map } from 'rxjs/operators';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { SecurityState } from '../../security/store/security.state';
 import { RoleTreeField } from '../../security/roles-and-permissions/role-form/role-form.component';
 import { ExternalBillRatePermissions } from '@organization-management/bill-rates/models/external-bill-rate-permissions.enum';
 import { GetPermissionsTree } from 'src/app/security/store/security.actions';
 import { GetOrganizationStructure } from '../../store/user.actions';
+import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 
 export enum BillRateNavigationTabs {
   BillRateSetup,
@@ -26,7 +26,7 @@ export enum BillRateNavigationTabs {
   styleUrls: ['./bill-rates.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BillRatesComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
+export class BillRatesComponent extends AbstractPermissionGrid implements OnInit, AfterViewInit, OnDestroy {
   @Select(SecurityState.roleTreeField)
   public roleTreeField$: Observable<RoleTreeField>;
 
@@ -41,6 +41,7 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
   ]);
   public isReadOnly = false; // TODO: temporary solution, until specific service provided
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
+  public canAddBillRate = true;
 
   addBillRateBtnText: string = 'Add Record';
   selectedTab: BillRateNavigationTabs = BillRateNavigationTabs.BillRateSetup;
@@ -55,22 +56,20 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
   >();
 
   get showButton(): boolean {
-    return (
-      (!this.isReadOnly && !this.isExternalBillRateTypeMapping) ||
-      (this.isExternalBillRateType &&
-        (this.externalBillRatePermissionsMap.get(ExternalBillRatePermissions.ManageExternalBillRates) as boolean))
-    );
+    return !this.isExternalBillRateTypeMapping || this.isExternalBillRateType;
   }
 
-  constructor(private store: Store) {
-    super();
+  constructor(protected override store: Store) {
+    super(store);
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
+    this.canAddRates();
     this.handlePagePermission();
-    this.subsToPermissions();
     this.store.dispatch(new GetOrganizationStructure());
   }
+
 
   ngAfterViewInit(): void {
     this.subsToSearch();
@@ -91,6 +90,9 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
 
   public onTabSelected(selectedTab: any): void {
     this.selectedTab = selectedTab.selectedIndex;
+
+    this.canAddRates();
+
     this.isBillRateSetupTabActive = BillRateNavigationTabs.BillRateSetup === selectedTab.selectedIndex;
     this.isExternalBillRateType = BillRateNavigationTabs.ExternalBillRateType === selectedTab.selectedIndex;
     this.isExternalBillRateTypeMapping =
@@ -152,6 +154,8 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
   }
 
   subsToPermissions(): void {
+    this.userPermission = this.store.selectSnapshot(UserState.userPermission);
+
     this.roleTreeField$
       .pipe(
         map((tree) => tree.dataSource),
@@ -174,5 +178,11 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
             )
           );
       });
+  }
+
+  private canAddRates(): void {
+    this.canAddBillRate = this.selectedTab === 0 ?
+      this.userPermission[this.userPermissions.CanEditSettingsBillRates] :
+      this.userPermission[this.userPermissions.CanManageExternalBillRates];
   }
 }

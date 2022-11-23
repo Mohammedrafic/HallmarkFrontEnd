@@ -8,8 +8,9 @@
           <ejs-dropdownlist
             formControlName="orderType"
             appValidateWithMessage
+            [allowFiltering]="true"
             [dataSource]="orderTypesDataSource"
-            [fields]="orderTypeFields"
+            [fields]="optionFields"
           >
           </ejs-dropdownlist>
         </div>
@@ -52,8 +53,9 @@
                     <ejs-dropdownlist
                       formControlName="regionId"
                       appValidateWithMessage
+                      [allowFiltering]="true"
                       [dataSource]="regions$ | async"
-                      [fields]="regionFields"
+                      [fields]="optionFields"
                       (select)="onRegionDropDownChanged($event)"
                     >
                     </ejs-dropdownlist>
@@ -67,8 +69,9 @@
                     <ejs-dropdownlist
                       formControlName="locationId"
                       appValidateWithMessage
+                      [allowFiltering]="true"
                       [dataSource]="locations$ | async"
-                      [fields]="locationFields"
+                      [fields]="optionFields"
                       (select)="onLocationDropDownChanged($event)"
                     >
                     </ejs-dropdownlist>
@@ -82,6 +85,7 @@
                     <ejs-dropdownlist
                       formControlName="departmentId"
                       appValidateWithMessage
+                      [allowFiltering]="true"
                       [dataSource]="departments$ | async"
                       [fields]="departmentFields"
                       (select)="onDepartmentDropDownChanged($event)"
@@ -97,6 +101,7 @@
                     <ejs-dropdownlist
                       formControlName="skillId"
                       appValidateWithMessage
+                      [allowFiltering]="true"
                       [dataSource]="skills$ | async"
                       [fields]="skillFields"
                       (select)="onSkillsDropDownChanged($event)"
@@ -110,7 +115,7 @@
                 <div class="form-line">
                   <!-- Hourly rate -->
                   <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
-                    <label>Hourly rate<span class="required">*</span></label>
+                    <label>Hourly Rate<span class="required">*</span></label>
                     <div class="input-group">
                       <input
                         class="e-input"
@@ -244,8 +249,9 @@
                       <ejs-dropdownlist
                         formControlName="duration"
                         appValidateWithMessage
+                        [allowFiltering]="true"
                         [dataSource]="durations"
-                        [fields]="durationFields"
+                        [fields]="optionFields"
                       >
                       </ejs-dropdownlist>
                     </div>
@@ -296,8 +302,9 @@
                       <ejs-dropdownlist
                         formControlName="shift"
                         appValidateWithMessage
+                        [allowFiltering]="true"
                         [dataSource]="masterShiftNames"
-                        [fields]="masterShiftFields"
+                        [fields]="optionFields"
                       >
                       </ejs-dropdownlist>
                     </div>
@@ -305,7 +312,9 @@
 
                   <!-- Shift Start Time -->
                   <div *ngIf="isPermPlacementOrder" class="input-container calendar form-line-item-20">
-                    <label for="startTime">Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label>
+                    <label for="startTime"
+                      >Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                    >
                     <div class="input-group datepicker bootstrap">
                       <ejs-timepicker
                         placeholder="HH:MM"
@@ -322,7 +331,9 @@
 
                   <!-- Shift End Time -->
                   <div *ngIf="isPermPlacementOrder" class="input-container calendar form-line-item-20">
-                    <label for="startTime">Shift End Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label>
+                    <label for="startTime"
+                      >Shift End Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                    >
                     <div class="input-group datepicker bootstrap">
                       <ejs-timepicker
                         placeholder="HH:MM"
@@ -346,8 +357,9 @@
                       <ejs-dropdownlist
                         formControlName="shift"
                         appValidateWithMessage
+                        [allowFiltering]="true"
                         [dataSource]="masterShiftNames"
-                        [fields]="masterShiftFields"
+                        [fields]="optionFields"
                       >
                       </ejs-dropdownlist>
                     </div>
@@ -355,7 +367,9 @@
 
                   <!-- Shift Start Time -->
                   <div class="input-container calendar form-line-item-20">
-                    <label for="startTime">Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label>
+                    <label for="startTime"
+                      >Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                    >
                     <div class="input-group datepicker bootstrap">
                       <ejs-timepicker
                         placeholder="HH:MM"
@@ -372,7 +386,9 @@
 
                   <!-- Shift End Time -->
                   <div class="input-container calendar form-line-item-20">
-                    <label for="startTime">Shift End Time<span class="required"  *ngIf="isShiftTimeRequired">*</span></label>
+                    <label for="startTime"
+                      >Shift End Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label
+                    >
                     <div class="input-group datepicker bootstrap">
                       <ejs-timepicker
                         placeholder="HH:MM"
@@ -391,49 +407,42 @@
             </form>
           </div>
         </div>
+        <!-- Job Distribution -->
         <div class="job-distibution">
           <div class="title">Job Distribution</div>
           <div class="job-distribution-form-container">
             <form [formGroup]="jobDistributionForm">
               <div class="form-line">
-                <!-- Job Distribution -->
                 <div class="input-container bootstrap form-line-item-40">
                   <label>Job Distribution<span class="required">*</span></label>
                   <div class="input-group dropdown">
-                    <ejs-multiselect
-                      mode="CheckBox"
+                    <ejs-dropdownlist
                       formControlName="jobDistribution"
                       appValidateWithMessage
-                      [dataSource]="jobDistributions"
-                      [fields]="jobDistributionFields"
-                      [allowFiltering]="false"
-                      [showDropDownIcon]="true"
+                      [allowFiltering]="true"
+                      [dataSource]="distribution"
+                      [fields]="optionFields"
                     >
-                    </ejs-multiselect>
+                    </ejs-dropdownlist>
                   </div>
                 </div>
-
-                <!-- Agency -->
-                <div class="input-container bootstrap form-line-item-40">
-                  <label>
-                    Agency
-                    <span *ngIf="agencyControlEnabled" class="required">*</span>
-                  </label>
-                  <div class="input-group dropdown">
-                    <ejs-multiselect
-                      mode="CheckBox"
-                      formControlName="agency"
-                      appValidateWithMessage
-                      [enabled]="agencyControlEnabled"
-                      [dataSource]="associateAgencies$ | async"
-                      [fields]="associateAgencyFields"
-                      [showSelectAll]="true"
-                      [allowFiltering]="false"
-                      [showDropDownIcon]="true"
-                    >
-                    </ejs-multiselect>
-                  </div>
+              <div class="input-container bootstrap form-line-item-40">
+                <label> Agency <span *ngIf="agencyControlEnabled" class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-multiselect
+                    mode="CheckBox"
+                    formControlName="agency"
+                    appValidateWithMessage
+                    [enabled]="agencyControlEnabled"
+                    [dataSource]="associateAgencies$ | async"
+                    [fields]="associateAgencyFields"
+                    [showSelectAll]="true"
+                    [allowFiltering]="true"
+                    [showDropDownIcon]="true"
+                  >
+                  </ejs-multiselect>
                 </div>
+              </div>
               </div>
             </form>
           </div>
@@ -447,13 +456,16 @@
                 <div class="input-container bootstrap form-line-item-20">
                   <label>Classification</label>
                   <div class="input-group dropdown">
-                    <ejs-dropdownlist
-                      formControlName="classification"
-                      appValidateWithMessage
+                    <ejs-multiselect
+                      mode="CheckBox"
+                      formControlName="classifications"
                       [dataSource]="jobClassifications"
-                      [fields]="jobClassificationFields"
+                      [fields]="optionFields"
+                      [allowFiltering]="true"
+                      [showSelectAll]="true"
+                      [showDropDownIcon]="true"
                     >
-                    </ejs-dropdownlist>
+                    </ejs-multiselect>
                   </div>
                 </div>
 
@@ -506,7 +518,8 @@
                     <ejs-dropdownlist
                       formControlName="orderRequisitionReasonId"
                       appValidateWithMessage
-                      (change)='onRequisitionChange($event)'
+                      (change)="onRequisitionChange($event)"
+                      [allowFiltering]="true"
                       [dataSource]="(reasons$ | async)?.items"
                       [fields]="reasonForRequisitionFields"
                     >
@@ -539,9 +552,10 @@
                       <label>Title<span class="required">*</span></label>
                       <div class="input-group dropdown">
                         <ejs-dropdownlist
-                          [dataSource]="contactDetailTitles"
                           appValidateWithMessage
                           formControlName="title"
+                          [allowFiltering]="true"
+                          [dataSource]="contactDetailTitles"
                         >
                         </ejs-dropdownlist>
                       </div>
@@ -663,6 +677,7 @@
                   <label>State<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
+                      [allowFiltering]="true"
                       [dataSource]="organizationStatesWithKeyCode$ | async"
                       [fields]="organizationStateWithKeyCodeFields"
                       appValidateWithMessage
@@ -711,12 +726,14 @@
             <div class="form-line">
               <!-- Special Project Category -->
               <div class="input-container bootstrap form-line-item-30">
-
-                <label>Special Project Category<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label>
+                <label
+                  >Special Project Category<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label
+                >
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
                     formControlName="projectTypeId"
                     appValidateWithMessage
+                    [allowFiltering]="true"
                     [dataSource]="specialProjectCategories"
                     [fields]="specialProjectCategoriesFields"
                   >
@@ -730,6 +747,7 @@
                   <ejs-dropdownlist
                     formControlName="projectNameId"
                     appValidateWithMessage
+                    [allowFiltering]="true"
                     [dataSource]="projectNames"
                     [fields]="projectNameFields"
                   >
@@ -743,6 +761,7 @@
                   <ejs-dropdownlist
                     formControlName="poNumberId"
                     appValidateWithMessage
+                    [allowFiltering]="true"
                     [dataSource]="poNumbers"
                     [fields]="poNumberFields"
                   >
@@ -771,7 +790,8 @@
           [comments]="comments"
           [commentContainerId]="commentContainerId"
           [useBackground]="false"
-          [isCreating]="!orderId"></app-comments>
+          [isCreating]="!orderId"
+        ></app-comments>
       </div>
     </div>
   </div>

@@ -80,21 +80,28 @@
         <div class="order-meta">
           <h2 class="order-id">Job ID: {{ timesheetDetails?.formattedId}}</h2>
         </div>
-        <div class="bootstrap reject-reason-input" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
-          <div class="e-input input">{{rejectReason}}</div>
-        </div>
 
-        <div class="controls-block">
-          <div class="checkbox-block" *ngIf="isDNWEnabled">
-            <ejs-switch #dnwSwitch
-              class="toggle"
-              [disabled]="disableAnyAction"
-              [checked]="timesheetDetails.noWorkPerformed"
-              (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
-            ></ejs-switch>
-            <span>DNW</span>
+        <div class="controls-wrapper">
+          <div class="reject-reason-block" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
+            <span class="reason-header">Reject Reason:</span>
+            <ejs-tooltip [content]="rejectReason" class="reject-tooltip">
+              <span class="reason-text">{{rejectReason}}</span>
+            </ejs-tooltip>
+          </div>
+
+          <div class="controls-block">
+            <div class="checkbox-block" *ngIf="isDNWEnabled">
+              <ejs-switch #dnwSwitch
+                class="toggle"
+                [disabled]="disableAnyAction"
+                [checked]="timesheetDetails.noWorkPerformed"
+                (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
+              ></ejs-switch>
+              <span>DNW</span>
+            </div>
           </div>
         </div>
+
       </div>
 
       <div class="job-general-info tile-dark-blue">

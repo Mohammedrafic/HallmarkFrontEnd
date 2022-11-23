@@ -88,6 +88,10 @@ import { ExtensionModule } from '@shared/components/extension/extension.module';
 import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
 import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
 import { ReopenOrderModule } from '@client/order-management/reopen-order/reopen-order.module';
+import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
+import { DistributionTierService } from '@client/order-management/order-details-form/services';
+import { MatMenuModule } from '@angular/material/menu';
+import { SettingsViewService } from '@shared/services';
 
 const gridIcons = {
   MessageSquare,
@@ -171,6 +175,8 @@ const gridIcons = {
     ChildOrderDialogModule,
     AssociateListModule,
     DropDownButtonAllModule,
+    TooltipContainerModule,
+    MatMenuModule,
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
     ExtensionModule,
@@ -186,6 +192,8 @@ const gridIcons = {
     FilterService,
     ChipsCssClass,
     MaskedDateTimeService,
+    SettingsViewService,
+    DistributionTierService
   ],
 })
 export class ClientModule {}

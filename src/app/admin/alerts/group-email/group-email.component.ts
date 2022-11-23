@@ -5,39 +5,34 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } 
 import { Actions, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { FilterChangedEvent, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
-import { ClearAlertTemplateState, GetAlertsTemplatePage, GetGroupEmailById, GetTemplateByAlertId, SaveTemplateByAlertId, SendGroupEmail, UpdateTemplateByAlertId } from '@admin/store/alerts.actions';
-import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from '@shared/models/alerts-template.model';
+import { ClearAlertTemplateState, GetGroupEmailById, SendGroupEmail} from '@admin/store/alerts.actions';
 import { AlertsState } from '@admin/store/alerts.state';
-import { SetHeaderState, ShowGroupEmailSideDialog, ShowSmsSideDialog, ShowOnScreenSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowGroupEmailSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
-import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 
-import { BUSINESS_UNITS_VALUES, BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor } from '../alerts.constants';
+import { BUSINESS_DATA_FIELDS, OPRION_FIELDS, toolsRichTextEditor } from '../alerts.constants';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
-import { AlertChannel } from '../alerts.enum';
 
 
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { RECORD_ADDED, RECORD_MODIFIED, GRID_CONFIG, SEND_EMAIL, SEND_EMAIL_REQUIRED } from '@shared/constants';
+import { GRID_CONFIG, SEND_EMAIL, SEND_EMAIL_REQUIRED } from '@shared/constants';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AppState } from '../../../store/app.state';
-import { AlertsEmailTemplateFormComponent } from '../alerts-template/alerts-email-template-form/alerts-email-template-form.component';
-import { AlertsSmsTemplateFromComponent } from '../alerts-template/alerts-sms-template-from/alerts-sms-template-from.component';
 import { SendGroupEmailComponent } from './send-group-email/send-group-email.component';
-import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailFilters, GroupEmailRequest, SendGroupEmailRequest } from '@shared/models/group-email.model';
+import { GroupEmail, GroupEmailByBusinessUnitIdPage, GroupEmailFilters, SendGroupEmailRequest } from '@shared/models/group-email.model';
 import { GetGroupMailByBusinessUnitIdPage } from '@admin/store/alerts.actions';
 import { User } from '@shared/models/user.model';
 import { GroupMailStatus } from '../group-email.enum';
 import { ColumnDefinitionModel } from '@shared/components/grid/models';
 import { GroupEmailColumnsDefinition } from './group-email.constant';
+import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
 @Component({
   selector: 'app-group-email',
   templateUrl: './group-email.component.html',
@@ -62,7 +57,6 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
   public rteEle: RichTextEditorComponent;
   @ViewChild(SendGroupEmailComponent, { static: true }) groupEmailTemplateForm: SendGroupEmailComponent;
 
-  private subTitle: string;
   public sendGroupEmailFormGroup: FormGroup;
   @Select(AlertsState.GroupEmailByBusinessUnitIdPage)
   public groupEmailPage$: Observable<GroupEmailByBusinessUnitIdPage>;

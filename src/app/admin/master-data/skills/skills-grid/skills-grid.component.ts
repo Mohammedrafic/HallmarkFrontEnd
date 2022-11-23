@@ -18,6 +18,8 @@ import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_R
 import { MasterSkillDataSources, MasterSkillFilters, Skill, SkillsPage } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { Permission } from '@core/interface';
+import { UserPermissions } from '@core/enums';
 
 @Component({
   selector: 'app-skills-grid',
@@ -35,6 +37,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   @Input() isActive: boolean = false;
   @Input() export$: Subject<ExportedFileType>;
   @Input() filteredItems$: Subject<number>;
+  @Input() userPermission: Permission;
 
   @ViewChild('grid')
   public grid: GridComponent;
@@ -57,7 +60,8 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   public fileName: string;
   public defaultFileName: string;
   public SkillFilterFormGroup: FormGroup;
-  public filters: MasterSkillFilters = { 
+  public readonly userPermissions = UserPermissions;
+  public filters: MasterSkillFilters = {
     searchTerm: '',
     skillAbbreviations: [],
     skillCategoryIds: [],
@@ -182,8 +186,8 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.store.dispatch(new ExportSkills(new ExportPayload(
-      fileType, 
-      { ...this.filters }, 
+      fileType,
+      { ...this.filters },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
       options?.fileName || this.defaultFileName

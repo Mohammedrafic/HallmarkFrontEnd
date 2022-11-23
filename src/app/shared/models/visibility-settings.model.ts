@@ -37,6 +37,7 @@ export type Department = {
   id: number;
   name: string;
   locationName?: string;
+  locationId:number;
   organizationId: number;
   uniqId?: string | number;
 };
@@ -44,6 +45,7 @@ export type Department = {
 export type Location = {
   id: number;
   name: string;
+  regionId:number;
   regionName?: string;
   departments: Department[];
   organizationId: number;

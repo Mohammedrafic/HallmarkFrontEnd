@@ -11,6 +11,8 @@ import { CandidateStatus, CreatedCandidateStatus } from 'src/app/shared/enums/st
 import { valuesOnly } from 'src/app/shared/utils/enum.utils';
 import { JobDistributionMasterSkills } from '@shared/models/associate-organizations.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { GetRegionList } from '@shared/components/candidate-list/store/candidate-list.actions';
+import { CandidateListState } from '@shared/components/candidate-list/store/candidate-list.state';
 
 enum Classification {
   Alumni = 0,
@@ -34,11 +36,13 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
     this.enableStatusFields = value as boolean;
     this.statuses = Object.values(value ? CreatedCandidateStatus : CandidateStatus)
       .filter(valuesOnly)
-      .map((text, id) => ({ text, id }));
+      .map((text, id) => ({ text, id })).sort((a, b) => a.text.localeCompare(b.text));
   }
 
   @Select(CandidateState.skills)
   private skills$: Observable<ListOfSkills[]>;
+  @Select(CandidateListState.listOfRegions)
+  public regions$: Observable<string[]>;
 
   public skills: ListOfSkills[];
   public readonly limitDate: Date = new Date();
@@ -53,7 +57,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
   };
   public skillsFields = {
     text: 'name',
-    value: 'id',
+    value: 'masterSkillId',
   };
   public statuses: any;
   public classifications = Object.values(Classification)
@@ -68,6 +72,22 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
 
   ngOnInit(): void {
     this.getCandidateSkills();
+    this.getRegions();
+  }
+
+  static createFormGroup(): FormGroup {
+    return new FormGroup({
+      firstName: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
+      middleName: new FormControl(null, [Validators.maxLength(10)]),
+      lastName: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
+      dob: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
+      classification: new FormControl(null),
+      candidateProfileSkills: new FormControl(null, [Validators.required]),
+      profileStatus: new FormControl(2, [Validators.required]),
+      candidateAgencyStatus: new FormControl(2, [Validators.required]),
+      candidateProfileRegions: new FormControl(null, [Validators.required]),
+      ssn: new FormControl(null, [Validators.minLength(9)]),
+    });
   }
 
   private getCandidateSkills(): void {
@@ -83,17 +103,7 @@ export class CandidateGeneralInfoComponent extends DestroyableDirective implemen
       });
   }
 
-  static createFormGroup(): FormGroup {
-    return new FormGroup({
-      firstName: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
-      middleName: new FormControl(null, [Validators.maxLength(10)]),
-      lastName: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
-      dob: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
-      classification: new FormControl(null),
-      candidateProfileSkills: new FormControl(null, [Validators.required]),
-      profileStatus: new FormControl(2, [Validators.required]),
-      candidateAgencyStatus: new FormControl(2, [Validators.required]),
-      ssn: new FormControl(null, [Validators.minLength(9)]),
-    });
+  private getRegions(): void {
+    this.store.dispatch(new GetRegionList());
   }
 }

@@ -1,19 +1,18 @@
-import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import { ClearDeployedCandidateOrderInfo, GetCandidateJob, GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { GetAvailableSteps, GetOrganisationCandidateJob,
-  GetPredefinedBillRates, SetPredefinedBillRatesData
-} from '@client/store/order-managment-content.actions';
+import { GetAvailableSteps, GetOrganisationCandidateJob, GetPredefinedBillRates } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Select, Store } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { Order, OrderCandidatesList } from '@shared/models/order-management.model';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { combineLatest, Observable, Subject, switchMap } from 'rxjs';
+import { combineLatest, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { UserState } from 'src/app/store/user.state';
 import { Duration } from '../../../enums/durations';
@@ -41,6 +40,9 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   @Select(OrderManagementContentState.selectedOrder)
   public selectedOrgOrder$: Observable<Order>;
 
+  @Select(OrderManagementState.deployedCandidateOrderInfo)
+  public readonly deployedCandidateOrderInfo$: Observable<DeployedCandidateOrderInfo[]>;
+
   public templateState: Subject<any> = new Subject();
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
@@ -49,6 +51,8 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public defaultDuration: Duration = Duration.Other;
   public selectedOrder: Order;
   public agencyActionsAllowed = true;
+  public deployedCandidateOrderIds: string[] = [];
+  public isOrderOverlapped = false;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
@@ -72,6 +76,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
       });
     if (this.isAgency) {
       this.checkForAgencyStatus();
+      this.subscribeToDeployedCandidateOrdersInfo();
     }
   }
 
@@ -81,6 +86,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     }
 
     this.candidate = { ...data };
+    this.getDeployedCandidateOrders();
 
     this.orderCandidateListViewService.setIsCandidateOpened(true);
     if (this.order && this.candidate) {
@@ -127,7 +133,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           this.store.dispatch(
             new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId)
           );
-          if (!this.isShowDropdown && !this.candidate.deployedCandidateInfo) {
+          if (!this.isShowDropdown) {
             this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
           }
           this.openDialog(this.offerDeployment);
@@ -142,7 +148,16 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
     }
   }
 
+  private getDeployedCandidateOrders(): void {
+    if (!!this.candidate.deployedCandidateInfo) {
+      const candidateId = this.candidate.candidateId;
+      const organizationId = this.candidate.organizationId || this.candidate.deployedCandidateInfo.organizationId;
+      this.store.dispatch(new GetDeployedCandidateOrderInfo(this.order.orderId, candidateId, organizationId));
+    }
+  }
+
   public onCloseDialog(): void {
+    this.clearDeployedCandidateOrderInfo();
     this.sideDialog.hide();
   }
 
@@ -152,17 +167,67 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   }
 
   private checkForAgencyStatus(): void {
-    this.store.select(UserState.agencyActionsAllowed)
-    .pipe(
-      distinctUntilChanged(),
-      takeUntil(this.unsubscribe$),
-    )
-    .subscribe((value) => {
-      this.agencyActionsAllowed = value;
-    });
+    this.store
+      .select(UserState.agencyActionsAllowed)
+      .pipe(distinctUntilChanged(), takeUntil(this.unsubscribe$))
+      .subscribe((value) => {
+        this.agencyActionsAllowed = value;
+      });
   }
 
   private initPredefinedBillRates(): void {
     this.store.dispatch(new GetPredefinedBillRates());
+  }
+
+  private subscribeToDeployedCandidateOrdersInfo(): void {
+    this.deployedCandidateOrderInfo$.pipe(takeUntil(this.unsubscribe$)).subscribe((ordersInfo) => {
+      this.isOrderOverlapped = this.isOrderOverlappingByDate(ordersInfo);
+      this.deployedCandidateOrderIds = ordersInfo.map((data) => data.orderPublicId);
+    });
+  }
+
+  private isOrderOverlappingByDate(ordersInfo: DeployedCandidateOrderInfo[]): boolean {
+    const timeRange_1 = {
+      start: this.selectedOrder.jobStartDate,
+      end: this.selectedOrder.jobEndDate,
+    };
+    const isOverlaped: boolean[] = [];
+
+    ordersInfo.forEach((order) => {
+      const timeRange_2 = {
+        start: order.positionActualStartDate,
+        end: order.positionActualEndDate,
+      };
+      isOverlaped.push(this.isThereOverlappingDateRange(timeRange_1, timeRange_2));
+    });
+
+    return isOverlaped.includes(true);
+  }
+
+  private isThereOverlappingDateRange(
+    timeRange_1: { start: Date | string; end: Date | string },
+    timeRange_2: { start: Date | string; end: Date | string }
+  ): boolean {
+    const startDate_1 = new Date(timeRange_1.start).getTime();
+    const endDate_1 = new Date(timeRange_1.end).getTime();
+    const startDate_2 = new Date(timeRange_2.start).getTime();
+    const endDate_2 = new Date(timeRange_2.end).getTime();
+
+    if (endDate_1 && endDate_2) {
+      return startDate_1 <= endDate_2 && startDate_2 <= endDate_1;
+    }
+    if (endDate_1 && !endDate_2) {
+      return endDate_1 > startDate_2;
+    }
+    if (!endDate_1 && endDate_2) {
+      return startDate_1 < endDate_2;
+    }
+    return true;
+  }
+
+  private clearDeployedCandidateOrderInfo(): void {
+    if (this.deployedCandidateOrderIds.length) {
+      this.store.dispatch(new ClearDeployedCandidateOrderInfo());
+    }
   }
 }

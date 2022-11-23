@@ -13,7 +13,7 @@
     [rowHeight]="rowHeight"
     [height]="gridHeight"
     (actionBegin)="actionBegin($event)"
-    (dataBound)="gridDataBound(reasonGrid)"
+    (dataBound)="gridDataBound(reasonGrid, null)"
   >
     <e-columns>
       <e-column textAlign="Right" width="100">
@@ -39,6 +39,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -55,6 +56,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(reasons$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager

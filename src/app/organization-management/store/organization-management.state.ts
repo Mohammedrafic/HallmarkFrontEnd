@@ -24,6 +24,7 @@ import {
   GetAllOrganizationSkills,
   GetAllSkills,
   GetAllSkillsCategories,
+  GetAssignedSkillsByOrganization,
   GetAssignedSkillsByPage,
   GetBillRatesImportErrors,
   GetBillRatesImportErrorsSucceeded,
@@ -48,6 +49,7 @@ import {
   GetLocationsImportTemplate,
   GetLocationsImportTemplateSucceeded,
   GetLocationTypes,
+  GetMasterRegions,
   GetMasterSkillsByOrganization,
   GetMasterSkillsByPage,
   GetOrganizationById,
@@ -58,6 +60,10 @@ import {
   GetOrganizationSettingsFilterOptions,
   GetRegionFilterOptions,
   GetRegions,
+  GetRegionsImportErrors,
+  GetRegionsImportErrorsSucceeded,
+  GetRegionsImportTemplate,
+  GetRegionsImportTemplateSucceeded,
   GetSkillDataSources,
   GetSkillsCategoriesByPage,
   GetUSCanadaTimeZoneIds,
@@ -89,6 +95,8 @@ import {
   SaveOrganizationSettings,
   SaveOrganizationSucceeded,
   SaveRegion,
+  SaveRegionsImportResult,
+  SaveRegionsImportResultSucceeded,
   SaveSkillsCategory,
   SaveSkillsCategorySucceeded,
   SaveUpdateCredentialSkillGroup,
@@ -106,22 +114,10 @@ import {
   UploadLocationsFile,
   UploadLocationsFileSucceeded,
   UploadOrganizationLogo,
-  GetRegionsImportTemplate,
   UploadRegionsFile,
-  SaveRegionsImportResult,
-  UploadRegionsFileSucceeded,
-  SaveRegionsImportResultSucceeded,
-  GetRegionsImportTemplateSucceeded,
-  GetRegionsImportErrors,
-  GetRegionsImportErrorsSucceeded,
-  GetMasterRegions
+  UploadRegionsFileSucceeded
 } from './organization-management.actions';
-import {
-  Department,
-  DepartmentFilterOptions,
-  DepartmentsPage,
-  ImportedDepartment,
-} from '@shared/models/department.model';
+import { Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
 import { ImportedRegion, Region, regionFilter } from '@shared/models/region.model';
 import {
   ImportedLocation,
@@ -129,11 +125,18 @@ import {
   LocationFilterOptions,
   LocationsPage,
   LocationType,
-  TimeZoneModel,
+  TimeZoneModel
 } from '@shared/models/location.model';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
-import { MasterSkillByOrganization, Skill, SkillDataSource, SkillsPage } from 'src/app/shared/models/skill.model';
+import {
+  AssignedSkillsByOrganization,
+  ListOfSkills,
+  MasterSkillByOrganization,
+  Skill,
+  SkillDataSource,
+  SkillsPage
+} from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
@@ -143,9 +146,10 @@ import {
   RECORD_ADDED,
   RECORD_ALREADY_EXISTS,
   RECORD_CANNOT_BE_DELETED,
+  RECORD_DELETE,
   RECORD_MODIFIED,
   RECORD_SAVED,
-  usedByOrderErrorMessage,
+  usedByOrderErrorMessage
 } from 'src/app/shared/constants/messages';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
@@ -159,9 +163,10 @@ import { OrganizationSettingsService } from '@shared/services/organization-setti
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { NodatimeService } from '@shared/services/nodatime.service';
-import { HttpErrorResponse } from "@angular/common/http";
+import { HttpErrorResponse } from '@angular/common/http';
 import { BillRatesService } from '@shared/services/bill-rates.service';
 import { ImportedBillRate } from '@shared/models';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 interface DropdownOption {
   id: number;
@@ -213,6 +218,7 @@ export interface OrganizationManagementStateModel {
   timeZones: TimeZoneModel[] | null;
   loctionTypes: LocationType[] | null;
   isLocationTypesLoading: boolean;
+  assignedSkillsByOrganization: ListOfSkills[];
 }
 
 @State<OrganizationManagementStateModel>({
@@ -268,6 +274,7 @@ export interface OrganizationManagementStateModel {
     timeZones: [],
     loctionTypes: [],
     isLocationTypesLoading: false,
+    assignedSkillsByOrganization: []
   },
 })
 @Injectable()
@@ -323,9 +330,20 @@ export class OrganizationManagementState {
   }
 
   @Selector()
+  static sortedDepartments(state: OrganizationManagementStateModel): Department[] | DepartmentsPage {
+    return sortByField(state.departments as Department[], 'departmentName');
+  }
+
+  @Selector()
   static regions(state: OrganizationManagementStateModel): Region[] {
     return state.regions;
   }
+
+  @Selector()
+  static sortedRegions(state: OrganizationManagementStateModel): Region[] {
+    return sortByField(state.regions, 'name');
+  }
+
   @Selector()
   static GetRegionFilterOptions(state: OrganizationManagementStateModel): Region[] {
     return state.regions;
@@ -338,6 +356,11 @@ export class OrganizationManagementState {
   @Selector()
   static locationsByRegionId(state: OrganizationManagementStateModel): Location[] | LocationsPage {
     return state.locations;
+  }
+
+  @Selector()
+  static sortedLocationsByRegionId(state: OrganizationManagementStateModel): Location[] {
+    return sortByField(state.locations as Location[], 'name');
   }
 
   @Selector()
@@ -358,6 +381,11 @@ export class OrganizationManagementState {
   @Selector()
   static masterSkillsByOrganization(state: OrganizationManagementStateModel): MasterSkillByOrganization[] {
     return state.masterSkillsByOrganization;
+  }
+
+  @Selector()
+  static assignedSkillsByOrganization(state: OrganizationManagementStateModel): ListOfSkills[] {
+    return state.assignedSkillsByOrganization;
   }
 
   @Selector()
@@ -675,8 +703,13 @@ export class OrganizationManagementState {
     return this.regionService.deleteRegionById(regionId).pipe(
       tap((payload) => {
         patchState({ isLocationLoading: false });
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
         dispatch(new GetRegions());
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error,
+          (error.error.errors != null && error.error.errors != undefined) ? 'Dependencies:'+error.error.errors.EntityInUse[0] : error.error.detail));
       })
     );
   }
@@ -799,6 +832,15 @@ export class OrganizationManagementState {
       tap((payload) => {
         patchState({ masterSkillsByOrganization: payload });
         return payload;
+      })
+    );
+  }
+
+  @Action(GetAssignedSkillsByOrganization)
+  GetAssignedSkillsByOrganization({ patchState, }: StateContext<OrganizationManagementStateModel>): Observable<AssignedSkillsByOrganization[]> {
+    return this.skillsService.getAssignedSkillsByOrganization().pipe(
+      tap((payload) => {
+        patchState({ assignedSkillsByOrganization: payload.map((skill) => ({...skill, id: skill.masterSkillId, name: skill.skillDescription})) });
       })
     );
   }
@@ -1530,8 +1572,8 @@ export class OrganizationManagementState {
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Bill rates were not imported'))))
     );
   }
-  
-  
+
+
   @Action(GetRegionsImportTemplate)
   GetRegionsImportTemplate({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: GetRegionsImportTemplate): Observable<any> {
     return this.regionService.getRegionsImportTemplate(payload).pipe(

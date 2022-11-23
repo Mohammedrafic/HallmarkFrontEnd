@@ -1,11 +1,10 @@
-import { Component, OnDestroy, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { DatePipe } from '@angular/common';
-import { SpecialProjectTabs, AddButtonText } from '@shared/enums/special-project-tabs.enum'
+import { AddButtonText, SpecialProjectTabs } from '@shared/enums/special-project-tabs.enum';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ShowSideDialog } from '../../../store/app.actions';
-import { Organization, OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { UserState } from '../../../store/user.state';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
@@ -15,10 +14,10 @@ import { SpecialProjectState } from '../../store/special-project.state';
 import { ProjectType } from '@shared/models/project.model';
 import { GetProjectTypes, GetSpecialProjectById, SaveSpecialProject } from '../../store/special-project.actions';
 import { SpecialProject } from '@shared/models/special-project.model';
-import { GetAllOrganizationSkills } from '../../store/organization-management.actions';
+import { GetAssignedSkillsByOrganization } from '../../store/organization-management.actions';
 import { SpecialProjectsComponent } from '../components/special-projects/special-projects.component';
 import { PurchaseOrdersComponent } from '../components/purchase-orders/purchase-orders.component';
-import { GetPurchaseOrders, GetPurchaseOrderById, SavePurchaseOrder } from '../../store/purchase-order.actions';
+import { GetPurchaseOrderById, GetPurchaseOrders, SavePurchaseOrder } from '../../store/purchase-order.actions';
 import { PurchaseOrder, PurchaseOrderPage } from '@shared/models/purchase-order.model';
 import { PurchaseOrderState } from '../../store/purchase-order.state';
 import { SpecialProjectCategoryState } from '../../store/special-project-category.state';
@@ -26,18 +25,23 @@ import { SpecialProjectCategoryComponent } from '../components/special-project-c
 import { SpecialProjectCategory } from '@shared/models/special-project-category.model';
 import { GetSpecialProjectCategoryById, SaveSpecialProjectCategory } from '../../store/special-project-category.actions';
 import { FormControlNames } from '../enums/specialproject.enum';
-import { ProjectNames, SaveSpecialProjectMappingDto, SpecialProjectMapping } from '@shared/models/special-project-mapping.model';
-import { GetProjectNamesByTypeId, SaveSpecialProjectMapping, SpecialProjectShowConfirmationPopUp } from '../../store/special-project-mapping.actions';
+import { ProjectNames, SaveSpecialProjectMappingDto } from '@shared/models/special-project-mapping.model';
+import {
+  GetProjectNamesByTypeId,
+  SaveSpecialProjectMapping,
+  SpecialProjectShowConfirmationPopUp
+} from '../../store/special-project-mapping.actions';
 import { ProjectMappingComponent } from '../components/project-mapping/project-mapping.component';
 import { SpecialProjectMappingState } from '../../store/special-project-mapping.state';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE } from '../../../shared/constants';
+import { DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE } from '@shared/constants';
 import { SavePurchaseOrderMapping, ShowConfirmationPopUp } from '../../store/purchase-order-mapping.actions';
-import { PurchaseOrderMappingState } from '../../store/purchase-order-mapping.state';
-import { PurchaseOrderNames, SavePurchaseOrderMappingDto } from '../../../shared/models/purchase-order-mapping.model';
+import { SavePurchaseOrderMappingDto } from '../../../shared/models/purchase-order-mapping.model';
 import { PurchaseOrderMappingComponent } from '../components/purchase-order-mapping/purchase-order-mapping.component';
 import { datesValidator } from '@shared/validators/date.validator';
+import { AbstractPermission } from '@shared/helpers/permissions';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-specialproject-container',
@@ -45,7 +49,7 @@ import { datesValidator } from '@shared/validators/date.validator';
   styleUrls: ['./specialproject-container.component.scss']
 })
 
-export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
+export class SpecialProjectContainerComponent extends AbstractPermission implements OnInit, OnDestroy {
   @ViewChild(SpecialProjectsComponent, { static: false }) childC: SpecialProjectsComponent;
   @ViewChild(PurchaseOrdersComponent, { static: false }) childPurchaseComponent: PurchaseOrdersComponent;
   @ViewChild(SpecialProjectCategoryComponent, { static: false }) childSpecialProjectCategoryComponent: SpecialProjectCategoryComponent;
@@ -88,7 +92,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   public regions: OrganizationRegion[] = [];
   public orgStructureData: any;
 
-  @Select(OrganizationManagementState.allOrganizationSkills)
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
   skills$: Observable<Skill[]>;
 
   @Select(SpecialProjectState.projectTypes)
@@ -122,14 +126,16 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   public today = new Date();
   public startDate:any = new Date();
 
-  constructor(private store: Store,
+  constructor(protected override store: Store,
     private changeDetectorRef: ChangeDetectorRef,
     private actions$: Actions,
     private confirmService: ConfirmService) {
+    super(store);
     this.today.setHours(0, 0, 0);
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.startDate = null;
     this.orgStructureDataSetup();
     this.onOrganizationStructureDataLoadHandler();
@@ -190,7 +196,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
     this.getPONames();
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
@@ -209,7 +215,8 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetPurchaseOrders());
     this.purchaseOrderPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (data?.items) {
-        this.orgStructureData.poNameIds.dataSource = data?.items.map((item) => { return { id: item.id, name: item.poName } });
+        const poNames = data?.items.map((item) => { return { id: item.id, name: item.poName } });
+        this.orgStructureData.poNameIds.dataSource = sortByField(poNames, 'name');
       }
     });
 
@@ -480,14 +487,16 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
       if (val?.length) {
         this.form.get('locationIds')?.setValue([]);
         const selectedRegions: OrganizationRegion[] = [];
+        const locations: OrganizationLocation[] = [];
         val.forEach((id) =>
           selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
         );
         this.orgStructureData.locationIds.dataSource = [];
         selectedRegions.forEach((region) => {
           region.locations?.forEach((location) => (location.regionName = region.name));
-          this.orgStructureData.locationIds.dataSource.push(...(region?.locations as []));
+          locations.push(...(region?.locations as []));
         });
+        this.orgStructureData.locationIds.dataSource = sortByField(locations, 'name');
       } else {
         this.orgStructureData.locationIds.dataSource = [];
         this.form.get('locationIds')?.setValue([]);
@@ -498,6 +507,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
       if (val?.length) {
         this.form.get('departmentsIds')?.setValue([]);
         const selectedLocations: OrganizationLocation[] = [];
+        const departments: OrganizationDepartment[] = [];
         val.forEach((id) =>
           selectedLocations.push(
             this.orgStructureData.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)
@@ -505,8 +515,9 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         );
         this.orgStructureData.departmentsIds.dataSource = [];
         selectedLocations.forEach((location) => {
-          this.orgStructureData.departmentsIds.dataSource.push(...(location?.departments as []));
+          departments.push(...(location?.departments as []));
         });
+        this.orgStructureData.departmentsIds.dataSource = sortByField(departments, 'name');
       } else {
         this.orgStructureData.departmentsIds.dataSource = [];
         this.form.get('departmentsIds')?.setValue([]);
@@ -517,7 +528,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   }
 
   private onSkillDataLoadHandler(): void {
-    this.store.dispatch(new GetAllOrganizationSkills());
+    this.store.dispatch(new GetAssignedSkillsByOrganization());
     this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe((skills) => {
       if (skills && skills.length > 0) {
         this.orgStructureData.skillIds.dataSource = skills;
@@ -804,5 +815,4 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
       this.form.controls['PrePopulateInOrders'].setValue(data.prePopulateInOrders);
     }
   }
-
 }

@@ -13,7 +13,7 @@ export interface CandidatesDetailsModel extends CandidatesBasicInfo {
   agencyId: number | null;
   organizationPrefix: string;
   startDate: string;
-  classification: number;
+  classifications: number[];
   endDate: string;
   scheduledDate: string;
   department: string;
@@ -43,6 +43,7 @@ export type FiltersModal = {
   startDate?: string;
   endDate?: string;
   orderTypes?: Array<number>;
+  organizationIds?: number[];
 };
 
 export interface FiltersPageModal extends FiltersModal {

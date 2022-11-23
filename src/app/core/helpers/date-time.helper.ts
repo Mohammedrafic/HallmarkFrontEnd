@@ -132,13 +132,13 @@ export class DateTimeHelper {
     return formatDate(date, format, 'en-US', 'UTC');
   }
 
-  public static findPreviousNearestDate(datesArray: string[], date: string | undefined): number | null {
+  public static findPreviousNearestDateIndex(datesArray: string[], date: string | undefined): number | null {
     const existDate: number = date ? new Date(date).getTime() : new Date().getTime();
     let closedToDate: number = datesArray[0] ? new Date(datesArray[0]).getTime() : new Date().getTime();
     let result = null;
 
     datesArray.forEach((el: string, idx: number) => {
-      const dateCheck: number = new Date(el).getTime();
+      const dateCheck: number = DateTimeHelper.convertDateToUtc(el).getTime();
       const diffTime = existDate - dateCheck;
 
       if (diffTime < closedToDate && dateCheck <= existDate) {

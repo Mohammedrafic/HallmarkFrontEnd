@@ -7,6 +7,7 @@
             appValidateWithMessage
             appHideBeforeSyncfusionLoad
             formControlName="businessUnit"
+            [allowFiltering]="true"
             [fields]="unitFields"
             [dataSource]="businessUnits"
             placeholder="Business Unit"
@@ -19,6 +20,7 @@
             appValidateWithMessage
             appHideBeforeSyncfusionLoad
             formControlName="business"
+            [allowFiltering]="true"
             [fields]="bussinesDataFields"
             [dataSource]="bussinesUserData$ | async"
             placeholder="Business"
@@ -40,7 +42,11 @@
           Export <i-feather name="download" class="icon"></i-feather>
         </div>
       </button>
-      <button ejs-button [isPrimary]="true" (click)="onAddNewUser()">Add User</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditUsers]">
+        <button ejs-button [isPrimary]="true" [disabled]="!userPermission[userPermissions.CanEditUsers]" (click)="onAddNewUser()">Add User</button>
+      </app-tooltip-container>
     </ng-container>
   </ng-container>
 </app-page-toolbar>
@@ -49,7 +55,7 @@
   <app-user-grid [filterForm]="businessForm" [export$]="exportUsers$" (editUserEvent)="onEdit($event)"></app-user-grid>
 </section>
 
-<app-side-dialog width="832" [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()" [disableSaveButton]="agencyActionsAllowed">
+<app-side-dialog width="832" [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()" [disableSaveButton]="agencyActionsAllowed || !userPermission[userPermissions.CanEditUsers]">
   <section>
     <app-add-edit-user [form]="$any(userSettingForm)" [businessUnits]="businessUnits" [user]="createdUser"></app-add-edit-user>
   </section>

@@ -25,7 +25,7 @@ import {
 } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
-import { OrderType } from '@shared/enums/order-type';
+import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Department, Location, Organisation, Region } from '@shared/models/visibility-settings.model';
 import { Department as ContactDetails } from '@shared/models/department.model';
@@ -65,6 +65,7 @@ import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shi
 import { ManualInvoiceReason } from '@shared/models/manual-invoice-reasons.model';
 import { DurationService } from '@shared/services/duration.service';
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-quick-order-form',
@@ -99,12 +100,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public priceUtils = PriceUtils;
   public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
 
-  public readonly orderTypes = [
-    { id: OrderType.ContractToPerm, name: 'Contract To Perm' },
-    { id: OrderType.OpenPerDiem, name: 'Open Per Diem' },
-    { id: OrderType.PermPlacement, name: 'Perm. Placement' },
-    { id: OrderType.Traveler, name: 'Traveler' },
-  ];
+  public readonly orderTypes = OrderTypeOptions;
   public readonly orderTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public readonly organizationTypeFields: FieldSettingsModel = { text: 'name', value: 'organizationId' };
@@ -152,7 +148,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   public readonly masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  @Select(RejectReasonState.orderRequisition)
+  @Select(RejectReasonState.sortedOrderRequisition)
   public readonly reasons$: Observable<RejectReasonPage>;
 
   public readonly reasonForRequisitionFields: FieldSettingsModel = { text: 'reason', value: 'id' };
@@ -424,6 +420,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       if (!(jobStartDate instanceof Date)) {
         return;
       }
+      jobStartDate.setHours(0, 0, 0, 0);
       this.jobStartDateControl.patchValue(jobStartDate);
       this.autoSetupJobEndDateControl(duration, jobStartDate);
     });
@@ -475,6 +472,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     const jobEndDateControl = this.generalInformationForm.get('jobEndDate') as AbstractControl;
 
     const jobEndDate: Date = this.durationService.getEndDate(duration, jobStartDateValue);
+    jobEndDate.setHours(0, 0, 0, 0);
     jobEndDateControl.patchValue(jobEndDate);
   }
 
@@ -565,15 +563,17 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.orderTypeControl.valueChanges,
       this.generalInformationForm.controls['departmentId'].valueChanges,
       this.generalInformationForm.controls['skillId'].valueChanges,
+      this.generalInformationForm.controls['jobStartDate'].valueChanges,
+      this.generalInformationForm.controls['jobEndDate'].valueChanges,
       this.userIsAdmin ? this.organizationForm.controls['organization'].valueChanges : of(null),
     ])
       .pipe(takeUntil(this.destroy$), debounceTime(300))
-      .subscribe(([orderType, departmentId, skillId, organizationId]) => {
-        if (isNaN(parseInt(orderType)) || !departmentId || !skillId) {
+      .subscribe(([orderType, departmentId, skillId, jobStartDate, jobEndDate, organizationId]) => {
+        if (isNaN(parseInt(orderType)) || !departmentId || !skillId || !jobStartDate || !jobEndDate) {
           return;
         }
 
-        this.populateHourlyRateField(orderType, departmentId, skillId, organizationId);
+        this.populateHourlyRateField(orderType, departmentId, skillId, jobStartDate, jobEndDate, organizationId);
       });
   }
 
@@ -581,14 +581,18 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     orderType: OrderType,
     departmentId: number,
     skillId: number,
+    jobStartDate: Date,
+    jobEndDate: Date,
     organizationId?: number
   ): void {
     if (this.isTravelerOrder || this.isContactToPermOrder) {
+      const startDate = DateTimeHelper.toUtcFormat(jobStartDate);
+      const endDate = DateTimeHelper.toUtcFormat(jobEndDate);
       this.orderManagementService
-        .getRegularLocalBillRate(orderType, departmentId, skillId, organizationId)
+        .getRegularBillRate(orderType, departmentId, skillId, startDate, endDate, organizationId)
         .pipe(take(1))
-        .subscribe((billRates: BillRate[]) =>
-          this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0]?.rateHour.toFixed(2) || null)
+        .subscribe((billRate: BillRate) =>
+          this.generalInformationForm.controls['hourlyRate'].patchValue(billRate?.rateHour.toFixed(2) || null)
         );
     }
   }
@@ -602,6 +606,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.generalInformationForm.controls['openPositions'].patchValue(1);
     this.durationControl.patchValue(Duration.ThirteenWeeks);
     const nextSundayAfterThreeWeeks: Date = this.getNextSundayAfterThreeWeeks();
+    nextSundayAfterThreeWeeks.setHours(0, 0, 0, 0);
     if (nextSundayAfterThreeWeeks instanceof Date) {
       this.jobStartDateControl.patchValue(nextSundayAfterThreeWeeks);
     }

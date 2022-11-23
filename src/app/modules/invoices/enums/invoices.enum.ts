@@ -5,6 +5,11 @@ export enum INVOICES_STATUSES {
   PAID = 'paid',
 }
 
+export enum InvoicesActionBtn {
+  Approve = 'Approve',
+  Pay = 'Pay',
+}
+
 export enum INVOICES_ACTIONS {
   GET = '[invoices] GET',
   GET_MANUAL_INVOICES = '[invoices] GET MANUAL INVOICES',

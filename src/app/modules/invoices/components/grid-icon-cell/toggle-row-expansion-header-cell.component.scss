@@ -1,3 +1,7 @@
+:host {
+  width: 100%;
+}
+
 .grid-icon-cell-container {
   display: flex;
   align-items: center;
@@ -5,5 +9,20 @@
   button {
     margin-right: 25px;
     margin-left: 5px;
+  }
+
+  .icon {
+    position: relative;
+    top: 2px;
+    width: 16px !important;
+    height: 16px !important;
+    margin-left: 6px;
+    color: #181d1f !important;
+    stroke-linecap: unset !important;
+    stroke-linejoin: unset !important;
+
+    &.desc {
+      transform: rotateZ(180deg);
+    }
   }
 }

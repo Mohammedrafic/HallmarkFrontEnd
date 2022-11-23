@@ -1,13 +1,41 @@
 import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { DropdownOption } from '@core/interface';
+import { Store } from '@ngxs/store';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
+import { User } from '@shared/models/user.model';
 import { isBoolean, isDate, isEmpty, isNumber } from 'lodash';
+import { SetPreservedFilters, SetPreservedFiltersForTimesheets } from 'src/app/store/preserved-filters.actions';
 
 @Injectable({ providedIn: 'root' })
 export class FilterService {
-  constructor() {}
+  constructor(private store: Store) {}
+
+  public canPreserveFilters(): boolean {
+    const user = JSON.parse(localStorage.getItem('User') || '') as User;
+    return ![BusinessUnitType.Hallmark, BusinessUnitType.MSP].includes(user.businessUnitType);
+  }
+
+  public setPreservedFIlters(filters: any, regionPropName = 'regionIds'): void {
+    if (this.canPreserveFilters()) {
+      this.store.dispatch(new SetPreservedFilters({ regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null }));
+    }
+  }
+
+  public setPreservedFIltersTimesheets(filters: any, regionPropName = 'regionIds'): void {
+    if (this.canPreserveFilters()) {
+      this.store.dispatch(new SetPreservedFiltersForTimesheets({ regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null }));
+    }
+  }
+
+  public setPreservedFIltersGlobal(filters: any, regionPropName = 'regionsNames'): void {
+    if (this.canPreserveFilters()) {
+      this.store.dispatch(new SetPreservedFilters({ regions: filters[regionPropName] || [], locations: filters.locationIds || [], organizations: filters.organizationIds || null }, true));
+    }
+  }
 
   /**
    * Remove value from form control
@@ -25,7 +53,10 @@ export class FilterService {
       form.controls[event.column].setValue(false);
     } else if (filterColumns[event.column].type === ControlTypes.Radio) {
       form.controls[event.column].setValue(filterColumns[event.column].default);
-    } else if (filterColumns[event.column].type === ControlTypes.Date) {
+    } else if (
+      filterColumns[event.column].type === ControlTypes.Date
+      || filterColumns[event.column].type === ControlTypes.Dropdown
+      ) {
       form.controls[event.column].setValue(null);
     } else {
       form.controls[event.column].setValue('');
@@ -52,12 +83,12 @@ export class FilterService {
         switch (filterColumns[key].type) {
           case ControlTypes.Multiselect:
             val.forEach((item: any) => {
-              const filteredItem = filterColumns[key].dataSource.find(
+              const filteredItem = filterColumns[key].dataSource?.find(
                 (data: any) => data[filterColumns[key].valueId] === item
               );
               chips.push({
                 text:
-                  filterColumns[key].valueType === ValueType.Id ? filteredItem[filterColumns[key].valueField] : item,
+                  filterColumns[key].valueType === ValueType.Id ? filteredItem && filteredItem[filterColumns[key].valueField] : item,
                 column: key,
                 value: item,
                 organizationId: filteredItem?.organizationId || filteredItem?.businessUnitId || null,
@@ -83,6 +114,13 @@ export class FilterService {
             }
             break;
 
+          case ControlTypes.Dropdown:
+            const item: DropdownOption = filterColumns[key].dataSource.find((item: DropdownOption) => item.value === val);
+
+            if (item) {
+              chips.push({ text: item.text, column: key, value: val });
+            }
+            break;
           default:
             chips.push({ text: val, column: key, value: val });
             break;

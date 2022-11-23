@@ -43,13 +43,13 @@ export class TimesheetTableLinkComponent implements ICellRendererAngularComp {
         this.router.navigate(['agency/candidates/edit', this.cellValue.candidateId]);
       } else if (this.params.colDef?.field === TimesheetsTableColumns.OrderId) {
         this.router.navigate(['agency/order-management'], {
-          state: { orderId: this.cellValue.orderId }
+          state: { publicId: this.cellValue.orderPublicId, prefix: this.params.data.orgPrefix }
         });
       }
     } else {
       if (this.params.colDef?.field === TimesheetsTableColumns.OrderId) {
         this.router.navigate(['client/order-management'], {
-          state: { orderId: this.cellValue.orderId }
+          state: { publicId: this.cellValue.orderPublicId, timesheetRedirect: true, prefix: this.cellValue.orgPrefix }
         });
       }
     }

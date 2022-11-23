@@ -4,9 +4,18 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
-import { ExportSkills, GetAllSkillsCategories, GetAssignedSkillsByPage, GetSkillDataSources, RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded, SetDirtyState } from '../store/organization-management.actions';
+import {
+  ExportSkills,
+  GetAllSkillsCategories,
+  GetAssignedSkillsByPage,
+  GetSkillDataSources,
+  RemoveAssignedSkill,
+  RemoveAssignedSkillSucceeded,
+  SaveAssignedSkill,
+  SaveAssignedSkillSucceeded,
+  SetDirtyState
+} from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
-import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { Skill, SkillDataSource, SkillFilters } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
@@ -19,6 +28,8 @@ import { UserState } from 'src/app/store/user.state';
 import { FilteredItem } from '@shared/models/filter.model';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilterService } from '@shared/services/filter.service';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { SaveAssignedSkillValue } from '@organization-management/store/skills.actions';
 
 @Component({
   selector: 'app-skills',
@@ -26,7 +37,7 @@ import { FilterService } from '@shared/services/filter.service';
   styleUrls: ['./skills.component.scss'],
   providers: [SortService, MaskedDateTimeService]
 })
-export class SkillsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class SkillsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   public optionFields = {
@@ -69,14 +80,16 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   public fileName: string;
   public defaultFileName: string;
   public filters: SkillFilters = {};
+  public openAssignSidebarSubject = new Subject<boolean>();
 
-  constructor(private store: Store,
+
+  constructor(protected override store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
               private confirmService: ConfirmService,
               private filterService: FilterService,
               private datePipe: DatePipe) {
-    super();
+    super(store);
     this.idFieldName = 'foreignKey';
     this.SkillFormGroup = this.fb.group({
       id: new FormControl(0),
@@ -98,7 +111,8 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     });
   }
 
-  ngOnInit() {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.filterColumns = {
       skillCategories: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
       skillAbbrs: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
@@ -130,6 +144,10 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
       this.filterColumns.skillAbbrs.dataSource = dataSource.skillABBRs.filter(item => item);
       this.filterColumns.skillDescriptions.dataSource = dataSource.skillDescriptions;
       this.filterColumns.glNumbers.dataSource = ['blank', ...dataSource.glNumbers.filter(item => item)];
+    });
+
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveAssignedSkillValue)).subscribe(() => {
+      this.getSkills();
     });
   }
 
@@ -225,6 +243,10 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     this.SkillFormGroup.controls['isDefault'].setValue(false);
     this.skillFieldsHandler(false);
     this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  public assignSkill(): void {
+    this.openAssignSidebarSubject.next(true)
   }
 
   public allowOnBoardChange(data: Skill, event: any): void {

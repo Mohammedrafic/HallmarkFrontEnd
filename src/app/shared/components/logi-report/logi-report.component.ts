@@ -1,36 +1,65 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { LogiReportTypes } from 'src/app/shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
-declare const com: any;
+import { ConfigurationDto } from '@shared/models/analytics.model';
+import { LogiReportJsLoaded } from '@shared/constants';
+import { UserState } from '../../../store/user.state';
+import { Store } from '@ngxs/store';
+import { BusinessUnitType } from '../../enums/business-unit-type';
+//declare const com: any;
+
+declare global {
+  /* eslint-disable no-var */
+  var com: {
+    jinfonet: {
+      api: {
+        AppFactory: any;
+      };
+    };
+  };
+  
+}
 
 @Component({
   selector: 'app-logi-report',
   templateUrl: './logi-report.component.html',
   styleUrls: ['./logi-report.component.scss']
 })
+
 export class LogiReportComponent implements OnInit {
-  private factory: any;
+  private static factory: any;
   private reportIframeName: string = "reportIframe";
-  private uId: string = "admin";
-  private pwd: string = "admin";
+  private uId: string = "";
+  private pwd: string = "";
   private jrdPrefer: any;
   private reportUrl: string;
+  private reportBaseUrl:string;  
+  private scriptLoadTimeoutHandle: any;
   @Input() paramsData: any | {};
   @Input() reportName: LogiReportFileDetails;
   @Input() catelogName: LogiReportFileDetails;
   @Input() reportType: LogiReportTypes;
   @Input() resultList: LogiReportFileDetails[];
-
-  constructor(@Inject(APP_SETTINGS) private appSettings: AppSettings) {
+  
+  constructor(@Inject(APP_SETTINGS) private appSettings: AppSettings, private store: Store) {
   }
+  
 
   ngOnInit(): void {
-    this.factory = com.jinfonet.api.AppFactory;    
+    //this.factory = com.jinfonet.api.AppFactory;    
     
   }
-  public SetReportUrl(url:string):void{
-    this.reportUrl=url+ 'jinfonet/tryView.jsp';
+  
+  public SetReportData(data:ConfigurationDto[]):void{
+    let url=data.find(i=>i.key=="ReportServer:BaseUrl")?.value;
+    let userId=data.find(i=>i.key=="ReportServer:UId")?.value;
+    let pass=data.find(i=>i.key=="ReportServer:Pwd")?.value;
+    this.reportBaseUrl=url==null?"":url;
+    this.reportUrl=url==null?"":url+ 'jinfonet/tryView.jsp';
+    this.uId=userId==null?"":userId;
+    this.pwd=pass==null?"":pass;
+    this.injectReportApiJs();
   }
   public RenderReport():void
   {
@@ -65,7 +94,7 @@ export class LogiReportComponent implements OnInit {
         active: 1
       };
       console.log(this.reportUrl);
-    let task = this.factory.runDashboard(server, resExt, entryId);
+    let task = LogiReportComponent.factory.runDashboard(server, resExt, entryId);
   }
 
   private ShowReport(entryId: string): void {
@@ -94,18 +123,48 @@ export class LogiReportComponent implements OnInit {
         }
       }
     }
+    const user = this.store.selectSnapshot(UserState.user);
+    var studio_mode = this.reportType == LogiReportTypes.PageReport ? "basic_only" : "view_only";
+    if (user?.businessUnitType === BusinessUnitType.Hallmark) {
+     
+      studio_mode = this.reportType == LogiReportTypes.PageReport ? "interactive" : "view";
+    }
     let server = {
       url: this.reportUrl,
       user: this.uId,
       pass: this.pwd,
       jrd_prefer: this.jrdPrefer,
-      jrd_studio_mode:this.reportType == LogiReportTypes.PageReport? "basic_only":"view_only",
+      jrd_studio_mode: studio_mode,
       "jrs.param_page": true //,
       //"jrs.profile": "profilename"
     };
     let prptRes = this.reportName;
     let catRes = this.catelogName;
-    let test = this.factory.runReport(
+    let test = LogiReportComponent.factory?.runReport(
       server, prptRes, catRes, this.paramsData, entryId);
   };
+
+  private injectReportApiJs(): Promise<void> {
+    let jrReportApiJsInjected= window.localStorage.getItem(LogiReportJsLoaded);
+    let jsfile=document.getElementById("j$vm");
+    return jrReportApiJsInjected!=null&&jrReportApiJsInjected=="true"&&jsfile!=null
+      ? Promise.resolve()
+      : new Promise((resolve: () => void, reject: () => void) => {
+          const script = document.createElement('script');
+          script.id = 'j$vm';
+          script.type = 'text/javascript';
+          window.localStorage.setItem(LogiReportJsLoaded,"true");
+          script.onload = (): void => {
+            LogiReportComponent.factory = com.jinfonet.api.AppFactory;            
+            clearTimeout(this.scriptLoadTimeoutHandle);
+            resolve();
+          };
+          script.src = `${this.reportBaseUrl}webos/jsvm/lib/jreportapi.js`;
+          document.getElementsByTagName('head')[0].appendChild(script);
+
+          this.scriptLoadTimeoutHandle = setTimeout(() => {
+            reject();
+          }, 10000);
+        });
+  }
 }

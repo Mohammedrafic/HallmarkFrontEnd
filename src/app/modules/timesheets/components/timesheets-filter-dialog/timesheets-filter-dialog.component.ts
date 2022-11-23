@@ -40,7 +40,11 @@ export class TimesheetsFilterDialogComponent extends
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!changes['activeTabIdx'].firstChange) {
+    if (changes['activeTabIdx'] && !changes['activeTabIdx'].firstChange) {
+      this.showStatuses = this.activeTabIdx === 0;
+      this.clearAllFilters(false, this.filterService.canPreserveFilters());
+    }
+    if (changes['orgId'] && !changes['orgId'].firstChange) {
       this.showStatuses = this.activeTabIdx === 0;
       this.clearAllFilters(false);
     }

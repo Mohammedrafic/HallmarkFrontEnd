@@ -7,7 +7,6 @@ import {
 } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-dialog/model/payment-details.model';
 import {
   BANK_COUNTRY,
-  COUNTRIES,
   FORMAT_INPUT,
   OPTION_FIELDS,
   PHONE_MASK,
@@ -21,6 +20,7 @@ import { Store } from '@ngxs/store';
 import { SetPaymentDetailsForm } from '@agency/store/agency.actions';
 import PriceUtils from '@shared/utils/price.utils';
 import { startDateDuplicationValidator } from '@shared/validators/start-date-duplication.validator';
+import { COUNTRIES } from '@shared/constants/countries-list';
 
 @Component({
   selector: 'app-electronic-form',

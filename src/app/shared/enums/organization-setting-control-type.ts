@@ -5,4 +5,5 @@ export enum OrganizationSettingControlType {
   Multiselect = 4,
   DateTime = 5,
   FixedKeyDictionary = 6,
+  InvoiceAutoGeneration = 7,
 }

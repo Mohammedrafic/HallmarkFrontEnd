@@ -6,7 +6,15 @@
   <ng-container right>
     <ng-container *ngIf="!isSeccondStepActive">
       <button [disabled]="!agencyForm?.dirty" ejs-button cssClass="e-outline" (click)="onClear()">Clear</button>
-      <button ejs-button [disabled]="activeUser.businessUnitType === businessUnitType.Agency && (activeUser.agencyStatus === agencyStatus.Inactive || activeUser.agencyStatus === agencyStatus.Terminated)" [isPrimary]="true" (click)="onSave()">Save</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditAgencyProfile]">
+        <button
+          ejs-button
+          [disabled]="(activeUser.businessUnitType === businessUnitType.Agency && (activeUser.agencyStatus === agencyStatus.Inactive || activeUser.agencyStatus === agencyStatus.Terminated))|| !userPermission[userPermissions.CanEditAgencyProfile]"
+          [isPrimary]="true"
+          (click)="onSave()">Save</button>
+      </app-tooltip-container>
     </ng-container>
   </ng-container>
 </app-page-toolbar>
@@ -30,6 +38,7 @@
                 appValidateWithMessage
                 formControlName="parentBusinessUnitId"
                 [fields]="createUnderFields"
+                [allowFiltering]="true"
                 [dataSource]="businessUnits$ | async"
               ></ejs-dropdownlist>
             </div>
@@ -63,7 +72,15 @@
 
                   <div class="e-card-title-wrapper contact-header">
                     <div class="e-card-title">Contact Details</div>
-                    <div class="add-contact-link" (click)="addContact()"><i-feather name="plus" class="icon"></i-feather> Add Contact</div>
+                    <app-tooltip-container class="stick-right" [showToolTip]="!userPermission[userPermissions.CanEditAgencyProfile]">
+                      <button
+                        [disabled]="!userPermission[userPermissions.CanEditAgencyProfile]"
+                        ejs-button
+                        cssClass="e-outline add-contact-link"
+                        (click)="addContact()">
+                        <i-feather name="plus" class="icon"></i-feather> Add Contact
+                      </button>
+                    </app-tooltip-container>
                   </div>
                   <hr />
                   <ng-container *ngFor="let contactGroup of contacts.controls; let i = index">
@@ -82,7 +99,10 @@
             </div>
           </section>
           <section class="payment-section last-content-section-padding">
-            <app-payment-details-grid [paymentsFormArray]="$any(agencyForm?.get('agencyPaymentDetails'))"></app-payment-details-grid>
+            <app-payment-details-grid
+              [paymentsFormArray]="$any(agencyForm?.get('agencyPaymentDetails'))"
+              [hasPermissions]="userPermission[userPermissions.CanEditAgencyProfile]"
+            ></app-payment-details-grid>
           </section>
         </form>
       </ng-template>

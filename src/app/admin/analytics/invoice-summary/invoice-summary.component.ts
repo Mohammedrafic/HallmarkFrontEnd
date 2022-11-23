@@ -1,13 +1,13 @@
 import { Component, OnInit, ViewChild ,OnDestroy} from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
 import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { Location, LocationsByRegionsFilter } from '@shared/models/location.model';
 import { Region, regionFilter } from '@shared/models/region.model';
 import { Department, DepartmentsByLocationsFilter } from '@shared/models/department.model';
-import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { UserState } from 'src/app/store/user.state';
@@ -16,14 +16,15 @@ import { SecurityState } from 'src/app/security/store/security.state';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportUrl, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
+import { GetDepartmentsByLocations, GetLocationsByRegions, GetLogiReportData, GetRegionsByOrganizations } from '@organization-management/store/logi-report.action';
 import { LogiReportState } from '@organization-management/store/logi-report.state';
-import { startDateValidator } from '@shared/validators/date.validator';
 import { formatDate } from '@angular/common';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { analyticsConstants } from '../constants/analytics.constant';
+import { ConfigurationDto } from '@shared/models/analytics.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 
 @Component({
@@ -62,8 +63,8 @@ export class InvoiceSummaryComponent implements OnInit,OnDestroy {
   departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
   selectedDepartments: Department[];
 
-  @Select(LogiReportState.logiReportUrl)
-  public logiReportUrl$: Observable<string>;
+  @Select(LogiReportState.logiReportData)
+  public logiReportData$: Observable<ConfigurationDto[]>;
 
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
@@ -103,14 +104,17 @@ export class InvoiceSummaryComponent implements OnInit,OnDestroy {
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType != null) {
       this.store.dispatch(new GetBusinessByUnitType(BusinessUnitType.Organization));
-    }this.SetReportUrl();  
+    }this.SetReportData();  
   }
 
   ngOnInit(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:number) => {  
-      this.SetReportUrl();
-      this.logiReportUrl$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:string)=>{
-        this.logiReportComponent.SetReportUrl(data);
+      this.SetReportData();
+      this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data:ConfigurationDto[])=>{
+        if(data.length>0)
+        {
+        this.logiReportComponent.SetReportData(data);
+        }
      });  
       this.agencyOrganizationId=data;   
       this.isInitialLoad = true;
@@ -207,14 +211,14 @@ export class InvoiceSummaryComponent implements OnInit,OnDestroy {
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
   }
-  private SetReportUrl(){
-    const logiReportUrl = this.store.selectSnapshot(LogiReportState.logiReportUrl);
-      if(logiReportUrl=='')
+  private SetReportData(){
+    const logiReportData = this.store.selectSnapshot(LogiReportState.logiReportData);
+      if(logiReportData!=null&&logiReportData.length==0)
       {
-        this.store.dispatch(new GetLogiReportUrl());
+        this.store.dispatch(new GetLogiReportData());
       }
       else{
-        this.logiReportComponent?.SetReportUrl(logiReportUrl);
+        this.logiReportComponent?.SetReportData(logiReportData);
       }
   }
   private orderFilterColumnsSetup(): void {
@@ -257,7 +261,7 @@ export class InvoiceSummaryComponent implements OnInit,OnDestroy {
       .subscribe((data: Region[]) => {
         if (data != undefined) {
           this.regions = data;
-          this.filterColumns.regionIds.dataSource = this.regions;
+          this.filterColumns.regionIds.dataSource = sortByField(this.regions, 'name');
           this.defaultRegions = data.map((list) => list.id);
           this.defaultLocations = [];
           this.defaultDepartments = [];
@@ -298,7 +302,6 @@ export class InvoiceSummaryComponent implements OnInit,OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.invoiceSummaryReportForm.get(analyticsConstants.formControlNames.BusinessIds)?.setValue([]);
     this.invoiceSummaryReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.invoiceSummaryReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.invoiceSummaryReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);

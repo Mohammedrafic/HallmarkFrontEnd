@@ -5,6 +5,7 @@
       <ejs-dropdownlist
         appValidateWithMessage
         formControlName="businessUnitType"
+        [allowFiltering]="true"
         [fields]="optionFields"
         [dataSource]="businessUnits"
       ></ejs-dropdownlist>
@@ -17,6 +18,7 @@
       <ejs-dropdownlist
         appValidateWithMessage
         formControlName="businessUnitId"
+        [allowFiltering]="true"
         [fields]="bussinesDataFields"
         [dataSource]="newRoleBussinesData"
         [value]="defaultBusinessValue"
@@ -37,6 +39,7 @@
       <div class="input-group dropdown">
         <ejs-dropdownlist
           appValidateWithMessage
+          [allowFiltering]="true"
           [formControl]="copyRoleControl"
           [dataSource]="copyRoleData$ | async"
           [fields]="copyRoleFields"

@@ -24,6 +24,7 @@
               <ejs-dropdownlist appValidateWithMessage
                                 [fields]="optionFields"
                                 formControlName="country"
+                                [allowFiltering]="true"
                                 [dataSource]="countries">
               </ejs-dropdownlist>
             </div>
@@ -34,6 +35,7 @@
               <ejs-dropdownlist appValidateWithMessage
                                 [fields]="optionFields"
                                 formControlName="state"
+                                [allowFiltering]="true"
                                 [dataSource]="states$ | async">
               </ejs-dropdownlist>
             </div>

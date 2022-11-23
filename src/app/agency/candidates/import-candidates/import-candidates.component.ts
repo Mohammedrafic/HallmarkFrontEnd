@@ -15,6 +15,7 @@ import { MessageTypes } from "@shared/enums/message-types";
 import { ConfirmService } from "@shared/services/confirm.service";
 import { downloadBlobFile } from "@shared/utils/file.utils";
 import { DestroyableDirective } from "@shared/directives/destroyable.directive";
+import { FileSize } from "@core/enums";
 import {
   GetCandidateProfileErrors,
   GetCandidateProfileErrorsSucceeded,
@@ -51,7 +52,7 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
   public targetElement: HTMLElement = document.body;
   public dropElement: HTMLElement;
   public readonly allowedExtensions: string = '.xlsx';
-  public readonly maxFileSize = 10485760; // 10 mb
+  public readonly maxFileSize = FileSize.MB_10;
   public selectedFile: FileInfo | null;
   public firstActive = true;
   public selectionSettings: SelectionSettingsModel = { mode: 'Single' };

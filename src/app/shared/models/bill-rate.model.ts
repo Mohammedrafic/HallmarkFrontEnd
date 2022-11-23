@@ -1,6 +1,5 @@
-import { MasterSkillByOrganization, Skill } from '@shared/models/skill.model';
+import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { PageOfCollections } from '@shared/models/page.model';
-import { FieldSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
 
 export enum BillRateCategory {
   BaseRate = 1,
@@ -16,9 +15,9 @@ export enum BillRateType {
 }
 
 export const BillRateTypes = [
+  {id: BillRateType.Additional, name: 'Additional'},
   {id: BillRateType.Fixed, name: 'Fixed'},
   {id: BillRateType.Times, name: 'Times'},
-  {id: BillRateType.Additional, name: 'Additional'},
 ]
 
 export enum BillRateUnit
@@ -172,7 +171,7 @@ export class BillRateSetupPost {
   billRateConfigId: number;
   orderTypes: number[];
   rateHour: string;
-  effectiveDate: string;
+  effectiveDate: string | Date;
   intervalMin?: number;
   intervalMax?: number;
   considerForWeeklyOT: boolean;
@@ -195,7 +194,7 @@ export class BillRateFilters {
   billRateConfigIds?: string[];
   billRateCategories?: string[];
   billRateTypes?: string[];
-  effectiveDate?: Date | null;
+  effectiveDate?: string | null;
   intervalMin?: number | null;
   intervalMax?: number | null;
   considerForWeeklyOt?: boolean | null;

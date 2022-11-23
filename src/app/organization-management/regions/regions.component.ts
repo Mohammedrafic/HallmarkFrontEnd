@@ -322,8 +322,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
   onEditButtonClick(region: Region, event: any): void {
     this.addActiveCssClass(event);
-   
-    this.regionFormGroup.controls["region"].setValue(this.masterRegion.filter(i => i.name == region?.name)[0].id)
+    this.regionFormGroup.controls["region"].setValue(this.masterRegion.filter(i => i.name == region?.name)[0]?.id)
     this.editedRegionId = region?.id;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
@@ -341,7 +340,6 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
       .subscribe((confirm) => {
         if (confirm && region.id ) {
           this.store.dispatch(new DeleteRegionById(region.id));
-          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
           this.regionFormGroup.reset();
         }
         this.removeActiveCssClass();

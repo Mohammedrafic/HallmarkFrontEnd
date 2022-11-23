@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 
 import { isUndefined } from 'lodash';
 
@@ -13,7 +13,6 @@ import { OrderApplicantsInitialData } from '@shared/models/order-applicants.mode
 import {
   AgencyOrderManagement,
   AgencyOrderManagementPage,
-  CandidatesBasicInfo,
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
@@ -29,6 +28,7 @@ import {
   ApplyOrderApplicants,
   ApplyOrderApplicantsSucceed,
   ClearAgencyHistoricalData,
+  ClearDeployedCandidateOrderInfo,
   ClearOrders,
   ExportAgencyOrders,
   GetAgencyExtensions,
@@ -38,7 +38,7 @@ import {
   GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
   GetCandidateJob,
-  GetCandidatesBasicInfo,
+  GetDeployedCandidateOrderInfo,
   GetOrderApplicantsData,
   GetOrderById,
   GetOrganizationStructure,
@@ -60,13 +60,13 @@ import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.e
 import { ExtensionGridModel } from '@shared/components/extension/extension-sidebar/models/extension.model';
 import { OrderManagementContentStateModel } from '@client/store/order-managment-content.state';
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
 
 export interface OrderManagementModel {
   ordersPage: AgencyOrderManagementPage | null;
   orderCandidatesListPage: OrderCandidatesListPage | null;
   orderCandidatesInformation: Order | null;
   candidatesJob: OrderCandidateJob | null;
-  candidatesBasicInfo: CandidatesBasicInfo | null;
   orderApplicantsInitialData: OrderApplicantsInitialData | null;
   selectedOrder: Order | null;
   orderDialogOptions: DialogNextPreviousOption;
@@ -76,6 +76,7 @@ export interface OrderManagementModel {
   organizationStructure: OrganizationStructure[];
   ordersTab: AgencyOrderManagementTabs;
   extensions: any;
+  deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
 }
 
 @State<OrderManagementModel>({
@@ -87,7 +88,6 @@ export interface OrderManagementModel {
     orderApplicantsInitialData: null,
     selectedOrder: null,
     candidatesJob: null,
-    candidatesBasicInfo: null,
     rejectionReasonsList: [],
     orderDialogOptions: {
       next: false,
@@ -98,6 +98,7 @@ export interface OrderManagementModel {
     historicalEvents: [],
     ordersTab: AgencyOrderManagementTabs.MyAgency,
     extensions: null,
+    deployedCandidateOrderInfo: [],
   },
 })
 @Injectable()
@@ -182,11 +183,6 @@ export class OrderManagementState {
   }
 
   @Selector()
-  static candidateBasicInfo(state: OrderManagementModel): CandidatesBasicInfo | null {
-    return state.candidatesBasicInfo;
-  }
-
-  @Selector()
   static ordersTab(state: OrderManagementModel): AgencyOrderManagementTabs | null {
     return state.ordersTab;
   }
@@ -198,6 +194,11 @@ export class OrderManagementState {
   @Selector()
   static extensions(state: OrderManagementContentStateModel): any | null {
     return state.extensions;
+  }
+
+  @Selector()
+  static deployedCandidateOrderInfo(state: OrderManagementModel): DeployedCandidateOrderInfo[] {
+    return state.deployedCandidateOrderInfo;
   }
 
   constructor(
@@ -316,7 +317,7 @@ export class OrderManagementState {
       tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'))),
       catchError((error) => {
         const errorMessage = error?.error?.errors?.CandidateBillRate[0] ?? 'Candidate cannot be updated';
-        return of(dispatch(new ShowToast(MessageTypes.Error, errorMessage)))
+        return of(dispatch(new ShowToast(MessageTypes.Error, errorMessage)));
       })
     );
   }
@@ -384,23 +385,6 @@ export class OrderManagementState {
       .pipe(tap((payload) => patchState({ organizationStructure: payload })));
   }
 
-  @Action(GetCandidatesBasicInfo)
-  GetCandidatesBasicInfo(
-    { patchState }: StateContext<OrderManagementModel>,
-    { organizationId, jobId }: GetCandidatesBasicInfo
-  ): Observable<CandidatesBasicInfo> {
-    return this.orderManagementContentService.getCandidatesBasicInfo(organizationId, jobId).pipe(
-      tap((payload) => {
-        patchState({ candidatesBasicInfo: payload });
-        return payload;
-      }),
-      catchError(() => {
-        patchState({ candidatesBasicInfo: null });
-        return of();
-      })
-    );
-  }
-
   @Action(ExportAgencyOrders)
   ExportAgencyOrders({}: StateContext<OrderManagementModel>, { payload, tab }: ExportAgencyOrders): Observable<any> {
     return this.orderManagementContentService.exportAgency(payload, tab).pipe(
@@ -429,5 +413,26 @@ export class OrderManagementState {
     return this.extensionSidebarService
       .getExtensions(id, orderId, organizationId)
       .pipe(tap((extensions) => patchState({ extensions })));
+  }
+
+  @Action(GetDeployedCandidateOrderInfo)
+  GetDeployedCandidateOrderInfo(
+    { patchState }: StateContext<OrderManagementModel>,
+    { orderId, candidateProfileId, organizationId }: GetDeployedCandidateOrderInfo
+  ): Observable<DeployedCandidateOrderInfo[]> {
+    return this.orderApplicantsService.getDeployedCandidateOrderInfo(orderId, candidateProfileId, organizationId).pipe(
+      map((data: DeployedCandidateOrderInfo[]) =>
+        data.map((dto) => ({
+          ...dto,
+          orderPublicId: dto.orgPrefix + '-' + dto.orderPublicId,
+        }))
+      ),
+      tap((orderInfo) => patchState({ deployedCandidateOrderInfo: orderInfo }))
+    );
+  }
+
+  @Action(ClearDeployedCandidateOrderInfo)
+  ClearDeployedCandidateOrderInfo({ patchState }: StateContext<OrderManagementModel>): OrderManagementModel {
+    return patchState({ deployedCandidateOrderInfo: [] });
   }
 }

@@ -1,27 +1,12 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  Inject,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {
-  OrganizationDepartment,
-  OrganizationLocation,
-  OrganizationRegion,
-  OrganizationStructure,
-} from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserState } from '../../../store/user.state';
-import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
+import { GetAssignedSkillsByOrganization } from '@organization-management/store/organization-management.actions';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Skill } from '@shared/models/skill.model';
@@ -32,7 +17,7 @@ import {
   DATA_OVERRIDE_TITLE,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE,
+  DELETE_RECORD_TITLE
 } from '@shared/constants';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
 import {
@@ -42,7 +27,7 @@ import {
   GetBillRates,
   SaveUpdateBillRate,
   SaveUpdateBillRateSucceed,
-  ShowConfirmationPopUp,
+  ShowConfirmationPopUp
 } from '@organization-management/store/bill-rates.actions';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
 import {
@@ -55,7 +40,7 @@ import {
   BillRateSetupPost,
   BillRateType,
   BillRateTypes,
-  BillRateUnit,
+  BillRateUnit
 } from '@shared/models/bill-rate.model';
 import { OrderTypeOptions } from '@shared/enums/order-type';
 import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
@@ -63,14 +48,17 @@ import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/i
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import PriceUtils from '@shared/utils/price.utils';
-import { currencyValidator } from '@shared/validators/currency.validator';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
 import { valuesOnly } from '@shared/utils/enum.utils';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { DateTimeHelper } from '@core/helpers';
+import { UserPermissions } from '@core/enums';
+import { Permission } from '@core/interface';
+import { BillRateTitleId } from '@shared/enums/bill-rate-title-id.enum';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
 @Component({
   selector: 'app-bill-rate-setup',
@@ -85,6 +73,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   @Input() export$: Subject<ExportedFileType> | undefined;
   @Input() filteredItems$: Subject<number>;
   @Input() importDialogEvent: Subject<boolean>;
+  @Input() userPermission: Permission;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
@@ -98,8 +87,9 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public departments: OrganizationDepartment[] = [];
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
+  public readonly userPermissions = UserPermissions;
 
-  @Select(OrganizationManagementState.allOrganizationSkills)
+  @Select(OrganizationManagementState.assignedSkillsByOrganization)
   skills$: Observable<Skill[]>;
   skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
   public allSkills: Skill[] = [];
@@ -111,7 +101,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   billRatesOptions$: Observable<BillRateOption[]>;
   billRateTitleFields: FieldSettingsModel = { text: 'title', value: 'id' };
   public billRatesOptions: BillRateOption[];
-  public priceUtils = PriceUtils;
 
   public orderTypes = OrderTypeOptions;
   public orderTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -147,7 +136,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   private editRecordId?: number;
-  private billRateValueValidators = [currencyValidator(0), Validators.minLength(1)];
 
   public columnsToExport: ExportColumn[] = [
     { text: 'Region', column: 'Region' },
@@ -169,6 +157,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   ];
   public fileName: string;
   public defaultFileName: string;
+  public isMileageTitleType: boolean;
+  public format = '#';
 
   constructor(
     private store: Store,
@@ -285,9 +275,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       .filter(valuesOnly)
       .map((name) => ({ name, id: BillRateCategory[name as BillRateCategory] }));
 
-    this.filterColumns.billRateTypes.dataSource = Object.values(BillRateType)
-      .filter(valuesOnly)
-      .map((name) => ({ name, id: BillRateType[name as BillRateType] }));
+    this.filterColumns.billRateTypes.dataSource = BillRateTypes
 
     this.organizationStructure$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
@@ -342,10 +330,12 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           selectedRegions.push(this.orgRegions.find((region) => region.id === id) as OrganizationRegion)
         );
         this.filterColumns.locationIds.dataSource = [];
+        const locations: OrganizationLocation[] = [];
         selectedRegions.forEach((region) => {
           region.locations?.forEach((location) => (location.regionName = region.name));
-          this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
+          locations.push(...(region.locations as []));
         });
+        this.filterColumns.locationIds.dataSource = sortByField(locations, 'name');
       } else {
         this.filterColumns.locationIds.dataSource = [];
         this.billRateFilterFormGroup.get('locationIds')?.setValue([]);
@@ -358,12 +348,14 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRateFilterFormGroup.get('locationIds')?.valueChanges.subscribe((locationIds: number[]) => {
       if (locationIds && locationIds.length > 0) {
         this.filterColumns.departmentIds.dataSource = [];
+        const departments: OrganizationDepartment[] = [];
         locationIds.forEach((id) => {
           const selectedLocation = this.filterColumns.locationIds.dataSource.find(
             (location: OrganizationLocation) => location.id === id
           );
-          this.filterColumns.departmentIds.dataSource.push(...(selectedLocation?.departments as []));
+          departments.push(...(selectedLocation?.departments as []));
         });
+        this.filterColumns.departmentIds.dataSource = sortByField(departments, 'name');
       } else {
         this.filterColumns.departmentIds.dataSource = [];
         this.billRateFilterFormGroup.get('departmentIds')?.setValue([]);
@@ -417,7 +409,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   }
 
   public loadData(): void {
-    this.store.dispatch(new GetAllOrganizationSkills());
+    this.store.dispatch(new GetAssignedSkillsByOrganization());
     this.store.dispatch(new GetBillRates({ pageNumber: this.currentPage, pageSize: this.pageSize }));
     this.store.dispatch(new GetBillRateOptions());
   }
@@ -474,6 +466,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public onFormSaveClick(): void {
     if (this.billRatesFormGroup.valid) {
+      const effectiveDate: Date = this.billRatesFormGroup.controls['effectiveDate'].value;
+      if (effectiveDate && !this.isEdit) {
+        effectiveDate.setHours(0, 0, 0, 0);
+      }
       const isAllRegions = this.billRatesFormGroup.controls['regionIds'].value.length === this.allRegions.length;
       const billRate: BillRateSetupPost = {
         billRateSettingId: this.editRecordId,
@@ -497,7 +493,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
             ? [] // [] means All on the BE side
             : this.billRatesFormGroup.controls['orderTypeIds'].value,
         rateHour: this.billRatesFormGroup.controls['billRateValueRateTimes'].value,
-        effectiveDate: this.billRatesFormGroup.controls['effectiveDate'].value,
+        effectiveDate: effectiveDate,
         intervalMin: this.billRatesFormGroup.controls['intervalMin'].value,
         intervalMax: this.billRatesFormGroup.controls['intervalMax'].value,
         considerForWeeklyOT: this.billRatesFormGroup.controls['considerForWeeklyOt'].value
@@ -639,7 +635,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public onFilterApply(): void {
     this.filters = this.billRateFilterFormGroup.getRawValue();
-    this.filters.effectiveDate = this.filters.effectiveDate || null;
+    const effectiveDate = this.filters.effectiveDate ? DateTimeHelper.toUtcFormat(this.filters.effectiveDate) : null;
+    this.filters.effectiveDate = effectiveDate;
     this.filteredItems = this.filterService.generateChips(
       this.billRateFilterFormGroup,
       this.filterColumns,
@@ -676,7 +673,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       orderTypeIds: ['', [Validators.required]],
       billRatesCategory: [{ value: '', disabled: true }],
       billRatesType: ['', [Validators.required]],
-      billRateValueRateTimes: [null, [Validators.required, Validators.maxLength(11), ...this.billRateValueValidators]],
+      billRateValueRateTimes: [null, [Validators.required, Validators.maxLength(11)]],
       effectiveDate: [null, [Validators.required]],
       intervalMin: [''],
       intervalMax: [''],
@@ -720,15 +717,17 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       ?.valueChanges.pipe(takeUntil(this.unsubscribe$))
       .subscribe((regionIds: number[]) => {
         if (regionIds && regionIds.length > 0) {
-          this.locations = [];
+          const locations: OrganizationLocation[] = [];
           regionIds.forEach((id) => {
             const selectedRegion = this.orgRegions.find((region) => region.id === id);
-            this.locations.push(...(selectedRegion?.locations as any));
+            locations.push(...(selectedRegion?.locations as any));
           });
-          this.departments = [];
+          this.locations = sortByField(locations, 'name');
+          const departments: OrganizationDepartment[] = [];
           this.locations.forEach((location) => {
-            this.departments.push(...location.departments);
+            departments.push(...location.departments);
           });
+          this.departments = sortByField(departments, 'name');
         } else {
           this.locations = [];
           this.departments = [];
@@ -746,11 +745,12 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       ?.valueChanges.pipe(takeUntil(this.unsubscribe$))
       .subscribe((locationIds: number[]) => {
         if (locationIds && locationIds.length > 0) {
-          this.departments = [];
+          const departments: OrganizationDepartment[] = [];
           locationIds.forEach((id) => {
             const selectedLocation = this.locations.find((location) => location.id === id);
-            this.departments.push(...(selectedLocation?.departments as []));
+            departments.push(...(selectedLocation?.departments as []));
           });
+          this.departments = sortByField(departments, 'name');
         } else {
           this.departments = [];
         }
@@ -765,6 +765,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       .get('billRateTitleId')
       ?.valueChanges.pipe(takeUntil(this.unsubscribe$))
       .subscribe((typeId: number) => {
+        this.isMileageTitleType = typeId !== BillRateTitleId.Mileage;
         const foundBillRateOption = this.billRatesOptions.find((option) => option.id === typeId);
 
         if (foundBillRateOption) {
@@ -775,7 +776,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           this.isIntervalMinRequired = foundBillRateOption.intervalMinRequired;
           this.isIntervalMaxRequired = foundBillRateOption.intervalMaxRequired;
           this.billRatesFormGroup.get('billRateValueRateTimes')?.setValue('');
-          this.updateAmountValidators();
           this.billRatesFormGroup.get('billRatesCategory')?.setValue(BillRateCategory[foundBillRateOption.category]);
         }
 
@@ -814,6 +814,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         this.changeFieldsSettingByType(typeId);
 
         this.billRatesFormGroup.updateValueAndValidity();
+        this.setFormatDecimalsValues();
         this.cd.markForCheck();
       });
   }
@@ -863,15 +864,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     }
   }
 
-  updateAmountValidators(): void {
-    if (this.selectedBillRateUnit === this.BillRateUnitList.Currency) {
-      this.billRatesFormGroup.get('billRateValueRateTimes')?.removeValidators(this.billRateValueValidators);
-    } else {
-      this.billRatesFormGroup.get('billRateValueRateTimes')?.addValidators(this.billRateValueValidators);
-    }
-    this.billRatesFormGroup.get('billRateValueRateTimes')?.updateValueAndValidity();
-  }
-
   private setupFormValues(data: BillRateSetup): void {
     if (!data.regionId) {
       const allRegionsIds = this.allRegions.map((region) => region.id);
@@ -911,10 +903,11 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.billRatesFormGroup.controls['orderTypeIds'].setValue(data.orderTypes);
     }
 
+    const decimals = this.isMileageTitleType ? 2 : 3;
     const rateHour =
       foundBillRateOption?.unit === BillRateUnit.Hours
         ? data.rateHour
-        : parseFloat(data.rateHour.toString()).toFixed(2);
+        : parseFloat(data.rateHour.toString()).toFixed(decimals);
     this.billRatesFormGroup.controls['billRateValueRateTimes'].setValue(rateHour);
     this.billRatesFormGroup.controls['effectiveDate'].setValue(data.effectiveDate);
     this.billRatesFormGroup.controls['intervalMin'].setValue(data.intervalMin);
@@ -930,5 +923,11 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   private handlePagePermission(): void {
     const user = this.store.selectSnapshot(UserState.user);
     this.isReadOnly = user?.businessUnitType === BusinessUnitType.Organization;
+  }
+
+  private setFormatDecimalsValues(): void {
+    const isBillRateUnitHours = this.selectedBillRateUnit === this.BillRateUnitList.Hours;
+    this.format = isBillRateUnitHours ? '#' : this.isMileageTitleType ? '###.00' : '###.000';
+    this.decimals = isBillRateUnitHours ? 0 : this.isMileageTitleType ? 2 : 3;
   }
 }

@@ -1,4 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { FileSize } from "@core/enums";
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -29,9 +30,10 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
   public targetElement: HTMLElement = document.body;
   public dropElement: HTMLElement;
   @Input() allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
-  public readonly maxFileSize = 10485760; // 10 mb
+  public readonly maxFileSize = FileSize.MB_10;
   public selectedFile: FileInfo | null;
   public firstActive = true;
+  public uploaderErrorMessageElement: HTMLElement;
 
   public fields = {
     text: 'name',
@@ -65,11 +67,27 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
   public selectFile(event: SelectedEventArgs): void {
     if (event.filesData.length) {
       this.importResult = null;
-      this.selectedFile = event.filesData[0];
-      this.uploadToFile.next(this.selectedFile.rawFile as Blob);
+      if (event.filesData[0].statusCode === '1') {
+        this.selectedFile = event.filesData[0];
+        this.uploadToFile.next(this.selectedFile.rawFile as Blob);
+      }
+      else {
+        this.addValidationMessage(event.filesData[0]);
+      }
     }
   }
-
+  private addValidationMessage(file: FileInfo) {
+    requestAnimationFrame(() => {
+      this.uploaderErrorMessageElement = document.getElementsByClassName('e-validation-fails')[0] ?
+        document.getElementsByClassName('e-validation-fails')[0] as HTMLElement :
+        document.getElementsByClassName('e-file-status e-file-invalid')[0] as HTMLElement;
+      if (this.uploaderErrorMessageElement) {
+        this.uploaderErrorMessageElement.innerText = file.size > this.maxFileSize
+          ? 'The file should not exceed 10MB.'
+          : 'The file should be in .pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png format.';
+      }
+    });
+  }
   public onTabSelecting(event: SelectEventArgs): void {
     if (event.isSwiped) {
       event.cancel = true;

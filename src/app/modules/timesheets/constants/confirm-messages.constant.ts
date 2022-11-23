@@ -17,5 +17,5 @@ export const TimesheetConfirmMessages: CommonDialogConformMessages = {
   confirmRecordDelete: 'Are you sure you want to delete this record?',
   confirmOrderChange: 'Are you sure you want to change timesheet without saving changes?',
   confirmEdit: 'Are you sure you want to change the timesheet? This will lead to recalculating values and generating new invoice records.',
-  confirmBulkApprove: 'Please note that not submitted timesheets and in other status than Pending Approval and Pending approval* cannot be approved'
+  confirmBulkApprove: 'Please note, only timesheets in Pending Approval status may be Approved.'
 }

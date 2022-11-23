@@ -3,7 +3,6 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
@@ -13,7 +12,7 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { FilterService } from '@shared/services/filter.service';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
-import { Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
+import { OrganizationStatus, Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import {
   Organization,
   OrganizationDataSource,
@@ -24,6 +23,7 @@ import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/stor
 import { UserState } from 'src/app/store/user.state';
 import { ExportOrganizations, GetOrganizationDataSources, GetOrganizationsByPage } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 
 @Component({
   selector: 'app-client-management-content',
@@ -32,7 +32,7 @@ import { AdminState } from '../../store/admin.state';
   providers: [SortService],
 })
 export class ClientManagementContentComponent
-  extends AbstractGridConfigurationComponent
+  extends AbstractPermissionGrid
   implements OnInit, AfterViewInit, OnDestroy
 {
   private pageSubject = new Subject<number>();
@@ -47,8 +47,7 @@ export class ClientManagementContentComponent
   ];
   public fileName: string;
   public defaultFileName: string;
-
-  public readonly statusEnum = Status;
+  public readonly organizationStatus = OrganizationStatus;
 
   readonly ROW_HEIGHT = 64;
 
@@ -71,22 +70,17 @@ export class ClientManagementContentComponent
   public filters: OrganizationFilter = {};
   public filterColumns: any;
 
-  get hasCreateOrganizationPermission(): boolean {
-    const createDeleteOrganizationPermissionId = PermissionTypes.CanCreateDeleteOrganization;
-    return this.permissions.map((permission) => permission.permissionId).includes(createDeleteOrganizationPermissionId);
-  }
-
   private permissions: CurrentUserPermission[] = [];
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private router: Router,
     private route: ActivatedRoute,
     private datePipe: DatePipe,
     private filterService: FilterService,
     private fb: FormBuilder
   ) {
-    super();
+    super(store);
     this.idFieldName = 'organizationId';
     this.fileName = 'Organizations ' + datePipe.transform(Date.now(), 'MM/dd/yyyy');
     store.dispatch(new SetHeaderState({ title: 'Organization List', iconName: 'file-text' }));
@@ -99,8 +93,8 @@ export class ClientManagementContentComponent
     });
   }
 
-  ngOnInit(): void {
-    this.subscribeOnPermissions();
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.idFieldName = 'organizationId';
     this.filterColumns = {
       searchTerm: { type: ControlTypes.Text },
@@ -125,6 +119,8 @@ export class ClientManagementContentComponent
       this.currentPage = page;
       this.getOrganizationList();
     });
+
+    this.subscribeOnPermissions();
   }
 
   ngAfterViewInit(): void {
@@ -245,15 +241,15 @@ export class ClientManagementContentComponent
     this.router.navigate(['./edit', data.organizationId], { relativeTo: this.route });
   }
 
-  private subscribeOnPermissions(): void {
-    this.currentUserPermissions$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((permissions) => (this.permissions = permissions));
-  }
-
   private getFiltersForExport(): OrganizationFilter & { organizationNames: string[] } {
     const { businessUnitNames, ...filtersRest } = this.filters;
 
     return { ...filtersRest, organizationNames: this.filters.businessUnitNames as string[] };
+  }
+
+  private subscribeOnPermissions(): void {
+    this.currentUserPermissions$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((permissions) => (this.permissions = permissions));
   }
 }

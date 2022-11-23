@@ -6,7 +6,7 @@
     <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
     <button ejs-button appHideBeforeSyncfusionLoad cssClass="e-outline button-filter" (click)="showFilters()">
       <div class="filter-button-content">
-        <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{
+        <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{
           filteredItems.length
         }}</span>
         Filters <i-feather name="sliders" class="icon"></i-feather>
@@ -27,15 +27,19 @@
     >
       <div class="button-export-container">Export <i-feather name="download" class="icon"></i-feather></div>
     </button>
-    <button
-      [disabled]="!canCreateOrder"
-      ejs-button
-      appHideBeforeSyncfusionLoad
-      [isPrimary]="true"
-      (click)="navigateToOrderForm()"
-    >
-      Create Order
-    </button>
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
+      <button
+        [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        [isPrimary]="true"
+        (click)="navigateToOrderForm()"
+      >
+        Create Order
+      </button>
+    </app-tooltip-container>
   </ng-container>
 </app-page-toolbar>
 
@@ -112,12 +116,13 @@
                 !canCreateOrder ||
                 data.status === orderStatus.PreOpen ||
                 data.status === orderStatus.Closed ||
-                !settings[SettingsKeys.IsReOrder]?.value
+                !settings[SettingsKeys.IsReOrder]?.value ||
+                !hasCreateEditOrderPermission
               "
             >
               <span><i-feather name="calendar" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat default-icon-button with-badge">
+            <button ejs-button [disabled]="!hasCreateEditOrderPermission" cssClass="e-flat default-icon-button with-badge">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
               <span *ngIf="data.unreadComments > 0" class="e-badge e-badge-success e-badge-pill right-overflow">{{
                 data.unreadComments
@@ -127,7 +132,7 @@
               ejs-button
               cssClass="e-flat secondary-icon-button"
               [class.green-background]="!data.isLocked"
-              [disabled]="!canCreateOrder || disabledLock(data.status) || data?.extensionFromId"
+              [disabled]="!canCreateOrder || disabledLock(data.status) || data?.extensionFromId || !hasCreateEditOrderPermission"
               (click)="lockOrder(data); $event.stopPropagation()"
               *ngIf="isLockMenuButtonsShown"
             >
@@ -137,27 +142,24 @@
               ></span>
             </button>
             <button
+              ejs-button
+              [matMenuTriggerFor]="menu"
               (click)="$event.stopPropagation()"
-              ejs-dropdownbutton
-              [disabled]="data.orderType === orderTypes.ReOrder && data.status === orderStatus.Closed"
-              [items]="
-                (data.status === orderStatus.Closed && closedOrderMenu) ||
+              [disabled]="data.orderType === orderTypes.ReOrder && data.status === orderStatus.Closed || !hasCreateEditOrderPermission"
+              [matMenuTriggerData]="{data: data, items: (data.status === orderStatus.Closed && closedOrderMenu) ||
                 (activeTab === OrganizationOrderManagementTabs.ReOrders && getMenuForReorders(data)) ||
-                (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : getMoreMenu(data))
-              "
-              (select)="menuOptionSelected($event, data)"
+                (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : getMoreMenu(data))}"
               cssClass="e-flat primary-icon-button"
             >
               <span><i-feather name="more-vertical" class="icon"></i-feather></span>
             </button>
           </div>
-
           <ng-template #templateButtons>
             <div class="row-tool-buttons" (click)="stopPropagation($event)">
               <i-feather
                 name="trash-2"
                 class="icon delete-template"
-                [class.disable]="!canCreateOrder"
+                [class.disable]="!canCreateOrder || !hasCreateEditOrderPermission"
                 (click)="deleteOrder(data?.id)"
               ></i-feather>
             </div>
@@ -314,7 +316,7 @@
           </span>
         </ng-template>
         <ng-template #template let-data>
-          <span>{{ data.startDate | date: formatDate }}</span>
+          <span>{{ data.startDate | date: 'MM/dd/yyy':'UTC' }}</span>
         </ng-template>
       </e-column>
       <e-column field="shift" headerText="SHIFT" width="160" minWidth="80" maxWidth="200" [visible]="false">
@@ -437,6 +439,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -455,6 +458,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(ordersPage$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -612,6 +618,7 @@
         <label>Order Status</label>
         <div class="input-group multiselect">
           <ejs-multiselect
+            #orderStatusFilter
             mode="CheckBox"
             formControlName="orderStatuses"
             placeholder="All"
@@ -647,6 +654,7 @@
             mode="CheckBox"
             placeholder="All"
             formControlName="projectTypeIds"
+            [allowFiltering]="true"
             [dataSource]="filterColumns.projectTypeIds.dataSource"
             [fields]="specialProjectCategoriesFields"
             [showDropDownIcon]="true"
@@ -663,6 +671,7 @@
             mode="CheckBox"
             placeholder="All"
             formControlName="projectNameIds"
+            [allowFiltering]="true"
             [dataSource]="filterColumns.projectNameIds.dataSource"
             [fields]="projectNameFields"
             [showDropDownIcon]="true"
@@ -677,6 +686,7 @@
             mode="CheckBox"
             placeholder="All"
             formControlName="poNumberIds"
+            [allowFiltering]="true"
             [dataSource]="filterColumns.poNumberIds.dataSource"
             [fields]="poNumberFields"
             [showDropDownIcon]="true"
@@ -962,6 +972,7 @@
   [settings]="settings"
   [openEvent]="openDetails"
   [orderPositionSelected$]="orderPositionSelected$"
+  [hasCreateEditOrderPermission]="hasCreateEditOrderPermission"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid()"
   (closeReOrderEmitter)="onAddReorderClose()"
@@ -986,3 +997,14 @@
   (closePositionSuccess)="updatePositionDetails($event)"
 >
 </app-close-order>
+
+<mat-menu #menu="matMenu">
+  <ng-template matMenuContent let-items="items" let-data="data">
+    <button mat-menu-item
+            *ngFor="let item of items"
+            [disabled]="item.disabled"
+            (click)="menuOptionSelected(item.id, data)">
+            {{ item.text }}
+    </button>
+  </ng-template>
+</mat-menu>

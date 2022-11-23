@@ -49,6 +49,7 @@
 
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
+                      [allowFiltering]="true"
                       [fields]="dropDownFieldsConfig"
                       [formControlName]="field.field"
                       [dataSource]="field.options"
@@ -125,6 +126,7 @@
         </form>
         <app-file-uploader *ngIf="dialogShown"
                            [maxFiles]="5"
+                           [maxFileSize]="maxFileSize"
                            [clearAll]="clearFiles"
                            [attachments]="invoiceToEdit?.attachments || []"
                            [useRedTrashBin]="true"

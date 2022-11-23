@@ -3,26 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { GridModule, PagerModule, PageService, ResizeService } from '@syncfusion/ej2-angular-grids';
-import {
-  ButtonModule,
-  CheckBoxModule,
-  ChipListModule,
-  RadioButtonModule,
-  SwitchModule,
-} from '@syncfusion/ej2-angular-buttons';
-import {
-  AutoCompleteModule,
-  DropDownListModule,
-  ListBoxModule,
-  MultiSelectAllModule,
-} from '@syncfusion/ej2-angular-dropdowns';
-import {
-  MaskedTextBoxModule,
-  NumericTextBoxModule,
-  TextBoxModule,
-  UploaderModule,
-} from '@syncfusion/ej2-angular-inputs';
-import { SidebarModule, TabAllModule, TabModule } from '@syncfusion/ej2-angular-navigations';
+import { ButtonModule, CheckBoxModule, ChipListModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import { AutoCompleteModule, DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
+import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
+import { SidebarModule, TabAllModule, TabModule, TreeViewModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, DateTimePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DialogModule, TooltipAllModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
@@ -42,10 +26,11 @@ import {
   Search,
   Sliders,
   Trash2,
-  Upload,
+  Upload
 } from 'angular-feather/icons';
-
 import { NgxsModule } from '@ngxs/store';
+
+import { ShiftsService } from '@organization-management/shifts/shifts.service';
 import { OrganizationManagementState } from './store/organization-management.state';
 import { CredentialsState } from './store/credentials.state';
 import { SharedModule } from '@shared/shared.module';
@@ -107,6 +92,19 @@ import { ImportRegionsComponent } from './regions/import-regions/import-regions.
 import { RegionsGridComponent } from './regions/import-regions/regions-grid/regions-grid.component';
 import { PenaltiesComponent } from './reasons/penalties/penalties.component';
 import { PenaltiesGridActionsRendererComponent } from './reasons/penalties/penalties-grid-actions-renderer/penalties-grid-actions-renderer.component';
+import { LocationsService } from './locations/locations.service';
+import { TiersComponent } from './tiers/tiers.component';
+import { TiersGridComponent } from './tiers/tiers-grid/tiers-grid.component';
+import { GridActionRendererComponent } from './tiers/tiers-grid/grid-action-renderer/grid-action-renderer.component';
+import { TiersDialogModule } from '@shared/components/tiers-dialog/tiers-dialog.module';
+import { TIER_DIALOG_TYPE } from '@shared/components/tiers-dialog/constants';
+import { Tiers } from '@shared/enums/tiers.enum';
+import { TiersState } from '@organization-management/store/tiers.state';
+import { TiersApiService } from '@shared/services';
+import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { AssignSkillComponent } from './skills/assign-skill/assign-skill.component';
+import { SkillsState } from '@organization-management/store/skills.state';
+import { DepartmentService } from '@organization-management/departments/services/department.service';
 
 const sidebarIcons = {
   Download,
@@ -170,7 +168,11 @@ const sidebarIcons = {
     ImportRegionsComponent,
     RegionsGridComponent,
     PenaltiesComponent,
-    PenaltiesGridActionsRendererComponent
+    PenaltiesGridActionsRendererComponent,
+    TiersComponent,
+    TiersGridComponent,
+    GridActionRendererComponent,
+    AssignSkillComponent
   ],
   imports: [
     CommonModule,
@@ -205,6 +207,8 @@ const sidebarIcons = {
     AgGridModule,
     AppGridModule,
     TooltipAllModule,
+    TooltipContainerModule,
+    TiersDialogModule,
 
     FeatherModule.pick(sidebarIcons),
 
@@ -222,10 +226,25 @@ const sidebarIcons = {
       SpecialProjectMappingState,
       PurchaseOrderMappingState,
       BusinessLinesState,
+      TiersState,
+      SkillsState
     ]),
     ImportDialogContentModule,
+    TreeViewModule
   ],
   exports: [BillRatesComponent],
-  providers: [ResizeService, PageService],
+  providers:
+    [
+      ResizeService,
+      PageService,
+      TiersApiService,
+      LocationsService,
+      ShiftsService,
+      {
+        provide: TIER_DIALOG_TYPE,
+        useValue: Tiers.tierSettings
+      },
+      DepartmentService
+    ],
 })
 export class OrganizationManagementModule {}

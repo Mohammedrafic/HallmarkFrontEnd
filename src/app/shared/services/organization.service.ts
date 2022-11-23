@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Organization, OrganizationDataSource, OrganizationFilter, OrganizationPage, OrganizationStructure } from 'src/app/shared/models/organization.model';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { sortBy } from '@shared/helpers/sort-array.helper';
 
 @Injectable({ providedIn: 'root' })
 export class OrganizationService {
@@ -27,7 +29,10 @@ export class OrganizationService {
    * Get organization structure with its regions-locations-departments
    */
   public getOrganizationStructure(): Observable<OrganizationStructure> {
-    return this.http.get<OrganizationStructure>(`/api/Organizations/structure`);
+    return this.http.get<OrganizationStructure>(`/api/Organizations/structure`).pipe(map((data) => ({
+      ...data,
+      regions: sortByField(data.regions, 'name')
+      })));
   }
 
   /**
@@ -63,7 +68,7 @@ export class OrganizationService {
    * @return Array of units
    */
   public getBusinessUnit(): Observable<BusinessUnit[]> {
-    return this.http.get<BusinessUnit[]>(`/api/BusinessUnit`);
+    return this.http.get<BusinessUnit[]>(`/api/BusinessUnit`).pipe(map((data) => sortByField(data, 'name')));
   }
 
   /**
@@ -102,7 +107,12 @@ export class OrganizationService {
   /**
    * Export organization list
    */
-  public getOrganizationDataSources(): Observable<OrganizationDataSource> {
-    return this.http.get<OrganizationDataSource>(`/api/Organizations/filteringOptions`);
+   public getOrganizationDataSources(): Observable<OrganizationDataSource> {
+    return this.http.get<OrganizationDataSource>(`/api/Organizations/filteringOptions`).pipe(
+      map((data) => Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortBy(value)]))));
+  }
+
+  public getOrgTierStructure(): Observable<OrganizationStructure> {
+    return this.http.get<OrganizationStructure>('/api/Organizations/structure/configuration?SettingKey=27')
   }
 }

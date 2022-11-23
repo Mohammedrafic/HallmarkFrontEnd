@@ -12,6 +12,7 @@ import { isArray } from 'lodash';
 import { datepickerMask } from '@shared/constants/datepicker-mask';
 import { formatDate } from '@shared/constants/format-date';
 import { placeholderDate } from '@shared/constants/placeholder-date';
+import { ChangeDetectorRef } from '@angular/core';
 
 enum ExportType {
   'Excel File',
@@ -40,7 +41,7 @@ export abstract class AbstractGridConfigurationComponent {
 
   // rows per page
   rowsPerPageDropDown = GRID_CONFIG.rowsPerPageDropDown;
-  activeRowsPerPageDropDown = GRID_CONFIG.rowsPerPageDropDown[0];
+  activeRowsPerPageDropDown = GRID_CONFIG.rowsPerPageDropDown[2];
 
   // go to page
   lastAvailablePage = 0;
@@ -52,7 +53,7 @@ export abstract class AbstractGridConfigurationComponent {
   pageSizePager = GRID_CONFIG.initialRowsPerPage;
   currentPagerPage: number = 1;
 
-  pageSize = 30;
+  pageSize = 100;
   currentPage = 1;
   orderBy = '';
 
@@ -84,6 +85,9 @@ export abstract class AbstractGridConfigurationComponent {
 
   protected constructor() {}
 
+  /**
+   * TODO: use formatDate instead of passing pipe instance.
+   */
   generateDateTime(datePipe: DatePipe): string {
     if (datePipe) {
       return datePipe.transform(Date.now(), 'MM/dd/yyyy hh:mm a') as string;
@@ -187,14 +191,17 @@ export abstract class AbstractGridConfigurationComponent {
     this.updatePage();
   }
 
-  contentLoadedHandler() {
+  contentLoadedHandler(cd?: ChangeDetectorRef | null) {
     // Syncfusion Support ticket #403476
     setTimeout(() => {
       this.isLoaded = true;
+      if (cd) {
+        cd.detectChanges();
+      }
     });
   }
 
-  gridDataBound(grid: any): void {
+  gridDataBound(grid: any, cd: ChangeDetectorRef | null = null): void {
     if (this.selectedItems.length) {
       const selectedIndexes: number[] = [];
       grid.dataSource.map((item: any, i: number) => {
@@ -204,7 +211,7 @@ export abstract class AbstractGridConfigurationComponent {
       });
       grid.selectRows(selectedIndexes);
     }
-    this.contentLoadedHandler();
+    this.contentLoadedHandler(cd);
   }
 
   actionBegin(args: PageEventArgs, grid?: any): void {
@@ -218,6 +225,7 @@ export abstract class AbstractGridConfigurationComponent {
       if (this.refreshing) {
         args.cancel = true;
         this.refreshing = false;
+        return;
       }
     }
     // Syncfusion Support ticket #403476

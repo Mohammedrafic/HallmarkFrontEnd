@@ -90,11 +90,6 @@ export class ExportAgencyOrders {
   constructor(public payload: ExportPayload, public tab: AgencyOrderManagementTabs) {}
 }
 
-export class GetCandidatesBasicInfo {
-  static readonly type = '[order management] Get Candidates Basic Info';
-  constructor(public organizationId: number, public jobId: number) {}
-}
-
 export class SetOrdersTab {
   static readonly type = '[order management] Set Orders Type';
   constructor(public tabName: AgencyOrderManagementTabs) {}
@@ -117,4 +112,13 @@ export class ClearAgencyHistoricalData {
 export class GetAgencyExtensions {
   static readonly type = '[agency order management] Get Extensions';
   constructor(public id: number, public orderId: number, public organizationId: number) {}
+}
+
+export class GetDeployedCandidateOrderInfo {
+  static readonly type = '[agency order management] Get Deployed Candidate Order Info';
+  constructor(public orderId: number, public candidateProfileId: number, public organizationId: number) {}
+}
+
+export class ClearDeployedCandidateOrderInfo {
+  static readonly type = '[agency order management] Clear Deployed Candidate Order Info';
 }

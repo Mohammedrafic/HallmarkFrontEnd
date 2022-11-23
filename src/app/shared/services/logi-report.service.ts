@@ -1,10 +1,13 @@
+import {  CommonReportFilterOptions, SearchCandidate} from "@admin/analytics/models/common-report.model";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { sortByField } from "@shared/helpers/sort-by-field.helper";
 import { ConfigurationDto } from "@shared/models/analytics.model";
 import { DepartmentsPage } from "@shared/models/department.model";
 import { LocationsPage } from "@shared/models/location.model";
 import { regionsPage } from "@shared/models/region.model";
-import { Observable } from "rxjs";
+import { map, Observable } from "rxjs";
+import { AssociateAgencyDto } from "../models/logi-report-file";
 
 @Injectable({ providedIn: 'root' })
 export class LogiReportService {
@@ -38,7 +41,32 @@ export class LogiReportService {
    * Get the list of Configurations
    * @return ConfigurationDto
    */
-public getLogiReportUrl(): Observable<ConfigurationDto[]> {
-  return this.http.get<ConfigurationDto[]>(`/config/ReportServer:BaseUrl`);
+public getLogiReportData(): Observable<ConfigurationDto[]> {
+  return this.http.get<ConfigurationDto[]>(`/config/ReportServer`);
 }
+/**
+   * Get the Common Report  Filter Options
+   * @return CommonReportFilterOptions
+   */
+public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOptions> {
+  return this.http.post<CommonReportFilterOptions>(`/api/LogiReport/financialtimesheet/filter`,filter).pipe(map((data) => {
+    const sortedFields: Record<keyof CommonReportFilterOptions, string> = { 
+      candidateStatuses: 'statusText',
+      orderStatuses: 'statusText',
+      masterSkills: 'name',
+      skillCategories: 'name',
+      agencies: 'agencyName',
+    }
+    
+    return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof CommonReportFilterOptions])]))
+  }));
+}
+/**
+   * Get the Common Candidate Search
+   * @return SearchCandidate
+   */
+ public getCommonCandidateSearch(filter:any): Observable<SearchCandidate[]> {
+  return this.http.post<SearchCandidate[]>(`/api/LogiReport/financialtimesheet/candidatesearch`,filter);
+}
+
 }

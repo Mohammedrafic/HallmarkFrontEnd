@@ -105,6 +105,7 @@ import { FilterDialogModule } from '@shared/components/filter-dialog/filter-dial
 import { DeployCandidateMessageComponent } from './components/order-candidate-list/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
 import { ExBillRateNamesPipe } from '@shared/pipes/external-bill-rate-names.pipe';
 import { SideMenuModule } from '@shared/components/side-menu/side-menu.module';
+import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 import { SecurityState } from '../security/store/security.state';
 import { NavigationPanelComponent } from './components/navigation-panel/navigation-panel.component';
 import { CandidateAvatarPipe } from './pipes/candidate-avatar.pipe';
@@ -145,6 +146,7 @@ import { AssignCredentialSideComponent } from './components/credentials-list/ass
 import { SendEmailSideDialogComponent } from './components/send-email-side-dialog/send-email-side-dialog.component';
 import { DocumentPreviewSideDialogComponent } from './components/document-preview-side-dialog/document-preview-side-dialog.component';
 import { CustomSideDialogComponent } from './components/custom-side-dialog/custom-side-dialog.component';
+import { OrderManagementState } from '@agency/store/order-management.state';
 
 const icons = {
   AlertCircle,
@@ -191,7 +193,6 @@ const COMPONENTS = [
   MessageToastComponent,
   FileUploadDialogComponent,
   ExportDialogComponent,
-  SearchComponent,
   DialogNextPreviousComponent,
   OrderDetailsComponent,
   SearchComponent,
@@ -199,9 +200,6 @@ const COMPONENTS = [
   GeneralOrderPerDiemInfoComponent,
   OrderCandidatesListComponent,
   OrderPerDiemCandidatesListComponent,
-  CustomProgressBarComponent,
-  ApplyCandidateComponent,
-  AcceptCandidateComponent,
   CustomProgressBarComponent,
   BillRatesViewGridComponent,
   CommentsComponent,
@@ -222,7 +220,6 @@ const COMPONENTS = [
   ReorderCandidatesListComponent,
   OrderReOrdersContainerComponent,
   ExtensionCandidateComponent,
-  ActionCellRendererComponent,
   CustomIconComponent,
   ActionCellRendererComponent,
   EmailSideDialogComponent,
@@ -269,7 +266,8 @@ const COMPONENTS = [
     MaskedTextBoxAllModule,
     TabAllModule,
     DropDownButtonAllModule,
-    NgxsModule.forFeature([BillRateState, SecurityState, CommentsState, AlertsState]),
+    TooltipContainerModule,
+    NgxsModule.forFeature([BillRateState, SecurityState, CommentsState, AlertsState, OrderManagementState]),
     PageToolbarModule,
     FilterDialogModule,
     SideMenuModule,
@@ -290,9 +288,10 @@ const COMPONENTS = [
     ErrorMessageComponent,
     CandidateAvatarPipe,
     AcceptFormComponent,
-    
+
     ImportDialogContentComponent,
-    MultiSelectModule
+    MultiSelectModule,
+    TooltipModule
   ],
   declarations: [
     ...COMPONENTS,
@@ -312,7 +311,7 @@ const COMPONENTS = [
     SendEmailSideDialogComponent,
     DocumentPreviewSideDialogComponent,
     CustomSideDialogComponent,
-    
+
   ],
   providers: [
     DatePipe,

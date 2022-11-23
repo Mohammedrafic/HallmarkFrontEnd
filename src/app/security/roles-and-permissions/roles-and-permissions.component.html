@@ -6,6 +6,7 @@
           <ejs-dropdownlist
             appValidateWithMessage
             formControlName="businessUnit"
+            [allowFiltering]="true"
             [fields]="optionFields"
             [dataSource]="businessUnits"
             placeholder="Business Unit"
@@ -27,7 +28,11 @@
   </ng-container>
   <ng-container right>
     <ng-container>
-      <button ejs-button appHideBeforeSyncfusionLoad [isPrimary]="true" (click)="onAddNewRole()">Add Role</button>
+      <app-tooltip-container
+        [message]="toolTipMessage"
+        [showToolTip]="!userPermission[userPermissions.CanEditRolesPermissions]">
+        <button ejs-button appHideBeforeSyncfusionLoad [disabled]="!userPermission[userPermissions.CanEditRolesPermissions]" [isPrimary]="true" (click)="onAddNewRole()">Add Role</button>
+      </app-tooltip-container>
     </ng-container>
   </ng-container>
 </app-page-toolbar>
@@ -36,7 +41,7 @@
   <app-roles-grid [filterForm]="businessForm" [export$]="exportRoles$" [filteredItems$]="filteredItems$" (editRoleEvent)="onEdit($event)"></app-roles-grid>
 </section>
 
-<app-side-dialog [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()" [disableSaveButton]="agencyActionsAllowed">
+<app-side-dialog [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()" [disableSaveButton]="agencyActionsAllowed || !userPermission[userPermissions.CanEditRolesPermissions]">
   <section>
     <app-role-form #roleForm [form]="$any(roleFormGroup)" [businessUnits]="businessUnits" [roleId]="roleId" (changeUnitId)="onChangeUnitId($event)"></app-role-form>
   </section>

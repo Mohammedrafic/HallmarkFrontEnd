@@ -5,15 +5,24 @@
         <div class="bootstrap business-dropdowns">
           <div class="dropdown-container">
             <div class="input-group dropdown">
-              <ejs-dropdownlist appValidateWithMessage formControlName="businessUnit" [fields]="optionFields"
-                                [dataSource]="businessUnits" placeholder="Business Unit"></ejs-dropdownlist>
+              <ejs-dropdownlist appValidateWithMessage
+                                formControlName="businessUnit"
+                                [fields]="optionFields"
+                                [dataSource]="businessUnits"
+                                [allowFiltering]="true"
+                                placeholder="Business Unit">
+              </ejs-dropdownlist>
             </div>
           </div>
           <div class="dropdown-container">
             <div class="input-group dropdown">
-              <ejs-dropdownlist appValidateWithMessage formControlName="business"
-                                [fields]="businessDataFields" [dataSource]="businessData$ | async"
-                                [value]="defaultBusinessValue" placeholder="Business">
+              <ejs-dropdownlist appValidateWithMessage
+                                formControlName="business"
+                                [fields]="businessDataFields"
+                                [dataSource]="businessData$ | async"
+                                [value]="defaultBusinessValue"
+                                [allowFiltering]="true"
+                                placeholder="Business">
               </ejs-dropdownlist>
             </div>
           </div>

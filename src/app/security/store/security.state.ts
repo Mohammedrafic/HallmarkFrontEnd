@@ -30,6 +30,7 @@ import {
   ExportUserList,
   ExportRoleList,
   GetAllUsersPage,
+  ResendWelcomeEmail,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -37,7 +38,7 @@ import { PermissionsTree } from '@shared/models/permission.model';
 import { RoleTreeField } from '../roles-and-permissions/role-form/role-form.component';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants/messages';
+import { EMAIL_RESEND_SUCCESS, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants/messages';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UsersService } from '../services/users.service';
 import { RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
@@ -201,7 +202,7 @@ export class SecurityState {
 
   @Action(GetBusinessByUnitType)
   GetBusinessByUnitType(
-    { dispatch,patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     { type }: GetBusinessByUnitType
   ): Observable<BusinessUnit[] | void> {
     return this.businessUnitService.getBusinessByUnitType(type).pipe(
@@ -237,7 +238,7 @@ export class SecurityState {
 
   @Action(GetRolesPage)
   GetRolesPage(
-    { dispatch,patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     { businessUnitIds, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters }: GetRolesPage
   ): Observable<RolesPage | void> {
     return this.roleService
@@ -271,7 +272,7 @@ export class SecurityState {
 
   @Action(GetUsersPage)
   GetUsersPage(
-    { dispatch,patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     { businessUnitIds, businessUnitType, pageNumber, pageSize, sortModel, filterModel }: GetUsersPage
   ): Observable<UsersPage | void> {
     return this.userService
@@ -306,7 +307,7 @@ export class SecurityState {
 
   @Action(GetPermissionsTree)
   GetPermissionsTree(
-    { dispatch,patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     { type }: GetPermissionsTree
   ): Observable<PermissionsTree | void> {
     patchState({ isNewRoleDataLoading: true });
@@ -387,7 +388,7 @@ export class SecurityState {
   }
 
   @Action(RemoveRole)
-  RemoveRole({ dispatch,patchState, getState }: StateContext<SecurityStateModel>, { id }: RemoveRole): Observable<RolesPage | void> {
+  RemoveRole({ dispatch, patchState, getState }: StateContext<SecurityStateModel>, { id }: RemoveRole): Observable<RolesPage | void> {
     const state = getState();
     return this.roleService.removeRoles(id).pipe(
       tap(() => {
@@ -461,27 +462,11 @@ export class SecurityState {
 
   @Action(GetOrganizationsStructureAll)
   GetOrganizationsStructureAll(
-    { dispatch,patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     { userId }: GetOrganizationsStructureAll
-  ): Observable<Organisation[] |void> {
+  ): Observable<Organisation[] | void> {
     return this.userService.getUserVisibilitySettingsOrganisation(userId).pipe(
       tap((payload) => {
-        payload.forEach((organization: Organisation) => {
-          organization.regions.forEach((region: OrganizationRegion) => {
-            region['organizationId'] = organization.organizationId;
-            region['regionId'] = region.id;
-            region.locations?.forEach((location: OrganizationLocation) => {
-              location['organizationId'] = organization.organizationId;
-              location['regionId'] = region.id;
-              location['locationId'] = location.id;
-              location.departments.forEach((department: OrganizationDepartment) => {
-                department['organizationId'] = organization.organizationId;
-                department['regionId'] = region.id;
-                department['locationId'] = location.id;
-              });
-            });
-          });
-        });
         patchState({ organizations: payload });
         return payload;
       }),
@@ -512,7 +497,7 @@ export class SecurityState {
   }
   @Action(GetUSCanadaTimeZoneIds)
   GetUSCanadaTimeZoneIds(
-    { dispatch,patchState }: StateContext<SecurityStateModel>,
+    { dispatch, patchState }: StateContext<SecurityStateModel>,
     {}: GetUSCanadaTimeZoneIds
   ): Observable<TimeZoneModel[] | void> {
     return this.nodatimeService.getUSCanadaTimeZoneIds().pipe(
@@ -522,7 +507,17 @@ export class SecurityState {
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
-      })
+      }),
+    );
+  }
+  @Action(ResendWelcomeEmail)
+  ResendWelcomeEmail({ dispatch }: StateContext<SecurityStateModel>, { userId }: ResendWelcomeEmail): Observable<void> {
+    return this.userService.resendWelcomeEmail(userId)
+    .pipe(
+      tap(() => { dispatch(new ShowToast(MessageTypes.Success, EMAIL_RESEND_SUCCESS)); }),
+      catchError((error: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      }),
     );
   }
 }

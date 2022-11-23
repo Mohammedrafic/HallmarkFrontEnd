@@ -179,6 +179,7 @@ $chip-margin: 8px;
 
 .checkbox-block {
   margin-right: 12px;
+  margin-left: 16px;
 }
 
 .controls-block {
@@ -208,4 +209,40 @@ app-date-week-picker {
 
 app-navigation-panel {
   margin-top: auto;
+}
+
+.reject-reason-block {
+  font-size: 14px;
+  font-weight: 400;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.reason-header {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  margin-right: 15px;
+  white-space: nowrap;
+}
+
+.reason-text {
+  border: 1px solid $secondary-dark-blue-40;
+  border-radius: 8px;
+  background-color: $secondary-dark-blue-50;
+  padding: 10px 17px;
+  width: auto;
+  max-width: 700px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: inline-block;
+}
+
+.controls-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  max-width: 87%;
 }

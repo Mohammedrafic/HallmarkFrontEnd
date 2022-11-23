@@ -7,10 +7,14 @@
     <div class="grid-pagination">
       <ejs-dropdownlist id="rowsPerPage"
                         class="dropdown-no-border"
+                        [allowFiltering]="true"
                         [dataSource]="rowsPerPageDropDown"
                         [(value)]="activeRowsPerPageDropDown"
                         (change)="onPageSizeChanged($event)">
       </ejs-dropdownlist>
+      <div class="total-rows">
+        Total Rows: {{totalRecordsCount}}
+      </div>
     </div>
   </div>
 </section>

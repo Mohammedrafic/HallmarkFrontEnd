@@ -10,6 +10,8 @@ import { AgencyStatus } from 'src/app/shared/enums/status';
 import { agencyStatusCreationOptions, agencyStatusOptions } from '../../agency-list.constants';
 import PriceUtils from '@shared/utils/price.utils';
 import { AgencyStatusesModel } from "@shared/models/agency.model";
+import { ALPHANUMERIC } from '@shared/constants';
+import { COUNTRIES } from '@shared/constants/countries-list';
 
 @Component({
   selector: 'app-general-info-group',
@@ -20,10 +22,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   @Input() formGroup: FormGroup;
   @Input() isAgencyUser: boolean;
 
-  public countries = [
-    { id: Country.USA, text: Country[0] },
-    { id: Country.Canada, text: Country[1] },
-  ];
+  public countries = COUNTRIES;
   public priceUtils = PriceUtils;
   public states$ = new Subject();
   public statuses: AgencyStatusesModel[] = agencyStatusCreationOptions;
@@ -71,7 +70,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
     return new FormGroup({
       name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       externalId: new FormControl('', [Validators.maxLength(10)]),
-      taxId: new FormControl('', [Validators.required, Validators.minLength(9), Validators.pattern(/^[0-9\s\-]+$/)]),
+      taxId: new FormControl('', [Validators.required, Validators.minLength(9), Validators.pattern(ALPHANUMERIC)]),
       baseFee: new FormControl(''),
       addressLine1: new FormControl('', [Validators.required, Validators.maxLength(100)]),
       addressLine2: new FormControl('', [Validators.maxLength(100)]),

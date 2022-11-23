@@ -12,15 +12,20 @@ import {
 } from '@angular/core';
 import {
   CancellationReasonsMap,
-  PenaltiesMap
-} from "@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants";
+  PenaltiesMap,
+} from '@shared/components/candidate-cancellation-dialog/candidate-cancellation-dialog.constants';
 
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { PenaltyCriteria } from "@shared/enums/candidate-cancellation";
+import {
+  DELETE_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  deployedCandidateMessage,
+  DEPLOYED_CANDIDATE,
+} from '@shared/constants';
+import { PenaltyCriteria } from '@shared/enums/candidate-cancellation';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, of, take } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
@@ -33,12 +38,13 @@ import {
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
-import { DatePipe } from '@angular/common';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import PriceUtils from '@shared/utils/price.utils';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
+import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -56,6 +62,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
   @Input() actionsAllowed: boolean;
+  @Input() deployedCandidateOrderInfo: DeployedCandidateOrderInfo[];
+  @Input() candidateOrderIds: string[];
+  @Input() isOrderOverlapped: boolean;
 
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
@@ -120,7 +129,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get showAccepteAction(): boolean {
-    return this.candidate?.statusName !== 'Accepted' && !this.isReadOnly && !this.candidate.deployedCandidateInfo;
+    return this.candidate?.statusName !== 'Accepted' && !this.isReadOnly;
   }
 
   get isAgencyAndOnboard(): boolean {
@@ -139,7 +148,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   constructor(
     private store: Store,
     private actions$: Actions,
-    private datePipe: DatePipe,
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
     private changeDetectionRef: ChangeDetectorRef
@@ -181,13 +189,38 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public onAccept(): void {
-    this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
+    this.shouldChangeCandidateStatus()
+      .pipe(take(1))
+      .subscribe((isConfirm) => {
+        if (isConfirm) {
+          this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
+        }
+      });
   }
 
   public onApply(): void {
     if (this.form.valid) {
-      this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Applied, statusText: 'Applied' });
+      this.shouldChangeCandidateStatus()
+        .pipe(take(1))
+        .subscribe((isConfirm) => {
+          if (isConfirm) {
+            this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Applied, statusText: 'Applied' });
+            this.closeDialog();
+          }
+        });
     }
+  }
+
+  private shouldChangeCandidateStatus(): Observable<boolean> {
+    const options = {
+      title: DEPLOYED_CANDIDATE,
+      okButtonLabel: 'Proceed',
+      okButtonClass: 'ok-button',
+    };
+
+    return this.isDeployedCandidate  && this.isAgency && this.isOrderOverlapped
+      ? this.confirmService.confirm(deployedCandidateMessage(this.candidateOrderIds), options)
+      : of(true);
   }
 
   public onWithdraw(): void {
@@ -223,6 +256,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
     const value = this.form.getRawValue();
+
     this.store
       .dispatch(
         new UpdateAgencyCandidateJob({
@@ -234,7 +268,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           offeredBillRate: value.offeredBillRate || null,
           requestComment: value.comments,
           expAsTravelers: value.expAsTravelers,
-          availableStartDate: value.availableStartDate,
+          availableStartDate: DateTimeHelper.toUtcFormat(new Date(value.availableStartDate)),
           actualStartDate: this.candidateJob.actualStartDate,
           actualEndDate: this.candidateJob.actualEndDate,
           clockId: this.candidateJob.clockId,
@@ -275,10 +309,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     });
   }
 
-  private getDateString(date: string): string | null {
-    return this.datePipe.transform(date, 'MM/dd/yyyy');
-  }
-
   private getComments(): void {
     this.commentsService
       .getComments(this.candidateJob?.commentContainerId as number, null)
@@ -298,9 +328,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: `${value.organizationPrefix}-${value.orderPublicId}`,
-          date: [value.order.jobStartDate, value.order.jobEndDate],
+          date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()), 
+            DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString())],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
-          availableStartDate: value.availableStartDate,
+          availableStartDate: DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy'),
           candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
           locationName: value.order.locationName,
           yearExp: value.yearsOfExperience,
@@ -309,10 +340,13 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           comments: value.requestComment,
           rejectReason: value.rejectReason,
           guaranteedWorkWeek: value.guaranteedWorkWeek,
-          offeredStartDate: this.getDateString(value.offeredStartDate),
+          offeredStartDate: DateTimeHelper.formatDateUTC(
+            DateTimeHelper.convertDateToUtc(value.offeredStartDate).toString(), 'MM/dd/yyyy'),
           clockId: value.clockId,
-          actualStartDate: this.getDateString(value.actualStartDate),
-          actualEndDate: this.getDateString(value.actualEndDate),
+          actualStartDate: DateTimeHelper.formatDateUTC(
+            DateTimeHelper.convertDateToUtc(value.actualStartDate).toString(), 'MM/dd/yyyy'),
+          actualEndDate: DateTimeHelper.formatDateUTC(
+            DateTimeHelper.convertDateToUtc(value.actualEndDate).toString(), 'MM/dd/yyyy'),
           jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
           penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
           rate: value.jobCancellation?.rate,
@@ -347,13 +381,13 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       ApplicantStatusEnum.OnBoarded,
       ApplicantStatusEnum.PreOfferCustom,
     ];
-    if (readOnlyStatuses.includes(this.candidateStatus) || this.isDeployedCandidate) {
+    if (readOnlyStatuses.includes(this.candidateStatus)) {
       this.isReadOnly = true;
     }
   }
 
   private switchFormState(): void {
-    if (this.isApplied && !this.candidate.deployedCandidateInfo) {
+    if (this.isApplied) {
       this.form?.enable();
     } else {
       this.form?.disable();
@@ -368,9 +402,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.form.markAsPristine();
   }
 
-  private setCancellationControls(value: PenaltyCriteria): void{
+  private setCancellationControls(value: PenaltyCriteria): void {
     this.showHoursControl = value === PenaltyCriteria.RateOfHours || value === PenaltyCriteria.FlatRateOfHours;
     this.showPercentage = value === PenaltyCriteria.RateOfHours;
   }
 }
-

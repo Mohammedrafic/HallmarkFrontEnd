@@ -1,5 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { WorkflowWithDetails } from '@shared/models/workflow.model';
+import { UserPermissions } from "@core/enums";
+import { Permission } from "@core/interface";
 
 
 @Component({
@@ -7,15 +9,13 @@ import { WorkflowWithDetails } from '@shared/models/workflow.model';
   templateUrl: './card-menu.component.html',
   styleUrls: ['./card-menu.component.scss']
 })
-export class CardMenuComponent implements OnInit {
+export class CardMenuComponent {
   @Input() cards: WorkflowWithDetails[];
+  @Input() userPermission: Permission;
   @Output() addNewWorkflowClick = new EventEmitter;
   @Output() cardClicked = new EventEmitter;
 
-  constructor() { }
-
-  ngOnInit(): void {
-  }
+  public readonly userPermissions = UserPermissions;
 
   public onAddNewWorkflowClick(): void {
     this.addNewWorkflowClick.emit();

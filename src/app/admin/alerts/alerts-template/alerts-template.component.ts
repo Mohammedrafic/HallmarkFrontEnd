@@ -6,14 +6,27 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { GridReadyEvent } from '@ag-grid-community/core';
-import { ClearAlertTemplateState, GetAlertsTemplatePage, GetTemplateByAlertId, SaveTemplateByAlertId, UpdateTemplateByAlertId } from '@admin/store/alerts.actions';
-import { AddAlertsTemplateRequest, AlertsTemplate, AlertsTemplateFilters, AlertsTemplatePage, EditAlertsTemplate, EditAlertsTemplateRequest } from '@shared/models/alerts-template.model';
+import {
+  ClearAlertTemplateState,
+  GetAlertsTemplatePage,
+  GetTemplateByAlertId,
+  SaveTemplateByAlertId,
+  UpdateTemplateByAlertId
+} from '@admin/store/alerts.actions';
+import {
+  AddAlertsTemplateRequest,
+  AlertsTemplate,
+  AlertsTemplateFilters,
+  AlertsTemplatePage,
+  EditAlertsTemplate,
+  EditAlertsTemplateRequest
+} from '@shared/models/alerts-template.model';
 import { AlertsState } from '@admin/store/alerts.state';
-import { SetHeaderState, ShowEmailSideDialog, ShowSmsSideDialog, ShowOnScreenSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowEmailSideDialog, ShowOnScreenSideDialog, ShowSmsSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { AlertsEmailTemplateFormComponent } from './alerts-email-template-form/alerts-email-template-form.component';
-import { BUSINESS_UNITS_VALUES, BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor } from '../alerts.constants';
+import { BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor } from '../alerts.constants';
 import { RichTextEditorComponent } from '@syncfusion/ej2-angular-richtexteditor';
 import { AlertChannel } from '../alerts.enum';
 import { AlertsSmsTemplateFromComponent } from './alerts-sms-template-from/alerts-sms-template-from.component';
@@ -24,10 +37,12 @@ import { BusinessUnit } from '@shared/models/business-unit.model';
 import { GetBusinessByUnitType } from 'src/app/security/store/security.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { RECORD_ADDED, RECORD_MODIFIED, GRID_CONFIG } from '@shared/constants';
+import { GRID_CONFIG, RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AppState } from '../../../store/app.state';
+import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
+
 @Component({
   selector: 'app-template',
   templateUrl: './alerts-template.component.html',
@@ -102,6 +117,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   private filters: AlertsTemplateFilters = {};
   public title: string = "Notification Templates";
   public export$ = new Subject<ExportedFileType>();
+  public totalRecordsCount: number;
+
   defaultValue: any;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
   rowModelType: any;
@@ -117,7 +134,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
   maxBlocksInCache: any;
   defaultColDef: any;
   itemList: Array<AlertsTemplate> | undefined;
-  
+
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
   }
@@ -260,11 +277,11 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
               "htmlAttributes": { draggable: true }
             })
           });
-        }   
+        }
         this.UpdateForm(data);
       }
     });
-    this.updateTemplateByAlertId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {      
+    this.updateTemplateByAlertId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
       if (data != undefined && data!=null) {
         if (data.alertChannel == AlertChannel.Email) {
           this.emailTemplateCloseDialog();
@@ -279,7 +296,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
         this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       }
     });
-      this.saveTemplateByAlertId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {      
+      this.saveTemplateByAlertId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
         if (data != undefined && data!=null) {
           if (data.alertChannel == AlertChannel.Email) {
             this.emailTemplateCloseDialog();
@@ -340,6 +357,8 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
 
           self.alertsTemplatePage$.pipe(takeUntil(self.unsubscribe$)).subscribe((data: any) => {
             self.itemList = data?.items;
+            self.totalRecordsCount = data?.totalCount;
+
             if (!self.itemList || !self.itemList.length) {
               self.gridApi.showNoRowsOverlay();
             }
@@ -418,7 +437,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
           bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
         };
-        this.store.dispatch(new SaveTemplateByAlertId(emailAddTemplateDto));       
+        this.store.dispatch(new SaveTemplateByAlertId(emailAddTemplateDto));
       }
       else {
         const updateEmailTemplateDto: EditAlertsTemplateRequest = {
@@ -430,7 +449,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
           bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
         };
-        this.store.dispatch(new UpdateTemplateByAlertId(updateEmailTemplateDto));        
+        this.store.dispatch(new UpdateTemplateByAlertId(updateEmailTemplateDto));
       }
     }
   }
@@ -450,7 +469,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
           bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
         };
-        this.store.dispatch(new SaveTemplateByAlertId(smsAddTemplateDto));       
+        this.store.dispatch(new SaveTemplateByAlertId(smsAddTemplateDto));
       }
       else {
         const smsUpdateTemplateDto: EditAlertsTemplateRequest = {
@@ -462,7 +481,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
           cCList: this.editAlertTemplateData.cCList == undefined ? '' : this.editAlertTemplateData.cCList,
           bCCList: this.editAlertTemplateData.bCCList == undefined ? '' : this.editAlertTemplateData.bCCList
         };
-        this.store.dispatch(new UpdateTemplateByAlertId(smsUpdateTemplateDto));       
+        this.store.dispatch(new UpdateTemplateByAlertId(smsUpdateTemplateDto));
       }
     }
 
@@ -511,7 +530,7 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     this.store.dispatch(new ShowOnScreenSideDialog(false));
   }
   private SetEditData(alertId: number, alertChannel: AlertChannel,businessUnitId:number |null): void {
-    this.dispatchEditAlertTemplate(alertId, alertChannel,businessUnitId);    
+    this.dispatchEditAlertTemplate(alertId, alertChannel,businessUnitId);
   }
   private generateBusinessForm(): FormGroup {
     return new FormGroup({
@@ -528,11 +547,11 @@ export class AlertsTemplateComponent extends AbstractGridConfigurationComponent 
     });
   }
   private onBusinessValueChanged(): void {
-    this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {     
+    this.businessControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
         this.dispatchNewPage();
     });
   }
-  
+
   private UpdateForm(data:any):void
   {
     if (this.alertTemplateType === AlertChannel[AlertChannel.Email]) {

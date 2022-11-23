@@ -15,32 +15,33 @@
         <div class="input-group dropdown bootstrap">
           <ejs-dropdownlist
             *ngIf="!isAgency"
+            [allowFiltering]="true"
             [fields]="optionFields"
             [dataSource]="applicantStatuses"
             [formControl]="statusesFormControl"
             [disabled]="!actionsAllowed"
             placeholder="Select Status"
             (select)="onDropDownChanged($event)"
-            [itemTemplate]="itemTemplate"
           >
-            <ng-template #itemTemplate let-data>
-              <option [disabled]="data.disabled">{{ data.statusText }}</option>
-            </ng-template>
           </ejs-dropdownlist>
         </div>
-        <button
-          ejs-button
-          cssClass="e-outline"
-          [isPrimary]="true"
-          *ngIf="canAccept"
-          [disabled]="!actionsAllowed"
-          (click)="onReject()"
-        >
-          Reject
-        </button>
-        <button ejs-button [isPrimary]="true" *ngIf="canAccept" [disabled]="!actionsAllowed" (click)="onAccept()">
-          Accept
-        </button>
+        <app-tooltip-container [showToolTip]="!actionsAllowed">
+          <button
+            ejs-button
+            cssClass="e-outline"
+            [isPrimary]="true"
+            *ngIf="canAccept"
+            [disabled]="!actionsAllowed"
+            (click)="onReject()"
+          >
+            Reject
+          </button>
+        </app-tooltip-container>
+        <app-tooltip-container [showToolTip]="!actionsAllowed">
+          <button ejs-button [isPrimary]="true" *ngIf="canAccept" [disabled]="!actionsAllowed" (click)="onAccept()">
+            Accept
+          </button>
+        </app-tooltip-container>
       </div>
     </div>
   </section>
@@ -292,14 +293,15 @@
         (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)"
         [isActive]="true"
         [readOnlyMode]="isReadOnlyBillRates"
-      >
-      </app-bill-rates>
+        [disabledActionMode]="!hasEditOrderBillRatesPermission"
+      ></app-bill-rates>
     </ng-template>
   </section>
   <ng-container *ngIf="canAccept || !isAgency">
     <div class="mobile-actions" [ngClass]="{ tab: isTab }">
       <div class="input-group dropdown bootstrap" *ngIf="!isAgency">
         <ejs-dropdownlist
+          [allowFiltering]="true"
           [fields]="optionFields"
           [dataSource]="applicantStatuses"
           [formControl]="statusesFormControl"

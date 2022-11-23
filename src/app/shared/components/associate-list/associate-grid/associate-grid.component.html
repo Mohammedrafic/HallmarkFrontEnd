@@ -16,10 +16,17 @@
       <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data); (false)">
+            <button ejs-button
+                    cssClass="e-flat primary-icon-button"
+                    (click)="onEdit(data); (false)"
+                    [disabled]="!userPermission[userPermissions.CanViewFeeExceptions] && !userPermission[userPermissions.CanViewPartnershipSettings]">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove(data)" [disabled]="!areAgencyActionsAllowed || data.agencyStatus === agencyStatus.Inactive || data.agencyStatus === agencyStatus.Terminated">
+            <button ejs-button
+                    cssClass="e-flat secondary-icon-button"
+                    (click)="onRemove(data)"
+                    [disabled]="!areAgencyActionsAllowed || data.agencyStatus === agencyStatus.Inactive || data.agencyStatus === agencyStatus.Terminated || !userPermission[userPermissions.CanEditAssociatedOrganizations]"
+            >
               <span><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -45,6 +52,7 @@
               <ejs-dropdownlist
                 id="rowsPerPage"
                 class="dropdown-no-border"
+                [allowFiltering]="true"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
                 (change)="onRowsDropDownChanged()"
@@ -61,6 +69,9 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
+              <div class="total-rows">
+                Total Rows: {{(associateListPage$ | async)?.totalCount}}
+              </div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
