@@ -65,7 +65,7 @@ export class TiersComponent extends AbstractPermission implements OnInit {
   }
 
   private getOrganizationStructure(): void {
-    this.store.dispatch(new GetOrgTierStructure());
+    this.store.dispatch(new GetOrgTierStructure(null));
   }
 
   private watchForRegionStructure(): void {

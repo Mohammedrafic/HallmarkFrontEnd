@@ -10,10 +10,13 @@ export class SettingsViewService {
   public getViewSettingKey(
     settingKeys: OrganizationSettingKeys,
     hierarchyLevel: OrganizationalHierarchy,
-    id: number
+    id: number,
+    organizationId?: number
   ): Observable<Record<string, string>> {
     return this.http.get<Record<string, string>>(
-      `/api/OrganizationSettings/byKeys?SettingKeys=${settingKeys}&HierarchyLevel=${hierarchyLevel}&HierarchyId=${id}`
+      organizationId ?
+        `/api/OrganizationSettings/byKeys?SettingKeys=${settingKeys}&HierarchyLevel=${hierarchyLevel}&HierarchyId=${id}&OrganizationId=${organizationId}`:
+        `/api/OrganizationSettings/byKeys?SettingKeys=${settingKeys}&HierarchyLevel=${hierarchyLevel}&HierarchyId=${id}`
     );
   }
 }

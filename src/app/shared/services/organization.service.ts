@@ -112,7 +112,11 @@ export class OrganizationService {
       map((data) => Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortBy(value)]))));
   }
 
-  public getOrgTierStructure(): Observable<OrganizationStructure> {
-    return this.http.get<OrganizationStructure>('/api/Organizations/structure/configuration?SettingKey=27')
+  public getOrgTierStructure(organizationId: number | null): Observable<OrganizationStructure> {
+    return this.http.get<OrganizationStructure>(
+      organizationId ?
+        `/api/Organizations/structure/configuration?SettingKey=27&OrganizationId=${organizationId}`:
+        '/api/Organizations/structure/configuration?SettingKey=27'
+    );
   }
 }
