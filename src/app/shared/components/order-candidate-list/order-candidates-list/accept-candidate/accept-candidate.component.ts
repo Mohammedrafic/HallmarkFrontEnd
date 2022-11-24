@@ -332,7 +332,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           date: [DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()), 
             DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString())],
           billRates: value.order.hourlyRate && PriceUtils.formatNumbers(value.order.hourlyRate),
-          availableStartDate: DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy'),
+          availableStartDate: value.availableStartDate ?
+          DateTimeHelper.formatDateUTC(value.availableStartDate, 'MM/dd/yyyy') : '',
           candidateBillRate: PriceUtils.formatNumbers(value.candidateBillRate),
           locationName: value.order.locationName,
           yearExp: value.yearsOfExperience,
@@ -341,13 +342,13 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           comments: value.requestComment,
           rejectReason: value.rejectReason,
           guaranteedWorkWeek: value.guaranteedWorkWeek,
-          offeredStartDate: DateTimeHelper.formatDateUTC(
-            DateTimeHelper.toUtcFormat(value.offeredStartDate).toString(), 'MM/dd/yyyy'),
+          offeredStartDate: value.offeredStartDate ? DateTimeHelper.formatDateUTC(
+            DateTimeHelper.toUtcFormat(value.offeredStartDate).toString(), 'MM/dd/yyyy') : '',
           clockId: value.clockId,
-          actualStartDate: DateTimeHelper.formatDateUTC(
-            DateTimeHelper.toUtcFormat(value.actualStartDate).toString(), 'MM/dd/yyyy'),
-          actualEndDate: DateTimeHelper.formatDateUTC(
-            DateTimeHelper.toUtcFormat(value.actualEndDate).toString(), 'MM/dd/yyyy'),
+          actualStartDate: value.actualStartDate ? DateTimeHelper.formatDateUTC(
+            DateTimeHelper.toUtcFormat(value.actualStartDate).toString(), 'MM/dd/yyyy') : '',
+          actualEndDate: value.actualEndDate ? DateTimeHelper.formatDateUTC(
+            DateTimeHelper.toUtcFormat(value.actualEndDate).toString(), 'MM/dd/yyyy') : '',
           jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
           penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
           rate: value.jobCancellation?.rate,
