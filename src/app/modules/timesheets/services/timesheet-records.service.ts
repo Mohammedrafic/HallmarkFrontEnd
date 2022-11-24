@@ -46,6 +46,8 @@ export class TimesheetRecordsService {
 
       controls['billRateConfigId'] = [record['billRateConfigId'], Validators.required];
       controls['timeOut'] = [record['timeOut'] || ''];
+      controls['timeIn'] = [record['timeIn'] || ''];
+      controls['isTimeInNull'] = [record['isTimeInNull'] || false];
 
       formGroups[record.id] = this.fb.group(controls);
     });

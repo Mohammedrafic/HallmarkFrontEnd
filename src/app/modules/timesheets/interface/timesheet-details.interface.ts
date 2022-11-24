@@ -149,6 +149,7 @@ export interface PutRecord {
   departmentId: number;
   value: number;
   description?: string;
+  isTimeInNull?: boolean;
 }
 
 export interface PutRecordDto {

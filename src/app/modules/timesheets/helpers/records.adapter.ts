@@ -57,6 +57,7 @@ export class RecordsAdapter {
         [RecordsMode.Edit]: data.timesheets.map((item: RecordValue) => {
           const record = item;
           record.day = item['timeIn'] as string;
+          record.isTimeInNull = !!item['isTimeInNull'];
 
           return record;
         }),
@@ -112,14 +113,17 @@ export class RecordsAdapter {
   }
 
   private static adaptRecordToPut(record: RecordValue): PutRecord {
+    const timeIn = record.timeIn || record.day;
+
     return {
       id: record.id,
-      timeIn: DateTimeHelper.toUtcFormat(record.timeIn),
+      timeIn: DateTimeHelper.toUtcFormat(timeIn),
+      isTimeInNull: !record.timeIn,
       billRateConfigId: record.billRateConfigId,
       departmentId: record.departmentId,
       value: record.value,
       description: record.description,
-      timeOut: record.timeOut ? RecordsAdapter.checkTimeOutDate(record.timeIn, record.timeOut) : null,
+      timeOut: record.timeOut ? RecordsAdapter.checkTimeOutDate(timeIn, record.timeOut) : null,
       ...record.description && { description: record.description },
       ...record.hasOwnProperty('hadLunchBreak') && { hadLunchBreak: record.hadLunchBreak },
     };
