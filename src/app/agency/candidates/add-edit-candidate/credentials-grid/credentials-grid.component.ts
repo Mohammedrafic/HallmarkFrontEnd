@@ -433,6 +433,13 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     completedDate, rejectReason,
   }: CandidateCredential): void {
     if (this.masterCredentialId) {
+      if (createdOn != null) {
+        createdOn = DateTimeHelper.toUtcFormat(createdOn);
+      }
+
+      if (createdUntil != null) {
+        createdUntil = DateTimeHelper.toUtcFormat(createdUntil);
+      }
       this.store.dispatch(
         new SaveCandidatesCredential({
           status,
