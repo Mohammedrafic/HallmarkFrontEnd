@@ -7,19 +7,19 @@ import { LogiReportJsLoaded } from '@shared/constants';
 import { UserState } from '../../../store/user.state';
 import { Store } from '@ngxs/store';
 import { BusinessUnitType } from '../../enums/business-unit-type';
-//declare const com: any;
-
-declare global {
-  /* eslint-disable no-var */
-  var com: {
-    jinfonet: {
-      api: {
-        AppFactory: any;
-      };
-    };
-  };
+import { GlobalConstants } from '@shell/global-constants';
+declare const com:any;
+// declare global {
+//   /* eslint-disable no-var */
+//   var com: {
+//     jinfonet: {
+//       api: {
+//         AppFactory: any;
+//       };
+//     };
+//   };
   
-}
+// }
 
 @Component({
   selector: 'app-logi-report',
@@ -28,13 +28,12 @@ declare global {
 })
 
 export class LogiReportComponent implements OnInit {
-  private static factory: any;
+  private factory:any;
   private reportIframeName: string = "reportIframe";
   private uId: string = "";
   private pwd: string = "";
   private jrdPrefer: any;
-  private reportUrl: string;
-  private reportBaseUrl:string;  
+  private reportUrl: string; 
   private scriptLoadTimeoutHandle: any;
   @Input() paramsData: any | {};
   @Input() reportName: LogiReportFileDetails;
@@ -47,22 +46,25 @@ export class LogiReportComponent implements OnInit {
   
 
   ngOnInit(): void {
-    //this.factory = com.jinfonet.api.AppFactory;    
+    this.factory = com.jinfonet.api.AppFactory;    
     
   }
   
   public SetReportData(data:ConfigurationDto[]):void{
-    let url=data.find(i=>i.key=="ReportServer:BaseUrl")?.value;
-    let userId=data.find(i=>i.key=="ReportServer:UId")?.value;
-    let pass=data.find(i=>i.key=="ReportServer:Pwd")?.value;
-    this.reportBaseUrl=url==null?"":url;
-    this.reportUrl=url==null?"":url+ 'jinfonet/tryView.jsp';
-    this.uId=userId==null?"":userId;
-    this.pwd=pass==null?"":pass;
-    this.injectReportApiJs();
+    // let url=data.find(i=>i.key=="ReportServer:BaseUrl")?.value;
+    // let userId=data.find(i=>i.key=="ReportServer:UId")?.value;
+    // let pass=data.find(i=>i.key=="ReportServer:Pwd")?.value;
+    // this.reportBaseUrl=url==null?"":url;
+    // this.reportUrl=url==null?"":url+ 'jinfonet/tryView.jsp';
+    // this.uId=userId==null?"":userId;
+    // this.pwd=pass==null?"":pass;
+    //this.injectReportApiJs();
   }
   public RenderReport():void
   {
+    this.reportUrl=GlobalConstants.reportBaseUrl==null?"":GlobalConstants.reportBaseUrl+ 'jinfonet/tryView.jsp';
+    this.uId=GlobalConstants.reportUId==null?"":GlobalConstants.reportUId;
+    this.pwd=GlobalConstants.reportPwd==null?"":GlobalConstants.reportPwd;
     if (this.reportType == LogiReportTypes.DashBoard) {
       this.showDashBoard(this.reportIframeName);
     }
@@ -94,7 +96,7 @@ export class LogiReportComponent implements OnInit {
         active: 1
       };
       console.log(this.reportUrl);
-    let task = LogiReportComponent.factory.runDashboard(server, resExt, entryId);
+    let task = this.factory?.runDashboard(server, resExt, entryId);
   }
 
   private ShowReport(entryId: string): void {
@@ -140,7 +142,7 @@ export class LogiReportComponent implements OnInit {
     };
     let prptRes = this.reportName;
     let catRes = this.catelogName;
-    let test = LogiReportComponent.factory?.runReport(
+    let test = this.factory?.runReport(
       server, prptRes, catRes, this.paramsData, entryId);
   };
 
@@ -155,11 +157,11 @@ export class LogiReportComponent implements OnInit {
           script.type = 'text/javascript';
           window.localStorage.setItem(LogiReportJsLoaded,"true");
           script.onload = (): void => {
-            LogiReportComponent.factory = com.jinfonet.api.AppFactory;            
+            this.factory = com.jinfonet.api.AppFactory;            
             clearTimeout(this.scriptLoadTimeoutHandle);
             resolve();
           };
-          script.src = `${this.reportBaseUrl}webos/jsvm/lib/jreportapi.js`;
+          //script.src = `${this.reportBaseUrl}webos/jsvm/lib/jreportapi.js`;
           document.getElementsByTagName('head')[0].appendChild(script);
 
           this.scriptLoadTimeoutHandle = setTimeout(() => {
