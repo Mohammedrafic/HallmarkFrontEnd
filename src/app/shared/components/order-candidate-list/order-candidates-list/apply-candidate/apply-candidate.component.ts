@@ -117,7 +117,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
             const value = this.formGroup.getRawValue();
             let availableStartDate = value.availableStartDate;
             if (value.availableStartDate && value.availableStartDate.setHours) {
-              availableStartDate = DateTimeHelper.setInitHours(value.availableStartDate.toISOString());
+              availableStartDate = DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(value.availableStartDate));
             }
             if (typeof value.availableStartDate === 'string') {
               const date = new Date(value.availableStartDate);
