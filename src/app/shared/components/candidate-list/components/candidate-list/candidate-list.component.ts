@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { debounceTime, filter, map, merge, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { debounceTime, filter, map, merge, Observable, Subject, switchMap, takeUntil, takeWhile } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '../../../abstract-grid-configuration/abstract-grid-configuration.component';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -140,9 +140,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   ngOnInit(): void {
-    if (this.filterService.canPreserveFilters()) {
-      this.store.dispatch([new GetRegionList()]);
-    }
+    this.getRegions();
     this.dispatchInitialIcon();
     this.subscribeOnSaveState();
     this.subscribeOnPageSubject();
@@ -440,5 +438,18 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private setFileName(): void {
     this.fileName = `Candidates ${this.generateDateTime(this.datePipe)}`;
+  }
+
+  private getRegions(): void {
+    if (this.filterService.canPreserveFilters()) {
+      this.store.dispatch(new GetRegionList());
+    } else {
+      merge(this.lastSelectedAgencyId$, this.lastSelectedOrgId$)
+        .pipe(
+          filter(Boolean),
+          switchMap(() => this.store.dispatch(new GetRegionList())),
+          takeUntil(this.unsubscribe$)
+          ).subscribe();
+    }
   }
 }
