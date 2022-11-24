@@ -70,6 +70,10 @@ export class MasterSkillFilters {
 export class MasterSkillByOrganization {
   id: number;
   name: string;
+  masterSkillId?: number;
+  categoryName?: string;
+  skillAbbr?: string;
+  skillDescription?: string;
 }
 
 export class MasterSkillDataSources {

@@ -18,6 +18,7 @@ export class FiltersComponent implements OnInit {
   @ViewChild('regionDropdown') public readonly regionDropdown: MultiSelectComponent;
 
   public typeFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  public skillFields: FieldSettingsModel = { text: 'skillDescription', value: 'masterSkillId' };
 
   constructor(private actions$: Actions) {}
 

@@ -41,7 +41,7 @@ import { filterColumns } from './candidate-list.constants';
 import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 
 @Component({
   selector: 'app-candidate-list',
@@ -113,6 +113,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   };
   public optionFields = optionFields;
   public regionFields = regionFields;
+  public skillFields: FieldSettingsModel = { text: 'name', value: 'masterSkillId' };
 
   private pageSubject = new Subject<number>();
   private includeDeployedCandidates: boolean = true;
@@ -195,6 +196,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   public onFilterClose(): void {
     this.CandidateFilterFormGroup.setValue({
+      candidateName: this.filters.candidateName || '',
       profileStatuses: this.filters.profileStatuses || [],
       regionsNames: this.filters.regionsNames || [],
       skillsIds: this.filters.skillsIds || [],
@@ -409,7 +411,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
         takeUntil(this.unsubscribe$)
       )
       .subscribe((skills) => {
-        this.filterColumns.skillsIds.dataSource = skills;
+        this.filterColumns.skillsIds.dataSource = skills.filter((v, i, a)=>a.findIndex(skill => (skill.masterSkillId === v.masterSkillId)) === i);
       });
   }
 

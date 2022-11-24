@@ -235,7 +235,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   private subscribeOnSkills(): Observable<MasterSkillByOrganization[]> {
     return this.candidateSkills$.pipe(
-      tap((skills: MasterSkillByOrganization[]) => (this.filterColumns.skillsIds.dataSource = skills))
+      tap((skills: MasterSkillByOrganization[]) => (this.filterColumns.skillsIds.dataSource = skills.filter((v, i, a)=>a.findIndex(skill => (skill.masterSkillId === v.masterSkillId)) === i)))
     );
   }
 
@@ -275,8 +275,8 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
         dataSource: [],
-        valueField: 'name',
-        valueId: 'id',
+        valueField: 'skillDescription',
+        valueId: 'masterSkillId',
       },
       regionsIds: {
         type: ControlTypes.Multiselect,

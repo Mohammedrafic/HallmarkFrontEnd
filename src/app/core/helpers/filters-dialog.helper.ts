@@ -15,7 +15,7 @@ import { APP_FILTERS_CONFIG, filterOptionFields } from '@core/constants/filters-
 
 import { findSelectedItems } from './functions.helper';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { ActivatedRoute } from '@angular/router';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
@@ -34,6 +34,7 @@ export class FiltersDialogHelper<T, F, S> extends Destroyable {
   public orgRegions: OrganizationRegion[] = [];
   public filteredItems: FilteredItem[] = [];
   public filterOptionFields = filterOptionFields;
+  public skillFields: FieldSettingsModel = { text: 'name', value: 'masterSkillsId' };
   public filterColumns: T;
   public formGroup: CustomFormGroup<T>;
   public isAgencyArea: boolean;
