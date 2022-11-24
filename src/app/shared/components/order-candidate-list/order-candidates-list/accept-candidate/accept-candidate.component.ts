@@ -322,6 +322,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private patchForm(): void {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
       this.candidateJob = value;
+
       if (value) {
         this.setCancellationControls(value.jobCancellation?.penaltyCriteria || 0);
         this.getComments();
@@ -341,12 +342,12 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           rejectReason: value.rejectReason,
           guaranteedWorkWeek: value.guaranteedWorkWeek,
           offeredStartDate: DateTimeHelper.formatDateUTC(
-            DateTimeHelper.convertDateToUtc(value.offeredStartDate).toString(), 'MM/dd/yyyy'),
+            DateTimeHelper.toUtcFormat(value.offeredStartDate).toString(), 'MM/dd/yyyy'),
           clockId: value.clockId,
           actualStartDate: DateTimeHelper.formatDateUTC(
-            DateTimeHelper.convertDateToUtc(value.actualStartDate).toString(), 'MM/dd/yyyy'),
+            DateTimeHelper.toUtcFormat(value.actualStartDate).toString(), 'MM/dd/yyyy'),
           actualEndDate: DateTimeHelper.formatDateUTC(
-            DateTimeHelper.convertDateToUtc(value.actualEndDate).toString(), 'MM/dd/yyyy'),
+            DateTimeHelper.toUtcFormat(value.actualEndDate).toString(), 'MM/dd/yyyy'),
           jobCancellationReason: CancellationReasonsMap[value.jobCancellation?.jobCancellationReason || 0],
           penaltyCriteria: PenaltiesMap[value.jobCancellation?.penaltyCriteria || 0],
           rate: value.jobCancellation?.rate,
