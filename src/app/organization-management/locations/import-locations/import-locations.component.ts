@@ -5,7 +5,7 @@ import { ColDef } from '@ag-grid-community/core';
 
 import { AbstractImport } from '@shared/classes/abstract-import';
 import { LocationsColumnsConfig, LocationsImportConfig, LocationsIrpColumnsConfig } from './location-grid.constants';
-import { ExportImportColumnsToHideInIrp, ExportImportColumnsToHideInVms, FieldsToHideInVms } from '../locations.constant';
+import { FieldsToHideInIrp, FieldsToHideInVms } from '../locations.constant';
 
 @Component({
   selector: 'app-import-locations',
@@ -42,7 +42,7 @@ export class ImportLocationsComponent extends AbstractImport implements OnChange
     this.columnDefs = JSON.parse(JSON.stringify(LocationsIrpColumnsConfig));
     
     if (!this.orgVMSEnabled) {
-      this.columnDefs = this.columnDefs.filter((column) => !ExportImportColumnsToHideInIrp.includes(column.field as string));
+      this.columnDefs = this.columnDefs.filter((column) => !FieldsToHideInIrp.includes(column.field as string));
     }
 
     if (!(this.orgIrpEnabled && this.orgVMSEnabled)) {
