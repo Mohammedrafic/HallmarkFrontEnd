@@ -125,7 +125,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get showApplyAction(): boolean {
-    return this.isApplied && !this.candidate.deployedCandidateInfo;
+    return this.isApplied;
   }
 
   get showAccepteAction(): boolean {
