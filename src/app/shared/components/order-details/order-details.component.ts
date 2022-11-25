@@ -70,7 +70,10 @@ export class OrderDetailsComponent implements OnChanges, OnDestroy {
   private getHistoricalEvents(): void {
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
     const organizationId = isAgencyArea ? this.order.organizationId : null;
-    this.historicalEventsService.getEvents(this.order.id, organizationId, this.jobId).subscribe(data => this.events = data);
+    this.historicalEventsService.getEvents(this.order.id, organizationId, this.jobId).subscribe(data => {
+      this.events = data;
+      this.cdr.markForCheck();
+     });
   }
 
   private getComments(): void {

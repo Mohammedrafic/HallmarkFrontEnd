@@ -200,7 +200,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
     this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
-      if (data.length > 0) {
+      if (data?.length > 0) {
           let url=data.find(i=>i.key=="ReportServer:BaseUrl")?.value;
           let userId=data.find(i=>i.key=="ReportServer:UId")?.value;
           let pass=data.find(i=>i.key=="ReportServer:Pwd")?.value;
