@@ -1,8 +1,8 @@
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Actions, ofActionSuccessful, Select, Store, ofActionDispatched } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -20,12 +20,8 @@ import { ClosePositionPayload } from '@client/order-management/close-order/model
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { UserState } from 'src/app/store/user.state';
-import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
-import { UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
-import { AlertIdEnum, AlertParameterEnum } from '@admin/alerts/alerts.enum';
-import { AlertTriggerDto } from '@shared/models/alerts-template.model';
 import { SaveCloseOrderSucceeded } from '@client/store/order-managment-content.actions';
-import { AlertTrigger } from '@admin/store/alerts.actions';
+import { DateTimeHelper } from '@core/helpers';
 
 @Component({
   selector: 'app-close-order',
@@ -48,7 +44,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   public readonly reasonFields: FieldSettingsModel = { text: 'reason', value: 'id' };
   public readonly datepickerMask = { month: 'MM', day: 'DD', year: 'YYYY' };
-  public minDate: Date | null;
+  public maxDate: Date | null;
 
   public dialogTitleType: string;
   public isPosition: boolean = false;
@@ -64,7 +60,6 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     private closeOrderService: CloseOrderService,
     private confirmService: ConfirmService,
     private commentsService: CommentsService,
-    private actions$: Actions
   ) {
     super();
   }
@@ -72,7 +67,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public ngOnChanges(changes: SimpleChanges) {
     if (changes['order']?.currentValue) {
       this.dialogTitleType = OrderTypeTitlesMap.get(this.order.orderType) as string;
-      this.setMinDate();
+      this.setMaxDate();
     }
   }
 
@@ -123,8 +118,8 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     });
   }
 
-  private setMinDate(): void {
-    this.minDate = this.order.orderType !== OrderType.OpenPerDiem ? (this.order?.jobStartDate as Date) : null;
+  private setMaxDate(): void {
+    this.maxDate = this.order?.jobEndDate!;
   }
 
   private getComments(): void {
@@ -159,7 +154,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   private submit(): void {
     let formData = this.closeForm.getRawValue();
     const { closingDate } = formData;
-    formData = { ...formData, closingDate: toCorrectTimezoneFormat(closingDate) };
+    formData = { ...formData, closingDate: DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(closingDate)) };
 
     if (this.isPosition) {
       this.closePosition(formData);

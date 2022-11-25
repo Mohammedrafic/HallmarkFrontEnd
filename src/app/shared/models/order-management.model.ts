@@ -46,6 +46,7 @@ export class OrderManagement {
   agencies?: string[] | null;
   allAgencies?: boolean;
   jobStartDate?: Date;
+  jobEndDate?: Date;
   orderCloseDate?: string;
   orderClosureReason?: string;
   orderClosureReasonId?: string;

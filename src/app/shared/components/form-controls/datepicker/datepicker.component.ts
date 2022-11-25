@@ -19,4 +19,5 @@ export class DatepickerComponent extends BaseFormControlDirective {
   @Input() enableMask: boolean;
   @Input() maskPlaceholder: MaskPlaceholderModel;
   @Input() min: Date | null;
+  @Input() max: Date | null;
 }
