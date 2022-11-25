@@ -24,7 +24,7 @@ import { ExportPayload } from '@shared/models/export.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { ActionBtnOnStatus, AgencyActionBtnOnStatus, NewStatusDependsOnAction } from '../../constants/invoice-detail.constant';
 import { INVOICES_STATUSES, InvoiceState, InvoicesActionBtn } from '../../enums';
-import { InvoiceDetail, InvoiceDialogActionPayload, InvoiceUpdateEmmit, PrintingPostDto } from '../../interfaces';
+import { InvoiceDetail, InvoiceDetailsSettings, InvoiceDialogActionPayload, InvoiceUpdateEmmit, PrintingPostDto } from '../../interfaces';
 import { InvoicePrintingService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { Invoices } from '../../store/actions/invoices.actions';
@@ -72,8 +72,11 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   public gridOptions: GridOptions = {};
   public gridSummaryOptions: GridOptions = {};
   public isAgency: boolean;
-  public isActionBtnDisabled = false;
   public actionBtnText = '';
+  public readonly invoiceDetailsConfig: InvoiceDetailsSettings = {
+    isActionBtnDisabled: false,
+    paymentDetailsOpen: false,
+  }
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -145,6 +148,16 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     this.cdr.detectChanges();
   }
 
+  public openPaymentDetails(): void {
+    this.invoiceDetailsConfig.paymentDetailsOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  closePaymentDetails(): void {
+    this.invoiceDetailsConfig.paymentDetailsOpen = false;
+    this.cdr.markForCheck();
+  }
+
   private getDialogState(): void {
     this.isInvoiceDetailDialogOpen$
       .pipe(
@@ -158,7 +171,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
           this.invoiceDetail = payload.invoiceDetail as InvoiceDetail;
           if (payload.invoiceDetail) {
             this.setActionBtnText();
-            this.isActionBtnDisabled = this.checkActionBtnDisabled();
+            this.invoiceDetailsConfig.isActionBtnDisabled = this.checkActionBtnDisabled();
             this.initTableColumns(this.invoiceDetail.summary[0]?.locationName || '');
             if (this.chipList) {
               this.chipList.cssClass = this.chipsCssClass.transform(this.invoiceDetail.meta.invoiceStateText);

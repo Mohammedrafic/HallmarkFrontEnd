@@ -80,6 +80,7 @@ import { InvoiceAgencyResolver } from './resolvers/invoice-agency.resolver';
 import { GridOrderIdCellComponent } from './components/grid-order-id-cell/grid-order-id-cell.component';
 import { InvoicesPermissionHelper } from './helpers/invoices-permission.helper';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { InvoicePaymentDetailsComponent } from './components/invoice-payment-details/invoice-payment-details.component';
 
 @NgModule({
   declarations: [
@@ -95,6 +96,7 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
     InvoicesTableTabsComponent,
     AllInvoicesActionCellComponent,
     GridOrderIdCellComponent,
+    InvoicePaymentDetailsComponent,
   ],
   imports: [
     CommonModule,

@@ -61,3 +61,11 @@
     }
   }
 }
+
+@mixin link-button {
+  border: none;
+  background: none;
+  padding: 0;
+  color: $primary-active-blue-10;
+  cursor: pointer;
+}

@@ -26,8 +26,8 @@ import { ExportUserList, GetRolesPage, GetUsersPage, ResendWelcomeEmail } from '
 import { SecurityState } from '../../store/security.state';
 import { Visibility } from './user-grid.enum';
 import { ColDef } from '@ag-grid-community/core';
-import { TypedValueGetterParams } from 'src/app/modules/invoices/interfaces/typed-col-def.interface';
 import { AutoGroupColDef, DefaultUserGridColDef, SideBarConfig, UserListExportOptions } from './user-grid.constant';
+import { TypedValueGetterParams } from '@core/interface';
 
 @Component({
   selector: 'app-user-grid',

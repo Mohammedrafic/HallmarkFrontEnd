@@ -6,12 +6,11 @@ import { Observable } from 'rxjs';
 import { DialogAction } from '@core/enums';
 import { InvoicesContainerService } from './invoices-container.service';
 import { ManualInvoicesGridHelper } from '../../helpers';
-import { InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
+import { GridContainerTabConfig, InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { AgencyInvoicesGridTab, InvoiceState } from '../../enums';
 import { invoiceDetailsColumnDefs, invoiceInfoItems, invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
 import { AllInvoicesGridHelper } from '../../helpers/grid/all-invoices-grid.helper';
-import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-config.interface';
 import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
 
 @Injectable()

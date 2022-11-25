@@ -9,7 +9,7 @@ import { BaseObservable } from '@core/helpers';
 import { CustomFormGroup, DataSourceItem } from '@core/interface';
 import { OrganizationRegion } from '@shared/models/organization.model';
 
-import { InvoiceFilterForm } from '../interfaces/form.interface';
+import { InvoiceFilterForm } from '../interfaces';
 import { InvoicesTableFiltersColumns } from '../enums';
 import { Invoices } from '../store/actions/invoices.actions';
 import { ConfirmService } from '@shared/services/confirm.service';

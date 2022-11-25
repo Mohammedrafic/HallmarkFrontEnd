@@ -87,3 +87,7 @@ export interface InvoiceUpdateEmmit {
   organizationId?: number;
 }
 
+export interface InvoiceDetailsSettings {
+  isActionBtnDisabled: boolean;
+  paymentDetailsOpen: boolean;
+}

@@ -43,12 +43,12 @@
           <button
             *ngIf="actionBtnText"
             ejs-button
-            [disabled]="isActionBtnDisabled"
+            [disabled]="invoiceDetailsConfig.isActionBtnDisabled"
             cssClass="e-primary"
             class="relative"
             (click)="handleApprove()">
             {{ actionBtnText }}
-            <ejs-tooltip *ngIf="isActionBtnDisabled" class="tooltip" content="Separate permission right is required" position="BottomCenter">
+            <ejs-tooltip *ngIf="invoiceDetailsConfig.isActionBtnDisabled" class="tooltip" content="Separate permission right is required" position="BottomCenter">
             </ejs-tooltip>
           </button>
         </div>
@@ -59,7 +59,7 @@
       </div>
 
       <div class="job-general-info tile-dark-blue">
-        <app-invoice-detail-invoice-info [invoiceInfo]="invoiceDetail"></app-invoice-detail-invoice-info>
+        <app-invoice-detail-invoice-info [invoiceInfo]="invoiceDetail" (detailsOpen)="openPaymentDetails()"></app-invoice-detail-invoice-info>
       </div>
 
       <div class="profile-table-block">
@@ -121,3 +121,8 @@
     </div>
   </div>
 </ng-template>
+
+<app-invoice-payment-details
+*ngIf="invoiceDetailsConfig.paymentDetailsOpen"
+(destroyDialog)="closePaymentDetails()">
+</app-invoice-payment-details>

@@ -1,13 +1,14 @@
-import { TypedValueGetterParams } from '../../interfaces/typed-col-def.interface';
-import { BaseInvoice } from '../../interfaces';
+import { ColDef, ICellRendererParams, ValueGetterParams } from '@ag-grid-community/core';
+import { TypedValueGetterParams } from '@core/interface';
+
 import { AttachmentsListComponent } from '@shared/components/attachments';
 import { GridCellLinkComponent } from '@shared/components/grid/components/grid-cell-link/grid-cell-link.component';
-import { ColDef, ICellRendererParams, ValueGetterParams } from '@ag-grid-community/core';
-import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
-import { GridValuesHelper } from '../../../timesheets/helpers';
 import { GridCellLinkParams } from '@shared/components/grid/models';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
+import { GridValuesHelper } from '../../../timesheets/helpers';
 import { GridOrderIdCellComponent } from '../../components/grid-order-id-cell/grid-order-id-cell.component';
+import { BaseInvoice } from '../../interfaces';
+import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
 
 type BaseInvoiceColDefsKeys = keyof Pick<BaseInvoice, 'locationName' | 'departmentName' | 'skillName' | 'statusText'>
 type CustomColDefsKeys = 'weekPeriod' | 'attachments' | 'candidateName' | 'orderId' | 'unitName';

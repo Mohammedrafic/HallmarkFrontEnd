@@ -1,4 +1,5 @@
 import { ColDef, GridOptions } from '@ag-grid-community/core';
+import { Directive } from '@angular/core';
 
 import { Observable } from 'rxjs';
 import { Store } from '@ngxs/store';
@@ -6,6 +7,7 @@ import { Store } from '@ngxs/store';
 import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
 import { GridContainerTabConfig, InvoiceDetail, InvoiceInfoUIItem } from '../../interfaces';
 
+@Directive()
 export abstract class InvoicesContainerService {
   constructor(
     protected readonly store: Store,

@@ -8,7 +8,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { DataSourceItem, FileForUpload } from '@core/interface';
 import { GetPendingApprovalParams, GroupInvoicesParams, InvoicesFilteringOptions, InvoicesFilterState, InvoiceStateDto, ManualInvoiceMeta,
   ManualInvoicePostDto, ManualInvoiceReason, ManualInvoicesData, ManualInvoiceTimesheetResponse, InvoiceDetail, PrintingPostDto,
-  PrintInvoiceData, ManualInvoicePutDto } from '../interfaces';
+  PrintInvoiceData, ManualInvoicePutDto, InvoicePayment, InvoicePaymentGetParams } from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ExportPayload } from '@shared/models/export.model';
 
@@ -142,6 +142,10 @@ export class InvoicesApiService {
 
   public getAgencyPermissions(): Observable<CurrentUserPermission[]> {
     return this.http.get<CurrentUserPermission[]>('/api/Permissions/currentUser');
+  }
+
+  public getInvoicesPayments(params: InvoicePaymentGetParams): Observable<InvoicePayment[]> {
+    return this.http.get<InvoicePayment[]>('/api/Invoices/payments');
   }
 
   private organizationDeleteManualInvoice(id: number): Observable<void> {
