@@ -228,6 +228,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public onOverrideButtonClick(data: any): void {
     this.isFormShown = true;
     this.formControlType = data.controlType;
+    this.disableDepForInvoiceGeneration();
     this.regionFormGroup.reset();
     this.regionRequiredFormGroup.reset();
     this.locationFormGroup.reset();
@@ -245,6 +246,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.addActiveCssClass(event);
     this.isEdit = true;
     this.formControlType = parentRecord.controlType;
+    this.disableDepForInvoiceGeneration();
     this.setFormValidation(parentRecord);
 
     if (!childRecord) {
@@ -674,7 +676,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.regionFormGroup = this.formBuilder.group({ regionId: [null] });
     this.regionRequiredFormGroup = this.formBuilder.group({ regionId: [null, Validators.required] });
     this.locationFormGroup = this.formBuilder.group({ locationId: [null] });
-    this.departmentFormGroup = this.formBuilder.group({ departmentId: [{ value: null, disabled: true }] } );
+    this.departmentFormGroup = this.formBuilder.group({ departmentId: [{ value: null }] } );
     this.pushStartDateFormGroup = this.formBuilder.group({
       daysToConsider: [null, Validators.required],
       daysToPush: [null, Validators.required],
@@ -791,5 +793,13 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
         this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
       }
     });
+  }
+
+  private disableDepForInvoiceGeneration(): void {
+    if (this.formControlType === this.organizationSettingControlType.InvoiceAutoGeneration) {
+      this.departmentFormGroup.get('departmentId')?.disable();
+    } else {
+      this.departmentFormGroup.get('departmentId')?.enable();
+    }
   }
 }

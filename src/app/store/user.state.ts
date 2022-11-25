@@ -411,8 +411,9 @@ export class UserState {
   @Action(GetOrgTierStructure)
   GetOrgTierStructure(
     { patchState, dispatch }: StateContext<UserStateModel>,
+    { organizationId }: GetOrgTierStructure
   ): Observable<OrganizationStructure | void> {
-    return this.organizationService.getOrgTierStructure().pipe(
+    return this.organizationService.getOrgTierStructure(organizationId).pipe(
       tap((structure: OrganizationStructure) => {
         patchState({tireOrganizationStructure: structure})
       }),

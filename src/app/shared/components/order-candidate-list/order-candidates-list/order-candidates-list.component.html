@@ -77,6 +77,11 @@
           </ng-template>
         </e-column>
       </ng-template>
+      <e-column field="availStartDate" textAlign="Left" headerText="AVAILABLE START DATE" width="200">
+        <ng-template #template let-data>
+          <div class="align-right">{{ data.availStartDate | date: 'MM/dd/yyy':'UTC' }}</div>
+        </ng-template>
+      </e-column>
       <e-column field="hourlyBillRate" textAlign="Right" headerText="Bill Rate &dollar;" width="200">
         <ng-template #template let-data>
           <div class="align-right">

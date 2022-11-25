@@ -228,7 +228,7 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
         createDepartmentsTier(associateOrganizationsAgency.organizationId!)
       ),
       new TiersException.GetSelectedOrgAgency(associateOrganizationsAgency),
-      new GetOrgTierStructure()
+      new GetOrgTierStructure(associateOrganizationsAgency.organizationId)
     ]);
   }
 
@@ -310,6 +310,7 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
     this.settingsViewService.getViewSettingKey(
       OrganizationSettingKeys.TieringLogic,
       OrganizationalHierarchy.Organization,
+      id,
       id
     ).pipe(
       takeWhile(() => this.isAlive)

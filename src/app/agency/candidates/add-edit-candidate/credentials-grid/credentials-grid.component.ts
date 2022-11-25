@@ -1,3 +1,18 @@
+import { Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { OutsideZone } from "@core/decorators";
+
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { GridComponent } from '@syncfusion/ej2-angular-grids';
+import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
+import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil } from 'rxjs';
+
+import { Permission } from '@core/interface';
+import { FileSize, UserPermissions } from '@core/enums';
+import { DateTimeHelper } from "@core/helpers";
 import {
   DownloadCredentialFiles,
   DownloadCredentialFilesSucceeded,
@@ -16,11 +31,7 @@ import {
   UploadCredentialFilesSucceeded,
 } from '@agency/store/candidate.actions';
 import { CandidateState } from '@agency/store/candidate.state';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { DateTimeHelper } from "@core/helpers";
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { CredentialGridService } from "@agency/services/credential-grid.service";
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
   DELETE_CONFIRM_TEXT,
@@ -28,26 +39,16 @@ import {
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
 } from '@shared/constants/messages';
+import { optionFields } from "@shared/constants";
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { MessageTypes } from "@shared/enums/message-types";
 import { CredentialStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
-import {
-  CandidateCredential,
-  CandidateCredentialResponse,
-  CredentialFile,
-} from '@shared/models/candidate-credential.model';
+import { CandidateCredential, CandidateCredentialResponse, CredentialFile, } from '@shared/models/candidate-credential.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { downloadBlobFile } from '@shared/utils/file.utils';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
-import { SelectionSettingsModel } from "@syncfusion/ej2-grids/src/grid/base/grid-model";
-import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil } from 'rxjs';
 import { SetHeaderState, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
-import { CredentialGridService } from "@agency/services/credential-grid.service";
 import { UserState } from 'src/app/store/user.state';
 import {
   agencySideCredentialStatuses,
@@ -55,9 +56,10 @@ import {
   orgSideCompletedCredentialStatuses,
   orgSidePendingCredentialStatuses,
   orgSideReviewedCredentialStatuses,
+  AllowedCredentialFileExtensions,
+  CredentialSelectionSettingsModel,
+  StatusFieldSettingsModel,
 } from './credentials-grid.constants';
-import { Permission } from '@core/interface';
-import { FileSize, UserPermissions } from '@core/enums';
 
 @Component({
   selector: 'app-credentials-grid',
@@ -66,7 +68,6 @@ import { FileSize, UserPermissions } from '@core/enums';
   providers: [MaskedDateTimeService],
 })
 export class CredentialsGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
-  @Input() readonlyMode = false;
   @Input() isNavigatedFromOrganizationArea: boolean;
   @Input() orderId: number | null;
   @Input() areAgencyActionsAllowed: boolean;
@@ -77,27 +78,23 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
 
   public readonly statusEnum = CredentialStatus;
-  public readonly allowedExtensions: string = '.pdf, .jpg, .jpeg, .png';
+  public readonly userPermissions = UserPermissions;
+  public readonly allowedExtensions = AllowedCredentialFileExtensions;
+  public readonly selectionOptions = CredentialSelectionSettingsModel;
   public readonly maxFileSize = FileSize.MB_20;
-  public uploaderErrorMessageElement: HTMLElement;
+  public readonly orderCredentialId = 0;
+  public readonly statusFieldSettingsModel = StatusFieldSettingsModel;
+  public readonly typeFieldSettingsModel = optionFields;
   public dropElement: HTMLElement;
   public addCredentialForm: FormGroup;
   public searchCredentialForm: FormGroup;
   public disabledCopy = false;
   public candidateCredentialResponse: CandidateCredentialResponse;
   public openFileViewerDialog = new EventEmitter<number>();
-  public credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public today = new Date();
-  public optionFields = { text: 'text', value: 'id' };
+
   public showCertifiedFields: boolean;
-  public readonly userPermissions = UserPermissions;
   public credentialStatusOptions: FieldSettingsModel[] = [];
-  public readonly orderCredentialId = 0;
-  public readonly selectionOptions: SelectionSettingsModel = {
-    type: 'Multiple',
-    mode: 'Row',
-    persistSelection: true,
-  };
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
@@ -118,52 +115,52 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @Select(CandidateState.masterCredentials)
   masterCredentials$: Observable<Credential[]>;
 
-  get searchTermControl(): AbstractControl | null {
-    return this.searchCredentialForm.get('searchTerm');
-  }
-
-  get credentialTypeIdControl(): AbstractControl | null {
-    return this.searchCredentialForm.get('credentialTypeId');
-  }
-
-  get selectCredentialError(): boolean {
+  public get selectCredentialError(): boolean {
     return !this.masterCredentialId && this.addCredentialForm.dirty;
   }
 
-  get disableClearButton(): boolean {
+  public get disableClearButton(): boolean {
     return !this.uploadObj?.filesData.length && !this.hasFiles;
   }
 
-  get isEdit(): boolean {
+  public get isEdit(): boolean {
     return !!this.credentialId;
   }
 
-  get showCompleteDate(): boolean {
+  public get showCompleteDate(): boolean {
     return this.statusControl?.value === CredentialStatus.Completed;
   }
 
-  get showRejectReason(): boolean {
+  public get showRejectReason(): boolean {
     return this.statusControl?.value === CredentialStatus.Rejected;
   }
 
-  get isOrganizationSide(): boolean {
+  public get isOrganizationSide(): boolean {
     return this.isOrganization || this.isNavigatedFromOrganizationArea;
   }
 
-  get isOrganization(): boolean {
-    return this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
-  }
-
-  get isAllRowsSelected(): boolean {
-    return this.selectedItems.length === this.pageSize;
-  }
-
-  get bulkDownloadAmountText(): string {
+  public get bulkDownloadAmountText(): string {
     return `${this.isAllRowsSelected ? 'All' : this.selectedItems.length } ${ this.selectedItems.length === 1 ? 'Row' : 'Rows' } Selected`;
   }
 
   private get statusControl(): AbstractControl | null {
     return this.addCredentialForm.get('status');
+  }
+
+  private get searchTermControl(): AbstractControl | null {
+    return this.searchCredentialForm.get('searchTerm');
+  }
+
+  private get credentialTypeIdControl(): AbstractControl | null {
+    return this.searchCredentialForm.get('credentialTypeId');
+  }
+
+  private get isOrganization(): boolean {
+    return this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.Organization;
+  }
+
+  private get isAllRowsSelected(): boolean {
+    return this.selectedItems.length === this.pageSize;
   }
 
   constructor(
@@ -172,7 +169,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     private actions$: Actions,
     private fb: FormBuilder,
     private credentialGridService: CredentialGridService,
-    private confirmService: ConfirmService
+    private confirmService: ConfirmService,
+    private readonly ngZone: NgZone,
   ) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
@@ -212,7 +210,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     );
 
     this.store.dispatch(new GetMasterCredentials('', ''));
-    this.store.dispatch(new ShowSideDialog(true)).subscribe(() => {
+    this.store.dispatch(new ShowSideDialog(true)).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
       this.setDropElement();
       this.setDefaultStatusValue();
     });
@@ -237,7 +237,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => confirm))
+        .pipe(
+          filter((confirm) => confirm),
+          takeUntil(this.unsubscribe$)
+        )
         .subscribe(() => {
           this.closeSideDialog();
         });
@@ -246,7 +249,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     }
   }
 
-  public onSaveCredential(): void {
+  public saveFormValue(): void {
     if (this.masterCredentialId && (this.addCredentialForm.valid || this.addCredentialForm.disabled)) {
       this.saveCredential(this.addCredentialForm.getRawValue());
     } else {
@@ -254,18 +257,18 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     }
   }
 
-  public onRowsDropDownChanged(): void {
+  public selectRowsPerPage(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
   }
 
-  public onGoToClick(event: any): void {
+  public selectPage(event: { currentPage: number; value: number }): void {
     if (event.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
     }
   }
 
-  public onCopy(event: MouseEvent, data: any) {
+  public copyCredential(event: MouseEvent, data: CandidateCredential) {
     event.stopPropagation();
     this.disabledCopy = true;
     this.masterCredentialId = data.masterCredentialId;
@@ -276,18 +279,22 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     });
   }
 
-  public onViewFiles(event: MouseEvent, id: number) {
+  public viewFiles(event: MouseEvent, id: number) {
     event.stopPropagation();
-    this.store.dispatch(new GetGroupedCredentialsFiles()).subscribe(() => this.openFileViewerDialog.emit(id));
+    this.store.dispatch(new GetGroupedCredentialsFiles()).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.openFileViewerDialog.emit(id);
+    });
   }
 
-  public onDownload(event: MouseEvent, file: CredentialFile) {
+  public downloadFile(event: MouseEvent, file: CredentialFile) {
     event.stopPropagation();
     this.file = file;
     this.store.dispatch(new GetCredentialFiles(this.file.id));
   }
 
-  public onEdit(
+  public editCredential(
     event: MouseEvent,
     {
       status,
@@ -312,7 +319,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.credentialId = id as number;
     this.masterCredentialId = masterCredentialId;
     this.hasFiles = !!credentialFiles?.length;
-    this.store.dispatch(new ShowSideDialog(true)).subscribe(() => this.setDropElement());
+    this.store.dispatch(new ShowSideDialog(true)).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.setDropElement();
+    });
     this.searchCredentialForm.patchValue({
       searchTerm: masterName,
       credentialTypeId: credentialTypeName,
@@ -336,13 +347,13 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.uploadObj.clearAll();
   }
 
-  public onFileSelected(event: SelectedEventArgs): void {
+  public selectCredentialFile(event: SelectedEventArgs): void {
     if (event.filesData[0].statusCode !== '1') {
       this.addFilesValidationMessage(event.filesData[0]);
     }
   }
 
-  public onRemove(event: MouseEvent, data: any) {
+  public removeCredential(event: MouseEvent, data: any) {
     event.stopPropagation();
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
@@ -350,7 +361,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter((confirm: boolean) => confirm), takeUntil(this.unsubscribe$))
+      .pipe(
+        filter((confirm: boolean) => confirm),
+        takeUntil(this.unsubscribe$)
+      )
       .subscribe(() => {
         this.store.dispatch(new RemoveCandidatesCredential(data));
       });
@@ -389,7 +403,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private closeSideDialog(): void {
     this.store
       .dispatch(new ShowSideDialog(false))
-      .pipe(delay(500))
+      .pipe(
+        delay(500),
+        takeUntil(this.unsubscribe$)
+      )
       .subscribe(() => {
         this.addCredentialForm.reset();
         this.addCredentialForm.enable();
@@ -433,6 +450,13 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     completedDate, rejectReason,
   }: CandidateCredential): void {
     if (this.masterCredentialId) {
+      if (createdOn != null) {
+        createdOn = DateTimeHelper.toUtcFormat(createdOn);
+      }
+
+      if (createdUntil != null) {
+        createdUntil = DateTimeHelper.toUtcFormat(createdUntil);
+      }
       this.store.dispatch(
         new SaveCandidatesCredential({
           status,
@@ -482,24 +506,24 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.dropElement = document.getElementById('files-droparea') as HTMLElement;
   }
 
+  @OutsideZone
   private addFilesValidationMessage(file: FileInfo) {
     requestAnimationFrame(() => {
-      this.uploaderErrorMessageElement = document.getElementsByClassName('e-validation-fails')[0] as HTMLElement;
-      if (this.uploaderErrorMessageElement) {
-        this.uploaderErrorMessageElement.innerText =
-          file.size > this.maxFileSize
-            ? 'The file should not exceed 20MB.'
-            : 'The file should be in pdf, jpg, jpeg, png format.';
+      const uploaderErrorMessageElement = document.getElementsByClassName('e-file-status')[0] as HTMLElement;
+      if (uploaderErrorMessageElement && file.statusCode === '0') {
+        uploaderErrorMessageElement.innerText = file.size > this.maxFileSize
+          ? 'The file should not exceed 20MB.'
+          : 'The file should be in pdf, jpg, jpeg, png format.';
       }
     });
   }
 
   private watchForCandidateCredential(): void {
-    this.candidateCredential$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((response: CandidateCredentialResponse) => {
-        this.candidateCredentialResponse = response;
-      });
+    this.candidateCredential$.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe((response: CandidateCredentialResponse) => {
+      this.candidateCredentialResponse = response;
+    });
   }
 
   private setDefaultStatusValue(): void {
@@ -538,15 +562,20 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   private watchForDownloadCredentialFiles(): void {
-    this.actions$.pipe(ofActionSuccessful(DownloadCredentialFilesSucceeded), takeUntil(this.unsubscribe$))
-      .subscribe((payload: { file: Blob, candidateName: string }) => {
-        const dateTime = DateTimeHelper.formatDateUTC(DateTimeHelper.toUtcFormat(new Date()), 'MM/dd/YYYY HH:mm');
-        downloadBlobFile(payload.file, `${payload.candidateName} Credentials ${dateTime}.zip`);
-      });
+    this.actions$.pipe(
+      ofActionSuccessful(DownloadCredentialFilesSucceeded),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((payload: { file: Blob, candidateName: string }) => {
+      const dateTime = DateTimeHelper.formatDateUTC(DateTimeHelper.toUtcFormat(new Date()), 'MM/dd/YYYY HH:mm');
+      downloadBlobFile(payload.file, `${payload.candidateName} Credentials ${dateTime}.zip`);
+    });
   }
 
   private watchForPageChanges(): void {
-    this.pageSubject.pipe(debounceTime(1), takeUntil(this.unsubscribe$)).subscribe((page) => {
+    this.pageSubject.pipe(
+      debounceTime(1),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
     });
@@ -554,7 +583,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   private watchForCandidateActions(): void {
     this.actions$
-      .pipe(ofActionSuccessful(SaveCandidatesCredentialSucceeded), takeUntil(this.unsubscribe$))
+      .pipe(
+        ofActionSuccessful(SaveCandidatesCredentialSucceeded),
+        takeUntil(this.unsubscribe$)
+      )
       .subscribe((credential: { payload: CandidateCredential }) => {
         this.credentialId = credential.payload.id as number;
         this.disabledCopy = false;
@@ -568,18 +600,30 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         }
       });
 
-    this.actions$.pipe(ofActionSuccessful(SaveCandidatesCredentialFailed), takeUntil(this.unsubscribe$)).subscribe(() => {
+    this.actions$.pipe(
+      ofActionSuccessful(SaveCandidatesCredentialFailed),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
       this.disabledCopy = false;
     });
-    this.actions$.pipe(ofActionSuccessful(UploadCredentialFilesSucceeded), takeUntil(this.unsubscribe$)).subscribe(() => {
+    this.actions$.pipe(
+      ofActionSuccessful(UploadCredentialFilesSucceeded),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
       this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
       this.addCredentialForm.markAsPristine();
       this.closeDialog();
     });
-    this.actions$.pipe(ofActionSuccessful(RemoveCandidatesCredentialSucceeded), takeUntil(this.unsubscribe$)).subscribe(() => {
+    this.actions$.pipe(
+      ofActionSuccessful(RemoveCandidatesCredentialSucceeded),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
       this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
     });
-    this.actions$.pipe(ofActionSuccessful(GetCredentialFilesSucceeded), takeUntil(this.unsubscribe$)).subscribe((files: { payload: Blob }) => {
+    this.actions$.pipe(
+      ofActionSuccessful(GetCredentialFilesSucceeded),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((files: { payload: Blob }) => {
       if (this.file) {
         downloadBlobFile(files.payload, this.file.name);
         this.file = null;

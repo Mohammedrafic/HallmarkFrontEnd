@@ -9,7 +9,7 @@ import { SkillCategory } from './skill-category.model';
 
 export type AssociateOrganizationsAgency = {
   id?: number;
-  organizationId?: number;
+  organizationId: number;
   organizationName: string;
   baseFee: number;
   tier: number;

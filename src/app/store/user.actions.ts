@@ -84,5 +84,7 @@ export class SetUserPermissions {
 
 export class GetOrgTierStructure {
   static readonly type = '[user] Get Org structure for Tier';
-  constructor() {}
+  constructor(
+    public organizationId: number | null
+  ) {}
 }
