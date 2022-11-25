@@ -1,12 +1,22 @@
 <ejs-dialog
-  #paymenDetailsDialog
+  #destroyableDialog
   cssClass="dialog"
   [width]="888"
   [visible]="false"
   [isModal]="true"
-  [animationSettings]="{ effect: 'SlideRight' }">
+  [animationSettings]="{ effect: 'SlideRight', duration: dialogAnimationTime }">
   <ng-template #content>
-    <button (click)="closeDetails()">Close</button>
-    <span>TESTTTTTTTTTTTTTTTT</span>
+    <div class="dialog-container">
+      
+      <div class="dialog-header">
+        <h3 class="title">Payment Details</h3>
+        <div class="controls">
+          <button ejs-button type="submit" cssClass="e-flat close-button" (click)="closeDialog()">
+            <i-feather name="x" class="icon"></i-feather>
+          </button>
+        </div>
+      </div>
+  
+    </div>
   </ng-template>
 </ejs-dialog>

@@ -69,3 +69,17 @@
   color: $primary-active-blue-10;
   cursor: pointer;
 }
+
+@mixin close-red-btn {
+  color: $supportive-red;
+  cursor: pointer;
+  margin-left: 26px;
+  margin-right: 10px;
+}
+
+@mixin dialog-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: $black;
+  margin: 0;
+}
