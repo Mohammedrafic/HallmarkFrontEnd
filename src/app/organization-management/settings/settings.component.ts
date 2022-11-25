@@ -798,6 +798,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   private disableDepForInvoiceGeneration(): void {
     if (this.formControlType === this.organizationSettingControlType.InvoiceAutoGeneration) {
       this.departmentFormGroup.get('departmentId')?.disable();
+    } else {
+      this.departmentFormGroup.get('departmentId')?.enable();
     }
   }
 }
