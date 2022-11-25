@@ -15,7 +15,7 @@
               ejs-button
               appHideBeforeSyncfusionLoad
               [isPrimary]="true"
-              [disabled]="!userPermission[userPermissions.CanCreateDeleteOrganization]"
+              *ngIf="userPermission[userPermissions.CanCreateDeleteOrganization]"
               (click)="navigateToOrganizationForm()"
             >
               Add Organization
