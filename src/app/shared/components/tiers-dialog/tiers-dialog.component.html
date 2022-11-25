@@ -108,6 +108,11 @@
           </ng-container>
         </form>
       </div>
+      <ng-container *ngIf="isTierSettingsDialog">
+        <div class="message">
+            Please note: Priority is assigned by default. You can change priority using drag & drop on the Tier grid.
+        </div>
+      </ng-container>
     </section>
   </ng-template>
 </ejs-dialog>

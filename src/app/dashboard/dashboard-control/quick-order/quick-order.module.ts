@@ -11,6 +11,8 @@ import { NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inp
 import { FeatherModule } from 'angular-feather';
 import { Edit3 } from 'angular-feather/icons';
 import { SharedModule } from '@shared/shared.module';
+import { SettingsViewService } from '@shared/services';
+import { QuickOrderService } from './services';
 
 @NgModule({
   imports: [
@@ -29,5 +31,6 @@ import { SharedModule } from '@shared/shared.module';
   ],
   declarations: [QuickOrderComponent, QuickOrderFormComponent],
   exports: [QuickOrderComponent],
+  providers: [SettingsViewService,QuickOrderService]
 })
 export class QuickOrderModule {}

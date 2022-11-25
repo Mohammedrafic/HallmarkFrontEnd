@@ -73,6 +73,7 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   public tierForm: CustomFormGroup<TierDTO> | null;
   public readonly FieldTypes = FieldType;
   public optionFields: FieldSettingsModel = OPTION_FIELDS;
+  public isTierSettingsDialog: boolean;
 
   private selectedRegions: number[] = [];
   private selectedLocations: number[] = [];
@@ -186,6 +187,8 @@ export class TiersDialogComponent extends DestroyableDirective implements OnInit
   }
 
   private watchForShowDialog(): void {
+    this.isTierSettingsDialog = this.dialogType === Tiers.tierSettings;
+
     this.actions$.pipe(ofActionDispatched(ShowSideDialog), takeUntil(this.destroy$)).subscribe((payload) => {
       if (payload.isDialogShown) {
         this.sideDialog.show();

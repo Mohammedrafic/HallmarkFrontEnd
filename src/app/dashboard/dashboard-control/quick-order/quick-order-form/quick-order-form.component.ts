@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   Input,
+  OnChanges,
   OnInit,
   SimpleChanges,
   ViewChild,
@@ -30,13 +31,12 @@ import { OrganizationRegion, OrganizationStructure } from '@shared/models/organi
 import { Department, Location, Organisation, Region } from '@shared/models/visibility-settings.model';
 import { Department as ContactDetails } from '@shared/models/department.model';
 import { currencyValidator } from '@shared/validators/currency.validator';
-import { integerValidator } from '@shared/validators/integer.validator';
 import { AllOrganizationsSkill } from 'src/app/dashboard/models/all-organization-skill.model';
 import { Duration } from '@shared/enums/durations';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { BillRate } from '@shared/models';
-import { JobDistribution } from '@shared/enums/job-distibution';
+import { OrderJobDistribution } from '@shared/enums/job-distibution';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
@@ -49,7 +49,7 @@ import {
 } from '@client/store/order-managment-content.actions';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import PriceUtils from '@shared/utils/price.utils';
-import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
+import { ORDER_CONTACT_DETAIL_TITLES, OrganizationalHierarchy, OrganizationSettingKeys } from '@shared/constants';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
@@ -60,12 +60,29 @@ import { RejectReasonPage } from '@shared/models/reject-reason.model';
 import { RejectReasonState } from '@organization-management/store/reject-reason.state';
 import { GetOrderRequisitionByPage } from '@organization-management/store/reject-reason.actions';
 import { ORDER_DURATION_LIST } from '@shared/constants/order-duration-list';
-import { ORDER_JOB_DISTRIBUTION_LIST } from '@shared/constants/order-job-distribution-list';
+import { distributionSource, ORDER_JOB_DISTRIBUTION } from '@shared/constants/order-job-distribution-list';
 import { ORDER_MASTER_SHIFT_NAME_LIST } from '@shared/constants/order-master-shift-name-list';
 import { ManualInvoiceReason } from '@shared/models/manual-invoice-reasons.model';
 import { DurationService } from '@shared/services/duration.service';
-import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 import { DateTimeHelper } from '@core/helpers';
+import { TierLogic } from '@shared/enums/tier-logic.enum';
+import { SettingsViewService } from '@shared/services';
+import {
+  associateAgencyFields,
+  CommonList,
+  GeneralOrderList,
+  optionFields,
+  organizationFields,
+  PermPlacementList,
+  poNumberFields,
+  projectNameFields,
+  QuickOrderCondition,
+  reasonForRequisitionFields,
+  skillsFields,
+  specialProjectCategoriesFields,
+} from '../constants';
+import { QuickOrderConditions } from '../interfaces';
+import { QuickOrderService } from '../services';
 
 @Component({
   selector: 'app-quick-order-form',
@@ -73,7 +90,7 @@ import { DateTimeHelper } from '@core/helpers';
   styleUrls: ['./quick-order-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class QuickOrderFormComponent extends DestroyableDirective implements OnInit {
+export class QuickOrderFormComponent extends DestroyableDirective implements OnInit, OnChanges {
   @Input() public allOrganizations: Organisation[];
   @Input() public userIsAdmin: boolean;
   @Input() public skills: AllOrganizationsSkill[];
@@ -89,79 +106,46 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   public jobDistributionDescriptionForm: FormGroup;
   public contactDetailsForm: FormGroup;
   public specialProjectForm: FormGroup;
-  public isSpecialProjectFieldsRequired = true;
-  public isPermPlacementOrder = false;
-  public isContactToPermOrder = false;
-  public isEditContactTitle = false;
-  public isTravelerOrder = true;
-  public isOpenPerDiem = false;
-  public isReOrder = false;
-  public orderStatus = 'Open';
-  public priceUtils = PriceUtils;
-  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
-
-  public readonly orderTypes = OrderTypeOptions;
-  public readonly orderTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
-
-  public readonly organizationTypeFields: FieldSettingsModel = { text: 'name', value: 'organizationId' };
-
-  public readonly regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  public isRegionsDropDownEnabled = false;
-  public regionDataSource: Region[] | OrganizationRegion[] = [];
-
-  public readonly locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  public isLocationsDropDownEnabled = false;
-  public locationDataSource: Location[] = [];
-
-  public readonly departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  public isDepartmentsDropDownEnabled = false;
-  public departmentDataSource: Department[] = [];
-
-  public skillDataSource: AllOrganizationsSkill[] = [];
-  public readonly skillFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
-
-  public readonly durations = ORDER_DURATION_LIST;
-  public readonly durationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-
-  public isJobEndDateControlEnabled = false;
 
   public shiftNameField: AbstractControl;
   public shiftStartTimeField: AbstractControl;
   public shiftEndTimeField: AbstractControl;
 
-  public readonly jobDistributions = ORDER_JOB_DISTRIBUTION_LIST;
-  public readonly jobDistributionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  public agencyControlEnabled = false;
-  public isShiftTimeRequired: boolean = true;
+  public readonly quickOrderConditions: QuickOrderConditions = QuickOrderCondition;
+  public readonly optionFields: FieldSettingsModel = optionFields;
+  public readonly skillFields: FieldSettingsModel = skillsFields;
+  public readonly organizationTypeFields: FieldSettingsModel = organizationFields;
+  public readonly associateAgencyFields: FieldSettingsModel = associateAgencyFields;
+  public readonly specialProjectCategoriesFields: FieldSettingsModel = specialProjectCategoriesFields;
+  public readonly projectNameFields: FieldSettingsModel = projectNameFields;
+  public readonly poNumberFields: FieldSettingsModel = poNumberFields;
+  public readonly reasonForRequisitionFields: FieldSettingsModel = reasonForRequisitionFields;
+
+  public orderStatus = 'Open';
+  public priceUtils = PriceUtils;
+  public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
+  public readonly orderTypes = OrderTypeOptions;
+  public readonly durations = ORDER_DURATION_LIST;
+  public readonly masterShiftNames = ORDER_MASTER_SHIFT_NAME_LIST;
+  public readonly contactDetailTitles = ORDER_CONTACT_DETAIL_TITLES;
+  public regionDataSource: Region[] | OrganizationRegion[] = [];
+  public locationDataSource: Location[] = [];
+  public departmentDataSource: Department[] = [];
+  public skillDataSource: AllOrganizationsSkill[] = [];
+  public jobDistributions = ORDER_JOB_DISTRIBUTION;
+
+  private selectedOrganizationId: number;
 
   @Select(OrderManagementContentState.associateAgencies)
-  associateAgencies$: Observable<AssociateAgency[]>;
-  associateAgencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
-
-  public readonly masterShiftNames = ORDER_MASTER_SHIFT_NAME_LIST;
-
+  public associateAgencies$: Observable<AssociateAgency[]>;
   @Select(OrderManagementContentState.projectSpecialData)
   public readonly projectSpecialData$: Observable<ProjectSpecialData>;
-  public readonly specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
-  public readonly projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
-  public readonly poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
-
-  public readonly masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
-
   @Select(RejectReasonState.sortedOrderRequisition)
   public readonly reasons$: Observable<RejectReasonPage>;
-
-  public readonly reasonForRequisitionFields: FieldSettingsModel = { text: 'reason', value: 'id' };
-
-  public readonly contactDetailTitles = ORDER_CONTACT_DETAIL_TITLES;
-
   @Select(OrganizationManagementState.organizationSettings)
   private readonly organizationSettings$: Observable<OrganizationSettingsGet[]>;
-
   @Select(OrderManagementContentState.contactDetails)
   private readonly contactDetails$: Observable<ContactDetails>;
-
-  private isFormDirty: boolean = false;
 
   get orderTypeControl() {
     return this.orderTypeForm.get('orderType') as AbstractControl;
@@ -200,15 +184,13 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     private readonly store: Store,
     private readonly orderManagementService: OrderManagementContentService,
     private readonly actions$: Actions,
-    private readonly durationService: DurationService
+    private readonly durationService: DurationService,
+    private settingsViewService: SettingsViewService,
+    private quickOrderService: QuickOrderService
   ) {
     super();
-    this.initOrganizationForm();
-    this.initOrderTypeForm();
-    this.initGeneralInformationForm();
-    this.initJobDistributionDescriptionForm();
-    this.initContactDetailsForm();
-    this.initSpecialProjectForm();
+    this.initOrderForms();
+    this.initOrderInformationForm();
   }
 
   public ngOnInit(): void {
@@ -230,6 +212,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     this.detectFormValueChanges();
     this.populateJobDistributionForm();
     this.setIsFormDirty();
+    this.watchForDepartmentId();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -237,116 +220,77 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     changes['organizationStructure'] && this.handleOrganizationUserDataStructure();
   }
 
-  private initOrganizationForm(): void {
-    this.organizationForm = this.fb.group({
-      organization: [null, Validators.required],
-    });
+  private initOrderForms(): void {
+    this.organizationForm = this.quickOrderService.createOrganizationForm();
+    this.orderTypeForm = this.quickOrderService.createOrderTypeForm();
+    this.jobDistributionDescriptionForm = this.quickOrderService.createJobDistributionForm();
+    this.contactDetailsForm = this.quickOrderService.createContactDetailsForm();
+    this.specialProjectForm = this.quickOrderService.createSpecialProjectForm();
   }
 
-  private initOrderTypeForm(): void {
-    this.orderTypeForm = this.fb.group({
-      orderType: [OrderType.Traveler, Validators.required],
-    });
-  }
-
-  private initGeneralInformationForm(): void {
-    this.generalInformationForm = this.fb.group(
-      {
-        title: [null, [Validators.required, Validators.maxLength(50)]],
-        regionId: [null, Validators.required],
-        locationId: [null, Validators.required],
-        departmentId: [null, Validators.required],
-        skillId: [null, Validators.required],
-        hourlyRate: [null, [Validators.required, Validators.maxLength(10)]],
-        openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
-        duration: [null, Validators.required],
-        jobStartDate: [null, Validators.required],
-        jobEndDate: [null, Validators.required],
-        shift: [null, Validators.required],
-        shiftStartTime: [null, Validators.required],
-        shiftEndTime: [null, Validators.required],
-        orderPlacementFee: [null, Validators.required],
-        annualSalaryRangeFrom: [null, Validators.required],
-        annualSalaryRangeTo: [null, Validators.required],
-      },
-      { validators: greaterThanValidator('annualSalaryRangeFrom', 'annualSalaryRangeTo') }
-    );
+  private initOrderInformationForm(): void {
+    this.generalInformationForm = this.quickOrderService.createOrderInformationForm();
 
     this.shiftNameField = this.generalInformationForm.get('shift') as AbstractControl;
     this.shiftStartTimeField = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
     this.shiftEndTimeField = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
     this.setShiftsValidation();
 
-    this.shiftNameField.valueChanges.subscribe((val) => {
-      if (val === MasterShiftName.Rotating) {
-        this.clearShiftsValidation();
-        this.isShiftTimeRequired = false;
-      } else {
-        this.setShiftsValidation();
-        this.isShiftTimeRequired = true;
-      }
-      this.updateShifts();
-    });
+    this.watchForShifts();
   }
 
-  private initJobDistributionDescriptionForm(): void {
-    this.jobDistributionDescriptionForm = this.fb.group({
-      jobDistribution: [[], Validators.required],
-      agency: [null],
-      jobDistributions: [[]],
-      jobDescription: ['', Validators.maxLength(4000)],
-      orderRequisitionReasonId: [null, Validators.required],
-      orderRequisitionReasonName: [null],
-    });
+  private watchForShifts(): void {
+    this.shiftNameField.valueChanges.pipe(
+      filter(Boolean),
+      takeUntil(this.destroy$),
+    )
+      .subscribe((value: MasterShiftName) => {
+        if (value === MasterShiftName.Rotating) {
+          this.clearShiftsValidation();
+          this.quickOrderConditions.isShiftTimeRequired = false;
+        } else {
+          this.setShiftsValidation();
+          this.quickOrderConditions.isShiftTimeRequired = true;
+        }
+        this.updateShifts();
+      });
   }
 
-  private initContactDetailsForm(): void {
-    this.contactDetailsForm = this.fb.group({
-      title: [[], Validators.required],
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      isPrimaryContact: true,
-    });
-  }
-
-  private initSpecialProjectForm(): void {
-    this.specialProjectForm = this.fb.group({
-      projectTypeId: [null, Validators.required],
-      projectNameId: [null, Validators.required],
-      poNumberId: [null, Validators.required],
-    });
-  }
-
-  public onOrganizationDropDownSelected(event: ChangeEventArgs): void {
+  public changeOrganizationDropdown(event: ChangeEventArgs): void {
     const selectedOrganization = event.itemData as Organisation;
+    this.selectedOrganizationId = selectedOrganization.organizationId;
     const organizationId = selectedOrganization.organizationId;
     this.regionDataSource = selectedOrganization.regions;
-    this.isRegionsDropDownEnabled = true;
+    this.quickOrderConditions.isRegionsDropDownEnabled = true;
     this.handleAllOrganizationSkills(organizationId);
     this.populateRegLocDepSkillFields(selectedOrganization.regions[0]);
-    this.store.dispatch(new GetOrganizationSettings(undefined, organizationId));
-    this.store.dispatch(new GetAssociateAgencies(organizationId));
-    this.store.dispatch(new GetProjectSpecialData(organizationId));
-    this.store.dispatch(new GetOrderRequisitionByPage(undefined, undefined, undefined, organizationId));
+
+    this.store.dispatch([
+      new GetOrganizationSettings(undefined, organizationId),
+      new GetAssociateAgencies(organizationId),
+      new GetProjectSpecialData(organizationId),
+      new GetOrderRequisitionByPage(undefined, undefined, undefined, organizationId)
+    ]);
+
     this.orderTypeControl.updateValueAndValidity();
   }
 
-  public onRegionDropDownSelected(event: ChangeEventArgs): void {
+  public changeRegionDropdown(event: ChangeEventArgs): void {
     this.resetLocation();
     this.resetDepartment();
     const selectedRegion = event.itemData as Region;
     this.locationDataSource = selectedRegion.locations;
-    this.isLocationsDropDownEnabled = true;
+    this.quickOrderConditions.isLocationsDropDownEnabled = true;
   }
 
-  public onLocationDropDownSelected(event: ChangeEventArgs): void {
+  public changeLocationDropdown(event: ChangeEventArgs): void {
     this.resetDepartment();
     const selectedLocation = event.itemData as Location;
     this.departmentDataSource = selectedLocation.departments;
-    this.isDepartmentsDropDownEnabled = true;
+    this.quickOrderConditions.isDepartmentsDropDownEnabled = true;
   }
 
-  public onDepartmentDropDownSelected(event: ChangeEventArgs): void {
+  public changeDepartmentDropdown(event: ChangeEventArgs): void {
     const selectedDepartment = event.itemData as Department;
     this.store.dispatch(new GetContactDetails(selectedDepartment.id, selectedDepartment.organizationId));
   }
@@ -358,7 +302,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       locationControl.reset(null, { emitValue: false });
       locationControl.markAsUntouched();
       this.locationDataSource = [];
-      this.isLocationsDropDownEnabled = false;
+      this.quickOrderConditions.isLocationsDropDownEnabled = false;
     }
   }
 
@@ -369,15 +313,15 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       departmentControl.reset(null, { emitValue: false });
       departmentControl.markAsUntouched();
       this.departmentDataSource = [];
-      this.isDepartmentsDropDownEnabled = false;
+      this.quickOrderConditions.isDepartmentsDropDownEnabled = false;
     }
   }
 
   private handleAllOrganizationSkills(organizationId?: number): void {
     this.skillDataSource = this.userIsAdmin
       ? this.skills.filter((skill) =>
-          organizationId ? !skill.businessUnitId || skill.businessUnitId === organizationId : !skill.businessUnitId
-        )
+        organizationId ? !skill.businessUnitId || skill.businessUnitId === organizationId : !skill.businessUnitId
+      )
       : this.skills;
   }
 
@@ -393,12 +337,12 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   private populateRegLocDepSkillFields(region: Region | OrganizationRegion): void {
     if (region) {
       this.generalInformationForm.controls['regionId'].patchValue(region.id);
-      this.isRegionsDropDownEnabled = true;
+      this.quickOrderConditions.isRegionsDropDownEnabled = true;
       this.locationDataSource = region.locations as Location[];
     }
     if (this.locationDataSource.length > 0) {
       this.generalInformationForm.controls['locationId'].patchValue(this.locationDataSource[0].id);
-      this.isLocationsDropDownEnabled = true;
+      this.quickOrderConditions.isLocationsDropDownEnabled = true;
       this.departmentDataSource = this.locationDataSource[0].departments;
     }
 
@@ -407,14 +351,15 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.store.dispatch(
         new GetContactDetails(this.departmentDataSource[0].id, this.departmentDataSource[0].organizationId)
       );
-      this.isDepartmentsDropDownEnabled = true;
+      this.quickOrderConditions.isDepartmentsDropDownEnabled = true;
     }
   }
 
   private handleDurationControlValueChanges(): void {
-    this.durationControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((duration: Duration) => {
-      this.cdr.markForCheck();
-      this.isJobEndDateControlEnabled = duration === Duration.Other;
+    this.durationControl.valueChanges.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((duration: Duration) => {
+      this.quickOrderConditions.isJobEndDateControlEnabled = duration === Duration.Other;
 
       const jobStartDate = this.getNextSundayAfterThreeWeeks();
       if (!(jobStartDate instanceof Date)) {
@@ -423,6 +368,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       jobStartDate.setHours(0, 0, 0, 0);
       this.jobStartDateControl.patchValue(jobStartDate);
       this.autoSetupJobEndDateControl(duration, jobStartDate);
+      this.cdr.markForCheck();
     });
   }
 
@@ -436,7 +382,9 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private handleJobStartDateValueChanges(): void {
-    this.jobStartDateControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((jobStartDate: Date | null) => {
+    this.jobStartDateControl.valueChanges.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((jobStartDate: Date | null) => {
       const duration = this.durationControl.value;
       if (
         isNaN(parseInt(duration)) ||
@@ -451,10 +399,12 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
 
   private getDataForOrganizationUser(): void {
     if (!this.userIsAdmin) {
-      this.store.dispatch(new GetAssociateAgencies());
-      this.store.dispatch(new GetProjectSpecialData());
-      this.store.dispatch(new GetOrganizationSettings());
-      this.store.dispatch(new GetOrderRequisitionByPage());
+      this.store.dispatch([
+        new GetAssociateAgencies(),
+        new GetProjectSpecialData(),
+        new GetOrganizationSettings(),
+        new GetOrderRequisitionByPage()
+      ]);
     }
   }
 
@@ -477,32 +427,29 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private handleOrderTypeControlValueChanges(): void {
-    this.orderTypeControl.valueChanges.pipe(takeUntil(this.destroy$), distinctUntilChanged()).subscribe((value) => {
-      this.cdr.markForCheck();
-      this.isContactToPermOrder = value === OrderType.ContractToPerm;
-      this.isTravelerOrder = value === OrderType.Traveler;
-      this.isPermPlacementOrder = value === OrderType.PermPlacement;
-      this.isOpenPerDiem = value === OrderType.OpenPerDiem;
+    this.orderTypeControl.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      distinctUntilChanged()
+    ).subscribe((value) => {
+      this.quickOrderConditions.isContactToPermOrder = value === OrderType.ContractToPerm;
+      this.quickOrderConditions.isTravelerOrder = value === OrderType.Traveler;
+      this.quickOrderConditions.isPermPlacementOrder = value === OrderType.PermPlacement;
+      this.quickOrderConditions.isOpenPerDiem = value === OrderType.OpenPerDiem;
       this.handlePerDiemOrder();
       this.handlePermPlacementOrder();
 
       Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
         this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
       });
+
+      this.cdr.markForCheck();
     });
   }
 
   private handlePerDiemOrder(): void {
-    const listOfCommonControls = [
-      'hourlyRate',
-      'openPositions',
-      'jobStartDate',
-      'jobEndDate',
-      'shift',
-      'shiftStartTime',
-      'shiftEndTime',
-    ];
-    if (this.isOpenPerDiem) {
+    const listOfCommonControls = CommonList;
+
+    if (this.quickOrderConditions.isOpenPerDiem) {
       listOfCommonControls.forEach((control) => {
         this.generalInformationForm.controls[control].setValidators(null);
         this.generalInformationForm.controls[control].patchValue(null, { emitEvent: false });
@@ -525,10 +472,10 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private handlePermPlacementOrder(): void {
-    const listOfPermPlacementControls = ['orderPlacementFee', 'annualSalaryRangeFrom', 'annualSalaryRangeTo'];
-    const listOfGeneralOrderControls = ['hourlyRate', 'jobEndDate', 'duration', 'joiningBonus', 'compBonus'];
+    const listOfPermPlacementControls = PermPlacementList;
+    const listOfGeneralOrderControls = GeneralOrderList;
 
-    if (this.isPermPlacementOrder) {
+    if (this.quickOrderConditions.isPermPlacementOrder) {
       this.addPermPlacementControls(listOfPermPlacementControls);
       this.removeValidators(listOfGeneralOrderControls);
     } else {
@@ -554,7 +501,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   private removePermPlacementControls(controls: string[]): void {
     controls.forEach((control: string) => {
       this.generalInformationForm.contains(control) &&
-        this.generalInformationForm.removeControl(control, { emitEvent: false });
+      this.generalInformationForm.removeControl(control, { emitEvent: false });
     });
   }
 
@@ -567,8 +514,10 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.generalInformationForm.controls['jobEndDate'].valueChanges,
       this.userIsAdmin ? this.organizationForm.controls['organization'].valueChanges : of(null),
     ])
-      .pipe(takeUntil(this.destroy$), debounceTime(300))
-      .subscribe(([orderType, departmentId, skillId, jobStartDate, jobEndDate, organizationId]) => {
+      .pipe(
+        debounceTime(300),
+        takeUntil(this.destroy$)
+      ).subscribe(([orderType, departmentId, skillId, jobStartDate, jobEndDate, organizationId]) => {
         if (isNaN(parseInt(orderType)) || !departmentId || !skillId || !jobStartDate || !jobEndDate) {
           return;
         }
@@ -585,7 +534,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     jobEndDate: Date,
     organizationId?: number
   ): void {
-    if (this.isTravelerOrder || this.isContactToPermOrder) {
+    if (this.quickOrderConditions.isTravelerOrder || this.quickOrderConditions.isContactToPermOrder) {
       const startDate = DateTimeHelper.toUtcFormat(jobStartDate);
       const endDate = DateTimeHelper.toUtcFormat(jobEndDate);
       this.orderManagementService
@@ -628,7 +577,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private populateJobDistributionForm(): void {
-    this.jobDistributionControl.patchValue([JobDistribution.All]);
+    this.jobDistributionControl.patchValue([OrderJobDistribution.All]);
   }
 
   private populateShiftTimes() {
@@ -638,7 +587,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       shiftStartTime: new Date(date.setHours(7, 0, 0)),
       shiftEndTime: new Date(date.setHours(19, 30, 0)),
     };
-    if (this.isTravelerOrder || this.isContactToPermOrder || this.isPermPlacementOrder) {
+    if (this.quickOrderConditions.isTravelerOrder || this.quickOrderConditions.isContactToPermOrder || this.quickOrderConditions.isPermPlacementOrder) {
       Object.entries(shiftControls).forEach(([name, value]) => {
         this.generalInformationForm.get(name)?.patchValue(value);
       });
@@ -650,22 +599,26 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private refreshMultiSelectAfterOpenDialog(): void {
-    this.openEvent.pipe(takeUntil(this.destroy$), debounceTime(300)).subscribe((isOpen) => {
-      if (isOpen) {
+    this.openEvent.pipe(
+      takeUntil(this.destroy$),
+      filter(Boolean),
+      debounceTime(300)
+    ).subscribe(() => {
         this.multiselect.refresh();
-      }
     });
   }
 
   private handleAgencyValueChanges(): void {
-    this.agencyControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((agencyIds) => {
+    this.agencyControl.valueChanges.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((agencyIds) => {
       const selectedJobDistributions: JobDistributionModel[] = [];
       if (agencyIds) {
         agencyIds.forEach((agencyId: number) => {
           selectedJobDistributions.push({
             id: 0,
             orderId: 0,
-            jobDistributionOption: JobDistribution.Selected,
+            jobDistributionOption: OrderJobDistribution.Selected,
             agencyId,
           });
         });
@@ -675,55 +628,54 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       }
     });
   }
+
   private handleJobDistributionValueChanges(): void {
     this.jobDistributionControl.valueChanges
-      .pipe(takeUntil(this.destroy$), debounceTime(300))
-      .subscribe((jobDistributionIds: JobDistribution[]) => {
+      .pipe(
+        debounceTime(300),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((jobDistributionId: OrderJobDistribution) => {
         this.cdr.markForCheck();
-        if (jobDistributionIds.includes(JobDistribution.All)) {
-          jobDistributionIds = [
-            JobDistribution.All,
-            JobDistribution.Internal,
-            JobDistribution.ExternalTier1,
-            JobDistribution.ExternalTier2,
-            JobDistribution.ExternalTier3,
-          ];
-
-          this.jobDistributionControl.patchValue(jobDistributionIds, { emitEvent: false });
+        if (jobDistributionId === OrderJobDistribution.All) {
+          this.jobDistributionControl.patchValue(OrderJobDistribution.All, { emitEvent: false });
         }
 
-        this.agencyControlEnabled = jobDistributionIds.includes(JobDistribution.Selected);
-        if (this.agencyControlEnabled) {
-          this.agencyControl.addValidators(Validators.required);
-        } else {
-          this.agencyControl.removeValidators(Validators.required);
-          this.agencyControl.reset();
-        }
-        this.agencyControl.updateValueAndValidity();
-        let jobDistributions: JobDistributionModel[] = jobDistributionIds
-          .filter((jobDistributionId) => jobDistributionId !== JobDistribution.Selected)
-          .map((jobDistributionId) => {
-            return {
-              id: 0,
-              orderId: 0,
-              jobDistributionOption: jobDistributionId,
-              agencyId: null,
-            };
-          });
+        this.quickOrderConditions.agencyControlEnabled = jobDistributionId === OrderJobDistribution.Selected;
+        this.addValidatorsForAgencyControl();
 
-        this.jobDistributionDescriptionForm.controls['jobDistributions'].patchValue(jobDistributions, {
+        let jobDistributions = {
+          id: 0,
+          orderId: 0,
+          jobDistributionOption: jobDistributionId,
+          agencyId: null,
+        };
+
+        this.jobDistributionDescriptionForm.controls['jobDistributions'].patchValue([jobDistributions], {
           emitEvent: false,
         });
       });
   }
 
+  private addValidatorsForAgencyControl(): void {
+    if (this.quickOrderConditions.agencyControlEnabled) {
+      this.agencyControl.addValidators(Validators.required);
+    } else {
+      this.agencyControl.removeValidators(Validators.required);
+      this.agencyControl.reset();
+    }
+    this.agencyControl.updateValueAndValidity();
+  }
+
   private subscribeForSettings(): void {
-    this.organizationSettings$.pipe(takeUntil(this.destroy$)).subscribe((settings) => {
+    this.organizationSettings$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((settings: OrganizationSettingsGet[]) => {
       const projectFields = ['projectTypeId', 'projectNameId', 'poNumberId'];
       this.settings = SettingsHelper.mapSettings(settings);
-      this.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
+      this.quickOrderConditions.isSpecialProjectFieldsRequired = this.settings[SettingsKeys.MandatorySpecialProjectDetails]?.value;
       if (this.specialProjectForm != null) {
-        if (this.isSpecialProjectFieldsRequired) {
+        if (this.quickOrderConditions.isSpecialProjectFieldsRequired) {
           projectFields.forEach((control) =>
             this.specialProjectForm.controls[control].setValidators(Validators.required)
           );
@@ -735,7 +687,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     });
   }
 
-  public onSubmitQuickOrderForm(): void {
+  public submitQuickOrderForm(): void {
     if (
       this.organizationForm.valid &&
       this.orderTypeForm.valid &&
@@ -770,10 +722,11 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   }
 
   private submitQuickOrder(): void {
-    this.submitQuickOrder$.pipe(takeUntil(this.destroy$)).subscribe((isSubmit) => {
-      if (isSubmit) {
-        this.onSubmitQuickOrderForm();
-      }
+    this.submitQuickOrder$.pipe(
+      filter(Boolean),
+      takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.submitQuickOrderForm();
     });
   }
 
@@ -795,11 +748,11 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
       this.specialProjectForm.valueChanges
     )
       .pipe(
+        filter(() => this.quickOrderConditions.isFormDirty !== this.isAnyFormsDirty),
         takeUntil(this.destroy$),
-        filter(() => this.isFormDirty !== this.isAnyFormsDirty)
       )
       .subscribe(() => {
-        this.isFormDirty = this.isAnyFormsDirty;
+        this.quickOrderConditions.isFormDirty = this.isAnyFormsDirty;
         this.store.dispatch(new SetIsDirtyQuickOrderForm(this.isAnyFormsDirty));
       });
   }
@@ -826,5 +779,24 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   updateShifts(): void {
     this.shiftStartTimeField.updateValueAndValidity();
     this.shiftEndTimeField.updateValueAndValidity();
+  }
+
+  private watchForDepartmentId(): void {
+    this.generalInformationForm.get('departmentId')?.valueChanges
+      .pipe(
+        filter(Boolean),
+        switchMap((id: number) => {
+          return this.settingsViewService.getViewSettingKey(
+            OrganizationSettingKeys.TieringLogic,
+            OrganizationalHierarchy.Department,
+            id,
+            this.selectedOrganizationId
+          )
+        }),
+        takeUntil(this.destroy$)
+      ).subscribe(({ TieringLogic }) => {
+      this.jobDistributions = distributionSource(TieringLogic === TierLogic.Show);
+      this.cdr.markForCheck();
+    });
   }
 }

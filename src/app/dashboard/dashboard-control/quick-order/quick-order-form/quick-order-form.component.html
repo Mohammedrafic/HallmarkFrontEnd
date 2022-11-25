@@ -1,6 +1,8 @@
 <div class="quick-order-form-container">
   <div class="row bootstrap">
-    <form *ngIf="userIsAdmin" [formGroup]="organizationForm" class="form-line-item-40">
+    <form *ngIf="userIsAdmin"
+          [formGroup]="organizationForm"
+          class="form-line-item-40">
       <div class="input-container">
         <label>Organization<span class="required">*</span></label>
         <div class="input-group dropdown">
@@ -10,7 +12,7 @@
             [allowFiltering]="true"
             [dataSource]="allOrganizations"
             [fields]="organizationTypeFields"
-            (select)="onOrganizationDropDownSelected($event)"
+            (select)="changeOrganizationDropdown($event)"
           >
           </ejs-dropdownlist>
         </div>
@@ -25,7 +27,7 @@
             appValidateWithMessage
             [allowFiltering]="true"
             [dataSource]="orderTypes"
-            [fields]="orderTypeFields"
+            [fields]="optionFields"
           >
           </ejs-dropdownlist>
         </div>
@@ -64,10 +66,10 @@
                   formControlName="regionId"
                   appValidateWithMessage
                   [allowFiltering]="true"
-                  [enabled]="isRegionsDropDownEnabled"
+                  [enabled]="quickOrderConditions.isRegionsDropDownEnabled"
                   [dataSource]="regionDataSource"
-                  [fields]="regionFields"
-                  (select)="onRegionDropDownSelected($event)"
+                  [fields]="optionFields"
+                  (select)="changeRegionDropdown($event)"
                 >
                 </ejs-dropdownlist>
               </div>
@@ -81,10 +83,10 @@
                   formControlName="locationId"
                   appValidateWithMessage
                   [allowFiltering]="true"
-                  [enabled]="isLocationsDropDownEnabled"
+                  [enabled]="quickOrderConditions.isLocationsDropDownEnabled"
                   [dataSource]="locationDataSource"
-                  [fields]="locationFields"
-                  (select)="onLocationDropDownSelected($event)"
+                  [fields]="optionFields"
+                  (select)="changeLocationDropdown($event)"
                 >
                 </ejs-dropdownlist>
               </div>
@@ -98,10 +100,10 @@
                   formControlName="departmentId"
                   appValidateWithMessage
                   [allowFiltering]="true"
-                  [enabled]="isDepartmentsDropDownEnabled"
+                  [enabled]="quickOrderConditions.isDepartmentsDropDownEnabled"
                   [dataSource]="departmentDataSource"
-                  [fields]="departmentFields"
-                  (select)="onDepartmentDropDownSelected($event)"
+                  [fields]="optionFields"
+                  (select)="changeDepartmentDropdown($event)"
                 >
                 </ejs-dropdownlist>
               </div>
@@ -125,7 +127,9 @@
 
           <div class="row">
             <!-- Hourly Rate -->
-            <div *ngIf="isTravelerOrder || isContactToPermOrder" class="input-container bootstrap form-line-item-20">
+            <div
+              *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
+              class="input-container bootstrap form-line-item-20">
               <label>Hourly rate ($)<span class="required">*</span></label>
               <div class="input-group dropdown">
                 <div class="input-group">
@@ -144,7 +148,9 @@
 
             <!-- of Position -->
             <div
-              *ngIf="this.isTravelerOrder || this.isContactToPermOrder || this.isPermPlacementOrder"
+              *ngIf="quickOrderConditions.isTravelerOrder
+                     || quickOrderConditions.isContactToPermOrder
+                     || quickOrderConditions.isPermPlacementOrder"
               class="input-container bootstrap form-line-item-20"
             >
               <label># Open Positions<span class="required">*</span></label>
@@ -163,7 +169,8 @@
               </div>
             </div>
 
-            <div *ngIf="isTravelerOrder || isContactToPermOrder" class="input-container bootstrap form-line-item-20">
+            <div *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
+                 class="input-container bootstrap form-line-item-20">
               <label>Duration<span class="required">*</span></label>
               <div class="input-group dropdown">
                 <ejs-dropdownlist
@@ -171,7 +178,7 @@
                   appValidateWithMessage
                   [allowFiltering]="true"
                   [dataSource]="durations"
-                  [fields]="durationFields"
+                  [fields]="optionFields"
                 >
                 </ejs-dropdownlist>
               </div>
@@ -179,7 +186,7 @@
 
             <!-- Job Start Date -->
             <div
-              *ngIf="this.isTravelerOrder || this.isContactToPermOrder"
+              *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
               class="datepicker-container form-line-item-20"
             >
               <label>Job Start Date<span class="required">*</span></label>
@@ -198,7 +205,8 @@
             </div>
 
             <!-- Job End Date -->
-            <div *ngIf="isTravelerOrder || isContactToPermOrder" class="datepicker-container form-line-item-20">
+            <div *ngIf="quickOrderConditions.isTravelerOrder || quickOrderConditions.isContactToPermOrder"
+                 class="datepicker-container form-line-item-20">
               <label>Job End Date<span class="required">*</span></label>
               <div class="input-group datepicker bootstrap">
                 <ejs-datepicker
@@ -207,9 +215,7 @@
                   placeholder="MM/DD/YYYY"
                   formControlName="jobEndDate"
                   appValidateWithMessage
-                  [enableMask]="true"
-                  [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                  [enabled]="isJobEndDateControlEnabled"
+                  [enabled]="quickOrderConditions.isJobEndDateControlEnabled"
                   [enableMask]="true"
                   [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
                   [min]="generalInformationForm.controls['jobStartDate'].value"
@@ -219,7 +225,8 @@
             </div>
 
             <!-- Order Placement Fee (%) -->
-            <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
+            <div *ngIf="quickOrderConditions.isPermPlacementOrder"
+                 class="input-container bootstrap form-line-item-20">
               <label>Order Placement Fee (%)<span class="required">*</span></label>
               <div class="input-group">
                 <ejs-numerictextbox
@@ -238,7 +245,8 @@
             </div>
 
             <!-- Annual Salary Range From -->
-            <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
+            <div *ngIf="quickOrderConditions.isPermPlacementOrder"
+                 class="input-container bootstrap form-line-item-20">
               <label>Annual Salary Range From<span class="required">*</span></label>
               <div class="input-group">
                 <input
@@ -254,7 +262,8 @@
             </div>
 
             <!-- Annual Salary Range To -->
-            <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
+            <div *ngIf="quickOrderConditions.isPermPlacementOrder"
+                 class="input-container bootstrap form-line-item-20">
               <label>Annual Salary Range To<span class="required">*</span></label>
               <div class="input-group">
                 <input
@@ -270,11 +279,14 @@
             </div>
           </div>
 
-          <div class="row" *ngIf="this.isTravelerOrder || this.isContactToPermOrder || this.isPermPlacementOrder">
-
+          <div class="row"
+               *ngIf="quickOrderConditions.isTravelerOrder
+               || quickOrderConditions.isContactToPermOrder
+               || quickOrderConditions.isPermPlacementOrder"
+          >
             <!-- Job Start Date -->
             <div
-              *ngIf="this.isPermPlacementOrder"
+              *ngIf="quickOrderConditions.isPermPlacementOrder"
               class="datepicker-container form-line-item-20"
             >
               <label>Job Start Date<span class="required">*</span></label>
@@ -301,7 +313,7 @@
                   appValidateWithMessage
                   [allowFiltering]="true"
                   [dataSource]="masterShiftNames"
-                  [fields]="masterShiftFields"
+                  [fields]="optionFields"
                 >
                 </ejs-dropdownlist>
               </div>
@@ -309,7 +321,7 @@
 
             <!-- Shift Start Time -->
             <div class="input-container calendar form-line-item-20">
-              <label for="startTime">Shift Start Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label>
+              <label for="startTime">Shift Start Time<span class="required" *ngIf="quickOrderConditions.isShiftTimeRequired">*</span></label>
               <div class="input-group datepicker bootstrap">
                 <ejs-timepicker
                   placeholder="HH:MM"
@@ -326,7 +338,7 @@
 
             <!-- Shift End Time -->
             <div class="input-container calendar form-line-item-20">
-              <label for="startTime">Shift End Time<span class="required" *ngIf="isShiftTimeRequired">*</span></label>
+              <label for="startTime">Shift End Time<span class="required" *ngIf="quickOrderConditions.isShiftTimeRequired">*</span></label>
               <div class="input-group datepicker bootstrap">
                 <ejs-timepicker
                   placeholder="HH:MM"
@@ -355,17 +367,14 @@
               <div class="input-container bootstrap form-line-item-100">
                 <label>Job Distribution<span class="required">*</span></label>
                 <div class="input-group dropdown">
-                  <ejs-multiselect
-                    #multiselect
-                    mode="CheckBox"
+                  <ejs-dropdownlist
                     formControlName="jobDistribution"
                     appValidateWithMessage
                     [dataSource]="jobDistributions"
-                    [fields]="jobDistributionFields"
+                    [fields]="optionFields"
                     [allowFiltering]="true"
-                    [showDropDownIcon]="true"
                   >
-                  </ejs-multiselect>
+                  </ejs-dropdownlist>
                 </div>
               </div>
             </div>
@@ -373,16 +382,14 @@
             <div class="row">
               <!-- Agency -->
               <div class="input-container bootstrap form-line-item-100">
-                <label>
-                  Agency
-                  <span *ngIf="agencyControlEnabled" class="required">*</span>
+                <label>Agency<span *ngIf="quickOrderConditions.agencyControlEnabled" class="required">*</span>
                 </label>
                 <div class="input-group dropdown">
                   <ejs-multiselect
                     mode="CheckBox"
                     formControlName="agency"
                     appValidateWithMessage
-                    [enabled]="agencyControlEnabled"
+                    [enabled]="quickOrderConditions.agencyControlEnabled"
                     [dataSource]="associateAgencies$ | async"
                     [fields]="associateAgencyFields"
                     [showSelectAll]="true"
@@ -439,7 +446,7 @@
         <form [formGroup]="contactDetailsForm">
           <div class="row">
             <div class="contact-details-title-container form-line-item-35">
-              <div *ngIf="!isEditContactTitle" class="input-container bootstrap">
+              <div *ngIf="!quickOrderConditions.isEditContactTitle" class="input-container bootstrap">
                 <label>Title<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
@@ -452,7 +459,7 @@
                 </div>
               </div>
 
-              <div *ngIf="isEditContactTitle" class="input-container bootstrap">
+              <div *ngIf="quickOrderConditions.isEditContactTitle" class="input-container bootstrap">
                 <label>Title<span class="required">*</span></label>
                 <div class="input-group">
                   <input class="e-input" type="text" appValidateWithMessage formControlName="title" />
@@ -466,7 +473,7 @@
                 type="button"
                 cssClass="e-outline"
                 class="icon-button"
-                (click)="isEditContactTitle = !isEditContactTitle"
+                (click)="quickOrderConditions.isEditContactTitle = !quickOrderConditions.isEditContactTitle"
               >
                 <i-feather name="edit3" class="icon"></i-feather>
               </button>
@@ -499,7 +506,7 @@
           <!-- Special Project Category -->
           <div class="input-container bootstrap form-line-item-40">
             <label
-              >Special Project Category<span *ngIf="isSpecialProjectFieldsRequired" class="required">*</span></label
+              >Special Project Category<span *ngIf="quickOrderConditions.isSpecialProjectFieldsRequired" class="required">*</span></label
             >
             <div class="input-group dropdown">
               <ejs-dropdownlist
@@ -514,7 +521,7 @@
           </div>
           <!-- Project Name -->
           <div class="input-container bootstrap form-line-item-30">
-            <label>Project Name<span *ngIf="isSpecialProjectFieldsRequired" class="required">*</span></label>
+            <label>Project Name<span *ngIf="quickOrderConditions.isSpecialProjectFieldsRequired" class="required">*</span></label>
             <div class="input-group dropdown">
               <ejs-dropdownlist
                 formControlName="projectNameId"
@@ -528,7 +535,7 @@
           </div>
           <!-- PO# -->
           <div class="input-container bootstrap form-line-item-30">
-            <label>PO#<span *ngIf="isSpecialProjectFieldsRequired" class="required">*</span></label>
+            <label>PO#<span *ngIf="quickOrderConditions.isSpecialProjectFieldsRequired" class="required">*</span></label>
             <div class="input-group dropdown">
               <ejs-dropdownlist
                 formControlName="poNumberId"

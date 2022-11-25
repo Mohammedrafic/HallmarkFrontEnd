@@ -12,6 +12,7 @@ import { DialogModule, TooltipAllModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
 import {
   AlertCircle,
+  AlertTriangle,
   AlignJustify,
   ChevronDown,
   ChevronRight,
@@ -105,6 +106,7 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
 import { AssignSkillComponent } from './skills/assign-skill/assign-skill.component';
 import { SkillsState } from '@organization-management/store/skills.state';
 import { DepartmentService } from '@organization-management/departments/services/department.service';
+import { SideMenuService } from '@shared/components/side-menu/services';
 
 const sidebarIcons = {
   Download,
@@ -123,6 +125,7 @@ const sidebarIcons = {
   ChevronRight,
   Copy,
   Search,
+  AlertTriangle
 };
 @NgModule({
   declarations: [
@@ -240,6 +243,7 @@ const sidebarIcons = {
       TiersApiService,
       LocationsService,
       ShiftsService,
+      SideMenuService,
       {
         provide: TIER_DIALOG_TYPE,
         useValue: Tiers.tierSettings
