@@ -3,13 +3,14 @@ import { PageOfCollections } from '@shared/models/page.model';
 import {
   BaseInvoice, InvoiceDetail,
   InvoiceFilterColumns,
+  InvoicePayment,
   InvoicePermissions,
   InvoiceRecord,
   InvoicesFilterState,
   ManualInvoiceMeta,
   ManualInvoiceReason,
   ManualInvoicesData,
-  PrintInvoiceData
+  PrintInvoiceData,
 } from '../interfaces';
 import { OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
@@ -39,4 +40,5 @@ export interface InvoicesModel {
   isAgencyArea: boolean;
   permissions: Partial<InvoicePermissions>;
   selectedTabIdx: number;
+  paymentDetails: InvoicePayment[];
 }

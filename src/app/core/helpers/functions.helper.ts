@@ -1,4 +1,7 @@
-import { findItemById } from '@core/helpers';
+import { HttpParams } from '@angular/common/http';
+
+import { findItemById } from '../helpers';
+import { ParamsFromObject } from '../interface';
 
 export const findSelectedItems = <T>(source: number[], arr: T[]): T[] => {
   return source.reduce((acc: T[], itemId: number) => {
@@ -32,4 +35,12 @@ export const reduceFiltersState = <T>(oldFilters: T, saveFiltersKeys: string[]):
 
     return acc;
   }, {})
+}
+
+export function GetQueryParams<T> (params: T): HttpParams {
+  if (params) {
+    return new HttpParams({ fromObject: params as unknown as ParamsFromObject });
+  }
+
+  return new HttpParams();
 }

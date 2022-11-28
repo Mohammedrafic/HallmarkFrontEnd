@@ -7,6 +7,7 @@ import { ExportPayload } from '@shared/models/export.model';
 import {
   GetPendingApprovalParams,
   GroupInvoicesParams,
+  InvoicePaymentGetParams,
   InvoicePermissions,
   InvoicesFilterState,
   ManualInvoice,
@@ -320,5 +321,11 @@ export namespace Invoices {
     constructor(
       public readonly organizationId: number,
     ) {}
+  }
+
+  export class GetPaymentDetails {
+    static readonly type = INVOICES_ACTIONS.GetPaymentDetails;
+
+    constructor(public readonly payload: InvoicePaymentGetParams) {}
   }
 }

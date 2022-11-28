@@ -83,3 +83,12 @@
   color: $black;
   margin: 0;
 }
+
+@mixin table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid $secondary-dark-blue-45;
+  border-radius: 12px 12px 0 0;
+  padding: 15px;
+}

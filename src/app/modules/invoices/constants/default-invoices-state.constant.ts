@@ -29,6 +29,7 @@ export const DefaultInvoicesState: InvoicesModel = {
     agencyCanPay: false,
   },
   selectedTabIdx: 0,
+  paymentDetails: [],
 };
 
 export const DefaultFiltersState: InvoicesFilterState = {

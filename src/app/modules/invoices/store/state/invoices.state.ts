@@ -16,12 +16,13 @@ import {
   BaseInvoice,
   InvoiceDetail, InvoiceDialogActionPayload,
   InvoiceFilterColumns,
+  InvoicePayment,
   InvoiceRecord,
   InvoicesFilteringOptions,
   InvoicesFilterState,
   InvoiceStateDto,
   ManualInvoiceMeta,
-  ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData
+  ManualInvoiceReason, ManualInvoicesData, PrintInvoiceData,
 } from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
 import {
@@ -30,7 +31,7 @@ import {
   FilteringInvoicesOptionsFields,
   InvoicesFilteringOptionsMapping,
   ManualInvoiceMessages,
-  SavedInvoicesFiltersParams
+  SavedInvoicesFiltersParams,
 } from '../../constants';
 import { InvoicesTableFiltersColumns } from '../../enums';
 import { InvoiceMessageHelper, InvoiceMetaAdapter } from '../../helpers';
@@ -136,6 +137,17 @@ export class InvoicesState {
     return state.manualInvoicesExist;
   }
 
+  @Selector([InvoicesState])
+  static paymentDetails(state: InvoicesModel): InvoicePayment[] {
+    return state.paymentDetails;
+  }
+
+  @Selector([InvoicesState])
+  static invoiceDetails(state: InvoicesModel): InvoiceDetail | null {
+    return state.invoiceDetail;
+  }
+
+
   @Action(Invoices.ToggleInvoiceDialog)
   ToggleInvoiceDialog(
     { patchState, dispatch }: StateContext<InvoicesModel>,
@@ -213,7 +225,7 @@ export class InvoicesState {
     return of(null).pipe(
       throttleTime(100),
       tap(() => setState(patch<InvoicesModel>({
-        invoicesFilters: null
+        invoicesFilters: null,
       })))
     );
   }
@@ -230,7 +242,8 @@ export class InvoicesState {
               return acc;
             }
 
-            acc[InvoicesFilteringOptionsMapping.get((key as FilteringInvoicesOptionsFields)) as InvoicesTableFiltersColumns] = patch({
+            acc[InvoicesFilteringOptionsMapping.get(
+              (key as FilteringInvoicesOptionsFields))as InvoicesTableFiltersColumns] = patch({
               dataSource: res[key as FilteringInvoicesOptionsFields],
             });
             return acc;
@@ -256,8 +269,8 @@ export class InvoicesState {
             invoiceFiltersColumns: patch({
               [columnKey]: patch({
                 dataSource: dataSource,
-              })
-            })
+              }),
+            }),
           }))
         )
       );
@@ -350,7 +363,7 @@ export class InvoicesState {
           ),
           this.invoicesAPIService.saveManualInvoiceAttachments(
             files, organizationId, payload.timesheetId
-          )
+          ),
         ])),
         map((ids: [number[], number[]]) => ids.flat()),
         tap(() => ctx.dispatch([
@@ -532,7 +545,7 @@ export class InvoicesState {
 
   @Action(Invoices.ApproveInvoices)
   ApproveInvoices(
-    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { dispatch }: StateContext<InvoicesModel>,
     { invoiceIds }: Invoices.ApproveInvoices
   ): Observable<void> {
     return this.invoicesAPIService.bulkApprove(invoiceIds)
@@ -562,21 +575,21 @@ export class InvoicesState {
 
   @Action(Invoices.PreviewAttachment)
   PreviewAttachment(
-    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { dispatch }: StateContext<InvoicesModel>,
     { organizationId, payload: { id, fileName } }: Invoices.PreviewAttachment
   ): Observable<void> {
     return dispatch(
       new FileViewer.Open({
         fileName,
         getPDF: () => this.manualInvoiceAttachmentsApiService.downloadPDFAttachment(id, organizationId),
-        getOriginal: () => this.manualInvoiceAttachmentsApiService.downloadAttachment(id, organizationId)
+        getOriginal: () => this.manualInvoiceAttachmentsApiService.downloadAttachment(id, organizationId),
       })
     );
   }
 
   @Action(Invoices.DownloadAttachment)
   DownloadAttachment(
-    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { dispatch }: StateContext<InvoicesModel>,
     { organizationId, payload: { id, fileName } }: Invoices.DownloadAttachment
   ): Observable<Blob | void> {
     return this.manualInvoiceAttachmentsApiService.downloadAttachment(id, organizationId)
@@ -590,7 +603,7 @@ export class InvoicesState {
 
   @Action(Invoices.DeleteAttachment)
   DeleteAttachment(
-    { patchState, getState, dispatch }: StateContext<InvoicesModel>,
+    { dispatch }: StateContext<InvoicesModel>,
     { invoiceId, fileId, organizationId }: Invoices.DeleteAttachment
   ): Observable<number | void> {
     return this.manualInvoiceAttachmentsApiService.deleteAttachment(fileId, invoiceId, organizationId)
@@ -606,21 +619,21 @@ export class InvoicesState {
 
   @Action(Invoices.PreviewMilesAttachment)
   PreviewMilesAttachment(
-    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { dispatch }: StateContext<InvoicesModel>,
     { invoiceId, organizationId, payload: { id, fileName } }: Invoices.PreviewMilesAttachment
   ): Observable<Blob | void> {
     return dispatch(
       new FileViewer.Open({
         fileName,
         getPDF: () => this.manualInvoiceAttachmentsApiService.downloadMilesPDFAttachment(invoiceId, id, organizationId),
-        getOriginal: () => this.manualInvoiceAttachmentsApiService.downloadMilesAttachment(invoiceId, id, organizationId)
+        getOriginal: () => this.manualInvoiceAttachmentsApiService.downloadMilesAttachment(invoiceId, id, organizationId),
       })
     );
   }
 
   @Action(Invoices.DownloadMilesAttachment)
   DownloadMilesAttachment(
-    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { dispatch }: StateContext<InvoicesModel>,
     { invoiceId, organizationId, payload: { id, fileName } }: Invoices.DownloadMilesAttachment
   ): Observable<Blob | void> {
     return this.manualInvoiceAttachmentsApiService.downloadMilesAttachment(invoiceId, id, organizationId)
@@ -634,13 +647,14 @@ export class InvoicesState {
 
   @Action(Invoices.GroupInvoices)
   GroupInvoices(
-    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { dispatch }: StateContext<InvoicesModel>,
     { payload  }: Invoices.GroupInvoices
   ): Observable<PendingApprovalInvoice[] | void> {
     return this.invoicesAPIService.groupInvoices(payload)
       .pipe(
         tap((res) => {
-          dispatch(new ShowToast(MessageTypes.Success, `Invoice ${InvoiceMessageHelper.getInvoiceIds(res)} was created successfully`));
+          dispatch(new ShowToast(MessageTypes.Success,
+            `Invoice ${InvoiceMessageHelper.getInvoiceIds(res)} was created successfully`));
         }),
         catchError(({ error }: HttpErrorResponse) => dispatch(
           new ShowToast(MessageTypes.Error, getAllErrors(error))
@@ -650,7 +664,7 @@ export class InvoicesState {
 
   @Action(Invoices.ChangeInvoiceState)
   ChangeInvoiceState(
-    { patchState, dispatch }: StateContext<InvoicesModel>,
+    { dispatch }: StateContext<InvoicesModel>,
     { invoiceId, stateId, orgId }: Invoices.ChangeInvoiceState,
   ): Observable<PendingApprovalInvoice | void> {
     const body: InvoiceStateDto = {
@@ -721,5 +735,20 @@ export class InvoicesState {
     patchState({
       selectedTabIdx: index,
     })
+  }
+
+  @Action(Invoices.GetPaymentDetails)
+  GetPaymentDetails(
+    { patchState }: StateContext<InvoicesModel>,
+    { payload }: Invoices.GetPaymentDetails,
+  ): Observable<InvoicePayment[]> {
+    return this.invoicesAPIService.getInvoicesPayments(payload)
+    .pipe(
+      tap((response) => {
+        patchState({
+          paymentDetails: response,
+        });
+      }),
+    )
   }
 }

@@ -28,6 +28,7 @@ export interface InvoiceDetailMeta {
   invoiceStateText: string;
   organizationPrefix: string;
   organizationIds: number[];
+  agencySuffix?: number;
 }
 
 export interface InvoiceDetailRecord {

@@ -6,35 +6,32 @@ import {
   Input,
   OnInit,
   Output,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 
-import { map, Observable, takeUntil, throttleTime } from 'rxjs';
-import { filter } from 'rxjs/operators';
 import { ColDef, GridOptions } from '@ag-grid-community/core';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
+import { map, Observable, takeUntil, throttleTime } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import { DialogAction } from '@core/enums';
 import { Destroyable } from '@core/helpers';
+import { GRID_CONFIG } from '@shared/constants';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportPayload } from '@shared/models/export.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { ActionBtnOnStatus, AgencyActionBtnOnStatus, NewStatusDependsOnAction } from '../../constants/invoice-detail.constant';
-import { INVOICES_STATUSES, InvoiceState, InvoicesActionBtn } from '../../enums';
-import { InvoiceDetail, InvoiceDetailsSettings, InvoiceDialogActionPayload, InvoiceUpdateEmmit, PrintingPostDto } from '../../interfaces';
+import { ActionBtnOnStatus, AgencyActionBtnOnStatus,
+  NewStatusDependsOnAction } from '../../constants/invoice-detail.constant';
+import { InvoicesActionBtn, InvoiceState, INVOICES_STATUSES } from '../../enums';
+import { ExportOption, InvoiceDetail, InvoiceDetailsSettings,
+  InvoiceDialogActionPayload, InvoiceUpdateEmmit, PrintingPostDto } from '../../interfaces';
 import { InvoicePrintingService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { Invoices } from '../../store/actions/invoices.actions';
-import { InvoicesState } from '../../store/state/invoices.state';
 import { InvoicesModel } from '../../store/invoices.model';
-import { GRID_CONFIG } from '@shared/constants';
-
-interface ExportOption extends ItemModel {
-  ext: string | null;
-}
+import { InvoicesState } from '../../store/state/invoices.state';
 
 @Component({
   selector: 'app-invoice-detail-container',
@@ -43,9 +40,6 @@ interface ExportOption extends ItemModel {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoiceDetailContainerComponent extends Destroyable implements OnInit {
-  @Select(InvoicesState.isInvoiceDetailDialogOpen)
-  isInvoiceDetailDialogOpen$: Observable<InvoiceDialogActionPayload>;
-
   @ViewChild('chipList') chipList: ChipListComponent;
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
@@ -64,6 +58,9 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
 
   @Select(InvoicesState.prevInvoiceId)
   public prevId$: Observable<number | null>;
+
+  @Select(InvoicesState.isInvoiceDetailDialogOpen)
+  isInvoiceDetailDialogOpen$: Observable<InvoiceDialogActionPayload>;
 
   public invoiceDetail: InvoiceDetail;
   public isLoading: boolean;
@@ -94,7 +91,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     this.getDialogState();
   }
 
-  public handleProfileClose(): void {
+  public closeInvoiceDetails(): void {
     this.store.dispatch(new Invoices.ToggleInvoiceDialog(DialogAction.Close)).pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
@@ -110,7 +107,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     ));
   }
 
-  public handlePrint(): void {
+  public printInvoice(): void {
     const dto: PrintingPostDto = this.isAgency ? {
       invoiceIds: [this.invoiceDetail.meta.invoiceId],
       organizationIds: [this.invoiceDetail.meta.organizationIds[0]],
@@ -133,7 +130,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
       });
   }
 
-  public handleApprove(): void {
+  public approveInvoice(): void {
     this.updateTable.emit({
       invoiceId: this.invoiceDetail.meta.invoiceId,
       status: NewStatusDependsOnAction.get(this.actionBtnText) as InvoiceState,
@@ -153,7 +150,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     this.cdr.markForCheck();
   }
 
-  closePaymentDetails(): void {
+  public closePaymentDetails(): void {
     this.invoiceDetailsConfig.paymentDetailsOpen = false;
     this.cdr.markForCheck();
   }
@@ -169,10 +166,12 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
         if (payload.dialogState) {
           this.sideDialog.show();
           this.invoiceDetail = payload.invoiceDetail as InvoiceDetail;
+          console.log(this.invoiceDetail)
           if (payload.invoiceDetail) {
             this.setActionBtnText();
             this.invoiceDetailsConfig.isActionBtnDisabled = this.checkActionBtnDisabled();
             this.initTableColumns(this.invoiceDetail.summary[0]?.locationName || '');
+
             if (this.chipList) {
               this.chipList.cssClass = this.chipsCssClass.transform(this.invoiceDetail.meta.invoiceStateText);
               this.chipList.text = this.invoiceDetail.meta.invoiceStateText.toUpperCase();

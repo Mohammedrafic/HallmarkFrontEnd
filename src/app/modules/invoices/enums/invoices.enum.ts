@@ -49,6 +49,7 @@ export enum INVOICES_ACTIONS {
   SetPermissions = '[invoices] Set permissions',
   SetTabIndex = '[invoices] set tab index',
   CheckManualInvoicesExist = '[invoices] check manual invoices existing',
+  GetPaymentDetails = '[invoices] get payment details',
 }
 
 export enum InvoicesTableFiltersColumns {

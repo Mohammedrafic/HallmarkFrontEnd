@@ -11,6 +11,11 @@ export interface InvoicePayment {
 
 export interface InvoicePaymentGetParams {
   InvoiceId: number;
-  OrganizationId: number;
-  AgencySuffix: string;
+  OrganizationId?: number;
+  AgencySuffix?: number;
+}
+
+export interface PaymentMeta {
+  invoiceNumber: string | null,
+  amount: number | null,
 }

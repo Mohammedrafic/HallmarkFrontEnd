@@ -1,21 +1,21 @@
-import { PageOfCollections } from '@shared/models/page.model';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import { DataSourceItem, TypedValueGetterParams } from '@core/interface';
+import { ColDef } from '@ag-grid-community/core';
+import { AggregateType } from '@syncfusion/ej2-angular-grids';
+import { ItemModel, SelectEventArgs, TabItemModel } from '@syncfusion/ej2-angular-navigations';
 
+import { DataSourceItem, TypedValueGetterParams } from '@core/interface';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { PageOfCollections } from '@shared/models/page.model';
+import { AttachmentAction } from '@shared/components/attachments';
+import { AgencyStatus } from '@shared/enums/status';
+import { BillRateType } from '@shared/models';
 import { Attachment, DetailsColumnConfig } from '../../timesheets/interface';
-import { INVOICES_STATUSES, InvoicesTableFiltersColumns, InvoiceState, DeliveryType,
-  InvoicesAggregationType, InvoiceAttachmentFileType, InvoiceRecordType } from '../enums';
+import { FilteringInvoicesOptionsFields } from '../constants';
+import { DeliveryType, InvoiceAttachmentFileType, InvoiceRecordType, InvoicesAggregationType,
+  InvoicesTableFiltersColumns, InvoiceState, INVOICES_STATUSES } from '../enums';
+import { PendingInvoiceStatus } from '../enums/invoice-status.enum';
 import { InvoiceDetail } from './invoice-detail.interface';
 import { PendingApprovalInvoice, PendingApprovalInvoicesData } from './pending-approval-invoice.interface';
-import { FilteringInvoicesOptionsFields } from '../constants';
-import { PendingInvoiceStatus } from '../enums/invoice-status.enum';
-import { SelectEventArgs, TabItemModel } from '@syncfusion/ej2-angular-navigations';
-import { AggregateType } from '@syncfusion/ej2-angular-grids';
-import { BillRateType } from '@shared/models';
-import { AgencyStatus } from '@shared/enums/status';
-import { AttachmentAction } from '@shared/components/attachments';
 import { PendingInvoiceRecord } from './pending-invoice-record.interface';
-import { ColDef } from '@ag-grid-community/core';
 
 export interface Invoice extends InvoiceRecord {
   groupBy: string;
@@ -288,3 +288,6 @@ export interface TypedColDef<T> extends ColDef {
   valueGetter?: string | TypedValueGetterFunc<T>;
 }
 
+export interface ExportOption extends ItemModel {
+  ext: string | null;
+}

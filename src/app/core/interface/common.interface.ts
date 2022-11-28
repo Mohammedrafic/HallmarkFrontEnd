@@ -29,3 +29,7 @@ export interface CommonDialogConformMessages {
 export interface TypedValueGetterParams<T> extends ValueGetterParams {
   data: T;
 }
+
+export interface ParamsFromObject {
+  [param: string]: string | string[];
+}

@@ -32,7 +32,7 @@ export class DestroyDialog extends Destroyable implements AfterViewChecked {
 
    /**
    * This method not used here in OnInit/Constructor to prevent
-   * overriding it in component class.
+   * overriding Oninit/constructor in component class.
    */
   protected watchForCloseStream(): void {
     this.viewObserver.asObservable()
