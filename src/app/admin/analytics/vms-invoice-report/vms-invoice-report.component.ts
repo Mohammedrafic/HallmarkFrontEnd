@@ -40,24 +40,23 @@ import { uniqBy } from 'lodash';
 export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
 
   public paramsData: any = {
-    "OrganizationParamACCR": "",
-    "StartDateParamACCR": "",
-    "EndDateParamACCR": "",
-    "RegionParamACCR": "",
-    "LocationParamACCR": "",
-    "DepartmentParamACCR": "",
-    "AgencyParamACCR": "",
-    "YearParamACCR": "",
-    "MonthParamACCR": "",
-    "InvoiceStatusParamACCR": "",
-    "InvoiceIdParamACCR": "",
-    "OrderTypeACCR": "",
-    "BearerParamACCR": "",
-    "BusinessUnitIdParamACCR": "",
+    "OrganizationParamVMSIR": "",
+    "StartDateParamVMSIR": "",
+    "EndDateParamVMSIR": "",
+    "RegionParamVMSIR": "",
+    "LocationParamVMSIR": "",
+    "DepartmentParamVMSIR": "",
+    "AgencyParamVMSIR": "",
+    "YearParamVMSIR": "",
+    "MonthParamVMSIR": "",
+    "InvoiceStatusParamVMSIR": "",
+    "InvoiceIdParamVMSIR": "",
+    "BearerParamVMSIR": "",
+    "BusinessUnitIdParamVMSIR": "",
     "HostName": ""
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/ClientFinanceAccrualReport.cls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/AccrualReport/Accrual.cat" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReport/VMSInvoiceReport.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReport/VMSInvoice.cat" };
   public title: string = "VMS Invoice Report";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
@@ -90,7 +89,6 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
 
   accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  remoteWaterMark: string = 'e.g. Andrew Fuller';
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   yearFields: FieldSettingsModel = { text: 'name', value: 'name' };
   monthFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -296,11 +294,9 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
         this.selectedAgencies = agencyData?.filter((object) => data?.includes(object.agencyId));
       }
     });
-
   }
 
   public SearchReport(): void {
-
     this.filteredItems = [];
     let auth = "Bearer ";
     for (let x = 0; x < window.localStorage.length; x++) {
@@ -308,7 +304,7 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    let { businessIds, departmentIds, locationIds,
+    let { departmentIds, locationIds,
       regionIds, agencyIds, startDate, endDate,year,month,invoiceStatus,invoiceId } = this.vmsInvoiceReportForm.getRawValue();
     if (!this.vmsInvoiceReportForm.dirty) {
       this.message = "Default filter selected with all regions ,locations and departments for last 30 and next 30 days";
@@ -319,20 +315,19 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     }
     this.paramsData =
     {
-      "OrganizationParamACCR": this.selectedOrganizations?.map((list) => list.organizationId),
-      "StartDateParamACCR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateParamACCR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamACCR": regionIds,
-      "LocationParamACCR": locationIds,
-      "DepartmentParamACCR": departmentIds,
-      "AgencyParamACCR": agencyIds,
-      "YearParamACCR": year,
-      "MonthParamACCR": month,
-      "InvoiceStatusParamACCR": invoiceStatus,
-      "InvoiceIdParamACCR": invoiceId,
-      "OrderTypeACCR": "",
-      "BearerParamACCR": auth,
-      "BusinessUnitIdParamACCR": window.localStorage.getItem("lastSelectedOrganizationId") == null
+      "OrganizationParamVMSIR": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "StartDateParamVMSIR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "EndDateParamVMSIR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "RegionParamVMSIR": regionIds.length == 0 ? "null" : regionIds.join(","),
+      "LocationParamVMSIR": locationIds.length == 0 ? "null" : locationIds.join(","),
+      "DepartmentParamVMSIR": departmentIds.length == 0 ? "null" : departmentIds.join(","),
+      "AgencyParamVMSIR": agencyIds.length == 0 ? "null" : agencyIds.join(","),
+      "YearParamVMSIR": year == null ? "null" : year,
+      "MonthParamVMSIR": month == null ? "null" : month,
+      "InvoiceStatusParamVMSIR": invoiceStatus == null ? "null" : invoiceStatus,
+      "InvoiceIdParamVMSIR": invoiceId == null ? "null" : invoiceId,
+      "BearerParamVMSIR": auth,
+      "BusinessUnitIdParamVMSIR": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
