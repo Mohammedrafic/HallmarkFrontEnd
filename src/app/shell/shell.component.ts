@@ -38,10 +38,8 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { AnalyticsApiService } from '@shared/services/analytics-api.service';
 import { InitPreservedFilters } from '../store/preserved-filters.actions';
 import { FilterService } from '@shared/services/filter.service';
-import { ConfigurationDto } from '@shared/models/analytics.model';
-import { GetLogiReportData } from '@organization-management/store/logi-report.action';
-import { LogiReportState } from '@organization-management/store/logi-report.state';
-import {GlobalConstants} from '@shell/global-constants';
+
+
   
 enum THEME {
   light = 'light',
@@ -162,8 +160,6 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
   @Select(AppState.isDekstopScreen)
   public isDekstop$: Observable<boolean>;
 
-  @Select(LogiReportState.logiReportData)
-  public logiReportData$: Observable<ConfigurationDto[]>;
 
   faTimes = faTimes as IconDefinition;
   faBan = faBan as IconDefinition;
@@ -186,7 +182,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     private filterService: FilterService,
     private readonly ngZone: NgZone,
   ) {
-    this.SetReportData();
+    
     this.filterService.canPreserveFilters() && store.dispatch(new InitPreservedFilters());
     router.events.pipe(filter((event) => event instanceof NavigationEnd), debounceTime(50)).subscribe((data: any) => {
       if (this.tree) {
@@ -199,16 +195,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
     });
-    this.logiReportData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: ConfigurationDto[]) => {
-      if (data?.length > 0) {
-          let url=data.find(i=>i.key=="ReportServer:BaseUrl")?.value;
-          let userId=data.find(i=>i.key=="ReportServer:UId")?.value;
-          let pass=data.find(i=>i.key=="ReportServer:Pwd")?.value;
-          GlobalConstants.reportBaseUrl=url==null?"":url;  
-          GlobalConstants.reportUId=userId==null?"":userId;
-          GlobalConstants.reportPwd=pass==null?"":pass;
-      }
-    });
+    
   }
 
   ngOnInit(): void {
@@ -325,9 +312,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
   }
-  private SetReportData() {   
-      this.store.dispatch(new GetLogiReportData());
-  }
+  
  
   @OutsideZone
   private getAlertsPoollingTime(): void {
