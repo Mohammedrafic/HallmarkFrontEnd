@@ -57,10 +57,10 @@ export class InvoiceSummaryComponent implements OnInit,OnDestroy {
     "InvoiceStartDateISD"  :  "",
     "invoiceEndDateISD"    :  ""
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/InvoiceSummaryReport/InvoiceSummaryReport.wls" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/InvoiceSummaryReport/InvoiceSummaryReport.cls" };
   public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/InvoiceSummaryReport/InvoiceSummaryReport.cat" };
   public title: string = "Invoice Summary Report";
-  public reportType: LogiReportTypes = LogiReportTypes.WebReport;
+  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public message: string = "";
   public allOption: string = "All";
 
