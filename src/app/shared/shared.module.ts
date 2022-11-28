@@ -147,6 +147,7 @@ import { SendEmailSideDialogComponent } from './components/send-email-side-dialo
 import { DocumentPreviewSideDialogComponent } from './components/document-preview-side-dialog/document-preview-side-dialog.component';
 import { CustomSideDialogComponent } from './components/custom-side-dialog/custom-side-dialog.component';
 import { OrderManagementState } from '@agency/store/order-management.state';
+import { HideByCandidateStatusPipe } from './pipes/hide-by-candidate-status.pipe';
 
 const icons = {
   AlertCircle,
@@ -311,6 +312,7 @@ const COMPONENTS = [
     SendEmailSideDialogComponent,
     DocumentPreviewSideDialogComponent,
     CustomSideDialogComponent,
+    HideByCandidateStatusPipe,
 
   ],
   providers: [

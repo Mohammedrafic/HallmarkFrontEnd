@@ -53,6 +53,12 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public agencyActionsAllowed = true;
   public deployedCandidateOrderIds: string[] = [];
   public isOrderOverlapped = false;
+  public hideWithStatus = [
+    ApplicantStatus.Rejected,
+    ApplicantStatus.Cancelled,
+    ApplicantStatus.NotApplied,
+    ApplicantStatus.Withdraw,
+  ];
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
