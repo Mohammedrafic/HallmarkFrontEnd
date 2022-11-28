@@ -55,8 +55,8 @@ export class VmsInvoiceReportComponent implements OnInit, OnDestroy {
     "BusinessUnitIdParamVMSIR": "",
     "HostName": ""
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReport/VMSInvoiceReport.cls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReport/VMSInvoice.cat" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReport/VMSInvoiceReport.wls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/VMSInvoiceReport/VMSInvoiceReport.cat" };
   public title: string = "VMS Invoice Report";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
