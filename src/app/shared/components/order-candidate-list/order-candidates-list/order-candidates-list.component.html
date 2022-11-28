@@ -51,7 +51,7 @@
             {{ data.lastName }}, {{ data.firstName }}
             <ng-container *ngIf="data.deployedCandidateInfo && data.statusName !== 'Onboard'">
               <ejs-tooltip content="Deployed Candidate" position="TopRight">
-                <i-feather name="briefcase" class="icon" ></i-feather>
+                <i-feather name="briefcase" class="icon"></i-feather>
               </ejs-tooltip>
             </ng-container>
           </div>
@@ -79,7 +79,9 @@
       </ng-template>
       <e-column field="availStartDate" textAlign="Left" headerText="AVAILABLE START DATE" width="200">
         <ng-template #template let-data>
-          <div class="align-right">{{ data.availStartDate | date: 'MM/dd/yyy':'UTC' }}</div>
+          <div *ngIf="data.status | hideByCandidateStatus: hideWithStatus" class="align-right">
+            {{ data.availStartDate | date: 'MM/dd/yyy':'UTC' }}
+          </div>
         </ng-template>
       </e-column>
       <e-column field="hourlyBillRate" textAlign="Right" headerText="Bill Rate &dollar;" width="120">
@@ -132,9 +134,7 @@
                 (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
-              <div class="total-rows">
-                Total Rows: {{candidatesList?.totalCount}}
-              </div>
+              <div class="total-rows">Total Rows: {{ candidatesList?.totalCount }}</div>
             </section>
             <section class="right-side-pager-controls">
               <ejs-pager
@@ -196,7 +196,7 @@
       [billRatesData]="$any((selectedAgOrder$ | async)?.billRates)"
       [candidate]="candidate"
       [isAgency]="isAgency"
-      [order]="$any((selectedAgOrder$ | async))"
+      [order]="$any(selectedAgOrder$ | async)"
       [isLocked]="(selectedAgOrder$ | async)?.isLocked"
       [actionsAllowed]="agencyActionsAllowed && userPermission[userPermissions.CanAgencyMatchOrders]"
       [deployedCandidateOrderInfo]="(deployedCandidateOrderInfo$ | async) ?? []"
