@@ -33,9 +33,9 @@
         </div>
       </div>
     </div>
-    <ejs-accordion class="historical-events" (expanding)="isJobDescriptionExpended = false" (expanded)="onExpanded($event)">
+    <ejs-accordion class="historical-events" (expanded)="onExpanded($event)">
       <e-accordionitems>
-        <e-accordionitem [expanded]="!isJobDescriptionExpended">
+        <e-accordionitem>
           <ng-template #header>
             <div>Historical Events</div>
           </ng-template>
