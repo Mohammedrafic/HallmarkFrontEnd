@@ -40,7 +40,7 @@ export class AgencyDto {
   }
   export class CommonCandidateSearchFilter{
     searchText:string;
-    businssUnitIds:number[]|null;
+    businessUnitIds:number[]|null;
   }
   export class SearchCandidate{
     id:number;
