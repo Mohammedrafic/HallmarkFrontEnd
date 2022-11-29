@@ -66,7 +66,7 @@
     </e-column>
     <e-column textAlign="Left" field="lastAssignmentEndDate" headerText="Current Assignment End Date">
       <ng-template #template let-data>
-        {{data.lastAssignmentEndDate | date: 'MM/dd/yyy'}}
+        {{data.lastAssignmentEndDate | date: 'MM/dd/yyy': 'UTC'}}
       </ng-template>
     </e-column>
     <e-column field="candidateStatus" headerText="Candidate status" textAlign="Left" width="150">
