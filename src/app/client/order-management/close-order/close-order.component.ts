@@ -140,9 +140,6 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     this.isPosition = isPosition;
     if (this.order?.orderType === OrderType.ReOrder) {
       this.closeForm.patchValue({ closingDate: new Date(this.order.jobStartDate as Date) });
-      this.closeForm.get('closingDate')?.disable();
-    } else {
-      this.closeForm.get('closingDate')?.enable();
     }
     this.getComments();
   }
