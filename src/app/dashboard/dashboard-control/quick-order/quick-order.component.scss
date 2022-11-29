@@ -1,4 +1,6 @@
 @import "colors";
+@import "adaptive-response";
+
 .e-dlg-header-content {
   padding: 24px !important;
 
@@ -32,5 +34,23 @@
         }
       }
     }
+  }
+}
+
+.e-dlg-content {
+  padding: 5px 24px !important;
+}
+
+.mobile-submit {
+  width: 100%;
+}
+
+@media #{$max-mobile} {
+  .e-dlg-content {
+    padding-bottom: 24px !important;
+  }
+
+  .e-dlg-header {
+    width: 80% !important;
   }
 }
