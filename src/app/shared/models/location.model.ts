@@ -20,6 +20,7 @@ export class Location {
   ext?: string;
   glNumber?: string;
   inactiveDate?: string;
+  reactivateDate?: string;
   timeZone? : string;
   locationTypeId? :number;
   organizationId :number;

@@ -1,5 +1,6 @@
 import { Department } from '@shared/models/department.model';
 import { FormGroup } from '@angular/forms';
+import { DateTimeHelper } from '@core/helpers';
 
 export class DepartmentsAdapter {
   public static prepareToSave(editedDepartmentId: number | undefined, selectedLocationId: number | undefined, formGroup: FormGroup): Department {
@@ -8,6 +9,7 @@ export class DepartmentsAdapter {
       invoiceDepartmentId,
       departmentName,
       inactiveDate,
+      reactivateDate,
       facilityPhoneNo,
       facilityEmail,
       facilityContact,
@@ -21,7 +23,8 @@ export class DepartmentsAdapter {
       extDepartmentId,
       invoiceDepartmentId,
       departmentName,
-      inactiveDate,
+      inactiveDate: inactiveDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(inactiveDate)) : null,
+      reactivateDate: reactivateDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(reactivateDate)) : null,
       facilityPhoneNo,
       facilityEmail,
       facilityContact,

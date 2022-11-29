@@ -20,6 +20,7 @@ export class DepartmentService {
       facilityEmail: ['', [Validators.email]],
       facilityPhoneNo: ['', [Validators.minLength(1), Validators.maxLength(10), Validators.pattern(/^\d+$/i)]],
       inactiveDate: [null],
+      reactivateDate: [null],
       ...(isIRPFlagEnabled && {
         includeInIRP: [false],
         unitDescription: ['', [Validators.maxLength(2000)]],
@@ -63,6 +64,7 @@ export class DepartmentService {
       facilityEmail: department.facilityEmail,
       facilityPhoneNo: department.facilityPhoneNo,
       inactiveDate: department.inactiveDate,
+      reactivateDate: department.reactivateDate,
       ...(isIRPFlagEnabled && {
         includeInIRP: !!department.includeInIRP,
         unitDescription: department.unitDescription,
