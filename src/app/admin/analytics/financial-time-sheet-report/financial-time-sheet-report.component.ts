@@ -100,7 +100,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'id' };
+  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   selectedDepartments: Department[];
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
@@ -264,7 +264,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
-              this.filterColumns.jobStatuses.dataSource = data.orderStatuses;
+              this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
               this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
               this.defaultOrderTypes = OrderTypeOptions.map((list) => list.id);
@@ -464,7 +464,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         valueType: ValueType.Text,
         dataSource: [],
         valueField: 'statusText',
-        valueId: 'id',
+        valueId: 'status',
       },
       jobId: {
         type: ControlTypes.Text,

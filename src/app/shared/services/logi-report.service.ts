@@ -53,6 +53,7 @@ public getCommonReportFilterOptions(filter:any): Observable<CommonReportFilterOp
     const sortedFields: Record<keyof CommonReportFilterOptions, string> = { 
       candidateStatuses: 'statusText',
       orderStatuses: 'statusText',
+      jobStatuses:'statusText',
       masterSkills: 'name',
       skillCategories: 'name',
       agencies: 'agencyName',
