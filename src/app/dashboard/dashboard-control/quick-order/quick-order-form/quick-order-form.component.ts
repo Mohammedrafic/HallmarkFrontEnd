@@ -97,6 +97,7 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   @Input() public organizationStructure: OrganizationStructure;
   @Input() public openEvent: Subject<boolean>;
   @Input() public submitQuickOrder$: Subject<boolean>;
+  @Input() public isMobile: boolean;
 
   @ViewChild('multiselect') public readonly multiselect: MultiSelectComponent;
 
@@ -185,8 +186,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
     private readonly orderManagementService: OrderManagementContentService,
     private readonly actions$: Actions,
     private readonly durationService: DurationService,
-    private settingsViewService: SettingsViewService,
-    private quickOrderService: QuickOrderService
+    private readonly settingsViewService: SettingsViewService,
+    private readonly quickOrderService: QuickOrderService
   ) {
     super();
     this.initOrderForms();
