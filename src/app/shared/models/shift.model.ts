@@ -18,7 +18,7 @@ export class Shift {
     this.regionId = shift.regionId;
     this.departmentId = shift.departmentId;
     this.name = shift.name;
-    this.onCall = shift.onCall;
+    this.onCall = shift.onCall || false;
 
     const startTime = new Date(shift.startTime);
     const endTime = new Date(shift.endTime);
