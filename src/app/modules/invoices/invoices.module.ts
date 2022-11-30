@@ -80,8 +80,8 @@ import { InvoiceAgencyResolver } from './resolvers/invoice-agency.resolver';
 import { GridOrderIdCellComponent } from './components/grid-order-id-cell/grid-order-id-cell.component';
 import { InvoicesPermissionHelper } from './helpers/invoices-permission.helper';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
-import { InvoicePaymentDetailsComponent } from './components/invoice-payment-details/invoice-payment-details.component';
-import { InvoicePaymentsTableComponent } from './components/invoice-payments-table/invoice-payments-table.component';
+import { InvoiceAddPaymentModule } from './components/invoice-add-payment/invoice-add-payment.module';
+import { InvoicePaymentDetailsModule } from './components/invoice-payment-details/invoice-payment-details.module';
 
 @NgModule({
   declarations: [
@@ -97,8 +97,7 @@ import { InvoicePaymentsTableComponent } from './components/invoice-payments-tab
     InvoicesTableTabsComponent,
     AllInvoicesActionCellComponent,
     GridOrderIdCellComponent,
-    InvoicePaymentDetailsComponent,
-    InvoicePaymentsTableComponent,
+
   ],
   imports: [
     CommonModule,
@@ -140,6 +139,8 @@ import { InvoicePaymentsTableComponent } from './components/invoice-payments-tab
     TableStatusCellModule,
     NumericalConverterModule,
     TooltipContainerModule,
+    InvoiceAddPaymentModule,
+    InvoicePaymentDetailsModule,
   ],
   providers: [
     InvoicesService,

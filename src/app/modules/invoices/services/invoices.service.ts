@@ -76,7 +76,7 @@ export class InvoicesService {
     return this.confirmService.confirm(getMessage(invoiceId), {
       title,
       okButtonLabel: submitButtonText,
-      okButtonClass: 'delete-button'
+      okButtonClass: 'delete-button',
     })
       .pipe(
         take(1),

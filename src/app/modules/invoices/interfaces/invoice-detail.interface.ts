@@ -6,6 +6,7 @@ export interface InvoiceDetail {
   totals: {
     total: number;
     amount: number;
+    amountToPay: number;
     feeTotal: number;
     calculatedTotal: number;
   };
@@ -91,4 +92,10 @@ export interface InvoiceUpdateEmmit {
 export interface InvoiceDetailsSettings {
   isActionBtnDisabled: boolean;
   paymentDetailsOpen: boolean;
+  addPaymentOpen: boolean;
+}
+
+export interface InvoicePaymentData {
+  invoiceNumber: string;
+  amount: number;
 }

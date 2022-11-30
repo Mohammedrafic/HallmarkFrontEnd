@@ -1,6 +1,8 @@
 import { InvoiceType } from '../enums/invoice-type.enum';
 import { PageOfCollections } from '@shared/models/page.model';
-
+/**
+ * Rename this type as it used for different invoices state
+ */
 export type PendingApprovalInvoicesData = PageOfCollections<PendingApprovalInvoice>;
 
 export interface PendingApprovalInvoice {
@@ -17,6 +19,7 @@ export interface PendingApprovalInvoice {
   invoiceStateText: string;
   issuedDate: string;
   organizationId: number;
+  amountToPay: number;
 }
 
 export interface PendingApprovalInvoiceRecord {

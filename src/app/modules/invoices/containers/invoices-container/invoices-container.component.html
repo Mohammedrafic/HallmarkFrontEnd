@@ -41,24 +41,33 @@
       <i-feather name="printer" class="icon"></i-feather>
     </button>
 
+    <button
+      ejs-button
+      *ngIf="(!isAgency && (selectedTabIdx === 3 || selectedTabIdx === 5)|| (isAgency && selectedTabIdx !== 0))"
+      [disabled]="!invoiceContainerConfig.invoicePayAllowed || !selectedInvoiceIds || !selectedInvoiceIds.length"
+      cssClass="e-primary relative"
+      (click)="openAddPayment()"
+    >Pay</button>
+
     <div class="invoices-actions-container">
-      <button
+      <button 
         ejs-button
         appHideBeforeSyncfusionLoad
         class="e-primary relative"
-        [disabled]="!agencyActionsAllowed || !createManualEnabled"
+        [disabled]="!invoiceContainerConfig.agencyActionsAllowed || !createManualEnabled"
         (click)="openAddDialog()"
         *ngIf="tabConfig?.manualInvoiceCreationEnabled"
       >
         Add Manual Invoice
-        <ejs-tooltip *ngIf="!createManualEnabled" class="tooltip" content="Separate permission right is required" position="BottomCenter">
+        <ejs-tooltip *ngIf="!createManualEnabled" class="tooltip" content="Separate permission right is required"
+        position="BottomCenter">
         </ejs-tooltip>
       </button>
 
 
 <!--      TODO: Move to component-->
       <div class="group-invoices-overlay"
-           [class.hidden]="!groupInvoicesOverlayVisible"
+           [class.hidden]="!invoiceContainerConfig.groupInvoicesOverlayVisible"
            appClickOutside (clickOutside)="hideGroupingOverlay()">
         <ejs-listbox [dataSource]="groupInvoicesOptions" [itemTemplate]="itemTemplate" (change)="onInvoiceGrouping($event)"></ejs-listbox>
 
@@ -166,7 +175,7 @@
 <app-invoice-detail-container
   [currentSelectedRowIndex]="currentSelectedTableRowIndex | async"
   [maxRowIndex]="0"
-  [actionAllowed]="invoicePayAllowed"
+  [actionAllowed]="invoiceContainerConfig.invoicePayAllowed"
   [approveAllowed]="approveInvoiceEnabled"
   [payAllowed]="payInvoiceEnabled"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
@@ -185,3 +194,9 @@
 <app-reject-reason-input-dialog (rejectReasonChange)="handleInvoiceRejection($event)"></app-reject-reason-input-dialog>
 
 <app-file-viewer></app-file-viewer>
+
+<app-invoice-add-payment
+  *ngIf="invoiceContainerConfig.addPaymentOpen"
+  [invoicesToPay]="paymentRecords"
+  (destroyDialog)="closeAddPayment()">
+</app-invoice-add-payment>

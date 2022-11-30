@@ -1,4 +1,4 @@
-import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
+import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Injectable } from '@angular/core';
 
 import { ColDef } from '@ag-grid-community/core';
@@ -93,11 +93,11 @@ export class TimesheetRecordsService {
   public watchFormChanges(controls: Record<string, FormGroup>): Observable<unknown> {
     return merge(
       ...Object.keys(controls).map((key) => controls[key].valueChanges)
-    )
+    );
   }
 
   public checkIfFormTouched(controls: Record<string, FormGroup>): boolean {
-    return Object.keys(controls).some((key) => controls[key].touched)
+    return Object.keys(controls).some((key) => controls[key].touched);
   }
 
   public getCurrentTabName(idx: number): RecordFields {
@@ -148,8 +148,8 @@ export class TimesheetRecordsService {
             isEditable: true,
             options: [],
             storeField: 'billRateTypes',
-          }
-        }
+          },
+        };
         def.field = 'billRateConfigId';
         def = {
           ...def,

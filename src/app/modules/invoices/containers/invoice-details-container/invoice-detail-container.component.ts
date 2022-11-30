@@ -26,7 +26,7 @@ import { ActionBtnOnStatus, AgencyActionBtnOnStatus,
   NewStatusDependsOnAction } from '../../constants/invoice-detail.constant';
 import { InvoicesActionBtn, InvoiceState, INVOICES_STATUSES } from '../../enums';
 import { ExportOption, InvoiceDetail, InvoiceDetailsSettings,
-  InvoiceDialogActionPayload, InvoiceUpdateEmmit, PrintingPostDto } from '../../interfaces';
+  InvoiceDialogActionPayload, InvoicePaymentData, InvoiceUpdateEmmit, PrintingPostDto } from '../../interfaces';
 import { InvoicePrintingService } from '../../services';
 import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
 import { Invoices } from '../../store/actions/invoices.actions';
@@ -73,7 +73,10 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   public readonly invoiceDetailsConfig: InvoiceDetailsSettings = {
     isActionBtnDisabled: false,
     paymentDetailsOpen: false,
-  }
+    addPaymentOpen: false,
+  };
+
+  public readonly paymentRecords: InvoicePaymentData[] = [];
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -155,6 +158,21 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     this.cdr.markForCheck();
   }
 
+  public openAddPayment(): void {
+    this.paymentRecords.push({
+      invoiceNumber: this.invoiceDetail.meta.formattedInvoiceNumber,
+      amount: this.invoiceDetail.totals.amountToPay,
+    });
+    this.invoiceDetailsConfig.addPaymentOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  public closeAddPayment(): void {
+    this.paymentRecords.length = 0;
+    this.invoiceDetailsConfig.addPaymentOpen = false;
+    this.cdr.markForCheck();
+  }
+
   private getDialogState(): void {
     this.isInvoiceDetailDialogOpen$
       .pipe(
@@ -166,7 +184,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
         if (payload.dialogState) {
           this.sideDialog.show();
           this.invoiceDetail = payload.invoiceDetail as InvoiceDetail;
-          console.log(this.invoiceDetail)
+
           if (payload.invoiceDetail) {
             this.setActionBtnText();
             this.invoiceDetailsConfig.isActionBtnDisabled = this.checkActionBtnDisabled();

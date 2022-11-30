@@ -16,7 +16,22 @@
           </button>
         </div>
       </div>
-      <app-invoice-payments-table [invoiceData]="invoiceData"></app-invoice-payments-table>  
+      
+      <div class="table-header">
+        <div>
+          <span class="header-block">Invoice Number: {{ invoiceData.invoiceNumber || '' }}</span>
+          <span class="header-block">
+            Invoice Amount: {{ invoiceData.amount || '' | currency: 'USD' }}
+          </span>
+        </div>
+        <div>
+          <button (click)="addNewPayment()" class="add-btn">
+            + Add Payment
+          </button>
+        </div>
+      </div>
+      <!-- Table here-->
+      
     </div>
   </ng-template>
 </ejs-dialog>

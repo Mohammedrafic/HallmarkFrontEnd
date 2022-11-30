@@ -24,7 +24,7 @@ import {
   TabConfig,
   TimesheetAttachments,
   TimesheetDetailsModel,
-  TimesheetRecordsDto
+  TimesheetRecordsDto,
 } from '../../interface';
 import { TimesheetDetailsTableService, TimesheetRecordsService } from '../../services';
 import { TimesheetsState } from '../../store/state/timesheets.state';
@@ -51,9 +51,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Input() isAgency: boolean;
 
-  @Input() actionsDisabled: boolean = false;
+  @Input() actionsDisabled = false;
 
-  @Input() disableAnyAction: boolean = false;
+  @Input() disableAnyAction = false;
 
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
@@ -119,13 +119,13 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public readonly getRowStyle = (params: any) => {
     if (params.data.stateText === RecordStatus.New) {
-      return { 'background-color': '#F2FAF2'}
+      return { 'background-color': '#F2FAF2'};
     }
     if (params.data.stateText === RecordStatus.Deleted) {
-      return { 'background-color': '#FFDFDF'}
+      return { 'background-color': '#FFDFDF'};
     }
-    return { 'background-color': 'inherit'}
-  }
+    return { 'background-color': 'inherit'};
+  };
 
   private records: TimesheetRecordsDto;
 
@@ -256,7 +256,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         takeUntil(this.componentDestroy()),
       ).subscribe(() => {
         this.saveRecords();
-      })
+      });
     } else {
       this.saveRecords();
     }
@@ -382,7 +382,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     )
     .subscribe(() => {
       this.cancelChanges();
-    })
+    });
   }
 
   private watchFormChanges(): void {
@@ -395,7 +395,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         this.isChangesSaved = false;
         this.changesSaved.emit(false);
       }
-    })
+    });
   }
 
   private initBtnsState(): void {

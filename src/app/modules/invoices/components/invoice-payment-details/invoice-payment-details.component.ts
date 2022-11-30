@@ -1,7 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { Module } from '@ag-grid-community/core';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 
 import { DestroyDialog } from '@core/helpers';
 import { InvoiceDetail, InvoicePaymentGetParams, PaymentMeta } from '../../interfaces';
@@ -16,8 +18,14 @@ import { InvoicesModel } from '../../store/invoices.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnInit {
+  @Output() addPayment: EventEmitter<void> = new EventEmitter();
+
   @Select(InvoicesState.invoiceDetails)
   private readonly invoiceDetail$: Observable<InvoiceDetail>;
+
+  context: { componentParent: InvoicePaymentDetailsComponent };
+
+  readonly modules: Module[] = [ClientSideRowModelModule];
 
   private isAgency = false;
 
@@ -39,6 +47,10 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
   ngOnInit(): void {
     this.watchForCloseStream();
     this.watchForInvoiceDetails();
+  }
+
+  addNewPayment(): void {
+    this.addPayment.emit();
   }
 
   private watchForInvoiceDetails(): void {

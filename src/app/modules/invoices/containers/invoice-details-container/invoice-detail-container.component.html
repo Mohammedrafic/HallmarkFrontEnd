@@ -124,5 +124,12 @@
 
 <app-invoice-payment-details
   *ngIf="invoiceDetailsConfig.paymentDetailsOpen"
-  (destroyDialog)="closePaymentDetails()">
+  (destroyDialog)="closePaymentDetails()"
+  (addPayment)="openAddPayment()">
 </app-invoice-payment-details>
+
+<app-invoice-add-payment
+  *ngIf="invoiceDetailsConfig.addPaymentOpen"
+  [invoicesToPay]="paymentRecords"
+  (destroyDialog)="closeAddPayment()">
+</app-invoice-add-payment>
