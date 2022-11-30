@@ -14,6 +14,7 @@ export class Department {
   unitDescription: string;
   includeInIRP?: boolean;
   locationIncludeInIRP?: boolean;
+  isDeactivated?: boolean;
 }
 
 export type DepartmentsPage = PageOfCollections<Department>;

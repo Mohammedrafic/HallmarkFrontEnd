@@ -26,6 +26,7 @@ export class Location {
   organizationId :number;
   includeInIRP: boolean;
   includeInIRPText?: 'Yes' | 'No';
+  isDeactivated?: boolean;
 }
 
 export type LocationsPage = PageOfCollections<Location>;
