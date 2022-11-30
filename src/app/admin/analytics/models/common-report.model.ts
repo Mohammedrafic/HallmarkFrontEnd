@@ -1,7 +1,9 @@
 import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
+import { OrderStatus } from "@shared/enums/order-management";
 
 export class CommonReportFilterOptions {    
       orderStatuses: OrderStatusDto[];
+      jobStatuses: JobStatusDto[];
       candidateStatuses: {
         status: ApplicantStatus;
         statusText: string;
@@ -9,6 +11,10 @@ export class CommonReportFilterOptions {
       masterSkills: MasterSkillDto[];
       skillCategories: SkillCategoryDto[];
       agencies: AgencyDto[];
+  }
+  export class JobStatusDto{
+    status: OrderStatus;
+    statusText: string;
   }
   export class OrderStatusDto{
     id:number;
