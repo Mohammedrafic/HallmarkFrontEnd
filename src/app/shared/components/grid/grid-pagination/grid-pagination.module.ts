@@ -3,6 +3,7 @@ import { PagerModule } from '@syncfusion/ej2-angular-grids';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 import { DropdownModule } from '@shared/components/form-controls/dropdown/dropdown.module';
 import { GridPaginationComponent } from './grid-pagination.component';
 import { NumericTextboxModule } from '@shared/components/form-controls/numeric-textbox/numeric-textbox.module';
@@ -17,6 +18,14 @@ const gridIcons = {
 @NgModule({
   declarations: [GridPaginationComponent],
   exports: [GridPaginationComponent],
-  imports: [CommonModule, NumericTextboxModule, PagerModule, DropdownModule, FeatherModule.pick(gridIcons), ButtonModule]
+  imports: [
+    CommonModule,
+    NumericTextboxModule,
+    PagerModule,
+    DropdownModule,
+    FeatherModule.pick(gridIcons),
+    ButtonModule,
+    TooltipContainerModule,
+  ]
 })
 export class GridPaginationModule {}

@@ -1,13 +1,15 @@
-<button
-        ejs-button
-        cssClass="e-outline"
-        class="upload-button"
-        [disabled]="disabled"
-        #uploadBtn
-        (click)="uploadTooltip.open(container)"
->Upload
+<app-tooltip-container [showToolTip]="!hasPermission">
+  <button
+    ejs-button
+    cssClass="e-outline"
+    class="upload-button"
+    [disabled]="disabled || !hasPermission"
+    #uploadBtn
+    (click)="uploadTooltip.open(container)"
+  >Upload
     <i-feather name="upload" class="icon"></i-feather>
-</button>
+  </button>
+</app-tooltip-container>
 
 <ejs-tooltip #uploadTooltip
              [container]="container"
