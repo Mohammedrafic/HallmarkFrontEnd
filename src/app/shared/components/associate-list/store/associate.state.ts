@@ -68,7 +68,7 @@ export class AssociateListState {
   }
 
   @Selector()
-  static getTiersList(state: AssociateStateModel): TierList | null {
+  static getTiersList(state: AssociateStateModel): TierList[] | null {
     return state.tierList;
   }
 
@@ -297,9 +297,9 @@ export class AssociateListState {
   GetTiers(
     { patchState, dispatch }: StateContext<AssociateStateModel>,
     { payload }: TiersException.GetTiers
-  ): Observable<TierList | void> {
+  ): Observable<TierList[] | void> {
     return this.associateService.getTiers(payload).pipe(
-      tap((tierList: TierList) => {
+      tap((tierList: TierList[]) => {
         patchState({tierList});
       }),
       catchError((error: HttpErrorResponse) => {

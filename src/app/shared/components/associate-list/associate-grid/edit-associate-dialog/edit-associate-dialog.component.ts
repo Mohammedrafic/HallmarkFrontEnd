@@ -133,7 +133,7 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
         if(this.tierControl.valid) {
           this.store.dispatch( new TiersException.SaveTier({
             associateOrganizationId: this.editAgencyOrg.id!,
-            organizationTierId: this.tierControl.value
+            organizationTierId: this.tierControl.value ?? null
           }));
         }
         break;
@@ -161,7 +161,6 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
     switch (switchTabVal) {
       case Tabs.JobDistribution:
         this.confirmSwitchBetweenTab(this.partnershipForm, tab);
-
         break;
       case Tabs.FeeSettings:
         this.confirmSwitchBetweenTab(this.feeSettingsForm, tab);
