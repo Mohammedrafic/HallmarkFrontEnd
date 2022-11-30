@@ -59,7 +59,7 @@
       </div>
     </div>
     <div class="column" *ngIf="!(isOrganizationOrAgencyArea$ | async)?.isOrganizationArea"></div>
-    <div class="column last-column">
+    <div class="column">
       <div class="accent link" (click)="moveToPerDiem()">
         Order Per Diem ID: {{ orderInformation?.organizationPrefix }}-{{ orderInformation?.reOrderFrom?.publicId }}
       </div>
