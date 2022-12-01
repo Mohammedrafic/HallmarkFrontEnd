@@ -65,7 +65,7 @@
       </e-column>
       <e-column field="startDate" headerText="date" textAlign="Right" width="100">
         <ng-template #template let-data>
-          <div class="align-right">{{ data.startDate | date: 'MM/dd/yyyy' }}</div>
+          <div class="align-right">{{ data.startDate | date: 'MM/dd/yyyy' : 'UTC' }}</div>
         </ng-template>
       </e-column>
       <e-column field="shift" textAlign="Right" headerText="SHIFT" width="150">
