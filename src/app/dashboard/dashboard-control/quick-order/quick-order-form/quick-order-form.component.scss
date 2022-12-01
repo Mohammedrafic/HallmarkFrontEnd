@@ -1,10 +1,14 @@
 @import "colors";
+@import "adaptive-response";
 
 .quick-order-form-container {
+  padding: 5px 24px;
+  height: 100%;
 
   .row {
     display: flex;
     width: 100%;
+    align-items: flex-end;
 
     &:not(:last-child) {
       margin-bottom: 15px;
@@ -17,7 +21,6 @@
 
     .order-type-status-form {
       display: flex;
-      width: 60%;
 
       .order-type-container {
         flex: 1;
@@ -27,6 +30,13 @@
         width: 32.39%;
         padding-left: 10px;
       }
+    }
+
+    .contact-details-title-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex: 1;
     }
   }
 
@@ -48,6 +58,11 @@
       font-weight: 700;
       color: $black;
     }
+  }
+
+  .mobile-submit-btn {
+    width: 100%;
+    margin-top: 24px;
   }
 }
 
@@ -89,6 +104,10 @@
   width: 40%;
 }
 
+.form-line-item-60 {
+  width: 60%;
+}
+
 .form-line-item-70 {
   width: 70%;
 }
@@ -99,4 +118,100 @@
 
 .contact-details-title-container {
   flex: 1;
+  margin-right: 10px;
+}
+
+// mobile resolution styles
+
+.e-accordion {
+  background-color: $background !important;
+  margin-top: 12px;
+
+  .e-acrdn-header {
+    .header-title {
+      display: flex;
+      align-items: center;
+
+      span:first-child {
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .e-acrdn-item {
+    background-color: $white !important;
+    border-radius: 8px;
+
+    &.form-invalid {
+      border: 1px solid $supportive-red !important;
+    }
+  }
+
+  .e-acrdn-panel {
+    background-color: $background;
+
+    .e-acrdn-content {
+      margin-top: 8px;
+      border-radius: 12px;
+      padding: 16px;
+      background-color: $white;
+    }
+  }
+}
+
+.e-badge.e-badge-success.e-badge-pill {
+  background-color: $secondary-dark-blue-20 !important;
+}
+
+.e-accordion .e-acrdn-item .e-acrdn-header:hover .e-badge.e-badge-success.e-badge-pill,
+.e-accordion .e-acrdn-item.e-select.e-active > .e-acrdn-header .e-badge.e-badge-success.e-badge-pill {
+  background-color: $primary-active-blue-15 !important;
+}
+
+@media #{$max-mobile} {
+  .row {
+    flex-direction: column;
+    margin: 0 !important;
+
+    > *:not(:first-child) {
+      padding: 12px 0 0 !important;
+    }
+
+    .order-status {
+      width: 50% !important;
+    }
+
+    .contact-details-title-wrapper {
+      width: 100%;
+    }
+  }
+
+  .job-description-form {
+    flex-direction: column;
+
+    .job-description {
+      padding: 10px 0 0;
+    }
+  }
+
+  .form-line-item-20,
+  .form-line-item-30,
+  .form-line-item-35,
+  .form-line-item-40,
+  .form-line-item-60,
+  .form-line-item-70 {
+    width: 100%;
+  }
+
+  .special-project,
+  .contact-details,
+  .job-description,
+  .job-distibution,
+  .general-information {
+    margin: 0 !important;
+
+    .title {
+      margin-bottom: 0 !important;
+    }
+  }
 }

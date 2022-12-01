@@ -2,9 +2,11 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  EventEmitter,
   Input,
   OnChanges,
   OnInit,
+  Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -100,6 +102,8 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
   @Input() public isMobile: boolean;
 
   @ViewChild('multiselect') public readonly multiselect: MultiSelectComponent;
+
+  @Output() public submit: EventEmitter<void> = new EventEmitter();
 
   public organizationForm: FormGroup;
   public orderTypeForm: FormGroup;
@@ -712,13 +716,13 @@ export class QuickOrderFormComponent extends DestroyableDirective implements OnI
         this.openEvent.next(false);
       });
     } else {
-      this.cdr.markForCheck();
       this.organizationForm.markAllAsTouched();
       this.orderTypeForm.markAllAsTouched();
       this.generalInformationForm.markAllAsTouched();
       this.jobDistributionDescriptionForm.markAllAsTouched();
       this.contactDetailsForm.markAllAsTouched();
       this.specialProjectForm.markAllAsTouched();
+      this.cdr.markForCheck();
     }
   }
 
