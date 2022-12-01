@@ -50,6 +50,7 @@ export enum INVOICES_ACTIONS {
   SetTabIndex = '[invoices] set tab index',
   CheckManualInvoicesExist = '[invoices] check manual invoices existing',
   GetPaymentDetails = '[invoices] get payment details',
+  SavePayment = '[invoices] save payment',
 }
 
 export enum InvoicesTableFiltersColumns {
@@ -68,4 +69,13 @@ export enum InvoicesTableFiltersColumns {
 
 export enum PermissionCodes {
   AgencyCanPay = 3201,
+}
+
+export enum PaymentMode {
+  Electronic,
+  Check,
+}
+
+export enum AddPaymentDialogMode {
+  
 }

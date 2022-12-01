@@ -5,10 +5,10 @@ import { ColDef, ValueFormatterParams } from '@ag-grid-community/core';
 import { FieldType } from '@core/enums';
 import { DropdownOption } from '@core/interface';
 import { PaymentFormConfig } from './invoice-add-payment.interface';
-import { PaymentMode } from './invoice-add-payment.enum';
 import { InputEditorComponent } from './cell-renderers/input-editor/input-editor.component';
 import { PaymentDeleteRendererComponent } from './cell-renderers/payment-delete-renderer/payment-delete-renderer.component';
 import { BalanceRendererComponent } from './cell-renderers/balance-renderer/balance-renderer.component';
+import { PaymentMode } from '../../enums';
 
 export const PaymentOptions: DropdownOption[] = [
   {

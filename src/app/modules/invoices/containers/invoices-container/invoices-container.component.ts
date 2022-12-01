@@ -414,7 +414,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         organizationIds: [this.organizationId] as number[],
       } : {
         organizationId: this.organizationId as number,
-      })
+      }),
     };
 
     this.store.dispatch(new Invoices.GetPrintData(dto, this.isAgency))
@@ -478,8 +478,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     .map((node) => {
       const data = node.data as PendingApprovalInvoice;
       return ({
+        invoiceId: data.invoiceId,
         invoiceNumber: data.formattedInvoiceId,
         amount: data.amountToPay,
+        agencySuffix: data.agencySuffix,
       });
     });
   }

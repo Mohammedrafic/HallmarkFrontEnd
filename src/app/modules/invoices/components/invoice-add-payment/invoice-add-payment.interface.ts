@@ -1,7 +1,7 @@
 import { FormGroup } from '@angular/forms';
 import { FieldType } from '@core/enums';
 import { DropdownOption } from '@core/interface';
-import { PaymentMode } from './invoice-add-payment.enum';
+import { PaymentMode } from '../../enums';
 
 export interface PaymentFormConfig {
   title: string;
@@ -12,9 +12,10 @@ export interface PaymentFormConfig {
 }
 
 export interface CheckForm {
-  date: string;
+  id?: number;
+  date: Date;
   checkNumber: string;
-  checkDate: string;
+  checkDate: Date;
   initialAmount: number;
   paymentMode: PaymentMode;
   isRefund: boolean;

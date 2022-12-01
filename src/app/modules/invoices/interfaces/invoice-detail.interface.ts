@@ -96,6 +96,10 @@ export interface InvoiceDetailsSettings {
 }
 
 export interface InvoicePaymentData {
+  invoiceId: number;
   invoiceNumber: string;
   amount: number;
+  agencySuffix?: number;
+  checkId?: number;
+  id?: number;
 }

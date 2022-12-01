@@ -1,13 +1,6 @@
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core';
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input,
+  OnInit, Output, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 
 import { ColDef, GridOptions } from '@ag-grid-community/core';
@@ -77,6 +70,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   };
 
   public readonly paymentRecords: InvoicePaymentData[] = [];
+
+  public editCheckNumber: string | null;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -160,9 +155,18 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
 
   public openAddPayment(): void {
     this.paymentRecords.push({
+      invoiceId: this.invoiceDetail.meta.invoiceId,
       invoiceNumber: this.invoiceDetail.meta.formattedInvoiceNumber,
       amount: this.invoiceDetail.totals.amountToPay,
+      agencySuffix: this.invoiceDetail.meta.agencySuffix,
     });
+    
+    this.invoiceDetailsConfig.addPaymentOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  public openEditPayment(id: string): void {
+    this.editCheckNumber = id;
     this.invoiceDetailsConfig.addPaymentOpen = true;
     this.cdr.markForCheck();
   }
@@ -170,6 +174,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   public closeAddPayment(): void {
     this.paymentRecords.length = 0;
     this.invoiceDetailsConfig.addPaymentOpen = false;
+    this.editCheckNumber = null;
     this.cdr.markForCheck();
   }
 

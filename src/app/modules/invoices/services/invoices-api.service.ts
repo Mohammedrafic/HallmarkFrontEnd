@@ -10,7 +10,7 @@ import { GetPendingApprovalParams, GroupInvoicesParams, InvoicesFilteringOptions
   InvoicesFilterState, InvoiceStateDto, ManualInvoiceMeta,
   ManualInvoicePostDto, ManualInvoiceReason, ManualInvoicesData,
   ManualInvoiceTimesheetResponse, InvoiceDetail, PrintingPostDto,
-  PrintInvoiceData, ManualInvoicePutDto, InvoicePayment, InvoicePaymentGetParams } from '../interfaces';
+  PrintInvoiceData, ManualInvoicePutDto, InvoicePayment, InvoicePaymentGetParams, PaymentCreationDto } from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ExportPayload } from '@shared/models/export.model';
 
@@ -81,7 +81,7 @@ export class InvoicesApiService {
    */
   public getOrgStructure(orgId: number, isAgency: boolean): Observable<OrganizationStructure> {
     const endpoint = isAgency ? `/api/Organizations/structure/partnered/${orgId}`
-    : '/api/Organizations/structure'
+    : '/api/Organizations/structure';
     return this.http.get<OrganizationStructure>(endpoint);
   }
 
@@ -94,7 +94,7 @@ export class InvoicesApiService {
     files.forEach((file) => formData.append('files', file.blob, file.fileName));
 
     const endPoint = orgId ? `/api/Timesheets/${timesheetId}/organization/${orgId}/files`
-    : `/api/Timesheets/${timesheetId}/files`
+    : `/api/Timesheets/${timesheetId}/files`;
     return this.http.post<number[]>(endPoint, formData);
   }
 
@@ -155,6 +155,14 @@ export class InvoicesApiService {
     return this.http.get<InvoicePayment[]>('/api/Invoices/payments', {
       params: GetQueryParams<InvoicePaymentGetParams>(params),
     });
+  }
+
+  public savePayment(paymentDto: PaymentCreationDto): Observable<void> {
+    return this.http.post<void>('/api/Invoices/payments', paymentDto);
+  }
+
+  public getCheckData(checkId: string): Observable<PaymentCreationDto> {
+    return this.http.get<PaymentCreationDto>(`/api/Invoices/payments/check/${checkId}`);
   }
 
   private organizationDeleteManualInvoice(id: number): Observable<void> {

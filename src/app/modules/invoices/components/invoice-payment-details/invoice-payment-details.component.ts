@@ -1,15 +1,16 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, switchMap, takeUntil, tap } from 'rxjs';
-import { Module } from '@ag-grid-community/core';
+import { GridApi, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 
 import { DestroyDialog } from '@core/helpers';
-import { InvoiceDetail, InvoicePaymentGetParams, PaymentMeta } from '../../interfaces';
+import { InvoiceDetail, InvoicePayment, InvoicePaymentGetParams, PaymentMeta } from '../../interfaces';
 import { InvoicesState } from '../../store/state/invoices.state';
-import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
+import { InvoicesApiService } from '../../services';
+import { PaymentTableDefs } from './invoice-payment-details.constant';
 
 @Component({
   selector: 'app-invoice-payment-details',
@@ -20,28 +21,41 @@ import { InvoicesModel } from '../../store/invoices.model';
 export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnInit {
   @Output() addPayment: EventEmitter<void> = new EventEmitter();
 
+  @Output() editPaymentCheck: EventEmitter<string> = new EventEmitter();
+
   @Select(InvoicesState.invoiceDetails)
   private readonly invoiceDetail$: Observable<InvoiceDetail>;
 
   context: { componentParent: InvoicePaymentDetailsComponent };
 
+  tableData: InvoicePayment[] = [];
+
+  readonly paymentTableDefs = PaymentTableDefs;
+
   readonly modules: Module[] = [ClientSideRowModelModule];
+
+  readonly invoiceData: PaymentMeta = {
+    invoiceNumber: null,
+    amount: null,
+  };
 
   private isAgency = false;
 
   private currentOrgId: number;
 
-  public readonly invoiceData: PaymentMeta = {
-    invoiceNumber: null,
-    amount: null,
-  };
+  private gridApi: GridApi;
 
   constructor(
     private store: Store,
+    private apiService: InvoicesApiService,
+    private cd: ChangeDetectorRef,
   ) {
     super();
     this.isAgency = (this.store.snapshot().invoices as InvoicesModel).isAgencyArea;
     this.currentOrgId = (this.store.snapshot().invoices as InvoicesModel).selectedOrganizationId;
+    this.context = {
+      componentParent: this,
+    };
   }
 
   ngOnInit(): void {
@@ -51,6 +65,19 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
 
   addNewPayment(): void {
     this.addPayment.emit();
+  }
+
+  editPayment(id: string): void {
+    this.editPaymentCheck.emit(id);
+  }
+
+  setGridApi(params: GridReadyEvent): void {
+    this.gridApi = params.api;
+    this.gridApi.showLoadingOverlay();
+    this.gridApi.setDomLayout('autoHeight');
+
+    this.gridApi.setRowData(this.tableData);
+    this.cd.detectChanges();
   }
 
   private watchForInvoiceDetails(): void {
@@ -67,10 +94,13 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
           ...this.isAgency ? { AgencySuffix: details.meta.agencySuffix } : {},
         };
 
-        return this.store.dispatch(new Invoices.GetPaymentDetails(dto));
+        return this.apiService.getInvoicesPayments(dto);
       }),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe();
+    .subscribe((response) => {
+      this.gridApi.setRowData(response);
+      this.cd.markForCheck();
+    });
   }
 }

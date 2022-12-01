@@ -30,8 +30,17 @@
           </button>
         </div>
       </div>
-      <!-- Table here-->
-      
+      <div class="grid-table-container">
+        <ag-grid-angular #grid
+          [columnDefs]="paymentTableDefs"
+          [rowData]="tableData"
+          [rowHeight]="64"
+          [pagination]="false"
+          [context]="context"
+          (gridReady)="setGridApi($event)"
+          class="ag-theme-alpine app-grid__component">
+        </ag-grid-angular>
+      </div>
     </div>
   </ng-template>
 </ejs-dialog>

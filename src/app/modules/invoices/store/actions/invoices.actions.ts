@@ -12,10 +12,12 @@ import {
   InvoicesFilterState,
   ManualInvoice,
   ManualInvoicePostDto,ManualInvoicePutDto,
-  PrintingPostDto
+  PaymentCreationDto,
+  PrintingPostDto,
 } from '../../interfaces';
 import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums';
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Invoices {
   export class GetManualInvoices {
     static readonly type = INVOICES_ACTIONS.GET_MANUAL_INVOICES;
@@ -323,9 +325,9 @@ export namespace Invoices {
     ) {}
   }
 
-  export class GetPaymentDetails {
-    static readonly type = INVOICES_ACTIONS.GetPaymentDetails;
+  export class SavePayment {
+    static readonly type = INVOICES_ACTIONS.SavePayment;
 
-    constructor(public readonly payload: InvoicePaymentGetParams) {}
+    constructor(public readonly payload: PaymentCreationDto) {}
   }
 }

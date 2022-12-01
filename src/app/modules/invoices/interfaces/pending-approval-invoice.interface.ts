@@ -20,6 +20,7 @@ export interface PendingApprovalInvoice {
   issuedDate: string;
   organizationId: number;
   amountToPay: number;
+  agencySuffix?: number;
 }
 
 export interface PendingApprovalInvoiceRecord {

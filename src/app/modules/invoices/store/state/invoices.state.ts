@@ -171,7 +171,7 @@ export class InvoicesState {
         })
       ),
       catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
     );
   }
@@ -187,7 +187,7 @@ export class InvoicesState {
           downloadBlobFile(file, `empty.${payload.exportFileType === ExportedFileType.csv ? 'csv' : 'xlsx'}`);
         }),
         catchError((err: HttpErrorResponse) => {
-          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
         }),
       );
   }
@@ -251,7 +251,7 @@ export class InvoicesState {
         }));
       }),
       catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
     );
   }
@@ -295,9 +295,9 @@ export class InvoicesState {
           );
         }),
         catchError((err: HttpErrorResponse) => {
-          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
         }),
-      )
+      );
   }
 
   @Action(Invoices.GetManInvoiceMeta)
@@ -313,7 +313,7 @@ export class InvoicesState {
           });
         }),
         catchError((err: HttpErrorResponse) => {
-          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
         }),
       );
   }
@@ -341,7 +341,7 @@ export class InvoicesState {
 
       }),
       catchError((err: HttpErrorResponse) => {
-        return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
     );
   }
@@ -397,7 +397,7 @@ export class InvoicesState {
           ]);
         }),
         catchError((err: HttpErrorResponse) => {
-          return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+          return ctx.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
         }),
       );
   }
@@ -414,9 +414,9 @@ export class InvoicesState {
         });
       }),
       catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
-    )
+    );
   }
 
   @Action(Invoices.GetOrganizationStructure)
@@ -433,9 +433,9 @@ export class InvoicesState {
         });
       }),
       catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
-    )
+    );
   }
 
   @Action(Invoices.SelectOrganization)
@@ -466,7 +466,7 @@ export class InvoicesState {
         manualInvoicesData: data,
       })),
       catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
     );
   }
@@ -502,7 +502,7 @@ export class InvoicesState {
         pendingInvoicesData: data,
       })),
       catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
     );
   }
@@ -524,7 +524,7 @@ export class InvoicesState {
         pendingApprovalInvoicesData: data,
       })),
       catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
     );
   }
@@ -538,7 +538,7 @@ export class InvoicesState {
       .pipe(
         switchMap(() => this.invoicesService.approveInvoice(invoiceId)),
         catchError((err: HttpErrorResponse) => {
-          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+          return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
         }),
       );
   }
@@ -568,9 +568,9 @@ export class InvoicesState {
     return this.invoicesService.rejectInvoice(invoiceId, rejectionReason)
     .pipe(
       catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
-    )
+    );
   }
 
   @Action(Invoices.PreviewAttachment)
@@ -697,9 +697,9 @@ export class InvoicesState {
         });
       }),
       catchError((err: HttpErrorResponse) => {
-        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
-    )
+    );
   }
 
   @Action(Invoices.SetIsAgencyArea)
@@ -734,21 +734,19 @@ export class InvoicesState {
   ): void {
     patchState({
       selectedTabIdx: index,
-    })
+    });
   }
 
-  @Action(Invoices.GetPaymentDetails)
-  GetPaymentDetails(
-    { patchState }: StateContext<InvoicesModel>,
-    { payload }: Invoices.GetPaymentDetails,
-  ): Observable<InvoicePayment[]> {
-    return this.invoicesAPIService.getInvoicesPayments(payload)
+  @Action(Invoices.SavePayment)
+  SavePayment(
+    { dispatch }: StateContext<InvoicesModel>,
+    { payload }: Invoices.SavePayment,
+  ): Observable<void> {
+    return this.invoicesAPIService.savePayment(payload)
     .pipe(
-      tap((response) => {
-        patchState({
-          paymentDetails: response,
-        });
+      catchError((err: HttpErrorResponse) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
-    )
+    );
   }
 }
