@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <div class="column"></div>
+    <div class="column empty-column"></div>
 
     <div class="column">
       <div class="icon">
@@ -68,7 +68,7 @@
       <div class="sup-title">Critical Order</div>
     </div>
     <div class="column">
-      <div class="title">{{(orderInformation.orderOpenDate | date: 'MM/dd/yyy') || '-'}}</div>
+      <div class="title">{{(orderInformation.orderOpenDate | date: 'MM/dd/yyy' : 'UTC') || '-'}}</div>
       <div class="sup-title">Distributed On</div>
     </div>
   </div>

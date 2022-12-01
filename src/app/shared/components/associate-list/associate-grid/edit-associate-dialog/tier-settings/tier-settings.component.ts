@@ -5,7 +5,7 @@ import { Select } from '@ngxs/store';
 import { filter, Observable, takeUntil } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
-import { OPTION_FIELDS } from '@shared/components/associate-list/constant';
+import { NotAssignedListOption, OPTION_FIELDS } from '@shared/components/associate-list/constant';
 import { AssociateListState } from '@shared/components/associate-list/store/associate.state';
 import { TierList } from '@shared/components/associate-list/interfaces';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -23,20 +23,35 @@ export class TierSettingsComponent extends DestroyableDirective implements OnIni
   @Input() public set editAgencyOrg(org: AssociateOrganizationsAgency) {
     if(org?.tierId) {
       this.tierControl.patchValue(org?.tierId);
-    }else {
+    } else {
       this.tierControl.reset();
+      this.tierControl.patchValue(NotAssignedListOption.id);
     }
   }
 
   public optionFields: FieldSettingsModel = OPTION_FIELDS;
   public tierControl: FormControl = new FormControl();
+  public tiersList: TierList[];
 
   @Select(AssociateListState.getTiersList)
-  public tierList$: Observable<TierList>;
+  public tierList$: Observable<TierList[]>;
 
   ngOnInit(): void {
     this.initTierData();
     this.watchForTier();
+    this.watchForTierList();
+  }
+
+  private watchForTierList(): void {
+    this.tierList$.pipe(
+      filter(Boolean),
+      takeUntil(this.destroy$)
+    ).subscribe((tiers: TierList[]) => {
+      this.tiersList = [
+        NotAssignedListOption,
+        ...tiers
+      ] as TierList[];
+    });
   }
 
   private initTierData(): void {

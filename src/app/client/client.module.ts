@@ -193,7 +193,7 @@ const gridIcons = {
     ChipsCssClass,
     MaskedDateTimeService,
     SettingsViewService,
-    DistributionTierService
+    DistributionTierService,
   ],
 })
 export class ClientModule {}

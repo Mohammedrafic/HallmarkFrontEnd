@@ -1,4 +1,3 @@
-import { CandidateStateModel } from '@agency/store/candidate.state';
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { ImportResult } from '@shared/models/import.model';
@@ -127,6 +126,7 @@ import {
   LocationType,
   TimeZoneModel
 } from '@shared/models/location.model';
+import { CandidateStateModel } from "@shared/models/candidate.model";
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
 import {
@@ -593,10 +593,15 @@ export class OrganizationManagementState {
   @Action(GetDepartmentsByLocationId)
   GetDepartmentsByLocationId(
     { patchState }: StateContext<OrganizationManagementStateModel>,
-    { locationId, filters }: GetDepartmentsByLocationId
+    { locationId, filters, activeOnly, preservedId }: GetDepartmentsByLocationId
   ): Observable<Department[] | DepartmentsPage> {
     return this.departmentService.getDepartmentsByLocationId(locationId, filters).pipe(
       tap((payload) => {
+        if (activeOnly) {
+          payload = (payload as []).filter((department: Department) => {
+            return !department.isDeactivated || department.departmentId === preservedId;
+          });
+        }
         patchState({ departments: payload });
         return payload;
       })
@@ -730,10 +735,15 @@ export class OrganizationManagementState {
   @Action(GetLocationsByRegionId)
   GetLocationsByRegionId(
     { patchState }: StateContext<OrganizationManagementStateModel>,
-    { regionId, filters }: GetLocationsByRegionId
+    { regionId, filters, activeOnly, preservedId }: GetLocationsByRegionId
   ): Observable<Location[] | LocationsPage> {
     return this.locationService.getLocationsByRegionId(regionId, filters).pipe(
       tap((payload) => {
+        if (activeOnly) {
+          payload = (payload as []).filter((location: Location) => {
+            return !location.isDeactivated || location.id === preservedId;
+          });
+        }
         patchState({ locations: payload });
         return payload;
       })

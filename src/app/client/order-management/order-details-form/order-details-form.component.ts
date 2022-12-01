@@ -161,8 +161,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public poNumbers: Array<{ id: number | null; poNumber: string }>;
 
   private selectedRegion: Region;
-  private selectedLocation: Location;
-  private selectedDepartment: Department;
+  public selectedLocation: Location;
+  public selectedDepartment: Department;
   private touchedFields: Set<string> = new Set();
   private alreadyShownDialog: boolean = false;
   private unsubscribe$: Subject<void> = new Subject();
@@ -576,7 +576,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion.id) {
       this.markTouchedField(fieldName);
-      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
+      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id, undefined, true));
       this.resetLocation();
       this.resetDepartment();
     }
@@ -588,7 +588,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.selectedLocation = event.itemData as Location;
     if (this.selectedLocation?.id) {
       this.markTouchedField(fieldName);
-      this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.id));
+      this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.id, undefined, true));
       this.resetDepartment();
     }
   }
@@ -908,7 +908,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
     if (order.regionId) {
       this.store
-        .dispatch(new GetLocationsByRegionId(order.regionId))
+        .dispatch(new GetLocationsByRegionId(order.regionId, undefined, true, order.locationId))
         .pipe(take(1))
         .subscribe(() => {
           this.generalInformationForm.controls['locationId'].patchValue(order.locationId);
@@ -917,7 +917,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
     if (order.locationId) {
       this.store
-        .dispatch(new GetDepartmentsByLocationId(order.locationId))
+        .dispatch(new GetDepartmentsByLocationId(order.locationId, undefined, true, order.departmentId))
         .pipe(take(1))
         .subscribe(() => {
           this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);

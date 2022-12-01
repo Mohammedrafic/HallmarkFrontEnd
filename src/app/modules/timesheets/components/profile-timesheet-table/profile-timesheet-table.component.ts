@@ -55,6 +55,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Input() disableAnyAction: boolean = false;
 
+  @Input() hasEditTimesheetRecordsPermission: boolean;
+
+  @Input() hasApproveRejectMileagesPermission: boolean;
+
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
   @Output() readonly uploadSideDialog: EventEmitter<TimesheetAttachments> = new EventEmitter<TimesheetAttachments>();
@@ -114,6 +118,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   public isRejectBtnEnabled = false;
 
   public actionButtonDisabled = false;
+
+  public hasPermissions: boolean;
 
   public submitText: string;
 
@@ -406,6 +412,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.isApproveBtnEnabled = !!currentTabMapping.get(this.currentTab);
     this.isRejectBtnEnabled = !this.isAgency && !!currentTabMapping.get(this.currentTab);
     this.isOrgSubmitBtnEnabled = this.orgCanSubmitTimesheet();
+    this.hasPermissions = this.currentTab === this.tableTypes.Miles
+      ? this.hasApproveRejectMileagesPermission : this.hasEditTimesheetRecordsPermission;
   }
 
   private setActionBtnState(): void {

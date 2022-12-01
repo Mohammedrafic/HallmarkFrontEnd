@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { OutsideZone } from "@core/decorators";
 
@@ -10,7 +10,7 @@ import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FileInfo, SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil } from 'rxjs';
 
-import { Permission } from '@core/interface';
+import { CustomFormGroup, Permission } from '@core/interface';
 import { FileSize, UserPermissions } from '@core/enums';
 import { DateTimeHelper } from "@core/helpers";
 import {
@@ -19,6 +19,8 @@ import {
   GetCandidatesCredentialByPage,
   GetCredentialFiles,
   GetCredentialFilesSucceeded,
+  GetCredentialStatuses,
+  GetCredentialStatusesSucceeded,
   GetCredentialTypes,
   GetGroupedCredentialsFiles,
   GetMasterCredentials,
@@ -43,7 +45,12 @@ import { optionFields } from "@shared/constants";
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { MessageTypes } from "@shared/enums/message-types";
 import { CredentialStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
-import { CandidateCredential, CandidateCredentialResponse, CredentialFile, } from '@shared/models/candidate-credential.model';
+import {
+  CandidateCredential,
+  CandidateCredentialGridItem,
+  CandidateCredentialResponse,
+  CredentialFile,
+} from '@shared/models/candidate-credential.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -51,15 +58,12 @@ import { downloadBlobFile } from '@shared/utils/file.utils';
 import { SetHeaderState, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import {
-  agencySideCredentialStatuses,
-  orgSideCredentialStatuses,
-  orgSideCompletedCredentialStatuses,
-  orgSidePendingCredentialStatuses,
-  orgSideReviewedCredentialStatuses,
   AllowedCredentialFileExtensions,
   CredentialSelectionSettingsModel,
   StatusFieldSettingsModel,
+  DisableEditMessage,
 } from './credentials-grid.constants';
+import { AddCredentialForm, SearchCredentialForm } from "./credentials-grid.interface";
 
 @Component({
   selector: 'app-credentials-grid',
@@ -83,16 +87,18 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public readonly selectionOptions = CredentialSelectionSettingsModel;
   public readonly maxFileSize = FileSize.MB_20;
   public readonly orderCredentialId = 0;
+  public readonly disableEditMessage = DisableEditMessage;
   public readonly statusFieldSettingsModel = StatusFieldSettingsModel;
   public readonly typeFieldSettingsModel = optionFields;
   public dropElement: HTMLElement;
-  public addCredentialForm: FormGroup;
-  public searchCredentialForm: FormGroup;
+  public addCredentialForm: CustomFormGroup<AddCredentialForm>;
+  public searchCredentialForm: CustomFormGroup<SearchCredentialForm>;
   public disabledCopy = false;
   public candidateCredentialResponse: CandidateCredentialResponse;
+  public gridItems: CandidateCredentialGridItem[] = [];
   public openFileViewerDialog = new EventEmitter<number>();
   public today = new Date();
-
+  public disableAddCredentialButton: boolean;
   public showCertifiedFields: boolean;
   public credentialStatusOptions: FieldSettingsModel[] = [];
 
@@ -143,6 +149,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return `${this.isAllRowsSelected ? 'All' : this.selectedItems.length } ${ this.selectedItems.length === 1 ? 'Row' : 'Rows' } Selected`;
   }
 
+  private get isNavigatedFromCandidateProfile(): boolean {
+    return !this.orderId;
+  }
+
   private get statusControl(): AbstractControl | null {
     return this.addCredentialForm.get('status');
   }
@@ -167,7 +177,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     private store: Store,
     private route: ActivatedRoute,
     private actions$: Actions,
-    private fb: FormBuilder,
     private credentialGridService: CredentialGridService,
     private confirmService: ConfirmService,
     private readonly ngZone: NgZone,
@@ -180,10 +189,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   ngOnInit(): void {
     this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize, this.orderId, this.candidateProfileId));
     this.store.dispatch(new GetCredentialTypes());
+    this.addCredentialForm = this.credentialGridService.createAddCredentialForm();
+    this.searchCredentialForm = this.credentialGridService.createSearchCredentialForm();
     this.watchForPageChanges();
     this.watchForCandidateActions();
-    this.createAddCredentialForm();
-    this.createSearchCredentialForm();
+    this.watchForCredentialStatuses();
     this.watchForSearchUpdate();
     this.watchForCandidateCredential();
     this.watchForDownloadCredentialFiles();
@@ -202,13 +212,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       ?.click();
   }
 
-  public addNew(): void {
-    this.setCredentialStatusOptions(
-      this.isOrganization || this.isNavigatedFromOrganizationArea
-        ? orgSideCredentialStatuses
-        : agencySideCredentialStatuses
-    );
-
+  public openAddCredentialDialog(): void {
+    this.store.dispatch(new GetCredentialStatuses(this.isOrganizationSide ?? true, this.orderId || null));
     this.store.dispatch(new GetMasterCredentials('', ''));
     this.store.dispatch(new ShowSideDialog(true)).pipe(
       takeUntil(this.unsubscribe$)
@@ -314,11 +319,16 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     }: CandidateCredential
   ) {
     event.stopPropagation();
-    this.updateCredentialStatusOptions(status as CredentialStatus);
     this.showCertifiedFields = !!expireDateApplicable;
     this.credentialId = id as number;
     this.masterCredentialId = masterCredentialId;
     this.hasFiles = !!credentialFiles?.length;
+    this.store.dispatch(new GetCredentialStatuses(
+      this.isOrganizationSide ?? true,
+      this.orderId || null,
+      status as CredentialStatus,
+      id as number
+    ));
     this.store.dispatch(new ShowSideDialog(true)).pipe(
       takeUntil(this.unsubscribe$)
     ).subscribe(() => {
@@ -420,26 +430,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       });
   }
 
-  private createAddCredentialForm(): void {
-    this.addCredentialForm = this.fb.group({
-      status: new FormControl(null, [Validators.required]),
-      insitute: new FormControl(null, [Validators.maxLength(100)]),
-      createdOn: new FormControl(null),
-      number: new FormControl(null, [Validators.maxLength(100)]),
-      experience: new FormControl(null, [Validators.maxLength(20)]),
-      createdUntil: new FormControl(null),
-      completedDate: new FormControl(null),
-      rejectReason: new FormControl(null),
-    });
-  }
-
-  private createSearchCredentialForm(): void {
-    this.searchCredentialForm = this.fb.group({
-      searchTerm: new FormControl(''),
-      credentialTypeId: new FormControl(''),
-    });
-  }
-
   private saveCredential({
     status,
     number,
@@ -523,42 +513,13 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       takeUntil(this.unsubscribe$)
     ).subscribe((response: CandidateCredentialResponse) => {
       this.candidateCredentialResponse = response;
+      this.setDisableAddCredentialButton();
+      this.setGridItems(response);
     });
   }
 
   private setDefaultStatusValue(): void {
     this.statusControl?.setValue(CredentialStatus.Pending);
-  }
-
-  private setCredentialStatusOptions(statuses: CredentialStatus[], currentStatus?: CredentialStatus): void {
-    const credentialStatuses = !currentStatus || statuses.includes(currentStatus) ? statuses : [currentStatus, ...statuses];
-
-    this.credentialStatusOptions = credentialStatuses.map((item: CredentialStatus) => {
-      return {
-        text: CredentialStatus[item],
-        id: item,
-      };
-    });
-  }
-
-  private updateCredentialStatusOptions(status: CredentialStatus): void {
-    if (this.isOrganizationSide) {
-      switch (status) {
-        case CredentialStatus.Completed:
-          this.setCredentialStatusOptions(orgSideCompletedCredentialStatuses, status);
-          break;
-        case CredentialStatus.Pending:
-          this.setCredentialStatusOptions(orgSidePendingCredentialStatuses, status);
-          break;
-        case CredentialStatus.Reviewed:
-          this.setCredentialStatusOptions(orgSideReviewedCredentialStatuses, status);
-          break;
-        default:
-          this.setCredentialStatusOptions(orgSideCredentialStatuses, status);
-      }
-    } else {
-      this.setCredentialStatusOptions(agencySideCredentialStatuses, status);
-    }
   }
 
   private watchForDownloadCredentialFiles(): void {
@@ -629,5 +590,52 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         this.file = null;
       }
     });
+  }
+
+  private watchForCredentialStatuses(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(GetCredentialStatusesSucceeded),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((payload: { statuses: CredentialStatus[] }) => {
+      this.credentialStatusOptions = this.credentialGridService.getCredentialStatusOptions(payload.statuses);
+    });
+  }
+
+  private setDisableAddCredentialButton(): void {
+    this.disableAddCredentialButton = !this.areAgencyActionsAllowed
+      || !this.userPermission[this.userPermissions.CanEditCandidateCredentials]
+      || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile)
+  }
+
+  private setGridItems(response: CandidateCredentialResponse): void {
+    this.gridItems = response?.credentials.items.map((item: CandidateCredential) => {
+      return {
+        ...item,
+        credentialFile: item.credentialFiles?.length ? item.credentialFiles[0] : null,
+        disableCopy: this.disableCopy(item),
+        disableEdit: this.disableEdit(item),
+        showDisableEditTooltip: (item.status === this.statusEnum.Reviewed || item.status === this.statusEnum.Verified)
+          && !this.isOrganizationSide,
+        disableDelete: this.disableDelete(item),
+      }
+    });
+  }
+
+  private disableCopy(item: CandidateCredential): boolean {
+    return !this.areAgencyActionsAllowed || this.disabledCopy || item.id === this.orderCredentialId
+      || !this.userPermission[this.userPermissions.CanEditCandidateCredentials]
+      || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile);
+  }
+
+  private disableEdit(item: CandidateCredential): boolean {
+    return !this.areAgencyActionsAllowed || item.id === this.orderCredentialId
+      || ((item.status === this.statusEnum.Reviewed || item.status === this.statusEnum.Verified) && !this.isOrganizationSide)
+      || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile);
+  }
+
+  private disableDelete(item: CandidateCredential): boolean {
+    return !this.areAgencyActionsAllowed || item.id === this.orderCredentialId
+      || !this.userPermission[this.userPermissions.CanEditCandidateCredentials]
+      || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile);
   }
 }

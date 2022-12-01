@@ -43,6 +43,8 @@ import {
   PROCEED_FOR_TIER_LOGIC
 } from '@shared/constants';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
+import { DateTimeHelper } from '@core/helpers';
+import { formatDate } from '@angular/common';
 
 enum SelectedTab {
   OrderDetails,
@@ -355,8 +357,62 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       })
       .pipe(filter((confirm) => !!confirm))
       .subscribe((res) => {
+        this.checkInactiveLocationDepartmentOverlap(order, documents);
+      });
+  }
+
+  private showConfirmLocationDepartmentOverlap(order: CreateOrderDto, documents: Blob[], message: string): void {
+    this.confirmService
+      .confirm(message, {
+        title: 'Confirmation',
+        okButtonLabel: 'Yes',
+        cancelButtonLabel: 'Cancel',
+        okButtonClass: 'delete-button',
+      })
+      .pipe(filter((confirm) => !!confirm))
+      .subscribe((res) => {
         this.proceedWithSaving(order, documents);
       });
+  }
+
+  private generateOverlapMessage(isLocationOverlaps: boolean, isDepartmentOverlaps: boolean, isLocationDepartmentDateSame: boolean, locationInactiveDate: Date, departmentInactiveDate: Date): string {
+    let message = '';
+    if (isLocationOverlaps) {
+      if (isDepartmentOverlaps) {
+        if (isLocationDepartmentDateSame) {
+          message = `Location and Department will be inactivated at ${formatDate(locationInactiveDate, 'MM/dd/yyyy', 'en-US')}. Are you sure you want to proceed?`;
+        } else {
+          message = `Location will be inactivated at ${formatDate(locationInactiveDate, 'MM/dd/yyyy', 'en-US')} and Department will be inactivated at ${formatDate(departmentInactiveDate, 'MM/dd/yyyy', 'en-US')}. Are you sure you want to proceed?`;
+        }
+      } else {
+        message = `Location will be inactivated at ${formatDate(locationInactiveDate, 'MM/dd/yyyy', 'en-US')}. Are you sure you want to proceed?`;
+      }
+    } else if (isDepartmentOverlaps) {
+      message = `Department will be inactivated at ${formatDate(departmentInactiveDate, 'MM/dd/yyyy', 'en-US')}. Are you sure you want to proceed?`;
+    }
+    return message;
+  }
+
+  private checkInactiveLocationDepartmentOverlap(order: CreateOrderDto, documents: Blob[]): void {
+    if (this.orderDetailsFormComponent.selectedLocation && this.orderDetailsFormComponent.selectedDepartment) {
+      const jobEndDate = order.jobEndDate;
+      const locationInactiveDate = this.orderDetailsFormComponent.selectedLocation.inactiveDate ? 
+        new Date(DateTimeHelper.formatDateUTC(this.orderDetailsFormComponent.selectedLocation.inactiveDate, 'MM/dd/yyyy')) : null;
+      const departmentInactiveDate = this.orderDetailsFormComponent.selectedDepartment.inactiveDate ?
+        new Date(DateTimeHelper.formatDateUTC(this.orderDetailsFormComponent.selectedDepartment.inactiveDate, 'MM/dd/yyyy')) : null;
+        locationInactiveDate && locationInactiveDate.setHours(0, 0, 0, 0);
+        departmentInactiveDate && departmentInactiveDate.setHours(0, 0, 0, 0);
+      const isLocationOverlaps = !!locationInactiveDate && DateTimeHelper.isDateBefore(locationInactiveDate, jobEndDate);
+      const isDepartmentOverlaps = !!departmentInactiveDate && DateTimeHelper.isDateBefore(departmentInactiveDate, jobEndDate);
+      const isLocationDepartmentDateSame = this.orderDetailsFormComponent.selectedLocation.inactiveDate === this.orderDetailsFormComponent.selectedDepartment.inactiveDate;
+      if (isLocationOverlaps || isDepartmentOverlaps) {
+        this.showConfirmLocationDepartmentOverlap(order, documents, this.generateOverlapMessage(isLocationOverlaps, isDepartmentOverlaps, isLocationDepartmentDateSame, locationInactiveDate as Date, departmentInactiveDate as Date));
+      } else {
+        this.proceedWithSaving(order, documents);
+      }
+    } else {
+      this.proceedWithSaving(order, documents);
+    }
   }
 
   private proceedWithSaving(order: CreateOrderDto, documents: Blob[]): void {
@@ -742,6 +798,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
 
     if (orderValid && billRatesValid && credentialsValid) {
+
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
 
@@ -749,7 +806,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       if (this.needToShowConfirmPopup(order, hourlyRate)) {
         this.showConfirmPopupForZeroRate(order, documents);
       } else {
-        this.proceedWithSaving(order, documents);
+        this.checkInactiveLocationDepartmentOverlap(order, documents);
       }
     } else {
       this.orderDetailsFormComponent.orderTypeForm.markAllAsTouched();

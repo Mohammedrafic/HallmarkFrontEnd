@@ -95,14 +95,18 @@ section {
       grid-row-start: 1;
       grid-row-end: 3;
     }
+
+    .empty-column {
+      display: none
+    }
   }
 }
 
 .candidates-additional-info {
-  margin-top: 16px;
 
   .container-row {
     display: flex;
+    flex-wrap: wrap;
 
     &.justify-content-normal {
       .column {
@@ -113,6 +117,7 @@ section {
     .column {
       display: flex;
       flex-direction: column;
+      margin-top: 16px;
     }
   }
 

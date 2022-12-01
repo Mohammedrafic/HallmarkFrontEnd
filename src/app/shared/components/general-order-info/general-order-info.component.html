@@ -191,7 +191,7 @@
 </ng-template>
 
 <ng-template #orderInfo>
-  <div class="column last-column" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension">
+  <div class="column" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension">
     <div *ngIf="orderInformation?.extensionInitialOrderId" class="accent link" (click)="moveToInitialOrder()">
       Initial Order ID: {{ orderInformation.organizationPrefix }}-{{
       orderInformation?.extensionInitialOrderPublicId

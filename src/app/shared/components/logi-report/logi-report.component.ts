@@ -8,6 +8,8 @@ import { UserState } from '../../../store/user.state';
 import { Store } from '@ngxs/store';
 import { BusinessUnitType } from '../../enums/business-unit-type';
 import { GlobalConstants } from '@shell/global-constants';
+import { GetLogiReportData } from '../../../organization-management/store/logi-report.action';
+import { takeUntil, takeWhile } from 'rxjs';
 declare const com:any;
 // declare global {
 //   /* eslint-disable no-var */
@@ -35,6 +37,7 @@ export class LogiReportComponent implements OnInit {
   private jrdPrefer: any;
   private reportUrl: string; 
   private scriptLoadTimeoutHandle: any;
+  private isAlive = true;
   @Input() paramsData: any | {};
   @Input() reportName: LogiReportFileDetails;
   @Input() catelogName: LogiReportFileDetails;
@@ -62,9 +65,31 @@ export class LogiReportComponent implements OnInit {
   }
   public RenderReport():void
   {
-    this.reportUrl=GlobalConstants.reportBaseUrl==null?"":GlobalConstants.reportBaseUrl+ 'jinfonet/tryView.jsp';
-    this.uId=GlobalConstants.reportUId==null?"":GlobalConstants.reportUId;
-    this.pwd=GlobalConstants.reportPwd==null?"":GlobalConstants.reportPwd;
+    if (GlobalConstants.reportBaseUrl == null || GlobalConstants.reportBaseUrl == undefined || GlobalConstants.reportBaseUrl.trim()=="") {
+      this.store.dispatch(new GetLogiReportData()).pipe(takeWhile(() => this.isAlive)).subscribe((val: any) => {
+        if (val) {
+          let data: ConfigurationDto[];
+          data = val?.LogiReport?.logiReportDto;
+          if (data != null) {
+            let url = data.find(i => i.key == "ReportServer:BaseUrl")?.value;
+            let userId = data.find(i => i.key == "ReportServer:UId")?.value;
+            let pass = data.find(i => i.key == "ReportServer:Pwd")?.value;
+            GlobalConstants.reportBaseUrl = url == null ? "" : url;
+            GlobalConstants.reportUId = userId == null ? "" : userId;
+            GlobalConstants.reportPwd = pass == null ? "" : pass;
+            this.setReportUrl();
+          }
+        }
+      });
+    } else {
+      this.setReportUrl();
+    }
+  }
+
+  private setReportUrl() {
+    this.reportUrl = GlobalConstants.reportBaseUrl == null ? "" : GlobalConstants.reportBaseUrl + 'jinfonet/tryView.jsp';
+    this.uId = GlobalConstants.reportUId == null ? "" : GlobalConstants.reportUId;
+    this.pwd = GlobalConstants.reportPwd == null ? "" : GlobalConstants.reportPwd;
     if (this.reportType == LogiReportTypes.DashBoard) {
       this.showDashBoard(this.reportIframeName);
     }
@@ -168,5 +193,9 @@ export class LogiReportComponent implements OnInit {
             reject();
           }, 10000);
         });
+  }
+
+  ngOnDestroy(): void {
+    this.isAlive = false;
   }
 }

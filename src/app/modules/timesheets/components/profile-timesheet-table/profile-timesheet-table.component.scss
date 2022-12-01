@@ -99,6 +99,10 @@ button.privilege {
   margin-left: 12px;
 }
 
+.action-buttons {
+  display: flex;
+}
+
 ::ng-deep {
   .spinner-btn {
     width: 81px!important;

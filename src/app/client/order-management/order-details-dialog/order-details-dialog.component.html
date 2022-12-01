@@ -87,6 +87,18 @@
                 Delete
               </button>
             </app-tooltip-container>
+            <app-tooltip-container *ngIf="tabletMenu.length" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-dropdownbutton
+                [items]="tabletMenu"
+                [disabled]="!canCreateOrder || !hasCreateEditOrderPermission"
+                (select)="onMobileMenuSelect($event)"
+                cssClass="e-caret-hide e-outline edit-button primary-icon-button menu-tablet"
+              >
+                <i-feather name="more-vertical" class="icon"></i-feather>
+              </button>
+            </app-tooltip-container>
+
             <app-tooltip-container *ngIf="showLockOrder" [showToolTip]="!hasCreateEditOrderPermission">
               <button
                 ejs-button
@@ -125,7 +137,7 @@
             <e-tabitem>
               <ng-template #headerText>{{ isReOrder ? 'Re-Order' : 'Order' }} Details</ng-template>
               <ng-template #content>
-                <app-order-details-container [currentOrder]="order"></app-order-details-container>
+                <app-order-details-container *ngIf="sideDialog.visible" [currentOrder]="order"></app-order-details-container>
               </ng-template>
             </e-tabitem>
             <e-tabitem>

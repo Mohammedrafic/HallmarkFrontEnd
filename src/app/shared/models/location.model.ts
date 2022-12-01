@@ -20,11 +20,13 @@ export class Location {
   ext?: string;
   glNumber?: string;
   inactiveDate?: string;
+  reactivateDate?: string;
   timeZone? : string;
   locationTypeId? :number;
   organizationId :number;
   includeInIRP: boolean;
   includeInIRPText?: 'Yes' | 'No';
+  isDeactivated?: boolean;
 }
 
 export type LocationsPage = PageOfCollections<Location>;

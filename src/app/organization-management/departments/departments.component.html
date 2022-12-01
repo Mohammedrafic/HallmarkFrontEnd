@@ -99,7 +99,16 @@
       <e-column field="facilityContact" headerText="DEPARTMENT CONTACT" width=200></e-column>
       <e-column field="facilityEmail" headerText="DEPARTMENT EMAIL" width=200></e-column>
       <e-column field="facilityPhoneNo" headerText="DEPARTMENT PHONE NO" [valueAccessor]="formatPhoneNumber" width=200></e-column>
-      <e-column field="inactiveDate" headerText="INACTIVE DATE" type="date" format="MM/dd/yyyy" width=200></e-column>
+      <e-column field="inactiveDate" headerText="Inactive Date" width=200>
+        <ng-template #template let-data>
+          {{ data.inactiveDate | date: 'MM/dd/yyy' : 'UTC' }}
+        </ng-template>
+      </e-column>
+      <e-column field="inactiveDate" headerText="Reactivate Date" width=200>
+        <ng-template #template let-data>
+          {{ data.inactiveDate | date: 'MM/dd/yyy' : 'UTC' }}
+        </ng-template>
+      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
@@ -366,9 +375,9 @@
       </div>
     </div>
 
-    <div>
-      <div class="input-container calendar">
-        <label for="inactiveDate">Inactive Date</label>
+    <div class="dates-container">
+      <div class="input-container calendar inactive-date">
+        <label for="inactiveDate">Inactivation Date</label>
         <div class="input-group datepicker">
           <ejs-datepicker
             id="inactiveDate"
@@ -377,7 +386,24 @@
             [placeholder]="placeholderDate"
             [enableMask]="true"
             [maskPlaceholder]="datepickerMask"
+            appValidateWithMessage
             formControlName="inactiveDate"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+      <div class="input-container calendar">
+        <label for="inactiveDate">Reactivate date</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            id="reactivateDate"
+            class="datepicker"
+            [format]="formatDate"
+            [placeholder]="placeholderDate"
+            [enableMask]="true"
+            [maskPlaceholder]="datepickerMask"
+            appValidateWithMessage
+            formControlName="reactivateDate"
           >
           </ejs-datepicker>
         </div>

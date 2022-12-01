@@ -5,6 +5,7 @@ import { Store } from '@ngxs/store';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { MessageTypes } from '@shared/enums/message-types';
+import { AbstractPermission } from "@shared/helpers/permissions";
 
 import { TimesheetDetails } from '../../../store/actions/timesheet-details.actions';
 import { Timesheets } from '../../../store/actions/timesheets.actions';
@@ -18,16 +19,17 @@ import { AgencyStatus } from '@shared/enums/status';
   styleUrls: ['./timesheet-table-approve-cell.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimesheetTableApproveCellComponent implements ICellRendererAngularComp {
+export class TimesheetTableApproveCellComponent extends AbstractPermission implements ICellRendererAngularComp {
   public disableAction = false;
 
   private isAgency = false;
   private params: ICellRendererParams;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private router: Router
   ) {
+    super(store);
     this.isAgency = this.router.url.includes('agency');
   }
 

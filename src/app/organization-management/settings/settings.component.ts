@@ -42,10 +42,11 @@ import { PermissionService } from 'src/app/security/services/permission.service'
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { Days } from '@shared/enums/days';
 import { groupInvoicesOptions } from 'src/app/modules/invoices/constants';
-import { SettingsFilterCols } from './settings.constant';
+import { AssociatedLink, SettingsFilterCols, tierSettingsKey } from './settings.constant';
 import { SettingsDataAdapter } from './helpers/settings-data.adapter';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { DateTimeHelper } from '@core/helpers';
+import { SideMenuService } from '@shared/components/side-menu/services';
+import { ORG_SETTINGS } from '@organization-management/organization-management-menu.config';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -123,6 +124,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   public organizationHierarchy: number;
   public organizationHierarchyId: number;
+  public showToggleMessage: boolean = false;
+  public readonly associateLink: string = AssociatedLink;
 
   public textFieldType: number;
   public textFieldTypeControl = TextFieldTypeControl;
@@ -159,7 +162,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     @Inject(FormBuilder) private builder: FormBuilder,
     private confirmService: ConfirmService,
     private filterService: FilterService,
-    private permissionService: PermissionService
+    private permissionService: PermissionService,
+    private sideMenuService: SideMenuService
   ) {
     super(store);
     this.formBuilder = builder;
@@ -226,6 +230,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   public onOverrideButtonClick(data: any): void {
+    this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
     this.formControlType = data.controlType;
     this.disableDepForInvoiceGeneration();
@@ -241,6 +246,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
   public onEditButtonClick(parentRecord: any, childRecord: any, event: any): void {
+    this.handleShowToggleMessage(parentRecord.settingKey);
     this.store.dispatch(new GetOrganizationStructure());
     this.isFormShown = true;
     this.addActiveCssClass(event);
@@ -271,7 +277,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       if (childRecord.departmentId) {
         this.departmentChanged(childRecord.departmentId);
       }
-      
+
       this.setFormValuesForEdit(parentRecord, childRecord);
     }
     this.store.dispatch(new ShowSideDialog(true));
@@ -410,6 +416,10 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
   }
 
+  public redirectToTiers():void {
+    this.sideMenuService.selectedMenuItem$.next(ORG_SETTINGS[13]);
+  }
+
   public onRowsDropDownChanged(): void {
     this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
   }
@@ -534,7 +544,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   private setFormValuesForEdit(parentData: any, childData: any): void {
     let dynamicValue: any;
-    
+
     if (this.formControlType === OrganizationSettingControlType.Checkbox) {
       dynamicValue = this.isParentEdit ? parentData.value === 'true' : childData.value === 'true';
     }
@@ -676,7 +686,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.regionFormGroup = this.formBuilder.group({ regionId: [null] });
     this.regionRequiredFormGroup = this.formBuilder.group({ regionId: [null, Validators.required] });
     this.locationFormGroup = this.formBuilder.group({ locationId: [null] });
-    this.departmentFormGroup = this.formBuilder.group({ departmentId: [{ value: null }] } );
+    this.departmentFormGroup = this.formBuilder.group({ departmentId: [{ value: null, disabled: true }] } );
     this.pushStartDateFormGroup = this.formBuilder.group({
       daysToConsider: [null, Validators.required],
       daysToPush: [null, Validators.required],
@@ -794,6 +804,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       }
     });
   }
+
+    private handleShowToggleMessage(key: string): void {
+      if(key === tierSettingsKey) {
+        this.showToggleMessage = true;
+      }
+    }
 
   private disableDepForInvoiceGeneration(): void {
     if (this.formControlType === this.organizationSettingControlType.InvoiceAutoGeneration) {

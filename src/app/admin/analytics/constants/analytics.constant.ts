@@ -40,6 +40,20 @@ export const accrualConstants = {
   }
 }
 
+export const invoiceSummaryConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',
+    CandidateName:'candidateName',
+    AgencyIds: 'agencyIds',
+    InvoiceNumber:'invoiceNumber',
+    StartDate: 'startDate',
+    EndDate:'endDate'
+  }
+}
+
 export const accrualReportTypesList : { name: string; id: number }[] = [
   { name: 'Invoice date range', id: 0 },
   { name: 'Timesheet date range', id: 1 }

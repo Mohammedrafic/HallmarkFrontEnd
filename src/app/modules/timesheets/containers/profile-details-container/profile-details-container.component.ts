@@ -1,6 +1,7 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { AbstractPermission } from "@shared/helpers/permissions";
 
 import { filter, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
@@ -40,7 +41,7 @@ import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
-import { FileForUpload } from '@core/interface';
+import { FileForUpload, Permission } from '@core/interface';
 import { AgencyStatus } from '@shared/enums/status';
 import { GRID_CONFIG } from '@shared/constants';
 import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
@@ -51,7 +52,7 @@ import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
   styleUrls: ['./profile-details-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileDetailsContainerComponent extends Destroyable implements OnInit {
+export class ProfileDetailsContainerComponent extends AbstractPermission implements OnInit {
   @ViewChild('candidateDialog')
   public candidateDialog: DialogComponent;
 
@@ -125,13 +126,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public disableAnyAction = false;
 
+  public hasEditTimesheetRecordsPermission: boolean;
+
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
    * */
   private isTimesheetOrMileagesUpdate: boolean = true;
 
   constructor(
-    private store: Store,
+    protected override store: Store,
     private route: ActivatedRoute,
     private confirmService: ConfirmService,
     private datePipe: DatePipe,
@@ -140,7 +143,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
     private cd: ChangeDetectorRef,
   ) {
-    super();
+    super(store);
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
     this.attachmentsListConfig$ = this.timesheetDetails$.pipe(
       map(({id}) => this.timesheetDetailsService.getAttachmentsListConfig(id, this.organizationId, this.isAgency))
@@ -151,7 +154,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     return this.maxRowIndex - 1 === this.currentSelectedRowIndex;
   }
 
-  public ngOnInit(): void {
+  public override ngOnInit(): void {
+    super.ngOnInit();
+    this.watchForPermissions();
     this.getDialogState();
     this.watchForDetails();
     this.startSelectedTimesheetWatching();
@@ -503,5 +508,17 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     const allowResult = agencyStatus === AgencyStatus.Inactive || agencyStatus === AgencyStatus.Terminated;
 
     this.disableAnyAction = allowResult;
+  }
+
+  private watchForPermissions(): void {
+    this.getPermissionStream()
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((permissions: Permission) => {
+        this.hasEditTimesheetRecordsPermission = this.isAgency
+          ? permissions[this.userPermissions.CanAgencyAddEditDeleteTimesheetRecords]
+          : permissions[this.userPermissions.CanOrganizationAddEditDeleteTimesheetRecords];
+      });
   }
 }

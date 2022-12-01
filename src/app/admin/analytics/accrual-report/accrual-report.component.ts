@@ -241,7 +241,8 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
                 this.accrualReportForm.get(accrualConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
 
                 if (this.isInitialLoad) {
-                  this.SearchReport();
+                  //ToDo: To add a spinner & may need to check if in 3seconds, skills and departments also get loaded
+                  setTimeout(()=>{this.SearchReport();},3000)
                   this.isInitialLoad = false;
                 }
 
@@ -350,6 +351,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
       }
     });
     
+
     this.regionIdControl = this.accrualReportForm.get(accrualConstants.formControlNames.RegionIds) as AbstractControl;
     this.regionIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (this.regionIdControl.value.length > 0) {
@@ -445,15 +447,16 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "OrganizationsAS": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "RegionAS":  regionIds.join(","),
-      "LocationAS": locationIds.join(","),
-      "DepartmentAS":departmentIds.join(","),
-      "SkillCategoryAC": skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
-      "SkillAS": skillIds.length==0?"null":skillIds.join(","),
-      "AgencyAS": agencyIds.length==0?"null":agencyIds.join(","),
-      "Candidate" :candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
-      "OrderIdAS": orderId ==null ? "null" : orderId,
+
+      "OrganizationsAS":    this.selectedOrganizations.length == 0? "null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "RegionAS":            regionIds.length == 0 ? "null" :regionIds.join(","),
+      "LocationAS":          locationIds.length == 0 ? "null" :locationIds.join(","),
+      "DepartmentAS":        departmentIds.length == 0 ? "null" :departmentIds.join(","),
+      "SkillCategoryAC":     skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
+      "SkillAS":             skillIds.length==0?"null":skillIds.join(","),
+      "AgencyAS":            agencyIds.length==0?"null":agencyIds.join(","),
+      "Candidate" :          candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
+      "OrderIdAS":           orderId ==null ? "null" : orderId,
       "TimesheetStartDate":  byTimesheetOrInvoiceValue=='0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
       "TimesheetEndDate"  :  byTimesheetOrInvoiceValue=='0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'): formatDate(startDate, '12/31/9999', 'en-US'),
       "InvoiceStartDate"  :  byTimesheetOrInvoiceValue=='1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US'): formatDate(startDate, '01/01/1900', 'en-US'),
@@ -465,15 +468,15 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "OrganizationsAD": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "RegionAD":  regionIds.join(","),
-      "LocationAD": locationIds.join(","),
-      "DepartmentAD":departmentIds.join(","),
-      "SkillCategoryAD": skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
-      "SkillAD": skillIds.length==0?"null":skillIds.join(","),
-      "AgencyAD": agencyIds.length==0?"null":agencyIds.join(","),
-      "CandidateAD" :candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
-      "OrderIdAD": orderId ==null ? "null" : orderId,
+      "OrganizationsAD":    this.selectedOrganizations.length == 0? "null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "RegionAD":           regionIds.length == 0 ? "null" :regionIds.join(","),
+      "LocationAD":         locationIds.length == 0 ? "null" :locationIds.join(","),
+      "DepartmentAD":       departmentIds.length == 0 ? "null" :departmentIds.join(","),
+      "SkillCategoryAD":    skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
+      "SkillAD":            skillIds.length==0?"null":skillIds.join(","),
+      "AgencyAD":           agencyIds.length==0?"null":agencyIds.join(","),
+      "CandidateAD" :       candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
+      "OrderIdAD":          orderId ==null ? "null" : orderId,
       "TimesheetStartDateAD":  byTimesheetOrInvoiceValue=='0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
       "TimesheetEndDateAD"  :  byTimesheetOrInvoiceValue=='0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'):  formatDate(startDate, '12/31/9999', 'en-US'),
       "InvoiceStartDateAD"  :  byTimesheetOrInvoiceValue=='1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US'): formatDate(startDate, '01/01/1900', 'en-US'),
@@ -485,15 +488,15 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "OrganizationsAF": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "RegionAF":  regionIds.join(","),
-      "LocationAF": locationIds.join(","),
-      "DepartmentAF":departmentIds.join(","),
-      "SkillCategoryAF": skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
-      "SkillAF": skillIds.length==0?"null":skillIds.join(","),
-      "AgencyAF": agencyIds.length==0?"null":agencyIds.join(","),
-      "CandidateAF" :candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
-      "OrderIdAF": orderId ==null ? "null" : orderId,
+      "OrganizationsAF":        this.selectedOrganizations.length == 0? "null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "RegionAF":               regionIds.length == 0 ? "null" :regionIds.join(","),
+      "LocationAF":             locationIds.length == 0 ? "null" :locationIds.join(","),
+      "DepartmentAF":           departmentIds.length == 0 ? "null" :departmentIds.join(","),
+      "SkillCategoryAF":        skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
+      "SkillAF":                skillIds.length==0?"null":skillIds.join(","),
+      "AgencyAF":               agencyIds.length==0?"null":agencyIds.join(","),
+      "CandidateAF" :           candidateName==null||candidateName==""?"null":this.candidateSearchData?.filter((i)=>i.id==candidateName).map(i=>i.fullName), 
+      "OrderIdAF":              orderId ==null ? "null" : orderId,
       "TimesheetStartDateAF":  byTimesheetOrInvoiceValue=='0' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US') : formatDate(startDate, '01/01/1900', 'en-US'),
       "TimesheetEndDateAF"  :  byTimesheetOrInvoiceValue=='0' ? formatDate(endDate, 'MM/dd/yyyy', 'en-US'):  formatDate(startDate, '12/31/9999', 'en-US'),
       "InvoiceStartDateAF"  :  byTimesheetOrInvoiceValue=='1' ? formatDate(startDate, 'MM/dd/yyyy', 'en-US'): formatDate(startDate, '01/01/1900', 'en-US'),
@@ -662,7 +665,7 @@ export class AccrualReportComponent implements OnInit,OnDestroy {
       ids.push(this.bussinessControl.value);
       let filter: CommonCandidateSearchFilter = {
         searchText: e.text,
-        businssUnitIds:ids
+        businessUnitIds:ids
       };
       this.filterColumns.dataSource = [];
       this.store.dispatch(new GetCommonReportCandidateSearch(filter))

@@ -4,9 +4,7 @@ import { Injectable } from '@angular/core';
 import { CredentialParams } from "@shared/models/candidate-credential.model";
 import { CredentialStorageService } from "./credential-storage.service";
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class CredentialStorageFacadeService {
 
   constructor(private credentialStorage: CredentialStorageService, private location: Location) { }
@@ -14,7 +12,11 @@ export class CredentialStorageFacadeService {
   public getCredentialParams(): CredentialParams {
     const location = this.location.getState() as CredentialParams;
 
-    if (location.orderId && location.candidateStatus && location.isNavigatedFromOrganizationArea !== undefined) {
+    if (
+      location.orderId !== undefined
+      && location.candidateStatus !== undefined
+      && location.isNavigatedFromOrganizationArea !== undefined
+    ) {
       this.credentialStorage.saveCredentialParamsToStorage(location);
 
       return location;

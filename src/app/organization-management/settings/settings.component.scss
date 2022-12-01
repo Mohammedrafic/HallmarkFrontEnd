@@ -95,3 +95,12 @@
   }
 }
 
+.toggle-message {
+  font-weight: 400;
+  font-size: 13px;
+
+  .link {
+    color: $primary-active-blue-10;
+    cursor: pointer;
+  }
+}

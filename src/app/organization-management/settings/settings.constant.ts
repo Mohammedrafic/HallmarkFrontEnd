@@ -1,6 +1,9 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { SettingsFilterColsConfig } from './settings.interface';
 
+export const AssociatedLink: string = '/client/associate-list';
+export const tierSettingsKey: string = 'TieringLogic';
+
 export const SettingsFilterCols: SettingsFilterColsConfig = {
   regionIds: {
     type: ControlTypes.Multiselect,

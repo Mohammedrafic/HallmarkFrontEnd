@@ -1,7 +1,7 @@
 import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 import { PageOfCollections } from "@shared/models/page.model";
 
-export type CandidateCredential = {
+export interface CandidateCredential {
   id?: number;
   candidateProfileId?: number;
   status?: number;
@@ -25,21 +25,29 @@ export type CandidateCredential = {
   rejectReason?: string;
 }
 
-export type CredentialFile = {
+export interface CandidateCredentialGridItem extends CandidateCredential {
+  disableCopy: boolean;
+  disableEdit: boolean;
+  showDisableEditTooltip: boolean;
+  disableDelete: boolean;
+  credentialFile: CredentialFile | null;
+}
+
+export interface CredentialFile {
   id: number;
   candidateCredentialId: number;
   name: string;
   fileId: string;
 }
 
-export type CredentialGroupedFiles = {
+export interface CredentialGroupedFiles {
   credentialTypeName: string;
   files: CredentialFile[];
 }
 
 export type CandidateCredentialPage = PageOfCollections<CandidateCredential>;
 
-export type CandidateCredentialResponse = {
+export interface CandidateCredentialResponse {
   jobTitle: string;
   publicId: number;
   organizationPrefix: string;
@@ -47,8 +55,8 @@ export type CandidateCredentialResponse = {
   credentials: CandidateCredentialPage
 }
 
-export type CredentialParams = {
-  isNavigatedFromOrganizationArea: boolean;
-  candidateStatus: ApplicantStatus;
-  orderId: number;
+export interface CredentialParams {
+  isNavigatedFromOrganizationArea: boolean | null;
+  candidateStatus: ApplicantStatus | null;
+  orderId: number | null;
 }

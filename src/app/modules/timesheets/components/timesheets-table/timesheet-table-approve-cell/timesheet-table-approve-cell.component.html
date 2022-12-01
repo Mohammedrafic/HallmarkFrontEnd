@@ -1,3 +1,7 @@
 <div (click)="$event.stopImmediatePropagation()" class="approve">
-  <p [class.disabled]="disableAction" (click)="approveItem()">Approve</p>
+  <p
+    [class.disabled]="disableAction || !userPermission[userPermissions.CanOrganizationApproveRejectTimesheets]"
+    (click)="approveItem()">
+    Approve
+  </p>
 </div>

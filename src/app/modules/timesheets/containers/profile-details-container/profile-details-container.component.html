@@ -56,14 +56,16 @@
               [isAbleToChange]="isChangesSaved">
             </app-date-week-picker>
 
-            <app-upload-button [disabled]="disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
-                    [container]="uploadContainer"
-                    (filesSelected)="onFilesSelected($event)"
+            <app-upload-button
+              [disabled]="disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
+              [hasPermission]="hasEditTimesheetRecordsPermission"
+              [container]="uploadContainer"
+              (filesSelected)="onFilesSelected($event)"
             ></app-upload-button>
 
             <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
             <app-export-button
-                    style="display: none;" 
+                    style="display: none;"
                     (csvExport)="exportProfileDetails(exportedFileType.csv)"
                     (excelExport)="exportProfileDetails(exportedFileType.excel)"
                     (customExport)="showCustomExportDialog()"
@@ -93,7 +95,7 @@
             <div class="checkbox-block" *ngIf="isDNWEnabled">
               <ejs-switch #dnwSwitch
                 class="toggle"
-                [disabled]="disableAnyAction"
+                [disabled]="disableAnyAction || !hasEditTimesheetRecordsPermission"
                 [checked]="timesheetDetails.noWorkPerformed"
                 (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
               ></ejs-switch>
@@ -129,7 +131,7 @@
               <app-attachments-list [attachments]="timesheetDetails.attachments"
                                     [attachmentsListConfig]="attachmentsListConfig$ | async"
                                     [deleteIconColor]="'#FF5858'"
-                                    [disableDelete]="disableAnyAction"
+                                    [disableDelete]="disableAnyAction || !hasEditTimesheetRecordsPermission"
               ></app-attachments-list>
           </div>
 
@@ -144,6 +146,8 @@
           [timesheetDetails]="timesheetDetails"
           [actionsDisabled]="timesheetDetails.noWorkPerformed"
           [disableAnyAction]="disableAnyAction"
+          [hasEditTimesheetRecordsPermission]="hasEditTimesheetRecordsPermission"
+          [hasApproveRejectMileagesPermission]="userPermission[userPermissions.CanOrganizationApproveRejectMileages]"
           (openAddSideDialog)="openAddDialog($event)"
           (uploadSideDialog)="openUploadSideDialog($event)"
           (changesSaved)="handleEditChanges($event)"

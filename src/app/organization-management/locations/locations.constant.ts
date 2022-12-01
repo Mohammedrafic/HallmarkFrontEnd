@@ -210,9 +210,17 @@ export const LocationsDialogConfig: LocationDialogConfig = {
         },
         {
           field: 'inactiveDate',
-          title: 'Inactive Date',
+          title: 'Inactivation Date',
           required: false,
           gridAreaName: 'inactivateArea',
+          fieldType: FieldType.Date,
+          visible: true,
+        },
+        {
+          field: 'reactivateDate',
+          title: 'Reactivate Date',
+          required: false,
+          gridAreaName: 'reactivateArea',
           fieldType: FieldType.Date,
           visible: true,
         }
@@ -385,9 +393,17 @@ export const LocationsDialogWithIrpConfig: LocationDialogConfig = {
         },
         {
           field: 'inactiveDate',
-          title: 'Inactive Date',
+          title: 'Inactivation Date',
           required: false,
           gridAreaName: 'inactivateArea',
+          fieldType: FieldType.Date,
+          visible: true,
+        },
+        {
+          field: 'reactivateDate',
+          title: 'Reactivate Date',
+          required: false,
+          gridAreaName: 'reactivateArea',
           fieldType: FieldType.Date,
           visible: true,
         }

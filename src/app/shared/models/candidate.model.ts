@@ -1,5 +1,11 @@
+import { CandidateCredentialResponse, CredentialGroupedFiles } from "./candidate-credential.model";
+import { CredentialType } from "./credential-type.model";
+import { Credential } from "./credential.model";
+import { Education } from "./education.model";
+import { Experience } from "./experience.model";
+import { ListOfSkills } from "./skill.model";
 import { PageOfCollections } from './page.model';
-import { JobDistributionMasterSkills } from '@shared/models/associate-organizations.model';
+import { JobDistributionMasterSkills } from './associate-organizations.model';
 
 export class Candidate {
   id?: number;
@@ -74,3 +80,16 @@ export class CandidateProfileContactDetail {
 }
 
 export type CandidatePage = PageOfCollections<Candidate>;
+
+export interface CandidateStateModel {
+  isCandidateLoading: boolean;
+  candidate: Candidate | null;
+  skills: ListOfSkills[];
+  experiences: Experience[];
+  educations: Education[];
+  candidatePage: CandidatePage | null;
+  candidateCredentialResponse: CandidateCredentialResponse | null;
+  credentialTypes: CredentialType[];
+  masterCredentials: Credential[];
+  groupedCandidateCredentialsFiles: CredentialGroupedFiles[];
+}

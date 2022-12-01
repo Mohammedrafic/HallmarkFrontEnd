@@ -549,7 +549,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
       ids.push(this.bussinessControl.value);
       let filter: CommonCandidateSearchFilter = {
         searchText: e.text,
-        businssUnitIds:ids
+        businessUnitIds:ids
       };
       this.filterColumns.dataSource = [];
       this.store.dispatch(new GetCommonReportCandidateSearch(filter))

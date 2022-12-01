@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
@@ -47,6 +47,8 @@ import { TakeUntilDestroy } from '@core/decorators';
 import { AppState } from '../../store/app.state';
 import { DepartmentsExportCols } from '@organization-management/departments/constants';
 import { DepartmentsAdapter } from '@organization-management/departments/adapters/departments.adapter';
+import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
+import { DateTimeHelper } from '@core/helpers';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 
@@ -249,6 +251,23 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.isLocationIRPEnabled = !!department.locationIncludeInIRP;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
+    this.inactivateDateHandler(this.departmentsDetailsFormGroup.controls['inactiveDate'], department.inactiveDate);
+  }
+
+  private inactivateDateHandler(field: AbstractControl, value: string | null): void {
+    if (value) {
+      const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
+      inactiveDate.setHours(0, 0, 0, 0);
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      if (DateTimeHelper.isDateBefore(inactiveDate, now)) {
+        field.disable();
+      } else {
+        field.enable();
+      }
+    } else {
+      field.enable();
+    }
   }
 
   onRemoveDepartmentClick(department: Department, event: any): void {
@@ -270,6 +289,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   onAddDepartmentClick(): void {
     if (this.selectedLocation && this.selectedRegion) {
+      this.departmentsDetailsFormGroup.controls['inactiveDate'].enable();
       this.isLocationIRPEnabled = this.selectedLocation.includeInIRP;
       this.store.dispatch(new ShowSideDialog(true));
     } else {
@@ -367,6 +387,20 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   private createDepartmentsForm(): void {
     this.departmentsDetailsFormGroup = this.departmentService.createDepartmentDetailForm(this.isIRPFlagEnabled);
     this.DepartmentFilterFormGroup = this.departmentService.createDepartmentFilterForm(this.isIRPFlagEnabled);
+    this.addDatesValidation();
+  }
+
+  private addDatesValidation(): void {
+    const inactiveDate = this.departmentsDetailsFormGroup.controls['inactiveDate'];
+    const reactivateDate = this.departmentsDetailsFormGroup.controls['reactivateDate'];
+    inactiveDate.addValidators(startDateValidator(this.departmentsDetailsFormGroup, 'reactivateDate'));
+    reactivateDate.addValidators(endDateValidator(this.departmentsDetailsFormGroup, 'inactiveDate'));
+    inactiveDate.valueChanges.subscribe(() =>
+      reactivateDate.updateValueAndValidity({ onlySelf: true, emitEvent: false })
+    );
+    reactivateDate.valueChanges.subscribe(() =>
+      inactiveDate.updateValueAndValidity({ onlySelf: true, emitEvent: false })
+    );
   }
 
   private startDepartmentOptionsWatching(): void {

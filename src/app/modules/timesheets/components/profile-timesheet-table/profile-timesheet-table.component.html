@@ -16,29 +16,32 @@
         </ejs-tab>
       </div>
 
+      <div class="action-buttons">
         <ng-container *ngIf="isEditEnabled">
-          <button
-            *ngIf="!actionsDisabled && (currentTab !== tableTypes.Expenses)"
-            class="add-action spaced"
-            cssClass="e-action-button"
-            ejs-button
-            [disabled]="disableAnyAction"
-            (click)="openAddDialog()"
-          >
-            <i-feather name="plus" class="icon"></i-feather> Add Record
-          </button>
+          <app-tooltip-container [showToolTip]="!hasPermissions" *ngIf="!actionsDisabled && (currentTab !== tableTypes.Expenses)">
+            <button
+              class="add-action spaced"
+              cssClass="e-action-button"
+              ejs-button
+              [disabled]="disableAnyAction || !hasPermissions"
+              (click)="openAddDialog()"
+            >
+              <i-feather name="plus" class="icon"></i-feather> Add Record
+            </button>
+          </app-tooltip-container>
 
           <ng-container *ngIf="!actionsDisabled && (recordsToShow?.[currentTab]?.[modeValues.Edit]?.length || isEditOn)">
-            <button
-              *ngIf="!isEditOn; else editHandlers"
-              (click)="editTimesheets()"
-              [disabled]="disableAnyAction"
-              ejs-button
-              cssClass="e-action-button"
-              class="add-action">
-              <i-feather name="edit" class="icon"></i-feather>
-              Edit
-            </button>
+            <app-tooltip-container [showToolTip]="!hasPermissions" *ngIf="!isEditOn; else editHandlers">
+              <button
+                (click)="editTimesheets()"
+                [disabled]="disableAnyAction || !hasPermissions"
+                ejs-button
+                cssClass="e-action-button"
+                class="add-action">
+                <i-feather name="edit" class="icon"></i-feather>
+                Edit
+              </button>
+            </app-tooltip-container>
           </ng-container>
         </ng-container>
 
@@ -55,42 +58,46 @@
         </ng-template>
 
         <div *ngIf="currentTab !== tableTypes.Expenses && !isEditOn" class="btn-group">
-          <button
-            *ngIf="isRejectBtnEnabled && !actionsDisabled"
-            ejs-button
-            [disabled]="disableAnyAction || actionButtonDisabled"
-            cssClass="e-outline privilege"
-            (click)="onRejectButtonClick()"
-          >
-            Reject
-          </button>
-          <button
-            *ngIf="isApproveBtnEnabled"
-            ejs-button
-            [isPrimary]="true"
-            [disabled]="disableAnyAction || actionButtonDisabled"
-            class="spinner-btn privilege"
-            (click)="handleApprove()"
-          >
-            <div #spinner class="spinner-container" *ngIf="loading; else approvetext"></div>
-            <ng-template #approvetext>
-              <span>{{ submitText }}</span>
-            </ng-template>
-          </button>
-          <button
-            *ngIf="!isApproveBtnEnabled && isOrgSubmitBtnEnabled"
-            ejs-button
-            [isPrimary]="true"
-            [disabled]="disableAnyAction || actionButtonDisabled"
-            class="spinner-btn privilege"
-            (click)="orgSubmit()"
-          >
-            <div #spinner class="spinner-container" *ngIf="loading; else submittext"></div>
-            <ng-template #submittext>
-              <span>Submit</span>
-            </ng-template>
-          </button>
+          <app-tooltip-container [showToolTip]="!hasPermissions" *ngIf="isRejectBtnEnabled && !actionsDisabled">
+            <button
+              ejs-button
+              [disabled]="disableAnyAction || actionButtonDisabled || !hasPermissions"
+              cssClass="e-outline privilege"
+              (click)="onRejectButtonClick()"
+            >
+              Reject
+            </button>
+          </app-tooltip-container>
+          <app-tooltip-container [showToolTip]="!hasPermissions" *ngIf="isApproveBtnEnabled">
+            <button
+              ejs-button
+              [isPrimary]="true"
+              [disabled]="disableAnyAction || actionButtonDisabled || !hasPermissions"
+              class="spinner-btn privilege"
+              (click)="handleApprove()"
+            >
+              <div #spinner class="spinner-container" *ngIf="loading; else approvetext"></div>
+              <ng-template #approvetext>
+                <span>{{ submitText }}</span>
+              </ng-template>
+            </button>
+          </app-tooltip-container>
+          <app-tooltip-container [showToolTip]="!hasPermissions" *ngIf="!isApproveBtnEnabled && isOrgSubmitBtnEnabled">
+            <button
+              ejs-button
+              [isPrimary]="true"
+              [disabled]="disableAnyAction || actionButtonDisabled || !hasPermissions"
+              class="spinner-btn privilege"
+              (click)="orgSubmit()"
+            >
+              <div #spinner class="spinner-container" *ngIf="loading; else submittext"></div>
+              <ng-template #submittext>
+                <span>Submit</span>
+              </ng-template>
+            </button>
+          </app-tooltip-container>
         </div>
+      </div>
     </div>
 
     <div class="timesheet-table-container">

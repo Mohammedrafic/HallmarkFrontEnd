@@ -80,6 +80,10 @@
 
     & .approve-button {
       margin-right: 16px;
+
+      &:disabled {
+        color: $white;
+      }
     }
   }
 
