@@ -9,7 +9,7 @@ import { Credential } from '@shared/models/credential.model';
 import { CandidateImportResult } from '@shared/models/candidate-profile-import.model';
 import { RECORD_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
-import { Candidate, CandidatePage } from 'src/app/shared/models/candidate.model';
+import { Candidate, CandidatePage, CandidateStateModel } from 'src/app/shared/models/candidate.model';
 import { Education } from 'src/app/shared/models/education.model';
 import { Experience } from 'src/app/shared/models/experience.model';
 import { ListOfSkills } from 'src/app/shared/models/skill.model';
@@ -33,6 +33,8 @@ import {
   GetCredentialFilesSucceeded,
   GetCredentialPdfFiles,
   GetCredentialPdfFilesSucceeded,
+  GetCredentialStatuses,
+  GetCredentialStatusesSucceeded,
   GetCredentialTypes,
   GetEducationByCandidateId,
   GetExperienceByCandidateId,
@@ -64,19 +66,7 @@ import {
   UploadCredentialFilesSucceeded
 } from './candidate.actions';
 import { getAllErrors } from '@shared/utils/error.utils';
-
-export interface CandidateStateModel {
-  isCandidateLoading: boolean;
-  candidate: Candidate | null;
-  skills: ListOfSkills[];
-  experiences: Experience[];
-  educations: Education[];
-  candidatePage: CandidatePage | null;
-  candidateCredentialResponse: CandidateCredentialResponse | null;
-  credentialTypes: CredentialType[];
-  masterCredentials: Credential[];
-  groupedCandidateCredentialsFiles: CredentialGroupedFiles[];
-}
+import { CredentialStatus } from "@shared/enums/status";
 
 @State<CandidateStateModel>({
   name: 'candidate',
@@ -359,6 +349,19 @@ export class CandidateState {
         patchState({ isCandidateLoading: false, masterCredentials: payload });
         return payload;
       })
+    );
+  }
+
+  @Action(GetCredentialStatuses)
+  GetCredentialStatuses(
+    { dispatch }: StateContext<CandidateStateModel>,
+    { isOrganization, orderId, credentialStatus, credentialId }: GetCredentialStatuses
+  ): Observable<Observable<void> | CredentialStatus[]> {
+    return this.candidateService.getCredentialStatuses(isOrganization, orderId, credentialStatus, credentialId).pipe(
+      tap((payload: CredentialStatus[]) => {
+        dispatch(new GetCredentialStatusesSucceeded(payload));
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot get credential statuses'))))
     );
   }
 

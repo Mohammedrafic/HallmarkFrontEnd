@@ -1,4 +1,3 @@
-import { CandidateStateModel } from '@agency/store/candidate.state';
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { ImportResult } from '@shared/models/import.model';
@@ -127,6 +126,7 @@ import {
   LocationType,
   TimeZoneModel
 } from '@shared/models/location.model';
+import { CandidateStateModel } from "@shared/models/candidate.model";
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
 import {

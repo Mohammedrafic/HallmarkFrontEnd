@@ -4,9 +4,7 @@ import { GlobalWindow } from "@core/tokens";
 import { CREDENTIALS_STORAGE_KEY } from "@shared/constants";
 import { CredentialParams } from "@shared/models/candidate-credential.model";
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class CredentialStorageService {
 
   constructor(@Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis) {}

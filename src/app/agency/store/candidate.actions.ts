@@ -1,3 +1,4 @@
+import { CredentialStatus } from "@shared/enums/status";
 import { CandidateImportRecord, CandidateImportResult } from '@shared/models/candidate-profile-import.model';
 import { CandidateCredential } from '@shared/models/candidate-credential.model';
 import { Candidate } from 'src/app/shared/models/candidate.model';
@@ -116,6 +117,21 @@ export class GetCandidatesCredentialByPage {
 export class GetMasterCredentials {
   static readonly type = '[candidate] Get Master Credentials by searchTerm and credentialTypeId';
   constructor(public searchTerm: string, public credentialTypeId: number | string) {}
+}
+
+export class GetCredentialStatuses {
+  static readonly type = '[candidate] Get Credential Statuses';
+  constructor(
+    public readonly isOrganization: boolean,
+    public readonly orderId: number | null,
+    public readonly credentialStatus: CredentialStatus | null = null,
+    public readonly credentialId: number | null = null,
+  ) {}
+}
+
+export class GetCredentialStatusesSucceeded {
+  static readonly type = '[candidate] Get Credential Statuses Succeeded';
+  constructor(public statuses: CredentialStatus[]) {}
 }
 
 export class SaveCandidatesCredential {

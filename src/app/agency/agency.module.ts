@@ -104,6 +104,8 @@ import { PaymentDialogComponent } from './agency-list/add-edit-agency/payment-de
 import { JobDistributionComponent } from './agency-list/add-edit-agency/job-distribution/job-distribution.component';
 import { OrderMatchColumnComponent } from './candidates/add-edit-candidate/credentials-grid/order-match-column/order-match-column.component';
 import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
+import { CredentialStorageFacadeService } from "./services/credential-storage-facade.service";
+import { CredentialStorageService } from "./services/credential-storage.service";
 
 const sidebarIcons = {
   Sliders,
@@ -215,6 +217,10 @@ const sidebarIcons = {
     ChildOrderDialogModule,
   ],
   exports: [FileViewerComponent],
-  providers: [CredentialGridService],
+  providers: [
+    CredentialGridService,
+    CredentialStorageService,
+    CredentialStorageFacadeService,
+  ],
 })
 export class AgencyModule {}

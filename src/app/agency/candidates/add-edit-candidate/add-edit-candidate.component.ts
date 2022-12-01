@@ -373,9 +373,9 @@ export class AddEditCandidateComponent extends AbstractPermission implements OnI
   private setCredentialParams(): void {
     const { isNavigatedFromOrganizationArea, candidateStatus, orderId } = this.credentialStorage.getCredentialParams();
 
-    this.isNavigatedFromOrganizationArea = isNavigatedFromOrganizationArea;
-    this.candidateStatus = candidateStatus;
-    this.orderId = orderId;
+    this.isNavigatedFromOrganizationArea = isNavigatedFromOrganizationArea as boolean;
+    this.candidateStatus = candidateStatus as ApplicantStatus;
+    this.orderId = orderId as number;
   }
 
   private checkForAgencyStatus(): void {

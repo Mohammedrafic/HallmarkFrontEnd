@@ -9,6 +9,7 @@ import { UserState } from '../../../../../store/user.state';
 import { SaveCandidateSucceeded } from '@agency/store/candidate.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { CredentialParams } from "@shared/models/candidate-credential.model";
 import { FilterService } from '@shared/services/filter.service';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from '../../../../../store/app.actions';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -231,7 +232,12 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   public onEdit(data: any): void {
-    this.router.navigate(['./edit', data.candidateProfileId], { relativeTo: this.route });
+    const credentialParams: CredentialParams = {
+      isNavigatedFromOrganizationArea: false,
+      candidateStatus: null,
+      orderId: null,
+    };
+    this.router.navigate(['./edit', data.candidateProfileId], { relativeTo: this.route, state: credentialParams });
   }
 
   public onRemove(id: any): void {
