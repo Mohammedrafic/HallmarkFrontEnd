@@ -67,13 +67,13 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   @Select(LogiReportState.regions)
   public regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedRegions: Region[];
+  selectedRegions: Region[]=[];
 
   @Select(LogiReportState.locations)
   public locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedLocations: Location[];
+  selectedLocations: Location[]=[];
 
   @Select(LogiReportState.departments)
   public departments$: Observable<Department[]>;
@@ -93,7 +93,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
 
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
-  selectedOrganizations: Organisation[];
+  selectedOrganizations: Organisation[]=[];
 
   accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -101,7 +101,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  selectedDepartments: Department[];
+  selectedDepartments: Department[]=[];
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
   @Select(UserState.lastSelectedOrganizationId)
@@ -368,12 +368,12 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     }
     this.paramsData =
     {
-      "OrganizationParamFTS": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "OrganizationParamFTS":this.selectedOrganizations?.length==0?"null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
       "StartDateParamFTS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
       "EndDateParamFTS": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamFTS": regionIds.join(","),
-      "LocationParamFTS": locationIds.join(","),
-      "DepartmentParamFTS": departmentIds.join(","),
+      "RegionParamFTS": regionIds.length==0?"null" : regionIds.join(","),
+      "LocationParamFTS":locationIds.length==0?"null" : locationIds.join(","),
+      "DepartmentParamFTS":departmentIds.length==0?"null" :  departmentIds.join(","),
       "SkillCategoriesParamFTS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds.join(","),
       "SkillsParamFTS": skillIds.length == 0 ? "null" : skillIds.join(","),
       "CandidateNameParamFTS": candidateName == null || candidateName == "" ? "null" : candidateName.toString(),
