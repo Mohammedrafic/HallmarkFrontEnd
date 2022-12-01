@@ -37,17 +37,15 @@
   }
 }
 
-.e-dlg-content {
-  padding: 5px 24px !important;
-}
-
-.mobile-submit {
-  width: 100%;
-}
 
 @media #{$max-mobile} {
   .e-dlg-content {
     padding-bottom: 24px !important;
+    background-color: $background !important;
+  }
+
+  .e-dlg-header-content {
+    background-color: $background !important;
   }
 
   .e-dlg-header {

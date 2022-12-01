@@ -6,6 +6,7 @@
   [showCloseIcon]="isMobile"
   [target]="targetElement"
   cssClass="dialog quick-order-dialog"
+  [ngClass]="{ filter: isMobile }"
   id="dialog"
 >
   <ng-template #header>
@@ -32,9 +33,7 @@
       [organizationStructure]="organizationStructure"
       [openEvent]="openEvent"
       [isMobile]="isMobile"
+      (submit)="onSubmitQuickOrder()"
     ></app-quick-order-form>
-    <button class="mobile-submit" *ngIf="isMobile" ejs-button [isPrimary]="true" (click)="onSubmitQuickOrder()">
-      Submit
-    </button>
   </ng-template>
 </ejs-dialog>
