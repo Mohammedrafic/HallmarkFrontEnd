@@ -1,24 +1,20 @@
-import { Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import { Organization, OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import {
   FieldSettingsModel,
   ISelectAllEventArgs,
   MultiSelectChangeEventArgs,
-  MultiSelectComponent,
+  MultiSelectComponent
 } from '@syncfusion/ej2-angular-dropdowns';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { CANCEL_CONFIRM_TEXT, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { combineLatestWith, debounceTime, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { combineLatestWith, debounceTime, delay, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { ShowSideDialog } from '../../../../store/app.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
-import {
-  CredentialSetupDetails,
-  CredentialSetupGet,
-  CredentialSetupMappingPost
-} from '@shared/models/credential-setup.model';
+import { CredentialSetupGet, CredentialSetupMappingPost } from '@shared/models/credential-setup.model';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { CredentialType } from '@shared/models/credential-type.model';
@@ -30,25 +26,36 @@ import {
   SaveUpdateCredentialSetupMappingSucceeded
 } from '@organization-management/store/credentials.actions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { TakeUntilDestroy } from '@core/decorators';
+import { AppState } from '../../../../store/app.state';
+import { MapCredentialsService } from '@organization-management/credentials/services/map-credentials.service';
+import { DropdownsList } from '@organization-management/credentials/enums';
+import { MapCredentialsAdapter } from '@organization-management/credentials/adapters/map-credentials.adapter';
 
-export enum DropdownsList {
-  Regions = 'regions',
-  Locations = 'locations',
-  Departments = 'departments',
-  Groups = 'groups'
-}
-
+@TakeUntilDestroy
 @Component({
   selector: 'app-map-credentials-form',
   templateUrl: './map-credentials-form.component.html',
   styleUrls: ['./map-credentials-form.component.scss']
 })
-export class MapCredentialsFormComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class MapCredentialsFormComponent extends AbstractGridConfigurationComponent implements OnInit {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('regionsDropdown') regionsDropdown: MultiSelectComponent;
   @ViewChild('locationsDropdown') locationsDropdown: MultiSelectComponent;
   @ViewChild('departmentsDropdown') departmentsDropdown: MultiSelectComponent;
   @ViewChild('groupsDropdown') groupsDropdown: MultiSelectComponent;
+
+  @Select(OrganizationManagementState.organization)
+  private organization$: Observable<Organization>;
+
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
+  @Select(OrganizationManagementState.credentials)
+  credentials$: Observable<Credential[]>;
+
+  @Select(OrganizationManagementState.credentialTypes)
+  credentialTypes$: Observable<CredentialType[]>;
 
   @Input() orgRegions: OrganizationRegion[];
   @Input() groups: CredentialSkillGroup[];
@@ -62,27 +69,14 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   public fields: FieldSettingsModel = { text: 'name', value: 'id' };
   public isGridStateInvalid = false;
   public mapCredentialsFormGroup: FormGroup;
-  public formBuilder: FormBuilder;
-
-  @Select(UserState.lastSelectedOrganizationId)
-  organizationId$: Observable<number>;
-
-  @Select(OrganizationManagementState.credentials)
-  credentials$: Observable<Credential[]>;
-
-  @Select(OrganizationManagementState.credentialTypes)
-  credentialTypes$: Observable<CredentialType[]>;
 
   public credentialSetupMappingToPost?: CredentialSetupMappingPost;
   public isEdit: boolean;
   public DropdownsList = DropdownsList;
 
-  get dialogTitle(): string {
-    return this.isEdit ? 'Edit Mapping' : 'Map Credentials';
-  }
+  protected componentDestroy: () => Observable<unknown>;
 
   private credentialSetupList: CredentialSetupGet[] = [];
-  private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private previouslySavedMappingsNumber: number;
   private isAllRegionsSelected?: boolean;
@@ -91,16 +85,23 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   private isAllGroupsSelected?: boolean;
   private checkedDropdownItems: number[] = [];
 
-  constructor(private store: Store,
-              private actions$: Actions,
-              @Inject(FormBuilder) private builder: FormBuilder,
-              private confirmService: ConfirmService) {
+  constructor(
+    private store: Store,
+    private actions$: Actions,
+    private confirmService: ConfirmService,
+    private mapCredentialsService: MapCredentialsService
+  ) {
     super();
-    this.formBuilder = builder;
+
     this.createCredentialMappingForm();
   }
 
+  get dialogTitle(): string {
+    return this.isEdit ? 'Edit Mapping' : 'Map Credentials';
+  }
+
   ngOnInit(): void {
+    this.startOrganizationWatching();
     this.organizationChangedHandler();
     this.mapGridData();
     this.dropdownChangedHandler();
@@ -108,11 +109,6 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
     this.mappingDataSavedHandler();
     this.setFormForEditHandler();
     this.pageChangedHandler();
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
   }
 
   public onSelectAllRegions(selectAllEvent: ISelectAllEventArgs): void {
@@ -277,10 +273,12 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => !!confirm))
-        .subscribe(() => {
-          this.cleanUp();
-        });
+        }).pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      ).subscribe(() => {
+        this.cleanUp();
+      });
     } else {
       this.cleanUp();
     }
@@ -288,17 +286,17 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
 
   public onMapCredentialFormSaveClick(): void {
     if (this.mapCredentialsFormGroup.valid && this.selectedItems.length) {
-      const credentials = this.getCredentialSetupDetails();
+      const { regionIds, locationIds, departmentIds, groupIds, mappingId } = this.mapCredentialsFormGroup.getRawValue();
       const credentialSetupMapping: CredentialSetupMappingPost = {
-        regionIds: this.isAllRegionsSelected ? [] : this.mapCredentialsFormGroup.controls['regionIds'].value, // [] means All on the BE side
-        locationIds: this.isAllLocationsSelected ? [] : this.mapCredentialsFormGroup.controls['locationIds'].value, // [] means All on the BE side
-        departmentIds: this.isAllDepartmentsSelected ? [] : this.mapCredentialsFormGroup.controls['departmentIds'].value, // [] means All on the BE side
-        skillGroupIds: this.isAllGroupsSelected ? [] : this.mapCredentialsFormGroup.controls['groupIds'].value,
-        credentials: credentials
-      }
+        regionIds: this.isAllRegionsSelected ? [] : regionIds, // [] means All on the BE side
+        locationIds: this.isAllLocationsSelected ? [] : locationIds, // [] means All on the BE side
+        departmentIds: this.isAllDepartmentsSelected ? [] : departmentIds, // [] means All on the BE side
+        skillGroupIds: this.isAllGroupsSelected ? [] : groupIds,
+        credentials: MapCredentialsAdapter.prepareCredentialsDetails(this.selectedItems),
+      };
 
       if (this.isEdit) {
-        credentialSetupMapping.credentionSetupMappingId = this.mapCredentialsFormGroup.controls['mappingId'].value;
+        credentialSetupMapping.credentionSetupMappingId = mappingId;
       }
 
       this.credentialSetupMappingToPost = credentialSetupMapping;
@@ -334,42 +332,43 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   }
 
   private organizationChangedHandler(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+    this.organizationId$.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
       this.store.dispatch(new GetCredential());
       this.store.dispatch(new GetCredentialTypes());
     });
   }
 
   private mapGridData(): void {
-    this.credentials$.pipe(combineLatestWith(this.credentialTypes$), takeUntil(this.unsubscribe$),
-      filter(([credentials, credentialTypes]) => credentials?.length > 0 && credentialTypes.length > 0))
-      .subscribe(([credentials, credentialTypes]) => {
-        this.lastAvailablePage = this.getLastPage(credentials);
-        this.totalDataRecords = credentials.length;
-        this.credentialSetupList = [];
+    this.credentials$.pipe(
+      combineLatestWith(this.credentialTypes$),
+      takeUntil(this.componentDestroy()),
+      filter(([credentials, credentialTypes]) => credentials?.length > 0 && credentialTypes.length > 0)
+    ).subscribe(([credentials, credentialTypes]) => {
+      this.lastAvailablePage = this.getLastPage(credentials);
+      this.totalDataRecords = credentials.length;
+      this.credentialSetupList = [];
 
-        if (credentialTypes) {
-          credentials.map(item => {
-            let foundCredentialType = credentialTypes.find(type => type.id === item.credentialTypeId);
-            let credentialSetup: CredentialSetupGet = {
-              masterCredentialId: item.id as number,
-              credentialType: foundCredentialType ? foundCredentialType.name : '',
-              description: item.name,
-              comments: item.comment
-            }
-            this.credentialSetupList.push(credentialSetup);
-          });
-        }
-        this.gridDataSource = this.credentialSetupList;
+      if (credentialTypes) {
+        credentials.map(item => {
+          const foundCredentialType = credentialTypes.find(type => type.id === item.credentialTypeId);
+          this.credentialSetupList.push(MapCredentialsAdapter.prepareCredentialGet(item, foundCredentialType));
+        });
+      }
+      this.gridDataSource = this.credentialSetupList;
 
-        // reset grid invalid state
-        this.isGridStateInvalid = false;
-      });
+      // reset grid invalid state
+      this.isGridStateInvalid = false;
+    });
   }
 
   private setFormForEditHandler(): void {
     // subscribe on mappingDataForEdit$ to be able to set up Mapping form in Edit mode
-    this.mappingDataForEdit$.pipe(takeUntil(this.unsubscribe$), debounceTime(700)).subscribe(credentialSetupMapping => {
+    this.mappingDataForEdit$.pipe(
+      debounceTime(700),
+      takeUntil(this.componentDestroy())
+    ).subscribe(credentialSetupMapping => {
       if (credentialSetupMapping) {
         this.isEdit = true;
         // setup form data
@@ -426,27 +425,23 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
     });
   }
 
-  public checkboxStateChanged(event: any, credential: CredentialSetupGet, checkboxName: string): void {
+  public checkboxStateChanged(
+    event: { checked: boolean },
+    credential: CredentialSetupGet,
+    checkboxName: 'isActive' | 'reqSubmission' | 'reqOnboard'
+  ): void {
     (this.grid.dataSource as []).map((item: CredentialSetupGet) => {
       if (item.masterCredentialId === credential.masterCredentialId) {
         // update checkbox state value
-        switch(checkboxName) {
-          case 'isActive':
-            item.isActive = event.checked;
-            break;
-          case 'reqSubmission':
-            item.reqSubmission = event.checked;
-            break;
-          case 'reqOnboard':
-            item.reqOnboard = event.checked;
-            break;
-        }
+        item[checkboxName] = event.checked;
       }
     });
   }
 
   public customStopPropagation(credential: CredentialSetupGet, event: any): void {
-    const foundItem = this.selectedItems.find((selectedItem: CredentialSetupGet) => selectedItem.masterCredentialId === credential.masterCredentialId);
+    const foundItem = this.selectedItems.find((selectedItem: CredentialSetupGet) =>
+      selectedItem.masterCredentialId === credential.masterCredentialId
+    );
 
     if (foundItem) {
       event.stopPropagation();
@@ -455,7 +450,7 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
 
   private dropdownChangedHandler(): void {
     this.mapCredentialsFormGroup.get('regionIds')?.valueChanges
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe((regionIds: number[]) => {
       if (regionIds && regionIds.length > 0) {
         this.locations = [];
@@ -477,7 +472,7 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
     });
 
     this.mapCredentialsFormGroup.get('locationIds')?.valueChanges
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(takeUntil(this.componentDestroy()))
       .subscribe((locationIds: number[]) => {
       if (locationIds && locationIds.length > 0) {
         this.departments = [];
@@ -494,7 +489,10 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   }
 
   private mappingDataSavedHandler(): void {
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUpdateCredentialSetupMappingSucceeded)).subscribe((response) => {
+    this.actions$.pipe(
+      ofActionSuccessful(SaveUpdateCredentialSetupMappingSucceeded),
+      takeUntil(this.componentDestroy())
+    ).subscribe((response) => {
       if (response.isSucceed) {
         this.store.dispatch(new ShowSideDialog(false));
         this.formClosed.emit();
@@ -513,45 +511,24 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
         title: DATA_OVERRIDE_TITLE,
         okButtonLabel: 'Confirm',
         okButtonClass: ''
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
-        if (this.credentialSetupMappingToPost) {
-          this.credentialSetupMappingToPost.forceUpsert = true; // set force override flag for BE
-          this.store.dispatch(new SaveUpdateCredentialSetupMappingData(this.credentialSetupMappingToPost));
-          this.store.dispatch(new ShowSideDialog(false));
-          this.formClosed.emit();
-          this.store.dispatch(new GetCredential());
-          this.store.dispatch(new GetCredentialTypes());
-          this.clearFormDetails();
-        }
-      });
+      }).pipe(
+      filter(Boolean),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      if (this.credentialSetupMappingToPost) {
+        this.credentialSetupMappingToPost.forceUpsert = true; // set force override flag for BE
+        this.store.dispatch(new SaveUpdateCredentialSetupMappingData(this.credentialSetupMappingToPost));
+        this.store.dispatch(new ShowSideDialog(false));
+        this.formClosed.emit();
+        this.store.dispatch(new GetCredential());
+        this.store.dispatch(new GetCredentialTypes());
+        this.clearFormDetails();
+      }
+    });
   }
 
   private createCredentialMappingForm(): void {
-    this.mapCredentialsFormGroup = this.formBuilder.group({
-      mappingId: [null],
-      regionIds: [null, Validators.required],
-      locationIds: [null, Validators.required],
-      departmentIds: [null, Validators.required],
-      groupIds: [null, Validators.required]
-    });
-  }
-
-  private getCredentialSetupDetails(): CredentialSetupDetails[] {
-    const credentialSetupDetails: CredentialSetupDetails[] = [];
-    this.selectedItems.forEach(item => {
-      let credential: CredentialSetupDetails = {
-        masterCredentialId: item.masterCredentialId,
-        comments: item.comments,
-        optional: item.isActive,
-        reqSubmission: item.reqSubmission,
-        reqOnboard: item.reqOnboard,
-        inactiveDate: item.inactiveDate
-      }
-      credentialSetupDetails.push(credential);
-    });
-
-    return credentialSetupDetails;
+    this.mapCredentialsFormGroup = this.mapCredentialsService.createForm();
   }
 
   private clearFormDetails(): void {
@@ -580,7 +557,10 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   }
 
   private pageChangedHandler(): void {
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
+    this.pageSubject.pipe(
+      throttleTime(100),
+      takeUntil(this.componentDestroy())
+    ).subscribe((page) => {
       this.currentPage = page;
       this.gridDataSource = this.getRowsPerPage(page);
     });
@@ -597,5 +577,21 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
 
   private getLastPage(data: object[]): number {
     return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
+  }
+
+  private startOrganizationWatching(): void {
+    this.organization$.pipe(
+      delay(200),
+      takeUntil(this.componentDestroy())
+    ).subscribe((org: Organization) => {
+      const { isIRPEnabled, isVMCEnabled } = org?.preferences || {};
+
+      this.grid.getColumnByField('irpComment').visible =
+        this.store.selectSnapshot(AppState.isIrpFlagEnabled) && !!(isIRPEnabled && isVMCEnabled);
+      this.grid.getColumnByField('system').visible =
+        this.store.selectSnapshot(AppState.isIrpFlagEnabled) && !!(isIRPEnabled && isVMCEnabled);
+
+      this.grid.refreshColumns();
+    });
   }
 }

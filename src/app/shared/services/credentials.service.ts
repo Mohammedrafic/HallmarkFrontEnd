@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { map, Observable } from 'rxjs';
 
@@ -136,17 +136,10 @@ export class CredentialsService {
    * @return list of Credential Setup Mapping Filter Data
    */
   public getFilteredCredentialSetupData(filterData: CredentialSetupFilterDto): Observable<CredentialSetupFilterGet[]> {
-    let data = '?';
-    const keysValues: string[] = [];
-
-    Object.entries(filterData).forEach(([key, value]) => {
-      if (value) {
-        keysValues.push(`${key}=${value}`)
-      }
-    });
-
-    data += keysValues.join('&');
-    return this.http.get<CredentialSetupFilterGet[]>(`/api/CredentialSetups/mappings${data}`);
+    return this.http.get<CredentialSetupFilterGet[]>(
+      `/api/CredentialSetups/mappings`,
+      { params: filterData as HttpParams }
+    );
   }
 
   /**

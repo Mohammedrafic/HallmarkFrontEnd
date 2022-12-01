@@ -9,6 +9,9 @@ export class Credential {
   expireDateApplicable: boolean;
   comment?: string;
   isMasterCredential?: boolean;
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
+  irpComment?: string;
 
   constructor(credential: Credential) {
     if (credential.id) {
@@ -19,6 +22,9 @@ export class Credential {
     this.name = credential.name;
     this.comment = credential.comment;
     this.expireDateApplicable = credential.expireDateApplicable;
+    this.includeInIRP = credential.includeInIRP;
+    this.includeInVMS = credential.includeInVMS;
+    this.irpComment = credential.irpComment;
   }
 }
 

@@ -351,19 +351,17 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
     if (!this.isInvoiceDepartmentIdFieldShow) {
       this.departmentsDetailsFormGroup.removeControl('invoiceDepartmentId');
-      this.grid.columns.splice(3, 1);
     }
 
     if (!this.isOrgUseIRPAndVMS) {
       this.departmentsDetailsFormGroup.removeControl('includeInIRP');
     }
 
-    if (this.isIRPFlagEnabled && !this.isOrgUseIRPAndVMS) {
-      this.grid.columns.pop();
-    }
+    this.grid.getColumnByField('invoiceDepartmentId').visible = this.isInvoiceDepartmentIdFieldShow;
+    this.grid.getColumnByField('includeInIRP').visible = this.isIRPFlagEnabled && this.isOrgUseIRPAndVMS;
 
     this.columnsToExport = DepartmentsExportCols(this.isIRPFlagEnabled && this.isOrgUseIRPAndVMS, this.isInvoiceDepartmentIdFieldShow);
-    this.grid.refresh();
+    this.grid.refreshColumns();
   }
 
   private createDepartmentsForm(): void {

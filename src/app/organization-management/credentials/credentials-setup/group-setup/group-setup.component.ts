@@ -1,12 +1,18 @@
-import { Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { GridComponent, SearchService } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { combineLatest, delay, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrganizationManagementState } from '../../../store/organization-management.state';
-import { ShowSideDialog } from '../../../../store/app.actions';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants/messages';
+import { ShowSideDialog, ShowToast } from '../../../../store/app.actions';
+import {
+  CANCEL_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+  PLEASE_SELECT_SYSTEM_GROUP_SETUP,
+} from '@shared/constants/messages';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CredentialSkillGroup, CredentialSkillGroupPage, CredentialSkillGroupPost } from '@shared/models/skill-group.model';
 import {
@@ -17,14 +23,20 @@ import {
 } from '../../../store/organization-management.actions';
 import { UserState } from 'src/app/store/user.state';
 import { Skill } from '@shared/models/skill.model';
+import { AppState } from '../../../../store/app.state';
+import { TakeUntilDestroy } from '@core/decorators';
+import { Organization } from '@shared/models/organization.model';
+import { GroupSetupService } from '@organization-management/credentials/services/group-setup.service';
+import { MessageTypes } from '@shared/enums/message-types';
 
+@TakeUntilDestroy
 @Component({
   selector: 'app-group-setup',
   templateUrl: './group-setup.component.html',
   styleUrls: ['./group-setup.component.scss'],
   providers: [SearchService]
 })
-export class GroupSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class GroupSetupComponent extends AbstractGridConfigurationComponent implements OnInit {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('searchGrid') searchGrid: GridComponent;
   @ViewChild('searchInputWithIcon') search: ElementRef;
@@ -34,24 +46,30 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
 
   @Select(OrganizationManagementState.skillGroups)
   skillGroups$: Observable<CredentialSkillGroupPage>;
-  public skillGroups: CredentialSkillGroup[];
 
   @Select(OrganizationManagementState.assignedSkillsByOrganization)
   allOrganizationSkills$: Observable<Skill[]>;
+
+  @Select(OrganizationManagementState.organization)
+  private organization$: Observable<Organization>;
+
+  public skillGroups: CredentialSkillGroup[];
   public filteredAssignedSkills: Skill[];
   public allAssignedSkills: Skill[];
   public searchDataSource: Skill[];
   public skillsId = new Set<number>();
 
   skillGroupsFormGroup: FormGroup;
-  formBuilder: FormBuilder;
 
   isGridStateInvalid = false;
   isEdit: boolean;
   editedSkillGroupId?: number;
+  isIRPAndVMSEnabled = false;
 
+  protected componentDestroy: () => Observable<unknown>;
+
+  private isIRPFlagEnabled = false;
   private reservedMasterSkillIds = new Set<number>();
-  private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private previouslySavedMappingsNumber: number;
 
@@ -59,40 +77,30 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     return this.isEdit ? 'Edit' : 'Add';
   }
 
-  constructor(private store: Store,
-              @Inject(FormBuilder) private builder: FormBuilder,
-              private confirmService: ConfirmService) {
+  constructor(
+    private store: Store,
+    private confirmService: ConfirmService,
+    private groupSetupService: GroupSetupService,
+  ) {
     super();
-    this.formBuilder = builder;
-    this.createSkillGroupFormGroup();
+
+    this.checkIRPFlag();
   }
 
   ngOnInit(): void {
+    this.startOrganizationWatching();
     this.organizationChangedHandler();
     this.skillGroupDataLoadedHandler();
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
   }
 
   onEditButtonClick(saveSkillGroup: CredentialSkillGroup, event: any): void {
     this.addActiveCssClass(event);
     const currentRowSkillGroupIds = saveSkillGroup.skills?.map(s => s.id);
-    const savedSkillIdsWithoutCurrentRow = Array.from(this.reservedMasterSkillIds).filter(s => {
-      if (currentRowSkillGroupIds && !currentRowSkillGroupIds.includes(s)) {
-        return s;
-      }
-      return null;
-    });
+    const savedSkillIdsWithoutCurrentRow = Array.from(this.reservedMasterSkillIds).filter(s =>
+      currentRowSkillGroupIds && !currentRowSkillGroupIds.includes(s)
+    );
 
-    const updatedAssignedSkills = this.allAssignedSkills.filter(s => {
-      if (!savedSkillIdsWithoutCurrentRow.includes(s.id)) {
-        return s;
-      }
-      return null;
-    });
+    const updatedAssignedSkills = this.allAssignedSkills.filter(s => !savedSkillIdsWithoutCurrentRow.includes(s.id));
 
     // reassign search grid data in Edit mode
     this.searchDataSource = updatedAssignedSkills;
@@ -113,10 +121,12 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
 
     setTimeout(() => this.searchGrid.selectRows(savedSkillIdsIndexes), 200);
 
-    this.skillGroupsFormGroup.setValue({
-      name: saveSkillGroup.name,
-      skillIds: savedSkillIds
-    });
+    this.groupSetupService.populateFormGroup(
+      this.skillGroupsFormGroup,
+      saveSkillGroup,
+      savedSkillIds,
+      this.isIRPAndVMSEnabled
+    );
 
     this.previouslySavedMappingsNumber = savedSkillIds.length;
 
@@ -130,18 +140,19 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
-        if (confirm) {
-          skillGroup.skills?.forEach(skill => {
-            if (this.reservedMasterSkillIds.has(skill.id)) {
-              this.reservedMasterSkillIds.delete(skill.id);
-            }
-          });
-          this.store.dispatch(new RemoveCredentialSkillGroup(skillGroup));
-        }
-        this.removeActiveCssClass();
-      });
+      }).pipe(
+       takeUntil(this.componentDestroy())
+    ).subscribe((confirm) => {
+      if (confirm) {
+        skillGroup.skills?.forEach(skill => {
+          if (this.reservedMasterSkillIds.has(skill.id)) {
+            this.reservedMasterSkillIds.delete(skill.id);
+          }
+        });
+        this.store.dispatch(new RemoveCredentialSkillGroup(skillGroup));
+      }
+      this.removeActiveCssClass();
+    });
   }
 
   onFormCancelClick(): void {
@@ -153,12 +164,14 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => !!confirm))
-        .subscribe(() => {
-          this.store.dispatch(new ShowSideDialog(false));
-          this.clearFormDetails();
-          this.removeActiveCssClass();
-        });
+        }).pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      ).subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false));
+        this.clearFormDetails();
+        this.removeActiveCssClass();
+      });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
       this.clearFormDetails();
@@ -167,28 +180,23 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   onFormSaveClick(): void {
-    if (this.skillGroupsFormGroup.valid && this.skillsId.size !== 0) {
-      if (this.isEdit) {
-        const skillGroup: CredentialSkillGroupPost = {
-          id: this.editedSkillGroupId,
-          name: this.skillGroupsFormGroup.controls['name'].value,
-          skillIds: Array.from(this.skillsId)
-        };
-        this.store.dispatch(new SaveUpdateCredentialSkillGroup(skillGroup));
-        this.store.dispatch(new ShowSideDialog(false));
-        this.removeActiveCssClass();
-        this.clearFormDetails();
-      } else {
-        const skillGroup: CredentialSkillGroupPost = {
-          name: this.skillGroupsFormGroup.controls['name'].value,
-          skillIds: Array.from(this.skillsId)
-        };
+    if (this.isIRPAndVMSEnabled && !this.checkOneIsSelected()) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, PLEASE_SELECT_SYSTEM_GROUP_SETUP));
 
-        this.store.dispatch(new SaveUpdateCredentialSkillGroup(skillGroup));
-        this.store.dispatch(new ShowSideDialog(false));
-        this.removeActiveCssClass();
-        this.clearFormDetails();
-      }
+      return;
+    }
+
+    if (this.skillGroupsFormGroup.valid && this.skillsId.size !== 0) {
+      const skillGroup: CredentialSkillGroupPost = {
+        ...this.skillGroupsFormGroup.getRawValue(),
+        skillIds: Array.from(this.skillsId),
+        ...(this.isEdit && { id: this.editedSkillGroupId }),
+      };
+
+      this.store.dispatch(new SaveUpdateCredentialSkillGroup(skillGroup));
+      this.store.dispatch(new ShowSideDialog(false));
+      this.removeActiveCssClass();
+      this.clearFormDetails();
     } else {
       this.isGridStateInvalid = this.skillsId.size === 0;
       this.skillGroupsFormGroup.markAllAsTouched();
@@ -247,15 +255,14 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.isGridStateInvalid = false;
   }
 
-  private createSkillGroupFormGroup(): void {
-    this.skillGroupsFormGroup = this.formBuilder.group({
-      name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      skillIds: ['']
-    });
+  private createSkillFormGroup(): void {
+    this.skillGroupsFormGroup = this.groupSetupService.createForm(this.isIRPAndVMSEnabled);
   }
 
   private organizationChangedHandler(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+    this.organizationId$.pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
       this.currentPage = 1;
       this.store.dispatch(new GetCredentialSkillGroup());
       this.store.dispatch(new GetAssignedSkillsByOrganization());
@@ -263,8 +270,9 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   private skillGroupDataLoadedHandler(): void {
-    combineLatest([this.skillGroups$, this.allOrganizationSkills$])
-    .pipe(takeUntil(this.unsubscribe$)).subscribe(([savedSkillGroupsPages, allOrganizationSkills]) => {
+    combineLatest([this.skillGroups$, this.allOrganizationSkills$]).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(([savedSkillGroupsPages, allOrganizationSkills]) => {
       if (savedSkillGroupsPages && savedSkillGroupsPages.items) {
         this.reservedMasterSkillIds.clear();
         savedSkillGroupsPages.items.forEach(item => {
@@ -283,12 +291,35 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   private filterSkills(): void {
-    this.filteredAssignedSkills = this.allAssignedSkills.filter(skill => {
-      if (!this.reservedMasterSkillIds.has(skill.id)) {
-        return skill;
-      }
-      return null;
-    });
+    this.filteredAssignedSkills = this.allAssignedSkills.filter(skill =>
+      !this.reservedMasterSkillIds.has(skill.id)
+    );
     this.searchDataSource = this.filteredAssignedSkills;
+  }
+
+  private checkIRPFlag(): void {
+    this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+  }
+
+  private startOrganizationWatching(): void {
+    this.organization$.pipe(
+      delay(100),
+      takeUntil(this.componentDestroy())
+    ).subscribe((org: Organization) => {
+      const { isIRPEnabled, isVMCEnabled } = org?.preferences || {};
+
+      this.isIRPAndVMSEnabled = this.isIRPFlagEnabled && !!(isIRPEnabled && isVMCEnabled);
+
+      this.createSkillFormGroup();
+
+      this.grid.getColumnByField('system').visible = this.isIRPAndVMSEnabled;
+      this.grid.refreshColumns();
+    });
+  }
+
+  private checkOneIsSelected(): boolean {
+    const { includeInIRP, includeInVMS } = this.skillGroupsFormGroup.getRawValue();
+
+    return includeInIRP || includeInVMS;
   }
 }

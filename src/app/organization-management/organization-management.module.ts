@@ -105,6 +105,10 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
 import { AssignSkillComponent } from './skills/assign-skill/assign-skill.component';
 import { SkillsState } from '@organization-management/store/skills.state';
 import { DepartmentService } from '@organization-management/departments/services/department.service';
+import { CredentialsSetupService } from '@organization-management/credentials/services/credentials-setup.service';
+import { GroupSetupService } from '@organization-management/credentials/services/group-setup.service';
+import { IrpSystemGridTextPipeModule } from '@shared/pipes/irp-system-grid-text/irp-system-grid-text.module';
+import { MapCredentialsService } from '@organization-management/credentials/services/map-credentials.service';
 
 const sidebarIcons = {
   Download,
@@ -230,7 +234,8 @@ const sidebarIcons = {
       SkillsState
     ]),
     ImportDialogContentModule,
-    TreeViewModule
+    TreeViewModule,
+    IrpSystemGridTextPipeModule,
   ],
   exports: [BillRatesComponent],
   providers:
@@ -244,7 +249,10 @@ const sidebarIcons = {
         provide: TIER_DIALOG_TYPE,
         useValue: Tiers.tierSettings
       },
-      DepartmentService
+      DepartmentService,
+      CredentialsSetupService,
+      GroupSetupService,
+      MapCredentialsService,
     ],
 })
 export class OrganizationManagementModule {}
