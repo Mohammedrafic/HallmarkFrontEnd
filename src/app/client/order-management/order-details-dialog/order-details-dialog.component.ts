@@ -112,7 +112,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public extensions: any[] = [];
 
   @Select(OrderManagementContentState.orderCandidatesLength)
-  public orderCandidatesLength$: Observable<number>
+  public orderCandidatesLength$: Observable<number>;
 
   @Select(UserState.currentUserPermissions)
   public currentUserPermissions$: Observable<any[]>;
@@ -183,13 +183,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     return !!(this.order?.orderClosureReasonId || this.order?.orderCloseDate) || this.disabledCloseButton;
   }
 
-  get mobileMenu(): any {
+  get tabletMenu(): { text: string }[] {
     let menu: { text: string }[] = [];
     if (this.showApproveAndCancel) {
       menu = [...menu, { text: MobileMenuItems.Cancel }, { text: MobileMenuItems.Approve }];
-    }
-    if (!this.disableEdit) {
-      menu = [...menu, { text: MobileMenuItems.Edit }];
     }
     if (!this.canCloseOrder && !this.disableCloseOrder) {
       menu = [...menu, { text: MobileMenuItems.CloseOrder }];
@@ -205,6 +202,14 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     }
     if (!this.disabledLock && this.showLockOrder) {
       menu = [...menu, { text: this.order?.isLocked ? MobileMenuItems.Unlock : MobileMenuItems.Lock }];
+    }
+    return menu;
+  }
+
+  get mobileMenu(): { text: string }[] {
+    let menu: { text: string }[] = this.tabletMenu;
+    if (!this.disableEdit) {
+      menu = [...menu, { text: MobileMenuItems.Edit }];
     }
     return menu;
   }
@@ -229,7 +234,6 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     this.subscribeOnOrderCandidatePage();
     this.subsToTabChange();
     this.subscribeOnPermissions();
-
   }
 
   ngOnChanges(changes: SimpleChanges): void {

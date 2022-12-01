@@ -37,6 +37,7 @@ export class GridComponent<Data = unknown> extends DestroyableDirective implemen
   @Input() public suppressRowClickSelection: boolean = false;
   @Input() public allowBulkSelection: boolean = false;
   @Input() public allowBulkButton: boolean = false;
+  @Input() public disableBulkButton: boolean = false;
   @Input() public rowSelection: 'single' | 'multiple' = 'single';
   @Input() public rowDragManaged: boolean = false;
   @Input() public suppressMoveWhenRowDragging: boolean = false;

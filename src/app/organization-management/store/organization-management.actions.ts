@@ -65,7 +65,7 @@ export class SaveDepartment {
 
 export class GetDepartmentsByLocationId {
   static readonly type = '[organizationManagement] Get The List Of Departments by locationId';
-  constructor(public locationId?: number, public filters?: DepartmentFilter) {}
+  constructor(public locationId?: number, public filters?: DepartmentFilter, public activeOnly?: boolean, public preservedId?: number) {}
 }
 
 export class UpdateDepartment {
@@ -110,7 +110,7 @@ export class GetLocationsByOrganizationId {
 
 export class GetLocationsByRegionId {
   static readonly type = '[organizationManagement] Get The List Of Locations by regionId';
-  constructor(public regionId: number, public filters?: LocationFilter) {}
+  constructor(public regionId: number, public filters?: LocationFilter, public activeOnly?: boolean, public preservedId?: number) {}
 }
 
 export class GetLocationById {

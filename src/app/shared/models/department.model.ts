@@ -9,10 +9,12 @@ export class Department {
   facilityContact: string;
   facilityEmail: string;
   facilityPhoneNo: string;
-  inactiveDate: string;
+  inactiveDate: string | null;
+  reactivateDate: string | null;
   unitDescription: string;
   includeInIRP?: boolean;
   locationIncludeInIRP?: boolean;
+  isDeactivated?: boolean;
 }
 
 export type DepartmentsPage = PageOfCollections<Department>;

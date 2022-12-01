@@ -16,7 +16,7 @@ export interface AssociateStateModel {
   partnershipSettings: PartnershipSettings | null;
   jobDistributionInitialData: JobDistributionInitialData | null;
   associateAgencyOrg: { id: number, name: string }[];
-  tierList: TierList | null;
+  tierList: TierList[] | null;
   selectedOrganizationAgency: AssociateOrganizationsAgency | null;
   tiersExceptionByPage: TierExceptionPage | null;
 }

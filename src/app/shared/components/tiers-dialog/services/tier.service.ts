@@ -62,9 +62,7 @@ export class TierService {
   }
 
   private getStructureForTierSettings(tier: TierDetails, regions: OrganizationRegion[]): TierDTO {
-    if (tier.regionId === null) {
-      this.getTierConfig(regions);
-    }
+    this.getTierConfig(regions);
 
     return {
       organizationTierId: tier.id,
@@ -90,7 +88,6 @@ export class TierService {
           departments: [...selectedDepartments, ...config.departments]
       } as TierConfig;
     }, this.tierConfig);
-
   }
 
   private getStructureForTierException(tier: TierDetails): TierDTO {

@@ -100,7 +100,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'id' };
+  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   selectedDepartments: Department[];
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];
@@ -264,7 +264,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
-              this.filterColumns.jobStatuses.dataSource = data.orderStatuses;
+              this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
               this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
               this.defaultOrderTypes = OrderTypeOptions.map((list) => list.id);
@@ -464,7 +464,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
         valueType: ValueType.Text,
         dataSource: [],
         valueField: 'statusText',
-        valueId: 'id',
+        valueId: 'status',
       },
       jobId: {
         type: ControlTypes.Text,
@@ -502,7 +502,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+    this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
     this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue([]);
@@ -544,7 +544,7 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
       ids.push(this.bussinessControl.value);
       let filter: CommonCandidateSearchFilter = {
         searchText: e.text,
-        businssUnitIds: ids
+        businessUnitIds: ids
       };
       this.filterColumns.dataSource = [];
       this.store.dispatch(new GetCommonReportCandidateSearch(filter))

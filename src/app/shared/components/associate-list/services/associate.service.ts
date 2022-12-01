@@ -150,8 +150,8 @@ export class AssociateService {
       return Object.fromEntries(Object.entries(data).map(([key, value]) => [[key], sortByField(value, sortedFields[key as keyof FeeExceptionsInitialData])]))}));
   }
 
-  public getTiers(payload: Partial<DepartmentsTierDTO>): Observable<TierList> {
-    return this.http.get<TierList>('/api/OrganizationTiers/byHierarchy', {params: payload});
+  public getTiers(payload: Partial<DepartmentsTierDTO>): Observable<TierList[]> {
+    return this.http.get<TierList[]>('/api/OrganizationTiers/byHierarchy', {params: payload});
   }
 
   public saveTierException(payload: TierDTO): Observable<TierDTO> {

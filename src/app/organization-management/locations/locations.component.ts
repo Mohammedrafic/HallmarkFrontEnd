@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -52,6 +52,8 @@ import {
 import { LocationsTrackKey } from './locations.enum';
 import { LocationsFormConfig, LocationsFormSource, LocationsSubFormConfig } from './locations.interface';
 import { LocationsService } from './locations.service';
+import { DateTimeHelper } from '@core/helpers';
+import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 
 @Component({
   selector: 'app-locations',
@@ -256,6 +258,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
 
   openAddLocationDialog(): void {
     if (this.selectedRegion) {
+      this.locationDetailsFormGroup.controls['inactiveDate'].enable();
       this.store.dispatch(new ShowSideDialog(true));
       this.getBusinessLineDataSource(null, null);
     } else {
@@ -295,6 +298,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       contactEmail: location.contactEmail,
       contactPerson: location.contactPerson,
       inactiveDate: location.inactiveDate,
+      reactivateDate: location.reactivateDate,
       phoneNumber: location.phoneNumber,
       phoneType: PhoneTypes[location.phoneType] || null,
       timeZone: location.timeZone,
@@ -307,6 +311,23 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.editedLocationId = location.id;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
+    this.inactivateDateHandler(this.locationDetailsFormGroup.controls['inactiveDate'], location.inactiveDate);
+  }
+
+  private inactivateDateHandler(field: AbstractControl, value: string | undefined): void {
+    if (value) {
+      const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
+      inactiveDate.setHours(0, 0, 0, 0);
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      if (DateTimeHelper.isDateBefore(inactiveDate, now)) {
+        field.disable();
+      } else {
+        field.enable();
+      }
+    } else {
+      field.enable();
+    }
   }
 
   deleteLocation(location: Location, event: Event): void {
@@ -357,6 +378,8 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
 
   saveLocation(): void {
     if (this.locationDetailsFormGroup.valid) {
+      const inactiveDate = this.locationDetailsFormGroup.controls['inactiveDate'].value;
+      const reactivateDate = this.locationDetailsFormGroup.controls['reactivateDate'].value;
       const location: Location = {
         id: this.editedLocationId,
         regionId: this.selectedRegion.id,
@@ -373,7 +396,8 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         ext: this.locationDetailsFormGroup.controls['ext'].value,
         contactEmail: this.locationDetailsFormGroup.controls['contactEmail'].value,
         contactPerson: this.locationDetailsFormGroup.controls['contactPerson'].value,
-        inactiveDate: this.locationDetailsFormGroup.controls['inactiveDate'].value,
+        inactiveDate: inactiveDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(inactiveDate)) : undefined,
+        reactivateDate: reactivateDate ? DateTimeHelper.setInitHours(DateTimeHelper.toUtcFormat(reactivateDate)) : undefined,
         phoneNumber: this.locationDetailsFormGroup.controls['phoneNumber'].value,
         phoneType: parseInt(PhoneTypes[this.locationDetailsFormGroup.controls['phoneType'].value]),
         timeZone: this.locationDetailsFormGroup.controls['timeZone'].value,
@@ -470,6 +494,20 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.locationDetailsFormGroup = this.locationsService.createForm();
     this.regionFormGroup = this.locationsService.createRegionForm();
     this.locationFilterForm = this.locationsService.createFilterForm();
+    this.addDatesValidation();
+  }
+
+  private addDatesValidation(): void {
+    const inactiveDate = this.locationDetailsFormGroup.controls['inactiveDate'];
+    const reactivateDate = this.locationDetailsFormGroup.controls['reactivateDate'];
+    inactiveDate.addValidators(startDateValidator(this.locationDetailsFormGroup, 'reactivateDate'));
+    reactivateDate.addValidators(endDateValidator(this.locationDetailsFormGroup, 'inactiveDate'));
+    inactiveDate.valueChanges.subscribe(() =>
+      reactivateDate.updateValueAndValidity({ onlySelf: true, emitEvent: false })
+    );
+    reactivateDate.valueChanges.subscribe(() =>
+      inactiveDate.updateValueAndValidity({ onlySelf: true, emitEvent: false })
+    );
   }
 
   private getBusinessLineDataSource(id: number | null, line: string | null | undefined): void {

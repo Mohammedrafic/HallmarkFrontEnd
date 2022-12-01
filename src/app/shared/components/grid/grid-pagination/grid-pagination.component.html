@@ -33,14 +33,17 @@
           {{ selectedTableRowsAmount }} Rows Selected
         </h3>
 
-        <button
-          *ngIf="allowBulkButton"
-          (click)="approveEmitter.emit()"
-          class="approve-button"
-          ejs-button
-          cssClass="e-primary">
-          Approve
-        </button>
+        <app-tooltip-container [showToolTip]="disableBulkButton">
+          <button
+            *ngIf="allowBulkButton"
+            [disabled]="disableBulkButton"
+            (click)="approveEmitter.emit()"
+            class="approve-button"
+            ejs-button
+            cssClass="e-primary">
+            Approve
+          </button>
+        </app-tooltip-container>
 
         <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
         <button

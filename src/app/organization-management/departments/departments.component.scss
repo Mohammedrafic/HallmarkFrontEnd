@@ -64,6 +64,14 @@
 .form-container {
   padding-top: 24px;
 
+  .dates-container {
+    display: flex;
+
+    .inactive-date {
+      margin-right: 12px;
+    }
+  }
+
   .input-container {
     margin-bottom: 12px;
     width: 386px;

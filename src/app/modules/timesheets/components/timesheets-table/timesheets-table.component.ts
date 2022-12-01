@@ -1,12 +1,14 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
+import { Store } from "@ngxs/store";
 
 import { BehaviorSubject, distinctUntilChanged, Observable, takeUntil, throttleTime } from 'rxjs';
 
 import { RowNode } from '@ag-grid-community/core';
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { GridReadyEventModel } from '@shared/components/grid/models/grid-ready-event.model';
-import { BaseObservable, Destroyable } from '@core/helpers';
+import { AbstractPermission } from "@shared/helpers/permissions";
+import { BaseObservable } from '@core/helpers';
 
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { TimesheetsSelectedRowEvent } from '../../interface';
@@ -20,7 +22,7 @@ import { GRID_CONFIG } from '@shared/constants';
   styleUrls: ['./timesheets-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimesheetsTableComponent extends Destroyable implements OnInit, OnChanges {
+export class TimesheetsTableComponent extends AbstractPermission implements OnInit, OnChanges {
   @Input() tableData: TimeSheetsPage;
 
   @Input() newSelectedIndex: null | number;
@@ -54,13 +56,15 @@ export class TimesheetsTableComponent extends Destroyable implements OnInit, OnC
 
   constructor(
     private router: Router,
+    protected override store: Store,
   ) {
-    super();
+    super(store);
 
     this.isAgency = this.router.url.includes('agency');
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.startCurrentPageWatching();
   }
 

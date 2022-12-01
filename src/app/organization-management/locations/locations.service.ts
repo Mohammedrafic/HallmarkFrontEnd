@@ -26,6 +26,7 @@ export class LocationsService {
       contactEmail: [null, [Validators.email]],
       contactPerson: [null, [Validators.minLength(1), Validators.maxLength(50)]],
       inactiveDate: [null],
+      reactivateDate: [null],
       phoneNumber: [null, [Validators.minLength(10), Validators.maxLength(10), Validators.pattern('^[0-9]*$')]],
       phoneType: [null],
       timeZone: [null],
