@@ -3,7 +3,6 @@
 
 .quick-order-form-container {
   padding: 5px 24px;
-  height: 100%;
 
   .row {
     display: flex;
@@ -153,7 +152,7 @@
     .e-acrdn-content {
       margin-top: 8px;
       border-radius: 12px;
-      padding: 16px;
+      padding: 0 16px 16px;
       background-color: $white;
     }
   }
@@ -173,8 +172,8 @@
     flex-direction: column;
     margin: 0 !important;
 
-    > *:not(:first-child) {
-      padding: 12px 0 0 !important;
+    > * {
+      padding: 15px 0 0 !important;
     }
 
     .order-status {
