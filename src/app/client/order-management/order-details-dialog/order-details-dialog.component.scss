@@ -21,6 +21,9 @@
   align-items: center;
 
   ejs-chiplist {
+    &:not(.e-chip) {
+      flex-wrap: nowrap !important;
+    }
     .e-chip {
       &:hover {
         cursor: default;
@@ -56,9 +59,26 @@
     display: none !important;
   }
 
+  .menu-tablet {
+    display: none !important;
+  }
+
+  @media #{$max-tablet} {
+    display: flex;
+
+    button:not(.close-button, .menu-mobile, .edit-button), .vertical-divider {
+      display: none;
+    }
+
+    .menu-tablet {
+      display: inline-block !important;
+    }
+  }
+
   @media (max-width: $tablet-min) {
     display: flex;
-    
+    margin-left: -15%;
+
     button:not(.close-button, .menu-mobile), .vertical-divider {
       display: none;
     }
@@ -66,7 +86,11 @@
     .menu-mobile {
       display: inline-block !important;
     }
+    .menu-tablet {
+      display: none !important;
+    }
   }
+
 }
 
 .vertical-divider {
