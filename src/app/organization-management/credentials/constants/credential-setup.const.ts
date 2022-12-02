@@ -3,7 +3,7 @@ import { CredentialSetupSystemEnum } from '@organization-management/credentials/
 export const systemOptions = [
   {
     id: CredentialSetupSystemEnum.All,
-    name: 'All'
+    name: 'IRP, VMS'
   },
   {
     id: CredentialSetupSystemEnum.IRP,
