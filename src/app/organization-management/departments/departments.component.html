@@ -88,6 +88,11 @@
           </div>
         </ng-template>
       </e-column>
+      <e-column field="includeInIRP" headerText="Include in IRP" width=200>
+        <ng-template #template let-data>
+          <span>{{ data.includeInIRP ? 'Yes' : 'No' }}</span>
+        </ng-template>
+      </e-column>
       <e-column field="extDepartmentId" headerText="EXT DEPARTMENT ID" width=200></e-column>
       <e-column field="invoiceDepartmentId" headerText="INVOICE DEPARTMENT ID" width=200></e-column>
       <e-column field="departmentName" headerText="DEPARTMENT NAME" width=200></e-column>
@@ -102,11 +107,6 @@
       <e-column field="inactiveDate" headerText="Reactivate Date" width=200>
         <ng-template #template let-data>
           {{ data.inactiveDate | date: 'MM/dd/yyy' : 'UTC' }}
-        </ng-template>
-      </e-column>
-      <e-column field="includeInIRP" headerText="Include in IRP" width=200>
-        <ng-template #template let-data>
-          <span>{{ data.includeInIRP ? 'Yes' : 'No' }}</span>
         </ng-template>
       </e-column>
     </e-columns>

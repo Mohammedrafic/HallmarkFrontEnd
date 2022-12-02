@@ -45,7 +45,8 @@ export const ERROR_START_LESS_END_DATE = 'Start date should be before end date o
 export const SHOULD_LOC_DEP_INCLUDE_IRP = 'Should all locations and departments be included in IRP?';
 export const JOB_DISTRIBUTION_TITLE = 'Job Distribution';
 export const PROCEED_FOR_ALL_AGENCY = 'Order will be distributed to all Agencies. Do you want to proceed?';
-export const PROCEED_FOR_TIER_LOGIC = 'Order will be distributed based on Tiering logic. Do you want to proceed?'
+export const PROCEED_FOR_TIER_LOGIC = 'Order will be distributed based on Tiering logic. Do you want to proceed?';
+export const PLEASE_SELECT_SYSTEM_GROUP_SETUP = 'Please select system for Group setup';
 
 export const updateCandidateJobMessage = (dates: string[]) =>
   `For this candidate job timesheets will be recalculated for the next start dates: ${dates.join(', ')}`;

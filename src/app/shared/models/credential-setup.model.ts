@@ -10,6 +10,10 @@ export class CredentialSetupGet {
   reqOnboard?: boolean;
   inactiveDate?: string;
   comments?: string;
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
+  irpComment?: string;
+  irpComments?: string;
 }
 
 export class CredentialSetupPost {
@@ -39,18 +43,30 @@ export class CredentialSetupDetails {
   reqOnboard?: boolean;
   inactiveDate?: string;
   comments?: string;
+  irpComment?: string;
+}
+
+export interface CredentialsSelectedItem {
+  masterCredentialId: number;
+  comments: string;
+  isActive: boolean;
+  reqSubmission: boolean;
+  reqOnboard: boolean;
+  inactiveDate: string;
 }
 
 export class SaveUpdatedCredentialSetupDetailIds {
   createdIds: number[];
 }
 
-export class CredentialSetupFilterDto {
+export interface CredentialSetupFilterDto {
   regionId?: number;
   locationId?: number;
   departmentId?: number;
   skillGroupId?: number;
   skillId?: number;
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
   pageNumber?: number;
   pageSize?: number;
 }

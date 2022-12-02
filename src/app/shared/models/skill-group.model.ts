@@ -1,11 +1,12 @@
 import { PageOfCollections } from '@shared/models/page.model';
-import { MasterSkillByOrganization } from '@shared/models/skill.model';
 
 export class CredentialSkillGroup {
   id?: number;
   name?: string;
   organizationId?: number;
   skills?: CredentialSkillByOrganization[];
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
 }
 
 export class CredentialSkillGroupPost {

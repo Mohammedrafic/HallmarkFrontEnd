@@ -23,6 +23,9 @@ export class Credential {
     this.name = credential.name;
     this.comment = credential.comment;
     this.expireDateApplicable = credential.expireDateApplicable;
+    this.includeInIRP = credential.includeInIRP;
+    this.includeInVMS = credential.includeInVMS;
+    this.irpComment = credential.irpComment;
   }
 }
 
