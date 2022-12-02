@@ -23,6 +23,7 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
   @Input() public userIsAdmin: boolean;
   @Input() public skills: AllOrganizationsSkill[];
   @Input() public organizationStructure: OrganizationStructure;
+  @Input() public isMobile: boolean;
 
   @ViewChild('sideDialog', { static: true }) public sideDialog: DialogComponent;
   @ViewChild('quickOrderForm') public quickOrderForm: QuickOrderFormComponent;
@@ -32,7 +33,7 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
 
   public submitQuickOrder$ = new Subject<boolean>();
 
-  public readonly targetElement: HTMLElement = document.body;
+  public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');;
 
   private isFormDirty: boolean;
 

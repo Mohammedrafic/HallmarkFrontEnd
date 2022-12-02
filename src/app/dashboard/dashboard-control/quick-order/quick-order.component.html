@@ -3,17 +3,18 @@
   [animationSettings]="{ effect: 'SlideRight' }"
   [isModal]="true"
   [visible]="false"
+  [showCloseIcon]="isMobile"
   [target]="targetElement"
-  cssClass="dialog"
+  cssClass="dialog quick-order-dialog"
+  [ngClass]="{ filter: isMobile }"
   id="dialog"
-  width="65%"
 >
   <ng-template #header>
     <section class="container">
       <section class="header-container">
         <div class="e-card-header">
           <h3 class="e-card-title">Quick Order</h3>
-          <div>
+          <div *ngIf="!isMobile">
             <button ejs-button cssClass="e-outline calcel" (click)="onClose()">Cancel</button>
             <button ejs-button [isPrimary]="true" (click)="onSubmitQuickOrder()">Submit</button>
           </div>
@@ -31,6 +32,8 @@
       [skills]="skills"
       [organizationStructure]="organizationStructure"
       [openEvent]="openEvent"
+      [isMobile]="isMobile"
+      (submit)="onSubmitQuickOrder()"
     ></app-quick-order-form>
   </ng-template>
 </ejs-dialog>
