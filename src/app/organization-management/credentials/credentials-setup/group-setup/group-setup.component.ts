@@ -93,7 +93,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.skillGroupDataLoadedHandler();
   }
 
-  onEditButtonClick(saveSkillGroup: CredentialSkillGroup, event: any): void {
+  editRow(saveSkillGroup: CredentialSkillGroup, event: any): void {
     this.addActiveCssClass(event);
     const currentRowSkillGroupIds = saveSkillGroup.skills?.map(s => s.id);
     const savedSkillIdsWithoutCurrentRow = Array.from(this.reservedMasterSkillIds).filter(s =>
@@ -119,8 +119,6 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
       }
     });
 
-    setTimeout(() => this.searchGrid.selectRows(savedSkillIdsIndexes), 200);
-
     this.groupSetupService.populateFormGroup(
       this.skillGroupsFormGroup,
       saveSkillGroup,
@@ -130,10 +128,15 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
 
     this.previouslySavedMappingsNumber = savedSkillIds.length;
 
-    this.store.dispatch(new ShowSideDialog(true));
+    this.store.dispatch(new ShowSideDialog(true)).pipe(
+      delay(100),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.searchGrid.selectRows(savedSkillIdsIndexes);
+    });
   }
 
-  onRemoveButtonClick(skillGroup: CredentialSkillGroup, event: any): void {
+  deleteRow(skillGroup: CredentialSkillGroup, event: any): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {

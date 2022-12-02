@@ -202,7 +202,7 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
     this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
   }
 
-  public onGoToClick(event: { currentPage?: number; value: number; }): void {
+  public changeTablePagination(event: { currentPage?: number; value: number; }): void {
     if (event.currentPage || event.value) {
       this.gridDataSource = this.getRowsPerPage(this.mappingData, event.currentPage || event.value);
       this.currentPagerPage = event.currentPage || event.value;
