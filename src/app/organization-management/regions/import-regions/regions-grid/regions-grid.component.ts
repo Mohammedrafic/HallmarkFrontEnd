@@ -18,6 +18,7 @@ export class RegionsGridComponent  {
 
   public gridReady(event: GridReadyEventModel) {
     this.gridApi = event.api;
+    this.gridApi.setDomLayout("autoHeight");
   }
 
 }
