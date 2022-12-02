@@ -25,7 +25,7 @@
           </span>
         </div>
         <div>
-          <button (click)="addNewPayment()" class="add-btn">
+          <button (click)="addNewPayment()" class="add-btn" [disabled]="!actionsAllowed">
             + Add Payment
           </button>
         </div>

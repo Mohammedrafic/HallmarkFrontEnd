@@ -751,6 +751,7 @@ export class InvoicesState {
   ): Observable<void> {
     return this.invoicesAPIService.savePayment(payload)
     .pipe(
+      tap(() => { dispatch(new ShowToast(MessageTypes.Success, 'Payment was saved successfully')); }),
       catchError((err: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),

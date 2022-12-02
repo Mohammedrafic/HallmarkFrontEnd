@@ -12,6 +12,7 @@ import { InvoicesModel } from '../../store/invoices.model';
 import { InvoicesApiService } from '../../services';
 import { PaymentTableDefs } from './invoice-payment-details.constant';
 import { Invoices } from '../../store/actions/invoices.actions';
+import { InvoiceState } from '../../enums';
 
 @Component({
   selector: 'app-invoice-payment-details',
@@ -30,6 +31,8 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
   context: { componentParent: InvoicePaymentDetailsComponent };
 
   tableData: InvoicePayment[] = [];
+
+  actionsAllowed = true;
 
   readonly paymentTableDefs = PaymentTableDefs;
 
@@ -95,6 +98,7 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
       switchMap((details) => {
         this.invoiceData.invoiceId = details.meta.invoiceId;
         this.invoiceData.agencySuffix = details.meta.agencySuffix as number;
+        this.actionsAllowed = details.meta.invoiceState === InvoiceState.PendingPayment;
 
         const dto: InvoicePaymentGetParams =  {
           InvoiceId: details.meta.invoiceId,
