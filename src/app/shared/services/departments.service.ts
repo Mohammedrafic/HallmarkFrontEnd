@@ -56,7 +56,10 @@ export class DepartmentsService {
   /**
    * Update department
    */
-  public updateDepartment(department: Department): Observable<void> {
+  public updateDepartment(department: Department, ignoreWarning: boolean): Observable<void> {
+    if (ignoreWarning) {
+      department.ignoreValidationWarning = true;
+    }
     return this.http.put<void>(`/api/Departments/`, department);
   }
 

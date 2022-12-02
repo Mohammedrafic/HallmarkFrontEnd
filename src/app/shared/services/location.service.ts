@@ -57,7 +57,10 @@ export class LocationService {
   /**
    * Update the location
    */
-  public updateLocation(location: Location): Observable<void> {
+  public updateLocation(location: Location, ignoreWarning: boolean): Observable<void> {
+    if (ignoreWarning) {
+      return this.http.put<void>(`/api/Locations/`, { location, ignoreValidationWarning: true });
+    }
     return this.http.put<void>(`/api/Locations/`, { location });
   }
 

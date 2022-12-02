@@ -84,11 +84,15 @@ import {
   SaveCredentialSucceeded,
   SaveCredentialType,
   SaveDepartment,
+  SaveDepartmentConfirm,
   SaveDepartmentsImportResult,
   SaveDepartmentsImportResultSucceeded,
+  SaveDepartmentSucceeded,
   SaveLocation,
+  SaveLocationConfirm,
   SaveLocationsImportResult,
   SaveLocationsImportResultSucceeded,
+  SaveLocationSucceeded,
   SaveMasterSkill,
   SaveMasterSkillSucceeded,
   SaveOrganization,
@@ -582,7 +586,7 @@ export class OrganizationManagementState {
     return this.departmentService.saveDepartment(payload).pipe(
       tap((payload) => {
         patchState({ isDepartmentLoading: false });
-        dispatch(new GetDepartmentsByLocationId(payload.locationId, filters));
+        dispatch([new GetDepartmentsByLocationId(payload.locationId, filters), new SaveDepartmentSucceeded()]);
         if (filters) {
           dispatch(new GetDepartmentFilterOptions(payload.locationId as number));
         }
@@ -612,16 +616,26 @@ export class OrganizationManagementState {
   @Action(UpdateDepartment)
   UpdateDepartments(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
-    { department, filters }: UpdateDepartment
+    { department, filters, ignoreWarning }: UpdateDepartment
   ): Observable<void> {
-    return this.departmentService.updateDepartment(department).pipe(
+    return this.departmentService.updateDepartment(department, ignoreWarning as boolean).pipe(
       tap((payload) => {
         patchState({ isDepartmentLoading: false });
-        dispatch(new GetDepartmentsByLocationId(department.locationId, filters));
+        dispatch([new GetDepartmentsByLocationId(department.locationId, filters), new SaveDepartmentSucceeded()]);
         if (filters) {
           dispatch(new GetDepartmentFilterOptions(department.locationId as number));
         }
         return payload;
+      }),
+      catchError((error) => {
+        const errorObj = error.error;
+        if (errorObj.errors?.IncompleteOpenOrdersExist) {
+          return dispatch(new ShowToast(MessageTypes.Error, 'Department has Open/Incomplete Orders, please re-assign or close them before inactivating the Location'));
+        }
+        if (errorObj.errors?.InProgressOrdersExist) {
+          return dispatch(new SaveDepartmentConfirm());
+        }
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
       })
     );
   }
@@ -773,7 +787,7 @@ export class OrganizationManagementState {
     return this.locationService.saveLocation(location).pipe(
       tap((payload) => {
         patchState({ isLocationLoading: false });
-        dispatch([new ShowToast(MessageTypes.Success, RECORD_ADDED), new GetLocationsByRegionId(regionId, filters)]);
+        dispatch([new ShowToast(MessageTypes.Success, RECORD_ADDED), new GetLocationsByRegionId(regionId, filters), new SaveLocationSucceeded()]);
         if (filters) {
           dispatch(new GetLocationFilterOptions(regionId));
         }
@@ -786,18 +800,27 @@ export class OrganizationManagementState {
   @Action(UpdateLocation)
   UpdateLocation(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
-    { location, regionId, filters }: UpdateLocation
+    { location, regionId, filters, ignoreWarning }: UpdateLocation
   ): Observable<void> {
-    return this.locationService.updateLocation(location).pipe(
+    return this.locationService.updateLocation(location, ignoreWarning as boolean).pipe(
       tap((payload) => {
         patchState({ isLocationLoading: false });
-        dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new GetLocationsByRegionId(regionId, filters)]);
+        dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new GetLocationsByRegionId(regionId, filters), new SaveLocationSucceeded()]);
         if (filters) {
           dispatch(new GetLocationFilterOptions(regionId));
         }
         return payload;
       }),
-      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error))))
+      catchError((error) => {
+        const errorObj = error.error;
+        if (errorObj.errors?.IncompleteOpenOrdersExist) {
+          return dispatch(new ShowToast(MessageTypes.Error, 'Location has Open/Incomplete Orders, please re-assign or close them before inactivating the Location'));
+        }
+        if (errorObj.errors?.InProgressOrdersExist) {
+          return dispatch(new SaveLocationConfirm());
+        }
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)));
+      })
     );
   }
 
