@@ -50,20 +50,20 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
   public allOption: string = "All";
   public regionFields = REGION_DATA_FIELDS;
-  selectedRegions: Region[];
+  selectedRegions: Region[]=[];
 
   isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedLocations: Location[];
+  selectedLocations: Location[]=[];
 
   isDepartmentsDropDownEnabled: boolean = false;
   departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedDepartments: Department[];
+  selectedDepartments: Department[]=[];
 
 
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
-  selectedOrganizations: Organisation[];
+  selectedOrganizations: Organisation[]=[];
 
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
@@ -259,10 +259,10 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     }
     this.paramsData =
     {
-      "OrganizationParamAR": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "RegionParamAR": this.selectedRegions?.map((list) => list.id).join(","),
-      "LocationParamAR": this.selectedLocations?.map((list) => list.id).join(","),
-      "DepartmentParamAR": this.selectedDepartments?.map((list) => list.id).join(","),
+      "OrganizationParamAR":this.selectedOrganizations?.length==0?"null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "RegionParamAR": this.selectedRegions?.length==0?"null":this.selectedRegions?.map((list) => list.id).join(","),
+      "LocationParamAR":this.selectedLocations?.length==0?"null":  this.selectedLocations?.map((list) => list.id).join(","),
+      "DepartmentParamAR":this.selectedDepartments?.length==0?"null": this.selectedDepartments?.map((list) => list.id).join(","),
       "BearerParamAR": auth,
       "BusinessUnitIdParamJD": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.organizationId != null ?

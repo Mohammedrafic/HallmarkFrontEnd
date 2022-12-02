@@ -31,6 +31,7 @@ import {
   GetBillRatesImportTemplateSucceeded,
   GetBusinessUnitList,
   GetCredential,
+  GetCredentialForSettings,
   GetCredentialSkillGroup,
   GetCredentialTypes,
   GetDepartmentFilterOptions,
@@ -1071,6 +1072,18 @@ export class OrganizationManagementState {
         return payload;
       })
     );
+  }
+
+  @Action(GetCredentialForSettings)
+  GetCredentialForSettings(
+    { patchState }: StateContext<OrganizationManagementStateModel>,
+    { filters }: GetCredentialForSettings
+  ): Observable<CredentialPage> {
+    return this.credentialsService.getCredentialForSettings(filters).pipe(
+      tap((payload: CredentialPage) => {
+        patchState({credentials: payload});
+      })
+    )
   }
 
   @Action(SaveCredential)

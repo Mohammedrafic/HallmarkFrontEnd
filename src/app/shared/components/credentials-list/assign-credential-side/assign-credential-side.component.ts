@@ -128,7 +128,7 @@ export class AssignCredentialSideComponent extends DestroyableDirective implemen
 
   private getTreeValue(): string[] {
     const value = this.store.selectSnapshot(CredentialsState.assignedCredentialTreeValue);
-    return value.map((number) => number.toString());
+    return value?.map((number) => number.toString());
   }
 
   private clearAndClose(): void {

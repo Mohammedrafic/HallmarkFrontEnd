@@ -141,7 +141,6 @@ import { UnsavedFormDirective } from './directives/unsaved-form.directive';
 import { ClearCacheComponent } from './components/clear-cache/clear-cache.component';
 import { CandidateCancellationDialogComponent } from './components/candidate-cancellation-dialog/candidate-cancellation-dialog.component';
 import { OrderHistoricalEventsComponent } from './components/order-historical-events/order-historical-events.component';
-import { CredentialsListComponent } from './components/credentials-list/credentials-list.component';
 import { AssignCredentialSideComponent } from './components/credentials-list/assign-credential-side/assign-credential-side.component';
 import { SendEmailSideDialogComponent } from './components/send-email-side-dialog/send-email-side-dialog.component';
 import { DocumentPreviewSideDialogComponent } from './components/document-preview-side-dialog/document-preview-side-dialog.component';
@@ -230,7 +229,6 @@ const COMPONENTS = [
   UnsavedFormDirective,
   ClearCacheComponent,
   CandidateCancellationDialogComponent,
-  CredentialsListComponent,
   AssignCredentialSideComponent,
   SendEmailSideDialogComponent,
   DocumentPreviewSideDialogComponent,
@@ -277,7 +275,7 @@ const COMPONENTS = [
     NgxMaskModule.forChild(),
     SidebarModule,
     RouterModule,
-    TreeViewAllModule
+    TreeViewAllModule,
   ],
   exports: [
     ...COMPONENTS,

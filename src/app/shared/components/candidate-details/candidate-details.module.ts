@@ -52,6 +52,6 @@ import { GridClassificationRendererComponent } from './candidate-grid/grid-class
     NgxsModule.forFeature([CandidateDetailsState]),
   ],
   providers: [CandidateDetailsService],
-  exports: [CandidateDetailsComponent],
+    exports: [CandidateDetailsComponent, FiltersComponent],
 })
 export class CandidateDetailsModule {}

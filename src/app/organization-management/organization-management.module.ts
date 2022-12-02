@@ -107,6 +107,7 @@ import { AssignSkillComponent } from './skills/assign-skill/assign-skill.compone
 import { SkillsState } from '@organization-management/store/skills.state';
 import { DepartmentService } from '@organization-management/departments/services/department.service';
 import { SideMenuService } from '@shared/components/side-menu/services';
+import { CredentialListModule } from '@shared/components/credentials-list/credential-list.module';
 import { CredentialsSetupService } from '@organization-management/credentials/services/credentials-setup.service';
 import { GroupSetupService } from '@organization-management/credentials/services/group-setup.service';
 import { IrpSystemGridTextPipeModule } from '@shared/pipes/irp-system-grid-text/irp-system-grid-text.module';
@@ -216,6 +217,7 @@ const sidebarIcons = {
     TooltipAllModule,
     TooltipContainerModule,
     TiersDialogModule,
+    CredentialListModule,
 
     FeatherModule.pick(sidebarIcons),
 
