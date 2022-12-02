@@ -42,7 +42,7 @@ import { PermissionService } from 'src/app/security/services/permission.service'
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { Days } from '@shared/enums/days';
 import { groupInvoicesOptions } from 'src/app/modules/invoices/constants';
-import { AssociatedLink, SettingsFilterCols, tierSettingsKey } from './settings.constant';
+import { AssociatedLink, DisabledSettingsByDefault, SettingsAppliedToPermissions, SettingsFilterCols, tierSettingsKey } from './settings.constant';
 import { SettingsDataAdapter } from './helpers/settings-data.adapter';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { SideMenuService } from '@shared/components/side-menu/services';
@@ -133,14 +133,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public organizationId: number;
   public maxFieldLength = 100;
   public hasPermissions: Record<string, boolean> = {};
-  public settingKeys: string[] = [
-    'AllowDocumentUpload',
-    'AllowAgencyToBidOnCandidateBillRateBeyondOrderBillRate',
-    'AutoLockOrder',
-    'IsReOrder',
-  ];
-
-  public disabledSettings = ["IsReOrder", "AllowDocumentUpload", "NetPaymentTerms", "NoOfDaysAllowedForTimesheetEdit", "EnableChat"];
+  public settingsAppliedToPermissions: string[] = SettingsAppliedToPermissions;
+  public disabledSettings = DisabledSettingsByDefault;
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -729,7 +723,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       .getPermissions()
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(({ canManageOrganizationConfigurations }) => {
-        this.settingKeys.forEach((key) => (this.hasPermissions[key] = canManageOrganizationConfigurations));
+        this.settingsAppliedToPermissions.forEach((key) => (this.hasPermissions[key] = canManageOrganizationConfigurations));
       });
   }
 

@@ -31,4 +31,19 @@ export const SettingsFilterCols: SettingsFilterColsConfig = {
     valueType: ValueType.Text,
     dataSource: [],
   },
-}
+};
+
+export const SettingsAppliedToPermissions: string[] = [
+  'AllowDocumentUpload',
+  'AllowAgencyToBidOnCandidateBillRateBeyondOrderBillRate',
+  'AutoLockOrder',
+  'IsReOrder',
+];
+
+export const DisabledSettingsByDefault = [
+  'IsReOrder',
+  'AllowDocumentUpload',
+  'NetPaymentTerms',
+  'NoOfDaysAllowedForTimesheetEdit',
+  'EnableChat',
+];
