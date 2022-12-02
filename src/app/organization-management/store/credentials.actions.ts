@@ -1,6 +1,5 @@
 import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
 import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
-import { ExportPayload } from '@shared/models/export.model';
 import { CredentialSetupFilterDto, CredentialSetupMappingPost, CredentialSetupPost } from '@shared/models/credential-setup.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 
@@ -27,11 +26,6 @@ export class SaveCredentialGroupMapping {
 export class DeleteCredentialGroupMappingById {
   static readonly type = '[credentials] Delete Credential Group Mapping By Id';
   constructor(public payload: number) {}
-}
-
-export class ExportCredentialList {
-  static readonly type = '[credentials] Export Credential list';
-  constructor(public payload: ExportPayload) { }
 }
 
 export class ShowExportCredentialListDialog {

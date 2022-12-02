@@ -107,6 +107,7 @@ import { AssignSkillComponent } from './skills/assign-skill/assign-skill.compone
 import { SkillsState } from '@organization-management/store/skills.state';
 import { DepartmentService } from '@organization-management/departments/services/department.service';
 import { SideMenuService } from '@shared/components/side-menu/services';
+import { CredentialListModule } from '@shared/components/credentials-list/credential-list.module';
 
 const sidebarIcons = {
   Download,
@@ -212,6 +213,7 @@ const sidebarIcons = {
     TooltipAllModule,
     TooltipContainerModule,
     TiersDialogModule,
+    CredentialListModule,
 
     FeatherModule.pick(sidebarIcons),
 

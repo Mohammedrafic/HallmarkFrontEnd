@@ -268,6 +268,11 @@ export class GetCredential {
   constructor(public payload?: CredentialFilter) {}
 }
 
+export class GetCredentialForSettings {
+  static readonly type = '[organizationManagement] Get Credential list for Settings';
+  constructor(public filters: CredentialFilter) {}
+}
+
 export class GetCredentialById {
   static readonly type = '[organizationManagement] Get Credential by ID';
   constructor(public payload: Credential) {}

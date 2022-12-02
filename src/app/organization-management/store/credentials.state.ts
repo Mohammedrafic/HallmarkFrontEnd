@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
 import {
   DeleteCredentialGroupMappingById,
-  ExportCredentialList,
   GetCredentialGroupMapping,
   GetCredentialSetupByMappingId,
   GetFilteredCredentialSetupData,
@@ -13,9 +12,13 @@ import {
   SetCredentialSetupFilter,
   SetNavigationTab,
   UpdateCredentialSetupSucceeded,
-  SaveUpdateCredentialSetupMappingData, SaveUpdateCredentialSetupMappingSucceeded, GetCredentialsDataSources, ClearCredentialSetup, GetAssignedCredentialTree, SaveAssignedCredentialValue
+  SaveUpdateCredentialSetupMappingData,
+  SaveUpdateCredentialSetupMappingSucceeded,
+  ClearCredentialSetup,
+  GetAssignedCredentialTree,
+  SaveAssignedCredentialValue
 } from './credentials.actions';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { catchError, Observable, tap } from 'rxjs';
 import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
 import { SkillGroupService } from '@shared/services/skill-group.service';
 import { ShowToast } from '../../store/app.actions';
@@ -26,11 +29,17 @@ import {
   RECORD_CANNOT_BE_SAVED,
   RECORD_MODIFIED
 } from '@shared/constants';
-import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { CredentialsService } from '@shared/services/credentials.service';
-import { CredentialSetupFilterGet, CredentialSetupGet, SaveUpdatedCredentialSetupDetailIds } from '@shared/models/credential-setup.model';
+import {
+  CredentialSetupFilterGet,
+  CredentialSetupGet,
+  SaveUpdatedCredentialSetupDetailIds
+} from '@shared/models/credential-setup.model';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { AssignedCredentialTree, AssignedCredentialTreeData, CredentialFilterDataSources } from '@shared/models/credential.model';
+import {
+  AssignedCredentialTree,
+  AssignedCredentialTreeData
+} from '@shared/models/credential.model';
 import { compact } from 'lodash';
 
 export interface CredentialsStateModel {
@@ -39,7 +48,6 @@ export interface CredentialsStateModel {
   groupMappings: SkillGroupMapping[],
   filteredCredentialSetupData: CredentialSetupFilterGet[],
   credentialSetupList: CredentialSetupGet[],
-  credentialDataSources: CredentialFilterDataSources | null,
   assignedCredentialTreeData: AssignedCredentialTreeData | null,
 }
 
@@ -51,7 +59,6 @@ export interface CredentialsStateModel {
     groupMappings: [],
     filteredCredentialSetupData: [],
     credentialSetupList: [],
-    credentialDataSources: null,
     assignedCredentialTreeData: null,
   }
 })
@@ -73,11 +80,8 @@ export class CredentialsState {
   static credentialSetupList(state: CredentialsStateModel): CredentialSetupGet[] { return state.credentialSetupList; }
 
   @Selector()
-  static credentialDataSources(state: CredentialsStateModel): CredentialFilterDataSources | null { return state.credentialDataSources; }
-  
-  @Selector()
   static assignedCredentialTree(state: CredentialsStateModel): AssignedCredentialTree { return state.assignedCredentialTreeData?.treeItems || []; }
-  
+
   @Selector()
   static assignedCredentialTreeValue(state: CredentialsStateModel): string[] { return state.assignedCredentialTreeData?.assignedCredentialIds || []; }
 
@@ -126,14 +130,6 @@ export class CredentialsState {
       }),
       catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
   }
-
-  @Action(ExportCredentialList)
-  ExportCredentialList({ }: StateContext<CredentialsStateModel>, { payload }: ExportCredentialList): Observable<any> {
-    return this.skillGroupService.exportCredentialTypes(payload).pipe(tap(file => {
-      const url = window.URL.createObjectURL(file);
-      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
-    }));
-  };
 
   @Action(GetFilteredCredentialSetupData)
   GetFilteredCredentialSetupData({ patchState }: StateContext<CredentialsStateModel>, { payload }: GetFilteredCredentialSetupData): Observable<CredentialSetupFilterGet[]> {
@@ -190,14 +186,6 @@ export class CredentialsState {
     return this.credentialService.updateCredentialSetup(credentialSetup).pipe(tap((response) => {
       dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED))
       dispatch(new UpdateCredentialSetupSucceeded());
-      return response;
-    }));
-  }
-
-  @Action(GetCredentialsDataSources)
-  GetCredentialsDataSources({ patchState }: StateContext<CredentialsStateModel>, { }: GetCredentialsDataSources): Observable<CredentialFilterDataSources> {
-    return this.credentialService.getCredentialsDataSources().pipe(tap((response) => {
-      patchState({ credentialDataSources: response });
       return response;
     }));
   }

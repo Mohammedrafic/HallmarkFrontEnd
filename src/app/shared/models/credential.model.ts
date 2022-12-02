@@ -9,6 +9,10 @@ export class Credential {
   expireDateApplicable: boolean;
   comment?: string;
   isMasterCredential?: boolean;
+  irpComment?: string;
+  system?: string;
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
 
   constructor(credential: Credential) {
     if (credential.id) {
@@ -24,7 +28,7 @@ export class Credential {
 
 export type CredentialPage = PageOfCollections<Credential>;
 
-export class CredentialFilter {
+export interface CredentialFilter {
   searchTerm?: string;
   credentialTypeIds?: number[];
   credentialIds?: number[];
@@ -32,6 +36,8 @@ export class CredentialFilter {
   orderBy?: string;
   pageSize?: number;
   pageNumber?: number;
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
 }
 
 export class CredentialDataSource {
@@ -40,8 +46,8 @@ export class CredentialDataSource {
   expireDateApplicable: boolean;
 }
 
-export class CredentialFilterDataSources {
-  credentialTypes: CredentialType;
+export interface CredentialFilterDataSources {
+  credentialTypes: CredentialType[];
   credentials: CredentialDataSource[];
 }
 

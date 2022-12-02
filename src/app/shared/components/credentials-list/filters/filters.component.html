@@ -1,0 +1,52 @@
+<app-filter-dialog
+  [items]="filteredItems"
+  [count]="totalDataRecords"
+  (deleteFilter)="deleteFilters($event)"
+  (clearAllFiltersClicked)="clearAllFilters()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
+  <form class="bootstrap" [formGroup]="credentialsFilters">
+    <div class="input-container" *ngIf="isCredentialSettings && isIRPFlagEnabled">
+      <label>Select system</label>
+      <div class="bootstrap checkbox-container">
+        <ejs-checkbox formControlName="includeInIRP" label="IRP"></ejs-checkbox>
+        <ejs-checkbox formControlName="includeInVMS" label="VMS"></ejs-checkbox>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Credential Type</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="credentialTypeIds"
+                         placeholder="All"
+                         [fields]="optionFields"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns['credentialTypeIds'].dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Credential</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="credentialIds"
+                         placeholder="All"
+                         [fields]="optionFields"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns['credentialIds'].dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container checkbox-container">
+      <div class="input-group">
+        <ejs-checkbox
+          label="Expiry Date Applicable"
+          formControlName="expireDateApplicable"
+        ></ejs-checkbox>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>
