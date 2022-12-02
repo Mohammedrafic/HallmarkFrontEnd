@@ -38,7 +38,7 @@ export class InvoiceAddPaymentService {
     forms: Record<string, CustomFormGroup<PaymentForm>>): PaymentsTableData[] {
     return payments.map((record) => {
       return ({
-        id: Math.random() * (100 - 1) + 1,
+        id: null,
         invoiceNumber: record.invoiceNumber,
         amount: record.amount,
         payment: 0,

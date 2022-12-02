@@ -165,6 +165,10 @@ export class InvoicesApiService {
     return this.http.get<PaymentCreationDto>(`/api/Invoices/payments/check/${checkId}`);
   }
 
+  public deletePayment(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/Invoices/payments/${id}`);
+  }
+
   private organizationDeleteManualInvoice(id: number): Observable<void> {
     return this.http.delete<void>(`/api/ManualInvoiceRecords/${id}`);
   }

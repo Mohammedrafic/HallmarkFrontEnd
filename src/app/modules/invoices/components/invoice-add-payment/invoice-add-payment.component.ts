@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } 
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { GridApi, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Store } from '@ngxs/store';
-import { debounceTime, filter, switchMap, take, takeUntil } from 'rxjs';
+import { debounceTime, filter, of, switchMap, take, takeUntil } from 'rxjs';
 
 import { FieldType } from '@core/enums';
 import { DateTimeHelper, DestroyDialog } from '@core/helpers';
@@ -146,22 +146,28 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
     }
   }
 
-  deletePayment(invoiceId: string): void {
+  deletePayment(invoiceId: string, id: number): void {
     this.confirmService.confirm(PaymentMessages.deleteInvoice, {
       title: 'Check Payment Amount',
       okButtonLabel: 'Yes',
       okButtonClass: 'delete-button',
     })
     .pipe(
-      take(1),
       filter(Boolean),
-    )
-    .subscribe(() => {
-      delete this.paymentsForm[invoiceId];
+      switchMap(() => {
+        delete this.paymentsForm[invoiceId];
 
-      this.tableData = this.tableData.filter((payment) => payment.invoiceNumber !== invoiceId);
-      this.cd.markForCheck();
-    });
+        this.tableData = this.tableData.filter((payment) => payment.invoiceNumber !== invoiceId);
+        this.cd.markForCheck();
+
+        if (id) {
+          return this.apiService.deletePayment(id);
+        }
+        return of();
+      }),
+      take(1),
+    )
+    .subscribe();
   }
 
   trackByField(index: number, item: PaymentFormConfig): string {
