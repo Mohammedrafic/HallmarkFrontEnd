@@ -99,7 +99,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
   candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
-  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'id' };
+  jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   agencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   selectedDepartments: Department[];
   selectedSkillCategories: SkillCategoryDto[];
@@ -266,7 +266,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
-              this.filterColumns.jobStatuses.dataSource = data.orderStatuses;
+              this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
               this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
               this.filterColumns.agencyIds.dataSource = data.agencies;
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
@@ -467,7 +467,7 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
         valueType: ValueType.Text,
         dataSource: [],
         valueField: 'statusText',
-        valueId: 'id',
+        valueId: 'status',
       },
       jobId: {
         type: ControlTypes.Text,
