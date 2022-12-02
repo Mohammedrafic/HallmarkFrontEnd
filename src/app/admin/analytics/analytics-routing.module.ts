@@ -38,6 +38,7 @@ import { VmsInvoiceReportComponent } from './vms-invoice-report/vms-invoice-repo
 import { YtdReportComponent } from './ytd-report/ytd-report.component';
 import { YtdSummaryComponent } from './ytd-summary/ytd-summary.component';
 import { AccrualReportComponent } from './accrual-report/accrual-report.component';
+import { DailyOrderStatusComponent } from './daily-order-status/daily-order-status.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '', pathMatch: 'full' },
@@ -296,7 +297,14 @@ const routes: Routes = [
         data: {
           isOrganizationArea: true,
         }
-      }
+      },
+      {
+        path: 'daily-order',
+        component: DailyOrderStatusComponent,
+        data: {
+          isOrganizationArea: true,
+        }
+      },
     ],
   },
 ];

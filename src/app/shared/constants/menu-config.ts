@@ -373,6 +373,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/accrual-report',
     },
+    83: {
+      // New Accrual Report
+      icon: '',
+      route: '/analytics/daily-order',
+    },
   },
 
   [BusinessUnitType.MSP]: {
