@@ -16,9 +16,12 @@ export class EditPaymentRendererComponent implements ICellRendererAngularComp {
 
   invoiceId: string;
 
+  editAllowed = true;
+
   agInit(params: ICellRendererParams): void {
     this.componentParent = params.context.componentParent;
     this.invoiceId = params.data.checkNumber;
+    this.editAllowed = this.componentParent.actionsAllowed;
   }
 
   refresh(): boolean {

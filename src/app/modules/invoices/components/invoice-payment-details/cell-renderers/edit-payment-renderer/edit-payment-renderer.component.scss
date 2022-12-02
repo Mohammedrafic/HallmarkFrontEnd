@@ -3,3 +3,7 @@
 .edit-button {
   color: #3E7FFF;
 }
+
+.edit-button:disabled {
+  opacity: 0.5;
+}

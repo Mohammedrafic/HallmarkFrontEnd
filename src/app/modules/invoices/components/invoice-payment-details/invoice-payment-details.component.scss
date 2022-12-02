@@ -41,6 +41,10 @@
   line-height: 20px;
 }
 
+.add-btn:disabled {
+  opacity: 0.5;
+}
+
 .grid-table-container {
   padding-bottom: 0;
   
