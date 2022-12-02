@@ -55,7 +55,10 @@ const routes: Routes = [
           {
             path: 'list',
             component: CredentialsListComponent,
-            data: { isOrganizationArea: true }
+            data: {
+              isOrganizationArea: true,
+              isCredentialSettings: true
+            }
           },
           {
             path: 'setup',

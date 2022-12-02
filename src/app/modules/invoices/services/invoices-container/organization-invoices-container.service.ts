@@ -2,15 +2,16 @@ import { Injectable } from '@angular/core';
 import { InvoicesContainerService } from './invoices-container.service';
 import { ColDef, GridOptions } from '@ag-grid-community/core';
 import { Observable } from 'rxjs';
-import { InvoiceAttachment, InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
+import { GridContainerTabConfig, InvoiceAttachment, InvoiceDetail,
+  InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
 import { ManualInvoicesGridHelper, PendingInvoiceRowDetailsGridHelper, PendingInvoicesGridHelper } from '../../helpers';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoiceState, OrganizationInvoicesGridTab } from '../../enums';
 import { Attachment } from '@shared/components/attachments';
 import { PendingApprovalGridHelper } from '../../helpers/grid/pending-approval-grid.helper';
 import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
-import { invoiceDetailsColumnDefs, invoiceInfoItems, invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
-import { GridContainerTabConfig } from '../../interfaces/grid-container-tab-config.interface';
+import { invoiceDetailsColumnDefs, invoiceInfoItems,
+  invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
 
 @Injectable()
 export class OrganizationInvoicesContainerService extends InvoicesContainerService {
@@ -52,14 +53,19 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
         return PendingApprovalGridHelper.getOrganizationColDefs({
           approve: (invoice: PendingApprovalInvoice) =>
             this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.PendingPayment)),
-          actionEnabled: canEdit
+          actionEnabled: canEdit,
         });
       case OrganizationInvoicesGridTab.PendingPayment:
         return PendingApprovalGridHelper.getOrganizationColDefs({
           approve: (invoice: PendingApprovalInvoice) =>
-            this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.Paid)),
+            this.store.dispatch(new Invoices.OpenPaymentAddDialog({
+              invoiceId: invoice.invoiceId,
+              invoiceNumber: invoice.formattedInvoiceId,
+              amount: invoice.amountToPay,
+              agencySuffix: invoice.agencySuffix,
+            })),
           actionTitle: 'Pay',
-          actionEnabled: canPay
+          actionEnabled: canPay,
         });
       case OrganizationInvoicesGridTab.Paid:
         return  PendingApprovalGridHelper.getOrganizationPaidColDefs();
@@ -68,10 +74,15 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
           approve: (invoice: PendingApprovalInvoice) =>
           this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.PendingPayment)),
           pay: (invoice: PendingApprovalInvoice) =>
-          this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.Paid)),
+          this.store.dispatch(new Invoices.OpenPaymentAddDialog({
+            invoiceId: invoice.invoiceId,
+            invoiceNumber: invoice.formattedInvoiceId,
+            amount: invoice.amountToPay,
+            agencySuffix: invoice.agencySuffix,
+          })),
           canEdit,
-          canPay
-        })
+          canPay,
+        });
       default:
         return [];
     }

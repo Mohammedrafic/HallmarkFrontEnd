@@ -1,6 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FileSize } from "@core/enums";
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { FileStatusCode } from "@shared/enums/file.enum";
 import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { FileInfo } from '@syncfusion/ej2-inputs/src/uploader/uploader';
@@ -10,13 +11,14 @@ import { ImportResult } from '@shared/models/import.model';
 @Component({
   selector: 'app-document-library-upload',
   templateUrl: './document-library-upload.component.html',
-  styleUrls: ['./document-library-upload.component.scss']
+  styleUrls: ['./document-library-upload.component.scss'],
 })
 export class DocumentLibraryUploadComponent extends DestroyableDirective implements OnInit {
   @ViewChild('previewupload') private uploadObj: UploaderComponent;
   @ViewChild('fileUploader') private fileUploader: ElementRef;
   @ViewChild('tab') tab: TabComponent;
 
+  @Input() allowedExtensions = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
   @Input() public selectErrorsTab: Subject<void>;
   @Input() public set importResponse(response: any) {
     this.importResult = response;
@@ -29,7 +31,6 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
   public width = `${window.innerWidth * 0.6}px`;
   public targetElement: HTMLElement = document.body;
   public dropElement: HTMLElement;
-  @Input() allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
   public readonly maxFileSize = FileSize.MB_10;
   public selectedFile: FileInfo | null;
   public firstActive = true;
@@ -46,7 +47,7 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
   }
 
   get enabledImportButton(): boolean {
-    return (this.selectedFile?.statusCode === '1' || !!this.importResult) && !this.activeErrorTab;
+    return (this.selectedFile?.statusCode === FileStatusCode.Valid || !!this.importResult) && !this.activeErrorTab;
   }
 
   constructor() { super(); }
@@ -67,7 +68,7 @@ export class DocumentLibraryUploadComponent extends DestroyableDirective impleme
   public selectFile(event: SelectedEventArgs): void {
     if (event.filesData.length) {
       this.importResult = null;
-      if (event.filesData[0].statusCode === '1') {
+      if (event.filesData[0].statusCode === FileStatusCode.Valid) {
         this.selectedFile = event.filesData[0];
         this.uploadToFile.next(this.selectedFile.rawFile as Blob);
       }

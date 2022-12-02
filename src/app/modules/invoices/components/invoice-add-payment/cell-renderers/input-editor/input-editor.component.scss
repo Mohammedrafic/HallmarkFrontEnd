@@ -1,0 +1,43 @@
+@import 'colors';
+
+::ng-deep {
+
+  .amount-input {
+    width: 90%!important;
+    border: 1px solid $secondary-dark-blue-40!important;
+    height: 40px!important;
+    padding: 0!important;
+    border-radius: 8px!important;
+    padding-left: 15px!important;
+    font-size: 14px!important;
+    color: $secondary-dark-blue-15!important;
+  }
+
+  .e-input-group {
+    border-bottom: none;
+  }
+}
+
+.init-value {
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: inline-block;
+}
+
+span::before {
+  content: "$";
+  font-size: 14px;
+  position: absolute;
+  left: 10px;
+  top: 49%;
+  transform: translateY(-50%);
+}
+
+.amount-container {
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}

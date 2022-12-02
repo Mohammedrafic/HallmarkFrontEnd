@@ -1,4 +1,4 @@
-import { TimesheetsModule } from './../modules/timesheets/timesheets.module';
+import { TimesheetsModule } from '../modules/timesheets/timesheets.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -35,7 +35,7 @@ import { AdminComponent } from './admin.component';
 import { AddEditOrganizationComponent } from './client-management/add-edit-organization/add-edit-organization.component';
 import { NgxsModule } from '@ngxs/store';
 import { AdminState } from './store/admin.state';
-import { SharedModule } from '../shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 import { MasterDataContentComponent } from './master-data/master-data-content.component';
 import { SkillsCategoriesComponent } from './master-data/skills/skills-categories.component';
 import { SkillsGridComponent } from './master-data/skills/skills-grid/skills-grid.component';
@@ -56,6 +56,7 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 import { NgxMaskModule } from 'ngx-mask';
 import { AddEditOrganizationService } from '@admin/client-management/services/add-edit-organization.service';
+import { CredentialListModule } from '@shared/components/credentials-list/credential-list.module';
 
 const sidebarIcons = {
   Download,
@@ -121,6 +122,7 @@ const sidebarIcons = {
     DropDownButtonModule,
     TimesheetsModule,
     TooltipContainerModule,
+    CredentialListModule,
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     //STORE

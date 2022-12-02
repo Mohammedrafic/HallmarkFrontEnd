@@ -6,6 +6,7 @@ export interface InvoiceDetail {
   totals: {
     total: number;
     amount: number;
+    amountToPay: number;
     feeTotal: number;
     calculatedTotal: number;
   };
@@ -28,6 +29,7 @@ export interface InvoiceDetailMeta {
   invoiceStateText: string;
   organizationPrefix: string;
   organizationIds: number[];
+  agencySuffix?: number;
 }
 
 export interface InvoiceDetailRecord {
@@ -87,3 +89,17 @@ export interface InvoiceUpdateEmmit {
   organizationId?: number;
 }
 
+export interface InvoiceDetailsSettings {
+  isActionBtnDisabled: boolean;
+  paymentDetailsOpen: boolean;
+  addPaymentOpen: boolean;
+}
+
+export interface InvoicePaymentData {
+  invoiceId: number;
+  invoiceNumber: string;
+  amount: number;
+  agencySuffix?: number;
+  checkId?: number;
+  id?: number;
+}

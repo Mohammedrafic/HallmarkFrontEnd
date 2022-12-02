@@ -13,4 +13,9 @@
         </div>
     </div>
   </ng-container>
+  <div *ngIf="invoiceInfo.meta.invoiceState !== 1" class="details-action-block">
+    <button class="link-button" (click)="openPaymentDetails()">
+      Payment Details
+    </button>
+  </div>
 </div>

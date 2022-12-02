@@ -61,3 +61,70 @@
     }
   }
 }
+
+@mixin link-button {
+  border: none;
+  background: none;
+  padding: 0;
+  color: $primary-active-blue-10;
+  cursor: pointer;
+}
+
+@mixin close-red-btn {
+  color: $supportive-red;
+  cursor: pointer;
+  margin-left: 26px;
+  margin-right: 10px;
+}
+
+@mixin dialog-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: $black;
+  margin: 0;
+}
+
+@mixin table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid $secondary-dark-blue-45;
+  border-radius: 12px 12px 0 0;
+  padding: 15px;
+}
+
+@mixin input-form-container {
+  width: 100%;
+
+  &.long {
+    grid-column-start: 1;
+    grid-column-end: 3;
+  }
+
+  &.flexed {
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    margin-bottom: 12px;
+  }
+}
+
+@mixin table-container {
+  height: auto;
+
+  &::ng-deep {
+    .empty-table {
+      .ag-body-viewport {
+        height: 100px;
+        background: #eaecf2;
+      }
+
+      & .ag-overlay-wrapper.ag-overlay-no-rows-wrapper {
+        font-size: 14px !important;
+        color: #9198ac !important;
+      }
+    }
+  }
+}

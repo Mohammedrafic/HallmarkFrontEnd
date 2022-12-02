@@ -147,7 +147,7 @@
           [actionsDisabled]="timesheetDetails.noWorkPerformed"
           [disableAnyAction]="disableAnyAction"
           [hasEditTimesheetRecordsPermission]="hasEditTimesheetRecordsPermission"
-          [hasApproveRejectMileagesPermission]="userPermission[userPermissions.CanOrganizationApproveRejectMileages]"
+          [hasApproveRejectMileagesPermission]="isAgency ? true : userPermission[userPermissions.CanOrganizationApproveRejectMileages]"
           (openAddSideDialog)="openAddDialog($event)"
           (uploadSideDialog)="openUploadSideDialog($event)"
           (changesSaved)="handleEditChanges($event)"

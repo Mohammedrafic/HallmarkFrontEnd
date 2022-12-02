@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { DatePicker, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { Department, DepartmentFilter, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
@@ -19,7 +19,7 @@ import {
   ExportDepartments,
   ClearLocationList,
   ClearDepartmentList,
-  GetDepartmentFilterOptions, GetOrganizationById
+  GetDepartmentFilterOptions, GetOrganizationById, SaveDepartmentSucceeded, SaveDepartmentConfirm
 } from '../store/organization-management.actions';
 import { Region } from '@shared/models/region.model';
 import { Location } from '@shared/models/location.model';
@@ -77,6 +77,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
+  @ViewChild('reactivationDatepicker') reactivationDatepicker: DatePicker;
 
   departmentsDetailsFormGroup: FormGroup;
   fieldsSettings: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -108,12 +109,15 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   private regions: OrganizationRegion[] = [];
   private pageSubject = new Subject<number>();
 
+  public maxReactivateDate: string | null;
+
   constructor(
     private store: Store,
     private confirmService: ConfirmService,
     private datePipe: DatePipe,
     private filterService: FilterService,
-    private departmentService: DepartmentService
+    private departmentService: DepartmentService,
+    private action$: Actions
   ) {
     super();
 
@@ -129,7 +133,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.createDepartmentsForm();
 
     this.filterColumns = this.departmentService.initFilterColumns(this.isIRPFlagEnabled);
-
+    this.watchForDepartmentUpdate();
     this.startDepartmentOptionsWatching();
     this.startPageNumberWatching();
     this.startOrgIdWatching();
@@ -199,6 +203,37 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.clearSelection(this.grid);
   }
 
+  private watchForDepartmentUpdate(): void {
+    this.action$.pipe(ofActionDispatched(SaveDepartmentSucceeded), takeUntil(this.componentDestroy())).subscribe(() => {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.removeActiveCssClass();
+      this.departmentsDetailsFormGroup.reset();
+      if (this.isEdit) {
+        this.isEdit = false;
+        this.editedDepartmentId = undefined;
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      } else {
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+      }
+    });
+    this.action$.pipe(ofActionDispatched(SaveDepartmentConfirm), takeUntil(this.componentDestroy())).subscribe(() => {
+      this.confirmService
+      .confirm('Department has active orders past the inactivation date. Do you want to proceed?', {
+        title: 'Confirmation',
+        okButtonLabel: 'Yes',
+        cancelButtonLabel: 'No',
+        okButtonClass: 'delete-button'
+      })
+      .pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(() => {
+        this.onDepartmentFormSaveClick(true);
+      });
+    });
+  }
+
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion?.id) {
@@ -250,6 +285,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.editedDepartmentId = department.departmentId;
     this.isLocationIRPEnabled = !!department.locationIncludeInIRP;
     this.isEdit = true;
+    this.reactivationDateHandler(department);
     this.store.dispatch(new ShowSideDialog(true));
     this.inactivateDateHandler(this.departmentsDetailsFormGroup.controls['inactiveDate'], department.inactiveDate);
   }
@@ -287,10 +323,28 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     });
   }
 
+  private reactivationDateHandler(department?: Department): void {
+    if (this.selectedLocation) {
+      const reactivationDateField = this.departmentsDetailsFormGroup.controls['reactivateDate'];
+      const reactivateDate = this.selectedLocation.reactivateDate ? new Date(this.selectedLocation.reactivateDate) : null;
+      this.maxReactivateDate = reactivateDate ? DateTimeHelper.formatDateUTC(reactivateDate.toISOString(), 'MM/dd/yyyy') : null;
+      if (!this.selectedLocation.reactivateDate) {
+        reactivationDateField.disable();
+      } else {
+        reactivationDateField.enable();
+        if (!department?.reactivateDate) {
+          reactivationDateField.patchValue(this.selectedLocation.reactivateDate);
+        }
+        this.reactivationDatepicker.refresh();
+      }
+    }
+  }
+
   onAddDepartmentClick(): void {
     if (this.selectedLocation && this.selectedRegion) {
       this.departmentsDetailsFormGroup.controls['inactiveDate'].enable();
       this.isLocationIRPEnabled = this.selectedLocation.includeInIRP;
+      this.reactivationDateHandler();
       this.store.dispatch(new ShowSideDialog(true));
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED));
@@ -323,7 +377,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     }
   }
 
-  onDepartmentFormSaveClick(): void {
+  onDepartmentFormSaveClick(ignoreWarning = false): void {
     if (this.departmentsDetailsFormGroup.valid) {
       const department: Department = DepartmentsAdapter.prepareToSave(
         this.editedDepartmentId,
@@ -331,11 +385,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         this.departmentsDetailsFormGroup
       );
 
-      this.saveOrUpdateDepartment(department);
-
-      this.store.dispatch(new ShowSideDialog(false));
-      this.removeActiveCssClass();
-      this.departmentsDetailsFormGroup.reset();
+      this.saveOrUpdateDepartment(department, ignoreWarning);
     } else {
       this.departmentsDetailsFormGroup.markAllAsTouched();
     }
@@ -345,15 +395,11 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.importDialogEvent.next(true);
   }
 
-  private saveOrUpdateDepartment(department: Department): void {
+  private saveOrUpdateDepartment(department: Department, ignoreWarning: boolean): void {
     if (this.isEdit) {
-      this.store.dispatch(new UpdateDepartment(department, this.filters));
-      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      this.isEdit = false;
-      this.editedDepartmentId = undefined;
+      this.store.dispatch(new UpdateDepartment(department, this.filters, ignoreWarning));
     } else {
       this.store.dispatch(new SaveDepartment(department, this.filters));
-      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
     }
   }
 
@@ -371,19 +417,17 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
     if (!this.isInvoiceDepartmentIdFieldShow) {
       this.departmentsDetailsFormGroup.removeControl('invoiceDepartmentId');
-      this.grid.columns.splice(3, 1);
     }
 
     if (!this.isOrgUseIRPAndVMS) {
       this.departmentsDetailsFormGroup.removeControl('includeInIRP');
     }
 
-    if (this.isIRPFlagEnabled && !this.isOrgUseIRPAndVMS) {
-      this.grid.columns.pop();
-    }
+    this.grid.getColumnByField('invoiceDepartmentId').visible = this.isInvoiceDepartmentIdFieldShow;
+    this.grid.getColumnByField('includeInIRP').visible = this.isIRPFlagEnabled && this.isOrgUseIRPAndVMS;
 
     this.columnsToExport = DepartmentsExportCols(this.isIRPFlagEnabled && this.isOrgUseIRPAndVMS, this.isInvoiceDepartmentIdFieldShow);
-    this.grid.refresh();
+    this.grid.refreshColumns();
   }
 
   private createDepartmentsForm(): void {

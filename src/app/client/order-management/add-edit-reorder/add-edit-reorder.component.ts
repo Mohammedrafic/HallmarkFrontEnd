@@ -30,6 +30,7 @@ import { UserState } from 'src/app/store/user.state';
 import { AlertTriggerDto } from '@shared/models/alerts-template.model';
 import { OrderStatus } from '@shared/enums/order-management';
 import { AlertTrigger } from '@admin/store/alerts.actions';
+import { getAllErrors } from '@shared/utils/error.utils';
 
 @Component({
   selector: 'app-add-edit-reorder',
@@ -318,15 +319,14 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
         tap((data) => {
           this.store.dispatch(new SaveOrderSucceeded(data));
           this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED));
+          this.saveEmitter.emit();
         }
         ),
         catchError((error) =>
-          this.store.dispatch(new ShowToast(MessageTypes.Error, error?.error?.errors?.RegularBillRate[0]))
+          this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)))
         )
       )
-      .subscribe(() => {
-        this.saveEmitter.emit();
-      });
+      .subscribe();
   }
 
   private getAgencyIds(jobDistributions: JobDistributionModel[]): (number | null)[] | void {

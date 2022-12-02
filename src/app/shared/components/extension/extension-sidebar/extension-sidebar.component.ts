@@ -3,7 +3,7 @@ import { extensionDurationPrimary, extensionDurationSecondary } from '@shared/co
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Duration } from '@shared/enums/durations';
-import { combineLatest, filter, startWith } from 'rxjs';
+import { catchError, combineLatest, filter, startWith, tap } from 'rxjs';
 import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
 import isNil from 'lodash/fp/isNil';
 import { addDays } from '@shared/utils/date-time.utils';
@@ -17,6 +17,7 @@ import { RECORD_ADDED } from '@shared/constants';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { BillRate } from '@shared/models';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
+import { getAllErrors } from '@shared/utils/error.utils';
 
 @Component({
   selector: 'app-extension-sidebar',
@@ -90,13 +91,16 @@ export class ExtensionSidebarComponent implements OnInit {
         orderId: this.candidateJob.orderId,
         comments: this.comments,
       })
-      .subscribe({
-        next: () => {
+      .pipe(
+        tap(() => {
           this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
           positionDialog.hide();
-          return this.saveEmitter.emit();
-        },
-      });
+          this.saveEmitter.emit();
+        }),
+        catchError((error) =>
+          this.store.dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error?.error)))
+        ))
+      .subscribe();
   }
 
   private subsToBillRateControlChange(): void {

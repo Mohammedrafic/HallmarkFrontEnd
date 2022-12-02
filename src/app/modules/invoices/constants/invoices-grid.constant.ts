@@ -10,11 +10,10 @@ import { GridValuesHelper } from '../../timesheets/helpers';
 import {
   TitleValueCellRendererComponent
 } from '@shared/components/grid/components/title-value-cell-renderer/title-value-cell-renderer.component';
-import { TypedColDef, TypedValueGetterParams } from '../interfaces/typed-col-def.interface';
-import { ManualInvoice } from '../interfaces';
+import { ManualInvoice, TypedColDef } from '../interfaces';
 import { PendingInvoice } from '../interfaces/pending-invoice-record.interface';
 import { PendingApprovalInvoiceRecord } from '../interfaces/pending-approval-invoice.interface';
-import { formatCurrency } from '@angular/common';
+import { TypedValueGetterParams } from '@core/interface';
 
 const commonColumn: ColDef = {
   sortable: true,

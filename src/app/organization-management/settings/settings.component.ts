@@ -125,7 +125,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
 
   public organizationHierarchy: number;
   public organizationHierarchyId: number;
-  public showToggleMessage: boolean = false;
+  public showToggleMessage = false;
   public readonly associateLink: string = AssociatedLink;
 
   public textFieldType: number;
@@ -817,9 +817,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   }
 
     private handleShowToggleMessage(key: string): void {
-      if(key === tierSettingsKey) {
-        this.showToggleMessage = true;
-      }
+      this.showToggleMessage = key === tierSettingsKey;
     }
 
   private disableDepForInvoiceGeneration(): void {

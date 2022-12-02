@@ -133,7 +133,7 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
         if(this.tierControl.valid) {
           this.store.dispatch( new TiersException.SaveTier({
             associateOrganizationId: this.editAgencyOrg.id!,
-            organizationTierId: this.tierControl.value ?? null
+            organizationTierId: this.getOrganizationTierId(this.tierControl.value)
           }));
         }
         break;
@@ -316,5 +316,9 @@ export class EditAssociateDialogComponent extends AbstractPermission implements 
     ).subscribe(({TieringLogic}) => {
       this.canViewTierTab = TieringLogic === TierLogic.Show;
     })
+  }
+
+  private getOrganizationTierId(id: number | null): number | null {
+    return id && id >= 0 ? id : null;
   }
 }

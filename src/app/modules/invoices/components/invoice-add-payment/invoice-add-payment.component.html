@@ -1,0 +1,133 @@
+<ejs-dialog
+  #destroyableDialog
+  cssClass="dialog"
+  [width]="744"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <div class="dialog-container">
+      
+      <div class="dialog-header">
+        <h3 class="title">Add Payment</h3>
+        <div class="controls">
+          <button ejs-button cssClass="e-outline button-cancel" (click)="closeDialog()">Cancel</button>
+          <button (click)="savePayment()" ejs-button [isPrimary]="true">Save</button>
+        </div>
+      </div>
+
+      <div class="form-container">
+        <form [formGroup]="checkForm" autocomplete="off" class="bootstrap grid">
+          <ng-container *ngFor="let field of addPaymentFormConfig; trackBy: trackByField">
+  
+            <ng-container [ngSwitch]="field.type">
+  
+              <ng-template [ngSwitchCase]="fieldTypes.Date">
+                <div class="input-container">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  </label>
+                  <div class="input-group">
+                    <ejs-datepicker
+                      appValidateWithMessage
+                      class="datepicker"
+                      appValidateWithMessage
+                      [max]="today"
+                      format="MM/dd/yyyy"
+                      [formControlName]="field.field"
+                    >
+                    </ejs-datepicker>
+                  </div>
+                </div>
+              </ng-template>
+  
+              <ng-template [ngSwitchCase]="fieldTypes.Input">
+                <div class="input-container">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  </label>
+                  <div class="input-group">
+                    <input
+                      appValidateWithMessage
+                      class="e-input"
+                      [name]="field.field"
+                      appValidateWithMessage
+                      [formControlName]="field.field"
+                    />
+                  </div>
+                </div>
+              </ng-template>
+
+              <ng-template [ngSwitchCase]="fieldTypes.Number">
+                <div class="input-container">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  </label>
+                  <div class="input-group numeric">
+                    <input
+                      appValidateWithMessage
+                      class="e-input"
+                      type="number"
+                      [name]="field.field"
+                      appValidateWithMessage
+                      [formControlName]="field.field"
+                    />
+                  </div>
+                </div>
+              </ng-template>
+  
+              <ng-template [ngSwitchCase]="fieldTypes.Dropdown">
+                <div class="input-container">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  </label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist
+                      appValidateWithMessage
+                      [formControlName]="field.field"
+                      [fields]="optionFields"
+                      [dataSource]="field.options"
+                      [allowFiltering]="false"
+                      appValidateWithMessage
+                    ></ejs-dropdownlist>
+                  </div>
+                </div>
+              </ng-template>
+  
+              <ng-template [ngSwitchCase]="fieldTypes.Toggle">
+                <div class="input-container row-flexed">
+                  <div class="input-group wide">
+                    <div class="amount-block">
+                      <span class="toggle-header">Check Outstanding Amount</span>
+                      <span class="amount-text">{{calculatedLeftAmount | currency: 'USD':'symbol':'1.0-2' }}</span>
+                    </div>
+                    <ejs-switch
+                    class="toggle"
+                    [formControlName]="field.field"
+                  ></ejs-switch>
+                  <label [for]="field.field">{{ field.title }}</label>
+                  </div>
+                </div>
+              </ng-template>
+  
+            </ng-container>
+  
+          </ng-container>
+        </form>
+      </div>
+
+      <div class="table-container">
+        <div class="table-header">Invoices</div>
+
+        <div class="grid-table-container">
+          <ag-grid-angular #grid
+            [columnDefs]="checkTableDef"
+            [rowData]="tableData"
+            [rowHeight]="64"
+            [pagination]="false"
+            [context]="tableContext"
+            (gridReady)="setGridApi($event)"
+            class="ag-theme-alpine app-grid__component">
+          </ag-grid-angular>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</ejs-dialog>

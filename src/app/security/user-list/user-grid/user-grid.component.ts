@@ -5,13 +5,13 @@ import { FormGroup } from '@angular/forms';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
 import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
-import { map, Observable, Subject, takeWhile } from 'rxjs';
+import { filter, map, Observable, Subject, takeWhile } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
 import { CustomNoRowsOverlayComponent } from '@shared/components/overlay/custom-no-rows-overlay/custom-no-rows-overlay.component';
-import { GRID_CONFIG } from '@shared/constants';
+import { GRID_CONFIG, RESEND_EMAIL_TEXT, RESEND_EMAIL_TITLE } from '@shared/constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { CreateUserStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
@@ -26,8 +26,9 @@ import { ExportUserList, GetRolesPage, GetUsersPage, ResendWelcomeEmail } from '
 import { SecurityState } from '../../store/security.state';
 import { Visibility } from './user-grid.enum';
 import { ColDef } from '@ag-grid-community/core';
-import { TypedValueGetterParams } from 'src/app/modules/invoices/interfaces/typed-col-def.interface';
 import { AutoGroupColDef, DefaultUserGridColDef, SideBarConfig, UserListExportOptions } from './user-grid.constant';
+import { TypedValueGetterParams } from '@core/interface';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 @Component({
   selector: 'app-user-grid',
@@ -88,7 +89,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   filters: RolesFilters;
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
 
-  constructor(private store: Store, private datePipe: DatePipe) {
+  constructor(private store: Store, private datePipe: DatePipe, private confirmService: ConfirmService) {
     super();
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
@@ -330,7 +331,16 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   }
 
   private resendWelcomeEmail(data: ButtonRenderedEvent): void {
-    this.store.dispatch(new ResendWelcomeEmail(data.rowData.id!));
+    this.confirmService
+      .confirm(RESEND_EMAIL_TEXT, {
+        title: RESEND_EMAIL_TITLE,
+        okButtonLabel: 'Send',
+        okButtonClass: 'send-button',
+      })
+      .pipe(filter(Boolean))
+      .subscribe(() => {
+        this.store.dispatch(new ResendWelcomeEmail(data.rowData.id!));
+      });
   }
 
   private updateUsers(): void {

@@ -63,6 +63,16 @@ export class SaveDepartment {
   constructor(public payload: Department, public filters?: DepartmentFilter) {}
 }
 
+export class SaveDepartmentSucceeded {
+  static readonly type = '[organizationManagement] Save/Update Department Succeeded';
+  constructor() {}
+}
+
+export class SaveDepartmentConfirm {
+  static readonly type = '[organizationManagement] Show Save/Update Location Confirmation PopUp';
+  constructor() {}
+}
+
 export class GetDepartmentsByLocationId {
   static readonly type = '[organizationManagement] Get The List Of Departments by locationId';
   constructor(public locationId?: number, public filters?: DepartmentFilter, public activeOnly?: boolean, public preservedId?: number) {}
@@ -70,7 +80,7 @@ export class GetDepartmentsByLocationId {
 
 export class UpdateDepartment {
   static readonly type = '[organizationManagement] Update Department';
-  constructor(public department: Department, public filters?: DepartmentFilter) {}
+  constructor(public department: Department, public filters?: DepartmentFilter, public ignoreWarning?: boolean) {}
 }
 
 export class DeleteDepartmentById {
@@ -125,7 +135,17 @@ export class SaveLocation {
 
 export class UpdateLocation {
   static readonly type = '[organizationManagement] Update Location';
-  constructor(public location: Location, public regionId: number, public filters?: LocationFilter) {}
+  constructor(public location: Location, public regionId: number, public filters?: LocationFilter, public ignoreWarning?: boolean) {}
+}
+
+export class SaveLocationSucceeded {
+  static readonly type = '[organizationManagement] Save/Update Location Succeeded';
+  constructor() {}
+}
+
+export class SaveLocationConfirm {
+  static readonly type = '[organizationManagement] Show Save/Update Location Confirmation PopUp';
+  constructor() {}
 }
 
 export class DeleteLocationById {
@@ -266,6 +286,11 @@ export class UpdateCredentialType {
 export class GetCredential {
   static readonly type = '[organizationManagement] Get Credential list';
   constructor(public payload?: CredentialFilter) {}
+}
+
+export class GetCredentialForSettings {
+  static readonly type = '[organizationManagement] Get Credential list for Settings';
+  constructor(public filters: CredentialFilter) {}
 }
 
 export class GetCredentialById {

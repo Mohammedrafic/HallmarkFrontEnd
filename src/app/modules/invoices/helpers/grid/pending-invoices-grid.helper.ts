@@ -3,12 +3,12 @@ import { ICellRendererParams, CheckboxSelectionCallbackParams, ColDef } from '@a
 import { AgencyStatus } from '@shared/enums/status';
 import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
 import { Attachment, AttachmentsListParams } from '@shared/components/attachments';
-import { TypedColDef } from '../../interfaces/typed-col-def.interface';
 import { InvoicesContainerGridHelper } from './invoices-container-grid.helper';
 import {
   ToggleRowExpansionHeaderCellComponent
 } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
 import { numberValueFormatter } from '../../constants';
+import { TypedColDef } from '../../interfaces';
 
 const commonColumn: ColDef = {
   sortable: true,

@@ -1,0 +1,46 @@
+<ejs-dialog
+  #destroyableDialog
+  cssClass="dialog"
+  [width]="888"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight', duration: dialogAnimationTime }">
+  <ng-template #content>
+    <div class="dialog-container">
+      
+      <div class="dialog-header">
+        <h3 class="title">Payment Details</h3>
+        <div class="controls">
+          <button ejs-button type="submit" cssClass="e-flat close-button" (click)="closeDialog()">
+            <i-feather name="x" class="icon"></i-feather>
+          </button>
+        </div>
+      </div>
+      
+      <div class="table-header">
+        <div>
+          <span class="header-block">Invoice Number: {{ invoiceData.invoiceNumber || '' }}</span>
+          <span class="header-block">
+            Invoice Amount: {{ invoiceData.amount || '' | currency: 'USD' }}
+          </span>
+        </div>
+        <div>
+          <button (click)="addNewPayment()" class="add-btn" [disabled]="!actionsAllowed">
+            + Add Payment
+          </button>
+        </div>
+      </div>
+      <div class="grid-table-container">
+        <ag-grid-angular #grid
+          [columnDefs]="paymentTableDefs"
+          [rowData]="tableData"
+          [rowHeight]="64"
+          [pagination]="false"
+          [context]="context"
+          (gridReady)="setGridApi($event)"
+          class="ag-theme-alpine app-grid__component">
+        </ag-grid-angular>
+      </div>
+    </div>
+  </ng-template>
+</ejs-dialog>

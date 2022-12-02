@@ -1,50 +1,41 @@
 {
   "root": true,
-  "ignorePatterns": [
-    "projects/**/*"
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
   ],
-  "overrides": [
-    {
-      "files": [
-        "*.ts"
-      ],
-      "parserOptions": {
-        "project": [
-          "tsconfig.json"
-        ],
-        "createDefaultProgram": true
-      },
-      "extends": [
-        "plugin:@angular-eslint/recommended",
-        "plugin:@angular-eslint/template/process-inline-templates"
-      ],
-      "rules": {
-        "@angular-eslint/directive-selector": [
-          "error",
-          {
-            "type": "attribute",
-            "prefix": "app",
-            "style": "camelCase"
-          }
-        ],
-        "@angular-eslint/component-selector": [
-          "error",
-          {
-            "type": "element",
-            "prefix": "app",
-            "style": "kebab-case"
-          }
-        ]
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": [
+      "./tsconfig.json"
+    ],
+    "createDefaultProgram": true
+  },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "ignorePatterns": ["src/**/*.spec.ts"],
+  "rules": {
+    "max-len": ["error", { "code": 125 }],
+    "class-methods-use-this": "off",
+    "lines-between-class-members": "off",
+    "@typescript-eslint/unbound-method": [
+      "error",
+      {
+        "ignoreStatic": true
       }
-    },
-    {
-      "files": [
-        "*.html"
-      ],
-      "extends": [
-        "plugin:@angular-eslint/template/recommended"
-      ],
-      "rules": {}
-    }
-  ]
+    ],
+    "@typescript-eslint/indent": "off",
+    "prefer-destructuring": "off",
+    // "import/newline-after-import": "error",
+    "no-duplicate-imports": "error",
+    // "import/prefer-default-export": "off",
+    // "import/no-unresolved": "off",
+    "no-plusplus": [2, { "allowForLoopAfterthoughts": true }],
+    "no-param-reassign": [2, {
+      "props": false
+    }],
+    "comma-dangle": ["error", "always-multiline"],
+    "semi": ["error", "always"]
+  }
 }

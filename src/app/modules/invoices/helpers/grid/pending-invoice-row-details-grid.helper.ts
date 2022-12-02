@@ -1,4 +1,3 @@
-import { formatNumber } from '@angular/common';
 import {
   GetDetailRowDataParams,
   GridOptions,
@@ -7,20 +6,21 @@ import {
   RowHeightParams,
   ValueFormatterParams
 } from '@ag-grid-community/core';
+import { formatNumber } from '@angular/common';
 import {
   TitleValueCellRendererComponent
 } from '@shared/components/grid/components/title-value-cell-renderer/title-value-cell-renderer.component';
 
+import { TypedValueGetterParams } from '@core/interface';
+import { AttachmentsListComponent, AttachmentsListParams } from '@shared/components/attachments';
+import { GridValuesHelper } from '../../../timesheets/helpers';
 import {
   InvoiceRecordsTableRowDetailsComponent
 } from '../../components/invoice-records-table-row-details/invoice-records-table-row-details.component';
-import { GridValuesHelper } from '../../../timesheets/helpers';
-import { AttachmentsListComponent, AttachmentsListParams } from '@shared/components/attachments';
-import { PendingInvoice, PendingInvoiceRecord } from '../../interfaces/pending-invoice-record.interface';
-import { TypedColDef, TypedValueGetterParams } from '../../interfaces/typed-col-def.interface';
-import { InvoiceType } from '../../enums/invoice-type.enum';
 import { CurrencyFormatter, invoicesRowDetailsOffsetColDef, titleValueCellRendererSelector } from '../../constants';
-import { GetPendingInvoiceDetailsColDefsFn, InvoiceAttachment, PendingInvoiceRowDetailsConfig } from '../../interfaces';
+import { InvoiceType } from '../../enums/invoice-type.enum';
+import { GetPendingInvoiceDetailsColDefsFn, InvoiceAttachment, PendingInvoiceRowDetailsConfig, TypedColDef } from '../../interfaces';
+import { PendingInvoice, PendingInvoiceRecord } from '../../interfaces/pending-invoice-record.interface';
 
 
 const dayColDef: TypedColDef<PendingInvoiceRecord> = {

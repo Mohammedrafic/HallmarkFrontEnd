@@ -1,37 +1,46 @@
-import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { combineLatestWith, filter, Observable, Subject, takeUntil, tap, throttleTime } from 'rxjs';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import {
   GetCredential,
+  GetCredentialForSettings,
   GetCredentialTypes,
   RemoveCredential,
   SaveCredential,
   SaveCredentialSucceeded,
-} from '../../../organization-management/store/organization-management.actions';
-import { Credential, CredentialFilter, CredentialFilterDataSources, CredentialPage } from '@shared/models/credential.model';
+} from '@organization-management/store/organization-management.actions';
+import { Credential,  CredentialFilterDataSources, CredentialPage } from '@shared/models/credential.model';
 
 import { ConfirmService } from '@shared/services/confirm.service';
 import { SortSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { UserState } from 'src/app/store/user.state';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { ExportCredentialList, GetCredentialsDataSources, SaveAssignedCredentialValue, SetCredentialsFilterCount, ShowExportCredentialListDialog } from '@organization-management/store/credentials.actions';
+import {  SaveAssignedCredentialValue, ShowExportCredentialListDialog } from '@organization-management/store/credentials.actions';
 import { DatePipe } from '@angular/common';
-import { FilterService } from '@shared/services/filter.service';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import { FilteredItem } from '@shared/models/filter.model';
-import { CredentialsState } from '@organization-management/store/credentials.state';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { CredentialType } from '@shared/models/credential-type.model';
-import { ActivatedRoute } from '@angular/router';
 import { PermissionService } from 'src/app/security/services/permission.service';
-import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
+import {
+  ExportColumns,
+  ExportIRPColumns,
+  FilterColumnsIncludeIRP,
+  FiltersColumns,
+  OptionFields,
+  SortSettings
+} from '@shared/components/credentials-list/constants';
+import { CredentialFiltersService } from '@shared/components/credentials-list/services';
+import { Organization } from '@shared/models/organization.model';
+import { systemColumnMapper } from '@shared/components/credentials-list/helpers';
+import { FormGroup } from '@angular/forms';
+import { FilterColumnsModel } from '@shared/models/filter.model';
+import { CredentialListState } from '@shared/components/credentials-list/store/credential-list.state';
+import { CredentialList } from '@shared/components/credentials-list/store/credential-list.action';
 
 @Component({
   selector: 'app-credentials-list',
@@ -41,115 +50,53 @@ import { AbstractPermissionGrid } from "@shared/helpers/permissions";
 export class CredentialsListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
-  public gridSortSettings: SortSettingsModel = { columns: [{ field: 'credentialTypeName', direction: 'Ascending' }] };
-
-  @Select(OrganizationManagementState.credentialTypes)
-  credentialTypes$: Observable<CredentialType[]> ;
-  public credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
-
-  @Select(OrganizationManagementState.credentials)
-  credentials$: Observable<CredentialPage>;
-
-  @Select(UserState.lastSelectedOrganizationId)
-  organizationId$: Observable<number>;
-
-  @Select(CredentialsState.credentialDataSources)
-  credentialDataSources$: Observable<CredentialFilterDataSources>;
-
-  @Select(UserState.isHallmarkMspUser)
-  isHallmarkMspUser$: Observable<boolean>;
-
-  private pageSubject = new Subject<number>();
-
-  public credentialsFormGroup: FormGroup;
-  public formBuilder: FormBuilder;
-
-  public editedCredentialId?: number;
-  public isEdit: boolean;
   public openAssignSidebarSubject = new Subject<boolean>();
-
-  private unsubscribe$: Subject<void> = new Subject();
-
-  public columnsToExport: ExportColumn[] = [
-    { text:'Credential Type', column: 'CredentialType'},
-    { text:'Credential', column: 'Credential'},
-    { text:'Expire Date Applicable', column: 'ExpireDateApplicable'},
-    { text:'Comment', column: 'Comment'}
-  ];
+  public gridSortSettings: SortSettingsModel = SortSettings;
+  public optionFields: FieldSettingsModel = OptionFields;
+  public columnsToExport: ExportColumn[];
   public fileName: string;
   public defaultFileName: string;
+  public isIRPFlagEnabled: boolean = false;
+  public isCredentialSettings: boolean = false;
+  public filterColumns: FilterColumnsModel;
+  public selectedCredential: Credential;
 
-  public CredentialsFilterFormGroup: FormGroup;
-  public filters: CredentialFilter = {
-    pageSize: this.pageSize,
-    pageNumber: this.currentPage
-  };
-  public filterColumns: any;
+  private pageSubject = new Subject<number>();
+  private unsubscribe$: Subject<void> = new Subject();
 
-  get dialogHeader(): string {
-    return this.isEdit ? 'Edit' : 'Add';
-  }
+  @Select(OrganizationManagementState.credentialTypes)
+  public credentialTypes$: Observable<CredentialType[]> ;
 
-  public optionFields = {
-    text: 'name', value: 'id'
-  };
+  @Select(OrganizationManagementState.credentials)
+  private credentials$: Observable<CredentialPage>;
+  @Select(UserState.lastSelectedOrganizationId)
+  private organizationId$: Observable<number>;
+  @Select(CredentialListState.credentialDataSources)
+  private credentialDataSources$: Observable<CredentialFilterDataSources>;
+  @Select(OrganizationManagementState.organization)
+  private readonly organization$: Observable<Organization>;
 
   constructor(protected override store: Store,
               private actions$: Actions,
               private confirmService: ConfirmService,
               private datePipe: DatePipe,
-              private filterService: FilterService,
               private route: ActivatedRoute,
               private permissionService: PermissionService,
-              @Inject(FormBuilder) private builder: FormBuilder) {
+              private credentialFiltersService: CredentialFiltersService) {
     super(store);
-    this.formBuilder = builder;
-    this.createCredentialsForm();
   }
 
   override ngOnInit(): void {
     super.ngOnInit();
 
-    this.filterColumns = {
-      credentialIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      credentialTypeIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      expireDateApplicable: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Expiry Date Applicable'},
-    }
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
-      this.clearFilters();
-      this.getCredentials();
-    });
-    this.credentialDataSources$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(data => {
-      this.filterColumns.credentialIds.dataSource = data.credentials;
-      this.filterColumns.credentialTypeIds.dataSource = data.credentialTypes;
-    });
-
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
-      this.currentPage = page;
-      this.getCredentials();
-    });
-
+    this.checkIRPFlag();
+    this.initFilterColumns();
+    this.watchForOrganization();
+    this.watchForCredentialDataSource();
+    this.watchForChangePage();
     this.mapGridData();
-
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveCredentialSucceeded)).subscribe(() => {
-      this.clearFormDetails();
-      this.getCredentials();
-    });
-
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
-      if (val.isDialogShown) {
-        this.defaultFileName = 'Credentials/Credentials List ' + this.generateDateTime(this.datePipe);
-        this.fileName = this.defaultFileName;
-      }
-    });
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportCredentialListDialog)).subscribe((event: { payload: ExportedFileType }) => {
-      this.defaultFileName = 'Credentials/Credentials List ' + this.generateDateTime(this.datePipe);
-      this.defaultExport(event.payload);
-    });
-
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveAssignedCredentialValue)).subscribe(() => {
-        this.getCredentials();
-    });
+    this.watchForAction();
+    this.initExportColumns();
   }
 
   ngOnDestroy(): void {
@@ -157,50 +104,49 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
     this.unsubscribe$.complete();
   }
 
+  public changeRowDropDown(): void {
+    this.grid.pageSettings.pageSize = this.pageSize = this.getActiveRowsPerPage();
+    this.credentialFiltersService.updateFilters = {
+      pageSize: this.pageSize
+    };
+  }
+
+  public changePage(event: { currentPage: number; value: number }): void {
+    if (event.currentPage || event.value) {
+      this.pageSubject.next(event.currentPage || event.value);
+    }
+  }
+
+  public clearAllFilters(): void {
+    this.getCredentials();
+  }
+
+  public applyFilters(): void {
+    this.getCredentials();
+    this.store.dispatch(new ShowFilterDialog(false));
+  }
+
   public override updatePage(): void {
     this.getCredentials();
   }
 
   private getCredentials(): void {
-    this.filters.pageNumber = this.currentPage;
-    this.filters.pageSize = this.pageSize;
-    this.filters.orderBy = this.orderBy;
-    this.store.dispatch([new GetCredential(this.filters), new GetCredentialTypes(), new GetCredentialsDataSources()]);
-  }
+    this.credentialFiltersService.updateFilters = {
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize,
+      orderBy: this.orderBy,
+    };
 
-  public onFilterClose() {
-    this.CredentialsFilterFormGroup.setValue({
-      credentialIds: this.filters.credentialIds || null,
-      credentialTypeIds: this.filters.credentialTypeIds || [],
-      expireDateApplicable: this.filters.expireDateApplicable || null,
-    });
-    this.filteredItems = this.filterService.generateChips(this.CredentialsFilterFormGroup, this.filterColumns, this.datePipe);
-    this.store.dispatch(new SetCredentialsFilterCount(this.filteredItems.length));
-  }
+    const credentialFilters = this.isIRPFlagEnabled && this.isCredentialSettings ?
+      new GetCredentialForSettings(this.credentialFiltersService.filtersState) :
+      new GetCredential(this.credentialFiltersService.filtersState)
 
-  public onFilterDelete(event: FilteredItem): void {
-    this.filterService.removeValue(event, this.CredentialsFilterFormGroup, this.filterColumns);
-  }
-
-  private clearFilters(): void {
-    this.CredentialsFilterFormGroup.reset();
-    this.filteredItems = [];
-    this.store.dispatch(new SetCredentialsFilterCount(this.filteredItems.length));
-    this.currentPage = 1;
-    this.filters = {};
-  }
-
-  public onFilterClearAll(): void {
-    this.clearFilters();
-    this.getCredentials();
-  }
-
-  public onFilterApply(): void {
-    this.filters = this.CredentialsFilterFormGroup.getRawValue();
-    this.filteredItems = this.filterService.generateChips(this.CredentialsFilterFormGroup, this.filterColumns);
-    this.store.dispatch(new SetCredentialsFilterCount(this.filteredItems.length));
-    this.getCredentials();
-    this.store.dispatch(new ShowFilterDialog(false));
+    this.store.dispatch([
+      credentialFilters,
+      new GetCredentialTypes(),
+      new CredentialList.GetCredentialsDataSources()
+      ]
+    );
   }
 
   public closeExport() {
@@ -215,13 +161,13 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     const ids = this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null;
-    this.store.dispatch(new ExportCredentialList(new ExportPayload(
+    this.store.dispatch(new CredentialList.ExportCredentialList(new ExportPayload(
       fileType,
-      { ...this.filters, ids: ids },
+      { ...this.credentialFiltersService.filtersState, ids: ids },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       null,
       options?.fileName || this.defaultFileName
-    )));
+    ), this.isCredentialSettings));
     this.clearSelection(this.grid);
   }
 
@@ -236,88 +182,26 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
     }));
   }
 
-  public onEditButtonClick(credential: Credential, event: any): void {
+  public editCredential(credential: Credential, event: any): void {
     this.addActiveCssClass(event);
-    this.credentialsFormGroup.setValue({
-      credentialTypeId: credential.credentialTypeId,
-      name: credential.name,
-      expireDateApplicable: credential.expireDateApplicable,
-      comment: credential.comment
-    });
-    this.disableFieldOnEdit(!!credential.isMasterCredential);
-    this.editedCredentialId = credential.id;
-    this.isEdit = true;
+    this.selectedCredential = credential;
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onRemoveButtonClick(credential: Credential, event: any): void {
+  public removeCredential(credential: Credential, event: any): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm('Are you sure want to delete?', {
         title: 'Delete Record',
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
-        if (confirm) {
-          this.store.dispatch(new RemoveCredential(credential, this.filters));
-        }
-        this.removeActiveCssClass();
+      }).pipe(
+        filter(Boolean),
+        takeUntil(this.unsubscribe$)
+      ).subscribe(() => {
+          this.store.dispatch(new RemoveCredential(credential, this.credentialFiltersService.filtersState));
+          this.removeActiveCssClass();
       });
-  }
-
-  public onRowsDropDownChanged(): void {
-    this.grid.pageSettings.pageSize = this.pageSize = this.getActiveRowsPerPage();
-  }
-
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-    }
-  }
-
-  public onFormCancelClick(): void {
-    if (this.credentialsFormGroup.dirty) {
-      this.confirmService
-        .confirm(CANCEL_CONFIRM_TEXT, {
-          title: DELETE_CONFIRM_TITLE,
-          okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => !!confirm))
-        .subscribe(() => {
-          this.clearFormDetails();
-        });
-    } else {
-      this.clearFormDetails();
-    }
-  }
-
-  public onFormSaveClick(): void {
-    if (this.credentialsFormGroup.valid) {
-      if (this.isEdit) {
-        const credential = new Credential({
-          id: this.editedCredentialId,
-          name: this.credentialsFormGroup.controls['name'].value,
-          credentialTypeId: this.credentialsFormGroup.controls['credentialTypeId'].value,
-          expireDateApplicable: this.credentialsFormGroup.controls['expireDateApplicable'].value,
-          comment: this.credentialsFormGroup.controls['comment'].value,
-        });
-
-        this.store.dispatch(new SaveCredential(credential));
-        this.isEdit = false;
-        this.editedCredentialId = undefined;
-      } else {
-        const credential = new Credential({
-          name: this.credentialsFormGroup.controls['name'].value,
-          credentialTypeId: this.credentialsFormGroup.controls['credentialTypeId'].value,
-          expireDateApplicable: this.credentialsFormGroup.controls['expireDateApplicable'].value,
-          comment: this.credentialsFormGroup.controls['comment'].value
-        });
-        this.store.dispatch(new SaveCredential(credential));
-      }
-    } else {
-      this.credentialsFormGroup.markAllAsTouched();
-    }
   }
 
   public showAssignSiderbar(): void {
@@ -325,9 +209,12 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
   }
 
   private mapGridData(): void {
-    this.credentials$.pipe(combineLatestWith(this.credentialTypes$), tap(() => this.gridDataSource = []),
-      filter(([credentials, credentialTypes]) => credentials?.items?.length > 0 && credentialTypes.length > 0))
-      .subscribe(([credentials, credentialTypes]) => {
+    this.credentials$.pipe(
+      combineLatestWith(this.credentialTypes$),
+      tap(() => this.gridDataSource = []),
+      filter(([credentials, credentialTypes]) => credentials?.items?.length > 0 && credentialTypes.length > 0),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(([credentials, credentialTypes]) => {
         this.lastAvailablePage = credentials.totalPages;
         if (credentialTypes) {
           credentials.items.map(item => {
@@ -335,45 +222,20 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
             item.credentialTypeName = credentialType ? credentialType.name : '';
           });
         }
-        this.gridDataSource = this.getRowsPerPage(credentials.items, this.currentPagerPage);
+        this.gridDataSource = this.getRowsPerPage(systemColumnMapper(credentials.items), this.currentPagerPage);
         this.totalDataRecords = credentials.totalCount;
     });
   }
 
-  private disableFieldOnEdit(isMasterCredential: boolean): void {
-    const { canEdit } = this.route.snapshot.data;
-
-    if (!canEdit) {
-      const havePermission = !isMasterCredential && this.permissionService.checkPermisionSnapshot(PermissionTypes.ManuallyAddCredential);
-
-      if (!havePermission) {
-        this.credentialsFormGroup.get('credentialTypeId')?.disable();
-        this.credentialsFormGroup.get('name')?.disable();
-      }
-    }
+  public gridCreated(): void {
+    this.showHideGridColumns();
   }
 
-  private clearFormDetails(): void {
+  public clearFormDetails(form?: FormGroup): void {
     this.store.dispatch(new ShowSideDialog(false));
-    this.isEdit = false;
-    this.editedCredentialId = undefined;
-    this.credentialsFormGroup.reset();
-    this.credentialsFormGroup.enable();
+    form?.reset();
+    form?.enable();
     this.removeActiveCssClass();
-  }
-
-  private createCredentialsForm(): void {
-    this.credentialsFormGroup = this.formBuilder.group({
-      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
-      credentialTypeId: ['', Validators.required],
-      expireDateApplicable: [false],
-      comment: ['', Validators.maxLength(500)]
-    });
-    this.CredentialsFilterFormGroup = this.formBuilder.group({
-      credentialIds: [[]],
-      credentialTypeIds: [[]],
-      expireDateApplicable: [false],
-    });
   }
 
   private getActiveRowsPerPage(): number {
@@ -383,5 +245,108 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
   private getRowsPerPage(data: object[], currentPage: number): object[] {
     return data.slice((currentPage * this.getActiveRowsPerPage()) - this.getActiveRowsPerPage(),
       (currentPage * this.getActiveRowsPerPage()));
+  }
+
+  private checkIRPFlag(): void {
+    this.organization$
+      .pipe(
+        filter(Boolean),
+        takeUntil(this.unsubscribe$)
+      ).subscribe((organization: Organization) => {
+      this.isIRPFlagEnabled = !!organization.preferences.isIRPEnabled;
+      if(this.grid) {
+        this.showHideGridColumns()
+      }
+      const { isCredentialSettings } = this.route.snapshot.data;
+      this.isCredentialSettings = isCredentialSettings;
+    });
+  }
+
+  private showHideGridColumns(): void {
+    this.grid.getColumnByField('system').visible = this.isIRPFlagEnabled;
+    this.grid.getColumnByField('irpComment').visible = this.isIRPFlagEnabled;
+    this.grid.refreshColumns();
+  }
+
+  private initFilterColumns(): void {
+    this.filterColumns = FiltersColumns;
+    if(this.isIRPFlagEnabled && this.isCredentialSettings) {
+      this.filterColumns = {
+        ...this.filterColumns,
+        ...FilterColumnsIncludeIRP
+      }
+    }
+  }
+
+  private watchForOrganization(): void {
+    this.organizationId$.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.getCredentials();
+    });
+  }
+
+  private watchForCredentialDataSource(): void {
+    this.credentialDataSources$.pipe(
+      filter(Boolean),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((data: CredentialFilterDataSources) => {
+      this.filterColumns['credentialIds'].dataSource = data.credentials;
+      this.filterColumns['credentialTypeIds'].dataSource = data.credentialTypes;
+      this.filterColumns = {...this.filterColumns};
+    });
+  }
+
+  private watchForChangePage(): void {
+    this.pageSubject.pipe(
+      throttleTime(1),
+      takeUntil(this.unsubscribe$)
+      ).subscribe((page) => {
+        this.currentPage = page;
+        this.credentialFiltersService.updateFilters = {
+          pageNumber: page
+        };
+        this.getCredentials();
+    });
+  }
+
+  private watchForAction(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(SaveCredentialSucceeded),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.clearFormDetails();
+      this.getCredentials();
+    });
+
+    this.actions$.pipe(
+      ofActionDispatched(ShowExportDialog),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((val) => {
+      if (val.isDialogShown) {
+        this.defaultFileName = 'Credentials/Credentials List ' + this.generateDateTime(this.datePipe);
+        this.fileName = this.defaultFileName;
+      }
+    });
+
+    this.actions$.pipe(
+      ofActionDispatched(ShowExportCredentialListDialog),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((event: { payload: ExportedFileType }) => {
+      this.defaultFileName = 'Credentials/Credentials List ' + this.generateDateTime(this.datePipe);
+      this.defaultExport(event.payload);
+    });
+
+    this.actions$.pipe(
+      ofActionSuccessful(SaveAssignedCredentialValue),
+      takeUntil(this.unsubscribe$),
+    ).subscribe(() => {
+      this.getCredentials();
+    });
+  }
+
+  private initExportColumns(): void {
+    this.columnsToExport = this.isCredentialSettings ?
+      [...ExportColumns, ...ExportIRPColumns] : ExportColumns;
   }
 }

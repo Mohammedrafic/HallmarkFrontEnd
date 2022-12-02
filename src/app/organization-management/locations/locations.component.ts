@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
@@ -39,7 +39,7 @@ import { UserState } from '../../store/user.state';
 import {
   ClearLocationList, DeleteLocationById, ExportLocations, GetLocationFilterOptions,
   GetLocationsByRegionId, GetLocationTypes, GetOrganizationById, GetRegions, GetUSCanadaTimeZoneIds,
-  SaveLocation, SaveRegion, SetGeneralStatesByCountry, UpdateLocation
+  SaveLocation, SaveLocationConfirm, SaveLocationSucceeded, SaveRegion, SetGeneralStatesByCountry, UpdateLocation
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import {
@@ -148,6 +148,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     private datePipe: DatePipe,
     private filterService: FilterService,
     private locationsService: LocationsService,
+    private action$: Actions
   ) {
     super(store);
     this.createForms();
@@ -156,6 +157,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.watchForLocationUpdate();
     this.watchForPageChange();
     this.populateFilterOptions();
     this.watchForOrgChange();
@@ -357,7 +359,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
           okButtonClass: 'delete-button'
         })
         .pipe(
-          filter((confirm) => !!confirm),
+          filter(Boolean),
           takeUntil(this.componentDestroy()),
         )
         .subscribe(() => {
@@ -376,7 +378,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     }
   }
 
-  saveLocation(): void {
+  saveLocation(ignoreWarning = false): void {
     if (this.locationDetailsFormGroup.valid) {
       const inactiveDate = this.locationDetailsFormGroup.controls['inactiveDate'].value;
       const reactivateDate = this.locationDetailsFormGroup.controls['reactivateDate'].value;
@@ -405,11 +407,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         organizationId : this.businessUnitId,
         includeInIRP: this.locationDetailsFormGroup.controls['includeInIRP'].value,
       }
-      this.saveOrUpdateLocation(location);
-
-      this.store.dispatch(new ShowSideDialog(false));
-      this.locationDetailsFormGroup.reset();
-      this.removeActiveCssClass();
+      this.saveOrUpdateLocation(location, ignoreWarning);
     } else {
       this.locationDetailsFormGroup.markAllAsTouched();
     }
@@ -478,12 +476,10 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     };
   }
 
-  private saveOrUpdateLocation(location: Location): void {
+  private saveOrUpdateLocation(location: Location, ignoreWarning: boolean): void {
     if (this.selectedRegion.id) {
       if (this.isEdit) {
-      this.store.dispatch(new UpdateLocation(location, this.selectedRegion.id, this.filters));
-        this.isEdit = false;
-        this.editedLocationId = undefined;
+        this.store.dispatch(new UpdateLocation(location, this.selectedRegion.id, this.filters, ignoreWarning));
         return;
       }
       this.store.dispatch(new SaveLocation(location, this.selectedRegion.id, this.filters));
@@ -542,6 +538,34 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     .subscribe((page: number) => {
       this.currentPage = page;
       this.getLocations();
+    });
+  }
+
+  private watchForLocationUpdate(): void {
+    this.action$.pipe(ofActionDispatched(SaveLocationSucceeded), takeUntil(this.componentDestroy())).subscribe(() => {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.locationDetailsFormGroup.reset();
+      this.removeActiveCssClass();
+      if (this.isEdit) {
+        this.isEdit = false;
+        this.editedLocationId = undefined;
+      }
+    });
+    this.action$.pipe(ofActionDispatched(SaveLocationConfirm), takeUntil(this.componentDestroy())).subscribe(() => {
+      this.confirmService
+      .confirm('Location has active orders past the inactivation date. Do you want to proceed?', {
+        title: 'Confirmation',
+        okButtonLabel: 'Yes',
+        cancelButtonLabel: 'No',
+        okButtonClass: 'delete-button'
+      })
+      .pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(() => {
+        this.saveLocation(true);
+      });
     });
   }
 

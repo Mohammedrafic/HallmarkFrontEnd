@@ -15,6 +15,7 @@ export class Department {
   includeInIRP?: boolean;
   locationIncludeInIRP?: boolean;
   isDeactivated?: boolean;
+  ignoreValidationWarning?: boolean;
 }
 
 export type DepartmentsPage = PageOfCollections<Department>;

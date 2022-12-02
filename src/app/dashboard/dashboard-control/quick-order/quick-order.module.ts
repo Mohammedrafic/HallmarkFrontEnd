@@ -13,6 +13,7 @@ import { Edit3 } from 'angular-feather/icons';
 import { SharedModule } from '@shared/shared.module';
 import { SettingsViewService } from '@shared/services';
 import { QuickOrderService } from './services';
+import { AccordionModule } from '@syncfusion/ej2-angular-navigations';
 
 @NgModule({
   imports: [
@@ -28,6 +29,7 @@ import { QuickOrderService } from './services';
     NumericTextBoxModule,
     FeatherModule.pick({Edit3}),
     SharedModule,
+    AccordionModule
   ],
   declarations: [QuickOrderComponent, QuickOrderFormComponent],
   exports: [QuickOrderComponent],

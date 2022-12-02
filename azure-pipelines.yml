@@ -81,10 +81,9 @@ steps:
       $(buildId)$(imageVersionIdentifier)
       latest$(imageVersionIdentifier)
       
-- task: HelmInstaller@0
+- task: HelmInstaller@1
   inputs:
-    helmVersion: '2.14.1'
-    installKubectl: false
+    helmVersionToInstall: '3.10.2'
 
 - task: PowerShell@2
   displayName: Pack helm package

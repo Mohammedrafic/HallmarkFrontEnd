@@ -1,13 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import { FileSize } from "@core/enums";
+import { FileStatusCode } from "@shared/enums/file.enum";
 import { SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
 import { FileInfo } from "@syncfusion/ej2-inputs/src/uploader/uploader";
 
 @Component({
   selector: 'app-image-uploader',
   templateUrl: './image-uploader.component.html',
-  styleUrls: ['./image-uploader.component.scss']
+  styleUrls: ['./image-uploader.component.scss'],
 })
 export class ImageUploaderComponent implements OnInit {
   @Input() uploaderTitle: string;
@@ -18,11 +19,11 @@ export class ImageUploaderComponent implements OnInit {
       reader.readAsDataURL(value as Blob);
       reader.onloadend = () => {
         this.logoSrc = reader.result as string;
-      }
+      };
     }
   }
 
-  @Output() selectImage = new EventEmitter<Blob | null>()
+  @Output() selectImage = new EventEmitter<Blob | null>();
 
   @ViewChild('previewupload')
   public uploadObj: UploaderComponent;
@@ -45,8 +46,8 @@ export class ImageUploaderComponent implements OnInit {
   }
 
   public onImageSelect(event: SelectedEventArgs): void {
-    if (event.filesData[0].statusCode === '1') {
-      this.selectImage.emit(event.filesData[0].rawFile as Blob)
+    if (event.filesData[0].statusCode === FileStatusCode.Valid) {
+      this.selectImage.emit(event.filesData[0].rawFile as Blob);
       this.isImageSelected = true;
     } else {
      this.addValidationMessage(event.filesData[0]);

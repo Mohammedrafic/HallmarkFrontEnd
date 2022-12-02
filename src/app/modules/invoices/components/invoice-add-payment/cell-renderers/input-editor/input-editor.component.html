@@ -1,0 +1,10 @@
+<div *ngIf="group" [formGroup]="group" class="amount-container">
+  <span>
+    <input
+    class="amount-input"
+    [formControlName]="controlName"
+    (change)="changePayment()"
+    type="number"/>
+  </span>
+
+</div>

@@ -66,11 +66,4 @@ export class SkillGroupService {
     // TODO: deprecated, can be removed after verification
     return this.http.delete<void>(`/api/SkillGroupsMapping/${skillGroupMappingId}`);
   }
-
-  /**
-   * Export credential list
-   */
-  public exportCredentialTypes(payload: ExportPayload): Observable<any> {
-    return this.http.post(`/api/MasterCredentials/export`, payload, { responseType: 'blob' });
-  }
 }

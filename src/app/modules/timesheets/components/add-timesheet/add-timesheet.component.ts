@@ -34,7 +34,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
   public onCallId: number;
 
   @Select(TimesheetsState.addDialogOpen)
-  public readonly dialogState$: Observable<TimesheetDetailsAddDialogState>
+  public readonly dialogState$: Observable<TimesheetDetailsAddDialogState>;
 
   ngOnInit(): void {
     this.getDialogState();
@@ -150,6 +150,6 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
     return this.form?.get('billRateConfigId')?.valueChanges
     .pipe(
       tap(() => this.cd.markForCheck()),
-    ) as Observable<number>
+    ) as Observable<number>;
   }
 }

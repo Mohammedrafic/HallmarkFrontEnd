@@ -11,11 +11,15 @@ export const DELETE_RECORD_TITLE = 'Delete Record';
 export const DELETE_CONFIRM_TEXT = 'Are you sure you want to leave this page without saving?';
 export const DELETE_FOLDER_TEXT = 'Are you sure you want to delete folder?';
 export const DELETE_FOLDER_TITLE = 'Delete Folder';
-export const ADD_CONFIRM_TEXT = 'Are you sure you want to add Bill rate for Onboarded Candidate? This may lead to recalculating values and generating new invoice records.';
-export const EDIT_CONFIRM_TEXT = 'Are you sure you want to edit the Bill rate for Onboarded Candidate? This may lead to recalculating values and generating new invoice records.';
+export const ADD_CONFIRM_TEXT =
+  'Are you sure you want to add Bill rate for Onboarded Candidate? This may lead to recalculating values and generating new invoice records.';
+export const EDIT_CONFIRM_TEXT =
+  'Are you sure you want to edit the Bill rate for Onboarded Candidate? This may lead to recalculating values and generating new invoice records.';
 export const DELETE_CONFIRM_TITLE = 'Unsaved Progress';
 export const UNSAVED_TABS_TEXT = 'Are you sure you want to leave this tab without saving?';
 export const CANCEL_CONFIRM_TEXT = 'Are you sure you want to cancel? All data will be deleted.';
+export const RESEND_EMAIL_TITLE = 'Sending Welcome Email';
+export const RESEND_EMAIL_TEXT = 'Are you sure you want to re-send the welcome email?';
 export const DATA_OVERRIDE_TITLE = 'Data Override';
 export const DATA_OVERRIDE_TEXT = 'Are you sure want to override existing data?';
 export const INACTIVE_USER_TITLE = 'Inactivate the User';
@@ -45,7 +49,8 @@ export const ERROR_START_LESS_END_DATE = 'Start date should be before end date o
 export const SHOULD_LOC_DEP_INCLUDE_IRP = 'Should all locations and departments be included in IRP?';
 export const JOB_DISTRIBUTION_TITLE = 'Job Distribution';
 export const PROCEED_FOR_ALL_AGENCY = 'Order will be distributed to all Agencies. Do you want to proceed?';
-export const PROCEED_FOR_TIER_LOGIC = 'Order will be distributed based on Tiering logic. Do you want to proceed?'
+export const PROCEED_FOR_TIER_LOGIC = 'Order will be distributed based on Tiering logic. Do you want to proceed?';
+export const PLEASE_SELECT_SYSTEM_GROUP_SETUP = 'Please select system for Group setup';
 
 export const updateCandidateJobMessage = (dates: string[]) =>
   `For this candidate job timesheets will be recalculated for the next start dates: ${dates.join(', ')}`;
@@ -55,8 +60,10 @@ export const usedInMappingMessage = (mappingName: string) =>
   `This change has been affected ${mappingName} Mapping, please update it on the ${mappingName} Mapping tab`;
 export const DEPLOYED_CANDIDATE = 'Deployed Candidate';
 export const deployedCandidateMessage = (orderIds: string[]) =>
-  `<span class="deployed-candidate__message">Candidate is already working on order <span class="deployed-candidate__order-id"> ${orderIds.join(', ')}</span>. Do you wish to proceed?</span>`;
-  export const SEND_EMAIL = 'Sent email';
+  `<span class="deployed-candidate__message">Candidate is already working on order <span class="deployed-candidate__order-id"> ${orderIds.join(
+    ', '
+  )}</span>. Do you wish to proceed?</span>`;
+export const SEND_EMAIL = 'Sent email';
 export const SEND_EMAIL_REQUIRED = 'Required';
 export const DOCUMENT_UPLOAD_SUCCESS = 'Document uploaded successfully';
 export const DOCUMENT_UPLOAD_EDIT = 'Document modified successfully';

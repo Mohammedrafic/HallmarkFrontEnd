@@ -1,6 +1,6 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
-export class FilteredItem {
+export interface FilteredItem {
   text: string;
   value: any;
   column: string;
@@ -9,7 +9,7 @@ export class FilteredItem {
   locationId?: number;
 }
 
-export class FilterColumn {
+export interface FilterColumn {
   type: ControlTypes;
   valueType: ValueType;
   dataSource?: any[];

@@ -6,17 +6,20 @@ import { map } from 'rxjs/operators';
 
 import { PageOfCollections } from '@shared/models/page.model';
 import { DataSourceItem, FileForUpload } from '@core/interface';
-import { GetPendingApprovalParams, GroupInvoicesParams, InvoicesFilteringOptions, InvoicesFilterState, InvoiceStateDto, ManualInvoiceMeta,
-  ManualInvoicePostDto, ManualInvoiceReason, ManualInvoicesData, ManualInvoiceTimesheetResponse, InvoiceDetail, PrintingPostDto,
-  PrintInvoiceData, ManualInvoicePutDto } from '../interfaces';
+import { GetPendingApprovalParams, GroupInvoicesParams, InvoicesFilteringOptions,
+  InvoicesFilterState, InvoiceStateDto, ManualInvoiceMeta,
+  ManualInvoicePostDto, ManualInvoiceReason, ManualInvoicesData,
+  ManualInvoiceTimesheetResponse, InvoiceDetail, PrintingPostDto,
+  PrintInvoiceData, ManualInvoicePutDto, InvoicePayment, InvoicePaymentGetParams, PaymentCreationDto } from '../interfaces';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { ExportPayload } from '@shared/models/export.model';
 
-import { PendingInvoice, PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
+import { PendingInvoicesData } from '../interfaces/pending-invoice-record.interface';
 import { ChangeStatusData } from '../../timesheets/interface';
 import { PendingApprovalInvoice, PendingApprovalInvoicesData } from '../interfaces/pending-approval-invoice.interface';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { GetQueryParams } from '@core/helpers/functions.helper';
 
 @Injectable()
 export class InvoicesApiService {
@@ -27,7 +30,8 @@ export class InvoicesApiService {
   public getFiltersDataSource(
     organizationId: number | null = null
   ): Observable<InvoicesFilteringOptions> {
-    return this.http.get<InvoicesFilteringOptions>(`/api/Timesheets/filteringOptions${organizationId ? `/${organizationId}` : ''}`);
+    return this.http.get<InvoicesFilteringOptions>
+    (`/api/Timesheets/filteringOptions${organizationId ? `/${organizationId}` : ''}`);
   }
 
   public getInvoiceReasons(): Observable<ManualInvoiceReason[]> {
@@ -59,7 +63,10 @@ export class InvoicesApiService {
   }
 
   public deleteManualInvoice(id: number, organizationId: number | null): Observable<void> {
-    return organizationId ? this.agencyDeleteManualInvoice(id, organizationId) : this.organizationDeleteManualInvoice(id);
+    if (organizationId) {
+      return this.agencyDeleteManualInvoice(id, organizationId);
+    }
+    return this.organizationDeleteManualInvoice(id);
   }
 
     /**
@@ -74,8 +81,8 @@ export class InvoicesApiService {
    */
   public getOrgStructure(orgId: number, isAgency: boolean): Observable<OrganizationStructure> {
     const endpoint = isAgency ? `/api/Organizations/structure/partnered/${orgId}`
-    : '/api/Organizations/structure'
-    return this.http.get<any>(endpoint);
+    : '/api/Organizations/structure';
+    return this.http.get<OrganizationStructure>(endpoint);
   }
 
   public saveManualInvoiceAttachments(
@@ -87,7 +94,7 @@ export class InvoicesApiService {
     files.forEach((file) => formData.append('files', file.blob, file.fileName));
 
     const endPoint = orgId ? `/api/Timesheets/${timesheetId}/organization/${orgId}/files`
-    : `/api/Timesheets/${timesheetId}/files`
+    : `/api/Timesheets/${timesheetId}/files`;
     return this.http.post<number[]>(endPoint, formData);
   }
 
@@ -142,6 +149,20 @@ export class InvoicesApiService {
 
   public getAgencyPermissions(): Observable<CurrentUserPermission[]> {
     return this.http.get<CurrentUserPermission[]>('/api/Permissions/currentUser');
+  }
+
+  public getInvoicesPayments(params: InvoicePaymentGetParams): Observable<InvoicePayment[]> {
+    return this.http.get<InvoicePayment[]>('/api/Invoices/payments', {
+      params: GetQueryParams<InvoicePaymentGetParams>(params),
+    });
+  }
+
+  public savePayment(paymentDto: PaymentCreationDto): Observable<void> {
+    return this.http.post<void>('/api/Invoices/payments', paymentDto);
+  }
+
+  public getCheckData(checkId: string): Observable<PaymentCreationDto> {
+    return this.http.get<PaymentCreationDto>(`/api/Invoices/payments/check/${checkId}`);
   }
 
   private organizationDeleteManualInvoice(id: number): Observable<void> {

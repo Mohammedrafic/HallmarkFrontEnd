@@ -217,6 +217,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   private getIsDashboardMobileView(): void {
+    this.dashboardSFComponent.mediaQuery = 'max-width: 640px';
     this.breakpointObserver
       .observe([`(${this.dashboardSFComponent.mediaQuery})`])
       .pipe(map((breakpointState: BreakpointState) => breakpointState.matches))

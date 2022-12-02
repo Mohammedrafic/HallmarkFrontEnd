@@ -88,6 +88,11 @@
           </div>
         </ng-template>
       </e-column>
+      <e-column field="includeInIRP" headerText="Include in IRP" width=200>
+        <ng-template #template let-data>
+          <span>{{ data.includeInIRP ? 'Yes' : 'No' }}</span>
+        </ng-template>
+      </e-column>
       <e-column field="extDepartmentId" headerText="EXT DEPARTMENT ID" width=200></e-column>
       <e-column field="invoiceDepartmentId" headerText="INVOICE DEPARTMENT ID" width=200></e-column>
       <e-column field="departmentName" headerText="DEPARTMENT NAME" width=200></e-column>
@@ -99,14 +104,9 @@
           {{ data.inactiveDate | date: 'MM/dd/yyy' : 'UTC' }}
         </ng-template>
       </e-column>
-      <e-column field="inactiveDate" headerText="Reactivate Date" width=200>
+      <e-column field="reactivateDate" headerText="Reactivate Date" width=200>
         <ng-template #template let-data>
-          {{ data.inactiveDate | date: 'MM/dd/yyy' : 'UTC' }}
-        </ng-template>
-      </e-column>
-      <e-column field="includeInIRP" headerText="Include in IRP" width=200>
-        <ng-template #template let-data>
-          <span>{{ data.includeInIRP ? 'Yes' : 'No' }}</span>
+          {{ data.reactivateDate | date: 'MM/dd/yyy' : 'UTC' }}
         </ng-template>
       </e-column>
     </e-columns>
@@ -396,12 +396,14 @@
         <label for="inactiveDate">Reactivate date</label>
         <div class="input-group datepicker">
           <ejs-datepicker
+            #reactivationDatepicker
             id="reactivateDate"
             class="datepicker"
             [format]="formatDate"
             [placeholder]="placeholderDate"
             [enableMask]="true"
             [maskPlaceholder]="datepickerMask"
+            [max]="maxReactivateDate"
             appValidateWithMessage
             formControlName="reactivateDate"
           >

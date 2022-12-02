@@ -5,14 +5,14 @@ import { A11yModule } from '@angular/cdk/a11y';
 
 import {
   AlignJustify, ChevronDown, ChevronRight, Lock, Menu, MessageSquare, MoreVertical, Package,
-  Percent, Sliders, Trash2, X, AlertCircle, ChevronsDown, Search, Printer, ArrowUp
+  Percent, Sliders, Trash2, X, AlertCircle, ChevronsDown, Search, Printer, ArrowUp,
 } from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import {
   AutoCompleteAllModule,
   DropDownListModule,
   ListBoxModule,
-  MultiSelectModule
+  MultiSelectModule,
 } from '@syncfusion/ej2-angular-dropdowns';
 import { NumericTextBoxModule, TextBoxAllModule, UploaderAllModule } from '@syncfusion/ej2-angular-inputs';
 import { NgxsModule, Store } from '@ngxs/store';
@@ -41,17 +41,17 @@ import { InvoicesState } from './store/state/invoices.state';
 import { AddInvoiceService, InvoicePrintingService, InvoicesService } from './services';
 import { InvoiceRecordDialogComponent } from './components/invoice-record-dialog/invoice-record-dialog.component';
 import {
-  InvoiceDetailContainerComponent
+  InvoiceDetailContainerComponent,
 } from './containers/invoice-details-container/invoice-detail-container.component';
 import {
-  InvoiceDetailInvoiceInfoComponent
+  InvoiceDetailInvoiceInfoComponent,
 } from './components/invoice-detail-invoice-info/invoice-detail-invoice-info.component';
 import { InvoiceDetailTableComponent } from './components/invoice-detail-table/invoice-detail-table.component';
 import {
-  InvoiceRecordsTableRowDetailsComponent
+  InvoiceRecordsTableRowDetailsComponent,
 } from './components/invoice-records-table-row-details/invoice-records-table-row-details.component';
 import {
-  ToggleRowExpansionHeaderCellComponent
+  ToggleRowExpansionHeaderCellComponent,
 } from './components/grid-icon-cell/toggle-row-expansion-header-cell.component';
 import { ManualInvoiceDialogComponent } from './components/manual-invoice-dialog/manual-invoice-dialog.component';
 import { InvoicesFiltersDialogComponent } from './components/invoices-filters-dialog/invoices-filters-dialog.component';
@@ -63,7 +63,7 @@ import { AGENCY_INVOICE_TABS, ORGANIZATION_INVOICE_TABS } from './constants';
 import { AppState } from '../../store/app.state';
 import { UserState } from '../../store/user.state';
 import {
-  RejectReasonInputDialogModule
+  RejectReasonInputDialogModule,
 } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.module';
 import { ManualInvoiceAttachmentsApiService } from './services/manual-invoice-attachments-api.service';
 import { FileViewerModule } from '@shared/modules/file-viewer/file-viewer.module';
@@ -71,7 +71,7 @@ import { InvoicesContainerService } from './services/invoices-container/invoices
 import { Router } from '@angular/router';
 import { AgencyInvoicesContainerService } from './services/invoices-container/agency-invoices-container.service';
 import {
-  OrganizationInvoicesContainerService
+  OrganizationInvoicesContainerService,
 } from './services/invoices-container/organization-invoices-container.service';
 import { TableStatusCellModule } from '@shared/components/table-status-cell/table-status-cell.module';
 import { AllInvoicesActionCellComponent } from './components/all-invoices-action-cell/all-invoices-action-cell.component';
@@ -80,6 +80,8 @@ import { InvoiceAgencyResolver } from './resolvers/invoice-agency.resolver';
 import { GridOrderIdCellComponent } from './components/grid-order-id-cell/grid-order-id-cell.component';
 import { InvoicesPermissionHelper } from './helpers/invoices-permission.helper';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
+import { InvoiceAddPaymentModule } from './components/invoice-add-payment/invoice-add-payment.module';
+import { InvoicePaymentDetailsModule } from './components/invoice-payment-details/invoice-payment-details.module';
 
 @NgModule({
   declarations: [
@@ -95,6 +97,7 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
     InvoicesTableTabsComponent,
     AllInvoicesActionCellComponent,
     GridOrderIdCellComponent,
+
   ],
   imports: [
     CommonModule,
@@ -103,7 +106,7 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
     FeatherModule.pick({
       AlignJustify, Lock, Menu, MessageSquare, MoreVertical, Sliders, ChevronRight,
       ChevronDown, X, Percent, Package, Trash2, AlertCircle, ChevronsDown, Search,
-      Printer, ArrowUp
+      Printer, ArrowUp,
     }),
     TabModule,
     DropDownButtonModule,
@@ -135,7 +138,9 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
     A11yModule,
     TableStatusCellModule,
     NumericalConverterModule,
-    TooltipContainerModule
+    TooltipContainerModule,
+    InvoiceAddPaymentModule,
+    InvoicePaymentDetailsModule,
   ],
   providers: [
     InvoicesService,
@@ -173,14 +178,18 @@ import { TooltipContainerModule } from '@shared/components/tooltip-container/too
         map((data: IsOrganizationAgencyAreaStateModel) => data.isAgencyArea),
         switchMap((agency: boolean) => agency ? store.select(UserState.lastSelectedOrganizationId) : of(null)),
       ),
-      deps: [Store]
+      deps: [Store],
     },
     {
       provide: InvoicesContainerService,
-      useFactory: (router: Router, store: Store) =>
-        router.url.includes('agency') ? new AgencyInvoicesContainerService(store) : new OrganizationInvoicesContainerService(store),
+      useFactory: (router: Router, store: Store) => {
+        if (router.url.includes('agency')) {
+          return new AgencyInvoicesContainerService(store);
+        }
+        return new OrganizationInvoicesContainerService(store);
+      },
       deps: [Router, Store],
-    }
-  ]
+    },
+  ],
 })
 export class InvoicesModule { }

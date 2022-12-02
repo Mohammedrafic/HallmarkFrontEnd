@@ -9,6 +9,7 @@ import { getInstance } from "@syncfusion/ej2-base";
 import { FileInfo } from "@syncfusion/ej2-inputs/src/uploader/uploader";
 import { filter, Observable, takeUntil } from "rxjs";
 
+import { FileStatusCode } from "@shared/enums/file.enum";
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, IMPORT_CONFIRM_TEXT, IMPORT_CONFIRM_TITLE } from "@shared/constants";
 import { CandidateImportRecord, CandidateImportResult } from "@shared/models/candidate-profile-import.model";
 import { MessageTypes } from "@shared/enums/message-types";
@@ -24,7 +25,7 @@ import {
   SaveCandidateImportResult,
   SaveCandidateImportResultSucceeded,
   UploadCandidateProfileFile,
-  UploadCandidateProfileFileSucceeded
+  UploadCandidateProfileFileSucceeded,
 } from "@agency/store/candidate.actions";
 import { ShowToast } from "src/app/store/app.actions";
 
@@ -36,7 +37,7 @@ interface ListBoxItem {
 @Component({
   selector: 'app-import-candidates',
   templateUrl: './import-candidates.component.html',
-  styleUrls: ['./import-candidates.component.scss']
+  styleUrls: ['./import-candidates.component.scss'],
 })
 export class ImportCandidatesComponent extends DestroyableDirective implements OnInit {
   @ViewChild('sideDialog') private sideDialog: DialogComponent;
@@ -60,8 +61,8 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
   public successfulListBoxData: ListBoxItem[] = [];
   public fields = {
     text: 'name',
-    value: 'id'
-  }
+    value: 'id',
+  };
   public selectedCandidate: CandidateImportRecord;
   public candidateImportResult: CandidateImportResult | null;
 
@@ -70,7 +71,7 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
   }
 
   get enabledImportButton(): boolean {
-    return (this.selectedFile?.statusCode === '1' || !!this.candidateImportResult) && !this.activeErrorTab;
+    return (this.selectedFile?.statusCode === FileStatusCode.Valid || !!this.candidateImportResult) && !this.activeErrorTab;
   }
 
   constructor(private store: Store,
@@ -109,7 +110,7 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
         .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
+          okButtonClass: 'delete-button',
         })
         .pipe(filter((confirm) => confirm))
         .subscribe(() => {
@@ -153,7 +154,7 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
     if (this.candidateImportResult) {
       this.saveImportedCandidates();
     } else {
-      this.uploadFile()
+      this.uploadFile();
     }
   }
 
@@ -214,8 +215,8 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
 
       return {
         name: firstName || lastName ? `${firstName} ${lastName}` : item.key,
-        id: item.key
-      }
+        id: item.key,
+      };
     });
   }
 
@@ -244,13 +245,13 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
       list = this.successfulListBoxData;
     }
 
-    let listBoxObj: ListBox = getInstance(document.getElementById(id) as HTMLElement, ListBox) as ListBox;
+    const listBoxObj: ListBox = getInstance(document.getElementById(id) as HTMLElement, ListBox) as ListBox;
     listBoxObj?.selectItems([list[0]?.name]);
     this.setCandidate(list[0]?.id);
   }
 
   private uploadFile(): void {
-    if (this.selectedFile?.statusCode === '1') {
+    if (this.selectedFile?.statusCode === FileStatusCode.Valid) {
       this.candidateImportResult = null;
       this.store.dispatch(new UploadCandidateProfileFile(this.selectedFile.rawFile as Blob));
     }
@@ -262,7 +263,7 @@ export class ImportCandidatesComponent extends DestroyableDirective implements O
         .confirm(IMPORT_CONFIRM_TEXT, {
           title: IMPORT_CONFIRM_TITLE,
           okButtonLabel: 'Import',
-          okButtonClass: ''
+          okButtonClass: '',
         })
         .pipe(filter((confirm) => confirm))
         .subscribe(() => {

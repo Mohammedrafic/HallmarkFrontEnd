@@ -1,0 +1,90 @@
+@import 'colors.scss';
+@import 'mixins';
+@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
+@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
+
+.dialog-container {
+  padding: 24px;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 46px;
+}
+
+.title {
+  @include dialog-title;
+}
+
+.table-header {
+  @include table-header;
+}
+
+.header-block {
+  padding: 0 16px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 28px;
+  color: $title-black;
+}
+
+.header-block:last-of-type {
+  border-left: 1px solid $secondary-dark-blue-45;
+}
+
+.add-btn {
+  @include link-button;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.add-btn:disabled {
+  opacity: 0.5;
+}
+
+.grid-table-container {
+  padding-bottom: 0;
+  
+  ::ng-deep {
+    ag-grid-angular {
+      height: auto !important;
+
+      .ag-header-cell-text {
+        font-weight: 600;
+        color: $secondary-dark-blue-15;
+      }
+
+      .ag-root-wrapper {
+        height: auto !important;
+      }
+
+      .ag-root-wrapper-body {
+        height: auto !important;
+      }
+    }
+  }
+  
+  ::ng-deep {
+    .ag-cell-focus, .ag-cell {
+      border: none !important;
+    }
+  
+    .ag-cell-value {
+      padding-left: 5px!important;
+      padding-right: 5px!important;
+    }
+  
+    .common-cell {
+      padding-left: 17px!important;
+      padding-right: 17px!important;
+      text-align: right;
+    }
+  
+    .custom-scroll {
+      overflow-y: auto;
+    }
+  }
+}

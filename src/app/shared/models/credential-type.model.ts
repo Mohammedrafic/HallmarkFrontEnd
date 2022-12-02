@@ -1,4 +1,4 @@
-export class CredentialType {
+export interface CredentialType {
   id?: number;
   name: string;
 }
