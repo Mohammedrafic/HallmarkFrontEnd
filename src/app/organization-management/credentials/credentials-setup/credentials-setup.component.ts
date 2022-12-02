@@ -89,7 +89,7 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
   public mappingData: CredentialSetupGet[];
   public isIRPAndVMSEnabled = false;
   public isIRPFlagEnabled = false;
-  public isCredentialIRPAndVMS = false;
+  public isCredentialIRP = false;
 
   public mappingDataForEditChanged$: Subject<CredentialSetupMappingPost> = new Subject();
   public credentialSetupFilter = new Subject<CredentialSetupFilterDto>();
@@ -147,12 +147,12 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
     this.addActiveCssClass(event);
     this.isCredentialSetupEdit = true;
 
-    this.isCredentialIRPAndVMS = this.isIRPAndVMSEnabled && !!(credentialSetup.includeInIRP && credentialSetup.includeInVMS);
-    this.credentialsSetupService.irpCommentFieldSettings(this.credentialsSetupFormGroup, this.isCredentialIRPAndVMS);
+    this.isCredentialIRP = this.isIRPAndVMSEnabled && !!(credentialSetup.includeInIRP);
+    this.credentialsSetupService.irpCommentFieldSettings(this.credentialsSetupFormGroup, this.isCredentialIRP);
     this.credentialsSetupService.populateCredentialSetupForm(
       this.credentialsSetupFormGroup,
       credentialSetup,
-      this.isCredentialIRPAndVMS,
+      this.isCredentialIRP,
     );
 
     setTimeout(() => this.store.dispatch(new ShowSideDialog(true)), 40);

@@ -13,7 +13,7 @@ export class CredentialsSetupService {
       masterCredentialId: [null],
       credentialType: [{ value: '', disabled: true }],
       description: [{ value: '', disabled: true }],
-      comments: ['', Validators.maxLength(500)],
+      comments: [{ value: '', disabled: true }, Validators.maxLength(500)],
       inactiveDate: [null],
       isActive: [false],
       reqSubmission: [false],
@@ -64,7 +64,10 @@ export class CredentialsSetupService {
 
   irpCommentFieldSettings(form: FormGroup, isAdd: boolean): void {
     if (isAdd) {
-      form.addControl('irpComments', this.fb.control('', [Validators.maxLength(500)]));
+      form.addControl(
+        'irpComments',
+        this.fb.control({ value: '', disabled: true }, [Validators.maxLength(500)])
+      );
     } else {
       form.removeControl('irpComments');
     }
