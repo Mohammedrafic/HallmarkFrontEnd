@@ -376,6 +376,7 @@ export class AssociateListState {
     return this.associateService.saveSelectedTier(payload).pipe(
       tap(() => {
         dispatch(new ShowToast(MessageTypes.Success,  RECORD_ADDED));
+        dispatch(new TiersException.UpdateAssociateOrganizationsAgencyPage());
       }),
       catchError((error: HttpErrorResponse) => {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));

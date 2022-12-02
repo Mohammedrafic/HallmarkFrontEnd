@@ -59,6 +59,6 @@ export interface TierList {
 export type TierExceptionPage = PageOfCollections<TierExceptionDetails>;
 
 export interface Tier {
-  associateOrganizationId: number,
-  organizationTierId: number
+  associateOrganizationId: number;
+  organizationTierId: number | null;
 }
