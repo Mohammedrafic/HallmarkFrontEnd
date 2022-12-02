@@ -51,6 +51,7 @@ export enum INVOICES_ACTIONS {
   CheckManualInvoicesExist = '[invoices] check manual invoices existing',
   GetPaymentDetails = '[invoices] get payment details',
   SavePayment = '[invoices] save payment',
+  OpenAddPaymentDialog = '[invoices] open add payment dialog',
 }
 
 export enum InvoicesTableFiltersColumns {
@@ -74,8 +75,4 @@ export enum PermissionCodes {
 export enum PaymentMode {
   Electronic,
   Check,
-}
-
-export enum AddPaymentDialogMode {
-  
 }

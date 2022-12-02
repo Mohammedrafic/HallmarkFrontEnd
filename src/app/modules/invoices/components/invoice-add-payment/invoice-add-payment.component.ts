@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } 
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { GridApi, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { Store } from '@ngxs/store';
-import { debounceTime, filter, switchMap, takeUntil } from 'rxjs';
+import { debounceTime, filter, switchMap, take, takeUntil } from 'rxjs';
 
 import { FieldType } from '@core/enums';
 import { DateTimeHelper, DestroyDialog } from '@core/helpers';
@@ -12,10 +12,13 @@ import { PaymentsAdapter } from '../../helpers/payments.adapter';
 import { InvoicePaymentData } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
-import { AddPaymentFormConfig, CheckPaymentsDefs } from './invoice-add-payment.constant';
+import { AddPaymentFormConfig, CheckPaymentsDefs, PaymentMessages } from './invoice-add-payment.constant';
 import { CheckForm, PaymentForm, PaymentFormConfig, PaymentsTableData } from './invoice-add-payment.interface';
 import { InvoiceAddPaymentService } from './invoice-add-payment.service';
 import { InvoicesApiService } from '../../services';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
 
 
 @Component({
@@ -37,6 +40,8 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
 
   gridApi: GridApi;
 
+  calculatedLeftAmount = 0;
+
   readonly optionFields = { text: 'text', value: 'value' };
 
   readonly addPaymentFormConfig = AddPaymentFormConfig;
@@ -53,8 +58,11 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
 
   private organizationId: number;
 
+  private initialAmount: number;
+
   constructor(
     private paymentService: InvoiceAddPaymentService,
+    private confirmService: ConfirmService,
     private store: Store,
     private apiService: InvoicesApiService,
     private cd: ChangeDetectorRef,
@@ -70,6 +78,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
   ngOnInit(): void {
     this.watchForCloseStream();
     this.watchForCheckControl();
+    this.watchForCheckAmountControl();
     this.setTableData();
 
     if (this.checkNumber) {
@@ -78,24 +87,66 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
   }
 
   savePayment(): void {
-    if (this.checkForm.valid && this.checkPaymentForms()) {
+    if (!this.checkForm.valid || !this.checkPaymentForms()) {
+      return;
+    }
 
-      const dto = PaymentsAdapter.adaptPaymentForPost(
-        this.checkForm.value, this.paymentsForm, this.organizationId, this.invoicesToPay);
+    if (this.checkForm.valid && !Object.keys(this.paymentsForm).length) {
+      this.savePaymentDto();
+      return;
+    }
 
-      this.store.dispatch(new Invoices.SavePayment(dto))
+    if (this.calculatedLeftAmount > 0 && this.paymentService.calcBalanceCovered(this.paymentsForm)) {
+      this.confirmService.confirm(PaymentMessages.lowerAmount, {
+        title: 'Check Payment Amount',
+        okButtonLabel: 'Yes',
+        okButtonClass: 'delete-button',
+      })
       .pipe(
-        takeUntil(this.componentDestroy())
-      ).subscribe(() => {
-        this.closeDialog();
+        take(1),
+        filter(Boolean),
+      )
+      .subscribe(() => {
+        this.savePaymentDto();
       });
+
+    } else if (this.calculatedLeftAmount > 0 && !this.paymentService.calcBalanceCovered(this.paymentsForm)) {
+      this.confirmService.confirm(
+        PaymentMessages.partialyCovered(this.paymentService.findPartialyCoveredIds(this.paymentsForm)),
+        {
+          title: 'Check Payment Amount',
+          okButtonLabel: 'Yes',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(
+          take(1),
+          filter(Boolean),
+        )
+        .subscribe(() => {
+          this.savePaymentDto();
+        });
+
+    } else if (this.calculatedLeftAmount < 0) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, PaymentMessages.negativeAmount));
     }
   }
 
   deletePayment(invoiceId: string): void {
-    delete this.paymentsForm[invoiceId];
+    this.confirmService.confirm(PaymentMessages.deleteInvoice, {
+      title: 'Check Payment Amount',
+      okButtonLabel: 'Yes',
+      okButtonClass: 'delete-button',
+    })
+    .pipe(
+      take(1),
+      filter(Boolean),
+    )
+    .subscribe(() => {
+      delete this.paymentsForm[invoiceId];
 
-    this.tableData = this.tableData.filter((payment) => payment.invoiceNumber !== invoiceId);
+      this.tableData = this.tableData.filter((payment) => payment.invoiceNumber !== invoiceId);
+      this.cd.markForCheck();
+    });
   }
 
   trackByField(index: number, item: PaymentFormConfig): string {
@@ -111,9 +162,15 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
     this.cd.detectChanges();
   }
 
+  calcCheckAmount(): void {
+    this.calcLeftAmount();
+  }
+
   private setTableData(): void {
     this.paymentsForm = this.paymentService.createPaymentsForm(this.invoicesToPay);
-    this.tableData = this.paymentService.createTableData(this.invoicesToPay, this.paymentsForm); 
+    this.tableData = this.paymentService.createTableData(this.invoicesToPay, this.paymentsForm);
+    this.calcLeftAmount();
+    this.cd.markForCheck();
   }
 
   private checkPaymentForms(): boolean {
@@ -137,11 +194,41 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
         paymentMode: response.check.paymentMode,
         isRefund: response.check.isRefund,
       });
-      
-      const tableRecords = this.paymentService.mergeTableData(this.tableData, response.payments, this.paymentsForm);
-      this.gridApi.setRowData(tableRecords);
 
+      this.initialAmount = response.check.initialAmount;
+      const tableRecords = this.paymentService.mergeTableData(this.tableData, response.payments, this.paymentsForm);
+
+      this.gridApi.setRowData(tableRecords);
+      this.calcLeftAmount();
       this.cd.markForCheck();
+    });
+  }
+
+  private calcLeftAmount(): void {
+    this.calculatedLeftAmount = this.paymentService.calculateCheckAmount(this.paymentsForm, this.initialAmount);
+  }
+
+  private watchForCheckAmountControl(): void {
+    this.checkForm.get('initialAmount')?.valueChanges
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((value) => {
+      this.initialAmount = parseFloat(value);
+      this.calcLeftAmount();
+      this.cd.markForCheck();
+    });
+  }
+
+  private savePaymentDto(): void {
+    const dto = PaymentsAdapter.adaptPaymentForPost(
+      this.checkForm.value, this.paymentsForm, this.organizationId, this.invoicesToPay);
+
+    this.store.dispatch(new Invoices.SavePayment(dto))
+    .pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.closeDialog();
     });
   }
 }

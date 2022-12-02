@@ -7,6 +7,7 @@ import { ExportPayload } from '@shared/models/export.model';
 import {
   GetPendingApprovalParams,
   GroupInvoicesParams,
+  InvoicePaymentData,
   InvoicePaymentGetParams,
   InvoicePermissions,
   InvoicesFilterState,
@@ -329,5 +330,11 @@ export namespace Invoices {
     static readonly type = INVOICES_ACTIONS.SavePayment;
 
     constructor(public readonly payload: PaymentCreationDto) {}
+  }
+
+  export class OpenPaymentAddDialog {
+    static readonly type = INVOICES_ACTIONS.OpenAddPaymentDialog;
+
+    constructor(public readonly payload: InvoicePaymentData) {}
   }
 }

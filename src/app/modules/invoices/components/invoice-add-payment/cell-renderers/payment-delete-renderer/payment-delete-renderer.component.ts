@@ -12,16 +12,13 @@ import { InvoiceAddPaymentComponent } from '../../invoice-add-payment.component'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentDeleteRendererComponent implements ICellRendererAngularComp {
-  componentParent: InvoiceAddPaymentComponent;
-
-  deleteAllowed = true;
-
   private invoiceId: string;
+
+  private componentParent: InvoiceAddPaymentComponent;
 
   agInit(params: ICellRendererParams): void {
     this.componentParent = params.context.componentParent;
     this.invoiceId = params.data.invoiceNumber;
-    this.setActionAvaliability();
   }
 
   refresh(): boolean {
@@ -30,9 +27,5 @@ export class PaymentDeleteRendererComponent implements ICellRendererAngularComp 
 
   deleteRecord(): void {
     this.componentParent.deletePayment(this.invoiceId);
-  }
-
-  private setActionAvaliability(): void {
-    this.deleteAllowed = this.componentParent.tableData.length > 1;
   }
 }

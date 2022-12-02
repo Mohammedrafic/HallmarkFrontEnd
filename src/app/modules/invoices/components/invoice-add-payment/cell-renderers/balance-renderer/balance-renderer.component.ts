@@ -44,6 +44,7 @@ export class BalanceRendererComponent extends Destroyable implements ICellRender
       takeUntil(this.componentDestroy()),
     ).subscribe((value) => {
       this.balance = this.initialAmount - value;
+      this.group.get('balance')?.patchValue(this.balance, { emitEvent: false, onlySelf: true });
       this.cd.markForCheck();
     });
   }

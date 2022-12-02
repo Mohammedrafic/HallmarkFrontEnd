@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { GridApi, GridReadyEvent, Module } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -11,6 +11,7 @@ import { InvoicesState } from '../../store/state/invoices.state';
 import { InvoicesModel } from '../../store/invoices.model';
 import { InvoicesApiService } from '../../services';
 import { PaymentTableDefs } from './invoice-payment-details.constant';
+import { Invoices } from '../../store/actions/invoices.actions';
 
 @Component({
   selector: 'app-invoice-payment-details',
@@ -37,6 +38,8 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
   readonly invoiceData: PaymentMeta = {
     invoiceNumber: null,
     amount: null,
+    invoiceId: null,
+    agencySuffix: null,
   };
 
   private isAgency = false;
@@ -48,6 +51,7 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
   constructor(
     private store: Store,
     private apiService: InvoicesApiService,
+    private actions$: Actions,
     private cd: ChangeDetectorRef,
   ) {
     super();
@@ -61,6 +65,7 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
   ngOnInit(): void {
     this.watchForCloseStream();
     this.watchForInvoiceDetails();
+    this.watchForPaymentSaveAction();
   }
 
   addNewPayment(): void {
@@ -88,6 +93,9 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
         this.invoiceData.amount = invoice.totals.amount;
       }),
       switchMap((details) => {
+        this.invoiceData.invoiceId = details.meta.invoiceId;
+        this.invoiceData.agencySuffix = details.meta.agencySuffix as number;
+
         const dto: InvoicePaymentGetParams =  {
           InvoiceId: details.meta.invoiceId,
           OrganizationId: this.currentOrgId,
@@ -99,8 +107,32 @@ export class InvoicePaymentDetailsComponent extends DestroyDialog implements OnI
       takeUntil(this.componentDestroy()),
     )
     .subscribe((response) => {
-      this.gridApi.setRowData(response);
-      this.cd.markForCheck();
+      this.setTableRowData(response);
     });
+  }
+
+  private watchForPaymentSaveAction(): void {
+    this.actions$
+    .pipe(
+      ofActionSuccessful(Invoices.SavePayment),
+      switchMap(() => {
+        const dto: InvoicePaymentGetParams =  {
+          InvoiceId: this.invoiceData.invoiceId as number,
+          OrganizationId: this.currentOrgId,
+          ...this.isAgency ? { AgencySuffix: this.invoiceData.agencySuffix as number } : {},
+        };
+
+        return this.apiService.getInvoicesPayments(dto);
+      }),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((response) => {
+      this.setTableRowData(response);
+    });
+  }
+
+  private setTableRowData(data: InvoicePayment[]): void {
+    this.gridApi.setRowData(data);
+    this.cd.markForCheck();
   }
 }

@@ -93,8 +93,11 @@
   
               <ng-template [ngSwitchCase]="fieldTypes.Toggle">
                 <div class="input-container row-flexed">
-                  <div class="input-group">
-                    <!-- <span class="toggle-header">Check Outstanding Amount</span> -->
+                  <div class="input-group wide">
+                    <div class="amount-block">
+                      <span class="toggle-header">Check Outstanding Amount</span>
+                      <span class="amount-text">{{calculatedLeftAmount | currency: 'USD':'symbol':'1.0-2' }}</span>
+                    </div>
                     <ejs-switch
                     class="toggle"
                     [formControlName]="field.field"

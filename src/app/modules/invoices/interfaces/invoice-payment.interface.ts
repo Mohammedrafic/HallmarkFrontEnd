@@ -23,6 +23,8 @@ export interface InvoicePaymentGetParams {
 export interface PaymentMeta {
   invoiceNumber: string | null,
   amount: number | null,
+  invoiceId: number | null,
+  agencySuffix: number | null,
 }
 
 export interface PaymentDto {

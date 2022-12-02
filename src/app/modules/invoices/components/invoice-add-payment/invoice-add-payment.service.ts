@@ -82,6 +82,27 @@ export class InvoiceAddPaymentService {
     return mergeData;
   }
 
+  calculateCheckAmount(paymentForms: Record<string, CustomFormGroup<PaymentForm>>, initAmount: number): number {
+    const forms = Object.keys(paymentForms).map((key) => paymentForms[key]);
+
+    const totalPayment = forms.reduce((acc, form) => {
+      return acc + form.get('amount')?.value;
+    }, 0);
+
+    return initAmount - totalPayment;
+  }
+
+  calcBalanceCovered(paymentForms: Record<string, CustomFormGroup<PaymentForm>>): boolean {
+    return !Object.keys(paymentForms)
+    .map((key) => paymentForms[key].get('balance')?.value)
+    .some((item) => item > 0);
+  }
+
+  findPartialyCoveredIds(paymentForms: Record<string, CustomFormGroup<PaymentForm>>): string[] {
+    return Object.keys(paymentForms)
+    .filter((key) => paymentForms[key].get('balance')?.value > 0);
+  }
+
   private createPaymentGroup(
     initAmount: number | null = null,
     initBalance: number | null = null): CustomFormGroup<PaymentForm> {

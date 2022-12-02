@@ -120,4 +120,28 @@
       margin: 0;
     }
   }
+
+  &.wide {
+    width: 100%;
+  }
+}
+
+.amount-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: $secondary-dark-blue-15;
+  font-size: 14px;
+  margin-bottom: 8px;
+  margin-top: -7px;
+}
+
+.toggle-header {
+  font-weight: 400;
+  color: $secondary-dark-blue-15;
+}
+
+.amount-text {
+  font-weight: 700;
+  color: $black;
 }
