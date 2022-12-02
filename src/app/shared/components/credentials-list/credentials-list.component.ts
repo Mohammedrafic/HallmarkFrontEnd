@@ -106,6 +106,9 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
 
   public changeRowDropDown(): void {
     this.grid.pageSettings.pageSize = this.pageSize = this.getActiveRowsPerPage();
+    this.credentialFiltersService.updateFilters = {
+      pageSize: this.pageSize
+    };
   }
 
   public changePage(event: { currentPage: number; value: number }): void {
@@ -224,6 +227,10 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
     });
   }
 
+  public gridCreated(): void {
+    this.showHideGridColumns();
+  }
+
   public clearFormDetails(form?: FormGroup): void {
     this.store.dispatch(new ShowSideDialog(false));
     form?.reset();
@@ -247,9 +254,18 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
         takeUntil(this.unsubscribe$)
       ).subscribe((organization: Organization) => {
       this.isIRPFlagEnabled = !!organization.preferences.isIRPEnabled;
+      if(this.grid) {
+        this.showHideGridColumns()
+      }
       const { isCredentialSettings } = this.route.snapshot.data;
       this.isCredentialSettings = isCredentialSettings;
     });
+  }
+
+  private showHideGridColumns(): void {
+    this.grid.getColumnByField('system').visible = this.isIRPFlagEnabled;
+    this.grid.getColumnByField('irpComment').visible = this.isIRPFlagEnabled;
+    this.grid.refreshColumns();
   }
 
   private initFilterColumns(): void {
@@ -287,6 +303,9 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
       takeUntil(this.unsubscribe$)
       ).subscribe((page) => {
         this.currentPage = page;
+        this.credentialFiltersService.updateFilters = {
+          pageNumber: page
+        };
         this.getCredentials();
     });
   }

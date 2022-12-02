@@ -27,7 +27,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
   };
   @Input() set isIRPFlag(flag: boolean) {
     this.isIRPFlagEnabled = flag;
-    this.createFilterForm();
+    this.initFilterForm();
     this.changeDetection.markForCheck();
   };
   @Input() public isCredentialSettings: boolean = false;
@@ -57,7 +57,6 @@ export class FiltersComponent extends Destroyable implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initFilterForm();
     this.watchForOrganizationId();
   }
 
@@ -106,9 +105,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
   }
 
   private initFilterForm(): void {
-    if(this.isCredentialSettings) {
-     this.createFilterForm();
-    }
+    this.credentialsFilters = this.credentialListService.createFiltersForm(this.isIRPFlagEnabled, this.isCredentialSettings);
   }
 
   private watchForOrganizationId(): void {
@@ -117,10 +114,6 @@ export class FiltersComponent extends Destroyable implements OnInit {
     ).subscribe(() => {
       this.clearAllFilters();
     });
-  }
-
-  private createFilterForm(): void {
-    this.credentialsFilters = this.credentialListService.createFiltersForm(this.isIRPFlagEnabled, this.isCredentialSettings);
   }
 
   private setSystemValue(): void {

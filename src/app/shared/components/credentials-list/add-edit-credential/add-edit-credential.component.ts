@@ -46,7 +46,13 @@ import { MessageTypes } from '@shared/enums/message-types';
 export class AddEditCredentialComponent extends Destroyable implements OnInit {
   @Input() disableButton: boolean;
   @Input() isCredentialSettings: boolean = false;
-  @Input() isIRPFlagEnabled: boolean = false;
+
+  @Input() set isIRPFlag(flag: boolean) {
+    this.isIRPFlagEnabled = flag;
+    this.initCredentialForm();
+    this.initDialogConfig();
+    this.changeDetection.markForCheck();
+  }
 
   @Input() set editCredential(credential: Credential) {
     if (credential) {
@@ -68,6 +74,7 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   public title: string;
   public isEdit: boolean = false;
   public dialogConfig: CredentialListConfig[];
+  public isIRPFlagEnabled: boolean = false;
 
   private selectedCredential: Credential;
 
@@ -87,15 +94,14 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
 
   ngOnInit(): void {
     this.setDialogTitle();
-    this.initDialogConfig();
     this.watchForCredentialTypes();
-    this.initCredentialForm();
     this.watchForIrpCheckbox();
   }
 
   public saveCredential(): void {
     if (this.credentialForm.valid && this.isSystemSelected()) {
       this.store.dispatch(new SaveCredential(this.credentialForm.getRawValue()));
+      this.credentialForm.reset();
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, ErrorMessageForSystem));
       this.credentialForm.markAllAsTouched();
@@ -212,6 +218,11 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   }
 
   private isSystemSelected(): boolean {
-    return this.credentialForm.get('includeInIRP')?.value || this.credentialForm.get('includeInVMS')?.value;
+    if(this.isIRPFlagEnabled) {
+      return this.credentialForm.get('includeInIRP')?.value
+        || this.credentialForm.get('includeInVMS')?.value
+    } else {
+      return true;
+    }
   }
 }
