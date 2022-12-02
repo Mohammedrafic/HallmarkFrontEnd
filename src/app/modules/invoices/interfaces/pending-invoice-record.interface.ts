@@ -1,10 +1,9 @@
 import { Attachment } from '@shared/components/attachments';
-import { PageOfCollections } from '@shared/models/page.model';
-import { InvoiceType } from '../enums/invoice-type.enum';
-import { BaseInvoice } from './base-invoice.interface';
-import { InvoiceRecordType } from '../enums';
-import { InvoiceAttachment } from './invoice-attachment.interface';
 import { AgencyStatus } from '@shared/enums/status';
+import { PageOfCollections } from '@shared/models/page.model';
+import { InvoiceRecordType } from '../enums';
+import { InvoiceType } from '../enums/invoice-type.enum';
+import { BaseInvoice, InvoiceAttachment } from './invoice.interface';
 
 export type PendingInvoicesData = PageOfCollections<PendingInvoice>;
 

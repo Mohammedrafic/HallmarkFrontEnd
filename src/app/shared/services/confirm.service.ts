@@ -7,7 +7,12 @@ import { DialogUtility } from '@syncfusion/ej2-angular-popups';
   providedIn: 'root',
 })
 export class ConfirmService {
-  confirm(content: string, options?: { title: string, okButtonLabel: string, okButtonClass: string, cancelButtonLabel?: string }): Observable<boolean> {
+  confirm(content: string, options?: {
+    title: string,
+    okButtonLabel:string,
+    okButtonClass: string,
+    cancelButtonLabel?: string }): Observable<boolean> {
+      
     const isAllowed$ = new Subject<boolean>();
     const dialog = DialogUtility.confirm({
       title: options?.title ? options.title : '',

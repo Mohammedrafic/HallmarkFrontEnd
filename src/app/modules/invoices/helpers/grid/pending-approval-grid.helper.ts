@@ -1,40 +1,28 @@
-import { TypedColDef, TypedValueGetterParams } from '../../interfaces/typed-col-def.interface';
-import {
-  PendingApprovalInvoice,
-  PendingApprovalInvoiceRecord
-} from '../../interfaces/pending-approval-invoice.interface';
-import { GridActionsCellComponent } from '@shared/components/grid/cell-renderers/grid-actions-cell';
-import {
-  ColDef,
-  GetDetailRowDataParams,
-  GridOptions,
-  ICellRendererParams,
-  IDetailCellRendererParams,
-  RowHeightParams,
-} from '@ag-grid-community/core';
-import { ManualInvoice } from '../../interfaces';
-import { PendingInvoiceStatus } from '../../enums/invoice-status.enum';
-import { InvoicesContainerGridHelper } from './invoices-container-grid.helper';
-import {
-  InvoiceRecordsTableRowDetailsComponent
-} from '../../components/invoice-records-table-row-details/invoice-records-table-row-details.component';
-import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
+import { ColDef, GetDetailRowDataParams, GridOptions, ICellRendererParams, IDetailCellRendererParams,
+  RowHeightParams } from '@ag-grid-community/core';
+import { TypedValueGetterParams } from '@core/interface';
+import { GridActionsCellComponent, GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import { TitleValueCellRendererParams } from '@shared/components/grid/models';
+import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
+import { AllInvoicesActionCellComponent } from '../../components/all-invoices-action-cell/all-invoices-action-cell.component';
 import {
   ToggleRowExpansionHeaderCellComponent
 } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
 import {
-  numberValueFormatter, weekPeriodValueGetter,
-  invoicesRowDetailsOffsetColDef,
-  monthDayYearDateFormatter,
-  titleValueCellRendererSelector,
-  RateReasonValueGetter,
-  DepartmentNameGetter,
-  CurrencyFormatter
+  InvoiceRecordsTableRowDetailsComponent
+} from '../../components/invoice-records-table-row-details/invoice-records-table-row-details.component';
+import {
+  CurrencyFormatter, DepartmentNameGetter, invoicesRowDetailsOffsetColDef,
+  monthDayYearDateFormatter, numberValueFormatter, RateReasonValueGetter, titleValueCellRendererSelector, weekPeriodValueGetter
 } from '../../constants';
-import { GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
-import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
-import { AllInvoicesActionCellComponent } from '../../components/all-invoices-action-cell/all-invoices-action-cell.component';
+import { PendingInvoiceStatus } from '../../enums/invoice-status.enum';
+import { ManualInvoice, TypedColDef } from '../../interfaces';
+import {
+  PendingApprovalInvoice,
+  PendingApprovalInvoiceRecord
+} from '../../interfaces/pending-approval-invoice.interface';
+import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
+import { InvoicesContainerGridHelper } from './invoices-container-grid.helper';
 
 const commonColumn: ColDef = {
   sortable: true,

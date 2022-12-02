@@ -1,13 +1,9 @@
 import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
+import { TypedValueGetterParams } from '@core/interface';
+
 import { Attachment, AttachmentsListParams } from '@shared/components/attachments';
-import { GridActionsCellComponent } from '@shared/components/grid/cell-renderers/grid-actions-cell';
-import { PendingInvoiceStatus } from '../../enums/invoice-status.enum';
-import { ManualInvoice } from '../../interfaces';
-import { TypedColDef, TypedValueGetterParams } from '../../interfaces/typed-col-def.interface';
-import {
-  InvoicesContainerGridHelper
-} from './invoices-container-grid.helper';
-import { InvoiceRecordType } from '../../enums';
+import { GridActionsCellComponent, GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
+import { AgencyStatus } from '@shared/enums/status';
 import {
   amountColDef,
   commentColDef,
@@ -16,8 +12,12 @@ import {
   rejectionReasonColDef,
   vendorFeeAppliedColDef
 } from '../../constants';
-import { GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
-import { AgencyStatus } from '@shared/enums/status';
+import { InvoiceRecordType } from '../../enums';
+import { PendingInvoiceStatus } from '../../enums/invoice-status.enum';
+import { ManualInvoice, TypedColDef } from '../../interfaces';
+import {
+  InvoicesContainerGridHelper
+} from './invoices-container-grid.helper';
 
 interface GetManualInvoicesColDefsConfig {
   previewAttachment: (attachment: Attachment) => void,

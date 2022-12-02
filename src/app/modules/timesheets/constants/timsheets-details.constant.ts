@@ -6,7 +6,6 @@ import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entit
 import { GridValuesHelper } from '@core/helpers/grid-values.helper';
 import { EditFieldTypes } from '@core/enums';
 import { AttachmentsListComponent } from '@shared/components/attachments';
-import { RecordFields } from '../enums';
 import { TabConfig } from '../interface';
 import { ActionsCellComponent } from '../components/cell-editors/actions-cell/actions-cell.component';
 import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor/dropdown-editor.component';
@@ -20,7 +19,7 @@ const commonColumn: ColDef = {
   filter: true,
   sortable: true,
   resizable: true,
-}
+};
 
 export const dayColDef: ColDef = {
   field: 'day',
@@ -41,8 +40,8 @@ export const editableCostCenterDef: ColDef = {
   cellRendererParams: {
     editMode: true,
     isEditable: false,
-    storeField: 'costCenterOptions'
-  }
+    storeField: 'costCenterOptions',
+  },
 };
 
 export const billRateColDef: ColDef = {
@@ -53,8 +52,8 @@ export const billRateColDef: ColDef = {
   cellClass: 'common-cell',
   width: 110,
   valueFormatter: (data) => {
-    if(!data.value) return '0'
-    return GridValuesHelper.formatCurrencyValue(data.value)
+    if(!data.value) return '0';
+    return GridValuesHelper.formatCurrencyValue(data.value);
   },
 };
 
@@ -87,7 +86,7 @@ export const actionCol = (isUploadAllowed = false, disableAction = false): ColDe
       isEditable: false,
       isUploadAllowed,
       disableAction,
-    }
+    },
   }
 );
 
@@ -99,8 +98,8 @@ export const totalCol: ColDef = {
   cellClass: 'common-cell',
   width: 140,
   valueFormatter: (data) => {
-    if(!data.value) return '0'
-    return GridValuesHelper.formatCurrencyValue(data.value)
+    if(!data.value) return '0';
+    return GridValuesHelper.formatCurrencyValue(data.value);
   },
 };
 
@@ -128,7 +127,7 @@ export const recordStatusCell: ColDef = {
   ...commonColumn,
   width: 140,
   cellRenderer: RecordStatusCellComponent,
-}
+};
 
 export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  ([
   dayColDef,
@@ -178,7 +177,7 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     headerName: 'Bill rate type',
     ...commonColumn,
     width: 180,
-    filterValueGetter: (value) => { return value.data.billRateConfigName },
+    filterValueGetter: (value) => { return value.data.billRateConfigName; },
     type: 'rightAligned',
   },
   amountColdef('Hours'),
@@ -215,7 +214,7 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
       isEditable: false,
       validators: [Validators.maxLength(250)],
 
-    }
+    },
   },
   {
     field: 'total',
@@ -226,15 +225,15 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
     width: 200,
     cellRenderer: InputEditorComponent,
     valueFormatter: (data) => {
-      if(!data.value) return '0'
-      return GridValuesHelper.formatCurrencyValue(data.value)
+      if(!data.value) return '0';
+      return GridValuesHelper.formatCurrencyValue(data.value);
     },
     cellRendererParams: {
       editMode: true,
       isEditable: false,
       type: EditFieldTypes.Currency,
       validators: [Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER), Validators.required],
-    }
+    },
   },
   actionCol(),
 ]);
@@ -251,20 +250,20 @@ export const RecordsTabConfig: TabConfig[] = [
   },
 ];
 
-export const approveTimesheetDialogData = (timesheetOrMiles: boolean = true) => ({
+export const approveTimesheetDialogData = (timesheetOrMiles = true) => ({
   title: `Approve ${timesheetOrMiles ? 'Timesheet' : 'Mileages'}`,
   submitButtonText: 'Approve',
   confirmMessage: `Are you sure you want to approve this ${timesheetOrMiles ? 'timesheet' : 'mileages'}?`,
   successMessage: `Success. ${timesheetOrMiles ? 'Timesheet' : 'Mileages'} Approved`,
 });
 
-export const rejectTimesheetDialogData = (timesheetOrMiles: boolean = true) => ({
+export const rejectTimesheetDialogData = (timesheetOrMiles = true) => ({
   successMessage: `Success. ${timesheetOrMiles ? 'Timesheet' : 'Mileages'} Rejected`,
 });
 
-export const rejectReasonMaxLength: number = 250;
+export const rejectReasonMaxLength = 250;
 
-export const submitTimesheetDialogData = (timesheetOrMiles: boolean = true) => ({
+export const submitTimesheetDialogData = (timesheetOrMiles = true) => ({
   title: `Submit ${timesheetOrMiles ? 'Timesheet' : 'Mileages'}`,
   submitButtonText: 'Submit',
   confirmMessage: `Are you sure you want to submit this ${timesheetOrMiles ? 'timesheet' : 'mileages'}?`,

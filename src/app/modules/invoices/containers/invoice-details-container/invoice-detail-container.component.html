@@ -35,7 +35,7 @@
           <button
             ejs-button
             cssClass="e-outline print-btn"
-            (click)="handlePrint()">
+            (click)="printInvoice()">
             Print
             <i-feather name="printer" class="icon"></i-feather>
           </button>
@@ -43,23 +43,23 @@
           <button
             *ngIf="actionBtnText"
             ejs-button
-            [disabled]="isActionBtnDisabled"
+            [disabled]="invoiceDetailsConfig.isActionBtnDisabled"
             cssClass="e-primary"
             class="relative"
-            (click)="handleApprove()">
+            (click)="approveInvoice()">
             {{ actionBtnText }}
-            <ejs-tooltip *ngIf="isActionBtnDisabled" class="tooltip" content="Separate permission right is required" position="BottomCenter">
+            <ejs-tooltip *ngIf="invoiceDetailsConfig.isActionBtnDisabled" class="tooltip" content="Separate permission right is required" position="BottomCenter">
             </ejs-tooltip>
           </button>
         </div>
 
-        <button ejs-button type="submit" cssClass="e-flat close-button" (click)="handleProfileClose()">
+        <button ejs-button type="submit" cssClass="e-flat close-button" (click)="closeInvoiceDetails()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
 
       <div class="job-general-info tile-dark-blue">
-        <app-invoice-detail-invoice-info [invoiceInfo]="invoiceDetail"></app-invoice-detail-invoice-info>
+        <app-invoice-detail-invoice-info [invoiceInfo]="invoiceDetail" (detailsOpen)="openPaymentDetails()"></app-invoice-detail-invoice-info>
       </div>
 
       <div class="profile-table-block">
@@ -121,3 +121,17 @@
     </div>
   </div>
 </ng-template>
+
+<app-invoice-payment-details
+  *ngIf="invoiceDetailsConfig.paymentDetailsOpen"
+  (destroyDialog)="closePaymentDetails()"
+  (editPaymentCheck)="openEditPayment($event)"
+  (addPayment)="openAddPayment()">
+</app-invoice-payment-details>
+
+<app-invoice-add-payment
+  *ngIf="invoiceDetailsConfig.addPaymentOpen"
+  [invoicesToPay]="paymentRecords"
+  [checkNumber]="editCheckNumber"
+  (destroyDialog)="closeAddPayment()">
+</app-invoice-add-payment>

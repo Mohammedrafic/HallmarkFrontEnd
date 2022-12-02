@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  EventEmitter,
   Input,
   OnChanges,
+  Output,
 } from '@angular/core';
 
 import { InvoiceDetail, InvoiceInfoUIItem } from '../../interfaces';
@@ -16,6 +18,8 @@ import { InvoicesContainerService } from '../../services/invoices-container/invo
 })
 export class InvoiceDetailInvoiceInfoComponent implements OnChanges {
   @Input() invoiceInfo: InvoiceDetail;
+
+  @Output() detailsOpen: EventEmitter<void> = new EventEmitter();
 
   public items: InvoiceInfoUIItem[] = [];
 
@@ -32,5 +36,9 @@ export class InvoiceDetailInvoiceInfoComponent implements OnChanges {
 
   public trackByTitle(_: number, item: InvoiceInfoUIItem): string {
     return item.title;
+  }
+
+  public openPaymentDetails(): void {
+    this.detailsOpen.emit();
   }
 }

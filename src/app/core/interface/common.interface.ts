@@ -1,3 +1,5 @@
+import { ValueGetterParams } from '@ag-grid-community/core';
+
 export interface FileForUpload {
   blob: Blob;
   fileName: string;
@@ -22,4 +24,12 @@ export interface CommonDialogConformMessages {
   confirmOrderChange: string;
   confirmEdit: string;
   confirmBulkApprove: string;
+}
+
+export interface TypedValueGetterParams<T> extends ValueGetterParams {
+  data: T;
+}
+
+export interface ParamsFromObject {
+  [param: string]: string | string[];
 }

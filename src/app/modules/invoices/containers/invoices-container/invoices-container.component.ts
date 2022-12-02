@@ -1,53 +1,44 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef,
+  Component, Inject, OnInit, ViewChild,
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
-  combineLatest,
-  combineLatestWith,
-  debounceTime,
-  distinctUntilChanged,
-  filter,
-  map,
-  Observable,
-  switchMap,
-  takeUntil,
-  tap
+  combineLatest, combineLatestWith, debounceTime, distinctUntilChanged, filter,
+  map, Observable, switchMap, takeUntil, tap,
 } from 'rxjs';
 
-import { PageOfCollections } from '@shared/models/page.model';
-import { Destroyable } from '@core/helpers';
-import { DialogAction } from '@core/enums';
-import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
-import {
-  BaseInvoice,
-  GridContainerTabConfig,
-  InvoicesFilterState,
-  InvoiceUpdateEmmit,
-  ManualInvoice,
-  ManualInvoicesData,
-  PrintingPostDto,
-  SelectedInvoiceRow
-} from '../../interfaces';
-import { Invoices } from '../../store/actions/invoices.actions';
-import { InvoicePrintingService, InvoicesService } from '../../services';
-import { InvoicesState } from '../../store/state/invoices.state';
-import { UNIT_ORGANIZATIONS_FIELDS } from 'src/app/modules/timesheets/constants';
-import { DataSourceItem, Permission } from '@core/interface';
 import { ColDef, GridOptions, RowNode, RowSelectedEvent } from '@ag-grid-community/core';
-import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
-import { PendingInvoice, PendingInvoiceRecord, PendingInvoicesData } from '../../interfaces/pending-invoice-record.interface';
-import { InvoicesTableTabsComponent } from '../../components/invoices-table-tabs/invoices-table-tabs.component';
-import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
-import { RejectReasonInputDialogComponent } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
-import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
-import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions } from '../../constants';
-import { UserState } from 'src/app/store/user.state';
-import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
-import { InvoicesModel } from '../../store/invoices.model';
+import { DialogAction } from '@core/enums';
+import { DataSourceItem } from '@core/interface';
+import {
+  RejectReasonInputDialogComponent,
+} from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.component';
 import { GRID_CONFIG } from '@shared/constants';
-import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
+import { PageOfCollections } from '@shared/models/page.model';
+import { UNIT_ORGANIZATIONS_FIELDS } from 'src/app/modules/timesheets/constants';
+import { UserState } from 'src/app/store/user.state';
+import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
+import { InvoicesTableTabsComponent } from '../../components/invoices-table-tabs/invoices-table-tabs.component';
+import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions } from '../../constants';
+import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
 import { InvoicesPermissionHelper } from '../../helpers/invoices-permission.helper';
+import {
+  BaseInvoice, GridContainerTabConfig, InvoicePaymentData, InvoicesFilterState, InvoiceUpdateEmmit,
+  ManualInvoice, ManualInvoicesData, PrintingPostDto, SelectedInvoiceRow,
+} from '../../interfaces';
+import { PendingApprovalInvoice, PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
+import { PendingInvoice, PendingInvoiceRecord,
+  PendingInvoicesData } from '../../interfaces/pending-invoice-record.interface';
+import { InvoicePrintingService, InvoicesService } from '../../services';
+import { InvoicesContainerService } from '../../services/invoices-container/invoices-container.service';
+import { Invoices } from '../../store/actions/invoices.actions';
+import { InvoicesModel } from '../../store/invoices.model';
+import { InvoicesState } from '../../store/state/invoices.state';
+import { InvoiceTabs, InvoiceTabsProvider } from '../../tokens';
+import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
 
 @Component({
   selector: 'app-invoices-container',
@@ -105,7 +96,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       this.groupingInvoiceRecordsIds = event.api.getSelectedRows()
         .map(({ invoiceRecords }: PendingInvoice) => invoiceRecords?.map((record: PendingInvoiceRecord) => record.id))
         .flat();
-    }
+    },
   };
 
   public gridOptions: GridOptions = {};
@@ -121,17 +112,20 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public isLoading: boolean;
   public newSelectedIndex: number;
   public organizationId: number;
-
   public rejectInvoiceId: number;
   public tabConfig: GridContainerTabConfig | null;
-  public groupInvoicesOverlayVisible: boolean = false;
   public selectedInvoiceIds: number[];
 
   public isAgency: boolean;
 
-  public agencyActionsAllowed = true;
-
-  public invoicePayAllowed = true;
+  public invoiceContainerConfig = {
+    agencyActionsAllowed: true,
+    invoicePayAllowed: true,
+    groupInvoicesOverlayVisible: false,
+    addPaymentOpen: false,
+  };
+ 
+  public paymentRecords: InvoicePaymentData[] = [];
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -164,6 +158,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
     this.watchOrganizationId();
     this.watchAgencyId();
+    this.watchForOpenPayment();
+    this.watchForSavePaymentAction();
   }
 
   public ngAfterViewInit(): void {
@@ -191,7 +187,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.organizationId$
       .pipe(
         tap((id: number) => {
-          const orgIdSet: boolean = !!this.organizationId;
+          const orgIdSet = !!this.organizationId;
           this.organizationId = id;
 
           if (!orgIdSet) {
@@ -262,8 +258,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
     this.colDefs = this.invoicesContainerService.getColDefsByTab(tabIdx,
       { organizationId: this.organizationId,
-        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay || this.invoicePayAllowed && this.payInvoiceEnabled,
-        canEdit: this.agencyActionsAllowed && this.approveInvoiceEnabled,
+        canPay: (this.store.snapshot().invoices as InvoicesModel).permissions.agencyCanPay
+        || this.invoiceContainerConfig.invoicePayAllowed && this.payInvoiceEnabled,
+        canEdit: this.invoiceContainerConfig.agencyActionsAllowed && this.approveInvoiceEnabled,
       });
 
 
@@ -328,8 +325,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     this.store.dispatch(new Invoices.ChangeInvoiceState(invoiceId, status, organizationId))
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe(() => {
-        this.store.dispatch(new Invoices.ToggleInvoiceDialog(DialogAction.Close))
-        this.getInvoicesByTab();
+        this.store.dispatch(new Invoices.ToggleInvoiceDialog(DialogAction.Close));
       });
   }
 
@@ -394,20 +390,22 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public showGroupingOverlay(): void {
     setTimeout(() => {
-      this.groupInvoicesOverlayVisible = true;
+      this.invoiceContainerConfig.groupInvoicesOverlayVisible = true;
       this.cdr.markForCheck();
     });
   }
 
   public hideGroupingOverlay(): void {
-    this.groupInvoicesOverlayVisible = false;
+    this.invoiceContainerConfig.groupInvoicesOverlayVisible = false;
   }
 
   public handleMultiSelectionChanged(nodes: RowNode[]): void {
     if (nodes.length) {
       this.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);
+      this.createInvoicesForPayment(nodes);
     } else {
       this.selectedInvoiceIds = [];
+      this.paymentRecords = [];
     }
   }
 
@@ -418,7 +416,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         organizationIds: [this.organizationId] as number[],
       } : {
         organizationId: this.organizationId as number,
-      })
+      }),
     };
 
     this.store.dispatch(new Invoices.GetPrintData(dto, this.isAgency))
@@ -436,11 +434,16 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     });
   }
 
-  private clearTab(): void {
-    this.groupingInvoiceRecordsIds = [];
+  public openAddPayment(): void {
+    this.invoiceContainerConfig.addPaymentOpen = true;
   }
 
-  private getInvoicesByTab(): void {
+  public closeAddPayment(): void {
+    this.invoiceContainerConfig.addPaymentOpen = false;
+  }
+
+  private clearTab(): void {
+    this.groupingInvoiceRecordsIds = [];
   }
 
   private clearSelections(): void {
@@ -467,8 +470,45 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       takeUntil(this.componentDestroy()),
     )
     .subscribe(([agencyActive, payAllowed]) => {
-      this.agencyActionsAllowed = agencyActive;
-      this.invoicePayAllowed = payAllowed;
+      this.invoiceContainerConfig.agencyActionsAllowed = agencyActive;
+      this.invoiceContainerConfig.invoicePayAllowed = payAllowed;
+    });
+  }
+
+  private createInvoicesForPayment(nodes: RowNode[]): void {
+    this.paymentRecords = nodes.filter((node) => (node.data as PendingApprovalInvoice).invoiceState === 2)
+    .map((node) => {
+      const data = node.data as PendingApprovalInvoice;
+      return ({
+        invoiceId: data.invoiceId,
+        invoiceNumber: data.formattedInvoiceId,
+        amount: data.amountToPay,
+        agencySuffix: data.agencySuffix,
+      });
+    });
+  }
+
+  private watchForOpenPayment(): void {
+    this.actions$
+    .pipe(
+      ofActionSuccessful(Invoices.OpenPaymentAddDialog),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      const paymentData = this.store.selectSnapshot(InvoicesState.selectedPayment) as InvoicePaymentData;
+      this.paymentRecords = [paymentData];
+      this.openAddPayment();
+    });
+  }
+
+  private watchForSavePaymentAction(): void {
+    this.actions$
+    .pipe(
+      ofActionSuccessful(Invoices.SavePayment),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(() => {
+      this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
+      this.cdr.markForCheck();
     });
   }
 }

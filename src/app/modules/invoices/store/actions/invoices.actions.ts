@@ -7,14 +7,18 @@ import { ExportPayload } from '@shared/models/export.model';
 import {
   GetPendingApprovalParams,
   GroupInvoicesParams,
+  InvoicePaymentData,
+  InvoicePaymentGetParams,
   InvoicePermissions,
   InvoicesFilterState,
   ManualInvoice,
   ManualInvoicePostDto,ManualInvoicePutDto,
-  PrintingPostDto
+  PaymentCreationDto,
+  PrintingPostDto,
 } from '../../interfaces';
 import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums';
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Invoices {
   export class GetManualInvoices {
     static readonly type = INVOICES_ACTIONS.GET_MANUAL_INVOICES;
@@ -320,5 +324,17 @@ export namespace Invoices {
     constructor(
       public readonly organizationId: number,
     ) {}
+  }
+
+  export class SavePayment {
+    static readonly type = INVOICES_ACTIONS.SavePayment;
+
+    constructor(public readonly payload: PaymentCreationDto) {}
+  }
+
+  export class OpenPaymentAddDialog {
+    static readonly type = INVOICES_ACTIONS.OpenAddPaymentDialog;
+
+    constructor(public readonly payload: InvoicePaymentData) {}
   }
 }

@@ -1,0 +1,147 @@
+@import 'colors.scss';
+@import 'mixins';
+@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
+@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
+
+.dialog-container {
+  padding: 24px;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 46px;
+}
+
+.title {
+  @include dialog-title;
+}
+
+.button-cancel {
+  margin-right: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.toggle {
+  @include toggle;
+}
+
+.input-container {
+  @include input-form-container;
+
+  &.row-flexed {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+}
+
+::ng-deep {
+  .input-container {
+    @include toggle;
+  }
+}
+
+.table-header {
+  @include table-header;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 28px;
+}
+
+.table-block {
+  @include table-container;
+}
+
+.table-container {
+  display: flex;
+  flex-direction: column;
+
+  .grid-table-container {
+    padding-bottom: 0;
+  
+    ::ng-deep {
+      ag-grid-angular {
+        height: auto !important;
+  
+        .ag-header-cell-text {
+          font-weight: 600;
+          color: $secondary-dark-blue-15;
+        }
+  
+        .ag-root-wrapper {
+          height: auto !important;
+        }
+  
+        .ag-root-wrapper-body {
+          height: auto !important;
+        }
+      }
+    }
+  }
+}
+
+::ng-deep {
+  .ag-cell-focus, .ag-cell {
+    border: none !important;
+  }
+
+  .ag-cell-value {
+    padding-left: 5px!important;
+    padding-right: 5px!important;
+  }
+
+  .common-cell {
+    padding-left: 17px!important;
+    padding-right: 17px!important;
+    text-align: right;
+  }
+
+  .custom-scroll {
+    overflow-y: auto;
+  }
+}
+
+.form-container {
+  margin-bottom: 24px;
+}
+
+.input-group {
+  &.numeric {
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  &.wide {
+    width: 100%;
+  }
+}
+
+.amount-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: $secondary-dark-blue-15;
+  font-size: 14px;
+  margin-bottom: 8px;
+  margin-top: -7px;
+}
+
+.toggle-header {
+  font-weight: 400;
+  color: $secondary-dark-blue-15;
+}
+
+.amount-text {
+  font-weight: 700;
+  color: $black;
+}

@@ -40,9 +40,9 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
 
   public filesForDelete: Attachment[] = [];
 
-  public dialogShown: boolean = false;
+  public dialogShown = false;
 
-  public title: string = '';
+  public title = '';
 
   public readonly maxFileSize: number = FileSize.MB_20;
 
@@ -222,7 +222,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
         linkedInvoiceId: link,
         vendorFeeApplicable: vendorFee,
         reasonId,
-        comment
+        comment,
       } = this.invoiceToEdit;
 
       this.form?.patchValue({

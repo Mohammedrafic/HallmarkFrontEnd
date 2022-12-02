@@ -1,4 +1,5 @@
-@import '../../../../styles/variables/colors';
+@import 'colors';
+@import 'mixins';
 
 $chip-margin: 8px;
 
@@ -160,10 +161,7 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   }
 
   .close-button {
-    color: $supportive-red;
-    cursor: pointer;
-    margin-left: 26px;
-    margin-right: 10px;
+    @include close-red-btn;
   }
 }
 

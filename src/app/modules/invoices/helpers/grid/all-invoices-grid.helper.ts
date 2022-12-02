@@ -5,21 +5,20 @@ import {
   IDetailCellRendererParams,
   RowHeightParams
 } from '@ag-grid-community/core';
+import { TypedValueGetterParams } from '@core/interface';
 import { TitleValueCellRendererParams } from '@shared/components/grid/models';
 
-import { TypedColDef, TypedValueGetterParams } from '../../interfaces/typed-col-def.interface';
-import { PendingApprovalInvoice, PendingApprovalInvoiceRecord } from '../../interfaces/pending-approval-invoice.interface';
-import { numberValueFormatter, invoicesRowDetailsOffsetColDef, monthDayYearDateFormatter,
-  titleValueCellRendererSelector, weekPeriodValueGetter, RateReasonValueGetter, CurrencyFormatter, DepartmentNameGetter } from '../../constants';
+import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
+import { AllInvoicesActionCellComponent } from '../../components/all-invoices-action-cell/all-invoices-action-cell.component';
+import { ToggleRowExpansionHeaderCellComponent } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
 import {
   InvoiceRecordsTableRowDetailsComponent
 } from '../../components/invoice-records-table-row-details/invoice-records-table-row-details.component';
+import { CurrencyFormatter, DepartmentNameGetter, invoicesRowDetailsOffsetColDef, monthDayYearDateFormatter, numberValueFormatter, RateReasonValueGetter, titleValueCellRendererSelector, weekPeriodValueGetter } from '../../constants';
+import { BaseInvoice, TypedColDef } from '../../interfaces';
+import { PendingApprovalInvoice, PendingApprovalInvoiceRecord } from '../../interfaces/pending-approval-invoice.interface';
 import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
 import { InvoicesContainerGridHelper } from './invoices-container-grid.helper';
-import { ToggleRowExpansionHeaderCellComponent } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
-import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
-import { AllInvoicesActionCellComponent } from '../../components/all-invoices-action-cell/all-invoices-action-cell.component';
-import { BaseInvoice } from '../../interfaces';
 
 interface AllColDefsConfig {
   approve?: (invoice: PendingApprovalInvoice) => void;

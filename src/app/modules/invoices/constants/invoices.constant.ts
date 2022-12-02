@@ -1,10 +1,9 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
-import { InvoiceFilterColumns } from '../interfaces';
+import { InvoiceFilterColumns, InvoicesTabItem } from '../interfaces';
 import { InvoicesTableFiltersColumns } from '../enums';
-import { CustomTabItemModel } from '../interfaces/custom-tab-item-model.interface';
 
-export const AGENCY_INVOICE_TABS: CustomTabItemModel[] = [
+export const AGENCY_INVOICE_TABS: InvoicesTabItem[] = [
   {
     title: 'Manual Invoice Pending'
   },
@@ -13,7 +12,7 @@ export const AGENCY_INVOICE_TABS: CustomTabItemModel[] = [
   }
 ];
 
-export const ORGANIZATION_INVOICE_TABS: CustomTabItemModel[] = [
+export const ORGANIZATION_INVOICE_TABS: InvoicesTabItem[] = [
   {
     title: 'Manual Invoice Pending'
   },
