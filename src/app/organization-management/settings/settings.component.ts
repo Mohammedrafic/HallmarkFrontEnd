@@ -47,6 +47,7 @@ import { SettingsDataAdapter } from './helpers/settings-data.adapter';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { SideMenuService } from '@shared/components/side-menu/services';
 import { ORG_SETTINGS } from '@organization-management/organization-management-menu.config';
+import { OrganizationSettingKeys } from '@shared/constants';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -139,6 +140,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     'IsReOrder',
   ];
 
+  public diasabledSettings = ["IsReOrder", "AllowDocumentUpload", "NetPaymentTerms", "NoOfDaysAllowedForTimesheetEdit", "EnableChat"];
+
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
@@ -156,6 +159,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     text: 'name',
     value: 'id',
   };
+
+  private organizationSettingKey: OrganizationSettingKeys;
+
+  set setOrganizationSettingKey(key: string) {
+    this.organizationSettingKey = Number(OrganizationSettingKeys[key as keyof object]);
+  }
 
   constructor(
     protected override store: Store,
@@ -232,6 +241,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public onOverrideButtonClick(data: any): void {
     this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
+    this.setOrganizationSettingKey = data.settingKey;
     this.formControlType = data.controlType;
     this.disableDepForInvoiceGeneration();
     this.regionFormGroup.reset();
@@ -251,6 +261,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.isFormShown = true;
     this.addActiveCssClass(event);
     this.isEdit = true;
+    this.setOrganizationSettingKey = parentRecord.settingKey;
     this.formControlType = parentRecord.controlType;
     this.disableDepForInvoiceGeneration();
     this.setFormValidation(parentRecord);
@@ -812,7 +823,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
 
   private disableDepForInvoiceGeneration(): void {
-    if (this.formControlType === this.organizationSettingControlType.InvoiceAutoGeneration) {
+    if (this.organizationSettingKey === OrganizationSettingKeys.InvoiceAutoGeneration || this.organizationSettingKey === OrganizationSettingKeys.PayHigherBillRates) {
       this.departmentFormGroup.get('departmentId')?.disable();
     } else {
       this.departmentFormGroup.get('departmentId')?.enable();

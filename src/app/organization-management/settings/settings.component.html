@@ -94,7 +94,7 @@
               ejs-button
               cssClass="e-flat default-icon-button"
               (click)="onOverrideButtonClick(data)"
-              [disabled]="hasPermissions | hasAccess : data : false"
+              [disabled]="hasPermissions | hasAccess : data : false : diasabledSettings"
             >
               <span class="edit-button" ><i-feather name="plus" class="icon"></i-feather></span>
             </button>
