@@ -3,6 +3,8 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { FileInfo } from '@syncfusion/ej2-inputs/src/uploader/uploader';
 
+import { FileSize } from "@core/enums";
+import { FileStatusCode } from "@shared/enums/file.enum";
 import { Document } from '@shared/models/document.model';
 
 @Component({
@@ -12,10 +14,10 @@ import { Document } from '@shared/models/document.model';
 })
 export class DocumentUploaderComponent implements OnInit {
   @Input() uploaderTitle: string;
-  @Input() allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
-  @Input() maxFileSize: number = 5242880; // 5 mb
+  @Input() allowedExtensions = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
+  @Input() maxFileSize = FileSize.MB_5;
   @Input() documents: Document[] | undefined | null;
-  @Input() disabled: boolean = false;
+  @Input() disabled = false;
 
   @Output() selectDocuments = new EventEmitter<Blob[]>();
   @Output() deleteDocument = new EventEmitter<Document>();
@@ -43,7 +45,9 @@ export class DocumentUploaderComponent implements OnInit {
 
     args.isModified = true;
     allFiles.forEach((file, index) => this.addFilesValidationMessage(file, index));
-    const allFilesReadyToUpload: Blob[] = allFiles.filter((f) => f.statusCode === '1').map((f) => f.rawFile as Blob);
+    const allFilesReadyToUpload: Blob[] = allFiles
+      .filter((f) => f.statusCode === FileStatusCode.Valid)
+      .map((f) => f.rawFile as Blob);
 
     this.selectDocuments.emit(allFilesReadyToUpload);
   }

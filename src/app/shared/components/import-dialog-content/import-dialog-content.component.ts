@@ -12,6 +12,7 @@ import {
   IMPORT_CONFIRM_TEXT,
   IMPORT_CONFIRM_TITLE,
 } from '@shared/constants';
+import { FileStatusCode } from "@shared/enums/file.enum";
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ImportResult } from '@shared/models/import.model';
@@ -34,7 +35,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   @Output() public uploadImportFile: EventEmitter<Blob> = new EventEmitter<Blob>();
 
   @Input() public dialogEvent: Subject<boolean>;
-  @Input() public title: string = 'Import';
+  @Input() public title = 'Import';
   @Input() public selectErrorsTab: Subject<void>;
   @Input() public set importResponse(response: any) {
     this.importResult = response;
@@ -157,7 +158,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   }
 
   private uploadFile(): void {
-    if (this.selectedFile?.statusCode === '1') {
+    if (this.selectedFile?.statusCode === FileStatusCode.Valid) {
       this.importResult = null;
       this.uploadImportFile.next(this.selectedFile.rawFile as Blob);
     }

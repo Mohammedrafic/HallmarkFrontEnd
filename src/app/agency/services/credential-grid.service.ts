@@ -2,8 +2,10 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from "@angular/forms";
 
 import { FieldSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
+import { FilesPropModel } from "@syncfusion/ej2-angular-inputs";
 
-import { AddCredentialForm, SearchCredentialForm } from "@agency/candidates/add-edit-candidate/credentials-grid/credentials-grid.interface";
+import { AddCredentialForm, SearchCredentialForm }
+  from "@agency/candidates/add-edit-candidate/credentials-grid/credentials-grid.interface";
 import { CustomFormGroup } from "@core/interface";
 import { CredentialStatus } from "@shared/enums/status";
 import { CandidateCredential, CredentialFile } from "@shared/models/candidate-credential.model";
@@ -13,7 +15,8 @@ export class CredentialGridService {
   constructor(private fb: FormBuilder) {}
 
   public getCandidateCredentialFileIds(credentials: CandidateCredential[]): number[] {
-    return credentials.map((item: CandidateCredential) => (item.credentialFiles as CredentialFile[])[0].candidateCredentialId);
+    return credentials
+      .map((item: CandidateCredential) => (item.credentialFiles as CredentialFile[])[0].candidateCredentialId);
   }
 
   public getCredentialRowsWithFiles(credentialRows: CandidateCredential[]): CandidateCredential[] {
@@ -28,6 +31,16 @@ export class CredentialGridService {
       };
     });
   }
+
+  public getExistingFile(credentialFile: CredentialFile): FilesPropModel {
+    const [name, type] = credentialFile.name.split(/\./);
+
+    return {
+      name,
+      type,
+      size: 0,
+    };
+}
 
   public createAddCredentialForm(): CustomFormGroup<AddCredentialForm> {
     return this.fb.group({
