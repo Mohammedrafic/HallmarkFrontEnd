@@ -140,7 +140,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     'IsReOrder',
   ];
 
-  public diasabledSettings = ["IsReOrder", "AllowDocumentUpload", "NetPaymentTerms", "NoOfDaysAllowedForTimesheetEdit", "EnableChat"];
+  public disabledSettings = ["IsReOrder", "AllowDocumentUpload", "NetPaymentTerms", "NoOfDaysAllowedForTimesheetEdit", "EnableChat"];
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
