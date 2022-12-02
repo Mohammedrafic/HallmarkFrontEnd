@@ -118,7 +118,9 @@ export const PaymentMessages = {
     return `Please note that amount assigned to invoices is lower than check\u00A0
     amount and ${ids.join(', ')} is/are partially paid. Are you sure you want to proceed?`;
   },
-
+  partialyNullAmount: (ids: string[]): string => {
+    return `Please note that invoices ${ids.join(', ')} is/are partially paid. Are you sure you want to proceed?`;
+  },
   lowerAmount: 'Please note that amount assigned to invoices is lower than check amount. Are you sure you want to proceed?',
   negativeAmount: 'Please note that amount assigned to invoices is higher than check amount',
   deleteInvoice: 'Deleting payment details can change invoice status. Are you sure you want to proceed?',

@@ -158,6 +158,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
     this.watchOrganizationId();
     this.watchAgencyId();
+    this.watchForOpenPayment();
+    this.watchForSavePaymentAction();
   }
 
   public ngAfterViewInit(): void {
@@ -483,6 +485,30 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
         amount: data.amountToPay,
         agencySuffix: data.agencySuffix,
       });
+    });
+  }
+
+  private watchForOpenPayment(): void {
+    this.actions$
+    .pipe(
+      ofActionSuccessful(Invoices.OpenPaymentAddDialog),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      const paymentData = this.store.selectSnapshot(InvoicesState.selectedPayment) as InvoicePaymentData;
+      this.paymentRecords = [paymentData];
+      this.openAddPayment();
+    });
+  }
+
+  private watchForSavePaymentAction(): void {
+    this.actions$
+    .pipe(
+      ofActionSuccessful(Invoices.SavePayment),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(() => {
+      this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
+      this.cdr.markForCheck();
     });
   }
 }

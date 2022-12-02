@@ -8,8 +8,9 @@ import { InvoicesContainerService } from './invoices-container.service';
 import { ManualInvoicesGridHelper } from '../../helpers';
 import { GridContainerTabConfig, InvoiceDetail, InvoiceInfoUIItem, ManualInvoice } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
-import { AgencyInvoicesGridTab, InvoiceState } from '../../enums';
-import { invoiceDetailsColumnDefs, invoiceInfoItems, invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
+import { AgencyInvoicesGridTab } from '../../enums';
+import { invoiceDetailsColumnDefs, invoiceInfoItems,
+  invoiceSummaryColumnDefs } from '../../constants/invoice-detail.constant';
 import { AllInvoicesGridHelper } from '../../helpers/grid/all-invoices-grid.helper';
 import { PendingApprovalInvoice } from '../../interfaces/pending-approval-invoice.interface';
 
@@ -42,8 +43,12 @@ export class AgencyInvoicesContainerService extends InvoicesContainerService {
           canPay,
           {
             pay: (invoice: PendingApprovalInvoice) =>
-            this.store.dispatch(
-              new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.Paid, invoice.organizationId)),
+            this.store.dispatch(new Invoices.OpenPaymentAddDialog({
+              invoiceId: invoice.invoiceId,
+              invoiceNumber: invoice.formattedInvoiceId,
+              amount: invoice.amountToPay,
+              agencySuffix: invoice.agencySuffix,
+            })),
           });
       default:
         return [];

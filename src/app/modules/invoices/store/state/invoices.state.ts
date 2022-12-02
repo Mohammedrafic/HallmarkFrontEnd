@@ -17,6 +17,7 @@ import {
   InvoiceDetail, InvoiceDialogActionPayload,
   InvoiceFilterColumns,
   InvoicePayment,
+  InvoicePaymentData,
   InvoiceRecord,
   InvoicesFilteringOptions,
   InvoicesFilterState,
@@ -145,6 +146,11 @@ export class InvoicesState {
   @Selector([InvoicesState])
   static invoiceDetails(state: InvoicesModel): InvoiceDetail | null {
     return state.invoiceDetail;
+  }
+
+  @Selector([InvoicesState])
+  static selectedPayment(state: InvoicesModel): InvoicePaymentData | null {
+    return state.selectedPayment;
   }
 
 
@@ -277,6 +283,7 @@ export class InvoicesState {
   }
 
   @Action(Invoices.ToggleManualInvoiceDialog)
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   ToggleManInvoiceDialog(): void {}
 
   @Action(Invoices.GetInvoicesReasons)
@@ -748,5 +755,15 @@ export class InvoicesState {
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(err.error)));
       }),
     );
+  }
+
+  @Action(Invoices.OpenPaymentAddDialog)
+  OpenPaymentDialog(
+    { patchState }: StateContext<InvoicesModel>,
+    { payload }: Invoices.OpenPaymentAddDialog,
+  ): void {
+    patchState({
+      selectedPayment: payload,
+    });
   }
 }

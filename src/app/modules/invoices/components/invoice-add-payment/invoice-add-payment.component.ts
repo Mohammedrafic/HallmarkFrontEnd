@@ -128,6 +128,21 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
 
     } else if (this.calculatedLeftAmount < 0) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, PaymentMessages.negativeAmount));
+    } else if (this.calculatedLeftAmount === 0 && !this.paymentService.calcBalanceCovered(this.paymentsForm)) {
+      this.confirmService.confirm(
+        PaymentMessages.partialyNullAmount(this.paymentService.findPartialyCoveredIds(this.paymentsForm)),
+        {
+          title: 'Check Payment Amount',
+          okButtonLabel: 'Yes',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(
+          take(1),
+          filter(Boolean),
+        )
+        .subscribe(() => {
+          this.savePaymentDto();
+        });
     }
   }
 

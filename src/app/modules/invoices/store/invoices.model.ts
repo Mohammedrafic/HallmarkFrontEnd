@@ -4,6 +4,7 @@ import {
   BaseInvoice, InvoiceDetail,
   InvoiceFilterColumns,
   InvoicePayment,
+  InvoicePaymentData,
   InvoicePermissions,
   InvoiceRecord,
   InvoicesFilterState,
@@ -41,4 +42,5 @@ export interface InvoicesModel {
   permissions: Partial<InvoicePermissions>;
   selectedTabIdx: number;
   paymentDetails: InvoicePayment[];
+  selectedPayment: InvoicePaymentData | null;
 }

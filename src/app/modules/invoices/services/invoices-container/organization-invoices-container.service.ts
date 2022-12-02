@@ -58,7 +58,12 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
       case OrganizationInvoicesGridTab.PendingPayment:
         return PendingApprovalGridHelper.getOrganizationColDefs({
           approve: (invoice: PendingApprovalInvoice) =>
-            this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.Paid)),
+            this.store.dispatch(new Invoices.OpenPaymentAddDialog({
+              invoiceId: invoice.invoiceId,
+              invoiceNumber: invoice.formattedInvoiceId,
+              amount: invoice.amountToPay,
+              agencySuffix: invoice.agencySuffix,
+            })),
           actionTitle: 'Pay',
           actionEnabled: canPay,
         });
@@ -69,7 +74,12 @@ export class OrganizationInvoicesContainerService extends InvoicesContainerServi
           approve: (invoice: PendingApprovalInvoice) =>
           this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.PendingPayment)),
           pay: (invoice: PendingApprovalInvoice) =>
-          this.store.dispatch(new Invoices.ChangeInvoiceState(invoice.invoiceId, InvoiceState.Paid)),
+          this.store.dispatch(new Invoices.OpenPaymentAddDialog({
+            invoiceId: invoice.invoiceId,
+            invoiceNumber: invoice.formattedInvoiceId,
+            amount: invoice.amountToPay,
+            agencySuffix: invoice.agencySuffix,
+          })),
           canEdit,
           canPay,
         });
