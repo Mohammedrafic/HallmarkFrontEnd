@@ -2,7 +2,7 @@ import { SaveLastSelectedOrganizationAgencyId } from './../../store/user.actions
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { catchError, debounceTime, Observable, of, tap } from 'rxjs';
+import { catchError, debounceTime, Observable, of, switchAll, switchMap, tap } from 'rxjs';
 import {
   ApproveOrder,
   CancelOrganizationCandidateJob,
@@ -589,16 +589,17 @@ export class OrderManagementContentState {
 
   @Action(SetPredefinedBillRatesData)
   SetPredefinedBillRatesData(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { patchState, dispatch }: StateContext<OrderManagementContentStateModel>,
     { orderType, departmentId, skillId, jobStartDate, jobEndDate }: SetPredefinedBillRatesData
-  ): Observable<null> {
+  ): Observable<void> {
     patchState({ getPredefinedBillRatesData: null });
 
     return of(null).pipe(
       debounceTime(100),
       tap(() =>
         patchState({ getPredefinedBillRatesData: { orderType, departmentId, skillId, jobStartDate, jobEndDate } })
-      )
+      ),
+      switchMap(() => dispatch(new GetPredefinedBillRates())),
     );
   }
 
@@ -619,7 +620,6 @@ export class OrderManagementContentState {
           .pipe(
             tap((payload) => {
               patchState({ predefinedBillRates: payload });
-              return payload;
             })
           );
       }
