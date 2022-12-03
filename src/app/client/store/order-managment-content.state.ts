@@ -2,7 +2,7 @@ import { SaveLastSelectedOrganizationAgencyId } from './../../store/user.actions
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { getAllErrors } from '@shared/utils/error.utils';
-import { catchError, debounceTime, Observable, of, switchAll, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, Observable, of, switchMap, tap } from 'rxjs';
 import {
   ApproveOrder,
   CancelOrganizationCandidateJob,
