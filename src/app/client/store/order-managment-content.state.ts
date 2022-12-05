@@ -700,13 +700,13 @@ export class OrderManagementContentState {
   @Action(EditOrder)
   EditOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents }: EditOrder
+    { order, documents, message }: EditOrder
   ): Observable<Order | void> {
     return this.orderManagementService.editOrder(order, documents).pipe(
-      tap((order) => {
+      tap((payload: Order) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
-          new SaveOrderSucceeded(order),
+          new ShowToast(MessageTypes.Success, message ?? RECORD_MODIFIED),
+          new SaveOrderSucceeded(payload),
           new SetIsDirtyOrderForm(false),
         ]);
 

@@ -3,36 +3,36 @@ import { FormGroup } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 
 import { Select, Store } from '@ngxs/store';
-import { Observable, takeUntil } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { Observable, takeUntil } from 'rxjs';
 
 import { OptionFields } from '@shared/components/credentials-list/constants';
 import { CredentialFiltersService, CredentialListService } from '@shared/components/credentials-list/services';
 import { FilterColumnsModel, FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { SetCredentialsFilterCount } from '@organization-management/store/credentials.actions';
-import { UserState } from '../../../../store/user.state';
 import { Destroyable } from '@core/helpers';
+import { UserState } from '../../../../store/user.state';
 
 @Component({
   selector: 'app-filters',
   templateUrl: './filters.component.html',
   styleUrls: ['./filters.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FiltersComponent extends Destroyable implements OnInit {
   @Input() set filteredColumns(columns: FilterColumnsModel) {
       this.filterColumns = columns;
       this.changeDetection.markForCheck();
-  };
+  }
   @Input() set isIRPFlag(flag: boolean) {
     this.isIRPFlagEnabled = flag;
     this.initFilterForm();
     this.changeDetection.markForCheck();
-  };
-  @Input() public isCredentialSettings: boolean = false;
+  }
+  @Input() public isCredentialSettings = false;
 
-  @Output() public handleClearFilters: EventEmitter<void> = new EventEmitter();
+  @Output() public handleClearFilters: EventEmitter<number> = new EventEmitter();
   @Output() public handleApplyFilters: EventEmitter<void> = new EventEmitter();
 
   public optionFields: FieldSettingsModel = OptionFields;
@@ -40,7 +40,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
   public filteredItems: FilteredItem[] = [];
   public totalDataRecords: number;
   public filterColumns: FilterColumnsModel;
-  public isIRPFlagEnabled: boolean = false;
+  public isIRPFlagEnabled = false;
 
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
@@ -64,13 +64,13 @@ export class FiltersComponent extends Destroyable implements OnInit {
     this.filterService.removeValue(event, this.credentialsFilters, this.filterColumns);
   }
 
-  public clearAllFilters(): void {
+  public clearAllFilters(id?: number): void {
     this.credentialsFilters.reset();
     this.setSystemValue();
     this.filteredItems = [];
     this.store.dispatch(new SetCredentialsFilterCount(this.filteredItems.length));
     this.credentialFiltersService.clearState();
-    this.handleClearFilters.emit();
+    this.handleClearFilters.emit(id);
   }
 
   public onFilterApply(): void {
@@ -86,7 +86,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
       credentialTypeIds,
       expireDateApplicable,
       includeInIRP,
-      includeInVMS
+      includeInVMS,
     } = this.credentialFiltersService.filtersState;
     this.credentialsFilters.patchValue({
       credentialIds: credentialIds ?? null,
@@ -97,7 +97,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
     if(this.isIRPFlagEnabled && this.isCredentialSettings) {
       this.credentialsFilters.patchValue({
         includeInIRP: includeInIRP ?? null,
-        includeInVMS: includeInVMS ?? null
+        includeInVMS: includeInVMS ?? null,
       });
     }
 
@@ -111,8 +111,8 @@ export class FiltersComponent extends Destroyable implements OnInit {
   private watchForOrganizationId(): void {
     this.organizationId$.pipe(
       takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.clearAllFilters();
+    ).subscribe((id: number) => {
+      this.clearAllFilters(id);
     });
   }
 
@@ -120,10 +120,8 @@ export class FiltersComponent extends Destroyable implements OnInit {
     if(this.isIRPFlagEnabled && this.isCredentialSettings) {
       this.credentialsFilters.patchValue({
         includeInIRP: false,
-        includeInVMS: false
-      })
+        includeInVMS: false,
+      });
     }
   }
-
-
 }

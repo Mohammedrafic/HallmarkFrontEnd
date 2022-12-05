@@ -17,10 +17,12 @@ import { Credential,  CredentialFilterDataSources, CredentialPage } from '@share
 
 import { ConfirmService } from '@shared/services/confirm.service';
 import { SortSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
-import { UserState } from 'src/app/store/user.state';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import {  SaveAssignedCredentialValue, ShowExportCredentialListDialog } from '@organization-management/store/credentials.actions';
+import {
+  SaveAssignedCredentialValue,
+  ShowExportCredentialListDialog,
+} from '@organization-management/store/credentials.actions';
 import { DatePipe } from '@angular/common';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { CredentialType } from '@shared/models/credential-type.model';
@@ -32,7 +34,7 @@ import {
   FilterColumnsIncludeIRP,
   FiltersColumns,
   OptionFields,
-  SortSettings
+  SortSettings,
 } from '@shared/components/credentials-list/constants';
 import { CredentialFiltersService } from '@shared/components/credentials-list/services';
 import { Organization } from '@shared/models/organization.model';
@@ -45,7 +47,7 @@ import { CredentialList } from '@shared/components/credentials-list/store/creden
 @Component({
   selector: 'app-credentials-list',
   templateUrl: './credentials-list.component.html',
-  styleUrls: ['./credentials-list.component.scss']
+  styleUrls: ['./credentials-list.component.scss'],
 })
 export class CredentialsListComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
@@ -56,8 +58,8 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
   public columnsToExport: ExportColumn[];
   public fileName: string;
   public defaultFileName: string;
-  public isIRPFlagEnabled: boolean = false;
-  public isCredentialSettings: boolean = false;
+  public isIRPFlagEnabled = false;
+  public isCredentialSettings = false;
   public filterColumns: FilterColumnsModel;
   public selectedCredential: Credential;
 
@@ -69,8 +71,6 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
 
   @Select(OrganizationManagementState.credentials)
   private credentials$: Observable<CredentialPage>;
-  @Select(UserState.lastSelectedOrganizationId)
-  private organizationId$: Observable<number>;
   @Select(CredentialListState.credentialDataSources)
   private credentialDataSources$: Observable<CredentialFilterDataSources>;
   @Select(OrganizationManagementState.organization)
@@ -91,7 +91,6 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
 
     this.checkIRPFlag();
     this.initFilterColumns();
-    this.watchForOrganization();
     this.watchForCredentialDataSource();
     this.watchForChangePage();
     this.mapGridData();
@@ -107,7 +106,7 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
   public changeRowDropDown(): void {
     this.grid.pageSettings.pageSize = this.pageSize = this.getActiveRowsPerPage();
     this.credentialFiltersService.updateFilters = {
-      pageSize: this.pageSize
+      pageSize: this.pageSize,
     };
   }
 
@@ -117,8 +116,10 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
     }
   }
 
-  public clearAllFilters(): void {
-    this.getCredentials();
+  public clearAllFilters(id: number): void {
+    if(!id) {
+      this.getCredentials();
+    }
   }
 
   public applyFilters(): void {
@@ -139,12 +140,12 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
 
     const credentialFilters = this.isIRPFlagEnabled && this.isCredentialSettings ?
       new GetCredentialForSettings(this.credentialFiltersService.filtersState) :
-      new GetCredential(this.credentialFiltersService.filtersState)
+      new GetCredential(this.credentialFiltersService.filtersState);
 
     this.store.dispatch([
       credentialFilters,
       new GetCredentialTypes(),
-      new CredentialList.GetCredentialsDataSources()
+      new CredentialList.GetCredentialsDataSources(),
       ]
     );
   }
@@ -194,7 +195,7 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
       .confirm('Are you sure want to delete?', {
         title: 'Delete Record',
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       }).pipe(
         filter(Boolean),
         takeUntil(this.unsubscribe$)
@@ -218,7 +219,7 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
         this.lastAvailablePage = credentials.totalPages;
         if (credentialTypes) {
           credentials.items.map(item => {
-            let credentialType = credentialTypes.find(type => type.id === item.credentialTypeId);
+            const credentialType = credentialTypes.find(type => type.id === item.credentialTypeId);
             item.credentialTypeName = credentialType ? credentialType.name : '';
           });
         }
@@ -254,11 +255,14 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
         takeUntil(this.unsubscribe$)
       ).subscribe((organization: Organization) => {
       this.isIRPFlagEnabled = !!organization.preferences.isIRPEnabled;
+
       if(this.grid) {
-        this.showHideGridColumns()
+        this.showHideGridColumns();
       }
       const { isCredentialSettings } = this.route.snapshot.data;
       this.isCredentialSettings = isCredentialSettings;
+
+      this.getCredentials();
     });
   }
 
@@ -273,17 +277,9 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
     if(this.isIRPFlagEnabled && this.isCredentialSettings) {
       this.filterColumns = {
         ...this.filterColumns,
-        ...FilterColumnsIncludeIRP
-      }
+        ...FilterColumnsIncludeIRP,
+      };
     }
-  }
-
-  private watchForOrganization(): void {
-    this.organizationId$.pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe(() => {
-      this.getCredentials();
-    });
   }
 
   private watchForCredentialDataSource(): void {
@@ -304,7 +300,7 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
       ).subscribe((page) => {
         this.currentPage = page;
         this.credentialFiltersService.updateFilters = {
-          pageNumber: page
+          pageNumber: page,
         };
         this.getCredentials();
     });

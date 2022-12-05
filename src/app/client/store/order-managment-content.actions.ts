@@ -167,7 +167,11 @@ export class SaveCloseOrderSucceeded {
 
 export class EditOrder {
   static readonly type = '[order management] Edit Order';
-  constructor(public order: EditOrderDto, public documents: Blob[]) {}
+  constructor(
+    public readonly order: EditOrderDto,
+    public readonly documents: Blob[],
+    public readonly message?: string | null
+  ) {}
 }
 
 export class DeleteOrder {

@@ -51,6 +51,7 @@ export const JOB_DISTRIBUTION_TITLE = 'Job Distribution';
 export const PROCEED_FOR_ALL_AGENCY = 'Order will be distributed to all Agencies. Do you want to proceed?';
 export const PROCEED_FOR_TIER_LOGIC = 'Order will be distributed based on Tiering logic. Do you want to proceed?';
 export const PLEASE_SELECT_SYSTEM_GROUP_SETUP = 'Please select system for Group setup';
+export const ORDER_DISTRIBUTED_TO_ALL = 'Order was distributed to all associated Agencies';
 
 export const updateCandidateJobMessage = (dates: string[]) =>
   `For this candidate job timesheets will be recalculated for the next start dates: ${dates.join(', ')}`;

@@ -38,9 +38,9 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { BillRatesSyncService } from '@shared/services/bill-rates-sync.service';
 import { OrderJobDistribution } from '@shared/enums/job-distibution';
 import {
-  JOB_DISTRIBUTION_TITLE,
+  JOB_DISTRIBUTION_TITLE, ORDER_DISTRIBUTED_TO_ALL,
   PROCEED_FOR_ALL_AGENCY,
-  PROCEED_FOR_TIER_LOGIC
+  PROCEED_FOR_TIER_LOGIC,
 } from '@shared/constants';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { DateTimeHelper } from '@core/helpers';
@@ -396,7 +396,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private checkInactiveLocationDepartmentOverlap(order: CreateOrderDto, documents: Blob[]): void {
     if (this.orderDetailsFormComponent.selectedLocation && this.orderDetailsFormComponent.selectedDepartment) {
       const jobEndDate = order.jobEndDate;
-      const locationInactiveDate = this.orderDetailsFormComponent.selectedLocation.inactiveDate ? 
+      const locationInactiveDate = this.orderDetailsFormComponent.selectedLocation.inactiveDate ?
         new Date(DateTimeHelper.formatDateUTC(this.orderDetailsFormComponent.selectedLocation.inactiveDate, 'MM/dd/yyyy')) : null;
       const departmentInactiveDate = this.orderDetailsFormComponent.selectedDepartment.inactiveDate ?
         new Date(DateTimeHelper.formatDateUTC(this.orderDetailsFormComponent.selectedDepartment.inactiveDate, 'MM/dd/yyyy')) : null;
@@ -416,6 +416,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private proceedWithSaving(order: CreateOrderDto, documents: Blob[]): void {
+    let message = null;
+    const prevDistributions = this.getJobDistributionOptions(this.order.jobDistributions);
+    const selectedDistributions = this.getJobDistributionOptions(order.jobDistributions);
+    if(
+      prevDistributions.includes(OrderJobDistribution.TierLogic) &&
+      selectedDistributions.includes(OrderJobDistribution.All)) {
+      message = ORDER_DISTRIBUTED_TO_ALL;
+    }
     if (this.orderId) {
       this.store.dispatch(
         new EditOrder(
@@ -424,7 +432,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
             id: this.orderId,
             deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids,
           },
-          documents
+          documents,
+          message as string
         )
       );
     } else {
@@ -861,5 +870,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private selectOrderTemplatesTab(): void {
     this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.OrderTemplates));
+  }
+
+  private getJobDistributionOptions(distributions: JobDistributionModel[]): number[] {
+    return distributions.map((distribution: JobDistributionModel) => distribution.jobDistributionOption);
   }
 }
