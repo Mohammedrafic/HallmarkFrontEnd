@@ -58,6 +58,10 @@ export class InvoiceAddPaymentService {
     paymentsForm: Record<string, CustomFormGroup<PaymentForm>>): PaymentsTableData[] {
     const mergeData: PaymentsTableData[] = [];
 
+    if (!payments || !payments.length) {
+      return tableData;
+    }
+    
     payments.forEach((payment) => {
       const initialAmount = (payment.amountToPay as number) + payment.payment;
       const form = this.createPaymentGroup(initialAmount, payment.amountToPay);

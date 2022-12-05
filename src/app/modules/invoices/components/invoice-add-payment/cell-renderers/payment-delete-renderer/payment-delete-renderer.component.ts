@@ -16,12 +16,15 @@ export class PaymentDeleteRendererComponent implements ICellRendererAngularComp 
 
   private componentParent: InvoiceAddPaymentComponent;
 
-  private dbId: number;
+  /**
+   * TODO: rename
+   */
+  private invoiceDbId: number;
 
   agInit(params: ICellRendererParams): void {
     this.componentParent = params.context.componentParent;
     this.invoiceId = params.data.invoiceNumber;
-    this.dbId = params.data.id;
+    this.invoiceDbId = params.data.id;
   }
 
   refresh(): boolean {
@@ -29,6 +32,6 @@ export class PaymentDeleteRendererComponent implements ICellRendererAngularComp 
   }
 
   deleteRecord(): void {
-    this.componentParent.deletePayment(this.invoiceId, this.dbId);
+    this.componentParent.deletePayment(this.invoiceId, this.invoiceDbId);
   }
 }
