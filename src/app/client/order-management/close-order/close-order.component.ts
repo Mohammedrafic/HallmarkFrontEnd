@@ -28,7 +28,7 @@ import { DateTimeHelper } from '@core/helpers';
   templateUrl: './close-order.component.html',
   styleUrls: ['./close-order.component.scss'],
 })
-export class CloseOrderComponent extends DestroyableDirective implements OnChanges, OnInit,OnDestroy {
+export class CloseOrderComponent extends DestroyableDirective implements OnChanges, OnInit, OnDestroy {
   @Input() public order: Order | OrderManagement;
   @Input() candidate: OrderManagementChild;
   @Output() private closeOrderSuccess: EventEmitter<Order | OrderManagement> = new EventEmitter<
@@ -65,11 +65,10 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   public ngOnChanges(changes: SimpleChanges) {
-    const { order : {currentValue} } = changes;
+    const { order: { currentValue } } = changes;
+
     if (currentValue) {
       this.dialogTitleType = OrderTypeTitlesMap.get(currentValue.orderType) as string;
-      const maxDate = currentValue.orderType === OrderType.ReOrder ? currentValue.jobStartDate : currentValue.jobEndDate;
-      this.setMaxDate(maxDate);
     }
   }
 
@@ -120,8 +119,14 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     });
   }
 
-  private setMaxDate(maxDate: Date): void {
-    this.maxDate = maxDate;
+  private setMaxDate(): void {
+    const maxDate =
+      this.order.orderType === OrderType.ReOrder
+        ? this.order.jobStartDate
+        : this.isPosition
+        ? new Date(this.candidate.actualEndDate || 0)
+        : this.order.jobEndDate;
+    this.maxDate = maxDate || null;
   }
 
   private getComments(): void {
@@ -140,6 +145,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
 
   public setCloseDateAvailability(isPosition: boolean): void {
     this.isPosition = isPosition;
+    this.setMaxDate();
     this.getComments();
   }
 
