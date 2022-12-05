@@ -40,12 +40,12 @@ export class SwitchEditorComponent extends Destroyable implements ICellRendererA
   }
 
   agInit(params: ICellRendererParams): void {
-    this.setData(params)
+    this.setData(params);
     this.cd.markForCheck();
   }
 
   refresh(params: ICellRendererParams): boolean {
-    this.setData(params)
+    this.setData(params);
     this.cd.markForCheck();
 
     return true;
@@ -59,16 +59,15 @@ export class SwitchEditorComponent extends Destroyable implements ICellRendererA
   private setData(params: ICellRendererParams): void {
     const colDef = (params.colDef as ColDef);
     const storeField = colDef.cellRendererParams.storeField as string;
-    this.controlDisabled = colDef.cellRendererParams.disabled as boolean;
 
+    this.controlDisabled = colDef.cellRendererParams.disabled as boolean;
     this.notApplicableRateIds = this.findDisabledRateIds(storeField);
     this.value = !params.value;
-    
     this.showControl = !this.notApplicableRateIds.includes((params.data as RecordValue).billRateConfigId)
-    && !(params.data as RecordValue).billRateConfigName.toLowerCase().includes('ot');
-    
+    && !(params.data as RecordValue).billRateConfigName?.toLowerCase().includes('ot');
+
     if (!this.controlDisabled) {
-      this.setFormControl(params);  
+      this.setFormControl(params);
     }
   }
 
@@ -93,7 +92,6 @@ export class SwitchEditorComponent extends Destroyable implements ICellRendererA
         this.showControl = !this.notApplicableRateIds.includes(value);
         this.cd.markForCheck();
       }) as Subscription;
-      
     }
   }
 
