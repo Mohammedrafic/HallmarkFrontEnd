@@ -205,6 +205,8 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
         .subscribe(() => {
           this.closeDialog();
         });
+    } else {
+      this.closeDialog();
     }
   }
 
