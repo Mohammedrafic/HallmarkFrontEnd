@@ -146,7 +146,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
     }
   }
 
-  deletePayment(invoiceId: string, id: number): void {
+  deletePayment(invoiceId: string, invoiceDbid: number): void {
     this.confirmService.confirm(PaymentMessages.deleteInvoice, {
       title: 'Check Payment Amount',
       okButtonLabel: 'Yes',
@@ -160,8 +160,8 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
         this.tableData = this.tableData.filter((payment) => payment.invoiceNumber !== invoiceId);
         this.cd.markForCheck();
 
-        if (id) {
-          return this.apiService.deletePayment(id);
+        if (invoiceDbid) {
+          return this.apiService.deletePayment(invoiceDbid);
         }
         return of();
       }),
@@ -201,7 +201,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
   private watchForCheckControl(): void {
     this.checkForm.get('checkNumber')?.valueChanges
     .pipe(
-      debounceTime(1500),
+      debounceTime(1000),
       filter(Boolean),
       switchMap((value) => this.apiService.getCheckData(value)),
       filter((response) => !!response),
