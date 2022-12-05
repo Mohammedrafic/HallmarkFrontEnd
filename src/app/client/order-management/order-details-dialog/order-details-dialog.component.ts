@@ -183,11 +183,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     return !!(this.order?.orderClosureReasonId || this.order?.orderCloseDate) || this.disabledCloseButton;
   }
 
-  get tabletMenu(): { text: string }[] {
+  get desktopSmallMenu(): { text: string }[] {
     let menu: { text: string }[] = [];
-    if (this.showApproveAndCancel) {
-      menu = [...menu, { text: MobileMenuItems.Cancel }, { text: MobileMenuItems.Approve }];
-    }
     if (!this.canCloseOrder && !this.disableCloseOrder) {
       menu = [...menu, { text: MobileMenuItems.CloseOrder }];
     }
@@ -202,6 +199,14 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     }
     if (!this.disabledLock && this.showLockOrder) {
       menu = [...menu, { text: this.order?.isLocked ? MobileMenuItems.Unlock : MobileMenuItems.Lock }];
+    }
+    return menu;
+  }
+
+  get tabletMenu(): { text: string }[] {
+    let menu: { text: string }[] = this.desktopSmallMenu;
+    if (this.showApproveAndCancel) {
+      menu = [...menu, { text: MobileMenuItems.Cancel }, { text: MobileMenuItems.Approve }];
     }
     return menu;
   }
