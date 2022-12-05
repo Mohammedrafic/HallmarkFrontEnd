@@ -34,7 +34,7 @@
       ejs-button
       *ngIf="(!isAgency && (selectedTabIdx !== 0 && selectedTabIdx !== 1)
       || (isAgency && selectedTabIdx !== 0))"
-      [disabled]="!selectedInvoiceIds || !selectedInvoiceIds.length"
+      [disabled]="!gridSelections.selectedInvoiceIds || !gridSelections.selectedInvoiceIds.length"
       cssClass="e-outline button-filter button--no-wrap"
       (click)="printInvoices()">
       <span>Print</span>
@@ -44,9 +44,10 @@
     <button
       ejs-button
       *ngIf="(!isAgency && (selectedTabIdx === 3 || selectedTabIdx === 5)|| (isAgency && selectedTabIdx !== 0))"
-      [disabled]="!invoiceContainerConfig.invoicePayAllowed || !selectedInvoiceIds || !selectedInvoiceIds.length"
+      [disabled]="!invoiceContainerConfig.invoicePayAllowed || !gridSelections.selectedInvoiceIds
+      || !gridSelections.selectedInvoiceIds.length"
       cssClass="e-primary relative"
-      (click)="openAddPayment()"
+      (click)="openAddPayment(true)"
     >Pay</button>
 
     <div class="invoices-actions-container">
