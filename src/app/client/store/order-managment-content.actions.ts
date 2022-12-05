@@ -134,7 +134,6 @@ export class SetPredefinedBillRatesData {
 
 export class GetPredefinedBillRates {
   static readonly type = '[order management] Get Predefined Bill Rates';
-  constructor() {}
 }
 
 export class ClearPredefinedBillRates {

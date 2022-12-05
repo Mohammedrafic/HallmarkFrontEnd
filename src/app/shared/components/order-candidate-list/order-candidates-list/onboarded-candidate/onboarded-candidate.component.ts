@@ -194,7 +194,6 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
     this.subscribeOnUpdateOrganisationCandidateJobError();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeOnGetStatus();
-    this.initPredefinedBillRates();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -422,7 +421,7 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
             allow: value.allowDeployCredentials,
             startDate: value.actualStartDate ? DateTimeHelper.convertDateToUtc(value.actualStartDate)
             : DateTimeHelper.convertDateToUtc(value.order.jobStartDate.toString()),
-            endDate: value.actualEndDate ? DateTimeHelper.convertDateToUtc(value.actualEndDate) 
+            endDate: value.actualEndDate ? DateTimeHelper.convertDateToUtc(value.actualEndDate)
             : DateTimeHelper.convertDateToUtc(value.order.jobEndDate.toString()),
             rejectReason: value.rejectReason,
             offeredStartDate: DateTimeHelper.formatDateUTC(
@@ -614,13 +613,5 @@ export class OnboardedCandidateComponent extends UnsavedFormComponentRef impleme
   private onReject(): void {
     this.store.dispatch(new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
-  }
-
-  private initPredefinedBillRates(): void {
-    this.actions$.pipe(
-      ofActionSuccessful(SetPredefinedBillRatesData),
-      switchMap(() => this.store.dispatch(new GetPredefinedBillRates())),
-      takeUntil(this.unsubscribe$)
-    ).subscribe();
   }
 }
