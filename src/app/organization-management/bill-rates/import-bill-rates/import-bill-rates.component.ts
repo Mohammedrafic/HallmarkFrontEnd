@@ -9,11 +9,12 @@ import {
   SaveBillRatesImportResult,
   SaveBillRatesImportResultSucceeded,
   UploadBillRatesFile,
-  UploadBillRatesFileSucceeded,
+  UploadBillRatesFileSucceeded
 } from '@organization-management/store/organization-management.actions';
 import { billRatesColumns } from '@organization-management/bill-rates/import-bill-rates/bill-rates-grid.constants';
+import { ImportConfigModel } from '@shared/models/import-config.model';
 
-const importConfig = {
+const importConfig: ImportConfigModel = {
   importTemplate: GetBillRatesImportTemplate,
   importError: GetBillRatesImportErrors,
   uploadFile: UploadBillRatesFile,

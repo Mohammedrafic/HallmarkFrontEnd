@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 
-import { ICellRendererAngularComp } from "@ag-grid-community/angular";
-import { ICellRendererParams } from "@ag-grid-community/core";
-import { ErroredData } from "@shared/models/candidate-profile-import.model";
+import { ICellRendererAngularComp } from '@ag-grid-community/angular';
+import { ICellRendererParams } from '@ag-grid-community/core';
+import { ErroredData } from '@shared/models/candidate-profile-import.model';
 
 @Component({
   selector: 'app-grid-errored-cell',
@@ -14,7 +14,7 @@ export class GridErroredCellComponent implements ICellRendererAngularComp {
   public colId: string;
 
   get isErrored(): boolean {
-    return this.cellValue.errorProperties.map((item: string) => item.toLowerCase()).includes(this.colId.toLowerCase());
+    return this.cellValue.errorProperties.some((item: string) => item.toLowerCase().includes(this.colId.toLowerCase()))
   }
 
   public agInit(params: ICellRendererParams): void {

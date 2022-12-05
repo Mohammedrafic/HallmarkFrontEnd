@@ -23,14 +23,14 @@ import {
   MoreVertical,
   Plus,
   Search,
+  Slash,
   Sliders,
   Trash2,
   Unlock,
   Upload,
   User,
   X,
-  XCircle,
-  Slash,
+  XCircle
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -42,18 +42,12 @@ import {
   PageService,
   ResizeService,
   SortService,
-  ToolbarService,
+  ToolbarService
 } from '@syncfusion/ej2-angular-grids';
-import {
-  ButtonModule,
-  CheckBoxModule,
-  ChipListModule,
-  RadioButtonModule,
-  SwitchModule,
-} from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule, ChipListModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownButtonAllModule, DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
-import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, MaskedDateTimeService, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 
@@ -88,10 +82,12 @@ import { ExtensionModule } from '@shared/components/extension/extension.module';
 import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
 import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
 import { ReopenOrderModule } from '@client/order-management/reopen-order/reopen-order.module';
-import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
+import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { DistributionTierService } from '@client/order-management/order-details-form/services';
 import { MatMenuModule } from '@angular/material/menu';
 import { SettingsViewService } from '@shared/services';
+import { OrderImportComponent } from './order-management/order-import/order-import.component';
+import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
 
 const gridIcons = {
   MessageSquare,
@@ -137,6 +133,7 @@ const gridIcons = {
     OrderDetailsDialogComponent,
     OrderDetailsContainerComponent,
     OrderCandidatesContainerComponent,
+    OrderImportComponent,
   ],
   imports: [
     CommonModule,
@@ -180,6 +177,8 @@ const gridIcons = {
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
     ExtensionModule,
+    ImportDialogContentModule,
+    ListBoxModule
   ],
   providers: [
     ResizeService,

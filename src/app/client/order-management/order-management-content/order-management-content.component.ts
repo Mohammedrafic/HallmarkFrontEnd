@@ -247,6 +247,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public orderTypes = OrderType;
   public canCreateOrder: boolean;
   public canCloseOrder: boolean;
+  public importDialogEvent: Subject<boolean> = new Subject<boolean>();
 
   private selectedCandidateMeta: { order: number; positionId: number } | null;
   private selectedIndex: number | null;
@@ -1023,6 +1024,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     } else {
       this.router.navigate(['./edit', data.id], { relativeTo: this.route });
     }
+  }
+
+  public openImportDialog(): void {
+    this.importDialogEvent.next(true);
   }
 
   private openReOrderDialog(orderId: number, organizationId: number): void {

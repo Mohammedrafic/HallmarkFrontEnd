@@ -1,7 +1,16 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 
 import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
-import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
+import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { FileInfo } from '@syncfusion/ej2-inputs/src/uploader/uploader';
 import { filter, Subject, takeUntil } from 'rxjs';
@@ -10,13 +19,14 @@ import {
   DELETE_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   IMPORT_CONFIRM_TEXT,
-  IMPORT_CONFIRM_TITLE,
+  IMPORT_CONFIRM_TITLE
 } from '@shared/constants';
-import { FileStatusCode } from "@shared/enums/file.enum";
+import { FileStatusCode } from '@shared/enums/file.enum';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ImportResult } from '@shared/models/import.model';
 import { FileSize, UploaderFileStatus } from '@core/enums';
+import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 
 @Component({
   selector: 'app-import-dialog-content',
@@ -28,13 +38,16 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   @ViewChild('previewupload') private uploadObj: UploaderComponent;
   @ViewChild('fileUploader') private fileUploader: ElementRef;
   @ViewChild('tab') tab: TabComponent;
+  @ViewChild('confirmOrderImport') confirmOrderImport: DialogComponent;
 
   @Output() public downloadTemplateEvent: EventEmitter<void> = new EventEmitter<void>();
   @Output() public downloadErrorsEvent: EventEmitter<any[]> = new EventEmitter<any[]>();
   @Output() public saveImportResult: EventEmitter<any[]> = new EventEmitter<any[]>();
   @Output() public uploadImportFile: EventEmitter<Blob> = new EventEmitter<Blob>();
+  @Output() public tabChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @Input() public dialogEvent: Subject<boolean>;
+  @Input() public isOrderImport: boolean;
   @Input() public title = 'Import';
   @Input() public selectErrorsTab: Subject<void>;
   @Input() public set importResponse(response: any) {
@@ -47,6 +60,9 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   public dropElement: HTMLElement;
   public readonly allowedExtensions: string = '.xlsx';
   public readonly maxFileSize = FileSize.MB_10;
+  public readonly submitImportMenuItems: ItemModel[] = [
+    { id: '0', text: 'Save For Later' },
+  ];
   public selectedFile: FileInfo | null;
   public firstActive = true;
 
@@ -64,7 +80,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
     return this.selectedFile?.statusCode === UploaderFileStatus.ReadyForUpload && !this.activeErrorTab;
   }
 
-  constructor(private confirmService: ConfirmService) {
+  constructor(private confirmService: ConfirmService, private cdr: ChangeDetectorRef) {
     super();
   }
 
@@ -107,6 +123,10 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
     }
   }
 
+  public cancelImportOrder(): void {
+    this.confirmOrderImport.hide();
+  }
+
   public downloadTemplate(): void {
     this.downloadTemplateEvent.next();
   }
@@ -122,6 +142,8 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   }
 
   public onTabCreated(): void {
+    this.tabChange.emit(this.activeErrorTab);
+
     this.tab.selected.pipe(takeUntil(this.destroy$)).subscribe((event: SelectEventArgs) => {
       this.firstActive = event.selectedIndex === 0;
     });
@@ -133,6 +155,19 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
     } else {
       this.uploadFile();
     }
+  }
+
+  public onSplitButtonSelect(args: MenuEventArgs): void {
+    if (args.item.id === '0') {
+     this.submitOrderImport(true);
+    }
+  }
+
+  public submitOrderImport(isSaveForLater = false): void {
+    this.saveImportResult.next(
+      this.importResult?.succesfullRecords.map((record) => ({...record, isSubmit: !isSaveForLater})) || []
+    );
+    this.confirmOrderImport.hide();
   }
 
   private setDropElement(): void {
@@ -155,6 +190,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
     this.importResult = null;
     this.selectedFile = null;
     this.uploadObj.clearAll();
+    this.cdr.markForCheck();
   }
 
   private uploadFile(): void {
@@ -165,19 +201,30 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   }
 
   private saveImportedItems(): void {
-    if (this.importResult?.errorRecords.length) {
-      this.confirmService
-        .confirm(IMPORT_CONFIRM_TEXT, {
-          title: IMPORT_CONFIRM_TITLE,
-          okButtonLabel: 'Import',
-          okButtonClass: '',
-        })
-        .pipe(filter((confirm) => confirm))
-        .subscribe(() => {
-          this.saveImportResult.next(this.importResult?.succesfullRecords || []);
-        });
+    if (this.isOrderImport) {
+      this.saveImportedOrder();
     } else {
-      this.saveImportResult.next(this.importResult?.succesfullRecords || []);
+      if (this.importResult?.errorRecords.length) {
+        this.confirmService
+          .confirm(IMPORT_CONFIRM_TEXT, {
+            title: IMPORT_CONFIRM_TITLE,
+            okButtonLabel: 'Import',
+            okButtonClass: '',
+          })
+          .pipe(filter((confirm) => confirm))
+          .subscribe(() => {
+            this.saveImportResult.next(this.importResult?.succesfullRecords || []);
+          });
+      } else {
+        this.saveImportResult.next(this.importResult?.succesfullRecords || []);
+      }
+    }
+
+  }
+
+  private saveImportedOrder(): void {
+    if (this.importResult?.errorRecords.length) {
+      this.confirmOrderImport.show();
     }
   }
 

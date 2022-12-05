@@ -27,6 +27,10 @@ import {
   GetOrderById,
   GetOrderByIdSucceeded,
   GetOrderFilterDataSources,
+  GetOrderImportErrors,
+  GetOrderImportErrorsSucceeded,
+  GetOrderImportTemplate,
+  GetOrderImportTemplateSucceeded,
   GetOrders,
   GetOrganisationCandidateJob,
   GetOrganizationExtensions,
@@ -43,6 +47,8 @@ import {
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   SaveOrder,
+  SaveOrderImportResult,
+  SaveOrderImportResultSucceeded,
   SaveOrderSucceeded,
   SelectNavigationTab,
   SetIsDirtyOrderForm,
@@ -51,6 +57,8 @@ import {
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
+  UploadOrderImportFile,
+  UploadOrderImportFileSucceeded
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -62,7 +70,7 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementPage,
-  SuggestedDetails,
+  SuggestedDetails
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -78,7 +86,7 @@ import {
   ORDER_WITHOUT_CREDENTIALS,
   RECORD_ADDED,
   RECORD_MODIFIED,
-  updateCandidateJobMessage,
+  updateCandidateJobMessage
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -98,6 +106,9 @@ import { createUniqHashObj } from '@core/helpers/functions.helper';
 import { DateTimeHelper } from '@core/helpers';
 import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { CandidateImportResult } from '@shared/models/candidate-profile-import.model';
+import { OrderImportService } from '@client/order-management/order-import/order-import.service';
+import { OrderImportResult } from '@shared/models/imported-order.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -323,7 +334,8 @@ export class OrderManagementContentState {
     private projectsService: ProjectsService,
     private departmentService: DepartmentsService,
     private rejectReasonService: RejectReasonService,
-    private extensionSidebarService: ExtensionSidebarService
+    private extensionSidebarService: ExtensionSidebarService,
+    private orderImportService: OrderImportService
   ) {}
 
   @Action(GetOrders, { cancelUncompleted: true })
@@ -864,5 +876,63 @@ export class OrderManagementContentState {
     { isDirtyQuickOrderForm }: SetIsDirtyQuickOrderForm
   ): void {
     patchState({ isDirtyQuickOrderForm });
+  }
+
+  @Action(GetOrderImportTemplate)
+  GetOrderImportTemplate({ dispatch }: StateContext<OrderManagementContentStateModel>): Observable<any> {
+    return this.orderImportService.getImportOrderTemplate().pipe(
+      tap((payload) => {
+        dispatch(new GetOrderImportTemplateSucceeded(payload));
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the template'))))
+    );
+  }
+
+  @Action(GetOrderImportErrors)
+  GetOrderImportErrors(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload }: GetOrderImportErrors
+  ): Observable<any> {
+    return this.orderImportService.getImportOrderErrors(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetOrderImportErrorsSucceeded(payload));
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(UploadOrderImportFile)
+  UploadOrderImportFile(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload }: UploadOrderImportFile
+  ): Observable<OrderImportResult | Observable<void>> {
+    return this.orderImportService.uploadImportOrderFile(payload).pipe(
+      tap((payload) => {
+        dispatch(new UploadOrderImportFileSucceeded(payload));
+      }),
+      catchError((error: any) =>
+        of(
+          dispatch(
+            new ShowToast(
+              MessageTypes.Error,
+              error && error.error ? getAllErrors(error.error) : 'File was not uploaded'
+            )
+          )
+        )
+      )
+    );
+  }
+
+  @Action(SaveOrderImportResult)
+  SaveOrderImportResult(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload }: SaveOrderImportResult
+  ): Observable<CandidateImportResult | Observable<void>> {
+    return this.orderImportService.saveImportOrderResult(payload).pipe(
+      tap((payload) => {
+        dispatch(new SaveOrderImportResultSucceeded(payload));
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Orders were not imported'))))
+    );
   }
 }

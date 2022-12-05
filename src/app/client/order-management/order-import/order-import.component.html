@@ -1,0 +1,64 @@
+<app-import-dialog-content
+  [importResponse]="importResponse"
+  [dialogEvent]="dialogEvent"
+  [selectErrorsTab]="selectErrorsTab"
+  (downloadErrorsEvent)="downloadErrors($event)"
+  (downloadTemplateEvent)="downloadTemplate()"
+  (saveImportResult)="saveImportResult($event)"
+  (uploadImportFile)="uploadImportFile($event)"
+  (tabChange)="tabChange($event)"
+  [title]="titleImport"
+  [isOrderImport]="true"
+>
+  <section
+    successful
+    class="records"
+    *ngIf="successGridList"
+  >
+    <ejs-listbox
+      id="success-record-list"
+      class="records-list"
+      *ngIf="successListBox"
+      [dataSource]="successListBox"
+      [fields]="recordsListField"
+      [selectionSettings]="selectionSettings"
+      (created)="selectFirstItemFactory()"
+      (change)="selectItem($event)">
+    </ejs-listbox>
+    <div class="records-grids">
+      <app-import-grid
+        *ngFor="let grid of successGridList[selectedIndex]?.grids"
+        [gridName]="grid?.gridName"
+        class="records-grid"
+        [importedItems]="grid.rowData"
+        [columnDefs]="grid.columnDefs"
+      ></app-import-grid>
+    </div>
+  </section>
+
+  <section
+    errors
+    class="records"
+    *ngIf="errorGridList"
+  >
+    <ejs-listbox
+      id="error-record-list"
+      class="records-list"
+      *ngIf="errorListBox"
+      [dataSource]="errorListBox"
+      [fields]="recordsListField"
+      [selectionSettings]="selectionSettings"
+      (created)="selectFirstItemFactory()"
+      (change)="selectItem($event)">
+    </ejs-listbox>
+    <div class="records-grids">
+      <app-import-grid
+        *ngFor="let grid of errorGridList[selectedIndex]?.grids"
+        [gridName]="grid?.gridName"
+        class="records-grid"
+        [importedItems]="grid.rowData"
+        [columnDefs]="grid.columnDefs"
+      ></app-import-grid>
+    </div>
+  </section>
+</app-import-dialog-content>
