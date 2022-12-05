@@ -417,7 +417,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private proceedWithSaving(order: CreateOrderDto, documents: Blob[]): void {
     let message = null;
-    const prevDistributions = this.getJobDistributionOptions(this.order.jobDistributions);
+    const prevDistributions = this.order ? this.getJobDistributionOptions(this.order.jobDistributions) : [];
     const selectedDistributions = this.getJobDistributionOptions(order.jobDistributions);
     if(
       prevDistributions.includes(OrderJobDistribution.TierLogic) &&
