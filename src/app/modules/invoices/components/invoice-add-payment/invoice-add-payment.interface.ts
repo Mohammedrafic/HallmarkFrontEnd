@@ -22,7 +22,7 @@ export interface CheckForm {
 }
 
 export interface PaymentsTableData {
-  id: number;
+  id: number | null;
   invoiceNumber: string;
   amount: number;
   payment: number;
