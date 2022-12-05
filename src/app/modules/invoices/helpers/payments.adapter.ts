@@ -11,7 +11,6 @@ export class PaymentsAdapter {
     invoiceData: InvoicePaymentData[]): PaymentCreationDto {
       const dto: PaymentCreationDto = {
         check: {
-          
           checkNumber: check.checkNumber,
           initialAmount: check.initialAmount,
           checkDate: DateTimeHelper.toUtcFormat(DateTimeHelper.setInitHours(check.checkDate.toString())),
