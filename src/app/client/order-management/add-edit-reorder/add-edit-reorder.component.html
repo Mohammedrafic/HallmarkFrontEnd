@@ -62,9 +62,10 @@
       [formGroupInstance]="reorderForm"
       [required]="true"
       [htmlAttributes]="numericInputAttributes"
+      [decimals]="2"
       class="control"
       id="billRate"
-      format="c"
+      format="###.00"
       controlName="billRate"
       label="Bill Rate"
     ></app-numeric-textbox>

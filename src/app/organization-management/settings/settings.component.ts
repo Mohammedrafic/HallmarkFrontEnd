@@ -42,11 +42,12 @@ import { PermissionService } from 'src/app/security/services/permission.service'
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { Days } from '@shared/enums/days';
 import { groupInvoicesOptions } from 'src/app/modules/invoices/constants';
-import { AssociatedLink, SettingsFilterCols, tierSettingsKey } from './settings.constant';
+import { AssociatedLink, DisabledSettingsByDefault, SettingsAppliedToPermissions, SettingsFilterCols, tierSettingsKey } from './settings.constant';
 import { SettingsDataAdapter } from './helpers/settings-data.adapter';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { SideMenuService } from '@shared/components/side-menu/services';
 import { ORG_SETTINGS } from '@organization-management/organization-management-menu.config';
+import { OrganizationSettingKeys } from '@shared/constants';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -132,12 +133,8 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public organizationId: number;
   public maxFieldLength = 100;
   public hasPermissions: Record<string, boolean> = {};
-  public settingKeys: string[] = [
-    'AllowDocumentUpload',
-    'AllowAgencyToBidOnCandidateBillRateBeyondOrderBillRate',
-    'AutoLockOrder',
-    'IsReOrder',
-  ];
+  public settingsAppliedToPermissions: string[] = SettingsAppliedToPermissions;
+  public disabledSettings = DisabledSettingsByDefault;
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -156,6 +153,12 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     text: 'name',
     value: 'id',
   };
+
+  private organizationSettingKey: OrganizationSettingKeys;
+
+  set setOrganizationSettingKey(key: string) {
+    this.organizationSettingKey = Number(OrganizationSettingKeys[key as keyof object]);
+  }
 
   constructor(
     protected override store: Store,
@@ -232,6 +235,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
   public onOverrideButtonClick(data: any): void {
     this.handleShowToggleMessage(data.settingKey);
     this.isFormShown = true;
+    this.setOrganizationSettingKey = data.settingKey;
     this.formControlType = data.controlType;
     this.disableDepForInvoiceGeneration();
     this.regionFormGroup.reset();
@@ -251,6 +255,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     this.isFormShown = true;
     this.addActiveCssClass(event);
     this.isEdit = true;
+    this.setOrganizationSettingKey = parentRecord.settingKey;
     this.formControlType = parentRecord.controlType;
     this.disableDepForInvoiceGeneration();
     this.setFormValidation(parentRecord);
@@ -718,7 +723,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
       .getPermissions()
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(({ canManageOrganizationConfigurations }) => {
-        this.settingKeys.forEach((key) => (this.hasPermissions[key] = canManageOrganizationConfigurations));
+        this.settingsAppliedToPermissions.forEach((key) => (this.hasPermissions[key] = canManageOrganizationConfigurations));
       });
   }
 
@@ -810,7 +815,7 @@ export class SettingsComponent extends AbstractPermissionGrid implements OnInit,
     }
 
   private disableDepForInvoiceGeneration(): void {
-    if (this.formControlType === this.organizationSettingControlType.InvoiceAutoGeneration) {
+    if (this.organizationSettingKey === OrganizationSettingKeys.InvoiceAutoGeneration || this.organizationSettingKey === OrganizationSettingKeys.PayHigherBillRates) {
       this.departmentFormGroup.get('departmentId')?.disable();
     } else {
       this.departmentFormGroup.get('departmentId')?.enable();
