@@ -117,7 +117,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
         PaymentMessages.partialyCovered(this.paymentService.findPartialyCoveredIds(this.paymentsForm)),
         {
           title: 'Check Payment Amount',
-          okButtonLabel: 'Leave',
+          okButtonLabel: 'Yes',
           okButtonClass: 'delete-button',
         })
         .pipe(
@@ -195,7 +195,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
         PaymentMessages.unsavedData,
         {
           title: 'Unsaved Progress',
-          okButtonLabel: 'Yes',
+          okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
         .pipe(
