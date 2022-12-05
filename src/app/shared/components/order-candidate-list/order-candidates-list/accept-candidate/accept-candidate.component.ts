@@ -129,7 +129,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get showAccepteAction(): boolean {
-    return this.candidate?.statusName !== 'Accepted' && !this.isReadOnly;
+    return this.candidate?.candidateStatus !== ApplicantStatusEnum.Accepted && this.candidate?.candidateStatus !== ApplicantStatusEnum.Offboard && !this.isReadOnly;
   }
 
   get isAgencyAndOnboard(): boolean {
@@ -137,7 +137,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get showRejectButton(): boolean {
-    return (!this.isRejected && !this.showWithdrawAction && !this.isAgencyAndOnboard) || !this.isReadOnly;
+    return (!this.isRejected && !this.showWithdrawAction && !this.isAgencyAndOnboard && this.candidate?.candidateStatus !== ApplicantStatusEnum.Offboard) || !this.isReadOnly;
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -381,6 +381,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       ApplicantStatusEnum.Applied,
       ApplicantStatusEnum.Shortlisted,
       ApplicantStatusEnum.OnBoarded,
+      ApplicantStatusEnum.Offboard,
       ApplicantStatusEnum.PreOfferCustom,
     ];
     if (readOnlyStatuses.includes(this.candidateStatus)) {

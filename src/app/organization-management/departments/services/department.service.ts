@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { DateTimeHelper } from '@core/helpers';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { Department, DepartmentFilter } from '@shared/models/department.model';
 import { FilterColumnsModel } from '@shared/models/filter.model';
@@ -63,8 +64,8 @@ export class DepartmentService {
       facilityContact: department.facilityContact,
       facilityEmail: department.facilityEmail,
       facilityPhoneNo: department.facilityPhoneNo,
-      inactiveDate: department.inactiveDate,
-      reactivateDate: department.reactivateDate,
+      inactiveDate: department.inactiveDate ? DateTimeHelper.convertDateToUtc(department.inactiveDate) : null,
+      reactivateDate: department.reactivateDate ? DateTimeHelper.convertDateToUtc(department.reactivateDate) : null,
       ...(isIRPFlagEnabled && {
         includeInIRP: !!department.includeInIRP,
         unitDescription: department.unitDescription,

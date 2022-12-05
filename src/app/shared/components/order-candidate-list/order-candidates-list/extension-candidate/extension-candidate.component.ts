@@ -142,7 +142,7 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   get canAccept(): boolean {
-    return this.candidateJob && this.isAgency && !this.isOnBoard;
+    return this.candidateJob && this.isAgency && !this.isOnBoard && this.candidateJob?.applicantStatus?.applicantStatus !== this.candidatStatus.Offboard;
   }
 
   get actualStartDateValue(): Date {
