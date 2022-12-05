@@ -39,3 +39,8 @@ export interface CredentialListConfig {
 export interface CredentialsListState {
   credentialDataSources: CredentialFilterDataSources | null
 }
+
+export interface SelectedSystemsFlag {
+  isIRP: boolean;
+  isVMS: boolean;
+}

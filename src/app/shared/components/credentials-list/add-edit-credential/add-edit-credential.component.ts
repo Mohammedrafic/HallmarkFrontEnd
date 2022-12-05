@@ -19,7 +19,7 @@ import {
   DialogHeight,
   ErrorMessageForSystem,
   IrpCommentField,
-  OptionFields
+  OptionFields,
 } from '@shared/components/credentials-list/constants';
 import { CredentialsDialogConfig, DialogTitle } from '@shared/components/credentials-list/helpers';
 import { FieldType } from '@core/enums';
@@ -33,7 +33,11 @@ import { SaveCredential } from '@organization-management/store/organization-mana
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { PermissionService } from '../../../../security/services/permission.service';
 import { Credential } from '@shared/models/credential.model';
-import { CredentialInputConfig, CredentialListConfig } from '@shared/components/credentials-list/interfaces';
+import {
+  CredentialInputConfig,
+  CredentialListConfig,
+  SelectedSystemsFlag,
+} from '@shared/components/credentials-list/interfaces';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 
@@ -41,14 +45,14 @@ import { MessageTypes } from '@shared/enums/message-types';
   selector: 'app-add-edit-credential',
   templateUrl: './add-edit-credential.component.html',
   styleUrls: ['./add-edit-credential.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddEditCredentialComponent extends Destroyable implements OnInit {
   @Input() disableButton: boolean;
-  @Input() isCredentialSettings: boolean = false;
+  @Input() isCredentialSettings = false;
 
-  @Input() set isIRPFlag(flag: boolean) {
-    this.isIRPFlagEnabled = flag;
+  @Input() set systemFlags(systems: SelectedSystemsFlag) {
+    this.selectedSystem = systems;
     this.initCredentialForm();
     this.initDialogConfig();
     this.changeDetection.markForCheck();
@@ -59,7 +63,7 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
       this.selectedCredential = credential;
       this.isEdit = true;
       this.setDialogTitle();
-      this.disableFieldOnEdit(!!credential.isMasterCredential)
+      this.disableFieldOnEdit(!!credential.isMasterCredential);
       this.credentialForm.patchValue(credential);
       this.changeDetection.markForCheck();
     }
@@ -72,9 +76,9 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   public readonly optionFields: FieldSettingsModel = OptionFields;
   public readonly FieldTypes = FieldType;
   public title: string;
-  public isEdit: boolean = false;
+  public isEdit = false;
   public dialogConfig: CredentialListConfig[];
-  public isIRPFlagEnabled: boolean = false;
+  public selectedSystem: SelectedSystemsFlag;
 
   private selectedCredential: Credential;
 
@@ -114,7 +118,7 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
+          okButtonClass: 'delete-button',
         }).pipe(
           filter(Boolean),
           takeUntil(this.componentDestroy())
@@ -130,11 +134,11 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   }
 
   public trackByTitle(index: number, config: CredentialListConfig): string {
-    return index + config.title
+    return config.title;
   }
 
   public trackByIndex(index: number, config: CredentialInputConfig): string {
-    return index + config.field;
+    return config.field;
   }
 
   private watchForCredentialTypes(): void {
@@ -152,12 +156,12 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   }
 
   private initDialogConfig(): void {
-    this.dialogConfig = CredentialsDialogConfig(this.isCredentialSettings, this.isIRPFlagEnabled);
+    this.dialogConfig = CredentialsDialogConfig(this.selectedSystem, this.isCredentialSettings);
   }
 
   private initCredentialForm(): void {
     this.credentialForm = this.credentialListService.createCredentialForm(
-      this.isIRPFlagEnabled,
+      this.selectedSystem,
       this.isCredentialSettings
     );
   }
@@ -191,7 +195,7 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
       });
 
       this.setRemoveFormControl(value);
-    })
+    });
   }
 
   private getConfigField(config: CredentialListConfig, field: string): CredentialInputConfig {
@@ -218,9 +222,9 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   }
 
   private isSystemSelected(): boolean {
-    if(this.isIRPFlagEnabled) {
+    if(this.selectedSystem.isIRP && this.selectedSystem.isVMS) {
       return this.credentialForm.get('includeInIRP')?.value
-        || this.credentialForm.get('includeInVMS')?.value
+        || this.credentialForm.get('includeInVMS')?.value;
     } else {
       return true;
     }

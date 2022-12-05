@@ -33,7 +33,7 @@ import {
   ExportIRPColumns,
   FilterColumnsIncludeIRP,
   FiltersColumns,
-  OptionFields,
+  OptionFields, SelectedSystems,
   SortSettings,
 } from '@shared/components/credentials-list/constants';
 import { CredentialFiltersService } from '@shared/components/credentials-list/services';
@@ -43,6 +43,7 @@ import { FormGroup } from '@angular/forms';
 import { FilterColumnsModel } from '@shared/models/filter.model';
 import { CredentialListState } from '@shared/components/credentials-list/store/credential-list.state';
 import { CredentialList } from '@shared/components/credentials-list/store/credential-list.action';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 
 @Component({
   selector: 'app-credentials-list',
@@ -58,7 +59,7 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
   public columnsToExport: ExportColumn[];
   public fileName: string;
   public defaultFileName: string;
-  public isIRPFlagEnabled = false;
+  public selectedSystem: SelectedSystemsFlag = SelectedSystems;
   public isCredentialSettings = false;
   public filterColumns: FilterColumnsModel;
   public selectedCredential: Credential;
@@ -138,7 +139,7 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
       orderBy: this.orderBy,
     };
 
-    const credentialFilters = this.isIRPFlagEnabled && this.isCredentialSettings ?
+    const credentialFilters = this.isCredentialSettings ?
       new GetCredentialForSettings(this.credentialFiltersService.filtersState) :
       new GetCredential(this.credentialFiltersService.filtersState);
 
@@ -254,7 +255,10 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
         filter(Boolean),
         takeUntil(this.unsubscribe$)
       ).subscribe((organization: Organization) => {
-      this.isIRPFlagEnabled = !!organization.preferences.isIRPEnabled;
+      this.selectedSystem = {
+        isIRP: !!organization.preferences.isIRPEnabled,
+        isVMS: !!organization.preferences.isVMCEnabled,
+      };
 
       if(this.grid) {
         this.showHideGridColumns();
@@ -267,14 +271,14 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
   }
 
   private showHideGridColumns(): void {
-    this.grid.getColumnByField('system').visible = this.isIRPFlagEnabled;
-    this.grid.getColumnByField('irpComment').visible = this.isIRPFlagEnabled;
+    this.grid.getColumnByField('system').visible = this.selectedSystem.isIRP && this.selectedSystem.isVMS;
+    this.grid.getColumnByField('irpComment').visible = this.selectedSystem.isIRP && this.selectedSystem.isVMS;
     this.grid.refreshColumns();
   }
 
   private initFilterColumns(): void {
     this.filterColumns = FiltersColumns;
-    if(this.isIRPFlagEnabled && this.isCredentialSettings) {
+    if(this.selectedSystem.isIRP && this.selectedSystem.isVMS && this.isCredentialSettings) {
       this.filterColumns = {
         ...this.filterColumns,
         ...FilterColumnsIncludeIRP,
