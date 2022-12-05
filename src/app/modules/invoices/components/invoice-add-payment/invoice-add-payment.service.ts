@@ -107,6 +107,10 @@ export class InvoiceAddPaymentService {
     .filter((key) => paymentForms[key].get('balance')?.value > 0);
   }
 
+  checkPaymentsFormTouch(paymentForms: Record<string, CustomFormGroup<PaymentForm>>): boolean {
+    return Object.keys(paymentForms).some((key) => paymentForms[key].touched);
+  }
+
   private createPaymentGroup(
     initAmount: number | null = null,
     initBalance: number | null = null): CustomFormGroup<PaymentForm> {

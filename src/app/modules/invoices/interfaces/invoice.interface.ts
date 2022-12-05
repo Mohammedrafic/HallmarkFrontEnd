@@ -1,4 +1,4 @@
-import { ColDef } from '@ag-grid-community/core';
+import { ColDef, RowNode } from '@ag-grid-community/core';
 import { AggregateType } from '@syncfusion/ej2-angular-grids';
 import { ItemModel, SelectEventArgs, TabItemModel } from '@syncfusion/ej2-angular-navigations';
 
@@ -290,4 +290,9 @@ export interface TypedColDef<T> extends ColDef {
 
 export interface ExportOption extends ItemModel {
   ext: string | null;
+}
+
+export interface InvoiceGridSelections {
+  selectedInvoiceIds: number[];
+  rowNodes: RowNode[];
 }
