@@ -10,6 +10,7 @@ import {
   GetCredentialForSettings,
   GetCredentialTypes,
   RemoveCredential,
+  RemoveCredentialSuccess,
   SaveCredential,
   SaveCredentialSucceeded,
 } from '@organization-management/store/organization-management.actions';
@@ -205,7 +206,9 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
         filter(Boolean),
         takeUntil(this.unsubscribe$)
       ).subscribe(() => {
-          this.store.dispatch(new RemoveCredential(credential, this.credentialFiltersService.filtersState));
+          this.store.dispatch(
+            new RemoveCredential(credential)
+          );
           this.removeActiveCssClass();
       });
   }
@@ -344,6 +347,13 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
     this.actions$.pipe(
       ofActionSuccessful(SaveAssignedCredentialValue),
       takeUntil(this.unsubscribe$),
+    ).subscribe(() => {
+      this.getCredentials();
+    });
+
+    this.actions$.pipe(
+      ofActionSuccessful(RemoveCredentialSuccess),
+      takeUntil(this.unsubscribe$)
     ).subscribe(() => {
       this.getCredentials();
     });
