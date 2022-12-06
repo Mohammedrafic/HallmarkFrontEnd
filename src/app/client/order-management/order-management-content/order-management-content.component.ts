@@ -747,15 +747,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.selectedDataRow = data;
         const options = this.getDialogNextPreviousOption(data);
         this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
-        this.store.dispatch(
-          new GetAgencyOrderCandidatesList(
-            data.id,
-            data.organizationId,
-            GRID_CONFIG.initialPage,
-            GRID_CONFIG.initialRowsPerPage,
-            this.orderManagementService.excludeDeployed
-          )
-        );
+        this.dispatchAgencyOrderCandidatesList(data.id, data.organizationId);
         this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
         this.openChildDialog.next(false);
         this.orderPositionSelected$.next({ state: false });
@@ -888,15 +880,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.gridWithChildRow?.clearRowSelection();
     this.selectedIndex = null;
     this.store.dispatch(new GetOrderById(reOrder.id, order.organizationId));
-    this.store.dispatch(
-      new GetAgencyOrderCandidatesList(
-        reOrder.id,
-        reOrder.organizationId,
-        GRID_CONFIG.initialPage,
-        GRID_CONFIG.initialRowsPerPage,
-        this.orderManagementService.excludeDeployed
-      )
-    );
+    this.dispatchAgencyOrderCandidatesList(reOrder.id, reOrder.organizationId);
     this.selectedDataRow = order as any;
     this.openDetails.next(true);
   }
@@ -933,15 +917,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       order: order.id,
       positionId: candidate.positionId,
     };
-    this.store.dispatch(
-      new GetAgencyOrderCandidatesList(
-        order.id,
-        order.organizationId,
-        GRID_CONFIG.initialPage,
-        GRID_CONFIG.initialRowsPerPage,
-        this.orderManagementService.excludeDeployed
-      )
-    );
+    this.dispatchAgencyOrderCandidatesList(order.id, order.organizationId);
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
     this.selectedDataRow = order as any;
@@ -1040,15 +1016,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.actions$
       .pipe(ofActionSuccessful(ReloadOrganisationOrderCandidatesLists), takeUntil(this.unsubscribe$))
       .subscribe(() => {
-        this.store.dispatch(
-          new GetAgencyOrderCandidatesList(
-            this.selectedOrder.id,
-            this.selectedOrder.organizationId as number,
-            GRID_CONFIG.initialPage,
-            GRID_CONFIG.initialRowsPerPage,
-            this.orderManagementService.excludeDeployed
-          )
-        );
+        this.dispatchAgencyOrderCandidatesList(this.selectedOrder.id, this.selectedOrder.organizationId as number);
         this.getOrders();
         this.store.dispatch(
           new GetOrderById(
@@ -1598,15 +1566,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   updateOrderDetails(order: Order | OrderManagement): void {
     this.store.dispatch(new GetOrderById(order.id, order.organizationId as number));
-    this.store.dispatch(
-      new GetAgencyOrderCandidatesList(
-        order.id,
-        order.organizationId as number,
-        GRID_CONFIG.initialPage,
-        GRID_CONFIG.initialRowsPerPage,
-        this.orderManagementService.excludeDeployed
-      )
-    );
+    this.dispatchAgencyOrderCandidatesList(order.id, order.organizationId as number);
     this.getOrders();
   }
 
@@ -1622,6 +1582,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         orderStatus: res.orderStatus,
         candidateStatus: res.applicantStatus.applicantStatus,
       };
+
+      this.dispatchAgencyOrderCandidatesList(this.selectedCandidate.orderId, this.selectedCandidate.organizationId);
     });
   }
 
@@ -1703,5 +1665,17 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         actualStartDate: data.actualStartDate,
         actualEndDate: data.actualEndDate,
       }})
+  }
+
+  private dispatchAgencyOrderCandidatesList(orderId: number, organizationId: number): void {
+    this.store.dispatch(
+      new GetAgencyOrderCandidatesList(
+        orderId,
+        organizationId,
+        GRID_CONFIG.initialPage,
+        GRID_CONFIG.initialRowsPerPage,
+        this.orderManagementService.excludeDeployed
+      )
+    );
   }
 }
