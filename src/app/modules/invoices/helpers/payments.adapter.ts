@@ -23,11 +23,11 @@ export class PaymentsAdapter {
 
       Object.keys(payments).forEach((invoiceFormatedId) => {
         const formValue = payments[invoiceFormatedId].value;
-        const { agencySuffix, checkId, id, invoiceId } = invoiceData
+        const { agencySuffix, checkId, invoiceId } = invoiceData
         .find((item) => item.invoiceNumber === invoiceFormatedId) as InvoicePaymentData;
 
         dto.payments.push({
-          id: id,
+          id: payments[invoiceFormatedId].get('id')?.value,
           invoiceId: invoiceId,
           checkId: checkId,
           agencySuffix: agencySuffix,

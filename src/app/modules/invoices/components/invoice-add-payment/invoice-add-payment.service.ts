@@ -66,6 +66,7 @@ export class InvoiceAddPaymentService {
       const initialAmount = (payment.amountToPay as number) + payment.payment;
       const form = this.createPaymentGroup(initialAmount, payment.amountToPay);
       paymentsForm[payment.formattedInvoiceId as string] = form;
+      
       form.get('amount')?.patchValue(payment.payment);
       
       mergeData.push({
@@ -76,6 +77,9 @@ export class InvoiceAddPaymentService {
         balance: (payment.amountToPay as number),
         group: form,
       });
+
+      paymentsForm[payment.formattedInvoiceId as string].get('id')?.patchValue(payment.id,
+        { emitEvent: false, onlySelf: true });
 
       tableData.filter((data) => !mergeData.find((record) => data.invoiceNumber === record.invoiceNumber))
       .forEach((record) => {
@@ -115,8 +119,9 @@ export class InvoiceAddPaymentService {
     initAmount: number | null = null,
     initBalance: number | null = null): CustomFormGroup<PaymentForm> {
     return this.fb.group({
-      amount: [initAmount, [Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER)]],
-      balance: [{ value: initBalance, disabled: true }, [Validators.min(1)]],
+      id: [{ value: null, disabled: true }],
+      amount: [initAmount, [Validators.required, Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER)]],
+      balance: [{ value: initBalance, disabled: true }, [ Validators.min(0)]],
     }) as CustomFormGroup<PaymentForm>;
   }
 }
