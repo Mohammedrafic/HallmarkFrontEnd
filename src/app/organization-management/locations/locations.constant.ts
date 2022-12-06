@@ -218,7 +218,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
         },
         {
           field: 'reactivateDate',
-          title: 'Reactivate Date',
+          title: 'Reactivation Date',
           required: false,
           gridAreaName: 'reactivateArea',
           fieldType: FieldType.Date,
@@ -401,7 +401,7 @@ export const LocationsDialogWithIrpConfig: LocationDialogConfig = {
         },
         {
           field: 'reactivateDate',
-          title: 'Reactivate Date',
+          title: 'Reactivation Date',
           required: false,
           gridAreaName: 'reactivateArea',
           fieldType: FieldType.Date,
