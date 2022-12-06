@@ -4,22 +4,24 @@ import { TypedValueGetterParams } from '@core/interface';
 import { GridActionsCellComponent, GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import { TitleValueCellRendererParams } from '@shared/components/grid/models';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
-import { AllInvoicesActionCellComponent } from '../../components/all-invoices-action-cell/all-invoices-action-cell.component';
 import {
-  ToggleRowExpansionHeaderCellComponent
+  AllInvoicesActionCellComponent } from '../../components/all-invoices-action-cell/all-invoices-action-cell.component';
+import {
+  ToggleRowExpansionHeaderCellComponent,
 } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
 import {
-  InvoiceRecordsTableRowDetailsComponent
+  InvoiceRecordsTableRowDetailsComponent,
 } from '../../components/invoice-records-table-row-details/invoice-records-table-row-details.component';
 import {
   CurrencyFormatter, DepartmentNameGetter, invoicesRowDetailsOffsetColDef,
-  monthDayYearDateFormatter, numberValueFormatter, RateReasonValueGetter, titleValueCellRendererSelector, weekPeriodValueGetter
+  monthDayYearDateFormatter, numberValueFormatter, RateReasonValueGetter,
+  titleValueCellRendererSelector, weekPeriodValueGetter,
 } from '../../constants';
 import { PendingInvoiceStatus } from '../../enums/invoice-status.enum';
 import { ManualInvoice, TypedColDef } from '../../interfaces';
 import {
   PendingApprovalInvoice,
-  PendingApprovalInvoiceRecord
+  PendingApprovalInvoiceRecord,
 } from '../../interfaces/pending-approval-invoice.interface';
 import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
 import { InvoicesContainerGridHelper } from './invoices-container-grid.helper';
@@ -69,7 +71,7 @@ export class PendingApprovalGridHelper {
                 ].includes(status) || !actionEnabled,
               },
             ],
-          } as GridActionsCellConfig
+          } as GridActionsCellConfig;
         },
         sortable: false,
         suppressMenu: true,
@@ -99,7 +101,7 @@ export class PendingApprovalGridHelper {
         minWidth: 280,
         headerName: 'Amount',
         cellClass: 'font-weight-bold',
-        valueFormatter: numberValueFormatter,
+        valueFormatter: CurrencyFormatter,
         ...commonColumn,
       },
       {
@@ -162,7 +164,7 @@ export class PendingApprovalGridHelper {
         minWidth: 280,
         headerName: 'Amount',
         cellClass: 'font-weight-bold',
-        valueFormatter: numberValueFormatter,
+        valueFormatter: CurrencyFormatter,
         ...commonColumn,
       },
       {
@@ -234,18 +236,19 @@ export class PendingApprovalGridHelper {
                 valueGetter: ({
                                 data: {
                                   candidateFirstName,
-                                  candidateLastName
-                                }
-                              }: TypedValueGetterParams<PendingApprovalInvoiceRecord>) => `${candidateLastName}, ${candidateFirstName}`,
+                                  candidateLastName,
+                                },
+                              }: TypedValueGetterParams<PendingApprovalInvoiceRecord>) => 
+                              `${candidateLastName}, ${candidateFirstName}`,
                 cellRendererSelector: titleValueCellRendererSelector,
                 cellRendererParams: (params: ICellRendererParams): TitleValueCellRendererParams => {
                   return {
                     ...params,
                     titleValueParams: {
-                      valueClass: 'font-weight-bold color-primary-active-blue-10'
-                    }
-                  }
-                }
+                      valueClass: 'font-weight-bold color-primary-active-blue-10',
+                    },
+                  };
+                },
               },
               {
                 ...weekPeriod,
@@ -313,15 +316,15 @@ export class PendingApprovalGridHelper {
                 field: 'agencyName',
                 headerName: 'Agency Name',
                 cellRendererSelector: titleValueCellRendererSelector,
-              }
+              },
             ] as TypedColDef<PendingApprovalInvoiceRecord>[],
           },
           getDetailRowData: (params: GetDetailRowDataParams) => params.successCallback(
             (params.data as PendingApprovalInvoice).invoiceRecords,
           ),
         };
-      }
-    }
+      },
+    };
   }
 
   public static getOrganizationAllColDefs(
@@ -370,7 +373,7 @@ export class PendingApprovalGridHelper {
         minWidth: 280,
         headerName: 'Amount',
         cellClass: 'font-weight-bold',
-        valueFormatter: numberValueFormatter,
+        valueFormatter: CurrencyFormatter,
         ...commonColumn,
       },
       {

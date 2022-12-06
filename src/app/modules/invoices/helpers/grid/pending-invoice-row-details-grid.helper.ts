@@ -4,22 +4,23 @@ import {
   ICellRendererParams,
   IDetailCellRendererParams,
   RowHeightParams,
-  ValueFormatterParams
+  ValueFormatterParams,
 } from '@ag-grid-community/core';
 import { formatNumber } from '@angular/common';
 import {
-  TitleValueCellRendererComponent
+  TitleValueCellRendererComponent,
 } from '@shared/components/grid/components/title-value-cell-renderer/title-value-cell-renderer.component';
 
 import { TypedValueGetterParams } from '@core/interface';
 import { AttachmentsListComponent, AttachmentsListParams } from '@shared/components/attachments';
 import { GridValuesHelper } from '../../../timesheets/helpers';
 import {
-  InvoiceRecordsTableRowDetailsComponent
+  InvoiceRecordsTableRowDetailsComponent,
 } from '../../components/invoice-records-table-row-details/invoice-records-table-row-details.component';
 import { CurrencyFormatter, invoicesRowDetailsOffsetColDef, titleValueCellRendererSelector } from '../../constants';
 import { InvoiceType } from '../../enums/invoice-type.enum';
-import { GetPendingInvoiceDetailsColDefsFn, InvoiceAttachment, PendingInvoiceRowDetailsConfig, TypedColDef } from '../../interfaces';
+import { GetPendingInvoiceDetailsColDefsFn,
+  InvoiceAttachment, PendingInvoiceRowDetailsConfig, TypedColDef } from '../../interfaces';
 import { PendingInvoice, PendingInvoiceRecord } from '../../interfaces/pending-invoice-record.interface';
 
 
@@ -45,7 +46,7 @@ const totalColDef: TypedColDef<PendingInvoiceRecord> = {
   headerName: 'Total',
   valueFormatter: CurrencyFormatter,
   cellRendererSelector: titleValueCellRendererSelector,
-  cellRenderer: TitleValueCellRendererComponent
+  cellRenderer: TitleValueCellRendererComponent,
 };
 
 const timesheetTypeColDefs: TypedColDef<PendingInvoiceRecord>[] = [
@@ -125,9 +126,9 @@ const getManualTypeColDefs: GetPendingInvoiceDetailsColDefsFn =
             preview: previewExpensesAttachment,
             download: downloadExpensesAttachment,
           },
-        }
-      }
-    }
+        };
+      },
+    },
   ];
 
 const milesInvoiceTypeColDefs: (config: PendingInvoiceRowDetailsConfig) => TypedColDef<PendingInvoiceRecord>[] =
@@ -167,8 +168,8 @@ const milesInvoiceTypeColDefs: (config: PendingInvoiceRowDetailsConfig) => Typed
           preview: previewMilesAttachments(timesheetRecordId),
           download: downloadMilesAttachments(timesheetRecordId),
         },
-      }
-    }
+      };
+    },
   },
 ];
 
@@ -200,8 +201,8 @@ export class PendingInvoiceRowDetailsGridHelper {
             (params.data as PendingInvoice).invoiceRecords,
           ),
         };
-      }
-    }
+      },
+    };
   }
 
   public static getRowDetailsColumnDefinitions(

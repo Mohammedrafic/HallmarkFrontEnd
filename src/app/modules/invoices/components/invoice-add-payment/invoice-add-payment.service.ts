@@ -42,7 +42,7 @@ export class InvoiceAddPaymentService {
         invoiceNumber: record.invoiceNumber,
         amount: record.amount,
         payment: 0,
-        balance: 0,
+        balance: record.amount,
         group: forms[record.invoiceNumber],
       });
     });  
@@ -68,7 +68,8 @@ export class InvoiceAddPaymentService {
       paymentsForm[payment.formattedInvoiceId as string] = form;
       
       form.get('amount')?.patchValue(payment.payment);
-      
+      form.get('balance')?.patchValue(payment.amountToPay);
+
       mergeData.push({
         id: payment.id as number,
         invoiceNumber: payment.formattedInvoiceId as string,
@@ -115,15 +116,23 @@ export class InvoiceAddPaymentService {
     return Object.keys(paymentForms).some((key) => paymentForms[key].touched);
   }
 
-  createInitialInvoicesData(data: PaymentCreationDto): InvoicePaymentData[] {
-    return data.payments.map((payment) => ({
-      invoiceId: payment.invoiceId,
-      invoiceNumber: payment.formattedInvoiceId,
-      amount: payment.amountToPay,
-      checkId: data.check.id,
-      id: payment.id,
-      ...payment.agencySuffix ? { agencySuffix: payment.agencySuffix } : {},
-    })) as InvoicePaymentData[];
+  createInitialInvoicesData(data: PaymentCreationDto, initialInvoices: InvoicePaymentData[]): InvoicePaymentData[] {
+    const invoicesData: InvoicePaymentData[] = initialInvoices.filter((invoice) => {
+      return !data.payments.find((payment) => payment.formattedInvoiceId === invoice.invoiceNumber);
+    });
+
+    data.payments.forEach((payment) => {
+      invoicesData.push({
+        invoiceId: payment.invoiceId,
+        invoiceNumber: payment.formattedInvoiceId as string,
+        amount: payment.amountToPay as number,
+        checkId: data.check.id,
+        id: payment.id,
+        ...payment.agencySuffix ? { agencySuffix: payment.agencySuffix } : {},
+      });
+    });
+
+    return invoicesData;
   }
 
   private createPaymentGroup(

@@ -3,18 +3,23 @@ import {
   GridOptions,
   ICellRendererParams,
   IDetailCellRendererParams,
-  RowHeightParams
+  RowHeightParams,
 } from '@ag-grid-community/core';
 import { TypedValueGetterParams } from '@core/interface';
 import { TitleValueCellRendererParams } from '@shared/components/grid/models';
 
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
-import { AllInvoicesActionCellComponent } from '../../components/all-invoices-action-cell/all-invoices-action-cell.component';
-import { ToggleRowExpansionHeaderCellComponent } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
 import {
-  InvoiceRecordsTableRowDetailsComponent
+  AllInvoicesActionCellComponent,
+} from '../../components/all-invoices-action-cell/all-invoices-action-cell.component';
+import {
+  ToggleRowExpansionHeaderCellComponent } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
+import {
+  InvoiceRecordsTableRowDetailsComponent,
 } from '../../components/invoice-records-table-row-details/invoice-records-table-row-details.component';
-import { CurrencyFormatter, DepartmentNameGetter, invoicesRowDetailsOffsetColDef, monthDayYearDateFormatter, numberValueFormatter, RateReasonValueGetter, titleValueCellRendererSelector, weekPeriodValueGetter } from '../../constants';
+import { CurrencyFormatter, DepartmentNameGetter, invoicesRowDetailsOffsetColDef,
+  monthDayYearDateFormatter, numberValueFormatter, RateReasonValueGetter,
+  titleValueCellRendererSelector, weekPeriodValueGetter } from '../../constants';
 import { BaseInvoice, TypedColDef } from '../../interfaces';
 import { PendingApprovalInvoice, PendingApprovalInvoiceRecord } from '../../interfaces/pending-approval-invoice.interface';
 import { PendingInvoice } from '../../interfaces/pending-invoice-record.interface';
@@ -75,7 +80,7 @@ export class AllInvoicesGridHelper {
         minWidth: 280,
         headerName: 'Amount',
         cellClass: 'font-weight-bold',
-        valueFormatter: numberValueFormatter,
+        valueFormatter: CurrencyFormatter,
       },
       {
         field: 'apDeliveryText',
@@ -130,7 +135,7 @@ export class AllInvoicesGridHelper {
 
         const rendererParams: Pick<TitleValueCellRendererParams, 'titleValueParams'> = {
           titleValueParams: {
-            organizationId: (params.data as BaseInvoice).organizationId
+            organizationId: (params.data as BaseInvoice).organizationId,
           },
         };
 
@@ -147,8 +152,8 @@ export class AllInvoicesGridHelper {
                   {
                     data: {
                       candidateFirstName,
-                      candidateLastName
-                    }
+                      candidateLastName,
+                    },
                   }: TypedValueGetterParams<PendingApprovalInvoiceRecord>
                 ) => `${candidateLastName}, ${candidateFirstName}`,
                 cellRendererSelector: titleValueCellRendererSelector,
@@ -158,9 +163,9 @@ export class AllInvoicesGridHelper {
                     titleValueParams: {
                       valueClass: 'font-weight-bold color-primary-active-blue-10',
                       ...rendererParams.titleValueParams,
-                    }
-                  }
-                }
+                    },
+                  };
+                },
               },
               {
                 ...weekPeriod,
@@ -237,14 +242,14 @@ export class AllInvoicesGridHelper {
                 cellRendererParams: rendererParams,
                 cellRendererSelector: titleValueCellRendererSelector,
                 valueFormatter: CurrencyFormatter,
-              }
+              },
             ] as TypedColDef<PendingApprovalInvoiceRecord>[],
           },
           getDetailRowData: (params: GetDetailRowDataParams) => params.successCallback(
             (params.data as PendingApprovalInvoice).invoiceRecords,
           ),
         };
-      }
-    }
+      },
+    };
   }
 }

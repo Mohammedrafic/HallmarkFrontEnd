@@ -10,13 +10,13 @@ import {
   linkedInvoiceIdColDef,
   reasonCodeColDef,
   rejectionReasonColDef,
-  vendorFeeAppliedColDef
+  vendorFeeAppliedColDef,
 } from '../../constants';
 import { InvoiceRecordType } from '../../enums';
 import { PendingInvoiceStatus } from '../../enums/invoice-status.enum';
 import { ManualInvoice, TypedColDef } from '../../interfaces';
 import {
-  InvoicesContainerGridHelper
+  InvoicesContainerGridHelper,
 } from './invoices-container-grid.helper';
 
 interface GetManualInvoicesColDefsConfig {
@@ -94,7 +94,7 @@ export class ManualInvoicesGridHelper {
                 disabled: [PendingInvoiceStatus.Approved].includes(status),
               },
             ] : [],
-          }
+          };
         },
         headerCheckboxSelection: true,
         headerCheckboxSelectionFilteredOnly: true,
@@ -130,7 +130,7 @@ export class ManualInvoicesGridHelper {
             attachmentsListConfig: {
               download: downloadAttachment,
               preview: previewAttachment,
-            }
+            },
           } as AttachmentsListParams;
         },
         ...commonColumn,
@@ -184,7 +184,7 @@ export class ManualInvoicesGridHelper {
                 ].includes(status) || agencyStatus === AgencyStatus.Terminated || !canEdit,
               },
             ],
-          } as GridActionsCellConfig
+          } as GridActionsCellConfig;
         },
         sortable: false,
         suppressMenu: true,
@@ -210,7 +210,7 @@ export class ManualInvoicesGridHelper {
             attachmentsListConfig: {
               download: downloadAttachment,
               preview: previewAttachment,
-            }
+            },
           };
         },
       },

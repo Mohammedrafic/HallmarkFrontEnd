@@ -29,7 +29,7 @@ export class BalanceRendererComponent extends Destroyable implements ICellRender
   agInit(params: ICellRendererParams): void {
     this.group = params.data.group;
     this.initialAmount = params.data.amount;
-    this.balance = params.data.amount;
+    this.balance = params.data.balance;
     this.watchForAmountControl();
   }
 

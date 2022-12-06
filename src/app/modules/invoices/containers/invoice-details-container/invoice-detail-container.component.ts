@@ -17,7 +17,7 @@ import { ExportPayload } from '@shared/models/export.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { ActionBtnOnStatus, AgencyActionBtnOnStatus,
   NewStatusDependsOnAction } from '../../constants/invoice-detail.constant';
-import { InvoicesActionBtn, InvoiceState, INVOICES_STATUSES } from '../../enums';
+import { InvoicesActionBtn, InvoiceState, INVOICES_STATUSES, PaymentDialogTitle } from '../../enums';
 import { ExportOption, InvoiceDetail, InvoiceDetailsSettings,
   InvoiceDialogActionPayload, InvoicePaymentData, InvoiceUpdateEmmit, PrintingPostDto } from '../../interfaces';
 import { InvoicePrintingService } from '../../services';
@@ -72,6 +72,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   public paymentRecords: InvoicePaymentData[] = [];
 
   public editCheckNumber: string | null;
+
+  public paymentDialogTitle = PaymentDialogTitle.Add;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -157,12 +159,16 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     this.cdr.markForCheck();
   }
 
-  public openAddPayment(): void {   
+  public openAddPayment(): void {
+    this.paymentDialogTitle = PaymentDialogTitle.Add;
+    this.createPaymentRecords(); 
     this.invoiceDetailsConfig.addPaymentOpen = true;
     this.cdr.markForCheck();
   }
 
   public openEditPayment(id: string): void {
+    this.paymentDialogTitle = PaymentDialogTitle.Edit;
+    this.createPaymentRecords();
     this.editCheckNumber = id;
     this.invoiceDetailsConfig.addPaymentOpen = true;
     this.cdr.markForCheck();
@@ -186,16 +192,8 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
         if (payload.dialogState) {
           this.sideDialog.show();
           this.invoiceDetail = payload.invoiceDetail as InvoiceDetail;
-          this.createPaymentRecords();
           if (payload.invoiceDetail) {
-            this.setActionBtnText();
-            this.invoiceDetailsConfig.isActionBtnDisabled = this.checkActionBtnDisabled();
-            this.initTableColumns(this.invoiceDetail.summary[0]?.locationName || '');
-
-            if (this.chipList) {
-              this.chipList.cssClass = this.chipsCssClass.transform(this.invoiceDetail.meta.invoiceStateText);
-              this.chipList.text = this.invoiceDetail.meta.invoiceStateText.toUpperCase();
-            }
+            this.setInvoiceData();
           }
         } else {
           this.sideDialog.hide();
@@ -243,5 +241,16 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
       amount: this.invoiceDetail.totals.amountToPay,
       agencySuffix: this.invoiceDetail.meta.agencySuffix,
     });
+  }
+
+  private setInvoiceData(): void {
+    this.setActionBtnText();
+    this.invoiceDetailsConfig.isActionBtnDisabled = this.checkActionBtnDisabled();
+    this.initTableColumns(this.invoiceDetail.summary[0]?.locationName || '');
+
+    if (this.chipList) {
+      this.chipList.cssClass = this.chipsCssClass.transform(this.invoiceDetail.meta.invoiceStateText);
+      this.chipList.text = this.invoiceDetail.meta.invoiceStateText.toUpperCase();
+    }
   }
 }

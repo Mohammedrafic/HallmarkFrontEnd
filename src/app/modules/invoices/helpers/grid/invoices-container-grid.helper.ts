@@ -58,7 +58,7 @@ export class InvoicesContainerGridHelper {
         valueGetter: (params: ValueGetterParams) => {
           const record = params.data as BaseInvoice;
 
-          return `${record.candidateLastName}, ${record.candidateFirstName}`
+          return `${record.candidateLastName}, ${record.candidateFirstName}`;
         },
         ...commonColumn,
       },
@@ -82,7 +82,8 @@ export class InvoicesContainerGridHelper {
         valueGetter: (params: ValueGetterParams) => {
           const { weekNumber, weekStartDate: date } = params.data as PendingInvoice;
 
-          return `${weekNumber} - ${GridValuesHelper.formatDate(date, 'cccccc')}<br>${GridValuesHelper.formatDate(date, 'MM/dd/yyyy')}`;
+          return `${weekNumber} - ${GridValuesHelper.formatDate(date, 'cccccc')}<br>
+          ${GridValuesHelper.formatDate(date, 'MM/dd/yyyy')}`;
         },
         cellRendererParams: (params: ICellRendererParams): GridCellLinkParams => {
           const { id, organizationId } = params.data as BaseInvoice;
@@ -92,7 +93,7 @@ export class InvoicesContainerGridHelper {
             link: agency ? `/agency/timesheets` : `/client/timesheets`,
             navigationExtras: {
               state: { timesheetId: id, organizationId },
-            }
+            },
           };
         },
         ...commonColumn,

@@ -47,19 +47,14 @@ import ShowRejectInvoiceDialog = Invoices.ShowRejectInvoiceDialog;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoicesContainerComponent extends InvoicesPermissionHelper implements OnInit, AfterViewInit {
-  @Select(InvoicesState.invoicesOrganizations)
-  readonly organizations$: Observable<DataSourceItem[]>;
-
   @ViewChild(InvoicesTableTabsComponent)
   public invoicesTableTabsComponent: InvoicesTableTabsComponent;
 
   @ViewChild(RejectReasonInputDialogComponent)
   public rejectReasonInputDialogComponent: RejectReasonInputDialogComponent;
 
-  public selectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab = 0;
-  public appliedFiltersAmount = 0;
-
-  public readonly organizationControl: FormControl = new FormControl(null);
+  @Select(InvoicesState.invoicesOrganizations)
+  readonly organizations$: Observable<DataSourceItem[]>;
 
   @Select(InvoicesState.pendingInvoicesData)
   public readonly pendingInvoicesData$: Observable<PendingInvoicesData>;
@@ -85,12 +80,21 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   @Select(InvoicesState.manualInvoicesExist)
   public readonly manualInvoicesExist$: Observable<boolean>;
 
+  public selectedTabIdx: OrganizationInvoicesGridTab | AgencyInvoicesGridTab = 0;
+
+  public appliedFiltersAmount = 0;
+
+  public readonly organizationControl: FormControl = new FormControl(null);
+
   public organizationId$: Observable<number>;
 
   public colDefs: ColDef[] = [];
 
   public groupingInvoiceRecordsIds: number[] = [];
 
+  /**
+   * TODO: move to const file
+   */
   public readonly defaultGridOptions: GridOptions = {
     onRowSelected: (event: RowSelectedEvent): void => {
       this.groupingInvoiceRecordsIds = event.api.getSelectedRows()
@@ -102,7 +106,9 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public gridOptions: GridOptions = {};
 
   public readonly groupInvoicesOptions = groupInvoicesOptions;
+
   public readonly defaultGroupInvoicesOption: GroupInvoicesOption = defaultGroupInvoicesOption;
+
   public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
 
   public groupInvoicesBy: GroupInvoicesOption = defaultGroupInvoicesOption;
@@ -110,7 +116,6 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public currentSelectedTableRowIndex: Observable<number>
     = this.invoicesService.getCurrentTableIdxStream();
   public isLoading: boolean;
-  public newSelectedIndex: number;
   public organizationId: number;
   public rejectInvoiceId: number;
   public tabConfig: GridContainerTabConfig | null;
@@ -301,6 +306,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
     if (this.selectedTabIdx >= enableSelectionIndex) {
       this.invoicesService.setCurrentSelectedIndexValue(selectedRowData.rowIndex);
+
+
       const invoices = this.store.selectSnapshot(InvoicesState.pendingApprovalInvoicesData);
       const prevId: number | null = invoices?.items[selectedRowData.rowIndex - 1]?.invoiceId || null;
       const nextId: number | null = invoices?.items[selectedRowData.rowIndex + 1]?.invoiceId || null;
@@ -316,6 +323,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
           prevId,
           nextId
         ));
+
       this.cdr.markForCheck();
     }
   }
@@ -507,6 +515,17 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
       takeUntil(this.componentDestroy()),
     ).subscribe(() => {
       this.invoicesContainerService.getRowData(this.selectedTabIdx, this.isAgency ? this.organizationId : null);
+      this.store.dispatch(
+        new Invoices.ToggleInvoiceDialog(
+          DialogAction.Open,
+          this.isAgency,
+          {
+            invoiceIds: this.gridSelections.selectedInvoiceIds,
+            organizationIds: [this.organizationId],
+          },
+          null,
+          null,
+        ));
       this.cdr.markForCheck();
     });
   }
