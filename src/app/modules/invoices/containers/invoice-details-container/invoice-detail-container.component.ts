@@ -163,7 +163,6 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   }
 
   public openEditPayment(id: string): void {
-    // this.createPaymentRecords();
     this.editCheckNumber = id;
     this.invoiceDetailsConfig.addPaymentOpen = true;
     this.cdr.markForCheck();
