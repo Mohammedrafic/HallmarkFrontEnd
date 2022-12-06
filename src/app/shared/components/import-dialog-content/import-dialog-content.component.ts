@@ -49,6 +49,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   @Input() public dialogEvent: Subject<boolean>;
   @Input() public isOrderImport: boolean;
   @Input() public title = 'Import';
+  @Input() public zIndex: number;
   @Input() public selectErrorsTab: Subject<void>;
   @Input() public set importResponse(response: any) {
     this.importResult = response;

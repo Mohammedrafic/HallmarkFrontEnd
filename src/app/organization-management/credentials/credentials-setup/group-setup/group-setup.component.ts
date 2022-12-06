@@ -28,6 +28,7 @@ import { TakeUntilDestroy } from '@core/decorators';
 import { Organization } from '@shared/models/organization.model';
 import { GroupSetupService } from '@organization-management/credentials/services/group-setup.service';
 import { MessageTypes } from '@shared/enums/message-types';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @TakeUntilDestroy
 @Component({
@@ -301,7 +302,10 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   private checkIRPFlag(): void {
-    this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+    const user = this.store.selectSnapshot(UserState.user);
+
+    this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled)
+      && user?.businessUnitType !== BusinessUnitType.MSP;
   }
 
   private startOrganizationWatching(): void {
