@@ -16,18 +16,21 @@ export const DialogHeight = '436px';
 export const CredentialTypeId = 'credentialTypeId';
 export const IrpCommentField = 'irpComment';
 export const OptionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-export const ErrorMessageForSystem: string = 'Please select system for Credential';
-
+export const ErrorMessageForSystem = 'Please select system for Credential';
+export const SelectedSystems = {
+  isIRP: false,
+  isVMS: true,
+};
 export const DefaultFilters: CredentialFilter = {
   pageSize: GRID_CONFIG.initialRowsPerPage,
-  pageNumber: GRID_CONFIG.initialPage
+  pageNumber: GRID_CONFIG.initialPage,
 };
 
 export const ExportColumns: ExportColumn[] = [
   { text:'Credential Type', column: 'CredentialType'},
   { text:'Credential', column: 'Credential'},
   { text:'Expire Date Applicable', column: 'ExpireDateApplicable'},
-  { text:'Comment', column: 'Comment'}
+  { text:'Comment', column: 'Comment'},
 ];
 export const ExportIRPColumns = [
   { text:'System', column: 'System'},
@@ -35,13 +38,31 @@ export const ExportIRPColumns = [
 ];
 
 export const SortSettings: SortSettingsModel = {
-  columns: [{ field: 'credentialTypeName', direction: 'Ascending' }]
+  columns: [
+    { field: 'credentialTypeName', direction: 'Ascending' }
+  ]
 };
 
 export const FiltersColumns: FilterColumnsModel = {
-  credentialIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-  credentialTypeIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-  expireDateApplicable: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Expiry Date Applicable'},
+  credentialIds: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'name',
+    valueId: 'id' ,
+  },
+  credentialTypeIds: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'name',
+    valueId: 'id',
+  },
+  expireDateApplicable: {
+    type: ControlTypes.Checkbox,
+    valueType: ValueType.Text,
+    checkBoxTitle: 'Expiry Date Applicable',
+  },
 };
 export const FilterColumnsIncludeIRP: FilterColumnsModel = {
   includeInIRP: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'IRP'},

@@ -299,14 +299,14 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       ext: location.ext,
       contactEmail: location.contactEmail,
       contactPerson: location.contactPerson,
-      inactiveDate: location.inactiveDate,
-      reactivateDate: location.reactivateDate,
+      inactiveDate: location.inactiveDate ? DateTimeHelper.convertDateToUtc(location.inactiveDate) : null,
+      reactivateDate: location.reactivateDate ? DateTimeHelper.convertDateToUtc(location.reactivateDate) : null,
       phoneNumber: location.phoneNumber,
       phoneType: PhoneTypes[location.phoneType] || null,
       timeZone: location.timeZone,
       locationType: location.locationTypeId,
       organizationId:this.businessUnitId,
-      includeInIRP: location.includeInIRP,
+      includeInIRP: location.includeInIRP || false,
     });
 
     this.getBusinessLineDataSource(location.businessLineId, location.businessLine);
@@ -382,6 +382,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     if (this.locationDetailsFormGroup.valid) {
       const inactiveDate = this.locationDetailsFormGroup.controls['inactiveDate'].value;
       const reactivateDate = this.locationDetailsFormGroup.controls['reactivateDate'].value;
+
       const location: Location = {
         id: this.editedLocationId,
         regionId: this.selectedRegion.id,
@@ -407,10 +408,12 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         organizationId : this.businessUnitId,
         includeInIRP: this.locationDetailsFormGroup.controls['includeInIRP'].value,
       };
+
       this.saveOrUpdateLocation(location, ignoreWarning);
     } else {
       this.locationDetailsFormGroup.markAllAsTouched();
     }
+
   }
 
   trackByField(index: number, item: LocationsFormConfig): string {
@@ -544,8 +547,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   private watchForLocationUpdate(): void {
     this.action$.pipe(ofActionDispatched(SaveLocationSucceeded), takeUntil(this.componentDestroy())).subscribe(() => {
       this.store.dispatch(new ShowSideDialog(false));
-      this.locationDetailsFormGroup.reset();
-      this.removeActiveCssClass();
+      this.locationDetailsFormGroup.reset({ includeInIRP: false });
       if (this.isEdit) {
         this.isEdit = false;
         this.editedLocationId = undefined;

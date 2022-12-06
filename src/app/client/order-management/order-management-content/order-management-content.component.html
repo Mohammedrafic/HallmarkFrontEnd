@@ -12,6 +12,19 @@
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
     </button>
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
+      <button
+        [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        (click)="openImportDialog()"
+        class="e-outline button-export"
+      >
+        <div class="button-import-container">Import<i-feather name="upload" class="icon"></i-feather></div>
+      </button>
+    </app-tooltip-container>
     <!-- TODO (activeTab !== OrganizationOrderManagementTabs.Incomplete) - temporary solution for hiding button without functionality -->
     <button
       *ngIf="
@@ -1008,3 +1021,5 @@
     </button>
   </ng-template>
 </mat-menu>
+
+<app-order-import [dialogEvent]="importDialogEvent" (reloadItemsList)="updatePage()"></app-order-import>

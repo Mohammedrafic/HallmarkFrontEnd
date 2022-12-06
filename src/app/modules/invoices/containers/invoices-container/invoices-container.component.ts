@@ -26,10 +26,10 @@ import { defaultGroupInvoicesOption, GroupInvoicesOption, groupInvoicesOptions }
 import { AgencyInvoicesGridTab, OrganizationInvoicesGridTab } from '../../enums';
 import { InvoicesPermissionHelper } from '../../helpers/invoices-permission.helper';
 import {
-  BaseInvoice, GridContainerTabConfig, InvoicePaymentData, InvoicesFilterState, InvoiceUpdateEmmit,
+  BaseInvoice, GridContainerTabConfig, InvoiceGridSelections, InvoicePaymentData, InvoicesFilterState, InvoiceUpdateEmmit,
   ManualInvoice, ManualInvoicesData, PrintingPostDto, SelectedInvoiceRow,
 } from '../../interfaces';
-import { PendingApprovalInvoice, PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
+import { PendingApprovalInvoicesData } from '../../interfaces/pending-approval-invoice.interface';
 import { PendingInvoice, PendingInvoiceRecord,
   PendingInvoicesData } from '../../interfaces/pending-invoice-record.interface';
 import { InvoicePrintingService, InvoicesService } from '../../services';
@@ -114,7 +114,11 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   public organizationId: number;
   public rejectInvoiceId: number;
   public tabConfig: GridContainerTabConfig | null;
-  public selectedInvoiceIds: number[];
+
+  public gridSelections: InvoiceGridSelections = {
+    selectedInvoiceIds: [],
+    rowNodes: [],
+  };
 
   public isAgency: boolean;
 
@@ -401,17 +405,18 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
 
   public handleMultiSelectionChanged(nodes: RowNode[]): void {
     if (nodes.length) {
-      this.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);
-      this.createInvoicesForPayment(nodes);
+      this.gridSelections.selectedInvoiceIds = nodes.map((node) => node.data.invoiceId);
+      this.gridSelections.rowNodes = nodes;
     } else {
-      this.selectedInvoiceIds = [];
+      this.gridSelections.selectedInvoiceIds = [];
+      this.gridSelections.rowNodes = [];
       this.paymentRecords = [];
     }
   }
 
   public printInvoices(): void {
     const dto: PrintingPostDto = {
-      invoiceIds: this.selectedInvoiceIds,
+      invoiceIds: this.gridSelections.selectedInvoiceIds,
       ...(this.isAgency ? {
         organizationIds: [this.organizationId] as number[],
       } : {
@@ -434,7 +439,10 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     });
   }
 
-  public openAddPayment(): void {
+  public openAddPayment(createRecords = false): void {
+    if (createRecords) {
+      this.createInvoicesForPayment();
+    }
     this.invoiceContainerConfig.addPaymentOpen = true;
   }
 
@@ -447,7 +455,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
   }
 
   private clearSelections(): void {
-    this.selectedInvoiceIds = [];
+    this.gridSelections.selectedInvoiceIds = [];
   }
 
   private watchForInvoiceStatusChange(): void {
@@ -475,17 +483,8 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     });
   }
 
-  private createInvoicesForPayment(nodes: RowNode[]): void {
-    this.paymentRecords = nodes.filter((node) => (node.data as PendingApprovalInvoice).invoiceState === 2)
-    .map((node) => {
-      const data = node.data as PendingApprovalInvoice;
-      return ({
-        invoiceId: data.invoiceId,
-        invoiceNumber: data.formattedInvoiceId,
-        amount: data.amountToPay,
-        agencySuffix: data.agencySuffix,
-      });
-    });
+  private createInvoicesForPayment(): void {
+    this.paymentRecords = this.invoicesService.createPaymentRecords(this.gridSelections.rowNodes);
   }
 
   private watchForOpenPayment(): void {

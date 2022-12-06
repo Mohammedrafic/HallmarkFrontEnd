@@ -22,18 +22,18 @@ import {
   Send,
   Sliders,
   Trash2,
-  User,
+  User
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
   NumericTextBoxAllModule,
   NumericTextBoxModule,
   TextBoxModule,
-  UploaderModule,
+  UploaderModule
 } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 
-import { ValidateDirective } from './directives/validate.directive';
+import { ValidateDirective } from './directives/validate-directive/validate.directive';
 import { ErrorMessageComponent } from './components/error-message/error-message.component';
 import { ValidationErrorPipe } from './pipes/validation-error.pipe';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -42,19 +42,13 @@ import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 import { ImageUploaderComponent } from './components/image-uploader/image-uploader.component';
 import { DocumentUploaderComponent } from './components/document-uploader/document-uploader.component';
 import { FileUploadDialogComponent } from './components/file-upload-dialog/file-upload-dialog.component';
-import {
-  ButtonModule,
-  CheckBoxModule,
-  ChipListAllModule,
-  RadioButtonAllModule,
-  SwitchModule,
-} from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule, ChipListAllModule, RadioButtonAllModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { SideDialogComponent } from './components/side-dialog/side-dialog.component';
 import { SearchComponent } from './components/search/search.component';
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DropDownButtonAllModule, DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { DropDownButtonAllModule, DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousComponent } from './components/dialog-next-previous/dialog-next-previous.component';
 import { OrderDetailsComponent } from './components/order-details/order-details.component';
@@ -73,7 +67,7 @@ import {
   PageService,
   ResizeService,
   SortService,
-  ToolbarService,
+  ToolbarService
 } from '@syncfusion/ej2-angular-grids';
 import { OrderCandidatesListComponent } from './components/order-candidate-list/order-candidates-list/order-candidates-list.component';
 import { OrderReOrdersListComponent } from './components/order-reorders-list/order-re-orders-list.component';
@@ -105,7 +99,7 @@ import { FilterDialogModule } from '@shared/components/filter-dialog/filter-dial
 import { DeployCandidateMessageComponent } from './components/order-candidate-list/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
 import { ExBillRateNamesPipe } from '@shared/pipes/external-bill-rate-names.pipe';
 import { SideMenuModule } from '@shared/components/side-menu/side-menu.module';
-import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
+import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { SecurityState } from '../security/store/security.state';
 import { NavigationPanelComponent } from './components/navigation-panel/navigation-panel.component';
 import { CandidateAvatarPipe } from './pipes/candidate-avatar.pipe';
@@ -147,6 +141,7 @@ import { DocumentPreviewSideDialogComponent } from './components/document-previe
 import { CustomSideDialogComponent } from './components/custom-side-dialog/custom-side-dialog.component';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { HideByCandidateStatusPipe } from './pipes/hide-by-candidate-status.pipe';
+import { ValidateDirectiveModule } from './directives/validate-directive/validate-directive.module';
 
 const icons = {
   AlertCircle,
@@ -180,7 +175,6 @@ const COMPONENTS = [
   RateHourPipe,
   BillRatePipe,
   ExBillRateNamesPipe,
-  ValidateDirective,
   HideBeforeSyncfusionLoadDirective,
   OpenFirstAccordionDirective,
   HighlightGridRowDirective,
@@ -232,7 +226,7 @@ const COMPONENTS = [
   AssignCredentialSideComponent,
   SendEmailSideDialogComponent,
   DocumentPreviewSideDialogComponent,
-  CustomSideDialogComponent
+  CustomSideDialogComponent,
 ];
 
 @NgModule({
@@ -276,6 +270,8 @@ const COMPONENTS = [
     SidebarModule,
     RouterModule,
     TreeViewAllModule,
+    SplitButtonModule,
+    ValidateDirectiveModule,
   ],
   exports: [
     ...COMPONENTS,

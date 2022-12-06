@@ -3,7 +3,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { GridComponent, ValueAccessor } from '@syncfusion/ej2-angular-grids';
-import { delay, filter, Observable } from 'rxjs';
+import { delay, filter, Observable, takeUntil } from 'rxjs';
 
 import {
   GetEducationByCandidateId,
@@ -13,7 +13,9 @@ import {
   SaveEducationSucceeded,
 } from 'src/app/agency/store/candidate.actions';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
-import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import {
+  AbstractGridConfigurationComponent,
+} from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
   DELETE_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
@@ -27,7 +29,10 @@ import { valuesOnly } from 'src/app/shared/utils/enum.utils';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { UserPermissions } from '@core/enums';
 import { Permission } from '@core/interface';
+import { DateTimeHelper } from '@core/helpers';
+import { TakeUntilDestroy } from '@core/decorators';
 
+@TakeUntilDestroy
 @Component({
   selector: 'app-education-grid',
   templateUrl: './education-grid.component.html',
@@ -57,6 +62,8 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
     .filter(valuesOnly)
     .map((text, id) => ({ text, id }));
 
+  protected componentDestroy: () => Observable<unknown>;
+
   constructor(
     private store: Store,
     private fb: FormBuilder,
@@ -69,15 +76,8 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
   ngOnInit(): void {
     this.store.dispatch(new GetEducationByCandidateId());
     this.createEducationForm();
-
-    this.actions$.pipe(ofActionSuccessful(SaveEducationSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetEducationByCandidateId());
-      this.educationForm.markAsPristine();
-      this.closeDialog();
-    });
-    this.actions$.pipe(ofActionSuccessful(RemoveEducationSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetEducationByCandidateId());
-    });
+    this.watchForSaveEducation();
+    this.watchForRemoveEducation();
   }
 
   public dataBound(): void {
@@ -104,7 +104,10 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       })
-      .pipe(filter((confirm) => !!confirm))
+      .pipe(
+        filter(Boolean),
+        takeUntil(this.componentDestroy())
+      )
       .subscribe(() => {
         this.store.dispatch(new RemoveEducation(data));
       });
@@ -123,8 +126,10 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
+        .pipe(
+          filter(Boolean),
+          takeUntil(this.componentDestroy())
+        ).subscribe(() => {
           this.closeSideDialog();
         });
     } else {
@@ -135,7 +140,12 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
   public saveEducation(): void {
     this.educationForm.markAllAsTouched();
     if (this.educationForm.valid) {
-      this.store.dispatch(new SaveEducation(this.educationForm.getRawValue()));
+      const educationValue = this.educationForm.getRawValue();
+      
+      this.store.dispatch(new SaveEducation({
+          ...educationValue,
+          graduationDate: DateTimeHelper.toUtcFormat(educationValue.graduationDate),
+        }));
     } else {
       this.educationForm.markAllAsTouched();
     }
@@ -155,9 +165,31 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
   private closeSideDialog(): void {
     this.store
       .dispatch(new ShowSideDialog(false))
-      .pipe(delay(500))
-      .subscribe(() => {
+      .pipe(
+        delay(500),
+        takeUntil(this.componentDestroy())
+      ).subscribe(() => {
         this.educationForm.reset();
       });
+  }
+
+  private watchForRemoveEducation(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(RemoveEducationSucceeded),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.store.dispatch(new GetEducationByCandidateId());
+    });
+  }
+
+  private watchForSaveEducation(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(SaveEducationSucceeded),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.store.dispatch(new GetEducationByCandidateId());
+      this.educationForm.markAsPristine();
+      this.closeDialog();
+    });
   }
 }

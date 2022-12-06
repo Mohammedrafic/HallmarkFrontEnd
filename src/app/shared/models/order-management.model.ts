@@ -108,6 +108,8 @@ export type AgencyOrderManagement = {
 };
 
 export type OrderManagementChild = {
+  actualEndDate?: string;
+  actualStartDate?: string;
   orderId: number;
   orderPublicId?: number;
   candidateBillRate: number;

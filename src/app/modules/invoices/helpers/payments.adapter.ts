@@ -11,23 +11,23 @@ export class PaymentsAdapter {
     invoiceData: InvoicePaymentData[]): PaymentCreationDto {
       const dto: PaymentCreationDto = {
         check: {
-          // id?: number;
           checkNumber: check.checkNumber,
           initialAmount: check.initialAmount,
           checkDate: DateTimeHelper.toUtcFormat(DateTimeHelper.setInitHours(check.checkDate.toString())),
           paymentMode: check.paymentMode,
           isRefund: check.isRefund,
+          ...check.id ? { id: check.id } : {},
         },
         payments: [],
       };
 
       Object.keys(payments).forEach((invoiceFormatedId) => {
         const formValue = payments[invoiceFormatedId].value;
-        const { agencySuffix, checkId, id, invoiceId } = invoiceData
+        const { agencySuffix, checkId, invoiceId } = invoiceData
         .find((item) => item.invoiceNumber === invoiceFormatedId) as InvoicePaymentData;
 
         dto.payments.push({
-          id: id,
+          id: payments[invoiceFormatedId].get('id')?.value,
           invoiceId: invoiceId,
           checkId: checkId,
           agencySuffix: agencySuffix,

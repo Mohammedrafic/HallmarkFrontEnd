@@ -63,6 +63,20 @@
     display: none !important;
   }
 
+  .menu-desktop-small {
+    display: none;
+  }
+
+  @media #{$max-desktop-small} {
+    .custom-order-btn {
+      display: none;
+    }
+
+    .menu-desktop-small {
+      display: inline-block !important;
+    }
+  }
+
   @media #{$max-tablet} {
     display: flex;
 
@@ -72,6 +86,10 @@
 
     .menu-tablet {
       display: inline-block !important;
+    }
+
+    .menu-desktop-small {
+      display: none !important;
     }
   }
 

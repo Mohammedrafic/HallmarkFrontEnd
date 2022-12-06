@@ -69,7 +69,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     addPaymentOpen: false,
   };
 
-  public readonly paymentRecords: InvoicePaymentData[] = [];
+  public paymentRecords: InvoicePaymentData[] = [];
 
   public editCheckNumber: string | null;
 
@@ -128,14 +128,18 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
       });
   }
 
-  public approveInvoice(): void {
-    this.updateTable.emit({
-      invoiceId: this.invoiceDetail.meta.invoiceId,
-      status: NewStatusDependsOnAction.get(this.actionBtnText) as InvoiceState,
-      ...(this.isAgency && {
-        organizationId: this.invoiceDetail.meta.organizationIds[0],
-      }),
-    });
+  public changeInvoiceStatus(): void {
+    if (this.invoiceDetail.meta.invoiceState === InvoiceState.PendingPayment) {
+      this.openAddPayment();
+    } else {
+      this.updateTable.emit({
+        invoiceId: this.invoiceDetail.meta.invoiceId,
+        status: NewStatusDependsOnAction.get(this.actionBtnText) as InvoiceState,
+        ...(this.isAgency && {
+          organizationId: this.invoiceDetail.meta.organizationIds[0],
+        }),
+      });
+    }
   }
 
   public onNextPreviousOrder(next: boolean): void {
@@ -153,14 +157,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     this.cdr.markForCheck();
   }
 
-  public openAddPayment(): void {
-    this.paymentRecords.push({
-      invoiceId: this.invoiceDetail.meta.invoiceId,
-      invoiceNumber: this.invoiceDetail.meta.formattedInvoiceNumber,
-      amount: this.invoiceDetail.totals.amountToPay,
-      agencySuffix: this.invoiceDetail.meta.agencySuffix,
-    });
-    
+  public openAddPayment(): void {   
     this.invoiceDetailsConfig.addPaymentOpen = true;
     this.cdr.markForCheck();
   }
@@ -189,7 +186,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
         if (payload.dialogState) {
           this.sideDialog.show();
           this.invoiceDetail = payload.invoiceDetail as InvoiceDetail;
-
+          this.createPaymentRecords();
           if (payload.invoiceDetail) {
             this.setActionBtnText();
             this.invoiceDetailsConfig.isActionBtnDisabled = this.checkActionBtnDisabled();
@@ -236,5 +233,15 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     }
 
     this.actionBtnText = result || '';
+  }
+
+  private createPaymentRecords(): void {
+    this.paymentRecords = [];
+    this.paymentRecords.push({
+      invoiceId: this.invoiceDetail.meta.invoiceId,
+      invoiceNumber: this.invoiceDetail.meta.formattedInvoiceNumber,
+      amount: this.invoiceDetail.totals.amountToPay,
+      agencySuffix: this.invoiceDetail.meta.agencySuffix,
+    });
   }
 }

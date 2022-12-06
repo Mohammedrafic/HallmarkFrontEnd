@@ -7,13 +7,14 @@ import {
   Order,
   OrderFilter,
   OrderManagement,
-  OrderManagementFilter,
+  OrderManagementFilter
 } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
+import { ImportedOrder, OrderImportResult } from '@shared/models/imported-order.model';
 
 export class GetOrders {
   static readonly type = '[order management] Get Orders';
@@ -167,7 +168,11 @@ export class SaveCloseOrderSucceeded {
 
 export class EditOrder {
   static readonly type = '[order management] Edit Order';
-  constructor(public order: EditOrderDto, public documents: Blob[]) {}
+  constructor(
+    public readonly order: EditOrderDto,
+    public readonly documents: Blob[],
+    public readonly message?: string | null
+  ) {}
 }
 
 export class DeleteOrder {
@@ -280,4 +285,42 @@ export class SetIsDirtyQuickOrderForm {
 
 export class ClearOrderCandidatePage {
   static readonly type = '[order management] Clear Order Candidate Page';
+}
+
+export class GetOrderImportTemplate {
+  static readonly type = '[order management] Get Order Import Template';
+}
+
+export class GetOrderImportErrors {
+  static readonly type = '[order management] Get Order Import Errors';
+  constructor(public payload: ImportedOrder[]) {}
+}
+export class UploadOrderImportFile {
+  static readonly type = '[order management] Upload Order Import File';
+  constructor(public payload: Blob) {}
+}
+
+export class SaveOrderImportResult {
+  static readonly type = '[order management] Save Order Import Result';
+  constructor(public payload: ImportedOrder[]) {}
+}
+
+export class UploadOrderImportFileSucceeded {
+  static readonly type = '[order management] Upload Order Import File Succeeded';
+  constructor(public payload: OrderImportResult) {}
+}
+
+export class GetOrderImportTemplateSucceeded {
+  static readonly type = '[order management] Get Order Import Template Succeeded';
+  constructor(public payload: Blob) {}
+}
+
+export class GetOrderImportErrorsSucceeded {
+  static readonly type = '[order management] Get Order Import Errors Succeeded';
+  constructor(public payload: Blob) {}
+}
+
+export class SaveOrderImportResultSucceeded {
+  static readonly type = '[order management] Save Order Import Result Succeeded';
+  constructor(public payload: OrderImportResult) {}
 }

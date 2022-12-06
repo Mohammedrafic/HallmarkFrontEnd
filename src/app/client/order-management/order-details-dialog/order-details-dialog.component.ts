@@ -169,8 +169,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   get disableCreateReOrder(): boolean {
     return (
-      this.order?.status === this.orderStatus.PreOpen ||
-      this.order?.status === this.orderStatus.Closed ||
+      [this.orderStatus.PreOpen, this.orderStatus.Closed, this.orderStatus.Incomplete].includes(this.order?.status) ||
       !this.settings[SettingsKeys.IsReOrder]?.value
     );
   }
@@ -183,11 +182,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     return !!(this.order?.orderClosureReasonId || this.order?.orderCloseDate) || this.disabledCloseButton;
   }
 
-  get tabletMenu(): { text: string }[] {
+  get desktopSmallMenu(): { text: string }[] {
     let menu: { text: string }[] = [];
-    if (this.showApproveAndCancel) {
-      menu = [...menu, { text: MobileMenuItems.Cancel }, { text: MobileMenuItems.Approve }];
-    }
     if (!this.canCloseOrder && !this.disableCloseOrder) {
       menu = [...menu, { text: MobileMenuItems.CloseOrder }];
     }
@@ -202,6 +198,14 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     }
     if (!this.disabledLock && this.showLockOrder) {
       menu = [...menu, { text: this.order?.isLocked ? MobileMenuItems.Unlock : MobileMenuItems.Lock }];
+    }
+    return menu;
+  }
+
+  get tabletMenu(): { text: string }[] {
+    let menu: { text: string }[] = this.desktopSmallMenu;
+    if (this.showApproveAndCancel) {
+      menu = [...menu, { text: MobileMenuItems.Cancel }, { text: MobileMenuItems.Approve }];
     }
     return menu;
   }

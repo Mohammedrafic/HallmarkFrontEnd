@@ -9,7 +9,7 @@ import { BaseObservable } from '@core/helpers';
 import { CustomFormGroup, DataSourceItem } from '@core/interface';
 import { OrganizationRegion } from '@shared/models/organization.model';
 
-import { InvoiceFilterForm } from '../interfaces';
+import { InvoiceFilterForm, InvoicePaymentData } from '../interfaces';
 import { InvoicesTableFiltersColumns } from '../enums';
 import { Invoices } from '../store/actions/invoices.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -20,10 +20,12 @@ import { ShowToast } from '../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { InvoicesApiService } from './invoices-api.service';
+import { RowNode } from '@ag-grid-community/core';
+import { PendingApprovalInvoice } from '../interfaces/pending-approval-invoice.interface';
 
 @Injectable()
 export class InvoicesService {
-  private currentSelectedTableRowIndex: BaseObservable<number> = new BaseObservable<number>(null as any);
+  private currentSelectedTableRowIndex: BaseObservable<number> = new BaseObservable<number>(null as unknown as number);
 
   constructor(
     private fb: FormBuilder,
@@ -117,5 +119,18 @@ export class InvoicesService {
         new ShowToast(MessageTypes.Error, getAllErrors(error.error))
       )),
     );
+  }
+
+  public createPaymentRecords(nodes: RowNode[]): InvoicePaymentData[] {
+    return nodes.filter((node) => (node.data as PendingApprovalInvoice).invoiceState === 2)
+    .map((node) => {
+      const data = node.data as PendingApprovalInvoice;
+      return ({
+        invoiceId: data.invoiceId,
+        invoiceNumber: data.formattedInvoiceId,
+        amount: data.amountToPay,
+        agencySuffix: data.agencySuffix,
+      });
+    });
   }
 }

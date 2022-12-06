@@ -124,4 +124,5 @@ export const PaymentMessages = {
   lowerAmount: 'Please note that amount assigned to invoices is lower than check amount. Are you sure you want to proceed?',
   negativeAmount: 'Please note that amount assigned to invoices is higher than check amount',
   deleteInvoice: 'Deleting payment details can change invoice status. Are you sure you want to proceed?',
+  unsavedData: 'Are you sure you want to leave this page without saving?',
 };

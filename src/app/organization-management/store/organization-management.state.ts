@@ -71,6 +71,7 @@ import {
   RemoveAssignedSkillSucceeded,
   RemoveCredential,
   RemoveCredentialSkillGroup,
+  RemoveCredentialSuccess,
   RemoveCredentialType,
   RemoveMasterSkill,
   RemoveMasterSkillSucceeded,
@@ -119,7 +120,7 @@ import {
   UploadLocationsFileSucceeded,
   UploadOrganizationLogo,
   UploadRegionsFile,
-  UploadRegionsFileSucceeded
+  UploadRegionsFileSucceeded,
 } from './organization-management.actions';
 import { Department, DepartmentFilterOptions, DepartmentsPage, ImportedDepartment } from '@shared/models/department.model';
 import { ImportedRegion, Region, regionFilter } from '@shared/models/region.model';
@@ -1134,12 +1135,12 @@ export class OrganizationManagementState {
   @Action(RemoveCredential)
   RemoveCredential(
     { patchState, dispatch }: StateContext<OrganizationManagementStateModel>,
-    { payload, filters }: RemoveCredential
-  ): Observable<any> {
+    { payload }: RemoveCredential
+  ): Observable<void> {
     return this.credentialsService.removeCredential(payload).pipe(
       tap(() => {
         patchState({ isCredentialLoading: false });
-        dispatch(new GetCredential(filters));
+        dispatch(new RemoveCredentialSuccess());
         return payload;
       }),
       catchError((error: any) => {

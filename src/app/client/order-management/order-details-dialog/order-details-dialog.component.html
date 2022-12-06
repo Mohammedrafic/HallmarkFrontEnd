@@ -51,6 +51,7 @@
               <button
                 ejs-button
                 cssClass="e-outline"
+                [class.custom-order-btn]="showApproveAndCancel"
                 [disabled]="disableCloseOrder || !canCloseOrderPermission || !hasCreateEditOrderPermission"
                 (click)="closeOrder(order)"
               >
@@ -61,6 +62,7 @@
               <button
                 ejs-button
                 cssClass="e-outline"
+                [class.custom-order-btn]="showApproveAndCancel"
                 [disabled]="!canCloseOrderPermission || !hasCreateEditOrderPermission"
                 (click)="reOpenOrder(order)"
               >
@@ -71,6 +73,7 @@
               <button
                 ejs-button
                 cssClass="e-outline"
+                [class.custom-order-btn]="showApproveAndCancel"
                 (click)="createReOrder()"
                 [disabled]="disableCreateReOrder || !canCreateOrder || !hasCreateEditOrderPermission"
               >
@@ -81,10 +84,22 @@
               <button
                 ejs-button
                 cssClass="e-primary delete-button"
+                [class.custom-order-btn]="showApproveAndCancel"
                 [disabled]="!canCreateOrder || !hasCreateEditOrderPermission"
                 (click)="deleteOrder(order.id)"
               >
                 Delete
+              </button>
+            </app-tooltip-container>
+            <app-tooltip-container *ngIf="desktopSmallMenu.length && showApproveAndCancel" [showToolTip]="!hasCreateEditOrderPermission">
+              <button
+                ejs-dropdownbutton
+                [items]="desktopSmallMenu"
+                [disabled]="!canCreateOrder || !hasCreateEditOrderPermission"
+                (select)="onMobileMenuSelect($event)"
+                cssClass="e-caret-hide e-outline edit-button primary-icon-button menu-desktop-small"
+              >
+                <i-feather name="more-vertical" class="icon"></i-feather>
               </button>
             </app-tooltip-container>
             <app-tooltip-container *ngIf="tabletMenu.length" [showToolTip]="!hasCreateEditOrderPermission">
@@ -103,6 +118,7 @@
               <button
                 ejs-button
                 cssClass="e-outline"
+                [class.custom-order-btn]="showApproveAndCancel"
                 [isPrimary]="true"
                 (click)="lockOrder()"
                 [disabled]="disabledLock || !canCreateOrder || !hasCreateEditOrderPermission"

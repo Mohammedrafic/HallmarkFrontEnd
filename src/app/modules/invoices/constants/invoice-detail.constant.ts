@@ -70,7 +70,7 @@ export const invoiceDetailsColumnDefs = (isAgency: boolean): ColDef[] => {
       cellClass: 'font-weight-bold custom-line-height',
       valueFormatter: (params: ValueFormatterParams) => {
         const weekNum = params.data.weekNumber;
-        return `${weekNum} - ${GridValuesHelper.formatDate(params.value, 'ccc MM/dd/yyyy')}`.toUpperCase()
+        return `${weekNum} - ${GridValuesHelper.formatDate(params.value, 'ccc MM/dd/yyyy')}`.toUpperCase();
       },
     },
     {
@@ -260,7 +260,8 @@ export const ActionBtnOnStatus: Map<INVOICES_STATUSES, InvoicesActionBtn> = new 
   .set(INVOICES_STATUSES.SUBMITED_PEND_APPR, InvoicesActionBtn.Approve)
   .set(INVOICES_STATUSES.PENDING_PAYMENT, InvoicesActionBtn.Pay);
 
-export const AgencyActionBtnOnStatus: Map<INVOICES_STATUSES, InvoicesActionBtn> = new Map<INVOICES_STATUSES, InvoicesActionBtn>()
+export const AgencyActionBtnOnStatus: Map<INVOICES_STATUSES,
+InvoicesActionBtn> = new Map<INVOICES_STATUSES, InvoicesActionBtn>()
   .set(INVOICES_STATUSES.SUBMITED_PEND_APPR, InvoicesActionBtn.Pay)
   .set(INVOICES_STATUSES.PENDING_PAYMENT, InvoicesActionBtn.Pay);
 

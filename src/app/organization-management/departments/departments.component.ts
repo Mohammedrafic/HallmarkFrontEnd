@@ -80,6 +80,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
   @ViewChild('reactivationDatepicker') reactivationDatepicker: DatePicker;
+  @ViewChild('inactivationDatepicker') inactivationDatepicker: DatePicker;
 
   departmentsDetailsFormGroup: FormGroup;
   fieldsSettings: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -100,9 +101,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   protected componentDestroy: () => Observable<unknown>;
 
   private selectedRegion: Region;
-  private selectedLocation: Location;
+  public selectedLocation: Location;
   private editedDepartmentId?: number;
-  private isEdit: boolean;
+  public isEdit: boolean;
   private defaultFileName: string;
   private filters: DepartmentFilter = {
     pageNumber: this.currentPage,
@@ -111,7 +112,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   private regions: OrganizationRegion[] = [];
   private pageSubject = new Subject<number>();
 
-  public maxReactivateDate: string | null;
+  public minReactivateDate: string | null;
+  public maxInactivateDate: string | null;
 
   constructor(
     private store: Store,
@@ -303,7 +305,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   private inactivateDateHandler(field: AbstractControl, value: string | null): void {
-    if (value) {
+    if (value && !this.selectedLocation.isDeactivated) {
       const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
       inactiveDate.setHours(0, 0, 0, 0);
       const now = new Date();
@@ -339,17 +341,18 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     if (this.selectedLocation) {
       const reactivationDateField = this.departmentsDetailsFormGroup.controls['reactivateDate'];
       const reactivateDate = this.selectedLocation.reactivateDate ? new Date(this.selectedLocation.reactivateDate) : null;
-      this.maxReactivateDate = reactivateDate
-        ? DateTimeHelper.formatDateUTC(reactivateDate.toISOString(), 'MM/dd/yyyy')
-        : null;
+      const inactiveDate = this.selectedLocation.inactiveDate ? new Date(this.selectedLocation.inactiveDate) : null;
+      this.minReactivateDate = reactivateDate ? DateTimeHelper.formatDateUTC(reactivateDate.toISOString(), 'MM/dd/yyyy') : null;
+      this.maxInactivateDate = inactiveDate ? DateTimeHelper.formatDateUTC(inactiveDate.toISOString(), 'MM/dd/yyyy') : null;
       if (!this.selectedLocation.reactivateDate) {
         reactivationDateField.disable();
       } else {
         reactivationDateField.enable();
-        if (!department?.reactivateDate) {
+        if (!department?.reactivateDate && !this.selectedLocation.isDeactivated) {
           reactivationDateField.patchValue(this.selectedLocation.reactivateDate);
         }
         this.reactivationDatepicker.refresh();
+        this.inactivationDatepicker.refresh();
       }
     }
   }

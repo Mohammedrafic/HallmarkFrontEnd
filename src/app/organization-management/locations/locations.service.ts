@@ -32,7 +32,7 @@ export class LocationsService {
       timeZone: [null],
       locationType: [null],
       organizationId: 0,
-      includeInIRP: [false]
+      includeInIRP: [false],
     }) as CustomFormGroup<LocationsForm>;
   }
 
@@ -46,7 +46,7 @@ export class LocationsService {
       states: [[]],
       zipCodes: [[]],
       contactPeople: [[]],
-      includeInIRP: [[]]
+      includeInIRP: [[]],
     });
   }
 

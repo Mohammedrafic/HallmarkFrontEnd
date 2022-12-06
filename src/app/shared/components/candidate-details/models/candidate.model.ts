@@ -4,8 +4,8 @@ import { FilterColumn } from '@shared/models/filter.model';
 
 export type OrderTab = {
   orderId: number;
-  candidateId: number;
-  orderType: number;
+  candidateId: number | string;
+  orderType: number | null;
   prefix: string;
 };
 
