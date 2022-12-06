@@ -3,23 +3,20 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { CustomFormGroup } from '@core/interface';
 import { CredentialFilter } from '@shared/models/credential.model';
-import { CredentialDTO, SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
+import { CredentialDTO } from '@shared/components/credentials-list/interfaces';
 
 @Injectable()
 export class CredentialListService {
   constructor(private formBuilder: FormBuilder) {}
 
-  public createFiltersForm(
-    selectedSystem: SelectedSystemsFlag,
-    isCredentialSettings: boolean
-  ): CustomFormGroup<CredentialFilter> {
+  public createFiltersForm(isIncludeIrp: boolean): CustomFormGroup<CredentialFilter> {
     let filtersForm = this.formBuilder.group({
       credentialIds: [[]],
       credentialTypeIds: [[]],
       expireDateApplicable: [false],
     });
 
-    if(selectedSystem.isIRP && selectedSystem.isVMS && isCredentialSettings) {
+    if(isIncludeIrp) {
       filtersForm = this.formBuilder.group({
         ...filtersForm.controls,
         includeInIRP: [true],
@@ -31,7 +28,7 @@ export class CredentialListService {
   }
 
   public createCredentialForm(
-    selectedSystem: SelectedSystemsFlag,
+    isIncludeIrp: boolean,
     isCredentialSettings: boolean
   ): CustomFormGroup<CredentialDTO> {
     let credentialForm = this.formBuilder.group({
@@ -42,7 +39,7 @@ export class CredentialListService {
       comment: ['', Validators.maxLength(500)],
     });
 
-    if(selectedSystem.isIRP && selectedSystem.isVMS && isCredentialSettings) {
+    if(isIncludeIrp && isCredentialSettings) {
       credentialForm = this.formBuilder.group({
         ...credentialForm.controls,
         includeInIRP: [false],

@@ -40,6 +40,8 @@ import {
 } from '@shared/components/credentials-list/interfaces';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
+import { UserState } from '../../../../store/user.state';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-add-edit-credential',
@@ -48,10 +50,11 @@ import { MessageTypes } from '@shared/enums/message-types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddEditCredentialComponent extends Destroyable implements OnInit {
-  @Input() disableButton: boolean;
-  @Input() isCredentialSettings = false;
+  @Input() public disableButton: boolean;
+  @Input() public isCredentialSettings = false;
 
   @Input() set systemFlags(systems: SelectedSystemsFlag) {
+    this.isCurrentMspUser();
     this.selectedSystem = systems;
     this.initCredentialForm();
     this.initDialogConfig();
@@ -79,6 +82,7 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   public isEdit = false;
   public dialogConfig: CredentialListConfig[];
   public selectedSystem: SelectedSystemsFlag;
+  public isMspUser = false;
 
   private selectedCredential: Credential;
 
@@ -156,12 +160,12 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   }
 
   private initDialogConfig(): void {
-    this.dialogConfig = CredentialsDialogConfig(this.selectedSystem, this.isCredentialSettings);
+    this.dialogConfig = CredentialsDialogConfig(this.showIrpFields(), this.isCredentialSettings);
   }
 
   private initCredentialForm(): void {
     this.credentialForm = this.credentialListService.createCredentialForm(
-      this.selectedSystem,
+      this.showIrpFields(),
       this.isCredentialSettings
     );
   }
@@ -222,11 +226,20 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   }
 
   private isSystemSelected(): boolean {
-    if(this.selectedSystem.isIRP && this.selectedSystem.isVMS) {
+    if(this.showIrpFields()) {
       return this.credentialForm.get('includeInIRP')?.value
         || this.credentialForm.get('includeInVMS')?.value;
     } else {
       return true;
     }
+  }
+
+  private showIrpFields(): boolean {
+    return this.selectedSystem.isIRP && this.selectedSystem.isVMS && !this.isMspUser;
+  }
+
+  private isCurrentMspUser(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    this.isMspUser = user?.businessUnitType === BusinessUnitType.MSP;
   }
 }

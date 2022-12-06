@@ -1,6 +1,6 @@
 import { CredentialsDialogTitle } from '@shared/components/credentials-list/enums';
 import { CredentialConfig, SystemConfig } from '@shared/components/credentials-list/constants';
-import { CredentialListConfig, SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
+import { CredentialListConfig } from '@shared/components/credentials-list/interfaces';
 import { Credential } from '@shared/models/credential.model';
 
 export const systemColumnMapper = (credentials: Credential[]) => {
@@ -17,10 +17,10 @@ export const DialogTitle = (isEdit: boolean) => {
 };
 
 export const CredentialsDialogConfig = (
-  selectedSystem: SelectedSystemsFlag,
+  isIncludeIrp: boolean,
   isCredentialSettings: boolean
 ): CredentialListConfig[] => {
-  if(selectedSystem.isIRP && selectedSystem.isVMS && isCredentialSettings) {
+  if(isIncludeIrp && isCredentialSettings) {
     return [...SystemConfig, ...CredentialConfig];
   }
   return CredentialConfig;

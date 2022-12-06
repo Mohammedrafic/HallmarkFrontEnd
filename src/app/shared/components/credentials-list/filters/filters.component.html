@@ -7,7 +7,12 @@
   (closeDialogClicked)="onFilterClose()"
 >
   <form class="bootstrap" [formGroup]="credentialsFilters">
-    <div class="input-container" *ngIf="isCredentialSettings && selectedSystem.isIRP && selectedSystem.isVMS">
+    <div class="input-container" *ngIf="
+    isCredentialSettings
+    && selectedSystem.isIRP
+    && selectedSystem.isVMS
+    && !isMspUser
+">
       <label>Select system</label>
       <div class="bootstrap checkbox-container">
         <ejs-checkbox formControlName="includeInIRP" label="IRP"></ejs-checkbox>

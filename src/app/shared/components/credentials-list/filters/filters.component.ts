@@ -32,6 +32,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
     this.changeDetection.markForCheck();
   }
   @Input() public isCredentialSettings = false;
+  @Input() public isMspUser = false;
 
   @Output() public handleClearFilters: EventEmitter<number> = new EventEmitter();
   @Output() public handleApplyFilters: EventEmitter<void> = new EventEmitter();
@@ -95,7 +96,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
       expireDateApplicable: expireDateApplicable ?? null,
     });
 
-    if(this.selectedSystem.isIRP && this.selectedSystem.isVMS && this.isCredentialSettings) {
+    if(this.isCredentialWithIrp()) {
       this.credentialsFilters.patchValue({
         includeInIRP: includeInIRP ?? null,
         includeInVMS: includeInVMS ?? null,
@@ -106,7 +107,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
   }
 
   private initFilterForm(): void {
-    this.credentialsFilters = this.credentialListService.createFiltersForm(this.selectedSystem, this.isCredentialSettings);
+    this.credentialsFilters = this.credentialListService.createFiltersForm(this.isCredentialWithIrp());
   }
 
   private watchForOrganizationId(): void {
@@ -118,11 +119,15 @@ export class FiltersComponent extends Destroyable implements OnInit {
   }
 
   private setSystemValue(): void {
-    if(this.selectedSystem.isIRP && this.selectedSystem.isVMS && this.isCredentialSettings) {
+    if(this.isCredentialWithIrp()) {
       this.credentialsFilters.patchValue({
         includeInIRP: false,
         includeInVMS: false,
       });
     }
+  }
+
+  private isCredentialWithIrp(): boolean {
+    return this.selectedSystem.isIRP && this.selectedSystem.isVMS && this.isCredentialSettings && !this.isMspUser;
   }
 }
