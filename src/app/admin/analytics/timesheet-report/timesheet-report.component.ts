@@ -40,15 +40,19 @@ import { uniqBy } from 'lodash';
 export class TimesheetReportComponent implements OnInit, OnDestroy{
 
   public paramsData: any = {
-    "OrganizationParamTSS": "",
-    "StartDateParamTSS": "",
-    "EndDateParamTSS": "",
-    "RegionParamTSS": "",
-    "LocationParamTSS": "",
-    "DepartmentParamTSS": ""
+    "OrganizationParamTS": "",
+    "RegionsParamTS": "",
+    "LocationsParamTS": "",
+    "DepartmentsParamTS": "",
+    "AgenciesParamTS": "",
+    "JobIDParamTS": "",
+    "StatusesParamTS": "",
+    "CandidateNameParamTS": "",
+    "StartDateParamTS": "",
+    "EndDateParamTS": ""
   };
-  public reportName: LogiReportFileDetails = { name: "/TimeSheetReport/TimeSheetReport.wls" };
-  public catelogName: LogiReportFileDetails = { name: "/TimeSheetReport/Dashbord.cat" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/TimeSheetReport/TimeSheet.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/TimeSheetReport/TimeSheet.cat" };
   public title: string = "Timesheet Report";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
@@ -338,18 +342,18 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
 
     this.paramsData =
     {
-      "OrganizationParamTSS": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "StartDateParamTSS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateParamTSS": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamTSS": regionIds?.join(","),
-      "LocationParamTSS": locationIds?.join(","),
-      "DepartmentParamTSS": departmentIds?.join(","),
-      "CandidateNameTSS": candidateName == null || candidateName == "" ? 'null' : candidateName.toString(),
-      "StatusTSS": timesheetStatuses?.length > 0 ? timesheetStatuses.join(",") : 'null',
-      "JobIdTSS": jobId == null || jobId == "" ? 'null' : jobId,
-      "AgencysTSS": agencyIds?.length > 0 ? agencyIds.join(",") : 'null',
-      "BearerParamTSS": auth,
-      "BusinessUnitIdParamTSS": businessIds,
+      "OrganizationParamTS": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "StartDateParamTS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "EndDateParamTS": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+      "RegionsParamTS": regionIds?.join(","),
+      "LocationsParamTS": locationIds?.join(","),
+      "DepartmentsParamTS": departmentIds?.join(","),
+      "CandidateNameParamTS": candidateName == null || candidateName == "" ? 'null' : candidateName.toString(),
+      "StatusesParamTS": timesheetStatuses?.length > 0 ? timesheetStatuses.join(",") : 'null',
+      "JobIDParamTS": jobId == null || jobId == "" ? 'null' : jobId,
+      "AgenciesParamTS": agencyIds?.length > 0 ? agencyIds.join(",") : 'null',
+      "BearerParamTS": auth,
+      "BusinessUnitIdParamTS": businessIds,
       "HostName": this.baseUrl,
     };
     this.logiReportComponent.paramsData = this.paramsData;
