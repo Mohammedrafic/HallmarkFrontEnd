@@ -7,7 +7,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { combineLatest, filter, map, Observable, Subject, switchMap, take, takeUntil, throttleTime } from 'rxjs';
+import { combineLatest, delay, filter, map, Observable, Subject, switchMap, take, takeUntil, throttleTime } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import { TakeUntilDestroy } from '@core/decorators';
@@ -413,7 +413,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     } else {
       this.locationDetailsFormGroup.markAllAsTouched();
     }
-    
+
   }
 
   trackByField(index: number, item: LocationsFormConfig): string {
@@ -602,15 +602,22 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.organization$
     .pipe(
       filter(Boolean),
+      delay(100),
       tap((organization) => {
         this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
         if (this.isFeatureIrpEnabled) {
           this.isOrgVMSEnabled = !!organization.preferences.isVMCEnabled;
           this.isOrgIrpEnabled = !!organization.preferences.isIRPEnabled;
           this.columnsToExport = this.isOrgIrpEnabled ? LocationsExportIrpColumns : LocationExportColumns;
+
           this.filterExportColumns();
           this.checkFieldsVisibility();
         }
+
+        this.grid.getColumnByField('includeInIRPText').visible =
+          this.isFeatureIrpEnabled && this.isOrgIrpEnabled && this.isOrgVMSEnabled;
+        this.grid.getColumnByField('invoiceId').visible = this.isOrgVMSEnabled || !this.isFeatureIrpEnabled;
+        this.grid.refreshColumns();
       }),
       switchMap(() => this.store.dispatch(new GetRegions())),
       takeUntil(this.componentDestroy()),
@@ -662,7 +669,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       if (!this.isOrgVMSEnabled && !FieldsToHideInVms.includes(column.field)) {
         return !FieldsToHideInIrp.includes(column.field);
       }
-      
+
       if (!this.isOrgIrpEnabled || (this.isOrgIrpEnabled && !this.isOrgVMSEnabled)) {
         return !FieldsToHideInVms.includes(column.field);
       }

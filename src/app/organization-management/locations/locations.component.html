@@ -88,13 +88,13 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="includeInIRPText" headerText="Include in IRP" width=200 *ngIf="isFeatureIrpEnabled && isOrgIrpEnabled && isOrgVMSEnabled">
+      <e-column field="includeInIRPText" headerText="Include in IRP" width=200>
         <ng-template #template let-data>
           <span>{{ data.includeInIRPText }}</span>
         </ng-template>
       </e-column>
       <e-column field="externalId" headerText="LOCATION Id" width=200></e-column>
-      <e-column field="invoiceId" headerText="INVOICE LOCATION ID" width=200 *ngIf="isOrgVMSEnabled || !isFeatureIrpEnabled"></e-column>
+      <e-column field="invoiceId" headerText="INVOICE LOCATION ID" width=200></e-column>
       <e-column field="name" headerText="LOCATION NAME" width=200></e-column>
       <e-column field="businessLine" headerText="Business Line" width=200></e-column>
       <e-column field="address1" headerText="ADDRESS 1" width=200></e-column>
@@ -384,7 +384,7 @@
                     </div>
                   </div>
                 </ng-template>
-      
+
                 <ng-template [ngSwitchCase]="FieldTypes.Input">
                   <div class="input-container" [ngStyle]="{'grid-area': control.gridAreaName}">
                     <label [for]="control.field">
@@ -402,7 +402,7 @@
                     </div>
                   </div>
                 </ng-template>
-    
+
                 <ng-template [ngSwitchCase]="FieldTypes.Date">
                   <div class="input-container calendar" [ngStyle]="{'grid-area': control.gridAreaName}">
                     <label [for]="control.field">
@@ -422,7 +422,7 @@
                   </div>
                 </ng-template>
               </ng-container>
-  
+
             </ng-container>
           </div>
         </div>
