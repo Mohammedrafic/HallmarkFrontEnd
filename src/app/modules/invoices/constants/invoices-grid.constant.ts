@@ -3,12 +3,12 @@ import {
   ColDef,
   ICellRendererParams,
   ValueFormatterFunc, ValueGetterFunc,
-  ValueGetterParams
+  ValueGetterParams,
 } from '@ag-grid-community/core';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 import { GridValuesHelper } from '../../timesheets/helpers';
 import {
-  TitleValueCellRendererComponent
+  TitleValueCellRendererComponent,
 } from '@shared/components/grid/components/title-value-cell-renderer/title-value-cell-renderer.component';
 import { ManualInvoice, TypedColDef } from '../interfaces';
 import { PendingInvoice } from '../interfaces/pending-invoice-record.interface';
@@ -32,7 +32,7 @@ export const titleValueCellRendererSelector: CellRendererSelectorFunc = (params:
   return params.value !== null ? {
     component: TitleValueCellRendererComponent,
   } : undefined;
-}
+};
 
 export const weekPeriodValueGetter: ValueGetterFunc = (params: ValueGetterParams) => {
   const { weekNumber, weekStartDate: date } = params.data as PendingInvoice;
@@ -59,7 +59,7 @@ export const amountColDef: TypedColDef<ManualInvoice> = {
   headerName: 'AMOUNT',
   width: 110,
   cellClass: 'font-weight-bold',
-  valueFormatter: numberValueFormatter,
+  valueFormatter: CurrencyFormatter,
   ...commonColumn,
 };
 

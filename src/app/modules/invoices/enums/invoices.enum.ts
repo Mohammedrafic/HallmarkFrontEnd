@@ -76,3 +76,8 @@ export enum PaymentMode {
   Electronic,
   Check,
 }
+
+export enum PaymentDialogTitle {
+  Add = 'Add',
+  Edit = 'Edit',
+}

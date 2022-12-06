@@ -9,7 +9,7 @@ import { FieldType } from '@core/enums';
 import { DateTimeHelper, DestroyDialog } from '@core/helpers';
 import { CustomFormGroup } from '@core/interface';
 import { PaymentsAdapter } from '../../helpers/payments.adapter';
-import { InvoicePaymentData, PaymentCreationDto } from '../../interfaces';
+import { InvoicePaymentData } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoicesModel } from '../../store/invoices.model';
 import { AddPaymentFormConfig, CheckPaymentsDefs, PaymentMessages } from './invoice-add-payment.constant';
@@ -19,6 +19,7 @@ import { InvoicesApiService } from '../../services';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
+import { PaymentDialogTitle } from '../../enums';
 
 
 @Component({
@@ -31,6 +32,8 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
   @Input() invoicesToPay: InvoicePaymentData[] = [];
 
   @Input() checkNumber: string | null;
+
+  @Input() dialogTitle = PaymentDialogTitle.Add;
 
   paymentsForm: Record<string, CustomFormGroup<PaymentForm>>;
 
@@ -242,7 +245,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
       this.initialAmount = response.check.initialAmount;
       const tableRecords = this.paymentService.mergeTableData(this.tableData, response.payments, this.paymentsForm);
 
-      this.invoicesToPay = this.paymentService.createInitialInvoicesData(response);
+      this.invoicesToPay = this.paymentService.createInitialInvoicesData(response, this.invoicesToPay);
       this.gridApi.setRowData(tableRecords);
       this.calcLeftAmount();
       this.cd.markForCheck();

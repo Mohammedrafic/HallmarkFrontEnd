@@ -5,9 +5,9 @@ import { PendingInvoice } from '../../interfaces/pending-invoice-record.interfac
 import { Attachment, AttachmentsListParams } from '@shared/components/attachments';
 import { InvoicesContainerGridHelper } from './invoices-container-grid.helper';
 import {
-  ToggleRowExpansionHeaderCellComponent
+  ToggleRowExpansionHeaderCellComponent,
 } from '../../components/grid-icon-cell/toggle-row-expansion-header-cell.component';
-import { numberValueFormatter } from '../../constants';
+import { CurrencyFormatter, numberValueFormatter } from '../../constants';
 import { TypedColDef } from '../../interfaces';
 
 const commonColumn: ColDef = {
@@ -31,7 +31,7 @@ export class PendingInvoicesGridHelper {
       skillName,
       weekPeriod,
       unitName,
-      orderId
+      orderId,
     } = InvoicesContainerGridHelper.getColDefsMap(false);
     return [
       {
@@ -41,7 +41,7 @@ export class PendingInvoicesGridHelper {
         headerCheckboxSelectionFilteredOnly: true,
         checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
           const { agencyStatus } = params.data as PendingInvoice;
-          return agencyStatus !== AgencyStatus.Terminated
+          return agencyStatus !== AgencyStatus.Terminated;
         },
         minWidth: 240,
         headerComponent: ToggleRowExpansionHeaderCellComponent,
@@ -60,7 +60,7 @@ export class PendingInvoicesGridHelper {
             attachmentsListConfig: {
               download: downloadAttachment,
               preview: previewAttachment,
-            }
+            },
           };
         },
         cellClass: 'invoice-records-attachments-list',
@@ -101,7 +101,7 @@ export class PendingInvoicesGridHelper {
         headerName: 'AMOUNT',
         width: 110,
         cellClass: 'font-weight-bold',
-        valueFormatter: numberValueFormatter,
+        valueFormatter: CurrencyFormatter,
         ...commonColumn,
       },
     ];

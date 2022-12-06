@@ -61,7 +61,7 @@ export class AgencyStrategy implements ManualInvoiceStrategy {
     )
     .pipe(
       map(() => null),
-    )
+    );
   }
 
   public connectConfigOptions(config: AddManInvoiceDialogConfig, options: ManualInvoiceInputOptions): void {
@@ -72,5 +72,6 @@ export class AgencyStrategy implements ManualInvoiceStrategy {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   public populateCandidates(): void {}
 }

@@ -133,5 +133,6 @@
   *ngIf="invoiceDetailsConfig.addPaymentOpen"
   [invoicesToPay]="paymentRecords"
   [checkNumber]="editCheckNumber"
+  [dialogTitle]="paymentDialogTitle"
   (destroyDialog)="closeAddPayment()">
 </app-invoice-add-payment>
