@@ -82,15 +82,15 @@ export class OrderImportService {
     const { orderImport } = importedOrder;
 
     const classification = orderImportClassifications
-      .filter((({ tempOrderId }) => tempOrderId === importedOrder.orderImport.tempOrderId))
+      .filter((({ tempOrderId, classification }) => tempOrderId === importedOrder.orderImport.tempOrderId && classification))
       .map(({classification}) => classification)
       .join(', ');
     const jobDistribution = orderImportJobDistributions
-      .filter((({ tempOrderId }) => tempOrderId === importedOrder.orderImport.tempOrderId))
+      .filter((({ tempOrderId, jobDistribution }) => tempOrderId === importedOrder.orderImport.tempOrderId && jobDistribution))
       .map(({jobDistribution}) => jobDistribution)
       .join(', ');
     const agency = orderImportJobDistributions
-      .filter((({ tempOrderId }) => tempOrderId === importedOrder.orderImport.tempOrderId))
+      .filter((({ tempOrderId, agency }) => tempOrderId === importedOrder.orderImport.tempOrderId && agency))
       .map(({agency}) => agency)
       .join(', ');
 

@@ -9,6 +9,7 @@
   (tabChange)="tabChange($event)"
   [title]="titleImport"
   [isOrderImport]="true"
+  [zIndex]="2"
 >
   <section
     successful
@@ -27,7 +28,7 @@
     </ejs-listbox>
     <div class="records-grids">
       <app-import-grid
-        *ngFor="let grid of successGridList[selectedIndex]?.grids"
+        *ngFor="let grid of successGridList[selectedIndex]?.grids; trackBy: trackByErrorHandler"
         [gridName]="grid?.gridName"
         class="records-grid"
         [importedItems]="grid.rowData"
@@ -53,7 +54,7 @@
     </ejs-listbox>
     <div class="records-grids">
       <app-import-grid
-        *ngFor="let grid of errorGridList[selectedIndex]?.grids"
+        *ngFor="let grid of errorGridList[selectedIndex]?.grids; trackBy: trackBySuccessHandler"
         [gridName]="grid?.gridName"
         class="records-grid"
         [importedItems]="grid.rowData"

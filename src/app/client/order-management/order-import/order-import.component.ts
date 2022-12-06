@@ -8,7 +8,7 @@ import { UploadOrderImportFileSucceeded } from '@client/store/order-managment-co
 import { OrderImportService } from '@client/order-management/order-import/order-import.service';
 import { getInstance } from '@syncfusion/ej2-base';
 import { DOCUMENT } from '@angular/common';
-import { ImportedOrder, ImportedOrderGrid, ListBoxItem } from '@shared/models/imported-order.model';
+import { ImportedOrder, ImportedOrderGrid, ListBoxItem, OrderGrid } from '@shared/models/imported-order.model';
 import { takeUntil } from 'rxjs';
 
 @Component({
@@ -71,6 +71,14 @@ export class OrderImportComponent extends AbstractImport implements OnInit {
   public selectItem(event: ListBoxChangeEventArgs): void {
     const [item] = event.items as ListBoxItem[];
     this.selectedIndex = this.dataSource.findIndex((record: ImportedOrderGrid) => item.id === record.tempOrderId);
+  }
+
+  public trackByErrorHandler(index: number, grid: OrderGrid): string {
+    return `error${grid.gridName ?? ''}${index}`;
+  }
+
+  public trackBySuccessHandler(index: number, grid: OrderGrid): string {
+    return `success${grid.gridName ?? ''}${index}`;
   }
 
   private listenOrderImportParser(): void {
