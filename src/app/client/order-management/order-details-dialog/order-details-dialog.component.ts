@@ -169,8 +169,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   get disableCreateReOrder(): boolean {
     return (
-      this.order?.status === this.orderStatus.PreOpen ||
-      this.order?.status === this.orderStatus.Closed ||
+      [this.orderStatus.PreOpen, this.orderStatus.Closed, this.orderStatus.Incomplete].includes(this.order?.status) ||
       !this.settings[SettingsKeys.IsReOrder]?.value
     );
   }
