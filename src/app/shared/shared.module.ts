@@ -33,7 +33,7 @@ import {
 } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 
-import { ValidateDirective } from './directives/validate.directive';
+import { ValidateDirective } from './directives/validate-directive/validate.directive';
 import { ErrorMessageComponent } from './components/error-message/error-message.component';
 import { ValidationErrorPipe } from './pipes/validation-error.pipe';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -141,6 +141,7 @@ import { DocumentPreviewSideDialogComponent } from './components/document-previe
 import { CustomSideDialogComponent } from './components/custom-side-dialog/custom-side-dialog.component';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { HideByCandidateStatusPipe } from './pipes/hide-by-candidate-status.pipe';
+import { ValidateDirectiveModule } from './directives/validate-directive/validate-directive.module';
 
 const icons = {
   AlertCircle,
@@ -174,7 +175,6 @@ const COMPONENTS = [
   RateHourPipe,
   BillRatePipe,
   ExBillRateNamesPipe,
-  ValidateDirective,
   HideBeforeSyncfusionLoadDirective,
   OpenFirstAccordionDirective,
   HighlightGridRowDirective,
@@ -226,7 +226,7 @@ const COMPONENTS = [
   AssignCredentialSideComponent,
   SendEmailSideDialogComponent,
   DocumentPreviewSideDialogComponent,
-  CustomSideDialogComponent
+  CustomSideDialogComponent,
 ];
 
 @NgModule({
@@ -270,7 +270,8 @@ const COMPONENTS = [
     SidebarModule,
     RouterModule,
     TreeViewAllModule,
-    SplitButtonModule
+    SplitButtonModule,
+    ValidateDirectiveModule,
   ],
   exports: [
     ...COMPONENTS,

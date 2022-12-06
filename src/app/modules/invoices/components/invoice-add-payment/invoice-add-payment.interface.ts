@@ -31,6 +31,7 @@ export interface PaymentsTableData {
 }
 
 export interface PaymentForm {
+  id: number;
   amount: number;
   balance: number;
 }
