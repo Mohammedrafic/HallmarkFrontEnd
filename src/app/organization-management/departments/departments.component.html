@@ -134,7 +134,7 @@
                 min="1"
                 [max]="(departments$ | async)?.totalPages"
                 [showSpinButton]="false"
-                (change)="onGoToClick($event)"
+                (change)="changeTablePagination($event)"
               >
               </ejs-numerictextbox>
               <div class="total-rows">
@@ -149,7 +149,7 @@
                 [totalRecordsCount]="(departments$ | async)?.totalCount"
                 [enablePagerMessage]="false"
                 [currentPage]="currentPage"
-                (click)="onGoToClick($event)"
+                (click)="changeTablePagination($event)"
               >
               </ejs-pager>
             </section>
