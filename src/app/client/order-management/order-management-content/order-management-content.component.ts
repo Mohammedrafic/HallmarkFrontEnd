@@ -928,6 +928,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public onOpenCandidateDialog(candidate: OrderManagementChild, order: OrderManagement, index?: number): void {
     this.selectedCandidate = candidate;
+    this.subscribeToCandidateJob(candidate.organizationId, candidate.jobId);
     this.selectedCandidateMeta = this.selectedCandidate.selected = {
       order: order.id,
       positionId: candidate.positionId,
@@ -1692,5 +1693,15 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         || permissions[this.userPermissions.CanOrganizationEditOrders];
         this.cd$.next(true);
     });
+  }
+
+  private subscribeToCandidateJob(organizationId: number, jobId: number): void {
+    this.store.dispatch(new GetOrganisationCandidateJob(organizationId, jobId));
+    this.candidatesJob$.pipe(filter(Boolean), take(1)).subscribe((data) => {
+      this.selectedCandidate = {
+        ...this.selectedCandidate,
+        actualStartDate: data.actualStartDate,
+        actualEndDate: data.actualEndDate,
+      }})
   }
 }

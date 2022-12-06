@@ -27,7 +27,11 @@ export class OrderDetailsContainerComponent {
       this.order.candidates?.length &&
       this.order.candidates[0].status === CandidatStatus[CandidatStatus.Rejected]
     );
-    this.isClosedOrder = this.order?.status === OrderStatus.Closed;
+    this.setIsClosedOrder = this.order;
+  }
+
+  set setIsClosedOrder(order: Order) {
+    this.isClosedOrder = order?.status === OrderStatus.Closed || !!order?.orderClosureReasonId || !!order?.orderClosureReason || !!order?.orderCloseDate;
   }
 
   public get orderInformation(): Order {
