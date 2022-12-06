@@ -62,8 +62,8 @@ export class CredentialsService {
       this.http.post<Credential>(`/api/MasterCredentials`, credential);
   }
 
-  public removeCredential(credential: Credential): Observable<any> {
-    return this.http.delete<any>(`/api/MasterCredentials/${credential.id}`);
+  public removeCredential(credential: Credential): Observable<void> {
+    return this.http.delete<void>(`/api/MasterCredentials/${credential.id}`);
   }
 
   public getCredentialSetupByMappingId(mappingId: number): Observable<CredentialSetupGet[]> {

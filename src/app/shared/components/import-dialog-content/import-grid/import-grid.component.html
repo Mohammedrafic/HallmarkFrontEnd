@@ -1,5 +1,5 @@
 <div class="grid-container">
-  <div class="grid-title">{{ gridName }}</div>
+  <div *ngIf="gridName" class="grid-title">{{ gridName }}</div>
   <app-grid
     (gridReadyEmitter)="gridReady($event)"
     [suppressRowClickSelection]="true"

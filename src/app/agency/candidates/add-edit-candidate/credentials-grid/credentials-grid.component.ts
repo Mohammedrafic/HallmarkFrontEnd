@@ -110,6 +110,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private unsubscribe$: Subject<void> = new Subject();
   private masterCredentialId: number | null;
   private credentialId: number | null;
+  private credentialStatus = CredentialStatus.Pending;
   private removeExistingFiles = false;
   private file: CredentialFile | null;
   private readonly candidateProfileId: number;
@@ -326,6 +327,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     event.stopPropagation();
     this.showCertifiedFields = !!expireDateApplicable;
     this.credentialId = id as number;
+    this.credentialStatus = status as CredentialStatus;
     this.masterCredentialId = masterCredentialId;
     this.setExistingFiles(credentialFiles);
     this.store.dispatch(new GetCredentialStatuses(
@@ -344,7 +346,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       credentialTypeId: credentialTypeName,
     });
     this.addCredentialForm.patchValue({
-      status,
       insitute,
       createdOn,
       number,
@@ -428,6 +429,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         this.searchCredentialForm.reset();
         this.addCredentialForm.markAsPristine();
         this.credentialId = null;
+        this.credentialStatus = CredentialStatus.Pending;
         this.masterCredentialId = null;
         this.removeExistingFiles = false;
         this.existingFiles = [];
@@ -620,12 +622,13 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       takeUntil(this.unsubscribe$)
     ).subscribe((payload: { statuses: CredentialStatus[] }) => {
       this.credentialStatusOptions = this.credentialGridService.getCredentialStatusOptions(payload.statuses);
+      this.addCredentialForm.patchValue({ status: this.credentialStatus });
     });
   }
 
   private setDisableAddCredentialButton(): void {
     this.disableAddCredentialButton = !this.areAgencyActionsAllowed
-      || !this.userPermission[this.userPermissions.CanEditCandidateCredentials]
+      || !this.hasPermissions()
       || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile);
   }
 
@@ -645,7 +648,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   private disableCopy(item: CandidateCredential): boolean {
     return !this.areAgencyActionsAllowed || this.disabledCopy || item.id === this.orderCredentialId
-      || !this.userPermission[this.userPermissions.CanEditCandidateCredentials]
+      || !this.hasPermissions()
       || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile);
   }
 
@@ -657,7 +660,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   private disableDelete(item: CandidateCredential): boolean {
     return !this.areAgencyActionsAllowed || item.id === this.orderCredentialId
-      || !this.userPermission[this.userPermissions.CanEditCandidateCredentials]
+      || !this.hasPermissions()
       || (this.isOrganizationSide && this.isNavigatedFromCandidateProfile);
   }
 
@@ -666,5 +669,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       this.existingFiles = [this.credentialGridService.getExistingFile(credentialFiles[0])];
       this.hideFileSize = true;
     }
+  }
+
+  private hasPermissions(): boolean {
+    return this.userPermission[this.userPermissions.CanEditCandidateCredentials]
+      || this.userPermission[this.userPermissions.ManageCredentialWithinOrderScope];
   }
 }

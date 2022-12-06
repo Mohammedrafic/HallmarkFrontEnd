@@ -9,38 +9,41 @@ import { CredentialDTO } from '@shared/components/credentials-list/interfaces';
 export class CredentialListService {
   constructor(private formBuilder: FormBuilder) {}
 
-  public createFiltersForm(isIRPFlagEnabled: boolean, isCredentialSettings: boolean): CustomFormGroup<CredentialFilter> {
+  public createFiltersForm(isIncludeIrp: boolean): CustomFormGroup<CredentialFilter> {
     let filtersForm = this.formBuilder.group({
       credentialIds: [[]],
       credentialTypeIds: [[]],
       expireDateApplicable: [false],
     });
 
-    if(isIRPFlagEnabled && isCredentialSettings) {
+    if(isIncludeIrp) {
       filtersForm = this.formBuilder.group({
         ...filtersForm.controls,
         includeInIRP: [true],
-        includeInVMS: [true]
+        includeInVMS: [true],
       });
     }
 
     return filtersForm as CustomFormGroup<CredentialFilter>;
   }
 
-  public createCredentialForm(isIRPFlagEnabled: boolean, isCredentialSettings: boolean): CustomFormGroup<CredentialDTO> {
+  public createCredentialForm(
+    isIncludeIrp: boolean,
+    isCredentialSettings: boolean
+  ): CustomFormGroup<CredentialDTO> {
     let credentialForm = this.formBuilder.group({
       id: [null],
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       credentialTypeId: ['', Validators.required],
       expireDateApplicable: [false],
-      comment: ['', Validators.maxLength(500)]
+      comment: ['', Validators.maxLength(500)],
     });
 
-    if(isIRPFlagEnabled && isCredentialSettings) {
+    if(isIncludeIrp && isCredentialSettings) {
       credentialForm = this.formBuilder.group({
         ...credentialForm.controls,
         includeInIRP: [false],
-        includeInVMS: [false, [Validators.required]]
+        includeInVMS: [false, [Validators.required]],
       });
     }
 

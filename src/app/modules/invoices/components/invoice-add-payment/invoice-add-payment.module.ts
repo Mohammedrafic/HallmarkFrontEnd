@@ -15,6 +15,7 @@ import { InvoiceAddPaymentService } from './invoice-add-payment.service';
 import { InputEditorComponent } from './cell-renderers/input-editor/input-editor.component';
 import { PaymentDeleteRendererComponent } from './cell-renderers/payment-delete-renderer/payment-delete-renderer.component';
 import { BalanceRendererComponent } from './cell-renderers/balance-renderer/balance-renderer.component';
+import { ValidateDirectiveModule } from '@shared/directives/validate-directive/validate-directive.module';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { BalanceRendererComponent } from './cell-renderers/balance-renderer/bala
     DatePickerAllModule,
     ButtonModule,
     FeatherModule.pick({Trash2}),
+    ValidateDirectiveModule,
   ],
   exports: [InvoiceAddPaymentComponent],
   providers: [InvoiceAddPaymentService],

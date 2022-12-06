@@ -91,12 +91,14 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
       return;
     }
 
-    if (this.checkForm.valid && !Object.keys(this.paymentsForm).length) {
+    const balanceCovered = this.paymentService.calcBalanceCovered(this.paymentsForm);
+
+    if (!Object.keys(this.paymentsForm).length || (this.calculatedLeftAmount === 0 && balanceCovered)) {
       this.savePaymentDto();
       return;
     }
 
-    if (this.calculatedLeftAmount > 0 && this.paymentService.calcBalanceCovered(this.paymentsForm)) {
+    if (this.calculatedLeftAmount > 0 && balanceCovered) {
       this.confirmService.confirm(PaymentMessages.lowerAmount, {
         title: 'Check Payment Amount',
         okButtonLabel: 'Yes',
@@ -110,7 +112,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
         this.savePaymentDto();
       });
 
-    } else if (this.calculatedLeftAmount > 0 && !this.paymentService.calcBalanceCovered(this.paymentsForm)) {
+    } else if (this.calculatedLeftAmount > 0 && !balanceCovered) {
       this.confirmService.confirm(
         PaymentMessages.partialyCovered(this.paymentService.findPartialyCoveredIds(this.paymentsForm)),
         {
@@ -128,7 +130,7 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
 
     } else if (this.calculatedLeftAmount < 0) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, PaymentMessages.negativeAmount));
-    } else if (this.calculatedLeftAmount === 0 && !this.paymentService.calcBalanceCovered(this.paymentsForm)) {
+    } else if (this.calculatedLeftAmount === 0 && !balanceCovered) {
       this.confirmService.confirm(
         PaymentMessages.partialyNullAmount(this.paymentService.findPartialyCoveredIds(this.paymentsForm)),
         {
@@ -185,6 +187,27 @@ export class InvoiceAddPaymentComponent extends DestroyDialog implements OnInit 
 
   calcCheckAmount(): void {
     this.calcLeftAmount();
+  }
+
+  closePaymentDialog(): void {
+    if (this.checkForm.touched) {
+      this.confirmService.confirm(
+        PaymentMessages.unsavedData,
+        {
+          title: 'Unsaved Progress',
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(
+          take(1),
+          filter(Boolean),
+        )
+        .subscribe(() => {
+          this.closeDialog();
+        });
+    } else {
+      this.closeDialog();
+    }
   }
 
   private setTableData(): void {

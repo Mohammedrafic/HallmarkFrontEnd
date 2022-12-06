@@ -99,12 +99,12 @@
       <e-column field="facilityContact" headerText="DEPARTMENT CONTACT" width=200></e-column>
       <e-column field="facilityEmail" headerText="DEPARTMENT EMAIL" width=200></e-column>
       <e-column field="facilityPhoneNo" headerText="DEPARTMENT PHONE NO" [valueAccessor]="formatPhoneNumber" width=200></e-column>
-      <e-column field="inactiveDate" headerText="Inactive Date" width=200>
+      <e-column field="inactiveDate" headerText="Inactivation Date" width=200>
         <ng-template #template let-data>
           {{ data.inactiveDate | date: 'MM/dd/yyy' : 'UTC' }}
         </ng-template>
       </e-column>
-      <e-column field="reactivateDate" headerText="Reactivate Date" width=200>
+      <e-column field="reactivateDate" headerText="Reactivation Date" width=200>
         <ng-template #template let-data>
           {{ data.reactivateDate | date: 'MM/dd/yyy' : 'UTC' }}
         </ng-template>
@@ -134,7 +134,7 @@
                 min="1"
                 [max]="(departments$ | async)?.totalPages"
                 [showSpinButton]="false"
-                (change)="onGoToClick($event)"
+                (change)="changeTablePagination($event)"
               >
               </ejs-numerictextbox>
               <div class="total-rows">
@@ -149,7 +149,7 @@
                 [totalRecordsCount]="(departments$ | async)?.totalCount"
                 [enablePagerMessage]="false"
                 [currentPage]="currentPage"
-                (click)="onGoToClick($event)"
+                (click)="changeTablePagination($event)"
               >
               </ejs-pager>
             </section>
@@ -375,17 +375,25 @@
       </div>
     </div>
 
+    <div class="dates-message-container" *ngIf="selectedLocation?.isDeactivated && isEdit">
+      <span>
+        Department is inactivated due to Location inactivation on {{ maxInactivateDate }} <span *ngIf="minReactivateDate">to {{ minReactivateDate }}</span>
+      </span>
+    </div>
+
     <div class="dates-container">
       <div class="input-container calendar inactive-date">
         <label for="inactiveDate">Inactivation Date</label>
         <div class="input-group datepicker">
           <ejs-datepicker
+            #inactivationDatepicker
             id="inactiveDate"
             class="datepicker"
             [format]="formatDate"
             [placeholder]="placeholderDate"
             [enableMask]="true"
             [maskPlaceholder]="datepickerMask"
+            [max]="maxInactivateDate"
             appValidateWithMessage
             formControlName="inactiveDate"
           >
@@ -393,7 +401,7 @@
         </div>
       </div>
       <div class="input-container calendar">
-        <label for="inactiveDate">Reactivate date</label>
+        <label for="inactiveDate">Reactivation date</label>
         <div class="input-group datepicker">
           <ejs-datepicker
             #reactivationDatepicker
@@ -403,7 +411,7 @@
             [placeholder]="placeholderDate"
             [enableMask]="true"
             [maskPlaceholder]="datepickerMask"
-            [max]="maxReactivateDate"
+            [min]="minReactivateDate"
             appValidateWithMessage
             formControlName="reactivateDate"
           >

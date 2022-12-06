@@ -1086,7 +1086,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private populateNewOrderForm(): void {
     this.orderTypeForm.controls['orderType'].patchValue(OrderType.Traveler);
     this.generalInformationForm.controls['duration'].patchValue(Duration.ThirteenWeeks);
-    this.jobDistributionForm.controls['jobDistribution'].patchValue([OrderJobDistribution.All]);
+    this.jobDistributionForm.controls['jobDistribution'].patchValue(OrderJobDistribution.All);
 
     const contactDetails = (this.contactDetailsForm.controls['contactDetails'] as FormArray).at(0) as FormGroup;
     contactDetails.controls['isPrimaryContact'].patchValue(true);

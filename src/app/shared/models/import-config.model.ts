@@ -10,23 +10,36 @@ import {
   SaveLocationsImportResult,
   UploadBillRatesFile,
   UploadDepartmentsFile,
-  UploadLocationsFile,
+  UploadLocationsFile
 } from '@organization-management/store/organization-management.actions';
 import { ActionType } from '@ngxs/store';
+import {
+  GetOrderImportErrors,
+  GetOrderImportTemplate,
+  SaveOrderImportResult,
+  UploadOrderImportFile
+} from '@client/store/order-managment-content.actions';
 
 type ImportTemplates =
   | typeof GetLocationsImportTemplate
   | typeof GetDepartmentsImportTemplate
-  | typeof GetBillRatesImportTemplate;
+  | typeof GetBillRatesImportTemplate
+  | typeof GetOrderImportTemplate;
 type ImportErrors =
   | typeof GetLocationsImportErrors
   | typeof GetDepartmentsImportErrors
-  | typeof GetBillRatesImportErrors;
+  | typeof GetBillRatesImportErrors
+  | typeof GetOrderImportErrors;
 type SaveImportResult =
   | typeof SaveLocationsImportResult
   | typeof SaveDepartmentsImportResult
-  | typeof SaveBillRatesImportResult;
-type UploadFile = typeof UploadLocationsFile | typeof UploadDepartmentsFile | typeof UploadBillRatesFile;
+  | typeof SaveBillRatesImportResult
+  | typeof SaveOrderImportResult;
+type UploadFile =
+  | typeof UploadLocationsFile
+  | typeof UploadDepartmentsFile
+  | typeof UploadBillRatesFile
+  | typeof UploadOrderImportFile;
 type UploadFileSucceeded = { instance: ActionType; message: string };
 type ImportErrorsSucceeded = { instance: ActionType; fileName: string };
 type ImportTemplatesSucceeded = ImportErrorsSucceeded;

@@ -7,18 +7,21 @@ export const systemColumnMapper = (credentials: Credential[]) => {
   return credentials.map((credential: Credential ) => {
     credential.system = `${credential.includeInIRP ? 'IRP': ''} ${credential.includeInVMS ? 'VMS': ''}`.trim();
     return credential;
-  })
+  });
 };
 
 export const DialogTitle = (isEdit: boolean) => {
   return isEdit ?
     CredentialsDialogTitle[CredentialsDialogTitle.Edit] :
-    CredentialsDialogTitle[CredentialsDialogTitle.Add]
+    CredentialsDialogTitle[CredentialsDialogTitle.Add];
 };
 
-export const CredentialsDialogConfig = (isCredentialSettings: boolean, isIRPFlagEnabled: boolean): CredentialListConfig[] => {
-  if(isCredentialSettings &&  isIRPFlagEnabled) {
+export const CredentialsDialogConfig = (
+  isIncludeIrp: boolean,
+  isCredentialSettings: boolean
+): CredentialListConfig[] => {
+  if(isIncludeIrp && isCredentialSettings) {
     return [...SystemConfig, ...CredentialConfig];
   }
   return CredentialConfig;
-}
+};

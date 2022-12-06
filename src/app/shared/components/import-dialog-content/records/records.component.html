@@ -1,0 +1,7 @@
+<ejs-listbox class="list-box"
+             [dataSource]="dataSource"
+             [fields]="fields"
+             [selectionSettings]="selectionSettings"
+             (created)="createdEmitter.emit()"
+             (change)="changeEmitter.emit($event)">
+</ejs-listbox>

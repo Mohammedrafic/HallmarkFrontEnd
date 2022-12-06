@@ -8,7 +8,7 @@ import { GridReadyEventModel } from '@shared/components/grid/models';
   styleUrls: ['./import-grid.component.scss'],
 })
 export class ImportGridComponent {
-  @Input() public gridName: string;
+  @Input() public gridName: string | undefined;
   @Input() public importedItems: any[] = [];
   @Input() public columnDefs: ColDef[] = [];
 

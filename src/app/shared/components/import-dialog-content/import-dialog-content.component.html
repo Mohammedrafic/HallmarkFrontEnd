@@ -53,7 +53,7 @@
             Download file with Errors
             <i-feather name="download" class="icon"></i-feather>
           </span>
-          <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
+          <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()" (selected)="onTabChange()">
             <e-tabitems>
               <e-tabitem [disabled]="!importResult.succesfullRecords.length">
                 <ng-template #headerText> Successful <span class="tab-badge">{{importResult?.succesfullRecords?.length}}</span></ng-template>
@@ -82,3 +82,38 @@
 <ng-template #importBtn>
   <button ejs-button cssClass="e-primary" [disabled]="!enabledImportButton" (click)="onImport()">Import</button>
 </ng-template>
+
+<ejs-dialog
+  *ngIf="isOrderImport"
+  #confirmOrderImport
+  [showCloseIcon]="true"
+  [isModal]="true"
+  [visible]="false"
+  height="262"
+  [target]="targetElement"
+  width='435px'
+  class="modal-dialog"
+>
+  <ng-template #footerTemplate>
+    <div class="modal-dialog__footer">
+      <button ejs-button cssClass="e-outline" (click)="cancelImportOrder()">Cancel</button>
+      <ejs-splitbutton
+        content="Submit"
+        cssClass="e-primary"
+        [items]="submitImportMenuItems"
+        (click)="submitOrderImport()"
+        (select)="onSplitButtonSelect($event)"
+      >
+      </ejs-splitbutton>
+    </div>
+  </ng-template>
+  <ng-template #content>
+    <div class="modal-dialog__content">
+      Only those data that do not contain errors will be imported. <br>
+      Do you want to submit them or save for later?
+    </div>
+  </ng-template>
+  <ng-template #header>
+    <h1 class="modal-dialog__header">Import</h1>
+  </ng-template>
+</ejs-dialog>

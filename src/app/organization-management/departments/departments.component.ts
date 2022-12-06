@@ -19,20 +19,22 @@ import {
   ExportDepartments,
   ClearLocationList,
   ClearDepartmentList,
-  GetDepartmentFilterOptions, GetOrganizationById, SaveDepartmentSucceeded, SaveDepartmentConfirm
+  GetDepartmentFilterOptions, GetOrganizationById, SaveDepartmentSucceeded, SaveDepartmentConfirm,
 } from '../store/organization-management.actions';
 import { Region } from '@shared/models/region.model';
 import { Location } from '@shared/models/location.model';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { MessageTypes } from '@shared/enums/message-types';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import {
+  AbstractGridConfigurationComponent,
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
   CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
   RECORD_ADDED,
-  RECORD_MODIFIED
+  RECORD_MODIFIED,
 } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
@@ -78,12 +80,13 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
   @ViewChild('reactivationDatepicker') reactivationDatepicker: DatePicker;
+  @ViewChild('inactivationDatepicker') inactivationDatepicker: DatePicker;
 
   departmentsDetailsFormGroup: FormGroup;
   fieldsSettings: FieldSettingsModel = { text: 'name', value: 'id' };
   irpFieldsSettings: FieldSettingsModel = { text: 'text', value: 'value' };
   defaultValue: number | undefined;
-  isLocationsDropDownEnabled: boolean = false;
+  isLocationsDropDownEnabled = false;
   columnsToExport: ExportColumn[];
   fileName: string;
   defaultLocationValue: number;
@@ -98,18 +101,19 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   protected componentDestroy: () => Observable<unknown>;
 
   private selectedRegion: Region;
-  private selectedLocation: Location;
+  public selectedLocation: Location;
   private editedDepartmentId?: number;
-  private isEdit: boolean;
+  public isEdit: boolean;
   private defaultFileName: string;
   private filters: DepartmentFilter = {
     pageNumber: this.currentPage,
-    pageSize: this.pageSizePager
+    pageSize: this.pageSizePager,
   };
   private regions: OrganizationRegion[] = [];
   private pageSubject = new Subject<number>();
 
-  public maxReactivateDate: string | null;
+  public minReactivateDate: string | null;
+  public maxInactivateDate: string | null;
 
   constructor(
     private store: Store,
@@ -168,8 +172,12 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   public onFilterApply(): void {
-    this.filters = this.DepartmentFilterFormGroup.getRawValue();
+    const { inactiveDate, ...formValue } = this.DepartmentFilterFormGroup.getRawValue();
+
+    this.filters = formValue;
+    this.filters.inactiveDate = DateTimeHelper.toUtcFormat(inactiveDate);
     this.filteredItems = this.filterService.generateChips(this.DepartmentFilterFormGroup, this.filterColumns, this.datePipe);
+
     this.getDepartments();
     this.store.dispatch(new ShowFilterDialog(false));
   }
@@ -222,7 +230,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         title: 'Confirmation',
         okButtonLabel: 'Yes',
         cancelButtonLabel: 'No',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       })
       .pipe(
         filter(Boolean),
@@ -263,8 +271,10 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   formatPhoneNumber(field: string, department: Department): string {
-    // @ts-ignore
-    return department[field]?.toString().length === 10 ? department[field].replace(/^(\d{3})(\d{3})(\d{4}).*/, '$1-$2-$3') : department[field];
+    const departmentValue = department[field as keyof Department] as string;
+    return departmentValue?.toString().length === 10
+      ? departmentValue.replace(/^(\d{3})(\d{3})(\d{4}).*/, '$1-$2-$3')
+      : departmentValue;
   }
 
   onRowsDropDownChanged(): void {
@@ -272,15 +282,19 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.grid.pageSettings.pageSize = this.pageSize;
   }
 
-  onGoToClick(event: any): void {
+  changeTablePagination(event: { currentPage?: number; value: number; }): void {
     if (event.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
     }
   }
 
-  onEditDepartmentClick(department: Department, event: any): void {
+  onEditDepartmentClick(department: Department, event: MouseEvent): void {
     this.addActiveCssClass(event);
-    this.departmentService.populateDepartmentDetailsForm(this.departmentsDetailsFormGroup, department, this.isIRPFlagEnabled);
+    this.departmentService.populateDepartmentDetailsForm(
+      this.departmentsDetailsFormGroup,
+      department,
+      this.isIRPFlagEnabled
+    );
 
     this.editedDepartmentId = department.departmentId;
     this.isLocationIRPEnabled = !!department.locationIncludeInIRP;
@@ -291,7 +305,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   private inactivateDateHandler(field: AbstractControl, value: string | null): void {
-    if (value) {
+    if (value && !this.selectedLocation.isDeactivated) {
       const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
       inactiveDate.setHours(0, 0, 0, 0);
       const now = new Date();
@@ -312,7 +326,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       }).pipe(
         takeUntil(this.componentDestroy()),
     ).subscribe((confirm) => {
@@ -327,15 +341,18 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     if (this.selectedLocation) {
       const reactivationDateField = this.departmentsDetailsFormGroup.controls['reactivateDate'];
       const reactivateDate = this.selectedLocation.reactivateDate ? new Date(this.selectedLocation.reactivateDate) : null;
-      this.maxReactivateDate = reactivateDate ? DateTimeHelper.formatDateUTC(reactivateDate.toISOString(), 'MM/dd/yyyy') : null;
+      const inactiveDate = this.selectedLocation.inactiveDate ? new Date(this.selectedLocation.inactiveDate) : null;
+      this.minReactivateDate = reactivateDate ? DateTimeHelper.formatDateUTC(reactivateDate.toISOString(), 'MM/dd/yyyy') : null;
+      this.maxInactivateDate = inactiveDate ? DateTimeHelper.formatDateUTC(inactiveDate.toISOString(), 'MM/dd/yyyy') : null;
       if (!this.selectedLocation.reactivateDate) {
         reactivationDateField.disable();
       } else {
         reactivationDateField.enable();
-        if (!department?.reactivateDate) {
+        if (!department?.reactivateDate && !this.selectedLocation.isDeactivated) {
           reactivationDateField.patchValue(this.selectedLocation.reactivateDate);
         }
         this.reactivationDatepicker.refresh();
+        this.inactivationDatepicker.refresh();
       }
     }
   }
@@ -357,7 +374,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
+          okButtonClass: 'delete-button',
         }).pipe(
           filter(Boolean),
           takeUntil(this.componentDestroy()),
@@ -408,7 +425,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   private checkOrgPreferences(): void {
-    const { isIRPEnabled, isVMCEnabled } = this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+    const { isIRPEnabled, isVMCEnabled } =
+    this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
 
     this.isOrgUseIRPAndVMS = !!(isVMCEnabled && isIRPEnabled);
     this.isInvoiceDepartmentIdFieldShow = !this.isIRPFlagEnabled
@@ -426,7 +444,10 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.grid.getColumnByField('invoiceDepartmentId').visible = this.isInvoiceDepartmentIdFieldShow;
     this.grid.getColumnByField('includeInIRP').visible = this.isIRPFlagEnabled && this.isOrgUseIRPAndVMS;
 
-    this.columnsToExport = DepartmentsExportCols(this.isIRPFlagEnabled && this.isOrgUseIRPAndVMS, this.isInvoiceDepartmentIdFieldShow);
+    this.columnsToExport = DepartmentsExportCols(
+      this.isIRPFlagEnabled && this.isOrgUseIRPAndVMS,
+      this.isInvoiceDepartmentIdFieldShow
+    );
     this.grid.refreshColumns();
   }
 
@@ -500,7 +521,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.filters.orderBy = this.orderBy;
     this.store.dispatch([
       new GetDepartmentsByLocationId(this.selectedLocation.id, this.filters),
-      new GetDepartmentFilterOptions(this.selectedLocation.id as number)
+      new GetDepartmentFilterOptions(this.selectedLocation.id as number),
     ]);
   }
 

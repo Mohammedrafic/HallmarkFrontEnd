@@ -7,7 +7,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { combineLatest, filter, map, Observable, Subject, switchMap, take, takeUntil, throttleTime } from 'rxjs';
+import { combineLatest, delay, filter, map, Observable, Subject, switchMap, take, takeUntil, throttleTime } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import { TakeUntilDestroy } from '@core/decorators';
@@ -16,7 +16,7 @@ import { DropdownOption } from '@core/interface';
 import { GetAllBusinessLines } from '@organization-management/store/business-lines.action';
 import { BusinessLinesState } from '@organization-management/store/business-lines.state';
 import {
-  CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE
+  CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE,
 } from '@shared/constants';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -27,7 +27,7 @@ import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/expor
 import { FilteredItem } from '@shared/models/filter.model';
 import {
   Location, LocationFilter, LocationFilterOptions, LocationsPage,
-  LocationType, TimeZoneModel
+  LocationType, TimeZoneModel,
 } from '@shared/models/location.model';
 import { Organization } from '@shared/models/organization.model';
 import { Region } from '@shared/models/region.model';
@@ -39,7 +39,7 @@ import { UserState } from '../../store/user.state';
 import {
   ClearLocationList, DeleteLocationById, ExportLocations, GetLocationFilterOptions,
   GetLocationsByRegionId, GetLocationTypes, GetOrganizationById, GetRegions, GetUSCanadaTimeZoneIds,
-  SaveLocation, SaveLocationConfirm, SaveLocationSucceeded, SaveRegion, SetGeneralStatesByCountry, UpdateLocation
+  SaveLocation, SaveLocationConfirm, SaveLocationSucceeded, SaveRegion, SetGeneralStatesByCountry, UpdateLocation,
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import {
@@ -47,7 +47,7 @@ import {
   ExportImportColumnsToHideInVms,
   FieldsToHideInIrp, FieldsToHideInVms, LocationExportColumns, LocationInitFilters,
   LocationsDialogConfig, LocationsDialogWithIrpConfig, LocationsExportIrpColumns,
-  MESSAGE_REGIONS_NOT_SELECTED
+  MESSAGE_REGIONS_NOT_SELECTED,
 } from './locations.constant';
 import { LocationsTrackKey } from './locations.enum';
 import { LocationsFormConfig, LocationsFormSource, LocationsSubFormConfig } from './locations.interface';
@@ -110,7 +110,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   public locationFilterForm: FormGroup;
   public filters: LocationFilter = {
     pageNumber: this.currentPage,
-    pageSize: this.pageSizePager
+    pageSize: this.pageSizePager,
   };
   public filterColumns = LocationInitFilters;
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
@@ -306,7 +306,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       timeZone: location.timeZone,
       locationType: location.locationTypeId,
       organizationId:this.businessUnitId,
-      includeInIRP: location.includeInIRP,
+      includeInIRP: location.includeInIRP || false,
     });
 
     this.getBusinessLineDataSource(location.businessLineId, location.businessLine);
@@ -338,7 +338,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       })
       .pipe(
         tap(() => { this.removeActiveCssClass(); }),
@@ -356,7 +356,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
+          okButtonClass: 'delete-button',
         })
         .pipe(
           filter(Boolean),
@@ -382,6 +382,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     if (this.locationDetailsFormGroup.valid) {
       const inactiveDate = this.locationDetailsFormGroup.controls['inactiveDate'].value;
       const reactivateDate = this.locationDetailsFormGroup.controls['reactivateDate'].value;
+
       const location: Location = {
         id: this.editedLocationId,
         regionId: this.selectedRegion.id,
@@ -406,11 +407,13 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         locationTypeId: this.locationDetailsFormGroup.controls['locationType'].value,
         organizationId : this.businessUnitId,
         includeInIRP: this.locationDetailsFormGroup.controls['includeInIRP'].value,
-      }
+      };
+
       this.saveOrUpdateLocation(location, ignoreWarning);
     } else {
       this.locationDetailsFormGroup.markAllAsTouched();
     }
+
   }
 
   trackByField(index: number, item: LocationsFormConfig): string {
@@ -472,7 +475,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.filters = {
       regionId: this.selectedRegion?.id,
       pageNumber: this.currentPage,
-      pageSize: this.pageSizePager
+      pageSize: this.pageSizePager,
     };
   }
 
@@ -516,11 +519,11 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
           if (id && businessLines.find((item) => item.id === id)) {
             return businessLines;
           } else {
-            return id && line ? [{ id, line }, ...businessLines] : businessLines
+            return id && line ? [{ id, line }, ...businessLines] : businessLines;
           }
         }),
         map((lines) => {
-          return lines.map((line) => ({ text: line.line, value: line.id }))
+          return lines.map((line) => ({ text: line.line, value: line.id }));
         }),
         take(1),
       )
@@ -544,8 +547,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   private watchForLocationUpdate(): void {
     this.action$.pipe(ofActionDispatched(SaveLocationSucceeded), takeUntil(this.componentDestroy())).subscribe(() => {
       this.store.dispatch(new ShowSideDialog(false));
-      this.locationDetailsFormGroup.reset();
-      this.removeActiveCssClass();
+      this.locationDetailsFormGroup.reset({ includeInIRP: false });
       if (this.isEdit) {
         this.isEdit = false;
         this.editedLocationId = undefined;
@@ -557,7 +559,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         title: 'Confirmation',
         okButtonLabel: 'Yes',
         cancelButtonLabel: 'No',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       })
       .pipe(
         filter(Boolean),
@@ -600,15 +602,22 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.organization$
     .pipe(
       filter(Boolean),
+      delay(100),
       tap((organization) => {
         this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
         if (this.isFeatureIrpEnabled) {
           this.isOrgVMSEnabled = !!organization.preferences.isVMCEnabled;
           this.isOrgIrpEnabled = !!organization.preferences.isIRPEnabled;
           this.columnsToExport = this.isOrgIrpEnabled ? LocationsExportIrpColumns : LocationExportColumns;
+
           this.filterExportColumns();
           this.checkFieldsVisibility();
         }
+
+        this.grid.getColumnByField('includeInIRPText').visible =
+          this.isFeatureIrpEnabled && this.isOrgIrpEnabled && this.isOrgVMSEnabled;
+        this.grid.getColumnByField('invoiceId').visible = this.isOrgVMSEnabled || !this.isFeatureIrpEnabled;
+        this.grid.refreshColumns();
       }),
       switchMap(() => this.store.dispatch(new GetRegions())),
       takeUntil(this.componentDestroy()),
@@ -658,9 +667,9 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.locationDialogConfig.baseForm = LocationsDialogWithIrpConfig.baseForm
     .filter((column) => {
       if (!this.isOrgVMSEnabled && !FieldsToHideInVms.includes(column.field)) {
-        return !FieldsToHideInIrp.includes(column.field)
+        return !FieldsToHideInIrp.includes(column.field);
       }
-      
+
       if (!this.isOrgIrpEnabled || (this.isOrgIrpEnabled && !this.isOrgVMSEnabled)) {
         return !FieldsToHideInVms.includes(column.field);
       }
@@ -684,7 +693,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.columnsToExport = this.columnsToExport
     .filter((column) => {
       if (!this.isOrgVMSEnabled && !ExportImportColumnsToHideInVms.includes(column.column)) {
-        return !ExportImportColumnsToHideInIrp.includes(column.column)
+        return !ExportImportColumnsToHideInIrp.includes(column.column);
       }
 
       if (!(this.isOrgIrpEnabled && this.isOrgVMSEnabled)) {

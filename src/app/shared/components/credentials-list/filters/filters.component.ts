@@ -13,6 +13,7 @@ import { FilterService } from '@shared/services/filter.service';
 import { SetCredentialsFilterCount } from '@organization-management/store/credentials.actions';
 import { Destroyable } from '@core/helpers';
 import { UserState } from '../../../../store/user.state';
+import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 
 @Component({
   selector: 'app-filters',
@@ -25,12 +26,13 @@ export class FiltersComponent extends Destroyable implements OnInit {
       this.filterColumns = columns;
       this.changeDetection.markForCheck();
   }
-  @Input() set isIRPFlag(flag: boolean) {
-    this.isIRPFlagEnabled = flag;
+  @Input() set systemFlags(systems: SelectedSystemsFlag) {
+    this.selectedSystem = systems;
     this.initFilterForm();
     this.changeDetection.markForCheck();
   }
   @Input() public isCredentialSettings = false;
+  @Input() public isMspUser = false;
 
   @Output() public handleClearFilters: EventEmitter<number> = new EventEmitter();
   @Output() public handleApplyFilters: EventEmitter<void> = new EventEmitter();
@@ -40,7 +42,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
   public filteredItems: FilteredItem[] = [];
   public totalDataRecords: number;
   public filterColumns: FilterColumnsModel;
-  public isIRPFlagEnabled = false;
+  public selectedSystem: SelectedSystemsFlag;
 
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
@@ -94,7 +96,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
       expireDateApplicable: expireDateApplicable ?? null,
     });
 
-    if(this.isIRPFlagEnabled && this.isCredentialSettings) {
+    if(this.isCredentialWithIrp()) {
       this.credentialsFilters.patchValue({
         includeInIRP: includeInIRP ?? null,
         includeInVMS: includeInVMS ?? null,
@@ -105,7 +107,7 @@ export class FiltersComponent extends Destroyable implements OnInit {
   }
 
   private initFilterForm(): void {
-    this.credentialsFilters = this.credentialListService.createFiltersForm(this.isIRPFlagEnabled, this.isCredentialSettings);
+    this.credentialsFilters = this.credentialListService.createFiltersForm(this.isCredentialWithIrp());
   }
 
   private watchForOrganizationId(): void {
@@ -117,11 +119,15 @@ export class FiltersComponent extends Destroyable implements OnInit {
   }
 
   private setSystemValue(): void {
-    if(this.isIRPFlagEnabled && this.isCredentialSettings) {
+    if(this.isCredentialWithIrp()) {
       this.credentialsFilters.patchValue({
         includeInIRP: false,
         includeInVMS: false,
       });
     }
+  }
+
+  private isCredentialWithIrp(): boolean {
+    return this.selectedSystem.isIRP && this.selectedSystem.isVMS && this.isCredentialSettings && !this.isMspUser;
   }
 }

@@ -10,6 +10,14 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ImportConfigModel } from '@shared/models/import-config.model';
 import { ImportedDepartment } from '@shared/models/department.model';
 import { ImportedBillRate } from '@shared/models';
+import { CandidateImportRecord } from '@shared/models/candidate-profile-import.model';
+import { ImportedOrder } from '@shared/models/imported-order.model';
+
+type ImportModel = ImportedLocation[]
+  & ImportedDepartment[]
+  & ImportedBillRate[]
+  & CandidateImportRecord[]
+  & ImportedOrder[];
 
 @Directive()
 export abstract class AbstractImport extends DestroyableDirective implements OnInit {
@@ -18,8 +26,7 @@ export abstract class AbstractImport extends DestroyableDirective implements OnI
   @Output() public reloadItemsList: EventEmitter<void> = new EventEmitter<void>();
 
   public selectErrorsTab: Subject<void> = new Subject<void>();
-
-  public importResponse: ImportResult<ImportedLocation & ImportedDepartment> | null;
+  public importResponse: ImportResult<ImportedLocation & ImportedDepartment & ImportedOrder> | null;
 
   protected constructor(
     protected actions$: Actions,
@@ -38,11 +45,11 @@ export abstract class AbstractImport extends DestroyableDirective implements OnI
     this.store.dispatch(new this.action.importTemplate([]));
   }
 
-  public downloadErrors(value: ImportedLocation[] & ImportedDepartment[] & ImportedBillRate[]): void {
+  public downloadErrors(value: ImportModel): void {
     this.store.dispatch(new this.action.importError(value));
   }
 
-  public saveImportResult(value: ImportedLocation[] & ImportedDepartment[] & ImportedBillRate[]): void {
+  public saveImportResult(value: ImportModel): void {
     this.store.dispatch(new this.action.saveImportResult(value));
   }
 
@@ -53,7 +60,7 @@ export abstract class AbstractImport extends DestroyableDirective implements OnI
   private subscribeOnFileActions(): void {
     this.actions$
       .pipe(takeUntil(this.destroy$), ofActionSuccessful(this.action.uploadFileSucceeded.instance))
-      .subscribe((result: { payload: ImportResult<ImportedLocation & ImportedDepartment> }) => {
+      .subscribe((result: { payload: ImportResult<ImportedLocation & ImportedDepartment & ImportedOrder> }) => {
         if (result.payload.succesfullRecords.length || result.payload.errorRecords.length) {
           this.importResponse = result.payload;
           this.cdr.markForCheck();

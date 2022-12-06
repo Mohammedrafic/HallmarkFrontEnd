@@ -394,7 +394,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private checkInactiveLocationDepartmentOverlap(order: CreateOrderDto, documents: Blob[]): void {
-    if (this.orderDetailsFormComponent.selectedLocation && this.orderDetailsFormComponent.selectedDepartment) {
+    if (this.orderDetailsFormComponent.selectedLocation && this.orderDetailsFormComponent.selectedDepartment && (order.orderType !== OrderType.OpenPerDiem)) {
       const jobEndDate = order.jobEndDate;
       const locationInactiveDate = this.orderDetailsFormComponent.selectedLocation.inactiveDate ?
         new Date(DateTimeHelper.formatDateUTC(this.orderDetailsFormComponent.selectedLocation.inactiveDate, 'MM/dd/yyyy')) : null;
@@ -416,9 +416,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private proceedWithSaving(order: CreateOrderDto, documents: Blob[]): void {
-    let message = null;
-    const prevDistributions = this.getJobDistributionOptions(this.order.jobDistributions);
     const selectedDistributions = this.getJobDistributionOptions(order.jobDistributions);
+    const prevDistributions = this.order ? this.getJobDistributionOptions(this.order.jobDistributions) : [];
+    let message = null;
+
     if(
       prevDistributions.includes(OrderJobDistribution.TierLogic) &&
       selectedDistributions.includes(OrderJobDistribution.All)) {

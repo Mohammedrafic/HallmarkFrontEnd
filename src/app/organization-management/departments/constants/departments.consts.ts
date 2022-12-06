@@ -7,7 +7,7 @@ export const DepartmentsExportCols = (isIRPEnabled: boolean, isInvoiceDepartment
     { text:'Department Email', column: 'FacilityEmail'},
     { text:'Department Contact', column: 'FacilityContact'},
     { text:'Department Phone NO', column: 'FacilityPhoneNo'},
-    { text:'Inactivate Date', column: 'InactiveDate'},
+    { text:'Inactivation Date', column: 'InactiveDate'},
   ];
 
   if (isInvoiceDepartmentIdFieldShow) {

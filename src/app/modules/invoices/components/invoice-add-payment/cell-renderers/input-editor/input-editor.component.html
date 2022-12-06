@@ -1,6 +1,7 @@
 <div *ngIf="group" [formGroup]="group" class="amount-container">
   <span>
     <input
+    appValidateWithMessage
     class="amount-input"
     [formControlName]="controlName"
     (change)="changePayment()"

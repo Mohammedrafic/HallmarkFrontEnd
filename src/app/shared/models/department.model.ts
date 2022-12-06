@@ -33,7 +33,7 @@ export class DepartmentFilter {
   facilityContacts?: string[];
   facilityEmails?: string[];
   includeInIRP?: string;
-  inactiveDate?: Date;
+  inactiveDate?: Date | string;
   orderBy?: string;
   pageSize?: number;
   pageNumber?: number;

@@ -267,6 +267,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
   ngOnChanges(changes: SimpleChanges): void {
     const candidate = changes['candidate']?.currentValue;
     if (candidate) {
+      this.isClosedOrder = this.isClosedOrderPosition;
       this.setCloseOrderButtonState();
       this.setAddExtensionBtnState(candidate);
       this.getDeployedCandidateOrders();
