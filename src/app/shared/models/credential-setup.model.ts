@@ -80,4 +80,6 @@ export class CredentialSetupFilterGet {
   departmentName?: string;
   departmentId?: number;
   skillGroups?: CredentialSkillGroup[];
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
 }
