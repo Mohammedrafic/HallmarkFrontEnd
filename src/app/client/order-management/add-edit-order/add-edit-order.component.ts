@@ -394,7 +394,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private checkInactiveLocationDepartmentOverlap(order: CreateOrderDto, documents: Blob[]): void {
-    if (this.orderDetailsFormComponent.selectedLocation && this.orderDetailsFormComponent.selectedDepartment) {
+    if (this.orderDetailsFormComponent.selectedLocation && this.orderDetailsFormComponent.selectedDepartment && (order.orderType !== OrderType.OpenPerDiem)) {
       const jobEndDate = order.jobEndDate;
       const locationInactiveDate = this.orderDetailsFormComponent.selectedLocation.inactiveDate ?
         new Date(DateTimeHelper.formatDateUTC(this.orderDetailsFormComponent.selectedLocation.inactiveDate, 'MM/dd/yyyy')) : null;
