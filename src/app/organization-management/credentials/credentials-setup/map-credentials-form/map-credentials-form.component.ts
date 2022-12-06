@@ -1,13 +1,20 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { Organization, OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import {
+  AbstractGridConfigurationComponent,
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import {
+  Organization,
+  OrganizationDepartment,
+  OrganizationLocation,
+  OrganizationRegion,
+} from '@shared/models/organization.model';
 import {
   FieldSettingsModel,
   ISelectAllEventArgs,
   MultiSelectChangeEventArgs,
-  MultiSelectComponent
+  MultiSelectComponent,
 } from '@syncfusion/ej2-angular-dropdowns';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { CANCEL_CONFIRM_TEXT, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE, DELETE_CONFIRM_TITLE } from '@shared/constants';
@@ -23,7 +30,7 @@ import { GetCredential, GetCredentialTypes } from '@organization-management/stor
 import { UserState } from '../../../../store/user.state';
 import {
   SaveUpdateCredentialSetupMappingData,
-  SaveUpdateCredentialSetupMappingSucceeded
+  SaveUpdateCredentialSetupMappingSucceeded,
 } from '@organization-management/store/credentials.actions';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { TakeUntilDestroy } from '@core/decorators';
@@ -31,12 +38,13 @@ import { AppState } from '../../../../store/app.state';
 import { MapCredentialsService } from '@organization-management/credentials/services/map-credentials.service';
 import { DropdownsList } from '@organization-management/credentials/enums';
 import { MapCredentialsAdapter } from '@organization-management/credentials/adapters/map-credentials.adapter';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @TakeUntilDestroy
 @Component({
   selector: 'app-map-credentials-form',
   templateUrl: './map-credentials-form.component.html',
-  styleUrls: ['./map-credentials-form.component.scss']
+  styleUrls: ['./map-credentials-form.component.scss'],
 })
 export class MapCredentialsFormComponent extends AbstractGridConfigurationComponent implements OnInit {
   @ViewChild('grid') grid: GridComponent;
@@ -254,25 +262,33 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
     this.checkedDropdownItems = [];
   }
 
-  private manageDropdownItems(isAllItemsSelected: boolean = false, dropdownComponent: MultiSelectComponent): void {
+  private manageDropdownItems(isAllItemsSelected = false, dropdownComponent: MultiSelectComponent): void {
     // disable items in dropdown if Select All was clicked
     if (isAllItemsSelected && dropdownComponent) {
-      dropdownComponent.ulElement.previousElementSibling?.querySelectorAll('.e-list-item').forEach((element: any) => element.classList.add('e-hide'));
+      dropdownComponent.ulElement.previousElementSibling?.querySelectorAll('.e-list-item').forEach((element: any) =>
+        element.classList.add('e-hide')
+      );
       dropdownComponent.getItems().forEach((element: any) => element.classList.add('e-hide'));
     } else if (dropdownComponent) {
-      dropdownComponent.ulElement.previousElementSibling?.querySelectorAll('.e-list-item').forEach((element: any) => element.classList.remove('e-hide'));
+      dropdownComponent.ulElement.previousElementSibling?.querySelectorAll('.e-list-item').forEach((element: any) =>
+        element.classList.remove('e-hide')
+      );
       dropdownComponent.getItems().forEach((element: any) => element.classList.remove('e-hide'));
     }
   }
 
   public onMapCredentialFormCancelClick(): void {
-    if ((this.isEdit && (this.mapCredentialsFormGroup.dirty || this.selectedItems.length !== this.previouslySavedMappingsNumber))
-      || (!this.isEdit && (this.mapCredentialsFormGroup.dirty || this.selectedItems.length))) {
+    if (
+      (this.isEdit
+        && (this.mapCredentialsFormGroup.dirty || this.selectedItems.length !== this.previouslySavedMappingsNumber)
+      )
+      || (!this.isEdit && (this.mapCredentialsFormGroup.dirty || this.selectedItems.length))
+    ) {
       this.confirmService
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
+          okButtonClass: 'delete-button',
         }).pipe(
         filter(Boolean),
         takeUntil(this.componentDestroy())
@@ -510,7 +526,7 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
       .confirm(DATA_OVERRIDE_TEXT, {
         title: DATA_OVERRIDE_TITLE,
         okButtonLabel: 'Confirm',
-        okButtonClass: ''
+        okButtonClass: '',
       }).pipe(
       filter(Boolean),
       takeUntil(this.componentDestroy())
@@ -585,11 +601,13 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
       takeUntil(this.componentDestroy())
     ).subscribe((org: Organization) => {
       const { isIRPEnabled, isVMCEnabled } = org?.preferences || {};
+      const user = this.store.selectSnapshot(UserState.user);
 
-      this.grid.getColumnByField('irpComment').visible =
-        this.store.selectSnapshot(AppState.isIrpFlagEnabled) && !!(isIRPEnabled && isVMCEnabled);
-      this.grid.getColumnByField('system').visible =
-        this.store.selectSnapshot(AppState.isIrpFlagEnabled) && !!(isIRPEnabled && isVMCEnabled);
+      const isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled)
+        && user?.businessUnitType !== BusinessUnitType.MSP;
+
+      this.grid.getColumnByField('irpComment').visible = isIRPFlagEnabled && !!(isIRPEnabled && isVMCEnabled);
+      this.grid.getColumnByField('system').visible = isIRPFlagEnabled && !!(isIRPEnabled && isVMCEnabled);
 
       this.grid.refreshColumns();
     });

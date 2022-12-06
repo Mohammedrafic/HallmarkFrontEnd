@@ -14,7 +14,7 @@ import {
   GetAlertsForCurrentUser,
   CheckScreen,
   ShouldDisableUserDropDown,
-  SetIrpFlag
+  SetIrpFlag,
 } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
@@ -49,7 +49,7 @@ export interface AppStateModel {
     isSidebarOpened: false,
     isOrganizationAgencyArea: {
       isOrganizationArea: false,
-      isAgencyArea: false
+      isAgencyArea: false,
     },
     getAlertsForCurrentUser : [],
     isMobileScreen: false,
@@ -85,10 +85,14 @@ export class AppState {
   static isSidebarOpened(state: AppStateModel): boolean { return state.isSidebarOpened; }
 
   @Selector()
-  static isOrganizationAgencyArea(state: AppStateModel): IsOrganizationAgencyAreaStateModel { return state.isOrganizationAgencyArea; }
-  
+  static isOrganizationAgencyArea(state: AppStateModel): IsOrganizationAgencyAreaStateModel {
+    return state.isOrganizationAgencyArea;
+  }
+
   @Selector()
-  static getAlertsForCurrentUser(state: AppStateModel): GetAlertsForUserStateModel[] { return state.getAlertsForCurrentUser; }
+  static getAlertsForCurrentUser(state: AppStateModel): GetAlertsForUserStateModel[] {
+    return state.getAlertsForCurrentUser;
+  }
 
   @Selector()
   static isMobileScreen(state: AppStateModel): boolean { return state.isMobileScreen; }
@@ -101,7 +105,7 @@ export class AppState {
 
   @Selector()
   static shouldDisableUserDropDown(state: AppStateModel): boolean { return state.shouldDisableUserDropDown; }
-  
+
   @Selector()
   static isIrpFlagEnabled(state: AppStateModel): boolean {
     return state.isIrpEnabled;
@@ -137,12 +141,15 @@ export class AppState {
   SetIsOrganizationAgencyArea({ patchState }: StateContext<AppStateModel>, { payload }: SetIsOrganizationAgencyArea): void {
     patchState({ isOrganizationAgencyArea: payload });
   }
-  
+
   @Action(GetAlertsForCurrentUser)
-  GetAlertsForCurrentUser({ patchState }: StateContext<AppStateModel>, { payload }: GetAlertsForCurrentUser): Observable<AlertsModel[]> {
+  GetAlertsForCurrentUser(
+    { patchState }: StateContext<AppStateModel>,
+    { payload }: GetAlertsForCurrentUser
+  ): Observable<AlertsModel[]> {
     return this.userService.getAlertsForUser().pipe(
       tap((payload) => {
-        patchState({ getAlertsForCurrentUser: payload });        
+        patchState({ getAlertsForCurrentUser: payload });
         return payload;
       })
     );

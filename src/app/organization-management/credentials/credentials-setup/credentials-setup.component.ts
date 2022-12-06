@@ -28,14 +28,14 @@ import {
   OrganizationDepartment,
   OrganizationLocation,
   OrganizationRegion,
-  OrganizationStructure
+  OrganizationStructure,
 } from '@shared/models/organization.model';
 import { CredentialsState } from '@organization-management/store/credentials.state';
 import {
   ClearCredentialSetup,
   GetCredentialSetupByMappingId, GetFilteredCredentialSetupData,
   UpdateCredentialSetup,
-  UpdateCredentialSetupSucceeded
+  UpdateCredentialSetupSucceeded,
 } from '@organization-management/store/credentials.actions';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { AbstractPermissionGrid } from "@shared/helpers/permissions";
@@ -46,13 +46,14 @@ import { CredentialSetupAdapter } from '@organization-management/credentials/ada
 import { AppState } from '../../../store/app.state';
 import { systemOptions } from '../constants';
 import { CredentialSetupSystemEnum } from '@organization-management/credentials/enums';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @TakeUntilDestroy
 @Component({
   selector: 'app-credentials-setup',
   templateUrl: './credentials-setup.component.html',
   styleUrls: ['./credentials-setup.component.scss'],
-  providers: [MaskedDateTimeService]
+  providers: [MaskedDateTimeService],
 })
 export class CredentialsSetupComponent extends AbstractPermissionGrid implements OnInit {
   @ViewChild('grid') grid: GridComponent;
@@ -164,7 +165,7 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
+          okButtonClass: 'delete-button',
         }).pipe(
         filter(Boolean),
         takeUntil(this.componentDestroy())
@@ -299,7 +300,7 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
       if (regionId) {
         const selectedRegion = this.orgRegions.find(region => region.id === regionId);
         this.locations.push(...sortByField(selectedRegion?.locations ?? [], 'name') as []);
-        const departments: OrganizationDepartment[] = []
+        const departments: OrganizationDepartment[] = [];
         this.locations.forEach(location => departments.push(...location.departments));
         this.departments = sortByField(departments, 'name');
 
@@ -438,7 +439,10 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
   }
 
   private checkIRPFlag(): void {
-    this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+    const user = this.store.selectSnapshot(UserState.user);
+
+    this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled)
+      && user?.businessUnitType !== BusinessUnitType.MSP;
   }
 
   private startOrganizationWatching(): void {
