@@ -238,6 +238,10 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
       this.lastSelectedCredential = selectedCredential;
       // get mapping for selected credential
       this.store.dispatch(new GetCredentialSetupByMappingId(selectedCredential.mappingId));
+
+      this.grid.getColumnByField('irpComments').visible =
+        this.isIRPAndVMSEnabled && !!selectedCredential.includeInIRP;
+      this.grid.refreshColumns();
     } else {
       // if no selected credential in Credential grid, then clear data from Mapping grid
       this.lastSelectedCredential = null;
@@ -455,9 +459,6 @@ export class CredentialsSetupComponent extends AbstractPermissionGrid implements
       this.isIRPAndVMSEnabled = this.isIRPFlagEnabled && !!(isIRPEnabled && isVMCEnabled);
 
       this.credentialsSetupService.systemFieldSettings(this.headerFilterFormGroup, this.isIRPAndVMSEnabled);
-
-      this.grid.getColumnByField('irpComments').visible = this.isIRPAndVMSEnabled;
-      this.grid.refreshColumns();
 
       if (this.isIRPAndVMSEnabled) {
         this.startSystemControlWatching();
