@@ -26,14 +26,16 @@ export class PaymentsAdapter {
         const { agencySuffix, checkId, invoiceId } = invoiceData
         .find((item) => item.invoiceNumber === invoiceFormatedId) as InvoicePaymentData;
 
+        const paymentId = payments[invoiceFormatedId].get('id')?.value;
+
         dto.payments.push({
-          id: payments[invoiceFormatedId].get('id')?.value,
           invoiceId: invoiceId,
           checkId: checkId,
           agencySuffix: agencySuffix,
           paymentDate: DateTimeHelper.toUtcFormat(DateTimeHelper.setInitHours(check.date.toString())),
           payment: formValue.amount,
           organizationId: orgId,
+          ...paymentId ? { id: paymentId } : {},
         });
       });
 
