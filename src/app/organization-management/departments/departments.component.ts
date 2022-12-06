@@ -170,13 +170,12 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   public onFilterApply(): void {
-    //    const { inactiveDate, ...formValue } = this.DepartmentFilterFormGroup.getRawValue();
-    //     console.log(inactiveDate, 'inactiveDate');
-    //     this.filters = formValue;
-    //     this.filters.inactiveDate = DateTimeHelper.toUtcFormat(inactiveDate);
-    //     console.log(this.filters.inactiveDate, 'this.filters.inactiveDate');
-    this.filters = this.DepartmentFilterFormGroup.getRawValue();
+    const { inactiveDate, ...formValue } = this.DepartmentFilterFormGroup.getRawValue();
+
+    this.filters = formValue;
+    this.filters.inactiveDate = DateTimeHelper.toUtcFormat(inactiveDate);
     this.filteredItems = this.filterService.generateChips(this.DepartmentFilterFormGroup, this.filterColumns, this.datePipe);
+
     this.getDepartments();
     this.store.dispatch(new ShowFilterDialog(false));
   }
