@@ -47,6 +47,7 @@ import { CredentialList } from '@shared/components/credentials-list/store/creden
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
 import { UserState } from '../../../store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { AppState } from '../../../store/app.state';
 
 @Component({
   selector: 'app-credentials-list',
@@ -67,6 +68,7 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
   public filterColumns: FilterColumnsModel;
   public selectedCredential: Credential;
   public isMspUser = false;
+  public isIrpFlagEnabled = false;
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
@@ -360,16 +362,17 @@ export class CredentialsListComponent extends AbstractPermissionGrid implements 
   }
 
   private initExportColumns(): void {
-    this.columnsToExport = this.showIrpFields() && this.selectedSystem.isIRP ?
+    this.columnsToExport = this.showIrpFields() && this.isCredentialSettings ?
       [...ExportColumns, ...ExportIRPColumns] : ExportColumns;
   }
 
   private showIrpFields(): boolean {
-    return this.selectedSystem.isIRP && this.selectedSystem.isVMS && !this.isMspUser;
+    return this.selectedSystem.isIRP && this.selectedSystem.isVMS && this.isIrpFlagEnabled && !this.isMspUser;
   }
 
   private checkCurrentUser(): void {
     const user = this.store.selectSnapshot(UserState.user);
     this.isMspUser = user?.businessUnitType === BusinessUnitType.MSP;
+    this.isIrpFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   }
 }

@@ -42,6 +42,7 @@ import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { UserState } from '../../../../store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { AppState } from '../../../../store/app.state';
 
 @Component({
   selector: 'app-add-edit-credential',
@@ -83,6 +84,7 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   public dialogConfig: CredentialListConfig[];
   public selectedSystem: SelectedSystemsFlag;
   public isMspUser = false;
+  public isIrpFlagEnabled = false;
 
   private selectedCredential: Credential;
 
@@ -235,11 +237,12 @@ export class AddEditCredentialComponent extends Destroyable implements OnInit {
   }
 
   private showIrpFields(): boolean {
-    return this.selectedSystem.isIRP && this.selectedSystem.isVMS && !this.isMspUser;
+    return this.selectedSystem.isIRP && this.selectedSystem.isVMS && this.isIrpFlagEnabled && !this.isMspUser;
   }
 
   private isCurrentMspUser(): void {
     const user = this.store.selectSnapshot(UserState.user);
     this.isMspUser = user?.businessUnitType === BusinessUnitType.MSP;
+    this.isIrpFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   }
 }

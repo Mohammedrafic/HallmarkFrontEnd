@@ -14,6 +14,7 @@ import { SetCredentialsFilterCount } from '@organization-management/store/creden
 import { Destroyable } from '@core/helpers';
 import { UserState } from '../../../../store/user.state';
 import { SelectedSystemsFlag } from '@shared/components/credentials-list/interfaces';
+import { AppState } from '../../../../store/app.state';
 
 @Component({
   selector: 'app-filters',
@@ -27,10 +28,12 @@ export class FiltersComponent extends Destroyable implements OnInit {
       this.changeDetection.markForCheck();
   }
   @Input() set systemFlags(systems: SelectedSystemsFlag) {
+    this.isIrpFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
     this.selectedSystem = systems;
     this.initFilterForm();
     this.changeDetection.markForCheck();
   }
+
   @Input() public isCredentialSettings = false;
   @Input() public isMspUser = false;
 
@@ -43,6 +46,8 @@ export class FiltersComponent extends Destroyable implements OnInit {
   public totalDataRecords: number;
   public filterColumns: FilterColumnsModel;
   public selectedSystem: SelectedSystemsFlag;
+  public isIrpFlagEnabled = false;
+  public showSelectSystem = false;
 
   @Select(UserState.lastSelectedOrganizationId)
   private organizationId$: Observable<number>;
@@ -95,7 +100,6 @@ export class FiltersComponent extends Destroyable implements OnInit {
       credentialTypeIds: credentialTypeIds ?? [],
       expireDateApplicable: expireDateApplicable ?? null,
     });
-
     if(this.isCredentialWithIrp()) {
       this.credentialsFilters.patchValue({
         includeInIRP: includeInIRP ?? null,
@@ -128,6 +132,11 @@ export class FiltersComponent extends Destroyable implements OnInit {
   }
 
   private isCredentialWithIrp(): boolean {
-    return this.selectedSystem.isIRP && this.selectedSystem.isVMS && this.isCredentialSettings && !this.isMspUser;
+    this.showSelectSystem = this.selectedSystem.isIRP &&
+      this.selectedSystem.isVMS &&
+      this.isCredentialSettings &&
+      this.isIrpFlagEnabled &&
+      !this.isMspUser;
+    return this.showSelectSystem;
   }
 }
