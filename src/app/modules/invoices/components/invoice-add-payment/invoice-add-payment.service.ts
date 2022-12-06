@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { CustomFormGroup } from '@core/interface';
-import { InvoicePaymentData, PaymentDto } from '../../interfaces';
+import { InvoicePaymentData, PaymentCreationDto, PaymentDto } from '../../interfaces';
 import { CheckForm, PaymentForm, PaymentsTableData } from './invoice-add-payment.interface';
 
 @Injectable()
@@ -113,6 +113,17 @@ export class InvoiceAddPaymentService {
 
   checkPaymentsFormTouch(paymentForms: Record<string, CustomFormGroup<PaymentForm>>): boolean {
     return Object.keys(paymentForms).some((key) => paymentForms[key].touched);
+  }
+
+  createInitialInvoicesData(data: PaymentCreationDto): InvoicePaymentData[] {
+    return data.payments.map((payment) => ({
+      invoiceId: payment.invoiceId,
+      invoiceNumber: payment.formattedInvoiceId,
+      amount: payment.amountToPay,
+      checkId: data.check.id,
+      id: payment.id,
+      ...payment.agencySuffix ? { agencySuffix: payment.agencySuffix } : {},
+    })) as InvoicePaymentData[];
   }
 
   private createPaymentGroup(
