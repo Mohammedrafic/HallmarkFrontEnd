@@ -170,6 +170,10 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
     this.confirmOrderImport.hide();
   }
 
+  public onTabChange(): void {
+    this.tabChange.emit(this.activeErrorTab);
+  }
+
   private setDropElement(): void {
     this.dropElement = document.getElementById('droparea') as HTMLElement;
   }
@@ -223,9 +227,7 @@ export class ImportDialogContentComponent extends DestroyableDirective implement
   }
 
   private saveImportedOrder(): void {
-    if (this.importResult?.errorRecords.length) {
-      this.confirmOrderImport.show();
-    }
+    this.confirmOrderImport.show();
   }
 
   private subscribeOnSelectErrorsTab(): void {

@@ -51,7 +51,7 @@ export class OrderImportComponent extends AbstractImport implements OnInit {
   }
 
   public selectFirstItemFactory(): void {
-    if (this.activeErrorTab) {
+    if (this.activeErrorTab || this.errorListBox.length) {
       this.selectFirstItem('error-record-list', this.errorListBox);
     } else {
       this.selectFirstItem('success-record-list', this.successListBox);
@@ -82,7 +82,6 @@ export class OrderImportComponent extends AbstractImport implements OnInit {
         this.errorListBox = this.orderImportService.getListBoxData(errorRecords as ImportedOrder[]);
         this.errorGridList = this.orderImportService.buildOrderGrids(errorRecords as ImportedOrder[]);
         this.successGridList = this.orderImportService.buildOrderGrids(succesfullRecords as ImportedOrder[]);
-        this.cdr.markForCheck();
     });
   }
 

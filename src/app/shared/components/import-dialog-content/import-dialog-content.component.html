@@ -53,7 +53,7 @@
             Download file with Errors
             <i-feather name="download" class="icon"></i-feather>
           </span>
-          <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
+          <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()" (selected)="onTabChange()">
             <e-tabitems>
               <e-tabitem [disabled]="!importResult.succesfullRecords.length">
                 <ng-template #headerText> Successful <span class="tab-badge">{{importResult?.succesfullRecords?.length}}</span></ng-template>
