@@ -313,16 +313,17 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.editedLocationId = location.id;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
-    this.inactivateDateHandler(this.locationDetailsFormGroup.controls['inactiveDate'], location.inactiveDate);
+    this.inactivateDateHandler(this.locationDetailsFormGroup.controls['inactiveDate'], location.inactiveDate, location.reactivateDate);
   }
 
-  private inactivateDateHandler(field: AbstractControl, value: string | undefined): void {
+  private inactivateDateHandler(field: AbstractControl, value: string | undefined, reactivateValue: string | undefined): void {
     if (value) {
       const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
+      const reactivateDate = reactivateValue ? new Date(DateTimeHelper.formatDateUTC(reactivateValue, 'MM/dd/yyyy')) : null;
       inactiveDate.setHours(0, 0, 0, 0);
       const now = new Date();
       now.setHours(0, 0, 0, 0);
-      if (DateTimeHelper.isDateBefore(inactiveDate, now)) {
+      if (!(reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, now)) && DateTimeHelper.isDateBefore(inactiveDate, now)) {
         field.disable();
       } else {
         field.enable();

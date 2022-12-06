@@ -301,16 +301,17 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.isEdit = true;
     this.reactivationDateHandler(department);
     this.store.dispatch(new ShowSideDialog(true));
-    this.inactivateDateHandler(this.departmentsDetailsFormGroup.controls['inactiveDate'], department.inactiveDate);
+    this.inactivateDateHandler(this.departmentsDetailsFormGroup.controls['inactiveDate'], department.inactiveDate, department.reactivateDate);
   }
 
-  private inactivateDateHandler(field: AbstractControl, value: string | null): void {
-    if (value && !this.selectedLocation.isDeactivated) {
+  private inactivateDateHandler(field: AbstractControl, value: string | null, reactivateValue: string | null): void {
+    if (value) {
       const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
+      const reactivateDate = reactivateValue ? new Date(DateTimeHelper.formatDateUTC(reactivateValue, 'MM/dd/yyyy')) : null;
       inactiveDate.setHours(0, 0, 0, 0);
       const now = new Date();
       now.setHours(0, 0, 0, 0);
-      if (DateTimeHelper.isDateBefore(inactiveDate, now)) {
+      if (!(reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, now)) && DateTimeHelper.isDateBefore(inactiveDate, now)) {
         field.disable();
       } else {
         field.enable();
