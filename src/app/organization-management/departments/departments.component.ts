@@ -348,9 +348,6 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         reactivationDateField.disable();
       } else {
         reactivationDateField.enable();
-        if (!department?.reactivateDate && !this.selectedLocation.isDeactivated) {
-          reactivationDateField.patchValue(this.selectedLocation.reactivateDate);
-        }
         this.reactivationDatepicker.refresh();
         this.inactivationDatepicker.refresh();
       }
