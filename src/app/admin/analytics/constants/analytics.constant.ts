@@ -19,7 +19,8 @@ export const analyticsConstants = {
     Months: 'months',
     Years: 'years',
     InvoiceStatuses: 'invoiceStatuses',
-    InvoiceID: 'invoiceID'
+    InvoiceID: 'invoiceID',
+    TimesheetStatuses:'timesheetStatuses'
   }
 }
 
@@ -51,6 +52,21 @@ export const invoiceSummaryConstants = {
     InvoiceNumber:'invoiceNumber',
     StartDate: 'startDate',
     EndDate:'endDate'
+  }
+}
+
+export const timeSheetConstants = {
+  formControlNames: {
+    BusinessIds: 'businessIds',
+    RegionIds: 'regionIds',
+    LocationIds: 'locationIds',
+    DepartmentIds: 'departmentIds',
+    CandidateName: 'candidateName',
+    AgencyIds: 'agencyIds',
+    OrderId: 'orderId',
+    StartDate: 'startDate',
+    EndDate: 'endDate',
+    TimeSheetType: 'timeSheetType'
   }
 }
 
