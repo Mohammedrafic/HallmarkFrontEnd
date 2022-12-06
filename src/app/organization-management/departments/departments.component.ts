@@ -345,7 +345,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       const inactiveDate = this.selectedLocation.inactiveDate ? new Date(this.selectedLocation.inactiveDate) : null;
       this.minReactivateDate = reactivateDate ? DateTimeHelper.formatDateUTC(reactivateDate.toISOString(), 'MM/dd/yyyy') : null;
       this.maxInactivateDate = inactiveDate ? DateTimeHelper.formatDateUTC(inactiveDate.toISOString(), 'MM/dd/yyyy') : null;
-      if (!this.selectedLocation.reactivateDate) {
+      if (!this.selectedLocation.reactivateDate && this.selectedLocation.isDeactivated) {
         reactivationDateField.disable();
       } else {
         reactivationDateField.enable();
