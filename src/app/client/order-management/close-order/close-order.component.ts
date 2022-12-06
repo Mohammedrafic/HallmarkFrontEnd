@@ -59,13 +59,15 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     private actions: Actions,
     private closeOrderService: CloseOrderService,
     private confirmService: ConfirmService,
-    private commentsService: CommentsService,
+    private commentsService: CommentsService
   ) {
     super();
   }
 
   public ngOnChanges(changes: SimpleChanges) {
-    const { order: { currentValue } } = changes;
+    const {
+      order: { currentValue },
+    } = changes;
 
     if (currentValue) {
       this.dialogTitleType = OrderTypeTitlesMap.get(currentValue.orderType) as string;
@@ -120,12 +122,14 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   private setMaxDate(): void {
-    const maxDate =
-      this.order.orderType === OrderType.ReOrder
-        ? this.order.jobStartDate
-        : this.isPosition
-        ? new Date(this.candidate.actualEndDate || 0)
-        : this.order.jobEndDate;
+    let maxDate;
+    if (this.order.orderType === OrderType.ReOrder) {
+      maxDate = this.order.jobStartDate;
+    } else if (this.isPosition) {
+      maxDate = new Date(this.candidate.actualEndDate || 0);
+    } else {
+      maxDate = this.order.jobEndDate;
+    }
     this.maxDate = maxDate || null;
   }
 
