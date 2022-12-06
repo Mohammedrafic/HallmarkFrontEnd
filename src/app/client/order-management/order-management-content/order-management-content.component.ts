@@ -272,7 +272,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private creatingReorder = false;
   private filterApplied = false;
   private isIncomplete = false;
-  private timesheetRedirect = false;
   private redirectFromPerdiem = false;
   private cd$ = new Subject();
 
@@ -300,7 +299,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
     this.orderStaus = routerState?.['orderStatus'] || 0;
     this.isRedirectedFromToast = routerState?.['redirectedFromToast'] || false;
-    this.timesheetRedirect = !!routerState?.['timesheetRedirect'];
     this.quickOrderId = routerState?.['publicId'];
     this.prefix = routerState?.['prefix'];
 
@@ -1270,7 +1268,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.filterColumns.orderStatuses.dataSource = statuses;
         this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
         this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
-        if (!this.timesheetRedirect && !this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect) {
+        if (!this.redirectFromPerdiem && !this.orderManagementService.selectedOrderAfterRedirect) {
           this.setDefaultFilter();
         } else {
           this.redirectFromPerdiem = false;
@@ -1572,6 +1570,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       .subscribe((data: { id: number; prefix: string }) => {
         this.orderPerDiemId = data.id;
         this.prefix = data.prefix;
+        this.clearFilters();
+        this.redirectFromPerdiem = true;
+        this.filters.orderPublicId = this.prefix + '-' + this.orderId;
+        this.OrderFilterFormGroup.controls['orderPublicId'].setValue(this.prefix + '-' + this.orderId);
+        this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
+        this.getOrders(true);
       });
   }
 
@@ -1621,7 +1625,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private handleRedirectFromQuickOrderToast(): void {
-    if (this.isRedirectedFromToast || this.timesheetRedirect) {
+    if (this.isRedirectedFromToast) {
       let prefix = this.prefix || '';
       this.orderManagementService.orderId$.next({ id: this.quickOrderId, prefix: prefix });
     }

@@ -64,9 +64,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PreviewOrderDialogComponent } from '@agency/order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
-import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -148,11 +146,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private datePipe: DatePipe,
     private filterService: FilterService,
     private orderManagementAgencyService: OrderManagementAgencyService,
-    private router: Router,
   ) {
     super();
     this.listenRedirectFromExtension();
-    this.checkRouterState();
   }
 
   ngOnInit(): void {
@@ -183,7 +179,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.subscribeOnPageChanges();
     this.onTabChange();
     this.onCommentRead();
-    this.listenRedirectFromExtension();
     this.listenRedirectFromPerDiem();
     this.listenRedirectFromReOrder();
     
@@ -843,14 +838,5 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.currentPage = page;
       this.dispatchNewPage();
     });
-  }
-
-  private checkRouterState(): void {
-    const orderId = this.router.getCurrentNavigation()?.extras?.state?.['publicId'];
-    const orderPrefix = this.router.getCurrentNavigation()?.extras?.state?.['prefix'] || '';
-
-    if (orderId && orderPrefix) {
-      this.orderManagementAgencyService.orderId$.next({ id: orderId, prefix: orderPrefix });
-    }
   }
 }
