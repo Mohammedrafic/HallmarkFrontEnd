@@ -1,0 +1,36 @@
+<div #inputWrapper class="bootstrap">
+  <div class="input-container">
+    <label *ngIf="title">{{ title }}</label>
+    <div class="input-group">
+      <input
+        class="e-input"
+        [class.active]="isCalendarShow"
+        readonly
+        placeholder="MM/DD/YYYY"
+      />
+      <div
+        [class.active]="isCalendarShow"
+        class="calendar-icon"
+        (click)="openMenu()"
+      ></div>
+    </div>
+    <div class="chips-wrapper">
+      <div *ngFor="let date of datesControl.value; index as idx" class="chip">
+        <span class="chip__text">{{ date | date: 'MM/dd/YYYY' }}</span>
+        <i-feather (click)="removeChip(idx)" class="chip__icon" name="x"></i-feather>
+      </div>
+    </div>
+  </div>
+
+  <ejs-calendar
+    #ejCalendar
+    *ngIf="isCalendarShow"
+    [values]="datesValues"
+    [isMultiSelection]="true"
+    [showTodayButton]="false"
+    (valuesChange)="datesValuesChange($event)"
+    (created)="calendarCreated(ejCalendar)"
+    (destroyed)="calendarDestroyed()"
+    class="calendar">
+  </ejs-calendar>
+</div>
