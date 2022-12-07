@@ -153,11 +153,18 @@ const defaultColumnMapping = {
   valueId: 'id',
 };
 
+const skillsColumnMapping = {
+  type: ControlTypes.Multiselect,
+  valueType: ValueType.Id,
+  valueField: 'name',
+  valueId: 'masterSkillsId',
+};
+
 export const DefaultFilterColumns: FilterColumns = {
   searchTerm: defaultInputMapping,
   orderIds: defaultColumnMapping,
   statusIds: defaultColumnMapping,
-  skillIds: defaultColumnMapping,
+  skillIds: skillsColumnMapping ,
   departmentIds: defaultColumnMapping,
   agencyIds: defaultColumnMapping,
   regionsIds: defaultColumnMapping,

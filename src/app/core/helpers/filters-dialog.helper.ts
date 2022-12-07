@@ -22,7 +22,7 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 @Directive()
 export class FiltersDialogHelper<T, F, S> extends Destroyable {
   @ViewChild('regionMultiselect') regionMultiselect: MultiSelectComponent;
-  
+
   @Input() activeTabIdx: number;
   @Input() orgId: number | null;
 
