@@ -173,10 +173,13 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
   }
 
   private initForm(): void {
-    let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 30);
-    let endDate = new Date(Date.now());
-    endDate.setDate(endDate.getDate() + 30);
+    let startDate = this.getLastWeek();
+    let first = startDate.getDate() - startDate.getDay();
+    let last = first + 6; 
+    let firstday = new Date(startDate.setDate(first));
+    let lastday = new Date(startDate.setDate(last));
+    startDate = firstday;
+    let endDate = lastday;
     this.timesheetReportForm = this.formBuilder.group(
       {
         businessIds: new FormControl([Validators.required]),
@@ -197,6 +200,12 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.isAlive = false;
+  }
+
+  getLastWeek() {
+    var today = new Date(Date.now());
+    var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
+    return lastWeek;
   }
 
   public onFilterControlValueChangedHandler(): void {
@@ -251,7 +260,9 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
               this.isAlive = false;
               this.filterOptionsData = data;
               this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
-              this.filterColumns.timesheetStatusIds.dataSource = data.timesheetStatuses;
+              let timesheetStatusData = data.timesheetStatuses;
+              timesheetStatusData.push({ id: -1, name: "DNW" }); //Include static "DNW" as a status to status dropdown with id -1
+              this.filterColumns.timesheetStatusIds.dataSource = timesheetStatusData;
               this.filterColumns.agencyIds.dataSource = data.agencies;
               this.defaultAgencyIds = data.agencies.map((list) => list.agencyId);
               this.timesheetReportForm.get(analyticsConstants.formControlNames.AgencyIds)?.setValue(this.defaultAgencyIds);
@@ -453,10 +464,13 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
   }
   public onFilterClearAll(): void {
     this.isClearAll = true;
-    let startDate = new Date(Date.now());
-    startDate.setDate(startDate.getDate() - 30);
-    let endDate = new Date(Date.now());
-    endDate.setDate(endDate.getDate() + 30);
+    let startDate = this.getLastWeek();
+    let first = startDate.getDate() - startDate.getDay();
+    let last = first + 6;
+    let firstday = new Date(startDate.setDate(first));
+    let lastday = new Date(startDate.setDate(last));
+    startDate = firstday;
+    let endDate = lastday;
     this.timesheetReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
     this.timesheetReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.timesheetReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
