@@ -12,7 +12,7 @@ export class MapCredentialsService {
       regionIds: [null, Validators.required],
       locationIds: [null, Validators.required],
       departmentIds: [null, Validators.required],
-      groupIds: [null, Validators.required]
+      groupIds: [null, Validators.required],
     });
   }
 }
