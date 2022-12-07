@@ -606,10 +606,36 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
       const isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled)
         && user?.businessUnitType !== BusinessUnitType.MSP;
 
+      if (isIRPFlagEnabled && !!(isIRPEnabled && isVMCEnabled)) {
+        this.startGroupIdWatching();
+      }
+
       this.grid.getColumnByField('irpComment').visible = isIRPFlagEnabled && !!(isIRPEnabled && isVMCEnabled);
       this.grid.getColumnByField('system').visible = isIRPFlagEnabled && !!(isIRPEnabled && isVMCEnabled);
 
       this.grid.refreshColumns();
+    });
+  }
+
+  private startGroupIdWatching(): void {
+    this.mapCredentialsFormGroup.get('groupIds')?.valueChanges.pipe(
+      takeUntil(this.componentDestroy()),
+    ).subscribe((groupIds: number[] | null) => {
+      let credentialSetupList = this.credentialSetupList;
+
+      if (groupIds?.length) {
+        const groupIdsSet = new Set(groupIds);
+        const selectedGroups = this.groups.filter(el => groupIdsSet.has(el.id as number));
+        const isGroupHasIrp = selectedGroups.some(el => el.includeInIRP);
+        const isGroupHasVMS = selectedGroups.some(el => el.includeInVMS);
+
+        credentialSetupList = credentialSetupList.filter((el) =>
+          el.includeInIRP && isGroupHasIrp || el.includeInVMS && isGroupHasVMS
+        );
+      }
+
+      this.gridDataSource = credentialSetupList;
+      this.grid.refresh();
     });
   }
 }
