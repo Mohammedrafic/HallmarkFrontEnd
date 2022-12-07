@@ -9,7 +9,7 @@ import { GridReadyEventModel } from '@shared/components/grid/models';
 })
 export class ImportGridComponent {
   @Input() public gridName: string | undefined;
-  @Input() public importedItems: any[] = [];
+  @Input() public importedItems: unknown[] = [];
   @Input() public columnDefs: ColDef[] = [];
 
   public gridApi: GridApi | null = null;

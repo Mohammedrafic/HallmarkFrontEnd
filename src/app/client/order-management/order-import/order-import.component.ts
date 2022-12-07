@@ -87,9 +87,9 @@ export class OrderImportComponent extends AbstractImport implements OnInit {
       .subscribe(() => {
         const { succesfullRecords, errorRecords } = this.importResponse || {};
         this.successListBox = this.orderImportService.getListBoxData(succesfullRecords as ImportedOrder[]);
+        this.successGridList = this.orderImportService.buildOrderGrids(succesfullRecords as ImportedOrder[]);
         this.errorListBox = this.orderImportService.getListBoxData(errorRecords as ImportedOrder[]);
         this.errorGridList = this.orderImportService.buildOrderGrids(errorRecords as ImportedOrder[]);
-        this.successGridList = this.orderImportService.buildOrderGrids(succesfullRecords as ImportedOrder[]);
     });
   }
 

@@ -4,8 +4,7 @@ import { GridErroredCellComponent } from '@shared/components/import-dialog-conte
 import { ImportedOrder, ImportedOrderGrid, ListBoxItem, OrderGrid, OrderImportResult } from '@shared/models/imported-order.model';
 import { ColDef } from '@ag-grid-community/core';
 import { Order } from '@shared/models/order-management.model';
-import { Observable } from 'rxjs';
-import { CandidateImportResult } from '@shared/models/candidate-profile-import.model';
+import { map, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -27,11 +26,17 @@ export class OrderImportService {
   public uploadImportOrderFile(file: Blob): Observable<OrderImportResult> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post<OrderImportResult>('/api/Orders/import', formData);
+
+    return this.http.post<OrderImportResult>('/api/Orders/import', formData).pipe(map((orderImportResult) => {
+      return {
+        succesfullRecords: this.removeRrackets(orderImportResult.succesfullRecords),
+        errorRecords: this.removeRrackets(orderImportResult.errorRecords),
+      };
+    }));
   }
 
-  public saveImportOrderResult(successfullRecords: ImportedOrder[]): Observable<CandidateImportResult> {
-    return this.http.post<CandidateImportResult>('/api/Orders/saveimport', successfullRecords);
+  public saveImportOrderResult(successfullRecords: ImportedOrder[]): Observable<OrderImportResult> {
+    return this.http.post<OrderImportResult>('/api/Orders/saveimport', successfullRecords);
   }
 
   public buildOrderGrids(importedOrders: ImportedOrder[]): ImportedOrderGrid[] {
@@ -104,11 +109,13 @@ export class OrderImportService {
 
   private createColumnDef(gridConfig: { [key: string]: string }): ColDef[] {
     const columnWidth = 200;
+    const wideColumnWidth = 250;
+    const wideColumns = ['orderPlacementFee', 'annualSalaryRangeFrom', 'annualSalaryRangeTo', 'specialProjectCategory'];
 
     return Object.entries(gridConfig).map(([key, value]: [string, string]) => {
       return {
         field: key,
-        width: columnWidth,
+        width: wideColumns.includes(key) ? wideColumnWidth : columnWidth,
         headerName: value,
         cellRenderer: GridErroredCellComponent,
       };
@@ -120,5 +127,22 @@ export class OrderImportService {
       columnDefs: this.createColumnDef(config),
       rowData: [source],
     };
+  }
+
+  private removeRrackets(importedOrders: ImportedOrder[]): ImportedOrder[] {
+    if (!importedOrders.length) {
+      return [];
+    }
+
+    const regex = /\([^()]*\)/g;
+    return importedOrders.map((importedOrder: ImportedOrder) => {
+      return {
+        ...importedOrder,
+        orderImport: {
+          ...importedOrder.orderImport,
+          location: importedOrder.orderImport.location.replace(regex, '').trim(),
+          department: importedOrder.orderImport.department.replace(regex, '').trim(),
+        }};
+    });
   }
 }

@@ -1,14 +1,21 @@
 import { Order } from '@shared/models/order-management.model';
 import { ColDef } from '@ag-grid-community/core';
-import { CandidateImportRecord } from '@shared/models/candidate-profile-import.model';
 
 export type ExtendedOrder = Order
-  & {jobTitle: string, tempOrderId: string, errorProperties: string[], agency: string, classification: string, jobDistribution: string};
+  & {jobTitle: string,
+  tempOrderId: string,
+  errorProperties: string[],
+  agency: string,
+  classification: string,
+  jobDistribution: string,
+  department: string,
+  location: string
+};
 
 
 export type OrderImportResult = {
-  succesfullRecords: CandidateImportRecord[];
-  errorRecords: CandidateImportRecord[];
+  succesfullRecords: ImportedOrder[];
+  errorRecords: ImportedOrder[];
 }
 
 export interface ImportedOrder {

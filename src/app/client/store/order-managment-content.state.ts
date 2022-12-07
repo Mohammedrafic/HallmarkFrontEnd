@@ -106,7 +106,6 @@ import { createUniqHashObj } from '@core/helpers/functions.helper';
 import { DateTimeHelper } from '@core/helpers';
 import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { CandidateImportResult } from '@shared/models/candidate-profile-import.model';
 import { OrderImportService } from '@client/order-management/order-import/order-import.service';
 import { OrderImportResult } from '@shared/models/imported-order.model';
 
@@ -927,7 +926,7 @@ export class OrderManagementContentState {
   SaveOrderImportResult(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { payload }: SaveOrderImportResult
-  ): Observable<CandidateImportResult | Observable<void>> {
+  ): Observable<OrderImportResult | Observable<void>> {
     return this.orderImportService.saveImportOrderResult(payload).pipe(
       tap((payload) => {
         dispatch(new SaveOrderImportResultSucceeded(payload));

@@ -7,14 +7,14 @@ import { ErroredData } from '@shared/models/candidate-profile-import.model';
 @Component({
   selector: 'app-grid-errored-cell',
   templateUrl: './grid-errored-cell.component.html',
-  styleUrls: ['./grid-errored-cell.component.scss']
+  styleUrls: ['./grid-errored-cell.component.scss'],
 })
 export class GridErroredCellComponent implements ICellRendererAngularComp {
   public cellValue: ErroredData;
   public colId: string;
 
   get isErrored(): boolean {
-    return this.cellValue.errorProperties.some((item: string) => item.toLowerCase().includes(this.colId.toLowerCase()))
+    return this.cellValue.errorProperties.some((item: string) => item.toLowerCase() === this.colId.toLowerCase());
   }
 
   public agInit(params: ICellRendererParams): void {

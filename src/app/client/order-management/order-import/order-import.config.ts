@@ -36,7 +36,7 @@ export const columnDefs = {
     location: 'Location',
     department: 'Department',
     skill: 'Skill',
-    numberOfOpenPositions: "# Open Position"
+    numberOfOpenPositions: "# Open Positions",
   },
   generalInfoMiddle: {
     hourlyRate: 'Hourly Rate',
@@ -75,7 +75,7 @@ export const columnDefs = {
     email: 'Email',
   },
   workLocation: {
-    jobDescription: 'Address',
+    address: 'Address',
     state: 'State',
     city: 'City',
     zipCode: 'Zip Code',
@@ -84,6 +84,6 @@ export const columnDefs = {
     specialProjectCategory: 'Special Project Category',
     projectName: 'Project Name',
     po: 'PO#',
-  }
-}
+  },
+};
 
