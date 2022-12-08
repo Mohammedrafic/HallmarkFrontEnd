@@ -315,16 +315,19 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.editedLocationId = location.id;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
-    this.inactivateDateHandler(this.locationDetailsFormGroup.controls['inactiveDate'], location.inactiveDate, location.reactivateDate, location.timeZone);
+    this.inactivateDateHandler(this.locationDetailsFormGroup.controls['inactiveDate'],
+    location.inactiveDate, location.reactivateDate, location.timeZone);
   }
 
-  private inactivateDateHandler(field: AbstractControl, value: string | undefined, reactivateValue: string | undefined, timeZone?: string): void {
+  private inactivateDateHandler(field: AbstractControl, value: string | undefined,
+    reactivateValue: string | undefined, timeZone?: string): void {
     if (value) {
       const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
       const reactivateDate = reactivateValue ? new Date(DateTimeHelper.formatDateUTC(reactivateValue, 'MM/dd/yyyy')) : null;
       inactiveDate.setHours(0, 0, 0, 0);
       const nowPerTimeZone = DateTimeHelper.newDateInTimeZone(timeZone || this.DEFAULT_LOCATION_TIMEZONE);
-      if (!(reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, nowPerTimeZone)) && DateTimeHelper.isDateBefore(inactiveDate, nowPerTimeZone)) {
+      if (!(reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, nowPerTimeZone))
+      && DateTimeHelper.isDateBefore(inactiveDate, nowPerTimeZone)) {
         field.disable();
       } else {
         field.enable();
@@ -368,14 +371,14 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
           this.store.dispatch(new ShowSideDialog(false));
           this.isEdit = false;
           this.editedLocationId = undefined;
-          this.locationDetailsFormGroup.reset();
+          this.locationDetailsFormGroup.reset({ includeInIRP: false });
           this.removeActiveCssClass();
         });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
       this.isEdit = false;
       this.editedLocationId = undefined;
-      this.locationDetailsFormGroup.reset();
+      this.locationDetailsFormGroup.reset({ includeInIRP: false });
       this.removeActiveCssClass();
     }
   }
