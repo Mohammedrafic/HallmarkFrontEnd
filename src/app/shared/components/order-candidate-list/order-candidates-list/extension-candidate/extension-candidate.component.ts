@@ -608,11 +608,9 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   }
 
   private clearOrderCandidateList(): void {
-    this.dialogEvent.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-      if (!data) {
+    this.dialogEvent.pipe(filter((data) => !data), takeUntil(this.destroy$)).subscribe(() => {
         const ClearCandidatesList = this.isAgency ? ClearAgencyOrderCandidatesList : ClearOrderCandidatePage;
         this.store.dispatch(new ClearCandidatesList());
-      }
     });
   }
 }

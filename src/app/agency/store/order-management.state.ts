@@ -241,7 +241,7 @@ export class OrderManagementState {
   }
 
   @Action(ClearAgencyOrderCandidatesList)
-  ClearAgencyOrderCandidatesList({ patchState }: StateContext<OrderManagementModel>) {
+  ClearAgencyOrderCandidatesList({ patchState }: StateContext<OrderManagementModel>): void {
     patchState({ orderCandidatesListPage: null });
   }
 
