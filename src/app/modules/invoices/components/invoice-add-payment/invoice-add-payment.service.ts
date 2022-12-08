@@ -17,7 +17,7 @@ export class InvoiceAddPaymentService {
       date: [new Date(), Validators.required],
       checkNumber: [null, [Validators.required, Validators.maxLength(20)]],
       checkDate: [new Date(), Validators.required],
-      initialAmount: [null, [Validators.required, Validators.maxLength(10)]],
+      initialAmount: [null, [Validators.required, Validators.max(9999999999)]],
       paymentMode: [null, Validators.required],
       isRefund: [false],
     }) as CustomFormGroup<CheckForm>;
@@ -140,7 +140,7 @@ export class InvoiceAddPaymentService {
     initBalance: number | null = null): CustomFormGroup<PaymentForm> {
     return this.fb.group({
       id: [{ value: null, disabled: true }],
-      amount: [initAmount, [Validators.required, Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER)]],
+      amount: [initAmount, [Validators.required, Validators.min(0), Validators.max(9999999999)]],
       balance: [{ value: initBalance, disabled: true }, [ Validators.min(0)]],
     }) as CustomFormGroup<PaymentForm>;
   }
