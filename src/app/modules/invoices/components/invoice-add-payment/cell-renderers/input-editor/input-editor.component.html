@@ -1,11 +1,11 @@
 <div *ngIf="group" [formGroup]="group" class="amount-container">
   <span>
     <input
-    appValidateWithMessage
-    class="amount-input"
-    [formControlName]="controlName"
-    (change)="changePayment()"
-    type="number"/>
+      class="amount-input"
+      [ngClass]="{ 'errored': group.invalid && group.touched}"
+      [formControlName]="controlName"
+      (change)="changePayment()"
+      type="number"/>
   </span>
 
 </div>
