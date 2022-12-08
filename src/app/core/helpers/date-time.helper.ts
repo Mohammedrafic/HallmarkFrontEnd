@@ -71,6 +71,10 @@ export class DateTimeHelper {
     return date.getTime() <= toDate.getTime();
   }
 
+  public static newDateInTimeZone(timeZone: string): Date {
+    return new Date(new Date().toLocaleString('en-US', { timeZone: timeZone }));
+  }
+
   public static getWeekDate(date: string | Date, isStart = false): Date {
     const curr = new Date(date);
     const firstDay = curr.getTime() - curr.getDay() * 24 * 60 * 60 * 1000;

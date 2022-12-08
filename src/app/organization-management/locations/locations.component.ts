@@ -97,6 +97,8 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   @Select(BusinessLinesState.allBusinessLines)
   public readonly businessLines$: Observable<BusinessLines[]>;
 
+  public readonly DEFAULT_LOCATION_TIMEZONE = 'America/New_York';
+
   public readonly regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public readonly dropDownfields = { text: 'text', value: 'value' };
   public locationDetailsFormGroup: FormGroup;
@@ -313,17 +315,16 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.editedLocationId = location.id;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
-    this.inactivateDateHandler(this.locationDetailsFormGroup.controls['inactiveDate'], location.inactiveDate, location.reactivateDate);
+    this.inactivateDateHandler(this.locationDetailsFormGroup.controls['inactiveDate'], location.inactiveDate, location.reactivateDate, location.timeZone);
   }
 
-  private inactivateDateHandler(field: AbstractControl, value: string | undefined, reactivateValue: string | undefined): void {
+  private inactivateDateHandler(field: AbstractControl, value: string | undefined, reactivateValue: string | undefined, timeZone?: string): void {
     if (value) {
       const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
       const reactivateDate = reactivateValue ? new Date(DateTimeHelper.formatDateUTC(reactivateValue, 'MM/dd/yyyy')) : null;
       inactiveDate.setHours(0, 0, 0, 0);
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      if (!(reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, now)) && DateTimeHelper.isDateBefore(inactiveDate, now)) {
+      const nowPerTimeZone = DateTimeHelper.newDateInTimeZone(timeZone || this.DEFAULT_LOCATION_TIMEZONE);
+      if (!(reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, nowPerTimeZone)) && DateTimeHelper.isDateBefore(inactiveDate, nowPerTimeZone)) {
         field.disable();
       } else {
         field.enable();
