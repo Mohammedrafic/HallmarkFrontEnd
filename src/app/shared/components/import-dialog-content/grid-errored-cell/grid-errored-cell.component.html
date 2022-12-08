@@ -1,4 +1,4 @@
 <div [class.errored-cell]="isErrored">
-  <span *ngIf="cellValue[colId] as value">{{value}}</span>
+  <span *ngIf="cellValue[colId]">{{value}}</span>
   <span *ngIf="isErrored"><i-feather name="alert-circle" class="icon"></i-feather></span>
 </div>

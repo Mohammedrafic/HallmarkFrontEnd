@@ -92,8 +92,4 @@ export class OrderImportComponent extends AbstractImport implements OnInit {
         this.errorGridList = this.orderImportService.buildOrderGrids(errorRecords as ImportedOrder[]);
     });
   }
-
-
-
-
 }
