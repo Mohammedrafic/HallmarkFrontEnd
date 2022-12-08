@@ -1,18 +1,31 @@
 import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 import { OrderStatus } from "@shared/enums/order-management";
 
-export class CommonReportFilterOptions {    
-      orderStatuses: OrderStatusDto[];
-      jobStatuses: JobStatusDto[];
-      candidateStatuses: {
-        status: ApplicantStatus;
-        statusText: string;
-      }[];
-      masterSkills: MasterSkillDto[];
-      skillCategories: SkillCategoryDto[];
-      agencies: AgencyDto[];
-      timesheetStatuses: timesheetStatusesDto[];
-  }
+export class CommonReportFilterOptions {
+  orderStatuses: OrderStatusDto[];
+  jobStatuses: JobStatusDto[];
+  candidateStatuses: {
+    status: ApplicantStatus;
+    statusText: string;
+  }[];
+  masterSkills: MasterSkillDto[];
+  skillCategories: SkillCategoryDto[];
+  agencies: AgencyDto[];
+  timesheetStatuses: timesheetStatusesDto[];
+  candidateStatusesAndReasons: CandidateStatusAndReasonFilterOptionsDto[];
+  jobStatusesAndReasons: JobStatusAndReasonFilterOptionsDto[];
+}
+
+export class CandidateStatusAndReasonFilterOptionsDto {
+  status: number;
+  statusText: string;
+}
+
+export class JobStatusAndReasonFilterOptionsDto {
+  status: number;
+  statusText: string;
+}
+
   export class JobStatusDto{
     status: OrderStatus;
     statusText: string;
