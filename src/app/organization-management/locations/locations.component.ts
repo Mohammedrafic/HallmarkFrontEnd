@@ -378,7 +378,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       this.store.dispatch(new ShowSideDialog(false));
       this.isEdit = false;
       this.editedLocationId = undefined;
-      this.locationDetailsFormGroup.reset();
+      this.locationDetailsFormGroup.reset({ includeInIRP: false });
       this.removeActiveCssClass();
     }
   }
