@@ -8,7 +8,7 @@ import { AddCredentialForm, SearchCredentialForm }
   from "@agency/candidates/add-edit-candidate/credentials-grid/credentials-grid.interface";
 import { CustomFormGroup } from "@core/interface";
 import { CredentialStatus } from "@shared/enums/status";
-import { CandidateCredential, CredentialFile } from "@shared/models/candidate-credential.model";
+import { CandidateCredential, CredentialFile, CredentialRequestParams } from "@shared/models/candidate-credential.model";
 
 @Injectable()
 export class CredentialGridService {
@@ -40,7 +40,26 @@ export class CredentialGridService {
       type,
       size: 0,
     };
-}
+  }
+
+  public getCredentialRequestParams(
+    pageNumber: number,
+    pageSize: number,
+    orderId: number | null,
+    organizationId: number | null,
+  ): CredentialRequestParams {
+    const params: CredentialRequestParams = { pageNumber, pageSize };
+
+    if (orderId) {
+      params.orderId = orderId;
+    }
+
+    if (organizationId) {
+      params.organizationId = organizationId;
+    }
+
+    return params;
+  }
 
   public createAddCredentialForm(): CustomFormGroup<AddCredentialForm> {
     return this.fb.group({

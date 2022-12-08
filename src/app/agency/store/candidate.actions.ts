@@ -1,6 +1,6 @@
 import { CredentialStatus } from "@shared/enums/status";
 import { CandidateImportRecord, CandidateImportResult } from '@shared/models/candidate-profile-import.model';
-import { CandidateCredential } from '@shared/models/candidate-credential.model';
+import { CandidateCredential, CredentialRequestParams } from '@shared/models/candidate-credential.model';
 import { Candidate } from 'src/app/shared/models/candidate.model';
 import { Education } from 'src/app/shared/models/education.model';
 import { Experience } from 'src/app/shared/models/experience.model';
@@ -106,12 +106,7 @@ export class GetCandidatePhotoSucceeded {
 
 export class GetCandidatesCredentialByPage {
   static readonly type = '[candidate] Get Candidates Credential by Page';
-  constructor(
-    public pageNumber: number,
-    public pageSize: number,
-    public orderId: number | null,
-    public candidateProfileId: number
-  ) {}
+  constructor(public credentialRequestParams: CredentialRequestParams, public candidateProfileId: number) {}
 }
 
 export class GetMasterCredentials {
@@ -196,7 +191,6 @@ export class UploadCredentialFilesSucceeded {
 
 export class GetCandidateProfileTemplate {
   static readonly type = '[candidate] Get Candidate Profile Template';
-  constructor() {}
 }
 
 export class GetCandidateProfileTemplateSucceeded {

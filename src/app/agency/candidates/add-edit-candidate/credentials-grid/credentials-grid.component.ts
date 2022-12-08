@@ -52,6 +52,7 @@ import {
   CandidateCredentialGridItem,
   CandidateCredentialResponse,
   CredentialFile,
+  CredentialRequestParams,
 } from '@shared/models/candidate-credential.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
@@ -174,6 +175,15 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     return this.selectedItems.length === this.pageSize;
   }
 
+  private get credentialRequestParams(): CredentialRequestParams {
+    return this.credentialGridService.getCredentialRequestParams(
+      this.currentPage,
+      this.pageSize,
+      this.orderId,
+      this.isOrganizationSide ? this.store.selectSnapshot(UserState.lastSelectedOrganizationId) : null
+    );
+  }
+
   constructor(
     private store: Store,
     private route: ActivatedRoute,
@@ -188,12 +198,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetCandidatesCredentialByPage(
-      this.currentPage,
-      this.pageSize,
-      this.orderId,
-      this.candidateProfileId
-    ));
+    this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
     this.store.dispatch(new GetCredentialTypes());
     this.addCredentialForm = this.credentialGridService.createAddCredentialForm();
     this.searchCredentialForm = this.credentialGridService.createSearchCredentialForm();
@@ -535,12 +540,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       takeUntil(this.unsubscribe$)
     ).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new GetCandidatesCredentialByPage(
-        this.currentPage,
-        this.pageSize,
-        this.orderId,
-        this.candidateProfileId
-      ));
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
     });
   }
 
@@ -565,12 +565,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           return;
         }
 
-        this.store.dispatch(new GetCandidatesCredentialByPage(
-          this.currentPage,
-          this.pageSize,
-          this.orderId,
-          this.candidateProfileId
-        ));
+        this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
         this.addCredentialForm.markAsPristine();
         this.closeDialog();
       });
@@ -585,12 +580,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       ofActionSuccessful(UploadCredentialFilesSucceeded),
       takeUntil(this.unsubscribe$)
     ).subscribe(() => {
-      this.store.dispatch(new GetCandidatesCredentialByPage(
-        this.currentPage,
-        this.pageSize,
-        this.orderId,
-        this.candidateProfileId
-      ));
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
       this.addCredentialForm.markAsPristine();
       this.closeDialog();
     });
@@ -598,12 +588,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       ofActionSuccessful(RemoveCandidatesCredentialSucceeded),
       takeUntil(this.unsubscribe$)
     ).subscribe(() => {
-      this.store.dispatch(new GetCandidatesCredentialByPage(
-        this.currentPage,
-        this.pageSize,
-        this.orderId,
-        this.candidateProfileId
-      ));
+      this.store.dispatch(new GetCandidatesCredentialByPage(this.credentialRequestParams, this.candidateProfileId));
     });
     this.actions$.pipe(
       ofActionSuccessful(GetCredentialFilesSucceeded),

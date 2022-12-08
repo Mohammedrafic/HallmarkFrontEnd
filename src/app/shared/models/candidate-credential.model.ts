@@ -55,6 +55,13 @@ export interface CandidateCredentialResponse {
   credentials: CandidateCredentialPage
 }
 
+export interface CredentialRequestParams {
+  pageNumber: number;
+  pageSize: number;
+  orderId?: number;
+  organizationId?: number;
+}
+
 export interface CredentialParams {
   isNavigatedFromOrganizationArea: boolean | null;
   candidateStatus: ApplicantStatus | null;

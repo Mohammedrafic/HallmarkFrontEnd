@@ -3,7 +3,12 @@ import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
-import { CandidateCredential, CandidateCredentialResponse, CredentialGroupedFiles } from "@shared/models/candidate-credential.model";
+import {
+  CandidateCredential,
+  CandidateCredentialResponse,
+  CredentialGroupedFiles,
+  CredentialRequestParams,
+} from "@shared/models/candidate-credential.model";
 import { CandidateImportRecord, CandidateImportResult } from "@shared/models/candidate-profile-import.model";
 import { CredentialStatus } from "@shared/enums/status";
 import { CredentialType } from "@shared/models/credential-type.model";
@@ -70,17 +75,11 @@ export class CandidateService {
     return this.http.delete<Education>(`/api/Education/${education.id}`);
   }
 
-  public getCredentialByCandidateId(
-    pageNumber: number,
-    pageSize: number,
-    orderId: number | null ,
-    id: number
-  ): Observable<CandidateCredentialResponse> {
-    const params: { pageNumber: number; pageSize: number; orderId?: number; } = { pageNumber, pageSize };
-    if (orderId) {
-      params.orderId = orderId;
-    }
-    return this.http.get<CandidateCredentialResponse>(`/api/CandidateCredentials/candidateProfileId/${id}`, { params });
+  public getCredentialByCandidateId(params: CredentialRequestParams, id: number): Observable<CandidateCredentialResponse> {
+    return this.http.get<CandidateCredentialResponse>(
+      `/api/CandidateCredentials/candidateProfileId/${id}`,
+      { params: { ... params } }
+    );
   }
 
   public getMasterCredentials(searchTerm: string, credentialTypeId: number | string): Observable<Credential[]> {
