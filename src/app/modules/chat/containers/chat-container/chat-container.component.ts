@@ -32,7 +32,7 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
 
   public chatTitle: { mainTitle: string, subTitle: string } = {
     mainTitle: '',
-    subTitle: ''
+    subTitle: '',
   };
 
   @Select(ChatState.chatDialogState)
@@ -90,8 +90,8 @@ export class ChatContainerComponent extends Destroyable implements OnInit {
   startNewChat(thread: ChatThread): void {
     this.chatTitle.mainTitle = thread.displayName;
     this.chatTitle.subTitle = thread.businessUnitName;
-    this.store.dispatch(new Chat.StartNewConversation(thread.userId))
-  };
+    this.store.dispatch(new Chat.StartNewConversation(thread.userId));
+  }
 
   trackByStringId(idx: number, item: ChatThread): string {
     return item.threadId as string;
