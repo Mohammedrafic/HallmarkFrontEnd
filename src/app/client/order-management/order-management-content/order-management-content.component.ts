@@ -1658,7 +1658,6 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private subscribeToCandidateJob(organizationId: number, jobId: number): void {
-    this.store.dispatch(new GetOrganisationCandidateJob(organizationId, jobId));
     this.candidatesJob$.pipe(filter(Boolean), take(1)).subscribe((data) => {
       this.selectedCandidate = {
         ...this.selectedCandidate,

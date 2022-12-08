@@ -28,6 +28,7 @@ import {
   ApplyOrderApplicants,
   ApplyOrderApplicantsSucceed,
   ClearAgencyHistoricalData,
+  ClearAgencyOrderCandidatesList,
   ClearDeployedCandidateOrderInfo,
   ClearOrders,
   ExportAgencyOrders,
@@ -237,6 +238,11 @@ export class OrderManagementState {
           return payload;
         })
       );
+  }
+
+  @Action(ClearAgencyOrderCandidatesList)
+  ClearAgencyOrderCandidatesList({ patchState }: StateContext<OrderManagementModel>): void {
+    patchState({ orderCandidatesListPage: null });
   }
 
   @Action(GetAgencyOrderGeneralInformation)

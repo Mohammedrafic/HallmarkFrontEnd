@@ -2,7 +2,17 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } 
 
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ChangedEventArgs, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { EMPTY, map, merge, mergeMap, Observable, Subject, takeUntil, filter, combineLatest } from 'rxjs';
+import {
+  EMPTY,
+  map,
+  merge,
+  mergeMap,
+  Observable,
+  Subject,
+  takeUntil,
+  filter,
+  combineLatest,
+} from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderManagementState } from '@agency/store/order-management.state';
@@ -21,6 +31,7 @@ import {
 } from '@shared/models/order-management.model';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
+  ClearAgencyOrderCandidatesList,
   GetCandidateJob,
   GetRejectReasonsForAgency,
   RejectCandidateForAgencySuccess,
@@ -35,10 +46,11 @@ import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { Router } from '@angular/router';
-import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
+  ClearOrderCandidatePage,
+  GetOrganisationCandidateJob,
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
@@ -81,11 +93,14 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
   @Select(OrderManagementContentState.orderCandidatePage)
   public clientOrderCandidatePage$: Observable<OrderCandidatesListPage>;
 
-  @Select(OrderManagementState.candidatesJob)
-  candidateJobState$: Observable<OrderCandidateJob>;
-
   @Select(UserState.currentUserPermissions)
   orderPermissions$: Observable<CurrentUserPermission[]>;
+
+  @Select(OrderManagementContentState.candidatesJob)
+  private readonly candidatesJob$: Observable<OrderCandidateJob>;
+
+  @Select(OrderManagementState.candidatesJob)
+  private readonly candidateJobState$: Observable<OrderCandidateJob>;
 
   public rejectReasons$: Observable<RejectReason[]>;
   public form: FormGroup;
@@ -159,7 +174,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     private datePipe: DatePipe,
     private commentsService: CommentsService,
     private router: Router,
-    private orderManagementContentService: OrderManagementContentService,
     private durationService: DurationService,
     private changeDetectorRef: ChangeDetectorRef
   ) {
@@ -173,6 +187,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.createForm();
     this.onRejectSuccess();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
+    this.subscribeToCandidateJob();
+    this.clearOrderCandidateList();
   }
 
   public updateOrganizationCandidateJobWithBillRate(bill: BillRate): void {
@@ -327,8 +343,8 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
 
     this.applicantStatuses = statuses;
     this.hasEditOrderBillRatesPermission = hasEditOrderBillRatesPermission(
-        this.candidateJob?.applicantStatus?.applicantStatus || this.candidate?.status as number,
-        this.applicantStatuses
+      this.candidateJob?.applicantStatus?.applicantStatus || (this.candidate?.status as number),
+      this.applicantStatuses
     );
     this.changeDetectorRef.markForCheck();
 
@@ -346,12 +362,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         const candidate = items?.find((candidate) => candidate.candidateJobId);
         this.candidate = candidate;
         if (candidate) {
-          this.statusesFormControl.reset();
-          this.createForm();
-          this.patchForm(candidate.candidateJobId);
-          this.store.dispatch(
-            new GetCandidateJob(this.currentOrder.organizationId as number, candidate?.candidateJobId as number)
-          );
           return candidate;
         } else {
           return EMPTY;
@@ -364,7 +374,14 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
         filter(([permission, candidate]) => !!permission && !!candidate),
         takeUntil(this.destroy$)
       )
-      .subscribe(([data, candidate]: [CurrentUserPermission[], OrderCandidatesList]) => (this.orderPermissions = data) && this.mapPermissions());
+      .subscribe(([permissions, candidate]: [CurrentUserPermission[], OrderCandidatesList]) => {
+        this.orderPermissions = permissions;
+        this.mapPermissions();
+
+        const { organizationId, candidateJobId } = candidate;
+        const GetCandidateJobAction = this.isAgency ? GetCandidateJob : GetOrganisationCandidateJob;
+        this.store.dispatch(new GetCandidateJobAction(organizationId as number, candidateJobId));
+      });
   }
 
   private getOrderPermissions(orderId: number): void {
@@ -443,10 +460,12 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
           );
           if (statusChanged) {
             this.dialogEvent.next(false);
+          } else {
+            this.resetStatusesFormControl();
           }
         });
     } else {
-      this.statusesFormControl.reset();
+      this.resetStatusesFormControl();
     }
   }
 
@@ -485,48 +504,41 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       });
   }
 
-  private patchForm(candidateJobId: number): void {
-    this.orderManagementContentService
-      .getCandidateJob(this.currentOrder.organizationId as number, candidateJobId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((value) => {
-        this.candidateJob = value;
-        if (this.candidateJob) {
-          this.setCancellationControls(this.candidateJob.jobCancellation?.penaltyCriteria || 0);
-          this.getComments();
-          if (!this.isAgency) {
-            this.getOrderPermissions(value.orderId);
-          }
-          this.billRatesData = this.candidateJob?.billRates ? [...this.candidateJob.billRates] : [];
-          this.form.disable();
-          this.form.patchValue({
-            jobId: `${this.currentOrder?.organizationPrefix ?? ''}-${this.currentOrder?.publicId}`,
-            avStartDate: this.getDateString(this.candidateJob.availableStartDate),
-            locationName: this.candidateJob.order?.locationName,
-            actualStartDate: this.getDateString(this.candidateJob.actualStartDate),
-            actualEndDate: this.getDateString(this.candidateJob.actualEndDate),
-            extensionStartDate: this.getDateString(this.candidateJob.actualStartDate),
-            extensionEndDate: this.getDateString(this.candidateJob.actualEndDate),
-            offeredBillRate: PriceUtils.formatNumbers(this.candidateJob.offeredBillRate),
-            comments: this.candidateJob.requestComment,
-            guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
-            clockId: this.candidateJob.clockId,
-            allowDeployCredentials: this.candidateJob.allowDeployCredentials,
-            rejectReason: this.candidateJob.rejectReason,
-            jobCancellationReason:
-              CancellationReasonsMap[this.candidateJob.jobCancellation?.jobCancellationReason || 0],
-            penaltyCriteria: PenaltiesMap[this.candidateJob.jobCancellation?.penaltyCriteria || 0],
-            rate: this.candidateJob.jobCancellation?.rate,
-            hours: this.candidateJob.jobCancellation?.hours,
-          });
-
-          if (!this.isRejected) {
-            this.fieldsEnableHandlear();
-          }
-        }
-
-        this.changeDetectorRef.markForCheck();
+  private patchForm(value: OrderCandidateJob): void {
+    this.candidateJob = value;
+    if (this.candidateJob) {
+      this.setCancellationControls(this.candidateJob.jobCancellation?.penaltyCriteria || 0);
+      this.getComments();
+      if (!this.isAgency) {
+        this.getOrderPermissions(value.orderId);
+      }
+      this.billRatesData = this.candidateJob?.billRates ? [...this.candidateJob.billRates] : [];
+      this.form.disable();
+      this.form.patchValue({
+        jobId: `${this.currentOrder?.organizationPrefix ?? ''}-${this.currentOrder?.publicId}`,
+        avStartDate: this.getDateString(this.candidateJob.availableStartDate),
+        locationName: this.candidateJob.order?.locationName,
+        actualStartDate: this.getDateString(this.candidateJob.actualStartDate),
+        actualEndDate: this.getDateString(this.candidateJob.actualEndDate),
+        extensionStartDate: this.getDateString(this.candidateJob.actualStartDate),
+        extensionEndDate: this.getDateString(this.candidateJob.actualEndDate),
+        offeredBillRate: PriceUtils.formatNumbers(this.candidateJob.offeredBillRate),
+        comments: this.candidateJob.requestComment,
+        guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
+        clockId: this.candidateJob.clockId,
+        allowDeployCredentials: this.candidateJob.allowDeployCredentials,
+        rejectReason: this.candidateJob.rejectReason,
+        jobCancellationReason: CancellationReasonsMap[this.candidateJob.jobCancellation?.jobCancellationReason || 0],
+        penaltyCriteria: PenaltiesMap[this.candidateJob.jobCancellation?.penaltyCriteria || 0],
+        rate: this.candidateJob.jobCancellation?.rate,
+        hours: this.candidateJob.jobCancellation?.hours,
       });
+
+      if (!this.isRejected) {
+        this.fieldsEnableHandlear();
+      }
+    }
+    this.changeDetectorRef.markForCheck();
   }
 
   private setCancellationControls(value: PenaltyCriteria): void {
@@ -583,5 +595,22 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
       .subscribe(() => {
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
       });
+  }
+
+  private subscribeToCandidateJob(): void {
+    (this.isAgency ? this.candidateJobState$ : this.candidatesJob$)
+      .pipe(filter(Boolean), takeUntil(this.destroy$))
+      .subscribe((data) => {
+        this.resetStatusesFormControl();
+        this.createForm();
+        this.patchForm(data);
+      });
+  }
+
+  private clearOrderCandidateList(): void {
+    this.dialogEvent.pipe(filter((data) => !data), takeUntil(this.destroy$)).subscribe(() => {
+        const ClearCandidatesList = this.isAgency ? ClearAgencyOrderCandidatesList : ClearOrderCandidatePage;
+        this.store.dispatch(new ClearCandidatesList());
+    });
   }
 }
