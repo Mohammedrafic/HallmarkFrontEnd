@@ -20,6 +20,7 @@ export const analyticsConstants = {
     Years: 'years',
     InvoiceStatuses: 'invoiceStatuses',
     InvoiceID: 'invoiceID',
+    AgingGroupIds:'agingGroupIds',
     TimesheetStatuses:'timesheetStatuses'
   }
 }
@@ -117,5 +118,14 @@ export const yearList: { name: number; id: number }[] = [
   { name: (new Date()).getFullYear(), id: 11 },
   { name: (new Date()).getFullYear() + 1, id: 12 }
 ];
+export const ageGroups: { name: string; id: number }[] = [
+  {name:"Current",id:1},
+  {name:"1 - 30",id:2},
+  {name:"31 - 60",id:3},
+  {name:"61 - 90",id:4},
+  {name:"Above 90",id:5}
+
+];
+
 
 
