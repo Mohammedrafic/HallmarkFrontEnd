@@ -18,7 +18,7 @@ import { LogiReportState } from '@organization-management/store/logi-report.stat
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { analyticsConstants } from '../constants/analytics.constant';
+import { ageGroups, analyticsConstants } from '../constants/analytics.constant';
 import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -59,7 +59,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   isDepartmentsDropDownEnabled: boolean = false;
   departmentFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedDepartments: Department[]=[];
-
+  agingGroupFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(SecurityState.organisations)
   public organizationData$: Observable<Organisation[]>;
@@ -71,7 +71,8 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
 
   @Select(LogiReportState.logiReportData)
   public logiReportData$: Observable<ConfigurationDto[]>;
-
+  
+  public agingGroups=ageGroups;
   public bussinesDataFields = BUSINESS_DATA_FIELDS;
   public organizationFields = ORGANIZATION_DATA_FIELDS;
   private unsubscribe$: Subject<void> = new Subject();
@@ -138,10 +139,11 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
   private initForm(): void {
     this.agingReportForm = this.formBuilder.group(
       {
-        businessIds: new FormControl([], [Validators.required]),
+        businessIds: new FormControl([Validators.required]),
         regionIds: new FormControl([], [Validators.required]),
         locationIds: new FormControl([], [Validators.required]),
-        departmentIds: new FormControl([], [Validators.required])
+        departmentIds: new FormControl([], [Validators.required]),
+        agingGroupIds:new FormControl(null)
       }
     );
   }
@@ -250,6 +252,8 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
+    let { agingGroupIds } = this.agingReportForm.getRawValue();
+    
     if (!this.agingReportForm.dirty) {
       this.message = "Default filter selected with all regions, locations and departments";
     }
@@ -268,7 +272,8 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
         ? this.organizations != null && this.organizations[0]?.organizationId != null ?
           this.organizations[0].organizationId.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-      "HostName": this.baseUrl
+      "HostName": this.baseUrl,
+      "AgingGroupAR":agingGroupIds==null?"null":agingGroupIds.toString()
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
@@ -302,6 +307,13 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
         dataSource: [],
         valueField: 'name',
         valueId: 'id',
+      },
+      agingGroupIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: this.agingGroups,
+        valueField: 'name',
+        valueId: 'id',
       }
     }
   }
@@ -331,6 +343,7 @@ export class AgingDetailsComponent implements OnInit, OnDestroy {
     this.agingReportForm.get(analyticsConstants.formControlNames.RegionIds)?.setValue([]);
     this.agingReportForm.get(analyticsConstants.formControlNames.LocationIds)?.setValue([]);
     this.agingReportForm.get(analyticsConstants.formControlNames.DepartmentIds)?.setValue([]);
+    this.agingReportForm.get(analyticsConstants.formControlNames.AgingGroupIds)?.setValue(null);
     this.filteredItems = [];
   }
   public onFilterApply(): void {
