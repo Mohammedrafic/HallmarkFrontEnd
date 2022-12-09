@@ -81,6 +81,7 @@ import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from '../../../security/services/permission.service';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
+import { DateTimeHelper } from '@core/helpers';
 
 enum Template {
   accept,
@@ -641,12 +642,15 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
     organizationPrefix,
     orderPublicId,
     jobCancellation,
+    reOrderDate,
   }: OrderCandidateJob) {
+
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     const isBillRatePending =
       this.candidateJob?.applicantStatus.applicantStatus === CandidatStatus.BillRatePending
         ? candidateBillRate
         : offeredBillRate;
+
     this.acceptForm.patchValue({
       reOrderFromId: `${organizationPrefix}-${orderPublicId}`,
       offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
@@ -654,7 +658,7 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       locationName,
       departmentName,
       skillName,
-      orderOpenDate,
+      orderOpenDate: this.order.orderType === OrderType.ReOrder ? reOrderDate : orderOpenDate,
       shiftStartTime,
       shiftEndTime,
       openPositions,
