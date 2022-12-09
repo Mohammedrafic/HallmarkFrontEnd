@@ -262,6 +262,15 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.CommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
             if (data != null) {
+              data.jobStatuses = data.jobStatuses.filter((item: any) => {
+                if (item.statusText !== 'Incomplete'
+                  && item.statusText !== 'PreOpen'
+                  && item.statusText !== 'Open'
+                  && item.statusText !== 'In progress'
+                  && item.statusText !== 'Pending') {
+                  return item;
+                }
+              });
               this.isAlive = false;
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
