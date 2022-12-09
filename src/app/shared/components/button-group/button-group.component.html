@@ -1,0 +1,17 @@
+<div class="e-btn-group e-round-corner">
+  <ng-container *ngFor="let button of buttonOptions; trackBy: trackByFn">
+    <input
+      type="radio"
+      [id]="button.id"
+      name="font"
+      [value]="button.title"
+      [checked]="button.active" />
+    <label
+      [class.active]="button.active"
+      class="e-btn"
+      [for]="button.id"
+      (click)="btnClick(button)">
+        {{ button.title }}
+    </label>
+  </ng-container>
+</div>
