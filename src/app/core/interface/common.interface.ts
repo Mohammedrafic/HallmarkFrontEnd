@@ -33,3 +33,21 @@ export interface TypedValueGetterParams<T> extends ValueGetterParams {
 export interface ParamsFromObject {
   [param: string]: string | string[];
 }
+
+interface PagerProp {
+  currentPage: number;
+}
+
+export interface PagerChangeEvent {
+  cancel: boolean;
+  currentPage: number;
+  name: string;
+  newProp: PagerProp;
+  oldProp: PagerProp;
+}
+
+export interface OrginazationModuleSettings {
+  isOrgVMSEnabled: boolean;
+  isOrgIrpEnabled: boolean;
+  isFeatureIrpEnabled: boolean;
+}

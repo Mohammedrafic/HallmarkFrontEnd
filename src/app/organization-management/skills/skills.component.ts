@@ -1,64 +1,55 @@
+import { formatDate } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, delay, filter, Observable, Subject, takeUntil } from 'rxjs';
+
+import { TakeUntilDestroy } from '@core/decorators';
+import { SaveAssignedSkillValue } from '@organization-management/store/skills.actions';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { FilteredItem } from '@shared/models/filter.model';
+import { Organization } from '@shared/models/organization.model';
+import { SkillCategoriesPage } from '@shared/models/skill-category.model';
+import { FilterService } from '@shared/services/filter.service';
 import {
-  ExportSkills,
-  GetAllSkillsCategories,
-  GetAssignedSkillsByPage,
-  GetSkillDataSources,
-  RemoveAssignedSkill,
-  RemoveAssignedSkillSucceeded,
-  SaveAssignedSkill,
-  SaveAssignedSkillSucceeded,
-  SetDirtyState
-} from '../store/organization-management.actions';
-import { OrganizationManagementState } from '../store/organization-management.state';
-import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
-import { Skill, SkillDataSource, SkillFilters } from 'src/app/shared/models/skill.model';
+  CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE,
+} from 'src/app/shared/constants/messages';
+import { Skill, SkillDataSource, SkillFilters, SkillsPage } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
-import { DatePipe } from '@angular/common';
-import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserState } from 'src/app/store/user.state';
-import { FilteredItem } from '@shared/models/filter.model';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import { FilterService } from '@shared/services/filter.service';
-import { AbstractPermissionGrid } from '@shared/helpers/permissions';
-import { SaveAssignedSkillValue } from '@organization-management/store/skills.actions';
+import {
+  ExportSkills, GetAllSkillsCategories, GetAssignedSkillsByPage, GetSkillDataSources,
+  RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded,
+  SetDirtyState } from '../store/organization-management.actions';
+import { OrganizationManagementState } from '../store/organization-management.state';
+import { InactivateColFormat, SkillsFilterConfig, VmsSkillsColsExport } from './skills.constant';
+import { SkillsService } from './skills.service';
+import { SkillGridEventData } from './skills.interface';
+import { ChangeEventArgs } from '@syncfusion/ej2-angular-buttons';
+import { OrginazationModuleSettings, PagerChangeEvent } from '@core/interface';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-skills',
   templateUrl: './skills.component.html',
   styleUrls: ['./skills.component.scss'],
-  providers: [SortService, MaskedDateTimeService]
+  providers: [SortService, MaskedDateTimeService],
 })
+@TakeUntilDestroy
 export class SkillsComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
-  private pageSubject = new Subject<number>();
-  private unsubscribe$: Subject<void> = new Subject();
-  public optionFields = {
-    text: 'name', value: 'id'
-  };
-  public filterOptionFields = {
-    text: 'name', value: 'name'
-  };
-  public format = {
-    type:'date', format: 'MM/dd/yyyy'
-  };
-  public title = '';
-
-  @ViewChild('grid')
-  public grid: GridComponent;
+  @ViewChild('grid') grid: GridComponent;
 
   @Select(OrganizationManagementState.skills)
-  skills$: Observable<any>;
+  skills$: Observable<SkillsPage | null>;
 
   @Select(OrganizationManagementState.allSkillsCategories)
-  allSkillsCategories$: Observable<any>;
+  allSkillsCategories$: Observable<SkillCategoriesPage | null>;
 
   @Select(OrganizationManagementState.skillDataSource)
   skillDataSource$: Observable<SkillDataSource>;
@@ -66,130 +57,98 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
-  public SkillFormGroup: FormGroup;
-  public SkillFilterFormGroup: FormGroup;
-  public columnsToExport: ExportColumn[] = [
-    { text:'Skill Category', column: 'SkillCategory_Name'},
-    { text:'Skill ABBR', column: 'SkillAbbr'},
-    { text:'Skill Description', column: 'SkillDescription'},
-    { text:'GL Number', column: 'GLNumber'},
-    { text:'Allow Onboard', column: 'AllowOnboard'},
-    { text:'Inactivate Date', column: 'InactiveDate'}
-  ];
-  public filterColumns: any;
-  public fileName: string;
-  public defaultFileName: string;
-  public filters: SkillFilters = {};
-  public openAssignSidebarSubject = new Subject<boolean>();
+  @Select(OrganizationManagementState.organization)
+  public readonly organization$: Observable<Organization>;
 
+  optionFields = {
+    text: 'name', value: 'id',
+  };
 
-  constructor(protected override store: Store,
-              private actions$: Actions,
-              private fb: FormBuilder,
-              private confirmService: ConfirmService,
-              private filterService: FilterService,
-              private datePipe: DatePipe) {
+  filterOptionFields = {
+    text: 'name', value: 'name',
+  };
+
+  inactivateColformat = InactivateColFormat;
+
+  title: 'Add' | 'Edit' = 'Add';
+
+  skillForm: FormGroup;
+
+  skillFilterForm: FormGroup;
+
+  columnsToExport: ExportColumn[] = VmsSkillsColsExport;
+
+  filterColumns = SkillsFilterConfig;
+
+  fileName: string;
+
+  defaultFileName: string;
+
+  filters: SkillFilters = {};
+  
+  openAssignSidebarSubject = new Subject<boolean>();
+
+  orgModuleSettings: OrginazationModuleSettings = {
+    isFeatureIrpEnabled: false,
+    isOrgIrpEnabled: false,
+    isOrgVMSEnabled: true,
+  };
+
+  private pageSubject = new Subject<number>();
+  
+  private componentDestroy: () => Observable<unknown>;
+
+  constructor(
+    protected override store: Store,
+    private actions$: Actions,
+    private confirmService: ConfirmService,
+    private filterService: FilterService,
+    private skillsService: SkillsService,
+    ) {
     super(store);
     this.idFieldName = 'foreignKey';
-    this.SkillFormGroup = this.fb.group({
-      id: new FormControl(0),
-      isDefault: new FormControl(false),
-      masterSkillId: new FormControl(null),
-      skillCategoryId: new FormControl('', [ Validators.required, Validators.minLength(3) ]),
-      skillAbbr: new FormControl('', [ Validators.minLength(3) ]),
-      skillDescription: new FormControl('', [ Validators.required, Validators.minLength(3) ]),
-      glNumber: new FormControl('', [ Validators.minLength(3) ]),
-      allowOnboard: new FormControl(false),
-      inactiveDate: new FormControl('')
-    });
-    this.SkillFilterFormGroup = this.fb.group({
-      skillCategories: new FormControl([]),
-      skillAbbrs: new FormControl([]),
-      skillDescriptions: new FormControl([]),
-      glNumbers: new FormControl([]),
-      allowOnboard: new FormControl(null),
-    });
+
+    this.skillForm = this.skillsService.createSkillsForm();
+    this.skillFilterForm = this.skillsService.createFilterForm();
+    this.setIrpFeatureFlag();
   }
 
   override ngOnInit(): void {
     super.ngOnInit();
-    this.filterColumns = {
-      skillCategories: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
-      skillAbbrs: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      skillDescriptions: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      glNumbers: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      allowOnboard: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Allow Onboard'},
-    }
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
-      this.currentPage = 1;
-      this.clearFilters();
-      this.getSkills();
-    });
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
-      this.currentPage = page;
-      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
-    });
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveAssignedSkillSucceeded)).subscribe(() => {
-      this.SkillFormGroup.reset();
-      this.closeDialog();
-      this.getSkills();
-    });
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RemoveAssignedSkillSucceeded)).subscribe(() => {
-      this.getSkills();
-    });
-    this.allSkillsCategories$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((dataSource) => {
-      this.filterColumns.skillCategories.dataSource = dataSource.items;
-    });
-    this.skillDataSource$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((dataSource) => {
-      this.filterColumns.skillAbbrs.dataSource = dataSource.skillABBRs.filter(item => item);
-      this.filterColumns.skillDescriptions.dataSource = dataSource.skillDescriptions;
-      this.filterColumns.glNumbers.dataSource = ['blank', ...dataSource.glNumbers.filter(item => item)];
-    });
-
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveAssignedSkillValue)).subscribe(() => {
-      this.getSkills();
-    });
+    this.getOrganizagionData();
+    this.watchForOrgId();
+    this.watchForPagination();
+    this.watchForSaveDeleteAction();
+    this.getSkillsCategories();
+    this.getSkillfilterData();
   }
 
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
-  }
+  /**
+   * Needed for TakeUntilDestroy decorator 
+   */
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ngOnDestroy(): void {}
 
-  private getSkills(): void {
-    this.store.dispatch([new GetAllSkillsCategories(), new GetSkillDataSources()]);
-    this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
-  }
-
-  public override updatePage(): void {
+  override updatePage(): void {
     this.filters.orderBy = this.orderBy;
     this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
   }
 
-  public override customExport(): void {
-    this.defaultFileName = 'Organization Skills ' + this.generateDateTime(this.datePipe);
+  override customExport(): void {
+    this.defaultFileName = 'Organization Skills ' + formatDate(Date.now(), 'MM/dd/yyyy hh:mm a', 'en-US');
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
 
-  public closeExport() {
-    this.fileName = '';
-    this.store.dispatch(new ShowExportDialog(false));
-  }
+  override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = 'Organization Skills ' + formatDate(Date.now(), 'MM/dd/yyyy hh:mm a', 'en-US');
 
-  public export(event: ExportOptions): void {
-    this.closeExport();
-    this.defaultExport(event.fileType, event);
-  }
-
-  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.defaultFileName = 'Organization Skills ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportSkills(new ExportPayload(
       fileType,
       { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => {
-        return { aId: val.id, mId: val.masterSkill.id }
+        return { aId: val.id, mId: val.masterSkill.id };
       }) : null,
       options?.fileName || this.defaultFileName,
       Math.abs(new Date().getTimezoneOffset()),
@@ -197,59 +156,60 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     this.clearSelection(this.grid);
   }
 
-  public onFilterClose() {
-    this.SkillFilterFormGroup.setValue({
+  closeExport() {
+    this.fileName = '';
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  closeFilter() {
+    this.skillFilterForm.setValue({
       skillCategories: this.filters.skillCategories || [],
       skillAbbrs: this.filters.skillAbbrs || [],
       skillDescriptions: this.filters.skillDescriptions || [],
       glNumbers: this.filters.glNumbers || [],
       allowOnboard: this.filters.allowOnboard || null,
     });
-    this.filteredItems = this.filterService.generateChips(this.SkillFilterFormGroup, this.filterColumns);
+    this.filteredItems = this.filterService.generateChips(this.skillFilterForm, this.filterColumns);
   }
 
-  public showFilters(): void {
+  showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
-  public onFilterDelete(event: FilteredItem): void {
-    this.filterService.removeValue(event, this.SkillFilterFormGroup, this.filterColumns);
+  deleteFilter(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.skillFilterForm, this.filterColumns);
   }
 
-  private clearFilters(): void {
-    this.SkillFilterFormGroup.reset();
-    this.filteredItems = [];
-    this.currentPage = 1;
-    this.filters = {
-      orderBy: this.orderBy
-    };
-  }
-
-  public onFilterClearAll(): void {
+  filterClearAll(): void {
     this.clearFilters();
     this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
   }
 
-  public onFilterApply(): void {
-    this.filters = this.SkillFilterFormGroup.getRawValue();
-    this.filteredItems = this.filterService.generateChips(this.SkillFilterFormGroup, this.filterColumns);
+  applyFilter(): void {
+    this.filters = this.skillFilterForm.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.skillFilterForm, this.filterColumns);
     this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  public addSkill(): void {
+  addSkill(): void {
     this.title = 'Add';
-    this.SkillFormGroup.controls['id'].setValue(0);
-    this.SkillFormGroup.controls['isDefault'].setValue(false);
-    this.skillFieldsHandler(false);
+    this.skillForm.controls['id'].patchValue(0);
+    this.skillForm.controls['isDefault'].patchValue(false);
+    this.changeControlsAvaliability(false);
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public assignSkill(): void {
-    this.openAssignSidebarSubject.next(true)
+  assignSkill(): void {
+    this.openAssignSidebarSubject.next(true);
   }
 
-  public allowOnBoardChange(data: Skill, event: any): void {
+  allowOnBoardChange(data: SkillGridEventData, event: ChangeEventArgs): void {
     data.allowOnboard = event.checked;
     this.store.dispatch(new SaveAssignedSkill(new Skill(
       {
@@ -261,48 +221,38 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
         skillDescription: data.masterSkill?.skillDescription as string,
         glNumber: data.glNumber,
         allowOnboard: data.allowOnboard,
-        inactiveDate: data.inactiveDate
+        inactiveDate: data.inactiveDate,
       }, true
     )));
   }
 
-  private skillFieldsHandler(disable: boolean): void {
-    if (disable) {
-      this.SkillFormGroup.controls['skillAbbr'].disable();
-      this.SkillFormGroup.controls['skillCategoryId'].disable();
-      this.SkillFormGroup.controls['skillDescription'].disable();
-    } else {
-      this.SkillFormGroup.controls['skillAbbr'].enable();
-      this.SkillFormGroup.controls['skillCategoryId'].enable();
-      this.SkillFormGroup.controls['skillDescription'].enable();
-    }
-  }
-
-  public editSkill(data: any, event: any): void {
+  editSkill(data: SkillGridEventData, event: MouseEvent): void {
     this.addActiveCssClass(event);
     this.title = 'Edit';
-    this.SkillFormGroup.setValue({
+
+    this.skillForm.setValue({
       id: data.id,
       isDefault: data.masterSkill?.isDefault || false,
       masterSkillId: data.masterSkill?.id || null,
-      skillAbbr: data.masterSkill.skillAbbr,
-      skillCategoryId: data.skillCategory.id,
-      skillDescription: data.masterSkill.skillDescription,
+      skillAbbr: data.masterSkill?.skillAbbr,
+      skillCategoryId: data.skillCategory?.id,
+      skillDescription: data.masterSkill?.skillDescription,
       glNumber: data.glNumber,
       allowOnboard: data.allowOnboard,
-      inactiveDate: data.inactiveDate
+      inactiveDate: data.inactiveDate,
     });
     this.store.dispatch(new ShowSideDialog(true));
-    this.skillFieldsHandler(data.masterSkill?.isDefault);
+    this.changeControlsAvaliability(data.masterSkill?.isDefault as boolean);
   }
 
-  public deleteSkill(data: any, event: any): void {
+  deleteSkill(data: SkillGridEventData, event: MouseEvent): void {
     this.addActiveCssClass(event);
+
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       })
       .subscribe((confirm) => {
         if (confirm) {
@@ -312,46 +262,169 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       });
   }
 
-  public closeDialog(): void {
-    if (this.SkillFormGroup.dirty) {
+  closeAsignDialog(): void {
+    if (this.skillForm.dirty) {
       this.confirmService
       .confirm(CANCEL_CONFIRM_TEXT, {
         title: DELETE_CONFIRM_TITLE,
         okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       }).pipe(filter(confirm => !!confirm))
       .subscribe(() => {
         this.store.dispatch(new ShowSideDialog(false));
-        this.SkillFormGroup.reset();
+        this.skillForm.reset();
         this.removeActiveCssClass();
       });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
-      this.SkillFormGroup.reset();
+      this.skillForm.reset();
       this.removeActiveCssClass();
     }
   }
 
-  public saveSkill(): void {
-    if (this.SkillFormGroup.valid) {
+  saveSkill(): void {
+    if (this.skillForm.valid) {
       this.store.dispatch(new SaveAssignedSkill(new Skill(
-        this.SkillFormGroup.getRawValue(), true
+        this.skillForm.getRawValue(), true
       )));
       this.store.dispatch(new SetDirtyState(false));
     } else {
-      this.SkillFormGroup.markAllAsTouched();
+      this.skillForm.markAllAsTouched();
     }
     this.removeActiveCssClass();
   }
 
-  public onRowsDropDownChanged(): void {
+  changeRowsPerPage(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
     this.grid.pageSettings.pageSize = this.pageSize;
   }
 
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
+  changePage(event: ChangeEventArgs & { value: number }): void {
+    if (event.value) {
+      this.pageSubject.next(event.value);
     }
+  }
+
+  switchPage(event: PagerChangeEvent): void {
+    if (event.currentPage) {
+      this.pageSubject.next(event.currentPage);
+    }
+  }
+
+  private getSkills(): void {
+    this.store.dispatch([new GetAllSkillsCategories(), new GetSkillDataSources()]);
+    this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
+  }
+
+  private clearFilters(): void {
+    this.skillFilterForm.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {
+      orderBy: this.orderBy,
+    };
+  }
+
+  private changeControlsAvaliability(disable: boolean): void {
+    if (disable) {
+      this.skillForm.controls['skillAbbr'].disable();
+      this.skillForm.controls['skillCategoryId'].disable();
+      this.skillForm.controls['skillDescription'].disable();
+    } else {
+      this.skillForm.controls['skillAbbr'].enable();
+      this.skillForm.controls['skillCategoryId'].enable();
+      this.skillForm.controls['skillDescription'].enable();
+    }
+  }
+
+  private watchForOrgId(): void {
+    this.organizationId$
+    .pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.currentPage = 1;
+      this.clearFilters();
+      this.getSkills();
+    });
+  }
+
+  private watchForPagination(): void {
+    this.pageSubject
+    .pipe(
+      takeUntil(this.componentDestroy()),
+      debounceTime(1)
+    )
+    .subscribe((page) => {
+      this.currentPage = page;
+      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
+    });
+  }
+
+  private watchForSaveDeleteAction(): void {
+    this.actions$
+    .pipe(
+      takeUntil(this.componentDestroy()),
+      ofActionSuccessful(SaveAssignedSkillSucceeded)
+    ).subscribe(() => {
+      this.skillForm.reset();
+      this.closeAsignDialog();
+      this.getSkills();
+    });
+
+    this.actions$
+    .pipe(
+      takeUntil(this.componentDestroy()),
+      ofActionSuccessful(RemoveAssignedSkillSucceeded)
+    ).subscribe(() => {
+      this.getSkills();
+    });
+
+    this.actions$
+    .pipe(
+      ofActionSuccessful(SaveAssignedSkillValue),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.getSkills();
+    });
+  }
+
+  private getSkillsCategories(): void {
+    this.allSkillsCategories$
+    .pipe(
+      filter(Boolean),
+      takeUntil(this.componentDestroy())
+    ).subscribe((dataSource) => {
+      this.filterColumns.skillCategories.dataSource = dataSource.items;
+    });
+  }
+
+  private getSkillfilterData(): void {
+    this.skillDataSource$
+    .pipe(
+      filter(Boolean),
+      takeUntil(this.componentDestroy())
+    ).subscribe((dataSource) => {
+      this.filterColumns.skillAbbrs.dataSource = dataSource.skillABBRs.filter(item => item);
+      this.filterColumns.skillDescriptions.dataSource = dataSource.skillDescriptions;
+      this.filterColumns.glNumbers.dataSource = ['blank', ...dataSource.glNumbers.filter(item => item)];
+    });
+  }
+
+  private getOrganizagionData(): void {
+    this.organization$
+    .pipe(
+      filter(Boolean),
+      filter(() => this.orgModuleSettings.isFeatureIrpEnabled),
+      delay(100),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((organization) => {
+      this.orgModuleSettings.isOrgVMSEnabled = !!organization.preferences.isVMCEnabled;
+      this.orgModuleSettings.isOrgIrpEnabled = !!organization.preferences.isIRPEnabled;
+    });
+  }
+
+  private setIrpFeatureFlag(): void {
+    this.orgModuleSettings.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   }
 }

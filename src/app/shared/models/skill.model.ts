@@ -15,7 +15,7 @@ export class Skill {
   isDefault?: boolean;
   foreignKey?: string;
 
-  constructor(skill: Skill, assigned: boolean = false) {
+  constructor(skill: Skill, assigned = false) {
     this.id = skill.id || 0;
     this.skillCategoryId = skill.skillCategoryId;
     this.skillAbbr = skill.skillAbbr;
