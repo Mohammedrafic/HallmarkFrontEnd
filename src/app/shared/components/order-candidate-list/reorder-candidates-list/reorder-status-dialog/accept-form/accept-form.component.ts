@@ -19,6 +19,7 @@ const showHourlyRateForStatuses: CandidatStatus[] = [
 })
 export class AcceptFormComponent {
   @Input() formGroup: FormGroup;
+  
   @Input() status: CandidatStatus;
 
   public priceUtils = PriceUtils;
@@ -30,11 +31,11 @@ export class AcceptFormComponent {
   get showHoursControl(): boolean {
     return this.penaltyCriteriaControlValue === PenaltiesMap[PenaltyCriteria.RateOfHours]
       || this.penaltyCriteriaControlValue === PenaltiesMap[PenaltyCriteria.FlatRateOfHours];
-  };
+  }
 
   get showPercentage(): boolean {
     return this.penaltyCriteriaControlValue === PenaltiesMap[PenaltyCriteria.RateOfHours];
-  };
+  }
 
   get showHourlyRate(): boolean {
     return showHourlyRateForStatuses.includes(this.status);
