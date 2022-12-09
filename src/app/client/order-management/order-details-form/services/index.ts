@@ -1,1 +1,1 @@
-export * from './distribution-tier.service';
+export * from './order-details.service';

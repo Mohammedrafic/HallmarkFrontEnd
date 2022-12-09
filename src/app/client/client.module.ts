@@ -30,7 +30,7 @@ import {
   Upload,
   User,
   X,
-  XCircle
+  XCircle,
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -42,9 +42,15 @@ import {
   PageService,
   ResizeService,
   SortService,
-  ToolbarService
+  ToolbarService,
 } from '@syncfusion/ej2-angular-grids';
-import { ButtonModule, CheckBoxModule, ChipListModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import {
+  ButtonModule,
+  CheckBoxModule,
+  ChipListModule,
+  RadioButtonModule,
+  SwitchModule,
+} from '@syncfusion/ej2-angular-buttons';
 import { DropDownButtonAllModule, DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
@@ -52,7 +58,9 @@ import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, MaskedDateTimeService, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 import { ClientRoutingModule } from './client-routing.module';
-import { OrderManagementContentComponent } from './order-management/order-management-content/order-management-content.component';
+import {
+  OrderManagementContentComponent,
+} from './order-management/order-management-content/order-management-content.component';
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
 import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
@@ -70,8 +78,12 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { OrderDetailsDialogComponent } from './order-management/order-details-dialog/order-details-dialog.component';
 import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { OrderDetailsContainerComponent } from './order-management/order-details-container/order-details-container.component';
-import { OrderCandidatesContainerComponent } from './order-management/order-candidates-container/order-candidates-container.component';
+import {
+  OrderDetailsContainerComponent,
+} from './order-management/order-details-container/order-details-container.component';
+import {
+  OrderCandidatesContainerComponent,
+} from './order-management/order-candidates-container/order-candidates-container.component';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
 import { SaveTemplateDialogModule } from '@client/order-management/save-template-dialog/save-template-dialog.module';
@@ -83,7 +95,7 @@ import { CandidateDetailsModule } from '@shared/components/candidate-details/can
 import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
 import { ReopenOrderModule } from '@client/order-management/reopen-order/reopen-order.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
-import { DistributionTierService } from '@client/order-management/order-details-form/services';
+import { OrderDetailsService } from '@client/order-management/order-details-form/services';
 import { MatMenuModule } from '@angular/material/menu';
 import { SettingsViewService } from '@shared/services';
 import { OrderImportComponent } from './order-management/order-import/order-import.component';
@@ -178,7 +190,7 @@ const gridIcons = {
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
     ExtensionModule,
     ImportDialogContentModule,
-    ListBoxModule
+    ListBoxModule,
   ],
   providers: [
     ResizeService,
@@ -192,7 +204,7 @@ const gridIcons = {
     ChipsCssClass,
     MaskedDateTimeService,
     SettingsViewService,
-    DistributionTierService,
+    OrderDetailsService,
   ],
 })
 export class ClientModule {}
