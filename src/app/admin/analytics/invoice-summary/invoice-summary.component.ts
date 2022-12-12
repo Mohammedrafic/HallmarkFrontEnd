@@ -448,7 +448,7 @@ export class InvoiceSummaryComponent implements OnInit,OnDestroy {
     this.isClearAll = true;
     let startDate = new Date(Date.now());
     startDate.setDate(startDate.getDate() - 90);
-    this.invoiceSummaryReportForm.get(invoiceSummaryConstants.formControlNames.RegionIds)?.setValue(this.defaultRegions);
+    this.invoiceSummaryReportForm.get(invoiceSummaryConstants.formControlNames.RegionIds)?.setValue([]);
     this.invoiceSummaryReportForm.get(invoiceSummaryConstants.formControlNames.LocationIds)?.setValue([]);
     this.invoiceSummaryReportForm.get(invoiceSummaryConstants.formControlNames.DepartmentIds)?.setValue([]);
     this.invoiceSummaryReportForm.get(invoiceSummaryConstants.formControlNames.CandidateName)?.setValue(null);

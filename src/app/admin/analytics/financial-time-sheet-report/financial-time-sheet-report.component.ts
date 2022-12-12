@@ -264,8 +264,8 @@ export class FinancialTimeSheetReportComponent implements OnInit, OnDestroy {
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
-              this.filterColumns.jobStatuses.dataSource = data.jobStatuses;
-              this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
+              this.filterColumns.jobStatuses.dataSource = data.jobStatusesAndReasons;
+              this.filterColumns.candidateStatuses.dataSource = data.candidateStatusesAndReasons;
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
               this.defaultOrderTypes = OrderTypeOptions.map((list) => list.id);
               this.financialTimesheetReportForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
