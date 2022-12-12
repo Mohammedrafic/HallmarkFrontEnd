@@ -56,7 +56,19 @@ export class JobFillRatioComponent implements OnInit {
     "skillCategoryFRL":    "",
     "skillFRL":   "",
     "startDateFRL":   "",
-    "endDateFRL"  :   ""
+    "endDateFRL": "",
+
+    "HostNameS": "",
+    "BearerParamFRLS": "",
+    "BusinessUnitIdParamFRLS": "",
+    "OrganizationsFRLS": "",
+    "regionFRLS": "",
+    "locationFRLS": "",
+    "departmentFRLS": "",
+    "skillCategoryFRLS": "",
+    "skillFRLS": "",
+    "startDateFRLS": "",
+    "endDateFRLS": ""
 
   };
 
@@ -367,7 +379,6 @@ export class JobFillRatioComponent implements OnInit {
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
-
       "OrganizationsFRL":    this.selectedOrganizations.length == 0? "null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
       "regionFRL":            regionIds.length == 0 ? "null" :regionIds.join(","),
       "locationFRL":          locationIds.length == 0 ? "null" :locationIds.join(","),
@@ -375,7 +386,22 @@ export class JobFillRatioComponent implements OnInit {
       "skillCategoryFRL":     skillCategoryIds.length==0?"null":skillCategoryIds.join(","),
       "skillFRL":             skillIds.length==0?"null":skillIds.join(","),
       "startDateFRL":   formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "endDateFRL"  :   formatDate(endDate, 'MM/dd/yyyy', 'en-US')
+      "endDateFRL": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
+
+      "HostNameS": this.baseUrl,
+      "BearerParamFRLS": auth,
+      "BusinessUnitIdFRLS": window.localStorage.getItem("lastSelectedOrganizationId") == null
+        ? this.organizations != null && this.organizations[0]?.id != null ?
+          this.organizations[0].id.toString() : "1" :
+        window.localStorage.getItem("lastSelectedOrganizationId"),
+      "OrganizationsFRLS": this.selectedOrganizations.length == 0 ? "null" : this.selectedOrganizations?.map((list) => list.organizationId).join(","),
+      "regionFRLS": regionIds.length == 0 ? "null" : regionIds.join(","),
+      "locationFRLS": locationIds.length == 0 ? "null" : locationIds.join(","),
+      "departmentFRLS": departmentIds.length == 0 ? "null" : departmentIds.join(","),
+      "skillCategoryFRLS": skillCategoryIds.length == 0 ? "null" : skillCategoryIds.join(","),
+      "skillFRLS": skillIds.length == 0 ? "null" : skillIds.join(","),
+      "startDateFRLS": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
+      "endDateFRLS": formatDate(endDate, 'MM/dd/yyyy', 'en-US')
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();
