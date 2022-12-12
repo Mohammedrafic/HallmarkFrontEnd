@@ -26,6 +26,7 @@ export const dayColDef: ColDef = {
   headerName: 'Day',
   ...commonColumn,
   width: 80,
+  minWidth: 80,
   cellRenderer: GridDayComponent,
 };
 
@@ -34,9 +35,11 @@ export const editableCostCenterDef: ColDef = {
   headerName: 'Cost center',
   ...commonColumn,
   width: 180,
+  minWidth: 100,
   filterValueGetter: (value) => value.data.costCenterFormattedName,
   cellRenderer: DropdownEditorComponent,
   type: 'rightAligned',
+  headerClass: 'custom-wrap',
   cellRendererParams: {
     editMode: true,
     isEditable: false,
@@ -48,9 +51,11 @@ export const billRateColDef: ColDef = {
   field: 'billRate',
   headerName: 'Bill rate',
   type: 'rightAligned',
+  headerClass: 'custom-wrap',
   ...commonColumn,
   cellClass: 'common-cell',
   width: 110,
+  minWidth: 90,
   valueFormatter: (data) => {
     if(!data.value) return '0';
     return GridValuesHelper.formatCurrencyValue(data.value);
@@ -63,9 +68,11 @@ export const amountColdef = (headerText: string): ColDef => (
     headerName: headerText,
     resizable: true,
     type: 'rightAligned',
+    headerClass: 'custom-wrap',
     ...commonColumn,
     cellClass: 'common-cell',
     width: 110,
+    minWidth: 100,
     valueFormatter: (params: ValueFormatterParams) => GridValuesHelper.formatNumber(params.value, '1.2-2'),
   }
 );
@@ -94,9 +101,11 @@ export const totalCol: ColDef = {
   field: 'total',
   headerName: 'Total',
   type: 'rightAligned',
+  headerClass: 'custom-wrap',
   ...commonColumn,
   cellClass: 'common-cell',
   width: 140,
+  minWidth: 90,
   valueFormatter: (data) => {
     if(!data.value) return '0';
     return GridValuesHelper.formatCurrencyValue(data.value);
@@ -108,9 +117,11 @@ export const attachmentsCol: ColDef = {
   headerName: 'Attachments',
   ...commonColumn,
   width: 200,
+  minWidth: 140,
   cellRenderer: AttachmentsListComponent,
   cellClass: 'invoice-records-attachments-list custom-scroll',
   type: 'rightAligned',
+  headerClass: 'custom-wrap',
 };
 
 export const billRateTypeStatic: ColDef = {
@@ -118,7 +129,9 @@ export const billRateTypeStatic: ColDef = {
   headerName: 'Bill rate type',
   ...commonColumn,
   width: 180,
+  minWidth: 105,
   type: 'rightAligned',
+  headerClass: 'custom-wrap',
 };
 
 export const recordStatusCell: ColDef = {
@@ -127,6 +140,7 @@ export const recordStatusCell: ColDef = {
   ...commonColumn,
   width: 140,
   cellRenderer: RecordStatusCellComponent,
+  headerClass: 'custom-wrap',
 };
 
 export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  ([
@@ -137,8 +151,10 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     headerName: 'Time in',
     ...commonColumn,
     width: 125,
+    minWidth: 85,
     cellRenderer: GridDateEditorComponent,
     type: 'rightAligned',
+    headerClass: 'custom-wrap',
     cellRendererParams: {
       editMode: true,
       isEditable: false,
@@ -150,8 +166,10 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     headerName: 'Time out',
     ...commonColumn,
     width: 125,
+    minWidth: 85,
     cellRenderer: GridDateEditorComponent,
     type: 'rightAligned',
+    headerClass: 'custom-wrap',
     cellRendererParams: {
       editMode: true,
       isEditable: false,
@@ -162,7 +180,9 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     field: 'hadLunchBreak',
     headerName: 'No Meal Break',
     width: 125,
+    minWidth: 105,
     type: 'rightAligned',
+    headerClass: 'custom-wrap',
     cellRenderer: SwitchEditorComponent,
     ...commonColumn,
     cellRendererParams: {
@@ -177,8 +197,10 @@ export const TimesheetRecordsColdef = (isStatusAvaliable = false): ColDef[] =>  
     headerName: 'Bill rate type',
     ...commonColumn,
     width: 180,
+    minWidth: 110,
     filterValueGetter: (value) => { return value.data.billRateConfigName; },
     type: 'rightAligned',
+    headerClass: 'custom-wrap',
   },
   amountColdef('Hours'),
   billRateColDef,
@@ -199,6 +221,7 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
     ...commonColumn,
     width: 180,
     type: 'rightAligned',
+    headerClass: 'custom-wrap',
   },
   {
     field: 'description',
@@ -207,7 +230,9 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
     sortable: false,
     resizable: true,
     width: 400,
+    minWidth: 200,
     type: 'leftAligned',
+    headerClass: 'custom-wrap',
     cellRenderer: InputEditorComponent,
     cellRendererParams: {
       editMode: true,
@@ -220,6 +245,7 @@ export const ExpensesRecordsColDef = (isStatusAvaliable = false): ColDef[] => ([
     field: 'total',
     headerName: 'Amount',
     type: 'rightAligned',
+    headerClass: 'custom-wrap',
     ...commonColumn,
     cellClass: 'common-cell',
     width: 200,
