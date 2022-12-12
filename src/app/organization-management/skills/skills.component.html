@@ -66,13 +66,14 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="includeInIRPText" headerText="Include in IRP" width=200>
+      <e-column field="skillCategory.name" headerText="category" width=200></e-column>
+      <e-column field="masterSkill.skillDescription" headerText="skill name" width=200></e-column>
+      <e-column field="includeInIRPText" headerText="System" width=200>
         <ng-template #template let-data>
           <span>{{ data.includeInIRPText }}</span>
         </ng-template>
       </e-column>
-      <e-column field="skillCategory.name" headerText="category" width=200></e-column>
-      <e-column field="masterSkill.skillDescription" headerText="skill name" width=200></e-column>
+      <e-column field="skillCode" headerText="Skill Code" width=200></e-column>
       <e-column field="glNumber" headerText="gl number" width=200></e-column>
       <e-column field="allowOnboard" headerText="allow onboard" width=150>
         <ng-template #template let-data>
@@ -140,12 +141,119 @@
   </ejs-grid>
 </section>
 
+<app-side-dialog
+  [disableSaveButton]="!userPermission[userPermissions.CanEditAssignedSkills]"
+  (formCancelClicked)="closeAsignDialog()"
+  (formSaveClicked)="saveSkill()"
+  header="Edit Skill"
+  >
+  <form
+    class="skills-form-dialog form-container bootstrap"
+    id="addEditSkillsForm"
+    [formGroup]="skillForm">
+    <ng-container *ngFor="let control of skillDialogConfig; trackBy: trackByField">
+      <ng-container [ngSwitch]="control.fieldType">
+
+        <ng-template [ngSwitchCase]="fieldTypes.Dropdown">
+          <div class="input-container form-dropdown">
+            <label [for]="control.field">
+              {{control.title}}
+              <span class="required" *ngIf="control.required">*</span>
+            </label>
+            <div class="input-group dropdown" *ngIf="control.sourceKey">
+              <ejs-dropdownlist
+                appValidateWithMessage
+                [dataSource]="formSourcesMap[control.sourceKey]"
+                [fields]="dropDownfields"
+                [allowFiltering]="true"
+                [formControlName]="control.field">
+              </ejs-dropdownlist>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template [ngSwitchCase]="fieldTypes.Input">
+          <div class="input-container">
+            <label [for]="control.field">{{control.title}}
+              <span class="required" *ngIf="control.required">*</span>
+            </label>
+            <div class="input-group">
+              <input
+                class="e-input"
+                type="text"
+                [attr.maxlength]="control.maxLen || null"
+                appValidateWithMessage
+                [name]="control.field"
+                [formControlName]="control.field"/>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template [ngSwitchCase]="fieldTypes.Date">
+          <div class="inactive-date-container">
+            <div class="input-container calendar">
+              <label [for]="control.field">{{control.title}}
+                <span class="required" *ngIf="control.required">*</span>
+              </label>
+              <div class="input-group datepicker">
+                <ejs-datepicker
+                  class="datepicker"
+                  format="MM/dd/yyyy"
+                  placeholder="MM/DD/YYYY"
+                  [formControlName]="control.field"
+                  [strictMode]='true'
+                >
+                </ejs-datepicker>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template [ngSwitchCase]="fieldTypes.CheckBoxGroup">
+          <div class="input-container">
+            <span class="controls-group-title">{{control.title}}</span>
+            <span class="required" *ngIf="control.required"> *</span>
+            
+              <div class="input-group checkboxes">
+                <div class="control-block" *ngFor="let checkbox of control.checkBoxes; trackBy: trackByField">
+                  <ejs-tooltip content="At least one system should be selected">
+                    <ejs-checkbox [formControlName]="checkbox.field" [label]="checkbox.title"></ejs-checkbox>
+                  </ejs-tooltip>
+                </div>
+              </div>
+          </div>
+        </ng-template>
+
+        <ng-template [ngSwitchCase]="fieldTypes.CheckBox">
+          <div>
+            <ejs-checkbox [formControlName]="control.field" [label]="control.title"></ejs-checkbox>
+          </div>
+        </ng-template>
+
+      </ng-container>
+    </ng-container>
+
+  </form>
+</app-side-dialog>
+
 <app-filter-dialog [items]="filteredItems" [count]="(skills$ | async)?.totalCount"
   (deleteFilter)="deleteFilter($event)"
   (clearAllFiltersClicked)="filterClearAll()"
   (applyFilterClicked)="applyFilter()"
   (closeDialogClicked)="closeFilter()">
   <form class="bootstrap" [formGroup]="skillFilterForm">
+    <div class="input-container" *ngIf="orgModuleSettings.isIrpDisplayed">
+      <span class="controls-group-title">Select System</span>
+        <div class="input-group checkboxes">
+          <div class="control-block">
+            <ejs-checkbox formControlName="includeInIRP" label="IRP"></ejs-checkbox>
+          </div>
+          <div class="control-block">
+            <ejs-checkbox formControlName="includeInVMS" label="VMS"></ejs-checkbox>
+          </div>
+        </div>
+    </div>
+
     <div class="input-container">
       <label for="skillCategoryId">Skill Category</label>
       <div class="input-group dropdown">
@@ -159,7 +267,7 @@
           placeholder="All"></ejs-multiselect>
       </div>
     </div>
-    <div class="input-container">
+    <!-- <div class="input-container">
       <label for="skillAbbr">Skill ABBR</label>
       <div class="input-group dropdown">
         <ejs-multiselect
@@ -170,7 +278,7 @@
           formControlName="skillAbbrs"
           placeholder="All"></ejs-multiselect>
       </div>
-    </div>
+    </div> -->
     <div class="input-container">
       <label for="skillDescription">Skill Description</label>
       <div class="input-group dropdown">
@@ -198,6 +306,7 @@
     <div>
       <ejs-checkbox formControlName="allowOnboard" label="Allow Onboard"></ejs-checkbox>
     </div>
+
   </form>
 </app-filter-dialog>
 
@@ -205,96 +314,8 @@
   [columns]="columnsToExport"
   [fileName]="fileName"
   (cancel)="closeExport()"
-  (export)="export($event)"></app-export-dialog>
-
-<app-side-dialog
-  [disableSaveButton]="!userPermission[userPermissions.CanEditAssignedSkills]"
-  (formCancelClicked)="closeAsignDialog()"
-  (formSaveClicked)="saveSkill()"
-  header="Edit Skill"
-  >
-  <form class="skills-form-dialog form-container bootstrap"
-        id="addEditSkillsForm"
-        [formGroup]="skillForm">
-    <div>
-      <div class="input-container">
-        <label for="skillCategoryId">Skill Category <span class="required">*</span></label>
-        <div class="input-group dropdown">
-          <ejs-dropdownlist
-            appValidateWithMessage
-            name="skillCategoryId"
-            formControlName="skillCategoryId"
-            [fields]="optionFields"
-            [allowFiltering]="true"
-            [dataSource]="(allSkillsCategories$ | async)?.items"
-          ></ejs-dropdownlist>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="input-container">
-        <label for="skillAbbr">Skill Abbr</label>
-        <div class="input-group">
-          <input class="e-input"
-                 type="text"
-                 maxlength="100"
-                 appValidateWithMessage
-                 name="skillAbbr"
-                 formControlName="skillAbbr"/>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="input-container">
-        <label for="skillDescription">Skill Description <span class="required">*</span></label>
-        <div class="input-group">
-          <input class="e-input"
-                 type="text"
-                 maxlength="100"
-                 appValidateWithMessage
-                 name="skillDescription"
-                 formControlName="skillDescription"/>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="input-container">
-        <label for="glNumber">GL Number</label>
-        <div class="input-group">
-          <input class="e-input"
-                 type="text"
-                 maxlength="100"
-                 appValidateWithMessage
-                 name="glNumber"
-                 formControlName="glNumber"/>
-        </div>
-      </div>
-    </div>
-
-    <div class="inactive-date-container">
-      <div class="input-container calendar">
-        <label for="inactiveDate">Inactive Date</label>
-        <div class="input-group datepicker">
-          <ejs-datepicker
-            id="inactiveDate"
-            class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
-            formControlName="inactiveDate"
-            [strictMode]='true'
-          >
-          </ejs-datepicker>
-        </div>
-      </div>
-    </div>
-    <div>
-      <ejs-checkbox formControlName="allowOnboard" label="Allow Onboard"></ejs-checkbox>
-    </div>
-  </form>
-</app-side-dialog>
+  (export)="export($event)">
+</app-export-dialog>
 
 <app-assign-skill [openSidebar]="openAssignSidebarSubject"></app-assign-skill>
 

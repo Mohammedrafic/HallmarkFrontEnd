@@ -5,7 +5,7 @@ import { FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, delay, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, delay, filter, map, Observable, Subject, takeUntil } from 'rxjs';
 
 import { TakeUntilDestroy } from '@core/decorators';
 import { SaveAssignedSkillValue } from '@organization-management/store/skills.actions';
@@ -28,12 +28,14 @@ import {
   RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded,
   SetDirtyState } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
-import { InactivateColFormat, SkillsFilterConfig, VmsSkillsColsExport } from './skills.constant';
+import { DefaultSkillsDialogConfig, InactivateColFormat, IrpSkillsColsExport, irpSkillsDialogConfig,
+  SkillsFilterConfig, VmsSkillsColsExport } from './skills.constant';
 import { SkillsService } from './skills.service';
-import { SkillGridEventData } from './skills.interface';
+import { SkillCheckBoxGroup, SkillGridEventData, SkillsForm, SkillsFormConfig, SkillSources } from './skills.interface';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-buttons';
-import { OrginazationModuleSettings, PagerChangeEvent } from '@core/interface';
+import { CustomFormGroup, OrginazationModuleSettings, PagerChangeEvent } from '@core/interface';
 import { AppState } from 'src/app/store/app.state';
+import { FieldType } from '@core/enums';
 
 @Component({
   selector: 'app-skills',
@@ -60,10 +62,6 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   @Select(OrganizationManagementState.organization)
   public readonly organization$: Observable<Organization>;
 
-  optionFields = {
-    text: 'name', value: 'id',
-  };
-
   filterOptionFields = {
     text: 'name', value: 'name',
   };
@@ -72,7 +70,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
 
   title: 'Add' | 'Edit' = 'Add';
 
-  skillForm: FormGroup;
+  skillForm: CustomFormGroup<SkillsForm>;
 
   skillFilterForm: FormGroup;
 
@@ -88,10 +86,21 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   
   openAssignSidebarSubject = new Subject<boolean>();
 
+  skillDialogConfig = DefaultSkillsDialogConfig;
+
   orgModuleSettings: OrginazationModuleSettings = {
     isFeatureIrpEnabled: false,
-    isOrgIrpEnabled: false,
-    isOrgVMSEnabled: true,
+    isIrpDisplayed: false,
+  };
+
+  formSourcesMap: SkillSources = {
+    skillCategory: [],
+  };
+
+  readonly fieldTypes = FieldType;
+
+  readonly dropDownfields = {
+    text: 'text', value: 'value',
   };
 
   private pageSubject = new Subject<number>();
@@ -118,6 +127,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     this.getOrganizagionData();
     this.watchForOrgId();
     this.watchForPagination();
+    this.getSkillCategories();
     this.watchForSaveDeleteAction();
     this.getSkillsCategories();
     this.getSkillfilterData();
@@ -230,11 +240,13 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     this.addActiveCssClass(event);
     this.title = 'Edit';
 
-    this.skillForm.setValue({
+    /**
+     * Add skill code here
+     */
+    this.skillForm.patchValue({
       id: data.id,
       isDefault: data.masterSkill?.isDefault || false,
       masterSkillId: data.masterSkill?.id || null,
-      skillAbbr: data.masterSkill?.skillAbbr,
       skillCategoryId: data.skillCategory?.id,
       skillDescription: data.masterSkill?.skillDescription,
       glNumber: data.glNumber,
@@ -311,6 +323,10 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     }
   }
 
+  trackByField(index: number, item: SkillsFormConfig | SkillCheckBoxGroup): string {
+    return item.field;
+  }
+
   private getSkills(): void {
     this.store.dispatch([new GetAllSkillsCategories(), new GetSkillDataSources()]);
     this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
@@ -327,11 +343,11 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
 
   private changeControlsAvaliability(disable: boolean): void {
     if (disable) {
-      this.skillForm.controls['skillAbbr'].disable();
+      this.skillForm.controls['skillCode'].disable();
       this.skillForm.controls['skillCategoryId'].disable();
       this.skillForm.controls['skillDescription'].disable();
     } else {
-      this.skillForm.controls['skillAbbr'].enable();
+      this.skillForm.controls['skillCode'].enable();
       this.skillForm.controls['skillCategoryId'].enable();
       this.skillForm.controls['skillDescription'].enable();
     }
@@ -404,7 +420,6 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((dataSource) => {
-      this.filterColumns.skillAbbrs.dataSource = dataSource.skillABBRs.filter(item => item);
       this.filterColumns.skillDescriptions.dataSource = dataSource.skillDescriptions;
       this.filterColumns.glNumbers.dataSource = ['blank', ...dataSource.glNumbers.filter(item => item)];
     });
@@ -419,12 +434,32 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       takeUntil(this.componentDestroy()),
     )
     .subscribe((organization) => {
-      this.orgModuleSettings.isOrgVMSEnabled = !!organization.preferences.isVMCEnabled;
-      this.orgModuleSettings.isOrgIrpEnabled = !!organization.preferences.isIRPEnabled;
+      this.orgModuleSettings.isIrpDisplayed = !!organization.preferences.isVMCEnabled
+      && !!organization.preferences.isIRPEnabled;
+
+      if (this.orgModuleSettings.isIrpDisplayed) {
+        this.skillDialogConfig = irpSkillsDialogConfig;
+        this.columnsToExport = IrpSkillsColsExport;
+      }
     });
   }
 
   private setIrpFeatureFlag(): void {
     this.orgModuleSettings.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+  }
+
+  private getSkillCategories(): void {
+    this.allSkillsCategories$
+    .pipe(
+      filter(Boolean),
+      map((categoriesPage) => categoriesPage.items.map((item) => ({
+        text: item.name,
+        value: item.id,
+      }))),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((categories) => {
+      this.formSourcesMap.skillCategory = categories;
+    });
   }
 }

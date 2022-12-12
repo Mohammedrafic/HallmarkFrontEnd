@@ -1,10 +1,24 @@
+import { FieldType } from '@core/enums';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportColumn } from '@shared/models/export.model';
-import { SkillsFilterData } from './skills.interface';
+import { SkillsSourceNames } from './skills.enum';
+import { SkillsFilterData, SkillsFormConfig } from './skills.interface';
 
 export const VmsSkillsColsExport: ExportColumn[] = [
   { text:'Skill Category', column: 'SkillCategory_Name' },
-  { text:'Skill ABBR', column: 'SkillAbbr' },
+  { text: 'Skill Code', column: 'SkillCode'},
+  // { text:'Skill ABBR', column: 'SkillAbbr' },
+  { text:'Skill Description', column: 'SkillDescription' },
+  { text:'GL Number', column: 'GLNumber' },
+  { text:'Allow Onboard', column: 'AllowOnboard' },
+  { text:'Inactivate Date', column: 'InactiveDate' },
+];
+
+export const IrpSkillsColsExport: ExportColumn[] = [
+  { text: 'System', column: 'System'},
+  { text:'Skill Category', column: 'SkillCategory_Name' },
+  { text: 'Skill Code', column: 'SkillCode'},
+  // { text:'Skill ABBR', column: 'SkillAbbr' },
   { text:'Skill Description', column: 'SkillDescription' },
   { text:'GL Number', column: 'GLNumber' },
   { text:'Allow Onboard', column: 'AllowOnboard' },
@@ -15,18 +29,12 @@ export const InactivateColFormat = {
   type:'date', format: 'MM/dd/yyyy',
 };
 
-
 export const SkillsFilterConfig: SkillsFilterData = {
   skillCategories: {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Text,
     dataSource: [],
     valueField: 'name',
-  },
-  skillAbbrs: {
-    type: ControlTypes.Multiselect,
-    valueType: ValueType.Text,
-    dataSource: [],
   },
   skillDescriptions: {
     type: ControlTypes.Multiselect,
@@ -45,3 +53,105 @@ export const SkillsFilterConfig: SkillsFilterData = {
     dataSource: [null],
   },
 };
+
+export const DefaultSkillsDialogConfig: SkillsFormConfig[] = [
+  {
+    field: 'skillCategoryId',
+    title: 'Skill Category',
+    fieldType: FieldType.Dropdown,
+    sourceKey: SkillsSourceNames.Category,
+    required: true,
+  },
+  {
+    field: 'skillCode',
+    title: 'Skill Code',
+    fieldType: FieldType.Input,
+    maxLen: 200,
+    required: true,
+  },
+  {
+    field: 'skillDescription',
+    title: 'Skill Description',
+    fieldType: FieldType.Input,
+    maxLen: 100,
+    required: true,
+  },
+  {
+    field: 'glNumber',
+    title: 'GL Number',
+    fieldType: FieldType.Input,
+    maxLen: 100,
+    required: false,
+  },
+  {
+    field: 'inactiveDate',
+    title: 'Inactive Date',
+    fieldType: FieldType.Date,
+    required: false,
+  },
+  {
+    field: 'allowOnboard',
+    title: 'Allow Onboard',
+    fieldType: FieldType.CheckBox,
+    required: false,
+  },
+];
+
+export const irpSkillsDialogConfig: SkillsFormConfig[] = [
+  {
+    field: '',
+    title: 'Select System',
+    fieldType: FieldType.CheckBoxGroup,
+    required: true,
+    checkBoxes: [
+      {
+        field: 'includeInIRP',
+        title: 'IRP',
+      },
+      {
+        field: 'includeInVMS',
+        title: 'VMS',
+      },
+    ],
+  },
+  {
+    field: 'skillCategoryId',
+    title: 'Skill Category',
+    fieldType: FieldType.Dropdown,
+    sourceKey: SkillsSourceNames.Category,
+    required: true,
+  },
+  {
+    field: 'skillCode',
+    title: 'Skill Code',
+    fieldType: FieldType.Input,
+    maxLen: 200,
+    required: true,
+  },
+  {
+    field: 'skillDescription',
+    title: 'Skill Description',
+    fieldType: FieldType.Input,
+    maxLen: 100,
+    required: true,
+  },
+  {
+    field: 'glNumber',
+    title: 'GL Number',
+    fieldType: FieldType.Input,
+    maxLen: 100,
+    required: false,
+  },
+  {
+    field: 'inactiveDate',
+    title: 'Inactive Date',
+    fieldType: FieldType.Date,
+    required: false,
+  },
+  {
+    field: 'allowOnboard',
+    title: 'Allow Onboard',
+    fieldType: FieldType.CheckBox,
+    required: false,
+  },
+];

@@ -47,7 +47,6 @@ export interface PagerChangeEvent {
 }
 
 export interface OrginazationModuleSettings {
-  isOrgVMSEnabled: boolean;
-  isOrgIrpEnabled: boolean;
   isFeatureIrpEnabled: boolean;
+  isIrpDisplayed: boolean;
 }

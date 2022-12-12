@@ -1,7 +1,11 @@
+import { Column, ValueType } from '@syncfusion/ej2-angular-grids';
+
+import { FieldType, InputAttrType } from '@core/enums';
 import { ControlTypes } from '@shared/enums/control-types.enum';
 import { SkillCategory } from '@shared/models/skill-category.model';
 import { Skill } from '@shared/models/skill.model';
-import { Column, ValueType } from '@syncfusion/ej2-angular-grids';
+import { SkillsSourceNames } from './skills.enum';
+import { DropdownOption } from '@core/interface';
 
 export interface SkillsForm {
   id: number;
@@ -25,7 +29,6 @@ export interface SkillsFilterItem<T> {
 
 export interface SkillsFilterData {
   skillCategories: SkillsFilterItem<SkillCategory>;
-  skillAbbrs: SkillsFilterItem<string>;
   skillDescriptions: SkillsFilterItem<string>;
   glNumbers: SkillsFilterItem<string>;
   allowOnboard: SkillsFilterItem<unknown>;
@@ -37,3 +40,24 @@ export type SkillGridEventData = Skill & {
   index: string;
   column: Column;
  }
+
+ export interface SkillCheckBoxGroup {
+  field: string;
+  title: string;
+ }
+
+ export interface SkillsFormConfig {
+  field: string;
+  title: string;
+  fieldType: FieldType;
+  sourceKey?: SkillsSourceNames;
+  required: boolean;
+  maxLen?: number;
+  pattern?: string;
+  inputType?: InputAttrType;
+  checkBoxes?: SkillCheckBoxGroup[];
+}
+
+export interface SkillSources {
+  [SkillsSourceNames.Category]: DropdownOption[];
+}
