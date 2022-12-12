@@ -8,7 +8,7 @@ import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 
-import { DateTimeHelper, Destroyable } from '@core/helpers';
+import { DateTimeHelper } from '@core/helpers';
 import { DialogAction } from '@core/enums';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
