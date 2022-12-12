@@ -96,6 +96,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
 
+  public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
+
   private jobId: number;
 
   @Select(TimesheetsState.isTimesheetOpen)
