@@ -1,4 +1,7 @@
-@import '../../../../styles/variables/colors';
+@import "../../../../styles/variables/colors";
+@import "adaptive-response";
+
+
 
 .job-info-container {
   display: flex;
@@ -26,7 +29,14 @@
     font-size: 12px;
     white-space: nowrap;
     color: $black;
-    min-width: 70px;
+  }
+}
+
+@media (max-width: $tablet-max) {
+  .job-info-container {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
   }
 }
 
