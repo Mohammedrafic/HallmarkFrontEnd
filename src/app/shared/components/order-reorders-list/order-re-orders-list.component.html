@@ -55,7 +55,7 @@
       </e-column>
       <e-column field="agencies" headerText="Agency" textAlign="Left" width="200" *ngIf="!isAgency">
         <ng-template #template let-data>
-          {{ data.agencies?.length ? data.agencies.join(', ') : '' }}
+          {{ data.agencies?.length ? data.allAgencies ? 'All' : data.agencies.join(', ') : '' }}
         </ng-template>
       </e-column>
       <e-column field="billRate" headerText="BILL RATE $" textAlign="Left" width="120">
