@@ -85,7 +85,7 @@
 
 
 <app-filter-dialog *ngIf="isActive" [items]="filteredItems" [count]="(masterSkills$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
-  <form class="bootstrap" [formGroup]="SkillFilterFormGroup">
+  <form class="bootstrap" [formGroup]="skillFilterFormGroup">
     <div class="input-container">
       <label for="externalId">Search</label>
       <div class="input-group">
@@ -140,11 +140,11 @@
 <app-side-dialog *ngIf="isActive"
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveSkill()"
-  header="{{ SkillFormGroup.get('id')?.value == 0 ? 'Add' : 'Edit' }} Skill" [disableSaveButton]="!userPermission[userPermissions.CanEditMasterSkills]"
+  header="{{ skillFormGroup.get('id')?.value == 0 ? 'Add' : 'Edit' }} Skill" [disableSaveButton]="!userPermission[userPermissions.CanEditMasterSkills]"
   >
   <form class="skills-form-dialog form-container bootstrap"
         id="addEditSkillsForm"
-        [formGroup]="SkillFormGroup">
+        [formGroup]="skillFormGroup">
     <div>
       <div class="input-container">
         <label for="skillCategoryId">Skill Category <span class="required">*</span></label>
