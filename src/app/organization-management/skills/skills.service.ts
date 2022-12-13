@@ -32,8 +32,8 @@ export class SkillsService {
       skillDescriptions: [],
       glNumbers: [],
       allowOnboard: [],
-      includeInIRP: [],
-      includeInVMS: [],
+      includeInIRP: [true],
+      includeInVMS: [true],
     });
   }
 }

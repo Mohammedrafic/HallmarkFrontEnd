@@ -24,7 +24,7 @@ import {
 } from 'src/app/shared/constants/messages';
 import { Skill, SkillDataSource, SkillFilters, SkillsPage } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import {
@@ -39,6 +39,8 @@ import {
 } from './skills.constant';
 import { SkillCheckBoxGroup, SkillGridEventData, SkillsForm, SkillsFormConfig, SkillSources } from './skills.interface';
 import { SkillsService } from './skills.service';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
   selector: 'app-skills',
@@ -186,6 +188,8 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       skillDescriptions: this.filters.skillDescriptions || [],
       glNumbers: this.filters.glNumbers || [],
       allowOnboard: this.filters.allowOnboard || null,
+      includeInIRP: this.filters.includeInIRP || null,
+      includeInVMS: this.filters.includeInVMS || null,
     });
     this.filteredItems = this.filterService.generateChips(this.skillFilterForm, this.filterColumns);
   }
@@ -242,7 +246,6 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   editSkill(data: SkillGridEventData, event: MouseEvent): void {
     this.addActiveCssClass(event);
     this.title = 'Edit';
-
     /**
      * Add skill code here
      */
@@ -255,6 +258,8 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       glNumber: data.glNumber,
       allowOnboard: data.allowOnboard,
       inactiveDate: data.inactiveDate,
+      includeInIRP: data.includeInIRP,
+      includeInVMS: data.includeInVMS,
     });
     this.store.dispatch(new ShowSideDialog(true));
     this.changeControlsAvaliability(data.masterSkill?.isDefault as boolean);
@@ -298,6 +303,14 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   }
 
   saveSkill(): void {
+    const atLeastOneSystemSelected = this.skillForm.get('includeInIRP')?.value
+    || this.skillForm.get('includeInVMS')?.value;
+
+    if (!atLeastOneSystemSelected) {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select system for Skill'));
+      return;
+    }
+
     if (this.skillForm.valid) {
       this.store.dispatch(new SaveAssignedSkill(new Skill(
         this.skillForm.getRawValue(), true
@@ -437,8 +450,9 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       takeUntil(this.componentDestroy()),
     )
     .subscribe((organization) => {
+      const isMspUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.MSP;
       this.orgModuleSettings.isIrpDisplayed = !!organization.preferences.isVMCEnabled
-      && !!organization.preferences.isIRPEnabled;
+      && !!organization.preferences.isIRPEnabled && !isMspUser;
 
       if (this.orgModuleSettings.isIrpDisplayed) {
         this.skillDialogConfig = irpSkillsDialogConfig;

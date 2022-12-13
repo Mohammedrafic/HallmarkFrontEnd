@@ -17,6 +17,9 @@ export interface SkillsForm {
   glNumber: string;
   allowOnboard: boolean;
   inactiveDate: string;
+  includeInIRP: boolean;
+  includeInVMS: boolean;
+  skillCode: string;
 }
 
 export interface SkillsFilterItem<T> {
@@ -32,6 +35,8 @@ export interface SkillsFilterData {
   skillDescriptions: SkillsFilterItem<string>;
   glNumbers: SkillsFilterItem<string>;
   allowOnboard: SkillsFilterItem<unknown>;
+  includeInIRP: SkillsFilterItem<unknown>;
+  includeInVMS: SkillsFilterItem<unknown>;
 }
 
 export type SkillGridEventData = Skill & {

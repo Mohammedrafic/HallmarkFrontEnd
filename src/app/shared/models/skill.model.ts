@@ -12,6 +12,8 @@ export class Skill {
   glNumber?: string | null;
   allowOnboard?: boolean;
   inactiveDate?: string | null;
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
   isDefault?: boolean;
   foreignKey?: string;
 
@@ -21,6 +23,8 @@ export class Skill {
     this.skillAbbr = skill.skillAbbr;
     this.skillDescription = skill.skillDescription;
     this.isDefault = skill.isDefault;
+    this.includeInIRP = skill.includeInIRP || false;
+    this.includeInVMS = skill.includeInVMS || false;
 
     if (assigned) {
       this.inactiveDate = skill.inactiveDate || null;
@@ -55,6 +59,8 @@ export class SkillFilters {
   pageNumber?: number;
   pageSize?: number;
   orderBy?: string;
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
 }
 
 export class MasterSkillFilters {

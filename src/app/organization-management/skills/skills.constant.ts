@@ -15,7 +15,6 @@ export const VmsSkillsColsExport: ExportColumn[] = [
 ];
 
 export const IrpSkillsColsExport: ExportColumn[] = [
-  { text: 'System', column: 'System'},
   { text:'Skill Category', column: 'SkillCategory_Name' },
   { text: 'Skill Code', column: 'SkillCode'},
   // { text:'Skill ABBR', column: 'SkillAbbr' },
@@ -23,6 +22,7 @@ export const IrpSkillsColsExport: ExportColumn[] = [
   { text:'GL Number', column: 'GLNumber' },
   { text:'Allow Onboard', column: 'AllowOnboard' },
   { text:'Inactivate Date', column: 'InactiveDate' },
+  { text: 'System', column: 'System'},
 ];
 
 export const InactivateColFormat = {
@@ -50,6 +50,18 @@ export const SkillsFilterConfig: SkillsFilterData = {
     type: ControlTypes.Checkbox,
     valueType: ValueType.Text,
     checkBoxTitle: 'Allow Onboard',
+    dataSource: [null],
+  },
+  includeInIRP: {
+    type: ControlTypes.Checkbox,
+    valueType: ValueType.Text,
+    checkBoxTitle: 'IRP',
+    dataSource: [null],
+  },
+  includeInVMS: {
+    type: ControlTypes.Checkbox,
+    valueType: ValueType.Text,
+    checkBoxTitle: 'VMS',
     dataSource: [null],
   },
 };
