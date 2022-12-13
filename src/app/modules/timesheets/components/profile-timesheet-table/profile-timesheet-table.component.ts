@@ -513,7 +513,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private adjustColumnWidth(): void {
     combineLatest([ this.componentStateChanged$.pipe(throttleTime(150)), this.breakpointObserver.observe([BreakpointQuery.TABLET_MAX])])
-    .pipe(debounceTime(200) ,takeUntil(this.componentDestroy())).subscribe(([ event, data]) => {
+    .pipe(debounceTime(200) ,takeUntil(this.componentDestroy())).subscribe(([event, data]) => {
         if(data.matches) {
             event.api.sizeColumnsToFit();   
         } else {
