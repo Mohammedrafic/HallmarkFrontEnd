@@ -2,12 +2,12 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
   EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { combineLatest, Observable, takeUntil } from 'rxjs';
-import { filter, skip, switchMap, take, tap } from 'rxjs/operators';
+import { combineLatest, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, filter, skip, switchMap, take, tap, throttleTime } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
+import { ComponentStateChangedEvent, GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
 import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
@@ -30,6 +30,8 @@ import { TimesheetDetailsTableService, TimesheetRecordsService } from '../../ser
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { RecordsAdapter } from '../../helpers';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -147,12 +149,15 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private isStatusColAvaliable = false;
 
+  private readonly componentStateChanged$: Subject<ComponentStateChangedEvent> = new Subject();
+
   constructor(
     private store: Store,
     private confirmService: ConfirmService,
     private timesheetRecordsService: TimesheetRecordsService,
     private timesheetDetailsTableService: TimesheetDetailsTableService,
     private cd: ChangeDetectorRef,
+    private breakpointObserver: BreakpointObserver
   ) {
     super();
     this.context = {
@@ -178,6 +183,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   ngAfterViewInit(): void {
     this.getRecords();
     this.watchForDialogState();
+    this.adjustColumnWidth(); 
   }
 
   public onTabSelect(selectEvent: SelectingEventArgs): void {
@@ -503,5 +509,20 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       || this.timesheetDetails.status === TimesheetStatus.Rejected;
 
     return isOrgAndTimesheetTab && this.timesheetDetails.canEditTimesheet && isStatusPass;
+  }
+
+  private adjustColumnWidth(): void {
+    combineLatest([ this.componentStateChanged$.pipe(throttleTime(150)), this.breakpointObserver.observe([BreakpointQuery.TABLET_MAX])])
+    .pipe(debounceTime(200) ,takeUntil(this.componentDestroy())).subscribe(([ event, data]) => {
+        if(data.matches) {
+            event.api.sizeColumnsToFit();   
+        } else {
+          event.columnApi.autoSizeAllColumns();
+        }  
+    });
+  }
+
+  public onComponentStateChanged(event: ComponentStateChangedEvent): void {
+    this.componentStateChanged$.next(event);
   }
 }

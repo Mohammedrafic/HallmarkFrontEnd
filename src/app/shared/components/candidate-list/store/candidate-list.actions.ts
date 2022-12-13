@@ -6,6 +6,11 @@ export class GetCandidatesByPage {
   constructor(public payload: CandidateListRequest) {}
 }
 
+export class GetIRPCandidatesByPage {
+  static readonly type = '[candidate-list] Get IRP Candidates List';
+  constructor(public payload: CandidateListRequest) {}
+}
+
 export class GetAllSkills {
   static readonly type = '[candidate-list] Get All Skills';
 }

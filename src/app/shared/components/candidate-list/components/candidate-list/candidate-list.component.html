@@ -28,6 +28,24 @@
         </div>
       </ng-template>
     </e-column>
+    <e-column headerText="" field="actions" textAlign="Left" width="150" [visible]="false">
+      <ng-template #template let-data>
+        <div class="row-tool-buttons" [class.hidden]="!isLoaded">
+          <button ejs-button cssClass="e-flat primary-icon-button">
+            <span><i-feather name="edit" class="icon"></i-feather></span>
+          </button>
+          <button ejs-button cssClass="e-flat secondary-icon-button enabled-button">
+            <span><i-feather name="trash-2" class="icon"></i-feather></span>
+          </button>
+          <ejs-tooltip *ngIf="data.hasRedFlag" [content]="data.redFlagDescription" position="TopCenter">
+            <button ejs-button cssClass="e-flat secondary-icon-button enabled-button">
+              <span><i-feather name="flag" class="icon"></i-feather></span>
+            </button>
+          </ejs-tooltip>
+        </div>
+      </ng-template>
+    </e-column>
+    <e-column headerText="ID" field="employeeId" [visible]="false" width=80></e-column>
     <e-column field="lastName" headerText="Name" width=200>
       <ng-template #template let-data>
         <div class="name-wrapper">
@@ -51,17 +69,30 @@
         <div>
           <ejs-chiplist class="events-off">
             <e-chips>
-              <e-chip [text]="statusEnum[data.profileStatus]"
-                      [cssClass]="getChipCssClass(statusEnum[data.profileStatus])">
+              <e-chip [text]="statusEnum[data.profileStatus] || data.employeeStatus"
+                      [cssClass]="getChipCssClass(statusEnum[data.profileStatus] || data.employeeStatus)">
               </e-chip>
             </e-chips>
           </ejs-chiplist>
         </div>
       </ng-template>
     </e-column>
+    <e-column headerText="Primary Skill" field="primarySkillName" [visible]="false" width=200></e-column>
     <e-column headerText="Skill" field="candidateProfileSkills" width=200>
       <ng-template #template let-data>
-        <div *ngFor="let skill of data.candidateProfileSkills">{{skill.skillDescription || skill}}</div>
+        <div *ngFor="let skill of (data.candidateProfileSkills || data.employeeSkills)">{{skill.skillDescription || skill}}</div>
+      </ng-template>
+    </e-column>
+    <e-column headerText="Location" field="locationName" [visible]="false" width=200></e-column>
+    <e-column headerText="DEpartment" field="departmentName" [visible]="false" width=200></e-column>
+    <e-column headerText="Hire Date" field="hireDate" textAlign="Left" [visible]="false" width=200>
+      <ng-template #template let-data>
+        {{data.hireDate | date: 'MM/dd/yyy': 'UTC'}}
+      </ng-template>
+    </e-column>
+    <e-column headerText="Org. Orientation" field="orgOrientation" textAlign="Left" [visible]="false" width=200>
+      <ng-template #template let-data>
+        {{data.orgOrientation | date: 'MM/dd/yyy': 'UTC'}}
       </ng-template>
     </e-column>
     <e-column textAlign="Left" field="lastAssignmentEndDate" headerText="Current Assignment End Date">

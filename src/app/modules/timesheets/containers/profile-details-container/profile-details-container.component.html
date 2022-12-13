@@ -2,6 +2,7 @@
   id="dialog"
   #candidateDialog
   cssClass="dialog timesheet-details-dialog"
+  [target]="targetElement"
   [width]="'1180px'"
   [visible]="false"
   [isModal]="true"
@@ -114,7 +115,7 @@
       </div>
 
       <div class="profile-hours-statistics">
-          <div class="tile-dark-blue">
+          <div class="tile-dark-blue statistic-wrapper">
               <app-profile-cumulative-hours
                       [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
               ></app-profile-cumulative-hours>

@@ -113,6 +113,7 @@
         [class.empty-table]="!recordsToShow[currentTab][currentMode].length"
         [overlayNoRowsTemplate]="gridEmptyMessage"
         (gridReady)="onGridReady($event)"
+        (componentStateChanged)="onComponentStateChanged($event)"
         class="ag-theme-alpine app-grid__component"
         >
       </ag-grid-angular>

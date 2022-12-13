@@ -1,5 +1,5 @@
-import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
-import { PageOfCollections } from "@shared/models/page.model";
+import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
+import { PageOfCollections } from '@shared/models/page.model';
 
 export interface CandidateCredential {
   id?: number;
@@ -21,8 +21,9 @@ export interface CandidateCredential {
   reqForSubmission?: boolean;
   comment?: string;
   credentialTypeId?: number;
-  credentialTypeName?: string
+  credentialTypeName?: string;
   rejectReason?: string;
+  organizationId?: number | null;
 }
 
 export interface CandidateCredentialGridItem extends CandidateCredential {
@@ -52,7 +53,7 @@ export interface CandidateCredentialResponse {
   publicId: number;
   organizationPrefix: string;
   positionId: number;
-  credentials: CandidateCredentialPage
+  credentials: CandidateCredentialPage;
 }
 
 export interface CredentialRequestParams {

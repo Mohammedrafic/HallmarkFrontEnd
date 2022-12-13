@@ -22,7 +22,8 @@ import {
   Send,
   Sliders,
   Trash2,
-  User
+  User,
+  Flag
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
@@ -33,7 +34,6 @@ import {
 } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 
-import { ValidateDirective } from './directives/validate-directive/validate.directive';
 import { ErrorMessageComponent } from './components/error-message/error-message.component';
 import { ValidationErrorPipe } from './pipes/validation-error.pipe';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -164,6 +164,7 @@ const icons = {
   EyeOff,
   DollarSign,
   Percent,
+  Flag
 };
 
 const COMPONENTS = [

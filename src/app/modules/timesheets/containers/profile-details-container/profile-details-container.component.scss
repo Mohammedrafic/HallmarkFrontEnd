@@ -1,5 +1,6 @@
 @import "colors";
 @import "mixins";
+@import "adaptive-response";
 
 $chip-margin: 8px;
 
@@ -28,7 +29,7 @@ $chip-margin: 8px;
 
 .container {
   padding: 12px 24px;
-  padding-bottom: 0!important;
+  padding-bottom: 0 !important;
 }
 
 .d-flex {
@@ -110,7 +111,8 @@ $chip-margin: 8px;
   margin-top: 15px;
   margin-bottom: 10px;
 
-  .order-id, .week-dates {
+  .order-id,
+  .week-dates {
     font-weight: 700;
     font-size: 16px;
   }
@@ -138,7 +140,8 @@ $chip-margin: 8px;
   margin-top: 15px;
   margin-bottom: 10px;
 
-  .profile-invoices, .miles {
+  .profile-invoices,
+  .miles {
     flex-grow: 1;
     min-width: 110px;
   }
@@ -245,4 +248,20 @@ app-navigation-panel {
   align-items: center;
   justify-content: flex-start;
   max-width: 87%;
+}
+
+@media (max-width: $tablet-max) {
+  .profile-hours-statistics {
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .statistic-wrapper {
+      width: 100%;
+      margin: 0 !important;
+    }
+
+    .miles {
+      margin: 0 !important;
+    }
+  }
 }

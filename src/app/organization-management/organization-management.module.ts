@@ -102,6 +102,7 @@ import { TIER_DIALOG_TYPE } from '@shared/components/tiers-dialog/constants';
 import { Tiers } from '@shared/enums/tiers.enum';
 import { TiersState } from '@organization-management/store/tiers.state';
 import { TiersApiService } from '@shared/services';
+import { ButtonGroupModule } from "@shared/components/button-group/button-group.module";
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
 import { AssignSkillComponent } from './skills/assign-skill/assign-skill.component';
 import { SkillsState } from '@organization-management/store/skills.state';
@@ -218,6 +219,7 @@ const sidebarIcons = {
     TooltipContainerModule,
     TiersDialogModule,
     CredentialListModule,
+    ButtonGroupModule,
 
     FeatherModule.pick(sidebarIcons),
 

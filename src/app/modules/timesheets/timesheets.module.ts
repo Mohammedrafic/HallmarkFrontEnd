@@ -32,7 +32,9 @@ import { TimesheetsContainerComponent } from './containers/timesheets-container/
 import { TimesheetsTableComponent } from './components/timesheets-table/timesheets-table.component';
 import { TimesheetsState } from './store/state/timesheets.state';
 import { TimesheetsApiService } from './services/timesheets-api.service';
-import { ProfileDetailsContainerComponent } from './containers/profile-details-container/profile-details-container.component';
+import {
+  ProfileDetailsContainerComponent,
+} from './containers/profile-details-container/profile-details-container.component';
 import { ProfileTimesheetTableComponent } from './components/profile-timesheet-table/profile-timesheet-table.component';
 import { AddTimesheetComponent } from './components/add-timesheet/add-timesheet.component';
 import { AddRecordService } from './services/add-record.service';
@@ -50,9 +52,11 @@ import { ProfileMilesComponent } from './components/profile-cumulative-hours/pro
 import { InputEditorComponent } from './components/cell-editors/input-editor/input-editor.component';
 import { GridDateEditorComponent } from './components/cell-editors/grid-date-editor/grid-date-editor.component';
 import {
-  TimesheetTableApproveCellComponent
+  TimesheetTableApproveCellComponent,
 } from './components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
-import { TimesheetTableLinkComponent } from './components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
+import {
+  TimesheetTableLinkComponent,
+} from './components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 import { TimesheetDetailsService } from './services/timesheet-details.service';
 import { FileViewerModule } from '@shared/modules/file-viewer/file-viewer.module';
 import { DateRangeWeekPickerModule } from '@shared/components/date-range-week-picker/date-range-week-picker.module';
@@ -67,7 +71,7 @@ import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper
 import { TimesheetsTableFiltersColumns } from './enums';
 import { APP_FILTERS_CONFIG } from '@core/constants/filters-helper.constant';
 import {
-  RejectReasonInputDialogModule
+  RejectReasonInputDialogModule,
 } from '@shared/components/reject-reason-input-dialog/reject-reason-input-dialog.module';
 import { RecordStatusCellComponent } from './components/cell-editors/record-status-cell/record-status-cell.component';
 import { TableStatusCellModule } from '@shared/components/table-status-cell/table-status-cell.module';
@@ -128,47 +132,47 @@ const gridIcons = {
     UploadDocumentsComponent,
     SwitchEditorComponent,
   ],
-    imports: [
-        CommonModule,
-        TimesheetsRoutingModule,
-        FeatherModule.pick(gridIcons),
-        ButtonModule,
-        TabAllModule,
-        GridAllModule,
-        ChipListModule,
-        DropDownButtonModule,
-        DropDownListModule,
-        NumericTextBoxModule,
-        PagerModule,
-        DatePickerModule,
-        ReactiveFormsModule,
-        MultiSelectModule,
-        TimePickerModule,
-        DialogAllModule,
-        DateTimePickerModule,
-        NgxsModule.forFeature([TimesheetsState]),
-        ChartAllModule,
-        AccumulationChartAllModule,
-        SharedModule,
-        FormsModule,
-        CheckBoxModule,
-        ControlConverterModule,
-        DateWeekPickerModule,
-        DateRangeWeekPickerModule,
-        UploaderModule,
-        TextBoxModule,
-        TooltipModule,
-        SwitchModule,
-        AgGridModule,
-        GridModule,
-        PdfViewerModule,
-        FileViewerModule,
-        AttachmentsModule,
-        FileUploaderModule,
-        RejectReasonInputDialogModule,
-        TableStatusCellModule,
-        TooltipContainerModule,
-    ],
+  imports: [
+    CommonModule,
+    TimesheetsRoutingModule,
+    FeatherModule.pick(gridIcons),
+    ButtonModule,
+    TabAllModule,
+    GridAllModule,
+    ChipListModule,
+    DropDownButtonModule,
+    DropDownListModule,
+    NumericTextBoxModule,
+    PagerModule,
+    DatePickerModule,
+    ReactiveFormsModule,
+    MultiSelectModule,
+    TimePickerModule,
+    DialogAllModule,
+    DateTimePickerModule,
+    NgxsModule.forFeature([TimesheetsState]),
+    ChartAllModule,
+    AccumulationChartAllModule,
+    SharedModule,
+    FormsModule,
+    CheckBoxModule,
+    ControlConverterModule,
+    DateWeekPickerModule,
+    DateRangeWeekPickerModule,
+    UploaderModule,
+    TextBoxModule,
+    TooltipModule,
+    SwitchModule,
+    AgGridModule,
+    GridModule,
+    PdfViewerModule,
+    FileViewerModule,
+    AttachmentsModule,
+    FileUploaderModule,
+    RejectReasonInputDialogModule,
+    TableStatusCellModule,
+    TooltipContainerModule,
+  ],
   exports: [TimesheetsContainerComponent],
   providers: [
     TimesheetsApiService,
@@ -196,6 +200,6 @@ const gridIcons = {
       provide: FiltersDialogHelperService,
       useClass: TimesheetsService,
     },
-  ]
+  ],
 })
 export class TimesheetsModule {}
