@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { CandidateList, CandidateListRequest } from '../types/candidate-list.model';
+import { CandidateList, CandidateListRequest, IRPCandidateList } from '../types/candidate-list.model';
 import { AssignedSkillsByOrganization } from '../../../models/skill.model';
 import { CandidateStatus } from '../../../enums/status';
 import { ExportPayload } from '../../../models/export.model';
@@ -18,6 +18,14 @@ export class CandidateListService {
    */
   public getCandidates(payload: CandidateListRequest): Observable<CandidateList> {
     return this.http.post<CandidateList>('/api/CandidateProfile/profiles', payload);
+  }
+
+  /**
+   * Get IRP candidates (Employees) by page number
+   * @return list of IRP candidates
+   */
+  public getIRPCandidates(payload: CandidateListRequest): Observable<IRPCandidateList> {
+    return this.http.post<IRPCandidateList>('/api/Employee/GetAll', payload);
   }
 
   /**

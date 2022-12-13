@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CandidateList } from '../types/candidate-list.model';
+import { CandidateList, IRPCandidateList } from '../types/candidate-list.model';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { catchError, Observable, tap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -12,6 +12,7 @@ import {
   ExportCandidateList,
   GetAllSkills,
   GetCandidatesByPage,
+  GetIRPCandidatesByPage,
   GetRegionList
 } from './candidate-list.actions';
 import { ListOfSkills } from '@shared/models/skill.model';
@@ -20,6 +21,7 @@ import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 export interface CandidateListStateModel {
   isCandidateLoading: boolean;
   candidateList: CandidateList | null;
+  IRPCandidateList: IRPCandidateList | null;
   listOfSkills: ListOfSkills[] | null;
   listOfRegions: string[] | null;
 }
@@ -29,6 +31,7 @@ export interface CandidateListStateModel {
   defaults: {
     isCandidateLoading: false,
     candidateList: null,
+    IRPCandidateList: null,
     listOfSkills: null,
     listOfRegions: null
   },
@@ -38,6 +41,11 @@ export class CandidateListState {
   @Selector()
   static candidates(state: CandidateListStateModel): CandidateList | null {
     return state.candidateList;
+  }
+
+  @Selector()
+  static IRPCandidates(state: CandidateListStateModel): IRPCandidateList | null {
+    return state.IRPCandidateList;
   }
 
   @Selector()
@@ -64,6 +72,24 @@ export class CandidateListState {
       }),
       catchError((error: HttpErrorResponse) => {
         patchState({ isCandidateLoading: false, candidateList: null });
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
+  }
+
+  @Action(GetIRPCandidatesByPage, { cancelUncompleted: true })
+  GetIRPCandidatesByPage(
+    { patchState, dispatch }: StateContext<CandidateListStateModel>,
+    { payload }: GetIRPCandidatesByPage
+  ): Observable<IRPCandidateList | unknown> {
+    patchState({ isCandidateLoading: true });
+    return this.candidateListService.getIRPCandidates(payload).pipe(
+      tap((payload) => {
+        patchState({ isCandidateLoading: false, IRPCandidateList: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        patchState({ isCandidateLoading: false, IRPCandidateList: null });
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
       })
     );

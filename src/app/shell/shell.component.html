@@ -1,8 +1,10 @@
 <div class="header" [class.expanded]="sidebar?.isOpen || false">
   <div class="header-item">
     <div class="header-item__sidebar-menu" *ngIf="isMobile$ | async" (click)="toggleMobileSidebar()"></div>
-    <i-feather *ngIf="(headerState$ | async)?.iconName" name="{{ (headerState$ | async)?.iconName }}" class="icon"></i-feather>
-    <h1>{{ (headerState$ | async)?.title }}</h1>
+    <ng-container *ngIf="(headerState$ | async) as headerState">
+      <i-feather name="{{ headerState?.iconName }}" class="icon"></i-feather>
+      <h1>{{ headerState?.title }}</h1>
+    </ng-container>
   </div>
 
   <div class="stick-right header-content">
@@ -110,12 +112,12 @@
 
     <aside class="secondary-container">
       <section class="misc">
-        <section class="edu-faq">
+        <!--section class="edu-faq"> TODO: hidden until implemented
           <a href="" class="icon-container" (click)="false">
             <i-feather name="settings" class="icon"></i-feather>
             <span class="e-text">Settings</span>
           </a>
-        </section>
+        </!--section-->
       </section>
       <section class="username sidebar-item">
         <div class="header-item header-item__inner" *ngIf="isMobile$ | async">
