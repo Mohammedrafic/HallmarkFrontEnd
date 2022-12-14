@@ -60,7 +60,6 @@ import { TimesheetsTabsComponent } from './components/timesheets-tabs/timesheets
 import { AddDialogHelperService, DateWeekService } from '@core/services';
 import { AttachmentsModule } from '@shared/components/attachments';
 import { AddDialogHelper } from '@core/helpers';
-import { UploadButtonComponent } from './components/upload-button/upload-button.component';
 import { FileUploaderModule } from '@shared/components/file-uploader/file-uploader.module';
 import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
 import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
@@ -74,6 +73,7 @@ import { TableStatusCellModule } from '@shared/components/table-status-cell/tabl
 import { UploadDocumentsComponent } from './components/upload-documents/upload-documents.component';
 import { TimesheetDetailsTableService } from './services';
 import { SwitchEditorComponent } from './components/cell-editors/switch-editor/switch-editor.component';
+import { UploadFileAreaModule } from '@shared/components/upload-file-area/upload-file-area.module';
 
 const gridIcons = {
   MessageSquare,
@@ -123,7 +123,6 @@ const gridIcons = {
     ProfileMilesComponent,
     InputEditorComponent,
     TimesheetsTabsComponent,
-    UploadButtonComponent,
     RecordStatusCellComponent,
     UploadDocumentsComponent,
     SwitchEditorComponent,
@@ -168,6 +167,7 @@ const gridIcons = {
         RejectReasonInputDialogModule,
         TableStatusCellModule,
         TooltipContainerModule,
+        UploadFileAreaModule
     ],
   exports: [TimesheetsContainerComponent],
   providers: [
