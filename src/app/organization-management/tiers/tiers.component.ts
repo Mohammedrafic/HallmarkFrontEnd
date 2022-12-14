@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 
 import { Actions, ofActionDispatched, Select, Store } from "@ngxs/store";
 import { filter, Observable, switchMap, takeUntil } from 'rxjs';
@@ -50,6 +50,7 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
     protected override store: Store,
     private actions$: Actions,
     private confirmService: ConfirmService,
+    private cd: ChangeDetectorRef,
   ) {
     super(store);
   }
@@ -146,7 +147,10 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
         this.showSystemButtons = !!organization.preferences.isIRPEnabled
           && !!organization.preferences.isVMCEnabled
           && !isMspUser;
-        this.selectedSystemType = this.showSystemButtons ? SystemType.IRP : SystemType.VMS;
+        this.selectedSystemType = this.showSystemButtons || !!organization.preferences.isIRPEnabled
+          ? SystemType.IRP
+          : SystemType.VMS;
+        this.cd.markForCheck();
     });
   }
 }

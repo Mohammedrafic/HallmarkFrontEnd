@@ -10,8 +10,7 @@ import {
   TimesheetsFilterState, TimesheetRecordsDto, CostCentersDto,
   AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, TabCountConfig, RawTimsheetRecordsDto, AddRecordBillRate
 } from '../interface';
-import { CostCenterAdapter } from '../helpers';
-import { RecordsAdapter } from '../helpers';
+import { CostCenterAdapter, RecordsAdapter } from '../helpers';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 
@@ -117,7 +116,7 @@ export class TimesheetsApiService {
           text: item.billRateConfig.title,
           value: item.billRateConfig.id,
           efectiveDate: item.effectiveDate,
-        }
+        };
       })),
     );
   }
@@ -128,7 +127,8 @@ export class TimesheetsApiService {
     organizationId: number | null = null,
   ): Observable<void> {
     if(organizationId) {
-      return this.http.post<void>(`/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files`, formData);
+      return this.http.post<void>(`/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files`,
+      formData);
     }
     return this.http.post<void>(`/api/TimesheetRecords/${timesheetRecordId}/files`, formData);
   }
@@ -139,7 +139,8 @@ export class TimesheetsApiService {
     organizationId: number | null = null,
   ): Observable<void> {
     if(organizationId) {
-      return this.http.delete<void>(`/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files/${fileId}`);
+      return this.http.delete<void>(
+        `/api/TimesheetRecords/${timesheetRecordId}/organizations/${organizationId}/files/${fileId}`);
     }
     return this.http.delete<void>(`/api/TimesheetRecords/${timesheetRecordId}/files/${fileId}`);
   }
