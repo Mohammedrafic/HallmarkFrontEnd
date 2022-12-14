@@ -277,29 +277,21 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       const orgId = this.filterService.canPreserveFilters() ? (preservedOrgIds[0]
         || this.getOrganizationIdFromState() || res[0].id) : (this.getOrganizationIdFromState() || res[0].id);
 
-
-
-
       this.store.dispatch(new Timesheets.SelectOrganization(orgId));
-
       this.organizationControl.setValue(orgId, { emitEvent: false });
 
       if (preservedFilters && this.filterService.canPreserveFilters()) {
-
         this.store.dispatch([
           new Timesheets.UpdateFiltersState({ organizationId: orgId,
             regionsIds: [...preservedFilters.regions], locationIds: [...preservedFilters.locations] },
             this.activeTabIdx !== 0),
           new Timesheets.GetFiltersDataSource(),
         ]);
-
       } else {
-
         this.store.dispatch([
           new Timesheets.UpdateFiltersState({ organizationId: orgId }, this.activeTabIdx !== 0),
           new Timesheets.GetFiltersDataSource(),
         ]);
-
       }
     });
   }
