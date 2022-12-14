@@ -212,13 +212,11 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     const idStream = this.isAgency ? this.agencyId$ : this.organizationId$;
 
     if (this.filterService.canPreserveFilters()) {
-      combineLatest([
-        idStream,
-        this.preservedFilters$,
-      ])
+      this.preservedFilters$
       .pipe(
+        switchMap(() => idStream),
         debounceTime(600),
-        filter((values) => !!values[0]),
+        filter((id) => !!id),
         takeUntil(this.componentDestroy()),
       ).subscribe(() => {
         this.store.dispatch(new Timesheets.ResetFiltersState());
