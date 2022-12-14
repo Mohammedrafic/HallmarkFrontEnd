@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { HtmlEditorService, ImageService, LinkService, RichTextEditorComponent, TableService, ToolbarService, ToolbarType } from '@syncfusion/ej2-angular-richtexteditor';
-import { Observable, Subject, takeWhile } from 'rxjs';
+import { Observable, Subject, takeWhile, filter } from 'rxjs';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { BUSINESS_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS, toolsRichTextEditor, User_DATA_FIELDS } from '../../alerts.constants';
 import { Actions, Select, Store } from '@ngxs/store';
@@ -17,6 +17,8 @@ import { AppState } from 'src/app/store/app.state';
 import { AlertsState } from '@admin/store/alerts.state';
 import { UserSubscriptionFilters, UserSubscriptionPage } from '@shared/models/user-subscription.model';
 import { BUSINESS_UNITS_VALUES } from '@shared/constants/business-unit-type-list';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { AgencyUserType, OrganizationUserType } from '@admin/alerts/group-email.enum';
 
 @Component({
   selector: 'app-send-group-email',
@@ -75,6 +77,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   defaultBusinessValue: any;
   defaultUserValue: any;
   defaultValue: number;
+  defaultUserType: number = 1;
   public userGuid: string = "";
   private filters: UserSubscriptionFilters = {};
   public unsubscribe$: Subject<void> = new Subject();
@@ -84,6 +87,9 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
   public uploaderErrorMessageElement: HTMLElement;
   public file: any;
   public files: File[] = [];
+  public commonFields: FieldSettingsModel = { text: 'name', value: 'value' };
+  public userType: any = [];
+  public filteredUserType: any = [];
   @ViewChild('filesUploaderGroupEmail') uploadObj: UploaderComponent;
 
   constructor(private actions$: Actions,
@@ -154,6 +160,23 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
       }
     });
 
+    var agencyUserTypes = Object.keys(AgencyUserType);
+    agencyUserTypes.forEach((v, i) => {
+      if(i > (agencyUserTypes.length / 2) - 1) {
+        var val = parseInt(agencyUserTypes[i - (agencyUserTypes.length / 2)]);
+        this.userType.push({ name: v, value: val, isAgency: true})
+      }
+    });
+
+    var orgUserTypes = Object.keys(OrganizationUserType);
+    orgUserTypes.forEach((v, i) => {
+      if(i > (orgUserTypes.length / 2) - 1) {
+        var val = parseInt(orgUserTypes[i - (orgUserTypes.length / 2)]);
+        this.userType.push({ name: v, value: val, isAgency: false})
+      }
+    });
+
+    console.log(this.userType);
   }
   ngOnDestroy(): void {
     this.unsubscribe$.next();
@@ -207,6 +230,17 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
         this.dispatchNewPage(null);
 
         this.store.dispatch(new GetBusinessByUnitType(value));
+        console.log(value);
+        this.filteredUserType = [];
+        if(value == 3) {
+          this.filteredUserType = this.userType.filter((i:any)=>i.isAgency == false);
+          //.map((j:any) => {j.name, j.value});
+        }
+        if(value == 4) {
+          this.filteredUserType = this.userType.filter((i:any)=>i.isAgency == true);
+          //.map((j:any) => {j.name, j.value});
+        }
+        console.log(this.filteredUserType);
         if (value == 1) {
           this.dispatchUserPage([]);
         }
@@ -234,7 +268,7 @@ export class SendGroupEmailComponent extends AbstractGridConfigurationComponent 
       this.dispatchNewPage(null);
       let businessUnitIds = [];
       if (value != 0 && value != null) {
-        businessUnitIds.push(this.businessControl.value);
+        businessUnitIds.push(this.businessControl.value);        
       }
       this.dispatchUserPage(businessUnitIds);
     }

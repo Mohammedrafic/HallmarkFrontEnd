@@ -26,10 +26,20 @@
               </ejs-dropdownlist>
             </div>
           </div>
-
           <div class="dropdown-container">
             <div class="input-group dropdown">
-
+              <ejs-dropdownlist appValidateWithMessage
+                                formControlName="userType"
+                                [fields]="commonFields"
+                                [dataSource]="filteredUserType"
+                                [value]="defaultUserType"
+                                [allowFiltering]="true"
+                                placeholder="User Type">
+              </ejs-dropdownlist>
+            </div>
+          </div>
+          <div class="dropdown-container">
+            <div class="input-group dropdown">
               <ejs-multiselect mode="CheckBox"
                                formControlName="user"
                                [placeholder]='placeholderValue'
@@ -43,6 +53,21 @@
               </ejs-multiselect>
             </div>
           </div>
+          <!-- <div class="dropdown-container">
+            <div class="input-group dropdown">
+              <ejs-multiselect mode="CheckBox"
+                               formControlName="candidate"
+                               [placeholder]='placeholderValue'
+                               [allowFiltering]="true"
+                               [showDropDownIcon]="true"
+                               appValidateWithMessage
+                               [fields]="userDataFields"
+                               [dataSource]="candidateData"
+                               [selectAllText]='allOption'
+                               showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div> -->
         </div>
         <div class="input-container bootstrap top-container">
 
