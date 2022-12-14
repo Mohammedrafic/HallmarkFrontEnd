@@ -646,7 +646,7 @@ export class TimesheetsState {
       catchError((err: HttpErrorResponse) => dispatch(
         new ShowToast(MessageTypes.Error, getAllErrors(err.error))
       )),
-    )
+    );
   }
 
   @Action(Timesheets.GetOrganizations)
