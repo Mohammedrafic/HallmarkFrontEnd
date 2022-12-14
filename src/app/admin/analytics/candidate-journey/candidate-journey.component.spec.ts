@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FillRateComponent } from './fillrate.component';
+import { CandidateJourneyComponent } from './candidate-journey.component';
 
-describe('FillRateComponent', () => {
-  let component: FillRateComponent;
-  let fixture: ComponentFixture<FillRateComponent>;
+describe('CandidateJourneyComponent', () => {
+  let component: CandidateJourneyComponent;
+  let fixture: ComponentFixture<CandidateJourneyComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [FillRateComponent ]
+      declarations: [CandidateJourneyComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FillRateComponent);
+    fixture = TestBed.createComponent(CandidateJourneyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
