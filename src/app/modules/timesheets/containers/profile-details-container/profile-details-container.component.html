@@ -12,7 +12,7 @@
   <ng-template #content>
     <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails; else closeTemplate" #resize>
       <div class="profile-details">
-        <div class="profile-details__wraper">
+        <div class="profile-details__wraper" #uploadMobileContainer>
           <div class="profile-details__info-container">
             <div class="profile-details__info">
               <img
@@ -39,7 +39,7 @@
           </div>
 
           <div class="profile-details__header-controls">
-            <div style="display: flex; align-items: center" class="timesheet-details-upload-container" #uploadContainer>
+            <div class="profile-details__upload-container" #uploadContainer>
               <app-date-week-picker
                 *ngIf="!isMobile"
                 [initDates]="weekPeriod"
@@ -48,13 +48,44 @@
               >
               </app-date-week-picker>
 
-              <app-upload-button
-                *ngIf="!responsiveTablet; else tabletButton"
-                [disabled]="disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
-                [hasPermission]="hasEditTimesheetRecordsPermission"
-                [container]="uploadContainer"
+              <app-tooltip-container
+                [showToolTip]="!hasEditTimesheetRecordsPermission"
+                [class.hide-elem]="isSmallTabletScreen"
+              >
+                <button
+                  #uploadBtn
+                  ejs-button
+                  cssClass="e-outline"
+                  class="profile-details__upload-button"
+                  [disabled]="disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
+                  (click)="openFileUploadArea()"
+                >
+                  Upload
+                  <i-feather name="upload" class="icon"></i-feather>
+                </button>
+              </app-tooltip-container>
+
+              <app-tooltip-container *ngIf="isSmallTabletScreen" [showToolTip]="!hasEditTimesheetRecordsPermission">
+                <button
+                  ejs-dropdownbutton
+                  iconCss="e-icons"
+                  cssClass="e-caret-hide primary-icon-button menu-mobile"
+                  [items]="mobileMenu"
+                  [disabled]="disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
+                  (select)="onMobileMenuSelect($event)"
+                >
+                  <i-feather name="more-vertical" class="icon"></i-feather>
+                </button>
+              </app-tooltip-container>
+
+              <app-upload-file-area
+                [container]="isMobile ? uploadMobileContainer : uploadContainer"
+                [excludeElement]="uploadBtn.element"
+                [maxFileSize]="maxFileSize"
+                [allowedFileExtensions]="allowedFileExtensions"
                 (filesSelected)="onFilesSelected($event)"
-              ></app-upload-button>
+              >
+              </app-upload-file-area>
 
               <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
               <app-export-button
@@ -64,18 +95,6 @@
                 (customExport)="showCustomExportDialog()"
               ></app-export-button>
             </div>
-            <ng-template #tabletButton>
-              <button
-                ejs-dropdownbutton
-                [items]="mobileMenu"
-                [disabled]="disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
-                (select)="onMobileMenuSelect($event)"
-                iconCss="e-icons"
-                cssClass="e-caret-hide primary-icon-button menu-mobile"
-              >
-                <i-feather name="more-vertical" class="icon"></i-feather>
-              </button>
-            </ng-template>
 
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="handleProfileClose()">
               <i-feather name="x" class="icon"></i-feather>

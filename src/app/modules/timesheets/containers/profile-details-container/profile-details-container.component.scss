@@ -68,6 +68,16 @@ $chip-margin: 8px;
     margin-top: 10px;
   }
 
+  &__upload-container {
+    display: flex;
+    align-items: center;
+  }
+
+  &__upload-button {
+    margin-left: 12px;
+    margin-right: 8px;
+  }
+
   .e-chip {
     width: auto;
 
@@ -255,6 +265,10 @@ app-navigation-panel {
   align-items: center;
   justify-content: flex-start;
   max-width: 87%;
+}
+
+.hide-elem {
+  display: none;
 }
 
 @media (max-width: $tablet-max) {
