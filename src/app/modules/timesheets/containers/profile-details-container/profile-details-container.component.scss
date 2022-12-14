@@ -271,7 +271,7 @@ app-navigation-panel {
   display: none;
 }
 
-@media (max-width: $tablet-max) {
+@media #{$max-tablet} {
   .profile-hours-statistics {
     flex-wrap: wrap;
     gap: 12px;
@@ -284,5 +284,11 @@ app-navigation-panel {
     .miles {
       margin: 0 !important;
     }
+  }
+}
+
+@media #{$max-mobile} {
+  .profile-hours-statistics {
+    flex-direction: column;
   }
 }

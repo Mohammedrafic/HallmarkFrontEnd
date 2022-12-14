@@ -140,6 +140,7 @@
 @media (max-width: $tablet-max) {
   .profile-hours-statistics-container {
     flex-wrap: wrap;
+    padding-bottom: 20px;
 
     .week-hours-chart {
       width: 120px;
@@ -153,9 +154,27 @@
       flex-grow: 1;
       padding: 0 !important;
 
-      table {
-        width: 100%;
-        padding-left: 20px;
+      .legend-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        table {
+          width: 80%;
+          padding-left: 20px;
+        }
+      }
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  .profile-hours-statistics-container {
+    flex-direction: column;
+
+    section {
+      &.cumulative-hours {
+        padding-left: 0;
       }
     }
   }
