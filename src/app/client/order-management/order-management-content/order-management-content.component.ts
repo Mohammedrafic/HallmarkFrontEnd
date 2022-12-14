@@ -1,5 +1,13 @@
 import { DatePipe, Location } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -23,12 +31,15 @@ import {
   LockUpdatedSuccessfully,
   ReloadOrganisationOrderCandidatesLists,
   SelectNavigationTab,
-  SetLock
+  SetLock,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Permission } from '@core/interface';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { GetAssignedSkillsByOrganization, GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
+import {
+  GetAssignedSkillsByOrganization,
+  GetOrganizationSettings,
+} from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
@@ -46,9 +57,14 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementChild,
-  OrderManagementPage
+  OrderManagementPage,
 } from '@shared/models/order-management.model';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import {
+  OrganizationDepartment,
+  OrganizationLocation,
+  OrganizationRegion,
+  OrganizationStructure,
+} from '@shared/models/organization.model';
 import { Skill } from '@shared/models/skill.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { FilterService } from '@shared/services/filter.service';
@@ -66,7 +82,7 @@ import {
   Subscription,
   take,
   takeUntil,
-  throttleTime
+  throttleTime,
 } from 'rxjs';
 import { CandidatesStatusText, FilterOrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import {
@@ -75,7 +91,7 @@ import {
   ShowExportDialog,
   ShowFilterDialog,
   ShowSideDialog,
-  ShowToast
+  ShowToast,
 } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
@@ -93,7 +109,7 @@ import {
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
-  ROW_HEIGHT
+  ROW_HEIGHT,
 } from './order-management-content.constants';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -101,7 +117,9 @@ import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { SearchComponent } from '@shared/components/search/search.component';
 import { OrderStatus } from '@shared/enums/order-management';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
-import { TabNavigationComponent } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
+import {
+  TabNavigationComponent,
+} from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
 import { OrderDetailsDialogComponent } from '@client/order-management/order-details-dialog/order-details-dialog.component';
 import isNil from 'lodash/fp/isNil';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
@@ -130,7 +148,7 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
   templateUrl: './order-management-content.component.html',
   styleUrls: ['./order-management-content.component.scss'],
   providers: [VirtualScrollService, DetailRowService, MaskedDateTimeService],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderManagementContentComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') override gridWithChildRow: GridComponent;
@@ -239,8 +257,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public selectedCandidate: any | null;
   public selectedReOrder: any | null;
   public openChildDialog = new Subject<any>();
-  public isRowScaleUp: boolean = true;
-  public isSubrowDisplay: boolean = false;
+  public isRowScaleUp = true;
+  public isSubrowDisplay = false;
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
   public orderStatus = OrderStatus;
   public reOrderCount$ = new Subject<number>();
@@ -1281,7 +1299,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.filterColumns.locationIds.dataSource = [];
         selectedRegions.forEach((region) => {
           region.locations?.forEach((location) => (location.regionName = region.name));
-          locations.push(...region.locations as [])
+          locations.push(...region.locations as []);
         });
         this.filterColumns.locationIds.dataSource.push(...sortByField(locations, 'name'));
       } else {
@@ -1414,7 +1432,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public getMoreMenu(order: OrderManagement): ItemModel[] {
     const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
     if (orderStatuses.includes(OrderStatus.InProgressOfferAccepted)) {
-      if (Boolean(order.children?.some((child) => orderStatuses.includes(child.orderStatus)))) {
+      if (order.children?.some((child) => orderStatuses.includes(child.orderStatus))) {
         return order.orderType === OrderType.OpenPerDiem ? this.moreMenuWithCloseButton : this.moreMenu;
       }
     }
@@ -1422,7 +1440,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public getMenuForReorders(order: OrderManagement): ItemModel[] {
-    if (Boolean(order.children?.some((child) => OrderStatus.Filled === child.orderStatus))) {
+    if (order.children?.some((child) => OrderStatus.Filled === child.orderStatus)) {
       return this.filledReOrdersMenu;
     }
 
@@ -1589,7 +1607,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private handleRedirectFromQuickOrderToast(): void {
     if (this.isRedirectedFromToast) {
-      let prefix = this.prefix || '';
+      const prefix = this.prefix || '';
       this.orderManagementService.orderId$.next({ id: this.quickOrderId, prefix: prefix });
     }
   }
@@ -1643,7 +1661,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     ];
 
     this.filledReOrdersMenu = [
-      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder }
+      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
     ];
 
     this.closedOrderMenu = [{ text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder }];
@@ -1663,7 +1681,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         ...this.selectedCandidate,
         actualStartDate: data.actualStartDate,
         actualEndDate: data.actualEndDate,
-      }})
+      };});
   }
 
   private dispatchAgencyOrderCandidatesList(orderId: number, organizationId: number): void {

@@ -5,12 +5,13 @@
       [id]="button.id"
       name="font"
       [value]="button.title"
-      [checked]="button.active" />
+      [checked]="button.active"
+      [disabled]="button.disabled" />
     <label
       [class.active]="button.active"
       class="e-btn"
       [for]="button.id"
-      (click)="btnClick(button)">
+      (click)="!button.disabled ? btnClick(button) : null">
         {{ button.title }}
     </label>
   </ng-container>

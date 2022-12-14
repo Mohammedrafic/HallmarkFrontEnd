@@ -7,7 +7,7 @@ import {
   Order,
   OrderFilter,
   OrderManagement,
-  OrderManagementFilter
+  OrderManagementFilter,
 } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
@@ -18,6 +18,11 @@ import { ImportedOrder, OrderImportResult } from '@shared/models/imported-order.
 
 export class GetOrders {
   static readonly type = '[order management] Get Orders';
+  constructor(public payload: OrderManagementFilter | object, public isIncomplete?: boolean | undefined) {}
+}
+
+export class GetIRPOrders {
+  static readonly type = '[order management] Get IRP Orders';
   constructor(public payload: OrderManagementFilter | object, public isIncomplete?: boolean | undefined) {}
 }
 

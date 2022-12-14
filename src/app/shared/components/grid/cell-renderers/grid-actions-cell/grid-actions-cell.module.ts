@@ -5,8 +5,9 @@ import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 
 import {
-  GridActionsCellComponent
+  GridActionsCellComponent,
 } from '@shared/components/grid/cell-renderers/grid-actions-cell/grid-actions-cell.component';
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import {
   imports: [
     CommonModule,
     ButtonModule,
-    FeatherModule
+    FeatherModule,
+    MatMenuModule
   ]
 })
 export class GridActionsCellModule {

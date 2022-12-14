@@ -23,7 +23,7 @@ import {
   GetAssociateAgencies,
   GetAvailableSteps,
   GetContactDetails,
-  GetHistoricalData,
+  GetHistoricalData, GetIRPOrders,
   GetOrderById,
   GetOrderByIdSucceeded,
   GetOrderFilterDataSources,
@@ -63,7 +63,7 @@ import {
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
   ApplicantStatus,
-  GetPredefinedBillRatesData,
+  GetPredefinedBillRatesData, IRPOrderManagementPage,
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
@@ -108,9 +108,11 @@ import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { OrderImportService } from '@client/order-management/order-import/order-import.service';
 import { OrderImportResult } from '@shared/models/imported-order.model';
+import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
+  IRPOrdersPage: IRPOrderManagementPage | null;
   selectedOrder: Order | null;
   candidatesJob: OrderCandidateJob | null;
   applicantStatuses: ApplicantStatus[];
@@ -142,6 +144,7 @@ export interface OrderManagementContentStateModel {
   name: 'orderManagement',
   defaults: {
     ordersPage: null,
+    IRPOrdersPage: null,
     selectedOrder: null,
     orderCandidatesListPage: null,
     candidatesJob: null,
@@ -178,6 +181,11 @@ export class OrderManagementContentState {
   @Selector()
   static ordersPage(state: OrderManagementContentStateModel): OrderManagementPage | null {
     return state.ordersPage;
+  }
+
+  @Selector()
+  static IRPOrdersPage(state: OrderManagementContentStateModel): IRPOrderManagementPage | null {
+    return state.IRPOrdersPage;
   }
 
   @Selector()
@@ -330,6 +338,7 @@ export class OrderManagementContentState {
 
   constructor(
     private orderManagementService: OrderManagementContentService,
+    private orderManagementIrpApiService: OrderManagementIrpApiService,
     private projectsService: ProjectsService,
     private departmentService: DepartmentsService,
     private rejectReasonService: RejectReasonService,
@@ -356,6 +365,20 @@ export class OrderManagementContentState {
             patchState({ ordersPage: payload });
           })
         );
+  }
+
+  @Action(GetIRPOrders, { cancelUncompleted: true })
+  GetIRPOrders(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { payload, isIncomplete }: GetIRPOrders
+  ): Observable<IRPOrderManagementPage> {
+    patchState({ IRPOrdersPage: null });
+    return this.orderManagementIrpApiService.getOrders(payload).pipe(
+      tap((payload) => {
+        patchState({ IRPOrdersPage: payload });
+        return payload;
+      })
+    );
   }
 
   @Action(ClearOrders)

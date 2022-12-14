@@ -11,9 +11,12 @@ import { ICellRendererParams } from '@ag-grid-community/core';
 })
 export class TableStatusCellComponent implements ICellRendererAngularComp {
   public cellValue: string;
+  public isEChipShown = false;
 
   agInit(params: ICellRendererParams): void {
     this.cellValue = params.value;
+
+    this.isEChipShown = params.data?.extensionFromId;
   }
 
   refresh(params: ICellRendererParams): boolean {

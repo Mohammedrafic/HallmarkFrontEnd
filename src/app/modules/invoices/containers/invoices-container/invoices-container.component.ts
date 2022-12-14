@@ -133,7 +133,7 @@ export class InvoicesContainerComponent extends InvoicesPermissionHelper impleme
     groupInvoicesOverlayVisible: false,
     addPaymentOpen: false,
   };
- 
+
   public paymentRecords: InvoicePaymentData[] = [];
 
   constructor(

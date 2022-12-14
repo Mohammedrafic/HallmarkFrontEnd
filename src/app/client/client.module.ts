@@ -30,7 +30,7 @@ import {
   Upload,
   User,
   X,
-  XCircle
+  XCircle,
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -42,7 +42,7 @@ import {
   PageService,
   ResizeService,
   SortService,
-  ToolbarService
+  ToolbarService,
 } from '@syncfusion/ej2-angular-grids';
 import { ButtonModule, CheckBoxModule, ChipListModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownButtonAllModule, DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
@@ -178,7 +178,7 @@ const gridIcons = {
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
     ExtensionModule,
     ImportDialogContentModule,
-    ListBoxModule
+    ListBoxModule,
   ],
   providers: [
     ResizeService,

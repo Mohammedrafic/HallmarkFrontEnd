@@ -8,11 +8,11 @@ import { GridActionsCellConfig, GridActionsCellItem } from './grid-actions-cell-
 @Component({
   selector: 'app-grid-actions-cell',
   templateUrl: './grid-actions-cell.component.html',
-  styleUrls: ['./grid-actions-cell.component.scss']
+  styleUrls: ['./grid-actions-cell.component.scss'],
 })
 export class GridActionsCellComponent extends GridCellRenderer<GridActionsCellConfig & ICellRendererParams> {
   public actionsConfig: GridActionsCellItem[];
-  public data: unknown;
+  public data: unknown | any;
 
   public override agInit(params: GridActionsCellConfig & ICellRendererParams) {
     super.agInit(params);

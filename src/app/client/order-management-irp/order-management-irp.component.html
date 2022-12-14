@@ -1,0 +1,97 @@
+<app-page-toolbar>
+  <ng-container left>
+    <app-button-group [buttonOptions]="systemGroupConfig" (buttonChange)="buttonGroupChange($event)"></app-button-group>
+  </ng-container>
+  <ng-container right>
+    <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
+    <button
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      cssClass="e-outline button-template">
+        <div class="filter-button-content">
+          Templates <i-feather name="clipboard" class="icon"></i-feather>
+        </div>
+    </button>
+    <button
+      ejs-button
+      appHideBeforeSyncfusionLoad
+      cssClass="e-outline button-filter"
+      (click)="showFilters()">
+      <div class="filter-button-content">
+        <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">
+          {{ filteredItems.length}}
+        </span>
+        Filters <i-feather name="sliders" class="icon"></i-feather>
+      </div>
+    </button>
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
+      <button
+        [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        (click)="openImportDialog()"
+        class="e-outline"
+      >
+        <div class="button-import-container">Import<i-feather name="upload" class="icon"></i-feather></div>
+      </button>
+    </app-tooltip-container>
+
+    <button
+      ejs-dropdownbutton
+      appHideBeforeSyncfusionLoad
+      [items]="exportOptions"
+      (select)="exportSelected($event)"
+      id="importButton"
+      cssClass="e-outline button-export"
+    >
+      <div class="button-export-container">Export<i-feather name="download" class="icon"></i-feather></div>
+    </button>
+    <app-tooltip-container
+      [message]="toolTipMessage"
+      [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
+      <button
+        [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
+        ejs-button
+        appHideBeforeSyncfusionLoad
+        [isPrimary]="true"
+        (click)="navigateToOrderForm()"
+      >
+        Create Order
+      </button>
+    </app-tooltip-container>
+  </ng-container>
+</app-page-toolbar>
+
+<app-tabs-list
+  *ngIf="activeSystem !== OrderManagementIRPSystemId.All; else helpText"
+  #tabNavigation
+  [tabConfig]="tabsListConfig"
+  (changeTab)="tabSelected($event)">
+</app-tabs-list>
+<ng-template #helpText>
+  <p class="help-text">Orders for the last 30 days</p>
+</ng-template>
+
+<div class="grid-table-container table-wrapper">
+  <ag-grid-angular
+    [columnDefs]="columnDefs"
+    [rowData]="(ordersPage$ | async)?.items"
+    [context]="context"
+    [gridOptions]="gridOptions"
+    [rowHeight]="rowHeight"
+    [modules]="modules"
+    [class.empty-table]="!(ordersPage$ | async)?.items?.length"
+    [overlayNoRowsTemplate]="gridEmptyMessage"
+    class="ag-theme-alpine app-grid__component"
+    (sortChanged)="gridSortHandler($event)">
+  </ag-grid-angular>
+  <app-grid-pagination
+    [currentPage]="currentPage"
+    [pageSize]="pageSize"
+    [totalRecordsCount]="(ordersPage$ | async)?.totalCount || 0"
+    (navigateToPageEmitter)="gridPageChanged($event)"
+    (pageSizeChangeEmitter)="gridPerPageChanged($event)"
+  ></app-grid-pagination>
+</div>

@@ -1,0 +1,9 @@
+<ejs-tooltip
+  *ngIf="orderType"
+  id="tooltip"
+  [content]="orderType"
+  position="TopCenter">
+    <span class="e-badge e-badge-primary e-badge-circle">
+      {{ orderType[0] }}
+    </span>
+</ejs-tooltip>
