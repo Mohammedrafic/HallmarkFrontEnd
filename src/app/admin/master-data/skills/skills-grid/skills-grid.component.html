@@ -83,7 +83,6 @@
 
 <app-export-dialog *ngIf="isActive" [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
-
 <app-filter-dialog *ngIf="isActive" [items]="filteredItems" [count]="(masterSkills$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
   <form class="bootstrap" [formGroup]="skillFilterFormGroup">
     <div class="input-container">
@@ -108,7 +107,7 @@
         </ejs-multiselect>
       </div>
     </div>
-    <div class="input-container">
+    <div class="input-container" *ngIf="!isFeatureIrpEnabled">
       <label>Skill ABBR</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
@@ -162,7 +161,7 @@
     </div>
 
     <div>
-      <div class="input-container">
+      <div class="input-container" *ngIf="!isFeatureIrpEnabled">
         <label for="skillAbbr">Skill Abbr</label>
         <div class="input-group">
           <input class="e-input"

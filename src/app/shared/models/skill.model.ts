@@ -61,6 +61,7 @@ export class SkillFilters {
   orderBy?: string;
   includeInIRP?: boolean;
   includeInVMS?: boolean;
+  skillCode?: string;
 }
 
 export class MasterSkillFilters {

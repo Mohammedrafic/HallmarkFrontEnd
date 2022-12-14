@@ -19,7 +19,7 @@ export class ExportDialogComponent implements OnInit, OnDestroy {
 
   @ViewChild('chipList') chipList: ChipListComponent;
 
-  @Input() width: string = '496px';
+  @Input() width = '496px';
 
   @Input() set fileName(value: string) {
     this._fileName = value;

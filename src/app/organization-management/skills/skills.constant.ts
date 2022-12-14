@@ -5,19 +5,17 @@ import { SkillsSourceNames } from './skills.enum';
 import { SkillsFilterData, SkillsFormConfig } from './skills.interface';
 
 export const VmsSkillsColsExport: ExportColumn[] = [
-  { text:'Skill Category', column: 'SkillCategory_Name' },
+  { text: 'Skill Category', column: 'SkillCategory_Name' },
   { text: 'Skill Code', column: 'SkillCode'},
-  // { text:'Skill ABBR', column: 'SkillAbbr' },
-  { text:'Skill Description', column: 'SkillDescription' },
-  { text:'GL Number', column: 'GLNumber' },
-  { text:'Allow Onboard', column: 'AllowOnboard' },
-  { text:'Inactivate Date', column: 'InactiveDate' },
+  { text: 'Skill Description', column: 'SkillDescription' },
+  { text: 'GL Number', column: 'GLNumber' },
+  { text: 'Allow Onboard', column: 'AllowOnboard' },
+  { text: 'Inactivate Date', column: 'InactiveDate' },
 ];
 
 export const IrpSkillsColsExport: ExportColumn[] = [
   { text:'Skill Category', column: 'SkillCategory_Name' },
   { text: 'Skill Code', column: 'SkillCode'},
-  // { text:'Skill ABBR', column: 'SkillAbbr' },
   { text:'Skill Description', column: 'SkillDescription' },
   { text:'GL Number', column: 'GLNumber' },
   { text:'Allow Onboard', column: 'AllowOnboard' },
@@ -66,7 +64,7 @@ export const SkillsFilterConfig: SkillsFilterData = {
   },
 };
 
-export const DefaultSkillsDialogConfig: SkillsFormConfig[] = [
+export const VmsSkillsDialogConfig: SkillsFormConfig[] = [
   {
     field: 'skillCategoryId',
     title: 'Skill Category',
@@ -79,7 +77,7 @@ export const DefaultSkillsDialogConfig: SkillsFormConfig[] = [
     title: 'Skill Code',
     fieldType: FieldType.Input,
     maxLen: 200,
-    required: true,
+    required: false,
   },
   {
     field: 'skillDescription',
@@ -109,7 +107,7 @@ export const DefaultSkillsDialogConfig: SkillsFormConfig[] = [
   },
 ];
 
-export const irpSkillsDialogConfig: SkillsFormConfig[] = [
+export const IrpSkillsDialogConfig: SkillsFormConfig[] = [
   {
     field: '',
     title: 'Select System',
@@ -138,7 +136,7 @@ export const irpSkillsDialogConfig: SkillsFormConfig[] = [
     title: 'Skill Code',
     fieldType: FieldType.Input,
     maxLen: 200,
-    required: true,
+    required: false,
   },
   {
     field: 'skillDescription',

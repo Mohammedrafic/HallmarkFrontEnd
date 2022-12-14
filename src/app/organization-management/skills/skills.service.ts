@@ -14,7 +14,8 @@ export class SkillsService {
       id: [0],
       isDefault: [false],
       masterSkillId: [null],
-      skillCode: ['', [Validators.required, Validators.minLength(3)]],
+      skillAbbr: ['', [Validators.minLength(3)]],
+      skillCode: ['', [Validators.maxLength(200)]],
       skillCategoryId: ['', [Validators.required, Validators.minLength(3)]],
       skillDescription: ['', [ Validators.required, Validators.minLength(3) ]],
       glNumber: ['', [ Validators.minLength(3) ]],
@@ -34,6 +35,7 @@ export class SkillsService {
       allowOnboard: [],
       includeInIRP: [true],
       includeInVMS: [true],
+      skillCode: [],
     });
   }
 }

@@ -33,10 +33,8 @@ import {
   SetDirtyState,
 } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
-import {
-  DefaultSkillsDialogConfig, InactivateColFormat, IrpSkillsColsExport, irpSkillsDialogConfig,
-  SkillsFilterConfig, VmsSkillsColsExport,
-} from './skills.constant';
+import { InactivateColFormat, IrpSkillsColsExport, IrpSkillsDialogConfig,
+  SkillsFilterConfig, VmsSkillsColsExport, VmsSkillsDialogConfig } from './skills.constant';
 import { SkillCheckBoxGroup, SkillGridEventData, SkillsForm, SkillsFormConfig, SkillSources } from './skills.interface';
 import { SkillsService } from './skills.service';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
@@ -91,7 +89,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   
   openAssignSidebarSubject = new Subject<boolean>();
 
-  skillDialogConfig = DefaultSkillsDialogConfig;
+  skillDialogConfig = VmsSkillsDialogConfig;
 
   orgModuleSettings: OrginazationModuleSettings = {
     isFeatureIrpEnabled: false,
@@ -129,13 +127,13 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
 
   override ngOnInit(): void {
     super.ngOnInit();
-    this.getOrganizagionData();
     this.watchForOrgId();
     this.watchForPagination();
     this.getSkillCategories();
     this.watchForSaveDeleteAction();
     this.getSkillsCategories();
     this.getSkillfilterData();
+    this.getOrganizagionData();
   }
 
   /**
@@ -190,6 +188,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       allowOnboard: this.filters.allowOnboard || null,
       includeInIRP: this.filters.includeInIRP || null,
       includeInVMS: this.filters.includeInVMS || null,
+      skillCode: this.filters.skillCode || null,
     });
     this.filteredItems = this.filterService.generateChips(this.skillFilterForm, this.filterColumns);
   }
@@ -208,7 +207,14 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   }
 
   applyFilter(): void {
+    const { includeInIRP, includeInVMS } = this.skillFilterForm.getRawValue();
+
     this.filters = this.skillFilterForm.getRawValue();
+    /**
+     * IRP flags have to be converted to bool as BE does not work with null values.
+     */
+    this.filters.includeInIRP = !!includeInIRP;
+    this.filters.includeInVMS = !!includeInVMS;
     this.filteredItems = this.filterService.generateChips(this.skillFilterForm, this.filterColumns);
     this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
     this.store.dispatch(new ShowFilterDialog(false));
@@ -246,9 +252,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   editSkill(data: SkillGridEventData, event: MouseEvent): void {
     this.addActiveCssClass(event);
     this.title = 'Edit';
-    /**
-     * Add skill code here
-     */
+
     this.skillForm.patchValue({
       id: data.id,
       isDefault: data.masterSkill?.isDefault || false,
@@ -260,6 +264,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       inactiveDate: data.inactiveDate,
       includeInIRP: data.includeInIRP,
       includeInVMS: data.includeInVMS,
+      skillAbbr: data.masterSkill?.skillAbbr,
     });
     this.store.dispatch(new ShowSideDialog(true));
     this.changeControlsAvaliability(data.masterSkill?.isDefault as boolean);
@@ -360,10 +365,12 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   private changeControlsAvaliability(disable: boolean): void {
     if (disable) {
       this.skillForm.controls['skillCode'].disable();
+      this.skillForm.controls['skillAbbr'].disable();
       this.skillForm.controls['skillCategoryId'].disable();
       this.skillForm.controls['skillDescription'].disable();
     } else {
       this.skillForm.controls['skillCode'].enable();
+      this.skillForm.controls['skillAbbr'].enable();
       this.skillForm.controls['skillCategoryId'].enable();
       this.skillForm.controls['skillDescription'].enable();
     }
@@ -445,8 +452,8 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     this.organization$
     .pipe(
       filter(Boolean),
-      filter(() => this.orgModuleSettings.isFeatureIrpEnabled),
       delay(100),
+      filter(() => this.orgModuleSettings.isFeatureIrpEnabled),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((organization) => {
@@ -455,9 +462,16 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       && !!organization.preferences.isIRPEnabled && !isMspUser;
 
       if (this.orgModuleSettings.isIrpDisplayed) {
-        this.skillDialogConfig = irpSkillsDialogConfig;
+        this.skillDialogConfig = IrpSkillsDialogConfig;
         this.columnsToExport = IrpSkillsColsExport;
+      } else {
+        this.skillDialogConfig = VmsSkillsDialogConfig;
+        this.columnsToExport = VmsSkillsColsExport;
       }
+
+      this.grid.getColumnByField('system').visible = this.orgModuleSettings.isFeatureIrpEnabled
+      && this.orgModuleSettings.isIrpDisplayed;
+      this.grid.refreshColumns();
     });
   }
 

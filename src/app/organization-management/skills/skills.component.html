@@ -68,7 +68,7 @@
       </e-column>
       <e-column field="skillCategory.name" headerText="category" width=200></e-column>
       <e-column field="masterSkill.skillDescription" headerText="skill name" width=200></e-column>
-      <e-column field="includeInIRPText" headerText="System" width=200>
+      <e-column field="system" headerText="System" width=200>
         <ng-template #template let-data>
           <span>{{ data.system }}</span>
         </ng-template>
@@ -267,18 +267,18 @@
           placeholder="All"></ejs-multiselect>
       </div>
     </div>
-    <!-- <div class="input-container">
-      <label for="skillAbbr">Skill ABBR</label>
+    <div class="input-container">
+      <label for="skillAbbr">Skill Code</label>
       <div class="input-group dropdown">
-        <ejs-multiselect
-          mode="CheckBox"
-          [allowFiltering]="true"
-          [dataSource]="filterColumns.skillAbbrs.dataSource"
-          [showDropDownIcon]="true"
-          formControlName="skillAbbrs"
-          placeholder="All"></ejs-multiselect>
+        <input
+        class="e-input"
+        type="text"
+        maxlength="200"
+        appValidateWithMessage
+        name="skillCode"
+        formControlName="skillCode"/>
       </div>
-    </div> -->
+    </div>
     <div class="input-container">
       <label for="skillDescription">Skill Description</label>
       <div class="input-group dropdown">

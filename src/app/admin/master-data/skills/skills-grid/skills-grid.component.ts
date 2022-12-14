@@ -28,9 +28,10 @@ import {
 import { MasterSkillDataSources, MasterSkillFilters, Skill, SkillsPage } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
-import { SkillsFilterConfig } from './skills-grid.constant';
+import { AbbrExportColumn, MasterSkillExportCols, SkillsFilterConfig } from './skills-grid.constant';
 import { MasterSkillsService } from './skills-grid.service';
 import { MasterSkillsFilterForm, MasterSkillsForm } from './skills-grid.interface';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-skills-grid',
@@ -65,11 +66,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   public skillFormGroup: CustomFormGroup<MasterSkillsForm>;
   public skillFilterFormGroup: CustomFormGroup<MasterSkillsFilterForm>;
 
-  public columnsToExport: ExportColumn[] = [
-    { text:'Skill Category', column: 'SkillCategoryName'},
-    { text:'Skill ABBR', column: 'SkillAbbr'},
-    { text:'Skill Description', column: 'SkillDescription'},
-  ];
+  public columnsToExport: ExportColumn[] = MasterSkillExportCols;
   public fileName: string;
   public defaultFileName: string;
   public readonly userPermissions = UserPermissions;
@@ -81,6 +78,8 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
    };
   public filterColumns = SkillsFilterConfig;
 
+  public isFeatureIrpEnabled = false;
+
   constructor(private store: Store,
               private actions$: Actions,
               private confirmService: ConfirmService,
@@ -90,6 +89,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
     super();
     this.skillFormGroup = this.skillsService.createMasterSkillsForm();
     this.skillFilterFormGroup = this.skillsService.createMasterSkillsFilterForm();
+    this.setIrpFeatureFlag();
   }
 
   ngOnInit() {
@@ -172,7 +172,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
       isDefault: data.isDefault,
       skillAbbr: data.skillAbbr,
       skillCategoryId: data.skillCategory.id,
-      skillDescription: data.skillDescription
+      skillDescription: data.skillDescription,
     });
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -249,6 +249,14 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
       this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
       this.filterColumns.skillAbbreviations.dataSource = data.skillAbbreviations;
       this.filterColumns.skillDescriptions.dataSource = data.skillDescriptions;
+
+      if (this.isFeatureIrpEnabled) {
+        this.columnsToExport = MasterSkillExportCols;
+        this.grid.getColumnByField('skillAbbr').visible = !this.isFeatureIrpEnabled;
+        this.grid.refreshColumns();
+      } else {
+        this.columnsToExport = this.columnsToExport.concat([AbbrExportColumn]);
+      }
     });
   }
 
@@ -306,5 +314,9 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   private getMasterSkills(): void {
     this.store.dispatch([new GetMasterSkillsByPage(this.currentPage, this.pageSize, this.filters),
       new GetMasterSkillDataSources()]);
+  }
+
+  private setIrpFeatureFlag(): void {
+    this.isFeatureIrpEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
   }
 }

@@ -34,3 +34,8 @@ export interface MasterSkillsFilterForm {
   skillAbbreviations: string[];
   skillDescriptions: string[];
 }
+
+export interface MasterSkillExportColumn {
+  text: string;
+  column: string;
+}
