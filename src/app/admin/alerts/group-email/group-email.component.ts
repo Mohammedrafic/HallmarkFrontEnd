@@ -234,9 +234,11 @@ export class GroupEmailComponent extends AbstractGridConfigurationComponent impl
     this.groupEmailCloseDialog();
   }
 
-  public onGroupEmailSend(): void {    
+  public onGroupEmailSend(): void {
     this.sendGroupEmailFormGroup.markAllAsTouched();
-
+    if (this.sendGroupEmailFormGroup.invalid) {
+      return;
+    }
     if (this.groupEmailTemplateForm.emailBody!=''&&this.groupEmailTemplateForm.emailTo!=''&&this.groupEmailTemplateForm.emailSubject!='') {
       const formValues = this.groupEmailTemplateForm.groupEmailTemplateForm.getRawValue();
       const sendGroupEmailDto: SendGroupEmailRequest = {
