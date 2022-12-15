@@ -29,6 +29,7 @@ import {
   ApplyOrderApplicantsSucceed,
   ClearAgencyHistoricalData,
   ClearAgencyOrderCandidatesList,
+  ClearAgencyCandidateJob,
   ClearDeployedCandidateOrderInfo,
   ClearOrders,
   ExportAgencyOrders,
@@ -312,6 +313,11 @@ export class OrderManagementState {
         return payload;
       })
     );
+  }
+
+  @Action(ClearAgencyCandidateJob)
+  ClearAgencyCandidateJob({ patchState }: StateContext<OrderManagementModel>): void {
+    patchState({ candidatesJob: null });
   }
 
   @Action(UpdateAgencyCandidateJob)
