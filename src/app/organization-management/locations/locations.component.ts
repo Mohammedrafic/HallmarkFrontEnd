@@ -171,6 +171,9 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.store.dispatch(new GetLocationTypes());
     this.store.dispatch(new GetUSCanadaTimeZoneIds());
     this.store.dispatch(new GetAllBusinessLines());
+    this.store.dispatch(new GetRegions()).subscribe((data) => {
+      this.defaultValue = data.organizationManagement.regions[0]?.id as Region;
+    });
   }
 
   ngOnDestroy(): void {
@@ -624,11 +627,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         this.grid.getColumnByField('invoiceId').visible = this.isOrgVMSEnabled || !this.isFeatureIrpEnabled;
         this.grid.refreshColumns();
       }),
-      switchMap(() => this.store.dispatch(new GetRegions())),
-      takeUntil(this.componentDestroy()),
-    ).subscribe((data) => {
-      this.defaultValue = data.organizationManagement.regions[0]?.id as Region;
-    });
+    ).subscribe();
   }
 
   private populateFormOptions(): void {
