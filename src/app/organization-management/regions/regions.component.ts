@@ -24,6 +24,7 @@ import {
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
   RECORD_DELETE,
+  RECORD_SAVED,
 } from '@shared/constants';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -43,7 +44,7 @@ export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
   templateUrl: './regions.component.html',
   styleUrls: ['./regions.component.scss']
 })
-export class RegionsComponent extends AbstractGridConfigurationComponent  implements OnInit ,OnDestroy{
+export class RegionsComponent extends AbstractGridConfigurationComponent  implements OnInit, OnDestroy {
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
@@ -101,14 +102,14 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
   public columnsToExport: ExportColumn[] = [
     { text:'Region', column: 'Name'},
- 
+
   ];
   public fileName: string;
   public defaultFileName: string;
   private businessUnitId: number;
-  
+
   public filters: regionFilter = {
- 
+
     pageNumber: this.currentPage,
     pageSize: this.pageSizePager
   };
@@ -120,12 +121,12 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
   public orgStructure: OrganizationStructure;
   constructor(private store: Store,
-              @Inject(FormBuilder) private builder: FormBuilder,
-              private confirmService: ConfirmService,
-              private datePipe: DatePipe,
-              private filterService: FilterService,
-              private regionService:RegionService
-              ) {
+    @Inject(FormBuilder) private builder: FormBuilder,
+    private confirmService: ConfirmService,
+    private datePipe: DatePipe,
+    private filterService: FilterService,
+    private regionService:RegionService
+  ) {
     super();
 
     this.formBuilder = builder;
@@ -133,28 +134,28 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
   }
 
   ngOnInit(): void {
-    
+
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
       this.currentPage = page;
-     this.getRegions();
+      this.getRegions();
 
     });
 
     this.store.dispatch(new GetMasterRegions());
     this.masterRegions$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.masterRegion = data;
-   ;
+      ;
 
     });
     this.filterColumns = {
 
       names: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-     
+
     }
     this.regionFilterOptions$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(options => {
       this.filterColumns.id.dataSource = options.ids;
       this.filterColumns.name.dataSource = options.name;
-  
+
     });
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.businessUnitId = id;
@@ -164,9 +165,9 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(organization?.generalInformation?.country));
       this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
-      .subscribe((data) => {
-        this.defaultValue = data.organizationManagement.regions[0]?.id;
-      });;
+        .subscribe((data) => {
+          this.defaultValue = data.organizationManagement.regions[0]?.id;
+        });;
     });
 
     this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
@@ -232,7 +233,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
   public onFilterClose() {
     this.regionFilterFormGroup.setValue({
-      
+
       ids: this.filters?.ids || [],
 
     });
@@ -264,7 +265,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
 
     this.filters.pageNumber = this.currentPage,
-    this.filters.pageSize = this.pageSizePager
+      this.filters.pageSize = this.pageSizePager
 
     this.getRegions();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -276,7 +277,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     this.filters.pageSize = this.pageSize;
     this.store.dispatch([
       new GetRegions(this.filters),
-      
+
     ]);
   }
   onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -290,8 +291,8 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
   }
 
   onAddRegionClick(): void {
-      this.regionFormGroup.controls["region"].setValue('');
-      this.store.dispatch(new ShowSideDialog(true));
+    this.regionFormGroup.controls["region"].setValue([]);
+    this.store.dispatch(new ShowSideDialog(true));
   }
 
   hideDialog(): void {
@@ -300,7 +301,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
 
 
- onImportDataClick(): void {
+  onImportDataClick(): void {
     this.importDialogEvent.next(true);
   }
 
@@ -322,7 +323,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
   onEditButtonClick(region: Region, event: any): void {
     this.addActiveCssClass(event);
-    this.regionFormGroup.controls["region"].setValue(this.masterRegion.filter(i => i.name == region?.name)[0]?.id)
+    this.regionFormGroup.controls["region"].setValue([this.masterRegion.filter(i => i.name == region?.name)[0]?.id])
     this.editedRegionId = region?.id;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
@@ -330,7 +331,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
   onRemoveButtonClick(region: Region, event: any): void {
     this.addActiveCssClass(event);
-  
+
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
@@ -374,38 +375,44 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     const isValid = !isWhitespace;
     var s=isValid ? null : { 'whitespace': true };
     return isValid ? null : { 'whitespace': true };
-}
+  }
   onFormSaveClick(): void {
     this.submited = true;
+    this.regionFormGroup.markAllAsTouched()
+    if (this.regionFormGroup.invalid) {
+      return;
+    }
+    const selectedRegions = this.regionFormGroup.controls['region'].value;
+    if (selectedRegions.length > 0) {
+      selectedRegions.forEach((regionId: number, index: number) => {
+        const Region: Region = {
+          id: this.editedRegionId,
+          name: this.masterRegion.filter(i=>i.id== regionId)[0].name
+        }
+        this.saveOrUpdateRegion(Region, index, selectedRegions.length);
+      })
+      this.store.dispatch(new ShowSideDialog(false));
+      this.regionFormGroup.reset();
+      this.removeActiveCssClass();
+    }
+  }
+
+
+  private saveOrUpdateRegion(Region: Region, selectedIndex: number, selectedRegionsLength: number): void {
+
+    if (this.isEdit) {
+      this.store.dispatch(new UpdateRegion(Region));
+      this.isEdit = false;
+      this.editedRegionId = undefined;
+      return;
+    }
+    this.store.dispatch(new SaveRegion(Region)).subscribe((res) => {
+      if (selectedIndex == (selectedRegionsLength - 1)) {
+          this.store.dispatch(new GetRegions());
+          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
+      }
+    });
     
-         const Region: Region = {
-     id: this.editedRegionId,
-
-           name: this.masterRegion.filter(i=>i.id==this.regionFormGroup.controls['region'].value)[0].name
-      }
-      if(this.regionFormGroup.valid){
-        
-        this.saveOrUpdateRegion(Region);
-        this.store.dispatch(new ShowSideDialog(false));
-        this.regionFormGroup.reset();
-        this.removeActiveCssClass();
-      }else{
-        this.regionFormGroup.markAllAsTouched()
-       
-      }
-      }
-
-
-  private saveOrUpdateRegion(Region: Region): void {
-
-      if (this.isEdit) {
-        this.store.dispatch(new UpdateRegion(Region));
-        this.isEdit = false;
-        this.editedRegionId = undefined;
-        return;
-      }
-      this.store.dispatch(new SaveRegion(Region));
-
   }
 
   onAllowDeployWOCreadentialsCheck(event: any): void {
@@ -421,7 +428,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
 
 
     this.regionFilterFormGroup = this.formBuilder.group({
-     ids:[[]]
+      ids:[[]]
     });
   }
 

@@ -688,12 +688,6 @@ export class OrganizationManagementState {
     return this.regionService.saveRegion(region).pipe(
       tap((payload) => {
         patchState({ isLocationLoading: false });
-        if (payload.id != 0) {
-          dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
-          dispatch(new GetRegions());
-        } else {
-          dispatch(new ShowToast(MessageTypes.Error, RECORD_ALREADY_EXISTS));
-        }
         return payload;
       })
     );
