@@ -257,7 +257,7 @@ const routes: Routes = [
         }
       },
       {
-        path: 'job-details-summary',
+        path: 'credential-summary',
         component: JobDetailsSummaryComponent,
         data: {
           isOrganizationArea: true,

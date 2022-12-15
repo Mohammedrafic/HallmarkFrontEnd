@@ -315,7 +315,7 @@ export const MENU_CONFIG: any = {
     74: {
       // Job - Job Details Summary
       icon: '',
-      route: '/analytics/job-details-summary',
+      route: '/analytics/credential-summary',
     },
     75: {
       // Labor Utilization
@@ -835,7 +835,7 @@ export const MENU_CONFIG: any = {
     74: {
       // Job - Job Details Summary
       icon: '',
-      route: '/analytics/job-details-summary',
+      route: '/analytics/credential-summary',
     },
     75: {
       // Labor Utilization
