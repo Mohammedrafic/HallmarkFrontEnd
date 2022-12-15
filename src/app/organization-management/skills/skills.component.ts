@@ -188,7 +188,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
       allowOnboard: this.filters.allowOnboard || null,
       includeInIRP: this.filters.includeInIRP || null,
       includeInVMS: this.filters.includeInVMS || null,
-      skillCode: this.filters.skillCode || null,
+      skillCode: this.filters.skillCodes || null,
     });
     this.filteredItems = this.filterService.generateChips(this.skillFilterForm, this.filterColumns);
   }
@@ -209,13 +209,14 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
   applyFilter(): void {
     const { includeInIRP, includeInVMS } = this.skillFilterForm.getRawValue();
 
-    this.filters = this.skillFilterForm.getRawValue();
+    this.filters = this.skillsService.adaptFilters(this.filters, this.skillFilterForm);
     /**
      * IRP flags have to be converted to bool as BE does not work with null values.
      */
     this.filters.includeInIRP = !!includeInIRP;
     this.filters.includeInVMS = !!includeInVMS;
     this.filteredItems = this.filterService.generateChips(this.skillFilterForm, this.filterColumns);
+
     this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
     this.store.dispatch(new ShowFilterDialog(false));
   }
