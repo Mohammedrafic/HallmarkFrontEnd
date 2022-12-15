@@ -57,8 +57,8 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     "BusinessUnitIdParamJDSR": "",
     "HostName": "",
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/JobDetailsSummary/JobDetailsSummary.wls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/JobDetailsSummary/Credential.cat" };
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialSummary/CredentialSummary.wls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialSummary/Credential.cat" };
   public title: string = "Credential Summary";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
