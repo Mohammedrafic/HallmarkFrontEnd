@@ -1,20 +1,46 @@
+@import 'adaptive-response';
+
 ::ng-deep {
   .e-calendar .e-content .e-range-hover {
-    background-color: #2368EE!important;
-    color: white!important;
+    background-color: #2368ee !important;
+    color: white !important;
 
     .e-day {
-      background-color: #2368EE!important;
-      color: white!important;
-      font-weight: 700!important;
+      background-color: #2368ee !important;
+      color: white !important;
+      font-weight: 700 !important;
+    }
+  }
+
+  .datepicker-timesheet .week-picker-container {
+    .e-input-group input.e-input,
+    .e-input-group.e-control-wrapper input.e-input,
+    .e-input-group input.e-input,
+    .e-input-group.e-control-wrapper {
+      @media #{$max-mobile} {
+        width: calc(100vw - 110px) !important;
+      }
+    }
+  }
+
+  .datepicker-mobile .week-picker-container {
+    .e-input-group input.e-input,
+    .e-input-group.e-control-wrapper input.e-input,
+    .e-input-group input.e-input,
+    .e-input-group.e-control-wrapper {
+      @media #{$max-mobile} {
+        width: calc(100vw - 50px) !important;
+      }
     }
   }
 
   .week-picker-container {
-    .e-input-group input.e-input, .e-input-group.e-control-wrapper input.e-input,
-    .e-input-group input.e-input, .e-input-group.e-control-wrapper {
-      background-color: #fff!important;
-      width: 247px!important;
+    .e-input-group input.e-input,
+    .e-input-group.e-control-wrapper input.e-input,
+    .e-input-group input.e-input,
+    .e-input-group.e-control-wrapper {
+      background-color: #fff !important;
+      width: 247px !important;
     }
 
     .e-input-group-icon.e-range-icon {
@@ -23,7 +49,7 @@
       }
 
       &.e-icons {
-        background-color: #fff!important;
+        background-color: #fff !important;
       }
     }
   }

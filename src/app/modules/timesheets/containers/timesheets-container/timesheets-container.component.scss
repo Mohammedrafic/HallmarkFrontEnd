@@ -1,7 +1,60 @@
-@import '../../styles/variables/colors';
+@import 'colors';
+@import 'adaptive-response';
+
+.right-container {
+  justify-content: flex-end;
+
+  .datepicker-mobile {
+    display: none;
+  }
+
+  @media #{$max-tablet} {
+    margin-top: 7px;
+  }
+
+  @media #{$max-mobile} {
+    margin-top: 7px;
+    flex-direction: column;
+
+    .datepicker-desktop {
+      display: none;
+    }
+
+    .datepicker-mobile {
+      display: inline-block;
+    }
+  }
+}
+.dropdown-filter {
+  width: 50%;
+  display: flex;
+  justify-content: flex-start;
+  flex-grow: 1;
+
+  & > *:not(:first-child) {
+    margin-left: 12px;
+  }
+}
+
+.datepicker-mobile {
+  display: none;
+}
+@media #{$max-mobile} {
+  .datepicker-desktop {
+    display: none;
+  }
+  .datepicker-mobile {
+    display: inline-block;
+    margin-top: 7px;
+  }
+}
 
 .input-container {
   min-width: 180px;
+
+  @media #{$max-mobile} {
+    width: calc(100vw - 110px) !important;
+  }
 }
 
 .e-input-group.e-float-icon-left.search-with-icon {
@@ -16,4 +69,14 @@
 
 .button--no-wrap {
   white-space: nowrap !important;
+}
+
+@media #{$max-mobile} {
+  .filter-button-text {
+    display: none !important;
+  }
+
+  button.e-control.e-btn i-feather {
+    margin-left: 0 !important;
+  }
 }

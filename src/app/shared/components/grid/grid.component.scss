@@ -10,6 +10,7 @@ app-grid {
   display: flex;
   flex-direction: column;
   height: 100%;
+  max-height: 75vh;
 
   & .ag-row-selected {
     background-color: $primary-active-blue-70 !important;
@@ -87,15 +88,15 @@ app-grid {
 }
 
 .app-grid-header {
-   .ag-root-wrapper {
+  .ag-root-wrapper {
     border-top-left-radius: unset;
     border-top-right-radius: unset;
   }
 }
 
 .app-grid-dark {
-
-  .ag-root-wrapper, .ag-header {
+  .ag-root-wrapper,
+  .ag-header {
     background-color: $sidebar-background;
   }
 
@@ -109,7 +110,9 @@ app-grid {
     color: $black;
   }
 
-  .ag-root-wrapper, .ag-row, .ag-header {
+  .ag-root-wrapper,
+  .ag-row,
+  .ag-header {
     border-color: $grid-border-color !important;
   }
 
