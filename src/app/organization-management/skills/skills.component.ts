@@ -311,7 +311,7 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
     const atLeastOneSystemSelected = this.skillForm.get('includeInIRP')?.value
     || this.skillForm.get('includeInVMS')?.value;
 
-    if (!atLeastOneSystemSelected) {
+    if (this.orgModuleSettings.isFeatureIrpEnabled && !atLeastOneSystemSelected) {
       this.store.dispatch(new ShowToast(MessageTypes.Error, 'Please select system for Skill'));
       return;
     }
@@ -364,12 +364,10 @@ export class SkillsComponent extends AbstractPermissionGrid implements OnInit, O
 
   private changeControlsAvaliability(disable: boolean): void {
     if (disable) {
-      this.skillForm.controls['skillCode'].disable();
       this.skillForm.controls['skillAbbr'].disable();
       this.skillForm.controls['skillCategoryId'].disable();
       this.skillForm.controls['skillDescription'].disable();
     } else {
-      this.skillForm.controls['skillCode'].enable();
       this.skillForm.controls['skillAbbr'].enable();
       this.skillForm.controls['skillCategoryId'].enable();
       this.skillForm.controls['skillDescription'].enable();

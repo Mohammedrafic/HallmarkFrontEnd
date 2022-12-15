@@ -16,6 +16,7 @@ export class Skill {
   includeInVMS?: boolean;
   isDefault?: boolean;
   foreignKey?: string;
+  skillCode?: string;
 
   constructor(skill: Skill, assigned = false) {
     this.id = skill.id || 0;
@@ -25,6 +26,7 @@ export class Skill {
     this.isDefault = skill.isDefault;
     this.includeInIRP = skill.includeInIRP || false;
     this.includeInVMS = skill.includeInVMS || false;
+    this.skillCode = skill.skillCode;
 
     if (assigned) {
       this.inactiveDate = skill.inactiveDate || null;
