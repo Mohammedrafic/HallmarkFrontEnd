@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CustomFormGroup } from '@core/interface';
+import { SkillFilters } from '@shared/models/skill.model';
 import { SkillsForm } from './skills.interface';
 
 @Injectable()
@@ -38,4 +39,13 @@ export class SkillsService {
       skillCode: [],
     });
   }
+
+  adaptFilters(filters: SkillFilters, filterForm: FormGroup): SkillFilters {
+    const filterValues = filterForm.getRawValue();
+
+    return ({
+      ...filters,
+      ...filterValues.skillCode ? { skillCodes: [filterValues.skillCode] } : { skillCodes: null },
+    }) as SkillFilters;
+  } 
 }

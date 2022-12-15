@@ -62,6 +62,11 @@ export const SkillsFilterConfig: SkillsFilterData = {
     checkBoxTitle: 'VMS',
     dataSource: [null],
   },
+  skillCode: {
+    type: ControlTypes.Text,
+    valueType: ValueType.Text,
+    dataSource: [],
+  },
 };
 
 export const VmsSkillsDialogConfig: SkillsFormConfig[] = [
