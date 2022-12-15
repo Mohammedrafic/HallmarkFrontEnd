@@ -9,7 +9,10 @@ export type ExtendedOrder = Order
   classification: string,
   jobDistribution: string,
   department: string,
-  location: string
+  location: string,
+  classificationName: string,
+  jobDistributionName: string,
+  agencyName: string
 };
 
 
@@ -21,8 +24,6 @@ export type OrderImportResult = {
 export interface ImportedOrder {
   tempOrderId: string;
   orderImport: ExtendedOrder;
-  orderImportJobDistributions: ExtendedOrder[];
-  orderImportClassifications: ExtendedOrder[];
 }
 
 export interface ListBoxItem {

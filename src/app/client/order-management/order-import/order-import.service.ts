@@ -76,22 +76,11 @@ export class OrderImportService {
   }
 
   private margeProperties(importedOrder: ImportedOrder): any {
-    const { orderImportClassifications } = importedOrder;
-    const { orderImportJobDistributions } = importedOrder;
     const { orderImport } = importedOrder;
 
-    const classification = orderImportClassifications
-      .filter((({ tempOrderId, classification }) => tempOrderId === importedOrder.orderImport.tempOrderId && classification))
-      .map(({classification}) => classification)
-      .join(', ');
-    const jobDistribution = orderImportJobDistributions
-      .filter((({ tempOrderId, jobDistribution }) => tempOrderId === importedOrder.orderImport.tempOrderId && jobDistribution))
-      .map(({jobDistribution}) => jobDistribution)
-      .join(', ');
-    const agency = orderImportJobDistributions
-      .filter((({ tempOrderId, agency }) => tempOrderId === importedOrder.orderImport.tempOrderId && agency))
-      .map(({agency}) => agency)
-      .join(', ');
+    const classification = orderImport.classificationName;
+    const jobDistribution = orderImport.jobDistributionName;
+    const agency = orderImport.agencyName;
 
     return {
       ...orderImport,
