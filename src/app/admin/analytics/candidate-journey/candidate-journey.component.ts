@@ -58,8 +58,8 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
     "HostName": "",
     "TodayCJR":""
   };
-  public reportName: LogiReportFileDetails = { name: "/FillRate/FillRate.wls" };
-  public catelogName: LogiReportFileDetails = { name: "/FillRate/Dashbord.cat" };  
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateJourney/CandidateJourney.wls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CandidateJourney/CandidateJourney.cat" };  
   public message: string = "";
   public title: string = "Candidate Journey";
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
@@ -370,7 +370,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
       "SkillsParamCJR": skillIds.length == 0 ? "null" : skillIds.join(","),"CandidateStatusesParamCJR": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
       "OrderTypesParamCJR": orderTypes.length == 0 ? "null" : orderTypes.join(","),
       "JobStatusesParamCJR": jobStatuses.length == 0 ? "null" : jobStatuses.join(","),
-      "JobIdParamCJR": jobId == null || jobId == "" ? "null" : jobId,
+      "OrderIdParamCJR": jobId == null || jobId == "" ? "null" : jobId,
       "BearerParamCJR": auth,
       "BusinessUnitIdParamCJR": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
