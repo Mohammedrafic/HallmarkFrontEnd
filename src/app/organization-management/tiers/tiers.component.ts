@@ -18,6 +18,7 @@ import { AppState } from "src/app/store/app.state";
 import { ShowSideDialog } from "../../store/app.actions";
 import { GetOrgTierStructure } from '../../store/user.actions';
 import { UserState } from '../../store/user.state';
+import { TiersService } from "./services/tiers.service";
 import { TiersGridComponent } from "./tiers-grid/tiers-grid.component";
 import { SystemButtons } from "./tiers.constants";
 
@@ -51,13 +52,13 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
     private actions$: Actions,
     private confirmService: ConfirmService,
     private cd: ChangeDetectorRef,
+    private tiersService: TiersService,
   ) {
     super(store);
   }
 
   override ngOnInit(): void {
     super.ngOnInit();
-    this.getOrganizationStructure();
     this.watchForRegionStructure();
     this.watchForOverrideTier();
     this.watchForOrganization();
@@ -91,10 +92,11 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
   public changeSystem({ id }: ButtonModel): void {
     this.selectedSystemType = id;
     this.getTiersPage(id);
+    this.getOrganizationStructure();
   }
 
   private getTiersPage(systemType: SystemType): void {
-    this.tiersGrid.getNewPage(systemType);
+    this.tiersGrid?.getNewPage(systemType);
   }
 
   private getOrganizationStructure(): void {
@@ -109,6 +111,10 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
       ).subscribe(
         (structure: OrganizationStructure) => {
         this.regionsStructure = structure.regions;
+
+        if (this.selectedSystemType === SystemType.IRP) {
+          this.tiersService.filterIrpLocationsDepartments(this.regionsStructure);
+        }
       });
   }
 
@@ -140,16 +146,23 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
     this.organization$
       .pipe(
         filter(Boolean),
-        filter(() => this.isIrpFlagEnabled),
         takeUntil(this.componentDestroy())
       ).subscribe((organization: Organization) => {
-        const isMspUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.MSP;
-        this.showSystemButtons = !!organization.preferences.isIRPEnabled
-          && !!organization.preferences.isVMCEnabled
-          && !isMspUser;
-        this.selectedSystemType = this.showSystemButtons || !!organization.preferences.isIRPEnabled
-          ? SystemType.IRP
-          : SystemType.VMS;
+        if (this.isIrpFlagEnabled) {
+          const isMspUser = this.store.selectSnapshot(UserState.user)?.businessUnitType === BusinessUnitType.MSP;
+          this.showSystemButtons = !!organization.preferences.isIRPEnabled
+            && !!organization.preferences.isVMCEnabled
+            && !isMspUser;
+          this.selectedSystemType = this.showSystemButtons || !!organization.preferences.isIRPEnabled
+            ? SystemType.IRP
+            : SystemType.VMS;
+        } else {
+          this.showSystemButtons = false;
+          this.selectedSystemType = SystemType.VMS;
+        }
+
+        this.getTiersPage(this.selectedSystemType);
+        this.getOrganizationStructure();
         this.cd.markForCheck();
     });
   }

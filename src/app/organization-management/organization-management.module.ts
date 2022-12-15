@@ -107,6 +107,7 @@ import { GroupSetupService } from '@organization-management/credentials/services
 import { IrpSystemGridTextPipeModule } from '@shared/pipes/irp-system-grid-text/irp-system-grid-text.module';
 import { MapCredentialsService } from '@organization-management/credentials/services/map-credentials.service';
 import { SkillsService } from './skills/skills.service';
+import { TiersService } from "@organization-management/tiers/services/tiers.service";
 
 const sidebarIcons = {
   Download,
@@ -244,6 +245,7 @@ const sidebarIcons = {
       ResizeService,
       PageService,
       TiersApiService,
+      TiersService,
       LocationsService,
       ShiftsService,
       SideMenuService,
