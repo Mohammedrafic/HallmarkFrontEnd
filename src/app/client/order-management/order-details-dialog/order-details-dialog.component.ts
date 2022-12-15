@@ -31,7 +31,6 @@ import {
   ClearOrderCandidatePage,
   DeleteOrder,
   GetOrganizationExtensions,
-  SaveOrderSucceeded,
   SetLock,
 } from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -45,7 +44,6 @@ import {
   DELETE_RECORD_TITLE,
 } from '@shared/constants';
 import { Location } from '@angular/common';
-import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { ShowCloseOrderDialog, ShowSideDialog, ShowToast } from '../../../store/app.actions';
 import { AddEditReorderComponent } from '@client/order-management/add-edit-reorder/add-edit-reorder.component';
 import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
@@ -59,18 +57,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 import { UserState } from '../../../store/user.state';
 import { PermissionService } from '../../../security/services/permission.service';
-
-enum MobileMenuItems {
-  Cancel = 'Cancel',
-  Approve = 'Approve',
-  Edit = 'Edit',
-  CloseOrder = 'Close Order',
-  ReOpen = 'Re-Open',
-  CreateReOrder = 'Create Re-Order',
-  Delete = 'Delete',
-  Unlock = 'Unlock',
-  Lock = 'Lock',
-}
+import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
 
 @Component({
   selector: 'app-order-details-dialog',

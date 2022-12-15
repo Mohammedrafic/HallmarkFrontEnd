@@ -3,7 +3,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { FormGroup } from '@angular/forms';
 
 import { combineLatest, Observable, Subject, takeUntil } from 'rxjs';
-import { debounceTime, filter, skip, switchMap, take, tap, throttleTime } from 'rxjs/operators';
+import { debounceTime, filter, skip, switchMap, take, tap, throttleTime, map } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -32,6 +32,7 @@ import { RecordsAdapter } from '../../helpers';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
+import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -125,6 +126,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public submitText: string;
 
+  public isSmallTablet = false;
+
   public readonly getRowStyle = (params: any) => {
     if (params.data.stateText === RecordStatus.New) {
       return { 'background-color': '#F2FAF2'};
@@ -150,6 +153,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private isStatusColAvaliable = false;
 
   private readonly componentStateChanged$: Subject<ComponentStateChangedEvent> = new Subject();
+
+  public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
+
+  private resizeObserver: ResizeObserverModel;
 
   constructor(
     private store: Store,
@@ -184,6 +191,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.getRecords();
     this.watchForDialogState();
     this.adjustColumnWidth(); 
+    this.initResizeObserver();
+    this.listenResizeContent();
   }
 
   public onTabSelect(selectEvent: SelectingEventArgs): void {
@@ -513,7 +522,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private adjustColumnWidth(): void {
     combineLatest([ this.componentStateChanged$.pipe(throttleTime(150)), this.breakpointObserver.observe([BreakpointQuery.TABLET_MAX])])
-    .pipe(debounceTime(200) ,takeUntil(this.componentDestroy())).subscribe(([ event, data]) => {
+    .pipe(debounceTime(200), takeUntil(this.componentDestroy())).subscribe(([event, data]) => {
         if(data.matches) {
             event.api.sizeColumnsToFit();   
         } else {
@@ -524,5 +533,17 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public onComponentStateChanged(event: ComponentStateChangedEvent): void {
     this.componentStateChanged$.next(event);
+  }
+
+  private initResizeObserver(): void {
+    this.resizeObserver = ResizeObserverService.init(this.targetElement!);
+  }
+
+  public listenResizeContent(): void {
+    const smallTabletWidth = 500;
+    this.resizeObserver.resize$.pipe(map((data) => data[0].contentRect.width), takeUntil(this.componentDestroy())).subscribe((containerWidth) => {
+      this.isSmallTablet = containerWidth <= smallTabletWidth;
+      this.cd.markForCheck();
+    });
   }
 }

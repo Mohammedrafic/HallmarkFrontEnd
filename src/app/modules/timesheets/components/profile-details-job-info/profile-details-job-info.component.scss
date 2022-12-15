@@ -1,8 +1,6 @@
 @import "../../../../styles/variables/colors";
 @import "adaptive-response";
 
-
-
 .job-info-container {
   display: flex;
   justify-content: space-between;
@@ -32,7 +30,7 @@
   }
 }
 
-@media (max-width: $tablet-max) {
+@media #{$max-tablet} {
   .job-info-container {
     justify-content: flex-start;
     flex-wrap: wrap;
@@ -40,3 +38,8 @@
   }
 }
 
+@media #{$max-mobile} {
+  .job-info-container {
+    flex-direction: column;
+  }
+}
