@@ -27,14 +27,14 @@
                 </h3>
                 <ng-container *ngIf="!isMobile">
                   <ng-container
-                    [ngTemplateOutlet]="test"
+                    [ngTemplateOutlet]="chipListTmplt"
                     [ngTemplateOutletContext]="{ timesheetDetails }"
                   ></ng-container>
                 </ng-container>
               </div>
             </div>
             <div *ngIf="isMobile" class="profile-details__chip-list">
-              <ng-container [ngTemplateOutlet]="test" [ngTemplateOutletContext]="{ timesheetDetails }"></ng-container>
+              <ng-container [ngTemplateOutlet]="chipListTmplt" [ngTemplateOutletContext]="{ timesheetDetails }"></ng-container>
             </div>
           </div>
 
@@ -226,7 +226,7 @@
 
 <app-file-viewer></app-file-viewer>
 
-<ng-template #test let-timesheetDetails="timesheetDetails">
+<ng-template #chipListTmplt let-timesheetDetails="timesheetDetails">
   <ejs-tooltip id="tooltip" #tooltip target=".e-chip" (beforeRender)="beforeRender($event)">
     <ejs-chiplist #chipList>
       <e-chips>

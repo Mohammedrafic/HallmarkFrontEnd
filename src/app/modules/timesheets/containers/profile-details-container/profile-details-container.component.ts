@@ -557,7 +557,6 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
       setTimeout(() => this.openFileUploadArea());
     }
   }
-
   
   private initResizeObserver(): void {
     this.resizeObserver = ResizeObserverService.init(this.targetElement!);
