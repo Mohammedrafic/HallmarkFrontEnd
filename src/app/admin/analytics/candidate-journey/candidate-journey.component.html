@@ -22,22 +22,18 @@
 </section>
 <app-filter-dialog [items]="filteredItems" (deleteFilter)="onFilterDelete($event)"
                    (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
-  <form [formGroup]="fillRateForm" class="filter-form-dialog form-container bootstrap">
+  <form [formGroup]="candidateJourneyForm" class="filter-form-dialog form-container bootstrap">
     <div class="form-elemet">
       <div class="input-container bootstrap">
         <label>Organization Name<span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="businessIds"
-                           placeholder="All"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           appValidateWithMessage
-                           [fields]="bussinesDataFields"
-                           [dataSource]="filterColumns.businessIds.dataSource"
-                           [selectAllText]='allOption'
-                           showSelectAll=true [value]="defaultOrganizations">
-          </ejs-multiselect>
+          <ejs-dropdownlist appValidateWithMessage
+          formControlName="businessIds"
+          [fields]="organizationFields"
+          [dataSource]="filterColumns.businessIds.dataSource"
+          [allowFiltering]="true"
+          placeholder="Business">
+</ejs-dropdownlist>
         </div>
       </div>
     </div>
@@ -97,6 +93,28 @@
     </div>
     <div class="form-elemet">
       <div class="group">
+        <div class="input-container bootstrap">
+          <label>Skill Category</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox" formControlName="skillCategoryIds" placeholder="All"
+              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skillCategoryIds.dataSource"
+              [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container bootstrap">
+          <label>Skills</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox" formControlName="skillIds"  placeholder="All"
+              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.skillIds.dataSource"
+              [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-elemet">
+      <div class="group">
         <div class="input-container calendar">
           <label>Start Date<span class="required">*</span></label>
           <div class="input-group datepicker">
@@ -110,16 +128,61 @@
           </div>
         </div>
         <div class="input-container calendar">
-          <label>End Date<span class="required">*</span></label>
+          <label>End Date</label>
           <div class="input-group datepicker">
             <ejs-datepicker id="endDate"
                             class="datepicker"
                             format="MM/dd/yyyy"
                             placeholder="MM/DD/YYYY"
-                            appValidateWithMessage
                             formControlName="endDate"
-                            [min]="fillRateForm.controls['startDate'].value">
+                            [min]="candidateJourneyForm.controls['startDate'].value">
             </ejs-datepicker>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-elemet">
+      <div class="group">
+        <div class="input-container bootstrap">
+          <label>Order Type</label>
+          <div class="input-group dropdown">
+              <ejs-multiselect mode="CheckBox" formControlName="orderTypes"  placeholder="All"
+              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.orderTypes.dataSource"
+              [fields]="commonFields" [selectAllText]='allOption' showSelectAll=true>
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container bootstrap">
+          <label>Job Status</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect mode="CheckBox" formControlName="jobStatuses"  placeholder="All"
+              [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.jobStatuses.dataSource"
+              [fields]="jobStatusesFields" [selectAllText]='allOption' showSelectAll=true>
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="group">
+        
+          <div class="input-container bootstrap">
+            <label>Candidate Status</label>
+            <div class="input-group dropdown">
+              <ejs-multiselect mode="CheckBox" formControlName="candidateStatuses"  placeholder="All"
+                [allowFiltering]="true" [showDropDownIcon]="true" [dataSource]="filterColumns.candidateStatuses.dataSource"
+                [fields]="candidateStatusesFields" [selectAllText]='allOption' showSelectAll=true>
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div class="input-container dropdown">
+            <label>Order Id</label>
+            <div class="input-group">
+              <input class="e-input"
+                     type="text"
+                     appValidateWithMessage
+                     maxlength="50"
+                     formControlName="jobId" />
+            </div>
           </div>
         </div>
       </div>

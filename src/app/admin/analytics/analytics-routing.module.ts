@@ -11,7 +11,7 @@ import { CandidateListComponent } from './candidate-list/candidate-list.componen
 import { ClientFinanceReportComponent } from './client-finance-report/client-finance-report.component';
 import { CredentialExpiryComponent } from './credential-expiry/credential-expiry.component';
 import { EventLogComponent } from './event-log/event-log.component';
-import { FillRateComponent } from './fillrate/fillrate.component';
+import { CandidateJourneyComponent } from './candidate-journey/candidate-journey.component';
 import { FinanceReportComponent } from './finance-report/finance-report.component';
 import { GeneralCommentsComponent } from './general-comments/general-comments.component';
 import { HeadCountComponent } from './head-count/head-count.component';
@@ -110,8 +110,8 @@ const routes: Routes = [
         }
       },
       {
-        path: 'fillrate',
-        component: FillRateComponent,
+        path: 'candidate-journey',
+        component: CandidateJourneyComponent,
         data: {
           isOrganizationArea: true,
         }

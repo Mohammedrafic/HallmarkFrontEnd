@@ -14,7 +14,8 @@ export class DepartmentsAdapter {
       facilityEmail,
       facilityContact,
       unitDescription,
-      includeInIRP
+      includeInIRP,
+      id
     } = formGroup.getRawValue();
 
     return {
@@ -29,7 +30,8 @@ export class DepartmentsAdapter {
       facilityEmail,
       facilityContact,
       unitDescription,
-      ...(typeof includeInIRP === 'boolean' && { includeInIRP })
+      ...(typeof includeInIRP === 'boolean' && { includeInIRP }),
+      id
     }
   }
 }
