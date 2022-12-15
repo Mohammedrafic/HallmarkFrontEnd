@@ -1,0 +1,48 @@
+<h2 class="title">HR Info</h2>
+<form class="hr-info__form">
+  <app-dropdown
+    [dataSource]="[]"
+    [fields]="fieldsSettings"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    label="HR Company Code"
+    id="hr-company-code"
+    controlName="hrCompanyCode"
+  ></app-dropdown>
+
+  <app-dropdown
+    [dataSource]="[]"
+    [fields]="fieldsSettings"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    label="Internal transfer/recruitment"
+    id="internal-transfer-recruitment"
+    controlName="internalTransferRecruitment"
+  ></app-dropdown>
+
+  <app-dropdown
+    [dataSource]="[]"
+    [fields]="fieldsSettings"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    label="Orientation Configuration"
+    id="orientation-configuration"
+    controlName="orientationConfiguration"
+  ></app-dropdown>
+
+  <app-datepicker
+    [formGroupInstance]="candidateForm"
+    [enableMask]="true"
+    [maskPlaceholder]="datepickerMask"
+    id="organizationOrientationDate"
+    controlName="organizationOrientationDate"
+    label="Organization Orientation Date"
+    format="MM/dd/yyyy"
+    placeholder="MM/DD/YYYY"
+  ></app-datepicker>
+
+  <div>
+    <ejs-switch id="contract" controlName="contract"></ejs-switch>
+    <label for="contract">Contract</label>
+  </div>
+</form>

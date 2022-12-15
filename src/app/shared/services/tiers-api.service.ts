@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
+import { SystemType } from "@shared/enums/system-type.enum";
 import { TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
 import { TiersPage } from '@shared/components/tiers-dialog/interfaces';
 import { TierPriorityDTO } from '@organization-management/tiers/interfaces';
@@ -11,8 +12,8 @@ import { TierPriorityDTO } from '@organization-management/tiers/interfaces';
 export class TiersApiService {
   constructor(private http: HttpClient) { }
 
-  public getTiersByPage(pageNumber: number, pageSize: number): Observable<TiersPage> {
-    return this.http.get<TiersPage>('/api/OrganizationTiers', { params: { PageNumber: pageNumber, PageSize: pageSize }})
+  public getTiersByPage(pageNumber: number, pageSize: number, systemType: SystemType): Observable<TiersPage> {
+    return this.http.get<TiersPage>('/api/OrganizationTiers', { params: { pageNumber, pageSize, systemType } });
   }
 
   public saveTier(payload: TierDTO): Observable<TierDTO> {

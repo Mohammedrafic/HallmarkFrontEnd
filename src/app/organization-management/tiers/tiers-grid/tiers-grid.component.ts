@@ -1,35 +1,38 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { ColDef, RowDragEvent } from "@ag-grid-community/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store'
+import { ColDef, RowDragEvent } from "@ag-grid-community/core";
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { Observable, takeUntil } from 'rxjs';
 
-import { TiersColumnsDefinition } from "@organization-management/tiers/tiers-grid/tiers-grid.constant";
 import { Tiers } from '@organization-management/store/tiers.actions';
 import { TiersState } from '@organization-management/store/tiers.state';
 import { TierFilters } from '@organization-management/tiers/interfaces';
+import { TiersColumnsDefinition } from "@organization-management/tiers/tiers-grid/tiers-grid.constant";
 import { GridReadyEventModel } from '@shared/components/grid/models';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { TierDetails, TiersPage } from '@shared/components/tiers-dialog/interfaces';
 import { GRID_CONFIG } from '@shared/constants';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { SystemType } from "@shared/enums/system-type.enum";
 
 @Component({
   selector: 'app-tiers-grid',
   templateUrl: './tiers-grid.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TiersGridComponent extends DestroyableDirective implements OnInit {
-  @Select(TiersState.tiersPage)
-  public tiersPage$: Observable<TiersPage>;
+  @Input() systemType: SystemType;
 
   @Output() editTier = new EventEmitter<TierDetails>();
 
   public columnDefinitions: ColDef[];
-  public isLoading: boolean = false;
+  public isLoading = false;
   public filters: TierFilters = {
     pageNumber: GRID_CONFIG.initialPage,
-    pageSize: GRID_CONFIG.initialRowsPerPage
-  }
+    pageSize: GRID_CONFIG.initialRowsPerPage,
+  };
+
+  @Select(TiersState.tiersPage)
+  public tiersPage$: Observable<TiersPage>;
 
   constructor(
     private store: Store,
@@ -40,7 +43,6 @@ export class TiersGridComponent extends DestroyableDirective implements OnInit {
 
   ngOnInit(): void {
     this.setColumnDefinition();
-    this.getNewPage();
     this.watchForUpdatePage();
   }
 
@@ -61,22 +63,22 @@ export class TiersGridComponent extends DestroyableDirective implements OnInit {
   public handleChangePage(pageNumber: number): void {
     if(pageNumber && this.filters.pageNumber !== pageNumber) {
       this.filters.pageNumber = pageNumber;
-      this.getNewPage();
+      this.getNewPage(this.systemType);
     }
   }
 
   public handleChangePageSize(pageSize: number): void {
     if(pageSize) {
       this.filters.pageSize = pageSize;
-      this.getNewPage();
+      this.getNewPage(this.systemType);
     }
   }
 
-  private getNewPage(): void {
-    this.store.dispatch(new Tiers.GetTiersByPage(this.filters.pageNumber, this.filters.pageSize));
+  public getNewPage(systemType: SystemType): void {
+    this.store.dispatch(new Tiers.GetTiersByPage(this.filters.pageNumber, this.filters.pageSize, systemType));
   }
 
-  setColumnDefinition(): void {
+  public setColumnDefinition(): void {
     this.columnDefinitions = TiersColumnsDefinition((tier: TierDetails) => {
       this.editTier.emit(tier);
     });
@@ -87,7 +89,7 @@ export class TiersGridComponent extends DestroyableDirective implements OnInit {
       ofActionDispatched(Tiers.UpdatePageAfterSuccessAction),
       takeUntil(this.destroy$)
     ).subscribe(() => {
-      this.getNewPage();
+      this.getNewPage(this.systemType);
     });
   }
 }

@@ -32,9 +32,9 @@ export class TiersState {
   @Action(Tiers.GetTiersByPage)
   GetTiersByPage(
     { patchState }: StateContext<TiersStateModel>,
-    { pageNumber, pageSize }: Tiers.GetTiersByPage
+    { pageNumber, pageSize, systemType }: Tiers.GetTiersByPage
   ): Observable<TiersPage> {
-    return this.tiersApiService.getTiersByPage(pageNumber,pageSize).pipe(
+    return this.tiersApiService.getTiersByPage(pageNumber, pageSize, systemType).pipe(
       tap((tiersByPage: TiersPage) => {
         patchState({ tiersByPage });
       })

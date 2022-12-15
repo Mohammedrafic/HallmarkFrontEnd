@@ -225,7 +225,7 @@
     </e-column>
     <e-column field="endDate" headerText="End Date" width="130" minWidth="105" maxWidth="200">
       <ng-template #template let-data>
-        <span>{{ data.endDate | date: formatDate }}</span>
+        <span>{{ data.endDate | date: formatDate: 'UTC' }}</span>
       </ng-template>
     </e-column>
     <e-column
