@@ -319,24 +319,6 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     location.inactiveDate, location.reactivateDate, location.timeZone);
   }
 
-  private inactivateDateHandler(field: AbstractControl, value: string | undefined,
-    reactivateValue: string | undefined, timeZone?: string): void {
-    if (value) {
-      const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
-      const reactivateDate = reactivateValue ? new Date(DateTimeHelper.formatDateUTC(reactivateValue, 'MM/dd/yyyy')) : null;
-      inactiveDate.setHours(0, 0, 0, 0);
-      const nowPerTimeZone = DateTimeHelper.newDateInTimeZone(timeZone || this.DEFAULT_LOCATION_TIMEZONE);
-      if (!(reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, nowPerTimeZone))
-      && DateTimeHelper.isDateBefore(inactiveDate, nowPerTimeZone)) {
-        field.disable();
-      } else {
-        field.enable();
-      }
-    } else {
-      field.enable();
-    }
-  }
-
   deleteLocation(location: Location, event: Event): void {
     this.addActiveCssClass(event);
     this.confirmService
@@ -450,6 +432,24 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       options?.fileName || this.defaultFileName
     )));
     this.clearSelection(this.grid);
+  }
+
+  private inactivateDateHandler(field: AbstractControl, value: string | undefined,
+    reactivateValue: string | undefined, timeZone?: string): void {
+    if (value) {
+      const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
+      const reactivateDate = reactivateValue ? new Date(DateTimeHelper.formatDateUTC(reactivateValue, 'MM/dd/yyyy')) : null;
+      inactiveDate.setHours(0, 0, 0, 0);
+      const nowPerTimeZone = DateTimeHelper.newDateInTimeZone(timeZone || this.DEFAULT_LOCATION_TIMEZONE);
+      if (!(reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, nowPerTimeZone))
+      && DateTimeHelper.isDateBefore(inactiveDate, nowPerTimeZone)) {
+        field.disable();
+      } else {
+        field.enable();
+      }
+    } else {
+      field.enable();
+    }
   }
 
   private watchForOrgChange(): void {

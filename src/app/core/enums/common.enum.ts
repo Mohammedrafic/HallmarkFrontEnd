@@ -10,7 +10,8 @@ export enum FieldType {
   SearchDD = 'searchDD',
   Toggle = 'toggle',
   TextArea = 'textarea',
-  CheckBox = 'checkBox'
+  CheckBox = 'checkBox',
+  CheckBoxGroup = 'checkBoxGroup',
  }
 
 

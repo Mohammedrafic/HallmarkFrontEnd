@@ -223,7 +223,7 @@ export const LocationsDialogConfig: LocationDialogConfig = {
           gridAreaName: 'reactivateArea',
           fieldType: FieldType.Date,
           visible: true,
-        }
+        },
       ],
     },
   ],
@@ -406,7 +406,7 @@ export const LocationsDialogWithIrpConfig: LocationDialogConfig = {
           gridAreaName: 'reactivateArea',
           fieldType: FieldType.Date,
           visible: true,
-        }
+        },
       ],
     },
   ],
