@@ -341,7 +341,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
-    debugger;
+    
     let { businessIds, candidateName, timesheetStatuses, departmentIds, jobId, locationIds,
       regionIds, agencyIds, startDate, endDate } = this.timesheetReportForm.getRawValue();
     if (!this.timesheetReportForm.dirty) {
