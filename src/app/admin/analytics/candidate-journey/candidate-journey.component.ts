@@ -52,7 +52,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
     "CandidateStatusesParamCJR": "",
     "OrderTypesParamCJR": "",
     "JobStatusesParamCJR": "",
-    "JobIdParamCJR": "",
+    "OrderIdParamCJR": "",
     "BearerParamCJR": "",
     "BusinessUnitIdParamCJR": "",
     "HostName": "",
@@ -248,8 +248,8 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;
               this.filterColumns.skillIds.dataSource = [];
-              this.filterColumns.jobStatuses.dataSource = data.jobAllStatusesAndReasons;
-              this.filterColumns.candidateStatuses.dataSource = data.candidateAllStatusesAndReasons;
+              this.filterColumns.jobStatuses.dataSource = data.allJobStatusesAndReasons;
+              this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons;
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
               this.defaultOrderTypes = OrderTypeOptions.map((list) => list.id);
               this.candidateJourneyForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
