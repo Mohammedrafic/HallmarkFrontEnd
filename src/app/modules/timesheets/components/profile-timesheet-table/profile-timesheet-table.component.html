@@ -24,7 +24,7 @@
               [disabled]="disableAnyAction || !hasPermissions"
               (click)="openAddDialog()"
             >
-              <i-feather name="plus" class="icon"></i-feather> <span class="action-text">Add Record</span>
+              <i-feather name="plus" class="icon"></i-feather> <span class="action-text" *ngIf="!isSmallTablet">Add Record</span>
             </button>
           </app-tooltip-container>
 
@@ -37,7 +37,7 @@
                 cssClass="e-action-button"
                 class="add-action">
                 <i-feather name="edit" class="icon"></i-feather>
-                <span class="action-text">Edit</span>
+                <span class="action-text" *ngIf="!isSmallTablet">Edit</span>
               </button>
             </app-tooltip-container>
           </ng-container>
@@ -55,7 +55,7 @@
           </div>
         </ng-template>
 
-        <div class="desktop-tablet-btn-group">
+        <div class="desktop-tablet-btn-group" *ngIf="!isSmallTablet">
           <ng-container *ngTemplateOutlet="btnGroup"></ng-container>
         </div>
       </div>
@@ -80,7 +80,7 @@
       >
       </ag-grid-angular>
     </div>
-    <div class="mobile-btn-group">
+    <div [ngClass]="{ 'mobile-btn-group': true, 'small-tablet': isSmallTablet }">
       <ng-container *ngTemplateOutlet="btnGroup"></ng-container>
     </div>
   </div>
