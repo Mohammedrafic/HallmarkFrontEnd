@@ -26,7 +26,8 @@
           <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-pill">{{
             filteredItems
             }}</span>
-          Filters <i-feather name="sliders" class="icon"></i-feather>
+          Filters
+          <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
     </div>
@@ -34,6 +35,7 @@
       <button ejs-button appHideBeforeSyncfusionLoad id="addIRPCandidate" cssClass="e-primary">
         Add Candidate
       </button>
+      <a routerLink="add">Add Candidate</a>
     </div>
   </ng-container>
 </app-page-toolbar>

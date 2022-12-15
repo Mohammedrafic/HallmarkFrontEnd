@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { OrderManagementContentComponent } from './order-management/order-management-content/order-management-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
-import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { ClientComponent } from './client.component';
 import { AddEditOrderComponent } from './order-management/add-edit-order/add-edit-order.component';
@@ -80,7 +79,10 @@ const routes: Routes = [
       },
       {
         path: 'candidates',
-        component: CandidatesContentComponent,
+        loadChildren: () =>
+          import('../client/candidates/organization-candidates.module').then(
+            (m: typeof import('../client/candidates/organization-candidates.module')) => m.OrganizationCandidatesModule
+          ),
         data: {
           isOrganizationArea: true,
           isAgencyArea: false,

@@ -1,0 +1,13 @@
+<div class="candidate-details">
+  <app-general-info [candidateForm]="candidateForm"></app-general-info>
+  <app-hr-info [candidateForm]="candidateForm"></app-hr-info>
+  <app-contact-details [candidateForm]="candidateForm"></app-contact-details>
+  <div class="professional-summary">
+    <h2 class="title">Professional Summary</h2>
+    <app-textarea
+      [formGroupInstance]="candidateForm"
+      [cssClass]="'professional-summary__textarea'"
+      controlName="professionalSummary"
+    ></app-textarea>
+  </div>
+</div>
