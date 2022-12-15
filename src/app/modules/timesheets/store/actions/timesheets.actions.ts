@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import { OrganizationRegion } from '@shared/models/organization.model';
 import { DialogAction } from '@core/enums';
 import { DataSourceItem, FileForUpload } from '@core/interface';

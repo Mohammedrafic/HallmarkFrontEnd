@@ -1,0 +1,21 @@
+<app-form-control-wrapper
+  [formGroup]="formGroupInstance"
+  [label]="label"
+  [id]="id"
+  [required]="required"
+>
+  <div class="input-container">
+    <div class="input-group">
+      <div class="input-group">
+        <ejs-textbox
+          appValidateWithMessage
+          [formControlName]="controlName"
+          cssClass="textarea"
+          [multiline]="true"
+          maxlength="2000">
+        </ejs-textbox>
+      </div>
+      <app-error-message [control]="getControl()"></app-error-message>
+    </div>
+  </div>
+</app-form-control-wrapper>
