@@ -46,7 +46,6 @@ export class TabsComponent<T> implements AfterViewInit {
     this.dynamic.map((vcr: ViewContainerRef, i: number) => {
       vcr.clear();
       this.componentRef = vcr.createComponent(this.tabs[i].component);
-      console.log(this.componentRef.instance);
     });
   }
 
