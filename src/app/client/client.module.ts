@@ -214,7 +214,6 @@ const gridIcons = {
     MaskedDateTimeService,
     SettingsViewService,
     OrderDetailsService,
-    DistributionTierService,
     OrderManagementIrpSubrowService,
   ],
 })
