@@ -8,8 +8,7 @@ import { CheckBoxChangeEventArgs } from '@syncfusion/ej2-angular-grids';
 import { Subscription, takeUntil } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
-import { AddRecordBillRate } from '../../../interface';
-import { RecordValue } from '../../../interface/common.interface';
+import { AddRecordBillRate, RecordValue } from '../../../modules/timesheets/interface';
 
 @Component({
   selector: 'app-switch-editor',
@@ -61,10 +60,13 @@ export class SwitchEditorComponent extends Destroyable implements ICellRendererA
     const storeField = colDef.cellRendererParams.storeField as string;
 
     this.controlDisabled = colDef.cellRendererParams.disabled as boolean;
-    this.notApplicableRateIds = this.findDisabledRateIds(storeField);
-    this.value = !params.value;
-    this.showControl = !this.notApplicableRateIds.includes((params.data as RecordValue).billRateConfigId)
-    && !(params.data as RecordValue).billRateConfigName?.toLowerCase().includes('ot');
+    if (!colDef.cellRendererParams.showCheckbox) {
+      this.notApplicableRateIds = this.findDisabledRateIds(storeField);
+    }
+    this.value = colDef.cellRendererParams.useValueAsTrue ? params.value : !params.value;
+    this.showControl = colDef.cellRendererParams.showCheckbox
+      || !this.notApplicableRateIds.includes((params.data as RecordValue).billRateConfigId)
+      && !(params.data as RecordValue).billRateConfigName?.toLowerCase().includes('ot');
 
     if (!this.controlDisabled) {
       this.setFormControl(params);

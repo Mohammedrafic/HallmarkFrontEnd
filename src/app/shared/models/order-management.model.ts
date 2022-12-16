@@ -55,6 +55,68 @@ export class OrderManagement {
   extensionFromId?: number | null;
 }
 
+export interface IRPOrderManagement {
+  criticalOrder: boolean;
+  shiftStartDateTime: string;
+  shiftEndDateTime: string;
+  id: number;
+  organizationId: number;
+  organizationPrefix: string;
+  publicId: number;
+  status: number;
+  statusText: string;
+  isCritical: boolean;
+  orderType: number;
+  skillId: number;
+  skillName: string;
+  numberOfPositions: number;
+  numberOfOpenPositions: number;
+  regionId: number;
+  regionName: string;
+  locationId: number;
+  locationName: string;
+  departmentId: number;
+  departmentName: string;
+  startDate: string;
+  endDate: string;
+  jobDate: string;
+  shiftStartTime: string;
+  shiftEndTime: string;
+  irpCandidatesCount: number;
+  vmsCandidatesCount: number;
+  creationDate: string;
+  isLocked: boolean;
+  acceptedCandidates: null;
+  acceptedEmployees: null;
+  isMoreMenuWithDeleteButton?: boolean;
+  children: OrderManagementChild[];
+}
+
+export interface IRPOrderPosition {
+  orderId: number;
+  organizationId: number;
+  candidateStatus: number;
+  employeeId: number;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  primarySkillId: number;
+  primarySkillName: string;
+  option: string;
+  contract: boolean;
+  lastShiftScheduledStartTime: string;
+  lastShiftScheduledEndTime: string;
+  nextShiftScheduledStartTime: string;
+  nextShiftScheduledEndTime: string;
+  scheduledWeeklyHours: number;
+  overtime: number;
+}
+
+export interface IRPOrderPositionMain {
+  orderId: number;
+  irpOrderPositionsMainInfoDto: IRPOrderPosition[];
+}
+
 export class OrderManagementFilter {
   orderBy: string;
   pageNumber: number;
@@ -68,6 +130,7 @@ export class OrderManagementFilter {
 }
 
 export type OrderManagementPage = PageOfCollections<OrderManagement>;
+export type IRPOrderManagementPage = PageOfCollections<IRPOrderManagement>;
 
 export type AgencyOrderManagement = {
   orderId: number;
@@ -529,6 +592,7 @@ export class OrderFilter {
   projectTypeIds?: number | null;
   projectNameIds?: number | null;
   poNumberIds?: number | null;
+  orderType?: number | null;
 }
 
 export class SortModel {

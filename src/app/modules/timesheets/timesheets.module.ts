@@ -76,8 +76,8 @@ import { RecordStatusCellComponent } from './components/cell-editors/record-stat
 import { TableStatusCellModule } from '@shared/components/table-status-cell/table-status-cell.module';
 import { UploadDocumentsComponent } from './components/upload-documents/upload-documents.component';
 import { TimesheetDetailsTableService } from './services';
-import { SwitchEditorComponent } from './components/cell-editors/switch-editor/switch-editor.component';
 import { UploadFileAreaModule } from '@shared/components/upload-file-area/upload-file-area.module';
+import { SwitchEditorModule } from '@shared/components/switch-editor/switch-editor.module';
 
 const gridIcons = {
   MessageSquare,
@@ -129,7 +129,6 @@ const gridIcons = {
     TimesheetsTabsComponent,
     RecordStatusCellComponent,
     UploadDocumentsComponent,
-    SwitchEditorComponent,
   ],
   imports: [
     CommonModule,
@@ -171,7 +170,8 @@ const gridIcons = {
     RejectReasonInputDialogModule,
     TableStatusCellModule,
     TooltipContainerModule,
-    UploadFileAreaModule
+    UploadFileAreaModule,
+    SwitchEditorModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [

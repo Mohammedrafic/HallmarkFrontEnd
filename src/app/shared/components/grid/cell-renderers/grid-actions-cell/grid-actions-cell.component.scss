@@ -1,3 +1,5 @@
+@import "colors";
+
 :host {
   display: flex;
   align-items: center;
@@ -25,6 +27,21 @@
 
     .grid-actions-cell-item-title {
       font-weight: 700;
+    }
+
+    &.centered {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+  }
+
+  .icon-unlock {
+    width: 16px;
+    height: 16px;
+
+    &.supportive-green-10 {
+      color: $supportive-green-10;
     }
   }
 }

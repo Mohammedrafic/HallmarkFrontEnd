@@ -8,6 +8,6 @@ import { SharedModule } from '@shared/shared.module';
 @NgModule({
   declarations: [TableStatusCellComponent],
   exports: [TableStatusCellComponent],
-  imports: [CommonModule, ChipListModule, SharedModule]
+  imports: [CommonModule, ChipListModule, SharedModule],
 })
 export class TableStatusCellModule {}

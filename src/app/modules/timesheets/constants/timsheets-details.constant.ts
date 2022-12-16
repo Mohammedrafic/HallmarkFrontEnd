@@ -13,7 +13,7 @@ import { GridDateEditorComponent } from '../components/cell-editors/grid-date-ed
 import { GridDayComponent } from '../components/cell-editors/grid-day/grid-day.component';
 import { InputEditorComponent } from '../components/cell-editors/input-editor/input-editor.component';
 import { RecordStatusCellComponent } from '../components/cell-editors/record-status-cell/record-status-cell.component';
-import { SwitchEditorComponent } from '../components/cell-editors/switch-editor/switch-editor.component';
+import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
 
 const commonColumn: ColDef = {
   filter: true,

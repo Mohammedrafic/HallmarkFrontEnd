@@ -8,7 +8,7 @@ import { GridActionsCellConfig, GridActionsCellItem } from './grid-actions-cell-
 @Component({
   selector: 'app-grid-actions-cell',
   templateUrl: './grid-actions-cell.component.html',
-  styleUrls: ['./grid-actions-cell.component.scss']
+  styleUrls: ['./grid-actions-cell.component.scss'],
 })
 export class GridActionsCellComponent extends GridCellRenderer<GridActionsCellConfig & ICellRendererParams> {
   public actionsConfig: GridActionsCellItem[];

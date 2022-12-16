@@ -23,14 +23,14 @@ import {
   Sliders,
   Trash2,
   User,
-  Flag
+  Flag,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
   NumericTextBoxAllModule,
   NumericTextBoxModule,
   TextBoxModule,
-  UploaderModule
+  UploaderModule,
 } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -67,7 +67,7 @@ import {
   PageService,
   ResizeService,
   SortService,
-  ToolbarService
+  ToolbarService,
 } from '@syncfusion/ej2-angular-grids';
 import { OrderCandidatesListComponent } from './components/order-candidate-list/order-candidates-list/order-candidates-list.component';
 import { OrderReOrdersListComponent } from './components/order-reorders-list/order-re-orders-list.component';
@@ -164,7 +164,7 @@ const icons = {
   EyeOff,
   DollarSign,
   Percent,
-  Flag
+  Flag,
 };
 
 const COMPONENTS = [
@@ -287,7 +287,7 @@ const COMPONENTS = [
 
     ImportDialogContentComponent,
     MultiSelectModule,
-    TooltipModule
+    TooltipModule,
   ],
   declarations: [
     ...COMPONENTS,

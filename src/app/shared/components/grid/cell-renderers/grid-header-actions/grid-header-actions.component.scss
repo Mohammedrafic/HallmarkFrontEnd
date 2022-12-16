@@ -1,0 +1,31 @@
+@import "colors";
+
+:host {
+  width: 100%;
+}
+
+.grid-icon-cell-container {
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+
+  button {
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .icon {
+    position: relative;
+    width: 16px !important;
+    height: 16px !important;
+    color: $secondary-dark-blue-20 !important;
+    stroke-linecap: unset !important;
+    stroke-linejoin: unset !important;
+
+    &.desc {
+      transform: rotateZ(180deg);
+    }
+  }
+}

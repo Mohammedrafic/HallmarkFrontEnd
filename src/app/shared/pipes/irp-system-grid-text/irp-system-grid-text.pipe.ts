@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'irpSystemGridText'
+  name: 'irpSystemGridText',
 })
 export class IrpSystemGridTextPipe implements PipeTransform {
   transform(isIrp: boolean, isVMS: boolean): string {

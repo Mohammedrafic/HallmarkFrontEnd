@@ -31,6 +31,7 @@ import {
   User,
   X,
   XCircle,
+  Clipboard,
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -95,6 +96,15 @@ import { SettingsViewService } from '@shared/services';
 import { OrderImportComponent } from './order-management/order-import/order-import.component';
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
 import { OrganizationCandidatesModule } from '@client/candidates/organization-candidates.module';
+import { ButtonGroupModule } from '@shared/components/button-group/button-group.module';
+import { GridHeaderActionsModule } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.module';
+import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
+import {
+  OrderManagementIrpSubrowService,
+} from '@client/order-management/order-management-content/services/order-management-irp-subrow.service';
+import { TableRowDetailModule } from '@shared/components/grid/cell-renderers/table-row-detail/table-row-detail.module';
+import { SwitchEditorModule } from '@shared/components/switch-editor/switch-editor.module';
+import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 
 const gridIcons = {
   MessageSquare,
@@ -124,6 +134,7 @@ const gridIcons = {
   CheckCircle,
   AlertTriangle,
   ChevronRight,
+  Clipboard,
 };
 
 @NgModule({
@@ -169,6 +180,7 @@ const gridIcons = {
     DialogModule,
     RadioButtonModule,
     AgGridModule,
+    GridPaginationModule,
     AddEditReorderModule,
     SaveTemplateDialogModule,
     CloseOrderModule,
@@ -187,6 +199,10 @@ const gridIcons = {
     ImportDialogContentModule,
     ListBoxModule,
     OrganizationCandidatesModule,
+    ButtonGroupModule,
+    GridHeaderActionsModule,
+    TableRowDetailModule,
+    SwitchEditorModule,
   ],
   providers: [
     ResizeService,
@@ -201,6 +217,8 @@ const gridIcons = {
     MaskedDateTimeService,
     SettingsViewService,
     OrderDetailsService,
+    OrderManagementIrpSubrowService,
+    OrderManagementIrpApiService,
   ],
 })
 export class ClientModule {}

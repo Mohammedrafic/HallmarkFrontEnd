@@ -13,6 +13,7 @@ import {
   ExportOrders,
   GetAgencyOrderCandidatesList,
   GetAvailableSteps,
+  GetIRPOrders,
   GetOrderById,
   GetOrderByIdSucceeded,
   GetOrderFilterDataSources,
@@ -23,17 +24,25 @@ import {
   LockUpdatedSuccessfully,
   ReloadOrganisationOrderCandidatesLists,
   SelectNavigationTab,
-  SetLock
+  SetLock,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Permission } from '@core/interface';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { GetAssignedSkillsByOrganization, GetOrganizationSettings } from '@organization-management/store/organization-management.actions';
+import {
+  GetAssignedSkillsByOrganization,
+  GetOrganizationById,
+  GetOrganizationSettings,
+} from '@organization-management/store/organization-management.actions';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import {
+  OrderManagementIRPSystemId,
+  OrderManagementIRPTabsIndex,
+  OrganizationOrderManagementTabs,
+} from '@shared/enums/order-management-tabs.enum';
 import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { AbstractPermissionGrid } from '@shared/helpers/permissions';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -46,7 +55,7 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementChild,
-  OrderManagementPage
+  OrderManagementPage,
 } from '@shared/models/order-management.model';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Skill } from '@shared/models/skill.model';
@@ -59,14 +68,16 @@ import {
   catchError,
   combineLatest,
   debounceTime,
+  delay,
   EMPTY,
   filter,
   Observable,
+  of,
   Subject,
   Subscription,
   take,
   takeUntil,
-  throttleTime
+  throttleTime,
 } from 'rxjs';
 import { CandidatesStatusText, FilterOrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import {
@@ -75,7 +86,7 @@ import {
   ShowExportDialog,
   ShowFilterDialog,
   ShowSideDialog,
-  ShowToast
+  ShowToast,
 } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
@@ -93,7 +104,7 @@ import {
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
-  ROW_HEIGHT
+  ROW_HEIGHT,
 } from './order-management-content.constants';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -124,13 +135,28 @@ import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { PreservedFilters } from '@shared/models/preserved-filters.model';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { AppState } from '../../../store/app.state';
+import { ButtonModel } from '@shared/models/buttons-group.model';
+import {
+  IRPTabsConfig,
+  SystemGroupConfig,
+  ThreeDotsMenuOptions,
+} from '@client/order-management/order-management-content/constants/order-management-irp.const';
+import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
+import { ColDef, GridOptions, Module, SortChangedEvent } from '@ag-grid-community/core';
+import { OrderManagementIrpGridHelper } from '@client/order-management/order-management-content/helpers/order-management-irp-grid.helper';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
+import {
+  OrderManagementIrpSubrowService,
+} from '@client/order-management/order-management-content/services/order-management-irp-subrow.service';
 
 @Component({
   selector: 'app-order-management-content',
   templateUrl: './order-management-content.component.html',
   styleUrls: ['./order-management-content.component.scss'],
   providers: [VirtualScrollService, DetailRowService, MaskedDateTimeService],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderManagementContentComponent extends AbstractPermissionGrid implements OnInit, OnDestroy {
   @ViewChild('grid') override gridWithChildRow: GridComponent;
@@ -187,19 +213,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   public settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   public SettingsKeys = SettingsKeys;
-  public activeTab: OrganizationOrderManagementTabs = OrganizationOrderManagementTabs.AllOrders;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
   public showFilterForm = false;
   public isLockMenuButtonsShown = true;
-
-  public moreMenuWithDeleteButton: ItemModel[];
-  public moreMenuWithCloseButton: ItemModel[];
-  public moreMenuWithReOpenButton: ItemModel[];
-  public moreMenu: ItemModel[];
-  public reOrdersMenu: ItemModel[];
-  public filledReOrdersMenu: ItemModel[];
-  public closedOrderMenu: ItemModel[];
 
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
@@ -239,8 +256,8 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public selectedCandidate: any | null;
   public selectedReOrder: any | null;
   public openChildDialog = new Subject<any>();
-  public isRowScaleUp: boolean = true;
-  public isSubrowDisplay: boolean = false;
+  public isRowScaleUp = true;
+  public isSubrowDisplay = false;
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
   public orderStatus = OrderStatus;
   public reOrderCount$ = new Subject<number>();
@@ -248,6 +265,22 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public canCreateOrder: boolean;
   public canCloseOrder: boolean;
   public importDialogEvent: Subject<boolean> = new Subject<boolean>();
+
+  public OrderManagementIRPSystemId = OrderManagementIRPSystemId;
+  public activeTab: OrganizationOrderManagementTabs
+    = OrganizationOrderManagementTabs.AllOrders;
+  public activeIRPTabIndex: OrderManagementIRPTabsIndex = OrderManagementIRPTabsIndex.AllOrders;
+  public isIRPFlagEnabled = false;
+  public systemGroupConfig: ButtonModel[] = SystemGroupConfig;
+  public activeSystem: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
+  public tabsListConfig: TabsListConfig[] = IRPTabsConfig;
+  public columnDefs: ColDef[] = [];
+  public threeDotsMenuOptions: Record<string, ItemModel[]>;
+  public context: { componentParent: OrderManagementContentComponent };
+  public gridOptions: GridOptions;
+
+  public readonly modules: Module[] = [ClientSideRowModelModule];
+  public readonly gridEmptyMessage = GRID_EMPTY_MESSAGE;
 
   private selectedCandidateMeta: { order: number; positionId: number } | null;
   private selectedIndex: number | null;
@@ -258,6 +291,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public fileName: string;
   public defaultFileName: string;
   public selectedRowRef: any;
+
+  private isOrgIRPEnabled = false;
+  private isOrgVMSEnabled = false;
 
   private isRedirectedFromDashboard: boolean;
   private orderStaus: number;
@@ -291,9 +327,16 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     private addEditReOrderService: AddEditReorderService,
     private reOpenOrderService: ReOpenOrderService,
     private permissionService: PermissionService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private orderManagementIrpSubrowService: OrderManagementIrpSubrowService
   ) {
     super(store);
+
+    this.context = { componentParent: this };
+    this.gridOptions = this.orderManagementIrpSubrowService.configureOrderGridSubRowOptions(this.context);
+
+    this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
+
     const routerState = this.router.getCurrentNavigation()?.extras?.state;
 
     this.isRedirectedFromDashboard = routerState?.['redirectedFromDashboard'] || false;
@@ -338,6 +381,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   override ngOnInit(): void {
     super.ngOnInit();
+
     this.watchForPermissions();
     this.handleDashboardFilters();
     this.orderFilterColumnsSetup();
@@ -372,6 +416,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.getProjectSpecialData();
     this.subscribeOnPermissions();
     this.subscribeOnChanges();
+    this.firstInitGridColumns();
   }
 
   ngOnDestroy(): void {
@@ -397,9 +442,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public override customExport(): void {
-    this.defaultFileName = `Organization Management/${this.activeTab} ` + this.generateDateTime(this.datePipe);
-    this.fileName = this.defaultFileName;
-    this.store.dispatch(new ShowExportDialog(true));
+    if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
+      // TODO new export for IRP system
+    } else {
+      this.defaultFileName = `Organization Management/${ this.activeTab } ` + this.generateDateTime(this.datePipe);
+      this.fileName = this.defaultFileName;
+      this.store.dispatch(new ShowExportDialog(true));
+    }
   }
 
   public closeExport() {
@@ -413,25 +462,29 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.defaultFileName = `Organization Management/${this.activeTab} ` + this.generateDateTime(this.datePipe);
-    this.store.dispatch(
-      new ExportOrders(
-        new ExportPayload(
-          fileType,
-          {
-            ...this.filters,
-            offset: Math.abs(new Date().getTimezoneOffset()),
-            isAgency: this.activeTab === OrganizationOrderManagementTabs.ReOrders ? false : null,
-            ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
-          },
-          options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
-          null,
-          options?.fileName || this.defaultFileName
-        ),
-        this.activeTab
-      )
-    );
-    this.clearSelection(this.gridWithChildRow);
+    if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
+      // TODO new export for IRP system
+    } else {
+      this.defaultFileName = `Organization Management/${ this.activeTab } ` + this.generateDateTime(this.datePipe);
+      this.store.dispatch(
+        new ExportOrders(
+          new ExportPayload(
+            fileType,
+            {
+              ...this.filters,
+              offset: Math.abs(new Date().getTimezoneOffset()),
+              isAgency: this.activeTab === OrganizationOrderManagementTabs.ReOrders ? false : null,
+              ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
+            },
+            options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
+            null,
+            options?.fileName || this.defaultFileName
+          ),
+          this.activeTab
+        )
+      );
+      this.clearSelection(this.gridWithChildRow);
+    }
   }
 
   public override updatePage(): void {
@@ -479,43 +532,56 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) || null : null;
     this.filters.pageSize = this.pageSize;
     this.isIncomplete = false;
-    switch (this.activeTab) {
-      case OrganizationOrderManagementTabs.AllOrders:
-        this.filters.isTemplate = false;
-        this.filters.includeReOrders = true;
-        this.hasOrderAllOrdersId();
-        cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
-        break;
-      case OrganizationOrderManagementTabs.PerDiem:
-        this.filters.orderTypes = [OrderType.OpenPerDiem];
-        this.filters.includeReOrders = true;
-        this.filters.isTemplate = false;
-        cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
-        break;
-      case OrganizationOrderManagementTabs.PermPlacement:
-        this.filters.orderTypes = [OrderType.PermPlacement];
-        this.filters.isTemplate = false;
-        cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
-        break;
-      case OrganizationOrderManagementTabs.ReOrders:
-        this.hasOrderAllOrdersId();
-        this.filters.orderTypes = [OrderType.ReOrder];
-        this.filters.isTemplate = false;
-        cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
-        break;
-      case OrganizationOrderManagementTabs.Incomplete:
-        this.columnsToExport = allOrdersColumnsToExport;
-        this.filters.isTemplate = false;
-        this.isIncomplete = true;
-        cleared ? this.store.dispatch([new GetOrders(this.filters, true)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
-        break;
-      case OrganizationOrderManagementTabs.OrderTemplates:
-        this.filters.isTemplate = true;
-        cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
-        break;
+
+    if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
+      this.filters = {}; // TODO remove and implement IRP filters
+
+      this.filters.orderBy = this.orderBy;
+      this.filters.pageNumber = this.currentPage;
+      this.filters.pageSize = this.pageSize;
+      this.filters.orderType = this.activeIRPTabIndex ? this.activeIRPTabIndex - 1 : null;
+
+      this.store.dispatch(new GetIRPOrders(this.filters));
+    } else if (this.activeSystem === OrderManagementIRPSystemId.VMS) {
+      switch (this.activeTab) {
+        case OrganizationOrderManagementTabs.AllOrders:
+          this.filters.isTemplate = false;
+          this.filters.includeReOrders = true;
+          this.hasOrderAllOrdersId();
+          cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
+          break;
+        case OrganizationOrderManagementTabs.PerDiem:
+          this.filters.orderTypes = [OrderType.OpenPerDiem];
+          this.filters.includeReOrders = true;
+          this.filters.isTemplate = false;
+          cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
+          break;
+        case OrganizationOrderManagementTabs.PermPlacement:
+          this.filters.orderTypes = [OrderType.PermPlacement];
+          this.filters.isTemplate = false;
+          cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
+          break;
+        case OrganizationOrderManagementTabs.ReOrders:
+          this.hasOrderAllOrdersId();
+          this.filters.orderTypes = [OrderType.ReOrder];
+          this.filters.isTemplate = false;
+          cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
+          break;
+        case OrganizationOrderManagementTabs.Incomplete:
+          this.columnsToExport = allOrdersColumnsToExport;
+          this.filters.isTemplate = false;
+          this.isIncomplete = true;
+          cleared ? this.store.dispatch([new GetOrders(this.filters, true)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
+          break;
+        case OrganizationOrderManagementTabs.OrderTemplates:
+          this.filters.isTemplate = true;
+          cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
+          break;
+      }
+
+      this.checkSelectedChildrenItem();
     }
 
-    this.checkSelectedChildrenItem();
     this.cd$.next(true);
   }
 
@@ -560,8 +626,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public showFilters(): void {
-    this.store.dispatch(new ShowFilterDialog(true));
-    setTimeout(() => {this.orderStatusFilter?.refresh(); this.cd$.next(true);}, 300);
+    if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
+      // TODO new filters for IRP system
+    } else {
+      this.store.dispatch(new ShowFilterDialog(true));
+      setTimeout(() => {this.orderStatusFilter?.refresh(); this.cd$.next(true);}, 300);
+    }
   }
 
   public onFilterDelete(event: FilteredItem): void {
@@ -828,7 +898,24 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
   }
 
-  public tabSelected(tabIndex: OrganizationOrderManagementTabs): void {
+  public irpTabSelected(tabIndex: OrderManagementIRPTabsIndex) {
+    this.activeIRPTabIndex = tabIndex;
+    this.clearFilters();
+    this.filterApplied = false;
+
+    if (!this.previousSelectedOrderId) {
+      this.openDetails.next(false);
+      this.store.dispatch(new ClearOrders());
+      this.selectedIndex = null;
+
+      this.initGridColumns();
+
+      this.pageSubject.next(1);
+    }
+    this.cd$.next(true);
+  }
+
+  public tabSelected(tabIndex: OrganizationOrderManagementTabs | any): void {
     this.activeTab = tabIndex;
     this.clearFilters();
     this.filterApplied = false;
@@ -840,6 +927,10 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.store.dispatch(new ClearOrders());
       this.selectedIndex = null;
       this.clearSelection(this.gridWithChildRow);
+
+      if (this.isIRPFlagEnabled) {
+        this.initGridColumns();
+      }
 
       switch (tabIndex) {
         case OrganizationOrderManagementTabs.AllOrders:
@@ -869,6 +960,30 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.pageSubject.next(1);
     }
     this.cd$.next(true);
+  }
+
+  buttonGroupChange(selectedBtn: ButtonModel) {
+    this.activeSystem = selectedBtn.id;
+
+    this.clearFilters();
+    this.initGridColumns();
+    this.getOrders();
+  }
+
+  gridSortHandler(sortEvent: SortChangedEvent): void {
+    const columnWithSort = sortEvent.columnApi.getColumnState().find((col) => col.sort !== null);
+    this.orderBy = columnWithSort ? `${ columnWithSort.colId } ${ columnWithSort.sort }` : '';
+
+    this.getOrders();
+  }
+
+  gridPageChanged(page: number) {
+    this.pageSubject.next(page);
+  }
+
+  gridPerPageChanged(perPage: number) {
+    this.pageSize = perPage;
+    this.pageSubject.next(1);
   }
 
   public onOpenReorderDialog(reOrder: OrderManagement, order: OrderManagement): void {
@@ -979,6 +1094,12 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     super.onSubrowAllToggle();
   }
 
+  public toggleRowHeight(scaled: boolean): void {
+    this.rowHeight = scaled ? ROW_HEIGHT.SCALE_UP_HEIGHT : ROW_HEIGHT.SCALE_DOWN_HEIGHT;
+
+    this.cd$.next(true);
+  }
+
   public reOpenOrder(order: OrderManagement): void {
     this.reOpenOrderService
       .reOpenOrder({ orderId: order.id })
@@ -1002,7 +1123,11 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   public openImportDialog(): void {
-    this.importDialogEvent.next(true);
+    if (this.isIRPFlagEnabled && this.activeSystem === OrderManagementIRPSystemId.IRP) {
+      // TODO new import for IRP system
+    } else {
+      this.importDialogEvent.next(true);
+    }
   }
 
   private openReOrderDialog(orderId: number, organizationId: number): void {
@@ -1040,21 +1165,21 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private onOrganizationChangedHandler(): void {
-    this.organizationId$
-      .pipe(
-        takeUntil(this.unsubscribe$),
-        filter((data) => !!data)
-      )
-      .subscribe(() => {
-        this.getSettings();
-        if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
-          this.clearFilters();
-        }
-        if (!this.previousSelectedOrderId) {
-          this.pageSubject.next(1);
-        }
-        this.store.dispatch(new GetAssignedSkillsByOrganization());
-      });
+    this.organizationId$.pipe(
+      filter(Boolean),
+      takeUntil(this.unsubscribe$),
+    ).subscribe((id) => {
+      this.getSettings();
+      if (!this.isRedirectedFromDashboard && !this.isRedirectedFromToast) {
+        this.clearFilters();
+      }
+      if (!this.previousSelectedOrderId) {
+        this.pageSubject.next(1);
+      }
+      this.store.dispatch(new GetAssignedSkillsByOrganization());
+
+      this.getOrganization(id);
+    });
   }
 
   private onOrdersDataLoadHandler(): void {
@@ -1242,7 +1367,13 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         } else {
           this.redirectFromPerdiem = false;
         }
-        this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
+
+        if (this.activeSystem === OrderManagementIRPSystemId.IRP) {
+          this.clearFilters();
+          this.store.dispatch(new GetIRPOrders(this.filters));
+        } else {
+          this.store.dispatch([new GetOrders(this.filters, this.isIncomplete)]);
+        }
         this.cd$.next(true);
       });
   }
@@ -1281,7 +1412,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.filterColumns.locationIds.dataSource = [];
         selectedRegions.forEach((region) => {
           region.locations?.forEach((location) => (location.regionName = region.name));
-          locations.push(...region.locations as [])
+          locations.push(...region.locations as []);
         });
         this.filterColumns.locationIds.dataSource.push(...sortByField(locations, 'name'));
       } else {
@@ -1414,23 +1545,27 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   public getMoreMenu(order: OrderManagement): ItemModel[] {
     const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
     if (orderStatuses.includes(OrderStatus.InProgressOfferAccepted)) {
-      if (Boolean(order.children?.some((child) => orderStatuses.includes(child.orderStatus)))) {
-        return order.orderType === OrderType.OpenPerDiem ? this.moreMenuWithCloseButton : this.moreMenu;
+      if (order.children?.some((child) => orderStatuses.includes(child.orderStatus))) {
+        return order.orderType === OrderType.OpenPerDiem
+          ? this.threeDotsMenuOptions['moreMenuWithCloseButton']
+          : this.threeDotsMenuOptions['moreMenu'];
       }
     }
-    return this.canReOpen(order) ? this.moreMenuWithReOpenButton : this.moreMenuWithCloseButton;
+    return this.canReOpen(order)
+      ? this.threeDotsMenuOptions['moreMenuWithReOpenButton']
+      : this.threeDotsMenuOptions['moreMenuWithCloseButton'];
   }
 
   public getMenuForReorders(order: OrderManagement): ItemModel[] {
-    if (Boolean(order.children?.some((child) => OrderStatus.Filled === child.orderStatus))) {
-      return this.filledReOrdersMenu;
+    if (order.children?.some((child) => OrderStatus.Filled === child.orderStatus)) {
+      return this.threeDotsMenuOptions['filledReOrdersMenu'];
     }
 
     if (!order.children?.length && order.orderCloseDate && order.status !== OrderStatus.Closed) {
-      return this.moreMenu;
+      return this.threeDotsMenuOptions['moreMenu'];
     }
 
-    return this.reOrdersMenu;
+    return this.threeDotsMenuOptions['reOrdersMenu'];
   }
 
   public canReOpen(order: OrderManagement): boolean {
@@ -1589,7 +1724,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
 
   private handleRedirectFromQuickOrderToast(): void {
     if (this.isRedirectedFromToast) {
-      let prefix = this.prefix || '';
+      const prefix = this.prefix || '';
       this.orderManagementService.orderId$.next({ id: this.quickOrderId, prefix: prefix });
     }
   }
@@ -1614,39 +1749,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   }
 
   private initMenuItems(): void {
-    this.moreMenuWithDeleteButton = [
-      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
-      { text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder },
-      { text: MoreMenuType[3], id: '3', disabled: !this.canCreateOrder },
-    ];
-
-    this.moreMenuWithCloseButton = [
-      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
-      { text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder },
-      { text: MoreMenuType[2], id: '2', disabled: !this.canCloseOrder },
-    ];
-
-    this.moreMenuWithReOpenButton = [
-      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
-      { text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder },
-      { text: MoreMenuType[4], id: '4', disabled: !this.canCreateOrder },
-    ];
-
-    this.moreMenu = [
-      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
-      { text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder },
-    ];
-
-    this.reOrdersMenu = [
-      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder },
-      { text: MoreMenuType[2], id: '2', disabled: !this.canCloseOrder },
-    ];
-
-    this.filledReOrdersMenu = [
-      { text: MoreMenuType[0], id: '0', disabled: !this.canCreateOrder }
-    ];
-
-    this.closedOrderMenu = [{ text: MoreMenuType[1], id: '1', disabled: !this.canCreateOrder }];
+    this.threeDotsMenuOptions = ThreeDotsMenuOptions(this.canCreateOrder, this.canCloseOrder);
   }
 
   private watchForPermissions(): void {
@@ -1663,7 +1766,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         ...this.selectedCandidate,
         actualStartDate: data.actualStartDate,
         actualEndDate: data.actualEndDate,
-      }})
+      };});
   }
 
   private dispatchAgencyOrderCandidatesList(orderId: number, organizationId: number): void {
@@ -1676,5 +1779,46 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
         this.orderManagementService.excludeDeployed
       )
     );
+  }
+
+  private getOrganization(businessUnitId: number) {
+    const id = businessUnitId || this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+
+    this.store.dispatch(new GetOrganizationById(id)).pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      const { isIRPEnabled, isVMCEnabled } =
+        this.store.selectSnapshot(OrganizationManagementState.organization)?.preferences || {};
+
+      this.isOrgIRPEnabled = !!isIRPEnabled;
+      this.isOrgVMSEnabled = !!isVMCEnabled;
+
+      this.initGridColumns();
+    });
+  }
+
+  private firstInitGridColumns(): void {
+    of(null).pipe(
+      delay(1000),
+      take(1),
+      takeUntil(this.unsubscribe$),
+    ).subscribe(() => {
+      this.initGridColumns();
+    });
+  }
+
+  private initGridColumns(): void {
+    this.columnDefs = OrderManagementIrpGridHelper.prepareColDefs(
+      this.activeSystem,
+      this.activeIRPTabIndex,
+      this.threeDotsMenuOptions,
+      this.canCreateOrder,
+      this.settings[SettingsKeys.IsReOrder]?.value,
+      this.hasCreateEditOrderPermission,
+      this.isOrgIRPEnabled,
+      this.isOrgVMSEnabled,
+    );
+
+    this.cd$.next(true);
   }
 }
