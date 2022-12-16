@@ -237,13 +237,13 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     return found ? found[0] : 'e-default';
   }
 
-  public onEdit(data: any): void {
+  public onEdit(data: CandidateRow | IRPCandidate): void {
     const credentialParams: CredentialParams = {
       isNavigatedFromOrganizationArea: false,
       candidateStatus: null,
       orderId: null,
     };
-    this.router.navigate(['./edit', data.candidateProfileId], { relativeTo: this.route, state: credentialParams });
+    this.router.navigate(['./edit', (data as CandidateRow).candidateProfileId || (data as IRPCandidate).employeeId], { relativeTo: this.route, state: credentialParams });
   }
 
   public onRemove(id: number): void {

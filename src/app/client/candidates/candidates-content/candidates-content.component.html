@@ -32,10 +32,9 @@
       </button>
     </div>
     <div class="button-group" *ngIf="isIRP">
-      <button ejs-button appHideBeforeSyncfusionLoad id="addIRPCandidate" cssClass="e-primary">
+      <button ejs-button appHideBeforeSyncfusionLoad id="addIRPCandidate" cssClass="e-primary" (click)="addIRPCandidate()">
         Add Candidate
       </button>
-      <a routerLink="add">Add Candidate</a>
     </div>
   </ng-container>
 </app-page-toolbar>
