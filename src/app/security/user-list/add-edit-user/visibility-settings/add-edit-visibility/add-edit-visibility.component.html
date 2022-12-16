@@ -42,69 +42,100 @@
               </ejs-dropdownlist>
             </div>
           </div>
-          <div class="dropdown-container bootstrap">
+          <div class="dropdown-container">
             <label>Region</label>
-            <div class="input-group">
-              <ejs-multiselect appValidateWithMessage
-                               #regionMultiselect
-                               mode="CheckBox"
-                               selectAllText="All"
-                               [showSelectAll]="true"
-                               [allowFiltering]="true"
-                               [showDropDownIcon]="true"
-                               [fields]="optionFields"
-                               [dataSource]="regions"
-                               formControlName="regionIds">
-                <ng-template #itemTemplate let-data>
-                  <div class="visibility-option-container">
-                    <span>{{data?.name}}</span>
-                    <span class="parent-option-name">{{data?.organisationName}}</span>
-                  </div>
-                </ng-template>
-              </ejs-multiselect>
+            <div class="dropdown-wrapper">
+              <div class="input-group bootstrap">
+                <ejs-multiselect appValidateWithMessage
+                                 #regionMultiselect
+                                 mode="CheckBox"
+                                 [allowFiltering]="true"
+                                 [showDropDownIcon]="true"
+                                 [fields]="optionFields"
+                                 [dataSource]="regions"
+                                 formControlName="regionIds">
+                  <ng-template #itemTemplate let-data>
+                    <div class="visibility-option-container">
+                      <span>{{data?.name}}</span>
+                      <span class="parent-option-name">{{data?.organisationName}}</span>
+                    </div>
+                  </ng-template>
+                </ejs-multiselect>
+              </div>
+              <div class="switch">
+                <ejs-switch
+                  name="allRegions"
+                  [checked]="allRegions"
+                  (change)="allRegionsChange($event)"
+                  label="All"
+                ></ejs-switch>
+                <label for="allRegions" class="switch-text">All</label>
+              </div>
             </div>
           </div>
-          <div class="dropdown-container bootstrap">
+          <div class="dropdown-container">
             <label>Location</label>
-            <div class="input-group">
-              <ejs-multiselect appValidateWithMessage
-                               mode="CheckBox"
-                               selectAllText="All"
-                               [showSelectAll]="true"
-                               [allowFiltering]="true"
-                               [showDropDownIcon]="true"
-                               [fields]="optionFields"
-                               [dataSource]="locations"
-                               formControlName="locationIds">
-                <ng-template #itemTemplate let-data>
-                  <div class="visibility-option-container">
-                    <span>{{data?.name}}</span>
-                    <span class="parent-option-name">{{data?.locationName}}</span>
-                  </div>
-                </ng-template>
-              </ejs-multiselect>
+            <div class="dropdown-wrapper">
+              <div class="input-group bootstrap">
+                <ejs-multiselect appValidateWithMessage
+                                 mode="CheckBox"
+                                 [allowFiltering]="true"
+                                 [showDropDownIcon]="true"
+                                 [fields]="optionFields"
+                                 [dataSource]="locations"
+                                 formControlName="locationIds">
+                  <ng-template #itemTemplate let-data>
+                    <div class="visibility-option-container">
+                      <span>{{data?.name}}</span>
+                      <span class="parent-option-name">{{data?.locationName}}</span>
+                    </div>
+                  </ng-template>
+                </ejs-multiselect>
+              </div>
+              <div class="switch">
+                <ejs-switch
+                  name="allLocations"
+                  [checked]="allLocations"
+                  (change)="allLocationsChange($event)"
+                  label="All"
+                ></ejs-switch>
+                <label for="allLocations" class="switch-text">All</label>
+              </div>
             </div>
           </div>
-          <div class="dropdown-container bootstrap">
+          <div class="dropdown-container">
             <label>Department</label>
-            <div class="input-group">
-              <ejs-multiselect appValidateWithMessage
-                               mode="CheckBox"
-                               selectAllText="All"
-                               [showSelectAll]="true"
-                               [allowFiltering]="true"
-                               [showDropDownIcon]="true"
-                               [fields]="optionFields"
-                               [dataSource]="departments"
-                               formControlName="departmentIds"
-                               maximumSelectionLength="50000">
-                <ng-template #itemTemplate let-data>
-                  <div class="visibility-option-container">
-                    <span>{{data?.name}}</span>
-                    <span class="parent-option-name">{{data?.locationName}}</span>
-                  </div>
-                </ng-template>
-              </ejs-multiselect>
+            <div class="dropdown-wrapper">
+              <div class="input-group bootstrap">
+                <ejs-multiselect appValidateWithMessage
+                                 mode="CheckBox"
+                                 [allowFiltering]="true"
+                                 [showDropDownIcon]="true"
+                                 [fields]="optionFields"
+                                 [dataSource]="departments"
+                                 (filtering)="onDepartmentsFiltering($event)"
+                                 formControlName="departmentIds"
+                                 [query]="query">
+                  <ng-template #itemTemplate let-data>
+                    <div class="visibility-option-container">
+                      <span>{{data?.name}}</span>
+                      <span class="parent-option-name">{{data?.locationName}}</span>
+                    </div>
+                  </ng-template>
+                </ejs-multiselect>
+              </div>
+              <div class="switch">
+                <ejs-switch
+                  name="allDepartments"
+                  [checked]="allDepartments"
+                  (change)="allDepartmentsChange($event)"
+                  label="All"
+                ></ejs-switch>
+                <label for="allDepartments" class="switch-text">All</label>
+              </div>
+            </div>
+            <div *ngIf="departments && departments.length > maxDepartmentsLength">
+              Narrow down locations/regions or use input search for departments.
             </div>
           </div>
         </form>

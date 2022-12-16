@@ -6,6 +6,21 @@
   left: auto !important;
   height: calc(100% - 60px) !important;
 
+  .switch {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dropdown-wrapper {
+    display: flex;
+
+    .input-group {
+      width: 100%;
+      margin-right: 12px;
+    }
+  }
+
   .e-dlg-content {
     padding: 0;
   }
