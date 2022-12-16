@@ -49,7 +49,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   private filters: DashboardFiltersModel = {} as DashboardFiltersModel;
   private regions: OrganizationRegion[] = [];
   private sortedSkillsByOrgId: Record<string, AllOrganizationsSkill[]> = {};
-  private commonSkillsIds: number[] = [];
   private filterIsApplied: boolean = false;
 
   public widgetFilterFormGroup: FormGroup;
@@ -88,9 +87,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     return this.widgetFilterFormGroup.get(FilterColumnTypeEnum.DEPARTMENT)?.value?.length || 0;
   }
 
-  get commonSkills(): AllOrganizationsSkill[] {
-    return this.sortedSkillsByOrgId['null'] || [];
-  }
 
   constructor(
     private readonly store: Store,
@@ -208,13 +204,13 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
           organizationRegions.push(...(organization.regions as []));
         })
         
-        const sortedSkills: AllOrganizationsSkill[] = sortByField(this.commonSkills.concat(allOrganizationSkills), 'skillDescription');
+        const sortedSkills: AllOrganizationsSkill[] = sortByField(allOrganizationSkills, 'skillDescription');
         this.filterColumns.skillIds.dataSource.push(...sortedSkills as []);
         this.filterColumns.regionIds.dataSource.push(...sortByField(organizationRegions, 'name'));
       } else {
         this.filterColumns.regionIds.dataSource = [];
-        this.filterColumns.skillIds.dataSource = this.commonSkills;
-        this.setCommonSkillsToFormControl();
+        this.filterColumns.skillIds.dataSource = [];
+        this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.setValue([]);
         this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.setValue([]);
         this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns)
       }
@@ -270,14 +266,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.valueChanges.pipe(throttleTime(100)).subscribe(() => this.cdr.markForCheck());
   }
 
-  private setCommonSkillsToFormControl(): void {
-    const selectedSkills = this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.value;
-    if(selectedSkills?.length) {
-      const commonSkills = selectedSkills.filter((value: number) => this.commonSkillsIds.includes(value));
-      this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.setValue([...commonSkills]);
-    }
-  }
-
   private onOrganizationStructureDataLoadHandler(): void {
     if(this.organizationStructure && !this.userIsAdmin) {
         this.cdr.markForCheck();
@@ -294,23 +282,18 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   private onSkillDataLoadHandler(): void {
     if (this.allSkills) {
-      let skills;
+      let skills: AllOrganizationsSkill[] = [];
       this.sortedSkillsByOrgId = {};
-      this.commonSkillsIds = [];
       if (this.userIsAdmin) {
         this.allSkills.forEach((skill) => {
-          if (skill.businessUnitId === null) {
-            this.commonSkillsIds.push(skill.id);
-          }
           if (skill.businessUnitId in this.sortedSkillsByOrgId) {
             this.sortedSkillsByOrgId[skill.businessUnitId].push(skill);
           } else {
             this.sortedSkillsByOrgId[skill.businessUnitId] = [skill];
           }
         });
-        skills = this.commonSkills;
       } else {
-        skills = this.allSkills;
+        skills = this.allSkills.filter((skill) => !!skill.businessUnitId);
       }
       this.filterColumns.skillIds.dataSource = skills;
     }
