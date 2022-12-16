@@ -31,7 +31,6 @@ import {
 } from '@shared/models/order-management.model';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
-  ClearAgencyOrderCandidatesList,
   GetCandidateJob,
   GetRejectReasonsForAgency,
   RejectCandidateForAgencySuccess,
@@ -49,7 +48,6 @@ import { Router } from '@angular/router';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
-  ClearOrderCandidatePage,
   GetOrganisationCandidateJob,
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
@@ -188,7 +186,6 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     this.onRejectSuccess();
     this.subscribeOnCancelOrganizationCandidateJobSuccess();
     this.subscribeToCandidateJob();
-    this.clearOrderCandidateList();
   }
 
   public updateOrganizationCandidateJobWithBillRate(bill: BillRate): void {
@@ -601,16 +598,11 @@ export class ExtensionCandidateComponent extends DestroyableDirective implements
     (this.isAgency ? this.candidateJobState$ : this.candidatesJob$)
       .pipe(filter(Boolean), takeUntil(this.destroy$))
       .subscribe((data) => {
-        this.resetStatusesFormControl();
-        this.createForm();
-        this.patchForm(data);
+        if(data.jobId === this.candidate?.candidateJobId) {
+          this.resetStatusesFormControl();
+          this.createForm();
+          this.patchForm(data);
+        }
       });
-  }
-
-  private clearOrderCandidateList(): void {
-    this.dialogEvent.pipe(filter((data) => !data), takeUntil(this.destroy$)).subscribe(() => {
-        const ClearCandidatesList = this.isAgency ? ClearAgencyOrderCandidatesList : ClearOrderCandidatePage;
-        this.store.dispatch(new ClearCandidatesList());
-    });
   }
 }
