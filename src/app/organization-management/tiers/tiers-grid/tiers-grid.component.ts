@@ -56,7 +56,8 @@ export class TiersGridComponent extends DestroyableDirective implements OnInit {
       priority: ++event.node.rowIndex!,
       orderBy: null,
       pageNumber: this.filters.pageNumber,
-      pageSize: this.filters.pageSize
+      pageSize: this.filters.pageSize,
+      systemType: this.systemType,
     }));
   }
 
