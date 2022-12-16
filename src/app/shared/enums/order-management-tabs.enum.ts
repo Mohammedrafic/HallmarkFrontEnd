@@ -10,24 +10,14 @@ export enum OrganizationOrderManagementTabs {
 export enum OrderManagementIRPTabs {
   AllOrders = 'All',
   PerDiem = 'Per Diem',
-  PermPlacement = 'Perm Placement',
-  ReOrders = 'Re-Orders',
-  Incomplete = 'Incomplete',
   LTA = 'LTA',
+  Incomplete = 'Incomplete',
 }
 
 export enum OrderManagementIRPTabsIndex {
   AllOrders,
   PerDiem,
   Lta,
-  Incomplete
-}
-
-export enum OrderManagementVMSTabsIndex {
-  AllOrders,
-  PerDiem,
-  PermPlacement,
-  ReOrders,
   Incomplete
 }
 

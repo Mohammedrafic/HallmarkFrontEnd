@@ -31,6 +31,7 @@ import {
   User,
   X,
   XCircle,
+  Clipboard,
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -88,6 +89,13 @@ import { MatMenuModule } from '@angular/material/menu';
 import { SettingsViewService } from '@shared/services';
 import { OrderImportComponent } from './order-management/order-import/order-import.component';
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
+import { ButtonGroupModule } from '@shared/components/button-group/button-group.module';
+import { GridHeaderActionsModule } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.module';
+import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
+import {
+  OrderManagementIrpSubrowService,
+} from '@client/order-management/order-management-content/services/order-management-irp-subrow.service';
+import { TableRowDetailModule } from '@shared/components/grid/cell-renderers/table-row-detail/table-row-detail.module';
 
 const gridIcons = {
   MessageSquare,
@@ -117,6 +125,7 @@ const gridIcons = {
   CheckCircle,
   AlertTriangle,
   ChevronRight,
+  Clipboard,
 };
 
 @NgModule({
@@ -162,6 +171,7 @@ const gridIcons = {
     DialogModule,
     RadioButtonModule,
     AgGridModule,
+    GridPaginationModule,
     AddEditReorderModule,
     SaveTemplateDialogModule,
     CloseOrderModule,
@@ -179,6 +189,9 @@ const gridIcons = {
     ExtensionModule,
     ImportDialogContentModule,
     ListBoxModule,
+    ButtonGroupModule,
+    GridHeaderActionsModule,
+    TableRowDetailModule,
   ],
   providers: [
     ResizeService,
@@ -193,6 +206,7 @@ const gridIcons = {
     MaskedDateTimeService,
     SettingsViewService,
     DistributionTierService,
+    OrderManagementIrpSubrowService,
   ],
 })
 export class ClientModule {}

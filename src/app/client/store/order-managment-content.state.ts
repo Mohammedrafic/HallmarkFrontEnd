@@ -58,19 +58,19 @@ import {
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
   UploadOrderImportFile,
-  UploadOrderImportFileSucceeded
+  UploadOrderImportFileSucceeded,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
   ApplicantStatus,
-  GetPredefinedBillRatesData, IRPOrderManagementPage,
+  GetPredefinedBillRatesData,
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementPage,
-  SuggestedDetails
+  SuggestedDetails,
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -86,7 +86,7 @@ import {
   ORDER_WITHOUT_CREDENTIALS,
   RECORD_ADDED,
   RECORD_MODIFIED,
-  updateCandidateJobMessage
+  updateCandidateJobMessage,
 } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate, BillRateOption } from '@shared/models/bill-rate.model';
@@ -112,7 +112,6 @@ import { OrderManagementIrpApiService } from '@shared/services/order-management-
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
-  IRPOrdersPage: IRPOrderManagementPage | null;
   selectedOrder: Order | null;
   candidatesJob: OrderCandidateJob | null;
   applicantStatuses: ApplicantStatus[];
@@ -144,7 +143,6 @@ export interface OrderManagementContentStateModel {
   name: 'orderManagement',
   defaults: {
     ordersPage: null,
-    IRPOrdersPage: null,
     selectedOrder: null,
     orderCandidatesListPage: null,
     candidatesJob: null,
@@ -181,11 +179,6 @@ export class OrderManagementContentState {
   @Selector()
   static ordersPage(state: OrderManagementContentStateModel): OrderManagementPage | null {
     return state.ordersPage;
-  }
-
-  @Selector()
-  static IRPOrdersPage(state: OrderManagementContentStateModel): IRPOrderManagementPage | null {
-    return state.IRPOrdersPage;
   }
 
   @Selector()
@@ -370,14 +363,20 @@ export class OrderManagementContentState {
   @Action(GetIRPOrders, { cancelUncompleted: true })
   GetIRPOrders(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { payload, isIncomplete }: GetIRPOrders
-  ): Observable<IRPOrderManagementPage> {
-    patchState({ IRPOrdersPage: null });
+    { payload }: GetIRPOrders
+  ) {
+    patchState({ ordersPage: null });
+
     return this.orderManagementIrpApiService.getOrders(payload).pipe(
-      tap((payload) => {
-        patchState({ IRPOrdersPage: payload });
-        return payload;
-      })
+      tap((orders) => {
+        const ordersPage = Object.assign(
+          {},
+          orders,
+          {
+            items: orders.items.map((el, idx) => ({...el, acceptedCandidates: idx < 3 ? 1 : 0 })),
+          }); // TODO MOK REMOVE FOR ACCORDION GRID
+        patchState({ ordersPage: ordersPage as unknown as OrderManagementPage });
+      }),
     );
   }
 

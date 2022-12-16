@@ -9,9 +9,10 @@
       [disabled]="button.disabled" />
     <label
       [class.active]="button.active"
+      [class.disabled]="button.disabled"
       class="e-btn"
       [for]="button.id"
-      (click)="!button.disabled ? btnClick(button) : null">
+      (click)="btnClick(button)">
         {{ button.title }}
     </label>
   </ng-container>

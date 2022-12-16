@@ -14,7 +14,7 @@ export class TableStatusCellComponent implements ICellRendererAngularComp {
   public isEChipShown = false;
 
   agInit(params: ICellRendererParams): void {
-    this.cellValue = params.value;
+    this.cellValue = params.valueFormatted || params.value;
 
     this.isEChipShown = params.data?.extensionFromId;
   }

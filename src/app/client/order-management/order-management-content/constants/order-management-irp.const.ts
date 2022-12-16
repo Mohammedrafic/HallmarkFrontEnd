@@ -1,24 +1,16 @@
 import { ButtonModel } from '@shared/models/buttons-group.model';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { OrderManagementIRPSystemId, OrderManagementIRPTabs } from '@shared/enums/order-management-tabs.enum';
-import {
-  ColDef,
-  GetDetailRowDataParams,
-  GridOptions,
-  IDetailCellRendererParams,
-  RowHeightParams,
-} from '@ag-grid-community/core';
+import { ColDef } from '@ag-grid-community/core';
 import { OrderManagement } from '@shared/models/order-management.model';
-import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
-import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
-import {
-  TableRowDetailsComponent,
-} from '@shared/components/grid/cell-renderers/table-row-details/table-row-details.component';
-import { titleValueCellRendererSelector } from '../../../modules/invoices/constants';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { MoreMenuType } from '@client/order-management/order-management-content/order-management-content.constants';
 import { OrderStatus } from '@shared/enums/order-management';
 import { OrderType } from '@shared/enums/order-type';
+import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
+import { titleValueCellRendererSelector } from '../../../../modules/invoices/constants';
+import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
+import { OrderStatusText } from '@shared/enums/status';
 
 export const systemGroupConfig: ButtonModel[] = [
   {
@@ -29,12 +21,11 @@ export const systemGroupConfig: ButtonModel[] = [
   {
     id: OrderManagementIRPSystemId.IRP,
     title: 'IRP',
-    active: true,
   },
   {
     id: OrderManagementIRPSystemId.VMS,
     title: 'VMS',
-    disabled: true,
+    active: true,
   },
   {
     id: OrderManagementIRPSystemId.OrderJourney,
@@ -58,30 +49,11 @@ export const irpTabsConfig: TabsListConfig[] = [
   },
 ];
 
-export const vmsTabsConfig: TabsListConfig[] = [
-  {
-    title: OrderManagementIRPTabs.AllOrders,
-  },
-  {
-    title: OrderManagementIRPTabs.PerDiem,
-  },
-  {
-    title: OrderManagementIRPTabs.PermPlacement,
-  },
-  {
-    title: OrderManagementIRPTabs.ReOrders,
-  },
-  {
-    title: OrderManagementIRPTabs.Incomplete,
-  },
-];
-
 export const openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
 
 export const MapSystemWithTabs: Map<OrderManagementIRPSystemId, TabsListConfig[]> =
   new Map<OrderManagementIRPSystemId, TabsListConfig[]>()
-    .set(OrderManagementIRPSystemId.IRP, irpTabsConfig)
-    .set(OrderManagementIRPSystemId.VMS, vmsTabsConfig);
+    .set(OrderManagementIRPSystemId.IRP, irpTabsConfig);
 
 export const ThreeDotsMenuOptions = (
   canCreateOrder: boolean,
@@ -125,9 +97,9 @@ export const defaultOrderCol: ColDef = {
 };
 
 export const firstColumnWidth = {
-  width: 210,
-  minWidth: 210,
-  maxWidth: 210,
+  width: 240,
+  minWidth: 240,
+  maxWidth: 240,
 };
 
 export const prepareMenuItems = (order: OrderManagement, threeDotsMenuOptions: Record<string, ItemModel[]> = {}) => {
@@ -153,68 +125,33 @@ export const prepareMenuItems = (order: OrderManagement, threeDotsMenuOptions: R
   }
 };
 
-export const orderGridSubRowOptions: GridOptions = {
-  masterDetail: true,
-  detailCellRenderer: TableRowDetailsComponent,
-  animateRows: true,
-  embedFullWidthRows: true,
-  isRowMaster: (dataItem: OrderManagement) => !!dataItem?.children?.length,
-  getRowHeight: (params: RowHeightParams) => {
-    if (params?.node?.detail) {
-      const data = params.data;
-
-      return data.children?.length * params.api.getSizesForCurrentTheme().rowHeight + 1;
-    }
-
-    return null;
+export const orderManagementIRPSubGridCells: ColDef[] = [
+  firstColumnWidth,
+  {
+    field: 'name',
+    headerName: 'Employee',
+    width: 200,
+    valueFormatter: (params: ValueFormatterParams) =>
+      `${params.data.lastName} ${params.data.firstName}`,
+    cellRendererSelector: titleValueCellRendererSelector,
   },
-  detailCellRendererParams: (params: IDetailCellRendererParams): IDetailCellRendererParams => {
-    return {
-      ...params,
-      detailGridOptions: {
-        columnDefs: [
-          firstColumnWidth,
-          {
-            field: 'name',
-            headerName: 'Employee',
-            width: 160,
-            minWidth: 160,
-            maxWidth: 200,
-            valueFormatter: (params: ValueFormatterParams) =>
-              `${params.data.lastName} ${params.data.firstName}`,
-            cellRendererSelector: titleValueCellRendererSelector,
-          },
-          {
-            field: 'orientation',
-            headerName: 'Orientation',
-            minWidth: 100,
-            width: 100,
-            cellRendererSelector: titleValueCellRendererSelector,
-          },
-          {
-            field: 'statusName',
-            cellRenderer: TableStatusCellComponent,
-            width: 215,
-          },
-          {
-            field: 'skill',
-            headerName: 'Primary skill',
-            minWidth: 100,
-            width: 100,
-            cellRendererSelector: titleValueCellRendererSelector,
-          },
-          {
-            field: 'contract',
-            headerName: 'Contract Employee',
-            minWidth: 100,
-            width: 100,
-            cellRendererSelector: titleValueCellRendererSelector,
-          },
-        ],
-      },
-      getDetailRowData: (params: GetDetailRowDataParams) => params.successCallback(
-        params.data.children,
-      ),
-    };
+  {
+    field: 'candidateStatus',
+    cellRenderer: TableStatusCellComponent,
+    valueFormatter: (params: ValueFormatterParams) => OrderStatusText[params.value],
+    width: 215,
   },
-};
+  {
+    field: 'primarySkillName',
+    headerName: 'Primary skill',
+    width: 100,
+    cellRendererSelector: titleValueCellRendererSelector,
+  },
+  {
+    field: 'contract',
+    headerName: 'Contract Employee',
+    width: 160,
+    valueFormatter: (params) => params.value ? 'Yes': 'No',
+    cellRendererSelector: titleValueCellRendererSelector,
+  },
+];

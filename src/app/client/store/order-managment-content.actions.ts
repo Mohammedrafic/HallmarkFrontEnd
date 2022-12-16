@@ -23,7 +23,7 @@ export class GetOrders {
 
 export class GetIRPOrders {
   static readonly type = '[order management] Get IRP Orders';
-  constructor(public payload: OrderManagementFilter | object, public isIncomplete?: boolean | undefined) {}
+  constructor(public payload: OrderManagementFilter | object) {}
 }
 
 export class ClearOrders {

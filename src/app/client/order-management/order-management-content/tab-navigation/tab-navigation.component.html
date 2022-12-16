@@ -10,7 +10,7 @@
         {{ incompleteCount }}
       </span>
     </div>
-    <div>{{ tabTitle.OrderTemplates }}</div>
+    <div *ngIf="!hideTemplatesTab">{{ tabTitle.OrderTemplates }}</div>
   </div>
   <div class="e-content"></div>
 </ejs-tab>

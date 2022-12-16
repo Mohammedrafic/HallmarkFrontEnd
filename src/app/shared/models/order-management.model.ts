@@ -56,6 +56,9 @@ export class OrderManagement {
 }
 
 export interface IRPOrderManagement {
+  criticalOrder: boolean;
+  shiftStartDateTime: string;
+  shiftEndDateTime: string;
   id: number;
   organizationId: number;
   organizationPrefix: string;
@@ -86,6 +89,32 @@ export interface IRPOrderManagement {
   acceptedCandidates: null;
   acceptedEmployees: null;
   isMoreMenuWithDeleteButton?: boolean;
+  children: OrderManagementChild[];
+}
+
+export interface IRPOrderPosition {
+  orderId: number;
+  organizationId: number;
+  candidateStatus: number;
+  employeeId: number;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  primarySkillId: number;
+  primarySkillName: string;
+  option: string;
+  contract: boolean;
+  lastShiftScheduledStartTime: string;
+  lastShiftScheduledEndTime: string;
+  nextShiftScheduledStartTime: string;
+  nextShiftScheduledEndTime: string;
+  scheduledWeeklyHours: number;
+  overtime: number;
+}
+
+export interface IRPOrderPositionMain {
+  orderId: number;
+  irpOrderPositionsMainInfoDto: IRPOrderPosition[];
 }
 
 export class OrderManagementFilter {

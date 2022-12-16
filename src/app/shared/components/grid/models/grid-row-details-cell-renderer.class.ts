@@ -3,12 +3,14 @@ import { Directive, OnDestroy } from '@angular/core';
 import { ColDef, IDetailCellRendererParams } from '@ag-grid-community/core';
 
 import { GridCellRenderer } from '@shared/components/grid/models/grid-cell-renderer.class';
+import { BaseObservable } from '@core/helpers';
 
 @Directive()
 export abstract class GridRowDetailsCellRenderer<T> extends GridCellRenderer<IDetailCellRendererParams> implements OnDestroy {
   public rowData: T[];
   public colDefs: ColDef[];
   public rowId: string;
+  public rowDataSubj: BaseObservable<T[]> = new BaseObservable<T[]>([]);
 
   public override agInit(params: IDetailCellRendererParams): void {
     super.agInit(params);
@@ -21,8 +23,11 @@ export abstract class GridRowDetailsCellRenderer<T> extends GridCellRenderer<IDe
     params.getDetailRowData({
       node,
       data,
-      successCallback: (rowData: T[]) => this.rowData = rowData,
-    })
+      successCallback: (rowData: T[]) => {
+        this.rowData = rowData;
+        this.rowDataSubj.set(this.rowData);
+      },
+    });
   }
 
   public ngOnDestroy(): void {

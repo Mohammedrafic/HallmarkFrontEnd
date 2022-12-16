@@ -1,5 +1,7 @@
 @import 'colors';
 @import 'adaptive-response';
+@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
+@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
 
 .e-grid {
   border-radius: 12px;
@@ -151,6 +153,103 @@
 
       @media #{$min-tablet} {
         margin-left: 12px;
+      }
+    }
+  }
+}
+
+:host {
+  .table-tabs {
+    margin-bottom: 30px;
+    display: inline-block;
+
+    &.irp {
+      max-width: 300px;
+      overflow: hidden;
+    }
+
+    &.vms {
+      &::ng-deep .e-tab-header {
+        .e-items.e-toolbar-items {
+          padding: 0;
+
+          .e-scroll-nav {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  app-page-toolbar {
+    margin-bottom: 8px;
+    border-bottom: 1px solid $secondary-dark-blue-40;
+    display: block;
+  }
+
+  &::ng-deep {
+    .ag-root-wrapper.ag-layout-normal.ag-ltr {
+      border-radius: 11px 11px 0 0;
+    }
+
+    .ag-header-cell-text {
+      font-weight: 600;
+      color: $secondary-dark-blue-15;
+    }
+
+    .ag-cell {
+      & .ag-cell-wrapper.ag-row-group-leaf-indent {
+        margin-left: 0;
+      }
+
+      &.fat-icon-btn {
+        .grid-actions-cell-item.e-btn {
+          width: 40px;
+          margin-right: 0;
+
+          &:first-of-type {
+            margin-left: 15px;
+          }
+        }
+      }
+
+      &.expansion-toggle-icons-order-1 {
+        .ag-group-contracted, .ag-group-expanded {
+          order: 1;
+          margin-left: 25px;
+
+          .ag-icon {
+            color: $primary-active-blue-10;
+            font-weight: 700;
+          }
+        }
+      }
+    }
+  }
+}
+
+.help-text {
+  margin-top: 20px;
+  font-family: Open Sans;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: $secondary-dark-blue-20;
+}
+
+.grid-table-container {
+  height: 100%;
+
+  &::ng-deep {
+    .empty-table {
+      .ag-body-viewport {
+        height: 100px;
+        background: $secondary-dark-blue-45;
+      }
+
+      & .ag-overlay-wrapper.ag-overlay-no-rows-wrapper {
+        font-size: 14px !important;
+        color: $secondary-dark-blue-30 !important;
       }
     }
   }

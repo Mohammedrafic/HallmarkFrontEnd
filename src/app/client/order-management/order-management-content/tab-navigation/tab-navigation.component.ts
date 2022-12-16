@@ -18,6 +18,7 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
   @ViewChild('tabNavigation') tabNavigation: TabComponent;
 
   @Input() incompleteCount: number;
+  @Input() hideTemplatesTab = false;
   @Output() selectedTab = new EventEmitter<OrganizationOrderManagementTabs>();
 
   public tabTitle = OrganizationOrderManagementTabs;

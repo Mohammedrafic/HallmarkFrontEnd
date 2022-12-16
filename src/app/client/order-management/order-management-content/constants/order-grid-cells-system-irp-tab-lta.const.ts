@@ -1,10 +1,4 @@
-import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { CellClassParams, ColDef, ICellRendererParams } from '@ag-grid-community/core';
-import {
-  defaultOrderCol,
-  firstColumnWidth,
-  prepareMenuItems,
-} from '@client/order-management-irp/constants/order-management-irp.const';
 import {
   GridHeaderActionsComponent,
 } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.component';
@@ -13,16 +7,20 @@ import { OrderType } from '@shared/enums/order-type';
 import { OrderStatus } from '@shared/enums/order-management';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
+import { formatDate } from '@angular/common';
+import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
+import { defaultOrderCol, firstColumnWidth, prepareMenuItems } from './order-management-irp.const';
 import {
   SwitchEditorComponent,
-} from '../../../modules/timesheets/components/cell-editors/switch-editor/switch-editor.component';
-import { formatDate } from '@angular/common';
+} from '../../../../modules/timesheets/components/cell-editors/switch-editor/switch-editor.component';
 
-export const GridCellsSystemIRPTabPerDiem = (
+export const GridCellsSystemIRPTabLta = (
   threeDotsMenuOptions: Record<string, ItemModel[]> = {},
   canCreateOrder = false,
   settingsIsReordered = false,
   hasCreateEditOrderPermission = false,
+  isIRPEnabled = false,
+  isVMSEnabled = false,
 ): ColDef[] => [
   {
     headerName: '',
@@ -50,7 +48,7 @@ export const GridCellsSystemIRPTabPerDiem = (
           }),
           {
             action: () => {
-              params.context.componentParent.openOrderDetail(params.data);
+              // TODO open IRP Order detail
             },
             iconName: 'message-square',
             buttonClass: 'default',
@@ -97,7 +95,7 @@ export const GridCellsSystemIRPTabPerDiem = (
     cellRenderer: 'agGroupCellRenderer',
     cellClass: (cellClassParams: CellClassParams) => {
       const expansionToggleClass = 'expansion-toggle-icons-order-1';
-      const usePrimaryColor = cellClassParams.data.children?.length ? 'color-primary-active-blue-10' : '';
+      const usePrimaryColor = cellClassParams.data.acceptedCandidates ? 'color-primary-active-blue-10' : '';
       const boldClass = 'font-weight-bold';
 
       return `${expansionToggleClass} ${usePrimaryColor} ${boldClass}`;
@@ -117,7 +115,7 @@ export const GridCellsSystemIRPTabPerDiem = (
   },
   {
     ...defaultOrderCol,
-    field: 'critical',
+    field: 'criticalOrder',
     headerName: 'CRITICAL',
     width: 125,
     cellRenderer: SwitchEditorComponent,
@@ -137,7 +135,7 @@ export const GridCellsSystemIRPTabPerDiem = (
   },
   {
     ...defaultOrderCol,
-    field: 'openPositions',
+    field: 'numberOfPositions',
     headerName: 'AVAIL POSITIONS',
     type: 'rightAligned',
     width: 135,
@@ -145,7 +143,7 @@ export const GridCellsSystemIRPTabPerDiem = (
     maxWidth: 180,
     valueFormatter: (params: ValueFormatterParams) =>
       params.data.orderType !== OrderType.OpenPerDiem
-        ? `${params.data.numberOfOpenPositions || ''}/${params.data.numberOfOpenPositions || ''}` : '',
+        ? `${params.data.numberOfOpenPositions || ''}/${params.data.numberOfPositions || ''}` : '',
   },
   {
     ...defaultOrderCol,
@@ -174,7 +172,7 @@ export const GridCellsSystemIRPTabPerDiem = (
   {
     ...defaultOrderCol,
     field: 'startDate',
-    headerName: 'JOB DATE',
+    headerName: 'START DATE',
     width: 155,
     minWidth: 135,
     maxWidth: 200,
@@ -183,34 +181,44 @@ export const GridCellsSystemIRPTabPerDiem = (
   },
   {
     ...defaultOrderCol,
-    field: 'shift',
+    field: 'endDate',
+    headerName: 'END DATE',
+    width: 155,
+    minWidth: 135,
+    maxWidth: 200,
+    valueFormatter: (params: ValueFormatterParams) =>
+      formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
+  },
+  {
+    ...defaultOrderCol,
+    field: 'shiftDateTime',
     headerName: 'SHIFT TIME',
     width: 160,
     minWidth: 80,
     maxWidth: 200,
     valueFormatter: (params: ValueFormatterParams) => {
-      const startShiftTime = formatDate(params.data.shiftStartTime, 'shortTime', 'en-US');
-      const endShiftTime = formatDate(params.data.shiftEndTime, 'shortTime', 'en-US');
+      const startShiftTime = formatDate(params.data.shiftStartDateTime, 'shortTime', 'en-US');
+      const endShiftTime = formatDate(params.data.shiftEndDateTime, 'shortTime', 'en-US');
 
       return `${startShiftTime}-${endShiftTime}`;
     },
   },
-  {
+  ...(isIRPEnabled ? [{
     ...defaultOrderCol,
     field: 'irpCandidatesCount',
     headerName: 'IRP CANDID',
     width: 120,
     minWidth: 120,
     maxWidth: 120,
-  },
-  {
+  }] : []),
+  ...(isVMSEnabled ? [{
     ...defaultOrderCol,
     field: 'vmsCandidatesCount',
     headerName: 'VMS CANDID',
     width: 120,
     minWidth: 120,
     maxWidth: 120,
-  },
+  }] : []),
   {
     ...defaultOrderCol,
     field: 'creationDate',

@@ -1,29 +1,27 @@
-import { CellClassParams, ColDef, ICellRendererParams } from '@ag-grid-community/core';
+import { GridActionsCellComponent, GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
 import {
-  defaultOrderCol,
-  firstColumnWidth,
-  prepareMenuItems,
-} from '@client/order-management-irp/constants/order-management-irp.const';
+  CellClassParams,
+  ColDef,
+  ICellRendererParams,
+} from '@ag-grid-community/core';
+import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
+import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
+import { OrderType } from '@shared/enums/order-type';
+import { formatDate } from '@angular/common';
+import { defaultOrderCol, firstColumnWidth } from './order-management-irp.const';
 import {
   GridHeaderActionsComponent,
 } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.component';
-import { GridActionsCellComponent, GridActionsCellConfig } from '@shared/components/grid/cell-renderers/grid-actions-cell';
-import { OrderType } from '@shared/enums/order-type';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
-import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
 import {
   SwitchEditorComponent,
-} from '../../../modules/timesheets/components/cell-editors/switch-editor/switch-editor.component';
-import { formatDate } from '@angular/common';
-import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
+} from '../../../../modules/timesheets/components/cell-editors/switch-editor/switch-editor.component';
 
-export const GridCellsSystemIRPTabLta = (
-  threeDotsMenuOptions: Record<string, ItemModel[]> = {},
+export const GridCellsSystemAll = (
   canCreateOrder = false,
   settingsIsReordered = false,
   hasCreateEditOrderPermission = false,
-): ColDef[] => [
+  ): ColDef[] => [
   {
     headerName: '',
     headerCheckboxSelection: true,
@@ -69,16 +67,6 @@ export const GridCellsSystemIRPTabLta = (
               || params.data.extensionFromId
               || !hasCreateEditOrderPermission,
           },
-          {
-            action: (itemId: number) => {
-              params.context.componentParent.menuOptionSelected(itemId, params.data);
-            },
-            iconName: 'more-vertical',
-            buttonClass: 'e-primary',
-            disabled: params.data.orderType === OrderType.ReOrder && params.data.status === OrderStatus.Closed
-              || !hasCreateEditOrderPermission,
-            menuItems: prepareMenuItems(params.data, threeDotsMenuOptions),
-          },
         ],
       } as GridActionsCellConfig;
     },
@@ -97,7 +85,7 @@ export const GridCellsSystemIRPTabLta = (
     cellRenderer: 'agGroupCellRenderer',
     cellClass: (cellClassParams: CellClassParams) => {
       const expansionToggleClass = 'expansion-toggle-icons-order-1';
-      const usePrimaryColor = cellClassParams.data.children?.length ? 'color-primary-active-blue-10' : '';
+      const usePrimaryColor = cellClassParams.data.acceptedCandidates ? 'color-primary-active-blue-10' : '';
       const boldClass = 'font-weight-bold';
 
       return `${expansionToggleClass} ${usePrimaryColor} ${boldClass}`;
@@ -117,7 +105,7 @@ export const GridCellsSystemIRPTabLta = (
   },
   {
     ...defaultOrderCol,
-    field: 'critical',
+    field: 'isCritical',
     headerName: 'CRITICAL',
     width: 125,
     cellRenderer: SwitchEditorComponent,
@@ -126,6 +114,39 @@ export const GridCellsSystemIRPTabLta = (
       showCheckbox: true,
       useValueAsTrue: true,
     },
+  },
+  {
+    ...defaultOrderCol,
+    field: 'system',
+    headerName: 'SYSTEM',
+    width: 125,
+    cellClass: 'name',
+    valueFormatter: (params: ValueFormatterParams) => {
+      const irpText = params.data.includeInIRP ? 'IRP' : '';
+      const vmsText = params.data.includeInVMS ? 'VMS' : '';
+
+      if (irpText && vmsText) {
+        return `${irpText}, ${vmsText}`;
+      }
+
+      return irpText || vmsText;
+    },
+  },
+  {
+    ...defaultOrderCol,
+    field: 'orderType',
+    headerName: 'TYPE',
+    width: 85,
+    minWidth: 70,
+    maxWidth: 110,
+  },
+  {
+    ...defaultOrderCol,
+    field: 'jobTitle',
+    headerName: 'JOB TITLE',
+    width: 115,
+    minWidth: 100,
+    maxWidth: 200,
   },
   {
     ...defaultOrderCol,
@@ -145,7 +166,7 @@ export const GridCellsSystemIRPTabLta = (
     maxWidth: 180,
     valueFormatter: (params: ValueFormatterParams) =>
       params.data.orderType !== OrderType.OpenPerDiem
-        ? `${params.data.numberOfOpenPositions || ''}/${params.data.numberOfOpenPositions || ''}` : '',
+        ? `${params.data.numberOfOpenPositions || ''}/${params.data.numberOfPositions || ''}` : '',
   },
   {
     ...defaultOrderCol,
@@ -207,19 +228,19 @@ export const GridCellsSystemIRPTabLta = (
   },
   {
     ...defaultOrderCol,
-    field: 'irpCandidatesCount',
-    headerName: 'IRP CANDID',
+    field: 'employee',
+    headerName: 'EMPLOYEE',
     width: 120,
     minWidth: 120,
     maxWidth: 120,
   },
   {
     ...defaultOrderCol,
-    field: 'vmsCandidatesCount',
-    headerName: 'VMS CANDID',
-    width: 120,
-    minWidth: 120,
-    maxWidth: 120,
+    field: 'candid',
+    headerName: 'CANDID',
+    width: 100,
+    minWidth: 100,
+    maxWidth: 100,
   },
   {
     ...defaultOrderCol,

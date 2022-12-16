@@ -3,7 +3,6 @@ import { ColDef } from '@ag-grid-community/core';
 import {
   OrderManagementIRPSystemId,
   OrderManagementIRPTabsIndex,
-  OrderManagementVMSTabsIndex,
 } from '@shared/enums/order-management-tabs.enum';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import {
@@ -11,12 +10,12 @@ import {
   GridCellsSystemIRPTabAll,
   GridCellsSystemIRPTabLta,
   GridCellsSystemIRPTabPerDiem,
-} from '../constants';
+} from '@client/order-management/order-management-content/constants';
 
-export class OrderManagementIrpHelper {
+export class OrderManagementIrpGridHelper {
   static prepareColDefs(
     systemId: OrderManagementIRPSystemId,
-    activeTab: OrderManagementIRPTabsIndex | OrderManagementVMSTabsIndex | null = null,
+    activeTab: OrderManagementIRPTabsIndex | unknown | null = null,
     threeDotsMenuOptions: Record<string, ItemModel[]> = {},
     ...restArguments: boolean[]
   ): ColDef[] {
@@ -30,9 +29,11 @@ export class OrderManagementIrpHelper {
       isSystemIRP
         && (activeTab === OrderManagementIRPTabsIndex.AllOrders || activeTab === OrderManagementIRPTabsIndex.Incomplete)
     ) {
-      restArguments.push(activeTab === OrderManagementIRPTabsIndex.Incomplete);
-
-      return GridCellsSystemIRPTabAll(threeDotsMenuOptions, ...restArguments);
+      return GridCellsSystemIRPTabAll(
+        threeDotsMenuOptions,
+        activeTab === OrderManagementIRPTabsIndex.Incomplete,
+        ...restArguments
+      );
     }
 
     if (isSystemIRP && activeTab === OrderManagementIRPTabsIndex.PerDiem) {
