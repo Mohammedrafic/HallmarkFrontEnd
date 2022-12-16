@@ -129,7 +129,10 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
   selectedSkillCategories: SkillCategoryDto[];
   selectedSkills: MasterSkillDto[];  
   public baseUrl: string = '';
-
+  private dateFormat = 'MM/dd/yyyy';
+  private culture = 'en-US';
+  private nullValue = "null";
+  private joinString = ",";
   @ViewChild(LogiReportComponent, { static: true }) logiReportComponent: LogiReportComponent;
   changeDetectorRef: ChangeDetectorRef;  
   filterOptionsData: CommonReportFilterOptions;
@@ -360,24 +363,25 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
     }
     this.paramsData =
     {
-      "OrganizationParamCJR":this.selectedOrganizations?.length==0?"null": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
-      "StartDateParamCJR": formatDate(startDate, 'MM/dd/yyyy', 'en-US'),
-      "EndDateParamCJR": formatDate(endDate, 'MM/dd/yyyy', 'en-US'),
-      "RegionParamCJR": regionIds.length==0?"null" : regionIds.join(","),
-      "LocationParamCJR":locationIds.length==0?"null" : locationIds.join(","),
-      "DepartmentParamCJR":departmentIds.length==0?"null" :  departmentIds.join(","),
-      "SkillCategoriesParamCJR": skillCategoryIds.length == 0 ? "null" : skillCategoryIds.join(","),
-      "SkillsParamCJR": skillIds.length == 0 ? "null" : skillIds.join(","),"CandidateStatusesParamCJR": candidateStatuses.length == 0 ? "null" : candidateStatuses.join(","),
-      "OrderTypesParamCJR": orderTypes.length == 0 ? "null" : orderTypes.join(","),
-      "JobStatusesParamCJR": jobStatuses.length == 0 ? "null" : jobStatuses.join(","),
-      "OrderIdParamCJR": jobId == null || jobId == "" ? "null" : jobId,
+      "OrganizationParamCJR":this.selectedOrganizations?.length==0?this.nullValue: this.selectedOrganizations?.map((list) => list.organizationId).join(this.joinString),
+      "StartDateParamCJR": formatDate(startDate, this.dateFormat, this.culture),
+      "EndDateParamCJR": formatDate(endDate, this.dateFormat, this.culture),
+      "RegionParamCJR": regionIds.length==0?this.nullValue : regionIds.join(this.joinString),
+      "LocationParamCJR":locationIds.length==0?this.nullValue : locationIds.join(this.joinString),
+      "DepartmentParamCJR":departmentIds.length==0?this.nullValue :  departmentIds.join(this.joinString),
+      "SkillCategoriesParamCJR": skillCategoryIds.length == 0 ? this.nullValue : skillCategoryIds.join(this.joinString),
+      "SkillsParamCJR": skillIds.length == 0 ? this.nullValue : skillIds.join(this.joinString),
+      "CandidateStatusesParamCJR": candidateStatuses.length == 0 ? this.nullValue : candidateStatuses.join(this.joinString),
+      "OrderTypesParamCJR": orderTypes.length == 0 ? this.nullValue : orderTypes.join(this.joinString),
+      "JobStatusesParamCJR": jobStatuses.length == 0 ? this.nullValue : jobStatuses.join(this.joinString),
+      "OrderIdParamCJR": jobId == null || jobId == "" ? this.nullValue : jobId,
       "BearerParamCJR": auth,
       "BusinessUnitIdParamCJR": window.localStorage.getItem("lastSelectedOrganizationId") == null
         ? this.organizations != null && this.organizations[0]?.id != null ?
           this.organizations[0].id.toString() : "1" :
         window.localStorage.getItem("lastSelectedOrganizationId"),
       "HostName": this.baseUrl,
-      "TodayCJR":formatDate(new Date(),'MM/dd/yyyy','en-US')
+      "TodayCJR":formatDate(new Date(),this.dateFormat,this.culture)
     };
     this.logiReportComponent.paramsData = this.paramsData;
     this.logiReportComponent.RenderReport();

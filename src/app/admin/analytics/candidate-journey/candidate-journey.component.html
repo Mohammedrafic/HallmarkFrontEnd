@@ -16,7 +16,7 @@
     </section>
   </section>
 </section>
-<section class="fill-rate-section">
+<section class="candidate-journey-section">
   <app-logi-report [paramsData]="paramsData" [reportName]="reportName" [catelogName]="catelogName" [reportType]="reportType"></app-logi-report>
   <router-outlet></router-outlet>
 </section>
@@ -50,7 +50,7 @@
                            [dataSource]="filterColumns.regionIds.dataSource"
                            [fields]="regionFields"
                            [selectAllText]='allOption'
-                           showSelectAll=true [value]="defaultRegions">
+                           showSelectAll=true>
           </ejs-multiselect>
         </div>
       </div>
@@ -68,7 +68,7 @@
                            [dataSource]="filterColumns.locationIds.dataSource"
                            [fields]="locationFields"
                            [selectAllText]='allOption'
-                           showSelectAll=true [value]="defaultLocations">
+                           showSelectAll=true>
           </ejs-multiselect>
         </div>
       </div>
@@ -86,7 +86,7 @@
                            [dataSource]="filterColumns.departmentIds.dataSource"
                            [fields]="departmentFields"
                            [selectAllText]='allOption'
-                           showSelectAll=true [value]="defaultDepartments">
+                           showSelectAll=true>
           </ejs-multiselect>
         </div>
       </div>
