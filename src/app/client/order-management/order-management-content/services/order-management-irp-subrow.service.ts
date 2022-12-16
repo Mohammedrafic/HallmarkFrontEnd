@@ -3,10 +3,9 @@ import { GetDetailRowDataParams, GridOptions, IDetailCellRendererParams, RowHeig
 import { IRPOrderManagement, IRPOrderPositionMain } from '@shared/models/order-management.model';
 import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 import { take } from 'rxjs/operators';
-import { Destroyable } from '@core/helpers';
-import { takeUntil } from 'rxjs';
+import { tap } from 'rxjs';
 import {
-  orderManagementIRPSubGridCells,
+  OrderManagementIRPSubGridCells,
 } from '@client/order-management/order-management-content/constants/order-management-irp.const';
 import {
   OrderManagementContentComponent,
@@ -14,12 +13,11 @@ import {
 import { TableRowDetailComponent } from '@shared/components/grid/cell-renderers/table-row-detail/table-row-detail.component';
 
 @Injectable()
-export class OrderManagementIrpSubrowService extends Destroyable {
+export class OrderManagementIrpSubrowService {
   constructor(private orderManagementIrpApiService: OrderManagementIrpApiService) {
-    super();
   }
 
-  orderGridSubRowOptions(context: { componentParent: OrderManagementContentComponent }): GridOptions {
+  configureOrderGridSubRowOptions(context: { componentParent: OrderManagementContentComponent }): GridOptions {
     return {
       masterDetail: true,
       animateRows: true,
@@ -39,19 +37,19 @@ export class OrderManagementIrpSubrowService extends Destroyable {
           ...params,
           detailGridOptions: {
             context: context,
-            columnDefs: orderManagementIRPSubGridCells,
+            columnDefs: OrderManagementIRPSubGridCells,
           },
           getDetailRowData: (params: GetDetailRowDataParams) => {
             const orderId = params.data.id;
 
             this.orderManagementIrpApiService.getOrderPositions([orderId]).pipe(
               take(1),
-              takeUntil(this.componentDestroy()),
-            ).subscribe((positions: IRPOrderPositionMain[]) => {
-              params.successCallback(
-                positions[0].irpOrderPositionsMainInfoDto,
-              );
-            });
+              tap((positions: IRPOrderPositionMain[]) => {
+                params.successCallback(
+                  positions[0].irpOrderPositionsMainInfoDto,
+                );
+              })
+            ).subscribe();
           },
         };
       },

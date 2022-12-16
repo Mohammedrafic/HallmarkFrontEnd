@@ -8,8 +8,7 @@ import { CheckBoxChangeEventArgs } from '@syncfusion/ej2-angular-grids';
 import { Subscription, takeUntil } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
-import { AddRecordBillRate } from '../../../interface';
-import { RecordValue } from '../../../interface/common.interface';
+import { AddRecordBillRate, RecordValue } from '../../../modules/timesheets/interface';
 
 @Component({
   selector: 'app-switch-editor',

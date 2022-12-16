@@ -103,6 +103,8 @@ import {
   OrderManagementIrpSubrowService,
 } from '@client/order-management/order-management-content/services/order-management-irp-subrow.service';
 import { TableRowDetailModule } from '@shared/components/grid/cell-renderers/table-row-detail/table-row-detail.module';
+import { SwitchEditorModule } from '@shared/components/switch-editor/switch-editor.module';
+import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 
 const gridIcons = {
   MessageSquare,
@@ -200,6 +202,7 @@ const gridIcons = {
     ButtonGroupModule,
     GridHeaderActionsModule,
     TableRowDetailModule,
+    SwitchEditorModule,
   ],
   providers: [
     ResizeService,
@@ -215,6 +218,7 @@ const gridIcons = {
     SettingsViewService,
     OrderDetailsService,
     OrderManagementIrpSubrowService,
+    OrderManagementIrpApiService,
   ],
 })
 export class ClientModule {}

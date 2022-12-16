@@ -9,10 +9,8 @@ import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entit
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
 import { formatDate } from '@angular/common';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-import { defaultOrderCol, firstColumnWidth, prepareMenuItems } from './order-management-irp.const';
-import {
-  SwitchEditorComponent,
-} from '../../../../modules/timesheets/components/cell-editors/switch-editor/switch-editor.component';
+import { DefaultOrderCol, FirstColumnWidth, PrepareMenuItems } from './order-management-irp.const';
+import { SwitchEditorComponent } from '@shared/components/switch-editor/switch-editor.component';
 
 export const GridCellsSystemIRPTabAll = (
   threeDotsMenuOptions: Record<string, ItemModel[]> = {},
@@ -28,7 +26,7 @@ export const GridCellsSystemIRPTabAll = (
     headerCheckboxSelection: true,
     headerCheckboxSelectionFilteredOnly: true,
     checkboxSelection: true,
-    ...firstColumnWidth,
+    ...FirstColumnWidth,
     headerComponent: GridHeaderActionsComponent,
     cellRenderer: GridActionsCellComponent,
     cellClass: 'fat-icon-btn',
@@ -77,7 +75,7 @@ export const GridCellsSystemIRPTabAll = (
             buttonClass: 'e-primary',
             disabled: params.data.orderType === OrderType.ReOrder && params.data.status === OrderStatus.Closed
               || !hasCreateEditOrderPermission,
-            menuItems: prepareMenuItems(params.data, threeDotsMenuOptions),
+            menuItems: PrepareMenuItems(params.data, threeDotsMenuOptions),
           },
         ],
       } as GridActionsCellConfig;
@@ -88,7 +86,7 @@ export const GridCellsSystemIRPTabAll = (
     resizable: false,
   },
   {
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'publicId',
     headerName: 'ORDER ID',
     width: 160,
@@ -106,7 +104,7 @@ export const GridCellsSystemIRPTabAll = (
       `${params.data.organizationPrefix}-${params.data.publicId}`,
   },
   {
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'statusText',
     headerName: 'STATUS',
     width: 215,
@@ -116,7 +114,7 @@ export const GridCellsSystemIRPTabAll = (
     cellClass: 'status-cell',
   },
   {
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'criticalOrder',
     headerName: 'CRITICAL',
     width: 125,
@@ -128,7 +126,7 @@ export const GridCellsSystemIRPTabAll = (
     },
   },
   {
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'orderType',
     headerName: 'TYPE',
     width: 85,
@@ -136,7 +134,7 @@ export const GridCellsSystemIRPTabAll = (
     maxWidth: 110,
   },
   {
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'skillName',
     headerName: 'SKILL',
     width: 100,
@@ -144,7 +142,7 @@ export const GridCellsSystemIRPTabAll = (
     maxWidth: 200,
   },
   {
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'numberOfPositions',
     headerName: 'AVAIL POSITIONS',
     type: 'rightAligned',
@@ -156,7 +154,7 @@ export const GridCellsSystemIRPTabAll = (
         ? `${params.data.numberOfOpenPositions || ''}/${params.data.numberOfPositions || ''}` : '',
   },
   {
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'regionName',
     headerName: 'REGION',
     width: 150,
@@ -164,7 +162,7 @@ export const GridCellsSystemIRPTabAll = (
     maxWidth: 200,
   },
   {
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'locationName',
     headerName: 'LOCATION',
     width: 140,
@@ -172,7 +170,7 @@ export const GridCellsSystemIRPTabAll = (
     maxWidth: 200,
   },
   {
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'departmentName',
     headerName: 'DEPARTMENT',
     width: 140,
@@ -180,7 +178,7 @@ export const GridCellsSystemIRPTabAll = (
     maxWidth: 200,
   },
   {
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'startDate',
     headerName: 'START DATE',
     width: 155,
@@ -190,7 +188,7 @@ export const GridCellsSystemIRPTabAll = (
       formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
   },
   {
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'endDate',
     headerName: 'END DATE',
     width: 155,
@@ -200,7 +198,7 @@ export const GridCellsSystemIRPTabAll = (
       formatDate(params.value, 'MM/dd/yyy', 'en-US', 'UTC'),
   },
   {
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'shiftDateTime',
     headerName: 'SHIFT TIME',
     width: 160,
@@ -214,7 +212,7 @@ export const GridCellsSystemIRPTabAll = (
     },
   },
   ...(isIRPEnabled ? [{
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'irpCandidatesCount',
     headerName: 'IRP CANDID',
     width: 120,
@@ -222,7 +220,7 @@ export const GridCellsSystemIRPTabAll = (
     maxWidth: 120,
   }] : []),
   ...(isVMSEnabled ? [{
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'vmsCandidatesCount',
     headerName: 'VMS CANDID',
     width: 120,
@@ -230,7 +228,7 @@ export const GridCellsSystemIRPTabAll = (
     maxWidth: 120,
   }] : []),
   {
-    ...defaultOrderCol,
+    ...DefaultOrderCol,
     field: 'creationDate',
     headerName: 'CREATION DATE',
     width: 155,

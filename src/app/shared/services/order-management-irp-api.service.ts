@@ -7,9 +7,7 @@ import {
 } from '@shared/models/order-management.model';
 import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class OrderManagementIrpApiService {
   constructor(private http: HttpClient) {}
 

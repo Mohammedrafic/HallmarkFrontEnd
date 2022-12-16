@@ -138,8 +138,8 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { AppState } from '../../../store/app.state';
 import { ButtonModel } from '@shared/models/buttons-group.model';
 import {
-  irpTabsConfig,
-  systemGroupConfig,
+  IRPTabsConfig,
+  SystemGroupConfig,
   ThreeDotsMenuOptions,
 } from '@client/order-management/order-management-content/constants/order-management-irp.const';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
@@ -271,9 +271,9 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     = OrganizationOrderManagementTabs.AllOrders;
   public activeIRPTabIndex: OrderManagementIRPTabsIndex = OrderManagementIRPTabsIndex.AllOrders;
   public isIRPFlagEnabled = false;
-  public systemGroupConfig: ButtonModel[] = systemGroupConfig;
+  public systemGroupConfig: ButtonModel[] = SystemGroupConfig;
   public activeSystem: OrderManagementIRPSystemId = OrderManagementIRPSystemId.VMS;
-  public tabsListConfig: TabsListConfig[] = irpTabsConfig;
+  public tabsListConfig: TabsListConfig[] = IRPTabsConfig;
   public columnDefs: ColDef[] = [];
   public threeDotsMenuOptions: Record<string, ItemModel[]>;
   public context: { componentParent: OrderManagementContentComponent };
@@ -333,7 +333,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     super(store);
 
     this.context = { componentParent: this };
-    this.gridOptions = this.orderManagementIrpSubrowService.orderGridSubRowOptions(this.context);
+    this.gridOptions = this.orderManagementIrpSubrowService.configureOrderGridSubRowOptions(this.context);
 
     this.isIRPFlagEnabled = this.store.selectSnapshot(AppState.isIrpFlagEnabled);
 

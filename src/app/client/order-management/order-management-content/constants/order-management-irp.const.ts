@@ -12,7 +12,7 @@ import { titleValueCellRendererSelector } from '../../../../modules/invoices/con
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
 import { OrderStatusText } from '@shared/enums/status';
 
-export const systemGroupConfig: ButtonModel[] = [
+export const SystemGroupConfig: ButtonModel[] = [
   {
     id: OrderManagementIRPSystemId.All,
     title: 'All',
@@ -34,7 +34,7 @@ export const systemGroupConfig: ButtonModel[] = [
   },
 ];
 
-export const irpTabsConfig: TabsListConfig[] = [
+export const IRPTabsConfig: TabsListConfig[] = [
   {
     title: OrderManagementIRPTabs.AllOrders,
   },
@@ -49,11 +49,9 @@ export const irpTabsConfig: TabsListConfig[] = [
   },
 ];
 
-export const openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
-
 export const MapSystemWithTabs: Map<OrderManagementIRPSystemId, TabsListConfig[]> =
   new Map<OrderManagementIRPSystemId, TabsListConfig[]>()
-    .set(OrderManagementIRPSystemId.IRP, irpTabsConfig);
+    .set(OrderManagementIRPSystemId.IRP, IRPTabsConfig);
 
 export const ThreeDotsMenuOptions = (
   canCreateOrder: boolean,
@@ -90,19 +88,19 @@ export const ThreeDotsMenuOptions = (
   ],
 });
 
-export const defaultOrderCol: ColDef = {
+export const DefaultOrderCol: ColDef = {
   sortable: true,
   filter: false,
   resizable: true,
 };
 
-export const firstColumnWidth = {
+export const FirstColumnWidth = {
   width: 240,
   minWidth: 240,
   maxWidth: 240,
 };
 
-export const prepareMenuItems = (order: OrderManagement, threeDotsMenuOptions: Record<string, ItemModel[]> = {}) => {
+export const PrepareMenuItems = (order: OrderManagement, threeDotsMenuOptions: Record<string, ItemModel[]> = {}) => {
   if (order.status === OrderStatus.Closed) {
     return threeDotsMenuOptions['closedOrderMenu'];
   }
@@ -125,8 +123,8 @@ export const prepareMenuItems = (order: OrderManagement, threeDotsMenuOptions: R
   }
 };
 
-export const orderManagementIRPSubGridCells: ColDef[] = [
-  firstColumnWidth,
+export const OrderManagementIRPSubGridCells: ColDef[] = [
+  FirstColumnWidth,
   {
     field: 'name',
     headerName: 'Employee',
