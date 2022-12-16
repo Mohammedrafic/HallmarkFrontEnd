@@ -23,12 +23,14 @@ import {
   SelectingEventArgs,
   TabComponent,
 } from '@syncfusion/ej2-angular-navigations';
-import { GetAgencyExtensions, GetCandidateJob, GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import { ClearAgencyCandidateJob, ClearAgencyOrderCandidatesList, GetAgencyExtensions, GetCandidateJob, GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
+  ClearOrderCandidatePage,
+  ClearOrganisationCandidateJob,
   GetAvailableSteps,
   GetOrganisationCandidateJob,
   GetOrganizationExtensions,
@@ -588,6 +590,8 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
         this.sideDialog.hide();
         this.selectedTemplate = null;
         disabledBodyOverflow(false);
+        this.clearOrderCandidateList();
+        this.clearCandidateJobState();
       }
     });
     this.jobStatusControl = new FormControl('');
@@ -738,5 +742,15 @@ export class ChildOrderDialogComponent extends AbstractPermission implements OnI
       const orderId = this.candidate.orderId;
       this.store.dispatch(new GetDeployedCandidateOrderInfo(orderId, candidateId, organizationId));
     }
+  }
+
+  private clearOrderCandidateList(): void {
+    const ClearCandidatesList = this.isAgency ? ClearAgencyOrderCandidatesList : ClearOrderCandidatePage;
+    this.store.dispatch(new ClearCandidatesList());
+  }
+
+  public clearCandidateJobState(): void {
+    const ClearCandidateJob = this.isAgency ? ClearAgencyCandidateJob : ClearOrganisationCandidateJob;
+    this.store.dispatch(new ClearCandidateJob());
   }
 }

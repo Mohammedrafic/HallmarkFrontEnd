@@ -308,7 +308,6 @@ const COMPONENTS = [
     DocumentPreviewSideDialogComponent,
     CustomSideDialogComponent,
     HideByCandidateStatusPipe,
-
   ],
   providers: [
     DatePipe,

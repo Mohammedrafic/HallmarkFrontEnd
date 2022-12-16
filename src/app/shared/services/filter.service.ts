@@ -70,7 +70,7 @@ export class FilterService {
    * @returns list of applied filters
    */
   public generateChips(form: FormGroup, filterColumns: any, datePipe?: DatePipe): FilteredItem[] {
-    let chips: any[] = [];
+    const chips: any[] = [];
 
     Object.keys(form.controls)
       .filter((key) => {
@@ -88,7 +88,8 @@ export class FilterService {
               );
               chips.push({
                 text:
-                  filterColumns[key].valueType === ValueType.Id ? filteredItem && filteredItem[filterColumns[key].valueField] : item,
+                  filterColumns[key].valueType === ValueType.Id ? filteredItem
+                  && filteredItem[filterColumns[key].valueField] : item,
                 column: key,
                 value: item,
                 organizationId: filteredItem?.organizationId || filteredItem?.businessUnitId || null,

@@ -1,8 +1,8 @@
 import { Router } from '@angular/router';
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { formatDate } from '@angular/common';
 
-import { CandidateInfoUIItem, TimesheetDetailsModel } from "../../interface";
+import { CandidateInfoUIItem, TimesheetDetailsModel } from '../../interface';
 
 @Component({
   selector: 'app-profile-details-job-info',
@@ -13,14 +13,12 @@ import { CandidateInfoUIItem, TimesheetDetailsModel } from "../../interface";
 export class ProfileDetailsJobInfoComponent implements OnChanges {
   public items: CandidateInfoUIItem[] = [];
 
-  @Input()
-  public isAgency: boolean = false;
+  @Input() public isAgency = false;
 
   @Input()
   public jobData: TimesheetDetailsModel | null;
 
   constructor(
-    private datePipe: DatePipe,
     private router: Router,
   ) {
     this.isAgency = this.router.url.includes('agency');
@@ -56,13 +54,13 @@ export class ProfileDetailsJobInfoComponent implements OnChanges {
       {
         title: 'Skill',
         icon: 'folder',
-        value: data.orderSkillAbbreviation,
+        value: data.orderSkillName,
       },
       {
         title: 'Start - End Date',
         icon: 'calendar',
-        value: `${this.datePipe.transform(data.jobStartDate, 'MM/dd/yyyy', 'utc')}
-         - ${this.datePipe.transform(data.jobEndDate, 'MM/dd/yyyy', 'utc')}`,
+        value: `${formatDate(data.jobStartDate, 'MM/dd/yyyy', 'utc')}
+         - ${formatDate(data.jobEndDate, 'MM/dd/yyyy', 'utc')}`,
       },
       {
         title: !this.isAgency ? 'Agency' : 'Organization',

@@ -1,3 +1,5 @@
+@import 'adaptive-response';
+
 :host::ng-deep {
   .e-toolbar-items.e-lib.e-hscroll.e-control.e-touch {
     padding: 0 !important;
@@ -11,10 +13,17 @@
     }
   }
 
-  .e-tab_default_tab_header_items_nav.e-scroll-nav.e-scroll-left-nav.e-lib.e-touch,
-  .e-tab_default_tab_header_items_nav.e-scroll-nav.e-scroll-right-nav.e-lib.e-touch {
-    display: none;
+  .tabs {
+    max-width: 85vw;
+    .e-hscroll-content {
+      padding: 0 42px;
+    }
   }
+}
+
+.e-tab_default_tab_header_items_nav.e-scroll-nav.e-scroll-left-nav.e-lib.e-touch,
+.e-tab_default_tab_header_items_nav.e-scroll-nav.e-scroll-right-nav.e-lib.e-touch {
+  display: none !important;
 }
 
 .tab-item {

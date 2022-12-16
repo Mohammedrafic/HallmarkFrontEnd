@@ -94,6 +94,7 @@ export interface TimesheetDetailsModel {
   mileageTimesheetId: number;
   agencyStatus: AgencyStatus;
   isEmpty: boolean;
+  orderSkillName: string;
 }
 
 export interface WorkWeek<T> {

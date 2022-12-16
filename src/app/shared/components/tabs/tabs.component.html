@@ -1,0 +1,18 @@
+<ejs-tab #tabComponent class="stepper" (selected)="selectEmitter.emit($event)" (created)="onCreated($event)">
+  <div class="e-tab-header">
+    <div *ngFor="let tab of tabs">
+      <div class="stepper-header">
+        <div class="stepper-title">
+          <span>{{tab.title}}</span>
+          <span *ngIf="tab.isRequired" class="required">*</span>
+        </div>
+        <div class="stepper-sub-title">{{tab.subtitle}}</div>
+      </div>
+    </div>
+  </div>
+  <div class="e-content">
+    <ng-template *ngFor="let _ of tabs" #tabContent ></ng-template>
+  </div>
+</ejs-tab>
+
+

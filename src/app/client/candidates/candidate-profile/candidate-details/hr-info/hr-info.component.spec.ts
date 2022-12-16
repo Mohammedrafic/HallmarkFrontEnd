@@ -1,19 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FillRateComponent } from './fillrate.component';
 
-describe('FillRateComponent', () => {
-  let component: FillRateComponent;
-  let fixture: ComponentFixture<FillRateComponent>;
+import { HrInfoComponent } from './hr-info.component';
+
+describe('HrInfoComponent', () => {
+  let component: HrInfoComponent;
+  let fixture: ComponentFixture<HrInfoComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [FillRateComponent ]
+      declarations: [HrInfoComponent]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FillRateComponent);
+    fixture = TestBed.createComponent(HrInfoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

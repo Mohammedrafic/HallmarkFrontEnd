@@ -14,6 +14,8 @@ export class CommonReportFilterOptions {
   timesheetStatuses: timesheetStatusesDto[];
   candidateStatusesAndReasons: CandidateStatusAndReasonFilterOptionsDto[];
   jobStatusesAndReasons: JobStatusAndReasonFilterOptionsDto[];
+  allCandidateStatusesAndReasons: CandidateStatusAndReasonFilterOptionsDto[];
+  allJobStatusesAndReasons: JobStatusAndReasonFilterOptionsDto[];
 }
 
 export class CandidateStatusAndReasonFilterOptionsDto {

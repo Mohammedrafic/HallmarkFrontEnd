@@ -1,5 +1,6 @@
 @import "colors.scss";
 @import "mixins";
+@import "adaptive-response";
 @import "@ag-grid-community/core/dist/styles/ag-grid.scss";
 @import "@ag-grid-community/core/dist/styles/ag-theme-alpine";
 
@@ -10,6 +11,10 @@
 .table-block {
   display: flex;
   flex-direction: column;
+
+  .mobile-btn-group {
+    display: none;
+  }
 }
 
 .table-header {
@@ -69,7 +74,6 @@
   }
 
   .custom-wrap {
-    .ag-grid-angular .ag-cell,
     .ag-header-cell-text {
       white-space: pre-wrap;
     }
@@ -145,5 +149,71 @@ button.privilege {
         stroke: #fff !important;
       }
     }
+  }
+}
+
+.small-tablet {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding-top: 20px;
+  width: 100%;
+
+  .btn-group {
+    .spinner-btn {
+      width: 100px !important;
+    }
+    
+    .privilege {
+      width: 100px;
+      margin: 0;
+    }
+
+    > *:not(:first-child) {
+      margin-left: 16px;
+    }
+  }
+
+  .add-action {
+    &.spaced {
+      width: auto;
+      margin: 0;
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  .action-text {
+    display: none;
+  }
+
+  .add-action {
+    &.spaced {
+      width: auto;
+      margin: 0;
+    }
+  }
+
+  button.e-btn.e-control.e-action-button {
+    padding: 8px;
+  }
+}
+
+@media #{$max-mobile} {
+  .action-text {
+    display: none;
+  }
+
+  .table-block {
+      .btn-group {
+        .privilege {
+          min-width: 38vw;
+          margin: 0;
+        }
+      }
+  }
+
+  .desktop-tablet-btn-group {
+    display: none;
   }
 }

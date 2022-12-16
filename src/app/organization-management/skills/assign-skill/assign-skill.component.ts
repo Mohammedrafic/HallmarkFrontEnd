@@ -1,19 +1,23 @@
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { filter, map, Observable, Subject, takeUntil, tap } from 'rxjs';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { DrawNodeEventArgs, FieldsSettingsModel, NodeCheckEventArgs, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
+
 import { Select, Store } from '@ngxs/store';
-import { ConfirmService } from '@shared/services/confirm.service';
+import { SkillsState } from '@organization-management/store/skills.state';
+import {
+  DrawNodeEventArgs, FieldsSettingsModel, NodeCheckEventArgs, TreeViewComponent,
+} from '@syncfusion/ej2-angular-navigations';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { filter, map, Observable, Subject, takeUntil, tap } from 'rxjs';
+
+import { GetAssignedSkillTree, SaveAssignedSkillValue } from '@organization-management/store/skills.actions';
 import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { SkillsState } from '@organization-management/store/skills.state';
 import { AssignedSkillTreeItem } from '@shared/models/skill.model';
-import { GetAssignedSkillTree, SaveAssignedSkillValue } from '@organization-management/store/skills.actions';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 @Component({
   selector: 'app-assign-skill',
   templateUrl: './assign-skill.component.html',
-  styleUrls: ['./assign-skill.component.scss']
+  styleUrls: ['./assign-skill.component.scss'],
 })
 export class AssignSkillComponent extends DestroyableDirective implements OnInit, AfterViewInit {
   @Input() openSidebar: Subject<boolean>;

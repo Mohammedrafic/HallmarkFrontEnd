@@ -237,16 +237,16 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     return found ? found[0] : 'e-default';
   }
 
-  public onEdit(data: any): void {
+  public onEdit(data: CandidateRow | IRPCandidate): void {
     const credentialParams: CredentialParams = {
       isNavigatedFromOrganizationArea: false,
       candidateStatus: null,
       orderId: null,
     };
-    this.router.navigate(['./edit', data.candidateProfileId], { relativeTo: this.route, state: credentialParams });
+    this.router.navigate(['./edit', (data as CandidateRow).candidateProfileId || (data as IRPCandidate).employeeId], { relativeTo: this.route, state: credentialParams });
   }
 
-  public onRemove(id: any): void {
+  public onRemove(id: number): void {
     this.confirmService
       .confirm('Are you sure you want to inactivate the Candidate?', {
         okButtonLabel: 'Inactivate',
@@ -379,12 +379,17 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private inactivateCandidate(id: number) {
-    this.store
+    if (this.isIRP) {
+       // TODO: employee inactivation endpoint is not ready yet
+       this.dispatchNewPage();
+    } else {
+      this.store
       .dispatch(new ChangeCandidateProfileStatus(id, CandidateStatus.Inactive))
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.dispatchNewPage();
       });
+    }
   }
 
   private clearFilters(): void {

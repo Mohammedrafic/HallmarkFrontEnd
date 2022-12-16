@@ -1,0 +1,11 @@
+@import "colors";
+
+.stepper {
+  padding-bottom: 40px;
+
+  .stepper-title {
+    .required {
+      color: $supportive-red;
+    }
+  }
+}

@@ -2,6 +2,7 @@
 
 .timesheet-picker-container {
   display: flex;
+  justify-content: space-between;
 
   button.e-control.e-btn i-feather {
     margin-left: 0;
@@ -10,6 +11,7 @@
 
 .datepicker {
   margin: 0 4px;
+  width: 100%;
 }
 
 ::ng-deep {

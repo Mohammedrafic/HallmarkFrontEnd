@@ -3,34 +3,52 @@
     <app-timesheets-tabs
       [tabConfig]="tabConfig"
       [isDisabled]="!!(loading$ | async)"
-      (changeTab)="handleChangeTab($event)">
+      (changeTab)="handleChangeTab($event)"
+    >
     </app-timesheets-tabs>
   </ng-container>
   <ng-container right>
-    <div *ngIf="isAgency" class="bootstrap">
-      <div class="input-container">
-        <ejs-dropdownlist
+    <div class="right-container">
+      <div class="dropdown-filter">
+        <div *ngIf="isAgency" class="bootstrap">
+          <div class="input-container">
+            <ejs-dropdownlist
+              appHideBeforeSyncfusionLoad
+              *ngIf="organizations$ | async as organizations"
+              placeholder="Select organization"
+              [allowFiltering]="true"
+              [dataSource]="organizations"
+              [fields]="unitOrganizationsFields"
+              [formControl]="organizationControl"
+            >
+            </ejs-dropdownlist>
+          </div>
+        </div>
+        <app-date-range-week-picker
+          (range)="setRange($event)"
+          class="datepicker-timesheet"
+          [class.datepicker-desktop]="isAgency"
+        ></app-date-range-week-picker>
+        <button
+          ejs-button
           appHideBeforeSyncfusionLoad
-          *ngIf="organizations$ | async as organizations"
-          placeholder="Select organization"
-          [allowFiltering]="true"
-          [dataSource]="organizations"
-          [fields]="unitOrganizationsFields"
-          [formControl]="organizationControl">
-        </ejs-dropdownlist>
+          cssClass="e-outline button-filter button--no-wrap"
+          (click)="showFilters()"
+        >
+          <div class="filter-button-content">
+            <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-pill align-text">{{
+              appliedFiltersAmount
+            }}</span>
+            <span class="filter-button-text">Filters</span> <i-feather name="sliders" class="icon"></i-feather>
+          </div>
+        </button>
       </div>
+      <app-date-range-week-picker
+        (range)="setRange($event)"
+        *ngIf="isAgency"
+        class="datepicker-mobile"
+      ></app-date-range-week-picker>
     </div>
-    <app-date-range-week-picker (range)="setRange($event)"></app-date-range-week-picker>
-    <button
-      ejs-button
-      appHideBeforeSyncfusionLoad
-      cssClass="e-outline button-filter button--no-wrap"
-      (click)="showFilters()">
-      <div class="filter-button-content">
-        <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-pill align-text">{{ appliedFiltersAmount }}</span>
-        Filters <i-feather name="sliders" class="icon"></i-feather>
-      </div>
-    </button>
   </ng-container>
 </app-page-toolbar>
 
@@ -61,5 +79,6 @@
 <app-profile-details-container
   [currentSelectedRowIndex]="currentSelectedTableRowIndex | async"
   [maxRowIndex]="(timesheets$ | async)?.items?.length || 0"
-  (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)">
+  (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
+>
 </app-profile-details-container>

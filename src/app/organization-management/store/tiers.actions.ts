@@ -1,13 +1,15 @@
 import { TierDTO } from '@shared/components/tiers-dialog/interfaces/tier-form.interface';
 import { TIERS_ACTIONS } from '@organization-management/enums';
 import { TierPriorityDTO } from '@organization-management/tiers/interfaces';
+import { SystemType } from "@shared/enums/system-type.enum";
 
 export namespace Tiers {
   export class GetTiersByPage {
     static readonly type = TIERS_ACTIONS.GET_TIERS_BY_PAGE;
     constructor(
       public pageNumber: number,
-      public pageSize: number
+      public pageSize: number,
+      public systemType: SystemType,
     ) {}
   }
 

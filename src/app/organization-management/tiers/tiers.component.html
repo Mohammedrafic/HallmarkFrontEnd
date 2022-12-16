@@ -3,6 +3,11 @@
     <div class="title">
       <h3>Tiers</h3>
     </div>
+    <app-button-group
+      *ngIf="showSystemButtons"
+      [buttonOptions]="systemButtons"
+      (buttonChange)="changeSystem($event)"
+    ></app-button-group>
     <div class="btn-container">
       <app-tooltip-container
         [message]="toolTipMessage"
@@ -18,7 +23,7 @@
     </div>
   </div>
   <div class="grid-container">
-    <app-tiers-grid (editTier)="handleEditTier($event)"></app-tiers-grid>
+    <app-tiers-grid [systemType]="selectedSystemType" (editTier)="handleEditTier($event)"></app-tiers-grid>
   </div>
 </section>
 

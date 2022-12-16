@@ -94,4 +94,8 @@ export class CandidatesContentComponent extends AbstractGridConfigurationCompone
     this.isIRP = !!isIRPEnabled;
     this.preferencesLoaded = true;
   }
+
+  public addIRPCandidate(): void {
+    this.navigateToCandidateForm();
+  }
 }

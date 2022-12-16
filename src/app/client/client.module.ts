@@ -58,9 +58,7 @@ import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, MaskedDateTimeService, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 import { ClientRoutingModule } from './client-routing.module';
-import {
-  OrderManagementContentComponent,
-} from './order-management/order-management-content/order-management-content.component';
+import { OrderManagementContentComponent } from './order-management/order-management-content/order-management-content.component';
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
 import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
@@ -78,12 +76,8 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { OrderDetailsDialogComponent } from './order-management/order-details-dialog/order-details-dialog.component';
 import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import {
-  OrderDetailsContainerComponent,
-} from './order-management/order-details-container/order-details-container.component';
-import {
-  OrderCandidatesContainerComponent,
-} from './order-management/order-candidates-container/order-candidates-container.component';
+import { OrderDetailsContainerComponent } from './order-management/order-details-container/order-details-container.component';
+import { OrderCandidatesContainerComponent } from './order-management/order-candidates-container/order-candidates-container.component';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
 import { SaveTemplateDialogModule } from '@client/order-management/save-template-dialog/save-template-dialog.module';
@@ -100,6 +94,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { SettingsViewService } from '@shared/services';
 import { OrderImportComponent } from './order-management/order-import/order-import.component';
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
+import { OrganizationCandidatesModule } from '@client/candidates/organization-candidates.module';
 
 const gridIcons = {
   MessageSquare,
@@ -191,6 +186,7 @@ const gridIcons = {
     ExtensionModule,
     ImportDialogContentModule,
     ListBoxModule,
+    OrganizationCandidatesModule,
   ],
   providers: [
     ResizeService,

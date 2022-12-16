@@ -210,7 +210,7 @@ export const MENU_CONFIG: any = {
     53: {
       // Fill Rate
       icon: '',
-      route: '/analytics/fillrate',
+      route: '/analytics/candidate-journey',
     },
     54: {
       // YTD Summary
@@ -315,7 +315,7 @@ export const MENU_CONFIG: any = {
     74: {
       // Job - Job Details Summary
       icon: '',
-      route: '/analytics/job-details-summary',
+      route: '/analytics/credential-summary',
     },
     75: {
       // Labor Utilization
@@ -735,7 +735,7 @@ export const MENU_CONFIG: any = {
     53: {
       // Fill Rate
       icon: '',
-      route: '/analytics/fillrate',
+      route: '/analytics/candidate-journey',
     },
     54: {
       // YTD Summary
@@ -835,7 +835,7 @@ export const MENU_CONFIG: any = {
     74: {
       // Job - Job Details Summary
       icon: '',
-      route: '/analytics/job-details-summary',
+      route: '/analytics/credential-summary',
     },
     75: {
       // Labor Utilization
@@ -1058,7 +1058,7 @@ export const MENU_CONFIG: any = {
     53: {
       // Fill Rate
       icon: '',
-      route: '/analytics/fillrate',
+      route: '/analytics/candidate-journey',
     },
     55: {
       // Missing Credentials

@@ -1,4 +1,5 @@
 @import 'colors';
+@import 'adaptive-response';
 
 .app-grid-pagination {
   background-color: #fff;
@@ -31,7 +32,8 @@
           }
         }
 
-        .e-nextpage, .e-prevpage {
+        .e-nextpage,
+        .e-prevpage {
           background: transparent;
 
           &::before {
@@ -63,6 +65,10 @@
     justify-content: space-between;
     align-items: center;
     column-gap: 15px;
+
+    @media #{$max-mobile} {
+      flex-direction: column-reverse !important;
+    }
   }
 
   & .bulk-section {
@@ -92,6 +98,10 @@
     align-items: center;
     column-gap: 15px;
 
+    @media #{$max-mobile} {
+      column-gap: 5px;
+    }
+
     .total-rows {
       color: $secondary-dark-blue-15;
       font-size: 14px;
@@ -106,4 +116,19 @@
 
 .app-grid-dark-pagination {
   background-color: $sidebar-background;
+}
+
+@media (max-width: 769px) {
+  ::ng-deep {
+    .e-pager .e-prevpagedisabled,
+    .e-pager .e-prevpage,
+    .e-pager .e-nextpage,
+    .e-pager .e-nextpagedisabled,
+    .e-pager .e-lastpagedisabled,
+    .e-pager .e-lastpage,
+    .e-pager .e-firstpage,
+    .e-pager .e-firstpagedisabled {
+      display: none !important;
+    }
+  }
 }

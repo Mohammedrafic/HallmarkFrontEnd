@@ -1,3 +1,4 @@
+@import 'adaptive-response';
 $gap: 12px;
 
 .controls-container {
@@ -5,8 +6,12 @@ $gap: 12px;
   display: flex;
   justify-content: space-between;
 
+  @media #{$max-tablet} {
+    flex-direction: column;
+  }
+
   .left-content {
-    width: 50%;
+    max-width: 50%;
     display: flex;
 
     & > *:not(:last-child) {
@@ -19,6 +24,10 @@ $gap: 12px;
     display: flex;
     justify-content: flex-end;
     flex-grow: 1;
+
+    @media #{$max-tablet} {
+      justify-content: flex-start;
+    }
 
     & > *:not(:first-child) {
       margin-left: $gap;

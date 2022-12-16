@@ -15,7 +15,7 @@ import { LogiReportState } from '@organization-management/store/logi-report.stat
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { ButtonModule,RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { SharedModule } from '@shared/shared.module';
-import { FillRateComponent } from './fillrate/fillrate.component';
+import { CandidateJourneyComponent } from './candidate-journey/candidate-journey.component';
 import { JobDetailsComponent } from './job-details/job-details.component';
 import { FinancialTimeSheetReportComponent } from './financial-time-sheet-report/financial-time-sheet-report.component';
 import { InvoiceSummaryComponent } from './invoice-summary/invoice-summary.component';
@@ -61,7 +61,7 @@ import { DailyOrderStatusComponent } from './daily-order-status/daily-order-stat
     CandidateListComponent,
     LogiReportComponent,
     LogiWebReportComponent,
-    FillRateComponent,
+    CandidateJourneyComponent,
     JobDetailsComponent,
     FinancialTimeSheetReportComponent,
     InvoiceSummaryComponent,

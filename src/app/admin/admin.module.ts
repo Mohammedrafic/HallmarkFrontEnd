@@ -4,7 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { GridModule, ResizeService, PagerModule, PageService } from '@syncfusion/ej2-angular-grids';
-import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, ChipListModule, CheckBoxModule,
+  RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { UploaderModule, TextBoxModule, NumericTextBoxModule, MaskedTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
@@ -26,10 +27,12 @@ import {
   Edit3,
   ChevronDown,
   ChevronRight,
-  Copy
+  Copy,
 } from 'angular-feather/icons';
 
-import { ClientManagementContentComponent } from './client-management/client-management-content/client-management-content.component';
+import {
+  ClientManagementContentComponent,
+} from './client-management/client-management-content/client-management-content.component';
 import { AdminRoutingModule } from './admin-routing.module';
 import { AdminComponent } from './admin.component';
 import { AddEditOrganizationComponent } from './client-management/add-edit-organization/add-edit-organization.component';
@@ -41,7 +44,7 @@ import { SkillsCategoriesComponent } from './master-data/skills/skills-categorie
 import { SkillsGridComponent } from './master-data/skills/skills-grid/skills-grid.component';
 import { SkillCategoriesGridComponent } from './master-data/skills/skill-categories-grid/skill-categories-grid.component';
 import {
-  MasterCredentialsTypesComponent
+  MasterCredentialsTypesComponent,
 } from './master-data/master-credentials/master-credentials-types/master-credentials-types.component';
 import { MasterHolidaysComponent } from './master-data/holidays/holidays.component';
 import { HolidaysState } from './store/holidays.state';
@@ -57,6 +60,7 @@ import { TooltipContainerModule } from "@shared/components/tooltip-container/too
 import { NgxMaskModule } from 'ngx-mask';
 import { AddEditOrganizationService } from '@admin/client-management/services/add-edit-organization.service';
 import { CredentialListModule } from '@shared/components/credentials-list/credential-list.module';
+import { MasterSkillsService } from './master-data/skills/skills-grid/skills-grid.service';
 
 const sidebarIcons = {
   Download,
@@ -73,7 +77,7 @@ const sidebarIcons = {
   Edit3,
   ChevronDown,
   ChevronRight,
-  Copy
+  Copy,
 };
 @NgModule({
   declarations: [
@@ -89,7 +93,7 @@ const sidebarIcons = {
     MasterHolidaysComponent,
     RejectReasonMasterComponent,
     ManualInvoiceReasonsComponent,
-    OrganizationProfileComponent
+    OrganizationProfileComponent,
   ],
   imports: [
     CommonModule,
@@ -131,13 +135,14 @@ const sidebarIcons = {
       HolidaysState,
       RejectReasonMasterState,
       ManualInvoiceReasonsState,
-      OrganizationManagementState
+      OrganizationManagementState,
     ]),
   ],
   providers: [
     ResizeService,
     PageService,
-    AddEditOrganizationService
-  ]
+    AddEditOrganizationService,
+    MasterSkillsService,
+  ],
 })
 export class AdminModule { }

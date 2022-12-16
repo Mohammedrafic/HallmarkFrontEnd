@@ -31,10 +31,10 @@
     <e-column headerText="" field="actions" textAlign="Left" width="150" [visible]="false">
       <ng-template #template let-data>
         <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-          <button ejs-button cssClass="e-flat primary-icon-button">
+          <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
             <span><i-feather name="edit" class="icon"></i-feather></span>
           </button>
-          <button ejs-button cssClass="e-flat secondary-icon-button enabled-button">
+          <button ejs-button cssClass="e-flat secondary-icon-button enabled-button" (click)="onRemove(data.employeeId)">
             <span><i-feather name="trash-2" class="icon"></i-feather></span>
           </button>
           <ejs-tooltip *ngIf="data.hasRedFlag" [content]="data.redFlagDescription" position="TopCenter">

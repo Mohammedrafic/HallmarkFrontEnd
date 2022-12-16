@@ -28,7 +28,7 @@ export class MasterDataContentComponent extends AbstractPermission implements On
   }
 
   private watchForPermissions(): void {
-    const itemsWithoutPermissions = MASTER_DATA_CONFIG.filter((item: MenuSettings) => !item.permissionKey).length;
+    const itemsWithoutPermissions = MASTER_DATA_CONFIG.filter((item: MenuSettings) => !item.permissionKeys).length;
     this.getPermissionStream().pipe(
       filter(() => this.sideMenuConfig.length <= itemsWithoutPermissions),
       takeUntil(this.componentDestroy())
