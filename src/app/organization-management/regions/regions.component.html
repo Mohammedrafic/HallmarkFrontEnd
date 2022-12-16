@@ -8,7 +8,8 @@
       ejs-button
       id="filterButton"
       cssClass="e-outline button-filter"
-      (click)="showFilters()">
+      (click)="showFilters()"
+      [class.hidden]="true">
       <div class="filter-button-content">
         <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-pill">{{ filteredItems.length }}</span>
         Filters <i-feather name="sliders" class="icon"></i-feather>
@@ -18,6 +19,7 @@
       ejs-button
       id="importButton"
       cssClass="e-outline button-import"
+      [class.hidden]="true"
       (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather></button>
     <button
       ejs-dropdownbutton
@@ -57,7 +59,7 @@
       <e-column  [customAttributes]='customAttributes'>
         <ng-template #template let-data >
           <div class="row-tool-buttons" [class.hidden]="!isLoaded">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, $event)">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, $event)" [class.hidden]="true">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
             <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemoveButtonClick(data, $event)">
