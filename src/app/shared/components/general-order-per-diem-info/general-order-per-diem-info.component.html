@@ -5,7 +5,7 @@
         <i-feather name="user" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{orderInformation.title}}</div>
+        <div class="title">{{ orderInformation.title }}</div>
         <div class="sup-title">Job title</div>
       </div>
     </div>
@@ -14,7 +14,7 @@
         <i-feather name="map-pin" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{orderInformation.locationName}}</div>
+        <div class="title">{{ orderInformation.locationName }}</div>
         <div class="sup-title">Location</div>
       </div>
     </div>
@@ -23,7 +23,7 @@
         <i-feather name="folder" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{orderInformation.departmentName}}</div>
+        <div class="title">{{ orderInformation.departmentName }}</div>
         <div class="sup-title">Department</div>
       </div>
     </div>
@@ -35,7 +35,7 @@
         <i-feather name="briefcase" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{orderInformation.orderRequisitionReasonName || '-'}}</div>
+        <div class="title">{{ orderInformation.orderRequisitionReasonName || '-' }}</div>
         <div class="sup-title">Reason for Requisition</div>
       </div>
     </div>
@@ -44,7 +44,7 @@
         <i-feather name="briefcase" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{orderInformation?.skillName}}</div>
+        <div class="title">{{ orderInformation?.skillName }}</div>
         <div class="sup-title">Skill</div>
       </div>
     </div>
@@ -60,16 +60,20 @@
       <div class="sup-title">Job Type</div>
     </div>
     <div class="column">
-      <div class="title">{{activeValue(orderInformation.onCallRequired)}}</div>
+      <div class="title">{{ activeValue(orderInformation.onCallRequired) }}</div>
       <div class="sup-title">Oncall</div>
     </div>
     <div class="column">
-      <div class="title">{{ orderInformation.criticalOrder ? 'Yes' : 'No'}}</div>
+      <div class="title">{{ orderInformation.criticalOrder ? 'Yes' : 'No' }}</div>
       <div class="sup-title">Critical Order</div>
     </div>
     <div class="column">
-      <div class="title">{{(orderInformation.orderOpenDate | date: 'MM/dd/yyy' : 'UTC') || '-'}}</div>
+      <div class="title">{{ (orderInformation.orderOpenDate | date: 'MM/dd/yyy':'UTC') || '-' }}</div>
       <div class="sup-title">Distributed On</div>
+    </div>
+    <div class="column">
+      <div class="title">{{ orderInformation.regionName }}</div>
+      <div class="sup-title">Region</div>
     </div>
   </div>
 </section>

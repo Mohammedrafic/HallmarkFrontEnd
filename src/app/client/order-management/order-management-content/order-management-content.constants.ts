@@ -18,6 +18,7 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Status', column: 'Status' },
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Skill', column: 'Skill' },
+  { text: 'Region', column: 'RegionName' },
   { text: '# of Positions', column: 'NumberOfPositions' },
   { text: 'Location', column: 'Location' },
   { text: 'Department', column: 'Department' },
@@ -27,9 +28,10 @@ export const allOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Start Date', column: 'JobStartDate' },
   { text: 'Agency', column: 'Agency' },
   { text: 'End Date', column: 'EndDate' },
+  { text: 'Shift', column: 'Shift' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
-  { text: 'Distributed To', column: 'DistributedTo' },
+  { text: 'Job Distribution', column: 'JobDistribution' },
   { text: 'Special Project Category', column: 'SpecialProjectCategory' },
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
@@ -42,6 +44,7 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Status', column: 'Status' },
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Skill', column: 'Skill' },
+  { text: 'Region', column: 'Region' },
   { text: 'Location', column: 'Location' },
   { text: 'Department', column: 'Department' },
   { text: 'Candidates', column: 'Candidates' },
@@ -49,7 +52,7 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Agency', column: 'Agency' },
   { text: 'Creation Date', column: 'CreationDate' },
   { text: 'Distributed On', column: 'DistributedOn' },
-  { text: 'Distributed To', column: 'DistributedTo' },
+  { text: 'Job Distribution', column: 'JobDistribution' },
   { text: 'Special Project Category', column: 'SpecialProjectCategory' },
   { text: 'Special Project Name', column: 'SpecialProjectName' },
   { text: 'PO #', column: 'PONumber' },
@@ -62,6 +65,7 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Status', column: 'Status' },
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Skill', column: 'Skill' },
+  { text: 'Region', column: 'Region' },
   { text: '# of Positions', column: 'CountOfPosition' },
   { text: 'Location', column: 'Location' },
   { text: 'Department', column: 'Department' },
@@ -117,6 +121,7 @@ export const permPlacementColumnsToExport: ExportColumn[] = [
   { text: 'Status', column: 'Status' },
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Skill', column: 'Skill' },
+  { text: 'Region', column: 'Region' },
   { text: '# of Positions', column: 'NumberOfPositions' },
   { text: 'Location', column: 'Location' },
   { text: 'Department', column: 'Department' },
@@ -131,8 +136,8 @@ export const permPlacementColumnsToExport: ExportColumn[] = [
   { text: 'Agency', column: 'Agency' },
   { text: 'Job Distribution', column: 'JobDistribution'},
   { text: 'Candidate Agency', column: 'CandidateAgency' },
-  { text: 'Annual Salary From', column: 'AnnualSalaryFrom'},
-  { text: 'Annual Salary To', column: 'AnnualSalaryTo'},
+  { text: 'Annual Salary From', column: 'AnnualSalaryFrom' },
+  { text: 'Annual Salary To', column: 'AnnualSalaryTo' },
 ];
 
 export const ReOrdersColumnsConfig = [
@@ -155,6 +160,10 @@ export const ReOrdersColumnsConfig = [
   {
     fieldName: 'orderType',
     visible: false,
+  },
+  {
+    fieldName: 'regionName',
+    visible: true,
   },
   {
     fieldName: 'startDate',
@@ -224,8 +233,12 @@ export const AllOrdersColumnsConfig = [
     visible: false,
   },
   {
-    fieldName: 'shift',
-    visible: false,
+    fieldName: 'regionName',
+    visible: true,
+  },
+  {
+    fieldName: 'shiftStartTime',
+    visible: true,
   },
   {
     fieldName: 'agencies',
@@ -295,7 +308,11 @@ export const PerDiemColumnsConfig = [
     visible: false,
   },
   {
-    fieldName: 'shift',
+    fieldName: 'regionName',
+    visible: true,
+  },
+  {
+    fieldName: 'shiftStartTime',
     visible: false,
   },
   {
@@ -366,8 +383,8 @@ export const orderTemplateColumnsConfig = [
     visible: false,
   },
   {
-    fieldName: 'shift',
-    visible: false,
+    fieldName: 'shiftStartTime',
+    visible: true,
   },
   {
     fieldName: 'agencies',
@@ -437,8 +454,12 @@ export const PermPlacementColumnsConfig = [
     visible: false,
   },
   {
-    fieldName: 'shift',
-    visible: false,
+    fieldName: 'regionName',
+    visible: true,
+  },
+  {
+    fieldName: 'shiftStartTime',
+    visible: true,
   },
   {
     fieldName: 'agencies',

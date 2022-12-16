@@ -29,9 +29,7 @@
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
     </button>
-    <app-tooltip-container
-      [message]="toolTipMessage"
-      [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
+    <app-tooltip-container [message]="toolTipMessage" [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
       <button
         [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
         ejs-button
@@ -57,9 +55,7 @@
     >
       <div class="button-export-container">Export<i-feather name="download" class="icon"></i-feather></div>
     </button>
-    <app-tooltip-container
-      [message]="toolTipMessage"
-      [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
+    <app-tooltip-container [message]="toolTipMessage" [showToolTip]="!userPermission[userPermissions.CanCreateOrders]">
       <button
         [disabled]="!canCreateOrder || !userPermission[userPermissions.CanCreateOrders]"
         ejs-button
@@ -337,7 +333,7 @@
           width="150"
           minWidth="90"
           maxWidth="200"
-          [visible]="false"
+          [visible]="true"
         ></e-column>
         <e-column
           field="openPositions"
@@ -391,11 +387,6 @@
           </ng-template>
           <ng-template #template let-data>
             <span>{{ data.startDate | date: 'MM/dd/yyy':'UTC' }}</span>
-          </ng-template>
-        </e-column>
-        <e-column field="shift" headerText="SHIFT" width="160" minWidth="80" maxWidth="200" [visible]="false">
-          <ng-template #template let-data>
-            <span>{{ data.shiftStartTime | date: 'shortTime' }}-{{ data.shiftEndTime | date: 'shortTime' }}</span>
           </ng-template>
         </e-column>
         <e-column field="agencies" headerText="AGENCY" width="130" minWidth="95" maxWidth="200" [visible]="false">
@@ -462,7 +453,12 @@
       </e-column>
       <e-column field="endDate" headerText="End Date" width="130" minWidth="105" maxWidth="200">
         <ng-template #template let-data>
-          <span>{{ data.endDate | date: formatDate: 'UTC' }}</span>
+          <span>{{ data.endDate | date: formatDate:'UTC' }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="shiftStartTime" headerText="SHIFT" width="160" minWidth="80" maxWidth="200">
+        <ng-template #template let-data>
+          <span>{{ data.shiftStartTime | date: 'shortTime' }}-{{ data.shiftEndTime | date: 'shortTime' }}</span>
         </ng-template>
       </e-column>
       <e-column field="candidates" headerText="CAND." headerTextAlign="Right" width="90" minWidth="80" maxWidth="160">
@@ -1075,11 +1071,13 @@
 
 <mat-menu #menu="matMenu">
   <ng-template matMenuContent let-items="items" let-data="data">
-    <button mat-menu-item
-            *ngFor="let item of items"
-            [disabled]="item.disabled"
-            (click)="menuOptionSelected(item.id, data)">
-            {{ item.text }}
+    <button
+      mat-menu-item
+      *ngFor="let item of items"
+      [disabled]="item.disabled"
+      (click)="menuOptionSelected(item.id, data)"
+    >
+      {{ item.text }}
     </button>
   </ng-template>
 </mat-menu>

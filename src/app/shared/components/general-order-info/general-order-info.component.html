@@ -1,6 +1,9 @@
 <section class="candidates-info" *ngIf="orderInformation">
-  <div class="container-row" [class.extension]="orderInformation.extensionFromId"
-       [ngSwitch]="orderInformation.orderType">
+  <div
+    class="container-row"
+    [class.extension]="orderInformation.extensionFromId"
+    [ngSwitch]="orderInformation.orderType"
+  >
     <ng-container *ngSwitchCase="orderType.PermPlacement">
       <ng-container [ngTemplateOutlet]="jobInfoTemplate"></ng-container>
       <ng-container [ngTemplateOutlet]="departmentTemplate"></ng-container>
@@ -34,7 +37,9 @@
       <div class="sup-title">Job Type</div>
     </div>
     <div class="column" *ngIf="!orderInformation.extensionFromId">
-      <div class="title accent positions">{{ orderInformation.acceptedPositions }} / {{ orderInformation.openPositions }}</div>
+      <div class="title accent positions">
+        {{ orderInformation.acceptedPositions }} / {{ orderInformation.openPositions }}
+      </div>
       <div class="sup-title">Open Positions</div>
     </div>
     <div class="column">
@@ -43,6 +48,10 @@
         {{ orderInformation.shiftEndTime | date: 'hh:mm a':'UTC' }}
       </div>
       <div class="sup-title">Shift</div>
+    </div>
+    <div class="column">
+      <div class="title">{{ orderInformation.regionName }}</div>
+      <div class="sup-title">Region</div>
     </div>
     <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
       <div class="title">
@@ -62,7 +71,7 @@
         <div class="sup-title">ASAP Start</div>
       </div>
       <div class="column">
-        <div class="title">{{ orderInformation.criticalOrder ? 'Yes' : 'No'}}</div>
+        <div class="title">{{ orderInformation.criticalOrder ? 'Yes' : 'No' }}</div>
         <div class="sup-title">Critical Order</div>
       </div>
       <div class="column">
@@ -116,9 +125,9 @@
     </div>
     <div>
       <div class="title">
-        {{ orderInformation.jobStartDate | date: 'MM/dd/yyy': 'utc' }}
+        {{ orderInformation.jobStartDate | date: 'MM/dd/yyy':'utc' }}
         <ng-container *ngIf="!hideEndDate">
-          -&nbsp;{{ orderInformation.jobEndDate | date: 'MM/dd/yyy': 'utc' }}
+          -&nbsp;{{ orderInformation.jobEndDate | date: 'MM/dd/yyy':'utc' }}
         </ng-container>
       </div>
       <div class="sup-title">
@@ -140,7 +149,7 @@
       <i-feather name="briefcase" class="icon"></i-feather>
     </div>
     <div>
-      <div class="title">{{ orderInformation.orderRequisitionReasonName || '-'}}</div>
+      <div class="title">{{ orderInformation.orderRequisitionReasonName || '-' }}</div>
       <div class="sup-title">Reason for Requisition</div>
     </div>
   </div>
@@ -164,7 +173,9 @@
       <i-feather name="percent" class="icon"></i-feather>
     </div>
     <div>
-      <div class="title">{{ orderInformation?.orderPlacementFee ? orderInformation?.orderPlacementFee + '%' : '-'}}</div>
+      <div class="title">
+        {{ orderInformation?.orderPlacementFee ? orderInformation?.orderPlacementFee + '%' : '-' }}
+      </div>
       <div class="sup-title">Order Placement Fee</div>
     </div>
   </div>
@@ -186,16 +197,14 @@
 </ng-template>
 
 <ng-template #billRate>
-  <div class="cost">${{ orderInformation.hourlyRate | number : '1.2-2'}}</div>
+  <div class="cost">${{ orderInformation.hourlyRate | number: '1.2-2' }}</div>
   <div class="sup-title">Bill Rate</div>
 </ng-template>
 
 <ng-template #orderInfo>
   <div class="column" *ngIf="orderInformation?.extensionInitialOrderId || orderInformation?.hasParentExtension">
     <div *ngIf="orderInformation?.extensionInitialOrderId" class="accent link" (click)="moveToInitialOrder()">
-      Initial Order ID: {{ orderInformation.organizationPrefix }}-{{
-      orderInformation?.extensionInitialOrderPublicId
-      }}
+      Initial Order ID: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionInitialOrderPublicId }}
     </div>
     <div *ngIf="orderInformation.hasParentExtension" class="accent link" (click)="moveToPreviousExtension()">
       Previous Extension: {{ orderInformation.organizationPrefix }}-{{ orderInformation?.extensionPublicId }}

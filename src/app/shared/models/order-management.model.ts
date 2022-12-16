@@ -392,6 +392,7 @@ export class Order {
   hasParentExtension?: boolean;
   hasExtensions?: boolean;
   extensionInitialOrderPublicId?: number;
+  regionName?: string;
 }
 
 export class ReOrder {
