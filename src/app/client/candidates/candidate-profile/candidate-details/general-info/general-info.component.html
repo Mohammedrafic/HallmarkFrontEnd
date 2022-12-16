@@ -1,0 +1,114 @@
+<h2 class="title">General Info</h2>
+<form class="general-info__form">
+  <app-input
+    [formGroupInstance]="candidateForm"
+    [required]="true"
+    controlName="employeeId"
+    id="employeeId"
+    label="Employee ID"
+    class="employee-id"
+  ></app-input>
+  <app-input
+    [formGroupInstance]="candidateForm"
+    [required]="true"
+    controlName="firstName"
+    id="first-name"
+    label="First Name"
+    class="first-name"
+  ></app-input>
+
+  <app-input
+    [formGroupInstance]="candidateForm"
+    controlName="middleName"
+    id="middle-name"
+    label="Middle Name"
+    class="middle-name"
+  ></app-input>
+
+  <app-input
+    [formGroupInstance]="candidateForm"
+    [required]="true"
+    controlName="lastName"
+    id="last-name"
+    label="Last Name"
+    class="last-name"
+  ></app-input>
+
+  <app-datepicker
+    [formGroupInstance]="candidateForm"
+    [enableMask]="true"
+    [required]="true"
+    [maskPlaceholder]="datepickerMask"
+    id="dob"
+    controlName="dob"
+    label="DOB"
+    format="MM/dd/yyyy"
+    placeholder="MM/DD/YYYY"
+  ></app-datepicker>
+
+  <app-dropdown
+    [dataSource]="[]"
+    [fields]="fieldsSettings"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    [required]="true"
+    label="Primary Skill"
+    id="primary-skill"
+    class="primary-skill"
+    controlName="primarySkill"
+  ></app-dropdown>
+
+  <app-multiselect-dropdown
+    [dataSource]="[]"
+    [formGroupInstance]="candidateForm"
+    [fields]="skillOptionFields"
+    [required]="true"
+    controlName="skill"
+    id="skill"
+    label="Skill"
+    class="skill"
+  ></app-multiselect-dropdown>
+
+  <app-dropdown
+    [dataSource]="classifications"
+    [fields]="fieldsSettings"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    label="Classification"
+    id="classification"
+    class="classification"
+    controlName="classification"
+  ></app-dropdown>
+
+  <app-datepicker
+    [formGroupInstance]="candidateForm"
+    [enableMask]="true"
+    [required]="true"
+    [maskPlaceholder]="datepickerMask"
+    id="hire-date"
+    controlName="hireDate"
+    label="Hire Date"
+    format="MM/dd/yyyy"
+    placeholder="MM/DD/YYYY"
+  ></app-datepicker>
+
+  <app-input
+    [formGroupInstance]="candidateForm"
+    [required]="true"
+    controlName="fte"
+    id="fte"
+    label="FTE"
+    class="fte"
+  ></app-input>
+
+  <app-dropdown
+    [dataSource]="[]"
+    [fields]="fieldsSettings"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    label="Profile Status"
+    id="profile-status"
+    class="profile-status"
+    controlName="profileStatus"
+  ></app-dropdown>
+</form>

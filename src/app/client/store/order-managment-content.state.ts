@@ -10,6 +10,7 @@ import {
   ClearHistoricalData,
   ClearOrderCandidatePage,
   ClearOrders,
+  ClearOrganisationCandidateJob,
   ClearPredefinedBillRates,
   ClearSelectedOrder,
   ClearSuggestions,
@@ -502,6 +503,11 @@ export class OrderManagementContentState {
         return payload;
       })
     );
+  }
+
+  @Action(ClearOrganisationCandidateJob)
+  ClearOrganisationCandidateJob({ patchState }: StateContext<OrderManagementContentStateModel>): void {
+    patchState({ candidatesJob: null });
   }
 
   @Action(GetAvailableSteps)

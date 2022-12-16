@@ -1,8 +1,8 @@
-@import 'colors.scss';
-@import 'mixins';
-@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
-@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
-
+@import "colors.scss";
+@import "mixins";
+@import "adaptive-response";
+@import "@ag-grid-community/core/dist/styles/ag-grid.scss";
+@import "@ag-grid-community/core/dist/styles/ag-theme-alpine";
 
 .table-container {
   margin-bottom: 25px;
@@ -11,6 +11,10 @@
 .table-block {
   display: flex;
   flex-direction: column;
+
+  .mobile-btn-group {
+    display: none;
+  }
 }
 
 .table-header {
@@ -65,18 +69,38 @@
 }
 
 ::ng-deep {
-  .ag-cell-focus, .ag-cell {
+  .align-right {
+    text-align: right;
+  }
+
+  .custom-wrap {
+    .ag-header-cell-text {
+      white-space: pre-wrap;
+    }
+  }
+
+  .ag-center-cols-clipper,
+  .ag-center-cols-container {
+    min-height: 64px;
+  }
+
+  .ag-overlay-no-rows-wrapper {
+    margin-top: 24px;
+  }
+
+  .ag-cell-focus,
+  .ag-cell {
     border: none !important;
   }
 
   .ag-cell-value {
-    padding-left: 5px!important;
-    padding-right: 5px!important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
   }
 
   .common-cell {
-    padding-left: 17px!important;
-    padding-right: 17px!important;
+    padding-left: 17px !important;
+    padding-right: 17px !important;
     text-align: right;
   }
 
@@ -102,28 +126,94 @@ button.privilege {
 
 ::ng-deep {
   .spinner-btn {
-    width: 81px!important;
-    height: 40px!important;
+    width: 81px !important;
+    height: 40px !important;
     display: block;
-    padding: 0!important;
+    padding: 0 !important;
 
     .spinner-container {
       height: 40px;
     }
 
     .e-spinner-pane.e-spin-show {
-      position: static!important;
+      position: static !important;
       align-items: center;
     }
     .e-spinner-inner {
-      position: static!important;
-      left: 0!important;
-      transform: none!important;
-      top: 0!important;
+      position: static !important;
+      left: 0 !important;
+      transform: none !important;
+      top: 0 !important;
 
       svg {
-        stroke: #fff!important;
+        stroke: #fff !important;
       }
     }
+  }
+}
+
+.small-tablet {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding-top: 20px;
+  width: 100%;
+
+  .btn-group {
+    .spinner-btn {
+      width: 100px !important;
+    }
+    
+    .privilege {
+      width: 100px;
+      margin: 0;
+    }
+
+    > *:not(:first-child) {
+      margin-left: 16px;
+    }
+  }
+
+  .add-action {
+    &.spaced {
+      width: auto;
+      margin: 0;
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  .action-text {
+    display: none;
+  }
+
+  .add-action {
+    &.spaced {
+      width: auto;
+      margin: 0;
+    }
+  }
+
+  button.e-btn.e-control.e-action-button {
+    padding: 8px;
+  }
+}
+
+@media #{$max-mobile} {
+  .action-text {
+    display: none;
+  }
+
+  .table-block {
+      .btn-group {
+        .privilege {
+          min-width: 38vw;
+          margin: 0;
+        }
+      }
+  }
+
+  .desktop-tablet-btn-group {
+    display: none;
   }
 }

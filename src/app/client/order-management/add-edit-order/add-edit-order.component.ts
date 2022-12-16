@@ -684,6 +684,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       order.compBonus = null;
     }
 
+    if (order.jobStartDate) {
+      order.jobStartDate.setHours(0, 0, 0, 0);
+    }
+
+    if (order.jobEndDate) {
+      order.jobEndDate.setHours(0, 0, 0, 0);
+    }
+
     return order;
   }
 

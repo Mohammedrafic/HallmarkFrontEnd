@@ -16,6 +16,20 @@ export type CandidateRow = {
   candidateStatus: ApplicantStatus;
 };
 
+export type IRPCandidate = {
+  hasRedFlag: boolean;
+  redFlagDescription: string;
+  employeeId: number
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  employeeStatus: string;
+  primarySkillName: string;
+  employeeSkills: string[];
+  hireDate: string;
+  orgOrientation: string;
+}
+
 export interface CandidateListRequest {
   orderBy: string;
   pageNumber: number;
@@ -71,3 +85,5 @@ export type CandidateListExport = {
 };
 
 export type CandidateList = PageOfCollections<CandidateRow>;
+
+export type IRPCandidateList = PageOfCollections<IRPCandidate>;

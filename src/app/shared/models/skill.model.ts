@@ -12,15 +12,21 @@ export class Skill {
   glNumber?: string | null;
   allowOnboard?: boolean;
   inactiveDate?: string | null;
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
   isDefault?: boolean;
   foreignKey?: string;
+  skillCode?: string;
 
-  constructor(skill: Skill, assigned: boolean = false) {
+  constructor(skill: Skill, assigned = false) {
     this.id = skill.id || 0;
     this.skillCategoryId = skill.skillCategoryId;
     this.skillAbbr = skill.skillAbbr;
     this.skillDescription = skill.skillDescription;
     this.isDefault = skill.isDefault;
+    this.includeInIRP = skill.includeInIRP || false;
+    this.includeInVMS = skill.includeInVMS || false;
+    this.skillCode = skill.skillCode;
 
     if (assigned) {
       this.inactiveDate = skill.inactiveDate || null;
@@ -55,6 +61,9 @@ export class SkillFilters {
   pageNumber?: number;
   pageSize?: number;
   orderBy?: string;
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
+  skillCodes?: string[];
 }
 
 export class MasterSkillFilters {

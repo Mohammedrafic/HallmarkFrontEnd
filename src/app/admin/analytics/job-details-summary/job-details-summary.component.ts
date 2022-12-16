@@ -57,9 +57,9 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
     "BusinessUnitIdParamJDSR": "",
     "HostName": "",
   };
-  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/JobDetailsSummary/JobDetailsSummary.wls" };
-  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/JobDetailsSummary/Credential.cat" };
-  public title: string = "Job Detail Summary";
+  public reportName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialSummary/CredentialSummary.wls" };
+  public catelogName: LogiReportFileDetails = { name: "/JsonApiReports/CredentialSummary/Credential.cat" };
+  public title: string = "Credential Summary";
   public message: string = "";
   public reportType: LogiReportTypes = LogiReportTypes.WebReport;
   public allOption: string = "All";
@@ -262,6 +262,15 @@ export class JobDetailsSummaryComponent implements OnInit, OnDestroy {
           this.store.dispatch(new GetCommonReportFilterOptions(filter));
           this.CommonReportFilterData$.pipe(takeWhile(() => this.isAlive)).subscribe((data: CommonReportFilterOptions | null) => {
             if (data != null) {
+              data.jobStatuses = data.jobStatuses.filter((item: any) => {
+                if (item.statusText !== 'Incomplete'
+                  && item.statusText !== 'PreOpen'
+                  && item.statusText !== 'Open'
+                  && item.statusText !== 'In progress'
+                  && item.statusText !== 'Pending') {
+                  return item;
+                }
+              });
               this.isAlive = false;
               this.filterOptionsData = data;
               this.filterColumns.skillCategoryIds.dataSource = data.skillCategories;

@@ -11,6 +11,7 @@ import { ErroredData } from '@shared/models/candidate-profile-import.model';
 })
 export class GridErroredCellComponent implements ICellRendererAngularComp {
   public cellValue: ErroredData;
+  public value: string;
   public colId: string;
 
   get isErrored(): boolean {
@@ -20,10 +21,12 @@ export class GridErroredCellComponent implements ICellRendererAngularComp {
   public agInit(params: ICellRendererParams): void {
     this.cellValue = params.data;
     this.colId = params.column?.getColId() as string;
+    this.value = params.valueFormatted;
   }
 
   public refresh(params: ICellRendererParams): boolean {
     this.cellValue = params.data;
+    this.value = params.valueFormatted;
     return true;
   }
 }

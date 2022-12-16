@@ -22,6 +22,8 @@ import {
   CandidateListFiltersColumn,
   CandidateListRequest,
   CandidateRow,
+  IRPCandidate,
+  IRPCandidateList,
 } from '../../types/candidate-list.model';
 import { Candidate } from '@shared/models/candidate.model';
 import {
@@ -29,6 +31,7 @@ import {
   ExportCandidateList,
   GetAllSkills,
   GetCandidatesByPage,
+  GetIRPCandidatesByPage,
   GetRegionList,
 } from '../../store/candidate-list.actions';
 import { ListOfSkills } from '@shared/models/skill.model';
@@ -38,7 +41,7 @@ import { DatePipe } from '@angular/common';
 import { isNil } from 'lodash';
 import { optionFields, regionFields } from '@shared/constants';
 import { adaptToNameEntity } from '../../../../helpers/dropdown-options.helper';
-import { filterColumns } from './candidate-list.constants';
+import { filterColumns, IRPCandidates, VMSCandidates } from './candidate-list.constants';
 import { Permission } from '@core/interface';
 import { UserPermissions } from '@core/enums';
 import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
@@ -55,6 +58,9 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   @Select(CandidateListState.candidates)
   private _candidates$: Observable<CandidateList>;
+
+  @Select(CandidateListState.IRPCandidates)
+  private _IRPCandidates$: Observable<IRPCandidateList>;
 
   @Select(CandidateListState.listOfSkills)
   private skills$: Observable<ListOfSkills[]>;
@@ -75,6 +81,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   @Input() isAgency: boolean;
   @Input() agencyActionsAllowed: boolean;
   @Input() userPermission: Permission;
+  @Input() isIRP: boolean;
   @Input() set tab(tabIndex: number) {
     if (!isNil(tabIndex)) {
       this.activeTab = tabIndex;
@@ -93,7 +100,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   public filterColumns: CandidateListFiltersColumn = filterColumns;
   public readonly statusEnum = CandidateStatus;
   public readonly candidateStatus = CandidatesStatusText;
-  public candidates$: Observable<CandidateList>;
+  public candidates$: Observable<CandidateList | IRPCandidateList>;
   public readonly userPermissions = UserPermissions;
   public columnsToExport: ExportColumn[] = [
     { text: 'Name', column: 'Name' },
@@ -150,7 +157,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.subscribeOnDeploydCandidates();
     this.subscribeOnSkills();
     this.subscribeOnRegions();
-    this.updateCandidates();
     this.subscribeOnExportAction();
     this.setFileName();
   }
@@ -184,7 +190,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private setDefaultFilter(): void {
-    if (this.filterService.canPreserveFilters()) {
+    if (this.filterService.canPreserveFilters() && !this.isIRP) {
       const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFiltersGlobal);
       if (preservedFilters?.regions) {
         this.CandidateFilterFormGroup.get('regionsNames')?.setValue([...preservedFilters.regions]);
@@ -231,16 +237,16 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     return found ? found[0] : 'e-default';
   }
 
-  public onEdit(data: any): void {
+  public onEdit(data: CandidateRow | IRPCandidate): void {
     const credentialParams: CredentialParams = {
       isNavigatedFromOrganizationArea: false,
       candidateStatus: null,
       orderId: null,
     };
-    this.router.navigate(['./edit', data.candidateProfileId], { relativeTo: this.route, state: credentialParams });
+    this.router.navigate(['./edit', (data as CandidateRow).candidateProfileId || (data as IRPCandidate).employeeId], { relativeTo: this.route, state: credentialParams });
   }
 
-  public onRemove(id: any): void {
+  public onRemove(id: number): void {
     this.confirmService
       .confirm('Are you sure you want to inactivate the Candidate?', {
         okButtonLabel: 'Inactivate',
@@ -302,7 +308,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
       tab: this.activeTab ?? 0,
       includeDeployedCandidates: this.includeDeployedCandidates,
     };
-    this.store.dispatch(new GetCandidatesByPage(candidateListRequest));
+    this.store.dispatch(this.isIRP ? new GetIRPCandidatesByPage(candidateListRequest) : new GetCandidatesByPage(candidateListRequest));
   }
 
   public regionTrackBy(index: number, region: string): string {
@@ -310,14 +316,25 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
   }
 
   private updateCandidates(): void {
-    this.candidates$ = this._candidates$.pipe(
-      map((value: CandidateList) => {
-        return {
-          ...value,
-          items: this.addSkillRegionEllipsis(value?.items),
-        };
-      })
-    );
+    if (this.isIRP) {
+      this.candidates$ = this._IRPCandidates$.pipe(
+        map((value: IRPCandidateList) => {
+          return {
+            ...value,
+            items: this.addEmployeeSkillEllipsis(value?.items),
+          };
+        })
+      );
+    } else {
+      this.candidates$ = this._candidates$.pipe(
+        map((value: CandidateList) => {
+          return {
+            ...value,
+            items: this.addSkillRegionEllipsis(value?.items),
+          };
+        })
+      );
+    }
   }
 
   private addSkillRegionEllipsis(candidates: CandidateRow[]): CandidateRow[] {
@@ -344,13 +361,35 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     );
   }
 
+  private addEmployeeSkillEllipsis(candidates: IRPCandidate[]): IRPCandidate[] {
+    return (
+      candidates &&
+      candidates.map((candidate: IRPCandidate) => {
+        if (candidate.employeeSkills.length > 2) {
+          const [first, second] = candidate.employeeSkills;
+          candidate = {
+            ...candidate,
+            employeeSkills: [first, second, '...'],
+          };
+        }
+
+        return candidate;
+      })
+    );
+  }
+
   private inactivateCandidate(id: number) {
-    this.store
+    if (this.isIRP) {
+       // TODO: employee inactivation endpoint is not ready yet
+       this.dispatchNewPage();
+    } else {
+      this.store
       .dispatch(new ChangeCandidateProfileStatus(id, CandidateStatus.Inactive))
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => {
         this.dispatchNewPage();
       });
+    }
   }
 
   private clearFilters(): void {
@@ -365,14 +404,24 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
   }
 
+  private IRPVMSGridHandler(): void {
+    if (this.isIRP) {
+      this.refreshGridColumns(IRPCandidates, this.grid);
+    } else {
+      this.refreshGridColumns(VMSCandidates, this.grid);
+    }
+  }
+
   private subscribeOnSaveState(): void {
     merge(this.lastSelectedAgencyId$, this.lastSelectedOrgId$, this.regions$)
       .pipe(
         filter((value) => !!value),
-        debounceTime(300),
+        debounceTime(600),
         takeUntil(this.unsubscribe$)
       )
       .subscribe(() => {
+        !this.isAgency && this.IRPVMSGridHandler();
+        this.updateCandidates();
         this.clearFilters();
         this.setDefaultFilter();
         this.dispatchNewPage();

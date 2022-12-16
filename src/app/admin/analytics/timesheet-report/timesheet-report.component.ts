@@ -90,7 +90,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
 
   accrualReportTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
   commonFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'id' };
+  candidateNameFields: FieldSettingsModel = { text: 'fullName', value: 'fullName' };
   remoteWaterMark: string = 'e.g. Andrew Fuller';
   candidateStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
   jobStatusesFields: FieldSettingsModel = { text: 'statusText', value: 'status' };
@@ -341,6 +341,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
         auth = auth + JSON.parse(window.localStorage.getItem(window.localStorage.key(x)!)!).secret
       }
     }
+    
     let { businessIds, candidateName, timesheetStatuses, departmentIds, jobId, locationIds,
       regionIds, agencyIds, startDate, endDate } = this.timesheetReportForm.getRawValue();
     if (!this.timesheetReportForm.dirty) {
@@ -350,7 +351,9 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
       this.isLoadNewFilter = false;
       this.message = ""
     }
-
+    var statusArray = Array.isArray(timesheetStatuses) 
+    ? (timesheetStatuses?.length > 0 ? timesheetStatuses : []) 
+    : (isNaN(timesheetStatuses) == false ? [timesheetStatuses] : []);
     this.paramsData =
     {
       "OrganizationParamTS": this.selectedOrganizations?.map((list) => list.organizationId).join(","),
@@ -360,7 +363,7 @@ export class TimesheetReportComponent implements OnInit, OnDestroy{
       "LocationsParamTS": locationIds?.join(","),
       "DepartmentsParamTS": departmentIds?.join(","),
       "CandidateNameParamTS": candidateName == null || candidateName == "" ? 'null' : candidateName.toString(),
-      "StatusesParamTS": timesheetStatuses?.length > 0 ? timesheetStatuses.join(",") : 'null',
+      "StatusesParamTS": statusArray?.length > 0 ? statusArray.join(",") : 'null',
       "JobIDParamTS": jobId == null || jobId == "" ? 'null' : jobId,
       "AgenciesParamTS": agencyIds?.length > 0 ? agencyIds.join(",") : 'null',
       "BearerParamTS": auth,

@@ -1,0 +1,8 @@
+.candidate-details {
+  margin: 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3, auto);
+  grid-column-gap: 0;
+  grid-row-gap: 24px;
+}

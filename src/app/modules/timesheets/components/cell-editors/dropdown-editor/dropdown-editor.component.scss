@@ -1,4 +1,5 @@
-@import 'colors';
+@import "colors";
+@import "adaptive-response";
 
 .dropdown-editor-dropdown-container {
   ::ng-deep {
@@ -6,11 +7,11 @@
       height: 40px;
 
       ejs-dropdownlist {
-        width: 100%!important;
+        width: 100% !important;
         height: 40px;
-        color: $secondary-dark-blue-15!important;
+        color: $secondary-dark-blue-15 !important;
         span.e-input-group {
-          margin-top: 0!important;
+          margin-top: 0 !important;
         }
       }
     }
@@ -19,5 +20,11 @@
       padding-left: 17px;
       padding-right: 17px;
     }
+  }
+}
+
+@media (max-width: $tablet-max) {
+  .init-value-wrapper {
+    padding-left: 0;
   }
 }

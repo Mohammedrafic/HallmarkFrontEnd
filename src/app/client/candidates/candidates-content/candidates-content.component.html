@@ -3,7 +3,7 @@
     <h3>Candidates</h3>
   </ng-container>
   <ng-container right>
-    <div class="button-group" >
+    <div class="button-group" *ngIf="!isIRP">
       <ejs-switch
         id="switcher"
         (change)="onSwitcher($event);"
@@ -26,25 +26,33 @@
           <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-pill">{{
             filteredItems
             }}</span>
-          Filters <i-feather name="sliders" class="icon"></i-feather>
+          Filters
+          <i-feather name="sliders" class="icon"></i-feather>
         </div>
+      </button>
+    </div>
+    <div class="button-group" *ngIf="isIRP">
+      <button ejs-button appHideBeforeSyncfusionLoad id="addIRPCandidate" cssClass="e-primary" (click)="addIRPCandidate()">
+        Add Candidate
       </button>
     </div>
   </ng-container>
 </app-page-toolbar>
 <section class="tabs">
-<app-tabs-list
+<app-tabs-list *ngIf="!isIRP"
   [tabConfig]="tabConfig"
   (changeTab)="handleChangeTab($event)"
 ></app-tabs-list>
 </section>
 <section>
   <app-candidate-list
+    *ngIf="preferencesLoaded"
     [filteredItems$]="filteredItems$"
     [export$]="exportUsers$"
     [search$]="search$"
     [includeDeployedCandidates$]="includeDeployedCandidates$"
     [isAgency]="false"
     [tab]="activeTabIndex"
+    [isIRP]="isIRP"
   ></app-candidate-list>
 </section>

@@ -45,7 +45,13 @@ import {
   SortService,
   ToolbarService,
 } from '@syncfusion/ej2-angular-grids';
-import { ButtonModule, CheckBoxModule, ChipListModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import {
+  ButtonModule,
+  CheckBoxModule,
+  ChipListModule,
+  RadioButtonModule,
+  SwitchModule,
+} from '@syncfusion/ej2-angular-buttons';
 import { DropDownButtonAllModule, DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
@@ -84,11 +90,12 @@ import { CandidateDetailsModule } from '@shared/components/candidate-details/can
 import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
 import { ReopenOrderModule } from '@client/order-management/reopen-order/reopen-order.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
-import { DistributionTierService } from '@client/order-management/order-details-form/services';
+import { OrderDetailsService } from '@client/order-management/order-details-form/services';
 import { MatMenuModule } from '@angular/material/menu';
 import { SettingsViewService } from '@shared/services';
 import { OrderImportComponent } from './order-management/order-import/order-import.component';
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
+import { OrganizationCandidatesModule } from '@client/candidates/organization-candidates.module';
 import { ButtonGroupModule } from '@shared/components/button-group/button-group.module';
 import { GridHeaderActionsModule } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.module';
 import { GridPaginationModule } from '@shared/components/grid/grid-pagination/grid-pagination.module';
@@ -189,6 +196,7 @@ const gridIcons = {
     ExtensionModule,
     ImportDialogContentModule,
     ListBoxModule,
+    OrganizationCandidatesModule,
     ButtonGroupModule,
     GridHeaderActionsModule,
     TableRowDetailModule,
@@ -205,6 +213,7 @@ const gridIcons = {
     ChipsCssClass,
     MaskedDateTimeService,
     SettingsViewService,
+    OrderDetailsService,
     DistributionTierService,
     OrderManagementIrpSubrowService,
   ],

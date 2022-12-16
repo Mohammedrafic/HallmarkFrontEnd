@@ -1,0 +1,64 @@
+<h2 class="title">Contact Details</h2>
+<form class="contact-details__form">
+  <app-input
+    [formGroupInstance]="candidateForm"
+    controlName="address"
+    id="address"
+    label="Address"
+  ></app-input>
+
+  <app-dropdown
+    [dataSource]="[]"
+    [fields]="fieldsSettings"
+    [formGroupInstance]="candidateForm"
+    [hideBorder]="false"
+    label="Internal transfer/recruitment"
+    id="internal-transfer-recruitment"
+    controlName="state"
+  ></app-dropdown>
+
+  <app-input
+    [formGroupInstance]="candidateForm"
+    controlName="city"
+    id="city"
+    label="City"
+  ></app-input>
+
+  <app-input
+    [formGroupInstance]="candidateForm"
+    [mask]="zipCodeMask"
+    controlName="zipCode"
+    id="zip-code"
+    label="Zip Code"
+  ></app-input>
+
+  <app-input
+    [formGroupInstance]="candidateForm"
+    controlName="email"
+    id="email"
+    label="Email"
+  ></app-input>
+
+  <app-input
+    [formGroupInstance]="candidateForm"
+    controlName="workEmail"
+    id="work-email"
+    label="Work Email"
+  ></app-input>
+
+  <app-input
+    [formGroupInstance]="candidateForm"
+    [mask]="phoneMask"
+    controlName="cellphone"
+    id="cellphone"
+    label="Cellphone"
+  ></app-input>
+
+  <app-input
+    [formGroupInstance]="candidateForm"
+    [mask]="phoneMask"
+    controlName="alternativePhone"
+    id="alternativePhone"
+    label="Alternative Phone"
+  ></app-input>
+</form>

@@ -92,6 +92,10 @@ export class GetOrganisationCandidateJob {
   constructor(public organizationId: number, public jobId: number) {}
 }
 
+export class ClearOrganisationCandidateJob {
+  static readonly type = '[order management] Glear Organisation Candidate Job';
+}
+
 export class UpdateOrganisationCandidateJob {
   static readonly type = '[order management] Update Organisation Candidate Job';
   constructor(public payload: AcceptJobDTO) {}

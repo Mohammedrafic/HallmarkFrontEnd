@@ -11,6 +11,10 @@
     padding-left: 15px!important;
     font-size: 14px!important;
     color: $secondary-dark-blue-15!important;
+
+    &.errored {
+      border-color: $supportive-red!important;
+    }
   }
 
   .e-input-group {

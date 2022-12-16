@@ -8,6 +8,8 @@ export interface TierDTO {
   associateOrganizationId?: number;
   forceUpsert?: boolean;
   tierExceptionId?: number;
+  includeInIRP?: boolean;
+  includeInVMS?: boolean;
 }
 
 export interface TierConfig {

@@ -1,71 +1,75 @@
 <div class="profile-hours-statistics-container">
-  <section class="cumulative-hours">
-    <h3>Week Hours</h3>
+  <div class="chart">
+    <section class="cumulative-hours">
+      <h3>Week Hours</h3>
 
-    <ejs-accumulationchart class="week-hours-chart"
-                           [background]="chartSettings.background"
-                           [width]="chartSettings.donutChart.width"
-                           [height]="chartSettings.donutChart.height"
-                           [legendSettings]="chartSettings.legend"
-                           [tooltip]="chartSettings.tooltip"
-                           (pointRender)="onPointRender($event)"
-    >
-      <e-accumulation-annotations>
-        <e-accumulation-annotation [content]="weekChartAnnotation"
-                                   region="Series"
-                                   coordinateUnits="Pixel"
-                                   y="46"
-        ></e-accumulation-annotation>
-      </e-accumulation-annotations>
+      <ejs-accumulationchart class="week-hours-chart"
+                            [background]="chartSettings.background"
+                            [width]="chartSettings.donutChart.width"
+                            [height]="chartSettings.donutChart.height"
+                            [legendSettings]="chartSettings.legend"
+                            [tooltip]="chartSettings.tooltip"
+                            (pointRender)="onPointRender($event)"
+      >
+        <e-accumulation-annotations>
+          <e-accumulation-annotation [content]="weekChartAnnotation"
+                                    region="Series"
+                                    coordinateUnits="Pixel"
+                                    y="46"
+                                    x="5"
+          ></e-accumulation-annotation>
+        </e-accumulation-annotations>
 
-      <e-accumulation-series-collection>
-        <e-accumulation-series xName='x'
-                               yName='y'
-                               innerRadius="70%"
-                               radius="70%"
-                               [dataSource]='weekHoursChartData'
-                               [dataLabel]="chartSettings.dataLabel"
-                               [startAngle]="35"
-        ></e-accumulation-series>
-      </e-accumulation-series-collection>
-    </ejs-accumulationchart>
-  </section>
+        <e-accumulation-series-collection>
+          <e-accumulation-series xName='x'
+                                yName='y'
+                                innerRadius="70%"
+                                radius="70%"
+                                [dataSource]='weekHoursChartData'
+                                [dataLabel]="chartSettings.dataLabel"
+                                [startAngle]="35"
+          ></e-accumulation-series>
+        </e-accumulation-series-collection>
+      </ejs-accumulationchart>
+    </section>
 
-  <section class="cumulative-hours-otd">
-    <h3>Cumulative Hours</h3>
-    <ejs-accumulationchart class="cumulative-hours-chart"
-                           [enableAnimation]="true"
-                           [background]="chartSettings.background"
-                           [width]="chartSettings.donutChart.width"
-                           [height]="chartSettings.donutChart.height"
-                           [legendSettings]="chartSettings.legend"
-                           [tooltip]="chartSettings.tooltip"
-                           (pointRender)="onPointRender($event)"
+    <section class="cumulative-hours-otd">
+      <h3>Cumulative Hours</h3>
+      <ejs-accumulationchart class="cumulative-hours-chart"
+                            [enableAnimation]="true"
+                            [background]="chartSettings.background"
+                            [width]="chartSettings.donutChart.width"
+                            [height]="chartSettings.donutChart.height"
+                            [legendSettings]="chartSettings.legend"
+                            [tooltip]="chartSettings.tooltip"
+                            (pointRender)="onPointRender($event)"
 
-    >
-      <e-accumulation-annotations>
-        <e-accumulation-annotation [content]="cumulativeChartAnnotation"
-                                   region="Series"
-                                   coordinateUnits="Pixel"
-                                   y="46"
-        ></e-accumulation-annotation>
-      </e-accumulation-annotations>
+      >
+        <e-accumulation-annotations>
+          <e-accumulation-annotation [content]="cumulativeChartAnnotation"
+                                    region="Series"
+                                    coordinateUnits="Pixel"
+                                    y="46"
+                                    x="5"
+          ></e-accumulation-annotation>
+        </e-accumulation-annotations>
 
-      <e-accumulation-series-collection>
-        <e-accumulation-series xName='x'
-                               yName='y'
-                               innerRadius="70%"
-                               radius="70%"
-                               [dataSource]='cumulativeHoursChartData'
-                               [dataLabel]="chartSettings.dataLabel"
-                               [startAngle]="35"
-        ></e-accumulation-series>
-      </e-accumulation-series-collection>
-    </ejs-accumulationchart>
-  </section>
+        <e-accumulation-series-collection>
+          <e-accumulation-series xName='x'
+                                yName='y'
+                                innerRadius="70%"
+                                radius="70%"
+                                [dataSource]='cumulativeHoursChartData'
+                                [dataLabel]="chartSettings.dataLabel"
+                                [startAngle]="35"
+          ></e-accumulation-series>
+        </e-accumulation-series-collection>
+      </ejs-accumulationchart>
+    </section>
+  </div>
 
   <section class="charts-legend">
-    <div>
+    <div class="legend-wrapper">
       <table>
         <tr>
           <th></th>

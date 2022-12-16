@@ -15,10 +15,8 @@ export abstract class AbstractPermission extends Destroyable implements OnInit, 
   public readonly userPermissions = UserPermissions;
   public readonly toolTipMessage = REQUIRED_PERMISSIONS;
 
-  protected constructor(
-    protected readonly store: Store,
-  ) {
-    super()
+  protected constructor(protected readonly store: Store) {
+    super();
   }
 
   ngOnInit(): void {
@@ -35,8 +33,10 @@ export abstract class AbstractPermission extends Destroyable implements OnInit, 
 
   protected checkValidPermissions(settings: MenuSettings[]): MenuSettings[] {
     return settings.filter((setting: MenuSettings) => {
-      if (setting.permissionKey) {
-        return this.userPermission[this.userPermissions[setting.permissionKey as unknown as number]];
+      if (setting.permissionKeys?.length) {
+        return setting.permissionKeys.some((key, index, array) => {
+          return this.userPermission[this.userPermissions[array[index] as unknown as number]];
+        });
       } else {
         return true;
       }

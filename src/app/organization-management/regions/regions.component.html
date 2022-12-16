@@ -158,13 +158,16 @@
 
       <div class="input-container">
         <label for="name">Region Name <span class="required">*</span></label>
-        <div class="input-group">
-          <ejs-dropdownlist appValidateWithMessage
-                            formControlName="region"
-                            [allowFiltering]="true"
-                            [fields]="optionFields"
-                            [dataSource]="masterRegion"
-                            placeholder=""></ejs-dropdownlist>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           appValidateWithMessage
+                           formControlName="region"
+                           placeholder="All"
+                           [allowFiltering]="true"
+                           [fields]="optionFields"
+                           [showDropDownIcon]="true"
+                           [dataSource]="masterRegion">
+          </ejs-multiselect>
         </div>
       </div>
     </div>

@@ -33,7 +33,7 @@ export class QuickOrderComponent extends DestroyableDirective implements OnInit 
 
   public submitQuickOrder$ = new Subject<boolean>();
 
-  public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');;
+  public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
 
   private isFormDirty: boolean;
 

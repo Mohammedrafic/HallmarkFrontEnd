@@ -97,6 +97,8 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
   @Select(BusinessLinesState.allBusinessLines)
   public readonly businessLines$: Observable<BusinessLines[]>;
 
+  public readonly DEFAULT_LOCATION_TIMEZONE = 'America/New_York';
+
   public readonly regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public readonly dropDownfields = { text: 'text', value: 'value' };
   public locationDetailsFormGroup: FormGroup;
@@ -169,6 +171,9 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.store.dispatch(new GetLocationTypes());
     this.store.dispatch(new GetUSCanadaTimeZoneIds());
     this.store.dispatch(new GetAllBusinessLines());
+    this.store.dispatch(new GetRegions()).subscribe((data) => {
+      this.defaultValue = data.organizationManagement.regions[0]?.id as Region;
+    });
   }
 
   ngOnDestroy(): void {
@@ -313,24 +318,8 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
     this.editedLocationId = location.id;
     this.isEdit = true;
     this.store.dispatch(new ShowSideDialog(true));
-    this.inactivateDateHandler(this.locationDetailsFormGroup.controls['inactiveDate'], location.inactiveDate, location.reactivateDate);
-  }
-
-  private inactivateDateHandler(field: AbstractControl, value: string | undefined, reactivateValue: string | undefined): void {
-    if (value) {
-      const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
-      const reactivateDate = reactivateValue ? new Date(DateTimeHelper.formatDateUTC(reactivateValue, 'MM/dd/yyyy')) : null;
-      inactiveDate.setHours(0, 0, 0, 0);
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      if (!(reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, now)) && DateTimeHelper.isDateBefore(inactiveDate, now)) {
-        field.disable();
-      } else {
-        field.enable();
-      }
-    } else {
-      field.enable();
-    }
+    this.inactivateDateHandler(this.locationDetailsFormGroup.controls['inactiveDate'],
+    location.inactiveDate, location.reactivateDate, location.timeZone);
   }
 
   deleteLocation(location: Location, event: Event): void {
@@ -367,14 +356,14 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
           this.store.dispatch(new ShowSideDialog(false));
           this.isEdit = false;
           this.editedLocationId = undefined;
-          this.locationDetailsFormGroup.reset();
+          this.locationDetailsFormGroup.reset({ includeInIRP: false });
           this.removeActiveCssClass();
         });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
       this.isEdit = false;
       this.editedLocationId = undefined;
-      this.locationDetailsFormGroup.reset();
+      this.locationDetailsFormGroup.reset({ includeInIRP: false });
       this.removeActiveCssClass();
     }
   }
@@ -446,6 +435,24 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
       options?.fileName || this.defaultFileName
     )));
     this.clearSelection(this.grid);
+  }
+
+  private inactivateDateHandler(field: AbstractControl, value: string | undefined,
+    reactivateValue: string | undefined, timeZone?: string): void {
+    if (value) {
+      const inactiveDate = new Date(DateTimeHelper.formatDateUTC(value, 'MM/dd/yyyy'));
+      const reactivateDate = reactivateValue ? new Date(DateTimeHelper.formatDateUTC(reactivateValue, 'MM/dd/yyyy')) : null;
+      inactiveDate.setHours(0, 0, 0, 0);
+      const nowPerTimeZone = DateTimeHelper.newDateInTimeZone(timeZone || this.DEFAULT_LOCATION_TIMEZONE);
+      if (!(reactivateDate && DateTimeHelper.isDateBefore(reactivateDate, nowPerTimeZone))
+      && DateTimeHelper.isDateBefore(inactiveDate, nowPerTimeZone)) {
+        field.disable();
+      } else {
+        field.enable();
+      }
+    } else {
+      field.enable();
+    }
   }
 
   private watchForOrgChange(): void {
@@ -620,11 +627,7 @@ export class LocationsComponent extends AbstractPermissionGrid implements OnInit
         this.grid.getColumnByField('invoiceId').visible = this.isOrgVMSEnabled || !this.isFeatureIrpEnabled;
         this.grid.refreshColumns();
       }),
-      switchMap(() => this.store.dispatch(new GetRegions())),
-      takeUntil(this.componentDestroy()),
-    ).subscribe((data) => {
-      this.defaultValue = data.organizationManagement.regions[0]?.id as Region;
-    });
+    ).subscribe();
   }
 
   private populateFormOptions(): void {

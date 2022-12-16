@@ -2,6 +2,7 @@
   id="dialog"
   #candidateDialog
   cssClass="dialog timesheet-details-dialog"
+  [target]="targetElement"
   [width]="'1180px'"
   [visible]="false"
   [isModal]="true"
@@ -9,91 +10,120 @@
   (open)="onOpen($event)"
 >
   <ng-template #content>
-    <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails; else closeTemplate">
-      <div class="profile-details-header">
-        <ng-container>
-            <img class="e-avatar e-avatar-xlarge" alt="avatar" [src]="timesheetDetails.candidateId | candidateAvatar"/>
-        </ng-container>
+    <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails; else closeTemplate" #resize>
+      <div class="profile-details">
+        <div class="profile-details__wraper" #uploadMobileContainer>
+          <div class="profile-details__info-container">
+            <div class="profile-details__info">
+              <img
+                class="e-avatar e-avatar-xlarge"
+                alt="avatar"
+                [src]="timesheetDetails.candidateId | candidateAvatar"
+              />
 
-        <div class="flex flex-column">
-          <h3 class="username">
-            {{ timesheetDetails.candidateLastName }}, {{ timesheetDetails.candidateFirstName}}
-          </h3>
+              <div class="profile-details__user-name">
+                <h3 class="username">
+                  {{ timesheetDetails.candidateLastName }}, {{ timesheetDetails.candidateFirstName }}
+                </h3>
+                <ng-container *ngIf="!isMobile">
+                  <ng-container
+                    [ngTemplateOutlet]="chipListTmplt"
+                    [ngTemplateOutletContext]="{ timesheetDetails }"
+                  ></ng-container>
+                </ng-container>
+              </div>
+            </div>
+            <div *ngIf="isMobile" class="profile-details__chip-list">
+              <ng-container [ngTemplateOutlet]="chipListTmplt" [ngTemplateOutletContext]="{ timesheetDetails }"></ng-container>
+            </div>
+          </div>
 
-          <ejs-tooltip
-            id="tooltip"
-            #tooltip
-            target=".e-chip"
-            (beforeRender)="beforeRender($event)">
-            <ejs-chiplist #chipList>
-              <e-chips>
-                <e-chip
-                  [text]="timesheetDetails.statusText"
-                  [cssClass]="timesheetDetails.statusText || '' | chipsCssClass"
+          <div class="profile-details__header-controls">
+            <div class="profile-details__upload-container" #uploadContainer>
+              <app-date-week-picker
+                *ngIf="!isMobile"
+                [initDates]="weekPeriod"
+                [availibleDates]="workWeeks"
+                [isAbleToChange]="isChangesSaved"
+              >
+              </app-date-week-picker>
+
+              <app-tooltip-container
+                [showToolTip]="!hasEditTimesheetRecordsPermission"
+                [class.hide-elem]="isSmallTabletScreen"
+              >
+                <button
+                  #uploadBtn
+                  ejs-button
+                  cssClass="e-outline"
+                  class="profile-details__upload-button"
+                  [disabled]="disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
+                  (click)="openFileUploadArea()"
                 >
-                </e-chip>
-                <e-chip
-                  *ngIf="isMileageStatusAvailable"
-                  [text]="timesheetDetails.mileageStatusText"
-                  [cssClass]="timesheetDetails.mileageStatusText || '' | chipsCssClass"
+                  Upload
+                  <i-feather name="upload" class="icon"></i-feather>
+                </button>
+              </app-tooltip-container>
+
+              <app-tooltip-container *ngIf="isSmallTabletScreen" [showToolTip]="!hasEditTimesheetRecordsPermission">
+                <button
+                  ejs-dropdownbutton
+                  iconCss="e-icons"
+                  cssClass="e-caret-hide primary-icon-button menu-mobile"
+                  [items]="mobileMenu"
+                  [disabled]="disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
+                  (select)="onMobileMenuSelect($event)"
                 >
-                </e-chip>
-              </e-chips>
-            </ejs-chiplist>
-          </ejs-tooltip>
+                  <i-feather name="more-vertical" class="icon"></i-feather>
+                </button>
+              </app-tooltip-container>
+
+              <app-upload-file-area
+                [container]="isMobile ? uploadMobileContainer : uploadContainer"
+                [excludeElement]="uploadBtn.element"
+                [maxFileSize]="maxFileSize"
+                [allowedFileExtensions]="allowedFileExtensions"
+                (filesSelected)="onFilesSelected($event)"
+              >
+              </app-upload-file-area>
+
+              <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
+              <app-export-button
+                style="display: none"
+                (csvExport)="exportProfileDetails(exportedFileType.csv)"
+                (excelExport)="exportProfileDetails(exportedFileType.excel)"
+                (customExport)="showCustomExportDialog()"
+              ></app-export-button>
+            </div>
+
+            <button ejs-button type="submit" cssClass="e-flat close-button" (click)="handleProfileClose()">
+              <i-feather name="x" class="icon"></i-feather>
+            </button>
+          </div>
         </div>
-        <div class="spacer"></div>
-
-        <div class="header-controls">
-          <div
-          style="display: flex; align-items: center"
-          class="timesheet-details-upload-container"
-          #uploadContainer>
-
-            <app-date-week-picker
-              [initDates]="weekPeriod"
-              [availibleDates]="workWeeks"
-              [isAbleToChange]="isChangesSaved">
-            </app-date-week-picker>
-
-            <app-upload-button
-              [disabled]="disableAnyAction || timesheetDetails.noWorkPerformed || !timesheetDetails.canUploadFiles"
-              [hasPermission]="hasEditTimesheetRecordsPermission"
-              [container]="uploadContainer"
-              (filesSelected)="onFilesSelected($event)"
-            ></app-upload-button>
-
-            <!--TODO: (style="display: none") temporary solution to hide the export button EIN-5900-->
-            <app-export-button
-                    style="display: none;"
-                    (csvExport)="exportProfileDetails(exportedFileType.csv)"
-                    (excelExport)="exportProfileDetails(exportedFileType.excel)"
-                    (customExport)="showCustomExportDialog()"
-            ></app-export-button>
-         </div>
-
-          <button ejs-button type="submit" cssClass="e-flat close-button" (click)="handleProfileClose()">
-            <i-feather name="x" class="icon"></i-feather>
-          </button>
+        <div *ngIf="isMobile" class="profile-details__mobile-date-picker">
+          <app-date-week-picker [initDates]="weekPeriod" [availibleDates]="workWeeks" [isAbleToChange]="isChangesSaved">
+          </app-date-week-picker>
         </div>
       </div>
 
       <div class="order-header">
         <div class="order-meta">
-          <h2 class="order-id">Job ID: {{ timesheetDetails?.formattedId}}</h2>
+          <h2 class="order-id">Job ID: {{ timesheetDetails?.formattedId }}</h2>
         </div>
 
         <div class="controls-wrapper">
           <div class="reject-reason-block" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
             <span class="reason-header">Reject Reason:</span>
             <ejs-tooltip [content]="rejectReason" class="reject-tooltip">
-              <span class="reason-text">{{rejectReason}}</span>
+              <span class="reason-text">{{ rejectReason }}</span>
             </ejs-tooltip>
           </div>
 
           <div class="controls-block">
             <div class="checkbox-block" *ngIf="isDNWEnabled">
-              <ejs-switch #dnwSwitch
+              <ejs-switch
+                #dnwSwitch
                 class="toggle"
                 [disabled]="disableAnyAction || !hasEditTimesheetRecordsPermission"
                 [checked]="timesheetDetails.noWorkPerformed"
@@ -103,41 +133,40 @@
             </div>
           </div>
         </div>
-
       </div>
 
       <div class="job-general-info tile-dark-blue">
-          <app-profile-details-job-info
-                  [isAgency]="isAgency"
-                  [jobData]="timesheetDetails"
-          ></app-profile-details-job-info>
+        <app-profile-details-job-info [isAgency]="isAgency" [jobData]="timesheetDetails"></app-profile-details-job-info>
       </div>
 
       <div class="profile-hours-statistics">
-          <div class="tile-dark-blue">
-              <app-profile-cumulative-hours
-                      [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
-              ></app-profile-cumulative-hours>
-          </div>
+        <div class="tile-dark-blue statistic-wrapper">
+          <app-profile-cumulative-hours
+            [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
+          ></app-profile-cumulative-hours>
+        </div>
 
-          <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
-            <app-profile-miles [milesData]="milesData"></app-profile-miles>
-          </div>
+        <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
+          <app-profile-miles [milesData]="milesData"></app-profile-miles>
+        </div>
 
-          <div class="tile-dark-blue profile-attachments"
-               *ngIf="!timesheetDetails.noWorkPerformed && timesheetDetails?.attachments?.length">
-              <h3 class="attachments-title">Attachments</h3>
+        <div
+          class="tile-dark-blue profile-attachments"
+          *ngIf="!timesheetDetails.noWorkPerformed && timesheetDetails?.attachments?.length"
+        >
+          <h3 class="attachments-title">Attachments</h3>
 
-              <app-attachments-list [attachments]="timesheetDetails.attachments"
-                                    [attachmentsListConfig]="attachmentsListConfig$ | async"
-                                    [deleteIconColor]="'#FF5858'"
-                                    [disableDelete]="disableAnyAction || !hasEditTimesheetRecordsPermission"
-              ></app-attachments-list>
-          </div>
+          <app-attachments-list
+            [attachments]="timesheetDetails.attachments"
+            [attachmentsListConfig]="attachmentsListConfig$ | async"
+            [deleteIconColor]="'#FF5858'"
+            [disableDelete]="disableAnyAction || !hasEditTimesheetRecordsPermission"
+          ></app-attachments-list>
+        </div>
 
-         <div class="tile-dark-blue profile-invoices" *ngIf="timesheetDetails?.invoices?.length">
-           <app-profile-invoices [invoices]="timesheetDetails.invoices"></app-profile-invoices>
-         </div>
+        <div class="tile-dark-blue profile-invoices" *ngIf="timesheetDetails?.invoices?.length">
+          <app-profile-invoices [invoices]="timesheetDetails.invoices"></app-profile-invoices>
+        </div>
       </div>
 
       <section class="profile-table-container">
@@ -147,7 +176,9 @@
           [actionsDisabled]="timesheetDetails.noWorkPerformed"
           [disableAnyAction]="disableAnyAction"
           [hasEditTimesheetRecordsPermission]="hasEditTimesheetRecordsPermission"
-          [hasApproveRejectMileagesPermission]="isAgency ? true : userPermission[userPermissions.CanOrganizationApproveRejectMileages]"
+          [hasApproveRejectMileagesPermission]="
+            isAgency ? true : userPermission[userPermissions.CanOrganizationApproveRejectMileages]
+          "
           (openAddSideDialog)="openAddDialog($event)"
           (uploadSideDialog)="openUploadSideDialog($event)"
           (changesSaved)="handleEditChanges($event)"
@@ -157,7 +188,6 @@
         >
         </app-profile-timesheet-table>
       </section>
-
     </section>
     <ng-template #closeTemplate>
       <section class="container d-flex justify-end">
@@ -167,12 +197,12 @@
       </section>
     </ng-template>
     <app-navigation-panel
-            prevLabel="Previous Timesheet"
-            nextLabel="Next Timesheet"
-            [prevDisabled]="currentSelectedRowIndex === 0"
-            [nextDisabled]="isNextDisabled"
-            (prevClick)="onNextPreviousOrder(false)"
-            (nextClick)="onNextPreviousOrder(true)"
+      prevLabel="Previous Timesheet"
+      nextLabel="Next Timesheet"
+      [prevDisabled]="currentSelectedRowIndex === 0"
+      [nextDisabled]="isNextDisabled"
+      (prevClick)="onNextPreviousOrder(false)"
+      (nextClick)="onNextPreviousOrder(true)"
     ></app-navigation-panel>
   </ng-template>
 </ejs-dialog>
@@ -188,10 +218,27 @@
 <app-upload-documents (fileChange)="saveFilesOnRecord($event)"></app-upload-documents>
 
 <app-export-dialog
-        [columns]="columnsToExport"
-        [fileName]="fileName"
-        (cancel)="closeExport()"
-        (export)="customExport($event)"
+  [columns]="columnsToExport"
+  [fileName]="fileName"
+  (cancel)="closeExport()"
+  (export)="customExport($event)"
 ></app-export-dialog>
 
 <app-file-viewer></app-file-viewer>
+
+<ng-template #chipListTmplt let-timesheetDetails="timesheetDetails">
+  <ejs-tooltip id="tooltip" #tooltip target=".e-chip" (beforeRender)="beforeRender($event)">
+    <ejs-chiplist #chipList>
+      <e-chips>
+        <e-chip [text]="timesheetDetails.statusText" [cssClass]="timesheetDetails.statusText || '' | chipsCssClass">
+        </e-chip>
+        <e-chip
+          *ngIf="isMileageStatusAvailable"
+          [text]="timesheetDetails.mileageStatusText"
+          [cssClass]="timesheetDetails.mileageStatusText || '' | chipsCssClass"
+        >
+        </e-chip>
+      </e-chips>
+    </ejs-chiplist>
+  </ejs-tooltip>
+</ng-template>

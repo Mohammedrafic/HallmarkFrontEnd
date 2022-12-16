@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { columnDefs } from '@client/order-management/order-import/order-import.config';
 import { GridErroredCellComponent } from '@shared/components/import-dialog-content/grid-errored-cell/grid-errored-cell.component';
 import { ImportedOrder, ImportedOrderGrid, ListBoxItem, OrderGrid, OrderImportResult } from '@shared/models/imported-order.model';
-import { ColDef } from '@ag-grid-community/core';
+import { ColDef, ValueFormatterParams } from '@ag-grid-community/core';
 import { Order } from '@shared/models/order-management.model';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -27,12 +27,7 @@ export class OrderImportService {
     const formData = new FormData();
     formData.append('file', file);
 
-    return this.http.post<OrderImportResult>('/api/Orders/import', formData).pipe(map((orderImportResult) => {
-      return {
-        succesfullRecords: this.removeRrackets(orderImportResult.succesfullRecords),
-        errorRecords: this.removeRrackets(orderImportResult.errorRecords),
-      };
-    }));
+    return this.http.post<OrderImportResult>('/api/Orders/import', formData);
   }
 
   public saveImportOrderResult(successfullRecords: ImportedOrder[]): Observable<OrderImportResult> {
@@ -71,7 +66,6 @@ export class OrderImportService {
       };
     });
   }
-
   public getListBoxData(records: ImportedOrder[]): ListBoxItem[] {
     return records.map((record: ImportedOrder) => {
       return {
@@ -82,22 +76,11 @@ export class OrderImportService {
   }
 
   private margeProperties(importedOrder: ImportedOrder): any {
-    const { orderImportClassifications } = importedOrder;
-    const { orderImportJobDistributions } = importedOrder;
     const { orderImport } = importedOrder;
 
-    const classification = orderImportClassifications
-      .filter((({ tempOrderId, classification }) => tempOrderId === importedOrder.orderImport.tempOrderId && classification))
-      .map(({classification}) => classification)
-      .join(', ');
-    const jobDistribution = orderImportJobDistributions
-      .filter((({ tempOrderId, jobDistribution }) => tempOrderId === importedOrder.orderImport.tempOrderId && jobDistribution))
-      .map(({jobDistribution}) => jobDistribution)
-      .join(', ');
-    const agency = orderImportJobDistributions
-      .filter((({ tempOrderId, agency }) => tempOrderId === importedOrder.orderImport.tempOrderId && agency))
-      .map(({agency}) => agency)
-      .join(', ');
+    const classification = orderImport.classificationName;
+    const jobDistribution = orderImport.jobDistributionName;
+    const agency = orderImport.agencyName;
 
     return {
       ...orderImport,
@@ -117,6 +100,7 @@ export class OrderImportService {
         field: key,
         width: wideColumns.includes(key) ? wideColumnWidth : columnWidth,
         headerName: value,
+        valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(key, params.value),
         cellRenderer: GridErroredCellComponent,
       };
     });
@@ -129,20 +113,12 @@ export class OrderImportService {
     };
   }
 
-  private removeRrackets(importedOrders: ImportedOrder[]): ImportedOrder[] {
-    if (!importedOrders.length) {
-      return [];
+  private getFormattedDate(key: string, value: string): string {
+    if (key === 'location' || key === 'department') {
+      const regex = /\([^()]*\)/g;
+      return value.replace(regex, '').trim();
+    } else {
+      return value;
     }
-
-    const regex = /\([^()]*\)/g;
-    return importedOrders.map((importedOrder: ImportedOrder) => {
-      return {
-        ...importedOrder,
-        orderImport: {
-          ...importedOrder.orderImport,
-          location: importedOrder.orderImport.location.replace(regex, '').trim(),
-          department: importedOrder.orderImport.department.replace(regex, '').trim(),
-        }};
-    });
   }
 }

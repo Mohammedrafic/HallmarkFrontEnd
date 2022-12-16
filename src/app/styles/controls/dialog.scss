@@ -114,6 +114,7 @@ body.dark {
 body.light, body.dark {
   & .e-dialog.e-popup {
     &.quick-order-dialog,
+    &.timesheet-details-dialog,
     &.order-details-dialog {
       width: 65%;
 

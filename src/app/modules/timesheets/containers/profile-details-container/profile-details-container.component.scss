@@ -1,5 +1,6 @@
 @import "colors";
 @import "mixins";
+@import "adaptive-response";
 
 $chip-margin: 8px;
 
@@ -26,17 +27,81 @@ $chip-margin: 8px;
   }
 }
 
+.profile-details {
+  padding-bottom: 20px;
+  border-bottom: 1px solid $secondary-dark-blue-45;
+
+  &__wraper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+
+    .e-avatar {
+      margin-right: 16px;
+    }
+
+    .username {
+      color: $black;
+      font-weight: 700;
+      font-size: 24px;
+      margin-bottom: 0;
+    }
+  }
+
+  &__header-controls {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+
+    .e-input-group {
+      margin-bottom: 0;
+    }
+  }
+
+  &__chip-list,
+  &__mobile-date-picker {
+    margin-top: 10px;
+  }
+
+  &__upload-container {
+    display: flex;
+    align-items: center;
+  }
+
+  &__upload-button {
+    margin-left: 12px;
+    margin-right: 8px;
+  }
+
+  .e-chip {
+    width: auto;
+
+    &:first-child {
+      margin-right: 20px;
+    }
+  }
+
+  .menu-mobile {
+    margin-left: 12px;
+  }
+
+  .e-chip-list:not(.e-chip) {
+    gap: 10px;
+  }
+}
+
 .container {
   padding: 12px 24px;
-  padding-bottom: 0!important;
+  padding-bottom: 0 !important;
 }
 
 .d-flex {
   display: flex;
-}
-
-.flex-column {
-  flex-direction: column;
 }
 
 .align-center {
@@ -51,56 +116,9 @@ $chip-margin: 8px;
   justify-content: flex-end;
 }
 
-.spacer {
-  flex-grow: 1;
-}
-
 .tile-dark-blue {
   background-color: $secondary-dark-blue-50;
   border-radius: 8px;
-}
-
-.profile-details-header {
-  display: flex;
-  align-items: center;
-  padding-bottom: 20px;
-  border-bottom: 1px solid $secondary-dark-blue-45;
-
-  .e-avatar {
-    margin-right: 16px;
-  }
-
-  .username {
-    color: $black;
-    font-weight: 700;
-    font-size: 24px;
-    margin-bottom: 0;
-  }
-
-  .e-chip {
-    width: auto;
-
-    &:first-child {
-      margin-right: 20px;
-    }
-  }
-
-  .header-controls {
-    display: flex;
-    align-items: center;
-    margin-top: 5px;
-
-    .e-input-group {
-      margin-bottom: 0;
-    }
-  }
-
-  .close-button {
-    color: $supportive-red;
-    cursor: pointer;
-    margin-left: 26px;
-    margin-right: 10px;
-  }
 }
 
 .order-header {
@@ -110,7 +128,8 @@ $chip-margin: 8px;
   margin-top: 15px;
   margin-bottom: 10px;
 
-  .order-id, .week-dates {
+  .order-id,
+  .week-dates {
     font-weight: 700;
     font-size: 16px;
   }
@@ -138,7 +157,8 @@ $chip-margin: 8px;
   margin-top: 15px;
   margin-bottom: 10px;
 
-  .profile-invoices, .miles {
+  .profile-invoices,
+  .miles {
     flex-grow: 1;
     min-width: 110px;
   }
@@ -245,4 +265,30 @@ app-navigation-panel {
   align-items: center;
   justify-content: flex-start;
   max-width: 87%;
+}
+
+.hide-elem {
+  display: none;
+}
+
+@media #{$max-tablet} {
+  .profile-hours-statistics {
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .statistic-wrapper {
+      width: 100%;
+      margin: 0 !important;
+    }
+
+    .miles {
+      margin: 0 !important;
+    }
+  }
+}
+
+@media #{$max-mobile} {
+  .profile-hours-statistics {
+    flex-direction: column;
+  }
 }

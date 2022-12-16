@@ -83,9 +83,8 @@
 
 <app-export-dialog *ngIf="isActive" [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
-
 <app-filter-dialog *ngIf="isActive" [items]="filteredItems" [count]="(masterSkills$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
-  <form class="bootstrap" [formGroup]="SkillFilterFormGroup">
+  <form class="bootstrap" [formGroup]="skillFilterFormGroup">
     <div class="input-container">
       <label for="externalId">Search</label>
       <div class="input-group">
@@ -108,7 +107,7 @@
         </ejs-multiselect>
       </div>
     </div>
-    <div class="input-container">
+    <div class="input-container" *ngIf="!isFeatureIrpEnabled">
       <label>Skill ABBR</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
@@ -140,11 +139,11 @@
 <app-side-dialog *ngIf="isActive"
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveSkill()"
-  header="{{ SkillFormGroup.get('id')?.value == 0 ? 'Add' : 'Edit' }} Skill" [disableSaveButton]="!userPermission[userPermissions.CanEditMasterSkills]"
+  header="{{ skillFormGroup.get('id')?.value == 0 ? 'Add' : 'Edit' }} Skill" [disableSaveButton]="!userPermission[userPermissions.CanEditMasterSkills]"
   >
   <form class="skills-form-dialog form-container bootstrap"
         id="addEditSkillsForm"
-        [formGroup]="SkillFormGroup">
+        [formGroup]="skillFormGroup">
     <div>
       <div class="input-container">
         <label for="skillCategoryId">Skill Category <span class="required">*</span></label>
@@ -162,7 +161,7 @@
     </div>
 
     <div>
-      <div class="input-container">
+      <div class="input-container" *ngIf="!isFeatureIrpEnabled">
         <label for="skillAbbr">Skill Abbr</label>
         <div class="input-group">
           <input class="e-input"

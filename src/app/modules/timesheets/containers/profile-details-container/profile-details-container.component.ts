@@ -1,15 +1,16 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { AbstractPermission } from "@shared/helpers/permissions";
+import { BreakpointObserver } from '@angular/cdk/layout';
 
-import { filter, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
+import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 
-import { DateTimeHelper, Destroyable } from '@core/helpers';
-import { DialogAction } from '@core/enums';
+import { DateTimeHelper } from '@core/helpers';
+import { DialogAction, FileSize } from '@core/enums';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -45,6 +46,12 @@ import { FileForUpload, Permission } from '@core/interface';
 import { AgencyStatus } from '@shared/enums/status';
 import { GRID_CONFIG } from '@shared/constants';
 import DeleteRecordAttachment = Timesheets.DeleteRecordAttachment;
+import { AbstractPermission } from "@shared/helpers/permissions";
+import { MobileMenuItems } from '@shared/enums/mobile-menu-items.enum';
+import { BreakpointQuery } from '@shared/enums/media-query-breakpoint.enum';
+import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
+import { FileExtensionsString } from '@core/constants';
+import { UploadFileAreaComponent } from '@shared/components/upload-file-area/upload-file-area.component';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -67,6 +74,9 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   @ViewChild('tooltip')
   public tooltip: TooltipComponent;
+
+  @ViewChild(UploadFileAreaComponent)
+  public readonly uploadFileArea: UploadFileAreaComponent;
 
   @Input() currentSelectedRowIndex: number | null = null;
 
@@ -95,6 +105,12 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
   public workWeeks: WorkWeek<Date>[];
 
   public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
+
+  public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
+
+  public readonly allowedFileExtensions: string = FileExtensionsString;
+  
+  public readonly maxFileSize: number = FileSize.MB_20;
 
   private jobId: number;
 
@@ -128,6 +144,14 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
 
   public hasEditTimesheetRecordsPermission: boolean;
 
+  public mobileMenu = [{ text: MobileMenuItems.Upload }];
+  
+  public isMobile = false;
+
+  public isSmallTabletScreen = false;
+
+  private resizeObserver: ResizeObserverModel;
+
   /**
    * isTimesheetOrMileagesUpdate used for detect what we try to reject/approve, true = timesheet, false = miles
    * */
@@ -140,7 +164,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     private datePipe: DatePipe,
     private router: Router,
     private timesheetDetailsService: TimesheetDetailsService,
-
+    private breakpointObserver: BreakpointObserver,
     private cd: ChangeDetectorRef,
   ) {
     super(store);
@@ -163,6 +187,8 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     this.closeDialogOnNavigationStart();
     this.setOrgId();
     this.watchForRangeChange();
+    this.initResizeObserver();
+    this.listenResizeToolbar()
   }
 
   public onOpen(args: { preventFocus: boolean }): void {
@@ -521,4 +547,34 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
           : permissions[this.userPermissions.CanOrganizationAddEditDeleteTimesheetRecords];
       });
   }
-}
+
+  public openFileUploadArea(): void {
+    this.uploadFileArea.open();
+  }
+
+  public onMobileMenuSelect({ item: { text }}: MenuEventArgs): void {
+    if(text === MobileMenuItems.Upload) {
+      setTimeout(() => this.openFileUploadArea());
+    }
+  }
+  
+  private initResizeObserver(): void {
+    this.resizeObserver = ResizeObserverService.init(this.targetElement!);
+  }
+
+  public listenResizeToolbar(): void {
+    const tabletBreakPoint$: Observable<boolean> = this.breakpointObserver.observe([BreakpointQuery.TABLET_MAX]).pipe(map((data) => data.matches));
+    const resizeToolbarObserver$: Observable<number> = this.resizeObserver.resize$.pipe(map((data) => data[0].contentRect.width), distinctUntilChanged());
+    
+    const smallTabletScreenWidth = 700;
+    const mobileScreenWidth = +BreakpointQuery.MOBILE_MAX.replace(/\D/g, ""); 
+  
+      combineLatest([tabletBreakPoint$, resizeToolbarObserver$])
+        .pipe(filter(([isLessMaxTablet, resize]) => Boolean(isLessMaxTablet)), takeUntil(this.componentDestroy()))
+        .subscribe(([isLessMaxTablet, toolbarWidth]) => {
+          this.isMobile = toolbarWidth <= mobileScreenWidth;
+          this.isSmallTabletScreen = toolbarWidth <= smallTabletScreenWidth;
+          this.cd.markForCheck();
+        });
+    }
+  }
