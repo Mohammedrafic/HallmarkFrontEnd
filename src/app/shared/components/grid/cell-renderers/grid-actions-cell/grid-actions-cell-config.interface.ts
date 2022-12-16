@@ -10,6 +10,7 @@ export interface GridActionsCellItem<T = unknown> {
   isCustomIcon?: boolean;
   buttonClass?: string;
   useBadge?: boolean;
+  badgeValue?: number,
   menuItems?: ItemModel[];
 }
 

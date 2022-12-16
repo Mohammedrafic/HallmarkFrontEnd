@@ -15,7 +15,7 @@ import {
 export class OrderManagementIrpGridHelper {
   static prepareColDefs(
     systemId: OrderManagementIRPSystemId,
-    activeTab: OrderManagementIRPTabsIndex | unknown | null = null,
+    activeTab: OrderManagementIRPTabsIndex | null = null,
     threeDotsMenuOptions: Record<string, ItemModel[]> = {},
     ...restArguments: boolean[]
   ): ColDef[] {

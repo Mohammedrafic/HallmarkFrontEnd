@@ -369,13 +369,7 @@ export class OrderManagementContentState {
 
     return this.orderManagementIrpApiService.getOrders(payload).pipe(
       tap((orders) => {
-        const ordersPage = Object.assign(
-          {},
-          orders,
-          {
-            items: orders.items.map((el, idx) => ({...el, acceptedCandidates: idx < 3 ? 1 : 0 })),
-          }); // TODO MOK REMOVE FOR ACCORDION GRID
-        patchState({ ordersPage: ordersPage as unknown as OrderManagementPage });
+        patchState({ ordersPage: orders as unknown as OrderManagementPage });
       }),
     );
   }

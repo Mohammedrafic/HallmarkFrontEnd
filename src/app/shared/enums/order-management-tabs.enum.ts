@@ -21,15 +21,6 @@ export enum OrderManagementIRPTabsIndex {
   Incomplete
 }
 
-export enum OrganizationOrderManagementTabIndex {
-  AllOrders = 0,
-  PerDiem = 1,
-  PermPlacement = 2,
-  ReOrders = 3,
-  Incomplete = 4,
-  OrderTemplates = 5,
-}
-
 export enum OrderManagementIRPSystemId {
   All = 1,
   IRP,

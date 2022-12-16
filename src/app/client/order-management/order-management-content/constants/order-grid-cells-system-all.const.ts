@@ -53,6 +53,7 @@ export const GridCellsSystemAll = (
             iconName: 'message-square',
             buttonClass: 'default',
             useBadge: true,
+            badgeValue: params.data.unreadComments,
             disabled: !hasCreateEditOrderPermission,
           },
           {

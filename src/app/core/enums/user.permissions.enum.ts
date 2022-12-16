@@ -159,8 +159,4 @@ export enum UserPermissions {
 
   // Manage Credentials
   ManageCredentialWithinOrderScope = 4110,
-
-  // IRP Order Management
-  CanOrganizationViewIRPOrders,
-  CanOrganizationManageIRPOrders
 }

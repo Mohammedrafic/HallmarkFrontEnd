@@ -14,9 +14,9 @@
                      class="icon grid-actions-cell-item-icon {{actionData?.iconClass}}"
           ></i-feather>
 
-          <span *ngIf="actionData.useBadge && data['unreadComments'] > 0" class="e-badge e-badge-success e-badge-pill right-overflow">
-          {{ data['unreadComments'] }}
-        </span>
+          <span *ngIf="actionData.useBadge && ((actionData?.badgeValue || 0) > 0)" class="e-badge e-badge-success e-badge-pill right-overflow">
+            {{ actionData.badgeValue }}
+          </span>
         </ng-container>
         <ng-template #customIconRef>
           <ng-container *ngIf="actionData.iconName === 'unlock' then unlock"></ng-container>

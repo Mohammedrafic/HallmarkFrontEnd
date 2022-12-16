@@ -12,7 +12,7 @@ import { GridActionsCellConfig, GridActionsCellItem } from './grid-actions-cell-
 })
 export class GridActionsCellComponent extends GridCellRenderer<GridActionsCellConfig & ICellRendererParams> {
   public actionsConfig: GridActionsCellItem[];
-  public data: unknown | any;
+  public data: unknown;
 
   public override agInit(params: GridActionsCellConfig & ICellRendererParams) {
     super.agInit(params);
