@@ -70,15 +70,10 @@ export class RolesAndPermissionsComponent extends AbstractPermissionGrid impleme
     super.ngOnInit();
 
     this.businessForm = this.generateBusinessForm();
-
     this.roleFormGroup = RoleFormComponent.createForm();
-    
     const user = this.store.selectSnapshot(UserState.user);
-
     this.userbusinessUnitId = user?.businessUnitId != null ? user?.businessUnitId : 0;
-
     this.onBusinessUnitValueChanged();
-
     this.businessUnitControl.patchValue(user?.businessUnitType);
 
     if (user?.businessUnitType !== BusinessUnitType.Hallmark) {
