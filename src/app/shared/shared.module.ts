@@ -106,7 +106,7 @@ import { CandidateAvatarPipe } from './pipes/candidate-avatar.pipe';
 import { GridSubrowReorderComponent } from './components/grid-subrow-reorder/grid-subrow-reorder.component';
 import { GeneralOrderPerDiemInfoComponent } from '@shared/components/general-order-per-diem-info/general-order-per-diem-info.component';
 import { GeneralReorderInfoComponent } from './components/general-reorder-info/general-reorder-info.component';
-import { OrderReOrdersContainerComponent } from '@client/order-management/order-reorders-container/order-reorders-container.component';
+import { OrderReOrdersContainerComponent } from '@client/order-management/components/order-reorders-container/order-reorders-container.component';
 import { OrderPerDiemCandidatesListComponent } from './components/order-candidate-list/order-per-diem-candidates-list/order-per-diem-candidates-list.component';
 import { CandidatesStatusModalComponent } from './components/order-candidate-list/order-per-diem-candidates-list/candidates-status-modal/candidates-status-modal.component';
 import { ReorderCandidatesListComponent } from './components/order-candidate-list/reorder-candidates-list/reorder-candidates-list.component';

@@ -1,0 +1,43 @@
+@import "src/app/styles/variables/colors";
+
+.records {
+  display: flex;
+
+  &-list {
+    width: 20%;
+
+    .e-listbox-wrapper {
+      .e-list-item {
+        height: 50px;
+        display: flex;
+        align-items: center;
+
+        &:not(:last-child) {
+          border-bottom: 1px solid $secondary-dark-blue-45;
+        }
+
+        &:hover:not(.e-selected):not(.e-disabled), {
+          background-color: $primary-active-blue-70;
+        }
+
+        &.e-selected {
+          background-color: $primary-active-blue;;
+          color: $white;
+        }
+      }
+    }
+  }
+
+  &-grids {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+
+    .records-grid {
+      height: 123px;
+      min-height: 150px;
+    }
+
+  }
+}

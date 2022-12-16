@@ -31,7 +31,7 @@ import { ExportPayload } from '@shared/models/export.model';
 import { AgencyOrderManagementTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 import { DateTimeHelper } from '@core/helpers';
-import { orderFieldsConfig } from '@client/order-management/add-edit-order/order-fields';
+import { orderFieldsConfig } from '@client/order-management/components/add-edit-order/order-fields';
 import { Penalty } from '@shared/models/penalty.model';
 import { JobCancellationReason } from '@shared/enums/candidate-cancellation';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
@@ -329,6 +329,18 @@ export class OrderManagementContentService {
           return this.http.post(`/api/Orders/${createdOrder.id}/documents`, formData).pipe(map(() => createdOrder));
         })
       );
+  }
+
+  //TODO: remove createdOrder[0].id, when backend will be implement
+  public saveIrpOrder(order: CreateOrderDto, documents: Blob[],): Observable<Order> {
+    return this.http.post<Order[]>('/api/IRPOrders', order).pipe(
+      switchMap((createdOrder: Order[]) => {
+        const formData = new FormData();
+        documents.forEach((document: Blob) => formData.append('documents', document));
+        this.http.post(`/api/Orders/${createdOrder[0].id}/documents`, formData);
+        return createdOrder;
+      }),
+    );
   }
 
   /**

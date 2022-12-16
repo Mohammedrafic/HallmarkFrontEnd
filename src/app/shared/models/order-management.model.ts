@@ -8,7 +8,7 @@ import { JobClassification } from '@shared/enums/job-classification';
 import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
 import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
-import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
+import { CandidateModel } from '@client/order-management/components/add-edit-reorder/models/candidate.model';
 import { FilterOrderStatusText } from '@shared/enums/status';
 
 export class OrderManagement {

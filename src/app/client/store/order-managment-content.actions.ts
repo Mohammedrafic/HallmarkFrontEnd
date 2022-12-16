@@ -166,6 +166,14 @@ export class SaveOrder {
   ) {}
 }
 
+export class SaveIrpOrder {
+  static readonly type = '[order management] Save Irp Order';
+  constructor(
+    public order: CreateOrderDto,
+    public documents: Blob[],
+  ) {}
+}
+
 export class SaveOrderSucceeded {
   static readonly type = '[order management] Save Order Succeeded';
   constructor(public order: Order) {}

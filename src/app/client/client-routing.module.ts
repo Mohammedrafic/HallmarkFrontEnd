@@ -1,17 +1,16 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import {
-  OrderManagementContentComponent,
-} from './order-management/order-management-content/order-management-content.component';
+import { OrderManagementContentComponent } from './order-management/components/order-management-content/order-management-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { ClientComponent } from './client.component';
-import { AddEditOrderComponent } from './order-management/add-edit-order/add-edit-order.component';
+import { AddEditOrderComponent } from './order-management/components/add-edit-order/add-edit-order.component';
 import { UnsavedOrderChangesGuard } from './guards/unsaved-order-changes.guard';
 import { CandidateDetailsComponent } from '@shared/components/candidate-details/candidate-details.component';
 import { AssociateListComponent } from '@shared/components/associate-list/associate-list.component';
 import { CommonModule } from '@angular/common';
+import { CreateEditOrderComponent } from '@client/order-management/create-edit-order.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -43,7 +42,7 @@ const routes: Routes = [
       },
       {
         path: 'order-management/add',
-        component: AddEditOrderComponent,
+        component: CreateEditOrderComponent,
         data: {
           isOrganizationArea: true,
           isEditing: false,
@@ -52,7 +51,7 @@ const routes: Routes = [
       },
       {
         path: 'order-management/edit/:orderId',
-        component: AddEditOrderComponent,
+        component: CreateEditOrderComponent,
         data: {
           isOrganizationArea: true,
           isEditing: true,

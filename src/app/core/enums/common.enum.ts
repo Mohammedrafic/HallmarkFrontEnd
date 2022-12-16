@@ -11,6 +11,9 @@ export enum FieldType {
   Toggle = 'toggle',
   TextArea = 'textarea',
   CheckBox = 'checkBox',
+  Button = 'button',
+  RadioButton = 'radioButton',
+  Phone = 'phone',
   CheckBoxGroup = 'checkBoxGroup',
  }
 

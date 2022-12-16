@@ -25,7 +25,7 @@ import {
 } from '@syncfusion/ej2-angular-navigations';
 import { ClearAgencyCandidateJob, ClearAgencyOrderCandidatesList, GetAgencyExtensions, GetCandidateJob, GetDeployedCandidateOrderInfo, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { ReOpenOrderService } from '@client/order-management/reopen-order/reopen-order.service';
+import { ReOpenOrderService } from '@client/order-management/components/reopen-order/reopen-order.service';
 import {
   CancelOrganizationCandidateJob,
   CancelOrganizationCandidateJobSuccess,
@@ -83,7 +83,6 @@ import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { PermissionService } from '../../../security/services/permission.service';
 import { DeployedCandidateOrderInfo } from '@shared/models/deployed-candidate-order-info.model';
-import { DateTimeHelper } from '@core/helpers';
 
 enum Template {
   accept,

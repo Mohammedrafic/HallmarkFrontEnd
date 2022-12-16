@@ -4,13 +4,13 @@ import { OrderManagementIRPSystemId, OrderManagementIRPTabs } from '@shared/enum
 import { ColDef } from '@ag-grid-community/core';
 import { OrderManagement } from '@shared/models/order-management.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-import { MoreMenuType } from '@client/order-management/order-management-content/order-management-content.constants';
 import { OrderStatus } from '@shared/enums/order-management';
 import { OrderType } from '@shared/enums/order-type';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 import { titleValueCellRendererSelector } from '../../../../modules/invoices/constants';
 import { TableStatusCellComponent } from '@shared/components/table-status-cell/table-status-cell.component';
 import { OrderStatusText } from '@shared/enums/status';
+import { MoreMenuType } from '@client/order-management/components/order-management-content/order-management-content.constants';
 
 export const SystemGroupConfig: ButtonModel[] = [
   {

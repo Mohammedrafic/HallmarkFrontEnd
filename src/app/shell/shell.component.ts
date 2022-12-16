@@ -24,7 +24,7 @@ import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/a
 import { GetCurrentUserPermissions, GetUserMenuConfig, LogoutUser } from '../store/user.actions';
 import { UserState } from '../store/user.state';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
-import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import { OrderManagementService } from '@client/order-management/components/order-management-content/order-management.service';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 import { faBan, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
@@ -40,7 +40,7 @@ import { InitPreservedFilters } from '../store/preserved-filters.actions';
 import { FilterService } from '@shared/services/filter.service';
 
 
-  
+
 enum THEME {
   light = 'light',
   dark = 'dark',
@@ -182,7 +182,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
     private filterService: FilterService,
     private readonly ngZone: NgZone,
   ) {
-    
+
     this.filterService.canPreserveFilters() && store.dispatch(new InitPreservedFilters());
     router.events.pipe(filter((event) => event instanceof NavigationEnd), debounceTime(50)).subscribe((data: any) => {
       if (this.tree) {
@@ -195,7 +195,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
     });
-    
+
   }
 
   ngOnInit(): void {
@@ -226,7 +226,7 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       });
 
     this.getAlertsPoolling();
-    
+
     this.watchForUnreadMessages();
   }
 
@@ -312,8 +312,8 @@ export class ShellPageComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
   }
-  
- 
+
+
   @OutsideZone
   private getAlertsPoollingTime(): void {
     setInterval(() => {

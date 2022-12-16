@@ -46,7 +46,7 @@ import {
   GetWorkflows,
   LockUpdatedSuccessfully,
   RejectCandidateForOrganisationSuccess,
-  RejectCandidateJob,
+  RejectCandidateJob, SaveIrpOrder,
   SaveOrder,
   SaveOrderImportResult,
   SaveOrderImportResultSucceeded,
@@ -107,7 +107,7 @@ import { createUniqHashObj } from '@core/helpers/functions.helper';
 import { DateTimeHelper } from '@core/helpers';
 import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { OrderImportService } from '@client/order-management/order-import/order-import.service';
+import { OrderImportService } from '@client/order-management/components/order-import/order-import.service';
 import { OrderImportResult } from '@shared/models/imported-order.model';
 import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 
@@ -676,6 +676,22 @@ export class OrderManagementContentState {
     { isDirtyOrderForm }: SetIsDirtyOrderForm
   ): void {
     patchState({ isDirtyOrderForm });
+  }
+
+  @Action(SaveIrpOrder)
+  SaveIrpOrder(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { order, documents }: SaveIrpOrder
+  ): Observable<void | Order> {
+    return this.orderManagementService.saveIrpOrder(order,documents).pipe(
+      tap((payload: Order) => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new SaveOrderSucceeded(payload),
+        ]);
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
+    );
   }
 
   @Action(SaveOrder)

@@ -59,42 +59,52 @@ import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, MaskedDateTimeService, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 import { ClientRoutingModule } from './client-routing.module';
-import { OrderManagementContentComponent } from './order-management/order-management-content/order-management-content.component';
+import {
+  OrderManagementContentComponent,
+} from './order-management/components/order-management-content/order-management-content.component';
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
 import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { ClientComponent } from './client.component';
-import { TabNavigationComponent } from './order-management/order-management-content/tab-navigation/tab-navigation.component';
+import {
+  TabNavigationComponent,
+} from './order-management/components/order-management-content/tab-navigation/tab-navigation.component';
 import { SharedModule } from '@shared/shared.module';
-import { AddEditOrderComponent } from './order-management/add-edit-order/add-edit-order.component';
-import { OrderDetailsFormComponent } from './order-management/order-details-form/order-details-form.component';
-
 import { OrderCredentialsModule } from '@order-credentials/order-credentials.module';
 import { NgxsModule } from '@ngxs/store';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { OrderDetailsDialogComponent } from './order-management/order-details-dialog/order-details-dialog.component';
+import {
+  OrderDetailsDialogComponent,
+} from './order-management/components/order-details-dialog/order-details-dialog.component';
 import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { OrderDetailsContainerComponent } from './order-management/order-details-container/order-details-container.component';
-import { OrderCandidatesContainerComponent } from './order-management/order-candidates-container/order-candidates-container.component';
+import {
+  OrderDetailsContainerComponent,
+} from './order-management/components/order-details-container/order-details-container.component';
+import {
+  OrderCandidatesContainerComponent,
+} from './order-management/components/order-candidates-container/order-candidates-container.component';
 import { AgGridModule } from '@ag-grid-community/angular';
-import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
-import { SaveTemplateDialogModule } from '@client/order-management/save-template-dialog/save-template-dialog.module';
-import { CloseOrderModule } from '@client/order-management/close-order/close-order.module';
+import { AddEditReorderModule } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.module';
+import {
+  SaveTemplateDialogModule,
+} from '@client/order-management/components/save-template-dialog/save-template-dialog.module';
+import { CloseOrderModule } from '@client/order-management/components/close-order/close-order.module';
 import { CandidateListModule } from '@shared/components/candidate-list/candidate-list.module';
 import { ChildOrderDialogModule } from '@shared/components/child-order-dialog/child-order-dialog.module';
 import { ExtensionModule } from '@shared/components/extension/extension.module';
 import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
 import { AssociateListModule } from '@shared/components/associate-list/associate-list.module';
-import { ReopenOrderModule } from '@client/order-management/reopen-order/reopen-order.module';
+import { ReopenOrderModule } from '@client/order-management/components/reopen-order/reopen-order.module';
 import { TooltipContainerModule } from '@shared/components/tooltip-container/tooltip.module';
-import { OrderDetailsService } from '@client/order-management/order-details-form/services';
+import { OrderDetailsService } from '@client/order-management/components/order-details-form/services';
 import { MatMenuModule } from '@angular/material/menu';
 import { SettingsViewService } from '@shared/services';
-import { OrderImportComponent } from './order-management/order-import/order-import.component';
+import { OrderImportComponent } from './order-management/components/order-import/order-import.component';
 import { ImportDialogContentModule } from '@shared/components/import-dialog-content/import-dialog-content.module';
+import { CreateEditOrderModule } from '@client/order-management/create-edit-order.module';
 import { OrganizationCandidatesModule } from '@client/candidates/organization-candidates.module';
 import { ButtonGroupModule } from '@shared/components/button-group/button-group.module';
 import { GridHeaderActionsModule } from '@shared/components/grid/cell-renderers/grid-header-actions/grid-header-actions.module';
@@ -146,8 +156,6 @@ const gridIcons = {
     TimesheetsContentComponent,
     ReportsContentComponent,
     TabNavigationComponent,
-    AddEditOrderComponent,
-    OrderDetailsFormComponent,
     OrderDetailsDialogComponent,
     OrderDetailsContainerComponent,
     OrderCandidatesContainerComponent,
@@ -198,6 +206,7 @@ const gridIcons = {
     ExtensionModule,
     ImportDialogContentModule,
     ListBoxModule,
+    CreateEditOrderModule,
     OrganizationCandidatesModule,
     ButtonGroupModule,
     GridHeaderActionsModule,

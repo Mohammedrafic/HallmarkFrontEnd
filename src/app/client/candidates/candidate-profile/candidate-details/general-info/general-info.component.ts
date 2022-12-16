@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractContactDetails } from '@client/candidates/candidate-profile/candidate-details/abstract-contact-details';
-import { JobClassifications } from '@client/order-management/order-details-form/constants';
+import { JobClassifications } from '@client/order-management/constants';
 
 @Component({
   selector: 'app-general-info',

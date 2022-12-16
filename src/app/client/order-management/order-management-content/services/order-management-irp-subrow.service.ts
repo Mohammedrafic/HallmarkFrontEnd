@@ -7,10 +7,10 @@ import { tap } from 'rxjs';
 import {
   OrderManagementIRPSubGridCells,
 } from '@client/order-management/order-management-content/constants/order-management-irp.const';
-import {
-  OrderManagementContentComponent,
-} from '@client/order-management/order-management-content/order-management-content.component';
 import { TableRowDetailComponent } from '@shared/components/grid/cell-renderers/table-row-detail/table-row-detail.component';
+import {
+  OrderManagementContentComponent
+} from '@client/order-management/components/order-management-content/order-management-content.component';
 
 @Injectable()
 export class OrderManagementIrpSubrowService {

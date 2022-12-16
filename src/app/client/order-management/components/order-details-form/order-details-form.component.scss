@@ -1,0 +1,195 @@
+@import 'src/app/styles/variables/colors';
+
+.order-type-status-container {
+  display: flex;
+
+  .left-section {
+    width: 70%;
+    padding-right: 20px;
+  }
+
+  .right-section {
+    width: 30%;
+  }
+
+  .order-type-container {
+    width: 70%;
+  }
+
+  .order-status-container {
+    width: 30%;
+  }
+
+  .order-type-status-form {
+    display: flex;
+  }
+
+  .input-container, .dropdown-container {
+    margin-bottom: 15px;
+    margin-right: 10px;
+  }
+
+  .order-status-container {
+    margin-right: 0;
+  }
+}
+
+label {
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+.order-form-container {
+  display: flex;
+  .left-section {
+    width: 70%;
+    padding-right: 20px;
+  }
+
+  .right-section {
+    width: 30%;
+  }
+}
+
+.general-information,
+.job-distibution,
+.job-description,
+.contact-details,
+.work-location,
+.workflow {
+  margin-bottom: 24px;
+}
+
+.title {
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: $black;
+}
+
+.form-line {
+  display: flex;
+  align-items: flex-end;
+
+  &:not(:last-child) {
+    margin-bottom: 15px;
+  }
+
+  > *:not(:first-child) {
+    box-sizing: border-box;
+    padding-left: 16px;
+  }
+}
+
+.form-line-item-20 {
+  width: 20%;
+}
+
+.form-line-item-25 {
+  width: 25%;
+}
+.form-line-item-30 {
+  width: 30%;
+}
+
+.form-line-item-40 {
+  width: 40%;
+}
+
+.form-line-item-50 {
+  width: 50%;
+}
+
+.form-line-item-60 {
+  width: 60%;
+}
+
+.comments {
+  padding: 0;
+
+  .e-card-content {
+    padding: 0;
+    height: 456px;
+  }
+}
+
+.job-description-checkboxes-container {
+  display: flex;
+  align-items: center;
+  padding-top: 18px;
+  padding-bottom: 14px;
+
+  ejs-checkbox:not(:first-child) {
+    margin-left: 24px;
+  }
+}
+
+ejs-textbox.e-control {
+  .e-textbox {
+    height: 220px !important;
+    padding-top: 10px;
+    padding-right: 31px;
+    padding-left: 17px;
+  }
+}
+
+.contact-header,
+.work-location-header {
+  display: flex;
+  align-items: center;
+  .title {
+    margin-bottom: 0;
+  }
+
+  .add-contact-link {
+    padding: 9px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: $primary-active-blue-10;
+    &:hover,
+    &:focus {
+      background-color: $primary-active-blue-70;
+      border-color: transparent;
+    }
+
+    i-feather {
+      vertical-align: bottom;
+    }
+  }
+}
+
+.contact-details-title-container,
+.project-type-container,
+.project-name-container {
+  display: flex;
+  .input-container:first-child {
+    width: 100%;
+  }
+  .edit-button-container {
+    margin: 22px 0 0 8px;
+  }
+}
+
+.remove-button-container {
+  width: 52px;
+  margin-top: 22px;
+}
+
+.radio-button {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0 20px 0;
+
+  label {
+    margin-bottom: 10px;
+  }
+}
+
+.e-wrapper {
+  label{
+    margin-right: 15px;
+  }
+}

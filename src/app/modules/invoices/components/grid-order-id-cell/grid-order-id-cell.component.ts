@@ -3,7 +3,9 @@ import { ICellRendererParams } from '@ag-grid-community/core';
 import { Store } from '@ngxs/store';
 import { Router } from '@angular/router';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
-import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import {
+  OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
 import { AppState } from '../../../../store/app.state';
 import { GridCellRenderer } from '@shared/components/grid/models';
 import { OrderType } from '@shared/enums/order-type';
