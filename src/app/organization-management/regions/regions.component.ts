@@ -144,8 +144,14 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     this.store.dispatch(new GetMasterRegions());
     this.masterRegions$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.masterRegion = data;
-      ;
-
+      this.regions$.subscribe((regionsData) => {
+        if (regionsData && regionsData.length > 0) {
+          let regionNameData = regionsData.map(x => x.name);
+          this.masterRegion = this.masterRegion.filter((item) => {
+            return !regionNameData.includes(item.name);
+          });
+        }
+      })
     });
     this.filterColumns = {
 
@@ -167,7 +173,7 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
       this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
         .subscribe((data) => {
           this.defaultValue = data.organizationManagement.regions[0]?.id;
-        });;
+        });
     });
 
     this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
@@ -275,10 +281,9 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     this.filters.orderBy = this.orderBy;
     this.filters.pageNumber = this.currentPage;
     this.filters.pageSize = this.pageSize;
-    this.store.dispatch([
-      new GetRegions(this.filters),
-
-    ]);
+    this.store.dispatch([new GetRegions(this.filters)]).pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data) => {
+      });
   }
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
