@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+
 import { OrderType } from '@shared/enums/order-type';
 import { Order } from "@shared/models/order-management.model";
 
@@ -10,7 +11,8 @@ enum Active {
 @Component({
   selector: 'app-general-order-per-diem-info',
   templateUrl: './general-order-per-diem-info.component.html',
-  styleUrls: ['../general-order-info/general-order-info.component.scss']
+  styleUrls: ['../general-order-info/general-order-info.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GeneralOrderPerDiemInfoComponent {
   @Input() orderInformation: Order | any;

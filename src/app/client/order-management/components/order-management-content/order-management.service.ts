@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderTab } from '@shared/components/candidate-details/models/candidate.model';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +26,9 @@ export class OrderManagementService extends DestroyableDirective {
 
   private _selectedOrderAfterRedirect: OrderTab | null;
 
-  constructor() {
+  constructor(
+    private fb: FormBuilder,
+  ) {
     super();
     this.selectedOrderAfterRedirect$
       .pipe(takeUntil(this.destroy$))
@@ -38,5 +41,39 @@ export class OrderManagementService extends DestroyableDirective {
 
   get selectedOrderAfterRedirect(): OrderTab | null {
     return this._selectedOrderAfterRedirect;
+  }
+
+  createFilterForm(): FormGroup {
+    return this.fb.group({
+      orderPublicId: new FormControl(null),
+      regionIds: new FormControl([]),
+      locationIds: new FormControl([]),
+      departmentsIds: new FormControl([]),
+      skillIds: new FormControl([]),
+      orderTypes: new FormControl([]),
+      jobTitle: new FormControl(null),
+      billRateFrom: new FormControl(null),
+      billRateTo: new FormControl(null),
+      openPositions: new FormControl(null),
+      jobStartDate: new FormControl(null),
+      jobEndDate: new FormControl(null),
+      orderStatuses: new FormControl([]),
+      annualSalaryRangeFrom: new FormControl(null),
+      annualSalaryRangeTo: new FormControl(null),
+      candidateStatuses: new FormControl([]),
+      candidatesCountFrom: new FormControl(null),
+      candidatesCountTo: new FormControl(null),
+      agencyIds: new FormControl([]),
+      agencyType: new FormControl('0'),
+      templateTitle: new FormControl(null),
+      creationDateFrom: new FormControl(null),
+      creationDateTo: new FormControl(null),
+      distributedOnFrom: new FormControl(null),
+      distributedOnTo: new FormControl(null),
+      candidateName: new FormControl(null),
+      projectTypeIds: new FormControl(null),
+      projectNameIds: new FormControl(null),
+      poNumberIds: new FormControl(null),
+    });
   }
 }

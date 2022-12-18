@@ -23,10 +23,11 @@
               </ejs-chiplist>
               <div class="vertical-divider"></div>
               <div *ngIf="order" class="order-other-statuses">
-                <span class="custom-chip" *ngIf="!isReOrder">{{ order.orderType | orderTypeName }}</span>
+                <span class="custom-chip" *ngIf="!isReOrder">{{ order.orderType | orderTypeName: order.isIRPOnly }}</span>
                 <span *ngIf="orderType.ReOrder !== order?.orderType" class="custom-chip">
                   {{ order.isLocked ? 'Locked' : 'Unlocked' }}</span
                 >
+                <span class="custom-chip" *ngIf="order.isIRPOnly">IRP</span>
               </div>
             </div>
           </div>

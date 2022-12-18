@@ -101,7 +101,10 @@
       [class.empty-table]="!(ordersPage$ | async)?.items?.length"
       [overlayNoRowsTemplate]="gridEmptyMessage"
       class="ag-theme-alpine app-grid__component"
-      (sortChanged)="gridSortHandler($event)">
+      (gridReady)="setGridApi($event)"
+      (sortChanged)="gridSortHandler($event)"
+      (rowClicked)="openIrpDetails($event)"
+      >
     </ag-grid-angular>
     <app-grid-pagination
       [currentPage]="currentPage"

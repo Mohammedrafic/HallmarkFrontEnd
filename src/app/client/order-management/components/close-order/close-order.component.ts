@@ -47,9 +47,9 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public maxDate: Date | null;
 
   public dialogTitleType: string;
-  public isPosition: boolean = false;
+  public isPosition = false;
   public closeForm: FormGroup;
-  public commentContainerId: number = 0;
+  public commentContainerId = 0;
   public comments: Comment[] = [];
   private unsubscribe$: Subject<void> = new Subject();
 

@@ -1,15 +1,15 @@
-import { JobCancellation } from '@shared/models/candidate-cancellation.model';
-import { PageOfCollections } from '@shared/models/page.model';
-import { Document } from '@shared/models/document.model';
-import { OrderStatus } from '@shared/enums/order-management';
-import { OrderType } from '@shared/enums/order-type';
+import { CandidateModel } from '@client/order-management/components/add-edit-reorder/models/candidate.model';
+import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
 import { Duration } from '@shared/enums/durations';
 import { JobClassification } from '@shared/enums/job-classification';
+import { OrderStatus } from '@shared/enums/order-management';
+import { OrderType } from '@shared/enums/order-type';
+import { FilterOrderStatusText } from '@shared/enums/status';
+import { JobCancellation } from '@shared/models/candidate-cancellation.model';
+import { Document } from '@shared/models/document.model';
+import { PageOfCollections } from '@shared/models/page.model';
 import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
-import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
-import { CandidateModel } from '@client/order-management/components/add-edit-reorder/models/candidate.model';
-import { FilterOrderStatusText } from '@shared/enums/status';
 
 export class OrderManagement {
   id: number;
@@ -393,6 +393,14 @@ export class Order {
   hasExtensions?: boolean;
   extensionInitialOrderPublicId?: number;
   regionName?: string;
+  isIRPOnly?: boolean;
+  /**
+   * Mispelling on BE, should be - contract.
+   */
+  contact?: boolean;
+  weekend?: boolean;
+  holiday?: boolean;
+  distributedOn?: string;
 }
 
 export class ReOrder {
