@@ -1,98 +1,103 @@
-import { DatePipe, Location } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  HostListener,
-  OnDestroy,
-  OnInit,
-  ViewChild,
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy,
+  OnInit, ViewChild,
 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { DatePipe, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import {
-  ApproveOrder,
-  ClearOrders,
-  ClearSelectedOrder,
-  DeleteOrder,
-  DeleteOrderSucceeded,
-  DuplicateOrder,
-  DuplicateOrderSuccess,
-  ExportOrders,
-  GetAgencyOrderCandidatesList,
-  GetAvailableSteps,
-  GetIRPOrders,
-  GetOrderById,
-  GetOrderByIdSucceeded,
-  GetOrderFilterDataSources,
-  GetOrders,
-  GetOrganisationCandidateJob,
-  GetProjectSpecialData,
-  GetSelectedOrderById,
-  LockUpdatedSuccessfully,
-  ReloadOrganisationOrderCandidatesLists,
-  SelectNavigationTab,
-  SetLock,
-} from '@client/store/order-managment-content.actions';
-import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Permission } from '@core/interface';
-import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import {
-  GetAssignedSkillsByOrganization,
-  GetOrganizationById,
-  GetOrganizationSettings,
-} from '@organization-management/store/organization-management.actions';
-import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
-import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import {
-  OrderManagementIRPSystemId,
-  OrderManagementIRPTabsIndex,
-  OrganizationOrderManagementTabs,
-} from '@shared/enums/order-management-tabs.enum';
-import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
-import { AbstractPermissionGrid } from '@shared/helpers/permissions';
-import { FilteredItem } from '@shared/models/filter.model';
-import {
-  FilterOrderStatus,
-  FilterStatus,
-  Order,
-  OrderCandidateJob,
-  OrderFilter,
-  OrderFilterDataSource,
-  OrderManagement,
-  OrderManagementChild,
-  OrderManagementPage,
-} from '@shared/models/order-management.model';
-import {
-  OrganizationDepartment,
-  OrganizationLocation,
-  OrganizationRegion,
-  OrganizationStructure,
-} from '@shared/models/organization.model';
-import { Skill } from '@shared/models/skill.model';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { FilterService } from '@shared/services/filter.service';
+
+import { MatMenuTrigger } from '@angular/material/menu';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+import { ColDef, GridApi, GridOptions, GridReadyEvent, Module, RowNode, RowSelectedEvent, SortChangedEvent } from '@ag-grid-community/core';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
+import { isArray, isUndefined } from 'lodash';
+import isNil from 'lodash/fp/isNil';
+import { catchError, combineLatest, debounceTime, delay, EMPTY, filter, Observable, of,
+  Subject, Subscription, take, takeUntil, throttleTime } from 'rxjs';
+
+import { ORDERS_GRID_CONFIG } from '@client/client.config';
+import { AddEditReorderService } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.service';
 import {
-  catchError,
-  combineLatest,
-  debounceTime,
-  delay,
-  EMPTY,
-  filter,
-  Observable,
-  of,
-  Subject,
-  Subscription,
-  take,
-  takeUntil,
-  throttleTime,
-} from 'rxjs';
+  OrderDetailsDialogComponent,
+} from '@client/order-management/components/order-details-dialog/order-details-dialog.component';
+import {
+  OrderManagementService,
+} from '@client/order-management/components/order-management-content/order-management.service';
+import {
+  TabNavigationComponent,
+} from '@client/order-management/components/order-management-content/tab-navigation/tab-navigation.component';
+import { ReOpenOrderService } from '@client/order-management/components/reopen-order/reopen-order.service';
+import {
+  IRPTabsConfig,
+  SystemGroupConfig,
+  ThreeDotsMenuOptions,
+} from '@client/order-management/order-management-content/constants/order-management-irp.const';
+import { OrderManagementIrpGridHelper,
+} from '@client/order-management/order-management-content/helpers/order-management-irp-grid.helper';
+import {
+  OrderManagementIrpSubrowService,
+} from '@client/order-management/order-management-content/services/order-management-irp-subrow.service';
+import {
+  ApproveOrder, ClearOrders, ClearSelectedOrder, DeleteOrder, DeleteOrderSucceeded,
+  DuplicateOrder, DuplicateOrderSuccess, ExportOrders, GetAgencyOrderCandidatesList, GetAvailableSteps, GetIRPOrders,
+  GetOrderById, GetOrderByIdSucceeded, GetOrderFilterDataSources, GetOrders, GetOrganisationCandidateJob,
+  GetProjectSpecialData, GetSelectedOrderById, LockUpdatedSuccessfully, ReloadOrganisationOrderCandidatesLists,
+  SelectNavigationTab, SetLock,
+} from '@client/store/order-managment-content.actions';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { SettingsHelper } from '@core/helpers/settings.helper';
+import { Permission } from '@core/interface';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import {
+  GetAssignedSkillsByOrganization, GetOrganizationById,
+  GetOrganizationSettings,
+} from '@organization-management/store/organization-management.actions';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
+import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
+import { SearchComponent } from '@shared/components/search/search.component';
+import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { MessageTypes } from '@shared/enums/message-types';
+import { OrderStatus } from '@shared/enums/order-management';
+import {
+  OrderManagementIRPSystemId, OrderManagementIRPTabsIndex,
+  OrganizationOrderManagementTabs,
+} from '@shared/enums/order-management-tabs.enum';
+import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
+import { SettingsKeys } from '@shared/enums/settings';
+import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 import { CandidatesStatusText, FilterOrderStatusText, STATUS_COLOR_GROUP } from '@shared/enums/status';
+import { AbstractPermissionGrid } from '@shared/helpers/permissions';
+import { sortByField } from '@shared/helpers/sort-by-field.helper';
+import { ButtonModel } from '@shared/models/buttons-group.model';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { FilteredItem } from '@shared/models/filter.model';
+import {
+  FilterOrderStatus, FilterStatus, Order, OrderCandidateJob, OrderFilter, OrderFilterDataSource,
+  OrderManagement, OrderManagementChild, OrderManagementPage, IRPOrderManagement,
+} from '@shared/models/order-management.model';
+import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import {
+  OrganizationDepartment, OrganizationLocation, OrganizationRegion,
+  OrganizationStructure,
+} from '@shared/models/organization.model';
+import { PreservedFilters } from '@shared/models/preserved-filters.model';
+import { ProjectSpecialData } from '@shared/models/project-special-data.model';
+import { Skill } from '@shared/models/skill.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { FilterService } from '@shared/services/filter.service';
+import { OrderManagementContentService } from '@shared/services/order-management-content.service';
+import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
+import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import {
   SetHeaderState,
   ShowCloseOrderDialog,
@@ -101,8 +106,10 @@ import {
   ShowSideDialog,
   ShowToast,
 } from 'src/app/store/app.actions';
+import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
 import { UserState } from 'src/app/store/user.state';
-import { ORDERS_GRID_CONFIG } from '@client/client.config';
+import { PermissionService } from '../../../../security/services/permission.service';
+import { AppState } from '../../../../store/app.state';
 import {
   allOrdersChildColumnsToExport,
   AllOrdersColumnsConfig,
@@ -119,56 +126,6 @@ import {
   reOrdersColumnsToExport,
   ROW_HEIGHT,
 } from './order-management-content.constants';
-import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
-import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { CandidatStatus } from '@shared/enums/applicant-status.enum';
-import { SearchComponent } from '@shared/components/search/search.component';
-import { OrderStatus } from '@shared/enums/order-management';
-import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
-import {
-  TabNavigationComponent,
-} from '@client/order-management/components/order-management-content/tab-navigation/tab-navigation.component';
-import {
-  OrderDetailsDialogComponent,
-} from '@client/order-management/components/order-details-dialog/order-details-dialog.component';
-import isNil from 'lodash/fp/isNil';
-import {
-  OrderManagementService,
-} from '@client/order-management/components/order-management-content/order-management.service';
-import { isArray, isUndefined } from 'lodash';
-import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
-import { OrderManagementContentService } from '@shared/services/order-management-content.service';
-import { AddEditReorderService } from '@client/order-management/components/add-edit-reorder/add-edit-reorder.service';
-import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
-import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
-import { SettingsKeys } from '@shared/enums/settings';
-import { SettingsHelper } from '@core/helpers/settings.helper';
-import { MessageTypes } from '@shared/enums/message-types';
-import { ReOpenOrderService } from '@client/order-management/components/reopen-order/reopen-order.service';
-import { ProjectSpecialData } from '@shared/models/project-special-data.model';
-import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { PermissionService } from '../../../../security/services/permission.service';
-import { PreservedFiltersState } from 'src/app/store/preserved-filters.state';
-import { PreservedFilters } from '@shared/models/preserved-filters.model';
-import { MatMenuTrigger } from '@angular/material/menu';
-import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { ButtonModel } from '@shared/models/buttons-group.model';
-import {
-  IRPTabsConfig,
-  SystemGroupConfig,
-  ThreeDotsMenuOptions,
-} from '@client/order-management/order-management-content/constants/order-management-irp.const';
-import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
-import { ColDef, GridOptions, Module, SortChangedEvent } from '@ag-grid-community/core';
-import { OrderManagementIrpGridHelper } from '@client/order-management/order-management-content/helpers/order-management-irp-grid.helper';
-import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { GRID_EMPTY_MESSAGE } from '@shared/components/grid/constants/grid.constants';
-import {
-  OrderManagementIrpSubrowService,
-} from '@client/order-management/order-management-content/services/order-management-irp-subrow.service';
-import { AppState } from '../../../../store/app.state';
 
 @Component({
   selector: 'app-order-management-content',
@@ -254,7 +211,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private search$ = new Subject();
-  public selectedDataRow: OrderManagement;
+  public selectedDataRow: OrderManagement | IRPOrderManagement;
 
   public hasCreateEditOrderPermission: boolean;
   public selectedOrder: Order;
@@ -329,6 +286,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
   private isIncomplete = false;
   private redirectFromPerdiem = false;
   private cd$ = new Subject();
+  private gridApi: GridApi;
 
   constructor(
     protected override store: Store,
@@ -365,37 +323,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     this.prefix = routerState?.['prefix'];
 
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
-    this.OrderFilterFormGroup = this.fb.group({
-      orderPublicId: new FormControl(null),
-      regionIds: new FormControl([]),
-      locationIds: new FormControl([]),
-      departmentsIds: new FormControl([]),
-      skillIds: new FormControl([]),
-      orderTypes: new FormControl([]),
-      jobTitle: new FormControl(null),
-      billRateFrom: new FormControl(null),
-      billRateTo: new FormControl(null),
-      openPositions: new FormControl(null),
-      jobStartDate: new FormControl(null),
-      jobEndDate: new FormControl(null),
-      orderStatuses: new FormControl([]),
-      annualSalaryRangeFrom: new FormControl(null),
-      annualSalaryRangeTo: new FormControl(null),
-      candidateStatuses: new FormControl([]),
-      candidatesCountFrom: new FormControl(null),
-      candidatesCountTo: new FormControl(null),
-      agencyIds: new FormControl([]),
-      agencyType: new FormControl('0'),
-      templateTitle: new FormControl(null),
-      creationDateFrom: new FormControl(null),
-      creationDateTo: new FormControl(null),
-      distributedOnFrom: new FormControl(null),
-      distributedOnTo: new FormControl(null),
-      candidateName: new FormControl(null),
-      projectTypeIds: new FormControl(null),
-      projectNameIds: new FormControl(null),
-      poNumberIds: new FormControl(null),
-    });
+    this.OrderFilterFormGroup = this.orderManagementService.createFilterForm();
   }
 
   override ngOnInit(): void {
@@ -567,24 +495,28 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
           this.filters.isTemplate = false;
           this.filters.includeReOrders = true;
           this.hasOrderAllOrdersId();
-          cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
+          cleared ? this.store.dispatch([new GetOrders(this.filters)])
+          : this.store.dispatch([new GetOrderFilterDataSources()]);
           break;
         case OrganizationOrderManagementTabs.PerDiem:
           this.filters.orderTypes = [OrderType.OpenPerDiem];
           this.filters.includeReOrders = true;
           this.filters.isTemplate = false;
-          cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
+          cleared ? this.store.dispatch([new GetOrders(this.filters)])
+          : this.store.dispatch([new GetOrderFilterDataSources()]);
           break;
         case OrganizationOrderManagementTabs.PermPlacement:
           this.filters.orderTypes = [OrderType.PermPlacement];
           this.filters.isTemplate = false;
-          cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
+          cleared ? this.store.dispatch([new GetOrders(this.filters)])
+          : this.store.dispatch([new GetOrderFilterDataSources()]);
           break;
         case OrganizationOrderManagementTabs.ReOrders:
           this.hasOrderAllOrdersId();
           this.filters.orderTypes = [OrderType.ReOrder];
           this.filters.isTemplate = false;
-          cleared ? this.store.dispatch([new GetOrders(this.filters)]) : this.store.dispatch([new GetOrderFilterDataSources()]);
+          cleared ? this.store.dispatch([new GetOrders(this.filters)])
+          : this.store.dispatch([new GetOrderFilterDataSources()]);
           break;
         case OrganizationOrderManagementTabs.Incomplete:
           this.columnsToExport = allOrdersColumnsToExport;
@@ -806,12 +738,48 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     }
   }
 
-  public onNextPreviousOrderEvent(next: boolean): void {
-    const [index] = this.gridWithChildRow.getSelectedRowIndexes();
-    const nextIndex = next ? index + 1 : index - 1;
-    this.gridWithChildRow.selectRow(nextIndex);
+  public onNextPreviousOrderEvent(event: { next: boolean, isIrpOrder: boolean}): void {
+    if (event.isIrpOrder) {
+      const node = this.gridApi.getSelectedNodes()[0];
+      const nextIndex = event.next ? Number(node.rowIndex) + 1 : Number(node.rowIndex) - 1;
+      const gridRows: RowNode[] = [];
+
+      this.gridApi.forEachNode((item: RowNode) => {
+        gridRows.push(item);
+      });
+
+      const selectEvent: Partial<RowSelectedEvent> = {
+        node: gridRows[nextIndex],
+        data: gridRows[nextIndex].data,
+      };
+
+      this.openIrpDetails(selectEvent);
+
+    } else {
+      const [index] = this.gridWithChildRow.getSelectedRowIndexes();
+      const nextIndex = event.next ? index + 1 : index - 1;
+      this.gridWithChildRow.selectRow(nextIndex);
+    }
   }
 
+  openIrpDetails(event: RowSelectedEvent | Partial<RowSelectedEvent>) {
+    const orderData = event.data as IRPOrderManagement;
+    this.gridApi.selectNode(event.node as RowNode);
+    this.selectedDataRow = orderData;
+    const options = this.getDialogNextPreviousOption(orderData, true);
+    this.store.dispatch(new GetOrderById(orderData.id, orderData.organizationId, options));
+    this.dispatchAgencyOrderCandidatesList(orderData.id, orderData.organizationId);
+    this.selectedCandidateMeta = this.selectedCandidate = this.selectedReOrder = null;
+    this.openChildDialog.next(false);
+    this.orderPositionSelected$.next({ state: false });
+    this.openDetails.next(true);
+    this.selectedRowRef = event;
+  }
+
+  setGridApi(params: GridReadyEvent): void {
+    this.gridApi = params.api;
+  }
+  
   public onRowClick(event: any): void {
     if (event.target) {
       this.orderManagementService.excludeDeployed = false;
@@ -868,10 +836,23 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
     });
   }
 
-  private getDialogNextPreviousOption(selectedOrder: OrderManagement): DialogNextPreviousOption {
-    const gridData = this.gridWithChildRow.dataSource as OrderManagement[];
+  private getDialogNextPreviousOption(
+    selectedOrder: OrderManagement | IRPOrderManagement, isIrpGrid = false): DialogNextPreviousOption {
+    let gridData: OrderManagement[] | IRPOrderManagement[];
+
+    if (isIrpGrid) {
+      gridData = [];
+
+      this.gridApi.forEachNode((item: RowNode) => {
+        gridData.push(item.data);
+      });
+    } else {
+      gridData = this.gridWithChildRow.dataSource as OrderManagement[];
+    }
+
     const first = gridData[0];
     const last = gridData[gridData.length - 1];
+
     return {
       previous: first.id !== selectedOrder.id,
       next: last.id !== selectedOrder.id,
@@ -1220,7 +1201,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.currentPage = page;
       const { selectedOrderAfterRedirect } = this.orderManagementService;
       if (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect) {
-        this.filters.orderPublicId = (this.prefix || selectedOrderAfterRedirect?.prefix) + '-' + (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect?.orderId);
+        this.filters.orderPublicId = (this.prefix || selectedOrderAfterRedirect?.prefix) + '-'+ (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect?.orderId);
         this.OrderFilterFormGroup.controls['orderPublicId'].setValue(
           ((this.prefix || selectedOrderAfterRedirect?.prefix) + '-' + (this.orderPerDiemId || this.orderId || selectedOrderAfterRedirect?.orderId))?.toString()
         );

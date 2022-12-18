@@ -142,6 +142,7 @@ import { CustomSideDialogComponent } from './components/custom-side-dialog/custo
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { HideByCandidateStatusPipe } from './pipes/hide-by-candidate-status.pipe';
 import { ValidateDirectiveModule } from './directives/validate-directive/validate-directive.module';
+import { BoolValuePipeModule } from './pipes/bool-values/bool-values-pipe.module';
 
 const icons = {
   AlertCircle,
@@ -273,6 +274,7 @@ const COMPONENTS = [
     TreeViewAllModule,
     SplitButtonModule,
     ValidateDirectiveModule,
+    BoolValuePipeModule,
   ],
   exports: [
     ...COMPONENTS,

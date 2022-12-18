@@ -108,6 +108,7 @@ import { IrpSystemGridTextPipeModule } from '@shared/pipes/irp-system-grid-text/
 import { MapCredentialsService } from '@organization-management/credentials/services/map-credentials.service';
 import { SkillsService } from './skills/skills.service';
 import { TiersService } from "@organization-management/tiers/services/tiers.service";
+import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
 
 const sidebarIcons = {
   Download,
@@ -238,6 +239,7 @@ const sidebarIcons = {
     ImportDialogContentModule,
     TreeViewModule,
     IrpSystemGridTextPipeModule,
+    BoolValuePipeModule,
   ],
   exports: [BillRatesComponent],
   providers:

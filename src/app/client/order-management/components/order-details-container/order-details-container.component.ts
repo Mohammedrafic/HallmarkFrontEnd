@@ -31,7 +31,8 @@ export class OrderDetailsContainerComponent {
   }
 
   set setIsClosedOrder(order: Order) {
-    this.isClosedOrder = order?.status === OrderStatus.Closed || !!order?.orderClosureReasonId || !!order?.orderClosureReason || !!order?.orderCloseDate;
+    this.isClosedOrder = order?.status === OrderStatus.Closed
+    || !!order?.orderClosureReasonId || !!order?.orderClosureReason || !!order?.orderCloseDate;
   }
 
   public get orderInformation(): Order {

@@ -76,7 +76,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() settings: { [key in SettingsKeys]?: OrganizationSettingsGet };
   @Input() hasCreateEditOrderPermission: boolean;
 
-  @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
+  @Output() nextPreviousOrderEvent = new EventEmitter<{ next: boolean, isIrpOrder: boolean}>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
   @Output() closeReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
   @Output() selectReOrder = new EventEmitter<any>();
@@ -406,8 +406,11 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     }
   }
 
-  public onNextPreviousOrder(next: boolean): void {
-    this.nextPreviousOrderEvent.emit(next);
+  public onNextPreviousOrder(isNext: boolean): void {
+    this.nextPreviousOrderEvent.emit({
+      next: isNext,
+      isIrpOrder: this.order.isIRPOnly as boolean,
+    });
   }
 
   public onMobileMenuSelect({ item: { text } }: MenuEventArgs): void {

@@ -106,6 +106,7 @@ import { OrderMatchColumnComponent } from './candidates/add-edit-candidate/crede
 import { TooltipContainerModule } from "@shared/components/tooltip-container/tooltip.module";
 import { CredentialStorageFacadeService } from "./services/credential-storage-facade.service";
 import { CredentialStorageService } from "./services/credential-storage.service";
+import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
 
 const sidebarIcons = {
   Sliders,
@@ -215,6 +216,7 @@ const sidebarIcons = {
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),
     CandidateListModule,
     ChildOrderDialogModule,
+    BoolValuePipeModule,
   ],
   exports: [FileViewerComponent],
   providers: [

@@ -2,7 +2,8 @@ import { Component, Input, ViewChild } from '@angular/core';
 
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { AbstractGridConfigurationComponent,
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { BillRate, BillRateCategory, BillRateType } from '@shared/models/bill-rate.model';
 
 export type BillRatesGridEvent = BillRate & { index: string };
@@ -10,7 +11,7 @@ export type BillRatesGridEvent = BillRate & { index: string };
 @Component({
   selector: 'app-bill-rates-view-grid',
   templateUrl: './bill-rates-view-grid.component.html',
-  styleUrls: ['./bill-rates-view-grid.component.scss']
+  styleUrls: ['./bill-rates-view-grid.component.scss'],
 })
 export class BillRatesViewGridComponent extends AbstractGridConfigurationComponent {
   @ViewChild('grid') grid: GridComponent;

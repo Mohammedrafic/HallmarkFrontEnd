@@ -32,6 +32,7 @@ import {
   X,
   XCircle,
   Clipboard,
+  Clock,
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -115,6 +116,7 @@ import {
 import { TableRowDetailModule } from '@shared/components/grid/cell-renderers/table-row-detail/table-row-detail.module';
 import { SwitchEditorModule } from '@shared/components/switch-editor/switch-editor.module';
 import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
+import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
 
 const gridIcons = {
   MessageSquare,
@@ -145,6 +147,7 @@ const gridIcons = {
   AlertTriangle,
   ChevronRight,
   Clipboard,
+  Clock,
 };
 
 @NgModule({
@@ -212,6 +215,7 @@ const gridIcons = {
     GridHeaderActionsModule,
     TableRowDetailModule,
     SwitchEditorModule,
+    BoolValuePipeModule,
   ],
   providers: [
     ResizeService,
