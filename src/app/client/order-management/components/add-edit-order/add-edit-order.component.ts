@@ -86,7 +86,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public SelectedTab = SelectedTab;
   public orderId: number;
   public publicId: number;
-  public prefix: string;
 
   public submitMenuItems: ItemModel[] = [
     { id: SubmitButtonItem.SaveForLater, text: 'Save For Later' },
@@ -128,7 +127,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.store.dispatch(new GetSelectedOrderById(this.orderId));
       this.selectedOrder$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((order: Order) => {
         this.order = order;
-        this.prefix = order?.organizationPrefix as string;
         this.publicId = order?.publicId as number;
         this.isPermPlacementOrder = order?.orderType === OrderType.PermPlacement;
         this.initCredentialsAndBillRates(order);

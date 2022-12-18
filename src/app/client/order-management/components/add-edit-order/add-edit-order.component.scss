@@ -1,35 +1,5 @@
 @import "colors";
 
-.controls-container {
-  padding: 20px 0;
-  display: flex;
-
-  .form-title {
-    display: flex;
-
-    h3 {
-      margin-left: 25px;
-    }
-
-    .order-id {
-      margin: 6px 5px 5px 15px;
-      font-size: 18px;
-    }
-  }
-
-  .controls-form {
-    button {
-      margin-left: 10px;
-
-      &.e-dropdown-btn {
-        width: 40px;
-        background-color: $primary-active-blue;
-        margin-left: 1px;
-      }
-    }
-  }
-}
-
 ejs-tab {
   padding-bottom: 40px;
 

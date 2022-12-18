@@ -48,8 +48,8 @@ export class OrderDetailsIrpService {
   public createJobDistributionForm(): FormGroup {
     return this.formBuilder.group({
       jobDistribution: [null, Validators.required],
-      agency: [null],
-      minYears: [null, Validators.required],
+      agencyId: [null],
+      minYrsRequired: [null, Validators.required],
       hourlyRate: [null],
     });
   }
@@ -57,7 +57,7 @@ export class OrderDetailsIrpService {
   public createJobDistributionPOForm(): FormGroup {
     return this.formBuilder.group({
       jobDistribution: [null, Validators.required],
-      agency: [null],
+      agencyId: [null],
       billRate: [null],
     });
   }
@@ -66,7 +66,7 @@ export class OrderDetailsIrpService {
     return this.formBuilder.group({
       orderRequisitionReasonId: [null, Validators.required],
       classifications: [null],
-      onCall: [false],
+      onCallRequired: [false],
       asapStart: [false],
       criticalOrder: [false],
       weekend: [false],
@@ -79,10 +79,11 @@ export class OrderDetailsIrpService {
   public createWorkLocationForm(): FormGroup {
     return this.formBuilder.group({
       id: [0],
-      address: ['', [ Validators.maxLength(100)]],
-      state: ['', [ Validators.maxLength(100)]],
-      city: [ '', [ Validators.maxLength(20)]],
+      address: ['', [Validators.required, Validators.maxLength(100)]],
+      state: ['', [Validators.required, Validators.maxLength(100)]],
+      city: [ '', [Validators.required, Validators.maxLength(20)]],
       zipCode: ['', [
+        Validators.required,
         Validators.minLength(5),
         Validators.pattern(/^[0-9]+$/),
       ]],

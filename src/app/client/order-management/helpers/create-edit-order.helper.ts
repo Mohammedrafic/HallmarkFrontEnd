@@ -52,6 +52,12 @@ export const collectInvalidFields = (formControlList: ListControls[]) => {
   return fields;
 };
 
+export const isFormsValid = (forms: FormGroup[]): boolean => {
+  return forms.map((form: FormGroup) => {
+    return !form.invalid;
+  }).every((valid: boolean) => valid);
+};
+
 export const getFormsList = (list: ListOfKeyForms): FormGroup[] => {
   const formList = [];
   for (const form in list) {
@@ -65,12 +71,6 @@ export const getFormsList = (list: ListOfKeyForms): FormGroup[] => {
   }
 
   return formList as FormGroup[];
-};
-
-export const isFormsValid = (forms: FormGroup[]): boolean => {
-  return forms.map((form: FormGroup) => {
-    return form.valid;
-  }).every((valid: boolean) => valid);
 };
 
 //TODO: remove credential, after implementation

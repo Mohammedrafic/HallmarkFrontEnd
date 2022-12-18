@@ -17,7 +17,7 @@ import {
   DeleteOrder,
   DeleteOrderSucceeded,
   DuplicateOrder,
-  DuplicateOrderSuccess,
+  DuplicateOrderSuccess, EditIrpOrder,
   EditOrder,
   ExportOrders,
   GetAgencyOrderCandidatesList,
@@ -46,7 +46,7 @@ import {
   GetWorkflows,
   LockUpdatedSuccessfully,
   RejectCandidateForOrganisationSuccess,
-  RejectCandidateJob, SaveIrpOrder,
+  RejectCandidateJob, SaveIrpOrder, SaveIrpOrderSucceeded,
   SaveOrder,
   SaveOrderImportResult,
   SaveOrderImportResultSucceeded,
@@ -682,12 +682,12 @@ export class OrderManagementContentState {
   SaveIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents }: SaveIrpOrder
-  ): Observable<void | Order> {
+  ): Observable<Order[] | void> {
     return this.orderManagementService.saveIrpOrder(order,documents).pipe(
-      tap((payload: Order) => {
+      tap(() => {
         dispatch([
           new ShowToast(MessageTypes.Success, RECORD_ADDED),
-          new SaveOrderSucceeded(payload),
+          new SaveIrpOrderSucceeded(),
         ]);
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
@@ -744,6 +744,22 @@ export class OrderManagementContentState {
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
+  }
+
+  @Action(EditIrpOrder)
+  EditIrpOrder(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { order, documents }: EditIrpOrder
+  ): Observable<Order[] | void> {
+    return this.orderManagementService.editIrpOrder(order,documents).pipe(
+      tap(() => {
+        dispatch([
+          new ShowToast(MessageTypes.Success,  RECORD_MODIFIED),
+          new SaveIrpOrderSucceeded(),
+        ]);
+      }),
+      catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
+      );
   }
 
   @Action(EditOrder)

@@ -43,11 +43,12 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
   public readonly orderSystemConfig:ButtonModel[] = OrderSystemConfig;
   public submitButtonConfig: ItemModel[];
   public selectedOrder: Order;
-  public activeSystem: OrderSystem = OrderSystem.VMS;
+  public activeSystem: OrderSystem;
   public orderSystem = OrderSystem;
+  public showSystemToggle = false;
   public selectedSystem: SelectSystem = {
     isIRP: false,
-    isVMS: true,
+    isVMS: false,
     isIRPFlag: false,
   };
 
@@ -107,6 +108,9 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
           takeUntil(this.componentDestroy())
         ).subscribe((selectedOrder: Order) => {
           this.selectedOrder = selectedOrder;
+          this.activeSystem = selectedOrder?.isIRPOnly ? OrderSystem.IRP : OrderSystem.VMS;
+          this.showSystemToggle = false;
+          this.changeDetection.markForCheck();
       });
     }
 
@@ -148,6 +152,12 @@ export class CreateEditOrderComponent extends Destroyable implements OnInit {
         isIRPFlag,
       };
 
+      this.showSystemToggle =
+        this.selectedSystem.isIRP &&
+        this.selectedSystem.isVMS &&
+        this.selectedSystem.isIRPFlag;
+
+      this.setSubmitButtonConfig();
       this.activeSystem = this.selectedSystem.isIRP ? OrderSystem.IRP : OrderSystem.VMS;
       this.changeDetection.markForCheck();
     });

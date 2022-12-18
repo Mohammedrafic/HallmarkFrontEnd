@@ -5,14 +5,15 @@
     </div>
     <div class="title">
       <h3>{{ title }} Order</h3>
-      <!-- TODO: add logic --->
-      <!--<span *ngIf="selectedOrder" class="order-id">
-        ID: <span *ngIf="orderDetailsFormComponent?.order?.isTemplate">{{ orderId }}</span>
-        <span *ngIf="!orderDetailsFormComponent?.order?.isTemplate">{{ prefix }}-{{ publicId }}</span>
-      </span>-->
+      <span *ngIf="selectedOrder" class="order-id">
+        ID: <span *ngIf="selectedOrder?.isTemplate">{{ selectedOrder?.orderId }}</span>
+        <span *ngIf="!selectedOrder?.isTemplate">
+          {{ selectedOrder?.organizationPrefix }}-{{ selectedOrder?.publicId }}
+        </span>
+      </span>
     </div>
   </div>
-  <div *ngIf="selectedSystem.isIRP && selectedSystem.isVMS && selectedSystem.isIRPFlag">
+  <div *ngIf="showSystemToggle && !selectedOrder">
     <app-button-group
       [buttonOptions]="orderSystemConfig"
       (buttonChange)="changeSystem($event)"
@@ -32,7 +33,11 @@
 <div class="split-line"></div>
 <div class="content-wrapper">
   <ng-container [ngSwitch]="activeSystem">
-      <app-irp-container *ngSwitchCase="orderSystem.IRP" [handleSaveEvents]="saveEvents"></app-irp-container>
+      <app-irp-container
+        *ngSwitchCase="orderSystem.IRP"
+        [handleSaveEvents]="saveEvents"
+        [selectedOrder]="selectedOrder"
+      ></app-irp-container>
       <app-add-edit-order *ngSwitchCase="orderSystem.VMS" [handleSaveEvents]="saveEvents"></app-add-edit-order>
   </ng-container>
 </div>

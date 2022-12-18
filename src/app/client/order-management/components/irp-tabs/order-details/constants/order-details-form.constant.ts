@@ -7,7 +7,8 @@ import { ButtonType } from '@client/order-management/components/irp-tabs/order-d
 import {
   IrpJobDistribution,
 } from '@client/order-management/components/irp-tabs/order-details/constants/order-details.constant';
-import { OrderFormInput, OrderFormsArrayConfig, OrderFormsConfig } from '@client/order-management/interfaces';
+import { OrderFormInput, OrderFormsArrayConfig, OrderFormsConfig, StateList } from '@client/order-management/interfaces';
+import { AssociateAgency } from '@shared/models/associate-agency.model';
 
 export const GeneralInformationConfigLTA: OrderFormsConfig  = {
   title: 'General Information',
@@ -189,7 +190,7 @@ export const JobDistributionConfigLTA: OrderFormsConfig  = {
       dataSource: IrpJobDistribution,
     },
     {
-      field: 'agency',
+      field: 'agencyId',
       title: 'Agency',
       required: false,
       enabled: false,
@@ -197,7 +198,7 @@ export const JobDistributionConfigLTA: OrderFormsConfig  = {
       dataSource: [],
     },
     {
-      field: 'minYears',
+      field: 'minYrsRequired',
       title: 'Min Years of Exp',
       required: true,
       type: FieldType.Input,
@@ -224,7 +225,7 @@ export const JobDistributionConfigPO: OrderFormsConfig = {
       dataSource: IrpJobDistribution,
     },
     {
-      field: 'agency',
+      field: 'agencyId',
       title: 'Agency',
       required: false,
       enabled: false,
@@ -262,7 +263,7 @@ export const JobDescriptionConfig: OrderFormsConfig = {
       dataSource: JobClassifications,
     },
     {
-      field: 'onCall',
+      field: 'onCallRequired',
       title: 'On-Call',
       cssClass: 'itm3',
       required: false,
@@ -395,30 +396,30 @@ export const ContactDetailsForm = (): OrderFormInput[] => [
   },
 ];
 
-export const WorkLocationFrom = (): OrderFormInput[] => [
+export const WorkLocationFrom = (stateSource?: AssociateAgency[]): OrderFormInput[] => [
   {
     field: 'address',
     title: 'Address',
-    required: false,
+    required: true,
     type: FieldType.Input,
   },
   {
     field: 'state',
     title: 'State',
-    required: false,
+    required: true,
     type: FieldType.Dropdown,
-    dataSource: [],
+    dataSource: stateSource ?? [],
   },
   {
     field: 'city',
     title: 'City',
-    required: false,
+    required: true,
     type: FieldType.Input,
   },
   {
     field: 'zipCode',
     title: 'Zip Code',
-    required: false,
+    required: true,
     type: FieldType.Input,
   },
   {

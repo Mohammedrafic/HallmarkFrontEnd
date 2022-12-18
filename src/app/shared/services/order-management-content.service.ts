@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { map, Observable, switchMap } from 'rxjs';
+import { filter, map, Observable, switchMap } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import {
@@ -331,16 +331,30 @@ export class OrderManagementContentService {
       );
   }
 
-  //TODO: remove createdOrder[0].id, when backend will be implement
-  public saveIrpOrder(order: CreateOrderDto, documents: Blob[],): Observable<Order> {
-    return this.http.post<Order[]>('/api/IRPOrders', order).pipe(
-      switchMap((createdOrder: Order[]) => {
+  //todo: add when backend will be ready
+  public saveIrpOrder(order: CreateOrderDto, documents: Blob[],): Observable<Order[]>{
+    return this.http.post<Order[]>('/api/IRPOrders', order);
+      /*.pipe(
+      switchMap((createdOrders: Order[]) => {
+        const formData = new FormData();
+        const orderIds = createdOrders.map((order: Order) => order.id);
+        documents.forEach((document: Blob) => formData.append('document', document));
+        orderIds.forEach((id: number) => formData.append('orderIds', `${id}`));
+        return this.http.post(`/api/IRPOrders/documents`, formData).pipe(map(() => createdOrders));
+      }),
+    );*/
+  }
+//todo: add when backend will be ready
+  public editIrpOrder(order: EditOrderDto, documents: Blob[]): Observable<Order[]> {
+    return this.http.put<Order[]>('/api/IRPOrders', order);
+      /*.pipe(
+      filter((createdOrders: Order[]) => !!createdOrders[0]?.documents?.length),
+      switchMap((editedOrder: Order[]) => {
         const formData = new FormData();
         documents.forEach((document: Blob) => formData.append('documents', document));
-        this.http.post(`/api/Orders/${createdOrder[0].id}/documents`, formData);
-        return createdOrder;
-      }),
-    );
+        return this.http.post(`/api/Orders/${editedOrder[0].id}/documents`, formData) as Observable<Blob>;
+      })
+    );*/
   }
 
   /**

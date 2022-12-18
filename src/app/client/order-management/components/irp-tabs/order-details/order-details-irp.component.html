@@ -297,6 +297,7 @@
   <div class="right-section">
     <app-document-uploader
       uploaderTitle="Documents"
+      [documents]="selectedOrder?.documents"
       (selectDocuments)="selectDocument($event)"
       (deleteDocument)="deleteSelectDocument($event)"
     >

@@ -1,14 +1,3 @@
-<!--Todo: move this logic to create-edit-order.component -->
-<!--<section class="controls-container">
-  <div class="form-title">
-    <h3>{{ title }} Order</h3>
-    <span *ngIf="orderId > 0" class="order-id">
-      ID: <span *ngIf="orderDetailsFormComponent?.order?.isTemplate">{{ orderId }}</span>
-      <span *ngIf="!orderDetailsFormComponent?.order?.isTemplate">{{ prefix }}-{{ publicId }}</span>
-    </span>
-  </div>
-</section> --->
-
 <ejs-tab class="stepper" #stepper (created)="onStepperCreated()">
   <e-tabitems>
     <e-tabitem>

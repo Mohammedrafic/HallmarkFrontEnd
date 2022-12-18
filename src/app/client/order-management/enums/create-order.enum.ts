@@ -43,7 +43,8 @@ export enum FieldName {
   'projectTypeId' = 'Special Project Category',
   'projectNameId' = 'Project Name',
   'poNumberId' = 'PO#',
-  'jobDate' = 'Job Date',
+  'jobDates' = 'Job Date',
   'minYears' = 'Min Years of Exp',
+  'name' = 'Contact Person',
   'email' = 'Email',
 }

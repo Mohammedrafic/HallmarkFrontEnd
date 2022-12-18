@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit, TrackByFunction } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormGroup } from '@angular/forms';
 
 import { Subject, takeUntil } from 'rxjs';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
@@ -18,9 +19,9 @@ import {
   isFormsValid,
   showInvalidFormControl,
 } from '@client/order-management/helpers';
-import { SaveIrpOrder, SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
-import { FormGroup } from '@angular/forms';
+import { EditIrpOrder, SaveIrpOrder, SaveIrpOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
+import { Order } from '@shared/models/order-management.model';
 
 @Component({
   selector: 'app-irp-container',
@@ -30,6 +31,7 @@ import { IrpOrderType } from '@client/order-management/components/irp-tabs/order
 })
 export class IrpContainerComponent extends Destroyable implements OnInit {
   @Input('handleSaveEvents') public handleSaveEvents$: Subject<void | MenuEventArgs>;
+  @Input() public selectedOrder: Order;
 
   public tabsConfig: TabsConfig[] = IrpTabConfig;
   public tabs = IrpTabs;
@@ -52,7 +54,7 @@ export class IrpContainerComponent extends Destroyable implements OnInit {
 
   private watchForSucceededSaveOrder(): void {
     this.actions$.pipe(
-      ofActionDispatched(SaveOrderSucceeded),
+      ofActionDispatched(SaveIrpOrderSucceeded),
       takeUntil(this.componentDestroy()),
       ).subscribe(() => {
       this.router.navigate(['/client/order-management']);
@@ -105,6 +107,14 @@ export class IrpContainerComponent extends Destroyable implements OnInit {
       };
     }
 
-    this.store.dispatch(new SaveIrpOrder(createdOrder,this.irpStateService.getDocuments()));
+    if(this.selectedOrder) {
+      this.store.dispatch(new EditIrpOrder({
+        ...createdOrder,
+        id: this.selectedOrder.id,
+        deleteDocumentsGuids: this.irpStateService.getDeletedDocuments(),
+      },this.irpStateService.getDocuments()));
+    } else {
+      this.store.dispatch(new SaveIrpOrder(createdOrder,this.irpStateService.getDocuments()));
+    }
   }
 }

@@ -43,14 +43,13 @@ export interface OrderFormsConfig {
   fields: OrderFormInput[];
 }
 
+//todo: ue correct type(OrderFormInput[])
 export interface OrderFormsArrayConfig {
   title: string;
   buttonText: string;
   formList: string;
   buttonType: ButtonType,
-  forms: [
-    OrderFormInput[]
-  ];
+  forms: any[];
 }
 
 export interface SpecialProjectStructure {
@@ -130,4 +129,9 @@ export interface SelectSystem {
   isIRP: boolean;
   isVMS: boolean;
   isIRPFlag: boolean;
+}
+
+export interface JobDistribution {
+  jobDistributionValue: number[];
+  agencyId: null | number;
 }

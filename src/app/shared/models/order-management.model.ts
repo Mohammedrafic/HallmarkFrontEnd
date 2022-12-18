@@ -319,6 +319,13 @@ export class GetPredefinedBillRatesData {
   jobEndDate?: string;
 }
 
+export interface IRPMetaData {
+  orderId: number;
+  contact: boolean;
+  weekend: boolean;
+  holiday: boolean;
+}
+
 export class Order {
   id: number;
   publicId?: number;
@@ -361,7 +368,10 @@ export class Order {
   statusText: string;
   locationName?: string;
   departmentName?: string;
+  jobDistributionValue?: number[];
+  isIRPOnly?: boolean;
   orderOpenDate?: Date;
+  irpOrderMetadata?: IRPMetaData;
   isLocked?: boolean;
   groupedCredentials?: Object;
   isSubmit: boolean;

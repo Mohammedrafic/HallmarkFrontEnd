@@ -10,6 +10,7 @@ export class IrpContainerStateService {
 
   private formState: ListOfKeyForms;
   private documents: Blob[];
+  private deleteDocumentsGuids: string[] = [];
 
   public setFormState(state: ListOfKeyForms): void {
     this.formState = state;
@@ -25,5 +26,13 @@ export class IrpContainerStateService {
 
   public getDocuments(): Blob[] {
     return this.documents;
+  }
+
+  public deleteDocuments(documents: string[]) {
+    this.deleteDocumentsGuids = documents;
+  }
+
+  public getDeletedDocuments(): string[] {
+    return this.deleteDocumentsGuids;
   }
 }

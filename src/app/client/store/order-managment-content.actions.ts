@@ -166,6 +166,10 @@ export class SaveOrder {
   ) {}
 }
 
+export class SaveIrpOrderSucceeded {
+  static readonly type = '[order management] Save Irp Order Succeeded';
+}
+
 export class SaveIrpOrder {
   static readonly type = '[order management] Save Irp Order';
   constructor(
@@ -178,6 +182,7 @@ export class SaveOrderSucceeded {
   static readonly type = '[order management] Save Order Succeeded';
   constructor(public order: Order) {}
 }
+
 export class SaveCloseOrderSucceeded {
   static readonly type = '[order management] Save Close Order Succeeded';
   constructor(public order: Order| OrderManagement) {}
@@ -189,6 +194,14 @@ export class EditOrder {
     public readonly order: EditOrderDto,
     public readonly documents: Blob[],
     public readonly message?: string | null
+  ) {}
+}
+
+export class EditIrpOrder {
+  static readonly type = '[order management] Edit Irp Order';
+  constructor(
+    public readonly order: EditOrderDto,
+    public readonly documents: Blob[],
   ) {}
 }
 
