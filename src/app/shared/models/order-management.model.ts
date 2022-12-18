@@ -401,6 +401,7 @@ export class Order {
   weekend?: boolean;
   holiday?: boolean;
   distributedOn?: string;
+  creationDate?: string;
 }
 
 export class ReOrder {
