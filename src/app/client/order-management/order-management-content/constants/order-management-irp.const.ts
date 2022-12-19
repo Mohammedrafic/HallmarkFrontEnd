@@ -15,27 +15,52 @@ import {
 } from '@client/order-management/components/order-management-content/order-management-content.constants';
 import { formatDate } from '@angular/common';
 
-export const SystemGroupConfig: ButtonModel[] = [
-  {
-    id: OrderManagementIRPSystemId.All,
-    title: 'All',
-    disabled: true,
-  },
-  {
-    id: OrderManagementIRPSystemId.IRP,
-    title: 'IRP',
-  },
-  {
-    id: OrderManagementIRPSystemId.VMS,
-    title: 'VMS',
-    active: true,
-  },
-  {
+export const SystemGroupConfig = (isIRPIncluded = false, isVMSIncluded = false): ButtonModel[] => {
+  const buttons = [];
+
+  if (isIRPIncluded && isVMSIncluded) {
+    buttons.push({
+      id: OrderManagementIRPSystemId.All,
+      title: 'All',
+      disabled: true,
+    });
+  }
+
+  if (isIRPIncluded) {
+    buttons.push({
+      id: OrderManagementIRPSystemId.IRP,
+      title: 'IRP',
+    });
+  }
+
+  if (isVMSIncluded) {
+    buttons.push({
+      id: OrderManagementIRPSystemId.VMS,
+      title: 'VMS',
+      active: true,
+    });
+  }
+
+  buttons.push({
     id: OrderManagementIRPSystemId.OrderJourney,
     title: 'Order Journey',
     disabled: true,
-  },
-];
+  });
+
+  return buttons;
+};
+
+export const DetectActiveSystem = (isIRPIncluded = false, isVMSIncluded = false): number => {
+  if (isIRPIncluded && isVMSIncluded) {
+    return OrderManagementIRPSystemId.VMS;
+  }
+
+  if (isIRPIncluded) {
+    return OrderManagementIRPSystemId.IRP;
+  }
+
+  return OrderManagementIRPSystemId.VMS;
+};
 
 export const IRPTabsConfig: TabsListConfig[] = [
   {
