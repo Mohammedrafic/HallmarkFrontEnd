@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -22,7 +23,7 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 @Component({
   selector: 'app-add-order-credential-form',
   templateUrl: './add-order-credential-form.component.html',
-  styleUrls: ['./add-order-credential-form.component.scss']
+  styleUrls: ['./add-order-credential-form.component.scss'],
 })
 export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDestroy {
 
@@ -47,7 +48,7 @@ export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDes
   private unsubscribe$: Subject<void> = new Subject();
   private allCredentialsOrigin: Credential[] = [];
 
-  constructor(private store: Store) { }
+  constructor(private store: Store, private cd: ChangeDetectorRef) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     const { addedCredentials, formSubmitted } = changes;
@@ -116,6 +117,6 @@ export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDes
     this.filteredCreds = allCredentials.filter(credential => {
       return !(this.addedCredentials.find(addedCred => addedCred.credentialId === credential.id));
     });
+    this.cd.markForCheck();
   }
-
 }
