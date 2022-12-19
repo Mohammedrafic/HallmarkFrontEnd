@@ -76,6 +76,7 @@
 
     @media #{$max-mobile} {
       margin-left: 0px !important;
+      overflow-x: hidden;
     }
   }
 

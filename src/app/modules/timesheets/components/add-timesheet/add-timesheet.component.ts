@@ -33,6 +33,8 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
 
   public onCallId: number;
 
+  public readonly targetDialogElement: HTMLElement | null = document.body.querySelector('#main');
+
   @Select(TimesheetsState.addDialogOpen)
   public readonly dialogState$: Observable<TimesheetDetailsAddDialogState>;
 
