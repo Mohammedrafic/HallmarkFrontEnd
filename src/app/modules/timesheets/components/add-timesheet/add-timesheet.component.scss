@@ -72,14 +72,6 @@
 }
 
 ::ng-deep {
-  body.light, body.dark {
-    .e-dialog.dialog {
-      &.short {
-        height: 580px!important;
-      }
-    }
-  }
-
   .input-container {
     &.flexed {
       @include toggle;
