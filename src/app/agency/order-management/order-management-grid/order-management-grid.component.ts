@@ -336,7 +336,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public setDefaultFilters(statuses: number[]): void {
     if (this.filterService.canPreserveFilters()) {
       const preservedFilters = this.store.selectSnapshot(PreservedFiltersState.preservedFilters);
-      if (preservedFilters?.organizations) {
+      if (preservedFilters?.organizations?.length) {
         this.OrderFilterFormGroup.get('organizationIds')?.setValue(preservedFilters.organizations);
         this.filters.organizationIds = preservedFilters.organizations;
         this.actions$.pipe(ofActionSuccessful(GetOrganizationStructure), take(1)).subscribe(() => {
