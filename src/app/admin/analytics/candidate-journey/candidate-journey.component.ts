@@ -23,8 +23,7 @@ import { FilterService } from '@shared/services/filter.service';
 import { analyticsConstants } from '../constants/analytics.constant';
 import { ConfigurationDto } from '@shared/models/analytics.model';
 import { sortByField } from '@shared/helpers/sort-by-field.helper';
-import { OrderTypeOptions } from '@shared/enums/order-type';
-import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SkillCategoryDto } from '../models/common-report.model';
+import { CommonReportFilter, CommonReportFilterOptions, MasterSkillDto, SkillCategoryDto,OrderTypeOptionsForReport } from '../models/common-report.model';
 import { User } from '@shared/models/user.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { uniqBy } from 'lodash';
@@ -254,7 +253,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
               this.filterColumns.jobStatuses.dataSource = data.allJobStatusesAndReasons;
               this.filterColumns.candidateStatuses.dataSource = data.allCandidateStatusesAndReasons;
               this.defaultSkillCategories = data.skillCategories.map((list) => list.id);
-              this.defaultOrderTypes = OrderTypeOptions.map((list) => list.id);
+              this.defaultOrderTypes = OrderTypeOptionsForReport.map((list) => list.id);
               this.candidateJourneyForm.get(analyticsConstants.formControlNames.SkillCategoryIds)?.setValue(this.defaultSkillCategories);
               this.changeDetectorRef.detectChanges();
             }
@@ -447,7 +446,7 @@ export class CandidateJourneyComponent implements OnInit ,OnDestroy{
       orderTypes: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
-        dataSource: OrderTypeOptions,
+        dataSource: OrderTypeOptionsForReport,
         valueField: 'name',
         valueId: 'id',
       },
