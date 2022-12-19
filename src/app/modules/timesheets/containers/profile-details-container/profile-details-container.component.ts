@@ -566,7 +566,7 @@ export class ProfileDetailsContainerComponent extends AbstractPermission impleme
     const tabletBreakPoint$: Observable<boolean> = this.breakpointObserver.observe([BreakpointQuery.TABLET_MAX]).pipe(map((data) => data.matches));
     const resizeToolbarObserver$: Observable<number> = this.resizeObserver.resize$.pipe(map((data) => data[0].contentRect.width), distinctUntilChanged());
     
-    const smallTabletScreenWidth = 700;
+    const smallTabletScreenWidth = 760;
     const mobileScreenWidth = +BreakpointQuery.MOBILE_MAX.replace(/\D/g, ""); 
   
       combineLatest([tabletBreakPoint$, resizeToolbarObserver$])

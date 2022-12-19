@@ -126,7 +126,13 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public submitText: string;
 
-  public isSmallTablet = false;
+  public isTablet = false;
+
+  public isMobile = false;
+
+  public isMiddleContentWidth = false;
+
+  public isSmallContentWidth = false;
 
   public readonly getRowStyle = (params: any) => {
     if (params.data.stateText === RecordStatus.New) {
@@ -170,6 +176,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.context = {
       componentParent: this,
     };
+    this.listenMediaQueryBreakpoints();
   }
 
   ngOnChanges(): void {
@@ -540,10 +547,26 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public listenResizeContent(): void {
-    const smallTabletWidth = 500;
-    this.resizeObserver.resize$.pipe(map((data) => data[0].contentRect.width), takeUntil(this.componentDestroy())).subscribe((containerWidth) => {
-      this.isSmallTablet = containerWidth <= smallTabletWidth;
-      this.cd.markForCheck();
+    if (this.isTablet) {
+      const smallTabletWidth = 490;
+      const middleTabletWidth = 640;
+      this.resizeObserver.resize$
+        .pipe(
+          map((data) => data[0].contentRect.width),
+          takeUntil(this.componentDestroy())
+        )
+        .subscribe((containerWidth) => {
+          this.isSmallContentWidth = containerWidth <= smallTabletWidth || this.isMobile;
+          this.isMiddleContentWidth = containerWidth <= middleTabletWidth;
+          this.cd.markForCheck();
+        });
+    }
+  }
+
+  private listenMediaQueryBreakpoints(): void {
+    this.breakpointObserver.observe([BreakpointQuery.TABLET_MAX, BreakpointQuery.MOBILE_MAX]).pipe(takeUntil(this.componentDestroy())).subscribe((data) => {
+      this.isTablet = data.breakpoints[BreakpointQuery.TABLET_MAX];
+      this.isMobile = data.breakpoints[BreakpointQuery.MOBILE_MAX];
     });
   }
 }

@@ -182,7 +182,7 @@ button.privilege {
   }
 }
 
-@media (max-width: 800px) {
+.middle-tablet {
   .action-text {
     display: none;
   }
@@ -200,9 +200,6 @@ button.privilege {
 }
 
 @media #{$max-mobile} {
-  .action-text {
-    display: none;
-  }
 
   .table-block {
       .btn-group {
