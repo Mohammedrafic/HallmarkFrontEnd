@@ -33,6 +33,9 @@ import {
   XCircle,
   Clipboard,
   Clock,
+  Flag,
+  Mail,
+  Compass,
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -117,6 +120,7 @@ import { TableRowDetailModule } from '@shared/components/grid/cell-renderers/tab
 import { SwitchEditorModule } from '@shared/components/switch-editor/switch-editor.module';
 import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
 import { BoolValuePipeModule } from '@shared/pipes/bool-values/bool-values-pipe.module';
+import { OrderCandidateApiService } from '@shared/components/order-candidate-list/order-candidate-api.service';
 
 const gridIcons = {
   MessageSquare,
@@ -148,6 +152,9 @@ const gridIcons = {
   ChevronRight,
   Clipboard,
   Clock,
+  Flag,
+  Mail,
+  Compass,
 };
 
 @NgModule({
@@ -232,6 +239,7 @@ const gridIcons = {
     OrderDetailsService,
     OrderManagementIrpSubrowService,
     OrderManagementIrpApiService,
+    OrderCandidateApiService,
   ],
 })
 export class ClientModule {}
