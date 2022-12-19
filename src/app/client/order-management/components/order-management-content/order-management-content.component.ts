@@ -1827,6 +1827,7 @@ export class OrderManagementContentComponent extends AbstractPermissionGrid impl
       this.activeSystem = DetectActiveSystem(this.isOrgIRPEnabled, this.isOrgVMSEnabled);
 
       this.initGridColumns();
+      this.getOrders();
     });
   }
 

@@ -41,11 +41,13 @@ export const SystemGroupConfig = (isIRPIncluded = false, isVMSIncluded = false):
     });
   }
 
-  buttons.push({
-    id: OrderManagementIRPSystemId.OrderJourney,
-    title: 'Order Journey',
-    disabled: true,
-  });
+  if (isIRPIncluded && isVMSIncluded) {
+    buttons.push({
+      id: OrderManagementIRPSystemId.OrderJourney,
+      title: 'Order Journey',
+      disabled: true,
+    });
+  }
 
   return buttons;
 };
