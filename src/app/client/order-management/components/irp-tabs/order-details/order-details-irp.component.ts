@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, TrackByFunction } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 
-import { filter, first, map, Observable, switchMap, takeUntil } from 'rxjs';
+import { filter, map, Observable, switchMap, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -54,7 +54,7 @@ import {
   mapReasonsStructure,
   mapSpecialProjectStructure,
   mapStatesStructure, mapStructureToEditedOrder,
-  setDataSource,
+  setDataSource, setDefaultPrimaryContact,
 } from '@client/order-management/components/irp-tabs/order-details/helpers';
 import { Department } from '@shared/models/department.model';
 import { ListOfSkills } from '@shared/models/skill.model';
@@ -75,7 +75,7 @@ import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { Document } from '@shared/models/document.model';
 import { IrpContainerStateService } from '@client/order-management/containers/irp-container/irp-container-state.service';
-import { Order, OrderContactDetails } from '@shared/models/order-management.model';
+import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 
 @Component({
@@ -103,7 +103,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   //TODO: Remove any (ListOfKeyForms)
   public listOfKeyForms: any;
   public orderFormsConfig: OrderFormsConfig[] = LongTermAssignmentConfig;
-  public orderFormsArrayConfig: OrderFormsArrayConfig[] = ContactDetailsConfig();
+  public orderFormsArrayConfig: OrderFormsArrayConfig[] = ContactDetailsConfig(ContactDetailsForm());
   public contactDetailsFormsList: FormGroup[] = [];
   public workLocationFormsList: FormGroup[] = [];
   public documents: Blob[] = [];
@@ -112,6 +112,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   public selectedOrder: Order;
 
   private dataSourceContainer: OrderDataSourceContainer = {};
+  private isLocationLoad = true;
+  private isDepartmentLoad = true;
 
   @Select(OrganizationManagementState.sortedRegions)
   private regions$: Observable<Region[]>;
@@ -162,7 +164,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       );
       this.showHideFormAction(selectedConfig, this.contactDetailsFormsList);
     } else {
-      selectedConfig?.forms.push(WorkLocationFrom( this.dataSourceContainer.state));
+      selectedConfig?.forms.push(WorkLocationFrom(this.dataSourceContainer.state));
       this.workLocationFormsList.push(this.orderDetailsService.createWorkLocationForm());
       this.showHideFormAction(selectedConfig, this.workLocationFormsList);
     }
@@ -181,8 +183,8 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
     switch (item.buttonType) {
       case ButtonType.RemoveContact:
-        //Todo: fix issue with isPrimary button
         this.removeFields(selectedConfig, index, this.contactDetailsFormsList);
+        setDefaultPrimaryContact(this.contactDetailsFormsList);
         break;
       case ButtonType.RemoveWorkLocation:
         this.removeFields(selectedConfig, index, this.workLocationFormsList);
@@ -217,7 +219,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     this.initGeneralForms(isLongTermAssignment);
     this.jobDescriptionForm =  this.orderDetailsService.createJobDescriptionForm();
     this.contactDetailsForm = this.orderDetailsService.createContactDetailsForm();
-    this.contactDetailsFormsList.push(this.contactDetailsForm);
+    if(!this.selectedOrder) {
+      this.contactDetailsFormsList.push(this.contactDetailsForm);
+    }
 
     const listOfKeysTermAssignment = {
       generalInformationForm: this.generalInformationForm,
@@ -229,7 +233,7 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     if(!isLongTermAssignment) {
       this.specialProjectForm = this.orderDetailsService.createSpecialProject();
       this.workLocationForm = this.orderDetailsService.createWorkLocationForm();
-      this.workLocationFormsList.push(this.workLocationForm);
+      this.createWorkLocationList();
 
       this.listOfKeyForms = {
         ...listOfKeysTermAssignment,
@@ -260,11 +264,12 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       this.clearFormLists();
 
       if (value === IrpOrderType.LongTermAssignment) {
-        this.orderFormsArrayConfig = [...ContactDetailsConfig()];
+        this.orderFormsArrayConfig = [...ContactDetailsConfig(ContactDetailsForm())];
         this.orderFormsConfig = LongTermAssignmentConfig;
       } else {
-        this.orderFormsArrayConfig = [...ContactDetailsConfig(), ...WorkLocationConfig()];
-        this.orderFormsConfig = perDiemConfig;
+        this.orderFormsArrayConfig =
+          [...ContactDetailsConfig(ContactDetailsForm()), ...WorkLocationConfig(WorkLocationFrom())];
+        this.orderFormsConfig = perDiemConfig();
       }
 
       this.initForms(value);
@@ -312,24 +317,23 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
     });
 
     this.locations$.pipe(
-      filter((locations: Location[]) => !!locations.length),
-      first(),
+      filter(Boolean),
       takeUntil(this.componentDestroy())
     ).subscribe((locations: Location[]) => {
       this.updateDataSourceFormList('locations', locations);
       const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
       setDataSource(selectedForm.fields, 'locationId', locations);
 
-      if(this.selectedOrder) {
-        this.generalInformationForm.get('locationId')?.setValue(this.selectedOrder.locationId);
+      if(this.selectedOrder && this.isLocationLoad) {
+        this.generalInformationForm.get('locationId')?.patchValue(this.selectedOrder?.locationId, { emitEvent: false });
+        this.isLocationLoad = false;
       }
 
       this.changeDetection.markForCheck();
     });
 
     this.departments$.pipe(
-      filter((departments: Department[]) => !!departments.length),
-      first(),
+      filter(Boolean),
       map((departments: Department[]) => mapDepartmentStructure(departments)),
       takeUntil(this.componentDestroy())
     ).subscribe((departments: Department[]) => {
@@ -337,8 +341,9 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
       const selectedForm = this.getSelectedFormConfig(GeneralInformationForm);
       setDataSource(selectedForm.fields, 'departmentId', departments);
 
-      if(this.selectedOrder) {
-        this.generalInformationForm.get('departmentId')?.setValue(this.selectedOrder.departmentId);
+      if(this.selectedOrder && this.isDepartmentLoad) {
+        this.generalInformationForm.get('departmentId')?.patchValue(this.selectedOrder?.departmentId, { emitEvent: false });
+        this.isDepartmentLoad = false;
       }
 
       this.changeDetection.markForCheck();
@@ -405,7 +410,6 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
 
     this.generalInformationForm.get('locationId')?.valueChanges.pipe(
       filter(Boolean),
-      first(),
       takeUntil(this.componentDestroy())
     ).subscribe((value: number) => {
       this.store.dispatch(new GetDepartmentsByLocationId(value, undefined, true));
@@ -586,20 +590,20 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   }
 
   private patchFormValues(selectedOrder: Order): void {
-    if(selectedOrder.orderType === OrderType.OpenPerDiem) {
-      const generalInformationConfig = this.getSelectedFormConfig(GeneralInformationForm);
-      changeTypeField(generalInformationConfig.fields, 'jobDates', FieldType.Date);
-    }
-
     this.orderTypeForm.patchValue(selectedOrder);
     this.generalInformationForm.patchValue(selectedOrder);
     this.jobDistributionForm.patchValue(selectedOrder);
     this.jobDescriptionForm.patchValue(selectedOrder);
+
+    if(selectedOrder.orderType === OrderType.OpenPerDiem) {
+      const generalInformationConfig = this.getSelectedFormConfig(GeneralInformationForm);
+      changeTypeField(generalInformationConfig.fields, 'jobDates', FieldType.Date);
+    }
   }
 
   private setConfigType(selectedOrder: Order): void {
     if(selectedOrder.orderType === OrderType.OpenPerDiem) {
-      this.orderFormsConfig = perDiemConfig;
+      this.orderFormsConfig = perDiemConfig();
     } else {
       this.orderFormsConfig = LongTermAssignmentConfig;
     }
@@ -608,37 +612,36 @@ export class OrderDetailsIrpComponent extends Destroyable implements OnInit {
   private createPatchContactDetails(selectedOrder: Order): void {
     const selectedConfig = this.getSelectedArrayFormsConfig({formList: ContactDetailsList} as OrderFormsArrayConfig);
 
-    for(let i = 1; i < selectedOrder.contactDetails.length; i++) {
-      selectedConfig?.forms.push(ContactDetailsForm());
-      this.contactDetailsFormsList.push(
-        this.orderDetailsService.createContactDetailsForm(this.contactDetailsFormsList.length)
-      );
-    }
     selectedOrder.contactDetails.forEach((contact: OrderContactDetails, index: number) => {
       if(!ORDER_CONTACT_DETAIL_TITLES.includes(contact.name)) {
         this.changeTypeEditButton(selectedConfig, index);
       }
-      this.contactDetailsFormsList[index].patchValue(contact);
-    });
 
-    this.showHideFormAction(selectedConfig, this.workLocationFormsList);
+      const contactForm = this.orderDetailsService.createContactDetailsForm(this.contactDetailsFormsList.length);
+      contactForm.patchValue(contact);
+      selectedConfig?.forms.push(ContactDetailsForm());
+      this.contactDetailsFormsList.push(contactForm);
+    });
+    this.showHideFormAction(selectedConfig, this.contactDetailsFormsList);
   }
 
   private createPatchWorkLocation(selectedOrder: Order): void {
     this.specialProjectForm.patchValue(selectedOrder);
-    const selectedConfig = this.getSelectedArrayFormsConfig({formList: 'workLocationList'} as OrderFormsArrayConfig);
+    const selectedConfig = this.getSelectedArrayFormsConfig({formList: WorkLocationList} as OrderFormsArrayConfig);
 
-    for(let i = 1; i < selectedOrder.workLocations.length; i++) {
-      selectedConfig?.forms.push(WorkLocationFrom());
-      this.workLocationFormsList.push(
-        this.orderDetailsService.createWorkLocationForm()
-      );
-    }
-
-    selectedOrder.workLocations.forEach((contact: any, index: number) => {
-      this.workLocationFormsList[index].patchValue(contact);
+    selectedOrder.workLocations.forEach((workLocation: OrderWorkLocation) => {
+      const workLocationForm = this.orderDetailsService.createWorkLocationForm();
+      workLocationForm.patchValue(workLocation);
+      selectedConfig?.forms.push(WorkLocationFrom(this.dataSourceContainer.state));
+      this.workLocationFormsList.push(workLocationForm);
     });
 
-    this.showHideFormAction(selectedConfig, this.workLocationFormsList);
+    this.showHideFormAction(selectedConfig, this.contactDetailsFormsList);
+  }
+
+  private createWorkLocationList(): void {
+    if(!this.selectedOrder) {
+      this.workLocationFormsList.push(this.workLocationForm);
+    }
   }
 }

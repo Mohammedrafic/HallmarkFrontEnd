@@ -1,4 +1,4 @@
-import { SaveLastSelectedOrganizationAgencyId } from './../../store/user.actions';
+import { SaveLastSelectedOrganizationAgencyId } from '../../store/user.actions';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { getAllErrors } from '@shared/utils/error.utils';
@@ -110,6 +110,7 @@ import { sortByField } from '@shared/helpers/sort-by-field.helper';
 import { OrderImportService } from '@client/order-management/components/order-import/order-import.service';
 import { OrderImportResult } from '@shared/models/imported-order.model';
 import { OrderManagementIrpApiService } from '@shared/services/order-management-irp-api.service';
+import { createFormData } from '@client/order-management/helpers';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -682,13 +683,18 @@ export class OrderManagementContentState {
   SaveIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents }: SaveIrpOrder
-  ): Observable<Order[] | void> {
-    return this.orderManagementService.saveIrpOrder(order,documents).pipe(
-      tap(() => {
+  ): Observable<void | Blob[] | Order> {
+    return this.orderManagementService.saveIrpOrder(order).pipe(
+      switchMap((order: Order[]) => {
         dispatch([
           new ShowToast(MessageTypes.Success, RECORD_ADDED),
           new SaveIrpOrderSucceeded(),
         ]);
+          if (documents.length) {
+            return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(order, documents));
+          } else {
+            return order;
+          }
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
@@ -750,16 +756,21 @@ export class OrderManagementContentState {
   EditIrpOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
     { order, documents }: EditIrpOrder
-  ): Observable<Order[] | void> {
-    return this.orderManagementService.editIrpOrder(order,documents).pipe(
-      tap(() => {
+  ): Observable<void | Blob[] | Order> {
+    return this.orderManagementService.editIrpOrder(order).pipe(
+      switchMap((order: Order[]) => {
         dispatch([
-          new ShowToast(MessageTypes.Success,  RECORD_MODIFIED),
+          new ShowToast(MessageTypes.Success, RECORD_ADDED),
           new SaveIrpOrderSucceeded(),
         ]);
+        if (documents.length) {
+          return this.orderManagementService.saveDocumentsForIrpOrder(createFormData(order, documents));
+        } else {
+          return order;
+        }
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
-      );
+    );
   }
 
   @Action(EditOrder)

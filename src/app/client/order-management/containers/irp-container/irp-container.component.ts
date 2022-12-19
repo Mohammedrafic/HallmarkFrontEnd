@@ -18,7 +18,7 @@ import {
   getFormsList,
   getValuesFromList,
   isFormsValid,
-  showInvalidFormControl,
+  showInvalidFormControl, showMessageForInvalidCredentials,
 } from '@client/order-management/helpers';
 import { SaveIrpOrder, EditIrpOrder, SaveIrpOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { IrpOrderType } from '@client/order-management/components/irp-tabs/order-details/order-details-irp.enum';
@@ -103,7 +103,15 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
       //Todo: add condition, when will be implement save for Template
       this.saveOrder(formState);
     } else {
+      this.checkIsCredentialsValid(formState);
+    }
+  }
+
+  private checkIsCredentialsValid(formState: ListOfKeyForms): void {
+    if(this.orderCredentials?.length) {
       this.saveOrder(formState);
+    } else {
+      showMessageForInvalidCredentials();
     }
   }
 
@@ -113,19 +121,17 @@ export class IrpContainerComponent extends Destroyable implements OnInit, OnChan
 
     if(orderType === IrpOrderType.LongTermAssignment) {
       createdOrder = {
-        ...createOrderDTO(formState),
+        ...createOrderDTO(formState, this.orderCredentials),
         contactDetails: getValuesFromList(formState.contactDetailsList),
       };
     } else {
       createdOrder = {
-        ...createOrderDTO(formState),
+        ...createOrderDTO(formState, this.orderCredentials),
         contactDetails: getValuesFromList(formState.contactDetailsList),
         workLocations: getValuesFromList(formState.workLocationList as FormGroup[]),
         isSubmit: false,
       };
     }
-
-    createdOrder.credentials = [...this.orderCredentials];
 
     if(this.selectedOrder) {
       this.store.dispatch(new EditIrpOrder({
