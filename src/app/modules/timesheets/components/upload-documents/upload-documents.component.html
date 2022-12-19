@@ -6,8 +6,9 @@
   [visible]="false"
   [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
+  [target]="targetElement"
 >
-  <ng-template #header>
+  <ng-template #content>
     <div class="dialog-header">
       <h3 class="title">Upload Documents</h3>
       <div class="controls">
@@ -15,8 +16,6 @@
         <button (click)="saveRecord()" ejs-button [isPrimary]="true">Save</button>
       </div>
     </div>
-  </ng-template>
-  <ng-template #content>
     <app-file-uploader
       *ngIf="(dialogState$ | async)?.state"
       class="upload-custom"

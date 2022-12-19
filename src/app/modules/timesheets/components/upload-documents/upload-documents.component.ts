@@ -36,6 +36,8 @@ export class UploadDocumentsComponent extends Destroyable implements OnInit {
 
   public readonly maxFileSize: number = FileSize.MB_20;
 
+  public readonly targetElement: HTMLElement | null = document.body.querySelector('#main');
+
   public existingFiles: Attachment[] = [];
 
   public filesForDelete: Attachment[] = [];
