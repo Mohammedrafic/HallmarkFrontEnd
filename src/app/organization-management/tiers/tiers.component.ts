@@ -80,6 +80,7 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
       forceUpsert: false,
       includeInIRP: this.selectedSystemType === SystemType.IRP,
       includeInVMS: this.selectedSystemType === SystemType.VMS,
+      systemType: this.selectedSystemType,
     }, this.isEdit));
   }
 
@@ -137,6 +138,7 @@ export class TiersComponent extends AbstractPermission implements OnInit, AfterV
         forceUpsert: true,
         includeInIRP: this.selectedSystemType === SystemType.IRP,
         includeInVMS: this.selectedSystemType === SystemType.VMS,
+        systemType: this.selectedSystemType,
       }, this.isEdit));
       this.store.dispatch(new ShowSideDialog(false));
     });
